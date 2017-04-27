@@ -53,11 +53,13 @@ The **Histogram** shows a histogram of the complete time series of the currently
 
 ![]({{ site.baseurl }}/images/HistogramExample.png)
 
-**Statistics Time Range** controls if a single time step or all time steps are included when statistics is computed.
+#### Statistics Options
+
+**Statistics Time Range** controls wether all time steps or only the current time step are included when statistics is computed. Flow Diagnostic results can only use the current time step option.  
 **Statistics Cell Range** controls if visible cells or all active cells is included when statistics is computed.
 
 <div class="note">
-The <b>Text Box</b> settings can be activated by clicking on the text info window in the 3D view.
+The <b>Info Box</b> settings can be activated by clicking on the Info Text in the 3D view.
 </div>
 
 ### Grids &nbsp;![]({{ site.baseurl }}/images/draw_style_faults_24x24.png)
