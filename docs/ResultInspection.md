@@ -6,12 +6,14 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/ResultInspectionOverview.png)
 
-The results mapped on the 3D model can be inspected in detail by left clicking the interesting cells in the 3D view. 
-The selected cells will be highlighted and text information extracted from the intersection point will be displayed in the docking window **Result Info**.
+The results mapped on the 3D model can be inspected in detail by left clicking cells in the 3D view. 
+The selected cells will be highlighted and text information extracted from the intersection point displayed in the **Result Info** docking window.
 
 {% comment %}  ![]({{ site.baseurl }}/images/ResultInfoWithSelectedCell.png) {% endcomment %}
 
-If a dynamic result is active, the result values of the selected cells for all time steps are displayed in the docking window **Result Plot** as one curve for each cell. 
+##### Result Plot
+
+If a dynamic none-Flow Diagnostics result is active, the result values of the selected cells for all time steps are displayed in the docking window **Result Plot** as one curve for each cell. 
 
 Additional curves can be added to the plot if CTRL-key is pressed during picking. The different cells are highlighted in different colors, and the corresponding curve is colored using the same color.
 
