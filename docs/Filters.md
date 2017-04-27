@@ -6,11 +6,15 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/FiltersOverview.png)
 
-Cell Filters are used to control visibility of the cells in the 3D view. Three types of filters exists:
+Cell Filters are used to control visibility of the cells in the 3D view. Two types of filters exists:
 
 - **Range filter**     : Extracts an IJK subset of the model.
 - **Property filter**  : Extracts cells with a property value matching a value range.
-- **Well cell filter** : Extracts cells that are connected to a well.
+
+<div class="note">
+<b>Well cells</b> The visibilities of cells connection to wells, and fences based on these cells can be controlled from the **Simulation Wells**. See [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) for more details. 
+<i>(They are not applicable for Geomechanical cases.</i>
+</div>
 
 ### Common properties for Range and Property Filters
 
@@ -23,6 +27,7 @@ Range Filters and Property filters can either be set to **Include** cells or to 
 The **Exclude** setting is used to explicitly remove cells from the visualization, regardless of what other filters say. 
 The **Include** setting behaves differently for Range filters and Property Filters but marks the cells as visible.
 The icon in front of the filters show a + or - sign to indicate the setting ![]({{ site.baseurl }}/images/FilterIncEx.png)
+
 
 ### Range filters
 
@@ -62,13 +67,13 @@ A new property filter can be made by activating the context menu for **Property 
 
 The name of the property filter is automatically set to *"propertyname (min .. max)"* as you edit the property filter.
 
+##### Range for Flow Diagnostic results
+Normally the available range in the sliders is the max and min of all the values in all the timesteps. For Flow Diagnostics results, however, the available range is based on the current timestep. We still need to keep the range somewhat fixed while moving from timestep to timestep, so in order to do so ResInsight tries to keep the intentions of your range settings, as the available range changes. If either the max or min value is set to the limit, ResInsight will keep that setting at the limit even when the limit changes. If you set a spesific value for the max or the min, that setting will keep its value, even if it happens to end up outside the available range at a time step.   
+
 #### Category selection
-If the property is representing integer values or formation names, the property filter displays a list of available categories used to filter cells. The separate values can then be toggled on or off using the list in the Property Editor.
+If the property is representing integer values, well tracer names or [ formation names ]({{ site.baseurl }}/docs/formations), the property filter displays a list of available categories used to filter cells. The separate values can then be toggled on or off using the list in the Property Editor.
 
 ![]({{ site.baseurl }}/images/PropertyFilterWithCategories.png)
 
 If it is more convenient to filter the values using a value range, toggle the **Category Selection** option off.
 
-### Well cell filters
-Well cell filters are a special type of filters that are controlled from the **Simulation Wells** item. See [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) for more details. 
-They are not applicable for Geomechanical cases.
