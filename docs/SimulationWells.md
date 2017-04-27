@@ -9,13 +9,13 @@ published: true
 
 This section describes how wells defined in the simulation are displayed, and how to control the different aspects of their visualization.
  
+## Overall Settings for Simulation Wells
+
 The Property Panel of the **Simulation Wells** item in the **Project Tree** contains options that are applied across all the wells, while the visualization of each single well can be controlled by the options in the property panel of that particular well, and will override the overall settings in the **Simulation Wells** item.
 
 If an option is overridden in any of the wells, this will be indicated in the corresponding top level toggle which will be partially checked. Toggling such a setting will overwrite the ones set on the individual level. 
 
-## Overall Settings for Simulation Wells
-
-In the following the different parts of the **Simulation Wells** property panel is explained.
+In the following are the different parts of the **Simulation Wells** property panel explained.
 
 ### Visibility
 
@@ -23,7 +23,7 @@ In the following the different parts of the **Simulation Wells** property panel 
 
 These options controls the visibility of different aspects of the simulation wells.
 
-- **Wells Trough Visible Cells Only** This option will only show wells with connections to cells deemed visible by the combined result of **Range Filters** and **Property Filters**.
+- **Wells Trough Visible Cells Only** -- This option will only show wells with connections to cells deemed visible by the combined result of **Range Filters** and **Property Filters**.
 - **Label** Controls visibility of well name labels in the 3D View
 - **Well head** Controls visibility of the arrow displaying the production status of the well
 - **Pipe** A symbolic pipe can be drawn between the well connection cells to illustrate the well. This option controls the visibility of the pipes.
