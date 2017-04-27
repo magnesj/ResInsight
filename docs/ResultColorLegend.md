@@ -26,6 +26,6 @@ Colors             | Defines the color palette
 
 
 ## Range type
-- **All Timesteps** - values for all time steps are used to find min and max value of the result values represented by the color legend
+- **All Timesteps** - values for all time steps are used to find min and max value of the result values represented by the color legend. (Not availanble for Flow Diagnostics results)
 - **Current Time Step** - use current (one) time step to find min and max values  
 - **User Defined Range** - user specifies numeric values for min and max  
