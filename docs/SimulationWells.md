@@ -82,7 +82,7 @@ The **Size Scaling** options, however, works relative to the scaling level set o
 		  	 
 ## Well pipes of Multi Segment Wells
 
-ResInsight reads the MSW information in the result files and uses that to create a topologically correct visualization of the Multi Segment Well. Reading this information is somewhat time consuming, and can be turned off in the ![Preferences]({{ site.baseurl }}/docs/preferences).
+ResInsight reads the MSW information in the result files and uses that to create a topologically correct visualization of the Multi Segment Well. Reading this information is somewhat time consuming, and can be turned off in the [ Preferences ]({{ site.baseurl }}/docs/preferences).
  
 ### Geometry approximation
 The pipe geometry generated for MSW's are based on the topology of the well (branch/segment structure) and the position of the cells being connected. The segment lengths are used as hints to place the branch points at sensible places. Thus the pipe geometry itself is not geometrically correct, but makes the topology of the well easier to see.
