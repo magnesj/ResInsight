@@ -12,8 +12,9 @@ Cell Filters are used to control visibility of the cells in the 3D view. Two typ
 - **Property filter**  : Extracts cells with a property value matching a value range.
 
 <div class="note">
-<b>Well cells</b> The visibilities of cells connection to wells, and fences based on these cells can be controlled from the **Simulation Wells**. See [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) for more details. 
-<i>(They are not applicable for Geomechanical cases.</i>
+<b>Note</b><br>
+<b>Well cells</b> The visibilities of cells connection to wells, and fences based on these cells can be controlled from the <b>Simulation Wells</b>. See [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) for more details.<br> 
+<i>(Not applicable for Geomechanical cases.</i>
 </div>
 
 ### Common properties for Range and Property Filters
