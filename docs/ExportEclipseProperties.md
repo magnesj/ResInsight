@@ -12,6 +12,12 @@ menu on a **Cell Result** item in the **Project Tree**.
 
 The command will export the property that currently is active in the 3D View. 
 
+![]({{ site.baseurl }}/images/ExportPropertyDialog.png) 
+
+- **Export File Name** The path to exported file
+- **Eclipse Keyword** The keyword to use for the property in the eclipse file
+- **Undefined Value** 
+
 This is particularly useful when a new property is generated using Octave. 
 The generated property can be exported for further use in the simulator.
 
