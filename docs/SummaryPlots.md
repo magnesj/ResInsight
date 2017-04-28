@@ -179,17 +179,27 @@ When disabling the **Auto** option, you can select which of the visual curve pro
 
 The user can control the curve names by toggeling what part of the summary vector information to use in the name.
 
+#### Contribute To Legend
+
+This option controls whether the curves created by the filter will be visible in the plot legend at all. In addition will  Curves with an empty name also be removed from the legend.  
+
 ## Summary Curve
 A new curve can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
 
 ![]({{ site.baseurl }}/images/summary_curve_properties.png)
 
-Many of the properties of a single curve is similar to the properties described for a curve filter. The appearance however, is controlled directly. 
+Many of the properties of a single curve is similar to the properties described for a curve filter. Ther are some differences, however:
 
+### Appearance
+
+The curve's appearance is controlled directly, and not automatically as for Curve Filters.
 <div class="note">
 The appearance set on a curve in a curve filter will override the settings in the curvefilter until the curvefilter settings are applied again. Then the clocal changes on the curve are overwritten. 
 </div>
 
+### *Curve Name Configuration*
+
+This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
 
 ## Copy and Paste 
 
