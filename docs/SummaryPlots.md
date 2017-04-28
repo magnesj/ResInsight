@@ -197,9 +197,11 @@ The curve's appearance is controlled directly, and not automatically as for Curv
 The appearance set on a curve in a curve filter will override the settings in the curvefilter until the curvefilter settings are applied again. Then the clocal changes on the curve are overwritten. 
 </div>
 
-### *Curve Name Configuration*
+### *Curve Name
 
-This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
+- **Contribute To Legend** - This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
+- **Auto Name** If enabled, ResInsight will create a name for the curve automatically based on the settings in this option group.
+- **Curve Name** - If **Auto Name** is off, you can enter any name here. If empty, the curve will be removed from the legend, but still visible in the plot.
 
 ## Copy and Paste 
 
