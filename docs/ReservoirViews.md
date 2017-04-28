@@ -55,8 +55,8 @@ The **Histogram** shows a histogram of the complete time series of the currently
 
 #### Statistics Options
 
-**Statistics Time Range** controls wether all time steps or only the current time step are included when statistics is computed. Flow Diagnostic results can only use the current time step option.  
-**Statistics Cell Range** controls if visible cells or all active cells is included when statistics is computed.
+- **Statistics Time Range** controls wether all time steps or only the current time step are included when statistics is computed. Flow Diagnostic results can only use the current time step option.  
+- **Statistics Cell Range** controls if visible cells or all active cells is included when statistics is computed.
 
 <div class="note">
 The <b>Info Box</b> settings can be activated by clicking on the Info Text in the 3D view.
