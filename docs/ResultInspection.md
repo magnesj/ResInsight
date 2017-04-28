@@ -11,7 +11,7 @@ The selected cells will be highlighted, text information displayed in the **Resu
 
 {% comment %}  ![]({{ site.baseurl }}/images/ResultInfoWithSelectedCell.png) {% endcomment %}
 
-##### Result Plot
+#### Result Plot
 
 If a dynamic none-Flow Diagnostics result is active, the result values of the selected cells for all time steps are displayed in the docking window **Result Plot** as one curve for each cell. 
 
@@ -25,8 +25,18 @@ To clear the cell-selection, left-click outside the visible geometry.
 Visibility of the docking widows can be controlled from the <b>Windows</b> menu.
 </div>
 
+##### Adding the curves to a Summary plot
+
+The time history curves of the selected cells can be added to a Summary Plot by right-clicking in the **Result Plot** or in the 3D View.
+
+![]({{ site.baseurl }}/images/ResultPlotToSummaryPlotCommand.png)
+
+A dialog will appear to prompt you to select an existion plot, or to create a new one.
+
+![]({{ site.baseurl }}/images/ResultPlotToSummaryPlotDialog.png)
+
 ## Result Info information
-Clicking on different type of geometry will display slightly different information as described in the following tables:
+Clicking on different type of geometry will display slightly different information based on the case type as described in the following tables:
 
 ### Eclipse model
 
