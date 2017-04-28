@@ -24,7 +24,7 @@ When selecting a linked view in the project tree, the different options are avai
 #### Link Options
 
 - **Camera** Navigation in any of the views where this option is active will be applied to the other linked views with this option set.
-- **Show Cursor** Shows the position of the mouse in the other vies as a cross-hair 
+- **Show Cursor** Shows the position of the mouse cursor in the other views as a cross-hair 
 - **Time Step** Change of time step in any of the views where this option is active will be applied to the other linked views with this option set.
 - **Cell Color Result** Change of cell result in the master view will be applied to all dependent views where this option is active. **Cell Color Result** is only supported between views of the *same type*.
 - **Legend Definition** Links the legend between views already linking the **Cell Results Color**
