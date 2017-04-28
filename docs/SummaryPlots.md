@@ -81,31 +81,32 @@ A new curve filter can be created by using the context menu of a plot selecting 
 
 ![]({{ site.baseurl }}/images/summary_curve_filter_properties.PNG)
 
-The property panel is divided in three main groups of options:
+The property panel is divided infour main groups of options:
 
-- **Summary Vectors** - Selecting what vectors to create curves from
+- **Cases** - Selecting the cases to extract data from
+- **Vector Selection** - Selecting what vectors to create curves from
 - **Appearance Settings** - Options controlling how colors, symbols etc are assigned to the curves
 - **Curve Name Configuration** - Control how the curves are named
 
-In the following sections these groups of options are described in more detail.
+In addition you have the following options:
 
-In addition to the option groups there are three general items in the property panel:
+- **Axis** - Controls wether the curves are to be associated with the left or right Y-Axis 
+- **Auto Apply Changes**  When toggled, the changes in the property panel is instanly reflected in the generated and controlled curves 
+- **Apply** - Applies the settings, and thus generates and updates the controlled curves 
 
-| Name | Description |
-|-----------|-------------|
-| **Axis** | Controls wether the curves are to be associated with the left or right Y-Axis |
-| **Auto Apply Changes** | When toggled, the changes in the property panel is instanly reflected in the generated and controlled curves |
-| **Apply** | Applies the settings, and thus generates and updates the controlled curves |
+In the following sections the option groups are described in more detail.
+
+### *Cases* 
+
+Selects the cases to be used when searching for data vectors. Several Cases can be selected at the same time and the filter will contain the union of all vectors in those cases. Curves will be created for each selected case for the selected set of vectors. 
 
 ### *Summary Vectors* - option group
 
 This group of options is used to define the selection of summary vectors of interest. Several filtering tools are available to make this as convenient as possible. 
 
-| Name | Description |
-|-----------|-------------|
-| **Cases** | Selects the cases to be used when searching for data vectors. Several Cases can be selected at the same time. If a particular case is not selected, unique vectors defined in this case will not appear in the filter. | 
-| **Search** | This option controls the filtering mode. Several are available and controls witch search fields that are made available. This is described in more detail below.|
-| *unnamed list of vectors* | This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want as curves. **Ctrl-A** selects them all.|
+- **Search**  This option controls the filtering mode. Several are available and controls witch search fields that are made available. The search modes are described below 
+- *Options depending on Search Mode* - Described below. 
+- *list of vector names* - This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want as curves. **Ctrl-A** selects them all.
 
 In the following, all the search fields are wildcard based text filters. An empty search string will match anything: any value or no value at all. A single `*` however, will only match something: There has to be some value for that particular quantity to make the filter match.
 
