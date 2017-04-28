@@ -7,7 +7,7 @@ published: true
 ![]({{ site.baseurl }}/images/ResultInspectionOverview.png)
 
 The results mapped on the 3D model can be inspected in detail by left clicking cells in the 3D view. 
-The selected cells will be highlighted and text information extracted from the intersection point displayed in the **Result Info** docking window.
+The selected cells will be highlighted, text information displayed in the **Result Info** docking window, and the time-history values plotted in the **Result Plot**, if available.
 
 {% comment %}  ![]({{ site.baseurl }}/images/ResultInfoWithSelectedCell.png) {% endcomment %}
 
