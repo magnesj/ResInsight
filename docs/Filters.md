@@ -13,7 +13,7 @@ Cell Filters are used to control visibility of the cells in the 3D view. Two typ
 
 <div class="note">
 The visibilities of cells connection to wells, and fences based on these cells can be controlled from <b> <a href="{{ site.baseurl }}/docs/simulationwells">Simulation Wells</a> </b>.<br> 
-<small><i>(Not applicable for Geomechanical cases.</i></small>
+<small><i>(Not applicable for Geomechanical cases)</i></small>
 </div>
 
 ### Common properties for Range and Property Filters
