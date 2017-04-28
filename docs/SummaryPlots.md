@@ -110,9 +110,11 @@ This group of options is used to define the selection of summary vectors of inte
 
 In the following, all the search fields are wildcard based text filters. An empty search string will match anything: any value or no value at all. A single `*` however, will only match something: There has to be some value for that particular quantity to make the filter match.
 
+The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed.  
+
 |**Search** mode | Filter Fields | Description |
 |----------------|--------------|--------------|
-| **All**   | Filter | A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default. |
+| **All**   | **Filter** | A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default. |
 | **Field** | **Vector name** | Searches the field variables available |
 | **Well** | **Vector name** | This mode searches the only for well related vectors |
 |          | **Well name**|  Narrows the search to wells with matching names |
@@ -129,8 +131,7 @@ In the following, all the search fields are wildcard based text filters. An empt
 | **Misc** | | |
 | **Aquifer**| | |
 | **Network** | | |
-The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed.    |
-| **All (Advanced)** | This is a complete combined search mode with all the different search options available to create advanced cross item type searches.| 
+| **All (Advanced)** | | This is a complete combined search mode with all the different search options available to create advanced cross item type searches.| 
 
 ### *Appearance Settings* - option group
 
