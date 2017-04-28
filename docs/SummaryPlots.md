@@ -127,14 +127,14 @@ The **Vector Name** field will match the name of the quantity itself, while the 
 - **Completion**   - Select Completion related vectors only
    - **Vector name**  - Filter for Completion related vector names 
    - **Well name** -  Well name filter 
-   - **I, J, K** - Text based filter of the I, J, K value string in the completion. Eg `"18,*,*"` to find vectors with I = 18 only 
+   - **I, J, K** - Text based filter of the I, J, K value string of the completion. Eg `"18,*,*"` to find vectors with I = 18 only 
 - **Segment** - Select Segment related vectors only    
    - **Vector name**  - Filter for Segment related vector names 
    - **Well name** -  Well name filter 
    - **Segment number** - Text based filter of the segment numbers
 - **Block** - Select I, J, K - Block related vectors only 
    - **Vector name**  - Filter for cell Block related vector names 
-   - **I, J, K** - Text based filter of the I, J, K value string of the Block. Eg `"18,*,*"` to find vectors with I = 18 only 
+   - **I, J, K** - Text based filter of the I, J, K value string of the Block. 
 - **Region** - Select Region related vectors only  
    - **Vector name**  - Filter for Region related vector names 
    - **Region number** - Text based filter of the Region numbers
@@ -147,32 +147,21 @@ The **Vector Name** field will match the name of the quantity itself, while the 
    - **Well name** -  Well name filter 
    - **Lgr name** - Lgr name filter 
 - **Lgr-Completion** - Select Completion in LGR related vectors only
-- **Lgr-Block** - Select I, J, K - Block in LGR related vectors only  
-- **Misc** - Select vectors in the Misc cathegory only  
-- **Aquifer** - Select Aquifer related vectors only 
-- **Network** - Select Network related vectors only  
+   - **Vector name** - Filter for Well in Lgr related vector names 
+   - **Well name** -  Well name filter 
+   - **Lgr name** - Lgr name filter 
+   - **I, J, K** - Text based filter of the I, J, K value string of the completion in the Lgr.
+- **Lgr-Block** - Select I, J, K - Block in LGR related vectors only
+   - **Vector name**  - Filter for cell Block related vector names 
+   - **Lgr name** - Lgr name filter 
+   - **I, J, K** - Text based filter of the I, J, K value string of the Block in the Lgr. 
+- **Misc** - Select vectors in the Misc cathegory only 
+   - **Vector name** - Filter for Misc cathegory vector names 
+- **Aquifer** - Select Aquifer cathegory vectors only 
+   - **Vector name** - Filter for Aquifer cathegory vector names 
+- **Network** - Select Network cathegory vectors only  
+   - **Vector name** - Filter for Network cathegory vector names 
 - **All (Advanced)** - This is a complete combined search mode with all the different search options available to create advanced cross item type searches.  
-
-|**Search** mode | Filter Fields | Description |
-|----------------|--------------|--------------|
-| **All**   | **Filter** | A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default. |
-| **Field** | **Vector name** | Searches the field variables available |
-| **Well** | **Vector name** | This mode searches the only for well related vectors |
-|          | **Well name**|  Narrows the search to wells with matching names |
-| **Group** | **Vector name**  | This mode searches the only for group related vectors |
-|          | **Group name**|  Narrows the search to groups with matching names |
-| **Completion**|  **Vector name**  | Searches the among the Completion related vectors |
-| **Segment** | | | 
-| **Block** | | |
-| **Region** | | |
-| **Region-Region**| | | 
-| **Lgr-Well**| | |
-| **Lgr-Completion**| | |
-|**Lgr-Block**| | |
-| **Misc** | | |
-| **Aquifer**| | |
-| **Network** | | |
-| **All (Advanced)** | | This is a complete combined search mode with all the different search options available to create advanced cross item type searches.| 
 
 ### *Appearance Settings* - option group
 
