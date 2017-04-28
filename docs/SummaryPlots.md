@@ -28,34 +28,31 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 - **Right Y-axis** - Controls the properties for the right Y-axis
 
 ### Time Axis Properties
+
 ![]({{ site.baseurl }}/images/SummaryTimeAxisProperties.png)
 
-| Parameter | Description |
-|-----------|-------------|
-| **Show Title** | Toggles wheter to show the axis title |
-| **Title** | A user defined name for the axis |
-| **Title Position** |  Either *Center* or *At End* |
-| **Font Size** | The font Size used for the date/times shown at the ticks of the axis |
-| **Time Mode** | Option to show the time from Simulation Start, or as real date-times. |
-| **Time Unit**|  The time unit used to display **Time From Simulation Start** |
-| **Max**/**Min** | The range of the visible time in the Plot in the appropriate time unit. The format of dates is yyyy-mm-ddThh:mm:ssZ |
+- **Show Title** - Toggles wheter to show the axis title 
+- **Title** - A user defined name for the axis 
+- **Title Position** -  Either *Center* or *At End* 
+- **Font Size** - The font Size used for the date/times shown at the ticks of the axis 
+- **Time Mode** - Option to show the time from Simulation Start, or as real date-times. 
+- **Time Unit** - The time unit used to display **Time From Simulation Start** 
+- **Max**/**Min** - The range of the visible time in the Plot in the appropriate time unit. The format of dates is yyyy-mm-ddThh:mm:ssZ 
 
 ### Y-axis properties
 
 ![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
 
-| Parameter | Description |
-|-----------|-------------|
-| **Auto Title** | If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. |
-| **Title** | If **Auto Title** is disabled, the plot title is set using this field |
-| **Title Position** | Controls the position of the title. Center or At End |
-| **Font Size**  | Defines the font size used by the axis title |
-| **Logarithmic Scale**  | Draw plot curves using a logarithmic scale |
-| **Number Format** | Defines how the legend numbers are formatted |
-| **Max and Min** | Defines the visible y range |
-
+- **Auto Title** - If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. 
+- **Title** - If **Auto Title** is disabled, the plot title is set using this field 
+- **Title Position** - Controls the position of the title. Center or At End 
+- **Font Size** -  Defines the font size used by the axis title 
+- **Logarithmic Scale**  - Draw plot curves using a logarithmic scale 
+- **Number Format** - Defines how the legend numbers are formatted 
+- **Max and Min** - Defines the visible y range 
 
 #### Number Format
+
 - **Auto** - Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
 - **Decimal** - Legend numbers are displayed using decimal notation
 - **Scientific** - Legend numbers are displayed using scientific notation (ie. 1.2e+6)
@@ -63,14 +60,11 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 ### Plot mouse interaction
 
 - **Value Tracking** - When the mouse cursor is close to a curve, the closest curve sample is highlighted and the curve sample value at this location is displayed in a tooltip. 
-
 - **Selection** - Left mouse button click can be used to select several of the parts in the plot, and display them in the Property Editor:
   - The closest curve
   - Each of the Plot Axes
   - The Plot itself if none of the above is hit and the Plot window is activated by the mouse click.
-
 - **Window Zoom** - Window zoom is available by dragging the mouse when the left mouse button is pressed. Use ![]({{ site.baseurl }}/images/ZoomAll16x16.png) **Zoom All** to restore default zoom level.
-
 - **Wheel Zoom** - The mouse wheel will zoom the plot in and out towards the current mouse cursor position 
 
 ## Summary Curve Filter
@@ -96,11 +90,11 @@ In addition you have the following options:
 
 In the following sections the option groups are described in more detail.
 
-### *Cases* 
+### Cases
 
 Selects the cases to be used when searching for data vectors. Several Cases can be selected at the same time and the filter will contain the union of all vectors in those cases. Curves will be created for each selected case for the selected set of vectors. 
 
-### *Summary Vectors* - option group
+### Summary Vectors
 
 This group of options is used to define the selection of summary vectors of interest. Several filtering tools are available to make this as convenient as possible. 
 
@@ -163,7 +157,7 @@ The **Vector Name** field will match the name of the quantity itself, while the 
    - **Vector name** - Filter for Network cathegory vector names 
 - **All (Advanced)** - This is a complete combined search mode with all the different search options available to create advanced cross item type searches.  
 
-### *Appearance Settings* - option group
+### Appearance Settings
 
 Curves created by a curve filter are assigned individual visual properties like colors and symbols in a systematic manner to make the plots easy to read. Different aspects of the vectors are assigned to different curve appearances. Eg. using symbols to distinguish cases, while using colors to distinguish quantity.
 
@@ -175,7 +169,7 @@ When set to **Auto** ResInsight assigns visual properties based on the present v
 
 When disabling the **Auto** option, you can select which of the visual curve properties to use for which vector category. The vector Category that currently can be used is Case, Vector, Well, Group and Region. The visual properties supported types are Color, Symbols, Line Style, Gradient and Line Thickness.
 
-### *Curve Name Configuration* - option group
+### Curve Name Configuration 
 
 The user can control the curve names by toggeling what part of the summary vector information to use in the name.
 
@@ -197,7 +191,7 @@ The curve's appearance is controlled directly, and not automatically as for Curv
 The appearance set on a curve in a curve filter will override the settings in the curvefilter until the curvefilter settings are applied again. Then the clocal changes on the curve are overwritten. 
 </div>
 
-### *Curve Name
+### Curve Name
 
 - **Contribute To Legend** - This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
 - **Auto Name** If enabled, ResInsight will create a name for the curve automatically based on the settings in this option group.
