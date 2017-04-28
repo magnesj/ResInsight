@@ -112,6 +112,10 @@ In the following, all the search fields are wildcard based text filters. An empt
 
 The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed.  
 
+- **Well** - Select only well related vecotors
+   - **Vector name** - Vector name filter 
+   - **Well name** -  Well name filter 
+
 |**Search** mode | Filter Fields | Description |
 |----------------|--------------|--------------|
 | **All**   | **Filter** | A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default. |
