@@ -112,7 +112,7 @@ In the following, all the search fields are wildcard based text filters. An empt
 
 The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed. 
 
-#### Search Modes
+#### Search Modes with filter fields
 
 - **All** - A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default.
    - **Filter** - The actual filter text to apply
@@ -126,11 +126,26 @@ The **Vector Name** field will match the name of the quantity itself, while the 
    - **Group name** -  Group name filter 
 - **Completion**   - Select Completion related vectors only
    - **Vector name**  - Filter for Completion related vector names 
+   - **Well name** -  Well name filter 
+   - **I, J, K** - Text based filter of the I, J, K value string in the completion. Eg `"18,*,*"` to find vectors with I = 18 only 
 - **Segment** - Select Segment related vectors only    
-- **Block** - Select I, J, K - Block related vectors only  
+   - **Vector name**  - Filter for Segment related vector names 
+   - **Well name** -  Well name filter 
+   - **Segment number** - Text based filter of the segment numbers
+- **Block** - Select I, J, K - Block related vectors only 
+   - **Vector name**  - Filter for cell Block related vector names 
+   - **I, J, K** - Text based filter of the I, J, K value string of the Block. Eg `"18,*,*"` to find vectors with I = 18 only 
 - **Region** - Select Region related vectors only  
+   - **Vector name**  - Filter for Region related vector names 
+   - **Region number** - Text based filter of the Region numbers
 - **Region-Region** - Select Region to Region related vectors only  
+   - **Vector name**  - Filter for Region to Region related vector names 
+   - **Region number** - Text based filter of the first Region number
+   - **2. Region number** - Text based filter of the second Region number
 - **Lgr-Well** - Select Well in LGR related vectors only
+   - **Vector name** - Filter for Well in Lgr related vector names 
+   - **Well name** -  Well name filter 
+   - **Lgr name** - Lgr name filter 
 - **Lgr-Completion** - Select Completion in LGR related vectors only
 - **Lgr-Block** - Select I, J, K - Block in LGR related vectors only  
 - **Misc** - Select vectors in the Misc cathegory only  
