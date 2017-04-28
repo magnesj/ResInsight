@@ -12,9 +12,8 @@ Cell Filters are used to control visibility of the cells in the 3D view. Two typ
 - **Property filter**  : Extracts cells with a property value matching a value range.
 
 <div class="note">
-<b>Note</b><br>
-<b>Well cells</b> The visibilities of cells connection to wells, and fences based on these cells can be controlled from the <b>Simulation Wells</b>. See [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) for more details.<br> 
-<i>(Not applicable for Geomechanical cases.</i>
+The visibilities of cells connection to wells, and fences based on these cells can be controlled from <b> <a href="{{ site.baseurl }}/docs/simulationwells">Simulation Wells</a> </b>.<br> 
+<small><i>(Not applicable for Geomechanical cases.</i></small>
 </div>
 
 ### Common properties for Range and Property Filters
@@ -67,6 +66,10 @@ The filter is based on a property value range (Min - Max). Cells in the range ar
 A new property filter can be made by activating the context menu for **Property Filters**. The new property filter is based on the currently viewed cell result by default.
 
 The name of the property filter is automatically set to *"propertyname (min .. max)"* as you edit the property filter.
+
+<div class="note">
+A property filter can also be made by right-clicking inside a 3D view.
+</div>
 
 ##### Range for Flow Diagnostic results
 Normally the available range in the sliders is the max and min of all the values in all the timesteps. For Flow Diagnostics results, however, the available range is based on the current timestep. We still need to keep the range somewhat fixed while moving from timestep to timestep, so in order to do so ResInsight tries to keep the intentions of your range settings, as the available range changes. If either the max or min value is set to the limit, ResInsight will keep that setting at the limit even when the limit changes. If you set a spesific value for the max or the min, that setting will keep its value, even if it happens to end up outside the available range at a time step.   
