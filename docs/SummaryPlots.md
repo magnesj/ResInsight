@@ -11,13 +11,11 @@ ResInsight can create summary plots based on vectors from SUMMARY files (`*.SMSP
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using the command: **File->Import->Import Summary Case**.
 
-When a summary case has been imported, a Summary Plot with a default **Curve Filter** is created.
-
-The default behaviours can be configured in the  [ Preferences ]({{ site.baseurl }}/docs/preferences).
+When a summary case has been imported, a Summary Plot with a default **Curve Filter** is created. This default behaviour can be configured in the  [ Preferences ]({{ site.baseurl }}/docs/preferences).
 
 ## Summary Plots
 
-A Summary Plot is a window displaying a graph in the main area of the Plot Mian Window. It can contain **Summary Curve Filters** and **Summary Curves** (See below) in addition to a title, left and right Y-Axis, and the Time-axis.
+A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain **Summary Curve Filters** and **Summary Curves** (See below).
 
 A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**.
 
@@ -29,25 +27,6 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 - **Left Y-axis** - Controls the properties for the left Y-axis
 - **Right Y-axis** - Controls the properties for the right Y-axis
 
-### Y-axis properties
-
-![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
-
-| Parameter | Description |
-|-----------|-------------|
-| **Auto Title** | If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. |
-| **Title** | If **Auto Title** is disabled, the plot title is set using this field |
-| **Title Position** | Controls the position of the title. Center or At End |
-| **Font Size**  | Defines the font size used by the axis title |
-| **Max and Min** | Defines the visible y range |
-| **Number Format** | Defines how the legend numbers are formatted |
-| **Logarithmic Scale**  | Draw plot curves using a logarithmic scale |
-
-#### Number Format
-- **Auto** - Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
-- **Decimal** - Legend numbers are displayed using decimal notation
-- **Scientific** - Legend numbers are displayed using scientific notation (ie. 1.2e+6)
-
 ### Time Axis Properties
 ![]({{ site.baseurl }}/images/SummaryTimeAxisProperties.png)
 
@@ -58,8 +37,28 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 | **Title Position** |  Either *Center* or *At End* |
 | **Font Size** | The font Size used for the date/times shown at the ticks of the axis |
 | **Time Mode** | Option to show the time from Simulation Start, or as real date-times. |
-|  |  When activated, The **Time Unit** Option will appear, with options to show the relative time in different units|
+| **Time Unit**|  The time unit used to display **Time From Simulation Start** |
 | **Max**/**Min** | The range of the visible time in the Plot in the appropriate time unit. The format of dates is yyyy-mm-ddThh:mm:ssZ |
+
+### Y-axis properties
+
+![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
+
+| Parameter | Description |
+|-----------|-------------|
+| **Auto Title** | If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. |
+| **Title** | If **Auto Title** is disabled, the plot title is set using this field |
+| **Title Position** | Controls the position of the title. Center or At End |
+| **Font Size**  | Defines the font size used by the axis title |
+| **Logarithmic Scale**  | Draw plot curves using a logarithmic scale |
+| **Number Format** | Defines how the legend numbers are formatted |
+| **Max and Min** | Defines the visible y range |
+
+
+#### Number Format
+- **Auto** - Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
+- **Decimal** - Legend numbers are displayed using decimal notation
+- **Scientific** - Legend numbers are displayed using scientific notation (ie. 1.2e+6)
 
 ### Plot mouse interaction
 
