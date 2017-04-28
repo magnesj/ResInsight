@@ -110,11 +110,33 @@ This group of options is used to define the selection of summary vectors of inte
 
 In the following, all the search fields are wildcard based text filters. An empty search string will match anything: any value or no value at all. A single `*` however, will only match something: There has to be some value for that particular quantity to make the filter match.
 
-The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed.  
+The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) beeing addressed. 
 
-- **Well** - Select only well related vecotors
-   - **Vector name** - Vector name filter 
+#### Search Modes
+
+- **All** - A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default.
+   - **Filter** - The actual filter text to apply
+- **Field** - Select Field related vectors only
+  -  **Vector name** - Filter for Field related vector names 
+- **Well** - Select Well related vectors only
+   - **Vector name** - Filter for Well related vector names 
    - **Well name** -  Well name filter 
+- **Group** - Select Group related vectors only
+   - **Vector name** - Filter for Group related vector names 
+   - **Group name** -  Group name filter 
+- **Completion**   - Select Completion related vectors only
+   - **Vector name**  - Filter for Completion related vector names 
+- **Segment** - Select Segment related vectors only    
+- **Block** - Select I, J, K - Block related vectors only  
+- **Region** - Select Region related vectors only  
+- **Region-Region** - Select Region to Region related vectors only  
+- **Lgr-Well** - Select Well in LGR related vectors only
+- **Lgr-Completion** - Select Completion in LGR related vectors only
+- **Lgr-Block** - Select I, J, K - Block in LGR related vectors only  
+- **Misc** - Select vectors in the Misc cathegory only  
+- **Aquifer** - Select Aquifer related vectors only 
+- **Network** - Select Network related vectors only  
+- **All (Advanced)** - This is a complete combined search mode with all the different search options available to create advanced cross item type searches.  
 
 |**Search** mode | Filter Fields | Description |
 |----------------|--------------|--------------|
