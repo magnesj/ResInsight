@@ -71,7 +71,7 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 
 - **Window Zoom** - Window zoom is available by dragging the mouse when the left mouse button is pressed. Use ![]({{ site.baseurl }}/images/ZoomAll16x16.png) **Zoom All** to restore default zoom level.
 
-
+- **Wheel Zoom** - The mouse wheel will zoom the plot in and out towards the current mouse cursor position 
 
 ## Summary Curve Filter
 
