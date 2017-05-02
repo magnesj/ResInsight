@@ -26,7 +26,7 @@ Visibility of the grid box with labels displaying the coordinates for the reserv
 
 ### Cell Result &nbsp;![]({{ site.baseurl }}/images/CellResult.png)
 
-The **Cell Result** item defines which Eclipse property the 3D View uses for the main cell color. The property can be chosen in the property panel of the **Cell Result** item. The mapping between cell values and color is defined by the **Legend Definition**  ![]({{ site.baseurl }}/images/Legend.png) along with some appearance settings on the Legend itself. (Number format etc.)
+The **Cell Result** item defines which Eclipse or Geomechanical property the 3D View uses for the main cell color. The property can be chosen in the property panel of the **Cell Result** item. The mapping between cell values and color is defined by the **Legend Definition**  ![]({{ site.baseurl }}/images/Legend.png) along with some appearance settings on the Legend itself. (Number format etc.)
 
 Please refer to [Result Color Legend]({{ site.baseurl }}/docs/resultcolorlegend) for details.
 
