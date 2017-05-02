@@ -63,7 +63,7 @@ Curve visual appearance is controlled in the **Appearance** section:
 
 Ectraction curves acts as an artifical well log curve. Instead of probing the real well, a simulation model is probed instead.
 
-The property panel for a geomechanical model is shown below:
+The property panel for an eclipse model is shown below:
 
 ![]({{ site.baseurl }}/images/WellLogExtractionCurveProperties.png)
 
@@ -84,6 +84,15 @@ Ectraction curves are calculated by finding the intersections between a well tra
 For Eclipse results the cell face value is used directly. This is normally the same as the corresponding cell value, but if a **Directional combined results** is used, (See [ Derived Results ]({{ site.baseurl }}/docs/derivedresults) ) it will be that particular face's value.
 
 Abaqus results are interpolated across the intersected cell-face from the result values associated with the nodes of that face. This is also the case for integration point results, as they are directly associated with their corresponding element node in ResInsight. 
+
+#### Change Data Source for several curves
+
+It is possible to change either the Case or the Well Path in several Well Log Extraction curves in one go. To do this, select the curves to change, and access the context menu. Select the command "Change Data Source". The following dialog will appear:
+
+![]({{ site.baseurl }}/images/WellLogExtractionChangeDataSource.png)
+
+- **Case** - Sets this case for all the curves
+- **Well Path** - Applies this well apth to all the curves. Will not affect curves using a Simulation Well.
 
 ### Well Log LAS Curves
 
