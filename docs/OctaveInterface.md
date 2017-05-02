@@ -40,11 +40,11 @@ If you add a script file directly by creating a new file, the new script can be 
 
 ResInsight can be instructed to execute an Octave script once as a one shot operation, or several times, one time for each selected case. The [Octave Interface Reference]({{ site.baseurl }}/docs/octaveinterfacereference) highlights in more depth how to design your Octave scripts to utilize these features.
 
-### Execution the Script Once
+### Executing a Script Once
 
 A script can be started by navigating to the script in the **Project Tree**, and selecting **Execute** from the context menu. The currently active case (The one with the active 3D View) will then be set as ResInsight's *Current Case*, and the script is executed once.
 
-### Executing Script for Each Selected Case
+### Executing a Script for Each Selected Case
 
 One script can be executed on many cases by first selecting a set of cases, and then activating **Execute script** from the context menu on the case selection. The script is then executed once per selected case setting the ResInsight's *Current Case* each time. 
 
