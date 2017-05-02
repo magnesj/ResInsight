@@ -11,20 +11,24 @@ The source code is hosted at [GitHub](https://github.com/opm/resinsight)
 ## Dependencies and prerequisites
 
 ### Windows compiler
+
 Visual Studio 2015 or later is supported.
 
 ### GCC compiler
-GCC version 4.9 or later is supported.
 
-### Boost
-[Boost](http://www.boost.org/users/history/) version 1.58 or later is supported. Earlier versions might work, but this has not been tested.
+GCC version 4.9 or later is supported. On RedHat Linux 6 you need to install devtoolset-3, and enable it with 
+    
+    source /opt/rh/devtoolset-3/enable
 
 ### Qt
-[Qt](http://download.qt.io/archive/qt/) version 4.7.3 or later is supported.
+
+[Qt](http://download.qt.io/archive/qt/) Qt4 version 4.6.2 or later is supported. Qt5 is not supported yet.
+On Windows we reccomend Qt-4.8.7, while the default installation will do under linux. 
+
+You will need to patch the Qt sources in order to make them build using Visual Studion 2015 using this : [Qt-patch](https://github.com/appleseedhq/appleseed/wiki/Making-Qt-4.8.7-compile-with-Visual-Studio-2015) 
 
 ### CMake
 [CMake](https://cmake.org/download/) version 2.8 or later is supported.
-
 
 ## Build instructions
 The ResInsight build may be configured in different ways, with optional support for Octave plugins, ABAQUS ODB API, and OpenMP. This is configured using options in CMake.
@@ -42,9 +46,10 @@ If you check the button 'Grouped' in the CMake GUI, the CMake variables are grou
 ### Windows
 ResInsight has been verified to build and run on Windows 7/8/10 using Microsoft Visual Studio 2015. Typical usage on Windows is to follow the build instructions above, and then open the generated solution file in Visual Studio to build the application.
 
+
 ### Linux
 
-ResInsight has been verified to build and run on RedHat Linux 6. Typical usage is to follow the build instructions above to build the makefiles. Then go to the build directory, and run:
+ResInsight has been verified to build and run on RedHat Linux 6, but you need to install the  Typical usage is to follow the build instructions above to build the makefiles. Then go to the build directory, and run:
 
 - make
 - make install
@@ -85,7 +90,16 @@ ResInsight has been verified to build and run with Octave versions 3.4.3, 3.8.1,
 | `RESINSIGHT_OCTAVE_PLUGIN_MKOCTFILE`  | Location of Octave tool mkoctfile used to compile Octave plugins |
 | `RESINSIGHT_OCTAVE_PLUGIN_QMAKE`      | Location of Qt version to use when compiling Octave plugins. Must be compatible with Octave runtime. (Use the Qt version embedded in Octave. The qmake executable itself is not used, only the path to the directory.) |
 
+#### Octave Dependencies for Debian Based Distributions
+
+- sudo apt-get install git cmake build-essential octave octave-headers qt4-dev-tools
+
+If you are running Ubuntu 12.10 or newer, you will need to replace octave-headers with liboctave-dev :
+
+- sudo apt-get install git cmake build-essential octave liboctave-dev qt4-dev-tools
+
 ### Optional - ABAQUS ODB API 
+
 ResInsight can be built with support for ABAQUS ODB files. This requires an installation of the ABAQUS ODB API from Simulia on the build computer. The path to the ABAQUS ODB API folder containing header files and library files must be specified. Leaving this option blank gives a build without ODB support. ResInsight has been built and tested with ABAQUS ODB API version 6.14-3 on Windows 7/8 and RedHat Linux 6.
 
 #### ABAQUS ODB API related CMake options for ResInsight
@@ -94,10 +108,3 @@ ResInsight can be built with support for ABAQUS ODB files. This requires an inst
 |--------------|---------|
 | `RESINSIGHT_ODB_API_DIR`              | Optional path to the ABAQUS ODB API from Simulia |
 
-### Dependencies for Debian based distributions
-
-- sudo apt-get install git cmake build-essential octave octave-headers qt4-dev-tools
-
-If you are running Ubuntu 12.10 or newer, you will need to replace octave-headers with liboctave-dev :
-
-- sudo apt-get install git cmake build-essential octave liboctave-dev qt4-dev-tools
