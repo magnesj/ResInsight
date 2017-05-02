@@ -4,8 +4,11 @@ title: Snapshots
 permalink: /docs/snapshots/
 published: true
 ---
+ResInsight has several commands to create snapshots conveniently. 3 commands to take snapshots of existing Plot and 3D Views directly, and a more advanced export command that can automatically modify Eclipse 3D Views before snapshotting them. 
 
-ResInsight can take screen shots of your different 3D Views and Plot Windows directly. These commands are available from the toolbar and the menues in the respective main window.  
+The simple commands are available from the toolbar and the **Edit** and **File**->**Export** menus in the main windows, while the **Advanced Snapshot Export** is only available from the **File**->**Export** menu in the **3D Main Window**
+
+## Snapshots of Existing Views
 
 ![]({{ site.baseurl }}/images/SnapShotToolBar.png)
 
@@ -24,6 +27,33 @@ If a project contains multiple 3D Views or Plot Windows, all of them can be expo
 The files generated are stored in a folder named `snapshots` within the folder where the Project File resides. 
 
 <div class="note">
- Snapshots can also be created and saved from the command line. 
+ Snapshots of existing views can also be created and saved from the command line. 
  (See <a href="{{ site.baseurl }}/docs/commandlineparameters">Command Line Arguments</a> )
 </div>
+
+## Advanced Snapshot Export  ![]({{ site.baseurl }}/images/SnapShotSaveViews.png)
+
+The **Advanced Snapshot Export** command is useful for exporting several images of a specified set of views while simultaniously changing some of their settings. By using this command it is easy to document all layers of a specific model, or generate images with identical setup across several different cases. It is also easy to export an image for each of the timesteps in a case, or even a combination of all these parameters.
+
+Invoking the command will display the following dialog 
+
+ ![]({{ site.baseurl }}/images/SnapshotAdvancedExport.png)
+
+This table defines which 3D Views to modify, and how to modify them. Each row defines the modifications of a specific view, and for all the combinations a row specifies, a snapshot is generated. 
+
+To edit a row, the row must be activated by toggeling it on in the **Active** column, then double click on the cell to edit.  
+
+- **View** - Selects the view to modify
+- **Result Type**, **Result Name** - Defines a list of eclipse result properties to cycle through when creating snapshots. If properties from both the dynamic and static list is needed, you must create a new row.
+- **Timestep Start**, **Timestep End** - Defines the timestep range to cycle through when creating snapshots
+- **Range Filter Direction**, **Range Filter Start**, **Range Filter End** - Defines a range filter slice that will be added to the view, and then cycled from start to end when creating snapshots. 
+- **Case List** 
+
+
+### Managing rows
+
+Rows can be deleted and created by right clicking in the table. 
+
+
+
+
