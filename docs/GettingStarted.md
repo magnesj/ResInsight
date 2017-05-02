@@ -33,6 +33,7 @@ windows can be managed from the **Windows** menu or directly using the local men
 - **Process Monitor** - displays output from Octave when executing Octave scripts
 - **Result Info** - displays info for the selected object in the 3D scene
 - **Result Plot** - displays curves based on result values for the selected cells in the 3D scene
+- **Messages** - displays occational info and warnings related to operations executed.
 
 Result Info and Result Plot is described in detail in [ Result Inspection ]({{ site.baseurl }}/docs/resultinspection)
 
