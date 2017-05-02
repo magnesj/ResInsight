@@ -13,9 +13,9 @@ ResInsight can display well logs by extracting data from a simulation model alon
 
 Well log plots can be created in several ways: 
 
-1. Right click the empty area below all the items in the **Project Tree** and select **New Well Log Plot**. A plot is created with one **Track** and an empty **Curve**.
-2. Right click a wellpath, either in the **Project Tree** or in the 3D-view, and select either **New Well Log Extraction Curve**. A new plot with a single **Track** and a **Curve** is created. The curve is setup to match your selection (Well trajectory, active case and result) 
-3. Right click a LAS-file channel in the **Project Tree** and select **Add to New Plot**. A new plot with a single **Track** and a **Curve** is created. The curve is setup to plot the selected LAS-file channel.
+1. Right click a wellpath or a simulation well, either in the **Project Tree** or in the 3D-view, and select **New Well Log Extraction Curve**. A new plot with a single **Track** and a **Curve** is created. The curve is setup to match your selection (Well trajectory, active case and result) 
+2. Right click the empty area below all the items in the **Project Tree** and select **New Well Log Plot**. A plot is created with one **Track** and an empty **Curve**.
+3. Right click a LAS-file channel in the **Project Tree** and select **Add to New Plot**. A new plot with a single **Track** and a **Curve**  displaying the selected LAS-file channel is created.
 
 Each **Well Log Plot** can contain several *Tracks*, and each **Track** can contain several **Curves**.
 
@@ -23,7 +23,11 @@ Each **Well Log Plot** can contain several *Tracks*, and each **Track** can cont
 
 Tracks and Curves can be organized using drag and drop functionality in the **Project Tree**. Tracks can be moved from one plot to another, and you can alter the order in which they appear in the **Plot**. **Curves** can be moved from one **Track** to another.
 
-All the **Tracks** in the same plot always display the same depth range, and share the *True Veritcal Depth (TVD)* or *Measured Depth (MD)* setting. In the property panel of the plot, the exact depth range can be adjusted along with the depth type setting (TVD/MD).
+### Measured Depth (MD), True Veritcal Depth (TVD) and Pseudo Length (PL)
+
+All the **Tracks** in the same plot always display the same depth range, and share the *True Veritcal Depth (TVD)* or *Measured Depth (MD)* setting. In the property panel of the plot, the exact depth range can be adjusted along with the depth type setting (TVD/MD). 
+
+**Simulation Wells** however, is using a *Pseudo Length* instead of the real *Measured Depth* as the MD information is not available in the restart files. The *Pseudo Length* is a length along the coarsly interploated visualization pipe, and serves only as a very coarse estimation of an MD-like depth. Pseudo length is measured from the simulation-wells first connection-cell (well head connection) to the reservoir. This is very different from MD, which would start at RKB or at sea level.
 
 ### Depth unit
 
