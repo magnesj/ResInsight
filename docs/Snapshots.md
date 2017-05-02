@@ -35,13 +35,15 @@ The files generated are stored in a folder named `snapshots` within the folder w
 
 The **Advanced Snapshot Export** command is useful for exporting several images of a specified set of views while simultaniously changing some of their settings. By using this command it is easy to document all layers of a specific model, or generate images with identical setup across several different cases. It is also easy to export an image for each of the timesteps in a case, or even a combination of all these parameters.
 
-Invoking the command will display the following dialog 
+Invoking the command will display the following dialog: 
 
  ![]({{ site.baseurl }}/images/SnapshotAdvancedExport.png)
 
 This table defines which 3D Views to modify, and how to modify them. Each row defines the modifications of a specific view, and for all the combinations a row specifies, a snapshot is generated. 
 
-To edit a row, the row must be activated by toggeling it on in the **Active** column, then double click on the cell to edit.  
+To edit a row, the row must be activated by toggeling it on in the **Active** column, then double click on the cell to edit. 
+
+Options represented by columns:
 
 - **View** - Selects the view to modify
 - **Result Type**, **Properties** - Defines a list of eclipse result properties to cycle through when creating snapshots. If properties from both the dynamic and static list is needed, you must create a new row.
@@ -50,6 +52,8 @@ To edit a row, the row must be activated by toggeling it on in the **Active** co
 - **Cases** - Defines the cases to cycle while creating snapshots. Normaly you can not change which case a view is displaying, but this option does temporarily.
 
 The number of exported snapshots from a row can easily end up beeing huge, so it is wise to use some causion. The total number will be Properties * Timesteps * Range Steps * Cases.
+
+The snapshots will be generated and saved to the folder displayed in the **Expot Folder** field, when pressing the **Export** button. This might take quite some time, depending on you settings.
 
 ### Managing rows
 
