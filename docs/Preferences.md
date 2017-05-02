@@ -13,7 +13,7 @@ The preferences are not stored in the project files, but rather in a platform sp
 
 ## General - tab
 
-### Default settings - option group
+### Default settings
 
 This group of options controls visual settings that will be used when creating new views.
 
@@ -24,23 +24,24 @@ This group of options controls visual settings that will be used when creating n
 - **Well Label Color**
 - **Font Size** - This font size is used for all labels shown in the 3D Views
 
-### 3D views - option group
+### 3D views
 - **Navigation mode** - Defines how to use the mouse to interact with with the 3D model.
 - **Use shaders** - This option controls the use of OpenGL shaders. Should be left **On**. Available only for testing purposes.
 - **Show 3D Information** - Displays graphical resource usage as text in the 3D view.
 
-### Other - option group
+### Other
 
 - **SSIHUB Address** - Optional Url to Statoil internal web service used to import well paths.
-- **Show LAS Curve Without TVD Warning**
+- **Show LAS Curve Without TVD Warning** - Turn off the warning displayed when showing LAS curves in TVD mode
 
 ## Eclipse - tab
 
 ![]({{ site.baseurl }}/images/EclipsePreferences.png)
 
-### Behaviour When Loading Data - option group
-- **Default Z Scale Factor**
-- **Compute DEPTH Related Properties** - If not present, compute DEPTH, DX, DY, DZ, TOP, BOTTOM when loading new case
+### Behaviour When Loading Data
+
+- **Default Z Scale Factor** - Default depth scale for grid models
+- **Compute DEPTH Related Properties** - If not present, compute DEPTH, DX, DY, DZ, TOP, BOTTOM when loading new cases
 - **Load and Show SOIL** - Control if SOIL is loaded and applied to grid
 - **Import Faults/NNCs/Advanced MSW Data** - Disable import of data for a case to reduce case import time.
 - **Fault Include File Absolute Path Prefix** - Prefix used on Windows if fault files use absolute UNIX paths
@@ -49,12 +50,12 @@ This group of options controls visual settings that will be used when creating n
 
 ![]({{ site.baseurl }}/images/OctavePreferences.png)
 
-### Octave - option group
+### Octave
 
 - **Octave executable location** - Defines the binary file location for Octave. Usually without path on Linux, and including path on Windows.
 - **Show text header when executing scripts** - Enables the default output that octave outputs when started.
 
-### Script files - option group
+### Script files
 
 - **Shared Script Folder(s)** - Defines the search paths for octave scripts
 - **Script Editor** - The text editor to invoke when editing scripts
