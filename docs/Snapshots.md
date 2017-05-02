@@ -44,15 +44,16 @@ This table defines which 3D Views to modify, and how to modify them. Each row de
 To edit a row, the row must be activated by toggeling it on in the **Active** column, then double click on the cell to edit.  
 
 - **View** - Selects the view to modify
-- **Result Type**, **Result Name** - Defines a list of eclipse result properties to cycle through when creating snapshots. If properties from both the dynamic and static list is needed, you must create a new row.
-- **Timestep Start**, **Timestep End** - Defines the timestep range to cycle through when creating snapshots
-- **Range Filter Direction**, **Range Filter Start**, **Range Filter End** - Defines a range filter slice that will be added to the view, and then cycled from start to end when creating snapshots. 
-- **Case List** 
+- **Result Type**, **Properties** - Defines a list of eclipse result properties to cycle through when creating snapshots. If properties from both the dynamic and static list is needed, you must create a new row.
+- **Start Time**, **End Time** - Defines the timestep range to cycle through when creating snapshots
+- **Range Filter Slice**, **Range Start**, **Range End** - Defines a range filter slice that will be added to the view, and then cycled from *Range Start* to *Range End* when creating snapshots. 
+- **Cases** - Defines the cases to cycle while creating snapshots. Normaly you can not change which case a view is displaying, but this option does temporarily.
 
+The number of exported snapshots from a row can easily end up beeing huge, so it is wise to use some causion. The total number will be Properties * Timesteps * Range Steps * Cases.
 
 ### Managing rows
 
-Rows can be deleted and created by right clicking in the table. 
+Rows can be deleted and created by right clicking in the table. 5 rows is created for convenince by default.
 
 
 
