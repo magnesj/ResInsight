@@ -94,7 +94,7 @@ In the following sections the option groups are described in more detail.
 
 Selects the cases to be used when searching for data vectors. Several Cases can be selected at the same time and the filter will contain the union of all vectors in those cases. Curves will be created for each selected case for the selected set of vectors. 
 
-### Summary Vectors
+### Vector Selection
 
 This group of options is used to define the selection of summary vectors of interest. Several filtering tools are available to make this as convenient as possible. 
 
