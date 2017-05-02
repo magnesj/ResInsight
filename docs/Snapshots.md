@@ -6,9 +6,9 @@ published: true
 ---
 ResInsight has several commands to create snapshots conveniently. 3 commands to take snapshots of existing Plot and 3D Views directly, and a more advanced export command that can automatically modify Eclipse 3D Views before snapshotting them. 
 
-The simple commands are available from the toolbar and the **Edit** and **File**->**Export** menus in the main windows, while the **Advanced Snapshot Export** is only available from the **File**->**Export** menu in the **3D Main Window**
-
 ## Snapshots of Existing Views
+
+The commands to snapshot existing views and plots are available from the toolbar and the **Edit** and **File**->**Export** menus in the main windows
 
 ![]({{ site.baseurl }}/images/SnapShotToolBar.png)
 
@@ -35,6 +35,7 @@ The files generated are stored in a folder named `snapshots` within the folder w
 
 The **Advanced Snapshot Export** command is useful for exporting several images of a specified set of views while simultaniously changing some of their settings. By using this command it is easy to document all layers of a specific model, or generate images with identical setup across several different cases. It is also easy to export an image for each of the timesteps in a case, or even a combination of all these parameters.
 
+The **Advanced Snapshot Export** is available from the **File**->**Export** menu in the **3D Main Window** 
 Invoking the command will display the following dialog: 
 
  ![]({{ site.baseurl }}/images/SnapshotAdvancedExport.png)
@@ -53,12 +54,6 @@ Options represented by columns:
 
 The number of exported snapshots from a row can easily end up beeing huge, so it is wise to use some causion. The total number will be Properties * Timesteps * Range Steps * Cases.
 
-The snapshots will be generated and saved to the folder displayed in the **Expot Folder** field, when pressing the **Export** button. This might take quite some time, depending on you settings.
-
-### Managing rows
-
 Rows can be deleted and created by right clicking in the table. 5 rows is created for convenince by default.
 
-
-
-
+The snapshots will be generated and saved to the folder displayed in the **Expot Folder** field, when pressing the **Export** button. This might take quite some time, depending on you settings.
