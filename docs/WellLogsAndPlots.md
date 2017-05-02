@@ -27,7 +27,7 @@ Tracks and Curves can be organized using drag and drop functionality in the **Pr
 
 All the **Tracks** in the same plot always display the same depth range, and share the *True Veritcal Depth (TVD)* or *Measured Depth (MD)* setting. In the property panel of the plot, the exact depth range can be adjusted along with the depth type setting (TVD/MD). 
 
-**Simulation Wells** however, is using a *Pseudo Length* instead of the real *Measured Depth* as the MD information is not available in the restart files. The *Pseudo Length* is a length along the coarsly interploated visualization pipe, and serves only as a very coarse estimation of an MD-like depth. Pseudo length is measured from the simulation-wells first connection-cell (well head connection) to the reservoir. This is very different from MD, which would start at RKB or at sea level.
+**Simulation Wells** however, is using a *Pseudo Length* instead of the real *Measured Depth* when the depth type is MD, as the MD information is not available in the restart files. The *Pseudo Length* is a length along the coarsly interploated visualization pipe, and serves only as a very coarse estimation of an MD-like depth. Pseudo length is measured from the simulation-wells first connection-cell (well head connection) to the reservoir. This is very different from MD, which would start at RKB or at sea level.
 
 ### Depth unit
 
@@ -63,7 +63,6 @@ Curve visual appearance is controlled in the **Appearance** section:
 
 Ectraction curves acts as an artifical well log curve. Instead of probing the real well, a simulation model is probed instead.
 
-
 The property panel for a geomechanical model is shown below:
 
 ![]({{ site.baseurl }}/images/WellLogExtractionCurveProperties.png)
@@ -71,7 +70,7 @@ The property panel for a geomechanical model is shown below:
 The first group of options controls all the input needed to setup the data extraction for the curve - Well Path, Case, and result value. The selection of result value is somewhat different between geomechanical cases and Eclipse cases. In addition you can select what timestep to address if the selected property is a dynamic one. 
 
 <div class="note">
-Placing keyboard focus in the <b>Time Step</b> drop-downbox will allow you to use the arrow keys to quickly step through the timesteps while watching the changes in the curve. 
+Placing keyboard focus in the <b>Time Step</b> drop-downbox will allow you to use the arrow keys or the mouse wheel to quickly step through the timesteps while watching the changes in the curve. 
 </div>
 
 The disply name of a curve is normally generated automatically. The options grouped below **Auto Name** can be used to tailor the length and content of the curve name.
