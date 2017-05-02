@@ -5,9 +5,7 @@ permalink: /docs/octaveinterface/
 published: true
 ---
 
-ResInsight provides a flexible interface to [Octave](http://www.gnu.org/software/octave/ "Octave").
-
-This includes:
+ResInsight provides a flexible interface to [Octave](http://www.gnu.org/software/octave/ "Octave") including:
 
 - Octave functions that communicates with a running ResInsight session
 - Features to simplify managment and editing of Octave scripts from ResInsight
