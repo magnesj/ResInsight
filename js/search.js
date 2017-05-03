@@ -11,11 +11,16 @@
     return text;
   }
 
+  function createRegex(term) {
+    term = term.replace("*", "").replace("+", "");
+    return new RegExp("("+term+")", "mig");
+  }
+
   function generateRegexes(term) {
     var terms = term.split(/\s+/);
     var regexes = [];
     for (var i = 0; i < terms.length; i++) {
-      regexes.push(new RegExp("("+terms[i]+")", "mig"));
+      regexes.push(createRegex(terms[i]));
     }
     return regexes;
   }

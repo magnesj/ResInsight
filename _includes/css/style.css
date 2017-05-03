@@ -1058,7 +1058,7 @@ input[type="search"] {
 span.search-hilight {
   background-color: rgba(0, 255, 0, 0.3);
   display: inline-block;
-  padding: 1px 4px;
+  padding: 1px 0px;
 }
 p.search-result-subtitle {
   margin: 0;
