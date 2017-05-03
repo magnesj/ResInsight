@@ -11,16 +11,10 @@
     return text;
   }
 
-  function createRegex(term) {
-    term = term.replace("*", "").replace("+", "");
-    return new RegExp("("+term+")", "mig");
-  }
-
-  function generateRegexes(term) {
-    var terms = term.split(/\s+/);
+  function matchRegexes(metadata) {
     var regexes = [];
-    for (var i = 0; i < terms.length; i++) {
-      regexes.push(createRegex(terms[i]));
+    for (var kw in metadata) {
+      regexes.push(new RegExp("\\b("+kw+"\\w*)", "mig"));
     }
     return regexes;
   }
@@ -61,12 +55,13 @@
     return null;
   }
 
-  function getItemText(regexes, item) {
+  function getItemText(item, metadata) {
     var itemText = "<div><h3 class='search-result-title'><a href='"+window.baseurl+item.url+"'>"+item.title+"</a></h3>";
     var dummy = document.createElement("div");
     dummy.innerHTML = item.html;
     var paragraphs = $(dummy).find("p, li, div, td");
     var lastSubtitle = null;
+    var regexes = matchRegexes(metadata);
     for (var p = 0;  p < paragraphs.length; p++) {
       var matchingText = getMatchingText(regexes, item, $(paragraphs[p]), lastSubtitle);
       if (matchingText !== null) {
@@ -83,11 +78,10 @@
       noResults();
     } else {
       var searchResults = document.getElementById("search-results");
-      var regexes = generateRegexes(term);
       var append = "";
       for (var i = 0; i < results.length; i++) {
         var item = store[results[i].ref];
-        append += getItemText(regexes, item);
+        append += getItemText(item, results[i].matchData.metadata);
       }
       searchResults.innerHTML = append;
     }
