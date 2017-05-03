@@ -43,6 +43,7 @@ These options controls the visibility of different aspects of the simulation wel
 - **Spheres** This option toggles the visibility of spheres drawn at the center of each well connection cell.
 - **Communication Lines** Toggles the visibility of well communication lines. These lines, or arrows, shows which wells that communicates, and at what rate. Broader arrows indicate higher level of communication. This is based on on Flow Diagnostics calculations, and is only available if the eclipse results includes fluxes.  
 
+
 ### Well Cells and Fence
 
 ![]({{ site.baseurl }}/images/SimulationWellsWellCellsProperties.png)
@@ -59,6 +60,8 @@ These options controls the visibility of different aspects of the simulation wel
 - **Well Head Scale** Scales the arrow displaying the production status of the well
 - **Pipe Radius Scale** Scaling the pipe radius by the average i,j cell size.
 - **Sphere Radius Scale** Scaling connection cell spheres radius by the average i,j cell size.
+
+Open Simulation Wells will be drawn with a slightly larger radius than open wells. This makes open wells easier to see if they occupy the same cells as a closed one.
 
 ### Colors
 
