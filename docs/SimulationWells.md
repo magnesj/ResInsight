@@ -8,7 +8,20 @@ published: true
 ![]({{ site.baseurl }}/images/SimulationWells.png)
 
 This section describes how wells defined in the simulation are displayed, and how to control the different aspects of their visualization.
- 
+
+## Commands
+
+Several commands is available as context commands on a simulation well. These commads are available either by right-clicking  the well in the **3D View** or in the **Project Tree**
+
+- **New Well Log Extraction Curve** - Creates a new Well Log curve based on the selected well, the current timestep and cell property. See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots) 
+- **New Intersection** - creates a new intersection based on the selected Simulation Well. See [Well Log Plots]({{ site.baseurl }}/docs/intersections) 
+- **Plot Production Rates** - Creates a summary plot ( See [Summary Plots]({{ site.baseurl }}/docs/summaryplots) ) of the selected wells production rates, along  with the bottom hole pressure.
+- **Plot Well Allocation** - Creates or modifies the default Well Allocation Plot to show the well allocation for the selected well. If the case has no Fluxes the well flow rates are shown instead. ( See [ Flow Diagnostics Plots ]({{ site.baseurl }}/docs/flowdiagnosticsplots) )
+- **Show Contributing Wells** - This command sets up a 3D View by adding filters and modifying the Cell Result based on Flow Diagnostic Calculations to show which regions and wells that contribute to the selected well by doing:
+   - Add a property filter of **Time Of Fligt** to/from the selected well to only show the cells that contribute to/are influenced by the well.
+   - Sets the **Cell Result** to show **Tracer With Max Fraction** based on **All Injectors** or **All Producers** (the opposite of the selected well)
+   - Toggles on the Simulation wells contributing to/influenced by the selected well.
+
 ## Overall Settings for Simulation Wells
 
 The Property Panel of the **Simulation Wells** item in the **Project Tree** contains options that are applied across all the wells, while the visualization of each single well can be controlled by the options in the property panel of that particular well, and will override the overall settings in the **Simulation Wells** item.
