@@ -17,7 +17,7 @@ When a summary case has been imported, a Summary Plot with a default **Curve Fil
 
 A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain **Summary Curve Filters** and **Summary Curves** (See below).
 
-A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**.
+A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. 
 
 ![]({{ site.baseurl }}/images/SummaryPlotTree.png)
 
@@ -66,6 +66,12 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
   - The Plot itself if none of the above is hit and the Plot window is activated by the mouse click.
 - **Window Zoom** - Window zoom is available by dragging the mouse when the left mouse button is pressed. Use ![]({{ site.baseurl }}/images/ZoomAll16x16.png) **Zoom All** to restore default zoom level.
 - **Wheel Zoom** - The mouse wheel will zoom the plot in and out towards the current mouse cursor position 
+
+### Accessing the Plot Data
+
+The command context command **Show Plot Data** will show a window containing the plot data in ascii format. The content of this window is easy to copy and paste into Excel or other tools for further processing.
+
+It is also possible to save the ascii data to a file directly by using the context command **Export Plot Data to Text File** on the plot. 
 
 ## Summary Curve Filter
 
