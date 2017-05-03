@@ -41,7 +41,10 @@ These options controls the visibility of different aspects of the simulation wel
 - **Well head** -- Controls visibility of the arrow displaying the production status of the well
 - **Pipe** -- A symbolic pipe can be drawn between the well connection cells to illustrate the well. This option controls the visibility of the pipes.
 - **Spheres** -- This option toggles the visibility of spheres drawn at the center of each well connection cell.
-- **Communication Lines** -- Toggles the visibility of well communication lines. These lines, or arrows, shows which wells that communicates, and at what rate. Broader arrows indicate higher level of communication. This is based on on Flow Diagnostics calculations, and is only available if the eclipse results includes fluxes.  
+- **Communication Lines** -- Toggles the visibility of well communication lines. 
+   These arrows shows the communication between wells. Broader arrows indicate higher level of communication. 
+   These arrows are based on Flow Diagnostics calculations, and are only available if the eclipse results includes fluxes. 
+   Arrows representing communication in the opposite direction from what is expected (eg. producers supporting another well due to cross flow) are displayed in a layer "under" the other arrows, to make them easier to see.  
 
 
 ### Well Cells and Fence
