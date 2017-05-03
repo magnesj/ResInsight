@@ -38,6 +38,12 @@ The depth unit can be set using the **Depth unit** option. Currently ResInsight 
 The visible depth range can be panned using the mouse wheel while the mouse pointer hovers over the plot.
 Pressing and holding **CTRL** while using the mouse wheel will allow you to zoom in or out depth-wise, towards the mouse position.
 
+### Accessing the Plot Data
+
+The command context command **Show Plot Data** will show a window containing the plot data in ascii format. The content of this window is easy to copy and paste into Excel or other tools for further processing.
+
+It is also possible to save the ascii data to a file directly by using the context command **Export Plot Data to Text File** on the plot. 
+
 ## Tracks
 
 Tracks can be created by right clicking a **Well Log Plot** and select **New Track**
