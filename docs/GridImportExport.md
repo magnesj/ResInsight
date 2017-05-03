@@ -15,11 +15,12 @@ ResInsight supports the following type of Eclipse input data:
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/Case24x24.png) Import Eclipse Case**  and select an `*.EGRID` or `*.GRID` Eclipse file for import.
 2. The case is imported, and a view of the case is created
 
+The **Reload Case** command can be used to reload a previously imported case, to make sure it is up to date. This is useful if the grid or result files changes while a ResInsight session is active.
+
 <div class="note">
 You can select several grid files in one go by multiple selection of files (Ctrl + left mouse button, Shift + left mouse button). 
 </div>
 
-The **Reload Case** command can be used to reload a previously imported case, to make sure it is up to date. This is useful if the grid or result files changes while a ResInsight session is active.
 
 ### Eclipse ASCII input data
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/EclipseInput24x24.png) Import Input Eclipse Case** and select a `*.GRDECL` file.
