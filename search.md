@@ -32,5 +32,6 @@ window.store = {
   {% endif %}
 {% endfor %}
 };
+window.baseurl = "{{ site.baseurl }}";
 </script>
 <script src="{{ site.baseurl }}/js/search.js"></script>

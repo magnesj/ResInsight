@@ -24,7 +24,7 @@
     var subtitle = $(from).prevAll(":header:first");
     if (subtitle.length > 0) {
       return {
-        content: "<p class='search-result-subtitle'><a href='"+item.url+"#"+subtitle[0].id+"'>"+$(subtitle[0]).text()+"</a></p>",
+        content: "<p class='search-result-subtitle'><a href='"+window.baseurl+item.url+"#"+subtitle[0].id+"'>"+$(subtitle[0]).text()+"</a></p>",
         id: subtitle[0].id
       };
     }
@@ -57,7 +57,7 @@
   }
 
   function getItemText(regexes, item) {
-    var itemText = "<div><h3 class='search-result-title'><a href='"+item.url+"'>"+item.title+"</a></h3>";
+    var itemText = "<div><h3 class='search-result-title'><a href='"+window.baseurl+item.url+"'>"+item.title+"</a></h3>";
     var dummy = document.createElement("div");
     dummy.innerHTML = item.html;
     var paragraphs = $(dummy).find("p, li, div, td");
