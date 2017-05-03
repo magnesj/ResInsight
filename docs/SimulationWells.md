@@ -61,7 +61,7 @@ These options controls the visibility of different aspects of the simulation wel
 - **Pipe Radius Scale** Scaling the pipe radius by the average i,j cell size.
 - **Sphere Radius Scale** Scaling connection cell spheres radius by the average i,j cell size.
 
-Open Simulation Wells will be drawn with a slightly larger radius than open wells. This makes open wells easier to see if they occupy the same cells as a closed one.
+Open Simulation Wells will be drawn with a slightly larger radius than closed wells. This makes open wells easier to see when they occupy the same cells as a closed one.
 
 ### Colors
 
