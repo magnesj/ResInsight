@@ -54,7 +54,7 @@ One script can be executed on many cases by first selecting a set of cases, and 
 
 When an Octave script is executed, the **Process Monitor** pops up and displays the output from Octave during the script execution as displayed below:
 
-![]({{ site.baseurl }}/images/ExecuteOctaveScriptOnSelectedCases.png)
+![]({{ site.baseurl }}/images/ProcessMonitor.png)
 
 In addition to the output from the script, it prints a start and stop timestamp. The **Clear**-button deletes all the text in the monitor, and the **Stop**-button tries to kill the running Octave process.
 
