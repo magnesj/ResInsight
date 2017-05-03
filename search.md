@@ -18,7 +18,7 @@ overview: true
 </section>
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-<script src="/js/lunr.js"></script>
+<script src="{{ site.baseurl }}/js/lunr.js"></script>
 <script>
 window.store = {
 {% for p in site.pages %}
@@ -33,4 +33,4 @@ window.store = {
 {% endfor %}
 };
 </script>
-<script src="/js/search.js"></script>
+<script src="{{ site.baseurl }}/js/search.js"></script>
