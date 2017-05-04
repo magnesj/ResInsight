@@ -80,3 +80,9 @@ There are two main selections you need to make: The tracers and the result prope
     This produces values between 0.0 and 1.0 where high values indicate that both the injectors and the producers 
     have a high influence.
 
+#### On-Demand Calculation
+
+The flow diagnostics results are only calculated when asked for, and only for requested timesteps. This means that statistics based on all timesteps is not available for these results.  
+
+## Geomechanical Results
+
