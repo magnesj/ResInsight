@@ -5,7 +5,7 @@ permalink: /docs/cellresults/
 published: true
 ---
 
-[]({{ site.baseurl }}/images/CellResultsOverview.png)
+![]({{ site.baseurl }}/images/CellResultsOverview.png)
 
 The main results to postprocess in ResInsight are Cell Results. A Cell Result is one value, or a small set of values per 
 cell over a region of the grid. A Cell Result is also reffered to as a *Property*.
@@ -26,7 +26,7 @@ In the following we will describe these options.
 
 As shown in the picture below, there are 6 different result types
 
-[]({{ site.baseurl }}/images/CellResultTypes.png)
+![]({{ site.baseurl }}/images/CellResultTypes.png)
 
 - **Dynamic** -- Time varying properties from the Eclipse simulation
 - **Static** -- Eclipse properties that does not vary with time. Some derived properties calculated by ResInsight are also present.
@@ -42,5 +42,5 @@ ResInsight has embedded Flow Diagnostics calculations, and the calculated Cell R
 
 There are several options available to define the particular result you want to target, as shown below:
 
-[]({{ site.baseurl }}/images/CellResultFlowDiagnostics.png)
+![]({{ site.baseurl }}/images/CellResultFlowDiagnostics.png)
 
