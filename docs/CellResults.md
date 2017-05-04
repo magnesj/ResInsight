@@ -8,7 +8,7 @@ published: true
 ![]({{ site.baseurl }}/images/CellResultsOverview.png)
 
 The main results to postprocess in ResInsight are Cell Results. A Cell Result is one value, or a small set of values per 
-cell over a region of the grid. A Cell Result is also reffered to as a *Property*.
+cell over a region of the grid. A Cell Result is also referred to as a *Property*.
 
 Cell Results are used in several operations and settings: 
 
@@ -38,9 +38,38 @@ As shown in the picture below, there are 6 different result types
 
 ### Flow Diagnostic Results
 
-ResInsight has embedded Flow Diagnostics calculations, and the calculated Cell Results are available using the **Flow Diagnostics** result type. 
+ResInsight has embedded Flow Diagnostics calculations made available using the **Flow Diagnostics** result type. 
+These results make it easier to see how and where wells interact with the reservoir and each other. 
+It is possible to select exactly what wells to investigate, and even the possible *opposite flow* part of the well.
+
+#### Cross Flow and Opposite Flow
+
+The *opposite flow* of a well denotes the flow that is opposite to the expected normal state of the well. Eg. parts of a producer might actually be injecting due to cross flow, and an injector could be producing in some sections.
+Each well is assigned an opposite flow name by adding "-XF" to the end of the name. "-XF" was chosen as a reference to Cross Flow.
+
+In this way, a producer will have two tracer names: The "well name" as a producer tracer, and "well name-XF" as an injector tracer.
+
+#### Defining results 
 
 There are several options available to define the particular result you want to target, as shown below:
 
 ![]({{ site.baseurl }}/images/CellResultFlowDiagnostics.png)
+
+There are two main selections you need to make: The tracers and the result property 
+- **Tracers** -- Option to select how/what tracers to use. Available options are:
+    - **All Injectors and Producers** --  Selects all the wells, including the oppsite flow tracers
+    - **All Producers** -- Selects all producer tracers, including the opposite flow tracers of injectors.
+    - **All Injectors** -- Selects all injector tracers, including the opposite flow tracers of producers.
+    - **By Selection** -- Displays a list of all the tracers that can be selected freely, and a **Filter** field. 
+       - The list of selectable tracers can be filtered using wild card search of their names.
+       - The tracers are sorted by their overall status as producer or injectors and prefixed depending on the status.
+         Injectors are prefixed with "I :", producers with "P :" and wells with varying state "I/P:".
+- **Result property** -- Displays a list of the available results properties described below.
+
+#### Flow Diagnostic Result Properties
+
+- **Time Of Flight (Average)** -- The time for some fluid in the cell to reach a producer, or the time it takes to reach the cell from an injector. When selecting several tracers, they are averaged based on TODO!!
+- **Tracer Cell Fraction (Sum)** -- The volume fraction of a cell occupied by the selected tracers. The injector and producer tracers counts as independent in this regard, so the sum of fractions for all the producer tracers will be 1.0 and the same for the injector tracers. If both types of tracers are selected, the total sum will normally reach 2.0. 
+- **Max Fraction Tracer** -- Shows which of the selected tracers that has the largest fraction in each cell. This is shown as a category result displaying a color for each tracer, and the names in the legend.
+- **Injector Producer Communication** -- TODO !!
 
