@@ -24,8 +24,11 @@
   - wellpaths
   - linkedviews
   - casegroupsandstatistics 
+  
   - summaryplots
   - welllogsandplots
+  - flowdiagosticsplots
+  
   - snapshots
   - exporteclipseproperties
   - octaveinterface
