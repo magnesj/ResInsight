@@ -76,5 +76,7 @@ There are two main selections you need to make: The tracers and the result prope
     - **Max Fraction Tracer** -- Shows which of the selected tracers that has the largest fraction in each cell. 
     This is shown as a category result displaying a color for each tracer, and the names in the legend.
     - **Injector Producer Communication** -- The communication in a cell between a set of producers and a set of injectors 
-    is calculated as the sum of producer fractions multiplied by the sum of injector fractions in the cell. This produces values between 0.0 and 1.0
+    is calculated as the sum of producer fractions multiplied by the sum of injector fractions in the cell. 
+    This produces values between 0.0 and 1.0 where high values indicate that both the injectors and the producers 
+    have a high influence.
 
