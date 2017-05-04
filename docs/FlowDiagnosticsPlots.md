@@ -22,9 +22,9 @@ This window displays three different graphs describing the overall behaviour of 
 
 ## Well Allocation Plots
 
-Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells.  
+Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells. The total phase or allocation is shown in the legend and as a pie chart, while the well flow is shown in a depth value vs flow graph.  
 
-### Creating
+### Creating Well Allocation Plots
 
 To plot the Well allocation for a well, right click the well in the **Project Tree** or in the **3D View** and invoke the command **Plot Well Allocation**.
 
@@ -33,4 +33,13 @@ To plot the Well allocation for a well, right click the well in the **Project Tr
 The command updates the default **Well Allocation Plot** with new values based on the selection and the settings in the active view. This plot can then be copied to the **Stored Plots** folder by the context command **Add Stored Well Allocation Plot**. 
 
 ### Options
+
+The **Legend**, **Total Allocation** pie chart, and the **Well Flow/Allocation** can be turned on or off from the toggles in the **Project Tree**. 
+
+Below the property panel of a Well Allocation Plot is shown:
+
+
+
+
+
 
