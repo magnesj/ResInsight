@@ -4,29 +4,30 @@
   
 - title: Getting Started
   docs:
-  - gettingstarted
   - installation
   - installationlinux
-
+  - gettingstarted
+  - gridimportexport
+  - modelnavigation
+  
 - title: Application
   docs:
-  - gridimportexport
   - reservoirviews
-  - modelnavigation
+  - cellresults
   - resultcolorlegend
+  - resultinspection
   - simulationwells
   - faults
   - intersections
   - filters
   - formations
   - wellpaths
-  - resultinspection
   - linkedviews
-  - exporteclipseproperties
+  - casegroupsandstatistics 
   - summaryplots
   - welllogsandplots
   - snapshots
-  - casegroupsandstatistics
+  - exporteclipseproperties
   - octaveinterface
   - odbsupport
   - derivedresults
