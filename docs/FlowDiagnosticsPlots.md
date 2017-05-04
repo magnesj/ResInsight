@@ -6,21 +6,31 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsOverview.png)
 
-There are currently two types of Flow Diagnostics related plots:
-
-- **Well Allocation Plots**
-- **Flow Characteristics**
-
-They are managed from the **Project Tree** in the **Plot Main Window** in the folder **Flow Diagnostics Plots**.
+Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main Window** in the folder **Flow Diagnostics Plots**.
 
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsProjectTree.png)
 
-This folder contains a **Flow Characteristics Plot**, a default **Well Allocation Plot** and a **Stored Plots** folder.
+This folder contains a **Flow Characteristics Plot**, a default **Well Allocation Plot** and a **Stored Plots** folder containing stored **Well Allocation Plots**.
 
+## Flow Characteristics Plot
 
+This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only the ones flow diagnostics results has been requested. 
 
-The default Well Allocation Plot is changed each time the command *Plot Well Allocation** is invoked on some well.
-This plot can be copied to the **Stored Plots** folder by the context command **Add Stored Well Allocation Plot** to 
-store it, and compare it to other plots.
+- **Lorenz Coefficient** -- This plot displys the lorenz coefficient for the complete reservoir for each calculated timestep. The background is colored to serve as a reference for the timestep in the other graphs.
+- **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each timestep of the F-phi curve for the reservoir. The color of the curve indicates the timestep, and can be looked up in the background color of the **Lorenz Coefficient** plot.
+- **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each calculated timestep.  The color of the curve indicates the timestep.
 
-The **Stored Plots** 
+## Well Allocation Plots
+
+Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells.  
+
+### Creating
+
+To plot the Well allocation for a well, right click the well in the **Project Tree** or in the **3D View** and invoke the command **Plot Well Allocation**.
+
+![]({{ site.baseurl }}/images/SimulationWellContextMenu.png)
+
+The command updates the default **Well Allocation Plot** with new values based on the selection and the settings in the active view. This plot can then be copied to the **Stored Plots** folder by the context command **Add Stored Well Allocation Plot**. 
+
+### Options
+
