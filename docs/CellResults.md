@@ -64,12 +64,17 @@ There are two main selections you need to make: The tracers and the result prope
        - The list of selectable tracers can be filtered using wild card search of their names.
        - The tracers are sorted by their overall status as producer or injectors and prefixed depending on the status.
          Injectors are prefixed with "I :", producers with "P :" and wells with varying state "I/P:".
-- **Result property** -- Displays a list of the available results properties described below.
-
-#### Flow Diagnostic Result Properties
-
-- **Time Of Flight (Average)** -- The time for some fluid in the cell to reach a producer, or the time it takes to reach the cell from an injector. When selecting several tracers, they are averaged based on TODO!!
-- **Tracer Cell Fraction (Sum)** -- The volume fraction of a cell occupied by the selected tracers. The injector and producer tracers counts as independent in this regard, so the sum of fractions for all the producer tracers will be 1.0 and the same for the injector tracers. If both types of tracers are selected, the total sum will normally reach 2.0. 
-- **Max Fraction Tracer** -- Shows which of the selected tracers that has the largest fraction in each cell. This is shown as a category result displaying a color for each tracer, and the names in the legend.
-- **Injector Producer Communication** -- TODO !!
+- **Result property** -- Displays a list of the available results:
+    - **Time Of Flight (Average)** -- The time for some fluid in the cell to reach a producer, 
+    or the time it takes to reach the cell from an injector. 
+    When selecting several tracers, the time of flight values from each of the tracers are weighted 
+    by their cell fraction before they are averaged.
+    - **Tracer Cell Fraction (Sum)** -- The volume fraction of a cell occupied by the selected tracers. 
+    The injector and producer tracers counts as independent in this regard, so the sum of fractions for 
+    all the producer tracers will be 1.0 and the same for the injector tracers. If both types of tracers 
+    are selected, the total sum will normally reach 2.0. 
+    - **Max Fraction Tracer** -- Shows which of the selected tracers that has the largest fraction in each cell. 
+    This is shown as a category result displaying a color for each tracer, and the names in the legend.
+    - **Injector Producer Communication** -- The communication in a cell between a set of producers and a set of injectors 
+    is calculated as the sum of producer fractions multiplied by the sum of injector fractions in the cell. This produces values between 0.0 and 1.0
 
