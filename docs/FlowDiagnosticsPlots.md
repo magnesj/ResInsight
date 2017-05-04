@@ -55,5 +55,9 @@ Below the property panel of a Well Allocation Plot is shown:
    - **Group Small Contributions** -- Groups the wells with a contribution below the threshold into a group called **Other**
    - **Threshold** -- Threshold used by the above option.
    
-   
+### Depth Settings
+
+- **Pseudo Length**
+- **TVD**
+- **Connection Number**
 
