@@ -29,12 +29,14 @@
   - welllogsandplots
   - flowdiagnosticsplots
   
+  
   - snapshots
+  - batchcommands
   - exporteclipseproperties
   - octaveinterface
   - odbsupport
+
   - derivedresults
-  - batchcommands
   - preferences
 
 - title: Appendix
