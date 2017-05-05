@@ -77,7 +77,7 @@ This group of options controls the visibility of the fault faces. Since they wor
 
 First of all. These options are only available in **Faults-only** visualization mode. ( See *Toolbar Control* above) When not in **Faults-Only** mode, ResInsight overrides the options, and the controls are inactive. 
 
-Secondly: The option you would normally want to adjust is **Dynamic Face Selection** (See below).
+Secondly: The option you would normally want to adjust is **Dynamic Face Selection** ( See below ).
 
 - **Show defined faces** -- Displays the fault cell faces that are defined on the Eclipse input file (_`*.DATA`_)
 - **Show opposite faces** -- Displays the opposite fault cell faces from what is defined on the input file, based on IJK neighbors.  
