@@ -28,12 +28,12 @@ Each of the windows can also be closed freely, but if both are closed, ResInsigh
 Each of the main windows has a central area and several docking windows surrounding it. The different docking 
 windows can be managed from the **Windows** menu or directly using the local menu bar of the docking window.
 
-- **Project Tree** - contains all application objects in a tree structure.
-- **Property Editor** - displays all properties for the selected object in the **Project Tree**
-- **Process Monitor** - displays output from Octave when executing Octave scripts
-- **Result Info** - displays info for the selected object in the 3D scene
-- **Result Plot** - displays curves based on result values for the selected cells in the 3D scene
-- **Messages** - displays occasional info and warnings related to operations executed.
+- **Project Tree** -- contains all application objects in a tree structure.
+- **Property Editor** -- displays all properties for the selected object in the **Project Tree**
+- **Process Monitor** -- displays output from Octave when executing Octave scripts
+- **Result Info** -- displays info for the selected object in the 3D scene
+- **Result Plot** -- displays curves based on result values for the selected cells in the 3D scene
+- **Messages** -- displays occasional info and warnings related to operations executed.
 
 Result Info and Result Plot is described in detail in [ Result Inspection ]({{ site.baseurl }}/docs/resultinspection)
 
@@ -57,9 +57,9 @@ Standard window management for applying minimized, normal and maximized state is
 
 Commands to arrange the windows in the standard ways are available from the **Windows** menu
 
-- **Tile Windows** - distribute all open view windows to fill available view widget space
-- **Cascade Windows** - organize all open view windows slightly offset on top of each other
-- **Close All Windows** - close all open view windows
+- **Tile Windows** -- distribute all open view windows to fill available view widget space
+- **Cascade Windows** -- organize all open view windows slightly offset on top of each other
+- **Close All Windows** -- close all open view windows
 
 #### Editing 3D views and Plot Windows content
 
