@@ -38,9 +38,9 @@ If you check the button 'Grouped' in the CMake GUI, the CMake variables are grou
 - Open the CMake GUI
 - Set the path to the source code
 - Set the path to the build directory
-- Click "Configure" and select your preferred compiler
+- Click **Configure** and select your preferred compiler
 - Set the build options and click "Configure" again (see ResInsight specific options below)
-- Click "Generate" to generate the makefiles or solution file and project files in the build directory
+- Click **Generate** to generate the makefiles or solution file and project files in the build directory
 - Run the compiler using the generated makefiles or solution file/project files to build ResInsight
 
 ### Windows
