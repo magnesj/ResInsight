@@ -37,7 +37,8 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 - **Font Size** -- The font Size used for the date/times shown at the ticks of the axis 
 - **Time Mode** -- Option to show the time from Simulation Start, or as real date-times. 
 - **Time Unit** -- The time unit used to display **Time From Simulation Start** 
-- **Max**/**Min** -- The range of the visible time in the Plot in the appropriate time unit. The format of dates is yyyy-mm-ddThh:mm:ssZ 
+- **Max**/**Min** -- The range of the visible time in the Plot in the appropriate time unit.  
+  The format of dates is _`yyyy-mm-ddThh:mm:ssZ`_ 
 
 ### Y-axis properties
 
