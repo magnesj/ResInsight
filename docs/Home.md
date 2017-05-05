@@ -22,10 +22,8 @@ Integration with GNU Octave enables powerful and flexible result manipulation an
 The main input data is
 _`*.GRID`_ and _`*.EGRID`_ files along with their _`*.INIT`_ and restart files _`*.XNNN`_ and _`*.UNRST`_. 
 Summary vectors can be imported from _`*.SMSPEC`_ files.
-
 ResInsight also supports selected parts of Eclipse input files and can read grid 
-information and corresponding cell property data sets from _`*.GRDECL`_ files.
-
+information and corresponding cell property data sets from _`*.GRDECL`_ files. 
 Well log data can be imported from _`*.LAS`_ files.
 
 ResInsight can also be built with support for Geomechanical models from ABAQUS in the _`*.odb`_ file format.
