@@ -6,11 +6,9 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsOverview.png)
 
-Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main Window** in the folder **Flow Diagnostics Plots**.
+Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main Window** in the folder **Flow Diagnostics Plots**. This folder contains a **Flow Characteristics Plot**, a default **Well Allocation Plot** and a **Stored Plots** folder containing stored **Well Allocation Plots**.
 
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsProjectTree.png)
-
-This folder contains a **Flow Characteristics Plot**, a default **Well Allocation Plot** and a **Stored Plots** folder containing stored **Well Allocation Plots**.
 
 ## Flow Characteristics Plot
 
