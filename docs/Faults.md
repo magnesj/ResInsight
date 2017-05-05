@@ -79,7 +79,7 @@ First of all. These options are only available in **Faults-only** visualization 
 
 Secondly: The option you would normally want to adjust is **Dynamic Face Selection** (See below).
 
-- **Show defined faces** -- Displays the fault cell faces that are defined on the Eclipse input file (`*.DATA`)
+- **Show defined faces** -- Displays the fault cell faces that are defined on the Eclipse input file (_`*.DATA`_)
 - **Show opposite faces** -- Displays the opposite fault cell faces from what is defined on the input file, based on IJK neighbors.  
   *These two options should normally be left **On**. They are useful when investigating the exact faults information provided on the `*.DATA` file. If you need to use them, it is normally wise to set the **Dynamic Face Selection** to "Show Both".*
 - **Dynamic Face Selection** -- At one particular position on a fault there are usually two cells competing for your attention: The cell closer to you as the viewer, or the one further from you. When showing results, this becomes important because these two cell faces have different result property values, and thus color.  
