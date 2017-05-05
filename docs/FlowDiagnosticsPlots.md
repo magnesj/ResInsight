@@ -69,9 +69,9 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
 
 - **Name** -- The plot name, updated automatically based on the **Flow Type** and well
 - **Depth Type**
-  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. In this mode, 
-  a rounded fraction of the total depth is used to add points with some negative depth, keping the curve 
-  value at zero depth constant. This is done to make it easier to see the end values of the curves relative to each other.  
+  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. 
+  In this mode the curves are extended somewat above zero depth keping the curve 
+  values constant. This is done to make it easier to see the final values of the curves relative to each other.  
   The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
   ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
   - **TVD** -- Use True Vertical Depth on the depth-axis. 
