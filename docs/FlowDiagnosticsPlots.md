@@ -31,7 +31,7 @@ Multi Segment Wells will be displayed according to their branch information, but
 
 ### Creating Well Allocation Plots
 
-To plot the Well allocation for a well, right click the well in the **Project Tree** or in the **3D View** and invoke the command **Plot Well Allocation**.
+To plot the Well allocation for a well, right-click the well in the **Project Tree** or in the **3D View** and invoke the command **Plot Well Allocation**.
 
 ![]({{ site.baseurl }}/images/SimulationWellContextMenu.png)
 

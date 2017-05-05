@@ -13,14 +13,14 @@ ResInsight can display well logs by extracting data from a simulation model alon
 
 Well log plots can be created in several ways: 
 
-1. Right click a wellpath or a simulation well, either in the **Project Tree** or in the 3D-view.  
+1. Right-click a wellpath or a simulation well, either in the **Project Tree** or in the 3D-view.  
    Select **New Well Log Extraction Curve**.   
    A new plot with a single **Track** and a **Curve** is created. The curve is setup to match the 
    selected Well trajectory, active case, and result. 
-2. Right click the empty area below all the items in the **Project Tree**.  
+2. Right-click the empty area below all the items in the **Project Tree**.  
    Select **New Well Log Plot**. 
    A plot is created with one **Track** and an empty **Curve**.
-3. Right click a LAS-file channel in the **Project Tree**.
+3. Right-click a LAS-file channel in the **Project Tree**.
    Select **Add to New Plot**. 
    A new plot with a single **Track** and a **Curve**  displaying the selected LAS-file channel is created.
 
@@ -53,7 +53,7 @@ It is also possible to save the ascii data to a file directly by using the conte
 
 ## Tracks
 
-Tracks can be created by right clicking a **Well Log Plot** and select **New Track**
+Tracks can be created by right-clicking a **Well Log Plot** and select **New Track**
 
 ![]({{ site.baseurl }}/images/TrackProperties.png)
 
@@ -62,7 +62,7 @@ Logarithmic display is controlled using the **Logarithmic Scale** option.
 
 ## Curves
 
-Curves can be created by right clicking a **Track** in the **Project Tree**, or by the commands mentioned above.
+Curves can be created by right-clicking a **Track** in the **Project Tree**, or by the commands mentioned above.
 There are two types of curves: *Well Log Extraction Curves* and *Well Log LAS Curves*. 
 
 Curve visual appearance is controlled in the **Appearance** section:
@@ -135,7 +135,7 @@ If the LAS-file does not contain a well name, the file name is used instead.
 
 ### Exporting LAS-files
 
-A set of curves can be exported to LAS files by right clicking the curves, well log track, or well log plots and select **Export To LAS Files ...**. An export dialog is displayed, allowing the user to configure how to export curve data.
+A set of curves can be exported to LAS files by right-clicking the curves, well log track, or well log plots and select **Export To LAS Files ...**. An export dialog is displayed, allowing the user to configure how to export curve data.
 
 ![]({{ site.baseurl }}/images/export_to_las_files.png)
 

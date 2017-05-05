@@ -54,6 +54,6 @@ Options represented by columns:
 
 The number of exported snapshots from a row can easily end up being huge, so it is wise to use some caution. The total number will be Properties * Timesteps * Range Steps * Cases.
 
-Rows can be deleted and created by right clicking in the table. 5 rows are created for convenience by default.
+Rows can be deleted and created by right-clicking in the table. 5 rows are created for convenience by default.
 
 The snapshots will be generated and saved to the folder displayed in the **Export Folder** field, when pressing the **Export** button. This might take quite some time, depending on you settings.

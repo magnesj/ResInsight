@@ -42,7 +42,7 @@ Faults can be hidden and shown in several ways.
 
 - Checking or unchecking the checkbox in front of the fault will show or hide the fault. 
 - Visibility for multiple faults can be controlled at the same time by selecting multiple faults and use the context menu: **On**, **Off** and **Toggle**. 
-- Right clicking a Fault in the 3D View will enable a context menu with a command to hide the fault.
+- Right-clicking a Fault in the 3D View will enable a context menu with a command to hide the fault.
 
 ### Fault color
 Each named Fault is given a color on import. This color can be controlled by selecting the fault and edit its  **Fault color** in the **Property Editor.**
@@ -99,7 +99,7 @@ The color of the NNC faces are set to be a bit lighter than their corresponding 
 
 Faults can be exported to separate files in the _`*grdecl`_ file format. This is useful for example if you need a list of the geometrically detected faults that has not been covered by entries in the eclipse FAULTS keyword.  
 
-To export some faults, select the faults you want to export in the **Project Tree**, right click them and select the command **Export Faults ...** from the context menu.
+To export some faults, select the faults you want to export in the **Project Tree**, right-click them and select the command **Export Faults ...** from the context menu.
 
  ![]({{ site.baseurl }}/images/ExportFaultsMenu.png)
 

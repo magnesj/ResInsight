@@ -25,7 +25,7 @@ You can select several grid files in one go by multiple selection of files (Ctrl
 ### Eclipse ASCII input data
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/EclipseInput24x24.png) Import Input Eclipse Case** and select a _`*.GRDECL`_ file.
 2. The case is imported, and a view of the case is created
-3. Right click the **Input Properties** in the generated **Input Case** and use the context menu to import additional Eclipse Property data files.
+3. Right-click the **Input Properties** in the generated **Input Case** and use the context menu to import additional Eclipse Property data files.
 
 ### Handling missing or wrong MAPAXES
 
