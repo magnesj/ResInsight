@@ -195,7 +195,7 @@ Many of the properties of a single curve is similar to the properties described 
 
 The curve's appearance is controlled directly, and not automatically as for **Curve Filters**.
 <div class="note">
-The appearance set on a curve in a **Curve Filter** will override the settings in the **Curve Filter** until the **Curve Filter** settings are applied again. Then the local changes on the curve are overwritten. 
+The appearance set on a curve in a <b>Curve Filter</b> will override the settings in the <b>Curve Filter</b> until the <b>Curve Filter</b> settings are applied again. Then the local changes on the curve are overwritten. 
 </div>
 
 ### Curve Name
