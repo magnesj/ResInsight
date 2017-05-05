@@ -64,11 +64,14 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
 
 - **Name** - The plot name, updated automatically based on the **Flow Type** and well
 - **Depth Type**
-  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
+  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. In this mode, 
+  a rounded fraction of the total depth is used to add points with some negative depth, keping the curve 
+  value at zero depth constant. This is done to make it easier to see the end values of the curves relative to each other.  
+  The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
   ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
   - **TVD** -- Use True Vertical Depth on the depth-axis. 
   This will produce rather strange plots for horizontal or near horizontal wells. 
-  - **Connection Number** -- Use the number of connections counted from the top on the depth-axis
+  - **Connection Number** -- Use the number of connections counted from the top on the depth-axis. In this mode the 
 - **Visible Depth Range** -- These options control the depth zoom
   - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are maid
   - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
