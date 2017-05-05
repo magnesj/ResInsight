@@ -47,7 +47,8 @@ The **Legend**, **Total Allocation** pie chart, and the **Well Flow/Allocation**
 - **Options**
    - **Plot Type**
        - **Allocation** -- Plots *Reservoir well flow rates* along with how this well supports/are 
-       supported by other wells. ( This option is only available for cases with Flux results available. ) 
+       supported by other wells.  
+       ( This option is only available for cases with Flux results available. ) 
        - **Well Flow** -- Plots *Surface Well Flow Rates* together with phase split between Oil, Gas, and Water.
    - **Flow Type** 
        - **Accumulated** -- Plots an approximation of the accumulated flow along the well 
@@ -63,7 +64,8 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
 
 - **Name** - The plot name, updated automatically based on the **Flow Type** and well
 - **Depth Type**
-  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry. ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
+  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
+  ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
   - **TVD** -- Use True Vertical Depth on the depth-axis. 
   This will produce rather strange plots for horizontal or near horizontal wells. 
   - **Connection Number** -- Use the number of connections counted from the top on the depth-axis
@@ -71,3 +73,11 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
   - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are maid
   - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
   
+### Accessing the Plot Data
+
+The command context command **Show Plot Data** will show a window containing the plot data in ascii format. The content of this window is easy to copy and paste into Excel or other tools for further processing.
+
+It is also possible to save the ascii data to a file directly by using the context command **Export Plot Data to Text File** on the **Accumulated Flow**/**Inflow Rates** item in the **Project Tree**. 
+
+The total accumulation data can also be viewed in ascci format by the command **Show Total Allocation Data**.
+
