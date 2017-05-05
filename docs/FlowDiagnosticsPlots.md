@@ -62,7 +62,7 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
 
 ![]({{ site.baseurl }}/images/WellAllocationWellLogProperties.png)
 
-- **Name** - The plot name, updated automatically based on the **Flow Type** and well
+- **Name** -- The plot name, updated automatically based on the **Flow Type** and well
 - **Depth Type**
   - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. In this mode, 
   a rounded fraction of the total depth is used to add points with some negative depth, keping the curve 
