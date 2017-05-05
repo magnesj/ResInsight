@@ -47,7 +47,7 @@ The **Legend**, **Total Allocation** pie chart, and the **Well Flow/Allocation**
    - **Time Step** -- The selected time step
    - **Well** -- The simulation well to plot
 - **Options**
-   - **Plot Type** -- Two options are available:
+   - **Plot Type**
        - **Allocation** -- Plots *Reservoir well flow rates* along with how this well supports/are 
        supported by other wells. ( This option is only available for cases with Flux results available. ) 
        - **Well Flow** -- Plots *Surface Well Flow Rates* together with phase split between Oil, Gas, and Water.
@@ -59,7 +59,17 @@ The **Legend**, **Total Allocation** pie chart, and the **Well Flow/Allocation**
    
 ### Depth Settings
 
-- **Pseudo Length**
-- **TVD**
-- **Connection Number**
+The depth value in the plot can be controlled by selecting the **Accumulated Flow**/**Inflow Rates** item in the **Project Tree**. This item represents the Well-Log-like part of the Well Allocation Plot and its properties are shown below:
 
+![]({{ site.baseurl }}/images/WellAllocationWellLogProperties.png)
+
+- **Name** - The plot name, updated automatically based on the **Flow Type** and well
+- **Depth Type**
+  - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry. ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
+  - **TVD** -- Use True Vertical Depth on the depth-axis. 
+  This will produce rather strange plots for horizontal or near horizontal wells. 
+  - **Connection Number** -- Use the number of connections counted from the top on the depth-axis
+- **Visible Depth Range** -- These options control the depth zoom
+  - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are maid
+  - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
+  
