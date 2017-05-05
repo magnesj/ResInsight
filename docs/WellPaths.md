@@ -91,7 +91,7 @@ The visible wells are always shown in all the 3D Views in the complete project, 
 
 ![]({{ site.baseurl }}/images/WellPathCollectionProperties.png)
 
-- **Global well path visibility** This option forces the well paths on or off, ignoring the individual settings unless it is set to Individual.
-- **Clip Well Paths** This option hides the top of the Well Trajectories to avoid displaying the very long lines from the reservoir to the sea surface.
-- **Well Path clipping depth distance** This number is the distance from the top of the reservoir to the clipping depth.
+- **Global well path visibility** -- This option forces the well paths on or off, ignoring the individual settings unless it is set to Individual.
+- **Clip Well Paths** -- This option hides the top of the Well Trajectories to avoid displaying the very long lines from the reservoir to the sea surface.
+- **Well Path clipping depth distance** -- This number is the distance from the top of the reservoir to the clipping depth.
 

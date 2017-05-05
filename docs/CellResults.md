@@ -57,7 +57,7 @@ There are several options available to define the particular result you want to 
 
 There are two main selections you need to make: The tracers and the result property 
 - **Tracers** -- Option to select how/what tracers to use. Available options are:
-    - **All Injectors and Producers** --  Selects all the wells, including the oppsite flow tracers
+    - **All Injectors and Producers** --  Selects all the wells, including the opposite flow tracers
     - **All Producers** -- Selects all producer tracers, including the opposite flow tracers of injectors.
     - **All Injectors** -- Selects all injector tracers, including the opposite flow tracers of producers.
     - **By Selection** -- Displays a list of all the tracers that can be selected freely, and a **Filter** field. 

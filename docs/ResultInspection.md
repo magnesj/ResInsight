@@ -28,8 +28,6 @@ Formation names| Displays name of formation the cell is part of
 
 ### Geomechanical model
 
-When clicking in the 3D scene, the selected geometry will be an element. 
-
 Name                   | Description
 -----------------------|------------
 Closest result         | Closest node ID and result value

@@ -103,6 +103,6 @@ To export some faults, select the faults you want to export in the **Project Tre
 
 You are then prompted to select a destination folder. Each Fault is exported to a file named `Faults_<fault name>_<case name>.grdecl` and stored in the selected folder. 
 
-The `fault name` of **Undefined Grid Faults** is simplified to "UNDEF", while **Undefinded Grid Faults With Inactive** is simplified to "UNDEF_IA". All other faults keep their original name.
+The `fault name` of **Undefined Grid Faults** is simplified to "UNDEF", while **Undefined Grid Faults With Inactive** is simplified to "UNDEF_IA". All other faults keep their original name.
 
 

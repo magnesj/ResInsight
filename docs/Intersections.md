@@ -67,7 +67,7 @@ A new **Simulation Well** intersection can be created by right-clicking the simu
 
 When a simulation well intersection is created, the source simulation well can be changed by using the **Simulation Well** selection combo box in the **Property Editor**. 
 
-If the well contains more than one branch, the intersection geometry will be created for the selected brach in the **Branch** combo box.
+If the well contains more than one branch, the intersection geometry will be created for the selected branch in the **Branch** combo box.
 
 #### Polyline Intersection
 A new **Polyline** intersection can be created from the context menu in the 3D view. Then, by left-clicking on reservoir geometry, a polyline is created. The points are added to the point list in the **Property Editor**. 

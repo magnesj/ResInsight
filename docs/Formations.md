@@ -47,7 +47,7 @@ If the formation file is modified outside ResInsight, the formation data can be 
 The formations can be visualized as a result property in **Cell Results**, **Cell Edge Result**, and **Separate Fault Result**. When selected, a special legend displaying formation names is activated.
 
 ### Property filter based on formations
-Formation names are available in Property Filters as Result Type **Formation Names**. This makes it easy to filter geometry based on formation specfications.
+Formation names are available in Property Filters as Result Type **Formation Names**. This makes it easy to filter geometry based on formation specifications.
 
 See [ Cell Filters ]({{ site.baseurl }}/docs/filters) for details.
 
