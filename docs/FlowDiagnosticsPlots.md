@@ -24,6 +24,11 @@ This window displays three different graphs describing the overall behaviour of 
 
 Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells. The total phase or allocation is shown in the legend and as a pie chart, while the well flow is shown in a depth value vs flow graph.  
 
+### Branches
+
+Each branch of the well will be assigned a separate **Track**. For normal wells this is based on the branch detection algorithm used for Well Pipe visualization, and will correspond to the pipe visualization with **Branch Detection** *On*.  ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )  
+Multi Segment Wells will be displayed according to their branch information, but tiny branches consisting of only one connection are lumped into the main branch to make the visualization more understandable.
+
 ### Creating Well Allocation Plots
 
 To plot the Well allocation for a well, right click the well in the **Project Tree** or in the **3D View** and invoke the command **Plot Well Allocation**.
