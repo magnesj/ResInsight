@@ -17,7 +17,7 @@ To use this functionality you will need to :
 ## Import of Formation Names files
 
 Formation Names files can be imported by using the command: **File->Import->Import Formation Names**.
-The user is asked to select ```*.lyr``` files for import.
+The user is asked to select _`*.lyr`_ files for import.
 
 The imported Formation Names files are then listed in the **Project Tree** in a folder named **Formations**. 
 

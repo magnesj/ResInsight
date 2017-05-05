@@ -24,7 +24,7 @@ Image export of the currently active 3D View or Plot Window can be launched from
 
 If a project contains multiple 3D Views or Plot Windows, all of them can be exported in one go using **File -> Export -> Snapshot All Views To File**. This will either export all the 3D Views or all the Plot Windows, depending on whether you invoke the command in the 3D Main Window or the Plot Main Window.
 
-The files generated are stored in a folder named `snapshots` within the folder where the Project File resides. 
+The files generated are stored in a folder named _`snapshots`_ within the folder where the Project File resides. 
 
 <div class="note">
  Snapshots of existing views can also be created and saved from the command line. 

@@ -20,15 +20,15 @@ Integration with GNU Octave enables powerful and flexible result manipulation an
 
 ### Data support
 The main input data is
-`*.GRID` and `*.EGRID` files along with their `*.INIT` and restart files `*.XNNN` and `*.UNRST`. 
-Summary vectors can be imported from `*.SMSPEC` files.
+_`*.GRID`_ and _`*.EGRID`_ files along with their _`*.INIT`_ and restart files _`*.XNNN`_ and _`*.UNRST`_. 
+Summary vectors can be imported from _`*.SMSPEC`_ files.
 
 ResInsight also supports selected parts of Eclipse input files and can read grid 
-information and corresponding cell property data sets from `*.GRDECL` files.
+information and corresponding cell property data sets from _`*.GRDECL`_ files.
 
-Well log data can be imported from `*.LAS` files.
+Well log data can be imported from _`*.LAS`_ files.
 
-ResInsight can also be built with support for Geomechanical models from ABAQUS in the `*.odb` file format.
+ResInsight can also be built with support for Geomechanical models from ABAQUS in the _`*.odb`_ file format.
 
 ### About
 ResInsight has been co-developed by [Statoil ASA](http://www.statoil.com/), [Ceetron Solutions AS](http://www.ceetronsolutions.com/), and [Ceetron AS](http://ceetron.com/) with the aim to provide a versatile tool for professionals who need to visualize and process reservoir models.

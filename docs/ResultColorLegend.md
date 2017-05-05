@@ -23,7 +23,7 @@ Colors             | Defines the color palette
 - **Continuous Logarithmic** -- Continuous logarithmic legend with tick mark count defined by **Number of levels**
 - **Discrete Logarithmic** -- Logarithmic legend divided into levels defined by **Number of levels**
 - **Category** -- Special legend with one level for each category, either integer values or formation names.  
-   Only available for result names ending with ```NUM``` or formation names.
+   Only available for result names ending with _`NUM`_ or formation names.
 
 
 ## Range type

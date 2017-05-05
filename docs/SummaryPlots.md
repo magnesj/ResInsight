@@ -108,13 +108,13 @@ This group of options is used to define the selection of summary vectors of inte
 - *Options depending on Search Mode* -- Described below. 
 - *list of vector names* -- This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want as curves. **Ctrl-A** selects them all.
 
-In the following, all the search fields are wildcard-based text filters. An empty search string will match anything: any value or no value at all. A single `*` however, will only match something: There has to be some value for that particular quantity to make the filter match.
+In the following, all the search fields are wildcard-based text filters. An empty search string will match anything: any value or no value at all. A single _`*`_ however, will only match something: There has to be some value for that particular quantity to make the filter match.
 
 The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) being addressed. 
 
 #### Search Modes with filter fields
 
-- **All** -- A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg. `"*:*, 55, *"` or `"WBHP:*"`. This mode is the default.
+- **All** -- A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg. _`"*:*, 55, *"`_ or _`"WBHP:*"`_. This mode is the default.
    - **Filter** -- The actual filter text to apply
 - **Field** -- Select Field related vectors only
   -  **Vector name** -- Filter for Field related vector names 
@@ -127,7 +127,7 @@ The **Vector Name** field will match the name of the quantity itself, while the 
 - **Completion**   -- Select Completion related vectors only
    - **Vector name**  -- Filter for Completion related vector names 
    - **Well name** --  Well name filter 
-   - **I, J, K** -- Text based filter of the I, J, K value string of the completion. Eg `"18,*,*"` to find vectors with I = 18 only 
+   - **I, J, K** -- Text based filter of the I, J, K value string of the completion. Eg _`"18,*,*"`_ to find vectors with I = 18 only 
 - **Segment** -- Select Segment related vectors only    
    - **Vector name**  -- Filter for Segment related vector names 
    - **Well name** -- Well name filter 

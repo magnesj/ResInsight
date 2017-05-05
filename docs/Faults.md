@@ -66,7 +66,7 @@ By clicking the ![]({{ site.baseurl }}/images/draw_style_faults_24x24.png) **Fau
  ![]({{ site.baseurl }}/images/FaultProperties.png)
  
 ##### Fault labels
-- **Show labels** -- Displays one label per fault with the name defined in the _`*.DATA`_-file
+- **Show labels** -- Displays one label per fault with the name defined in the _`*.DATA`_ file
 - **Label color** -- Defines the label color
  
 ##### Fault options
@@ -81,7 +81,7 @@ Secondly: The option you would normally want to adjust is **Dynamic Face Selecti
 
 - **Show defined faces** -- Displays the fault cell faces that are defined on the Eclipse input file (_`*.DATA`_)
 - **Show opposite faces** -- Displays the opposite fault cell faces from what is defined on the input file, based on IJK neighbors.  
-  *These two options should normally be left **On**. They are useful when investigating the exact faults information provided on the _`*.DATA`_ file. If you need to use them, it is normally wise to set the **Dynamic Face Selection** to "Show Both".*
+  *These two options should normally be left **On**. They are useful when investigating the exact faults information provided on the `*.DATA` file. If you need to use them, it is normally wise to set the **Dynamic Face Selection** to "Show Both".*
 - **Dynamic Face Selection** -- At one particular position on a fault there are usually two cells competing for your attention: The cell closer to you as the viewer, or the one further from you. When showing results, this becomes important because these two cell faces have different result property values, and thus color.  
   This option controls which of the two cell faces you actually can see: The one behind the fault, or the one in front of the fault. There is also an option of showing both, which will give you an undefined mixture, making it hard to be certain what you see.  
   This means that ResInsight turns on or off the faces based on your view position and this option to make sure that you always see the faces (and thus the result property) you request.
@@ -105,6 +105,6 @@ To export some faults, select the faults you want to export in the **Project Tre
 
 You are then prompted to select a destination folder. Each Fault is exported to a file named _`Faults_<fault name>_<case name>.grdecl`_ and stored in the selected folder. 
 
-The _`fault name`_ of **Undefined Grid Faults** is simplified to "UNDEF", while **Undefined Grid Faults With Inactive** is simplified to "UNDEF_IA". All other faults keep their original name.
+The fault name of **Undefined Grid Faults** is simplified to _`UNDEF`_, while **Undefined Grid Faults With Inactive** is simplified to _`UNDEF_IA`_. All other faults keep their original name.
 
 

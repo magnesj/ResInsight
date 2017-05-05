@@ -22,7 +22,7 @@ Octave scripts are available in the **Scripts** folder in the **Project Tree**.
 
 ![]({{ site.baseurl }}/images/OctaveScriptTree.png)
 
-This folder contains an entry for each of the directories you have added as a **Script Folder**. Each of the folder lists available `*.m` files and sub directories.
+This folder contains an entry for each of the directories you have added as a **Script Folder**. Each of the folder lists available _`*.m`_ files and sub directories.
 
 ### Adding Script Folders
 You can add directories by right clicking the **Scripts** item to access the context menu.
