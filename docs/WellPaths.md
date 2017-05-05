@@ -18,7 +18,7 @@ The supported ASCII format is quite flexible but the main requirements are:
 - Each data line must contain four numbers: X Y TVD MD separated with white-space.
 - Lines starting with "--" or "#" is considered to be comment lines
 - A line starting with none-number-characters are used as a well name after the following rules:
-  - If the line contains a pair of : _`  "'", "`", "´", "’" or "‘" `_ the text between the quotation marks is used as a well name.
+  - If the line contains a pair of : _```  "'", "`", "´", "’" or "‘" ```_ the text between the quotation marks is used as a well name.
   - If the line contains the case insensitive string "name" with an optional ":" after then the rest of the line is used as a well name. 
   - If there are no quotes or "name"'s, the complete line is used as a well name.
   - If there are several consecutive name-like lines, only the last one will be used 
