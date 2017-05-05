@@ -8,8 +8,8 @@ published: true
 
 Cell Filters are used to control visibility of the cells in the 3D view. Two types of filters exists:
 
-- **Range filter**     : Extracts an IJK subset of the model.
-- **Property filter**  : Extracts cells with a property value matching a value range.
+- **Range filter** -- Extracts an IJK subset of the model.
+- **Property filter** -- Extracts cells with a property value matching a value range.
 
 <div class="note">
 The visibilities of cells connection to wells, and fences based on these cells can be controlled from <b> <a href="{{ site.baseurl }}/docs/simulationwells">Simulation Wells</a> </b>.<br> 
@@ -44,9 +44,9 @@ Below is a snapshot of the **Property Editor** of the **Range Filter** :
 
 ![]({{ site.baseurl }}/images/RangeFilterProperties.png)
 
- - **Filter Type** : The filter can either make the specified range visible ( *Include* ), or remove the range from the View ( *Exclude* ).
- - **Grid** :  This option selects which of the grids the range is addressing.
- - **Apply to Subgrids** : This option tells ResInsight to use the visibility of the cells in the current grid to control the visibility of the cells in sub-LGR's. If this option is turned off, Sub LGR-cells is not included in this particular Range Filter.  
+ - **Filter Type** -- The filter can either make the specified range visible ( *Include* ), or remove the range from the View ( *Exclude* ).
+ - **Grid** --  This option selects which of the grids the range is addressing.
+ - **Apply to Subgrids** -- This option tells ResInsight to use the visibility of the cells in the current grid to control the visibility of the cells in sub-LGR's. If this option is turned off, Sub LGR-cells is not included in this particular Range Filter.  
  
 The **Start** and **Width** labels in front of the sliders features a number in parenthesis denoting maximum available value.<br>
 The **Start** labels shows the index of the start of the active cells.<br>
