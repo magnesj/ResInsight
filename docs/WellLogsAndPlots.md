@@ -101,6 +101,7 @@ Abaqus results are interpolated across the intersected cell-face from the result
 #### Change Data Source for several curves
 
 It is possible to change either the Case or the Well Path in several Well Log Extraction curves in one go. To do this, select the curves to change, and access the context menu. Select the command **Change Data Source**. The following dialog will appear:
+
 ![]({{ site.baseurl }}/images/WellLogExtractionChangeDataSource.png)
 
 - **Case** -- Sets this case for all the curves
