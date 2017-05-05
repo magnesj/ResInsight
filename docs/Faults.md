@@ -14,8 +14,8 @@ ResInsight always scans the grids for geometrical faults when they are loaded. W
 
 All the tagged cell faces are then compared to the faults possibly imported from the `*.DATA` file in order to group them. If a particular face is *not* found among the fault faces defined in the `*.DATA` file (or their opposite faces), the cell face is added to one of two predefined faults: 
 
-1. **Undefined grid faults** 
-2. **Undefined grid faults With Inactive** 
+- **Undefined grid faults** 
+- **Undefined grid faults With Inactive** 
  
 The first fault is used if both the neighbor cells are active. If one or both of the neighbor cells are inactive, the second fault is used. 
 
@@ -66,11 +66,11 @@ By clicking the ![]({{ site.baseurl }}/images/draw_style_faults_24x24.png) **Fau
  ![]({{ site.baseurl }}/images/FaultProperties.png)
  
 ##### Fault labels
-- **Show labels**: Displays one label per fault with the name defined in the `*.DATA`-file
-- **Label color**: Defines the label color
+- **Show labels** -- Displays one label per fault with the name defined in the `*.DATA`-file
+- **Label color** -- Defines the label color
  
 ##### Fault options
-- **Show faults outside filters**: Turning this option on, will display faults outside the filter region, making the fault visualization completely ignore the Range and Property filters in action.
+- **Show faults outside filters** -- Turning this option on, will display faults outside the filter region, making the fault visualization completely ignore the Range and Property filters in action.
 
 ##### Fault Face Visibility
 This group of options controls the visibility of the fault faces. Since they work together, and in some cases are overridden by the system, they can be a bit confusing. 
@@ -79,15 +79,17 @@ First of all. These options are only available in **Faults-only** visualization 
 
 Secondly: The option you would normally want to adjust is **Dynamic Face Selection** (See below).
 
-- **Show defined faces**: Displays the fault cell faces that are defined on the Eclipse input file (`*.DATA`)
-- **Show opposite faces**: Displays the opposite fault cell faces from what is defined on the input file, based on IJK neighbors.
- <br> *These two options should normally be left **On**. They are useful when investigating the exact faults information provided on the `*.DATA` file. If you need to use them, it is normally wise to set the **Dynamic Face Selection** to "Show Both".*
-- **Dynamic Face Selection**: At one particular position on a fault there are usually two cells competing for your attention: The cell closer to you as the viewer, or the one further from you. When showing results, this becomes important because these two cell faces have different result property values, and thus color. <br>This option controls which of the two cell faces you actually can see: The one behind the fault, or the one in front of the fault. There is also an option of showing both, which will give you an undefined mixture, making it hard to be certain what you see.  <br>This means that ResInsight turns on or off the faces based on your view position and this option to make sure that you always see the faces (and thus the result property) you request.
+- **Show defined faces** -- Displays the fault cell faces that are defined on the Eclipse input file (`*.DATA`)
+- **Show opposite faces** -- Displays the opposite fault cell faces from what is defined on the input file, based on IJK neighbors.  
+  *These two options should normally be left **On**. They are useful when investigating the exact faults information provided on the `*.DATA` file. If you need to use them, it is normally wise to set the **Dynamic Face Selection** to "Show Both".*
+- **Dynamic Face Selection** -- At one particular position on a fault there are usually two cells competing for your attention: The cell closer to you as the viewer, or the one further from you. When showing results, this becomes important because these two cell faces have different result property values, and thus color.  
+  This option controls which of the two cell faces you actually can see: The one behind the fault, or the one in front of the fault. There is also an option of showing both, which will give you an undefined mixture, making it hard to be certain what you see.  
+  This means that ResInsight turns on or off the faces based on your view position and this option to make sure that you always see the faces (and thus the result property) you request.
 
 ##### NNC Visibility
  
-- **Show NNCs**: Toggles whether to display the Non Neighbor Connections, or not.
-- **Hide NNC geometry if no NNC result is available**: Automatically hides NNC geometry if no NNC results are available
+- **Show NNCs** -- Toggles whether to display the Non Neighbor Connections, or not.
+- **Hide NNC geometry if no NNC result is available** -- Automatically hides NNC geometry if no NNC results are available
 
 <div class="note info">
 The color of the NNC faces are set to be a bit lighter than their corresponding named fault, and can not be controlled directly.
