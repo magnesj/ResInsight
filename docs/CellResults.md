@@ -36,20 +36,20 @@ As shown in the picture below, there are 6 different result types
 - **Flow Diagnostics** -- Flow diagnostic results are derived from the flux field in the Eclipse result data file and is only 
   available if those results are present. This option is described in detail below.
 
-### Flow Diagnostic Results
+## Flow Diagnostic Results
 
 ResInsight has embedded Flow Diagnostics calculations made available using the **Flow Diagnostics** result type. 
 These results make it easier to see how and where wells interact with the reservoir and each other. 
 It is possible to select exactly what wells to investigate, and even the possible *opposite flow* part of the well.
 
-#### Cross Flow and Opposite Flow
+### Cross Flow and Opposite Flow
 
 The *opposite flow* of a well denotes the flow that is opposite to the expected normal state of the well. Eg. parts of a producer might actually be injecting due to cross flow, and an injector could be producing in some sections.
 Each well is assigned an opposite flow name by adding "-XF" to the end of the name. "-XF" was chosen as a reference to Cross Flow.
 
 In this way, a producer will have two tracer names: The "well name" as a producer tracer, and "well name-XF" as an injector tracer.
 
-#### Defining results 
+### Defining results 
 
 There are several options available to define the particular result you want to target, as shown below:
 
@@ -80,9 +80,11 @@ There are two main selections you need to make: The tracers and the result prope
     This produces values between 0.0 and 1.0 where high values indicate that both the injectors and the producers 
     have a high influence.
 
-#### On-Demand Calculation
+### On-Demand Calculation
 
-The flow diagnostics results are only calculated when asked for, and only for requested timesteps. This means that statistics based on all timesteps is not available for these results.  
+The flow diagnostics results are only calculated when asked for, and only for requested timesteps. This means that statistics based on all timesteps are not available for these results.
+
+Se also [ Flow Diagnostics Plots]({{ site.baseurl }}/docs/flowdiagnosticsplots) and [ Flow Characteristics Plot]({{ site.baseurl }}/docs/flowdiagnosticsplots#flow-characteristics-plot) 
 
 ## Geomechanical Results
 
