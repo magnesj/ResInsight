@@ -34,7 +34,7 @@ The property panel of a Well Path based Intersection is shown below:
  ![]({{ site.baseurl }}/images/IntersectionWellPath.png)
  
 - **Name** -- Automatically created based on the item specifying the intersection. The user can customize the name by editing, but will be updated if you change the well or well path.
-- **Intersecting Geometry ** -- These options controls the curve to be used for the cross section, and depends on the type of intersection you choose.
+- **Intersecting Geometry** -- These options controls the curve to be used for the cross section, and depends on the type of intersection you choose.
 - **Direction** -- Horizontal, vertical or Defined by two points
 - **Extent length** -- Defines how far an intersection for Well Path or Simulation Well is extended at intersection ends
 - **Show Inactive Cells** -- Controls if inactive cells are included when creating the intersection geometry
