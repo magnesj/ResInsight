@@ -15,7 +15,7 @@ When a summary case has been imported, a Summary Plot with a default **Curve Fil
 
 ## Summary Plots
 
-A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain **Summary Curve Filters** and **Summary Curves** (See below).
+A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain **Summary Curve Filters** and **Summary Curves** ( See below ).
 
 A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. 
 
