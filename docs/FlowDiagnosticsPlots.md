@@ -27,7 +27,7 @@ Well allocation plots show the flow along a specified well, along with either ph
 ### Branches
 
 Each branch of the well will be assigned a separate **Track**. For normal wells this is based on the branch detection algorithm used for Well Pipe visualization, and will correspond to the pipe visualization with **Branch Detection** *On*.  ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )  
-Multi Segment Wells will be displayed according to their branch information, but tiny branches consisting of only one connection are lumped into the main branch to make the visualization more understandable.
+Multi Segment Wells will be displayed according to their branch information, but tiny branches consisting of only one connection are lumped into the main branch to make the visualization more understandable. ( See  [Dummy branches]({{ site.baseurl }}/docs/simulationwells#dummy-branches) )
 
 ### Creating Well Allocation Plots
 
