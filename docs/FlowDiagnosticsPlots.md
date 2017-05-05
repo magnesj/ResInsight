@@ -12,11 +12,11 @@ Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main 
 
 ## Flow Characteristics Plot
 
-This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only the ones flow diagnostics results has been requested. 
+This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only those aready calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
 
 ![]({{ site.baseurl }}/images/FlowCharacteristicsPlot.png)
 
-- **Lorenz Coefficient** -- This plot displys the lorenz coefficient for the complete reservoir for each calculated timestep. The background is colored to serve as a reference for the timestep in the other graphs.
+- **Lorenz Coefficient** -- This plot displays the lorenz coefficient for the complete reservoir for each calculated timestep. The background is colored to serve as a reference for the timestep in the other graphs.
 - **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each timestep of the F-phi curve for the reservoir. The color of the curve indicates the timestep, and can be looked up in the background color of the **Lorenz Coefficient** plot.
 - **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each calculated timestep.  The color of the curve indicates the timestep.
 
