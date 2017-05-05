@@ -76,7 +76,7 @@ You will find the ResInsight binary under the Install directory in your build di
 | `RESINSIGHT_USE_OPENMP`               | Enable OpenMP parallellization in the code |
 
 ### Optional - Octave plugins 
-To be able to compile the Octave plugins, the path to the Octave development tool `mkoctfile` must be provided.
+To be able to compile the Octave plugins, the path to the Octave development tool _`mkoctfile`_ must be provided.
 
 It is possible to build ResInsight without compiling the Octave plugins. This can be done by specifying blank for the Octave CMake options. The Octave plugin module will not be built, and CMake will show warnings like 'Failed to find mkoctfile'. This will not break the build or compilation of ResInsight.
 
