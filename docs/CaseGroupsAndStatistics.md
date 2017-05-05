@@ -49,22 +49,22 @@ The properties of non-calculated and calculated **Statistics Case** is shown bel
 
 ![]({{ site.baseurl }}/images/StatisticsCaseProperties.png)  ![]({{ site.baseurl }}/images/StatisticsCasePropertiesCalculated.png)
 
-- **Compute**: Starts to calculate requested statistical Properties.
-- **Edit** : Deletes the calculated results, and makes the controls to edit the setup available.
-- **Summary of calculation setup** : Summarizes what to calculate 
-- **Properties to consider**: These options makes it possible to select what Eclipse properties to include in the Statistical calculations. Adding variables increase the memory usage and the computational time.
-- **Percentile Setup**: Selects whether to calculate percentiles, what method and what percentile levels should be used. Turning this off speeds up the calculations.
-- **Well Data Source Case**: This option selects which set of **Simulation Wells** to be shown along with the statistical results. You can select one of the **Source Cases**.
+- **Compute** --  Starts to calculate requested statistical Properties.
+- **Edit** -- Deletes the calculated results, and makes the controls to edit the setup available.
+- **Summary of calculation setup** -- Summarizes what to calculate 
+- **Properties to consider** -- These options makes it possible to select what Eclipse properties to include in the Statistical calculations. Adding variables increase the memory usage and the computational time.
+- **Percentile Setup** -- Selects whether to calculate percentiles, what method and what percentile levels should be used. Turning this off speeds up the calculations.
+- **Well Data Source Case** -- This option selects which set of **Simulation Wells** to be shown along with the statistical results. You can select one of the **Source Cases**.
  
 #### Percentile Methods
 
 Three Percentile methods are implemented:
 
-- **Interpolated Observation**
+- **Interpolated Observation** --
 The values are sorted, and the two observations representing the probabilities closest to the percentile are interpolated to find the value for the percentile. This is the default method.
-- **Nearest Observation**
+- **Nearest Observation** --
 The values are sorted, and the first observation representing a probability higher or equal to the percentile probability is selected as the value for the percentile. This method is by some considered to be statistically more puristic.
-- **Histogram based estimate**
+- **Histogram based estimate** --
 A histogram is created and the percentile is calculated based on the histogram. This method will be faster when having a large number of realizations, because no value sorting is involved. You would however need several hundred realizations before this method should be considered.
 
 
