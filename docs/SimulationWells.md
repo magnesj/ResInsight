@@ -86,7 +86,7 @@ Open Simulation Wells will be drawn with a slightly larger radius than closed we
 
 ![]({{ site.baseurl }}/images/SimulationWellsPipeGeometryProperties.png)
 
-- **Type** -- Controls whether the pipe will go from cell center to cell center, or in a somewhat more smooth trajectory.
+- **Type** -- Controls whether the pipe will go from cell center to cell center or in a smoother trajectory.
 - **Branch Detection** -- Enables splitting of wells into branches based on the positions of the connection cells.  This option applies to ordinary wells only and has no effect on multi segment wells (MSW).
 
 ### Advanced
