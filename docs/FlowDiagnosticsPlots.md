@@ -12,7 +12,7 @@ Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main 
 
 ## Flow Characteristics Plot
 
-This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only those aready calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
+This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
 
 ![]({{ site.baseurl }}/images/FlowCharacteristicsPlot.png)
 
@@ -75,10 +75,10 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
   The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
   ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
   - **TVD** -- Use True Vertical Depth on the depth-axis. 
-  This will produce rather strange plots for horizontal or near horizontal wells. 
+  This will produce distorted plots for horizontal or near horizontal wells. 
   - **Connection Number** -- Use the number of connections counted from the top on the depth-axis. In this mode the 
 - **Visible Depth Range** -- These options control the depth zoom
-  - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are maid
+  - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are made
   - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
   
 ### Accessing the Plot Data
