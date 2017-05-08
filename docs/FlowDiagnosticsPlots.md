@@ -76,7 +76,7 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
   ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
   - **TVD** -- Use True Vertical Depth on the depth-axis. 
   This will produce distorted plots for horizontal or near horizontal wells. 
-  - **Connection Number** -- Use the number of connections counted from the top on the depth-axis. In this mode the 
+  - **Connection Number** -- Use the number of connections counted from the top on the depth-axis.
 - **Visible Depth Range** -- These options control the depth zoom
   - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are made
   - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
