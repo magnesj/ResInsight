@@ -23,6 +23,7 @@ This group of options controls visual settings that will be used when creating n
 - **Mesh Color Along Faults**
 - **Well Label Color**
 - **Font Size** -- This font size is used for all labels shown in the 3D Views
+- **Default Z Scale Factor** -- Default depth scale for grid models
 
 ### 3D views
 - **Navigation mode** -- Defines how to use the mouse to interact with with the 3D model.
@@ -40,7 +41,6 @@ This group of options controls visual settings that will be used when creating n
 
 ### Behaviour When Loading Data
 
-- **Default Z Scale Factor** -- Default depth scale for grid models
 - **Compute DEPTH Related Properties** -- If not present, compute DEPTH, DX, DY, DZ, TOP, BOTTOM when loading new cases
 - **Load and Show SOIL** -- Control if SOIL is loaded and applied to grid
 - **Import Faults/NNCs/Advanced MSW Data** -- Disable import of data for a case to reduce case import time.
