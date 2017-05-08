@@ -59,7 +59,7 @@ These options controls the visibility of different aspects of the simulation wel
 - **Show Well Cells** -- This option toggles whether to add the well connection cells to the set of visible 
   cells. If no cell filters are active, toggling this option will conveniently hide all other cells,
   displaying only the requested well cells.   
--  **Use Well Fence** -- and 
+-  **Show Well Cell Fence** -- and 
 -  **Well Fence direction** -- Controls whether to add extensions of the well cells in the I, J or K direction to the set of visible cells
 
   
