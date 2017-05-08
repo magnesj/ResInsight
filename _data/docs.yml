@@ -24,24 +24,23 @@
   - wellpaths
   - linkedviews
   - casegroupsandstatistics 
-  
   - summaryplots
   - welllogsandplots
   - flowdiagnosticsplots
-  
-  
+  - preferences  
+   
+- title: Export and Interfaces  
+  docs:
   - snapshots
   - batchcommands
   - exporteclipseproperties
   - octaveinterface
   - odbsupport
 
-  - derivedresults
-  - preferences
-
 - title: Appendix
   docs:
   - commandlineparameters
+  - derivedresults
   - octaveinterfacereference
   - buildinstructions
   - regressiontestsystem
