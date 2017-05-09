@@ -4,7 +4,7 @@ title: Downloads
 permalink: /project/download/
 published: true
 ---
-		ResInsight-2017.05.0_oct-4.0.0_win64.zip	
+
 Windows : [ResInsight-2017.05.0_oct-4.0.0_win64.zip](https://github.com/OPM/ResInsight/releases/download/v2017.05/ResInsight-2017.05.0_oct-4.0.0_win64.zip) 
 
 Linux - RHEL6 : [ResInsight-2017.05.0_oct-3.4.3_el6.tar.gz](https://github.com/OPM/ResInsight/releases/download/v2016.11/ResInsight-2017.05.0_oct-3.4.3_el6.tar.gz) 
