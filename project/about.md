@@ -7,10 +7,9 @@ published: true
 
 
 ### Project organization
-The development of ResInsight was initiated by Statoil Petroleum AS in 2011 following a series of projects. ResInsight is still under active development. Ceetron Solutions AS is responsible for the software development work.
+The development of ResInsight was initiated by Statoil Petroleum AS in 2011, and was followed up by a series of projects. ResInsight is still under active development, mainly by Ceetron Solutions AS who is responsible for the software development work.
 
-ResInsight is part of the [Open Porous Media](http://opm-project.org/) project.
-
+ResInsight is a part of the [Open Porous Media](http://opm-project.org/) project.
 
 ### Licensing
 
