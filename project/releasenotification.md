@@ -1,7 +1,7 @@
 ---
 layout: project
 title: Release Notification Subscription
-permalink: /project/releasenotification
+permalink: /project/releasenotification/
 published: true
 ---
 
