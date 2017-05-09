@@ -16,7 +16,7 @@ ResInsight is a part of the [Open Porous Media](http://opm-project.org/) project
 The software is licensed under GPL 3+, see [Licensing details](https://github.com/OPM/ResInsight/blob/master/COPYING).
 
 ### Project hosting
-The software is hosted at [GitHub](https://github.com/OPM/ResInsight)
+The software is hosted at [GitHub](https://github.com/OPM/ResInsight), and the development progress can be monitored there. The GitHub issue tracker is heavily used to organize our development process.
 
 ### Web site programming and design
 The programming and design of this site is based on work by [Tom Preston-Werner](http://tom.preston-werner.com/). This is also the current theme of [Jekyll](http://jekyllrb.com/), the publishing engine used to produce content of [GitHub Pages](https://pages.github.com/).
