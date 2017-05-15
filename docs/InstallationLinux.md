@@ -15,7 +15,7 @@ published: true
 3. Start ./ResInsight
 
 ### Installation from binary packages on Linux
- Packages for ResInsight are also available as part of the distribution by the [Opm project](http://opm-project.org/?page_id=36)
+ Packages for ResInsight are available as part of the distribution by the [Opm project](http://opm-project.org/?page_id=36)
 
 ### Octave installation (optional)
 The precompiled octave support is only tested for RedHat 6 (ResInsight 1.3.2-dev and earlier, was also tested on RedHat 5) and is not expected to work for other configurations, unless you build ResInsight yourself. See [Build Instructions]({{ site.baseurl }}/docs/buildinstructions)
