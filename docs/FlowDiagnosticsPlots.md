@@ -10,6 +10,8 @@ Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main 
 
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsProjectTree.png)
 
+Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flowdiagnosticsresults) for more description of the results and references to more information about the methodology.
+
 ## Flow Characteristics Plot
 
 This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
