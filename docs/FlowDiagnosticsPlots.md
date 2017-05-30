@@ -10,7 +10,7 @@ Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main 
 
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsProjectTree.png)
 
-Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flowdiagnosticsresults) for more description of the results and references to more information about the methodology.
+Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flow-diagnostic-results) for more description of the results and references to more information about the methodology.
 
 ## Flow Characteristics Plot
 
