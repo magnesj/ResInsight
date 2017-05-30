@@ -12,16 +12,6 @@ Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main 
 
 Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flow-diagnostic-results) for more description of the results and references to more information about the methodology.
 
-## Flow Characteristics Plot
-
-This window displays three different graphs describing the overall behaviour of the reservoir for each timestep. The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
-
-![]({{ site.baseurl }}/images/FlowCharacteristicsPlot.png)
-
-- **Lorenz Coefficient** -- This plot displays the Lorenz coefficient for the complete reservoir for each calculated timestep. The time step color is used as a reference for the timestep in the other graphs.
-- **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each timestep of the F-phi curve for the reservoir.
-- **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each calculated timestep.
-
 ## Well Allocation Plots
 
 Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells. The total phase or allocation is shown in the legend and as a pie chart, while the well flow is shown in a depth value vs flow graph.  
@@ -91,3 +81,14 @@ It is also possible to save the ascii data to a file directly by using the conte
 
 The total accumulation data can also be viewed in ascci format by the command **Show Total Allocation Data**.
 
+## Flow Characteristics Plot
+
+This window displays three different graphs describing the overall behaviour of the reservoir for each timestep from a flow diagnostics point of view. 
+
+The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
+
+![]({{ site.baseurl }}/images/FlowCharacteristicsPlot.png)
+
+- **Lorenz Coefficient** -- This plot displays the Lorenz coefficient for the complete reservoir for each calculated timestep. The time step color is used as a reference for the timestep in the other graphs.
+- **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each timestep of the F-phi curve for the reservoir.
+- **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each calculated timestep.
