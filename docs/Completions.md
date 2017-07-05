@@ -5,17 +5,15 @@ permalink: /docs/completions/
 published: true
 ---
 
-## Completions
+## Fishbones
 
-### Fishbones
-
-#### Modelling of Fishbone Completions
+### Modelling of Fishbone Completions
 
 To add new fishbones completions, select the «New Fishbones Subs Definition”. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
 
 TODO: Image
 
-#### Fishbone Subs Definition
+### Fishbone Subs Definition
 A Fishbones Subs Definition (a group of fishbones) is created in the Project tree from the command descibed above. New subs definitions can be created to give more flexibility in the placing of the fishbones. 
 
 In the property editor one can set the parameters for the fishbones subs
@@ -32,13 +30,13 @@ TODO: Image Fishbones_SubDefPropEdit.png
 **Well Properties** and properties for **Multi Segment Wells** are only used for export. See description of these parameters below. 
 <\div>
 
-#### Imported Laterals
+### Imported Laterals
 
 
 In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
 
 
-#### Export of Fishbone Completion Data
+### Export of Fishbone Completion Data
 
 TODO: Fishbones_PropEdit.png
 StartMD – the start position for the fishbones. 
@@ -47,13 +45,13 @@ Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrosta
 Length and Depth can be *Incremental* or *Absolute*. 
 
 
-#### Export Well Segments
+### Export Well Segments
 
 
-### Perforation Intervals
+## Perforation Intervals
 
-#### Modelling of Perforation Interval Completions
-#### Export of Perforation Interval Completion Data
+### Modelling of Perforation Interval Completions
+### Export of Perforation Interval Completion Data
 
 
-### Exporting Completion Data
+## Exporting Completion Data
