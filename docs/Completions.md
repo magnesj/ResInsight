@@ -72,8 +72,12 @@ Length and Depth can be *Incremental* or *Absolute*.
 
 
 ## Perforation Intervals
+![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
+
 
 ### Modelling of Perforation Interval Completions
+
+
 ### Export of Perforation Interval Completion Data
 
 
