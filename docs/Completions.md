@@ -10,7 +10,43 @@ published: true
 ### Fishbones
 
 #### Modelling of Fishbone Completions
+
+To add new fishbones completions, select the «New Fishbones Subs Definition”. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
+
+TODO: Image
+
+#### Fishbone Subs Definition
+A Fishbones Subs Definition (a group of fishbones) is created in the Project tree from the command descibed above. New subs definitions can be created to give more flexibility in the placing of the fishbones. 
+
+In the property editor one can set the parameters for the fishbones subs
+
+TODO: Image Fishbones_SubDefPropEdit.png
+
+**Location defined by** -- This parameter has three options, “Start/End/Number of Subs”, “Start/End/Spacing” and “User Specified”. The setting will control which of the **location** parameters the user can control and which are calculated automatically. 
+- **Start MD / End MD** -- Position, in Measured depth along the well, of the first / last fishbone Sub. The unit will be dependent on unit system for the well (m for metric units and ft for field units). 
+- **Measured Depths** -- The measured depth of the fishbone subs. If the “location defined by” is set to the “User specified” option, only this property will be available to the user. 
+- **Lateral configuration Orientation** -- Can be “Fixed Angle”, in which case the user can specify the angle for the first lateral, or “Random angle” where each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
+- **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
+
+<div class="note info">
+**Well Properties** and properties for **Multi Segment Wells** are only used for export. See description of these parameters below. 
+<\div>
+
+#### Imported Laterals
+
+
+In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
+
+
 #### Export of Fishbone Completion Data
+
+TODO: Fishbones_PropEdit.png
+StartMD – the start position for the fishbones. 
+For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data, see …. 
+Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
+Length and Depth can be *Incremental* or *Absolute*. 
+
+
 #### Export Well Segments
 
 
