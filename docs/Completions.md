@@ -65,10 +65,27 @@ For multisegment wells there are additional parameters which should be set. Thes
 ![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
 
 Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
-Length and Depth can be *Incremental* or *Absolute*. 
+
+**Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
+**Liner Inner Diameter** is exported as Diameter in WelSegs
+**Tubing Roughness Factor** is exported as Roughness in Welsegs
 
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
+
+In the output file there are data for three Eclipse keyword specified: 
+- WELSEGS -- Defines multi-segment well 
+
+- COMPSEGS -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
+
+
+
+- WSEGVALV -- Defining segments representing a sub-critical valve. 
+
+WSEGVALV: 
+Cv = icdFlowCoefficient, 
+Ac = icdArea (icdOrificeRadius^2 * PI) * icdCount ;
+      
 
 
 
