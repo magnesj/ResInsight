@@ -68,6 +68,7 @@ Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrosta
 Length and Depth can be *Incremental* or *Absolute*. 
 
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
+![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 
 
@@ -88,4 +89,4 @@ Notice that there are additional MSW parameters in the property edit for the fis
 
 - **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. 
 - **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
-- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*.
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. File names given by default: /Well Path B_Perforations_TEST10K_FLT_LGR_NNC
