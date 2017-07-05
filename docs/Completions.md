@@ -62,11 +62,12 @@ The **Export Laterals** command will export the fishbones laterals as a *.dev*-f
 #### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
 
+![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
 
 Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
 Length and Depth can be *Incremental* or *Absolute*. 
 
-
+Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 
 
 
