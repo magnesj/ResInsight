@@ -4,6 +4,7 @@ title: Completions
 permalink: /docs/completions/
 published: true
 ---
+![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
 ## Fishbones
 
