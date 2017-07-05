@@ -12,7 +12,7 @@ published: true
 
 To add new fishbones completions, select the «New Fishbones Subs Definition”. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
 
-TODO: Image
+![]({{ site.baseurl }}/images/Completions_AddNew.png)
 
 <div class="note info">
 In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
@@ -23,7 +23,7 @@ A Fishbones Subs Definition (a group of fishbones) is created in the Project tre
 
 In the property editor one can set the parameters for the fishbones subs
 
-TODO: Image Fishbones_SubDefPropEdit.png
+![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
 
 **Location defined by** -- This parameter has three options, “Start/End/Number of Subs”, “Start/End/Spacing” and “User Specified”. The setting will control which of the **location** parameters the user can control and which are calculated automatically. 
 - **Start MD / End MD** -- Position, in Measured depth along the well, of the first / last fishbone Sub. The unit will be dependent on unit system for the well (m for metric units and ft for field units). 
