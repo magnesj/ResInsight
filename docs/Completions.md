@@ -44,17 +44,30 @@ Laterals configurations sets up the configuration of the laterals at each sub po
 
 By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export (see below).  
 
+### Fishbones Export 
 
-### Export of Fishbone Completion Data
+#### Export Laterals
+The **Export Laterals** command will export the fishbones laterals as a *.dev*-file, which can be imported as a completion. Notice that well properties needed for export of well segment data or connection factors is not saved, and must be entered manually after import of the laterals. 
+
+#### Export of Fishbone Completion Data
 
 TODO: Fishbones_PropEdit.png
-StartMD – the start position for the fishbones. 
-For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data, see …. 
+
+- **Hole Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
+- **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
+
+
+
+#### Export Well Segments
+For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+
+
 Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
 Length and Depth can be *Incremental* or *Absolute*. 
 
 
-### Export Well Segments
+
+
 
 
 ## Perforation Intervals
