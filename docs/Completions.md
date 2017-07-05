@@ -13,6 +13,10 @@ To add new fishbones completions, select the «New Fishbones Subs Definition”.
 
 TODO: Image
 
+<div class="note info">
+In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
+</div>
+
 ### Fishbone Subs Definition
 A Fishbones Subs Definition (a group of fishbones) is created in the Project tree from the command descibed above. New subs definitions can be created to give more flexibility in the placing of the fishbones. 
 
@@ -23,7 +27,13 @@ TODO: Image Fishbones_SubDefPropEdit.png
 **Location defined by** -- This parameter has three options, “Start/End/Number of Subs”, “Start/End/Spacing” and “User Specified”. The setting will control which of the **location** parameters the user can control and which are calculated automatically. 
 - **Start MD / End MD** -- Position, in Measured depth along the well, of the first / last fishbone Sub. The unit will be dependent on unit system for the well (m for metric units and ft for field units). 
 - **Measured Depths** -- The measured depth of the fishbone subs. If the “location defined by” is set to the “User specified” option, only this property will be available to the user. 
-- **Lateral configuration Orientation** -- Can be “Fixed Angle”, in which case the user can specify the angle for the first lateral, or “Random angle” where each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
+
+Laterals configurations sets up the configuration of the laterals at each sub position.  
+- **Laterals Per Sub** -- Number of laterals for each sub position
+- **Lenght(s)** -- Length of each lateral, in m or ft. 
+- **Exit Angle** -- Exit angle for fishbone lateral, in degree. 
+- **Build Angle** -- Build angle for fishbone lateral, in degree pr meter. 
+- **Orientation** -- Can be “Fixed Angle”, in which case the user can specify the angle for the first lateral, or “Random angle” where each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
 - **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
 
 <div class="note info">
@@ -32,8 +42,7 @@ TODO: Image Fishbones_SubDefPropEdit.png
 
 ### Imported Laterals
 
-
-In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
+By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export (see below).  
 
 
 ### Export of Fishbone Completion Data
