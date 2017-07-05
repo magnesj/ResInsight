@@ -81,4 +81,6 @@ Length and Depth can be *Incremental* or *Absolute*.
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
-
+- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. 
+- **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*.
