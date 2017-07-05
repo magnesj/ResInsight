@@ -28,7 +28,7 @@ TODO: Image Fishbones_SubDefPropEdit.png
 
 <div class="note info">
 **Well Properties** and properties for **Multi Segment Wells** are only used for export. See description of these parameters below. 
-<\div>
+</div>
 
 ### Imported Laterals
 
