@@ -78,3 +78,7 @@ Length and Depth can be *Incremental* or *Absolute*.
 
 
 ## Exporting Completion Data
+
+![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
+
+
