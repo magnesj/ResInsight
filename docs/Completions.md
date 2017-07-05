@@ -52,7 +52,7 @@ The **Export Laterals** command will export the fishbones laterals as a *.dev*-f
 
 #### Export of Fishbone Completion Data
 
-TODO: Fishbones_PropEdit.png
+![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
 - **Hole Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
 - **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
