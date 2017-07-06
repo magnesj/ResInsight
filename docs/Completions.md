@@ -73,6 +73,14 @@ Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrosta
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
+- **Tubing Diameter** -- Diameter of 
+- ** Open Hole Roughness Factor** -- The 
+- ** Tubing Roughness Factor** -- the... 
+- ** ICDs per Sub** -- The number of ICD (valves) per Sub
+- ** ICD Orifice Diameter** -- The Diamater of the ICD
+- ** ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
+
+
 In the output file there are data for three Eclipse keyword specified: 
 - WELSEGS -- Defines multi-segment well 
 
@@ -83,9 +91,7 @@ In the output file there are data for three Eclipse keyword specified:
 - WSEGVALV -- Defining segments representing a sub-critical valve. 
 
 WSEGVALV: 
-Cv = icdFlowCoefficient, 
-Ac = icdArea (icdOrificeRadius^2 * PI) * icdCount ;
-      
+The parameters exported in the WEGVALV keword are *Cv*, the ICD Flow Coefficient, and *Ac*, the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
 
 
 
