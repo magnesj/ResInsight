@@ -161,7 +161,7 @@ The transmissibility calculation is performed for each direction,X, Y and Z, in 
 
 Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* ($K_y$) and PERMZ ($K_x$): 
 
-![]({{ site.baseurl }}/images/Equation_PerfInveval_K.png)
+![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
 
 
 ## Exporting Completion Data
