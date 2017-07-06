@@ -92,40 +92,38 @@ Notice that there are additional MSW parameters in the property edit for the fis
 In the output file there are data for three Eclipse keyword specified: 
 - WELSEGS -- Defines multi-segment well 
 The first WELSEGS entry contains information about the well: 
-- *Well name*
-- *Dep 1*
-- *Tlen 1*
-- *Len&Dep*
-- *PresDrop*
+- *Name* - Name of well
+- *Dep 1* - TODO
+- *Tlen 1* - TODO
+- *Len&Dep* - incremental or abosulute, as specified by the user in the Fishbones property editor. 
+- *PresDrop* - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
+
 The folowing entries contains information about each segment: 
-- *First Seg*
-- *Last Seg*
-- *Branch Num*
-- *Outlet Seg*
-- *Length*
-- *Depth Change*
-- *Diam*
-- *Rough*       
+- *First Seg*, *Last Seg* -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
+- *Branch Num* -- Branch number for segment being exported 
+- *Outlet Seg* - The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
+- *Length* - Length of segment
+- *Depth Change* - Depth of segment. 
+- *Diam* - Liner inner diamater for the main bore and ICD entries. TODO: check for Laterals. 
+- *Rough* - The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
 
-The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. 
-
-
--- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
-   Well Path A     4137.09154     87.00000     1*        ABS         H--           /
--- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
--- Main stem
--- Segment for sub 0
-   2             2            1              1              13.00000      0.53667          0.15200     0.00001      /
--- Laterals
--- Diam: MSW - Tubing Radius
--- Rough: MSW - Open Hole Roughness Factor
--- ICD
-   3             3            2              2              0.10000       0                0.15200     0.00001      /
--- Fishbone 0 : Sub index 0 - Lateral 0
-   52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
-   53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
+The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for. 
 
 
+    -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
+       Well Path A     4137.09154     87.00000     1*        ABS         H--           /
+    -- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
+    -- Main stem
+    -- Segment for sub 0
+       2             2            1              1              13.00000      0.53667          0.15200     0.00001      /
+    -- Laterals
+    -- Diam: MSW - Tubing Radius
+    -- Rough: MSW - Open Hole Roughness Factor
+    -- ICD
+       3             3            2              2              0.10000       0                0.15200     0.00001      /
+    -- Fishbone 0 : Sub index 0 - Lateral 0
+       52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
+       53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
 
 
 - COMPSEGS -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
