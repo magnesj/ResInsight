@@ -160,4 +160,8 @@ The parameters exported in the WEGVALV keword are
 - **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
 - **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Caclulated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissbility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
 - **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
-- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. 
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. If there are completions of multiple types or along multiple wells, this parameter determines if the entries for the different wels / completion types should be in the same file or split in different files. 
+- **Include Fishbones** -- Option to inclulde or exclude fishbone completions from the export. 
+- **Exclude Main Bore Transmissibility For Fishbones** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
+- **Include Perforations** -- Option to include or exclude perforation invervals in the export. 
+- **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
