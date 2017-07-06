@@ -74,24 +74,28 @@ Notice that there are additional MSW parameters in the property edit for the fis
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 - **Tubing Diameter** -- Diameter of 
-- ** Open Hole Roughness Factor** -- The 
-- ** Tubing Roughness Factor** -- the... 
-- ** ICDs per Sub** -- The number of ICD (valves) per Sub
-- ** ICD Orifice Diameter** -- The Diamater of the ICD
-- ** ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
+- **Open Hole Roughness Factor** -- The 
+- **Tubing Roughness Factor** -- the... 
+- **ICDs per Sub** -- The number of ICD (valves) per Sub
+- **ICD Orifice Diameter** -- The Diamater of the ICD
+- **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
 
 
 In the output file there are data for three Eclipse keyword specified: 
 - WELSEGS -- Defines multi-segment well 
 
 - COMPSEGS -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
+The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
+- *I*, *J* and *K* -- The Eclipde cell index
+- *Branch no* -- Branch number for the segment
+- *Start Length*, *End Length* -- Start and end lenght along the well for the relevent segment. 
 
-
-
-- WSEGVALV -- Defining segments representing a sub-critical valve. 
-
-WSEGVALV: 
-The parameters exported in the WEGVALV keword are *Cv*, the ICD Flow Coefficient, and *Ac*, the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
+- **WSEGVALV** -- Defining segments representing a sub-critical valve. 
+The parameters exported in the WEGVALV keword are
+- *Well Name* -- The name of the well
+- * Seg No* -- Segment number along the well
+- *Cv* -- The ICD Flow Coefficient, as entered by the user
+- *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
 
 
 
