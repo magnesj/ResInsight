@@ -54,20 +54,25 @@ The **Export Laterals** command will export the fishbones laterals as a *.dev*-f
 
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
-- **Hole Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
 - **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
+- **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
+
 
 
 
 #### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
 
+For the Fishbone group the following parameters can be set for Multi Segment Wells
+- **Liner Inner Diameter** -- The 
+- **Roughness Factor** -- The
+- **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
+**Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
+
+
 ![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
 
-Pressure drop can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
 
-**Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
-**Liner Inner Diameter** is exported as Diameter in WelSegs
 **Tubing Roughness Factor** is exported as Roughness in Welsegs
 
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
@@ -76,8 +81,8 @@ Notice that there are additional MSW parameters in the property edit for the fis
 - **Tubing Diameter** -- Diameter of 
 - **Open Hole Roughness Factor** -- The 
 - **Tubing Roughness Factor** -- the... 
-- **ICDs per Sub** -- The number of ICD (valves) per Sub
-- **ICD Orifice Diameter** -- The Diamater of the ICD
+- **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for WSEGVALV export. 
+- **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for WSEGVALV export. 
 - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
 
 
