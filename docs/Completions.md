@@ -158,7 +158,8 @@ The perforation intervals will be indicated by different colour along the well p
 
 ### Export of Perforation Interval Completion Data
 
-
+TODO: fix equation - only for testing math mode... 
+$$ T = \frac{8cKL}{S + Dy} $$
 
 
 ## Exporting Completion Data
