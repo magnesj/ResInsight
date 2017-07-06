@@ -91,6 +91,42 @@ Notice that there are additional MSW parameters in the property edit for the fis
 
 In the output file there are data for three Eclipse keyword specified: 
 - WELSEGS -- Defines multi-segment well 
+The first WELSEGS entry contains information about the well: 
+- *Well name*
+- *Dep 1*
+- *Tlen 1*
+- *Len&Dep*
+- *PresDrop*
+The folowing entries contains information about each segment: 
+- *First Seg*
+- *Last Seg*
+- *Branch Num*
+- *Outlet Seg*
+- *Length*
+- *Depth Change*
+- *Diam*
+- *Rough*       
+
+The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. 
+
+
+-- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
+   Well Path A     4137.09154     87.00000     1*        ABS         H--           /
+-- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
+-- Main stem
+-- Segment for sub 0
+   2             2            1              1              13.00000      0.53667          0.15200     0.00001      /
+-- Laterals
+-- Diam: MSW - Tubing Radius
+-- Rough: MSW - Open Hole Roughness Factor
+-- ICD
+   3             3            2              2              0.10000       0                0.15200     0.00001      /
+-- Fishbone 0 : Sub index 0 - Lateral 0
+   52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
+   53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
+
+
+
 
 - COMPSEGS -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
 The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
@@ -101,7 +137,7 @@ The first COMPSEGS entry is a line with the well path name. Each following entry
 - **WSEGVALV** -- Defining segments representing a sub-critical valve. 
 The parameters exported in the WEGVALV keword are
 - *Well Name* -- The name of the well
-- * Seg No* -- Segment number along the well
+- *Seg No* -- Segment number along the well
 - *Cv* -- The ICD Flow Coefficient, as entered by the user
 - *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
 
