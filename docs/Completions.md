@@ -164,17 +164,16 @@ Taking the X direction as an example, we first calculate the releavatn permeabil
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
 K = \sqrt{K_Y K_Z} (TODO: Add as comment?)
 
-The peacman radius for the cell is then calculated: 
+The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (Dy and Dz): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
 r_{0_X} = 0.28 \frac{ D_z^2 \sqrt{\frac{K_Y}{K_Z}} + D_y^2 \sqrt{\frac{K_Z}{K_Y}} } {\sqrt[4]{\frac{K_y}{K_z}} + \sqrt[4]{\frac{K_z}{K_y}}}
 
-The x-component of the transmissibility vector can then be calculation
+The x-component of the transmissibility vector can then be calculation, using the length of the perforation in the x direction (lx), the well radius (rw) and skin factor (S):
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
 T_X = \frac{c 2 \pi K l_x }{\ln (\frac{r_{0_x}}{r_w}) + S}
 
 The y and z component to the transmissibilities are calculated in the same manner, and the total transmissibility is then calculated as: 
-
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 T = \sqrt{T_x + T_y + T_z}
 
