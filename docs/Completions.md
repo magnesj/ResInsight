@@ -6,6 +6,44 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
+## Perforation Intervals
+
+### Modelling of Perforation Interval Completions
+![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
+
+When creating a new perforation interval, the following properties of the perforation can be set in the property editor: 
+- **Start MD**, **End MD** -- Measured depth along the well path for the perforation to start/stop. 
+- **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see below). 
+- **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
+- **Start of History** -- Turned on if the perforation should be present for all time steps
+- ** Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
+
+The perforation intervals will be indicated by different colour along the well path. 
+
+### Export of Perforation Interval Completion Data
+The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. TODO Describe this more?
+
+Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
+K = \sqrt{K_Y K_Z} (TODO: Add as comment?)
+
+The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (Dy and Dz): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
+r_{0_X} = 0.28 \frac{ D_z^2 \sqrt{\frac{K_Y}{K_Z}} + D_y^2 \sqrt{\frac{K_Z}{K_Y}} } {\sqrt[4]{\frac{K_y}{K_z}} + \sqrt[4]{\frac{K_z}{K_y}}}
+
+The x-component of the transmissibility vector can then be calculation, using the length of the perforation in the x direction (lx), the well radius (rw) and skin factor (S):
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
+T_X = \frac{c 2 \pi K l_x }{\ln (\frac{r_{0_x}}{r_w}) + S}
+
+The y and z component to the transmissibilities are calculated in the same manner, and the total transmissibility is then calculated as: 
+![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
+T = \sqrt{T_x + T_y + T_z}
+
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it based on COMPDAT default values. The ratio between these trasmissibilities is then exported as the WPIMULT value. 
+
+
 ## Fishbones
 
 ### Modelling of Fishbone Completions
@@ -139,45 +177,6 @@ The parameters exported in the WEGVALV keword are
 - *Cv* -- The ICD Flow Coefficient, as entered by the user
 - *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
 
-
-
-
-## Perforation Intervals
-
-### Modelling of Perforation Interval Completions
-![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
-
-When creating a new perforation interval, the following properties of the perforation can be set in the property editor: 
-- **Start MD**, **End MD** -- Measured depth along the well path for the perforation to start/stop. 
-- **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see below). 
-- **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
-- **Start of History** -- Turned on if the perforation should be present for all time steps
-- ** Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
-
-The perforation intervals will be indicated by different colour along the well path. 
-
-### Export of Perforation Interval Completion Data
-The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. TODO Describe this more?
-
-Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
-K = \sqrt{K_Y K_Z} (TODO: Add as comment?)
-
-The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (Dy and Dz): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
-r_{0_X} = 0.28 \frac{ D_z^2 \sqrt{\frac{K_Y}{K_Z}} + D_y^2 \sqrt{\frac{K_Z}{K_Y}} } {\sqrt[4]{\frac{K_y}{K_z}} + \sqrt[4]{\frac{K_z}{K_y}}}
-
-The x-component of the transmissibility vector can then be calculation, using the length of the perforation in the x direction (lx), the well radius (rw) and skin factor (S):
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
-T_X = \frac{c 2 \pi K l_x }{\ln (\frac{r_{0_x}}{r_w}) + S}
-
-The y and z component to the transmissibilities are calculated in the same manner, and the total transmissibility is then calculated as: 
-![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
-T = \sqrt{T_x + T_y + T_z}
-
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it based on COMPDAT default values. The ratio between these trasmissibilities is then exported as the WPIMULT value. 
 
 ## Exporting Completion Data
 
