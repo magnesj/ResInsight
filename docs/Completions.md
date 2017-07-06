@@ -157,9 +157,11 @@ When creating a new perforation interval, the following properties of the perfor
 The perforation intervals will be indicated by different colour along the well path. 
 
 ### Export of Perforation Interval Completion Data
+The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. TODO Describe this more?
 
-TODO: fix equation - only for testing math mode... 
-\[ T = \frac{8cKL}{S + Dy} \]
+Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* ($K_y$) and PERMZ ($K_x$): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInveval_K.png)
 
 
 ## Exporting Completion Data
