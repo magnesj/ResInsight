@@ -159,9 +159,19 @@ The perforation intervals will be indicated by different colour along the well p
 ### Export of Perforation Interval Completion Data
 The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. TODO Describe this more?
 
-Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* ($K_y$) and PERMZ ($K_x$): 
+Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
+
+The peacman radius for the cell is then calculated: 
+
+
+And finally the Tx contribution to the transmissibility can be calculated: 
+
+
+The total transmissibility is then calculated as: 
+
+
 
 
 ## Exporting Completion Data
