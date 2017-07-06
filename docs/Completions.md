@@ -143,13 +143,22 @@ The parameters exported in the WEGVALV keword are
 
 
 ## Perforation Intervals
-![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
-
 
 ### Modelling of Perforation Interval Completions
+![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
 
+When creating a new perforation interval, the following properties of the perforation can be set in the property editor: 
+- **Start MD**, **End MD** -- Measured depth along the well path for the perforation to start/stop. 
+- **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see below). 
+- **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
+- **Start of History** -- Turned on if the perforation should be present for all time steps
+- ** Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
+
+The perforation intervals will be indicated by different colour along the well path. 
 
 ### Export of Perforation Interval Completion Data
+
+
 
 
 ## Exporting Completion Data
