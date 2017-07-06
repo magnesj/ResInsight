@@ -156,6 +156,8 @@ The parameters exported in the WEGVALV keword are
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
-- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. 
+- **Export Folder** -- Folder for the exported COMPDAT file. If it does not already exist, it will be created when performing the export. The exported file will get a fixed name based on what is included in the export. 
+- **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
+- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Caclulated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissbility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
 - **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
-- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. File names given by default: /Well Path B_Perforations_TEST10K_FLT_LGR_NNC
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. 
