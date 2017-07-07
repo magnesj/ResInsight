@@ -47,6 +47,7 @@ The y and z component to the transmissibilities are calculated in the same manne
 
 If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it based on COMPDAT default values. The ratio between these trasmissibilities is then exported as the WPIMULT value. 
 
+For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
 ## Fishbones
 
