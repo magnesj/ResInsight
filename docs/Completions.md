@@ -26,20 +26,16 @@ The transmissibility calculation is performed for each direction,X, Y and Z, in 
 Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
-K = \sqrt{K_Y K_Z} (TODO: Add as comment?)
 
 The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (Dy and Dz): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
-r_{0_X} = 0.28 \frac{ D_z^2 \sqrt{\frac{K_Y}{K_Z}} + D_y^2 \sqrt{\frac{K_Z}{K_Y}} } {\sqrt[4]{\frac{K_y}{K_z}} + \sqrt[4]{\frac{K_z}{K_y}}}
 
 The x-component of the transmissibility vector can then be calculation, using the length of the perforation in the x direction (lx), the well radius (rw) and skin factor (S):
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
-T_X = \frac{c 2 \pi K l_x }{\ln (\frac{r_{0_x}}{r_w}) + S}
 
 The y and z component to the transmissibilities are calculated in the same manner, and the total transmissibility is then calculated as: 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
-T = \sqrt{T_x + T_y + T_z}
 
 If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it based on COMPDAT default values. The ratio between these trasmissibilities is then exported as the WPIMULT value. 
 
