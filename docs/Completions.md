@@ -72,7 +72,7 @@ Laterals configurations sets up the configuration of the laterals at each sub po
 - **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
 
 <div class="note info">
-**Well Properties** and properties for **Multi Segment Wells** are only used for export. See description of these parameters below. 
+<b>Well Properties</b> and properties for <b>Multi Segment Wells</b> are only used for export. See description of these parameters below. 
 </div>
 
 ### Imported Laterals
