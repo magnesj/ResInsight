@@ -116,7 +116,7 @@ For multisegment wells there are additional parameters which should be set. Thes
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit_MSW.png)
 
 For the Fishbone group the following parameters can be set for Multi Segment Wells
-- **Liner Inner Diameter** -- The liner inner diameter for the fishbones. 
+- **Liner Inner  eter** -- The liner inner diameter for the fishbones. 
 - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
 - **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
 - **Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
@@ -141,7 +141,7 @@ Notice that there are additional MSW parameters in the property edit for the fis
 In the output file there are data for three Eclipse keyword specified: 
 
 ##### WELSEGS
-WELSEGS defines multi-segment well. Example: 
+WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for.  Example: 
 
     WELSEGS
     -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
@@ -163,8 +163,8 @@ WELSEGS defines multi-segment well. Example:
 
 - The first *WELSEGS* entry contains information about the well: 
   - *Name* - Name of well
-  - *Dep 1* - TODO
-  - *Tlen 1* - TODO
+  - *Dep 1* - TVD of start MD point, as given by the user in the Fishbones **Start MD** field.  
+  - *Tlen 1* - Point given by the user in the Fishbones **Start MD** field.  
   - *Len&Dep* - incremental or abosulute, as specified by the user in the Fishbones property editor. 
   - *PresDrop* - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
 
@@ -172,12 +172,10 @@ WELSEGS defines multi-segment well. Example:
   - *First Seg*, *Last Seg* -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
   - *Branch Num* -- Branch number for segment being exported 
   - *Outlet Seg* - The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
-  - *Length* - Length of segment
-  - *Depth Change* - Depth of segment. 
-  - *Diam* - Liner inner diamater for the main bore and ICD entries. TODO: check for Laterals. 
+  - *Length* - Length of segment (if incremental Len&Dep above) or length of segments including this along well (if abosulte Len&Dep above). For ICDs length is set to 0.1. 
+  - *Depth Change* - Depth of segment, incremental or abosolute as for Length. For ICDs depth is set to 0. 
+  - *Diam* - Diameter of segment. For main bore and ICD entries, the liner inner diamater for the Fishbones collection is used. For laterals, an effecive diamaeter is calculated so that the diameter exported is the diamaneter which, assuming a circle, would give the same area as the area betweeen the hole diamaeter and the tubing diameter.  
   - *Rough* - The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
-
-The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for. 
 
     
 ##### COMPSEGS
