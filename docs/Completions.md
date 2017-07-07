@@ -130,7 +130,27 @@ An example of the exported COMPDAT file is shown below. The calculated transmiss
     /
     
 
+For export with WPIMULT factors, the main bore diameter and direction are given in the export for cells which have both main bore and lateral contribuitons, while diamater and main direction of the first lateral is used for cells with no main bore contribuiton. Other parameters exported as part of COMPDAT are set to default. 
 
+The *WPIMULT* parameters are calculated, as for the perforation intervals, by ResInsight calculating both the transmissibility of the completion as described above, and in addition calculating the transmissibility based on the information exported in the COMPDAT keyword. The ratio between these two numbers is then exported as the *WPIMUT* keyword. 
+
+    COMPDAT
+    -- Well            I      J      K1     K2     Status     SAT     TR     DIAM        KH     S           Df     DIR     r0     
+    -- Well Path B main bore : 0.0569986
+       Well Path B     26     45     29     29     OPEN       1*      1*     0.21600     1*     0.00000     1*     'Z'      /
+    -- Fishbone 0: Sub: 0 Lateral: 0 : 0.0021382
+    -- Fishbone 0: Sub: 0 Lateral: 1 : 0.00228575
+    -- Fishbone 0: Sub: 0 Lateral: 2 : 0.0126269
+    -- Fishbone 0: Sub: 1 Lateral: 1 : 0.0112929
+    -- Fishbone 0: Sub: 2 Lateral: 0 : 0.00566964
+    -- Well Path B main bore : 0.230572
+       Well Path B     27     41     15     15     OPEN       1*      1*     0.21600     1*     0.00000     1*     'Z'      /
+    /
+    WPIMULT
+    -- Well            Mult         I      J      K      
+       Well Path B     0.70133      25     45     29      /
+       Well Path B     25.11396     27     41     15      /
+    /
 
 #### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
