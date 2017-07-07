@@ -6,11 +6,9 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
-Completions can be modelled by adding new perforation intervals or fishbones collections. Details about the Dette er for å eksportere Eclipse keyword COMPDAT, WELSEGS 
+Two types of completions are available for modelling and export - perforation invervals and fishbone wells. The purpose of modelling such completions, is that it enables Resindight to export Eclipse keyword to do more refined simulations.
 
-
-Modelling completions, Resindight can export keyword to Eclipse to do more refined simulations.
-
+Completions can be modelled by adding new perforation intervals or fishbones fishbones. Details about the completions must be specified, and the transmissibility, or cell connection factors, can then be calculated and exported to Eclipse Keyword COMPDAT. For fishbones completions multisegment well information can be exported using the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
 
 ## Perforation Intervals
 
