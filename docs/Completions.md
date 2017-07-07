@@ -114,6 +114,23 @@ If the user chooses, the main bore transmissibility can be excluded from the cal
 
 When calculating the transmissibility for the laterals, the full cell volume is split among the laterals for calculation of the transmissibility. This is done by finding the direction of the main bore, and then dividing the cell size in this direction by the number of laterals in the cell when calculating the Peaceman radius. 
 
+An example of the exported COMPDAT file is shown below. The calculated transmissibility contribution to the cell connection factor from each lateral or main bore part is included as a comment. 
+
+    COMPDAT
+    -- Well            I      J      K1     K2     Status     SAT     TR               DIAM     KH     S     Df     DIR     r0     
+    -- Well Path B main bore : 0.0569986
+       Well Path B     26     45     29     29     OPEN       1*      5.699858E-02      /
+    -- Fishbone 0: Sub: 0 Lateral: 0 : 0.0021382
+    -- Fishbone 0: Sub: 0 Lateral: 1 : 0.00228575
+    -- Fishbone 0: Sub: 0 Lateral: 2 : 0.0126269
+    -- Fishbone 0: Sub: 1 Lateral: 1 : 0.0112929
+    -- Fishbone 0: Sub: 2 Lateral: 0 : 0.00566964
+    -- Well Path B main bore : 0.230572
+       Well Path B     27     41     15     15     OPEN       1*      2.645858E-01      /
+    /
+    
+
+
 
 #### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
