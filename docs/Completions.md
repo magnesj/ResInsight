@@ -57,7 +57,7 @@ To add new fishbones completions, select the «New Fishbones Subs Definition”.
 ![]({{ site.baseurl }}/images/Completions_AddNew.png)
 
 <div class="note info">
-In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created. These properties are only used for the export, see below. 
+In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created.
 </div>
 
 ### Fishbone Subs Definition
@@ -124,8 +124,6 @@ For the Fishbone group the following parameters can be set for Multi Segment Wel
 
 ![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
 
-
-**Tubing Roughness Factor** is exported as Roughness in Welsegs
 
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
