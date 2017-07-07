@@ -181,7 +181,7 @@ The list of entries contains information on the main stem, the ICDs at the fishb
 
     
 ##### COMPSEGS
-Along a multisegment well, the COMPSEGS keyword defines the location of the completions. An example of the COMPSEGS keyword as exported: 
+An example of the COMPSEGS keyword as exported is shown below.  
 
     COMPSEGS
     -- Name            
@@ -200,7 +200,7 @@ The first COMPSEGS entry is a line with the well path name. Each following entry
 
 
 ##### WSEGVALV
-WSEGVALV defines segments representing a sub-critical valve. Example of keyword exported: 
+An example of the WSEGVALV keyword as exported is shown below.  
 
     WSEGVALV
     -- Well Name       Seg No     Cv          Ac          
@@ -209,8 +209,6 @@ WSEGVALV defines segments representing a sub-critical valve. Example of keyword 
        Well Path A     7          1.50000     0.00008      /
     /
     
-
-
 The parameters exported in the WEGVALV keword are
 - *Well Name* -- The name of the well
 - *Seg No* -- Segment number along the well
