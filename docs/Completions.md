@@ -117,7 +117,7 @@ For multisegment wells there are additional parameters which should be set. Thes
 
 For the Fishbone group the following parameters can be set for Multi Segment Wells
 - **Liner Inner Diameter** -- The liner inner diameter for the fishbones. 
-- **Roughness Factor** -- The roughness factor of ...
+- **Roughness Factor** -- The roughness factor used in export of main bore segments. 
 - **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
 - **Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
 
