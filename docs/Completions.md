@@ -100,13 +100,19 @@ Properties for the fishbones relevant for the export of completion data for the 
 - **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
 - **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
 
-The calculation of the transmissibilities for the fishbones uses the same equations as the calculation for Perforation intervals (see TODO), however there are som modification. 
-TODO: 
-Compute for laterals and main bore
-Split cell size for laterals
-Option to exclude main bore. 
+TODO: Find out about Skin factor used for main bore, ref issue https://github.com/OPM/ResInsight/issues/1655
 
+For the Fishbones laterals, the relevant propertoes are : 
+- **Hole Diameter** -- The hole diameter of the lateral
+- **Skin Factor** -- The skin factor used in the transmissibility calculation for the lateral. 
 
+These parameters are available either for the Fishbones subs definition, or as parameters imported fishbone laterals. 
+
+The transmissibility calculation for the fishbones is done following the same description as the transmissibility calculation for the perforation interval, see TODO-link. 
+
+If the user chooses, the main bore transmissibility can be excluded from the calculation, by swithing on this option in the Export dialog. 
+
+When calculating the transmissibility for the laterals, the full cell volume is split among the laterals for calculation of the transmissibility. This is done by finding the direction of the main bore, and then dividing the cell size in this direction by the number of laterals in the cell when calculating the Peaceman radius. 
 
 
 #### Export Well Segments
