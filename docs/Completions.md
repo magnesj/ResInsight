@@ -13,6 +13,7 @@ Completions can be modelled by adding new perforation intervals or fishbones fis
 ## Perforation Intervals
 
 ### Modelling of Perforation Interval Completions
+
 ![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
 
 When creating a new perforation interval, the following properties of the perforation can be set in the property editor: 
@@ -96,6 +97,7 @@ The **Export Laterals** command will export the fishbones laterals as a *.dev*-f
 #### Export of Fishbone Completion Data
 
 Properties for the fishbones relevant for the export of completion data for the fishbones are available in the property editor: 
+
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
 - **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
@@ -156,7 +158,6 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
 #### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
 
-
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit_MSW.png)
 
 For the Fishbone group the following parameters can be set for Multi Segment Wells
@@ -170,6 +171,7 @@ For the Fishbone group the following parameters can be set for Multi Segment Wel
 
 
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
+
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 - **Tubing Diameter** -- The diameter used in the *WELSEGS* export of the laterals. 
