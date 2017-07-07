@@ -16,7 +16,7 @@ When creating a new perforation interval, the following properties of the perfor
 - **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see below). 
 - **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
 - **Start of History** -- Turned on if the perforation should be present for all time steps
-- ** Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
+- **Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
 
 The perforation intervals will be indicated by different colour along the well path. 
 
@@ -127,8 +127,8 @@ Notice that there are additional MSW parameters in the property edit for the fis
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 - **Tubing Diameter** -- Diameter of 
-- **Open Hole Roughness Factor** -- The 
-- **Tubing Roughness Factor** -- the... 
+- **Open Hole Roughness Factor** -- The rougness factor used in the WELSEGS export of the laterals. 
+- **Tubing Roughness Factor** -- TODO: Not in use?
 - **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for WSEGVALV export. 
 - **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for WSEGVALV export. 
 - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
