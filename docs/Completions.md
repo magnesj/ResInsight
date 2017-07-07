@@ -6,6 +6,12 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
+Completions can be modelled by adding new perforation intervals or fishbones collections. Details about the Dette er for å eksportere Eclipse keyword COMPDAT, WELSEGS 
+
+
+Modelling completions, Resindight can export keyword to Eclipse to do more refined simulations.
+
+
 ## Perforation Intervals
 
 ### Modelling of Perforation Interval Completions
