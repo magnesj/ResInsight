@@ -22,6 +22,8 @@ When creating a new perforation interval, the following properties of the perfor
 - **Start of History** -- Turned on if the perforation should be present for all time steps
 - **Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
 
+TODO: Start date changed to "All Timestep" - update text and image!
+
 The perforation intervals will be indicated by different colour along the well path. 
 
 ### Export of Perforation Interval Completion Data
@@ -128,35 +130,35 @@ For the Fishbone group the following parameters can be set for Multi Segment Wel
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
-- **Tubing Diameter** -- Diameter of 
-- **Open Hole Roughness Factor** -- The rougness factor used in the WELSEGS export of the laterals. 
-- **Tubing Roughness Factor** -- TODO: Not in use?
-- **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for WSEGVALV export. 
-- **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for WSEGVALV export. 
-- **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of WSEGVALV.
+- **Tubing Diameter** -- The diameter used in the *WELSEGS* export of the laterals. 
+- **Open Hole Roughness Factor** -- The rougness factor used in the *WELSEGS* export of the laterals. 
+- **Tubing Roughness Factor** -- TODO: Not in use? 
+- **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for *WSEGVALV* export. 
+- **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
+- **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
 
 In the output file there are data for three Eclipse keyword specified: 
-- WELSEGS -- Defines multi-segment well 
-The first WELSEGS entry contains information about the well: 
-- *Name* - Name of well
-- *Dep 1* - TODO
-- *Tlen 1* - TODO
-- *Len&Dep* - incremental or abosulute, as specified by the user in the Fishbones property editor. 
-- *PresDrop* - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
+- *WELSEGS* -- Defines multi-segment well 
+- The first *WELSEGS* entry contains information about the well: 
+  - *Name* - Name of well
+  - *Dep 1* - TODO
+  - *Tlen 1* - TODO
+  - *Len&Dep* - incremental or abosulute, as specified by the user in the Fishbones property editor. 
+  - *PresDrop* - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
 
-The folowing entries contains information about each segment: 
-- *First Seg*, *Last Seg* -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
-- *Branch Num* -- Branch number for segment being exported 
-- *Outlet Seg* - The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
-- *Length* - Length of segment
-- *Depth Change* - Depth of segment. 
-- *Diam* - Liner inner diamater for the main bore and ICD entries. TODO: check for Laterals. 
-- *Rough* - The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
+- The folowing *WELSEGS* entries contains information about each segment: 
+  - *First Seg*, *Last Seg* -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
+  - *Branch Num* -- Branch number for segment being exported 
+  - *Outlet Seg* - The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
+  - *Length* - Length of segment
+  - *Depth Change* - Depth of segment. 
+  - *Diam* - Liner inner diamater for the main bore and ICD entries. TODO: check for Laterals. 
+  - *Rough* - The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
 
 The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for. 
 
-
+    WELSEGS
     -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
        Well Path A     4137.09154     87.00000     1*        ABS         H--           /
     -- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
@@ -171,21 +173,37 @@ The list of entries contains information on the main stem, the ICDs at the fishb
     -- Fishbone 0 : Sub index 0 - Lateral 0
        52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
        53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
+    /
 
 
-- COMPSEGS -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
+- *COMPSEGS* -- Along a multisegment well, the COMPSEGS keyword defines the location of the completions 
 The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
-- *I*, *J* and *K* -- The Eclipde cell index
-- *Branch no* -- Branch number for the segment
-- *Start Length*, *End Length* -- Start and end lenght along the well for the relevent segment. 
+  - *I*, *J* and *K* -- The Eclipde cell index
+  - *Branch no* -- Branch number for the segment
+  - *Start Length*, *End Length* -- Start and end lenght along the well for the relevent segment. 
 
-- **WSEGVALV** -- Defining segments representing a sub-critical valve. 
+    COMPSEGS
+    -- Name            
+       Well Path A      /
+    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+       28     40     6      27            0.00000          1.70326         /
+       28     40     7      27            1.70326          2.34748         /
+       28     40     8      27            2.34748          2.96577         /
+    /
+
+- *WSEGVALV* -- Defining segments representing a sub-critical valve. 
 The parameters exported in the WEGVALV keword are
-- *Well Name* -- The name of the well
-- *Seg No* -- Segment number along the well
-- *Cv* -- The ICD Flow Coefficient, as entered by the user
-- *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
+  - *Well Name* -- The name of the well
+  - *Seg No* -- Segment number along the well
+  - *Cv* -- The ICD Flow Coefficient, as entered by the user
+  - *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.       
 
+    WSEGVALV
+    -- Well Name       Seg No     Cv          Ac          
+       Well Path A     3          1.50000     0.00008      /
+       Well Path A     5          1.50000     0.00008      /
+       Well Path A     7          1.50000     0.00008      /
+    /
 
 ## Exporting Completion Data
 
