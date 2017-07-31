@@ -102,7 +102,7 @@ Properties for the fishbones relevant for the export of completion data for the 
 
 - **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
 - **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
-
+- **Main Bore Skin Factor** -- The skin factor for the main bore, used in calculation of the transmissibility (connection factor) into the main bore. 
 TODO: Find out about Skin factor used for main bore, ref issue https://github.com/OPM/ResInsight/issues/1655
 
 For the Fishbones laterals, the relevant propertoes are : 
