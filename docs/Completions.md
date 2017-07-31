@@ -20,15 +20,13 @@ When creating a new perforation interval, the following properties of the perfor
 - **Start MD**, **End MD** -- Measured depth along the well path for the perforation to start/stop. 
 - **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see [Export of Perforation Interval Completion Data]({{ site.baseurl }}/docs/completions#export-of-perforation-interval-completion-data) ). 
 - **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
-- **Start of History** -- Turned on if the perforation should be present for all time steps
+- **All Timesteps** -- Turned on if the perforation should be present for all time steps
 - **Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
-
-TODO: Start date changed to "All Timestep" - update text and image!
 
 The perforation intervals will be indicated by different colour along the well path. 
 
 ### Export of Perforation Interval Completion Data
-The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. TODO Describe this more?
+The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. 
 
 Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
 
