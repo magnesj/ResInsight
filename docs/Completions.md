@@ -6,9 +6,9 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
-Two types of completions are available for modelling and export - perforation invervals and fishbone wells. The purpose of modelling such completions, is that it enables Resindight to export Eclipse keyword to do more refined simulations.
+Two types of completions are available for modelling and export - perforation invervals and fishbone wells. The purpose of modelling these completions, is that it enables ResInsight to export Eclipse keywords for doing more refined simulations.
 
-Completions can be modelled by adding new perforation intervals or fishbones fishbones. Details about the completions must be specified, and the transmissibility, or cell connection factors, can then be calculated and exported to Eclipse Keyword COMPDAT. For fishbones completions multisegment well information can be exported using the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
+Completions can be modelled by adding new perforation intervals or fishbones subs. Details about the completions must then be specified, such as the length of the perforation interval or number of fishbone subs and laterals. After modelling the completions, the transmissibility (cell connection factors) can be calculated and exported to the Eclipse COMPDAT Keyword. For fishbones completions multisegment well information can be exported using the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
 
 ## Perforation Intervals
 
