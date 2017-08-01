@@ -33,15 +33,15 @@ TODO: Image??
 ### Export of Perforation Interval Completion Data
 The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
 
-Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
+Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
 
-The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (Dy and Dz): 
+The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
 
-The x-component of the transmissibility vector can then be calculation, using the length of the perforation in the x direction (lx), the well radius (rw) and skin factor (S):
+The x-component of the transmissibility vector is be calculation, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
 
@@ -49,7 +49,7 @@ The y and z component to the transmissibilities are calculated in the same manne
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it based on COMPDAT default values. The ratio between these trasmissibilities is then exported as the WPIMULT value. 
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
