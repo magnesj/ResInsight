@@ -14,19 +14,24 @@ Completions can be modelled by adding new perforation intervals or fishbones sub
 
 ### Modelling of Perforation Interval Completions
 
+TODO: Image: New perforation interval
+
+A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **New Perforation interval**. 
+
 ![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
 
-When creating a new perforation interval, the following properties of the perforation can be set in the property editor: 
+After creating the perforation interval, the following properties of the perforation can be set in the property editor: 
 - **Start MD**, **End MD** -- Measured depth along the well path for the perforation to start/stop. 
-- **Diameter** -- Diameter of the perforation, used in calculation of transmissibility (see [Export of Perforation Interval Completion Data]({{ site.baseurl }}/docs/completions#export-of-perforation-interval-completion-data) ). 
-- **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility (see below). 
-- **All Timesteps** -- Turned on if the perforation should be present for all time steps
-- **Start Date** -- The perforation will be included in the model for al time steps after this date. If "Start of History" is turned on, this option is not available and the perforation is included for all time steps. 
+- **Diameter** -- Diameter of the perforation, used in calculation of transmissibility ( For details on the transmissibility calculation, see [Export of Perforation Interval Completion Data]({{ site.baseurl }}/docs/completions#export-of-perforation-interval-completion-data)). 
+- **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility. 
+- **All Timesteps** -- If on, the perforation interval will be present for all time steps
+- **Start Date** -- The perforation will be included in the model for al time steps after this date. If "All TimeSteps" is turned on, this option is not available and the perforation is included for all time steps. 
 
 The perforation intervals will be indicated by different colour along the well path. 
+TODO: Image??
 
 ### Export of Perforation Interval Completion Data
-The transmissibility calculation is performed for each direction,X, Y and Z, in an orthogonal coordinate system local to the cell. 
+The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
 
 Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (Ky) and PERMZ (Kz): 
 
