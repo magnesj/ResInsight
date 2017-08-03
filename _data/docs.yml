@@ -37,6 +37,7 @@
   - exporteclipseproperties
   - octaveinterface
   - odbsupport
+  - commandfile
 
 - title: Appendix
   docs:
