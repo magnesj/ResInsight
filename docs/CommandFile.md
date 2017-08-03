@@ -102,11 +102,11 @@ Replaces a case in the current project with the specified new case.
 | Parameter   | Description                                        | Type    | Required |
 |-------------|----------------------------------------------------|---------|----------|
 | newGridFile | File path to the new grid file to replace with     | String  | &#10004; |
-| case        | ID of the case to replace. Defaults to first case  | Integer |          |
+| caseId      | ID of the case to replace. Defaults to first case  | Integer |          |
 
 ### Example
 
-`replaceCase(newGridFile="/home/user/otherReservoir.EGRID", case=4)`
+`replaceCase(newGridFile="/home/user/otherReservoir.EGRID", caseId=4)`
 
 
 replaceSourceCases
@@ -119,7 +119,7 @@ Replaces multiple source cases in the current project.
 | Parameter    | Description                                                     | Type    | Required |
 |--------------|-----------------------------------------------------------------|---------|----------|
 | gridListFile | File path to file containing list of cases to replace with      | String  | &#10004; |
-| group        | ID of group to replace cases in. Defaults to first group        | Integer |          |
+| caseGroupId  | ID of group to replace cases in. Defaults to first group        | Integer |          |
 
 ### Example
 
@@ -172,7 +172,7 @@ This command changes the selected property on the first view of the selected cas
 
 | Parameter      | Description                                                                                     | Type    | Required |
 |----------------|-------------------------------------------------------------------------------------------------|---------|----------|
-| case           | ID of case to export property from                                                              | Integer | &#10004; |
+| caseId         | ID of case to export property from                                                              | Integer | &#10004; |
 | property       | Name of property to export                                                                      | String  | &#10004; |
 | eclipseKeyword | Eclipse keyword to use. Defaults to the value of `property` parameter                           | String  |          |
 | undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |          |
@@ -180,7 +180,7 @@ This command changes the selected property on the first view of the selected cas
 
 ### Example
 
-`exportProperty(case=1, property="SOIL")`
+`exportProperty(caseId=1, property="SOIL")`
 
 
 exportWellPathCompletions
@@ -190,7 +190,7 @@ Export well path completions.
 
 | Parameter                   | Description                                                                                                                                               | Type           | Required |
 |-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|----------|
-| case                        | ID of case to export well paths for                                                                                                                       | Integer        | &#10004; |
+| caseId                      | ID of case to export well paths for                                                                                                                       | Integer        | &#10004; |
 | timeStep                    | The time step to export completions for                                                                                                                   | Integer        | &#10004; |
 | wellPathNames               | Names of well paths to export for. Defaults to all wells or checked wells, as determined by `wellSelection` parameter                                     | List of String |          |
 | wellSelection               | Which wells are included. Choices: `ALL_WELLS`, `CHECKED_WELLS`. Defaults to `ALL_WELLS`                                                                  | Enum           |          |
@@ -202,7 +202,7 @@ Export well path completions.
 
 ### Example
 
-`exportWellPathCompletions(case=3, timeStep=5, wellSelection=CHECKED_WELLS, includeFishbones=false)`
+`exportWellPathCompletions(caseId=3, timeStep=5, wellSelection=CHECKED_WELLS, includeFishbones=false)`
 
 
 exportMsw
@@ -212,12 +212,12 @@ Export multi-segment wells.
 
 | Parameter | Description                                    | Type    | Required |
 |-----------|------------------------------------------------|---------|----------|
-| case      | ID of case to export well paths for            | Integer | &#10004; |
+| caseId    | ID of case to export well paths for            | Integer | &#10004; |
 | wellPath  | Name of well path to export well segments for  | String  | &#10004; |
 
 ### Example
 
-`exportMsw(case=1, wellPath="MainWell")`
+`exportMsw(caseId=1, wellPath="MainWell")`
 
 
 setExportFolder
@@ -246,11 +246,11 @@ Execute an Octave script.
 | Parameter | Description                                                                                     | Type            | Required |
 |-----------|-------------------------------------------------------------------------------------------------|-----------------|----------|
 | path      | Path to the octave script to execute                                                            | Integer         | &#10004; |
-| cases     | The cases to run the octave script on. Defaults to running the script without a specified case  | List of Integer |          |
+| caseIds   | The cases to run the octave script on. Defaults to running the script without a specified case  | List of Integer |          |
 
 ### Example
 
-`runOctaveScript(path="/home/user/octave/something.m", cases=[1,2,6])`
+`runOctaveScript(path="/home/user/octave/something.m", caseIds=[1,2,6])`
 
 
 setMainWindowSize
@@ -275,13 +275,13 @@ Compute statistics for statistics cases.
 
 | Parameter | Description                                                          | Type            | Required |
 |-----------|----------------------------------------------------------------------|-----------------|----------|
-| cases     | IDs of statistics cases to compute. Default is all statistics cases  | List of Integer |          |
+| caseIds   | IDs of statistics cases to compute. Default is all statistics cases  | List of Integer |          |
 
 ### Example
 
-`computeCaseGroupStatistics(cases=[5])`
+`computeCaseGroupStatistics(caseIds=[5])`
 
-`computeCaseGroupStatistics(cases=[2,4,8])`
+`computeCaseGroupStatistics(caseIds=[2,4,8])`
 
 
 setTimeStep
@@ -291,9 +291,9 @@ Set the time step for a given case. The time step is used for all views on the c
 
 | Parameter | Description                      | Type    | Required |
 |-----------|----------------------------------|---------|----------|
-| case      | ID of case to set time step for  | Integer | &#10004; |
+| caseId    | ID of case to set time step for  | Integer | &#10004; |
 | timeStep  | Index of time step to switch to  | Integer | &#10004; |
 
 ### Example
 
-`setTimeStep(case=1, timeStep=8)`
+`setTimeStep(caseId=1, timeStep=8)`
