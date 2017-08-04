@@ -9,6 +9,32 @@ The command file interface allows a sequence of specified commands to be run in 
 The interface is used by supplying the command file as a [command line paramter]({{site.baseurl}}/docs/commandlineparameters).
 Once the command file is finished executing, ResInsight will exit.
 
+**Case Control Commands**
+
+* [openProject](#openproject)
+* [closeProject](#closeproject)
+* [setStartDir](#setstartdir)
+* [loadCase](#loadcase)
+* [replaceCase](#replacecase)
+* [replaceSourceCases](#replacesourcecases)
+
+**Export Commands**
+
+* [exportMultiCaseSnapshots](#exportmulticasesnapshots)
+* [exportSnapshots](#exportsnapshots)
+* [exportProperty](#exportproperty)
+* [exportWellPathCompletions](#exportwellpathcompletions)
+* [exportMsw](#exportmsw)
+* [setExportFolder](#setexportfolder)
+
+**Other Commands**
+
+* [runOctaveScript](#runoctavescript)
+* [setMainWindowSize](#setmainwindowsize)
+* [computeCaseGroupStatistics](#computecasegroupstatistics)
+* [setTimeStep](#settimestep)
+
+
 Syntax
 ======
 
