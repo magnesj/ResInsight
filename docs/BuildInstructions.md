@@ -44,12 +44,12 @@ If you check the button 'Grouped' in the CMake GUI, the CMake variables are grou
 - Run the compiler using the generated makefiles or solution file/project files to build ResInsight
 
 ### Windows
-ResInsight has been verified to build and run on Windows 7/8/10 using Microsoft Visual Studio 2015. Typical usage on Windows is to follow the build instructions above, and then open the generated solution file in Visual Studio to build the application.
+ResInsight has been verified to build and run on Windows 7/8/10 using Microsoft Visual Studio 2015/2017. Typical usage on Windows is to follow the build instructions above, and then open the generated solution file in Visual Studio to build the application.
 
 
 ### Linux
 
-ResInsight has been verified to build and run on RedHat Linux 6, but you need to install the  Typical usage is to follow the build instructions above to build the makefiles. Then go to the build directory, and run:
+Typical usage is to follow the build instructions above to build the makefiles. Then go to the build directory, and run:
 
 - make
 - make install
