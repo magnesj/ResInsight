@@ -69,11 +69,12 @@ You will find the ResInsight binary under the Install directory in your build di
 
 ### General CMake options for ResInsight
 
-| CMake Name   | Description |
-|--------------|---------|
-| `RESINSIGHT_BUILD_DOCUMENTATION`      | Use Doxygen to create the HTML based API documentation |
-| `RESINSIGHT_PRIVATE_INSTALL`          | Install as an independent bundle including the necessary Qt libraries |
-| `RESINSIGHT_USE_OPENMP`               | Enable OpenMP parallellization in the code |
+| CMake Name                                        | Default | Description                                                           |
+|---------------------------------------------------|---------|-----------------------------------------------------------------------|
+| `RESINSIGHT_BUILD_DOCUMENTATION`                  | OFF     | Use Doxygen to create the HTML based API documentation |
+| `RESINSIGHT_PRIVATE_INSTALL`                      |  ON     | Install as an independent bundle including the necessary Qt libraries |
+| `RESINSIGHT_USE_OPENMP`                           |  ON     | Enable OpenMP parallellization in the code |
+| `RESINSIGHT_INCLUDE_APPLICATION_UNIT_TESTS`       | OFF     | Include Application Code Unit Tests |
 
 ### Optional - Octave plugins 
 To be able to compile the Octave plugins, the path to the Octave development tool _`mkoctfile`_ must be provided.
@@ -82,7 +83,7 @@ It is possible to build ResInsight without compiling the Octave plugins. This ca
 
 ResInsight has been verified to build and run with Octave versions 3.4.3, 3.8.1, and 4.0.0.
 
-#### Octave related CMake options for ResInsight
+#### [DEPRECATED] Octave related CMake options for ResInsight
 
 | CMake Name   | Description |
 |--------------|---------|
@@ -98,13 +99,15 @@ If you are running Ubuntu 12.10 or newer, you will need to replace octave-header
 
 - sudo apt-get install git cmake build-essential octave liboctave-dev qt4-dev-tools
 
-### Optional - ABAQUS ODB API 
+### [TODO Rewrite for features] Optional Featires 
 
 ResInsight can be built with support for ABAQUS ODB files. This requires an installation of the ABAQUS ODB API from Simulia on the build computer. The path to the ABAQUS ODB API folder containing header files and library files must be specified. Leaving this option blank gives a build without ODB support. ResInsight has been built and tested with ABAQUS ODB API version 6.14-3 on Windows 7/8 and RedHat Linux 6.
 
 ABAQUS ODB API related CMake options for ResInsight
 
-| CMake Name   | Description |
-|--------------|---------|
-| `RESINSIGHT_ODB_API_DIR`              | Optional path to the ABAQUS ODB API from Simulia |
+| CMake Name                                        | Default | Description                                                           |
+|---------------------------------------------------|---------|-----------------------------------------------------------------------|
+| `RESINSIGHT_ODB_API_DIR`                          | Blank   | Optional path to the ABAQUS ODB API from Simulia |
+| `RESINSIGHT_ENABLE_PROTOTYPE_FEATURE_SOURING`     | OFF     | Enable prototype feature Souring |
+| `RESINSIGHT_ENABLE_PROTOTYPE_FEATURE_FRACTURES`   | OFF     | Enable prototype feature Fractures |
 
