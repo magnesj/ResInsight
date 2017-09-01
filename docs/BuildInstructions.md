@@ -99,7 +99,7 @@ If you are running Ubuntu 12.10 or newer, you will need to replace octave-header
 
 - sudo apt-get install git cmake build-essential octave liboctave-dev qt4-dev-tools
 
-### [TODO Rewrite for features] Optional Featires 
+### [TODO Rewrite for features] Optional Features 
 
 ResInsight can be built with support for ABAQUS ODB files. This requires an installation of the ABAQUS ODB API from Simulia on the build computer. The path to the ABAQUS ODB API folder containing header files and library files must be specified. Leaving this option blank gives a build without ODB support. ResInsight has been built and tested with ABAQUS ODB API version 6.14-3 on Windows 7/8 and RedHat Linux 6.
 
