@@ -16,7 +16,7 @@ The command **File -> Import -> Import Well Paths From File** will read the well
 The supported ASCII format is quite flexible but the main requirements are: 
 
 - Each data line must contain four numbers: X Y TVD MD separated with white-space.
-- Lines starting with "--" or "#" is considered to be comment lines
+- Lines starting with `"--"` or "#" is considered to be comment lines
 - A line starting with none-number-characters are used as a well name after the following rules:
   - If the line contains a pair of : _```  "'", "`", "´", "’" or "‘" ```_ the text between the quotation marks is used as a well name.
   - If the line contains the case insensitive string "name" with an optional ":" after then the rest of the line is used as a well name. 
@@ -25,36 +25,35 @@ The supported ASCII format is quite flexible but the main requirements are:
 - If a well name is found, a new well is created and the following data points are added to it.
 
 #### Example 1:
-
-	WELLNAME: WELL1
-    4507.0	5638.5	0.0	0.0
-    4507	5638.5	4628.6	1628.6
-	4297.4	5938.5	4632.4	1998.387
+    WELLNAME: WELL1
+    6507.1	725	2542	2590
+    6523.5	757	2549	2626.6
+    6523.5	760	2559	2637.1
     -999
     WELLNAME: WELL2
-	5507.0	4638.5	0.0	0.0
-    5507	4638.5	3628.6	1628.6
-    5297.4	4938.5	3632.4	1998.387
-	-999
+    550.7	1020.2	2410	2410
+    551		1004.1	2422.2	2430.2
+    555.2	993.9	2425	2441.6
+    -999
 
 #### Example 2:
     X Y TVD MD
     Name Well_1
-  	5507.0	4638.5	0.0	0.0
-    5507	4638.5	3628.6	1628.6
-    5297.4	4938.5	3632.4	1998.387
+    6507.1	725	2542	2542
+    6523.5	757	2549	2578.6
+    6523.5	760	2559	2589.1
     
     -- A Comment new well
     This is not its name
     Name Well_2
-    5507.0	4638.5	0.0	0.0
-    5507	4638.5	3628.6	1628.6
-    # a comment inside the data
-    5297.4	4938.5	3632.4	1998.387
+    550.7	1020.2	2410	2520
+    551	1004.1	2422.2	2540.2
+    # a comment inside the data 
+    555.2	993.9	2425	2551.6
     
     3Q AHB-J
     5507.0	4638.5	0.0	0.0
-    5507	4638.5	3628.6	1628.6
+    5507	4638.5	1628.6	1628.6
 
     
 ### Trajectory files are referenced
