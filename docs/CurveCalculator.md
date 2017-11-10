@@ -14,7 +14,32 @@ To make a new calculated curve, click on "New Calculation". This will add a new 
 
 ### Operators
 
+#### Assignment Operators
++----------+-----------------------+
+| OPERATOR | DEFINITION            |
++----------+-----------------------+
+|  :=      | Assign                |
+|  +=      | Increment             |
+|  -=      | Decrement             |
+|  `*`=    | Assign multiplication |
+|  %=      | Assign modulo         |
+|  /=      | Assign division       |
++----------+-----------------------+
+
+#### Arithmetic  Operators
++----------+-----------------+
+| OPERATOR | DEFINITION      |
++----------+-----------------+
+|  +       | Addition        |
+|  -       | Subtraction     |
+|  *       | Multiplication  |
+|  /       | Division        |
+|  %       | Modulus         |
+|  ^       | Power of        |
++----------+-----------------+
+
+
 ### Unit
 
-##S ummary Address Selection
+## Summary Address Selection
 
