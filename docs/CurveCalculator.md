@@ -10,9 +10,10 @@ The summary curve calculator is a tool to do relative simple vector calculations
 The calculator can be run by pressing the calculator icon in en menu bar, or by right-clicking on either a summary case or the summary plot collection.
 
 ## Calculation Settings
-To make a new calculated curve, click on "New Calculation". This will add a new calculation to "Calculated Summaries". Before choosing which curves to do calculations on, a calculation expression must be made. The default expression *Calculation_1 := a + b* will do a vector addition on the curves *a* and *b* and assign it to the calculation *Calculation_1*. How to choose curves *a* and *b* will be covered in section **Summary Address Selection**. Other possible operations and functions can be found by right-clikcing in the expression window.
+To make a new calculated curve, click on "New Calculation". This will add a new calculation to "Calculated Summaries". Before choosing which curves to do calculations on, a calculation expression must be made. The default expression *Calculation_1 := a + b* will do a vector addition on the curves which *a* and *b* are placeholdes for, and assign it to the calculation *Calculation_1*. How to assign curves to assign to *a* and *b* will be covered in section **Summary Address Selection**. 
 
-### Operators
+### Operators and Functions
+Possible operations and functions are found by right-clikcing in the expression window. The following tables show all the options available.
 
 #### Assignment Operators
 
@@ -63,31 +64,32 @@ To make a new calculated curve, click on "New Calculation". This will add a new 
 
 #### Trigonometry Functions
 
-|----------|------------------------------------|
-| FUNCTION | DEFINITION                         |
-|----------|------------------------------------|
-| acos     | Arc cosine                         |
-| acosh    | Inverse hyperbolic cosine          |
-| asin     | Arc sine                           |
-| asinh    | Inverse hyperbolic sine            |
-| atan     | Arc tangent                        |
-| atanh    | Inverse hyperbolic tangent         |
-| cos      | Cosine                             |
-| cosh     | Hyperbolic cosine                  |
-| cot      | Cotangent                          |
-| csc      | Cosecant                           |
-| deg2rad  | Convert x from degrees to radians  |
-| deg2grad | Convert x from degrees to gradians |
-| rad2deg  | Convert x from radians to degrees  |
-| grad2deg | Convert x from gradians to degrees |
-| sec      | Secant                             |
-| sin      | Sine                               |
-| sinc     | Sine cardinal                      |
-| sinh     | Hyperbolic sine                    |
-| tan      | Tangent                            |
-| tanh     | Hyperbolic tangent                 |
+| FUNCTION | DEFINITION                              |
+|----------|-----------------------------------------|
+| acos     | Arc cosine (in radians)                 |
+| acosh    | Inverse hyperbolic cosine (in radians)  |
+| asin     | Arc sine (in radians)                   |
+| asinh    | Inverse hyperbolic sine (in radians)    |
+| atan     | Arc tangent (in radians)                |
+| atanh    | Inverse hyperbolic tangent (in radians) |
+| cos      | Cosine                                  |
+| cosh     | Hyperbolic cosine                       |
+| cot      | Cotangent                               |
+| csc      | Cosecant                                |
+| deg2rad  | Convert x from degrees to radians       |
+| deg2grad | Convert x from degrees to gradians      |
+| rad2deg  | Convert x from radians to degrees       |
+| grad2deg | Convert x from gradians to degrees      |
+| sec      | Secant                                  |
+| sin      | Sine                                    |
+| sinc     | Sine cardinal                           |
+| sinh     | Hyperbolic sine                         |
+| tan      | Tangent                                 |
+| tanh     | Hyperbolic tangent                      |
 
 ### Unit
 
 ## Summary Address Selection
+An expression consists of placeholders (variables) for curves (summary address). By clicking "Parse Expession", the variables will appear in the table below the settings. To assign a summary address to a variable, click *Edit*. This action will create a *Summary Address Selection* dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
 
+## Using Generated Curves
