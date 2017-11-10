@@ -22,7 +22,7 @@ Possible operations and functions are found by right-clikcing in the expression 
 |  :=      | Assign                |
 |  +=      | Increment             |
 |  -=      | Decrement             |
-|  `*`=    | Assign multiplication |
+|  \*=     | Assign multiplication |
 |  %=      | Assign modulo         |
 |  /=      | Assign division       |
 
@@ -92,4 +92,6 @@ Possible operations and functions are found by right-clikcing in the expression 
 ## Summary Address Selection
 An expression consists of placeholders (variables) for curves (summary address). By clicking "Parse Expession", the variables will appear in the table below the settings. To assign a summary address to a variable, click *Edit*. This action will create a *Summary Address Selection* dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
 
-## Using Generated Curves
+## Generating Curves
+After assigning summary addresses to all variables, click *Calculate* to evaluate the expression.
+
