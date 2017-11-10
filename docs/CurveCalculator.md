@@ -25,7 +25,7 @@ To make a new calculated curve, click on "New Calculation". This will add a new 
 |  %=      | Assign modulo         |
 |  /=      | Assign division       |
 
-#### Arithmetic  Operators
+#### Arithmetic Operators
 
 | OPERATOR | DEFINITION      |
 |----------|-----------------|
@@ -34,8 +34,58 @@ To make a new calculated curve, click on "New Calculation". This will add a new 
 |  *       | Multiplication  |
 |  /       | Division        |
 |  %       | Modulus         |
-|  ^       | Power of        |
+|  ^       | Power           |
 
+
+#### Functions
+
+| FUNCTION | DEFINITION                                              |
+|----------|---------------------------------------------------------|
+| abs      | Absolute value                                          |
+| avg      | Average                                                 |
+| ceil     | Rounding up                                             |
+| clamp    | Clamp                                                   |
+| floor    | Rounding down                                           |
+| frac     | Fractional portion of input                             |
+| log      | Natural logarithm                                       |
+| log10    | Base 10 logarithm                                       |
+| max      | Maximum                                                 |
+| min      | Minimum                                                 |
+| mul      | Product of all the inputs.                              |
+| pow      | Power                                                   |
+| root     | Nth-Root                                                |
+| round    | Round x to the nearest integer                          |
+| roundn   | Round x to n decimal places                             |
+| sgn      | Sign of x, -1 where x < 0, +1 where x > 0, else zero    |
+| sqrt     | Square root                                             |
+| sum      | Sum                                                     |
+| trunc    | Integer portion of input                                |
+
+#### Trigonometry Functions
+
+|----------|------------------------------------|
+| FUNCTION | DEFINITION                         |
+|----------|------------------------------------|
+| acos     | Arc cosine                         |
+| acosh    | Inverse hyperbolic cosine          |
+| asin     | Arc sine                           |
+| asinh    | Inverse hyperbolic sine            |
+| atan     | Arc tangent                        |
+| atanh    | Inverse hyperbolic tangent         |
+| cos      | Cosine                             |
+| cosh     | Hyperbolic cosine                  |
+| cot      | Cotangent                          |
+| csc      | Cosecant                           |
+| deg2rad  | Convert x from degrees to radians  |
+| deg2grad | Convert x from degrees to gradians |
+| rad2deg  | Convert x from radians to degrees  |
+| grad2deg | Convert x from gradians to degrees |
+| sec      | Secant                             |
+| sin      | Sine                               |
+| sinc     | Sine cardinal                      |
+| sinh     | Hyperbolic sine                    |
+| tan      | Tangent                            |
+| tanh     | Hyperbolic tangent                 |
 
 ### Unit
 
