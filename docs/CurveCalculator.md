@@ -41,7 +41,7 @@ Possible operations and functions are found by right-clikcing in the expression 
 #### Functions
 
 | FUNCTION | DEFINITION                                              |
-|----------|---------------------------------------------------------|
+|-------------------------------------------|---------------------------------------------------------|
 | abs      | Absolute value                                          |
 | avg      | Average                                                 |
 | ceil     | Rounding up                                             |
