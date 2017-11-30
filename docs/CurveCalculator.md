@@ -89,6 +89,8 @@ It is possible to add a unit to the calculated curve, in the field *Unit* beneat
 An expression consists of placeholders (variables) for curves (summary address). By clicking "Parse Expession", the variables will appear in the table below the settings. To assign a summary address to a variable, click *Edit*. This action will create a *Summary Address Selection* dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
 
 ## Generating Curves
-After assigning summary addresses to all variables, click *Calculate* to evaluate the expression. The curve is saved and can be accessed in the following ways:
+After assigning summary addresses to all variables, click *Calculate* to evaluate the expression. The curve is saved and can be accessed in the following ways.
 
+Right click on "Summary Plots" and click "New Summary Plot". The Plot Editor dialog will appear. A type called "Calculated" can be found in the Summary Types panel. Click on this field, and the curves will appear in the Summaries panel.
 
+The curves can also be found in an existing curve's Property Editor. Choose the case "Calculated", and the curves will appear in "Vector Selection".
