@@ -14,6 +14,10 @@ To use this functionality you will need to :
 1. Import one or more Formation Names file(s)
 2. Select the correct Formation Names file in the Case of interest
 
+<div class="note info">
+If only one formation file is imported, the formation will automatically be selected in the active view's case.
+</div>
+
 ## Import of Formation Names files
 
 Formation Names files can be imported by using the command: **File->Import->Import Formation Names**.
