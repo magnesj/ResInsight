@@ -75,6 +75,8 @@ The user is asked to select _`*.csv`_ files for import.
 
 The imported Well Path Formation Names files will be added their associated well path, if a match on well name can be found. If not, new paths will be created, and they can all be found in **Wells** in the **Project Tree**. The file path of the formations can be found in a well paths **Property Editor**.
 
+![]({{ site.baseurl }}/images/wellPathFormationsInPropertyEditor.PNG)
+
 A Well Path Formation Names file is a csv-file, which uses semicolon to separate entries in a table. Below is an example of such a file:
 
 ```
