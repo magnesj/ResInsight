@@ -68,6 +68,8 @@ Formations can be set for a single well path, defined on measured depths of the 
 - PLT Plots
 - Well Allocation Plots
 
+![]({{ site.baseurl }}/images/formNameOnPlot.PNG)
+
 ### Import of Well Path Formation Names files
 
 Well Path Formation Names files can be imported by using the command: **File->Import->Import Well Path Formation Names**.
