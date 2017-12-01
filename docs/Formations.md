@@ -62,6 +62,11 @@ Picking on a cell being part of a formation will display the formation name in t
 
 
 ## Formations for a Well Path
+Formations can be set for a single well path, defined on measured depths of the well path. This formation can be used to annotate the following plot types:
+- Well Log Plots
+- RFT Plots
+- PLT Plots
+- Well Allocation Plots
 
 ### Import of Well Path Formation Names files
 
@@ -83,4 +88,4 @@ B-3H; Fname 3.2; UNKNOWN; G;1; ; ;3400;3300;-2050;2000;
 B-3H; Fname 4; UNKNOWN; G;1; ; ;3440;3340;-2060;2010;
 ```
 
-The file must have the columns "Well name", "Surface name" and "MD" to be regarded as a Well Path Formation Names file. All other columns will be ignorded.
+The file must have the columns "Well name", "Surface name" (i.e. formation name) and "MD" (i.e. measured depth) to be regarded as a Well Path Formation Names file. They can be listed in any order, and all other columns will be ignorded.
