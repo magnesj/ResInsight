@@ -26,17 +26,8 @@ Dialog fields description:
 - **Cell Separator** -- Select the correct cell separator character. ResInsight will try to set the correct value as default.
 - **Decimal Separator** -- Select the correct decimal separator. ResInsight will try to set the correct value as default.
 - **Selected Time Column** -- Select the column that contains the time/date information. The first column is default.
-- **Use Custom Date Time Format** -- Check this box if the Date Format and/or Time Format in the file do not match any of the predefined formats.
-- **Custom Date Time Format** -- Enter date time format to match the time information in the file. This field is visible only when the above check bos checked.
+- **Use Custom Date Time Format** -- Check this box if the Date Format and/or Time Format in the file do not match any of the most common formats.
+- **Custom Date Time Format** -- Enter date time format to match the time information in the file. This field is visible only when the above check box checked. A tooltip will tell the user how to enter the correct information.
 - **Date Format** -- Select the date format matching the date information in the file.
-- **Time Format** -- Select the time format matching the time information in the file.
+- **Time Format** -- Select the time format matching the time information in the file. If the file contains dates only, this field is ignored by ResInsight.
 - **Preview** -- Preview the first 30 lines of the file contents. The view will reflect the currently selected Cell Separator and the selected time column is marked in yellow.
-
-
--------
-The files generated are stored in a folder named _`snapshots`_ within the folder where the Project File resides. 
-
-<div class="note">
- Snapshots of existing views can also be created and saved from the command line. 
- ( See <a href="{{ site.baseurl }}/docs/commandlineparameters">Command Line Arguments</a> )
-</div>
