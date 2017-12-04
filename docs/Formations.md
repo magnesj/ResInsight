@@ -107,4 +107,4 @@ See [Annotations on plot](#annotationOnPlot). Annotations are added to plots in 
 
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
 
-In the **Property Editor**, choose **Well** as formation source, and all well paths with formations will be shown in the drop-down list below.
+In the **Property Editor**, choose **Well** as **Formation Source**, and all well paths with formations will be shown in the drop-down list below.
