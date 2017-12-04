@@ -14,4 +14,5 @@ Most of the fields in this dialog are the same as in the [CSV/txt import dialog]
 
 - **Curve Prefix** -- Curve name prefix for all curves created from the pasted data.
 - **Line style** -- Line style to use for the curves created from the pasted data.
-- 
+- **Symbol** -- Line symbol to use for the curves created from the pasted data.
+
