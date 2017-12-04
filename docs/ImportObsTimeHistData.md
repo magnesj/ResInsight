@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Import Observed Time History Data
-permalink: /docs/importobstimehistdata
+permalink: /docs/importobstimehistdata/
 published: true
 ---
 
