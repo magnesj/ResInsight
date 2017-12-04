@@ -36,6 +36,7 @@
   - snapshots
   - batchcommands
   - exporteclipseproperties
+  - importobservedtimehistorydata
   - octaveinterface
   - odbsupport
   - commandfile
