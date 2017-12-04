@@ -103,6 +103,8 @@ B-3H; Fname 4; UNKNOWN; G;1; ; ;3440;3340;-2060;2010;
 The file must have the columns "Well name", "Surface name" (i.e. formation name) and "MD" (i.e. measured depth) to be regarded as a Well Path Formation Names file. They can be listed in any order, and all other columns will be ignorded.
 
 ### Viewing the Formation Information
-See [Annotations on plot](#annotationOnPlot)
+See [Annotations on plot](#annotationOnPlot). Annotations are added to plots in the same way as for k-layered formations, but the formation source is different.
 
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
+
+In the **Property Editor**, choose **Well** as formation source, and all well paths with formations will be shown in the drop-down list below.
