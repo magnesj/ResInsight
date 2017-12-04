@@ -60,7 +60,7 @@ See [ Cell Filters ]({{ site.baseurl }}/docs/filters) for details.
 #### Picking in 3D view
 Picking on a cell being part of a formation will display the formation name in the **Result Info** windows, in addition to other pick info for the cell.
 
-### Annotation on Plots
+<a name=annotationOnPlot>### Annotation on Plots</a>
 Formation can be used to annotate the following plot types:
 - Well Log Plots
 - RFT Plots
@@ -103,4 +103,6 @@ B-3H; Fname 4; UNKNOWN; G;1; ; ;3440;3340;-2060;2010;
 The file must have the columns "Well name", "Surface name" (i.e. formation name) and "MD" (i.e. measured depth) to be regarded as a Well Path Formation Names file. They can be listed in any order, and all other columns will be ignorded.
 
 ### Viewing the Formation Information
+See [Annotations on plot](#annotationOnPlot)
+
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
