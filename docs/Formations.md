@@ -60,15 +60,23 @@ See [ Cell Filters ]({{ site.baseurl }}/docs/filters) for details.
 #### Picking in 3D view
 Picking on a cell being part of a formation will display the formation name in the **Result Info** windows, in addition to other pick info for the cell.
 
-
-## Formations for a Well Path
-Formations can be set for a single well path, defined on measured depths of the well path. This formation can be used to annotate the following plot types:
+### Annotation on Plots
+Formation can be used to annotate the following plot types:
 - Well Log Plots
 - RFT Plots
 - PLT Plots
 - Well Allocation Plots
 
-![]({{ site.baseurl }}/images/formNameOnPlot.PNG)
+![]({{ site.baseurl }}/images/formOnPlot.PNG)
+
+For RFT and PLT Plots, **Formation Names** can be found in the plot's **Property Editor**. Tick "Show Formations" and choose the case with the desired formations. 
+
+In Well Log Plots and Well Allocation Plots, **Formation Names** can be found in the **Property Editor** for a **Track** or **Branch**. In addition to choosing case, the path to show formations for must also be selected, as each track can have curves with data from more than one path.
+
+![]({{ site.baseurl }}/images/caseFormationsPropEditor.PNG)
+
+## Formations for a Well Path
+Formations can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots.
 
 ### Import of Well Path Formation Names files
 
@@ -93,3 +101,6 @@ B-3H; Fname 4; UNKNOWN; G;1; ; ;3440;3340;-2060;2010;
 ```
 
 The file must have the columns "Well name", "Surface name" (i.e. formation name) and "MD" (i.e. measured depth) to be regarded as a Well Path Formation Names file. They can be listed in any order, and all other columns will be ignorded.
+
+### Viewing the Formation Information
+![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
