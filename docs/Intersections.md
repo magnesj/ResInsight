@@ -11,7 +11,7 @@ Intersections are cross sections of the grid model that displays the grid cell v
 
 There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a picewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. The second intersection type is called an **Intersection Box**. An Intersecion Box can be used both as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
 
-Intersections are stored in a folder named **Intersections** in a **View** as shown below.
+All types of intersections are stored in a folder named **Intersections** in a **View** as shown below.
 
 ![]({{ site.baseurl }}/images/IntersectionInTree.png)
 
@@ -82,7 +82,17 @@ To append more points by clicking in the 3D view, push the button **Start pickin
 The points in the list can be copied to clipboard using **CTRL-C** when keyboard focus is inside the point list. A new list of points can be pasted into the point list by using **CTRL-V**.
 
 ### Azimuth and Dip
+A new **Azimuth and Dip** intersection can be created from the context menu in the 3D view. Then, by left-clicking two points on reservoir geometry, a single line is created. The two points are added to the point list in the **Property Editor**. 
 
+![]({{ site.baseurl }}/images/IntersectionAzimuthDip.png)
+
+- The background color of this list is set to light pink when adding points by picking in the 3D view is active. 
+- To finish adding points, click the button **Stop picking points** in the **Property Editor**. 
+- The background color of the point list is then set to white. 
+
+When two points are picked, a plane between the points will appear in the 3D view, with a 90 degrees **Dip**, and the **Azimuth** angle calculated from the two points. The two angles can be edited in the **Property Editor** of the intersection, and is defined by the following:
+- **Dip** is the angle between the horizontal plane and down. 
+- **Azimuth** is the angle between North and the plane. Changing the azimuth will rotate the plane about the first point picked in the 3D view.
 
 ## Intersection Box and Intersection Planes
 
