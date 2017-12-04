@@ -103,6 +103,8 @@ The length of the plane can also be set manually in the **Property Editor**.
 - **Length Up** is the distance from the user defined horizontal line, to the top of the plane intersecting the model.
 - **Length Down** is the distance from the user defined horizontal line, to the bottom of the plane intersecting the model.
 
+![]({{ site.baseurl }}/images/azimuthDip3DView.PNG)
+
 ## Intersection Box and Intersection Planes
 
 A new **Intersection Box** or **Intersection Plane** can be created from the context menu in the 3D view or the context menu in the **Project Tree**.
