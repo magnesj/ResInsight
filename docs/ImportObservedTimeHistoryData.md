@@ -6,8 +6,8 @@ published: true
 ---
 
 Importing observed time history data to ResInsight may be performed in two different ways:
-- By selecting the main menu item *File -> Import -> Import Observed Time History Data*
-- By right clicking the project tree item *Observed Time History Data and* and selecting *Import Observed Time History Data*
+- By selecting the main menu item **File -> Import -> Import Observed Time History Data**
+- By right clicking the project tree item **Observed Time History Data and** and selecting **Import Observed Time History Data**
 
 The following file types are supported:
 - RSM observed time history data file (\*.rsm)
@@ -19,34 +19,21 @@ To import RSM files, the only action needed from the user is to select one or mo
 ## Import CSV/txt observed time history data
 CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). The dialog appears once for each imported file.
 
+### CSV/txt import dialog
 ![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
 
+Dialog fields description:
+- **Cell Separator** -- Select the correct cell separator character. ResInsight will try to set the correct value as default.
+- **Decimal Separator** -- Select the correct decimal separator. ResInsight will try to set the correct value as default.
+- **Selected Time Column** -- Select the column that contains the time/date information. The first column is default.
+- **Use Custom Date Time Format** -- Check this box if the Date Format and/or Time Format in the file do not match any of the predefined formats.
+- **Custom Date Time Format** -- Enter date time format to match the time information in the file. This field is visible only when the above check bos checked.
+- **Date Format** -- Select the date format matching the date information in the file.
+- **Time Format** -- Select the time format matching the time information in the file.
+- **Preview** -- Preview the first 30 lines of the file contents. The view will reflect the currently selected Cell Separator and the selected time column is marked in yellow.
 
 
-
-Under construction
----------------------------------
-
-ResInsight has several commands to create snapshots conveniently. 3 commands to take snapshots of existing Plot and 3D Views directly, and a more advanced export command that can automatically modify Eclipse 3D Views before snapshotting them. 
-
-## Snapshots of Existing Views
-
-The commands to snapshot existing views and plots are available from the toolbar and the **Edit** and **File**->**Export** menus in the main windows
-
-![]({{ site.baseurl }}/images/SnapShotToolBar.png)
-
-### Snapshot to Clipboard ![]({{ site.baseurl }}/images/SnapShot.png)
-
-A snapshot of the active view is copied to the clipboard using **Edit -> Copy Snapshot To Clipboard**.
-
-### Snapshot to File ![]({{ site.baseurl }}/images/SnapShotSave.png)
-
-Image export of the currently active 3D View or Plot Window can be launched from **File -> Export -> Snapshot To File**. 
-
-### Snapshot All Views/Plots to File ![]({{ site.baseurl }}/images/SnapShotSaveViews.png)
-
-If a project contains multiple 3D Views or Plot Windows, all of them can be exported in one go using **File -> Export -> Snapshot All Views To File**. This will either export all the 3D Views or all the Plot Windows, depending on whether you invoke the command in the 3D Main Window or the Plot Main Window.
-
+-------
 The files generated are stored in a folder named _`snapshots`_ within the folder where the Project File resides. 
 
 <div class="note">
