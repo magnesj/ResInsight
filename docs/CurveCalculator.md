@@ -10,7 +10,7 @@ The summary curve calculator is a tool to do relative simple vector calculations
 The calculator can be run by pressing the calculator icon in en menu bar, or by right-clicking on either a summary case or the summary plot collection.
 
 ## Calculation Settings
-To make a new calculated curve, click on "New Calculation". This will add a new calculation to "Calculated Summaries". Before choosing which curves to do calculations on, a calculation expression must be made. The default expression *Calculation_1 := x + y* will do a vector addition on the curves which *x* and *y* are placeholdes for, and assign it to the calculation *Calculation_1*. How to assign curves to assign to *x* and *y* will be covered in section **Summary Address Selection**. 
+To make a new calculated curve, click on **New Calculation**. This will add a new calculation to **Calculated Summaries**. Before choosing which curves to do calculations on, a calculation expression must be made. The default expression *Calculation_1 := x + y* will do a vector addition on the curves which *x* and *y* are placeholdes for, and assign it to the calculation *Calculation_1*. How to assign curves to assign to *x* and *y* will be covered in section [Summary Address Selection](#summaryAddressSelection). 
 
 ### Operators and Functions
 Possible operations and functions are found by right-clikcing in the expression window. The following tables show all the options available.
@@ -85,12 +85,12 @@ Possible operations and functions are found by right-clikcing in the expression 
 ### Unit
 It is possible to add a unit to the calculated curve, in the field *Unit* beneath the expression field. This will be used as the label on the y-axis when the curve is used in a plot.
 
-## Summary Address Selection
-An expression consists of placeholders (variables) for curves (summary address). By clicking "Parse Expession", the variables will appear in the table below the settings. To assign a summary address to a variable, click *Edit*. This action will create a *Summary Address Selection* dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
+## <a name=summaryAddressSelection> Summary Address Selection </a>
+An expression consists of placeholders (variables) for curves (summary address). By clicking **Parse Expession**, the variables will appear in the table below the settings. To assign a summary address to a variable, click **Edit**. This action will create a **Summary Address Selection** dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
 
 ## Generating Curves
-After assigning summary addresses to all variables, click *Calculate* to evaluate the expression. The curve is saved and can be accessed in the following ways.
+After assigning summary addresses to all variables, click **Calculate** to evaluate the expression. The curve is saved and can be accessed in the following ways.
 
-Right click on "Summary Plots" and click "New Summary Plot". The Plot Editor dialog will appear. A type called "Calculated" can be found in the Summary Types panel. Click on this field, and the curves will appear in the Summaries panel.
+Right click on **Summary Plots** and click **New Summary Plot**. The Plot Editor dialog will appear. A type called **Calculated** can be found in the Summary Types panel. Click on this field, and the curves will appear in the Summaries panel.
 
-The curves can also be found in an existing curve's Property Editor. Choose the case "Calculated", and the curves will appear in "Vector Selection".
+The curves can also be found in an existing curve's **Property Editor**. Choose the case **Calculated**, and the curves will appear in **Vector Selection**.
