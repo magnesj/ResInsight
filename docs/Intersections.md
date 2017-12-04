@@ -9,7 +9,7 @@ published: true
 
 Intersections are cross sections of the grid model that displays the grid cell values on planes that cut through the grid in various ways. 
 
-There are two main types of intersections. The first one which simply is called **Intersection** is defined by a picewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path or a user defined polyline. The second intersection type is called an **Intersection Box** that can be used both as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
+There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a picewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. The second intersection type is called an **Intersection Box**. An Intersecion Box can be used both as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
 
 Intersections are stored in a folder named **Intersections** in a **View** as shown below.
 
@@ -17,9 +17,9 @@ Intersections are stored in a folder named **Intersections** in a **View** as sh
 
 ## Curve Based **Intersections**
 
-There are three types of curve based intersections: Well Path, Simulation Well, and Polyline intersections.
+There are four types of curve based intersections: Well Path, Simulation Well, Polyline, and Azimuth and Dip. Azimuth and Dip differs from the other three curves, as it is defined just by one straight line. It is called Azimuth and Dip because the plane's extrusion direction can be defined by the two angles.
 
-Any of these can be created by activating ![]({{ site.baseurl }}/images/CrossSection16x16.png) **New Intersection** from the context menu of the **Intersections** item in the Project Tree.
+Any of these intersections can be created by activating ![]({{ site.baseurl }}/images/CrossSection16x16.png) **New Intersection** from the context menu of the **Intersections** item in the Project Tree.
 
 They can also be created from the context menu in the 3D view, as described below.
 
@@ -80,6 +80,9 @@ The points in the list can be deleted and edited using the keyboard.
 To append more points by clicking in the 3D view, push the button **Start picking points** again.
 
 The points in the list can be copied to clipboard using **CTRL-C** when keyboard focus is inside the point list. A new list of points can be pasted into the point list by using **CTRL-V**.
+
+### Azimuth and Dip
+
 
 ## Intersection Box and Intersection Planes
 
