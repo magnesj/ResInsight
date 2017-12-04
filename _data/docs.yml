@@ -37,6 +37,7 @@
   - batchcommands
   - exporteclipseproperties
   - importobstimehistdata
+  - pasteexceltimedata
   - octaveinterface
   - odbsupport
   - commandfile
