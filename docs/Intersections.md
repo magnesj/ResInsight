@@ -82,7 +82,7 @@ To append more points by clicking in the 3D view, push the button **Start pickin
 The points in the list can be copied to clipboard using **CTRL-C** when keyboard focus is inside the point list. A new list of points can be pasted into the point list by using **CTRL-V**.
 
 ### Azimuth and Dip
-A new **Azimuth and Dip** intersection can be created from the context menu in the 3D view. Then, by left-clicking two points on reservoir geometry, a single line is created. The two points are added to the point list in the **Property Editor**. 
+A new **Azimuth and Dip** intersection can be created from the context menu in the 3D view. Then, by left-clicking two points on reservoir geometry, a single line is created between the first point, and the second point projected down to the plane with same z-value as the first point. The two points are added to the point list in the **Property Editor**. 
 
 ![]({{ site.baseurl }}/images/IntersectionAzimuthDip.png)
 
@@ -98,6 +98,10 @@ The points in the list can be copied to clipboard using **CTRL-C** when keyboard
 When two points are picked, a plane between the points will appear in the 3D view, with a 90 degrees **Dip**, and the **Azimuth** angle calculated from the two points. The two angles can be edited in the **Property Editor** of the intersection, and is defined by the following:
 - **Dip** is the angle between the horizontal plane and down. 
 - **Azimuth** is the angle between North and the plane. Changing the azimuth will rotate the plane about the first point picked in the 3D view.
+
+The length of the plane can also be set manually in the **Property Editor**.
+- **Length Up** is the distance from the user defined horizontal line, to the top of the plane intersecting the model.
+- **Length Down** is the distance from the user defined horizontal line, to the bottom of the plane intersecting the model.
 
 ## Intersection Box and Intersection Planes
 
