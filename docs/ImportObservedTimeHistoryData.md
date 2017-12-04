@@ -10,9 +10,14 @@ Importing observed time history data to ResInsight may be performed in two diffe
 - By right clicking the project tree item *Observed Time History Data and* and selecting *Import Observed Time History Data*
 
 The following file types are supported:
-- rsm
-- csv/txt: Column based ASCII data (CSV format)
+- RSM observed time history data file (\*.rsm)
+- Column based (Comma Separated Values, CSV) time history data file (\*.csv/\*.txt)
 
+## Import RSM observed time history data
+To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the *Observed Time History Data* node in the project tree.
+
+## Import CSV/txt observed time history data
+CSV files may have slightly different formatting
 
 
 
