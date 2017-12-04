@@ -19,7 +19,7 @@ To import RSM files, the only action needed from the user is to select one or mo
 ## Import CSV/txt observed time history data
 CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
 
-### CSV/txt import dialog
+### CSV/txt import options dialog
 ![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
 
 Dialog fields description:
