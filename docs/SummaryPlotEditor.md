@@ -10,6 +10,6 @@ The plot editor is a separate ResInsight dialog window where the user can select
 The upper part of the editor contains editor for selecting vectors to display in the plot. The number of fields vary from 3 to 6 depending on which summary type is highlighted.
 
 <div class="note">
-In this context **highlight** means a field item that is marked with a light blue background, while **selected** means an item that has a ticked check box.
+In this context <bold>highlight</bold> means a field item that is marked with a light blue background, while <bold>selected</bold> means an item that has a ticked check box.
 </div>
 
