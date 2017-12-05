@@ -14,5 +14,5 @@ Most of the fields in this dialog are the same as in the [CSV/txt import options
 
 - **Curve Prefix** -- Curve name prefix for all curves created from the pasted data.
 - **Line style** -- Line style to use for the curves created from the pasted data.
-- **Symbol** -- Line symbol to use for the curves created from the pasted data.
-- **Skip Symbol Distance** -- 
+- **Symbol** -- Line symbol to use for each data point on the curves created from the pasted data.
+- **Symbol Skip Distance** -- Minimum distance between two adjacent symbols on the curves. If two data points on a curve is closer than the specified distance, a symbol is not drawn for one of the data points. Default value is 0, which will draw a symbol at all data points on the curves.
