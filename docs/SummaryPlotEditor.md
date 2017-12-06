@@ -52,7 +52,7 @@ This field contains all fixed summary types and two special ones, *Calculated* a
 - **Lgr-Block** -- Select I, J, K - Block in LGR related vectors only
    - **Lgr name** -- Select Lgr name
    - **I, J, K** -- Select the I, J, K values of the Block in the Lgr. 
-- **Calculated** -- Select calculated vectors created by the [curve calculator]({{site.baseurl/docs/curvecalculator}}).
-- **Imported** -- Select observed dat vectors [imported from file]({{site.baseurl/docs/importobstimehistdata) (e.g. CSV, RSM files)
+- **Calculated** -- Select calculated vectors created by the [curve calculator]({{site.baseurl}}/docs/curvecalculator).
+- **Imported** -- Select observed dat vectors [imported from file]({{site.baseurl}}/docs/importobstimehistdata) (e.g. CSV, RSM files)
 
 
