@@ -13,6 +13,8 @@ The upper part of the editor contains editors for selecting which vectors/summar
 In this context <b>highlight</b> means a marked field item that has a light blue background (only one at a time), while <b>selected</b> means an item or items that have a ticked check box.
 </div>
 
+![]({{site.baseurl}}/images/Dummy.png)
+
 ## Selection Fields
 This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector/summary.
 
@@ -77,4 +79,9 @@ These assignments can be controlled using the options in the **Curve Appearance 
 When set to **Auto** ResInsight assigns visual properties based on the present vector categories and the number of different values in each category.
 
 When disabling the **Auto** option, you can select which of the visual curve properties to use for which summary category. The summary category that currently can be used is Case, Vector, Well, Group and Region. The visual properties supported types are Color, Symbols, Line Style, Gradient and Line Thickness.
+
+The **Apply** button must be clicked to apply the new settings to all curves.
+
+
+
 
