@@ -15,10 +15,12 @@ There are several ways to create new RFT Plots
 - Right-click a simulation well in the 3D view and select **Well Plots -> New RFT Plot**.
 - Right-click the RFT Plots node in the project tree and select **New RFT Plot**.
 
-## Restrictions
+## Constraints
 If an imported well log file does not contain pressure data, that data source (_Observed data_) will not be visible in the sources field in the property editor. Pressure data in a well log file is expected to have a column named _PRESSURE_ or _PRES_FORM_. If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
 
-
 ## Property Editor
+The property editor lets the user select which curves to display in the RFT plot. 
 
 
+-----
+If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
