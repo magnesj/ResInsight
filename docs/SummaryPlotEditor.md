@@ -62,12 +62,19 @@ In the list above some of the summary categories have one or more sub fields whi
 This field contains the summaries/vectors for the highlighted summary category.
 
 ## Preview Plot
-When a complete/valid vector exists, one or more curves will appear in the preview plot. Each curve will also have a corresponding item in the curves field in the lower left corner. Visibility for the curves may be controlled by the checkboxes. Each curve is automatically assigned a name and appearance. However the user may modify these settings in the *Curve Name Configuration* and *Appearance Type Assignment* fields.
+When a complete/valid vector exists, one or more curves will appear in the preview plot. Each curve will also have a corresponding item in the curves field in the lower left corner. Visibility for the curves may be controlled by the checkboxes. Each curve is automatically assigned a name and appearance. However the user may modify these settings in the *Curve Name Configuration* and *Curve Appearance Assignment* fields.
 
 ### Curve Name Configuration
+The checkboxes in this field control which information elements to include in the curve name. The checkboxes are self-explanatory. Toggling some of the checkboxes will have no effect on some curves depending on which information elements are relevant for each curve.
 
+### Curve Appearance Assignment
+Curves created are assigned individual visual properties like colors and symbols in a systematic manner to make the plots easy to read. Different aspects of the vectors are assigned to different curve appearances. Eg. using symbols to distinguish cases, while using colors to distinguish quantity.
 
-### Appearance Type Assignment
+These assignments can be controlled using the options in the **Curve Appearance Assignment** group. 
 
+![]({{ site.baseurl }}/images/CurveAppearanceAssignment.png)
 
+When set to **Auto** ResInsight assigns visual properties based on the present vector categories and the number of different values in each category.
+
+When disabling the **Auto** option, you can select which of the visual curve properties to use for which summary category. The summary category that currently can be used is Case, Vector, Well, Group and Region. The visual properties supported types are Color, Symbols, Line Style, Gradient and Line Thickness.
 
