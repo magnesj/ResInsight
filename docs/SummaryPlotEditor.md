@@ -61,4 +61,13 @@ In the list above some of the summary categories have one or more sub fields whi
 ### Summaries
 This field contains the summaries/vectors for the highlighted summary category.
 
-## 
+## Preview Plot
+When a complete/valid vector exists, one or more curves will appear in the preview plot. Each curve will also have a corresponding item in the curves field in the lower left corner. Visibility for the curves may be controlled by the checkboxes. Each curve is automatically assigned a name and appearance. However the user may modify these settings in the *Curve Name Configuration* and *Appearance Type Assignment* fields.
+
+### Curve Name Configuration
+
+
+### Appearance Type Assignment
+
+
+
