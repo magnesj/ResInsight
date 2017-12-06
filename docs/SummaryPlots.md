@@ -164,18 +164,6 @@ The **Vector Name** field will match the name of the quantity itself, while the 
    - **Vector name** -- Filter for Network category vector names 
 - **All (Advanced)** -- This is a complete combined search mode with all the different search options available to create advanced cross item type searches.  
 
-### Appearance Settings
-
-Curves created by a curve filter are assigned individual visual properties like colors and symbols in a systematic manner to make the plots easy to read. Different aspects of the vectors are assigned to different curve appearances. Eg. using symbols to distinguish cases, while using colors to distinguish quantity.
-
-These assignments can be controlled using the options in the **Appearance Settings** group. 
-
-![]({{ site.baseurl }}/images/SummaryCurveFilterAppearance.png)
-
-When set to **Auto** ResInsight assigns visual properties based on the present vector categories and the number of different values in each category.
-
-When disabling the **Auto** option, you can select which of the visual curve properties to use for which vector category. The vector Category that currently can be used is Case, Vector, Well, Group and Region. The visual properties supported types are Color, Symbols, Line Style, Gradient and Line Thickness.
-
 ### Curve Name Configuration 
 
 The user can control the curve names by toggling what part of the summary vector information to use in the name.
