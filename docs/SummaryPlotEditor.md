@@ -10,14 +10,14 @@ The plot editor is a separate ResInsight dialog window where the user can select
 The upper part of the editor contains editors for selecting which vectors/summaries to display in the plot. The number of fields vary from 3 to 6 depending on the summary type currently highlighted. Dynamic field are hidden if the highlighted summary category does not have any sub-fields.
 
 <div class="note">
-In this context <b>highlight</b> means a field item that is marked with a light blue background, while <b>selected</b> means an item that has a ticked check box.
+In this context <b>highlight</b> means a marked field item that has a light blue background (only one at a time), while <b>selected</b> means an item or items that have a ticked check box.
 </div>
 
 ## Selection Fields
-This section describes the different selection fields in the selection part of the plot editor. A complete vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field and a selected vector/summary.
+This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector/summary.
 
 ### Sources
-This field contains all imported cases.
+This field contains all imported cases. Select the case(s) to display in the plot.
 
 ### Summary Types
 This field contains all fixed summary types and two special ones, *Calculated* and *Imported*. 
@@ -53,6 +53,12 @@ This field contains all fixed summary types and two special ones, *Calculated* a
    - **Lgr name** -- Select Lgr name
    - **I, J, K** -- Select the I, J, K values of the Block in the Lgr. 
 - **Calculated** -- Select calculated vectors created by the [curve calculator]({{site.baseurl}}/docs/curvecalculator).
-- **Imported** -- Select observed dat vectors [imported from file]({{site.baseurl}}/docs/importobstimehistdata) (e.g. CSV, RSM files)
+- **Imported** -- Select observed data vectors [imported from file]({{site.baseurl}}/docs/importobstimehistdata) (e.g. CSV, RSM files)
 
+### Dynamic Fields
+In the list above some of the summary categories have one or more sub fields which is displayed when that category is highlighted. See previous section for a description of those fields.
 
+### Summaries
+This field contains the summaries/vectors for the highlighted summary category.
+
+## 
