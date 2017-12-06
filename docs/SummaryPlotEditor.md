@@ -82,6 +82,7 @@ When disabling the **Auto** option, you can select which of the visual curve pro
 
 The **Apply** button must be clicked to apply the new settings to all curves.
 
-
+### Target Plot
+In the bottom of the dialog window **Target Plot** may be specified. A target plot is a summary plot in ResInsight that will receive the curves from the preview plot when the **OK** or **Apply** button is clicked. If the curve creator was opened from an **Edit Summary Plot** command, the default target plot is set to the source plot. Otherwise the default target plot is set to **(new plot)**. In that case a small dialog will ask the user to enter a target plot name when the **OK** or **Apply** button is clicked. A new summary plot will then be created in the project tree containing all curves from the preview plot.
 
 
