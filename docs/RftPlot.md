@@ -38,7 +38,16 @@ There are two types of wells in the Well Name field:
 - Imported physical well paths. These are postfixed by '(Well Path)'.
 - Simulation wells without a connected physical well path
 
-### Sources and Time Steps
+### Sources
+After a well is selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
+- **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
+- **Grid Cases** -- Simulation cases
+- **Observed Cases** -- 
+
+
+When the user selects a source, time steps for that source appears in the **Time Steps** field.
+
+### Time Steps
 To display curve(s) in the RFT plot at least one source and one time step must be selected.
 
 -----
