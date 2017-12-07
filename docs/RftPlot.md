@@ -31,10 +31,10 @@ The property editor lets the user select which curves to display in the RFT plot
   RFT plot property editor
 </p>
 
-### Well name
+### Well Name
 An RFT plot is always related to a well. The **Well Name** field contains the selected well. If the RFT plot was created from a simulation well or a well path, the correct well name is initially selected. If no well is selected, the user must select a well to be able to proceed.
 
-There are two types of wells in the Well Name field:
+There are two types of wells in the well name field:
 - Imported physical well paths. These are postfixed by '(Well Path)'.
 - Simulation wells without a connected physical well path
 
@@ -57,9 +57,14 @@ The **Time Steps** field contains available time steps for the selected source(s
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
 ### Zonation/Formation Names
-Text before
-![Doc]({{site.baseurl}}/docs/gridstatisticsdialog)
-Text after
+![]({{site.baseurl}}/images/RftPltFormationNames.png)
+
+This field lets the user control whether to display formation names or not, and where to load the names from.
+If **Show Formations** is checked, formations are loaded from the specified formation source. The options are as follows.
+- **Case** -- Load formations from the case specified in the **Formation Case** field
+- **Well Pick** -- Load formations from the selected well in the **Well Name** field.
 
 ### Legend and Axis
+![]({{site.baseurl}}/images/RftPltLegendAndAxis.png)
+
 
