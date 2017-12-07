@@ -26,5 +26,20 @@ If an imported well log file does not contain pressure data, that data source (_
 ## Property Editor
 The property editor lets the user select which curves to display in the RFT plot.
 
+<p align="center">
+  <img src="{{site.baseurl}}/images/RftPlotPropertyEditor.png"/><br/>
+  RFT plot property editor
+</p>
+
+### Well name
+An RFT plot is always related to a well. The **Well Name** field contains the selected well. If the RFT plot was created from a simulation well or a well path, the correct well name is initially selected. If no well is selected, the user must select a well to be able to proceed.
+
+There are two types of wells in the Well Name field:
+- Imported physical well paths. These are postfixed by '(Well Path)'.
+- Simulation wells without a connected physical well path
+
+### Sources and Time Steps
+To display curve(s) in the RFT plot at least one source and one time step must be selected.
+
 -----
 If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
