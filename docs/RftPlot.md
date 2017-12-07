@@ -70,8 +70,14 @@ Please see the [full documentation]({{site.baseurl}}/docs/formations) on the for
 ### Legend and Axis
 ![]({{site.baseurl}}/images/RftPltLegendAndAxis.png)
 
-### <p id="xxxx">Overskrift</p>
-
-
-
-
+This property editor lets the user control visual properties for the legend and axis.
+- **Show Legends** -- Toggle on/off legends in plot
+- Visible X Axis Range
+  - **Auto Scale** -- Automatically set X axis range based on data values
+  - **Logarithmic Scale** -- Toggle between linear and logarithmic X axis
+  - **Min** -- Set X axis minimum value
+  - **Max** -- Set X axis maximum value
+- Visible Depth Range
+  - **Auto Scale** -- Automatically set depth axis range based on data values
+  - **Min** -- Set depth axis minimum value
+  - **Max** -- Set depth axis maximum value
