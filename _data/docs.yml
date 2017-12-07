@@ -26,11 +26,13 @@
   - linkedviews
   - casegroupsandstatistics 
   - summaryplots
+  - summaryploteditor
   - welllogsandplots
   - flowdiagnosticsplots
   - curvecalculator
   - preferences  
   - gridstatisticsdialog
+  - rftplot
    
 - title: Export and Interfaces  
   docs:
