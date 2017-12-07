@@ -20,7 +20,8 @@ If an imported well log file does not contain pressure data, that data source (_
 
 ## Property Editor
 The property editor lets the user select which curves to display in the RFT plot.
-[Bilde]({{site.baseurl}}/images/Dummy.png)
+
+![Bilde]({{site.baseurl}}/images/Dummy.png) Bildetekst
 
 -----
 If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
