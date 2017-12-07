@@ -58,7 +58,7 @@ The **Time Steps** field contains available time steps for the selected source(s
 
 ### Zonation/Formation Names
 Text before
-![]({{site.baseurl}}/docs/gridstatisticsdialog)
+![Doc]({{site.baseurl}}/docs/gridstatisticsdialog)
 Text after
 
 ### Legend and Axis
