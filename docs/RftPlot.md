@@ -56,6 +56,10 @@ The **Time Steps** field contains available time steps for the selected source(s
 3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
+### Zonation/Formation Names
+Text before
+![]({{site.baseurl}}/docs/gridstatisticsdialog)
+Text after
 
------
-If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
+### Legend and Axis
+
