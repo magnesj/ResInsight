@@ -7,7 +7,7 @@ published: true
 
 An RFT plot is a special well plot displaying pressure data against true vertical depth (TVD). RFT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
 
-![Screen Dump]({{site.baseurl}}/images/Dummy.png)
+![]({{site.baseurl}}/images/Dummy.png)
 
 ## Create New RFT Plot
 There are several ways to create new RFT Plots
