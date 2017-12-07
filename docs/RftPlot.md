@@ -57,12 +57,13 @@ The **Time Steps** field contains available time steps for the selected source(s
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
 ### Zonation/Formation Names
+This property editor lets the user control how formations are handled. This is what it looks like in the RFT plot context.
+
 ![]({{site.baseurl}}/images/RftPltFormationNames.png)
 
-This field lets the user control whether to display formation names or not, and where to load the names from.
-If **Show Formations** is checked, formations are loaded from the specified formation source. The options are as follows.
-- **Case** -- Load formations from the case specified in the **Formation Case** field
-- **Well Pick** -- Load formations from the selected well in the **Well Name** field.
+Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
+
+When used in the context of RFT plots, the fields **Trajectory** and **Simulation Well** are hidden because those values are given by the RFT plot definition.
 
 ### Legend and Axis
 ![]({{site.baseurl}}/images/RftPltLegendAndAxis.png)
