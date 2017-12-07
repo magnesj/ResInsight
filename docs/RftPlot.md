@@ -63,7 +63,9 @@ This property editor lets the user control how formations are handled. This is w
 
 Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
 
-When used in the context of RFT plots, the fields **Trajectory** and **Simulation Well** are hidden because those values are given by the RFT plot definition.
+<div class="note">
+  When used in the context of RFT plots, the fields <b>Trajectory</b> and <b>Simulation Well</b> are hidden because those values are given by the RFT plot definition.
+</div>
 
 ### Legend and Axis
 ![]({{site.baseurl}}/images/RftPltLegendAndAxis.png)
