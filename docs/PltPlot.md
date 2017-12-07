@@ -5,10 +5,12 @@ permalink: /docs/pltplot/
 published: true
 ---
 
-An PLT plot is a special well plot displaying ... pressure data against true vertical depth (TVD). RFT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
+An PLT plot is a special well plot displaying PLT (Production Log Tool) data against measured depth (TVD). PLT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
 
 ![]({{site.baseurl}}/images/PltPlot.png)
 
+
+----
 ## Create New RFT Plot
 There are several ways to create new RFT Plots
 - Right-click a Well Path under Wells in the project tree and then select **New RFT Plot**.
