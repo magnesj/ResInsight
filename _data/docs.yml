@@ -33,6 +33,7 @@
   - preferences  
   - gridstatisticsdialog
   - rftplot
+  - pltplot
    
 - title: Export and Interfaces  
   docs:
