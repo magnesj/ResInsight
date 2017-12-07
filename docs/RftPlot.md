@@ -40,15 +40,21 @@ There are two types of wells in the Well Name field:
 
 ### Sources
 After a well is selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
-- **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
+- **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output case. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
 - **Grid Cases** -- Simulation cases
-- **Observed Cases** -- 
-
+- **Observed Cases** -- Observed data imported from well log files and well path files
 
 When the user selects a source, time steps for that source appears in the **Time Steps** field.
 
 ### Time Steps
-To display curve(s) in the RFT plot at least one source and one time step must be selected.
+The **Time Steps** field contains available time steps for the selected source(s). Some combinations of selected sources may display a filtered list of time steps instead of the union of all time steps for all selected sources. The policy is as follows:
+- Exclusively grid cases selected: All available time steps for the selected grid cases are displayed.
+- Grid case(s) and RFT file case(s) selected:
+  Time steps shown:
+  - The time step from the RFT File case
+  - The first time step from the merged time step list from all grid cases
+  - If no time steps from grid cases match the RFT time step, display the two adjacent grid case time steps.
+  
 
 -----
 If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
