@@ -13,7 +13,7 @@ The upper part of the editor contains editors for selecting which vectors/summar
 In this context <b>highlight</b> means a marked field item that has a light blue background (only one at a time), while <b>selected</b> means an item or items that have a ticked check box.
 </div>
 
-![]({{site.baseurl}}/images/Dummy.png)
+![]({{site.baseurl}}/images/SummaryPlotEditor.png)
 
 ## Selection Fields
 This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector/summary.
