@@ -75,10 +75,10 @@ In Well Log Plots and Well Allocation Plots, **Formation Names** can be found in
 
 ![]({{ site.baseurl }}/images/caseFormationsPropEditor.PNG)
 
-## Formations for a Well Path
+## Well Picks
 Formations can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots.
 
-### Import of Well Path Formation Names files
+### Import of Well Pick files
 
 Well Path Formation Names files can be imported by using the command: **File->Import->Import Well Path Formation Names**.
 The user is asked to select _`*.csv`_ files for import.
