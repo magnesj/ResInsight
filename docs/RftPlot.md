@@ -48,13 +48,14 @@ When the user selects a source, time steps for that source appears in the **Time
 
 ### Time Steps
 The **Time Steps** field contains available time steps for the selected source(s). Some combinations of selected sources may display a filtered list of time steps instead of the union of all time steps for all selected sources. The policy is as follows:
-- Exclusively grid cases selected: All available time steps for the selected grid cases are displayed.
-- Grid case(s) and RFT file case(s) selected:
-  Time steps shown:
-  - The time step from the RFT File case
+1. **Exclusively grid cases selected**. All available time steps for the selected grid cases are displayed.
+2. **Grid case(s) and observed data case selected**. Time steps shown are
+  - The time steps from the observed case
   - The first time step from the merged time step list from all grid cases
-  - If no time steps from grid cases match the RFT time step, display the two adjacent grid case time steps.
-  
+  - If no time steps from grid cases match the observed time step, display the two adjacent grid case time steps.
+3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2
+4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
+
 
 -----
 If the RFT plot has been created from a well path or a simulation well one curve is already selected and displayed in the plot when it opens. RFT plots created from RFT plot collection is initially empty. 
