@@ -25,7 +25,7 @@ If an imported well log file does not contain PLT data, that data source (_Obser
 - Total: _QTZT_, _QTOT_, _xxxx_QTOT_
 
 ## Property Editor
-The property editor lets the user select which curves to display in the RFT plot.
+The property editor lets the user select which curves to display in the PLT plot.
 
 <p align="center">
   <img src="{{site.baseurl}}/images/PltPlotPropertyEditor.png"/><br/>
@@ -60,7 +60,7 @@ Each time step is postfixed by an indication of which source type(s) the time st
 More than one letter for one single time step, means that the time steps is from multiple case types.
 
 ### Zonation/Formation Names
-This property editor lets the user control how formations are handled. This is what it looks like in the RFT plot context.
+This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
 
 ![]({{site.baseurl}}/images/RftPltFormationNames.png)
 
@@ -86,3 +86,6 @@ This property editor lets the user control visual properties for the legend and 
   - **Auto Scale** -- Automatically set depth axis range based on data values
   - **Min** -- Set depth axis minimum value
   - **Max** -- Set depth axis maximum value
+  
+  ### Plot
+  The PLT plot displays groups of curves. A group consists of the components oil, gas and water. The curves within a group are stacked.
