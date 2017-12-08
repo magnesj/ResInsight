@@ -59,6 +59,15 @@ Each time step is postfixed by an indication of which source type(s) the time st
 
 More than one letter for one single time step, means that the time steps is from multiple case types.
 
+### Curve Selection
+The curve selection group lets the user control what to display.
+- **Standard Volume** --
+- **Reservoir Volume** --
+- **Oil** -- Check to display the oil component
+- **Gas** -- Check to display the gas component
+- **Water** -- Check to display the water component
+- **Total** -- Check to display the total component
+
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
 
