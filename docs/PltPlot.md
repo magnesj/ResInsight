@@ -96,5 +96,5 @@ This property editor lets the user control visual properties for the legend and 
   - **Min** -- Set depth axis minimum value
   - **Max** -- Set depth axis maximum value
   
-  ### Plot
-  The PLT plot displays groups of curves. A group consists of the components oil, gas and water. The curves within a group are stacked.
+### Plot
+The PLT plot displays groups of curves. A group consists of the components oil, gas and water. The curves within a group are stacked, the biggest component first.
