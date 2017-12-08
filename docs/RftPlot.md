@@ -40,7 +40,7 @@ There are two types of wells in the well name field:
 - Simulation wells without a connected physical well path
 
 ### Sources
-After a well is selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
+After a well has been selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
 - **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output case. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
 - **Grid Cases** -- Simulation cases
 - **Observed Cases** -- Observed data imported from well log files and well path files
@@ -76,7 +76,7 @@ Please see the [full documentation]({{site.baseurl}}/docs/formations) on the for
 </div>
 
 ### Legend and Axis
-![]({{site.baseurl}}/images/RftPltLegendAndAxis.png)
+![]({{site.baseurl}}/images/RftLegendAndAxis.png)
 
 This property editor lets the user control visual properties for the legend and axis.
 - **Show Legends** -- Toggle on/off legends in plot
