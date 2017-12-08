@@ -57,6 +57,13 @@ The **Time Steps** field contains available time steps for the selected source(s
 3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
+Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
+- **O** -- Indicates that the current time step is from observed data
+- **R** -- Indicates that the current time step is from RFT data
+- **G** -- Indicates that the current time step is from Grid data
+
+More than one letter for one single time step, means that the time steps is from multiple case types.
+
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the RFT plot context.
 
