@@ -9,16 +9,23 @@ An PLT plot is a special well plot displaying PLT (Production Log Tool) data aga
 
 ![]({{site.baseurl}}/images/PltPlot.png)
 
-
-----
-## Create New RFT Plot
-There are several ways to create new RFT Plots
-- Right-click a Well Path under Wells in the project tree and then select **New RFT Plot**.
-- Right-click a simulation well in the 3D view and select **Well Plots -> New RFT Plot**.
-- Right-click the RFT Plots node in the project tree and select **New RFT Plot**.
+## Create New PLT Plot
+There are several ways to create new PLT Plots
+- Right-click a Well Path under Wells in the project tree and then select **New PLT Plot**.
+- Right-click the PLT Plots node in the project tree and select **New PLT Plot**.
+- Right-click a simulation well in the 3D view that has an associated well path and select **Well Plots -> New PLT Plot**.
+- Right-click a simulation well in the project tree that has an associated well path and select **New PLT Plot**.
 
 ## Constraints
-If an imported well log file does not contain pressure data, that data source (_Observed data_) will not be visible in the sources field in the property editor. Pressure data in a well log file is expected to have a column named _PRESSURE_ or _PRES_FORM_. If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
+If an imported well log file does not contain PLT data, that data source (_Observed data_) will not be visible in the sources field in the property editor. PLT data in a well log file is expected to have column names:
+
+- Oil: _QOZT_, _QOIL_, _xxxx_QOIL_
+- Gas: _QOZT_, _QGAS_, _xxxx_QGAS_
+- Water: _QGZT_, _QWAT_, _xxxx_QWAT_
+- Total: _QTZT_, _QTOT_, _xxxx_QTOT_
+
+----
+If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
 
 <p align="center">
   <img src="{{site.baseurl}}/images/NoTvdWarningDialog.png"/><br/>
