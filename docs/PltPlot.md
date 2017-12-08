@@ -24,31 +24,19 @@ If an imported well log file does not contain PLT data, that data source (_Obser
 - Water: _QGZT_, _QWAT_, _xxxx_QWAT_
 - Total: _QTZT_, _QTOT_, _xxxx_QTOT_
 
-----
-If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
-
-<p align="center">
-  <img src="{{site.baseurl}}/images/NoTvdWarningDialog.png"/><br/>
-  No TVD warning dialog
-</p>
-
 ## Property Editor
 The property editor lets the user select which curves to display in the RFT plot.
 
 <p align="center">
-  <img src="{{site.baseurl}}/images/RftPlotPropertyEditor.png"/><br/>
+  <img src="{{site.baseurl}}/images/PltPlotPropertyEditor.png"/><br/>
   RFT plot property editor
 </p>
 
 ### Well Name
-An RFT plot is always related to a well. The **Well Name** field contains the selected well. If the RFT plot was created from a simulation well or a well path, the correct well name is initially selected. If no well is selected, the user must select a well to be able to proceed.
-
-There are two types of wells in the well name field:
-- Imported physical well paths. These are postfixed by '(Well Path)'.
-- Simulation wells without a connected physical well path
+A PLT plot is always related to a well path. The **Well Name** field contains the selected well path. Only observed well paths are displayed.
 
 ### Sources
-After a well is selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
+The **Sources** field shows the sources for the selected well path should appear in the sources field. The different sources are grouped in three different groups:
 - **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output case. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
 - **Grid Cases** -- Simulation cases
 - **Observed Cases** -- Observed data imported from well log files and well path files
