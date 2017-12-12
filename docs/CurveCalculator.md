@@ -85,7 +85,7 @@ Possible operations and functions are found by right-clikcing in the expression 
 ### Unit
 It is possible to add a unit to the calculated curve, in the field *Unit* beneath the expression field. This will be used as the label on the y-axis when the curve is used in a plot.
 
-## <a name=summaryAddressSelection> Summary Address Selection </a>
+## <a name="summaryAddressSelection"> Summary Address Selection </a>
 An expression consists of placeholders (variables) for curves (summary address). By clicking **Parse Expession**, the variables will appear in the table below the settings. To assign a summary address to a variable, click **Edit**. This action will create a **Summary Address Selection** dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
 
 ## Generating Curves
