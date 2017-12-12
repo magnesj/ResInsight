@@ -76,35 +76,53 @@ In Well Log Plots and Well Allocation Plots, **Formation Names** can be found in
 ![]({{ site.baseurl }}/images/caseFormationsPropEditor.PNG)
 
 ## Well Picks
-Formations can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots.
+Well Picks can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots. Well picks can be both of type *fluid* or *formation*.
 
 ### Import of Well Pick files
 
-Well Path Formation Names files can be imported by using the command: **File->Import->Import Well Path Formation Names**.
+Well Pick files can be imported by using the command: **File->Import->Import Well Picks**.
 The user is asked to select _`*.csv`_ files for import.
 
-The imported Well Path Formation Names files will be added their associated well path, if a match on well name can be found. If not, new paths will be created, and they can all be found in **Wells** in the **Project Tree**. The file path of the formations can be found in a well path's **Property Editor**.
+The imported Well Pick files will be added their associated well path, if a match on well name can be found. If not, new paths will be created, and they can all be found in **Wells** in the **Project Tree**. The file path of the formations can be found in a well path's **Property Editor**.
 
 ![]({{ site.baseurl }}/images/wellPathFormationsInPropertyEditor.PNG)
 
-A Well Path Formation Names file is a csv-file, which uses semicolon to separate entries in a table. Below is an example of such a file:
+A Well Pick file is a csv-file, which uses semicolon to separate entries in a table. Below is an example of such a file:
 
 ```
-Well name; Surface name; Geologic feature; CF; Obs#; Qlf; Kind; MD; TVD; TVDSS; TWT;
-B-2H; Formation A Top; UNKNOWN; P;1; ; ;3000;2900;-1850;2000;
-B-2H; Formation A1 Top; UNKNOWN; P;1; ; ;3000;2900;-1850;2000; 
-B-2H; Formation B Top; UNKNOWN; G;1; ; ;3100;3000;-1950;2000;
-B-2H; Formation C Top; UNKNOWN; G;1; ; ;3200;3100;-2050;2000;
-B-3H; Fname 2; UNKNOWN; G;1; ; ;3100;3000;-1950;2000;
-B-3H; Fname 3.2; UNKNOWN; G;1; ; ;3400;3300;-2050;2000;
-B-3H; Fname 4; UNKNOWN; G;1; ; ;3440;3340;-2060;2010;
+Well name; Column name; Unit name; Top MD; Base MD
+B-3H; FLUID; GAS;2203.2;2317.4
+B-3H; FLUID; OIL;2317.4;2459
+B-3H; STRAT; FANGST GP. ;2203.399902;2223.350098
+B-3H; STRAT;   Ile Fm. ;2203.399902;2223.350098
+B-3H; STRAT;     Ile Fm. 3 ;2203.401123;2219.26001
+B-3H; STRAT;     Ile Fm. 2 ;2219.26001;2222.399902
+B-3H; STRAT;       Ile Fm. 2.2 ;2219.26;2219.350098
+B-3H; STRAT;       Ile Fm. 2.1 ;2219.350098;2222.399902
+B-3H; STRAT;     Ile Fm. 1 ;2222.399902;2223.350098
+B-3H; STRAT; BAAT GP. ;2223.350098;2979.28125
+B-3H; STRAT;   Ror Fm. ;2223.350098;2285.199951
+B-3H; STRAT;     Ror Fm. 2 ;2223.350098;2246
+B-3H; STRAT;     Ror Fm. 1 ;2246;2285.199951
+B-2H; FLUID; GAS;2144.4;2338.5
+B-2H; FLUID; OIL;2338.5;2440
+B-2H; STRAT; FANGST GP. ;2144.199951;2158.389893
+B-2H; STRAT;   Ile Fm. ;2144.199951;2158.389893
+B-2H; STRAT;     Ile Fm. 2 ;2144.201416;2156.197266
+B-2H; STRAT;     Ile Fm. 1 ;2156.197266;2158.38501
 ```
 
-The file must have the columns "Well name", "Surface name" (i.e. formation name) and "MD" (i.e. measured depth) to be regarded as a Well Path Formation Names file. They can be listed in any order, and all other columns will be ignorded.
+The file must have the columns "Well name", "Unit name" (i.e. formation name), "Top MD" and "Base MD" (i.e. measured depth) to be regarded as a Well Pick file. They can be listed in any order, and all other columns will be ignorded.
 
-### Viewing the Formation Information
-See [Annotations on plot](#annotationOnPlot). Annotations are added to plots in the same way as for k-layered formations, but the formation source is different.
+The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on.
+
+### Viewing the Well Picks
+See [Annotations on plot](#annotationOnPlot). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
 
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
 
-In the **Property Editor**, choose **Well** as **Formation Source**, and all well paths with formations will be shown in the drop-down list below.
+In the **Property Editor**, choose **Well Path** as **Source**, and all well paths with formations will be shown in the drop-down list below. All disjoint well picks for the chosen well path is shown on default. To reduce the number of annotations, the **Well Pick Filter** can be used.
+
+![]({{ site.baseurl }}/images/wellPickFilter.png)
+
+The **Well Pick Filter** will show formations down to the specified level. If more there are more than one formation within 0.1m of an MD, only the lowermost formation is shown. Well picks interpreted as *Fluids* are only shown by ticking the **Show Fluids** mark.
