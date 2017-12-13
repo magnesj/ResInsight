@@ -11,10 +11,15 @@ An PLT plot is a special well plot displaying PLT (Production Log Tool) data aga
 
 ## Create New PLT Plot
 There are several ways to create new PLT Plots
-- Right-click a Well Path under Wells in the project tree and then select **New PLT Plot**.
-- Right-click the PLT Plots node in the project tree and select **New PLT Plot**.
-- Right-click a simulation well in the 3D view that has an associated well path and select **Well Plots -> New PLT Plot**.
-- Right-click a simulation well in the project tree that has an associated well path and select **New PLT Plot**.
+
+**From the Plot Object Project Tree**
+- Select context command **New PLT Plot** for a _Well Path_ node or the _PLT Plots_ node.
+
+**From the Project Tree**
+- Select context command **New PLT Plot** for a simulation well.
+
+**From the 3D view**
+- Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
 
 ## Constraints
 If an imported well log file does not contain PLT data, that data source (_Observed data_) will not be visible in the sources field in the property editor. PLT data in a well log file is expected to have column names:
