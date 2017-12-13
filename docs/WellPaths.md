@@ -16,7 +16,7 @@ The command **File -> Import -> Import Well Paths From File** will read the well
 The supported ASCII format is quite flexible but the main requirements are: 
 
 - Each data line must contain four numbers: X Y TVD MD separated with white-space.
-- Lines starting with `"--"` or `"#"` is considered to be comment lines
+- Lines starting with `"--" or "#"` is considered to be comment lines
 - A line starting with none-number-characters are used as a well name after the following rules:
   - If the line contains a pair of : ```  "'", "`", "´", "’" or "‘" ``` the text between the quotation marks is used as a well name.
   - If the line contains the case insensitive string "name" with an optional ":" after then the rest of the line is used as a well name. 
