@@ -53,19 +53,19 @@ When the user selects a source, time steps for that source appears in the **Time
 ### Time Steps
 The **Time Steps** field contains available time steps for the selected source(s). Some combinations of selected sources may display a filtered list of time steps instead of the union of all time steps for all selected sources. The policy is as follows:
 1. **Exclusively grid cases selected**. All available time steps for the selected grid cases are displayed.
-2. **Grid case(s) and observed data case selected**. Time steps shown are
+2. **Grid case(s) and observed data selected**. Time steps shown are
   - The time steps from the observed case
-  - The first time step from the merged time step list from all grid cases
+  - The first time step from the grid case(s)
   - If no time steps from grid cases match the observed time step, display the two adjacent grid case time steps.
-3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2
-4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
+3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2, except from RFT cases behaving as observed data.
+4. **All types of cases selected**. Same display logic as point 2, except from RFT File case time steps are treated as grid time steps.
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
-- **O** -- Indicates that the current time step is from observed data
-- **R** -- Indicates that the current time step is from RFT data
-- **G** -- Indicates that the current time step is from Grid data
+- **O** -- Time step comes from observed data
+- **R** -- Time step comes from RFT data
+- **G** -- Time step comes from Grid data
 
-More than one letter for one single time step, means that the time steps is from multiple case types.
+More than one letter for one single time step, means that the time steps comes from multiple case types.
 
 ### Zonation/Formation Names
 This property editor lets the user control the visibility of formations lines. This is what it looks like in the RFT plot context.
