@@ -94,3 +94,38 @@ The visible wells are always shown in all the 3D Views in the complete project, 
 - **Clip Well Paths** -- This option hides the top of the Well Trajectories to avoid displaying the very long lines from the reservoir to the sea surface.
 - **Well Path clipping depth distance** -- This number is the distance from the top of the reservoir to the clipping depth.
 
+## Individual Well Trajectories
+A well trajectory (well path) will hold well log data and well path data imported from files. A well path file is placed inside the well path item, while one or more well log files are placed as child items under the well path in the project tree.
+
+### Importing Well Log Files
+Well log data is usually imported from LAS-files (_\*.las_). LAS-files can be imported using the command: **File->Import->Import Well Logs from File**.
+
+ResInsight will look for the the well name in the imported LAS-files among the existing **Well Paths**.
+If a match is found, the LAS-file is placed as a child of that trajectory. If not, a new empty well path entry is created with the imported LAS-file under it. A well path may have more than one LAS-files as children.
+
+<p align="center">
+  <img src="{{ site.baseurl }}/images/LasFilesInTree.png"/>
+</p>
+
+If the LAS-file does not contain a well name, the file name is used instead. 
+
+### Importing Well Path Files
+See []({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
+
+### Look for an Existing Well Path
+Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparision this way:
+- First remove any prefix (like _xxxxx1111/1111-_ or _xxxxx1111/1111\__)
+- Then try an exact name match
+- If not found, try to match the names ignoring all spaces, dashes and underscores
+- If still no match, no existing well was found and a new one is created
+
+### Well Path Property Editor
+![]()
+
+### Associated Simulation Well
+When a well path item is created, ResInsight will try to associate a simulation well to the well path. This is done in the exact same way as looking upan existing well path.
+
+
+
+
+
