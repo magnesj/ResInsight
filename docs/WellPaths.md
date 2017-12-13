@@ -120,10 +120,13 @@ Well log names may vary slightly among different files from the same well. When 
 - If still no match, no existing well was found and a new one is created
 
 ### Well Path Property Editor
-![]()
+<p align="center">
+  <img src="{{ site.baseurl }}/images/WellPathPropertyEditor.png"/><br/>
+  Well Path Property Editor
+</p>
 
 ### Associated Simulation Well
-When a well path item is created, ResInsight will try to associate a simulation well to the well path. This is done in the exact same way as looking upan existing well path.
+When a well path item is created, ResInsight will try to associate a simulation well to the well path. This is done in the exact same way as looking up an existing well path.
 
 
 
