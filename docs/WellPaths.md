@@ -120,15 +120,16 @@ Well log names may vary slightly among different files from the same well. When 
 - If still no match, no existing well was found and a new one is created
 
 ### Well Path Property Editor
+The well path property editor lets the user control the appearance of the well path and associate the well path to a simulation well. It also gives some information about the well path metadata.
+
 <p align="center">
   <img src="{{ site.baseurl }}/images/WellPathPropertyEditor.png"/><br/>
   Well Path Property Editor
 </p>
 
-### Associated Simulation Well
-When a well path item is created, ResInsight will try to associate a simulation well to the well path. This is done in the exact same way as looking up an existing well path.
-
-
-
-
+- **Appearance group** -- Settings in this group affect the well path appearance in the 3D view
+- **File group** -- Information about the well path file
+- **Simulation Well group** -- Associated simulation well. ResInsight will try to associate each well path with a simulation well. This is done in the exact same way as looking up an existing well path. If the auto-association fails, the user can set the correct simulation well here.
+- **Well Info group** -- Metadata for the well path
+- **Well Picks group** -- 
 
