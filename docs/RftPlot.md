@@ -5,7 +5,7 @@ permalink: /docs/rftplot/
 published: true
 ---
 
-An RFT (_Repeated Formation Tester_) plot is a special well plot for displaying observed formation pressure and simulated formation pressure data, and for comparing those data. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data may be a part of the grid model (\*.rft) and observed pressure data are loaded from well log files (\*.las).
+An RFT (_Repeated Formation Tester_) plot is a special well plot for displaying observed formation pressure and simulated formation pressure, and for comparing those. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data may be a part of the grid model (\*.rft) and observed pressure data are loaded from well log files (\*.las).
 
 ![]({{site.baseurl}}/images/RftPlot.png)
 
@@ -40,17 +40,13 @@ The property editor lets the user select which curves to display in the RFT plot
 </p>
 
 ### Well Name
-An RFT plot is always related to a well. The **Well Name** field contains the selected well. If the RFT plot was created from a simulation well or a well path, the correct well name is initially selected. If no well is selected, the user must select a well to be able to proceed.
-
-There are two types of wells in the well name field:
-- Imported physical well paths. These are postfixed by '(Well Path)'.
-- Simulation wells without a connected physical well path
+Select the wanted well to display in the plot. Wells postfixed by _'(Well Path)'_ have associated observed data in addition to simulated data.
 
 ### Sources
-After a well has been selected in the Well Name field, sources for that well should appear in the sources field. The different sources are grouped in three different groups:
-- **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output case. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
+After a well has been selected in the Well Name field, sources for that well should appear in the sources field. The sources are placed in one of three different groups:
+- **RFT File Cases** -- Simulation cases may have associated formation pressure data in _\*.rft_ file(s). If the simulation case contains such files, those are imported together with the simulation case (See the keyword _WRFTPLT_ in the Eclipse manual for information)
 - **Grid Cases** -- Simulation cases
-- **Observed Cases** -- Observed data imported from well log files and well path files
+- **Observed Cases** -- Observed data imported from well log files
 
 When the user selects a source, time steps for that source appears in the **Time Steps** field.
 
@@ -72,7 +68,7 @@ Each time step is postfixed by an indication of which source type(s) the time st
 More than one letter for one single time step, means that the time steps is from multiple case types.
 
 ### Zonation/Formation Names
-This property editor lets the user control how formations are handled. This is what it looks like in the RFT plot context.
+This property editor lets the user control the visibility of formations lines. This is what it looks like in the RFT plot context.
 
 ![]({{site.baseurl}}/images/RftPltFormationNames.png)
 
