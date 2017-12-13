@@ -112,6 +112,9 @@ If the LAS-file does not contain a well name, the file name is used instead.
 ### Importing Well Path Files
 See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
 
+### Importing Well Picks Files
+`Needs input...`
+
 ### Look for an Existing Well Path
 Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparision this way:
 - First remove any prefix (like `xxxxx1111/1111-` or `xxxxx1111/1111_`)
@@ -131,5 +134,5 @@ The well path property editor lets the user control the appearance of the well p
 - **File group** -- Information about the well path file
 - **Simulation Well group** -- Associated simulation well. ResInsight will try to associate each well path with a simulation well. This is done in the exact same way as looking up an existing well path. If the auto-association fails, the user can set the correct simulation well here.
 - **Well Info group** -- Metadata for the well path
-- **Well Picks group** -- 
+- **Well Picks group** -- `Needs input...`
 
