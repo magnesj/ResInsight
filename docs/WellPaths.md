@@ -114,7 +114,7 @@ See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajecto
 
 ### Look for an Existing Well Path
 Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparision this way:
-- First remove any prefix (like _xxxxx1111/1111-_ or _xxxxx1111/1111\__)
+- First remove any prefix (like `_xxxxx1111/1111-_` or `_xxxxx1111/1111\__`)
 - Then try an exact name match
 - If not found, try to match the names ignoring all spaces, dashes and underscores
 - If still no match, no existing well was found and a new one is created
