@@ -5,16 +5,26 @@ permalink: /docs/rftplot/
 published: true
 ---
 
-An RFT plot is a special well plot displaying pressure data against true vertical depth (TVD). RFT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
+An RFT (_Repeated Formation Tester_) plot is a special well plot for displaying observed formation pressure and simulated formation pressure data, and for comparing those data. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data may be a part of the grid model (\*.rft) and observed pressure data are loaded from well log files (\*.las).
 
 ![]({{site.baseurl}}/images/RftPlot.png)
 
 ## Create New RFT Plot
-There are several ways to create new RFT Plots
-- Right-click a Well Path under Wells in the project tree and then select **New RFT Plot**.
-- Right-click a simulation well in the 3D view and select **Well Plots -> New RFT Plot**.
-- Right-click a simulation well in project tree and select **New RFT plot**.
-- Right-click the RFT Plots node in the project tree and select **New RFT Plot**.
+There are several ways to create new RFT Plots.
+
+**From the Plot Object Project Tree**
+- Select context command **New RFT Plot** for _Well Path_ node or _RFT Plots_ node.
+
+**From the Project Tree**
+- Select context command **New RFT plot** for a simulation well.
+
+**From the 3D view**
+- Right-click a simulation well select **Well Plots -> New RFT Plot**.
+
+## Plotting
+
+.....
+
 
 ## Constraints
 If an imported well log file does not contain pressure data, that data source (_Observed data_) will not be visible in the sources field in the property editor. Pressure data in a well log file is expected to have a column named _PRESSURE_ or _PRES_FORM_. If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
