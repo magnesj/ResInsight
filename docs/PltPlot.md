@@ -21,7 +21,12 @@ There are several ways to create new PLT Plots
 **From the 3D view**
 - Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
 
-## Constraints
+## Plot Observed Data
+To be able to plot observed
+
+...
+
+
 If an imported well log file does not contain PLT data, that data source (_Observed data_) will not be visible in the sources field in the property editor. PLT data in a well log file is expected to have column names:
 
 - Oil: _QOZT_, _QOIL_, _xxxx_QOIL_
