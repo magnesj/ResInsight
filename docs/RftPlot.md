@@ -21,13 +21,10 @@ There are several ways to create new RFT Plots.
 **From the 3D view**
 - Right-click a simulation well select **Well Plots -> New RFT Plot**.
 
-## Plotting
+## Plot Observed Data
+To be able to plot observed pressure data for a well in an RFT plot, at least one well log file from that well (e.g. \*.las) have to be imported to ResInsight. This file must contain a pressure column, which must have the name _PRESSURE_ or _PRES_FORM_. If the well log file does not contain a TVD column (named _TVDMSL_), a well path file (See [Well Trajectories]({{site.baseurl}}/docs/wellpaths)) for the same well must also be imported to ResInsight.
 
-.....
-
-
-## Constraints
-If an imported well log file does not contain pressure data, that data source (_Observed data_) will not be visible in the sources field in the property editor. Pressure data in a well log file is expected to have a column named _PRESSURE_ or _PRES_FORM_. If the well log contains pressure data, but has no infomation about TVD, a warning will appear when a curve is to be displayed. TVD may be available either as an explicit TVD column named _TVDMSL_ in the well log file or a separately imported well path file.
+If TVD data is missing for a well, ResInsight will not be able to plot RFT curves for that well. In that case a warning dialog is presented to the user.
 
 <p align="center">
   <img src="{{site.baseurl}}/images/NoTvdWarningDialog.png"/><br/>
