@@ -110,7 +110,7 @@ If a match is found, the LAS-file is placed as a child of that trajectory. If no
 If the LAS-file does not contain a well name, the file name is used instead. 
 
 ### Importing Well Path Files
-See []({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
+See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
 
 ### Look for an Existing Well Path
 Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparision this way:
