@@ -61,9 +61,9 @@ The **Time Steps** field contains available time steps for the selected source(s
 4. **All types of cases selected**. Same display logic as point 2, except from RFT File case time steps are treated as grid time steps.
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
-- **O** -- Time step comes from observed data
-- **R** -- Time step comes from RFT data
-- **G** -- Time step comes from Grid data
+- **O** -- Time step is from observed data
+- **R** -- Time step is from RFT data
+- **G** -- Time step is from Grid data
 
 More than one letter for one single time step, means that the time steps comes from multiple case types.
 
