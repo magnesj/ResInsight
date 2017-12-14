@@ -11,7 +11,7 @@ ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.GR
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
-A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command: **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor] ({{ site.baseurl }}/docs/summaryploteditor).
+A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command: **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
 ## Summary Plots
 
