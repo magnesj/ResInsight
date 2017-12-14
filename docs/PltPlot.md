@@ -24,10 +24,12 @@ There are several ways to create new PLT Plots
 ## Plot Observed Data
 To be able to plot observed production data for a well, a well log file containing that data must be imported. Production data in a well log file is expected to have column names:
 
-- Oil: `_QOZT_, _QOIL_, _xxxx_QOIL_`
-- Gas: `_QOZT_, _QGAS_, _xxxx_QGAS_`
-- Water: `_QGZT_, _QWAT_, _xxxx_QWAT_`
-- Total: `_QTZT_, _QTOT_, _xxxx_QTOT_`
+| Component    | Names                         |
+| ------------ | ----------------------------- |
+| Oil          | `_QOZT_, _QOIL_, _xxxx_QOIL_` |
+| Gas          | `_QOZT_, _QGAS_, _xxxx_QGAS_` |
+| Water        | `_QGZT_, _QWAT_, _xxxx_QWAT_` |
+| Total        | `_QTZT_, _QTOT_, _xxxx_QTOT_` |
 
 To be able to plot simulated data for a well, the trajectory for that well have to be imported. If no well trajectory is found, ResInsight will present a warning dialog to the user.
 
