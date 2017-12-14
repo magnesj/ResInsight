@@ -22,7 +22,7 @@ There are several ways to create new PLT Plots
 - Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
 
 ## Plot Observed Data
-To be able to plot observed PLT data for a well, a well log file containing PLT data must be imported. PLT data in a well log file is expected to have column names:
+To be able to plot observed production data for a well, a well log file containing that data must be imported. Production data in a well log file is expected to have column names:
 
 - Oil: `_QOZT_, _QOIL_, _xxxx_QOIL_`
 - Gas: `_QOZT_, _QGAS_, _xxxx_QGAS_`
@@ -65,20 +65,20 @@ The **Time Steps** field contains available time steps for the selected source(s
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
-- **O** -- Time step is from observed data
-- **R** -- Time step is from RFT data
-- **G** -- Time step is from Grid data
+- **O** -- Time step belongs to observed data
+- **R** -- Time step belongs to RFT data
+- **G** -- Time step belongs to Grid data
 
-More than one letter for one single time step, means that the time steps is from multiple case types.
+More than one letter for one single time step, means that the time step belongs to multiple case types.
 
 ### Curve Selection
 The curve selection group lets the user control which component(s) of the PLT data to display.
-- **Standard Volume** --
-- **Reservoir Volume** --
-- **Oil** -- The oil component
-- **Gas** -- The gas component
-- **Water** -- The water component
-- **Total** -- Sum of all three components
+- **Standard Volume** -- Production data at standard conditions (normal air pressure)
+- **Reservoir Volume** -- Production data at reservoir pressure (high air pressure)
+- **Oil** -- The oil production component
+- **Gas** -- The gas production component
+- **Water** -- The water production component
+- **Total** -- Total production
 
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
