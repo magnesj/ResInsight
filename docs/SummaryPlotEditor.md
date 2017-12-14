@@ -8,20 +8,20 @@ published: true
 
 The plot editor is a separate ResInsight dialog window where the user can select which vectors to display in a summary plot. It is also possible to edit an existing plot in this editor.
 
-The upper part of the editor contains editors for selecting which vectors/summaries to display in the plot. The number of fields vary from 3 to 6 depending on the summary type currently highlighted. Dynamic field are hidden if the highlighted summary category does not have any sub-fields.
+The upper part of the editor contains editors for selecting which vectors/summaries to display in the plot. The number of fields vary from 3 to 6 depending on the **Summary Type** currently highlighted. 
 
 <div class="note">
 In this context <b>highlighted</b> means the marked item with a different background color, while <b>selected</b> means an item or items that have a ticked check box.
 </div>
 
 ## Selection Fields
-This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector/summary.
+This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector among the Summaries.
 
 ### Sources
 This field contains all imported cases. Select the case(s) to display in the plot.
 
-### Summary Types
-This field contains all fixed summary types and two special ones, *Calculated* and *Imported*. 
+### Summary Types and Item Selection Fields
+In the mid-section of the dialog, the Summary Type and the corresponding Items can be selected.
 
 - **Field** -- Select Field related vectors only
 - **Aquifer** -- Select Aquifer category vectors only 
@@ -55,9 +55,6 @@ This field contains all fixed summary types and two special ones, *Calculated* a
    - **I, J, K** -- Select the I, J, K values of the Block in the Lgr. 
 - **Calculated** -- Select calculated vectors created by the [curve calculator]({{site.baseurl}}/docs/curvecalculator).
 - **Imported** -- Select observed data vectors [imported from file]({{site.baseurl}}/docs/importobstimehistdata) (e.g. CSV, RSM files)
-
-### Dynamic Fields
-In the list above some of the summary categories have one or more sub fields which is displayed when that category is highlighted. See previous section for a description of those fields.
 
 ### Summaries
 This field contains the summaries/vectors for the highlighted summary category.
