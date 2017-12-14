@@ -29,6 +29,13 @@ To be able to plot observed PLT data for a well, a well log file containing PLT 
 - Water: `_QGZT_, _QWAT_, _xxxx_QWAT_`
 - Total: `_QTZT_, _QTOT_, _xxxx_QTOT_`
 
+To be able to plot simulated data for a well, the trajectory for that well have to be imported. If no well trajectory is found, ResInsight will present a warning dialog to the user.
+
+<p align="center">
+  <img src="{{site.baseurl}}/images/NoMdWarningDialog.png"/><br/>
+  No MD warning dialog
+</p>
+
 ## Property Editor
 The property editor lets the user select which curves to display in the PLT plot.
 
