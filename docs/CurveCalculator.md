@@ -5,6 +5,8 @@ permalink: /docs/curvecalculator/
 published: true
 ---
 
+![]({{ site.baseurl }}/images/SummaryCurveCalculator.png)
+
 The summary curve calculator is a tool to do relative simple vector calculations on a set of curves. The created curves can be stored for later use in the project.
 
 The calculator can be run by pressing the calculator icon ![]({{ site.baseurl }}/images/calculator.png) in the menu bar, or by right-clicking on either a summary case or the summary plot collection.
@@ -89,8 +91,6 @@ It is possible to add a unit to the calculated curve, in the field *Unit* beneat
 An expression consists of placeholders (variables) for curves (summary address). By clicking **Parse Expession**, the variables will appear in the table below the settings. To assign a summary address to a variable, click **Edit**. This action will open a **Summary Address Selection** dialog. Use the dialog to select a summary address and press **OK**. Repeat the procedure for all the variables.
 
 ## Generating Curves
-After assigning summary addresses to all variables, click **Calculate** to evaluate the expression. The curve is saved and can be accessed in the following ways.
-
-Right click on **Summary Plots** and click **New Summary Plot**. The Plot Editor dialog will appear. A type called **Calculated** can be found in the Summary Types panel. Click on this field, and the curves will appear in the Summaries panel.
+After assigning summary addresses to all variables, click **Calculate** to evaluate the expression. The curve is saved and can be accessed in the Plot Editor selecting the Summary Type: **Calculated**.
 
 The curves can also be found in an existing curve's **Property Editor**. Choose the case **Calculated**, and the curves will appear in **Vector Selection**.
