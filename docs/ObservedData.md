@@ -23,4 +23,4 @@ Which summaries that has been detected in a Observed data file can be read in an
 
 ![]({{ site.baseurl }}/images/observedDataCurveCreator.png)
 
-To plot Observed Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed data will appear in **Sources** together with summary cases. How to use the Plot editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed data are plotted a cross on each data point.
+To plot Observed Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed data will appear in **Sources** together with summary cases. How to use the Plot editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed data points are plotted as crosses by default.
