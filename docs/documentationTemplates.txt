@@ -10,7 +10,7 @@ References to a specific heading whithin a document:
 
 See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
 
-The heading lowercase with dash instead of space
+The heading lowercase with dash instead of space. No space between ](
 
 #### A hint type "block" (with star)
 
