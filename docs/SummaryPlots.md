@@ -6,18 +6,29 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
 
-ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.GRDECL`_ ) and imported Observed Time History Data. 
+A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain Summary Curves, Grid time history curves and pasted ascii curves ( See below ).
+
+A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor) dialog will then open. The usage of the dialog is described [here]({{ site.baseurl }}/docs/summaryploteditor).
+
+## Plot Data
+
+ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SMSPEC`_ ), imported Observed Time History Data  (See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)), pasted ascii data and properties from the 3D grid.
+
+### SUMMARY Files
 
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
 A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command: **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
-## Summary Plots
+### Observed data
 
-A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain Summary Curves, Grid time history curves and pasted ascii curves ( See below ).
+See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)
 
-A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor) dialog will then open. The usage of the dialog is described [here]({{ site.baseurl }}/docs/summaryploteditor).
+### Pasted Ascii Curves
+
+You can copy an ascii table directly from Excel or any text source and paste it directly into a Summary Plot using the command **Paste Excel Data to Summary Plot**. A dialog will open showing some import options along with the text on the clip-board.
+Each column will end up as a *Pasted Ascii Curve* in the Summary Plot.
 
 ![]({{ site.baseurl }}/images/SummaryPlotTree.png)
 
