@@ -5,4 +5,3 @@ permalink: /docs/observeddata/
 published: true
 ---
 
-# Observed Data
