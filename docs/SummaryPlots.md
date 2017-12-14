@@ -60,8 +60,8 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
     - **Auto** -- Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
     - **Decimal** -- Legend numbers are displayed using decimal notation
     - **Scientific** -- Legend numbers are displayed using scientific notation (ie. 1.2e+6)
-  - **Number of Decimals** -- Controls the number of digits after ".". (For  **Decimal** or **Scientific** fromat options.)
-  - **Scale Factor** -- "Moves" the scale value away from the values along the axis and into the unit on the axis title. (For  **Decimal** or **Scientific** fromat options.)
+  - **Number of Decimals** -- Controls the number of digits after ".". (For  **Decimal** or **Scientific** format options.)
+  - **Scale Factor** -- "Moves" the scale value away from the values along the axis and into the unit on the axis title. (For  **Decimal** or **Scientific** format options.)
   - **Max and Min** -- Defines the visible y range 
   - **Font Size** -- The font size used for the values shown at the ticks on the axis   
 
@@ -81,6 +81,107 @@ The command context command **Show Plot Data** will show a window containing the
 
 It is also possible to save the ascii data to a file directly by using the context command **Export Plot Data to Text File** on the plot. 
 
+
+## Summary Curves
+
+Summary curves are normally created using the **Plot Editor** see TODO Ref SummaryPlotEditor, but can be created directly using 
+the context menu in the **Main Plot Window Project Tree**. Right click a Summary Plot, the Summary Curves folder or an existing curve and select the command ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
+
+![]({{ site.baseurl }}/images/summary_curve_properties.png)
+
+The property panel is divided in three main groups of options:
+
+- **Summary Vector** -- Options selecting the value to plot 
+- **Appearance Settings** -- Options controlling the color, symbol etc of the curve
+- **Curve Name Configuration** -- Controls how the curve is labeled in the legend
+
+### Summary Vector
+
+This group of options is used to define the summary vector data that the curve will display. 
+
+- **Case** -- Selects the imported Summary or Observed Data case to use as source.
+- **Vector** -- Displays a short name/ acronyme of the selected vector
+- **Axis** -- Controls whether the curve is to be associated with the left or right Y-Axis 
+
+To optional ways to select the curve data are available: The **Vector Selection Dialog** and the **Vector Selection Filter**.
+
+The first is accessed by clicking the button **Vector Selection Dialog**. This opens a dialog similar to the one used as Plot Editor.
+
+The **Vector Selection Filter** group of options is a different way of selecting the curve data:
+- **Search** -- This option controls the filtering mode. Several are available and controls witch search fields that are made available. The search modes are described below 
+- *Options depending on Search Mode* -- Described below. 
+- *list of vector names* -- This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want to plot.
+
+In the following, all the search fields are wildcard-based text filters. An empty search string will match anything: any value or no value at all. A single _`*`_ however, will only match something: There has to be some value for that particular quantity to make the filter match.
+
+The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) being addressed. 
+
+#### Search Modes with filter fields
+
+- **All** -- A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg. _`"*:*, 55, *"`_ or _`"WBHP:*"`_. This mode is the default.
+   - **Filter** -- The actual filter text to apply
+- **Field** -- Select Field related vectors only
+  -  **Vector name** -- Filter for Field related vector names 
+- **Well** -- Select Well related vectors only
+   - **Vector name** -- Filter for Well related vector names 
+   - **Well name** --  Well name filter 
+- **Group** - Select Group related vectors only
+   - **Vector name** -- Filter for Group related vector names 
+   - **Group name** --  Group name filter 
+- **Completion**   -- Select Completion related vectors only
+   - **Vector name**  -- Filter for Completion related vector names 
+   - **Well name** --  Well name filter 
+   - **I, J, K** -- Text based filter of the I, J, K value string of the completion. Eg _`"18,*,*"`_ to find vectors with I = 18 only 
+- **Segment** -- Select Segment related vectors only    
+   - **Vector name**  -- Filter for Segment related vector names 
+   - **Well name** -- Well name filter 
+   - **Segment number** -- Text based filter of the segment numbers
+- **Block** -- Select I, J, K -- Block related vectors only 
+   - **Vector name**  -- Filter for cell Block related vector names 
+   - **I, J, K** -- Text based filter of the I, J, K value string of the Block. 
+- **Region** -- Select Region related vectors only  
+   - **Vector name**  -- Filter for Region related vector names 
+   - **Region number** -- Text based filter of the Region numbers
+- **Region-Region** -- Select Region to Region related vectors only  
+   - **Vector name**  -- Filter for Region to Region related vector names 
+   - **Region number** -- Text based filter of the first Region number
+   - **2. Region number** -- Text based filter of the second Region number
+- **Lgr-Well** -- Select Well in LGR related vectors only
+   - **Vector name** -- Filter for Well in Lgr related vector names 
+   - **Well name** -- Well name filter 
+   - **Lgr name** -- Lgr name filter 
+- **Lgr-Completion** -- Select Completion in LGR related vectors only
+   - **Vector name** -- Filter for Well in Lgr related vector names 
+   - **Well name** --  Well name filter 
+   - **Lgr name** -- Lgr name filter 
+   - **I, J, K** -- Text based filter of the I, J, K value string of the completion in the Lgr.
+- **Lgr-Block** -- Select I, J, K - Block in LGR related vectors only
+   - **Vector name**  -- Filter for cell Block related vector names 
+   - **Lgr name** -- Lgr name filter 
+   - **I, J, K** -- Text based filter of the I, J, K value string of the Block in the Lgr. 
+- **Misc** -- Select vectors in the Misc category only 
+   - **Vector name** -- Filter for Misc category vector names 
+- **Aquifer** -- Select Aquifer category vectors only 
+   - **Vector name** -- Filter for Aquifer category vector names 
+- **Network** -- Select Network category vectors only  
+   - **Vector name** -- Filter for Network category vector names 
+- **All (Advanced)** -- This is a complete combined search mode with all the different search options available to create advanced cross item type searches.  
+
+### Curve Name 
+
+The user can control the curve name used in the plot legend by using these options.
+
+- **Contribute To Legend** -- This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
+- **Auto Name** -- If enabled, ResInsight will create a name for the curve automatically based on the settings in this option group.
+- **Curve Name** -- If **Auto Name** is off, you can enter any name here. If empty, the curve will be removed from the legend, but still visible in the plot.
+- **Case Name, Vector name ...** etc. -- These options controls what part of the summary vector information to use in the curve auto-name.
+
+## Copy and Paste 
+
+Copy and Paste of selections of Summary Plots and Curves, is possible using the Project Tree Context menu and standard keyboard shortcuts (CTRL-C/CTRL-V).
+
+
+------------------------------------------------------------------------------------------------
 ## Summary Curve Filter
 
 A Summary Curve filter is a simplified way of creating and controlling many related curves at the same time. It enables efficient search options to select a sensible subset of vectors and controls the appearance and naming of the resulting curves.
@@ -179,26 +280,3 @@ The user can control the curve names by toggling what part of the summary vector
 
 This option controls whether the curves created by the filter will be visible in the plot legend at all. In addition will  Curves with an empty name also be removed from the legend.  
 
-## Summary Curve
-A new curve can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
-
-![]({{ site.baseurl }}/images/summary_curve_properties.png)
-
-Many of the properties of a single curve is similar to the properties described for a curve filter. There are some differences, however:
-
-### Appearance
-
-The curve's appearance is controlled directly, and not automatically as for **Curve Filters**.
-<div class="note">
-The appearance set on a curve in a <b>Curve Filter</b> will override the settings in the <b>Curve Filter</b> until the <b>Curve Filter</b> settings are applied again. Then the local changes on the curve are overwritten. 
-</div>
-
-### Curve Name
-
-- **Contribute To Legend** -- This option controls whether the curve will be visible in the plot legend at all. A curves with an empty name will also be removed from the legend. 
-- **Auto Name** -- If enabled, ResInsight will create a name for the curve automatically based on the settings in this option group.
-- **Curve Name** -- If **Auto Name** is off, you can enter any name here. If empty, the curve will be removed from the legend, but still visible in the plot.
-
-## Copy and Paste 
-
-Copy and Paste of selections of Summary Plots, Curves, or Curve Filter is possible using the Project Tree Context menu and standard keyboard shortcuts (CTRL-C/CTRL-V).
