@@ -56,15 +56,14 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
   - **Font Size** --  Defines the font size used by the axis title 
 - **Axis Values**
   - **Logarithmic Scale**  - Draw plot curves using a logarithmic scale 
-  - **Number Format** -- Defines how the legend numbers are formatted 
+  - **Number Format** -- Defines how the legend numbers are formatted
+    - **Auto** -- Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
+    - **Decimal** -- Legend numbers are displayed using decimal notation
+    - **Scientific** -- Legend numbers are displayed using scientific notation (ie. 1.2e+6)
+  - **Number of Decimals** -- Controls the number of digits after ".". (For  **Decimal** or **Scientific** fromat options.)
+  - **Scale Factor** -- "Moves" the scale value away from the values along the axis and into the unit on the axis title. (For  **Decimal** or **Scientific** fromat options.)
   - **Max and Min** -- Defines the visible y range 
-  - **Font Size** -- The font size used for the values shown at the ticks on the axis 
-  
-#### Number Format
-
-- **Auto** -- Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
-- **Decimal** -- Legend numbers are displayed using decimal notation
-- **Scientific** -- Legend numbers are displayed using scientific notation (ie. 1.2e+6)
+  - **Font Size** -- The font size used for the values shown at the ticks on the axis   
 
 ### Plot mouse interaction
 
