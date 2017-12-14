@@ -4,10 +4,9 @@ title: Grid Statistics Dialog
 permalink: /docs/gridstatisticsdialog/
 published: true
 ---
+![]({{ site.baseurl }}/images/GridStatisticsDialog.png)
 
 ResInsight 3D Views has an [info box]({{ site.baseurl }}/docs/reservoirviews#info-box) in the upper right corner displaying statistics for the current view. A more detailed version of this information may also be displayed in a separate dialog window. Right click on the 3D view background and select **Grid Statistics** to bring up the dialog.
-
-![]({{ site.baseurl }}/images/GridStatisticsDialog.png)
 
 ## Grid Statistics Dialog Fields
 The dialog consist of three information parts.
