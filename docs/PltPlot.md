@@ -76,7 +76,9 @@ The curve selection group lets the user control which component(s) of the PLT da
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
 
-![]({{site.baseurl}}/images/RftPltFormationNames.png)
+<p align="center">
+  <img src="{{site.baseurl}}/images/RftPltFormationNames.png"/>
+  PLT plot property editor
 
 Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
 
@@ -85,7 +87,9 @@ Please see the [full documentation]({{site.baseurl}}/docs/formations) on the for
 </div>
 
 ### Legend and Axis
-![]({{site.baseurl}}/images/PltLegendAndAxis.png)
+<p align="center">
+  <img src="{{site.baseurl}}/images/PltLegendAndAxis.png"/>
+</p>
 
 This property editor lets the user control visual properties for the legend and axis.
 - **Depth Type** -- Select depth type, _Measured Depth_ or _Pseudo Length_
