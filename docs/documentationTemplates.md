@@ -15,6 +15,19 @@ a new Project Tree and Property Editor by using the command <b>Windows->New Proj
 The <code>*.rsp</code> file is an XML file, and can be edited by any text editor.  
 </div>
 
+#### A info type "block" (with (i) )
+<div class="note info">
+If the well trajectory file is changed and you would like a running ResInsight to update accordingly, you will need to delete all the well trajectories that emerge from that file, and import it again.
+</div>
+
 #### Monospace/Code etc.
 
 Monospace without the annoying box around it : _`*.GRDECL`_ 
+Monospace with the annoying box `*.SMSPEC`
+
+##### Block of monospace:
+
+    WELLNAME: WELL1
+    6507.1	725	2542	2590
+    -999
+   
