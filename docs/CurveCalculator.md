@@ -13,7 +13,7 @@ The calculator can be run by pressing the calculator icon ![]({{ site.baseurl }}
 To make a new calculated curve, click on **New Calculation**. This will add a new calculation to **Calculated Summaries**. Before choosing which curves to do calculations on, a calculation expression must be made. The default expression *Calculation_1 := x + y* will do a vector addition on the curves which *x* and *y* are placeholdes for, and assign it to the calculation *Calculation_1*. How to assign curves to assign to *x* and *y* will be covered in section [Summary Address Selection](#summaryAddressSelection). 
 
 ### Operators and Functions
-Possible operations and functions are found by right-clikcing in the expression window. The following tables show all the options available.
+Possible operations and functions are found by right-clicking in the expression window. The following tables show all the options available.
 
 #### Assignment Operators
 
@@ -86,7 +86,7 @@ Possible operations and functions are found by right-clikcing in the expression 
 It is possible to add a unit to the calculated curve, in the field *Unit* beneath the expression field. This will be used as the label on the y-axis when the curve is used in a plot.
 
 ## <a name="summaryAddressSelection"> Summary Address Selection </a>
-An expression consists of placeholders (variables) for curves (summary address). By clicking **Parse Expession**, the variables will appear in the table below the settings. To assign a summary address to a variable, click **Edit**. This action will create a **Summary Address Selection** dialog. Use the dialog to select a summary address and press OK. Repeat the procedure for all the variables.
+An expression consists of placeholders (variables) for curves (summary address). By clicking **Parse Expession**, the variables will appear in the table below the settings. To assign a summary address to a variable, click **Edit**. This action will open a **Summary Address Selection** dialog. Use the dialog to select a summary address and press **OK**. Repeat the procedure for all the variables.
 
 ## Generating Curves
 After assigning summary addresses to all variables, click **Calculate** to evaluate the expression. The curve is saved and can be accessed in the following ways.
