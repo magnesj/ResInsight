@@ -4,16 +4,15 @@ title: Summary Plot Editor
 permalink: /docs/summaryploteditor/
 published: true
 ---
+![]({{site.baseurl}}/images/SummaryPlotEditor.png)
 
 The plot editor is a separate ResInsight dialog window where the user can select which vectors to display in a summary plot. It is also possible to edit an existing plot in this editor.
 
 The upper part of the editor contains editors for selecting which vectors/summaries to display in the plot. The number of fields vary from 3 to 6 depending on the summary type currently highlighted. Dynamic field are hidden if the highlighted summary category does not have any sub-fields.
 
 <div class="note">
-In this context <b>highlight</b> means a marked field item that has a light blue background (only one at a time), while <b>selected</b> means an item or items that have a ticked check box.
+In this context <b>highlighted</b> means the marked item with a different background color, while <b>selected</b> means an item or items that have a ticked check box.
 </div>
-
-![]({{site.baseurl}}/images/SummaryPlotEditor.png)
 
 ## Selection Fields
 This section describes the different selection fields in the selection part of the plot editor. A complete/valid vector selection consists of a selected source, a selected summary category, a selected item in each dynamic field (if any) and a selected vector/summary.
