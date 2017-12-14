@@ -5,17 +5,18 @@ permalink: /docs/rftplot/
 published: true
 ---
 
-An RFT (_Repeated Formation Tester_) plot is a special well plot for displaying observed formation pressure and simulated formation pressure, and for comparing those. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data may be a part of the grid model (\*.rft) and observed pressure data are loaded from well log files (\*.las).
-
 ![]({{site.baseurl}}/images/RftPlot.png)
+
+An RFT (_Repeated Formation Tester_) plot is a special well plot for comparing observed formation pressure and simulated formation pressure. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data is retreived directly from the grid model or from the corresponding (\*.rft) files, while observed pressure data are loaded from well log files (\*.las).
+
 
 ## Create New RFT Plot
 There are several ways to create new RFT Plots.
 
-**From the Plot Object Project Tree**
+**From the Project Tree in the Plot Main Window**
 - Select context command **New RFT Plot** for _Well Path_ node or _RFT Plots_ node.
 
-**From the Project Tree**
+**From the Project Tree in the Main Window**
 - Select context command **New RFT plot** for a simulation well.
 
 **From the 3D view**
