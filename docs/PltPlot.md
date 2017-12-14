@@ -78,7 +78,7 @@ This property editor lets the user control how formations are handled. This is w
 
 <p align="center">
   <img src="{{site.baseurl}}/images/RftPltFormationNames.png"/>
-  PLT plot property editor
+</p>
 
 Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
 
