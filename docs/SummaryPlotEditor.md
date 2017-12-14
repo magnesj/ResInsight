@@ -62,12 +62,12 @@ This field contains the summaries/vectors for the highlighted summary category.
 ## Preview Plot
 When a complete/valid vector exists, one or more curves will appear in the preview plot. Each curve will also have a corresponding item in the curves field in the lower left corner. Visibility for the curves may be controlled by the checkboxes. Each curve is automatically assigned a name and appearance. However the user may modify these settings in the *Curve Name Configuration* and *Curve Appearance Assignment* fields.
 
-### Curve Name Configuration
+### Plot and Curve Name Configuration
 <p align="center">
   <img src="{{site.baseurl}}/images/CurveNameConfig.png"/>
 </p>
 
-The checkboxes in this field control which information elements to include in the curve name. The checkboxes are self-explanatory. Toggling some of the checkboxes will have no effect on some curves depending on which information elements are relevant for each curve.
+The checkboxes in this field control which information elements to include in the curve name. Toggling some of the checkboxes will have no effect on some curves depending on which information elements are relevant for each curve.
 
 ### Curve Appearance Assignment
 Curves created are assigned individual visual properties like colors and symbols in a systematic manner to make the plots easy to read. Different aspects of the vectors are assigned to different curve appearances. Eg. using symbols to distinguish cases, while using colors to distinguish quantity.
@@ -84,12 +84,21 @@ When disabling the **Auto** option, you can select which of the visual curve pro
 
 The **Apply** button must be clicked to apply the new settings to all curves.
 
+<div class="note">
+Assignment of curve appearance are incremental, and can end up as sub optimal if adding curves in several steps.
+Press the <b>Apply</b> button to apply consistent appearance settings according to the current curve selection.
+</div>
+
 ### Target Plot
 <p align="center">
   <img src="{{site.baseurl}}/images/TargetPlot_new.png"/>
   <img src="{{site.baseurl}}/images/TargetPlot_1.png"/>
 </p>
 
-In the bottom of the dialog window **Target Plot** may be specified. A target plot is a summary plot in ResInsight that will receive the curves from the preview plot when the **OK** or **Apply** button is clicked. If the curve creator was opened from an **Edit Summary Plot** command, the default target plot is set to the source plot. Otherwise the default target plot is set to **(new plot)**. In that case a small dialog will ask the user to enter a target plot name when the **OK** or **Apply** button is clicked. A new summary plot will then be created in the project tree containing all curves from the preview plot.
+In the bottom of the dialog window **Target Plot** may be specified. The target plot is the summary plot that will receive the selected curves when the **OK** or **Apply** button is clicked. 
+
+By default the target plot is set to **(new plot)** or to the plot selected for editing when invoking the command. 
+
+Setting the targt plot to a different plot will add the selected curves to that plot when pressing the the **OK** or **Apply** button.
 
 
