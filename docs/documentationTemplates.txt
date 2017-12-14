@@ -1,10 +1,16 @@
 #### Including an image:
 
-![]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
+![Hower Name Of Picture]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
 
-#### Reference a different document
+#### References 
 
 [ Result Inspection ]({{ site.baseurl }}/docs/resultinspection)
+
+References to a specific heading whithin a document:
+
+See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
+
+The heading lowercase with dash instead of space
 
 #### A hint type "block" (with star)
 
