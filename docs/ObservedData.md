@@ -5,7 +5,7 @@ permalink: /docs/observeddata/
 published: true
 ---
 
-Observed data, or *Observed Time History Data*, is data measured in time. Observed data can be plotted along with summary data in **Summary Plots**.
+Observed data, or *Observed Time History Data*, is data measured in time. On import of observed data, ResInsight translates the data to make it similar to summary data. Observed data can be plotted along with summary data in **Summary Plots**.
 
 ## Import Observed Data
 
@@ -17,10 +17,11 @@ Which summaries that has been detected in a Observed data file can be read in an
 
 ![]({{ site.baseurl }}/images/observedDataProperty.png)
 
-### TODO: file format
+## File Formats
+Seek "User data file formats" in **Eclipse: File Formats Reference Manual** for details.
 
 ## Viewing Observed Data
 
 ![]({{ site.baseurl }}/images/observedDataCurveCreator.png)
 
-To plot Observed Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed data will appear in **Sources** together with summary cases. How to use the Plot editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed data points are plotted as crosses by default.
+To plot Observed Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed data will appear in **Sources** together with summary cases. How to use the Plot Editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed data points are plotted without lines by default.
