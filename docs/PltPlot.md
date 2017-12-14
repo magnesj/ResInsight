@@ -5,18 +5,18 @@ permalink: /docs/pltplot/
 published: true
 ---
 
-An PLT plot is a special well plot displaying PLT (Production Log Tool) data against measured depth (MD). PLT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
-
 ![]({{site.baseurl}}/images/PltPlot.png)
+
+A PLT (Production Log Tool) plot is a special well plot for comparing observed production (well flow rates) and simulated production. The curves are plotted as production against measured depth (MD). Simulated pressure data is retreived directly from the grid model or from the corresponding (\*.rft) files, while observed pressure data are loaded from well log files (\*.las).
 
 ## Create New PLT Plot
 There are several ways to create new PLT Plots
 
-**From the Plot Object Project Tree**
-- Select context command **New PLT Plot** for a _Well Path_ node or the _PLT Plots_ node.
+**From Project Tree in the Plot Main Window**
+- Select context command **New PLT Plot** for the _PLT Plots_ node.
 
-**From the Project Tree**
-- Select context command **New PLT Plot** for a simulation well.
+**From the Project Tree in the Main Window**
+- Select context command **New PLT Plot** for a _Well Path_ node or a _Simulation Well_ node.
 
 **From the 3D view**
 - Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
@@ -38,11 +38,11 @@ The property editor lets the user select which curves to display in the PLT plot
 </p>
 
 ### Well Name
-A PLT plot is always related to a well path. The **Well Name** field contains the selected well path. Only observed well paths are displayed.
+Select the well to display in the plot. Only observed well paths are displayed.
 
 ### Sources
-The **Sources** field shows the sources for the selected well path should appear in the sources field. The different sources are grouped in three different groups:
-- **RFT File Cases** -- Cases imported from \*.rft file(s) included in the simulation output case. (The keyword _WRFTPLT_ was used in the schedule file during simulation output generation)
+After a well has been selected in the Well Name field, sources for that well should appear in the sources field. The sources are placed in one of three different groups:
+- **RFT File Cases** -- Simulation cases may have associated PLT data in _\*.rft_ file(s). If the simulation case contains such files, those are imported together with the simulation case (See the keyword `WRFTPLT` in the Eclipse manual for information)
 - **Grid Cases** -- Simulation cases
 - **Observed Cases** -- Observed data imported from well log files and well path files
 
@@ -58,20 +58,20 @@ The **Time Steps** field contains available time steps for the selected source(s
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
-- **O** -- Indicates that the current time step is from observed data
-- **R** -- Indicates that the current time step is from RFT data
-- **G** -- Indicates that the current time step is from Grid data
+- **O** -- Time step is from observed data
+- **R** -- Time step is from RFT data
+- **G** -- Time step is from Grid data
 
 More than one letter for one single time step, means that the time steps is from multiple case types.
 
 ### Curve Selection
-The curve selection group lets the user control what to display.
+The curve selection group lets the user control which component(s) of the PLT data to display.
 - **Standard Volume** --
 - **Reservoir Volume** --
-- **Oil** -- Check to display the oil component
-- **Gas** -- Check to display the gas component
-- **Water** -- Check to display the water component
-- **Total** -- Check to display the total component
+- **Oil** -- The oil component
+- **Gas** -- The gas component
+- **Water** -- The water component
+- **Total** -- Sum of all three components
 
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
