@@ -46,15 +46,17 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 ### Y-axis properties
 
 ![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
-
-- **Auto Title** -- If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. 
-- **Title** -- If **Auto Title** is disabled, the plot title is set using this field 
-- **Title Position** -- Controls the position of the title. Center or At End 
-- **Font Size** --  Defines the font size used by the axis title 
-- **Logarithmic Scale**  - Draw plot curves using a logarithmic scale 
-- **Number Format** -- Defines how the legend numbers are formatted 
-- **Max and Min** -- Defines the visible y range 
-
+- **Axis Title**
+  - **Auto Title** -- If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. 
+  - **Title** -- If **Auto Title** is disabled, the plot title is set using this field 
+  - **Title Position** -- Controls the position of the title. Center or At End 
+  - **Font Size** --  Defines the font size used by the axis title 
+- **Axis Values**
+  - **Logarithmic Scale**  - Draw plot curves using a logarithmic scale 
+  - **Number Format** -- Defines how the legend numbers are formatted 
+  - **Max and Min** -- Defines the visible y range 
+  - **Font Size** -- The font size used for the values shown at the ticks on the axis 
+  
 #### Number Format
 
 - **Auto** -- Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
