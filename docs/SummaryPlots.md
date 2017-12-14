@@ -17,7 +17,7 @@ A selection of cases can be grouped by right-clicking  a selection of summary ca
 
 A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain Summary Curves, Grid time history curves and pasted ascii curves ( See below ).
 
-A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor] ({{ site.baseurl }}/docs/summaryploteditor) dialog will then open. The usage of the dialog is described [here] ({{ site.baseurl }}/docs/summaryploteditor).
+A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor) dialog will then open. The usage of the dialog is described [here]({{ site.baseurl }}/docs/summaryploteditor).
 
 ![]({{ site.baseurl }}/images/SummaryPlotTree.png)
 
@@ -84,7 +84,7 @@ It is also possible to save the ascii data to a file directly by using the conte
 
 ## Summary Curves
 
-Summary curves are normally created using the **Plot Editor** see [Summary Plot Editor] ({{ site.baseurl }}/docs/summaryploteditor), but can be created directly using 
+Summary curves are normally created using the **Plot Editor** see [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor), but can be created directly using 
 the context menu in the **Main Plot Window Project Tree**. Right click a Summary Plot, the Summary Curves folder or an existing curve and select the command ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
 
 ![]({{ site.baseurl }}/images/summary_curve_properties.png)
@@ -105,7 +105,7 @@ This group of options is used to define the summary vector data that the curve w
 
 To optional ways to select the curve data are available: The **Vector Selection Dialog** and the **Vector Selection Filter**.
 
-The first is accessed by clicking the button **Vector Selection Dialog**. This opens a dialog similar to the one used as Plot Editor. See [Summary Plot Editor] ({{ site.baseurl }}/docs/summaryploteditor).
+The first is accessed by clicking the button **Vector Selection Dialog**. This opens a dialog similar to the one used as Plot Editor. See [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
 The **Vector Selection Filter** group of options is a different way of selecting the curve data:
 - **Search** -- This option controls the filtering mode. Several are available and controls witch search fields that are made available. The search modes are described below 
