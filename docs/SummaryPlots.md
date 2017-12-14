@@ -47,8 +47,11 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
 
 ![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
 - **Axis Title**
-  - **Auto Title** -- If enabled, the y-axis title is derived from the vectors associated with the axis. Names and unit are used. 
+  - **Auto Title** -- If enabled, the y-axis title is derived from the vectors associated with the axis. Long names, acronymes  and unit can be used. 
+    - **Names** -- Use the long name of the quantities
+    - **Acronymes** -- Add the shortname/acronyme of the quantities
   - **Title** -- If **Auto Title** is disabled, the plot title is set using this field 
+- **Title Layout**
   - **Title Position** -- Controls the position of the title. Center or At End 
   - **Font Size** --  Defines the font size used by the axis title 
 - **Axis Values**
