@@ -6,7 +6,7 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
 
-ResInsight can create summary plots based on vectors from SUMMARY files (_`*.SMSPEC`_) and imported Observed Time History Data. 
+ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.GRDECL`_ ) and imported Observed Time History Data. 
 
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
