@@ -6,16 +6,16 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
 
-ResInsight can create summary plots based on vectors from SUMMARY files (`*.SMSPEC`). 
+ResInsight can create summary plots based on vectors from SUMMARY files (`*.SMSPEC`) and imported Observed Time History Data. 
 
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
-Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. A selection of cases can be grouped by clicking **Group Summary Cases** in a summary case or a selection of summary cases' context menu. After group creation, summary cases can be drag and dropped between summary groups.
+Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
-When a summary case has been imported, a Summary Plot with a default **Curve Filter** is created. This default behaviour can be configured in the  [ Preferences ]({{ site.baseurl }}/docs/preferences).
+A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command: **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups.
 
 ## Summary Plots
 
-A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain **Summary Curve Filters** and **Summary Curves** ( See below ).
+A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain Summary Curves, Grid time history curves and pasted ascii curves ( See below ).
 
 A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. 
 
