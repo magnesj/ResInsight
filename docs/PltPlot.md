@@ -5,7 +5,7 @@ permalink: /docs/pltplot/
 published: true
 ---
 
-An PLT plot is a special well plot displaying PLT (Production Log Tool) data against measured depth (TVD). PLT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
+An PLT plot is a special well plot displaying PLT (Production Log Tool) data against measured depth (MD). PLT data may be a part of the grid model or may be loaded from well log files (\*.LAS) and well path files (\*.dev, \*.json etc.).
 
 ![]({{site.baseurl}}/images/PltPlot.png)
 
@@ -22,17 +22,12 @@ There are several ways to create new PLT Plots
 - Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
 
 ## Plot Observed Data
-To be able to plot observed
+To be able to plot observed PLT data for a well, a well log file containing PLT data must be imported. PLT data in a well log file is expected to have column names:
 
-...
-
-
-If an imported well log file does not contain PLT data, that data source (_Observed data_) will not be visible in the sources field in the property editor. PLT data in a well log file is expected to have column names:
-
-- Oil: _QOZT_, _QOIL_, _xxxx_QOIL_
-- Gas: _QOZT_, _QGAS_, _xxxx_QGAS_
-- Water: _QGZT_, _QWAT_, _xxxx_QWAT_
-- Total: _QTZT_, _QTOT_, _xxxx_QTOT_
+- Oil: `_QOZT_, _QOIL_, _xxxx_QOIL_`
+- Gas: `_QOZT_, _QGAS_, _xxxx_QGAS_`
+- Water: `_QGZT_, _QWAT_, _xxxx_QWAT_`
+- Total: `_QTZT_, _QTOT_, _xxxx_QTOT_`
 
 ## Property Editor
 The property editor lets the user select which curves to display in the PLT plot.
