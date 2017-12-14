@@ -16,13 +16,13 @@ There are several ways to create new RFT Plots.
 **From the Project Tree in the Plot Main Window**
 - Select context command **New RFT Plot** for _Well Path_ node or _RFT Plots_ node.
 
-**From the Project Tree in the Main Window**
+**From the Project Tree in the 3D Main Window**
 - Select context command **New RFT plot** for a simulation well.
 
-**From the 3D view**
+**From a 3D view**
 - Right-click a simulation well select **Well Plots -> New RFT Plot**.
 
-## Plot Observed Data
+## Import Observed RFT Data
 To be able to plot observed pressure data for a well in an RFT plot, at least one well log file from that well (e.g. \*.las) have to be imported to ResInsight. This file must contain a pressure column, which must have the name _PRESSURE_ or _PRES_FORM_. If the well log file itself does not contain a TVD column (named _TVDMSL_), a well path file (See [Well Trajectories]({{site.baseurl}}/docs/wellpaths)) for the same well must also be imported to ResInsight.
 
 If no TVD data for a well is found when the user tries to plot a curve, ResInsight will present a warning dialog to the user.
@@ -41,30 +41,29 @@ The property editor lets the user select which curves to display in the RFT plot
 </p>
 
 ### Well Name
-Select the wanted well to display in the plot. Wells postfixed by _'(Well Path)'_ have associated observed data in addition to simulated data.
+Select the well to display in the plot. Wells postfixed by _'(Well Path)'_ have an associated well trajectory loaded.
 
 ### Sources
-After a well has been selected in the Well Name field, sources for that well should appear in the sources field. The sources are placed in one of three different groups:
+After a well has been selected in the Well Name field, the relevant sources for that well will appear in the sources field. The sources are placed in one of three different groups:
 - **RFT File Cases** -- Simulation cases may have associated formation pressure data in _\*.rft_ file(s). If the simulation case contains such files, those are imported together with the simulation case (See the keyword `WRFTPLT` in the Eclipse manual for information)
-- **Grid Cases** -- Simulation cases
+- **Grid Cases** -- The PRESSURE property in the 3D grid
 - **Observed Cases** -- Observed data imported from well log files
 
-When the user selects a source, time steps for that source appears in the **Time Steps** field.
+When the user selects one or more sources, a selection of their time steps appears in the **Time Steps** field.
 
 ### Time Steps
-The **Time Steps** field contains available time steps for the selected source(s). Some combinations of selected sources may display a filtered list of time steps instead of the union of all time steps for all selected sources. The policy is as follows:
-1. **Exclusively grid cases selected**. All available time steps for the selected grid cases are displayed.
-2. **Grid case(s) and observed data selected**. Time steps shown are
-  - The time steps from the observed case
-  - The first time step from the grid case(s)
-  - If no time steps from grid cases match the observed time step, display the two adjacent grid case time steps.
-3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2, except from RFT cases behaving as observed data.
-4. **All types of cases selected**. Same display logic as point 2, except from RFT File case time steps are treated as grid time steps.
+The **Time Steps** field contains the relevant time steps according to the source selection. Time steps are deemed to be relevant by the following rules:
+1. If a single source or sources of the same type are selected, all cvailable timesteps in those sources are shown.
+2. If sources from two or tree types are selected, the time steps are filtered: 
+  - The time steps matching the observed case(s) time steps
+  - If no time steps from a case match the observed time step, the two adjacent ones are shown.
+  - The first time step from any grid case(s) (as initial pressure reference)
+If the Observed data isn't selected, the RFT data serves as filter reference. 
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
-- **O** -- Time step is from observed data
-- **R** -- Time step is from RFT data
-- **G** -- Time step is from Grid data
+- **O** -- Time step has observed data
+- **R** -- Time step has RFT data
+- **G** -- Time step has Grid data
 
 More than one letter for one single time step, means that the time steps comes from multiple case types.
 
