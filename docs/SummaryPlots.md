@@ -12,7 +12,7 @@ A new plot can be created by using the context menu of a plot selecting ![]({{ s
 
 ## Plot Data
 
-ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SMSPEC`_ ), imported Observed Time History Data  (See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)), pasted ascii data and properties from the 3D grid.
+ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SMSPEC`_ ), imported Observed Time History Data, Grid Cell Time history Curve and pasted ascii curves. 
 
 ### SUMMARY Files
 
@@ -121,7 +121,7 @@ This group of options is used to define the summary vector data that the curve w
 - **Axis** -- Controls whether the curve is to be associated with the left or right Y-Axis 
 
 <div class="note">
-Switching the Y-Axis for several curves in one go can be done using the context command **Switch Plot Axis**.  
+Switching the Y-Axis for several curves in one go can be done using the context command <b>Switch Plot Axis</b>.  
 </div>
 
 To optional ways to select the curve data are available: The **Vector Selection Dialog** and the **Vector Selection Filter**.
