@@ -114,5 +114,5 @@ This window displays three different graphs describing the overall behaviour of 
     - **Max Time of Flight [days]** -- Only cells with a Time of Flight value less then this value are used. 
 - **Options**
   - **Legend** -- Toggles the legend on/off
-  - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells with a pore volume larger than threshold _`*`_ total porevolume are excluded.
+  - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells are excluded if their pore volume are larger than threshold _`*`_ total porevolume.
   
