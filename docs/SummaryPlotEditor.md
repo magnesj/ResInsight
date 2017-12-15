@@ -63,9 +63,7 @@ This field contains the summaries/vectors for the highlighted summary category.
 When a complete/valid vector exists, one or more curves will appear in the preview plot. Each curve will also have a corresponding item in the curves field in the lower left corner. Visibility for the curves may be controlled by the checkboxes. Each curve is automatically assigned a name and appearance. However the user may modify these settings in the *Curve Name Configuration* and *Curve Appearance Assignment* fields.
 
 ### Plot and Curve Name Configuration
-<p align="center">
-  <img src="{{site.baseurl}}/images/CurveNameConfig.png"/>
-</p>
+![]({{site.baseurl}}/images/CurveNameConfig.png)
 
 The checkboxes in this field control which information elements to include in the curve name. Toggling some of the checkboxes will have no effect on some curves depending on which information elements are relevant for each curve.
 
@@ -74,9 +72,7 @@ Curves created are assigned individual visual properties like colors and symbols
 
 These assignments can be controlled using the options in the **Curve Appearance Assignment** group. 
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/CurveAppearanceAssignment.png"/>
-</p>
+![]({{site.baseurl}}/images/CurveAppearanceAssignment.png)
 
 When set to **Auto** ResInsight assigns visual properties based on the present vector categories and the number of different values in each category.
 
@@ -90,15 +86,11 @@ Press the <b>Apply</b> button to apply consistent appearance settings according 
 </div>
 
 ### Target Plot
-<p align="center">
-  <img src="{{site.baseurl}}/images/TargetPlot_new.png"/>
-  <img src="{{site.baseurl}}/images/TargetPlot_1.png"/>
-</p>
+![]({{site.baseurl}}/images/TargetPlot_new.png)
+![]({{site.baseurl}}/images/TargetPlot_1.png)
 
 In the bottom of the dialog window **Target Plot** may be specified. The target plot is the summary plot that will receive the selected curves when the **OK** or **Apply** button is clicked. 
 
 By default the target plot is set to **(new plot)** or to the plot selected for editing when invoking the command. 
 
 Setting the targt plot to a different plot will add the selected curves to that plot when pressing the the **OK** or **Apply** button.
-
-
