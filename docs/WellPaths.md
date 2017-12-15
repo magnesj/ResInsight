@@ -103,9 +103,7 @@ Well log data is usually imported from LAS-files (_\*.las_). LAS-files can be im
 ResInsight will look for the the well name in the imported LAS-files among the existing **Well Paths**.
 If a match is found, the LAS-file is placed as a child of that trajectory. If not, a new empty well path entry is created with the imported LAS-file under it. A well path may have more than one LAS-files as children.
 
-<p align="center">
-  <img src="{{ site.baseurl }}/images/LasFilesInTree.png"/>
-</p>
+![]({{ site.baseurl }}/images/LasFilesInTree.png)
 
 If the LAS-file does not contain a well name, the file name is used instead. 
 
@@ -125,10 +123,7 @@ Well log names may vary slightly among different files from the same well. When 
 ### Well Path Property Editor
 The well path property editor lets the user control the appearance of the well path and associate the well path to a simulation well. It also gives some information about the well path metadata.
 
-<p align="center">
-  <img src="{{ site.baseurl }}/images/WellPathPropertyEditor.png"/><br/>
-  Well Path Property Editor
-</p>
+![]({{ site.baseurl }}/images/WellPathPropertyEditor.png)
 
 - **Appearance group** -- Settings in this group affect the well path appearance in the 3D view
 - **File group** -- Information about the well path file
