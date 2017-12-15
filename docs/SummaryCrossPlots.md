@@ -23,4 +23,7 @@ New Summary Cross Plot curves are created by using the context command ![]({{ si
 In this property editor, the editor group called **Summary Vector**, has been replaced by two vector selection groups **Summary Vector Y** and **Summary Vector X**, compared to an ordinary summary plot. Like the other property editor groups, the vector selection groups works the same way as in the ordinary summary plot. See the [detailed description]({{site.baseurl}}/docs/summaryplots#summary-curves).
 
 ### Cross Plotting
-Cross plotting creates a new vector from two input vectors. Each vector entry in the resulting vector consists of one vector item value from each of the two input vectors, having equal time steps. However, in most cases the two input vectors do not share the same time steps. To be able to create a resulting cross plot vector in such cases, linear interpolation between adjacent inpuyt vector items is being used.
+Cross plotting creates a new vector from two input vectors. Each vector entry in the resulting vector consists of one vector item value from each of the two input vectors, having equal time steps. However, in most cases the two input vectors do not share the same time steps. To be able to create a resulting cross plot vector in such cases, linear interpolation between adjacent input vector items is being used.
+
+When a time step _T_ in input vector _A_ is not found in input vector _B_, ResInsight interpolates between the two time steps closest to _T_ in vector _B_. In this way, ResInsight calculates an interpolated value for time step _T_ in vector _B_. If either the value at the current time step or one of the values involved in interpolation is a NULL value, the resulting vector will have a NULL value at the current time step.
+
