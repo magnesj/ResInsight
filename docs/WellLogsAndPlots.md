@@ -124,14 +124,7 @@ You can also create a LAS-curve by a simple drag-drop operation in the <b>Projec
 ResInsight has some support for reading and writing LAS files. In the following two sections this support is described.
 
 ### Importing LAS-files
-LAS-files can be imported using the command: **File->Import->Import Well Logs from File**.
-
-ResInsight will search for the the well name in the imported LAS-files among your existing **Well Trajectories**.
-If a match is found, the LAS-file is placed as a child of that trajectory. If not, a new empty trajectory entry is created with the imported LAS-file under it.
-
-![]({{ site.baseurl }}/images/LasFilesInTree.png)
-
-If the LAS-file does not contain a well name, the file name is used instead. 
+See [Importing Well Log Files]({{site.baseurl}}/docs/wellpaths#importing-well-log-files) for details on LAS file import.
 
 ### Exporting LAS-files
 
