@@ -6,15 +6,21 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsOverview.png)
 
-Flow Diagnostics Plots are managed from the **Project Tree** of the **Plot Main Window** in the folder **Flow Diagnostics Plots**. This folder contains a **Flow Characteristics Plot**, a default **Well Allocation Plot** and a **Stored Plots** folder containing stored **Well Allocation Plots**.
+Flow Diagnostics Plots can be used to view well allocation, well inflow rates, cumulative saturation along time of flight and flow characteristics. 
+
+They are managed from the folder **Flow Diagnostics Plots** located in **Plot Project Tree** in the **Plot Main Window**. 
 
 ![]({{ site.baseurl }}/images/FlowDiagnosticsPlotsProjectTree.png)
 
-Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flow-diagnostic-results) for more description of the results and references to more information about the methodology.
+This folder contains a default **Flow Characteristics Plot** and **Well Allocation Plot**. In addition, two folders with stored  well allocation and flow characteristics plots will show up if there are any of those in the model.
+
+Please refer to [Cell Results-> Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#flow-diagnostic-results) for a description of the results and references to more information about the methodology.
 
 ## Well Allocation Plots
 
 Well allocation plots show the flow along a specified well, along with either phase distribution or the amount of support from/to other wells. The total phase or allocation is shown in the legend and as a pie chart, while the well flow is shown in a depth value vs flow graph.  
+
+In addition a **Cumulative Saturation by Time of Flight** plot may be shown. This little plot illustrates how the total saturation changes as you go from the well-connection-cells along increasing time of flight adding the cells as you go.
 
 ### Branches
 
