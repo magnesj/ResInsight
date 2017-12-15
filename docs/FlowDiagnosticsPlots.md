@@ -116,5 +116,3 @@ This window displays three different graphs describing the overall behaviour of 
   - **Legend** -- Toggles the legend on/off
   - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells with a pore volume larger than threshold _`*`_ total porevolume are excluded.
   
- 
-The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
