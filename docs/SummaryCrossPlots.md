@@ -27,5 +27,5 @@ Cross plotting creates a new vector from two input vectors. Each vector entry in
 
 When a current time step **T** in input vector **A** is not found in input vector **B**, ResInsight interpolates between the time steps before and after **T** in vector **B**. In this way, ResInsight calculates an interpolated value for time step **T** from vector **B**. The same happens when a time step in vector **B** is not found in vector **A**.
 
-If either the value at the current time step or one of the values involved in interpolation is a **NULL** value, the resulting vector will have a **NULL** value at the current time step.
+If either the value at the current time step or one of the values involved in interpolation are **NULL**, the resulting vector will have a **NULL** value at the current time step. This is displayed as a 'hole' in the cross plot curve.
 
