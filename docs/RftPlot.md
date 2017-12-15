@@ -27,18 +27,12 @@ To be able to plot observed pressure data for a well in an RFT plot, at least on
 
 If no TVD data for a well is found when the user tries to plot a curve, ResInsight will present a warning dialog to the user.
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/NoTvdWarningDialog.png"/><br/>
-  No TVD warning dialog
-</p>
+![]({{site.baseurl}}/images/NoTvdWarningDialog.png)
 
 ## Property Editor
 The property editor lets the user select which curves to display in the RFT plot.
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/RftPlotPropertyEditor.png"/><br/>
-  RFT plot property editor
-</p>
+![]({{site.baseurl}}/images/RftPlotPropertyEditor.png)
 
 ### Well Name
 Select the well to display in the plot. Wells postfixed by _'(Well Path)'_ have an associated well trajectory loaded.
