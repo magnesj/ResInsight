@@ -37,7 +37,7 @@ The command updates the default **Well Allocation Plot** with new values based o
 
 ### Options
 
-The **Legend**, **Total Allocation** pie chart, and the **Well Flow/Allocation** can be turned on or off from the toggles in the **Project Tree**. The other options are controlled from the property panel of a Well Allocation Plot:
+The **Legend**, **Total Allocation** pie chart, **Cumulative Saturation**, and the **Well Flow/Allocation** can be turned on or off from the toggles in the **Project Tree**. The other options are controlled from the property panel of a Well Allocation Plot:
 
 ![]({{ site.baseurl }}/images/WellAllocationProperties.png)
 
