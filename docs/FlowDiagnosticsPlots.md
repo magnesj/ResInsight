@@ -104,7 +104,17 @@ This window displays three different graphs describing the overall behaviour of 
     - **All Active Cells** -- Use all the active cells in the model (default)
     - **Visible Cells** -- Use the visible cells in a particular predefined view as cell region. This option will respect all the filter settings in the view, and use the correct cell set for each timestep. 
       - **View** -- The view to use as cell filter
-    - **Injector Producer Communication** -- The region of communication between selected producers and injectors. See 
+    - **Injector Producer Communication** -- The region of communication between selected producers and injectors. See  [Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#Flow-Diagnostic-Results)
+      - **Tracer Filter** -- Wild card based filter-text to filter the list of tracers
+      - _**list**_ -- Producer and injector tracers to select
+      - **Show Region** -- Button to create (or edit) a 3D View to show the selected region of cells.
+      - **Min communication** -- A threshold for the cells communication value. Cells with communication below this threshold is omitted from the region.
+    - **Flooded by Injector**/**Drained by Producer** -- The region with a Time Of Flight from the selected tracers below the selected threshold.
+    - **Tracer Filter**/_**list**_/**Show Region** -- See above. 
+    - **Max Time of Flight [days]** -- Only cells with a Time of Flight value of less then this threshold is used. 
+- **Options**
+  - **Legend** -- Toggles the legend on/off
+  - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells with a pore volume larger than threshold _`*`_ total porevolume are excluded.
   
  
 The timesteps available are only those already calculated by the flow diagnostics solver. That means timesteps for which flow diagnostic results have been requested either by Cell Results, Well Allocation Plots, or Well Log Extraction Curves. 
