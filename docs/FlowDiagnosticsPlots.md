@@ -110,8 +110,8 @@ This window displays three different graphs describing the overall behaviour of 
       - **Show Region** -- Button to create (or edit) a 3D View to show the selected region of cells.
       - **Min communication** -- A threshold for the cells communication value. Cells with communication below this threshold is omitted from the region.
     - **Flooded by Injector**/**Drained by Producer** -- The region with a Time Of Flight from the selected tracers below the selected threshold.
-    - **Tracer Filter**/_**list**_/**Show Region** -- See above. 
-    - **Max Time of Flight [days]** -- Only cells with a Time of Flight value of less then this threshold is used. 
+    - **Tracer Filter**/_list_/**Show Region** -- See above. 
+    - **Max Time of Flight [days]** -- Only cells with a Time of Flight value less then this value are used. 
 - **Options**
   - **Legend** -- Toggles the legend on/off
   - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells with a pore volume larger than threshold _`*`_ total porevolume are excluded.
