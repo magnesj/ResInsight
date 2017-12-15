@@ -20,4 +20,4 @@ New Summary Cross Plot curves are created by using the context command ![]({{ si
 
 ![]({{site.baseurl}}/images/SummaryCrossPlotCurvePropertyEditor.png)
 
-The property editor in an ordinary summary plot has an editor group called **Summary Vector** for selecting the Y vector. In the property editor for a summary cross plot, this group has been replaced by two vector selection groups **Summary Vector Y** and **Summary Vector X**. Like the other editor groups, the vector selection groups works the same way as in the ordinary summary plot. See the [detailed description]({{site.baseurl}}/docs/summaryplots#summary-curves)
+In this property editor, the editor group called **Summary Vector**, has been replaced by two vector selection groups **Summary Vector Y** and **Summary Vector X**, compared to an ordinary summary plot. Like the other property editor groups, the vector selection groups works the same way as in the ordinary summary plot. See the [detailed description]({{site.baseurl}}/docs/summaryplots#summary-curves).
