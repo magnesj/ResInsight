@@ -13,7 +13,7 @@ A Summary Cross Plot is a window displaying a graph in the main area of the **Pl
 - Not possible to paste Excel/CSV data to a summary cross plot
 - Summary cross plots have no [Plot Editor]({{site.baseurl}}/docs/summaryploteditor)
 
-To create a new Summary Cross Plot, select the context command ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Cross Plot** on the **Plot Main Window -> Project Tree -> Summary Cross Plots** item. 
+The only way to create a new Summary Cross Plot, is to select the context command ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Cross Plot** on the **Plot Main Window -> Project Tree -> Summary Cross Plots** item. 
 
 ## Summary Cross Plot Curves
 New Summary Cross Plot curves are created by using the context command ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Cross Plot Curve** on a summary cross plot. To be able to display a Summary Cross Plot curve, ResInsight needs two data vectors, which are selected using the **Summary Cross Plot Curve** property editor.
