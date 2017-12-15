@@ -27,8 +27,9 @@ See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)
 
 ### Pasted Ascii Curves
 
-You can copy an ascii table directly from Excel or any text source and paste it directly into a Summary Plot using the command **Paste Excel Data to Summary Plot**. A dialog will open showing some import options along with the text on the clip-board.
-Each column will end up as a *Pasted Ascii Curve* in the Summary Plot.
+You can copy an ascii table directly from Excel or any text source and paste it directly into a Summary Plot using the command **Paste Excel Data to Summary Plot**. See [Paste Excel Time History Data]({{ site.baseurl }}/docs/pasteexceltimedata).
+
+## Plot Settings
 
 ![]({{ site.baseurl }}/images/SummaryPlotTree.png)
 
