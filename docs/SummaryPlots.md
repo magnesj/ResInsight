@@ -25,6 +25,11 @@ A selection of cases can be grouped by right-clicking  a selection of summary ca
 
 See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)
 
+### Grid Cell Time history Curve
+
+Time history curves from a grid cell property can also be added to a Summary Plot. 
+See [Result Inspection]({{ site.baseurl }}/docs/resultinspection#result-plot).
+
 ### Pasted Ascii Curves
 
 You can copy an ascii table directly from Excel or any text source and paste it directly into a Summary Plot using the command **Paste Excel Data to Summary Plot**. See [Paste Excel Time History Data]({{ site.baseurl }}/docs/pasteexceltimedata).
