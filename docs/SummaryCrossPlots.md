@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Summary Cross Plot
+title: Summary Cross Plots
 permalink: /docs/summarycrossplots/
 published: true
 ---
