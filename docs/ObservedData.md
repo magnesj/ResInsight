@@ -8,9 +8,13 @@ published: true
 Observed data, or *Observed Time History Data*, is data measured in time. On import of observed data, ResInsight translates the data to make it similar to summary data. Observed data can be plotted along with summary data in **Summary Plots**.
 
 ## Import Observed Data
+Importing observed time history data to ResInsight may be performed in two different ways:
+- By selecting the main menu item **File -> Import -> Import Observed Time History Data**
+- By using the context command **Import Observed Time History Data** on the **Observed Time History Data** item in the **Plot Main Window Project Tree** 
 
-Observed Data files can be imported by using the command: **File->Import->Import Observed Time History Data**, or by using the context command of ![]({{ site.baseurl }}/images/Folder.png)**Observed Time History Data** in the **Plot Object Project Tree**. The user is asked to select _`*.RSM`_, _`*.txt`_, or _`*.csv`_ files for import.
-
+The following file types are supported:
+- RSM observed time history data file (_\*.rsm_)
+- Column based (Comma Separated Values, CSV) time history data file (_\*.csv/\*.txt_)
 The imported ![]({{ site.baseurl }}/images/Default.png) Observed Data files will be added to ![]({{ site.baseurl }}/images/Folder.png)**Observed Time History Data**. 
 
 Which summaries that has been detected in a Observed data file can be read in an Observed data's **Property Editor**. In the image below, time and year info has been found together with the summary "WBP9L" for the well "OP-1".
@@ -19,9 +23,26 @@ Which summaries that has been detected in a Observed data file can be read in an
 
 ## File Formats
 
-# TODO: Move observed time history data under export and interfaces?
+### Import CSV/txt observed time history data
+CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
 
-### Column Based File Format
+#### CSV/txt import options dialog
+![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
+
+Dialog fields description:
+- **Cell Separator** -- Select the correct cell separator character. ResInsight will try to set the correct value as default.
+- **Decimal Separator** -- Select the correct decimal separator. ResInsight will try to set the correct value as default.
+- **Selected Time Column** -- Select the column that contains the time/date information. The first column is default.
+- **Use Custom Date Time Format** -- Check this box if the Date Format and/or Time Format in the file do not match any of the most common formats.
+- **Custom Date Time Format** -- Enter date time format to match the time information in the file. This field is visible only when the above check box checked. A tooltip will tell the user how to enter the correct information.
+- **Date Format** -- Select the date format matching the date information in the file.
+- **Time Format** -- Select the time format matching the time information in the file. If the file contains dates only, this field is ignored by ResInsight.
+- **Preview** -- Preview the first 30 lines of the file contents. The view will reflect the currently selected Cell Separator and the selected time column is marked in yellow.
+
+### Import RSM observed time history data
+To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the **Observed Time History Data** node in the project tree. RSM files can be either *Column based* or *Keyword based*.
+
+#### Column Based File Format
 
 If a column based file is presented, ResInsight first tries to identify if its header has fixed witdh or not. Further, the header is interpreted by looking for specific lines.
 
@@ -29,7 +50,7 @@ The first line must have one or more vector mnemonics. The initial letter(s) in 
 
 The next lines can define units, well/group names, region names, LGR names and block numbers and the local cell number. They do not have to appear in any particular order. Scale factors can also be included, but will be ignored by ResInsight. All lines starting with _*--*_ will also be ignored.
 
-#### Column Based with Fixed Header Width
+##### Column Based with Fixed Header Width
 
 When interpreting column based files with fixed header width, ResInsight looks for left aligned column entries. These type of files are interpreted as we natuarlly read them. More than one table can be present in each file.
 
@@ -52,7 +73,7 @@ When interpreting column based files with fixed header width, ResInsight looks f
  11-NOV-1997         0     28.79427     0.022613     21.93558     21.95819
 ```
 
-#### Column Based with Random Header Width
+##### Column Based with Random Header Width
 
 Column Based with Random Header Width will try to be parsed in the same way as fixed width, but it might fail in situations like the one below. We can see that SM3/SM3 *probably* belongs to WGORH, but it is parsed to WWCTH, as it is the second entry on that line.
 
@@ -66,7 +87,7 @@ DAYS               SM3/SM3
      3     0.000   0.000
 ```
 
-### Keyword Based File Format
+#### Keyword Based File Format
 
 If the non-comment line inlcudes the word "VECTOR", the file is interpreted as a keyword based file. In keyword based files, the content of the one-column tables is described in each header. Tables should be assosiated with a table containing time stamps. In the example below, *S-1AH-GOR* is assosiated with *YEARX*, since their origin is equal. ResInsight always interpret *ORIGIN* as well name, and look for a table with the line "VECTOR YEARX" to assosiate with it.
 
