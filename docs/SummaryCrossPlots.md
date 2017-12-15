@@ -7,7 +7,7 @@ published: true
 
 ![]({{site.baseurl}}/images/SummaryCrossPlot.png)
 
-A Summary Cross Plot is a window displaying a graph in the main area of the **Plot Main Window**. It is very similar to [Summary Plots]({{site.baseurl}}/docs/summaryplots), but there are some differences:
+A Summary Cross Plot is a window displaying a graph in the main area of the **Plot Main Window**. It is very similar to an ordinary [Summary Plot]({{site.baseurl}}/docs/summaryplots), but there are some differences:
 
 - Summary Cross Plot displays one vector against another vector, not one vector against time
 - Not possible to paste Excel/CSV data to a summary cross plot
