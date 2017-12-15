@@ -107,7 +107,7 @@ This window displays three different graphs describing the overall behaviour of 
     - **Injector Producer Communication** -- The region of communication between selected producers and injectors. See  [Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#Flow-Diagnostic-Results)
       - **Tracer Filter** -- Wild card based filter-text to filter the list of tracers
       - _list_ -- Producer and injector tracers to select
-      - **Show Region** -- Button to create (or edit) a 3D View to show the selected region of cells.
+      - **Show Region** -- Button to create (or edit) a 3D View showing the selected region of cells.
       - **Min communication** -- A threshold for the cells communication value. Cells with communication below this threshold is omitted from the region.
     - **Flooded by Injector**/**Drained by Producer** -- The region with a Time Of Flight from the selected tracers below the selected threshold.
     - **Tracer Filter**/_list_/**Show Region** -- See above. 
