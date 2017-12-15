@@ -201,4 +201,11 @@ The user can control the curve name used in the plot legend by using these optio
 
 Copy and Paste of selections of Summary Plots and Curves, is possible using the Project Tree Context menu and standard keyboard shortcuts (CTRL-C/CTRL-V).
 
+## Summary Source Stepping
+Summary Source Stepping is a function which lets the user step through multiple vectors in one click. This function is available both from the toolbar and from the property editor for the **Summary Curves** item under a **Summary Plot** item in the **Main Plot Window Project Tree**.
+The toolbar version look like this
+![]({{site.baseurl}}/images/SummarySourceSteppingToolbar.png)
+
+and the property editor version looks like this
+![]({{site.baseurl}}/images/SummarySourceSteppingPropertyEditor.png)
 
