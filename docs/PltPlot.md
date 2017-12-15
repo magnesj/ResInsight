@@ -33,18 +33,12 @@ To be able to plot observed production data for a well, a well log file containi
 
 To be able to plot simulated data for a well, the trajectory for that well have to be imported. If no well trajectory is found, ResInsight will present a warning dialog to the user.
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/NoMdWarningDialog.png"/><br/>
-  No MD warning dialog
-</p>
+![]({{site.baseurl}}/images/NoMdWarningDialog.png)
 
 ## Property Editor
 The property editor lets the user select which curves to display in the PLT plot.
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/PltPlotPropertyEditor.png"/><br/>
-  PLT plot property editor
-</p>
+![]({{site.baseurl}}/images/PltPlotPropertyEditor.png)
 
 ### Well Name
 Select the well to display in the plot. Only observed well paths are displayed.
@@ -85,9 +79,7 @@ The curve selection group lets the user control which component(s) of the PLT da
 ### Zonation/Formation Names
 This property editor lets the user control how formations are handled. This is what it looks like in the PLT plot context.
 
-<p align="center">
-  <img src="{{site.baseurl}}/images/RftPltFormationNames.png"/>
-</p>
+![]({{site.baseurl}}/images/RftPltFormationNames.png)
 
 Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
 
@@ -96,9 +88,7 @@ Please see the [full documentation]({{site.baseurl}}/docs/formations) on the for
 </div>
 
 ### Legend and Axis
-<p align="center">
-  <img src="{{site.baseurl}}/images/PltLegendAndAxis.png"/>
-</p>
+![]({{site.baseurl}}/images/PltLegendAndAxis.png)
 
 This property editor lets the user control visual properties for the legend and axis.
 - **Depth Type** -- Select depth type, _Measured Depth_ or _Pseudo Length_
