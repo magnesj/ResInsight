@@ -14,7 +14,7 @@ The following file types are supported:
 - Column based (Comma Separated Values, CSV) time history data file (_\*.csv/\*.txt_)
 
 ## Import RSM observed time history data
-To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the *Observed Time History Data* node in the project tree.
+To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the **Observed Time History Data** node in the project tree.
 
 ## Import CSV/txt observed time history data
 CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
