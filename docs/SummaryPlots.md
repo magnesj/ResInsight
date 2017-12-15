@@ -211,7 +211,7 @@ and the property editor version may looks like this
 
 ![]({{site.baseurl}}/images/SummarySourceSteppingPropertyEditor.png)
 
-In some cases some of the stepping components are hidden, depending on the set of summary curves currently plotted. When ResInsight decides which stepping component to display, all curves in the currrent plot are taken into account. 
+In some cases some of the stepping components are hidden, depending on the set of summary curves currently plotted. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. 
 
 - All visible curves belongs to the same case -> The case stepping component is displayed.
 - All visible curves belongs to the same well -> The well stepping component is displayed.
