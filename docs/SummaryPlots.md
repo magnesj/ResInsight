@@ -120,6 +120,10 @@ This group of options is used to define the summary vector data that the curve w
 - **Vector** -- Displays a short name/ acronyme of the selected vector
 - **Axis** -- Controls whether the curve is to be associated with the left or right Y-Axis 
 
+<div class="note">
+Switching the Y-Axis for several curves in one go can be done using the context command **Switch Plot Axis**.  
+</div>
+
 To optional ways to select the curve data are available: The **Vector Selection Dialog** and the **Vector Selection Filter**.
 
 The first is accessed by clicking the button **Vector Selection Dialog**. This opens a dialog similar to the one used as Plot Editor. See [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
