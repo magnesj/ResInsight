@@ -34,7 +34,13 @@ Filtering can be done by adjusting the following parameters:
 
 First and last time step to include in the import can be chosen in their respective drop down list. All time steps found in the file are included in both lists.
 
-**Filter Type** is set to *All* by default. This means that all time steps between the first and last chosen time step will be imported. The alternative to *All* is to skip time steps on a number of *Days*, *Weeks*, *Months*, *Quarters* or *Years*. The skipping interval is set in the text field below. After editing the **Interval** field, press *tab* to update the **Filtered Time Steps** preview, or click anywhere in the dialog. 
+**Filter Type** is set to *All* by default. This means that all time steps between the first and last chosen time step will be imported. The alternative to *All* is to skip time steps in a number of *Days*, *Weeks*, *Months*, *Quarters* or *Years*. The skipping interval is set in the text field below. After editing the **Interval** field, press *tab* to update the **Filtered Time Steps** preview, or click anywhere in the dialog. Click *Ok* to import when the filter is ready.
+
+Filtering can also be done after import, in a case's **Property Window**.
+
+![]({{ site.baseurl }}/images/timeStepFilterPropEditor.png)
+
+After clicking *Reload Case*, the time steps in the toolbar will be updated.
 
 ### Eclipse ASCII input data
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/EclipseInput24x24.png) Import Input Eclipse Case** and select a _`*.GRDECL`_ file.
