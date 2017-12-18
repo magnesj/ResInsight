@@ -31,7 +31,13 @@ Transmissibility can be set or adjusted with multiple keywords in an Eclipse dat
 The TRANX, TRANY and TRANZ used in the simulation are divided by the ResInsight calculated transmissibilities and the resulting multiplicators are named riMULTX, riMULTY and riMULTZ respectively. The derived properties are listed under **Static** properties. The riMULT-properties are useful for quality checking consistence in user input for fault seal along a fault plane. 
 
 ### Directional combined results
-Some static properties with directional dependency can be visualized in x-, y- and z-direction combined in **Cell Result** and **Separate Fault Result**. The face of a cell is then colored based on the value associated with that particular face. The Positive I-face of the cell gets the cell X-value, while the J-face gets the Y-value etc. The negative faces, however, get the value from the neighbor cell on that side. The negative I-face gets the X-value of the IJK-neighbor in negative I direction, and so on for the J- and K-faces.
+
+Cell properties with names ending in I, J, K, X, Y, or Z, and an optional "+" or "-" are combined into derived results postfixed with IJK, or XYZ depending on their origin. (Eg. the static cell properties MULTX, MULTY, MULTZ, and their negatives are combined into the result MULTXYZ, while the dynamic cell properties FLRGASI, FLRGASJ, FLRGASK are combined to FLRGASIJK). 
+
+These combined cell properties visualize the property as a color in all directions combined when selected in 
+as a **Cell Result** and **Separate Fault Result**. 
+
+The face of a cell is then colored based on the value associated with that particular face. The Positive I-face of the cell gets the cell X/I-value, while the J-face gets the Y/J-value etc. The negative faces, however, get the value from the neighbor cell on that side. The negative I-face gets the X-value of the IJK-neighbor in negative I direction, and so on for the J- and K-faces.
 
 The directional combined parameters available are:
 
