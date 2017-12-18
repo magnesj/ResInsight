@@ -20,7 +20,7 @@ New Summary Cross Plot curves are created by using the context command ![]({{ si
 
 ![]({{site.baseurl}}/images/SummaryCrossPlotCurvePropertyEditor.png)
 
-In this property editor, the editor group called **Summary Vector**, has been replaced by two vector selection groups **Summary Vector Y** and **Summary Vector X**, compared to an ordinary summary plot. Like the other property editor groups, the vector selection groups works the same way as in the ordinary summary plot. See the [detailed description]({{site.baseurl}}/docs/summaryplots#summary-curves).
+In this property editor, the editor group called **Summary Vector**, has been replaced by two vector selection groups **Summary Vector Y** and **Summary Vector X**, compared to an ordinary summary plot. Like the other property editor groups, the vector selection groups works the same way as in the ordinary summary plot. However, there is one exception. The **Summary Vector X** group is missing the **Axis** field. This is because the X values have one axis only, below the plot, as opposed to the Y values, which have the left and right axis. See the [detailed description]({{site.baseurl}}/docs/summaryplots#summary-curves).
 
 ### Cross Plotting
 Cross plotting creates a new vector from two input vectors. Each vector entry in the resulting vector consists of one vector item value from each of the two input vectors, having equal time steps. However, in most cases the two input vectors do not share the same time steps. To be able to create a resulting cross plot vector in such cases, linear interpolation between adjacent input vector items is being used.
