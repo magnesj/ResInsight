@@ -36,6 +36,8 @@
   - gridstatisticsdialog
   - rftplot
   - pltplot
+  - relpermplot
+  - pvtplot
    
 - title: Export and Interfaces  
   docs:
