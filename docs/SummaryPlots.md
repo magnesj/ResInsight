@@ -215,6 +215,7 @@ and the property editor version may looks like this
 In some cases some of the stepping components are hidden, depending on the set of summary curves currently visible. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. If, for instance, all curves display data from the same well, the well stepping component is displayed. This policy applies to the following source dimensions:
 - Cases
 - Wells
+- Well groups
 - Regions
 - Vectors/Summaries
 
