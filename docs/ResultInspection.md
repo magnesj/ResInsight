@@ -65,3 +65,8 @@ Show the PVT Plot widget my selecting **Windows -> PVT Plot**.
 The PVT plot window shows two plots, based on PVTNUM in the selected cell. One plots *Phase Formation Volume Factor* and the other plots *Phase Viscosity*, both against pressure. The *Phase* can be either oil or gas, and can be selected in the top left corner of the window.
 
 Pressure for the selected cell is marked on the plot as a vertical line, and a large circle marks the value of the cell (regarging the plots property). RV for the selected cell is also shown.
+
+## Relative Permeability Plot
+
+![]({{ site.baseurl }}/images/relParm.png)
+
