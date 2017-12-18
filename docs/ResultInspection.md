@@ -54,7 +54,7 @@ A dialog will appear to prompt you to select an existion plot, or to create a ne
 
 ![]({{ site.baseurl }}/images/ResultPlotToSummaryPlotDialog.png)
 
-## PVT Plot 
+## PVT Plot
 
 Show the PVT Plot window my selecting **Windows -> PVT Plot**.
 
@@ -64,7 +64,7 @@ Show the PVT Plot window my selecting **Windows -> PVT Plot**.
 
 The PVT plot window shows two plots, based on PVTNUM in the selected cell. One plots *Phase Formation Volume Factor* and the other plots *Phase Viscosity*, both against pressure. The *Phase* can be either oil or gas, and can be selected in the top left corner of the window.
 
-Pressure for the selected cell is marked on the plot as a vertical line, and a large circle marks the scalar value of the cell (formation volume factor/viscosity). RV for the selected cell is also shown.
+Pressure for the selected cell, at the current timestep, is marked on the plot as a vertical line, and a large circle marks the scalar value of the cell (formation volume factor/viscosity). RV for the selected cell is also shown.
 
 ## Relative Permeability Plot
 
@@ -83,4 +83,4 @@ KROG | Relative permeability oil gas   | KR (Left)
 PCOW | Capilar pressure oil water      | PC (Right)
 PCOG | Capilar pressure oil gas        | PC (Right)
 
-Saturation of water and gas in the selected cell are annotated in the plot by a blue and orange vertical line, respectively. The  intersections between the lines and the relevant curves are marked with large circles.
+Saturation of water and gas in the selected cell, at the current timestep, are annotated in the plot by a blue and orange vertical line, respectively. The intersections between the lines and the relevant curves are marked with large circles.
