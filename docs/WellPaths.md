@@ -107,6 +107,11 @@ If a match is found, the LAS-file is placed as a child of that trajectory. If no
 
 If the LAS-file does not contain a well name, the file name is used instead. 
 
+#### Moving LAS-file
+If ResInsight's automatic well matching fails and a LAS-file is matched with the wrong well path, it is possible to move the LAS-file to the correct well path. Select the LAS-file context menu click **Move LAS File to Well Path** and select destination well path.
+
+![]({{site.baseurl}}/images/MoveLasFileMenu.png)
+
 ### Importing Well Path Files
 See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
 
