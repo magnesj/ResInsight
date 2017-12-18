@@ -21,6 +21,12 @@ The **Reload Case** command can be used to reload a previously imported case, to
 You can select several grid files in one go by multiple selection of files (Ctrl + left mouse button, Shift + left mouse button). 
 </div>
 
+### Time Step Filtered Eclipse Result
+Some Eclipse files have an enormous amount of time steps. If only a selection of the time steps really are needed for the session, the time steps can be filtered before loading. This can possibly speed up the import a great deal. Filtering can be done in the following way.
+
+Select **File->Import-> ![]({{ site.baseurl }}/images/Case24x24.png) Import Eclipse Case (Time Step Filtered)** and select an _`*.EGRID`_ or _`*.GRID`_ Eclipse file for import. A dialog will apprear.
+
+![]({{ site.baseurl }}/images/timeStepFilter.png)
 
 ### Eclipse ASCII input data
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/EclipseInput24x24.png) Import Input Eclipse Case** and select a _`*.GRDECL`_ file.
