@@ -74,12 +74,13 @@ Show the Relative Permeability Plot window my selecting **Windows -> Relative Pe
 
 The Relative Permeability Plot window shows up to six curves, based on SATNUM in the selected cell. The curves can be turned on/off in the top left corner of the window, and they are described in the following table:
 
-Name | Description                 | Axis
------|-----------------------------|-----------
-KRW  | Rel. permeability water     | Left (KR)
-KRG  | Rel. permeability gas       | Left (KR)
-KROW | Rel. permeability oil water | Left (KR)
-KROG | Rel. permeability oil gas   | Left (KR)
-PCOW | Capilar pressure oil water  | Right (PC)
-PCOG | Capilar pressure oil gas    | Right (PC)
+Name | Description                     | Axis
+-----|---------------------------------|-----------
+KRW  | Relative permeability water     | KR (Left)
+KRG  | Relative permeability gas       | KR (Left)
+KROW | Relative permeability oil water | KR (Left)
+KROG | Relative permeability oil gas   | KR (Left)
+PCOW | Capilar pressure oil water      | PC (Right)
+PCOG | Capilar pressure oil gas        | PC (Right)
 
+Saturation of water and gas in the selected cell are annotated in the plot by a blue and orange vertical line, respectively. The  intersections between the lines and the relevant curves are marked with large circles.
