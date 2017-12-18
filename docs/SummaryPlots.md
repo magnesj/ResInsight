@@ -212,10 +212,11 @@ and the property editor version may looks like this
 
 ![]({{site.baseurl}}/images/SummarySourceSteppingPropertyEditor.png)
 
-In some cases some of the stepping components are hidden, depending on the set of summary curves currently visible. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. If all curves display data from the same well, the well stepping component is displayed. This policy applies to the following dimensions:
+In some cases some of the stepping components are hidden, depending on the set of summary curves currently visible. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. If, for instance, all curves display data from the same well, the well stepping component is displayed. This policy applies to the following source dimensions:
 - Cases
 - Wells
 - Regions
 - Vectors/Summaries
 
-When, for instance, the well stepping **next button** is clicked, all curves are changed to display data for the next well in the well list.
+When one of the **next buttons** are clicked, all curves are changed to display data for the next item for the clicked source dimension. Example: The user clicks the **next well button**. Then the well source for all curves in the current plot are changed to display data for the next well.
+
