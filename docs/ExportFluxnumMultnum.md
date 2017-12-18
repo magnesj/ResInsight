@@ -13,3 +13,6 @@ Exporting FLUXNUM/MULTNUM from ResInsight may be performed by using the command 
 - In the **3D View**
 
 The command can also be found in **File -> Export**. If the command is used in the project tree, the visible cells from the selected view are used for calculation. In the 3D view and from File -> Export, the visible cells from the 3D view are used.
+
+## Export Option Dialog
+![]({{ site.baseurl }}/images/fluxnumMultnum.png)
