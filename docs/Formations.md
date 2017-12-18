@@ -62,9 +62,9 @@ Picking on a cell being part of a formation will display the formation name in t
 
 #### <a name="annotationOnPlot">Annotation on Plots</a>
 Formation can be used to annotate the following plot types:
-- Well Log Plots
+- [Well Log Plots]({{site.baseurl}}/docs/welllogsandplots)
 - [RFT Plots]({{site.baseurl}}/docs/rftplot)
-- PLT Plots
+- [PLT Plots]({{site.baseurl}}/docs/pltplot)
 - Well Allocation Plots
 
 ![]({{ site.baseurl }}/images/formOnPlot.PNG)
