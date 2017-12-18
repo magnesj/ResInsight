@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Export of FLUXNUM/MULTNUM
+title: FLUXNUM/MULTNUM
 permalink: /docs/exportfluxnummultnum/
 published: true
 ---
