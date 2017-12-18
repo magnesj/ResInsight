@@ -56,7 +56,7 @@ A dialog will appear to prompt you to select an existion plot, or to create a ne
 
 ## PVT Plot 
 
-Show the PVT Plot widget my selecting **Windows -> PVT Plot**.
+Show the PVT Plot window my selecting **Windows -> PVT Plot**.
 
 ![]({{ site.baseurl }}/images/pvtOil.png)
 
@@ -68,5 +68,8 @@ Pressure for the selected cell is marked on the plot as a vertical line, and a l
 
 ## Relative Permeability Plot
 
+Show the Relative Permeability Plot window my selecting **Windows -> Relative Permeability Plot**.
+
 ![]({{ site.baseurl }}/images/relParm.png)
 
+The Relative Permeability Plot window shows up to six curves, based on SATNUM in the selected cell. 
