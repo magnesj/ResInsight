@@ -60,10 +60,3 @@ This group of options controls visual settings that will be used when creating n
 - **Shared Script Folder(s)** -- Defines the search paths for octave scripts
 - **Script Editor** -- The text editor to invoke when editing scripts
 
-## Summary - tab
-
-![]({{ site.baseurl }}/images/SummaryPreferences.png)
-
-- **Create Summary Plots When Importing Eclipse Case** -- Automatically import the summary case and display a plot if a _`*.SMSPEC`_ file exists when importing an Eclipse binary case
-- **Default Vector Selection Filter** -- Wildcard text defining the summary vector filter to be applied by default. Default string is _`F*OPT`_
-
