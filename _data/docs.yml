@@ -47,6 +47,7 @@
   - octaveinterface
   - odbsupport
   - commandfile
+  - exportfluxnummultnum
 
 - title: Appendix
   docs:
