@@ -202,7 +202,8 @@ The user can control the curve name used in the plot legend by using these optio
 Copy and Paste of selections of Summary Plots and Curves, is possible using the Project Tree Context menu and standard keyboard shortcuts (CTRL-C/CTRL-V).
 
 ## Summary Source Stepping
-Summary Source Stepping is a function which lets the user step through multiple vectors in one click. This function is available both from the toolbar and from the property editor for the **Summary Curves** item under a **Summary Plot** item in the **Main Plot Window Project Tree**.
+Summary Source Stepping is a function which lets the user step through multiple vectors in one click. This function is available from both the toolbar and the **Summary Curves** property editor under a **Summary Plot** item in the **Main Plot Window Project Tree**.
+
 The toolbar version may look like this
 
 ![]({{site.baseurl}}/images/SummarySourceSteppingToolbar.png)
@@ -211,9 +212,9 @@ and the property editor version may looks like this
 
 ![]({{site.baseurl}}/images/SummarySourceSteppingPropertyEditor.png)
 
-In some cases some of the stepping components are hidden, depending on the set of summary curves currently plotted. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. 
+In some cases some of the stepping components are hidden, depending on the set of summary curves currently visible. When ResInsight decides which stepping component to display, all visible curves in the current plot are taken into account. 
 
-- All visible curves belongs to the same case -> The case stepping component is displayed.
-- All visible curves belongs to the same well -> The well stepping component is displayed.
-- All visible curves belongs to the same region -> The region stepping component is displayed.
+- All visible curves belong to the same case -> The case stepping component is displayed.
+- All visible curves belong to the same well -> The well stepping component is displayed.
+- All visible curves belong to the same region -> The region stepping component is displayed.
 - All visible curves display the same vector -> The vector stepping component is displayed.
