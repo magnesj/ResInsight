@@ -41,12 +41,19 @@ The face of a cell is then colored based on the value associated with that parti
 
 The directional combined parameters available are:
 
-- **TRANXYZ** (inluding NNCs)
-- **MULTXYZ**
-- **riTRANXYZ** (inluding NNCs)
-- **riMULTXYZ** (inluding NNCs)
-- **riTRANXYZbyArea** (inluding NNCs)
-
+- Static Properties
+  - **TRANXYZ** (inluding NNCs)
+  - **MULTXYZ**
+  - **riTRANXYZ** (inluding NNCs)
+  - **riMULTXYZ** (inluding NNCs)
+  - **riTRANXYZbyArea** (inluding NNCs)
+- Dynamic Properties
+  - **FLRWATIJK** (inluding NNCs)
+  - **FLROILIJK** (inluding NNCs)
+  - **FLRGASIJK** (inluding NNCs)
+- Generated
+  - Octave generated results with same name but ending with I,J and K will be combined.
+  
 ## Derived Geomechanical results
 
 ResInsight calculates several of the presented geomechanical results based on the native results present in the odb-files. 
