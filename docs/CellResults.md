@@ -24,7 +24,7 @@ In the following we will describe these options.
 
 ## Eclipse Result Types
 
-As shown in the picture below, there are 6 different result types
+As shown in the picture below, there are 7 different result types
 
 ![]({{ site.baseurl }}/images/CellResultTypes.png)
 
@@ -35,6 +35,7 @@ As shown in the picture below, there are 6 different result types
 - **Formation Names** -- Lists only the Active Formation Names selected on the case.  ( See [Formations]({{ site.baseurl }}/docs/formations) )
 - **Flow Diagnostics** -- Flow diagnostic results are derived from the flux field in the Eclipse result data file and is only 
   available if those results are present. This option is described in detail below.
+- **Injection Flooding** -- Number of flooded mobile pore volumes as contribution from one or more simulation tracers.
 
 ## Flow Diagnostic Results
 
