@@ -36,7 +36,7 @@ As shown in the picture below, there are 7 different result types
 - **Formation Names** -- Lists only the Active Formation Names selected on the case.  ( See [Formations]({{ site.baseurl }}/docs/formations) )
 - **Flow Diagnostics** -- Flow diagnostic results are derived from the flux field in the Eclipse result data file and is only 
   available if those results are present. This option is described in detail below.
-- **Injection Flooding** -- Currently only the derived property: **Number of Flooded PV** calculated based on one or more selected simulation tracers. (See [below]({{ site.baseurl }}/docs/CellResults#injection-flooding)  )
+- **Injection Flooding** -- Currently only the derived property: **Number of Flooded PV** calculated based on one or more selected simulation tracers. (See [below]({{ site.baseurl }}/docs/cellresults#injection-flooding)  )
 
 ### Flow Diagnostic Results
 
