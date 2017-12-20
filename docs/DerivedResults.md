@@ -53,7 +53,11 @@ The directional combined parameters available are:
   - **FLRGASIJK** (inluding NNCs)
 - Generated
   - Octave generated results with same name but ending with I,J and K will be combined.
-  
+
+### Water Flooded PV
+
+Water Flooded PV, also called _Number of flooded porevolumes_ shows the amount of flow from a selected set of simulation tracers into a particular cell, compared to the cells mobile pore volume. A value of 1.0 will tell that the tracers accumulated flow into the cell has reached a volume equal to the mobile pore volume in the cell.   
+
 ## Derived Geomechanical results
 
 ResInsight calculates several of the presented geomechanical results based on the native results present in the odb-files. 
