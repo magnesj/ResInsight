@@ -53,6 +53,10 @@ The X and Y grid data can be negated in order to make the Grid model appear corr
  
 ![]({{ site.baseurl }}/images/CaseProperties.png)
 
+### SourSimRL Import
+
+Results From the simulation software SourSimRL can be imported using the **SourSim File Name** field. Importing such a file will enable result type called **SourSimRL** as explained in [Eclipse Result Types]({{ site.baseurl }}/docs/cellresults#eclipse-result-types)   
+
 ## Importing ABAQUS odb cases
 When ResInsight is compiled with ABAQUS-odb support, _`*.odb`_ files can be imported by selecting the command:
 
