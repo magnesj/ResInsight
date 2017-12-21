@@ -41,24 +41,26 @@ To add new fishbones completions, select the **New Fishbones Subs Definition** c
 The new **Fishbones Subs Definition** (a group of fishbones) is created in the Project tree. Several subs definitions can be created on the same welll trajectory to give more flexibility in the placing of the fishbones. 
 
 ![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
-
-**Location Defined By** -- This parameter has three options, **Start/End/Number of Subs**, **Start/End/Spacing** and **User Specified**. The setting will control which of the settings in the **Location** group of options the user can control. The rest are calculated automatically. 
-- **Start MD / End MD** -- Position, in Measured depth along the well, of the first / last fishbone Sub. The unit will be dependent on unit system for the well (m for metric units and ft for field units). 
-- **Measured Depths** -- The measured depth of the fishbone subs. If the **Location Defined By** is set to the **User Specified** option, only this property will be available to the user. 
-
-Laterals configurations sets up the configuration of the laterals at each sub position.  
-- **Laterals Per Sub** -- Number of laterals for each sub position
-- **Lenght(s)** -- Length of each lateral, in m or ft. 
-- **Exit Angle** -- Exit angle for fishbone lateral, in degree. 
-- **Build Angle** -- Build angle for fishbone lateral, in degree pr meter. 
-- **Orientation**
-  - **Fixed Angle** -- The user can specify the angle for the first lateral
-  - **Random angle** -- Each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
-- **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
-
-<div class="note info">
-<b>Well Properties</b> and properties for <b>Multi Segment Wells</b> are only used for export. See description of these parameters below. 
-</div>
+- **Appearance**
+  - **Fishbones Color** -- The 3D View color of the fishbones created by this definition
+- **Location** -- Options to control the position and number of fishbone subs created by this definition
+  - **Location Defined By** -- This setting will select how to define the location of the subs in this group. 
+  - **Start MD** -- Position, in Measured depth along the well, of the first fishbone Sub. 
+  - **End MD** -- Position of the last fishbone Sub. 
+  - **Number of Subs** -- Defines the number of subs to create in the defined interval
+  - **Spacing** -- Spacing between the subs within the interval
+  - **Measured Depths** -- The measured depth of each of the fishbone subs. If the **Location Defined By** is set to the **User Specified** this will be directly editable by the user. 
+- **Laterals Configuration** -- Configures the laterals at each sub position.  
+  - **Laterals Per Sub** -- Number of laterals for each sub position
+  - **Lenght(s)** -- Length of each lateral, in m or ft. 
+  - **Exit Angle** -- Exit angle for fishbone lateral, in degree. 
+  - **Build Angle** -- Build angle for fishbone lateral, in degree pr meter. 
+  - **Orientation**
+    - **Fixed Angle** -- The user can specify the angle for the first lateral
+    - **Random angle** -- Each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
+  - **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
+- **Well Properties** -- Only used for export
+- **Multi Segment Wells** -- Only used for export
 
 ### Imported Laterals
 
