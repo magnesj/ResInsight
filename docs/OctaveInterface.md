@@ -14,7 +14,7 @@ ResInsight provides a flexible interface to [Octave](http://www.gnu.org/software
 The Octave functions are documented in [Octave Interface Reference]({{ site.baseurl }}/docs/octaveinterfacereference).
 
 <div class="note info"> 
-<b>Note:</b> The Octave interface does not support Geomechanical cases and flow diagnostic results. 
+<b>Note:</b> The Octave interface does not support Flow diagnostics and Injection flooding results in addition to Geomechanical cases. 
 </div>
 
 ## Octave Script Management 
