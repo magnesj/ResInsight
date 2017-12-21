@@ -6,15 +6,17 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
-Two types of completions are available for modelling and export - perforation invervals and fishbone wells. The purpose of modelling these completions, is that it enables ResInsight to export Eclipse keywords for doing more refined simulations.
+Three types of completions are available for modelling and export - perforation invervals, fishbone wells and fractures. The purpose of modelling these completions, is that it enables ResInsight to export Eclipse keywords for doing more refined simulations.
 
-Completions can be modelled by adding new perforation intervals or fishbones subs. Details about the completions must then be specified, such as the length of the perforation interval or number of fishbone subs and laterals. After modelling the completions, the transmissibility (cell connection factors) can be calculated and exported to the Eclipse COMPDAT Keyword. For fishbones completions multisegment well information can be exported using the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
+Completions can be modelled by adding new perforation intervals, fishbones subs or fractures. Details about the completions must then be specified, such as the length of the perforation interval or number of fishbone subs and laterals. After modelling the completions, the transmissibility (cell connection factors) can be calculated and exported to the Eclipse COMPDAT Keyword. 
+
+For fishbones completions, multisegment well information can even be exported to the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
 
 ## Perforation Intervals
 
 ### Modelling of Perforation Interval Completions
 
-TODO: Image: New perforation interval
+![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
 A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **New Perforation interval**. 
 
