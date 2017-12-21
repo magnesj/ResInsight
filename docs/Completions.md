@@ -54,6 +54,8 @@ For multisegment wells there are additional parameters which should be set. Thes
     - **Incremental** -- length / depth of given segment
     - **Absolute** -- the length down the tube or depth of the last nodal point
 
+### Fishbones Subs Definition
+
 To add new fishbones completions, select the **New Fishbones Subs Definition** command. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well trajectory in the 3D View. 
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
@@ -90,10 +92,11 @@ The new **Fishbones Subs Definition** (a group of fishbone subs) is created in t
   - **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
   - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
-### Imported Laterals
+### Import Well Trajectories as Laterals
 
-By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export.
+The command **Import Completions From File** can be used to import well trajectories in the `*.dev`format as fishbone laterals.  The imported laterals are listed under the folder **Imported Laterals** in the **Project Tree**. These laterals behave as completions, and will be exported when exporting completion data using the settings in the property panel of the **Imported Laterals** folder.
 
+![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 ### Export Fishbones as Well Trajectories
 
