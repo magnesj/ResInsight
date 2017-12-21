@@ -33,28 +33,6 @@ The perforation intervals will be indicated by different colour along the well p
 
 ![]({{ site.baseurl }}/images/WellPerforationIntervalColor.png)
 
-### Export of Perforation Interval Completion Data
-The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
-
-Taking the X direction as an example, we first calculate the relevant permeability *K* from the Eclipse properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
-
-The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
-
-The x-component of the transmissibility vector is calculated, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
-
-The y and z component of the transmissibility are calculated in the same manner, and the total transmissibility is then calculated as: 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
-
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
-
-For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
 ## Fishbones
 
@@ -282,3 +260,27 @@ The parameters exported in the WEGVALV keword are
 - **Exclude Main Bore Transmissibility For Fishbones** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
 - **Include Perforations** -- Option to include or exclude perforation invervals in the export. 
 - **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
+
+### Transmissibility Calculations
+
+The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
+
+Taking the X direction as an example, we first calculate the relevant permeability *K* from the Eclipse properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
+
+The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
+
+The x-component of the transmissibility vector is calculated, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
+
+The y and z component of the transmissibility are calculated in the same manner, and the total transmissibility is then calculated as: 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
+
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
+
+For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
