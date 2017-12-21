@@ -103,13 +103,48 @@ The **Export Laterals** command will export the fishbone laterals as a well traj
 Notice that only the trajectory data is exported. Properties related to well segment data or needed to calculate connection factors or are not exported. 
 </div>
 
+
+## Exporting Completion Data
+
+![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
+
+- **Export Folder** -- Folder for the exported COMPDAT file. If it does not already exist, it will be created when performing the export. The exported file will get a fixed name based on what is included in the export. 
+- **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
+- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Caclulated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissbility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
+- **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. If there are completions of multiple types or along multiple wells, this parameter determines if the entries for the different wels / completion types should be in the same file or split in different files. 
+- **Include Fishbones** -- Option to inclulde or exclude fishbone completions from the export. 
+- **Exclude Main Bore Transmissibility For Fishbones** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
+- **Include Perforations** -- Option to include or exclude perforation invervals in the export. 
+- **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
+
+### Transmissibility Calculations
+
+The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
+
+Taking the X direction as an example, we first calculate the relevant permeability *K* from the Eclipse properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
+
+The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
+
+The x-component of the transmissibility vector is calculated, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
+
+The y and z component of the transmissibility are calculated in the same manner, and the total transmissibility is then calculated as: 
+
+![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
+
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
+
+For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
+
 ### Export of Fishbone Completion Data
 
-The transmissibility calculation for the fishbones is done following the same description as the transmissibility calculation for the perforation interval, see TODO-link. 
-
-If the user chooses, the main bore transmissibility can be excluded from the calculation, by swithing on this option in the Export dialog. 
-
-When calculating the transmissibility for the laterals, the full cell volume is split among the laterals for calculation of the transmissibility. This is done by finding the direction of the main bore, and then dividing the cell size in this direction by the number of laterals in the cell when calculating the Peaceman radius. 
+The transmissibility calculation for the fishbones is done following the above description except that when calculating the transmissibility for the laterals, the full cell volume is split among the laterals for calculation of the transmissibility. This is done by finding the direction of the main bore, and then dividing the cell size in this direction by the number of laterals in the cell when calculating the Peaceman radius. 
 
 An example of the exported COMPDAT file is shown below. The calculated transmissibility contribution to the cell connection factor from each lateral or main bore part is included as a comment. 
 
@@ -151,47 +186,9 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
 
 
 
-## Exporting Completion Data
-
-![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
-
-- **Export Folder** -- Folder for the exported COMPDAT file. If it does not already exist, it will be created when performing the export. The exported file will get a fixed name based on what is included in the export. 
-- **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
-- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Caclulated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissbility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
-- **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
-- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. If there are completions of multiple types or along multiple wells, this parameter determines if the entries for the different wels / completion types should be in the same file or split in different files. 
-- **Include Fishbones** -- Option to inclulde or exclude fishbone completions from the export. 
-- **Exclude Main Bore Transmissibility For Fishbones** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
-- **Include Perforations** -- Option to include or exclude perforation invervals in the export. 
-- **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
-
-### Transmissibility Calculations
-
-The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
-
-Taking the X direction as an example, we first calculate the relevant permeability *K* from the Eclipse properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
-
-The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
-
-The x-component of the transmissibility vector is calculated, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
-
-The y and z component of the transmissibility are calculated in the same manner, and the total transmissibility is then calculated as: 
-
-![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
-
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
-
-For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
-
 ## Export Well Segments
 
-It is possible to export all the Fishbone Sus Definitions to a text file containing the Eclipse input data 
+It is possible to export all the Fishbone Subs Definitions to a text file containing the Eclipse input data 
 keywords needed to represent the fishbone part of the well as an MSW.
 
 This can be done by the command **Export Well Segments** available as a context command on the **Fishbones** folder. Invoking the command will show a dialog prompting you to enter a target directory and which case to use in the calculations.
