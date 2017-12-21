@@ -34,11 +34,31 @@ The perforation intervals will be indicated by different colour along the well p
 
 ## Fishbones
 
+Fishbones are completions created by drilling or etching a set of small holes nearly perpendicular to the main bore.
+Each set of holes is created in the same operation and is callea a _sub_ while each individual hole is called a _lateral_.
+
+For each wellpath there is a top level folder in the **Project Tree** containing all the fish bone definitions containing settings that applies to all the fishbones for this well path. 
+
+![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
+
+- **Fishbone Well Properties** -- Settings used when exporting well connection factors
+  - **StartMD** –- the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
+  - **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
+  - **Main Bore Skin Factor** -- The skin factor for the main bore, used in calculation of the transmissibility (connection factor) into the main bore. 
+For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+- **Multi Segment Wells** - Options used by the Well Segments Export
+  - **Liner Inner  eter** -- The liner inner diameter for the fishbones. 
+  - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
+  - **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
+  - **Length and Depth** -- Used in WELSEGS export - when specifyig the lenght and depth change for each segment
+    - **Incremental** -- length / depth of given segment
+    - **Absolute** -- the length down the tube or depth of the last nodal point
+
 To add new fishbones completions, select the **New Fishbones Subs Definition** command. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well trajectory in the 3D View. 
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
-The new **Fishbones Subs Definition** (a group of fishbones) is created in the Project tree. Several subs definitions can be created on the same welll trajectory to give more flexibility in the placing of the fishbones. 
+The new **Fishbones Subs Definition** (a group of fishbone subs) is created in the Project tree. Several subs definitions can be created on the same well trajectory to give more flexibility in placing of the fishbones. 
 
 ![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
 - **Appearance**
@@ -59,12 +79,21 @@ The new **Fishbones Subs Definition** (a group of fishbones) is created in the P
     - **Fixed Angle** -- The user can specify the angle for the first lateral
     - **Random angle** -- Each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
   - **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
-- **Well Properties** -- Only used for export
-- **Multi Segment Wells** -- Only used for export
+- **Well Properties** -- Settings to control the connection factor calculation used in [Completion Data Export]({{ site.baseurl }}/docs/completions#exporting-completion-data))
+  - **Hole Diameter** -- The hole diameter of the lateral
+  - **Skin Factor** -- The skin factor used in the transmissibility calculation for the lateral. 
+- **Multi Segment Wells** -- Settings used for Well Segment Export
+  - **Tubing Diameter** -- The diameter used in the *WELSEGS* export of the laterals. 
+  - **Open Hole Roughness Factor** -- The rougness factor used in the *WELSEGS* export of the laterals. 
+  - **Tubing Roughness Factor** --  
+  - **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for *WSEGVALV* export. 
+  - **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
+  - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
 ### Imported Laterals
 
-By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export (see below).  
+By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export.
+
 
 ### Export Fishbones as Well Trajectories
 
@@ -75,20 +104,6 @@ Notice that only the trajectory data is exported. Properties related to well seg
 </div>
 
 ### Export of Fishbone Completion Data
-
-Properties for the fishbones relevant for the export of completion data for the fishbones are available in the property editor: 
-
-![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
-
-- **StartMD** – the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
-- **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
-- **Main Bore Skin Factor** -- The skin factor for the main bore, used in calculation of the transmissibility (connection factor) into the main bore. 
-
-For the Fishbones laterals, the relevant propertoes are : 
-- **Hole Diameter** -- The hole diameter of the lateral
-- **Skin Factor** -- The skin factor used in the transmissibility calculation for the lateral. 
-
-These parameters are available either for the Fishbones subs definition, or as parameters imported fishbone laterals. 
 
 The transmissibility calculation for the fishbones is done following the same description as the transmissibility calculation for the perforation interval, see TODO-link. 
 
@@ -135,16 +150,6 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
     /
 
 ### Export Well Segments
-For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
-
-![]({{ site.baseurl }}/images/Fishbones_PropEdit_MSW.png)
-
-For the Fishbone group the following parameters can be set for Multi Segment Wells
-- **Liner Inner  eter** -- The liner inner diameter for the fishbones. 
-- **Roughness Factor** -- The roughness factor used in export of main bore segments. 
-- **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
-- **Length and Depth** can be *Incremental* or *Absolute*. Used in WELSEGS export - when specifyig the lenght and depth change for each segment, these will be incremental (length / depth of given segment) or abosolute (the length down the tube or depth of the last nodal point). 
-
 
 ![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
 
@@ -152,13 +157,6 @@ For the Fishbone group the following parameters can be set for Multi Segment Wel
 Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
-
-- **Tubing Diameter** -- The diameter used in the *WELSEGS* export of the laterals. 
-- **Open Hole Roughness Factor** -- The rougness factor used in the *WELSEGS* export of the laterals. 
-- **Tubing Roughness Factor** -- TODO: Not in use? 
-- **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for *WSEGVALV* export. 
-- **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
-- **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
 
 In the output file there are data for three Eclipse keyword specified: 
