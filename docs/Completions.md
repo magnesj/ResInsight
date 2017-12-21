@@ -14,11 +14,9 @@ For fishbones completions, multisegment well information can even be exported to
 
 ## Perforation Intervals
 
-### Modelling of Perforation Interval Completions
+A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **New Perforation interval**. 
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
-
-A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **New Perforation interval**. 
 
 ![]({{ site.baseurl }}/images/PerforationIntervals_propEditor.png)
 
@@ -36,20 +34,11 @@ The perforation intervals will be indicated by different colour along the well p
 
 ## Fishbones
 
-### Modelling of Fishbone Completions
+To add new fishbones completions, select the **New Fishbones Subs Definition** command. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well trajectory in the 3D View. 
 
-To add new fishbones completions, select the **New Fishbones Subs Definition**. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
+![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
-![]({{ site.baseurl }}/images/Completions_AddNew.png)
-
-<div class="note info">
-In the property editor, the settings for the Fishbones group becomes available when a fishbone group is created.
-</div>
-
-### Fishbone Subs Definition
-A Fishbones Subs Definition (a group of fishbones) is created in the Project tree from the command descibed above. New subs definitions can be created to give more flexibility in the placing of the fishbones. 
-
-In the property editor one can set the parameters for the fishbones subs
+The new **Fishbones Subs Definition** (a group of fishbones) is created in the Project tree. Several subs definitions can be created on the same welll trajectory to give more flexibility in the placing of the fishbones. 
 
 ![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
 
