@@ -36,7 +36,7 @@ The perforation intervals will be indicated by different colour along the well p
 ### Export of Perforation Interval Completion Data
 The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
 
-Taking the X direction as an example, we first calculate the releavatn permeability *K* from the Eclipe properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
+Taking the X direction as an example, we first calculate the relevant permeability *K* from the Eclipse properties *PERMY* (K<sub></sub>) and PERMZ (K<sub>z</sub>): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
 
@@ -44,11 +44,11 @@ The Peacman radius (pressure equvivalent radius) for the cell is then calculated
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
 
-The x-component of the transmissibility vector is be calculation, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
+The x-component of the transmissibility vector is calculated, using the length of the perforation in the x direction (l<sub>x</sub>), the well radius (r<sub>w</sub>) and skin factor (S):
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Trans.png)
 
-The y and z component to the transmissibilities are calculated in the same manner, and the total transmissibility is then calculated as: 
+The y and z component of the transmissibility are calculated in the same manner, and the total transmissibility is then calculated as: 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 
@@ -60,7 +60,7 @@ For an example of *COMPDAT* files exported with calculated transmissibilities an
 
 ### Modelling of Fishbone Completions
 
-To add new fishbones completions, select the «New Fishbones Subs Definition”. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
+To add new fishbones completions, select the **New Fishbones Subs Definition**. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well in the view. 
 
 ![]({{ site.baseurl }}/images/Completions_AddNew.png)
 
@@ -75,16 +75,18 @@ In the property editor one can set the parameters for the fishbones subs
 
 ![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
 
-**Location defined by** -- This parameter has three options, “Start/End/Number of Subs”, “Start/End/Spacing” and “User Specified”. The setting will control which of the **location** parameters the user can control and which are calculated automatically. 
+**Location Defined By** -- This parameter has three options, **Start/End/Number of Subs**, **Start/End/Spacing** and **User Specified**. The setting will control which of the settings in the **Location** group of options the user can control. The rest are calculated automatically. 
 - **Start MD / End MD** -- Position, in Measured depth along the well, of the first / last fishbone Sub. The unit will be dependent on unit system for the well (m for metric units and ft for field units). 
-- **Measured Depths** -- The measured depth of the fishbone subs. If the “location defined by” is set to the “User specified” option, only this property will be available to the user. 
+- **Measured Depths** -- The measured depth of the fishbone subs. If the **Location Defined By** is set to the **User Specified** option, only this property will be available to the user. 
 
 Laterals configurations sets up the configuration of the laterals at each sub position.  
 - **Laterals Per Sub** -- Number of laterals for each sub position
 - **Lenght(s)** -- Length of each lateral, in m or ft. 
 - **Exit Angle** -- Exit angle for fishbone lateral, in degree. 
 - **Build Angle** -- Build angle for fishbone lateral, in degree pr meter. 
-- **Orientation** -- Can be “Fixed Angle”, in which case the user can specify the angle for the first lateral, or “Random angle” where each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
+- **Orientation**
+  - **Fixed Angle** -- The user can specify the angle for the first lateral
+  - **Random angle** -- Each sub will have a random orientation. Notice that the angle between each of the laterals will be constant, with the laterals equally spaced. 
 - **Install Success Rate** -- Gives the probability of success for installation of each of the fishbones laterals. If 1, all laterals are installed.  
 
 <div class="note info">
