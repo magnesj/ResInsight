@@ -105,7 +105,7 @@ The **Export Laterals** command will export the fishbone laterals as a well traj
 Notice that only the trajectory data is exported. Properties related to well segment data or needed to calculate connection factors or are not exported. 
 </div>
 
-#### Export of Fishbone Completion Data
+### Export of Fishbone Completion Data
 
 Properties for the fishbones relevant for the export of completion data for the fishbones are available in the property editor: 
 
@@ -165,7 +165,7 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
        Well Path B     25.11396     27     41     15      /
     /
 
-#### Export Well Segments
+### Export Well Segments
 For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
 
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit_MSW.png)
