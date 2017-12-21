@@ -19,4 +19,4 @@ The command can also be found in **File -> Export**. If the command is used in t
 - **Export Keyword** -- Selects the Eclipse keyword to export
 - **Visible Active Cells Value** -- This value is used for all the active cells that passes the filters(Range Filter, Property Filter etc) in the 3D View, and thus is visible. 
 - **Hidden Active Cells Value** -- All the active cells that are not visible in the 3D view.
-- **
+- **Inactive Cells Value** -- This value is used for all inactive cells, regardless of whether they are visible or not.
