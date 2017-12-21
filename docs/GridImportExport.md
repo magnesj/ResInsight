@@ -23,7 +23,8 @@ You can select several grid files in one go by multiple selection of files (Ctrl
 
 #### Result Index File
 
-If enabled, ResInsight will generate an index file when reading the eclipse result files for the first time. This file will significantly reduce the time used to open the case next time. The file is named _`<casename>.RESINSIGHT_IDX`_.
+If enabled, ResInsight will generate an index file when reading the eclipse result files for the first time. This file will significantly reduce the time used to open the case next time. The file is named _`<casename>.RESINSIGHT_IDX`_
+See [Preferences: Behaviour When Loading Data]({{ site.baseurl }}/docs/preferences#behaviour-when-loading-data)
 
 ### Time Step Filtered Eclipse Result
 Some Eclipse files have an enormous amount of time steps. If only a selection of the time steps really are needed for the session, the time steps can be filtered before loading. This can possibly speed up the import a great deal. Filtering can be done in the following way.
