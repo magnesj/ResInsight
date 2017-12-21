@@ -49,7 +49,7 @@ Se also [ Flow Diagnostics Plots]({{ site.baseurl }}/docs/flowdiagnosticsplots) 
 
 The calculations are performed by a library called [opm-flowdiagnostics](https://github.com/OPM/opm-flowdiagnostics) developed by [SINTEF Digital](http://www.sintef.no/sintef-ikt/#/). 
 
-This method is based on the presence of a flux field, and will use the flux field written to the eclipse result data file (Cell Properties: FLRGAS, FLRWAT, FLROIL) if available. If these are not available, the flux field is estimated by algorithms in the opm-flowdiagnostics-applications library.
+This method is based on the presence of a flux field, and will use the flux field written to the eclipse result data file (Cell Properties: FLRGAS, FLRWAT, FLROIL) if available. If these are not available, the flux field is estimated by algorithms in the opm-flowdiagnostics-applications library based on pressure differences, relative and absolute permeability and viscosity. Other effects are not included.  
 
 A more elaborate description of the technique and how it can be  utilized, can be found at Sintef's web site [here](http://www.sintef.no/projectweb/mrst/modules/diagnostics/). The MRST tool described is a Matlab predecessor of the flow diagnostics calculations developed for ResInsight.
 
