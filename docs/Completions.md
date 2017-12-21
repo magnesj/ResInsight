@@ -103,7 +103,7 @@ The command **Import Completions From File** can be used to import well trajecto
 The **Export Laterals** command will export the fishbone laterals as a well trajectory into a  *.dev*-file. 
 
 <div class="note info">
-Notice that only the trajectory data is exported. Properties related to well segment data or needed to calculate connection factors or are not exported. 
+Notice that only the trajectory data is exported. Properties related to well segment data or Completion Data export are not exported. 
 </div>
 
 
