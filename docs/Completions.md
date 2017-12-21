@@ -30,7 +30,8 @@ After creating the perforation interval, the following properties of the perfora
 - **Start Date** -- The perforation will be included in the model for al time steps after this date. If "All TimeSteps" is turned on, this option is not available and the perforation is included for all time steps. 
 
 The perforation intervals will be indicated by different colour along the well path. 
-TODO: Image??
+
+![]({{ site.baseurl }}/images/WellPerforationIntervalColor.png)
 
 ### Export of Perforation Interval Completion Data
 The transmissibility calculation is performed for each direction, X, Y and Z, in an orthogonal coordinate system local to the cell. 
