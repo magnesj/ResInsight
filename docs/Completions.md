@@ -97,10 +97,13 @@ Laterals configurations sets up the configuration of the laterals at each sub po
 
 By selecting **Import Completions From File** fishbone laterals which have been previously exported can be imported. For imported laterals there are no possibility to change the modelling of the completions, and all parameters are related to export (see below).  
 
-### Fishbones Export 
+### Export Fishbones as Well Trajectories
 
-#### Export Laterals
-The **Export Laterals** command will export the fishbones laterals as a *.dev*-file, which can be imported as a completion. Notice that well properties needed for export of well segment data or connection factors is not saved, and must be entered manually after import of the laterals. 
+The **Export Laterals** command will export the fishbone laterals as a well trajectory into a  *.dev*-file. 
+
+<div class="note info">
+Notice that only the trajectory data is exported. Properties related to well segment data or needed to calculate connection factors or are not exported. 
+</div>
 
 #### Export of Fishbone Completion Data
 
