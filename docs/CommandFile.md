@@ -6,7 +6,7 @@ published: true
 ---
 
 The command file interface allows a sequence of specified commands to be run in order from the command line.
-The interface is used by supplying the command file as a [command line paramter]({{site.baseurl}}/docs/commandlineparameters).
+The interface is used by supplying the command file as a [command line parameter]({{site.baseurl}}/docs/commandlineparameters).
 Once the command file is finished executing, ResInsight will exit.
 
 **Case Control Commands**
