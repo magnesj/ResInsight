@@ -43,14 +43,15 @@ ResInsight has embedded Flow Diagnostics calculations made available using the *
 These results make it easier to see how and where wells interact with the reservoir and each other. 
 It is possible to select exactly what wells to investigate, and even the possible *opposite flow* part of the well.
 
-This method is based on a flux field, and will use the flux field written to the eclipse result data file (Cell Properties: FLRGAS, FLRWAT, FLROIL) if available. If these are not available, the flux field is estimated by algorithms in the opm-flowdiagnostics-applications library.
-
 Se also [ Flow Diagnostics Plots]({{ site.baseurl }}/docs/flowdiagnosticsplots) and [ Flow Characteristics Plot]({{ site.baseurl }}/docs/flowdiagnosticsplots#flow-characteristics-plot) 
-
 
 #### Method
 
-The calculations are performed by a library called [opm-flowdiagnostics](https://github.com/OPM/opm-flowdiagnostics) developed by [SINTEF Digital](http://www.sintef.no/sintef-ikt/#/). A more elaborate description of the technique and how it can be  utilized, can be found at Sintef's web site [here](http://www.sintef.no/projectweb/mrst/modules/diagnostics/). The MRST tool described is a Matlab predecessor of the flow diagnostics calculations developed for ResInsight.
+The calculations are performed by a library called [opm-flowdiagnostics](https://github.com/OPM/opm-flowdiagnostics) developed by [SINTEF Digital](http://www.sintef.no/sintef-ikt/#/). 
+
+This method is based on the presence of a flux field, and will use the flux field written to the eclipse result data file (Cell Properties: FLRGAS, FLRWAT, FLROIL) if available. If these are not available, the flux field is estimated by algorithms in the opm-flowdiagnostics-applications library.
+
+A more elaborate description of the technique and how it can be  utilized, can be found at Sintef's web site [here](http://www.sintef.no/projectweb/mrst/modules/diagnostics/). The MRST tool described is a Matlab predecessor of the flow diagnostics calculations developed for ResInsight.
 
 The methodology is also described in: 
 [The application of flow diagnostics for reservoir management](http://folk.ntnu.no/andreas/papers/diagnostics.pdf) SPE J., Vol. 20, No. 2, pp. 306-323, 2015. DOI: [10.2118/171557-PA](https://dx.doi.org/10.2118/171557-PA)
