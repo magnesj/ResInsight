@@ -75,6 +75,7 @@ There are two main selections you need to make: The tracers and the result prope
        - The list of selectable tracers can be filtered using wild card search of their names.
        - The tracers are sorted by their overall status as producer or injectors and prefixed depending on the status.
          Injectors are prefixed with "I :", producers with "P :" and wells with varying state "I/P:".
+- **Phases** -- Select the fluid phase you are interested in: All, Oil, Gas or Water. If one of the separate phases are selected, only the _Time Of Flight_ result property will be available in the list below.
 - **Result property** -- Displays a list of the available results:
     - **Time Of Flight (Average)** -- The time for some fluid in the cell to reach a producer, 
     or the time it takes to reach the cell from an injector. 
