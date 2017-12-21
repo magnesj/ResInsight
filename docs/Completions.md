@@ -149,91 +149,6 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
        Well Path B     25.11396     27     41     15      /
     /
 
-### Export Well Segments
-
-![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
-
-
-Notice that there are additional MSW parameters in the property edit for the fishbones subs definition. 
-
-![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
-
-
-In the output file there are data for three Eclipse keyword specified: 
-
-##### WELSEGS
-WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for.  Example: 
-
-    WELSEGS
-    -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
-       Well Path A     4137.09154     87.00000     1*        ABS         H--           /
-    -- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
-    -- Main stem
-    -- Segment for sub 0
-       2             2            1              1              13.00000      0.53667          0.15200     0.00001      /
-    -- Laterals
-    -- Diam: MSW - Tubing Radius
-    -- Rough: MSW - Open Hole Roughness Factor
-    -- ICD
-       3             3            2              2              0.10000       0                0.15200     0.00001      /
-    -- Fishbone 0 : Sub index 0 - Lateral 0
-       52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
-       53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
-    /
-   
-
-- The first *WELSEGS* entry contains information about the well: 
-  - *Name* - Name of well
-  - *Dep 1* - TVD of start MD point, as given by the user in the Fishbones **Start MD** field.  
-  - *Tlen 1* - Point given by the user in the Fishbones **Start MD** field.  
-  - *Len&Dep* - incremental or abosulute, as specified by the user in the Fishbones property editor. 
-  - *PresDrop* - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
-
-- The folowing *WELSEGS* entries contains information about each segment: 
-  - *First Seg*, *Last Seg* -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
-  - *Branch Num* -- Branch number for segment being exported 
-  - *Outlet Seg* - The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
-  - *Length* - Length of segment (if incremental Len&Dep above) or length of segments including this along well (if abosulte Len&Dep above). For ICDs length is set to 0.1. 
-  - *Depth Change* - Depth of segment, incremental or abosolute as for Length. For ICDs depth is set to 0. 
-  - *Diam* - Diameter of segment. For main bore and ICD entries, the liner inner diamater for the Fishbones collection is used. For laterals, an effecive diamaeter is calculated so that the diameter exported is the diamaneter which, assuming a circle, would give the same area as the area betweeen the hole diamaeter and the tubing diameter.  
-  - *Rough* - The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
-
-    
-##### COMPSEGS
-An example of the COMPSEGS keyword as exported is shown below.  
-
-    COMPSEGS
-    -- Name            
-       Well Path A      /
-    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
-       28     40     6      27            0.00000          1.70326         /
-       28     40     7      27            1.70326          2.34748         /
-       28     40     8      27            2.34748          2.96577         /
-    /
-
-The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
-- *I*, *J* and *K* -- The Eclipde cell index
-- *Branch no* -- Branch number for the segment
-- *Start Length*, *End Length* -- Start and end lenght along the well for the relevent segment. 
-
-
-
-##### WSEGVALV
-An example of the WSEGVALV keyword as exported is shown below.  
-
-    WSEGVALV
-    -- Well Name       Seg No     Cv          Ac          
-       Well Path A     3          1.50000     0.00008      /
-       Well Path A     5          1.50000     0.00008      /
-       Well Path A     7          1.50000     0.00008      /
-    /
-    
-The parameters exported in the WEGVALV keword are
-- *Well Name* -- The name of the well
-- *Seg No* -- Segment number along the well
-- *Cv* -- The ICD Flow Coefficient, as entered by the user
-- *Ac* -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.  
-    
 
 
 ## Exporting Completion Data
@@ -273,3 +188,90 @@ The y and z component of the transmissibility are calculated in the same manner,
 If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
+
+## Export Well Segments
+
+It is possible to export all the Fishbone Sus Definitions to a text file containing the Eclipse input data 
+keywords needed to represent the fishbone part of the well as an MSW.
+
+This can be done by the command **Export Well Segments** available as a context command on the **Fishbones** folder. Invoking the command will show a dialog prompting you to enter a target directory and which case to use in the calculations.
+
+![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
+
+
+
+### Exported MSW Data
+
+In the output file there are data for three Eclipse keyword specified.
+
+##### WELSEGS
+WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for.  Example: 
+
+    WELSEGS
+    -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
+       Well Path A     4137.09154     87.00000     1*        ABS         H--           /
+    -- First Seg     Last Seg     Branch Num     Outlet Seg     Length        Depth Change     Diam        Rough       
+    -- Main stem
+    -- Segment for sub 0
+       2             2            1              1              13.00000      0.53667          0.15200     0.00001      /
+    -- Laterals
+    -- Diam: MSW - Tubing Radius
+    -- Rough: MSW - Open Hole Roughness Factor
+    -- ICD
+       3             3            2              2              0.10000       0                0.15200     0.00001      /
+    -- Fishbone 0 : Sub index 0 - Lateral 0
+       52            52           27             3              1.70326       -0.57276         0.00960     0.00100      /
+       53            53           27             52             2.34748       -0.81635         0.00960     0.00100      /
+    /
+   
+
+- The first *WELSEGS* entry contains information about the well: 
+  - **Name** - Name of well
+  - **Dep 1** - TVD of start MD point, as given by the user in the Fishbones **Start MD** field.  
+  - **Tlen 1** - Point given by the user in the Fishbones **Start MD** field.  
+  - **Len&Dep** - incremental or abosulute, as specified by the user in the Fishbones property editor. 
+  - **PresDrop** - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
+
+- The folowing *WELSEGS* entries contains information about each segment: 
+  - **First Seg**, **Last Seg** -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
+  - **Branch Num** -- Branch number for segment being exported 
+  - **Outlet Seg** -- The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
+  - **Length** -- Length of segment (if incremental Len&Dep above) or length of segments including this along well (if abosulte Len&Dep above). For ICDs length is set to 0.1. 
+  - **Depth Change** -- Depth of segment, incremental or abosolute as for Length. For ICDs depth is set to 0. 
+  - **Diam** -- Diameter of segment. For main bore and ICD entries, the liner inner diamater for the Fishbones collection is used. For laterals, an effecive diamaeter is calculated so that the diameter exported is the diamaneter which, assuming a circle, would give the same area as the area betweeen the hole diamaeter and the tubing diameter.  
+  - **Rough** -- The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
+
+    
+##### COMPSEGS
+An example of the COMPSEGS keyword as exported is shown below.  
+
+    COMPSEGS
+    -- Name            
+       Well Path A      /
+    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+       28     40     6      27            0.00000          1.70326         /
+       28     40     7      27            1.70326          2.34748         /
+       28     40     8      27            2.34748          2.96577         /
+    /
+
+The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
+- **I**, **J** and **K** -- The Eclipde cell index
+- **Branch no** -- Branch number for the segment
+- **Start Length**, **End Length** -- Start and end lenght along the well for the relevent segment. 
+
+##### WSEGVALV
+An example of the WSEGVALV keyword as exported is shown below.  
+
+    WSEGVALV
+    -- Well Name       Seg No     Cv          Ac          
+       Well Path A     3          1.50000     0.00008      /
+       Well Path A     5          1.50000     0.00008      /
+       Well Path A     7          1.50000     0.00008      /
+    /
+    
+The parameters exported in the WEGVALV keword are
+- **Well Name** -- The name of the well
+- **Seg No** -- Segment number along the well
+- **Cv** -- The ICD Flow Coefficient, as entered by the user
+- **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.  
+    
