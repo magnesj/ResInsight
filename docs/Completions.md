@@ -136,10 +136,26 @@ To create a new fracture template, rightclick the **Fracture Template** item in 
 
 #### Stimplan Fracture Template
 
-Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results of a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc.
+Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc. as time varying quantities.
 
 ![]({{ site.baseurl }}/images/StimplanFractureTemplateProperties.png)
 
+- **Name** -- User name of this particular fracture template
+- **Show StimPlan Mesh** -- Show or hide the meshlines on the fracture in the 3D View
+- **Input**
+  - **File Name** -- Path to the imported StimPLan XML-file
+  - **Active Timestep Index** -- Timestep in the StimPlan simulation to use for transmissibility calculations and visualization
+  - **Well/fracture Intersection Depth** -- The position of the fracture along the well path as MD.
+- **Geometry**
+  - **Fracture Orientation** -- The fractures orientation
+    - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
+    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiencyof the well in the fracture. See below.
+    - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
+- **Fracture Truncation**
+  - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
+  - **Top Layer** -- Topmost K-layer that the fracture will penetrate
+  - **Base Layer** -- Lowest K-layer that the fracture will penetrate
+  
 ## Exporting Completion Data to Eclipse
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
