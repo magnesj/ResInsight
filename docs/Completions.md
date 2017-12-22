@@ -136,6 +136,9 @@ To create a new fracture template, rightclick the **Fracture Template** item in 
 
 #### Stimplan Fracture Template
 
+Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results of a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc.
+
+![]({{ site.baseurl }}/images/StimplanFractureTemplateProperties.png)
 
 ## Exporting Completion Data to Eclipse
 
