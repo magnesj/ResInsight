@@ -36,6 +36,9 @@ The perforation intervals will be indicated by different colour along the well p
 
 ![]({{ site.baseurl }}/images/WellPerforationIntervalColor.png)
 
+### Import Perforation Intervals
+
+Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
 
 ## Fishbones
 
@@ -97,22 +100,22 @@ The new **Fishbones Subs Definition** (a group of fishbone subs) is created in t
   - **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
   - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
-### Import Well Trajectories as Laterals
+### Import Well Trajectories as Fishbones Laterals
 
-The command **Import Completions From File** can be used to import well trajectories in the `*.dev`format as fishbone laterals.  The imported laterals are listed under the folder **Imported Laterals** in the **Project Tree**. These laterals behave as completions, and will be exported when exporting completion data using the settings in the property panel of the **Imported Laterals** folder.
+The command **Import Completions From File** can be used to import well trajectories in the _`*.dev`_ format as fishbone laterals.  The imported laterals are listed under the folder **Imported Laterals** in the **Project Tree**. These laterals behave as completions, and will be exported when exporting completion data using the settings in the property panel of the **Imported Laterals** folder.
 
 ![]({{ site.baseurl }}/images/Fishbones_LateralsMSWprop.png)
 
 ### Export Fishbones as Well Trajectories
 
-The **Export Laterals** command will export the fishbone laterals as a well trajectory into a  *.dev*-file. 
+The **Export Laterals** command will export the fishbone laterals as a well trajectory into a  _`*.dev*`_ -file. 
 
 <div class="note info">
-Notice that only the trajectory data is exported. Properties related to well segment data or Completion Data export are not exported. 
+Notice that only the trajectory data is exported. Properties related to well segment data or Completion Data export can not be written to _`*.dev*`_ files. 
 </div>
 
 
-## Exporting Completion Data
+## Exporting Completion Data to Eclipse
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
@@ -202,8 +205,6 @@ keywords needed to represent the fishbone part of the well as an MSW.
 This can be done by the command **Export Well Segments** available as a context command on the **Fishbones** folder. Invoking the command will show a dialog prompting you to enter a target directory and which case to use in the calculations.
 
 ![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
-
-
 
 ### Exported MSW Data
 
