@@ -9,26 +9,21 @@ ResInsight computes several derived results. In this section we will explain wha
 
 ## Derived results for Eclipse cases
 
-The derived results are listed at the bottom of the **Static** result properties, as shown below.
+ResInsight calculates several derived cell properties that is made available as **Static** or **Dynamic** cell properties.
+The derived results listed at the bottom of the **Static** result properties, are shown below.
 
 ![]({{ site.baseurl }}/images/DerivedStaticResults.png)
 
-
 ### Transmissibility normalized by area
-The transmissibility for cells and Non-Neighbor Connections (NNCs) are dependent on both cell properties and geometry. ResInsight normalizes TRANX, TRANY and TRANZ with the overlapping flow area for both neighbor cells and NNC-cells. The results are named riTRANXbyArea, riTRANYbyArea and riTRANZbyArea respectively.
+The transmissibility for cells and Non-Neighbor Connections (NNCs) are dependent on both cell properties and geometry. ResInsight normalizes TRANX, TRANY and TRANZ with the overlapping flow area for both neighbor cells and NNC-cells. The results are named **riTRANXbyArea**, **riTRANYbyArea** and **riTRANZbyArea** respectively.
 
 The normalized transmissibilities make it easier to compare and check the flow capacity visually. This can be useful when history matching pressure differences across a fault. 
 
-### Identification of questionable NNCs
-In the process of normalizing transmissibility by the overlapping flow area, the NNCs in the model without any shared surface between two cells are identified. These NNCs are listed in the **Faults/NNCs With No Common Area** folder. These NNCs are questionable since flow normally is associated with a flow area.
-
-![]({{ site.baseurl }}/images/ResInsight_NNCsWithNoCommonArea.png)
- 
 
 ### Overall transmissibility multiplyer
-Transmissibility can be set or adjusted with multiple keywords in an Eclipse data deck. To visualize the adjustments made, ResInsight calculates a multiplicator for the overall change. First unadjusted transmissibilities for all neighbor cells and NNCs are evaluated based on geometry and permeabilities, similar to the NEWTRAN algorithm in Eclipse. For x- and y-directions, the NTG parameter is also included. The results are named riTRANX, riTRANY and riTRANZ respectively.
+Transmissibility can be set or adjusted with multiple keywords in an Eclipse data deck. To visualize the adjustments made, ResInsight calculates a multiplicator for the overall change. First unadjusted transmissibilities for all neighbor cells and NNCs are evaluated based on geometry and permeabilities, similar to the NEWTRAN algorithm in Eclipse. For x- and y-directions, the NTG parameter is also included. The results are named **riTRANX**, **riTRANY** and **riTRANZ** respectively.
 
-The TRANX, TRANY and TRANZ used in the simulation are divided by the ResInsight calculated transmissibilities and the resulting multiplicators are named riMULTX, riMULTY and riMULTZ respectively. The derived properties are listed under **Static** properties. The riMULT-properties are useful for quality checking consistence in user input for fault seal along a fault plane. 
+The TRANX, TRANY and TRANZ used in the simulation are divided by the ResInsight calculated transmissibilities and the resulting multiplicators are named **riMULTX**, **riMULTY** and **riMULTZ** respectively. The derived properties are listed under **Static** properties. The riMULT-properties are useful for quality checking consistence in user input for fault seal along a fault plane. 
 
 ### Directional combined results
 
@@ -52,8 +47,19 @@ The directional combined parameters available are:
   - **FLROILIJK** (inluding NNCs)
   - **FLRGASIJK** (inluding NNCs)
 - Generated
-  - Octave generated results with same name but ending with I,J and K will be combined.
+  - Octave generated results with same name but ending with I,J and K will also be combined into a _`<name>IJK`_ cell property.
 
+### Completion Type
+
+![]({{ site.baseurl }}/images/CompletionTypes.png)
+
+The dynamic cell property named **Completion Type** is calculated from the intersections between [Completions]({{ site.baseurl }}/docs/completions) and the grid cells. All grid cells intersected by a completion will be assigned a color based on the completion that intersects the cell.
+
+### Identification of questionable NNCs
+In the process of normalizing transmissibility by the overlapping flow area, the NNCs in the model without any shared surface between two cells are identified. These NNCs are listed in the **Faults/NNCs With No Common Area** folder. These NNCs are questionable since flow normally is associated with a flow area.
+
+![]({{ site.baseurl }}/images/ResInsight_NNCsWithNoCommonArea.png)
+ 
 ### Water Flooded PV
 
 Water Flooded PV, also called _Number of flooded porevolumes_ shows the amount of flow from a selected set of simulation tracers into a particular cell, compared to the cells mobile pore volume. A value of 1.0 will tell that the tracers accumulated flow into the cell has reached a volume equal to the mobile pore volume in the cell.   
