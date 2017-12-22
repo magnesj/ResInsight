@@ -15,7 +15,7 @@ For fishbones completions, multisegment well information can even be exported to
 <div class="note">
   The derived cell property <b>Completion Type</b> displays wich cells are intersected by the completions.
 </div>
-See [Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type)
+( See [Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type) )
 
 ## Perforation Intervals
 
@@ -111,8 +111,17 @@ The command **Import Completions From File** can be used to import well trajecto
 The **Export Laterals** command will export the fishbone laterals as a well trajectory into a  _`*.dev*`_ -file. 
 
 <div class="note info">
-Notice that only the trajectory data is exported. Properties related to well segment data or Completion Data export can not be written to _`*.dev*`_ files. 
+Notice that only the trajectory data is exported. Properties related to well segment data or Completion Data export can not be written to <code>*.dev*</code> files. 
 </div>
+
+## Fractures
+
+Hydraulic fractures are completions created by pressurizing the reservoir at a certain point in the well, and thereby creating a crack in the formations. A substance is then injected into the crack to keep it open when relaxing the pressure.
+
+Fractures in Resinsight can be added both to simulation wells and Well Trajectories, and have two main types: Eliptical fractures and StimPlan fractures. 
+
+### Fracture Templates
+
 
 
 ## Exporting Completion Data to Eclipse
