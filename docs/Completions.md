@@ -122,6 +122,19 @@ Fractures in Resinsight can be added both to simulation wells and Well Trajector
 
 ### Fracture Templates
 
+To create a fracture you first need a _Fracture Template_. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
+
+Fracture Templates are listed in a folder with the same name in the **Project Tree**
+
+![]({{ site.baseurl }}/images/FractureTemplates.png)
+
+To create a new fracture template, rightclick the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New Stimplan Fracture Template**. 
+
+#### Ellipse Fracture Template
+
+![]({{ site.baseurl }}/images/EllipseFractureTemplateProperties.png)
+
+#### Stimplan Fracture Template
 
 
 ## Exporting Completion Data to Eclipse
