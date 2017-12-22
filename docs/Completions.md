@@ -13,9 +13,9 @@ Completions can be modelled by adding new perforation intervals, fishbones subs 
 For fishbones completions, multisegment well information can even be exported to the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
 
 <div class="note">
-The derived cell property **Completion Type** displays wich cells are intersected by the completions.
-See [Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type)
+  The derived cell property <b>Completion Type</b> displays wich cells are intersected by the completions.
 </div>
+See [Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type)
 
 ## Perforation Intervals
 
