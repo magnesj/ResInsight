@@ -142,7 +142,7 @@ To create a new fracture template, rightclick the **Fracture Template** item in 
   - **Top Layer** -- Topmost K-layer that the fracture will drain
   - **Base Layer** -- Lowest K-layer that the fracture will drain
 - **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
- - **Conductivity in Fracture** 
+  - **Conductivity in Fracture** 
     - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures 
     - **Infinite Condictivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
   - **Skin Factor** -- Used when exporting to Eclipse
