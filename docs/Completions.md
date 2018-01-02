@@ -176,8 +176,8 @@ Stimplan fracture templates imports XML output from the Stimplan software. These
     - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
 - **Fracture Truncation**
   - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
-  - **Top Layer** -- Topmost K-layer that the fracture will penetrate
-  - **Base Layer** -- Lowest K-layer that the fracture will penetrate
+  - **Top Layer** -- Topmost K-layer that the fracture will drain
+  - **Base Layer** -- Lowest K-layer that the fracture will drain
 - **Properties**
   - **Condictivity Scaling Factor** -- Scale the overall condictivity to do sensitivity studies.
   - **Conductivity in Fracture** 
