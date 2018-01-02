@@ -38,7 +38,39 @@ The perforation intervals will be indicated by different colour along the well p
 
 ### Import Perforation Intervals
 
-Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
+Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. The formate is as follows:
+
+"--" is interpretet as the start of a comment. The comment ends at the end of the line. 
+The files can start with a unit definition line:
+
+    UNITS <unitname>
+
+<div class="note info">
+This line is ignored for now. The numbers are interpreted to be in the units present in the case. 
+</div>
+
+In the following any number of :
+
+    WELLNAME <well-name>
+    <date>  <well completion>  <top mMD>  <base mMD>   <bore hole diameter>  <skin factor>
+    <date>  <well completion>  <top mMD>  <base mMD>   <bore hole diameter>  <skin factor>
+
+- _date_ -- Start date of the completion in the format "dd mmm yyyy". Eg `01 SEP 2006`. A special `"SOH"`date is also allowed meaning Start Of History.
+- _well completion_ -- For now, only `"perforation"` is supported
+
+Here is an example:
+
+    UNITS METRIC
+
+    -- R-2 AH sidetrack into Ile/Tilje
+    WELLNAME R-2AH
+    "SOH"   perforation 6200 6350 0.212 0   -- taget Ile 2 and Ile 3
+    "SOH"   perforation 7050 7133 0.212 0   -- target Tilje 3, 83 m prodint
+
+    -- S-2 AH
+    WELLNAME S-2AH
+    "SOH"   perforation 4340 4369 0.212 0   -- target Garn 2, 29 m prodint (update 290915)
+    01 SEP 2006   perforation 5060 6185 0.212 0   -- target Tilje 3, 1125 m prodint
 
 ## Fishbones
 
