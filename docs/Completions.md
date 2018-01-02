@@ -38,7 +38,9 @@ The perforation intervals will be indicated by different colour along the well p
 
 ### Import Perforation Intervals
 
-Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. The formate is as follows:
+Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
+
+#### Perforation Interval File Format
 
 "--" is interpretet as the start of a comment. The comment ends at the end of the line. 
 The files can start with a unit definition line:
