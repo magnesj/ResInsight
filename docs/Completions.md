@@ -130,6 +130,26 @@ Fracture Templates are listed in a folder with the same name in the **Project Tr
 
 To create a new fracture template, rightclick the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New Stimplan Fracture Template**. 
 
+#### Common Fracture Template Options
+
+- **Geometry**
+  - **Fracture Orientation** -- The fractures orientation
+    - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
+    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiencyof the well in the fracture. See below.
+    - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
+- **Fracture Truncation**
+  - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
+  - **Top Layer** -- Topmost K-layer that the fracture will drain
+  - **Base Layer** -- Lowest K-layer that the fracture will drain
+- **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
+ - **Conductivity in Fracture** 
+    - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures 
+    - **Infinite Condictivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
+  - **Skin Factor** -- Used when exporting to Eclipse
+  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fractue is along the well path. ( Fractures **Along Well Path** only )
+  - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation. ( Fractures **Along Well Path** only )
+  - **Well Diameter** -- Used when exporting to Eclipse
+ 
 #### Ellipse Fracture Template
 
 ![]({{ site.baseurl }}/images/EllipseFractureTemplateProperties.png)
@@ -138,25 +158,11 @@ To create a new fracture template, rightclick the **Fracture Template** item in 
 - **Geometry** 
   - **Halflength X<sub>r</sub>** -- Half the width of the ellipse
   - **Height** -- The height of the elliptical fracture
-  - **Fracture Orientation** -- The fractures orientation
-    - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
-    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiency of the well in the fracture. See below.
-    - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
-- **Fracture Truncation**
-  - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
-  - **Top Layer** -- Topmost K-layer that the fracture will penetrate
-  - **Base Layer** -- Lowest K-layer that the fracture will penetrate
-- **Properties**
-  - **Conductivity in Fracture** 
-    - **Finite Conductivity** -- Use the conductivity in the Stimplane data
-    - **Infinite Condictivity** -- Ignore the conductivity in the Stimplane data, and assume infinite conductivity in the fracture itself.
-  - **Permeability** -- A constant permeability inside the fracture 
-  - **Width** -- Crack width
-  - **Skin Factor** -- Used when exporting to Eclipse
-  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fractue is along the well path.
-  - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation. 
-  - **Well Diameter** -- Used when exporting to Eclipse
- 
+  - **Fracture Orientation** -- See above
+- **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
+  - **Permeability** -- A constant permeability inside the fracture (Used to calculate conductivity in the fracture)
+  - **Width** -- Crack width (Used to calculate conductivity in the fracture)
+
 #### Stimplan Fracture Template
 
 Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc. as time varying quantities.
@@ -170,21 +176,10 @@ Stimplan fracture templates imports XML output from the Stimplan software. These
   - **Active Timestep Index** -- Timestep in the StimPlan simulation to use for transmissibility calculations and visualization
   - **Well/fracture Intersection Depth** -- The position of the fracture along the well path as MD.
 - **Geometry**
-  - **Fracture Orientation** -- The fractures orientation
-    - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
-    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiencyof the well in the fracture. See below.
-    - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
-- **Fracture Truncation**
-  - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
-  - **Top Layer** -- Topmost K-layer that the fracture will drain
-  - **Base Layer** -- Lowest K-layer that the fracture will drain
+  - **Fracture Orientation** -- See above
 - **Properties**
   - **Condictivity Scaling Factor** -- Scale the overall condictivity to do sensitivity studies.
-  - **Conductivity in Fracture** 
-    - **Finite Conductivity** -- Use the conductivity in the Stimplane data
-    - **Infinite Condictivity** -- Ignore the conductivity in the Stimplane data, and assume infinite conductivity in the fracture itself.
-  - **Skin Factor** -- Used when exporting to Eclipse
-  - **Well Diameter** --Used when exporting to Eclipse
+  
     
 ## Exporting Completion Data to Eclipse
 
