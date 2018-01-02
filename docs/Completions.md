@@ -180,7 +180,25 @@ Stimplan fracture templates imports XML output from the Stimplan software. These
 - **Properties**
   - **Condictivity Scaling Factor** -- Scale the overall condictivity to do sensitivity studies.
   
-    
+### Fracture Instances
+
+Instances of fractures can be created along well paths and simulation wells by right clicking the well pipe in the 3D view, or the corresponding items in the **Project Tree**. 
+
+![]({{ site.baseurl }}/images/FractureInstancePropertyPanel.png)
+
+- **Name** -- User editable name
+- **Location/Orientation**
+  - **Measured depth Location** -- The measured depth
+  - **Azimuth** -- Azimuth orientation of fracture. 
+  - **Dip** -- Dip of fracture plane
+  - **Tilt** -- Rotation of fracture about its plane normal
+- **Properties**
+  - **Fracture Template** -- Select the fracture template to use for this fracture.
+  - **StimPlan Time Step** -- Displays the timestep used by the template 
+  - **Perforation Length** / **Perforation Efficiency** / **Well Diameter** -- These values are copied from the new template when selecting a different one. See [Common Fracture Template Options]({{ site.baseurl }}/docs/completions#common-fracture-template-options)  
+- **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
+
+
 ## Exporting Completion Data to Eclipse
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
