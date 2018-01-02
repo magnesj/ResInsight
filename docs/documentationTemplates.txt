@@ -1,3 +1,11 @@
+---
+layout: docs
+title: Any Document Title
+permalink: /docs/uselowercasedocumentbasename/
+published: true
+---
+
+
 #### Including an image:
 
 ![Hower Name Of Picture]({{ site.baseurl }}/images/ResInsightMainPlotMediumSize.png)
