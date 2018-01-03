@@ -26,6 +26,8 @@ From the ResInsight Gui select : **File->Testing->Regression Test Dialog**
 
 Specify location of compare tool in **Folder containing compare**. The current working directory of ResInsight is temporarily changed to this path during execution.
 
+To execute a subset of tests, specify folder names separated by ";" in the *Test Filter*. If the test filter is empty, all tests are executed.
+
 ## Creating regression tests
 
 An example of the folder structure is shown below:
