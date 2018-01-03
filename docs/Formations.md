@@ -118,7 +118,7 @@ The file must have the columns "Well name", "Unit name" (i.e. formation name), "
 The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on. Indentions will be ignored.
 
 ### Viewing the Well Picks
-See [Annotations on plots](Formations#annotations-on-plots). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
+See [Annotations on plots](annotations-on-plots). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
 
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
 
