@@ -20,7 +20,9 @@ Views of Eclipse models and Geomechanical models has a lot in common, but Eclips
 
 ### View properties
 
-Grid appearance can be controlled from the **Property Editor** when a view is selected. This includes background color and z scaling. In addition, cell visibility controls of inactive and invalid cells. ![]({{ site.baseurl }}/images/ViewProperties.png) 
+Grid appearance can be controlled from the **Property Editor** when a view is selected. This includes background color and z scaling. In addition, cell visibility controls of inactive and invalid cells.
+
+![]({{ site.baseurl }}/images/ViewProperties.png) 
 
 Visibility of the grid box with labels displaying the coordinates for the reservoir can also be controlled using **Show Grid Box**. 
 
