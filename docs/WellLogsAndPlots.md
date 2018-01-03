@@ -58,7 +58,7 @@ Tracks can be created by right-clicking a **Well Log Plot** and select **New Tra
 ![]({{ site.baseurl }}/images/TrackProperties.png)
 
 A track controls the x-axis range of the display, and can be edited from the property panel of the **Track**. 
-Logarithmic display is controlled using the **Logarithmic Scale** option.
+Logarithmic display is controlled using the **Logarithmic Scale** option. It is also possible to add **Zonation** or **Formation Names** to the track. See [Formations]({{site.baseurl}}/docs/formations) for details.
 
 ## Curves
 
