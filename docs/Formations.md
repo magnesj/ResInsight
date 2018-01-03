@@ -115,7 +115,7 @@ B-2H; STRAT;     Ile Fm. 1 ;2156.197266;2158.38501
 
 The file must have the columns "Well name", "Unit name" (i.e. formation name), "Top MD" and "Base MD" (i.e. measured depth) to be regarded as a Well Pick file. They can be listed in any order, and all other columns will be ignorded.
 
-The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on.
+The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on. Indentions will be ignored.
 
 ### Viewing the Well Picks
 See [Annotations on plots](Formations#annotations-on-plots). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
