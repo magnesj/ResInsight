@@ -65,7 +65,7 @@ Formation can be used to annotate the following plot types:
 - [Well Log Plots]({{site.baseurl}}/docs/welllogsandplots)
 - [RFT Plots]({{site.baseurl}}/docs/rftplot)
 - [PLT Plots]({{site.baseurl}}/docs/pltplot)
-- Well Allocation Plots
+- [Well Allocation Plots]({{site.baseurl}}/docs/flowdiagnosticsplots)
 
 ![]({{ site.baseurl }}/images/formOnPlot.PNG)
 
@@ -117,7 +117,7 @@ The file must have the columns "Well name", "Unit name" (i.e. formation name), "
 The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on.
 
 ### Viewing the Well Picks
-See [Annotations on plot](#annotationOnPlot). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
+See section *Annotations on plot*. Annotations are added to plots in the same way as for k-layered formations, but the source is different.
 
 ![]({{ site.baseurl }}/images/wellFormationsPropEditor.PNG)
 
