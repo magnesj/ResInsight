@@ -116,7 +116,7 @@ If ResInsight's automatic well matching fails and a LAS-file is matched with the
 See [Importing Well Paths]({{ site.baseurl }}/docs/wellpaths#ascii-well-trajectories)
 
 ### Look for an Existing Well Path
-Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparision this way:
+Well log names may vary slightly among different files from the same well. When importing a well log file or a well log path file, ResInsight have to look for an existing well path item to ensure that the well log data and well path are imported to the correct well path item. The lookup is based on name comparison this way:
 - First remove any prefix (like `xxxxx1111/1111-` or `xxxxx1111/1111_`)
 - Then try an exact name match
 - If not found, try to match the names ignoring all spaces, dashes and underscores

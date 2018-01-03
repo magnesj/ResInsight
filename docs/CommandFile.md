@@ -55,7 +55,7 @@ There are different types of parameters that can be supplied.
 |---------|----------------------------------------------------------------------------------------------------|-----------------|
 | Integer | Number                                                                                             | 5               |
 | Double  | Decimal number                                                                                     | 3.14            |
-| String  | Sequence of characters contained in qoutes (`""`)<sup>1</sup>                                      | "/path/to/file" |
+| String  | Sequence of characters contained in quotes (`""`)<sup>1</sup>                                      | "/path/to/file" |
 | Enum    | Choice of a set of given options                                                                   | ALL             |
 | Boolean | `true` or `false`                                                                                  | true            |
 | List    | Multiple choices of another type, written within square brackets (`[]`) separated by a comma (`,`) | [1, 2, 3]       |

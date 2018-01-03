@@ -44,15 +44,15 @@ To import RSM files, the only action needed from the user is to select one or mo
 
 #### Column Based File Format
 
-If a column based file is presented, ResInsight first tries to identify if its header has fixed witdh or not. Further, the header is interpreted by looking for specific lines.
+If a column based file is presented, ResInsight first tries to identify if its header has fixed width or not. Further, the header is interpreted by looking for specific lines.
 
-The first line must have one or more vector mnemonics. The initial letter(s) in a mnenomic specify which summary data type the column represents. For instance, *FVPT* and *FWPT* are of type *Field*, as they both have an initial *F*. *WWCTH* and *WGORH* are well data types. See *Vector naming convention* in *Eclipse: File Formats Reference Manual* for a full overview of supported mnenomics.
+The first line must have one or more vector mnemonics. The initial letter(s) in a mnemonic specify which summary data type the column represents. For instance, *FVPT* and *FWPT* are of type *Field*, as they both have an initial *F*. *WWCTH* and *WGORH* are well data types. See *Vector naming convention* in *Eclipse: File Formats Reference Manual* for a full overview of supported mnemonics.
 
 The next lines can define units, well/group names, region names, LGR names and block numbers and the local cell number. They do not have to appear in any particular order. Scale factors can also be included, but will be ignored by ResInsight. All lines starting with _*--*_ will also be ignored.
 
 ##### Column Based with Fixed Header Width
 
-When interpreting column based files with fixed header width, ResInsight looks for left aligned column entries. These type of files are interpreted as we natuarlly read them. More than one table can be present in each file.
+When interpreting column based files with fixed header width, ResInsight looks for left aligned column entries. These type of files are interpreted as we naturally read them. More than one table can be present in each file.
 
 ```
 1                                                                                                      
@@ -89,7 +89,7 @@ DAYS               SM3/SM3
 
 #### Keyword Based File Format
 
-If the non-comment line inlcudes the word "VECTOR", the file is interpreted as a keyword based file. In keyword based files, the content of the one-column tables is described in each header. Tables should be assosiated with a table containing time stamps. In the example below, *S-1AH-GOR* is assosiated with *YEARX*, since their origin is equal. ResInsight always interpret *ORIGIN* as well name, and look for a table with the line "VECTOR YEARX" to assosiate with it.
+If the non-comment line includes the word "VECTOR", the file is interpreted as a keyword based file. In keyword based files, the content of the one-column tables is described in each header. Tables should be associated with a table containing time stamps. In the example below, *S-1AH-GOR* is associated with *YEARX*, since their origin is equal. ResInsight always interpret *ORIGIN* as well name, and look for a table with the line "VECTOR YEARX" to associate with it.
 
 ```
 ----------------------------------------------

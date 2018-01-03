@@ -142,13 +142,13 @@ If the CaseId is not defined, ResInsight's Current Case is used.
 This function returns a two dimensional matrix: [ActiveCells][Num TimestepsRequested] containing the requested property data from the case with CaseId.
 If the case contains coarse-cells, the results are expanded onto the active cells. 
 If the CaseId is not defined, ResInsight's Current Case is used. 
-The RequestedTimeSteps must contain a list of indices to the requested timesteps. If not defined, all the timesteps are returned.
+The RequestedTimeSteps must contain a list of indices to the requested time steps. If not defined, all the time steps are returned.
 
 #### Matrix[numI][numJ][numK][numTimestepsRequested] riGetGridProperty([CaseId], GridIndex , PropertyName, [RequestedTimeSteps], [PorosityModel = "Matrix"|"Fracture"])
-This function returns a matrix of the requested property data for all the grid cells in the requested grid for each requested timestep.
+This function returns a matrix of the requested property data for all the grid cells in the requested grid for each requested time step.
 Grids are indexed from 0 (main grid) to max number of LGR's 
 If the CaseId is not defined, ResInsight's Current Case is used.
-The RequestedTimeSteps must contain a list of indices to the requested time steps. If not defined, all the timesteps are returned.
+The RequestedTimeSteps must contain a list of indices to the requested time steps. If not defined, all the time steps are returned.
 Writing Back to ResInsight
 
 #### riSetActiveCellProperty( Matrix[numActiveCells][numTimeSteps], [CaseId], PropertyName, [TimeStepIndices], [PorosityModel = "Matrix"|"Fracture"])
@@ -280,7 +280,7 @@ The cells are specified in a structure defined as:
 This function returns a two dimensional matrix: [Num Connections][Num Time Steps Requested] containing the value of the requested property from the case with CaseId. The order of connections is the same as the order from `riGetNNCConnections`.
 
 If the CaseId is not defined, ResInsight's Current Case is used.
-The RequestedTimeSteps must contain a list of indices to the requested time steps. If not defined, all the timesteps are returned.
+The RequestedTimeSteps must contain a list of indices to the requested time steps. If not defined, all the time steps are returned.
 
 #### Vector[numConnections] riGetStaticNNCValues([CaseId], PropertyName)
 

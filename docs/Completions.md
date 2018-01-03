@@ -6,11 +6,11 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/CompletionsIllustration.png)
 
-Three types of completions are available for modelling and export - perforation invervals, fishbone wells and fractures. The purpose of modelling these completions, is that it enables ResInsight to export Eclipse keywords for doing more refined simulations.
+Three types of completions are available for modeling and export - perforation intervals, fishbone wells and fractures. The purpose of modeling these completions, is that it enables ResInsight to export Eclipse keywords for doing more refined simulations.
 
-Completions can be modelled by adding new perforation intervals, fishbones subs or fractures. Details about the completions must then be specified, such as the length of the perforation interval or number of fishbone subs and laterals. After modelling the completions, the transmissibility (cell connection factors) can be calculated and exported to the Eclipse COMPDAT Keyword. 
+Completions can be modeled by adding new perforation intervals, fishbones subs or fractures. Details about the completions must then be specified, such as the length of the perforation interval or number of fishbone subs and laterals. After modeling the completions, the transmissibility (cell connection factors) can be calculated and exported to the Eclipse COMPDAT Keyword. 
 
-For fishbones completions, multisegment well information can even be exported to the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
+For fishbones completions, multi-segment well information can even be exported to the Eclipse Keywords WELSEGS, COMPSEGS and WSEGVALV. 
 
 <div class="note">
   The derived cell property <b>Completion Type</b> displays wich cells are intersected by the completions.
@@ -30,9 +30,9 @@ After creating the perforation interval, the following properties of the perfora
 - **Diameter** -- Diameter of the perforation, used in calculation of transmissibility ( For details on the transmissibility calculation, see [Export of Perforation Interval Completion Data]({{ site.baseurl }}/docs/completions#export-of-perforation-interval-completion-data)). 
 - **Skin Factor** -- Skin factor for the perforation, used in calculation of transmissibility. 
 - **All Timesteps** -- If on, the perforation interval will be present for all time steps
-- **Start Date** -- The perforation will be included in the model for al time steps after this date. If "All TimeSteps" is turned on, this option is not available and the perforation is included for all time steps. 
+- **Start Date** -- The perforation will be included in the model for all time steps after this date. If "All TimeSteps" is turned on, this option is not available and the perforation is included for all time steps. 
 
-The perforation intervals will be indicated by different colour along the well path. 
+The perforation intervals will be indicated by different color along the well path. 
 
 ![]({{ site.baseurl }}/images/WellPerforationIntervalColor.png)
 
@@ -42,7 +42,7 @@ Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These
 
 #### Perforation Interval File Format
 
-"--" is interpretet as the start of a comment. The comment ends at the end of the line. 
+"--" is interpreted as the start of a comment. The comment ends at the end of the line. 
 The files can start with a unit definition line:
 
     UNITS <unitname>
@@ -79,7 +79,7 @@ Here is an example:
 Fishbones are completions created by drilling or etching a set of small holes nearly perpendicular to the main bore.
 Each set of holes is created in the same operation and is callea a _sub_ while each individual hole is called a _lateral_.
 
-For each wellpath there is a top level folder in the **Project Tree** containing all the fish bone definitions containing settings that applies to all the fishbones for this well path. 
+For each well path there is a top level folder in the **Project Tree** containing all the fish bone definitions containing settings that applies to all the fishbones for this well path. 
 
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
@@ -87,7 +87,7 @@ For each wellpath there is a top level folder in the **Project Tree** containing
   - **StartMD** –- the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
   - **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
   - **Main Bore Skin Factor** -- The skin factor for the main bore, used in calculation of the transmissibility (connection factor) into the main bore. 
-For multisegment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+For multi-segment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
 - **Multi Segment Wells** - Options used by the Well Segments Export
   - **Liner Inner  eter** -- The liner inner diameter for the fishbones. 
   - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
@@ -131,7 +131,7 @@ The new **Fishbones Subs Definition** (a group of fishbone subs) is created in t
   - **Open Hole Roughness Factor** -- The rougness factor used in the *WELSEGS* export of the laterals. 
   - **Tubing Roughness Factor** --  
   - **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for *WSEGVALV* export. 
-  - **ICD Orifice Diameter** -- The Diamater of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
+  - **ICD Orifice Diameter** -- The Diameter of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
   - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
 
 ### Import Well Trajectories as Fishbones Laterals
@@ -152,7 +152,7 @@ Notice that only the trajectory data is exported. Properties related to well seg
 
 Hydraulic fractures are completions created by pressurizing the reservoir at a certain point in the well, and thereby creating a crack in the formations. A substance is then injected into the crack to keep it open when relaxing the pressure.
 
-Fractures in Resinsight can be added both to simulation wells and Well Trajectories, and have two main types: Eliptical fractures and StimPlan fractures. 
+Fractures in ResInsight can be added both to simulation wells and Well Trajectories, and have two main types: Eliptical fractures and StimPlan fractures. 
 
 ### Fracture Templates
 
@@ -162,14 +162,14 @@ Fracture Templates are listed in a folder with the same name in the **Project Tr
 
 ![]({{ site.baseurl }}/images/FractureTemplates.png)
 
-To create a new fracture template, rightclick the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New Stimplan Fracture Template**. 
+To create a new fracture template, right-click the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New Stimplan Fracture Template**. 
 
 #### Common Fracture Template Options
 
 - **Geometry**
   - **Fracture Orientation** -- The fractures orientation
     - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
-    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiencyof the well in the fracture. See below.
+    - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiency of the well in the fracture. See below.
     - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
 - **Fracture Truncation**
   - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
@@ -178,9 +178,9 @@ To create a new fracture template, rightclick the **Fracture Template** item in 
 - **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
   - **Conductivity in Fracture** 
     - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures 
-    - **Infinite Condictivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
+    - **Infinite Conductivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
   - **Skin Factor** -- Used when exporting to Eclipse
-  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fractue is along the well path. ( Fractures **Along Well Path** only )
+  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path. ( Fractures **Along Well Path** only )
   - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation. ( Fractures **Along Well Path** only )
   - **Well Diameter** -- Used when exporting to Eclipse
  
@@ -204,15 +204,15 @@ Stimplan fracture templates imports XML output from the Stimplan software. These
 ![]({{ site.baseurl }}/images/StimplanFractureTemplateProperties.png)
 
 - **Name** -- User name of this particular fracture template
-- **Show StimPlan Mesh** -- Show or hide the meshlines on the fracture in the 3D View
+- **Show StimPlan Mesh** -- Show or hide the mesh lines on the fracture in the 3D View
 - **Input**
   - **File Name** -- Path to the imported StimPLan XML-file
-  - **Active Timestep Index** -- Timestep in the StimPlan simulation to use for transmissibility calculations and visualization
+  - **Active Timestep Index** -- Time step in the StimPlan simulation to use for transmissibility calculations and visualization
   - **Well/fracture Intersection Depth** -- The position of the fracture along the well path as MD.
 - **Geometry**
   - **Fracture Orientation** -- See above
 - **Properties**
-  - **Condictivity Scaling Factor** -- Scale the overall condictivity to do sensitivity studies.
+  - **Conductivity Scaling Factor** -- Scale the overall conductivity to do sensitivity studies.
   
 ### Fracture Instances
 
@@ -228,7 +228,7 @@ Instances of fractures can be created along well paths and simulation wells by r
   - **Tilt** -- Rotation of fracture about its plane normal
 - **Properties**
   - **Fracture Template** -- Select the fracture template to use for this fracture.
-  - **StimPlan Time Step** -- Displays the timestep used by the template 
+  - **StimPlan Time Step** -- Displays the time step used by the template 
   - **Perforation Length** / **Perforation Efficiency** / **Well Diameter** -- These values are copied from the new template when selecting a different one. See [Common Fracture Template Options]({{ site.baseurl }}/docs/completions#common-fracture-template-options)  
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
 
@@ -239,12 +239,12 @@ Instances of fractures can be created along well paths and simulation wells by r
 
 - **Export Folder** -- Folder for the exported COMPDAT file. If it does not already exist, it will be created when performing the export. The exported file will get a fixed name based on what is included in the export. 
 - **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
-- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Caclulated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissbility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
-- **Well Selsction** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
-- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. If there are completions of multiple types or along multiple wells, this parameter determines if the entries for the different wels / completion types should be in the same file or split in different files. 
-- **Include Fishbones** -- Option to inclulde or exclude fishbone completions from the export. 
+- **Export**  -- Can be *Calculated Transmissibilities* or *Default Connection Factors and WPIMULT*. If *Calculated Transmissibilities* is chosen, the transmissibilities calculated based on the case and completion data are exported directly. If the *Default Connection Factors and WPIMULT* is chosen, the information about the connections for Eclipse to be able to make the transmissibility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInshight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
+- **Well Selection** -- *All Wells* or *Checked wells* if exporting from a well path collection. *Selected wells* if exporting wells. 
+- **File Split** -- *Unified File*, *Split On Well* or *Split on Well and Completion Type*. If there are completions of multiple types or along multiple wells, this parameter determines if the entries for the different wells / completion types should be in the same file or split in different files. 
+- **Include Fishbones** -- Option to include or exclude fishbone completions from the export. 
 - **Exclude Main Bore Transmissibility For Fishbones** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
-- **Include Perforations** -- Option to include or exclude perforation invervals in the export. 
+- **Include Perforations** -- Option to include or exclude perforation intervals in the export. 
 - **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
 
 ### Transmissibility Calculations
@@ -255,7 +255,7 @@ Taking the X direction as an example, we first calculate the relevant permeabili
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_K.png)
 
-The Peacman radius (pressure equvivalent radius) for the cell is then calculated, using permeabilites and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
+The Peacman radius (pressure equivalent radius) for the cell is then calculated, using permeabilities and cell sizes (D<sub>y</sub> and D<sub>z</sub>): 
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_Peaceman.png)
 
@@ -267,7 +267,7 @@ The y and z component of the transmissibility are calculated in the same manner,
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these trasmissibilities is then exported as the WPIMULT value. 
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these transmissibilities is then exported as the WPIMULT value. 
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
@@ -291,7 +291,7 @@ An example of the exported COMPDAT file is shown below. The calculated transmiss
     /
     
 
-For export with WPIMULT factors, the main bore diameter and direction are given in the export for cells which have both main bore and lateral contribuitons, while diamater and main direction of the first lateral is used for cells with no main bore contribuiton. Other parameters exported as part of COMPDAT are set to default. 
+For export with WPIMULT factors, the main bore diameter and direction are given in the export for cells which have both main bore and lateral contributions, while diameter and main direction of the first lateral is used for cells with no main bore contribution. Other parameters exported as part of COMPDAT are set to default. 
 
 The *WPIMULT* parameters are calculated, as for the perforation intervals, by ResInsight calculating both the transmissibility of the completion as described above, and in addition calculating the transmissibility based on the information exported in the COMPDAT keyword. The ratio between these two numbers is then exported as the *WPIMUT* keyword. 
 
@@ -329,7 +329,7 @@ This can be done by the command **Export Well Segments** available as a context 
 In the output file there are data for three Eclipse keyword specified.
 
 ##### WELSEGS
-WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A commet above each entry detals which element (main bore / ICD / lateral) the entry is for.  Example: 
+WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A comment above each entry details which element (main bore / ICD / lateral) the entry is for.  Example: 
 
     WELSEGS
     -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
@@ -353,16 +353,16 @@ WELSEGS defines multi-segment well. The list of entries contains information on 
   - **Name** - Name of well
   - **Dep 1** - TVD of start MD point, as given by the user in the Fishbones **Start MD** field.  
   - **Tlen 1** - Point given by the user in the Fishbones **Start MD** field.  
-  - **Len&Dep** - incremental or abosulute, as specified by the user in the Fishbones property editor. 
+  - **Len&Dep** - incremental or absolute, as specified by the user in the Fishbones property editor. 
   - **PresDrop** - specifies what is included in the pressure drop calculation, hydrostatic, friction or acceleration. Specified by user in the Fishbones property editor.
 
-- The folowing *WELSEGS* entries contains information about each segment: 
+- The following *WELSEGS* entries contains information about each segment: 
   - **First Seg**, **Last Seg** -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
   - **Branch Num** -- Branch number for segment being exported 
   - **Outlet Seg** -- The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
-  - **Length** -- Length of segment (if incremental Len&Dep above) or length of segments including this along well (if abosulte Len&Dep above). For ICDs length is set to 0.1. 
+  - **Length** -- Length of segment (if incremental Len&Dep above) or length of segments including this along well (if absolute Len&Dep above). For ICDs length is set to 0.1. 
   - **Depth Change** -- Depth of segment, incremental or abosolute as for Length. For ICDs depth is set to 0. 
-  - **Diam** -- Diameter of segment. For main bore and ICD entries, the liner inner diamater for the Fishbones collection is used. For laterals, an effecive diamaeter is calculated so that the diameter exported is the diamaneter which, assuming a circle, would give the same area as the area betweeen the hole diamaeter and the tubing diameter.  
+  - **Diam** -- Diameter of segment. For main bore and ICD entries, the liner inner diamater for the Fishbones collection is used. For laterals, an effective diameter is calculated so that the diameter exported is the diameter which, assuming a circle, would give the same area as the area between the hole diameter and the tubing diameter.  
   - **Rough** -- The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
 
     
@@ -379,9 +379,9 @@ An example of the COMPSEGS keyword as exported is shown below.
     /
 
 The first COMPSEGS entry is a line with the well path name. Each following entry is for the segments in the well, and contaning the following field: 
-- **I**, **J** and **K** -- The Eclipde cell index
+- **I**, **J** and **K** -- The Eclipse cell index
 - **Branch no** -- Branch number for the segment
-- **Start Length**, **End Length** -- Start and end lenght along the well for the relevent segment. 
+- **Start Length**, **End Length** -- Start and end length along the well for the relevant segment. 
 
 ##### WSEGVALV
 An example of the WSEGVALV keyword as exported is shown below.  
@@ -393,9 +393,9 @@ An example of the WSEGVALV keyword as exported is shown below.
        Well Path A     7          1.50000     0.00008      /
     /
     
-The parameters exported in the WEGVALV keword are
+The parameters exported in the WEGVALV keyword are
 - **Well Name** -- The name of the well
 - **Seg No** -- Segment number along the well
 - **Cv** -- The ICD Flow Coefficient, as entered by the user
-- **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icds per Sub.  
+- **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icd per Sub.  
     

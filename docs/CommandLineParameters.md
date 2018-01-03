@@ -18,7 +18,7 @@ Examples on how command line options are used are given in
 | &#45;&#45;project &lt;filename&gt;     | Open project file &lt;filename&gt;. |
 | &#45;&#45;case &lt;casename&gt;        | Import Eclipse case &lt;casename&gt; (do not include .GRID/.EGRID) |
 | &#45;&#45;startdir &lt;folder&gt;      | Set startup directory. |
-| &#45;&#45;savesnapshots all&#124;views&#124;plots&#124;          | Save snapshot of all views/plots or all(both views and plots) to **snapshots** folder in project file folder. If no arugument option is given, views are exported. Application closes after snapshots have been written. |
+| &#45;&#45;savesnapshots all&#124;views&#124;plots&#124;          | Save snapshot of all views/plots or all(both views and plots) to **snapshots** folder in project file folder. If no argument option is given, views are exported. Application closes after snapshots have been written. |
 | &#45;&#45;size &lt;width&gt; &lt;height&gt;  | Set size of the main application window. |
 | &#45;&#45;replaceCase [&lt;caseId&gt;] &lt;newGridFile&gt;  | Replace grid in &lt;caseId&gt; or first case with &lt;newGridFile&gt;. Repeat parameter for multiple replace operations.|
 | &#45;&#45;replaceSourceCases [&lt;caseGroupId&gt;] &lt;gridListFile&gt; | Replace source cases in &lt;caseGroupId&gt; or first grid case group with the grid files listed in the &lt;gridListFile&gt; file. Repeat parameter for multiple replace operations.|

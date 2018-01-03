@@ -56,7 +56,7 @@ Visualization mode and mesh lines can be controlled from the toolbar.
 - ![]({{ site.baseurl }}/images/draw_style_faults_24x24.png) **Faults-Only** visualization mode. 
    <br>When turned on, this option hides all the grid cells, and shows only the fault faces in the reservoir limited by the applied range and property filters. (Unless **Show faults outside filters** are turned on. See below.)
 - ![]({{ site.baseurl }}/images/draw_style_surface_24x24.png) Turns faces on and mesh off
-- ![]({{ site.baseurl }}/images/draw_style_surface_w_fault_mesh_24x24.png) Turns on all faces, and shows meshlines on faults only.
+- ![]({{ site.baseurl }}/images/draw_style_surface_w_fault_mesh_24x24.png) Turns on all faces, and shows mesh lines on faults only.
    <br> This is a useful method to highlight the faults in your reservoir, because the faults stands out with black outlining. 
 - ![]({{ site.baseurl }}/images/draw_style_faults_label_24x24.png) Shows labels for faults  
 

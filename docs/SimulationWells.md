@@ -11,9 +11,9 @@ This section describes how wells defined in the simulation are displayed, and ho
 
 ## Commands
 
-Several commands are available as context commands on a simulation well. These commads are available either by right-clicking  the well in the **3D View** or in the **Project Tree**.
+Several commands are available as context commands on a simulation well. These commands are available either by right-clicking  the well in the **3D View** or in the **Project Tree**.
 
-- **New Well Log Extraction Curve** -- Creates a new Well Log curve based on the selected well, the current timestep and cell property.  
+- **New Well Log Extraction Curve** -- Creates a new Well Log curve based on the selected well, the current time step and cell property.  
   ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots) )
 - **New Intersection** -- creates a new intersection based on the selected Simulation Well.  
   ( See [Well Log Plots]({{ site.baseurl }}/docs/intersections) )

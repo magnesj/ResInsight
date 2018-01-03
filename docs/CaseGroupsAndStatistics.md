@@ -7,9 +7,9 @@ published: true
 
 ![]({{ site.baseurl }}/images/GridCaseGroupTree.png)
 
-**Grid Case Group**'s are designed to make it easy to calculate statistics per cell and per timestep of a large number of Eclipse simulation Cases with identical Grids (often labeled *realizations*).
+**Grid Case Group**'s are designed to make it easy to calculate statistics per cell and per time step of a large number of Eclipse simulation Cases with identical Grids (often labeled *realizations*).
  
-If you have several Eclipse simulations with different input parameters available, you can put all the realizations into a Grid Case Group and easily calculate each of the cells mean value, range and max/min values at each timestep between the realizations.
+If you have several Eclipse simulations with different input parameters available, you can put all the realizations into a Grid Case Group and easily calculate each of the cells mean value, range and max/min values at each time step between the realizations.
 
 ## Creating Grid Case Groups
 

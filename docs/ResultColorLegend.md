@@ -14,7 +14,7 @@ The color mapping of the displayed cell result is controlled by the **Legend Def
 - **Number format** -- Defines how the numbers are formatted
 - **Colors** -- Defines the color palette
 
-- **Mapping** -- This option defines how the values are mappend onto the color distribution
+- **Mapping** -- This option defines how the values are mapped onto the color distribution
   - **Discrete Linear** -- Legend divided into linear levels defined by **Number of levels**
   - **Continuous Linear** -- Continuous linear legend with tick mark count defined by **Number of levels**
   - **Continuous Logarithmic** -- Continuous logarithmic legend with tick mark count defined by **Number of levels**

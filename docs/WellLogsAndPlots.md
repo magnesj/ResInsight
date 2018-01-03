@@ -30,7 +30,7 @@ Each **Well Log Plot** can contain several *Tracks*, and each **Track** can cont
 
 Tracks and Curves can be organized using drag and drop functionality in the **Project Tree**. Tracks can be moved from one plot to another, and you can alter the order in which they appear in the **Plot**. **Curves** can be moved from one **Track** to another.
 
-### Measured Depth (MD), True Veritcal Depth (TVD) and Pseudo Length (PL)
+### Measured Depth (MD), True Vertical Depth (TVD) and Pseudo Length (PL)
 
 All the **Tracks** in the same plot always display the same depth range, and share the *True Vertical Depth (TVD)* or *Measured Depth (MD)* setting. In the property panel of the plot, the exact depth range can be adjusted along with the depth type setting (TVD/MD). 
 
@@ -80,7 +80,7 @@ The property panel for an eclipse model is shown below:
 
 ![]({{ site.baseurl }}/images/WellLogExtractionCurveProperties.png)
 
-The first group of options controls all the input needed to setup the data extraction for the curve - Well Path, Case, and result value. The selection of result value is somewhat different between geomechanical cases and Eclipse cases. In addition you can select what timestep to address if the selected property is a dynamic one. 
+The first group of options controls all the input needed to setup the data extraction for the curve - Well Path, Case, and result value. The selection of result value is somewhat different between geomechanical cases and Eclipse cases. In addition you can select what time step to address if the selected property is a dynamic one. 
 
 <div class="note">
 Placing keyboard focus in the <b>Time Step</b> drop-downbox will allow you to use the arrow keys or the mouse wheel to quickly step through the timesteps while watching the changes in the curve. 

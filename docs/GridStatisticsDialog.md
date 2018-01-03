@@ -30,7 +30,7 @@ A grid statistics dialog is always connected to the 3D view from where it was op
 
 ![]({{ site.baseurl }}/images/InfoBoxConfig.png)
 
-The options in the Visibilty group apply to the info box only and do not affect the Grid Statistics dialog, while the options in the Statistics Options group affect both.
+The options in the Visibility group apply to the info box only and do not affect the Grid Statistics dialog, while the options in the Statistics Options group affect both.
 
 ### Statistics Options
 - **Statistics Time Range** -– Controls whether all time steps or only the current time step are included when statistics is computed. Flow Diagnostic results can only use the current time step option.

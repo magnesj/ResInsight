@@ -7,7 +7,7 @@ published: true
 
 ![]({{site.baseurl}}/images/RftPlot.png)
 
-An RFT (_Repeated Formation Tester_) plot is a special well plot for comparing observed formation pressure and simulated formation pressure. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data is retreived directly from the grid model or from the corresponding (\*.rft) files, while observed pressure data are loaded from well log files (\*.las).
+An RFT (_Repeated Formation Tester_) plot is a special well plot for comparing observed formation pressure and simulated formation pressure. The curves are plotted as pressure against true vertical depth (TVD). Simulated pressure data is retrieved directly from the grid model or from the corresponding (\*.rft) files, while observed pressure data are loaded from well log files (\*.las).
 
 
 ## Create New RFT Plot
@@ -47,7 +47,7 @@ When the user selects one or more sources, a selection of their time steps appea
 
 ### Time Steps
 The **Time Steps** field contains the relevant time steps according to the source selection. Time steps are deemed to be relevant by the following rules:
-1. If a single source or sources of the same type are selected, all cvailable timesteps in those sources are shown.
+1. If a single source or sources of the same type are selected, all available time steps in those sources are shown.
 2. If sources from two or tree types are selected, the time steps are filtered: 
   - The time steps matching the observed case(s) time steps
   - If no time steps from a case match the observed time step, the two adjacent ones are shown.

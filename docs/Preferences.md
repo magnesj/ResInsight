@@ -5,7 +5,7 @@ permalink: /docs/preferences/
 published: true
 ---
 
-In this section the different settings that controls the default behaviour of ResInsight is described. These settings can be controlled using the **Preference** dialog available from the **Edit -> Preferences** menu.
+In this section the different settings that controls the default behavior of ResInsight is described. These settings can be controlled using the **Preference** dialog available from the **Edit -> Preferences** menu.
 
 ![]({{ site.baseurl }}/images/Preferences.png)
 
@@ -39,13 +39,13 @@ This group of options controls visual settings that will be used when creating n
 
 ![]({{ site.baseurl }}/images/EclipsePreferences.png)
 
-### Behaviour When Loading Data
+### Behavior When Loading Data
 
 - **Compute DEPTH Related Properties** -- If not present, compute DEPTH, DX, DY, DZ, TOP, BOTTOM when loading new cases
 - **Load and Show SOIL** -- Control if SOIL is loaded and applied to grid
 - **Import Faults/NNCs/Advanced MSW Data** -- Disable import of data for a case to reduce case import time
 - **Fault Include File Absolute Path Prefix** -- Prefix used on Windows if fault files use absolute UNIX paths
-- **Use Result Index File** -- If enabled ResInsight will try to save a result index file when opening a new case. The file is stored in the same directory as the _`*.EGRID`_ file with filename _`<casename>.RESINSIGHT_IDX`_ If it exists, ResInsight will use this when loading the case, resultiing in a significant speedup.
+- **Use Result Index File** -- If enabled ResInsight will try to save a result index file when opening a new case. The file is stored in the same directory as the _`*.EGRID`_ file with filename _`<casename>.RESINSIGHT_IDX`_ If it exists, ResInsight will use this when loading the case, resulting in a significant speedup.
 - **Skip Import of Simulation Well Data** -- Disable import of simulation well data for a case to reduce case import time (opposite toggling than the other import commands)
 
 ## Octave - tab

@@ -37,7 +37,7 @@ Each *Include* range filter will *add more cells* to the visualization. The view
 A new range filter can be added by activating the context menu for the **Range Filters** collection in the **Project Tree**. 
 
 <div class="note">
-An I,J or K-slice range filter can be added directly from a Cell in the <b>3D View</b> by rightclicking the cell and using the context menu. 
+An I,J or K-slice range filter can be added directly from a Cell in the <b>3D View</b> by right-clicking the cell and using the context menu. 
 </div>
 
 Below is a snapshot of the **Property Editor** of the **Range Filter** :
@@ -72,9 +72,9 @@ Below is a snapshot of the **Property Editor** of the **Property Filter**.
 The filter is based on a property value range (Min - Max). Cells in the range are either shown or hidden depending on the **Filter Type** (*Include*/*Exclude*). Exclude-filters removes the selected cells from the **View** even if some other filter includes them.
 
 #### Range Behavior for Flow Diagnostic results
-Normally the available range in the sliders is the max and min of all the values in all the timesteps. For Flow Diagnostics results, however, the available range is based on the current timestep. 
+Normally the available range in the sliders is the max and min of all the values in all the tim esteps. For Flow Diagnostics results, however, the available range is based on the current time step. 
 
-We still need to keep the range somewhat fixed while moving from timestep to timestep, so in order to do so ResInsight tries to keep the intentions of your range settings, as the available range changes. If either the max or min value is set to the limit, ResInsight will keep that setting at the limit even when the limit changes. If you set a spesific value for the max or the min, that setting will keep its value, even if it happens to end up outside the available range at a time step.   
+We still need to keep the range somewhat fixed while moving from time step to time step, so in order to do so ResInsight tries to keep the intentions of your range settings, as the available range changes. If either the max or min value is set to the limit, ResInsight will keep that setting at the limit even when the limit changes. If you set a specific value for the max or the min, that setting will keep its value, even if it happens to end up outside the available range at a time step.   
 
 ### Category selection
 If the property is representing integer values, well tracer names or [ formation names ]({{ site.baseurl }}/docs/formations), the property filter displays a list of available categories used to filter cells. The separate values can then be toggled on or off using the list in the Property Editor.

@@ -93,4 +93,4 @@ In the bottom of the dialog window **Target Plot** may be specified. The target 
 
 By default the target plot is set to **(new plot)** or to the plot selected for editing when invoking the command. 
 
-Setting the targt plot to a different plot will add the selected curves to that plot when pressing the the **OK** or **Apply** button.
+Setting the target plot to a different plot will add the selected curves to that plot when pressing the the **OK** or **Apply** button.

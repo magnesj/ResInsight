@@ -10,7 +10,7 @@ published: true
 
 ![]({{ site.baseurl }}/images/ViewTree.png)
 
-Each item has a set of properties that can be editied in the **Property Editor**.
+Each item has a set of properties that can be edited in the **Property Editor**.
 
 Several views can be added to the same case by right-clicking the case or a view and select **New View**. You can also **Copy** and then **Paste** a view into a Case. All the settings are then copied to the new view.  
 

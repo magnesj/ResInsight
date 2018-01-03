@@ -61,7 +61,6 @@ See [ Cell Filters ]({{ site.baseurl }}/docs/filters) for details.
 Picking on a cell being part of a formation will display the formation name in the **Result Info** windows, in addition to other pick info for the cell.
 
 #### Annotations on Plots
-<!--- #### <span name="annotationsOnPlot">Annotations on Plots</span> --->
 Formation can be used to annotate the following plot types:
 - [Well Log Plots]({{site.baseurl}}/docs/welllogsandplots)
 - [RFT Plots]({{site.baseurl}}/docs/rftplot)

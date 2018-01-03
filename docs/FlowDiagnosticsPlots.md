@@ -91,24 +91,24 @@ The total accumulation data can also be viewed in ascci format by the command **
 
 ![]({{ site.baseurl }}/images/FlowCharacteristicsPlot.png)
 
-This window displays three different graphs describing the overall behaviour of the reservoir for each timestep from a flow diagnostics point of view. 
+This window displays three different graphs describing the overall behavior of the reservoir for each time step from a flow diagnostics point of view. 
 
-- **Lorenz Coefficient** -- This plot displays the Lorenz coefficient for the complete reservoir for each selected timestep. The time step color is used as a reference for the timestep in the other graphs.
-- **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each timestep of the F-phi curve for the reservoir.
-- **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each selected timestep.
+- **Lorenz Coefficient** -- This plot displays the Lorenz coefficient for the complete reservoir for each selected time step. The time step color is used as a reference for the time step in the other graphs.
+- **Flow Capacity vs Storage Capacity** -- This plot displays one curve for each time step of the F-phi curve for the reservoir.
+- **Sweep Efficiency** -- This plot displays one Sweep Efficiency curve for each selected time step.
 
 ### Settings
 
 ![]({{ site.baseurl }}/images/FlowCharacteristicsPropertyPanel.png)
 
 - **Case** -- Selects the source case for the plot
-- **Time Steps** -- These options selects the timesteps to be used in the plot
-  - **All With Calculated FlowDiagnostics** -- Plot data from all the timesteps already solved by the Flow Diagnostics Solver, but nothing more. The solver will be run implicitly when the user requests any Flow Diagnostics results on a particular timestep using  [Cell Results]({{ site.baseurl }}/docs/cellresults), Well Allocation Plots, or [Well Log Extraction Curves]({{ site.baseurl }}/docs/welllogsandplots#Well-Log-Extraction-Curves).  
-  - **Selected** -- Use the selected timesteps only. Activating this options displays a listbox with all the available timesteps in the 3D case. Timesteps already solved by the Flow Diagnostics Solver are marked with an asterix _`*`_. Select the interesting timesteps and press apply to invoke the solver for unsolved timesteps, and to show them in the plot.
+- **Time Steps** -- These options selects the time steps to be used in the plot
+  - **All With Calculated FlowDiagnostics** -- Plot data from all the time steps already solved by the Flow Diagnostics Solver, but nothing more. The solver will be run implicitly when the user requests any Flow Diagnostics results on a particular time step using  [Cell Results]({{ site.baseurl }}/docs/cellresults), Well Allocation Plots, or [Well Log Extraction Curves]({{ site.baseurl }}/docs/welllogsandplots#Well-Log-Extraction-Curves).  
+  - **Selected** -- Use the selected time steps only. Activating this options displays a listbox with all the available time steps in the 3D case. Time steps already solved by the Flow Diagnostics Solver are marked with an asterix _`*`_. Select the interesting time steps and press apply to invoke the solver for unsolved time steps, and to show them in the plot.
 - **Region** -- These group of options controls the cell region of interest for the plot.
   - **Cell Filter** -- Selects the type of cell filtering to apply. Sub-options are displayed depending on the selection.
     - **All Active Cells** -- Use all the active cells in the model (default)
-    - **Visible Cells** -- Use the visible cells in a particular predefined view as cell region. This option will respect all the filter settings in the view, and use the correct cell set for each timestep. 
+    - **Visible Cells** -- Use the visible cells in a particular predefined view as cell region. This option will respect all the filter settings in the view, and use the correct cell set for each time step. 
       - **View** -- The view to use as cell filter
     - **Injector Producer Communication** -- The region of communication between selected producers and injectors. See  [Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#Flow-Diagnostic-Results)
       - **Tracer Filter** -- Wild card based filter-text to filter the list of tracers
@@ -120,5 +120,5 @@ This window displays three different graphs describing the overall behaviour of 
     - **Max Time of Flight [days]** -- Only cells with a Time of Flight value less then this value are used. 
 - **Options**
   - **Legend** -- Toggles the legend on/off
-  - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells are excluded if their pore volume are larger than threshold _`*`_ total porevolume.
+  - **Aquifer Cell Threshold** -- This threshold can be used to exclude unwanted effects of aquifers. Cells are excluded if their pore volume are larger than threshold _`*`_ total pore volume.
   
