@@ -23,10 +23,10 @@ Which summaries that has been detected in a Observed data file can be read in an
 
 ## File Formats
 
-### Import CSV/txt observed time history data
+### Import CSV/txt Observed Time History Data
 CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
 
-#### CSV/txt import options dialog
+#### CSV/txt Import Options Dialog
 ![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
 
 Dialog fields description:
@@ -46,7 +46,7 @@ To import RSM files, the only action needed from the user is to select one or mo
 
 If a column based file is presented, ResInsight first tries to identify if its header has fixed width or not. Further, the header is interpreted by looking for specific lines.
 
-The first line must have one or more vector mnemonics. The initial letter(s) in a mnemonic specify which summary data type the column represents. For instance, *FVPT* and *FWPT* are of type *Field*, as they both have an initial *F*. *WWCTH* and *WGORH* are well data types. See *Vector naming convention* in *Eclipse: File Formats Reference Manual* for a full overview of supported mnemonics.
+The first line must have one or more vector mnemonics. The initial letter(s) in a mnemonic specify which summary data type the column represents. For instance, *FVPT* and *FWPT* are of type *Field*, as they both have an initial *F*. *WWCTH* and *WGORH* are well data types. See *Vector naming convention* in **Eclipse: File Formats Reference Manual** for a full overview of supported mnemonics.
 
 The next lines can define units, well/group names, region names, LGR names and block numbers and the local cell number. They do not have to appear in any particular order. Scale factors can also be included, but will be ignored by ResInsight. All lines starting with _*--*_ will also be ignored.
 
