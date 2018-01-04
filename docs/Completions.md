@@ -84,7 +84,7 @@ For each well path there is a top level folder in the **Project Tree** containin
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
 - **Fishbone Well Properties** -- Settings used when exporting well connection factors
-  - **StartMD** –- the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
+  - **StartMD** -- the start position for the fishbones. This will be set to the highest possible value automatically, but can be set lower by the user. Gives the point along the well from which the transmissibility from the matrix to the main bore will be calculated.  
   - **Main Bore Diameter** -- The hole diameter for the main bore will be used in the calculation of the transmissibility (connection factor) into the main bore. 
   - **Main Bore Skin Factor** -- The skin factor for the main bore, used in calculation of the transmissibility (connection factor) into the main bore. 
 For multi-segment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
@@ -156,7 +156,7 @@ Fractures in ResInsight can be added both to simulation wells and Well Trajector
 
 ### Fracture Templates
 
-To create a fracture you first need a _Fracture Template_. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
+To create a fracture you first need a **Fracture Template**. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
 
 Fracture Templates are listed in a folder with the same name in the **Project Tree**
 
@@ -173,16 +173,16 @@ To create a new fracture template, right-click the **Fracture Template** item in
     - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
 - **Fracture Truncation**
   - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
-  - **Top Layer** -- Topmost K-layer that the fracture will drain
-  - **Base Layer** -- Lowest K-layer that the fracture will drain
-- **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
+  - **Top Layer** -- Topmost K-layer that the fracture will drain.
+  - **Base Layer** -- Lowest K-layer that the fracture will drain.
+- **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting.
   - **Conductivity in Fracture** 
-    - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures 
+    - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures.
     - **Infinite Conductivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
-  - **Skin Factor** -- Used when exporting to Eclipse
-  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path. ( Fractures **Along Well Path** only )
-  - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation. ( Fractures **Along Well Path** only )
-  - **Well Diameter** -- Used when exporting to Eclipse
+  - **Skin Factor** -- Used when exporting to Eclipse.
+  - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path ( Fractures **Along Well Path** only ).
+  - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation ( Fractures **Along Well Path** only ).
+  - **Well Diameter** -- Used when exporting to Eclipse.
  
 #### Ellipse Fracture Template
 
@@ -358,7 +358,7 @@ WELSEGS defines multi-segment well. The list of entries contains information on 
 
 - The following *WELSEGS* entries contains information about each segment: 
   - **First Seg**, **Last Seg** -- Values are being exported pr segment, so both first and last segment number is the number of the segment being exported. 
-  - **Branch Num** -- Branch number for segment being exported 
+  - **Branch Num** -- Branch number for segment being exported.
   - **Outlet Seg** -- The segment the exported segment is connected to. For the main bore segments, this is the segment before them, for ICDs the segment number being exported and for fishbone laterals the segment on the main broe where the laterals are connected.  
   - **Length** -- Length of segment (if incremental Len&Dep above) or length of segments including this along well (if absolute Len&Dep above). For ICDs length is set to 0.1. 
   - **Depth Change** -- Depth of segment, incremental or abosolute as for Length. For ICDs depth is set to 0. 
@@ -394,8 +394,8 @@ An example of the WSEGVALV keyword as exported is shown below.
     /
     
 The parameters exported in the WEGVALV keyword are
-- **Well Name** -- The name of the well
-- **Seg No** -- Segment number along the well
-- **Cv** -- The ICD Flow Coefficient, as entered by the user
+- **Well Name** -- The name of the well.
+- **Seg No** -- Segment number along the well.
+- **Cv** -- The ICD Flow Coefficient, as entered by the user.
 - **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icd per Sub.  
     
