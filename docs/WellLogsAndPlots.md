@@ -20,9 +20,7 @@ Well log plots can be created in several ways:
 2. Right-click the empty area below all the items in the **Project Tree**.  
    Select **New Well Log Plot**. 
    A plot is created with one **Track** and an empty **Curve**.
-3. Right-click a LAS-file channel in the **Project Tree**.
-   Select **Add to New Plot**. 
-   A new plot with a single **Track** and a **Curve**  displaying the selected LAS-file channel is created.
+3. Right-click a LAS-file channel in the **Project Tree**. Select **Add to New Plot**. A new plot with a single **Track** and a **Curve**  displaying the selected LAS-file channel is created.
 
 Each **Well Log Plot** can contain several *Tracks*, and each **Track** can contain several **Curves**.
 
@@ -36,11 +34,11 @@ All the **Tracks** in the same plot always display the same depth range, and sha
 
 **Simulation Wells** however, is using a *Pseudo Length* instead of the real *Measured Depth* when the depth type is MD, as the MD information is not available in the restart files. The *Pseudo Length* is a length along the coarsely interpolated visualization pipe, and serves only as a very coarse estimation of an MD-like depth. Pseudo length is measured from the simulation-wells first connection-cell (well head connection) to the reservoir. This is very different from MD, which would start at RKB or at sea level.
 
-### Depth unit
+### Depth Unit
 
 The depth unit can be set using the **Depth unit** option. Currently ResInsight supports *Meter* and *Feet*. The first curve added to a plot will set the plot unit based on the curve unit. Additional curves added to a plot will be converted to the plot unit if needed.
 
-### Depth zoom and pan
+### Depth Zoom and Pan
 
 The visible depth range can be panned using the mouse wheel while the mouse pointer hovers over the plot.
 Pressing and holding **CTRL** while using the mouse wheel will allow you to zoom in or out depth-wise, towards the mouse position.
@@ -88,7 +86,7 @@ Placing keyboard focus in the <b>Time Step</b> drop-downbox will allow you to us
 
 The display name of a curve is normally generated automatically. The options grouped below **Auto Name** can be used to tailor the length and content of the curve name.
 
-#### Curve extraction calculation
+#### Curve Extraction Calculation
 
 This section describes how the values are extracted from the grid when creating a Well log Extraction Curve.
 
@@ -98,7 +96,7 @@ For Eclipse results the cell face value is used directly. This is normally the s
 
 Abaqus results are interpolated across the intersected cell-face from the result values associated with the nodes of that face. This is also the case for integration point results, as they are directly associated with their corresponding element node in ResInsight. 
 
-#### Change Data Source for several curves
+#### Change Data Source for Several Curves
 
 It is possible to change either the Case or the Well Path in several Well Log Extraction curves in one go. To do this, select the curves to change, and access the context menu. Select the command **Change Data Source**. The following dialog will appear:
 
