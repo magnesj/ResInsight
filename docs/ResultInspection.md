@@ -13,11 +13,11 @@ The selected cells will be highlighted, text information displayed in the **Resu
 Visibility of the docking widows can be controlled from the <b>Windows</b> menu.
 </div>
 
-## Result Info information
+## Result Info
 
-Clicking cells will display slightly different information text based on the case type as described in the following tables:
+Clicking cells will display slightly different information text based on the case type as described in the following tables.
 
-### Eclipse model
+### Eclipse Model
 
 Geometry      | Description
 --------------|------------
@@ -26,7 +26,7 @@ Fault face    | Displays the same info as for a *Reservoir cell*. In addition th
 Fault face with NNC | Displays the same info as *Fault face*, except the Non Neighbor Connections (NNC) result value is displayed instead of grid cell value. Information added in section **-- NNC details --** is geometry information of the two cells connected by the NNC.
 Formation names| Displays name of formation the cell is part of
 
-### Geomechanical model
+### Geomechanical Model
 
 Name                   | Description
 -----------------------|------------
@@ -44,7 +44,7 @@ Additional curves can be added to the plot if CTRL-key is pressed during picking
 
 To clear the cell-selection, left-click outside the visible geometry.
 
-### Adding the curves to a Summary plot
+### Adding the Curves to a Summary Plot
 
 The time history curves of the selected cells can be added to a Summary Plot by right-clicking in the **Result Plot** or in the 3D View.
 
@@ -56,7 +56,7 @@ A dialog will appear to prompt you to select an existion plot, or to create a ne
 
 ## PVT Plot
 
-Show the PVT Plot window my selecting **Windows -> PVT Plot**.
+Show the PVT Plot window by selecting **Windows -> PVT Plot**.
 
 ![]({{ site.baseurl }}/images/pvtOil.png)
 
@@ -68,7 +68,7 @@ Pressure for the selected cell, at the current time step, is marked on the plot 
 
 ## Relative Permeability Plot
 
-Show the Relative Permeability Plot window my selecting **Windows -> Relative Permeability Plot**.
+Show the Relative Permeability Plot window by selecting **Windows -> Relative Permeability Plot**.
 
 ![]({{ site.baseurl }}/images/relParm.png)
 
