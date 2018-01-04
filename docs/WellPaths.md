@@ -56,14 +56,14 @@ The supported ASCII format is quite flexible but the main requirements are:
     5507	4638.5	1628.6	1628.6
 
     
-### Trajectory files are referenced
+### Trajectory Files are Referenced
 The trajectory data is not copied into the ResInsight project as such. The project file only stores the file path, and the next time you open the project, ResInsight will try to read the well data from the file again.  
 
 <div class="note info">
 If the well trajectory file is changed and you would like a running ResInsight to update accordingly, you will need to delete all the well trajectories that emerge from that file, and import it again.
 </div>
 
-## Importing from SSI-Hub (Internal Statoil web-service)
+## Importing from SSI-Hub (Internal Statoil Web-service)
 
 In order to import from SSI-Hub, a project file must be present and stored to file. All imported well paths from the web service will be stored relative to this project file location. If no project file exists, the menu item is disabled.
 
@@ -72,7 +72,6 @@ The command **File -> Import -> Import Well Paths From SSI-hub** launches a wiza
 <div class="note info">
 <h5>Access to web service</h5>
 The import of well paths is using a web service. If you are a Statoil employee, make sure you have access to "EDM Landmark" and "EDM Compass".
-</b>
 </div>
 
 
