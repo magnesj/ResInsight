@@ -267,7 +267,7 @@ The y and z component of the transmissibility are calculated in the same manner,
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see TODO), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these transmissibilities is then exported as the WPIMULT value. 
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see [Exporting Completion Data to Eclipse](#exporting-completion-data-to-eclipse)), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these transmissibilities is then exported as the WPIMULT value. 
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
