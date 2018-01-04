@@ -35,7 +35,7 @@ As shown in the picture below, there are 7 different result types
 - **Input Property** -- Directly imported Eclipse properties from ascii files is shown in this category
 - **Formation Names** -- Lists only the Active Formation Names selected on the case.  ( See [Formations]({{ site.baseurl }}/docs/formations) )
 - **Flow Diagnostics** -- Flow diagnostic results are derived from a flux field. Either the fluxes stored in the Eclipse result data file or estimated fluxes. This option is described in detail below.
-- **Injection Flooding** -- Currently only the derived property: **Water Flooded PV** calculated based on one or more selected simulation tracers. (See [below]({{ site.baseurl }}/docs/cellresults#injection-flooding)  )
+- **Injection Flooding** -- Currently only the derived property **Water Flooded PV** calculated based on one or more selected simulation tracers. (See [below]({{ site.baseurl }}/docs/cellresults#injection-flooding)  )
 
 ### Flow Diagnostic Results
 
@@ -51,14 +51,14 @@ The calculations are performed by a library called [opm-flowdiagnostics](https:/
 
 This method is based on the presence of a flux field, and will use the flux field written to the eclipse result data file (Cell Properties: FLRGAS, FLRWAT, FLROIL) if available. If these are not available, the flux field is estimated by algorithms in the opm-flowdiagnostics-applications library based on pressure differences, relative and absolute permeability and viscosity. Other effects are not included.  
 
-A more elaborate description of the technique and how it can be  utilized, can be found at Sintef's web site [here](http://www.sintef.no/projectweb/mrst/modules/diagnostics/). The MRST tool described is a Matlab predecessor of the flow diagnostics calculations developed for ResInsight.
+A more elaborate description of the technique and how it can be  utilized, can be found at Sintef's [web site](http://www.sintef.no/projectweb/mrst/modules/diagnostics/). The MRST tool described is a Matlab predecessor of the flow diagnostics calculations developed for ResInsight.
 
 The methodology is also described in: 
 [The application of flow diagnostics for reservoir management](http://folk.ntnu.no/andreas/papers/diagnostics.pdf) SPE J., Vol. 20, No. 2, pp. 306-323, 2015. DOI: [10.2118/171557-PA](https://dx.doi.org/10.2118/171557-PA)
 
 #### Cross Flow and Opposite Flow
 
-The *opposite flow* of a well denotes the flow that is opposite to the expected normal state of the well. Eg. parts of a producer might actually be injecting due to cross flow, and an injector could be producing in some sections.
+The *opposite flow* of a well denotes the flow that is opposite to the expected normal state of the well. E.g. parts of a producer might actually be injecting due to cross flow, and an injector could be producing in some sections.
 Each well is assigned an opposite flow name by adding "-XF" to the end of the name. "-XF" was chosen as a reference to Cross Flow.
 
 In this way, a producer will have two tracer names: The "well name" as a producer tracer, and "well name-XF" as an injector tracer.
