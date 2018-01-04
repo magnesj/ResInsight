@@ -128,8 +128,8 @@ The new **Fishbones Subs Definition** (a group of fishbone subs) is created in t
   - **Skin Factor** -- The skin factor used in the transmissibility calculation for the lateral. 
 - **Multi Segment Wells** -- Settings used for Well Segment Export
   - **Tubing Diameter** -- The diameter used in the *WELSEGS* export of the laterals. 
-  - **Open Hole Roughness Factor** -- The rougness factor used in the *WELSEGS* export of the laterals. 
-  - **Tubing Roughness Factor** --  
+  - **Open Hole Roughness Factor** -- Exported directly to the *WELSEGS* keyword.
+  - **Tubing Roughness Factor** -- Exported directly to the *WELSEGS* keyword.
   - **ICDs per Sub** -- The number of ICD (valves) per Sub, used for calculation of total ICD area for *WSEGVALV* export. 
   - **ICD Orifice Diameter** -- The Diameter of the ICD, used for calculation of ICD area for *WSEGVALV* export. 
   - **ICD Flow Coefficient** -- The flow coefficient, exported directly as a part of *WSEGVALV*.
