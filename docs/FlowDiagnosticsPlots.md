@@ -24,8 +24,8 @@ In addition a **Cumulative Saturation by Time of Flight** plot may be shown. Thi
 
 ### Branches
 
-Each branch of the well will be assigned a separate **Track**. For normal wells this is based on the branch detection algorithm used for Well Pipe visualization, and will correspond to the pipe visualization with **Branch Detection** *On*. ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
-Multi Segment Wells will be displayed according to their branch information, but tiny branches consisting of only one connection are lumped into the main branch to make the visualization more understandable. ( See  [Dummy branches]({{ site.baseurl }}/docs/simulationwells#dummy-branches) )
+Each branch of the well will be assigned a separate **Track**. For normal wells this is based on the branch detection algorithm used for Well Pipe visualization, and will correspond to the pipe visualization with **Branch Detection** *On* ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) ).
+Multi Segment Wells will be displayed according to their branch information, but tiny branches consisting of only one connection are lumped into the main branch to make the visualization more understandable ( See  [Dummy branches]({{ site.baseurl }}/docs/simulationwells#dummy-branches) ).
 
 ### Creating Well Allocation Plots
 
@@ -65,18 +65,17 @@ The depth value in the plot can be controlled by selecting the **Accumulated Flo
 
 ![]({{ site.baseurl }}/images/WellAllocationWellLogProperties.png)
 
-- **Name** -- The plot name, updated automatically based on the **Flow Type** and well
+- **Name** -- The plot name, updated automatically based on the **Flow Type** and well.
 - **Depth Type**
   - **Pseudo Length**  -- Use the length along the visualized simulation well pipe as depth. 
   In this mode the curves are extended somewhat above zero depth keeping the curve 
   values constant. This is done to make it easier to see the final values of the curves relative to each other.  
   The depth are calculated with **Branch detection** *On* and using the **Interpolated** well pipe geometry.  
   ( See [Well Pipe Geometry]({{ site.baseurl }}/docs/simulationwells#well-pipe-geometry) )
-  - **TVD** -- Use True Vertical Depth on the depth-axis. 
-  This will produce distorted plots for horizontal or near horizontal wells. 
+  - **TVD** -- Use True Vertical Depth on the depth-axis. This will produce distorted plots for horizontal or near horizontal wells. 
   - **Connection Number** -- Use the number of connections counted from the top on the depth-axis.
-- **Visible Depth Range** -- These options control the depth zoom
-  - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are made
+- **Visible Depth Range** -- These options control the depth zoom.
+  - **Auto Scale** -- Toggles autoscale on/off. The plot is autoscaled when significant changes to its settings are made.
   - **Min**, **Max** -- Sets the visible depth range. These are updated when zooming using the mouse wheel etc.
   
 ### Accessing the Plot Data
@@ -112,7 +111,7 @@ This window displays three different graphs describing the overall behavior of t
       - **View** -- The view to use as cell filter
     - **Injector Producer Communication** -- The region of communication between selected producers and injectors. See  [Flow Diagnostic Results]({{ site.baseurl }}/docs/cellresults#Flow-Diagnostic-Results)
       - **Tracer Filter** -- Wild card based filter-text to filter the list of tracers
-      - _list_ -- Producer and injector tracers to select
+      - **list** -- Producer and injector tracers to select
       - **Show Region** -- Button to create (or edit) a 3D View showing the selected region of cells.
       - **Min communication** -- A threshold for the cells communication value. Cells with communication below this threshold is omitted from the region.
     - **Flooded by Injector**/**Drained by Producer** -- The region with a Time Of Flight from the selected tracers below the selected threshold.
