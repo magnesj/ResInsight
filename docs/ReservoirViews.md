@@ -44,7 +44,7 @@ The **Animation Progress** shows which time step you are viewing.
 
 ![]({{ site.baseurl }}/images/AnimationProgress.png)
 
-The **Info Text** shows general info about the case, the selected results, and some statistics. **Mobile Volume Weighted Mean** is the mean of the current **Cell Property** weighted by the **Mobile pore volume**. Mobile pore volume is defined in every cell as: *MULTPV _*_ PORV(1-SWCR)*. If MULTPV data is not present, it is ignored in the equation. The same applies to SWCR data.
+The **Info Text** shows general info about the case, the selected results, and some statistics. **Mobile Volume Weighted Mean** is the mean of the current **Cell Property** weighted by the **Mobile pore volume**. Mobile pore volume is defined in every cell as: MULTPV _*_ PORV(1-SWCR). If MULTPV data is not present, it is ignored in the equation. The same applies to SWCR data.
 
 ![]({{ site.baseurl }}/images/infoBox.png)
 
