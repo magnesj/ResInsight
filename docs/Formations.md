@@ -7,6 +7,8 @@ published: true
 
 ![]({{ site.baseurl }}/images/formations_legend.PNG)
 
+This section will describe how to use formations for different k-layers of a case, and how to use well picks/zonations for ranges of measured depths of a well path.
+
 ## Formations for k-layers
 
 Formation information can be utilized in ResInsight as cell colors, used in property filters and are displayed in the **Result info** panel when selecting single cells.
