@@ -107,6 +107,10 @@ It is possible to change either the Case or the Well Path in several Well Log Ex
 - **Case** -- Sets this case for all the curves
 - **Well Path** -- Applies this well path to all the curves. Will not affect curves using a Simulation Well.
 
+### Well Log RFT Curves
+
+# TODO
+
 ### Well Log LAS Curves
 
 LAS-curves shows the values in a particular channel in a LAS-file.
