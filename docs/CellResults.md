@@ -63,7 +63,7 @@ Each well is assigned an opposite flow name by adding "-XF" to the end of the na
 
 In this way, a producer will have two tracer names: The "well name" as a producer tracer, and "well name-XF" as an injector tracer.
 
-#### Defining results 
+#### Defining Results 
 
 There are several options available to define the particular result you want to target, as shown below:
 
