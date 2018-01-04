@@ -25,5 +25,5 @@ The color mapping of the displayed cell result is controlled by the **Legend Def
   - **All Timesteps** -- values for all time steps are used to find min and max value of 
   the result values represented by the color legend.  
   (Not available for Flow Diagnostics results)
-  - **Current Time Step** -- use current (one) time step to find min and max values  
+  - **Current Timestep** -- use current (one) time step to find min and max values  
   - **User Defined Range** -- user specifies numeric values for min and max  
