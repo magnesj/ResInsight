@@ -102,7 +102,7 @@ Open Simulation Wells will be drawn with a slightly larger radius than closed we
 
 ![]({{ site.baseurl }}/images/WellProperties.png)
 
-Each of the wells has a set of individual settings which corresponds to the setting on the global level. See the documentation of [Overall Settings for Simulation Wells](overall-settings-for-simulation-wells). 
+Each of the wells has a set of individual settings which corresponds to the setting on the global level. See the documentation of [Overall Settings for Simulation Wells](#overall-settings-for-simulation-wells). 
 
 Except for the **Size Scaling**, these options will override the corresponding setting on the global level, 
 and will result in a partially checked state on the corresponding toggle in the **Simulation Wells** property panel. 
