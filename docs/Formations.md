@@ -16,7 +16,7 @@ To use this functionality you will need to :
 1. Import one or more Formation Names file(s)
 2. Select the correct Formation Names file in the Case of interest
 
-### Import of Formation Names files
+### Import of Formation Names Files
 
 Formation Names files can be imported by using the command: **File->Import->Import Formation Names**.
 The user is asked to select _`*.lyr`_ files for import.
@@ -33,7 +33,7 @@ Formation Names files consists of a list of formation names and their k-range. B
 'Last Name'                      21 - 21 
 ```
 
-### Select the Formation file in a Case
+### Select the Formation File in a Case
 
 If only one formation file is imported, the formation will automatically be set in the active view's case. If more than one formation file is imported at once, or if a case must change formation file, the formation file for a case can be set later on. This option is available in the **Property Editor** for a case. The formation is selected in the combo box for property **Formation Names File**.
 
@@ -44,15 +44,15 @@ If the formation file is modified outside ResInsight, the formation data can be 
 
 ### Viewing the Formation Information
 
-#### Formations in 3D view
+#### Formations in 3D View
 The formations can be visualized as a result property in **Cell Results**, **Cell Edge Result**, and **Separate Fault Result**. When selected, a special legend displaying formation names is activated.
 
-#### Property filter based on formations
+#### Property Filter Based on Formations
 Formation names are available in Property Filters as Result Type **Formation Names**. This makes it easy to filter geometry based on formation specifications.
 
 See [ Cell Filters ]({{ site.baseurl }}/docs/filters) for details.
 
-#### Picking in 3D view
+#### Picking in 3D View
 Picking on a cell being part of a formation will display the formation name in the **Result Info** windows, in addition to other pick info for the cell.
 
 #### Annotations on Plots
@@ -64,16 +64,17 @@ Formation can be used to annotate the following plot types:
 
 ![]({{ site.baseurl }}/images/formOnPlot.PNG)
 
-For RFT and PLT Plots, **Formation Names** can be found in the plot's **Property Editor**. Tick "Show Formations" and choose the case with the desired formations. 
+For RFT and PLT Plots, **Zonation/Formation Names** can be found in the plot's **Property Editor**. Tick "Show Formations" and choose the case with the desired formations. 
 
-In Well Log Plots and Well Allocation Plots, **Formation Names** can be found in the **Property Editor** for a **Track** or **Branch**. In addition to choosing case, the path to show formations for must also be selected, as each track can have curves with data from more than one path.
+In Well Log Plots and Well Allocation Plots, **Zonation/Formation Names** can be found in the **Property Editor** for a **Track** or **Branch**. In addition to choosing case, the path to show formations for must also be selected, as each track can have curves with data from more than one path.
 
 ![]({{ site.baseurl }}/images/caseFormationsPropEditor.PNG)
 
 ## Well Picks
-Well Picks can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots. Well picks can be both of type *fluid* or *formation*.
 
-### Import of Well Pick files
+Well Picks can be set for a single well path, defined on measured depths of the well path. Unlike formations for k-layers, formations for a well path can only be used to annotate plots. A well pick can be either a *fluid* or a *formation*.
+
+### Import of Well Pick Files
 
 Well Pick files can be imported by using the command: **File->Import->Import Well Picks**.
 The user is asked to select _`*.csv`_ files for import.
@@ -109,7 +110,7 @@ B-2H; STRAT;     Ile Fm. 1 ;2156.197266;2158.38501
 
 The file must have the columns "Well name", "Unit name" (i.e. formation name), "Top MD" and "Base MD" (i.e. measured depth) to be regarded as a Well Pick file. They can be listed in any order, and all other columns will be ignorded.
 
-The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on. Indentions will be ignored.
+The three unit names *OIL*, *GAS* and *WATER* are interpreted as *fluids*. Other unit names with only capital letters are *groups*. A unit name without an index is simply a *formation*. Unit names with one number is a *formation 1*, unit names with *one* punctuation is a *formation 2*, two punctuations, *formation 3* and so on. Indentions in column name will be ignored.
 
 ### Viewing the Well Picks
 See [Annotations on plots](#annotations-on-plots). Annotations are added to plots in the same way as for k-layered formations, but the source is different.
