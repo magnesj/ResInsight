@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Formations
+title: Zonations/Formations
 permalink: /docs/formations/
 published: true
 ---
@@ -15,10 +15,6 @@ To use this functionality you will need to :
 
 1. Import one or more Formation Names file(s)
 2. Select the correct Formation Names file in the Case of interest
-
-<div class="note info">
-If only one formation file is imported, the formation will automatically be selected in the active view's case.
-</div>
 
 ### Import of Formation Names files
 
@@ -38,11 +34,10 @@ Formation Names files consists of a list of formation names and their k-range. B
 ```
 
 ### Select the Formation file in a Case
-To make the Formation information available for viewing, you have to select which of the Formation files to be used for a particular case.
+
+If only one formation file is imported, the formation will automatically be set in the active view's case. If more than one formation file is imported at once, or if a case must change formation file, the formation file for a case can be set later on. This option is available in the **Property Editor** for a case. The formation is selected in the combo box for property **Formation Names File**.
 
 ![]({{ site.baseurl }}/images/formations_property_editor.PNG)
-
-This option is available in the **Property Editor** for a case. The formation is selected in the combo box for property **Formation Names File**.
 
 #### Reload of formation data
 If the formation file is modified outside ResInsight, the formation data can be imported again by the context menu **Formations->Reload**. This command will import formations for the selected formation files.
