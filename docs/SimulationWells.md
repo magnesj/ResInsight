@@ -73,14 +73,14 @@ These options controls the visibility of different aspects of the simulation wel
 - **Pipe Radius Scale** -- Scaling the pipe radius by the average i,j cell size.
 - **Sphere Radius Scale** -- Scaling connection cell spheres radius by the average i,j cell size.
 
-Open Simulation Wells will be drawn with a slightly larger radius than closed wells. This makes open wells easier to see when they occupy the same cells as a closed one.
+Open Simulation Wells will be drawn with a slightly larger radius than closed wells. This makes open wells easier to see when they occupy the same cells as closed ones.
 
 ### Colors
 
 ![]({{ site.baseurl }}/images/SimulationWellsColorsProperties.png)
 
 - **Color Pipe Connections** -- Applies a red, green, blue or gray color to the section of the pipe touching a connection cell indicating the production status of the connection. Gas injection, oil production, water injection or closed respectively.  
-- **Label Color** -- Sets the well label color in the 3D view
+- **Label Color** -- Sets the well label color in the 3D view.
 - **Unique Pipe Colors** -- Pushing this apply button will apply unique colors to all the wells, overwriting the colors they had.
 - **Uniform Pipe Colors** -- Pushing the apply button will apply the displayed color to all the wells.
 
@@ -95,14 +95,14 @@ Open Simulation Wells will be drawn with a slightly larger radius than closed we
 
 ![]({{ site.baseurl }}/images/SimulationWellsAdvancedProperties.png)
 
-- **Well Cell Transparency** -- Controls the transparency level for the well cells
+- **Well Cell Transparency** -- Controls the transparency level for the well cells.
 - **Well Head Position** -- Controls the depth position of the wellhead. Either relative to the top of the active cells in the relevant IJ-column, or relative to the highest active cell overall.  
 
 ## Individual Simulation Well options 
 
 ![]({{ site.baseurl }}/images/WellProperties.png)
 
-Each of the wells has a set of individual settings which corresponds to the setting on the global level. See the above documentation of *Overall Settings for Simulation Wells*. 
+Each of the wells has a set of individual settings which corresponds to the setting on the global level. See the documentation of [Overall Settings for Simulation Wells](overall-settings-for-simulation-wells). 
 
 Except for the **Size Scaling**, these options will override the corresponding setting on the global level, 
 and will result in a partially checked state on the corresponding toggle in the **Simulation Wells** property panel. 
