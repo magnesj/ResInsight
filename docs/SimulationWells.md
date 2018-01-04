@@ -13,10 +13,9 @@ This section describes how wells defined in the simulation are displayed, and ho
 
 Several commands are available as context commands on a simulation well. These commands are available either by right-clicking  the well in the **3D View** or in the **Project Tree**.
 
-- **New Well Log Extraction Curve** -- Creates a new Well Log curve based on the selected well, the current time step and cell property.  
-  ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots) )
-- **New Intersection** -- creates a new intersection based on the selected Simulation Well.  
-  ( See [Well Log Plots]({{ site.baseurl }}/docs/intersections) )
+- **New Well Log Extraction Curve** -- Creates a new Well Log curve based on the selected simulation well, the current time step and cell property.  ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots#well-log-extraction-curves) )
+- **New Well Log RFT Curve** -- Creates a new RFT curve in a well log plot based on the selected simulation well. This option is only present if the current simulation well has RFT data. ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots#well-log-rft-curves) )
+- **New RFT Plot** --  See [Well Log Plots]({{ site.baseurl }}/docs/rftplot
 - **Plot Production Rates** -- Creates a summary plot of the selected wells production rates, along  with the bottom hole pressure.  
   ( See [Summary Plots]({{ site.baseurl }}/docs/summaryplots) ) 
 - **Plot Well Allocation** -- Creates or modifies the default Well Allocation Plot to show the well
@@ -26,7 +25,10 @@ Several commands are available as context commands on a simulation well. These c
    - Add a property filter of **Time Of Flight** to/from the selected well to show only the cells that contribute to/are influenced by the well.
    - Sets the **Cell Result** to show **Tracer With Max Fraction** based on **All Injectors** or **All Producers** (the opposite of the selected well)
    - Toggles the visibility of the other Simulation wells to show only wells contributing to/influenced by the selected well.
-
+- **New Fracture** -- Creates a new fracture along the simulation well. (See [Fracture instances]({{ site.baseurl }}/docs/welllogsandplots#fracture-instances))
+- **New Intersection** -- creates a new intersection based on the selected simulation well.  
+  ( See [Well Log Plots]({{ site.baseurl }}/docs/intersections) )
+  
 ## Overall Settings for Simulation Wells
 
 The Property Panel of the **Simulation Wells** item in the **Project Tree** contains options that are applied across all the wells, while the visualization of each single well can be controlled by the options in the property panel of that particular well, and will override the overall settings in the **Simulation Wells** item.
@@ -106,18 +108,18 @@ Except for the **Size Scaling**, these options will override the corresponding s
 and will result in a partially checked state on the corresponding toggle in the **Simulation Wells** property panel. 
 The **Size Scaling** options, however, works relative to the scaling level set on the top level.
 		  	 
-## Well pipes of Multi Segment Wells
+## Well Pipes of Multi Segment Wells
 
 ResInsight reads the MSW information in the result files and uses that to create a topologically correct visualization of the Multi Segment Well. Reading this information is somewhat time consuming, and can be turned off in the [ Preferences ]({{ site.baseurl }}/docs/preferences).
  
-### Geometry approximation
+### Geometry Approximation
 The pipe geometry generated for MSW's are based on the topology of the well (branch/segment structure) and the position of the cells being connected. The segment lengths are used as hints to place the branch points at sensible places. Thus the pipe geometry itself is not geometrically correct, but makes the topology of the well easier to see.
 
-### Dummy branches
+### Dummy Branches
 Often MSW's are modeled using a long stem without connections and a multitude of small branches; one for each connection. ResInsight offsets the the pipe within the cell to clearly show how the topology of the well is defined.
 
 ![]({{ site.baseurl }}/images/MSWDummyBranchExample.png)
 
-### Picking reveals Segment/Branch info
+### Picking Reveals Segment/Branch Info
 
 Branch and segment info of a MSW-connected-Cell is shown in the **Result Info** window when picking a cell in the 3D View. This can be handy when relating the visualization to the input files.
