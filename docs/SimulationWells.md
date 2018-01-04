@@ -15,10 +15,10 @@ Several commands are available as context commands on a simulation well. These c
 
 - **New Well Log Extraction Curve** -- Creates a new Well Log curve based on the selected simulation well, the current time step and cell property.  ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots#well-log-extraction-curves) )
 - **New Well Log RFT Curve** -- Creates a new RFT curve in a well log plot based on the selected simulation well. This option is only present if the current simulation well has RFT data. ( See [Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots#well-log-rft-curves) )
-- **New RFT Plot** --  See [Well Log Plots]({{ site.baseurl }}/docs/rftplot
+- **New RFT Plot** --  See [Well Log Plots]({{ site.baseurl }}/docs/rftplot.
 - **Plot Production Rates** -- Creates a summary plot of the selected wells production rates, along  with the bottom hole pressure.  
   ( See [Summary Plots]({{ site.baseurl }}/docs/summaryplots) ) 
-- **Plot Well Allocation** -- Creates or modifies the default Well Allocation Plot to show the well
+- **Plot Well Allocation** -- Creates or modifies the default Well Allocation Plot to show the well.
   allocation for the selected well. If the case has no Fluxes the well flow rates are shown instead.  
   ( See [ Flow Diagnostics Plots ]({{ site.baseurl }}/docs/flowdiagnosticsplots) )
 - **Show Contributing Wells** -- This command sets up a 3D View by adding filters and modifying the Cell Result based on Flow Diagnostic Calculations to show which regions and wells that contribute to the selected well by doing:
@@ -58,10 +58,8 @@ These options controls the visibility of different aspects of the simulation wel
 
 ![]({{ site.baseurl }}/images/SimulationWellsWellCellsProperties.png)
 
-- **Show Well Cells** -- This option toggles whether to add the well connection cells to the set of visible 
-  cells. If no cell filters are active, toggling this option will conveniently hide all other cells,
-  displaying only the requested well cells.   
--  **Show Well Cell Fence** -- and 
+- **Show Well Cells** -- This option toggles whether to add the well connection cells to the set of visible cells. If no cell filters are active, toggling this option will conveniently hide all other cells, displaying only the requested well cells.   
+-  **Show Well Cell Fence** -- This options toggles whether to add all cells in a given direction ( I, J or K) to the set of visible cells, which has a connecting cell within its set.
 -  **Well Fence direction** -- Controls whether to add extensions of the well cells in the I, J or K direction to the set of visible cells
 
   
