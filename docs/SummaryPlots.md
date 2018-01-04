@@ -8,7 +8,7 @@ published: true
 
 A Summary Plot is a window displaying a graph in the main area of the **Plot Main Window**. It can contain Summary Curves, Grid time history curves and pasted ascii curves ( See below ).
 
-A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor) dialog will then open. The usage of the dialog is described [here]({{ site.baseurl }}/docs/summaryploteditor).
+A new plot can be created by using the context menu of a plot selecting ![]({{ site.baseurl }}/images/SummaryPlot16x16.png) **New Summary Plot**. The [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor) dialog will then open.
 
 ## Plot Data
 
@@ -19,13 +19,13 @@ ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SM
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
-A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command: **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
+A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
-### Observed data
+### Observed Data
 
 See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)
 
-### Grid Cell Time history Curve
+### Grid Cell Time History Curve
 
 Time history curves from a grid cell property can also be added to a Summary Plot. 
 See [Result Inspection]({{ site.baseurl }}/docs/resultinspection#result-plot).
@@ -60,37 +60,37 @@ Most of the settings for the Plot itself is controlled by its sub items in the P
     The format of dates is _`yyyy-mm-ddThh:mm:ssZ`_ 
   - **Font Size** -- The font size used for the date/times shown at the ticks of the axis 
 
-### Y-axis properties
+### Y-axis Properties
 
 ![]({{ site.baseurl }}/images/summary_plot_yaxis_properties.png)
 - **Axis Title**
   - **Auto Title** -- If enabled, the y-axis title is derived from the vectors associated with the axis. Long names, acronymes  and unit can be used. 
     - **Names** -- Use the long name of the quantities
     - **Acronymes** -- Add the shortname/acronyme of the quantities
-  - **Title** -- If **Auto Title** is disabled, the plot title is set using this field 
+  - **Title** -- If **Auto Title** is disabled, the plot title is set using this field.
 - **Title Layout**
-  - **Title Position** -- Controls the position of the title. Center or At End 
-  - **Font Size** --  Defines the font size used by the axis title 
+  - **Title Position** -- Controls the position of the title. Center or At End.
+  - **Font Size** --  Defines the font size used by the axis title. 
 - **Axis Values**
-  - **Logarithmic Scale**  - Draw plot curves using a logarithmic scale 
-  - **Number Format** -- Defines how the legend numbers are formatted
+  - **Logarithmic Scale**  - Draw plot curves using a logarithmic scale. 
+  - **Number Format** -- Defines how the legend numbers are formatted.
     - **Auto** -- Legend numbers are either using a scientific or decimal notation based on the number of digits of the value
-    - **Decimal** -- Legend numbers are displayed using decimal notation
-    - **Scientific** -- Legend numbers are displayed using scientific notation (ie. 1.2e+6)
-  - **Number of Decimals** -- Controls the number of digits after ".". (For  **Decimal** or **Scientific** format options.)
-  - **Scale Factor** -- "Moves" the scale value away from the values along the axis and into the unit on the axis title. (For  **Decimal** or **Scientific** format options.)
-  - **Max and Min** -- Defines the visible y range 
-  - **Font Size** -- The font size used for the values shown at the ticks on the axis   
+    - **Decimal** -- Legend numbers are displayed using decimal notation.
+    - **Scientific** -- Legend numbers are displayed using scientific notation (ie. 1.2e+6).
+  - **Number of Decimals** -- Controls the number of digits after "." (for  **Decimal** or **Scientific** format options).
+  - **Scale Factor** -- "Moves" the scale value away from the values along the axis and into the unit on the axis title (for  **Decimal** or **Scientific** format options).
+  - **Max and Min** -- Defines the visible y range.
+  - **Font Size** -- The font size used for the values shown at the ticks on the axis.   
 
-### Plot mouse interaction
+### Plot Mouse Interaction
 
 - **Value Tracking** -- When the mouse cursor is close to a curve, the closest curve sample is highlighted and the curve sample value at this location is displayed in a tooltip. 
 - **Selection** -- Left mouse button click can be used to select several of the parts in the plot, and display them in the Property Editor:
-  - The closest curve
-  - Each of the Plot Axes
+  - The closest curve.
+  - Each of the Plot Axes.
   - The Plot itself if none of the above is hit and the Plot window is activated by the mouse click.
 - **Window Zoom** -- Window zoom is available by dragging the mouse when the left mouse button is pressed. Use ![]({{ site.baseurl }}/images/ZoomAll16x16.png) **Zoom All** to restore default zoom level.
-- **Wheel Zoom** -- The mouse wheel will zoom the plot in and out towards the current mouse cursor position 
+- **Wheel Zoom** -- The mouse wheel will zoom the plot in and out towards the current mouse cursor position.
 
 ### Accessing the Plot Data
 
@@ -101,24 +101,23 @@ It is also possible to save the ascii data to a file directly by using the conte
 
 ## Summary Curves
 
-Summary curves are normally created using the **Plot Editor** see [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor), but can be created directly using 
-the context menu in the **Main Plot Window Project Tree**. Right click a Summary Plot, the Summary Curves folder or an existing curve and select the command ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
+Summary curves are normally created using the **Plot Editor** see [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor), but can be created directly using the context menu in the **Main Plot Window Project Tree**. Right click a Summary Plot, the Summary Curves folder or an existing curve and select the command ![]({{ site.baseurl }}/images/SummaryCurve16x16.png) **New Summary Curve**.
 
 ![]({{ site.baseurl }}/images/summary_curve_properties.png)
 
 The property panel is divided in three main groups of options:
 
-- **Summary Vector** -- Options selecting the value to plot 
-- **Appearance Settings** -- Options controlling the color, symbol etc of the curve
-- **Curve Name Configuration** -- Controls how the curve is labeled in the legend
+- **Summary Vector** -- Options selecting the value to plot.
+- **Appearance Settings** -- Options controlling the color, symbol etc of the curve.
+- **Curve Name Configuration** -- Controls how the curve is labeled in the legend.
 
 ### Summary Vector
 
 This group of options is used to define the summary vector data that the curve will display. 
 
 - **Case** -- Selects the imported Summary or Observed Data case to use as source.
-- **Vector** -- Displays a short name/ acronyme of the selected vector
-- **Axis** -- Controls whether the curve is to be associated with the left or right Y-Axis 
+- **Vector** -- Displays a short name/ acronyme of the selected vector.
+- **Axis** -- Controls whether the curve is to be associated with the left or right Y-Axis. 
 
 <div class="note">
 Switching the Y-Axis for several curves in one go can be done using the context command <b>Switch Plot Axis</b>.  
@@ -130,14 +129,14 @@ The first is accessed by clicking the button **Vector Selection Dialog**. This o
 
 The **Vector Selection Filter** group of options is a different way of selecting the curve data:
 - **Search** -- This option controls the filtering mode. Several are available and controls witch search fields that are made available. The search modes are described below 
-- *Options depending on Search Mode* -- Described below. 
-- *list of vector names* -- This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want to plot.
+- **Options depending on Search Mode** -- Described below. 
+- **List of vector names** -- This list displays the set of vectors filtered by the search options. Use this to select which of the vectors you want to plot.
 
 In the following, all the search fields are wildcard-based text filters. An empty search string will match anything: any value or no value at all. A single _`*`_ however, will only match something: There has to be some value for that particular quantity to make the filter match.
 
 The **Vector Name** field will match the name of the quantity itself, while the additional mode specific fields will match the item(s) being addressed. 
 
-#### Search Modes with filter fields
+#### Search Modes with Filter Fields
 
 - **All** -- A wildcard search filter applied to the colon-separated string that describes the complete vector. Eg. _`"*:*, 55, *"`_ or _`"WBHP:*"`_. This mode is the default.
    - **Filter** -- The actual filter text to apply
