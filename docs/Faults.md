@@ -75,7 +75,7 @@ By clicking the ![]({{ site.baseurl }}/images/draw_style_faults_24x24.png) **Fau
 ##### Fault Face Visibility
 This group of options controls the visibility of the fault faces. Since they work together, and in some cases are overridden by the system, they can be a bit confusing. 
 
-First of all, these options are only available in **Faults-only** visualization mode. ( See [Toolbar Control](#toolbar-control)) When not in **Faults-Only** mode, ResInsight overrides the options, and the controls are inactive. 
+First of all, these options are only available in **Faults-only** visualization mode ( See [Toolbar Control](#toolbar-control) ). When not in **Faults-Only** mode, ResInsight overrides the options, and the controls are inactive. 
 
 Secondly, the option you would normally want to adjust is **Dynamic Face Selection** ( See below ).
 
