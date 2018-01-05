@@ -39,9 +39,9 @@ Select the well to display in the plot. Wells postfixed by _'(Well Path)'_ have 
 
 ### Sources
 After a well has been selected in the Well Name field, the relevant sources for that well will appear in the sources field. The sources are placed in one of three different groups:
-- **RFT File Cases** -- Simulation cases may have associated formation pressure data in _\*.rft_ file(s). If the simulation case contains such files, those are imported together with the simulation case (See the keyword `WRFTPLT` in the Eclipse manual for information)
-- **Grid Cases** -- The PRESSURE property in the 3D grid
-- **Observed Cases** -- Observed data imported from well log files
+- **RFT File Cases** -- Simulation cases may have associated formation pressure data in _\*.rft_ file(s). If the simulation case contains such files, those are imported together with the simulation case (See the keyword `WRFTPLT` in the Eclipse manual for information).
+- **Grid Cases** -- The PRESSURE property in the 3D grid.
+- **Observed Cases** -- Observed data imported from well log files.
 
 When the user selects one or more sources, a selection of their time steps appears in the **Time Steps** field.
 
@@ -49,9 +49,9 @@ When the user selects one or more sources, a selection of their time steps appea
 The **Time Steps** field contains the relevant time steps according to the source selection. Time steps are deemed to be relevant by the following rules:
 1. If a single source or sources of the same type are selected, all available time steps in those sources are shown.
 2. If sources from two or tree types are selected, the time steps are filtered: 
-  - The time steps matching the observed case(s) time steps
+  - The time steps matching the observed case(s) time steps.
   - If no time steps from a case match the observed time step, the two adjacent ones are shown.
-  - The first time step from any grid case(s) (as initial pressure reference)
+  - The first time step from any grid case(s) (as initial pressure reference).
 If the Observed data isn't selected, the RFT data serves as filter reference. 
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
@@ -66,7 +66,7 @@ This property editor lets the user control the visibility of formations lines. T
 
 ![]({{site.baseurl}}/images/RftPltFormationNames.png)
 
-Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details.
+Formation source *Well Path* is not available for RFT plots, as this source use MD as depth type, and RFT always use TVD. Please see the [full documentation]({{site.baseurl}}/docs/formations) on the formations property editor for details about formations.
 
 <div class="note">
   When the formation names property editor is used in the context of RFT plots, the fields <b>Trajectory</b> and <b>Simulation Well</b> are hidden because those values are given by the RFT plot definition.
