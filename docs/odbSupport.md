@@ -20,7 +20,7 @@ Pressure and stress are always displayed using the *Bar* unit.
 
 Other derived results are also calculated, and are described in [ Derived Results ]({{ site.baseurl }}/docs/derivedresults)
 
-### ResInsight features
+### ResInsight Features
 Most of the central features of ResInsight visualization setup also applies to ABAQUS Odb models, like range filters and property filters. Well Paths will also show up along with the odb models.
 
 The Octave interface, however, does not support the odb-data yet.
