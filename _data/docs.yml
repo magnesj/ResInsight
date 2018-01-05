@@ -40,15 +40,18 @@
   - pltplot
   - flowdiagnosticsplots
      
-- title: Export and Interfaces  
+- title: Export and Import 
   docs:
-  - snapshots  
-  - importobstimehistdata
-  - pasteexceltimedata
+  - snapshots
   - exporteclipseproperties
   - exportfluxnummultnum
   - carfinexport
   - odbsupport
+  - importobstimehistdata
+  - pasteexceltimedata
+  
+- title: Scripting
+  docs:
   - octaveinterface
   - batchcommands
   - commandfile
