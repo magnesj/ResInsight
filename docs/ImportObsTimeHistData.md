@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: Observed Time History Data
+title: Import Observed Time History Data
 permalink: /docs/importobstimehistdata/
 published: true
 ---
