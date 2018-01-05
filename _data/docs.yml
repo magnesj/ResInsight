@@ -10,32 +10,35 @@
   - gridimportexport
   - modelnavigation
   
-- title: Application
+- title: 3D Main Window
   docs:
   - reservoirviews
   - cellresults
+  - resultcolorlegend
   - resultinspection
   - gridstatisticsdialog
-  - resultcolorlegend
+  - linkedviews
   - simulationwells
   - faults
   - intersections
   - filters
   - wellpaths
-  - formations
   - completions
-  - linkedviews
+  - formations
   - casegroupsandstatistics 
-  - observeddata
-  - curvecalculator
+  - preferences
+  
+- title: Plot Window
+  docs:
   - summaryplots
   - summaryploteditor
   - summarycrossplots
+  - observeddata
+  - curvecalculator
   - welllogsandplots
   - rftplot
   - pltplot
   - flowdiagnosticsplots
-  - preferences  
      
 - title: Export and Interfaces  
   docs:
