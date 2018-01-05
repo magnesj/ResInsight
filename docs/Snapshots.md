@@ -27,8 +27,8 @@ If a project contains multiple 3D Views or Plot Windows, all of them can be expo
 The files generated are stored in a folder named _`snapshots`_ within the folder where the Project File resides. 
 
 <div class="note">
- Snapshots of existing views can also be created and saved from the command line. 
- ( See <a href="{{ site.baseurl }}/docs/commandlineparameters">Command Line Arguments</a> )
+ Snapshots of existing views can also be created and saved from the command line 
+ ( See <a href="{{ site.baseurl }}/docs/commandlineparameters">Command Line Arguments</a> ).
 </div>
 
 ## Advanced Snapshot Export  ![]({{ site.baseurl }}/images/SnapShotSaveViews.png)
