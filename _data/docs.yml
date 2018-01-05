@@ -14,29 +14,30 @@
   docs:
   - reservoirviews
   - cellresults
-  - resultcolorlegend
   - resultinspection
+  - gridstatisticsdialog
+
+  - resultcolorlegend
   - simulationwells
   - faults
   - intersections
   - filters
-  - formations
   - wellpaths
+  - formations
   - completions
   - linkedviews
   - casegroupsandstatistics 
   - observeddata
-  - summaryplots
-  - summarycrossplots
-  - summaryploteditor
-  - welllogsandplots
-  - flowdiagnosticsplots
   - curvecalculator
-  - preferences  
-  - gridstatisticsdialog
+  - summaryplots
+  - summaryploteditor
+  - summarycrossplots
+  - welllogsandplots
   - rftplot
   - pltplot
-   
+  - flowdiagnosticsplots
+  - preferences  
+     
 - title: Export and Interfaces  
   docs:
   - snapshots  
