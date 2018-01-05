@@ -105,8 +105,9 @@ Tested with 1.8.18 on windows, and default installation on RedHat 6.
 
 #### Octave
 
-To be able to compile the Octave plugins, the path to the Octave development tool _`mkoctfile`_ must be provided in the RESINSIGHT_OCTAVE_PLUGIN_MKOCTFILE.
-The path to a compatible qt library must also be provided, controlled by RESINSIGHT_OCTAVE_PLUGIN_QMAKE.
+To be able to compile the Octave plugins, the path to the Octave development tool _`mkoctfile`_ must be provided in the RESINSIGHT_OCTAVE_PLUGIN_MKOCTFILE. On linux this is populated automatically if Octave is installed.
+
+The path to a compatible qt library must also be provided, controlled by RESINSIGHT_OCTAVE_PLUGIN_QMAKE. On linux this can be left blank. 
 
 It is possible to build ResInsight without compiling the Octave plugins. This can be done by specifying blank for 
 the Octave CMake options. The Octave plugin module will not be built, and CMake will show warnings like 'Failed to find mkoctfile'. 
