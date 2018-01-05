@@ -107,7 +107,7 @@ It is possible to change either the Case or the Well Path in several Well Log Ex
 
 ### Well Log RFT Curves
 
-# TODO
+Well Log RFT Curves shows the values in a RFT file. See [RFT Plot]({{ site.baseurl }}/docs/rftplot) for details abuot RFT. A curve in a RFT plot will look identical to a RFT curve in a well log plot, if the depth type of the well log plot is TVD, and the interpolation type of the curve is *Point to Point*.
 
 ### Well Log LAS Curves
 
