@@ -15,7 +15,7 @@ published: true
 3. Start ResInsight.exe 
 
 ### Octave Installation (optional)
-1. Download [Octave-4.0.0](ftp://ftp.gnu.org/gnu/octave/windows) and install it. 
+1. Download [Octave-4.0.0](ftp://ftp.gnu.org/gnu/octave/windows) and install it. (Newer versions will not work)
 2. Launch ResInsight.exe, open **Edit->Preferences**. 
 3. On the **Octave** tab, enter the path to the Octave command line interpreter executable.  
    ( Usually _`C:\Your\Path\To\Octave-x.x.x\bin\octave-cli.exe`_ )
