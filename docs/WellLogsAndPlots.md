@@ -51,7 +51,7 @@ It is also possible to save the ascii data to a file directly by using the conte
 
 ## Tracks
 
-Tracks can be created by right-clicking a **Well Log Plot** and select **New Track**
+Tracks can be created by right-clicking a **Well Log Plot** and select **New Track**.
 
 ![]({{ site.baseurl }}/images/TrackProperties.png)
 
@@ -65,14 +65,14 @@ There are two types of curves: *Well Log Extraction Curves* and *Well Log LAS Cu
 
 Curve visual appearance is controlled in the **Appearance** section:
 
-- **Color** -- Controls the color of the curve
-- **Thickness** -- Number of pixels used to draw the curve
-- **Point style** -- Defines the style used to draw the result points of the curve, select *None* to disable drawing of points
-- **Line style** -- Defines the the style used to draw the curve, select  *None* to disable line drawing
+- **Color** -- Controls the color of the curve.
+- **Thickness** -- Number of pixels used to draw the curve.
+- **Point style** -- Defines the style used to draw the result points of the curve, select *None* to disable drawing of points.
+- **Line style** -- Defines the the style used to draw the curve, select  *None* to disable line drawing.
 
 ### Well Log Extraction Curves
 
-Extraction curves acts as an artificial well log curve. Instead of probing the real well, a simulation model is probed instead.
+Extraction curves acts as an artificial well log curves. Instead of probing the real well, a simulation model is probed instead.
 
 The property panel for an eclipse model is shown below:
 
@@ -88,21 +88,21 @@ The display name of a curve is normally generated automatically. The options gro
 
 #### Curve Extraction Calculation
 
-This section describes how the values are extracted from the grid when creating a Well log Extraction Curve.
+This section describes how the values are extracted from the grid when creating a Well Log Extraction Curve.
 
 Extraction curves are calculated by finding the intersections between a well trajectory and the cell-faces in a particular grid model. Usually there are two intersections at nearly the same spot; the one leaving the previous cell, and the one entering the next one. At each intersection point the measured depth along the trajectory is interpolated from the trajectory data. The result value is retrieved from the corresponding cell in different ways depending on the nature of the underlying result. 
 
-For Eclipse results the cell face value is used directly. This is normally the same as the corresponding cell value, but if a **Directional combined results** is used, ( See [ Derived Results ]({{ site.baseurl }}/docs/derivedresults) ) it will be that particular face's value.
+For Eclipse results the cell face value is used directly. This is normally the same as the corresponding cell value, but if a **Directional combined results** is used ( See [ Derived Results ]({{ site.baseurl }}/docs/derivedresults) ), it will be that particular face's value.
 
 Abaqus results are interpolated across the intersected cell-face from the result values associated with the nodes of that face. This is also the case for integration point results, as they are directly associated with their corresponding element node in ResInsight. 
 
 #### Change Data Source for Several Curves
 
-It is possible to change either the Case or the Well Path in several Well Log Extraction curves in one go. To do this, select the curves to change, and access the context menu. Select the command **Change Data Source**. The following dialog will appear:
+It is possible to change either the Case or the Well Path in several Well Log Extraction curves in one go. To do so, select the curves to change, and access the context menu. Select the command **Change Data Source**. The following dialog will appear:
 
 ![]({{ site.baseurl }}/images/WellLogExtractionChangeDataSource.png)
 
-- **Case** -- Sets this case for all the curves
+- **Case** -- Sets this case for all the curves.
 - **Well Path** -- Applies this well path to all the curves. Will not affect curves using a Simulation Well.
 
 ### Well Log RFT Curves
@@ -134,7 +134,7 @@ A set of curves can be exported to LAS files by right-clicking the curves, well 
 
 ![]({{ site.baseurl }}/images/export_to_las_files.png)
 
-- **Export Folder** -- Location of the exported LAS files, one file per unique triplet of well path, case and time step
-- **Resample Curve Data** -- If enabled, all curves are resampled at the given resample interval before export
+- **Export Folder** -- Location of the exported LAS files, one file per unique triplet of well path, case and time step.
+- **Resample Curve Data** -- If enabled, all curves are resampled at the given resample interval before export.
 - **TVDRKB** -- If enabled, TVDRKB for all curves based on the listed well paths are exported. If the difference field is blank, no TVDRKB values are exported.
 
