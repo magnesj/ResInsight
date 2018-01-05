@@ -16,10 +16,10 @@ There are several ways to create new PLT Plots
 - Select context command **New PLT Plot** for the _PLT Plots_ node.
 
 **From the Project Tree in the Main Window**
-- Select context command **New PLT Plot** for a _Well Path_ node or a _Simulation Well_ node.
+- Select context command **New PLT Plot** for a _Well Path_ node or a _Simulation Well_ node that has an associated well path.
 
 **From the 3D view**
-- Right-click a simulation well that has an associated well path and select **Well Plots -> New PLT Plot**.
+- Right-click a well path, or a simulation well that has an associated well path, and select **Well Plots -> New PLT Plot**.
 
 ## Plot Observed Data
 To be able to plot observed production data for a well, a well log file containing that data must be imported. Production data in a well log file is expected to have column names:
@@ -54,10 +54,10 @@ When the user selects a source, time steps for that source appears in the **Time
 ### Time Steps
 The **Time Steps** field contains available time steps for the selected source(s). Some combinations of selected sources may display a filtered list of time steps instead of the union of all time steps for all selected sources. The policy is as follows:
 1. **Exclusively grid cases selected**. All available time steps for the selected grid cases are displayed.
-2. **Grid case(s) and observed data case selected**. Time steps shown are
-  - The first time step from the merged time step list from all grid cases
+2. **Grid case(s) and observed data case selected**. Time steps shown are:
+  - The first time step from the merged time step list from all grid cases.
   - If no time steps from grid cases match the observed time step, display the two adjacent grid case time steps.
-3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2
+3. **Grid case(s) and RFT File case(s) selected**. Same display logic as point 2.
 4. **All types of cases selected**. Same display logic as point 2 with the exception that RFT File case time steps are treated as grid time steps.
 
 Each time step is postfixed by an indication of which source type(s) the time step is belonging to. This indication is displayed as one or more letters within square brackets. Examples: **[ O ]**, **[ R G ]**.
