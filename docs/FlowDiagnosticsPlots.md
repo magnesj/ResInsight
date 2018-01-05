@@ -50,14 +50,13 @@ The **Legend**, **Total Allocation** pie chart, **Cumulative Saturation**, and t
 - **Options**
    - **Plot Type**
        - **Allocation** -- Plots *Reservoir well flow rates* along with how this well supports/are 
-       supported by other wells.  
-       ( This option is only available for cases with Flux results available. ) 
-       - **Well Flow** -- Plots *Surface Well Flow Rates* together with phase split between Oil, Gas, and Water.
+       supported by other wells ( This option is only available for cases with Flux results available ) 
+       - **Well Flow** -- Plots *Surface Well Flow Rates* together with phase split between Oil, Gas, and Water
    - **Flow Type** 
        - **Accumulated** -- Plots an approximation of the accumulated flow along the well 
        - **Inflow Rates** -- Plots the rate of flow from the connection into the well
    - **Group Small Contributions** -- Groups small well contributions into a group called **Other**
-   - **Threshold** -- Threshold used by the **Group Small Contributions** option.
+   - **Threshold** -- Threshold used by the **Group Small Contributions** option
    
 ### Depth Settings
 
@@ -100,9 +99,9 @@ This window displays three different graphs describing the overall behavior of t
 
 ![]({{ site.baseurl }}/images/FlowCharacteristicsPropertyPanel.png)
 
-- **Case** -- Selects the source case for the plot
-- **Time Steps** -- These options selects the time steps to be used in the plot
-  - **All With Calculated FlowDiagnostics** -- Plot data from all the time steps already solved by the Flow Diagnostics Solver, but nothing more. The solver will be run implicitly when the user requests any Flow Diagnostics results on a particular time step using  [Cell Results]({{ site.baseurl }}/docs/cellresults), Well Allocation Plots, or [Well Log Extraction Curves]({{ site.baseurl }}/docs/welllogsandplots#Well-Log-Extraction-Curves).  
+- **Case** -- Selects the source case for the plot.
+- **Time Steps** -- These options selects the time steps to be used in the plot.
+  - **All With Calculated FlowDiagnostics** -- Plot data from all the time steps already solved by the Flow Diagnostics Solver, but nothing more. The solver will be run implicitly when the user requests any Flow Diagnostics results on a particular time step using  [Cell Results]({{ site.baseurl }}/docs/cellresults), Well Allocation Plots, or [Well Log Extraction Curves]({{ site.baseurl }}/docs/welllogsandplots#well-log-extraction-curves).  
   - **Selected** -- Use the selected time steps only. Activating this options displays a listbox with all the available time steps in the 3D case. Time steps already solved by the Flow Diagnostics Solver are marked with an asterix _`*`_. Select the interesting time steps and press apply to invoke the solver for unsolved time steps, and to show them in the plot.
 - **Region** -- These group of options controls the cell region of interest for the plot.
   - **Cell Filter** -- Selects the type of cell filtering to apply. Sub-options are displayed depending on the selection.
