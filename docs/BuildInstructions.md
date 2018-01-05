@@ -8,7 +8,7 @@ published: true
 ## Source code
 The source code is hosted at [GitHub](https://github.com/opm/resinsight)
 
-In a git enables shell do: `git clone https://github.com/OPM/ResInsight.git`
+In a git enabled shell do: `git clone https://github.com/OPM/ResInsight.git`
 
 ## Dependencies and Prerequisites
 
