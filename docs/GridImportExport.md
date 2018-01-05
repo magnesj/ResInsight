@@ -5,7 +5,7 @@ permalink: /docs/gridimportexport/
 published: true
 ---
 
-## Importing Eclipse cases 
+## Importing Eclipse Cases 
 ResInsight supports the following type of Eclipse input data:
 
 - _`*.GRID`_ and _`*.EGRID`_ files along with their _`*.INIT`_ and restart files _`*.XNNN`_ and _`*.UNRST`_. 
@@ -47,12 +47,12 @@ Filtering can also be done after import, in a case's **Property Window**.
 
 After clicking *Reload Case*, the time steps in the toolbar will be updated.
 
-### Eclipse ASCII input data
+### Eclipse ASCII Input Data
 1. Select **File->Import-> ![]({{ site.baseurl }}/images/EclipseInput24x24.png) Import Input Eclipse Case** and select a _`*.GRDECL`_ file.
 2. The case is imported, and a view of the case is created
 3. Right-click the **Input Properties** in the generated **Input Case** and use the context menu to import additional Eclipse Property data files.
 
-### Handling missing or wrong MAPAXES
+### Handling Missing or Wrong MAPAXES
 
 The X and Y grid data can be negated in order to make the Grid model appear correctly in ResInsight. This functionality is accessible in the **Property Editor** for all Eclipse Case types as the toggle buttons **Flip X Axis** and **Flip Y Axis** as shown in the example below.
  
@@ -62,7 +62,7 @@ The X and Y grid data can be negated in order to make the Grid model appear corr
 
 Results From the simulation software SourSimRL can be imported using the **SourSim File Name** field. Importing such a file will enable result type called **SourSimRL** as explained in [Eclipse Result Types]({{ site.baseurl }}/docs/cellresults#eclipse-result-types)   
 
-## Importing ABAQUS odb cases
+## Importing ABAQUS Odb Cases
 When ResInsight is compiled with ABAQUS-odb support, _`*.odb`_ files can be imported by selecting the command:
 
 **File->Import-> ![]({{ site.baseurl }}/images/GeoMechCase24x24.png) Import Geo Mechanical Model** 
