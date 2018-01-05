@@ -12,11 +12,11 @@ To identify a ResInsight case uniquely in the Octave script, an integer Id (Case
 <b>Note:</b> The Octave interface does not support Geomechanical cases and flow diagnostic results. 
 </div>
 
-### Single case scripts
+### Single Case Scripts
 Single case scripts do not need to address cases explicitly, but works on what ResInsight considers being the "Current Case". When the user selects several cases and executes a script on them, ResInsight loops over all cases in the selection, sets the current case and executes the script. All references to the "Current Case" from the script will then refer to the case currently being processed by ResInsight. 
 The Current Case can be accessed directly using **riGetCurrentCase()**, but the more direct way is to *omit the CaseId parameter* in the functions, the Current Case is then automatically used. 
 
-### Multi case scripts
+### Multi Case Scripts
 Scripts can access the selection state in ResInsight, and also retrieve lists of Case Groups and cases including some meta information. This can be used if the scripts need to get values from some cases, and store the results in others, etc.
 
 ### Case Types
@@ -29,7 +29,7 @@ The case type (Labeled "CaseType" in the following specification) of a case is r
 |StatisticsCase | A statistics case based on many source cases in Grid Case Group | 
 |SourceCase     | A binary Eclipse case in a Grid Case Group |
 
-### Unresolved issues
+### Unresolved Issues
 The issue around having multiple instances of ResInsight is still not addressed, but might affect the function signatures by adding a port number parameter to all of them. We will try to find ways to avoid this, but are still not certain that we will succeed.
 
 ## Specification
