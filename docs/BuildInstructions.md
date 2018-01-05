@@ -87,7 +87,8 @@ You will find the ResInsight binary under the Install directory in your build di
 | `RESINSIGHT_USE_OPENMP`                           | ON      | Enable OpenMP parallellization in the code |
 
 #### Advanced Options
-
+| CMake Name                                        | Default | Description                              |
+|---------------------------------------------------|---------|--------------------------------------------------------|
 | `RESINSIGHT_ENABLE_PROTOTYPE_FEATURE_FRACTURES`   | ON     | Enable Fracture features |
 | `RESINSIGHT_ENABLE_PROTOTYPE_FEATURE_SOURING`     | ON     | Enable Souring features |
 | `RESINSIGHT_PRIVATE_INSTALL`                      | ON      | Linux only: Install the libecl shared libraries along the executable |
