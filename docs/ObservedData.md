@@ -1,13 +1,13 @@
 ---
 layout: docs
-title: Observed Data
+title: Observed Time History Data
 permalink: /docs/observeddata/
 published: true
 ---
 
-Observed data, or *Observed Time History Data*, is data measured in time. On import of observed data, ResInsight translates the data to make it similar to summary data. Observed data can be plotted along with summary data in **Summary Plots**.
+Observed Time History Data, is data measured in time. On import of observed time history data, ResInsight translates the data to make it similar to summary data. Observed time history data can be plotted along with summary data in **Summary Plots**.
 
-## Import Observed Data
+## Import Observed Time History Data
 Importing observed time history data to ResInsight may be performed in two different ways:
 - By selecting the main menu item **File -> Import -> Import Observed Time History Data**
 - By using the context command **Import Observed Time History Data** on the **Observed Time History Data** item in the **Plot Main Window Project Tree** 
@@ -15,11 +15,11 @@ Importing observed time history data to ResInsight may be performed in two diffe
 The following file types are supported:
 - RSM observed time history data file (_\*.rsm_)
 - Column based (Comma Separated Values, CSV) time history data file (_\*.csv/\*.txt_)
-The imported ![]({{ site.baseurl }}/images/Default.png) Observed Data files will be added to ![]({{ site.baseurl }}/images/Folder.png)**Observed Time History Data**. 
+The imported ![]({{ site.baseurl }}/images/Default.png) Observed Time History Data files will be added to ![]({{ site.baseurl }}/images/Folder.png)**Observed Time History Data**. 
 
 See [Import Observed Time History Data]({{site.baseurl}}/docs/importobstimehistdata) for details.
 
-Which summaries that has been detected in a Observed data file can be read in an Observed data's **Property Editor**. In the image below, time and year info has been found together with the summary "WBP9L" for the well "OP-1".
+Which summaries that has been detected in a Observed Time History Data file can be read in an Observed Time History Data's **Property Editor**. In the image below, time and year info has been found together with the summary "WBP9L" for the well "OP-1".
 
 ![]({{ site.baseurl }}/images/observedDataProperty.png)
 
@@ -147,8 +147,8 @@ UNITS YEAR
 
 Please seek "User data file formats" in **Eclipse: File Formats Reference Manual** for details.
 
-## Viewing Observed Data
+## Viewing Observed Time History Data
 
 ![]({{ site.baseurl }}/images/observedDataCurveCreator.png)
 
-To plot Observed Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed data will appear in **Sources** together with summary cases. How to use the Plot Editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed data points are plotted without lines by default.
+To plot Observed Time History Data, choose **New Summary Plot** in the context menu of **Summary Plots**, in **Plot Object Project Tree**. Observed time history data will appear in **Sources** together with summary cases. How to use the Plot Editor is covered in [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor). Observed time history data points are plotted without lines by default.
