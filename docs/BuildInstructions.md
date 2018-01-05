@@ -8,13 +8,13 @@ published: true
 ## Source code
 The source code is hosted at [GitHub](https://github.com/opm/resinsight)
 
-## Dependencies and prerequisites
+## Dependencies and Prerequisites
 
-### Windows compiler
+### Windows Compiler
 
 Visual Studio 2015 or later is supported.
 
-### GCC compiler
+### GCC Compiler
 
 GCC version 4.9 or later is supported. On RedHat Linux 6 you need to install devtoolset-3, and enable it with 
     
@@ -30,7 +30,7 @@ You will need to patch the Qt sources in order to make them build using Visual S
 ### CMake
 [CMake](https://cmake.org/download/) version 2.8 or later is supported.
 
-## Build instructions
+## Build Instructions
 The ResInsight build may be configured in different ways, with optional support for Octave plugins, ABAQUS ODB API, and OpenMP. This is configured using options in CMake.
 
 If you check the button 'Grouped' in the CMake GUI, the CMake variables are grouped by prefix. This makes it easier to see all of the options for ResInsight.
@@ -67,7 +67,7 @@ To build from the command line without using the CMake GUI:
 
 You will find the ResInsight binary under the Install directory in your build directory.
 
-### General CMake options for ResInsight
+### General CMake Options for ResInsight
 
 | CMake Name                                        | Default | Description                                                           |
 |---------------------------------------------------|---------|-----------------------------------------------------------------------|
@@ -76,14 +76,14 @@ You will find the ResInsight binary under the Install directory in your build di
 | `RESINSIGHT_USE_OPENMP`                           |  ON     | Enable OpenMP parallellization in the code |
 | `RESINSIGHT_INCLUDE_APPLICATION_UNIT_TESTS`       | OFF     | Include Application Code Unit Tests |
 
-### Optional - Octave plugins 
+### Optional - Octave Plugins 
 To be able to compile the Octave plugins, the path to the Octave development tool _`mkoctfile`_ must be provided.
 
 It is possible to build ResInsight without compiling the Octave plugins. This can be done by specifying blank for the Octave CMake options. The Octave plugin module will not be built, and CMake will show warnings like 'Failed to find mkoctfile'. This will not break the build or compilation of ResInsight.
 
 ResInsight has been verified to build and run with Octave versions 3.4.3, 3.8.1, and 4.0.0.
 
-#### [DEPRECATED] Octave related CMake options for ResInsight
+#### [DEPRECATED] Octave Related CMake Options for ResInsight
 
 | CMake Name   | Description |
 |--------------|---------|
