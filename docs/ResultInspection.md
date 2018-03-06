@@ -84,3 +84,11 @@ PCOW | Capilar pressure oil water      | PC (Right)
 PCOG | Capilar pressure oil gas        | PC (Right)
 
 Saturation of water and gas in the selected cell, at the current time step, are annotated in the plot by a blue and orange vertical line, respectively. The intersections between the lines and the relevant curves are marked with large circles.
+
+## Mohr's Circle Plot (for Geo Mechanical Models Only)
+
+Show the Mohr's Circle Plot window by selecting **Windows -> Mohr's Circle Plot**.
+
+![]({{ site.baseurl }}/images/mohrsCircles.png)
+
+The Mohr's circle plot shows three circles representing the 3D state of stress for selected cells. In addition, it shows the envelope, calculated from the *cohesion* and *friction angle* given in the geo mechanical view's property editor.
