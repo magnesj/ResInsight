@@ -33,8 +33,8 @@ Once the command file is finished executing, ResInsight will exit.
 * [setMainWindowSize](#setmainwindowsize)
 * [computeCaseGroupStatistics](#computecasegroupstatistics)
 * [setTimeStep](#settimestep)
-* [scaleFractureTemplate](#scaleFractureTemplate)
-* [setFractureContainment](#setFractureContainment)
+* [scaleFractureTemplate](#scalefracturetemplate)
+* [setFractureContainment](#setfracturecontainment)
 
 
 Syntax
@@ -342,3 +342,18 @@ Scale fracture template parameters.
 ### Example
 
 `scaleFractureTemplate(id=1, width=2, height=1.5)`
+
+setFractureContainment
+---------------------
+
+Set fracture template containment parameters.
+
+| Parameter    | Description                      | Type    | Required |
+|--------------|----------------------------------|---------|----------|
+| id           | ID of fracture template          | Integer | &#10004; |
+| topLayer     | Top layer containment            | Integer | &#10004; |
+| baseLayer    | Base layer containment           | Integer | &#10004; |
+
+### Example
+
+`setFractureContainment(id=1, topLayer=2, baseLayer=7)`
