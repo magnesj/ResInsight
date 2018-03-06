@@ -37,6 +37,6 @@ The vector color **Result Colors** is special. By choosing this color type, a ne
 
 ![]({{ site.baseurl }}/images/tensorsResultColor.png)
 
-##3#Vector Size
+### Vector Size
 Scale method **Result** scales the arrows relative to the maximum result value of all components in the model. With scale method **Constant**, the arrows are of equal size. The arrow size can be both minified and magnified by using **Size Scale**.
 
