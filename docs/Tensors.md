@@ -15,7 +15,10 @@ The tensor results editor is found in a geo mechanical model's **View** in the p
 
 ## Visualization
 
-Arrows. Pressure/tension
+![]({{ site.baseurl }}/images/tensorPressureTension.png)
+
+The tensor arrows visualize the principal vectors in three directions. Each colored pair of arrows represents a principal.
+In the example above, the orange and blue arrows represent pressures and the white arrows represent tensions. 
 
 ## Properties
 
@@ -27,7 +30,9 @@ Arrows. Pressure/tension
 
 **Vector Colors**. Choose which color palette to use for the three arrows. The colors appear in "correct" order (first color = principal 1). 
 
-The vector color **Result Colors** is special. By choosing this color type, a new legend will appear. This legend is defined by the values in the Legend definition of the Element Tensor Results. The extremal values of the color mapper are the extremals of the three principals combined. 
+The vector color **Result Colors** is special. By choosing this color type, a new legend will appear. This legend is defined by the values in the Legend definition of the Element Tensor Results. The extremal values of the color mapper are the extremals of the three principals combined. In the example below, the color result is SE-S1. The largest arrow (principal 1) is quite similar to the cell color, as expected.
+
+![]({{ site.baseurl }}/images/tensorsResultColor.png)
 
 **Vector Size**. Scale method **Result** scales the arrows relative to the maximum result value of all components in the model. With scale method **Constant**, the arrows are of equal size. The arrow size can be both minified and magnified by using **Size Scale**.
 
