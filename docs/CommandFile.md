@@ -33,6 +33,8 @@ Once the command file is finished executing, ResInsight will exit.
 * [setMainWindowSize](#setmainwindowsize)
 * [computeCaseGroupStatistics](#computecasegroupstatistics)
 * [setTimeStep](#settimestep)
+* [scaleFractureTemplate](#scaleFractureTemplate)
+* [setFractureContainment](#setFractureContainment)
 
 
 Syntax
@@ -323,3 +325,20 @@ Set the time step for a given case. The time step is used for all views on the c
 ### Example
 
 `setTimeStep(caseId=1, timeStep=8)`
+
+scaleFractureTemplate
+---------------------
+
+Scale fracture template parameters.
+
+| Parameter    | Description                      | Type    | Required |
+|--------------|----------------------------------|---------|----------|
+| id           | ID of fracture template          | Integer | &#10004; |
+| width        | Width scale factor               | Double  |          |
+| height       | Height scale factor              | Double  |          |
+| dFactor      | D-factor scale factor            | Double  |          |
+| conductivity | Conductivity scale factor        | Double  |          |
+
+### Example
+
+`scaleFractureTemplate(id=1, width=2, height=1.5)`
