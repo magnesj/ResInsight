@@ -91,4 +91,4 @@ Show the Mohr's Circle Plot window by selecting **Windows -> Mohr's Circle Plot*
 
 ![]({{ site.baseurl }}/images/mohrsCircles.png)
 
-The Mohr's circle plot shows three circles representing the 3D state of stress for selected cells. In addition, it shows the envelope, calculated from the *cohesion* and *friction angle* given in the geo mechanical view's property editor.
+The Mohr's circle plot shows three circles representing the 3D state of stress for a selected cell. In addition, it shows the envelope, calculated from the *cohesion* and *friction angle* given in the geo mechanical view's property editor. Several sets of circles and envelopes can be added by selecting more than one cell in any view (as in image above).
