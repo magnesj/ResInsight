@@ -20,6 +20,7 @@
   - linkedviews
   - simulationwells
   - faults
+  - tensors
   - intersections
   - filters
   - wellpaths
