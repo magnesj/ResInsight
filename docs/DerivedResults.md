@@ -89,6 +89,8 @@ Gamma_D*n* = ST_D*n* / POR_D*n*
 
 The calculated result fields are:
 
+* Nodal
+  * COMPACTION (Magnitude of compression)
 * Element Nodal and Integration Points
   * ST (Total Stress)
      * All tensor components
@@ -141,6 +143,21 @@ Two constants can be assigned to a Geomechanical case:
 In the following they are denoted s0 and fa respectively. Some of the derived results use these constants, that can be changed in the property panel of the Case.
 
 ![]({{ site.baseurl }}/images/GeoMechCasePropertyPanel.png)
+
+##### COMPACTION
+
+Compaction is the difference in vertical displacement (U3) between a grid node and a specified reference K layer.
+The reference K layer is specified in the property editor.
+
+For each node <i>n</i> in the grid, a node <i>nref</i> in the reference K layer is found by vertical intersection from the node <i>n</i>.
+
+If Z<sub>n</sub> >= Z<sub>nref</sub>:
+
+COMPACTION<sub>n</sub> = -(U3<sub>n</sub> - U3<sub>nref</sub>)
+
+else:
+
+COMPACTION<sub>n</sub> = -(U3<sub>nref</sub> - U3<sub>n</sub>)
 
 ##### ST - Total Stress
 
