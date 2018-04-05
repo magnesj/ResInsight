@@ -151,7 +151,7 @@ The reference K layer is specified in the property editor.
 
 For each node <i>n</i> in the grid, a node <i>nref</i> in the reference K layer is found by vertical intersection from the node <i>n</i>.
 
-If Z<sub>n</sub> >= Z<sub>nref</sub>:
+If Depth<sub>n</sub> <= Depth<sub>nref</sub>:
 
 COMPACTION<sub>n</sub> = -(U3<sub>n</sub> - U3<sub>nref</sub>)
 
