@@ -9,7 +9,9 @@ published: true
 
 Intersections are cross sections of the grid model that displays the grid cell values on planes that cut through the grid in various ways. 
 
-There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a piecewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. The second intersection type is called an **Intersection Box**. An Intersection Box can be used as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
+There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a piecewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. These intersections can also be shown in their own separate [2D Intersection View]({{ site.baseurl }}/docs/intersections#2d-intersection-views)
+
+The second intersection type is called an **Intersection Box**. An Intersection Box can be used as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
 
 All types of intersections are stored in a folder named **Intersections** in a **View** as shown below.
 
@@ -104,6 +106,18 @@ The length of the plane can also be set manually in the **Property Editor**.
 - **Length Down** is the distance from the user defined horizontal line, to the bottom of the plane intersecting the model.
 
 ![]({{ site.baseurl }}/images/azimuthDip3DView.PNG)
+
+### 2D Intersection Views
+
+![]({{ site.baseurl }}/images/IntersectionView.png)
+
+Each of the curve based intersections have a corresponding **2D Intersection View**. This view can be shown either by right clicking the intersection in a 3D View, or by toggling the view on in the project tree.
+
+![]({{ site.baseurl }}/images/IntersectionViewsProjectTree.png)
+
+Management of these views are automatic. They will follow the lifespan of the intersection, and is thus deleted automatically when the intersection is deleted.
+
+
 
 ## Intersection Box and Intersection Planes
 
