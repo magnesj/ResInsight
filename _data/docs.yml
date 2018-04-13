@@ -54,6 +54,7 @@
 - title: Scripting
   docs:
   - octaveinterface
+  - commandlineinterface
   - batchcommands
   - commandfile
 
