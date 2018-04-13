@@ -5,12 +5,11 @@ permalink: /docs/commandlineinterface/
 published: true
 ---
 
-Command line parameters are prefixed using a double dash. This convention is used on all platforms to make it possible to reuse scripts across different platforms.
+ResInsight supports several command line parameters that can be used to automate some tasks using shell scripts. 
 
-See GNU Standards for [Command Line Interfaces](http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html#Command_002dLine-Interfaces).
+Command line parameters are prefixed using a double dash. This convention is used on all platforms to make it possible to reuse scripts across different platforms. See GNU Standards for [Command Line Interfaces](http://www.gnu.org/prep/standards/html_node/Command_002dLine-Interfaces.html#Command_002dLine-Interfaces).
 
-Examples on how command line options are used are given in 
-[Batch Commands]({{ site.baseurl }}/docs/batchcommands)
+Examples on how command line options are used are given [below]({{ site.baseurl }}/docs/commandlineinterface#usageexamples)
 
 | Parameter | Description |
 |-----------|-------------|
@@ -32,3 +31,77 @@ Examples on how command line options are used are given in
 | &#45;&#45;unittest | Execute integration tests |
 
 See also the [Regression Test System ]({{site.baseurl }}/docs/regressiontestsystem) for a more in-depth explanation.
+
+<div class="note">
+<h5>Reduce project load time using <code>--replaceSourceCases</code> </h5>
+  
+ResInsight stores data computed by statistics calculation in a cache file. When a project file is loaded, data from this cache is also imported. For large cases, the cached data can be large. When replacing source cases during batch, this data is never used and can be removed from the cache using the following workaround:
+<ul>
+  <li>Open the project file used to produce statistics</li>
+  <li>Select the statistics object in the project tree</li>
+  <li>Click the button <b>Edit (Will DELETE current result)</b></li>
+  <li>Save the project file</li>
+</ul> 
+</div>
+
+## Usage Examples 
+
+These examples are also available from the [test section](https://github.com/OPM/ResInsight/tree/master/TestModels/Case_with_10_timesteps).
+
+### Example 1 : Create snapshots of all views for multiple cases
+A list of cases is defined in **CaseList.txt**, containing the following
+
+```
+Real0/BRUGGE_0000.EGRID
+Real10/BRUGGE_0010.EGRID
+Real30/BRUGGE_0030.EGRID
+Real40/BRUGGE_0040.EGRID
+```
+
+The command line used to run this example is shown here:
+
+```
+ResInsight --project BatchTest.rsp --multiCaseSnapshots CaseList.txt --size 500 500
+```
+
+This will instruct ResInsight to read the project file **BatchTest.rsp**. All cases will be replaced one by one in ResInsight, and snapshots of all views will be written to file. 
+
+
+### Example 2 : Replace a single case and take snapshots of all views
+
+The command line used to run this example is shown here:
+
+```
+ResInsight --project BatchTest.rsp --replaceCase "Real10\BRUGGE_0010.EGRID" --savesnapshots
+```
+
+This will instruct ResInsight to read the project file **BatchTest.rsp**. The specified case **Real10\BRUGGE_0010.EGRID** will be imported into the project, and snapshots of all views will be written to file. 
+
+
+### Example 3 : Replace source cases in a case group and create snapshot
+A list of cases is defined in **CaseList2.txt**, containing the following
+
+```
+Real0/BRUGGE_0000.EGRID
+Real10/BRUGGE_0010.EGRID
+```
+
+The command line used to run this example is shown here:
+
+```
+ResInsight --project BatchStatistics.rsp --replaceSourceCases CaseList2.txt --savesnapshots
+```
+
+This will instruct ResInsight to read the project file **BatchStatistics.rsp**. All cases specified will be imported in the case group specified in the project file. Statistics will be computed, and snapshots for all views will be written to file.
+
+### Example 4 : Replace source cases in multiple case groups and create snapshots
+Multiple source case groups can be updated by repeating the replaceSourceCases parameter.
+
+The command line used to run this example is shown here:
+
+```
+ResInsight --project BatchStatistics.rsp --replaceSourceCases 0 CaseList2.txt --replaceSourceCases 1 CaseList3.txt --savesnapshots
+```
+This will instruct ResInsight to read the project file **BatchStatistics.rsp**. Source cases for case group 0 is given in CaseList2.txt, and source cases for case group 1 is given in CaseList3.txt. Statistics will be computed, and snapshots for all views will be written to file.
+
+The possibility to replace multiple cases can also be applied for single case replace (parameter *replaceCase*).
