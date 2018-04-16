@@ -121,7 +121,9 @@ The view can be shown either by right clicking the intersection and select the c
 
 Scales along the edges of the view show the depth and the horizontal length of the intersection. The startpoint of this length is the start of the wellpath or the well head of a simulation well. 
 
-The view is mostly controlled by the options in the 3D view where the intersection is defined. There are, however some independent controls, like drawstyle, timestep and Z-scale. These options are the smae as for a regular 3D view (See []({{ site.baseurl }}/docs/reservoirviews#view-properties) There is, however a separate option to turn on/off the visualization of the defining points of a polyline or azimuth/dip intersection.
+The view is mostly controlled by the options in the 3D view where the intersection is defined. There are, however some independent controls, like drawstyle, timestep and Z-scale. These options are the samae as for a regular 3D view (See []({{ site.baseurl }}/docs/reservoirviews#view-properties) 
+
+There is, however a separate option to turn on/off the visualization of the defining points of a polyline or azimuth/dip intersection.
 
 ## Intersection Box and Intersection Planes
 
