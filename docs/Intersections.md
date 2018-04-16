@@ -115,13 +115,24 @@ A 2D Intersection View displays the intersection in a separate 2D view along wit
 
 Each of the curve based intersections have a corresponding **2D Intersection View**. Management of these views are automatic. They will be created and deleted along with the intersection.
 
-The view can be shown either by right clicking the intersection and select the command **Show 2D intersection View**, or by toggling the view on in the project tree directly.
+The view can be shown either by right clicking the intersection and select the command **Show 2D intersection View**, or by toggling the view in the project tree directly.
 
 ![]({{ site.baseurl }}/images/IntersectionViewsProjectTree.png)
 
-Scales along the edges of the view show the depth and the horizontal length of the intersection. The startpoint of this length is the start of the wellpath or the well head of a simulation well. 
+Scales along the edges of the view show the depth and the horizontal length of the intersection. The length is measured from the start of the wellpath or the well head of a simulation well. 
 
-The view is mostly controlled by the options in the 3D view where the intersection is defined. There are, however some independent controls, like drawstyle, timestep and Z-scale. These options are the samae as for a regular 3D view (See []({{ site.baseurl }}/docs/reservoirviews#view-properties) 
+The view is mostly controlled by the options in the 3D view where the intersection is defined. There are, however some independent controls, like drawstyle, timestep and Z-scale.
+
+![]({{ site.baseurl }}/images/2DIntersectionViewProperties.png)
+
+These options are the same as for a regular 3D view (See [View Properties]({{ site.baseurl }}/docs/reservoirviews#view-properties) ) 
+
+- **Viewer**
+  - **Name** -- Useeditable name of the view. The default name is set by combining the name of the origin view and intersection name.
+  - **Background** -- Color of the viewer background 
+  - **Disable Results Lighting** -- Turn of the shadow effect to make the colors easier to compare with the legend. The effect is small on 2D Intersection View.
+- **Defining Points**
+  - **Show points** -- Toggle the display of the defining points for polyline or azimuth/Dip intersections.
 
 There is, however a separate option to turn on/off the visualization of the defining points of a polyline or azimuth/dip intersection.
 
