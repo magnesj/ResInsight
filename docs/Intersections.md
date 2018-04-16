@@ -128,9 +128,9 @@ The view is mostly controlled by the options in the 3D view where the intersecti
 These options are the same as for a regular 3D view (See [View Properties]({{ site.baseurl }}/docs/reservoirviews#view-properties) ) 
 
 - **Viewer**
-  - **Name** -- Useeditable name of the view. The default name is set by combining the name of the origin view and intersection name.
+  - **Name** -- User editable name of the view. The default name is set by combining the name of the origin view and the intersection name.
   - **Background** -- Color of the viewer background 
-  - **Disable Results Lighting** -- Turn of the shadow effect to make the colors easier to compare with the legend. The effect is small on 2D Intersection View.
+  - **Disable Results Lighting** -- Toggle the light effect. When the lighting is turned off, the colors are easier to compare with the legend, but the colors carry no visual cue to visualize the 3D shape. The effect is tiny on 2D Intersection Views.
 - **Grid Appearance** -- Controls the drawstyle of the grid geometry
   - **Z Scale** -- Scales the view in Z(depth) direction to make slim K-layers easier to see
   - **Grid Lines** -- Controls what mesh lines to draw
