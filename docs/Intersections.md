@@ -109,15 +109,15 @@ The length of the plane can also be set manually in the **Property Editor**.
 
 ### 2D Intersection Views
 
-2D Intersection views displays the intersection in a separate 2D view. The intersection and the possible corresponding well/wellpath is flattened to make it easier to see intersected grid and how the well traverses it. 
+A 2D Intersection View displays the intersection in a separate 2D view along with the defining curve. The intersection and the defining wellpath, simulation well or polyline is flattened to make it easier to see the intersected grid and how the well traverses it. 
 
 ![]({{ site.baseurl }}/images/IntersectionView.png)
 
-Each of the curve based intersections have a corresponding **2D Intersection View**. This view can be shown either by right clicking the intersection in a 3D View, or by toggling the view on in the project tree.
+Each of the curve based intersections have a corresponding **2D Intersection View**. Management of these views are automatic. They will be created and deleted along with the intersection.
+
+The view can be shown either by right clicking the intersection and select the command **Show 2D intersection View**, or by toggling the view on in the project tree directly.
 
 ![]({{ site.baseurl }}/images/IntersectionViewsProjectTree.png)
-
-Management of these views are automatic. They will follow the lifespan of the intersection, and is thus deleted automatically when the intersection is deleted.
 
 Scales along the edges of the view show the depth and the horizontal length of the intersection. The startpoint of this length is the start of the wellpath or the well head of a simulation well. 
 
