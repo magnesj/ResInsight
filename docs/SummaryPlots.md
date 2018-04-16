@@ -23,7 +23,7 @@ A selection of cases can be grouped by right-clicking  a selection of summary ca
 
 ### Observed Data
 
-See [Observed Time History Data]({{ site.baseurl }}/docs/importobstimehistdata)
+See [Observed Time History Data]({{ site.baseurl }}/docs/observeddata)
 
 ### Grid Cell Time History Curve
 
