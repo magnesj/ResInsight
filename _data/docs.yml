@@ -34,7 +34,7 @@
   - summaryplots
   - summaryploteditor
   - summarycrossplots
-  - observeddata
+  
   - curvecalculator
   - welllogsandplots
   - rftplot
@@ -48,7 +48,7 @@
   - exportfluxnummultnum
   - carfinexport
   - odbsupport
-  - importobstimehistdata
+  - observeddata 
   - pasteexceltimedata
   
 - title: Scripting
