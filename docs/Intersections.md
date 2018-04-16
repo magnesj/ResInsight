@@ -131,10 +131,18 @@ These options are the same as for a regular 3D view (See [View Properties]({{ si
   - **Name** -- Useeditable name of the view. The default name is set by combining the name of the origin view and intersection name.
   - **Background** -- Color of the viewer background 
   - **Disable Results Lighting** -- Turn of the shadow effect to make the colors easier to compare with the legend. The effect is small on 2D Intersection View.
+- **Grid Appearance** -- Controls the drawstyle of the grid geometry
+  - **Z Scale** -- Scales the view in Z(depth) direction to make slim K-layers easier to see
+  - **Grid Lines** -- Controls what mesh lines to draw
+    - **All** -- All mesh lines are drawn
+    - **Faults Only** -- Only mesh lines associated with faults are drawn
+    - **None** -- Mesh lines are not drawn at all
+  - **Grid Surface** -- Controls what grid surface geometry to draw
+    - **All** -- All grid faces are drawn
+    - **Faults Only** -- Only faces that are included in a fault is drawn
+    - **None** -- Do not draw any faces
 - **Defining Points**
-  - **Show points** -- Toggle the display of the defining points for polyline or azimuth/Dip intersections.
-
-There is, however a separate option to turn on/off the visualization of the defining points of a polyline or azimuth/dip intersection.
+  - **Show points** -- Toggle the display of the defining points for Polyline or Azimuth and Dip intersections.
 
 ## Intersection Box and Intersection Planes
 
