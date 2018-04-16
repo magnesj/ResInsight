@@ -125,7 +125,7 @@ The view is mostly controlled by the options in the 3D view where the intersecti
 
 ![]({{ site.baseurl }}/images/2DIntersectionViewProperties.png)
 
-These options are the same as for a regular 3D view (See [View Properties]({{ site.baseurl }}/docs/reservoirviews#view-properties) ) 
+
 
 - **Viewer**
   - **Name** -- User editable name of the view. The default name is set by combining the name of the origin view and the intersection name.
@@ -143,6 +143,8 @@ These options are the same as for a regular 3D view (See [View Properties]({{ si
     - **None** -- Do not draw any faces
 - **Defining Points**
   - **Show points** -- Toggle the display of the defining points for Polyline or Azimuth and Dip intersections.
+
+These options are similar to the options for a regular 3D view (See [View Properties]({{ site.baseurl }}/docs/reservoirviews#view-properties) ) 
 
 ## Intersection Box and Intersection Planes
 
