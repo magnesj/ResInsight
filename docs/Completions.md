@@ -185,8 +185,10 @@ To create a new fracture template, right-click the **Fracture Template** item in
   - **Well Diameter** -- Used when exporting to Eclipse.
 - **Sensitivity Scale Factors** -- Each of the properties are scaled by the scaling factor. When used interactively, the **Apply** button must be pressed to apply the scaling factors. These scaling factors are also available from command file scripting (TODO : add reference to command file scripts)
 
-- **Non-Darcy Flow**
+#### Non-Darcy Flow
+
 ![]({{ site.baseurl }}/images/FractureNonDarcyFlow.png)
+
 Non-Darcy Flow is used to improve the computation of connection factors for cells penetrated by well pipes. A precomputed D-factor can be set using **User Defined D-factor**. Selecting the option **Compute D-factor** displays the following set of properties:
   - **Inertial Coefficient** -- Beta-factor in Forcheimer units
   - **Effective Permeability**
