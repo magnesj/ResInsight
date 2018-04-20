@@ -183,7 +183,23 @@ To create a new fracture template, right-click the **Fracture Template** item in
   - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path ( Fractures **Along Well Path** only ).
   - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation ( Fractures **Along Well Path** only ).
   - **Well Diameter** -- Used when exporting to Eclipse.
- 
+- **Sensitivity Scale Factors** -- Each of the properties are scaled by the scaling factor. When used interactively, the **Apply** button must be pressed to apply the scaling factors. These scaling factors are also available from command file scripting (TODO : add reference to command file scripts)
+
+- **Non-Darcy Flow**
+![]({{ site.baseurl }}/images/FractureNonDarcyFlow.png)
+Non-Darcy Flow is used to improve the computation of connection factors for cells penetrated by well pipes. A precomputed D-factor can be set using **User Defined D-factor**. Selecting the option **Compute D-factor** displays the following set of properties:
+  - **Inertial Coefficient** -- Beta-factor in Forcheimer units
+  - **Effective Permeability**
+    - **User Defined** -- Defines the permeability *Ke* in milliDarcy in the property **Effective Permeability** 
+    - **Use Fracture Conductivity** -- Extract conductivity from the fracture template at the well intersection location and scale with **Relative Permeability**
+  - **Width**
+    - **User Defined** -- Defines the width of the fracture
+    - **Use Fracture Width** -- Extract width from the fracture template at the well intersection location
+  - **Relative Gas Density**
+  - **Gas Viscosity**
+  - **D Factor** -- Displays the computed value of the D factor
+  - **D Factor Details** -- Displays the value of variables used to compute the D factor
+
 #### Ellipse Fracture Template
 
 ![]({{ site.baseurl }}/images/EllipseFractureTemplateProperties.png)
