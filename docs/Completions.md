@@ -232,6 +232,15 @@ Instances of fractures can be created along well paths and simulation wells by r
   - **Perforation Length** / **Perforation Efficiency** / **Well Diameter** -- These values are copied from the new template when selecting a different one. See [Common Fracture Template Options]({{ site.baseurl }}/docs/completions#common-fracture-template-options)  
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
 
+## Visualization and Inspection of Well Connection Factors
+
+![]({{ site.baseurl }}/images/Completions_WellConnectionFactors.png)
+
+Connection factors can be visualized in the 3D view by enabling **Well Connection Factors**. All cells in the scene having a connection factor will be visible using a star symbol. By clicking on the connection factor, addidional details of completions contributing to the connection factor is displayed in the **Result Info** window. The color of the connection factor is controlled by the legend settings.
+
+Connection factors along simulation wells are also visualized together with the computed connection factors along well paths. Connection factor for closed simulation well connection are also visible, and can be turned off using **Show on Closed Connections**.
+
+The size of the well connection geometry is controlled by **Geometry Scale Factor**
 
 ## Export Completion Data to Eclipse
 
