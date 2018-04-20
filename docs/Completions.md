@@ -242,8 +242,8 @@ Connection factors along simulation wells are also visualized together with the 
 
 The size of the well connection geometry is controlled by **Geometry Scale Factor**
 
-A combined view of well connection factors and the derived result **Completion Type** enables the user to see the completion type contributing to connection factor in a cell, ee [Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type) 
-
+A combined view of well connection factors and the derived result **Completion Type** enables the user to see the completion type contributing to connection factor in a cell ([Derived Results, Completion Type]({{ site.baseurl }}/docs/derivedresults#completion-type) 
+)
 
 ## Export Completion Data to Eclipse
 
