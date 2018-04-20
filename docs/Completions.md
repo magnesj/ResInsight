@@ -233,7 +233,7 @@ Instances of fractures can be created along well paths and simulation wells by r
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
 
 
-## Exporting Completion Data to Eclipse
+## Export Completion Data to Eclipse
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
