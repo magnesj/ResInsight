@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: 3d Well Log Plots
+title: 3d Well Log Curves
 permalink: /docs/3dwelllogcurves/
 published: true
 ---
