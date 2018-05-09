@@ -22,23 +22,23 @@ Delete one or more 3D well log curves by selecting them in the project tree, rig
 # Configurating the 3D Well Log Curves
 
 ## 3D Track and Draw Plane Appearance
-Each 3D well log curve belongs to a 3D Track which in turn is attached to a well path. The 3D track itself contains some settings related to the display of the curves:
-
-| Parameter      | Description                                                                | Range        |
-|----------------|----------------------------------------------------------------------------|--------------|
-| Width Scaling  | A scaling factor applied to the width of the draw surfaces                 | [0.25 , 2.5] | 
-| Show Grid      | Show axis markers for the value-axis of the curves along the draw surface  | True / False |
-| Show Background| Draw a white background on the drawing surfaces of the curves              | True / False |
-
+Each 3D well log curve belongs to a 3D Track which in turn is attached to a well path. The 3D track itself contains some settings related to the display of the curves.
 
 ![]({{ site.baseurl }}/images/3dWellLogCurves_DrawPlaneAppearance.png)
 
-## Curve Data Selection
-The Curve Data configuration allows you to select a case, result type, property and time step to plot.
-![]({{ site.baseurl }}/images/3dWellLogCurves_CurveData.png)
+| Parameter      | Description                                                                | Range       |
+|----------------|----------------------------------------------------------------------------|-------------|
+| Width Scaling  | A scaling factor applied to the width of the draw surfaces                 | [0.25, 2.5] | 
+| Show Grid      | Show axis markers for the value-axis of the curves along the draw surface  | True/False  |
+| Show Background| Draw a white background on the drawing surfaces of the curves              | True/False  |
 
 ## Curve Configuration
-![]({{ site.baseurl }}/images/3dWellLogCurves_CurveConfiguration.png)
 
-## Selecting a Drawing Plane for the Curve
+### Name & Data Selection
+The Curve Data configuration allows you to select a case, result type, property and time step to plot.
+
+![]({{ site.baseurl }}/images/3dWellLogCurves_CurveData.png)
+
+### Appearance
+![]({{ site.baseurl }}/images/3dWellLogCurves_CurveConfiguration.png)
 ![]({{ site.baseurl }}/images/3dWellLogCurves_DrawPlaneSelection.png)
