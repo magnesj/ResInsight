@@ -10,10 +10,10 @@ ResInsight can display well logs curves directly in the 3d view with a subset of
 ![]({{ site.baseurl }}/images/3dWellLogCurves.png)
 
 # Creating new 3d Well Log Curves
-![]({{ site.baseurl }}/images/3dWellLogCurves_Create.png)
+![]({{ site.baseurl }}/images/3dWellLogCurvesCreate.png)
 
 # Deleting 3d Well Log Curves
-![]({{ site.baseurl }}/images/3dWellLogCurves_Delete.png)
+![]({{ site.baseurl }}/images/3dWellLogCurvesDelete.png)
 
 # Configuration the 3d Well Log Curves
 
