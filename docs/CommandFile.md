@@ -26,6 +26,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [exportSnapshots](#exportsnapshots)
 * [exportProperty](#exportproperty)
 * [exportWellPathCompletions](#exportwellpathcompletions)
+* [exportSimWellFractureCompletions](#exportsimwellfracturecompletions)
 * [exportMsw](#exportmsw)
 * [setExportFolder](#setexportfolder)
 
@@ -212,8 +213,7 @@ Export well path completions.
 |-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|----------|
 | caseId                      | ID of case to export well paths for                                                                                                                       | Integer        | &#10004; |
 | timeStep                    | The time step to export completions for                                                                                                                   | Integer        | &#10004; |
-| wellPathNames               | Names of well paths to export for. Defaults to all wells or checked wells, as determined by `wellSelection` parameter                                     | List of String |          |
-| wellSelection               | Which wells are included. Choices: `ALL_WELLS`, `CHECKED_WELLS`. Defaults to `ALL_WELLS`                                                                  | Enum           |          |
+| wellPathNames               | Names of well paths to export for. Defaults to all checked wells. If a list of well names are provided, those wells are included even if unchecked        | List of String |          |
 | fileSplit                   | How the files are split. Choices: `UNIFIED_FILE`, `SPLIT_ON_WELL`, `SPLIT_ON_WELL_AND_COMPLETION_TYPE`. Defaults to `UNIFIED_FILE`                        | Enum           |          |
 | compdatExport               | Chose whether transmissibilities are exported. Choices: `TRANSMISSIBILITIES`, `WPIMULT_AND_DEFAULT_CONNECTION_FACTORS`. Defaults to `TRANSMISSIBILITIES`  | Enum           |          |
 | includePerforations         | Whether main bore perforations should be included. Defaults to `true`                                                                                     | Boolean        |          |
@@ -222,8 +222,24 @@ Export well path completions.
 
 #### Example
 
-`exportWellPathCompletions(caseId=3, timeStep=5, wellSelection=CHECKED_WELLS, includeFishbones=false)`
+`exportWellPathCompletions(caseId=3, timeStep=5, includeFishbones=false)`
 
+### exportSimWellFractureCompletions
+
+Export fracture completions for simulation wells.
+
+| Parameter                   | Description                                                                                                                                               | Type           | Required |
+|-----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------|----------------|----------|
+| caseId                      | ID of case to export simulation well fracture completions for                                                                                             | Integer        | &#10004; |
+| viewName                    | The name of the view to export simulation well fracture completions for. Since view names are not unique, all views sharing the given name will be used   | String         | &#10004; |
+| timeStep                    | The time step to export completions for                                                                                                                   | Integer        | &#10004; |
+| simulationWellNames         | Names of simulation wells to export for. Defaults to all checked wells. If a list of names are provided, those wells are included even if unchecked       | List of String |          |
+| fileSplit                   | How the files are split. Choices: `UNIFIED_FILE`, `SPLIT_ON_WELL`, `SPLIT_ON_WELL_AND_COMPLETION_TYPE`. Defaults to `UNIFIED_FILE`                        | Enum           |          |
+| compdatExport               | Chose whether transmissibilities are exported. Choices: `TRANSMISSIBILITIES`, `WPIMULT_AND_DEFAULT_CONNECTION_FACTORS`. Defaults to `TRANSMISSIBILITIES`  | Enum           |          |
+
+#### Example
+
+`exportSimWellFractureCompletions(caseId=3, viewName="View 2", timeStep=5)`
 
 ### exportMsw
 
