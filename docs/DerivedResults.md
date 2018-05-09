@@ -55,6 +55,8 @@ The directional combined parameters available are:
 
 The dynamic cell property named **Completion Type** is calculated from the intersections between [Completions]({{ site.baseurl }}/docs/completions) and the grid cells. All grid cells intersected by a completion will be assigned a color based on the type of completion that intersects the cell.
 
+If a cell is completed with multiple completions, the following priority is used : **Fracture**, **Fishbones**, and **Perforation Interval**.
+
 ### Identification of Questionable NNCs
 In the process of normalizing transmissibility by the overlapping flow area, the NNCs in the model without any shared surface between two cells are identified. These NNCs are listed in the **Faults/NNCs With No Common Area** folder. These NNCs are questionable since flow normally is associated with a flow area.
 
