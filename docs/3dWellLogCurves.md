@@ -34,11 +34,15 @@ Each 3D well log curve belongs to a 3D Track which in turn is attached to a well
 
 ## Curve Configuration
 
-### Name & Data Selection
+### Data Selection
 The Curve Data configuration allows you to select a case, result type, property and time step to plot.
 
 ![]({{ site.baseurl }}/images/3dWellLogCurves_CurveData.png)
 
 ### Appearance
+In the Curve Appearance box, the curve can be assinged to a draw plane, the color can be changed and the range of the result property can be set.
 ![]({{ site.baseurl }}/images/3dWellLogCurves_CurveConfiguration.png)
 ![]({{ site.baseurl }}/images/3dWellLogCurves_DrawPlaneSelection.png)
+
+### Automatic Name Generation
+Finally the name of the curve is created automatically from a set of parameters such as case, view, etc. The parameters that should make up the curve name can be selected in the Automatic Name Generation box.
