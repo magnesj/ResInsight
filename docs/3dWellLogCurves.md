@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: 3d Well Log Plots
-permalink: /docs/3dwelllogsandplots/
+permalink: /docs/3dWellLogCurves/
 published: true
 ---
 
