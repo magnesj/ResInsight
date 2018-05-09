@@ -11,10 +11,12 @@ ResInsight can display well logs curves directly in the 3d view with a subset of
 
 # Creating new 3D Well Log Curves
 Add a new 3D well log curve by selecting a Well Path in the Project Tree, right-clicking and selecting "3D Well Log Curves" and "Add 3D Well Log Curve".
+
 ![]({{ site.baseurl }}/images/3dWellLogCurvesCreate.png)
 
 # Deleting 3D Well Log Curves
 Delete one or more 3D well log curves by selecting them in the project tree, right-clicking on one of the selected items and choosing "Delete 3D Well Log Curve(s)". The curves will be deleted with no further confirmation.
+
 ![]({{ site.baseurl }}/images/3dWellLogCurvesDelete.png)
 
 # Configuration the 3D Well Log Curves
