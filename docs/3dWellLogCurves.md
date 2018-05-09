@@ -24,11 +24,11 @@ Delete one or more 3D well log curves by selecting them in the project tree, rig
 ## 3D Track and Draw Plane Appearance
 Each 3D well log curve belongs to a 3D Track which in turn is attached to a well path. The 3D track itself contains some settings related to the display of the curves:
 
-| Parameter      | Description                                                                                         | Range          |
-|----------------|-----------------------------------------------------------------------------------------------------|----------------|
-| Width Scaling  | A scaling factor applied to the grid characteristic length to yield the width of the draw surfaces  | [0.25 , 2.5] |
-| Show Grid      | Show axis markers for the value-axis of the curves along the draw surface                           | True / False   |
-| Show Background| Draw a white background on the drawing surfaces of the curves                                       | True / False   |
+| Parameter      | Description                                                                | Range        |
+|----------------|----------------------------------------------------------------------------|--------------|
+| Width Scaling  | A scaling factor applied to the width of the draw surfaces                 | [0.25 , 2.5] | 
+| Show Grid      | Show axis markers for the value-axis of the curves along the draw surface  | True / False |
+| Show Background| Draw a white background on the drawing surfaces of the curves              | True / False |
 
 
 ![]({{ site.baseurl }}/images/3dWellLogCurves_DrawPlaneAppearance.png)
