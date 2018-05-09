@@ -26,7 +26,7 @@ Each 3D well log curve belongs to a 3D Track which in turn is attached to a well
 
 | Parameter      | Description                                                                                         | Range          |
 |----------------|-----------------------------------------------------------------------------------------------------|----------------|
-| Width Scaling  | A scaling factor applied to the grid characteristic length to yield the width of the draw surfaces  | [0.25 ... 2.5] |
+| Width Scaling  | A scaling factor applied to the grid characteristic length to yield the width of the draw surfaces  | [0.25 , 2.5] |
 | Show Grid      | Show axis markers for the value-axis of the curves along the draw surface                           | True / False   |
 | Show Background| Draw a white background on the drawing surfaces of the curves                                       | True / False   |
 
