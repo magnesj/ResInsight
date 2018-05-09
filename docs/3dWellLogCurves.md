@@ -1,11 +1,11 @@
 ---
 layout: docs
-title: 3d Well Log Curves
+title: 3d Well Log Plots
 permalink: /docs/3dwelllogcurves/
 published: true
 ---
 
-ResInsight can display well logs curves directly in the 3d view.
+ResInsight can display well logs plots directly in the 3d view with a subset of the functionality of the full [2D Well Log Plots]({{ site.baseurl }}/docs/welllogsandplots). The curves will be drawn in a plane next to or centered on the well trajectory they belong to.
 
 ![]({{ site.baseurl }}/images/3dWellLogCurves.png)
 
