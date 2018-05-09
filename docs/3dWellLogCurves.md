@@ -5,9 +5,9 @@ permalink: /docs/3dwelllogcurves/
 published: true
 ---
 
-![]({{ site.baseurl }}/images/3dWellLogCurves.png)
-
 ResInsight can display well logs curves directly in the 3d view.
+
+![]({{ site.baseurl }}/images/3dWellLogCurves.png)
 
 # Configuration the 3d Well Log Curves
 Test text
