@@ -42,15 +42,18 @@ The "Curve Data" configuration allows you to select a case, result type, propert
 
 | Parameter      | Description                                                                |
 |----------------|----------------------------------------------------------------------------|
-| Case           |                                                                            |
-| Result Type    |                                                                            |
-| Result Property|                                                                            |
-| Time Step      |                                                                            |
+| Case           | Test                                                                       |
+| Result Type    | Test                                                                       |
+| Result Property| Test                                                                       |
+| Time Step      | Test                                                                       |
 
 ### Appearance
-In the "Curve Appearance" box, the curve can be assinged to a draw plane, the color can be changed and the range of the result property can be set.
+In the "Curve Appearance" box, the curve can be assinged to a draw plane and the color can be changed. Furthermore, the range of the result property can be set with the minimum and maximum curve value settings. The curve range is by default set to the minimum and maximum values found in the data set and these values are retained in the label if different values have been chosen.
+
 ![]({{ site.baseurl }}/images/3dWellLogCurves_CurveConfiguration.png)
+
+The draw plane can be vertical (above well path, centered and below well path) and horizontal (left, centered and right). 
 ![]({{ site.baseurl }}/images/3dWellLogCurves_DrawPlaneSelection.png)
 
 ### Name Generation
-Finally the name of the curve is created automatically from a set of parameters such as case, view, etc. The parameters that should make up the curve name can be selected in the "Curve Name" box.
+Finally the name of the curve is created automatically from a set of parameters such as case, view, etc. The parameters that should make up the curve name can be selected in the "Curve Name" box. Only extraction log curves have multiple settings here. The automatic name generation will be automatically switched off if the curve has been renamed manually and can be switched back on by checking the "Generate Name Automatically" tick box.
