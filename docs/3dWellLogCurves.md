@@ -42,13 +42,13 @@ The "Curve Data" configuration allows you to select a case, result type, propert
 
 | Parameter      | Description                                                                |
 |----------------|----------------------------------------------------------------------------|
-| Case           | Test                                                                       |
+| Case           | The eclipse or geomechanical case to retrieve the data from                |
 | Result Type    | Test                                                                       |
-| Result Property| Test                                                                       |
-| Time Step      | Test                                                                       |
+| Result Property| The parameter to plot                                                      |
+| Time Step      | Which time step to show                                                    |
 
 ### Appearance
-In the "Curve Appearance" box, the curve can be assinged to a draw plane, the color can be changed and a range of curve values applied. The range of the result property can be set with the minimum and maximum curve value settings. The curve range is by default set to the minimum and maximum values found in the data set and these values are retained in the label if different values have been chosen.
+In the "Curve Appearance" box, the curve can be assigned to a draw plane, the color can be changed and a range of curve values applied. The range of the result property can be set with the minimum and maximum curve value settings. The curve range is by default set to the minimum and maximum values found in the data set and these values are retained in the label if different values have been chosen.
 
 ![]({{ site.baseurl }}/images/3dWellLogCurves_CurveConfiguration.png)
 
