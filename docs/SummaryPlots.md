@@ -25,6 +25,20 @@ Summary files can also be imported directly using one of the following commands 
 
 All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
+### Origin Files
+During summary file import, ResInsight checks whether the summary file is restarted, i.e. has an origin file. If an origin file is found, the dialog below is displayed.
+
+![]({{site.baseurl}}/images/OriginFileDialog.png)
+
+Depending on what triggered the summary file import, the dialog shows slightly different information. If the summary file import was triggered by a grid file import, the dialog displays information about grid files in addition to the summary files. If the summary file was imported directly, information about grid files are not relevant and thus not displayed.
+
+The dialog displays information in several groups. Those are:
+- **Current Grid and Summary Files** or **Current Summary Files**: This group displays the name of the files that the user selected. If the summary file was imported directly, no grid file is displayed.
+- **Origin Summary Files**: This group displays the names of the origin file(s) found. If there are more than one file listed, it means that the found origin file also has an origin file.
+
+... to be continued
+
+### Summary Case Groups
 A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
 ### Observed Data
