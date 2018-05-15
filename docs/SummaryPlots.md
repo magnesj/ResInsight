@@ -19,9 +19,9 @@ ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SM
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
 Summary files can also be imported directly using one of the following commands in the **File->Import->Summary Cases** menu:
 - **Import Summary Case**: Brings up the standard file selection dialog. Multiple selections are allowed.
-- **Import Summary Cases Recursively**: Brings up the recursive file selection dialog that is able to find files in a directory structure. This dialog is described in details [below](#recursive-summary-file-import)
+- **Import Summary Cases Recursively**: Brings up the recursive file selection dialog. This dialog is described in details [below](#recursive-summary-file-import)
 - **Import Summary Case Group**: Brings up the recursive file selection dialog. All files selected are automatically grouped in ResInsight.
-- **Import Ensemble**: Same as the above command, but in addition the group is automatically converted to an ensemble
+- **Import Ensemble**: Similar to the above, but in addition to just create a group, ResInsight performs some extra checking related to ensembles and converts the group to an ensemble.
 
 All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
@@ -233,11 +233,14 @@ When using the standard file selection dialog, the user is limited to select fil
 
 The dialog consists of the following fields:
 - **Root Folder**: Enter the root directory where the file search starts. Alternatively press the browse button next to the field.
-- **Path Pattern**: Enter a search pattern that applies to the relative search path. Wildcards "\*" and "?" are supported
+- **Path Pattern**: Enter a search pattern that applies to the start of the relative search path. If the pattern does not end with a "\*", an implicit wildcard is added silently. Supported wildcards:
+  - **\*** Matches any number of any characters except the directory separator
+  - **?** Matches one character exception the directory separator
+  - **[abc]** Matches one of the specified characters. Ex. a, b or c
 - **File Pattern**: Enter a search pattern that applies to the file name.
 - **Effective Filter**: The effective filter displays the resulting full path search pattern. It is updated on the fly as the user edits the pattern fields.
 
-After pressing the "Find" button, a file search is performed in the root directory and all directories below. The files found are presented in a list, where the user can check/uncheck each file separately.
+After pressing the "Find" button, a file search is performed in the root directory and directories below matching the path pattern. The files found are presented in a list, where the user can check/uncheck each file separately.
 
 ![]({{site.baseurl}}/images/RecursiveImportDialog2.png)
 
