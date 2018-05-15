@@ -17,7 +17,13 @@ ResInsight can create summary plots based on vectors from SUMMARY files ( _`*.SM
 ### SUMMARY Files
 
 When opening an Eclipse case in the 3D view, the associated summary file is opened automatically by default, and made available as a **Summary Case**.
-Summary files can also be imported directly using the command: **File->Import->Import Summary Case**. All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
+Summary files can also be imported directly using one of the following commands in the **File->Import->Summary Cases** menu:
+- **Import Summary Case**: Brings up the standard file selection dialog. Multiple selections are allowed.
+- **Import Summary Cases Recursively**: Brings up the recursive file selection dialog that is able to find files in a directory structure. This dialog is described in details [below](#recursive-summary-file-import)
+- **Import Summary Case Group**: Brings up the recursive file selection dialog. All files selected are automatically grouped in ResInsight.
+- **Import Ensemble**: Same as the above command, but in addition the group is automatically converted to an ensemble
+
+All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
 A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
 
@@ -220,3 +226,19 @@ In some cases some of the stepping components are hidden, depending on the set o
 
 When one of the **next buttons** are clicked, all curves are changed to display data for the next item for the clicked source dimension. Example: The user clicks the **next well button**. Then the well source for all curves in the current plot are changed to display data for the next well.
 
+## Recursive summary file import
+When using the standard file selection dialog, the user is limited to select files in one directory only. If the interesting files are distributed over multiple directories, the dialog has to be opened once for each directory. The recursive file selection dialog is created to circumvent this limitation. This dialog is able to search a directory tree for files matching a specified pattern.
+
+![]({{site.baseurl}}/images/RecursiveImportDialog1.png)
+
+The dialog consists of the following fields:
+- **Root Folder**: Enter the root directory where the file search starts. Alternatively press the browse button next to the field.
+- **Path Pattern**: Enter a search pattern that applies to the relative search path. Wildcards "\*" and "?" are supported
+- **File Pattern**: Enter a search pattern that applies to the file name.
+- **Effective Filter**: The effective filter displays the resulting full path search pattern. It is updated on the fly as the user edits the pattern fields.
+
+After pressing the "Find" button, a file search is performed in the root directory and all directories below. The files found are presented in a list, where the user can check/uncheck each file separately.
+
+![]({{site.baseurl}}/images/RecursiveImportDialog2.png)
+
+When the "OK" button is pressed, all checked files are imported.
