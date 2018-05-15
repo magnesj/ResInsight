@@ -232,15 +232,15 @@ When using the standard file selection dialog, the user is limited to select fil
 ![]({{site.baseurl}}/images/RecursiveImportDialog1.png)
 
 The dialog consists of the following fields:
-- **Root Folder**: Enter the root directory where the file search starts. Alternatively press the browse button next to the field.
-- **Path Pattern**: Enter a search pattern that applies to the start of the relative search path. If the pattern does not end with a "\*", an implicit wildcard is added silently. Supported wildcards:
+- **Root Folder**: The root directory where the file search starts. Alternatively press the browse button next to the field.
+- **Path Pattern**: The search pattern that applies to the start of the relative search path. If the pattern does not end with a "\*", an implicit wildcard is added silently. Supported wildcards:
   - **\*** Matches any number of any characters except the directory separator
   - **?** Matches one character exception the directory separator
   - **[abc]** Matches one of the specified characters. Ex. a, b or c
-- **File Pattern**: Enter a search pattern that applies to the file name.
+- **File Pattern**: The search pattern that applies to the file name.
 - **Effective Filter**: The effective filter displays the resulting full path search pattern. It is updated on the fly as the user edits the pattern fields.
 
-After pressing the "Find" button, a file search is performed in the root directory and directories below matching the path pattern. The files found are presented in a list, where the user can check/uncheck each file separately.
+After pressing the "Find" button, a file search is performed in the root directory and the directories below matching the path pattern. The files found are presented in a list, where the user can check/uncheck each file individually.
 
 ![]({{site.baseurl}}/images/RecursiveImportDialog2.png)
 
