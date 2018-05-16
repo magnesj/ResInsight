@@ -34,13 +34,13 @@ Depending on what triggered the summary file import, the dialog shows slightly d
 
 The dialog contents are organized in groups:
 - **Current Grid and Summary Files** or **Current Summary Files**: This group displays the name of the main summary file to import. If the import is triggered by a grid file import, the name of the grid file is also displayed.
-- **Origin Summary Files**: This group displays the names of the origin file(s) found. If there are more than one file listed, it means that the found origin file also has an origin file. ResInsight will search the "hierarchy" of summary origin files.
+- **Origin Summary Files**: This group displays the names of the origin summary file(s) found. If there are more than one file listed, it means that the found origin file also has an origin file. ResInsight will search the "chain" of summary origin files until it reaches the end.
   - **Import Options** There are three options to control how origin summary file are imported
     - **Unified**: The main summary files and all origin files are imported into one single summary case
     - **Separate Cases**: The main files and all origin files are imported into separate summary cases
     - **Skip**: Only the main summary file is imported. The origin summary files are skipped.
 - **Origin Grid Files**: If the summary file import was triggered by a grid file import, this group is visible. It contains a list of the grid files associated to the origin summary files
-  - **Import Options** There are two options to controll how "origin" grid files are imported
+  - **Import Options** There are two options to control how the grid files are imported
     - **Separate Cases**: All "origin" grid files are imported into sparated grid cases
     - **Skip**: Only the main grid file is imported. The "origin" grid files are skipped.
 
