@@ -27,3 +27,7 @@ The color mapping of the displayed cell result is controlled by the **Legend Def
   (Not available for Flow Diagnostics results)
   - **Current Timestep** -- use current (one) time step to find min and max values  
   - **User Defined Range** -- user specifies numeric values for min and max  
+
+Furthermore the legend can have a semi-transparent background applied to it by selecting the **Enable Legend Background** option in the Preferences dialog.
+
+![Legend Configuration]({{ site.baseurl }}/images/legend_background.PNG)
