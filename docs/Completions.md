@@ -22,9 +22,8 @@ For fishbones completions, multi-segment well information can even be exported t
 
 ![]({{ site.baseurl }}/images/Completions_WellConnectionFactors.png)
 
-The calculated connection factors can be visualized in the 3D view by enabling **Well Connection Factors** in the **Project Tree**. The connection factors are displayed with a symbol as in the example shown above. The color of the symbol displays the magnitude of the connection factor and can be controlled by the legend settings.  Additional details of the connection factor are displayed in the **Result Info** window when clicking on the connection factor symbol.
+Connection factors both from the Simulation Wells and the ones calculated from the modelled completions can be visualized in the 3D view by enabling **Well Connection Factors** in the **Project Tree**. The connection factors are displayed with a symbol as in the example shown above. The color of the symbol displays the magnitude of the connection factor and can be controlled by the legend settings.  Additional details of the connection factor are displayed in the **Result Info** window when clicking on the connection factor symbol.
 
-Connection factors along simulation wells are also visualized together with the computed connection factors along well paths.
 The **Property Panel** of the **Well Connection Factors** item has a few options:
 
 - **Geometry Scale Factor** -- Scales the connection factor symbols relative to the displayed well path radius
