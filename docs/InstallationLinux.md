@@ -49,7 +49,7 @@ On the command line do:
 
 Start ResInsight by typing: ResInsight
 
-## Setup Octave Interface(optional)
+## Setup Octave Interface (optional)
 
 1. Install Octave directly from the package manager in Linux. See the documentation for your particular distribution. 
 2. Launch ResInsight, open **Edit->Preferences** 
@@ -57,10 +57,12 @@ Start ResInsight by typing: ResInsight
   ( usually just _`octave`_. )
 
 <div class="note info">
-The precompiled octave interface distributed in the tarball is only tested for RedHat 6. It is not expected to work for other configurations.
+The precompiled octave interface distributed in the tarball is only tested for RedHat 6. <br>
+It is <b>not</b> expected to work for other configurations.
 (ResInsight 1.3.2-dev and earlier, was also tested on RedHat 5)<br>
-
-If you need the octave interface to work on a different OS, you need to build ResInsight yourself. See [Build Instructions]({{ site.baseurl }}/docs/buildinstructions)
+<br>
+If you need the octave interface to work on a different OS, you need to build ResInsight yourself.<br> 
+See [Build Instructions]({{ site.baseurl }}/docs/buildinstructions)
 </div>
 
 
@@ -68,4 +70,5 @@ If you need the octave interface to work on a different OS, you need to build Re
 Uncheck **Settings->Display->Enable 3D Acceleration**. Disabling this option will cause OpenGL operations to be executed in software, so the the performance of graphics operations in ResInsight will be slower, but will not crash.
 
 Here is a pointer addressing the issue with Virtual Box, this is not testes by us:
-https://superuser.com/questions/541537/how-to-solve-issues-with-shader-model-in-virtualbox
+
+[https://superuser.com/questions/541537/how-to-solve-issues-with-shader-model-in-virtualbox](https://superuser.com/questions/541537/how-to-solve-issues-with-shader-model-in-virtualbox)
