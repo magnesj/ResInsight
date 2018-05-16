@@ -5,7 +5,7 @@ permalink: /docs/resultcolorlegend/
 published: true
 ---
 
-The color mapping of the displayed cell result is controlled by the **Legend Definition** located below a result node in the **Project Tree**
+The color mapping of the displayed cell result is controlled by the **Legend Definition** located below a result node in the **Project Tree**. The legend can be shown or hidden by checking or unchecking the box in front of the Legend Definition.
 
 ![Legend Configuration]({{ site.baseurl }}/images/legend_configuration.PNG)
 
