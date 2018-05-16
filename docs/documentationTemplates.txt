@@ -31,7 +31,8 @@ The <code>*.rsp</code> file is an XML file, and can be edited by any text editor
 
 #### A info type "block" (with (i) )
 <div class="note info">
-If the well trajectory file is changed and you would like a running ResInsight to update accordingly, you will need to delete all the well trajectories that emerge from that file, and import it again.
+If the well trajectory file is changed and you would like a running ResInsight to update accordingly, you will need to delete all the well trajectories that emerge from that file, and import it again. 
+<b> <a href="{{ site.baseurl }}/docs/simulationwells">Simulation Wells</a> </b>
 </div>
 
 #### Monospace/Code etc.
