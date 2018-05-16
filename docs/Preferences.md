@@ -24,6 +24,7 @@ This group of options controls visual settings that will be used when creating n
 - **Well Label Color**
 - **Font Size** -- This font size is used for all labels shown in the 3D Views.
 - **Default Z Scale Factor** -- Default depth scale for grid models.
+- **Enable Legend Background** -- Apply a semi-transparent background to the legends in the 3D Views.
 
 ### 3D Views
 - **Navigation mode** -- Defines how to use the mouse to interact with with the 3D model.
