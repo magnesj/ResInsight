@@ -25,28 +25,7 @@ Summary files can also be imported directly using one of the following commands 
 
 All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
 
-### Origin Files
-During summary file import, ResInsight checks whether the summary file is restarted, i.e. has an origin file. If an origin file is found, the dialog below is displayed.
-
-![]({{site.baseurl}}/images/OriginFileDialog.png)
-
-Depending on what triggered the summary file import, the dialog shows slightly different information. If the summary file import was triggered by a grid file import, the dialog displays information about grid files in addition to the summary origin file(s). If the summary file was imported directly, information about grid files are not relevant and thus not displayed.
-
-The dialog contents are organized in groups:
-- **Current Grid and Summary Files** or **Current Summary Files**: This group displays the name of the main summary file to import. If the import is triggered by a grid file import, the name of the grid file is also displayed.
-- **Origin Summary Files**: This group displays the names of the origin summary file(s) found. If there are more than one file listed, it means that the found origin file also has an origin file. ResInsight will search the "chain" of summary origin files until it reaches the end.
-  - **Import Options** There are three options to control how origin summary file are imported
-    - **Unified**: The main summary files and all origin files are imported into one single summary case
-    - **Separate Cases**: The main files and all origin files are imported into separate summary cases
-    - **Skip**: Only the main summary file is imported. The origin summary files are skipped.
-- **Origin Grid Files**: If the summary file import was triggered by a grid file import, this group is visible. It contains a list of the grid files associated to the origin summary files
-  - **Import Options** There are two options to control how the grid files are imported
-    - **Separate Cases**: All "origin" grid files are imported into sparated grid cases
-    - **Skip**: Only the main grid file is imported. The "origin" grid files are skipped.
-
-By default the file names are displayed using relative path based on the common root folder for all files. In order to display the full path, check the **Show full paths** checkbox. Regardless of the checkbox state, there is always a tooltip showing the full path for every file. It is also possible to copy a full path file name to the clipboard. Right click on the file name and select **Copy file name**.
-
-If the user selected multiple summary files or grid files, this dialog will be displayed for every file that has an origin summary file. In this case the button **OK to All** appears. When this button is clicked, the rest of the files will be imported silently using the same options.
+During summary file import, ResInsight checks whether the summary file is restarted, i.e. has an origin file. If an origin file is found, the Origin Files dialog is displayed. Origin file support is decribed [below](#origin-files).
 
 ### Summary Case Groups
 A selection of cases can be grouped by right-clicking  a selection of summary cases and selecting the command **Group Summary Cases**. Summary cases can also be drag-dropped between summary groups. The groups will be used when listing the cases in the [Summary Plot Editor]({{ site.baseurl }}/docs/summaryploteditor).
@@ -269,3 +248,24 @@ After pressing the "Find" button, a file search is performed in the root directo
 ![]({{site.baseurl}}/images/RecursiveImportDialog2.png)
 
 When the "OK" button is pressed, all checked files are imported.
+
+### Origin Files
+![]({{site.baseurl}}/images/OriginFileDialog.png)
+
+Depending on what triggered the summary file import, the dialog shows slightly different information. If the summary file import was triggered by a grid file import, the dialog displays information about grid files in addition to the summary origin file(s). If the summary file was imported directly, information about grid files are not relevant and thus not displayed.
+
+The dialog contents are organized in groups:
+- **Current Grid and Summary Files** or **Current Summary Files**: This group displays the name of the main summary file to import. If the import is triggered by a grid file import, the name of the grid file is also displayed.
+- **Origin Summary Files**: This group displays the names of the origin summary file(s) found. If there are more than one file listed, it means that the found origin file also has an origin file. ResInsight will search the "chain" of summary origin files until it reaches the end.
+  - **Import Options** There are three options to control how origin summary file are imported
+    - **Unified**: The main summary files and all origin files are imported into one single summary case
+    - **Separate Cases**: The main files and all origin files are imported into separate summary cases
+    - **Skip**: Only the main summary file is imported. The origin summary files are skipped.
+- **Origin Grid Files**: If the summary file import was triggered by a grid file import, this group is visible. It contains a list of the grid files associated to the origin summary files
+  - **Import Options** There are two options to control how the grid files are imported
+    - **Separate Cases**: All "origin" grid files are imported into sparated grid cases
+    - **Skip**: Only the main grid file is imported. The "origin" grid files are skipped.
+
+By default the file names are displayed using relative path based on the common root folder for all files. In order to display the full path, check the **Show full paths** checkbox. Regardless of the checkbox state, there is always a tooltip showing the full path for every file. It is also possible to copy a full path file name to the clipboard. Right click on the file name and select **Copy file name**.
+
+If the user selected multiple summary files or grid files, this dialog will be displayed for every file that has an origin summary file. In this case the button **OK to All** appears. When this button is clicked, the rest of the files will be imported silently using the same options.
