@@ -31,9 +31,9 @@ The supported ASCII format is quite flexible but the main requirements are:
     6523.5	760	2559	2637.1
     -999
     WELLNAME: WELL2
-    550.7	1020.2	2410	2410
-    551		1004.1	2422.2	2430.2
-    555.2	993.9	2425	2441.6
+    550.7 1020.2  2410   2410
+    551   1004.1  2422.2 2430.2
+    555.2 993.9	  2425   2441.6
     -999
 
 #### Example 2:
