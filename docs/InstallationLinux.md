@@ -62,7 +62,7 @@ It is <b>not</b> expected to work for other configurations.
 (ResInsight 1.3.2-dev and earlier, was also tested on RedHat 5)<br>
 <br>
 If you need the octave interface to work on a different OS, you need to build ResInsight yourself.<br> 
-See [Build Instructions]({{ site.baseurl }}/docs/buildinstructions)
+See <a href="{{ site.baseurl }}/docs/buildinstructions">Build Instructions</a> 
 </div>
 
 
