@@ -97,6 +97,14 @@ Default result mapping on faults is using the result specified in **Cell Result*
 This item controls the visualization of the Eclipse simulation wells.
 Please refer to [Simulation Wells]({{ site.baseurl }}/docs/simulationwells) to read more.
 
+### Well Connection Factors
+This item controls the visualization of well connection factors.
+See [Visualization and Inspection of Well Connection Factors]({{site.baseurl}}/docs/completions/#visualization-and-inspection-of-well-connection-factors) for details.
+
+### Fractures
+This item controls the visualization of fractures.
+See [Fractures]({{site.baseurl}}/docs/completions/#fractures) for details.
+
 ### Faults
 Visualization of the faults in the model is controlled by this item. 
 Please refer to [Faults]({{ site.baseurl }}/docs/faults) to read more.
