@@ -30,4 +30,4 @@ The color mapping of the displayed cell result is controlled by the **Legend Def
 
 Furthermore the legend can have a semi-transparent background applied to it by selecting the **Enable Legend Background** option in the Preferences dialog.
 
-![Legend Configuration]({{ site.baseurl }}/images/legend_background.PNG)
+![Legend Background]({{ site.baseurl }}/images/legend_background.png)
