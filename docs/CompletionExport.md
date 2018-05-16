@@ -5,7 +5,7 @@ permalink: /docs/completionexport/
 published: true
 ---
 
-## Export Completion Data to Eclipse
+The completions defined in ResInsight can be exported to Eclipse for use in new simulation runs.
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
