@@ -49,7 +49,7 @@ On the command line do:
 
 Start ResInsight by typing: ResInsight
 
-## Install Octave (optional)
+## Setup Octave Interface(optional)
 
 1. Install Octave directly from the package manager in Linux. See the documentation for your particular distribution. 
 2. Launch ResInsight, open **Edit->Preferences** 
