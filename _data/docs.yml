@@ -42,15 +42,18 @@
   - pltplot
   - flowdiagnosticsplots
      
-- title: Export and Import 
+- title: Import 
+  docs:
+  - odbsupport
+  - observeddata 
+  - pasteexceltimedata
+  
+- title: Export 
   docs:
   - snapshots
   - exporteclipseproperties
   - exportfluxnummultnum
   - carfinexport
-  - odbsupport
-  - observeddata 
-  - pasteexceltimedata
   
 - title: Scripting
   docs:
