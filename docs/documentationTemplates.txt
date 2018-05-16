@@ -44,4 +44,10 @@ Monospace with the annoying box `*.SMSPEC`
     WELLNAME: WELL1
     6507.1	725	2542	2590
     -999
-   
+    
+##### Other block of monospace
+
+```
+gconftool-2 --type boolean --set /desktop/gnome/interface/buttons_have_icons true
+gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
+```
