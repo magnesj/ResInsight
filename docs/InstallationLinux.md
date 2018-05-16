@@ -15,6 +15,16 @@ published: true
 2. Extract content from TAR file
 3. Start ./ResInsight
 
+#### Display Menu Icons in GNOME (Optional)
+By default, icons are not visible in menus in the GNOME desktop environment. ResInsight has icons for many menu items, and icons can be set visible by issuing the following commands (Tested on RHEL6) :
+
+```
+gconftool-2 --type boolean --set /desktop/gnome/interface/buttons_have_icons true
+gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
+```
+
+This fix was taken from reply number 11 in this [thread](https://bbs.archlinux.org/viewtopic.php?id=117414)
+
 ### From Binary Packages on Linux (Not always latest release)
  Packages for ResInsight are available as part of the distribution by the [Opm project](http://opm-project.org/?page_id=36)
 
@@ -53,15 +63,6 @@ The precompiled octave interface distributed in the tarball is only tested for R
 If you need the octave interface to work on a different OS, you need to build ResInsight yourself. See [Build Instructions]({{ site.baseurl }}/docs/buildinstructions)
 </div>
 
-## Display Menu Icons in GNOME
-By default, icons are not visible in menus in the GNOME desktop environment. ResInsight has icons for many menu items, and icons can be set visible by issuing the following commands (Tested on RHEL6) :
-
-```
-gconftool-2 --type boolean --set /desktop/gnome/interface/buttons_have_icons true
-gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
-```
-
-This fix was taken from reply number 11 in this [thread](https://bbs.archlinux.org/viewtopic.php?id=117414)
 
 ## Workaround for crash using Virtual Box
 Uncheck **Settings->Display->Enable 3D Acceleration**. Disabling this option will cause OpenGL operations to be executed in software, so the the performance of graphics operations in ResInsight will be slower, but will not crash.
