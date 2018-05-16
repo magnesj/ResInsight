@@ -54,6 +54,7 @@
   - exporteclipseproperties
   - exportfluxnummultnum
   - carfinexport
+  - completionexport
   
 - title: Scripting
   docs:
