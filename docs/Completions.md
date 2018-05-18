@@ -174,7 +174,7 @@ Fractures in ResInsight can be added both to simulation wells and Well Trajector
 
 The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. 
 
-![]({{ site.baseurl }}/images/FractureVizControl.png)
+![]({{ site.baseurl }}/images/FractureVizControl.png) ![]({{ site.baseurl }}/images/FractureResults.png) 
 
 - **Colors** -- Control the color settings for the fractures in the View
   - **Result Variable** -- Selects the fracture result to use for coloring the fracture. This is most interesting when you have imported a StimPlan fracture with varying width, conductivity and other parameters. The legend item in the **Project Tree** controls how the legend is set up.
