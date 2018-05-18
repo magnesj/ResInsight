@@ -227,9 +227,12 @@ Non-Darcy Flow is used to improve the computation of connection factors for cell
   - **Halflength X<sub>r</sub>** -- Half the width of the ellipse
   - **Height** -- The height of the elliptical fracture
   - **Fracture Orientation** -- See above
+- **Fracture Truncation** -- See above
 - **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting
   - **Permeability** -- A constant permeability inside the fracture (Used to calculate conductivity in the fracture)
   - **Width** -- Crack width (Used to calculate conductivity in the fracture)
+- **Sensivity Scale Factors** -- See above
+- **Non-Darcy Flow** -- See above
 
 #### Stimplan Fracture Template
 
@@ -245,9 +248,12 @@ Stimplan fracture templates imports XML output from the Stimplan software. These
   - **Well/fracture Intersection Depth** -- The position of the fracture along the well path as MD.
 - **Geometry**
   - **Fracture Orientation** -- See above
+- **Fracture Truncation** -- See above
 - **Properties**
   - **Conductivity Scaling Factor** -- Scale the overall conductivity to do sensitivity studies.
-  
+- **Sensivity Scale Factors** -- See above
+- **Non-Darcy Flow** -- See above
+
 ### Fracture Instances
 
 Instances of fractures can be created along well paths and simulation wells by right clicking the well pipe in the 3D view, or the corresponding items in the **Project Tree**. 
