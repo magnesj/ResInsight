@@ -23,7 +23,7 @@ Summary files can also be imported directly using one of the following commands 
 - **Import Summary Case Group**: Brings up the recursive file selection dialog. All files selected are automatically grouped in ResInsight.
 - **Import Ensemble**: Similar to the above, but in addition to just create a group, ResInsight performs some extra checking related to ensembles and converts the group to an ensemble. See [ensemble support description]({{site.baseurl}}/docs/ensembleplotting).
 
-All cases will be available under **Summary Cases** in the **Plot Object Project Tree**. 
+These commands can also be accessed in the right-click context menu for the **Summary Cases** entry in the **Plot Main Window Project Tree** under which the imported cases will also be listed.
 
 During summary file import, ResInsight checks whether the summary file is restarted, i.e. has an origin file. If an origin file is found, the Origin Files dialog is displayed. Origin file support is described [below](#origin-files).
 
