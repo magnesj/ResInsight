@@ -170,6 +170,16 @@ Hydraulic fractures are completions created by pressurizing the reservoir at a c
 
 Fractures in ResInsight can be added both to simulation wells and Well Trajectories, and have two main types: Elliptical fractures and StimPlan fractures. 
 
+### Visualization control
+
+The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. 
+
+![]({{ site.baseurl }}/images/FractureVizControl.png)
+
+- **Colors** -- Control the color settings for the fractures in the View
+  - **Result Variable** -- Selects the fracture result to use for coloring the fracture. This is most interesting when you have imported a StimPlan fracture with varying width, conductivity and other parameters. The legend item in the **Project Tree** controls how the legend is set up.
+  - **Default Color** -- The color to use if the requested result is not available for some fracture.
+
 ### Fracture Templates
 
 To create a fracture you first need a **Fracture Template**. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
