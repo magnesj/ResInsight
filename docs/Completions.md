@@ -236,7 +236,7 @@ Non-Darcy Flow is used to improve the computation of connection factors for cell
 
 #### Stimplan Fracture Template
 
-Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc. as time varying quantities.
+Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc. as time varying quantities. Both symmetric and asymmetric stimplan fracture templates are supported.
 
 ![]({{ site.baseurl }}/images/StimplanFractureTemplateProperties.png)
 
