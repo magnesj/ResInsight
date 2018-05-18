@@ -20,10 +20,10 @@ A couple of examples on the file format are shown below.
 ResInsight searches for the first line containing `\*Distribution Table`, then splits the following line by `,`. These entries describes the expected property values to be found in the file.
 
 ResInsight then searches for the data block by ignoring lines 
-- starting with "\*" and "," 
-- does not have the expected column count when splitting the line by "," 
+- starting with `\*` and `,` 
+- does not have the expected column count when splitting the line by `,` 
 
-When the datablock is found, the part of the line before "." is stripped away, and first column is expected to be element ID
+When the datablock is found, the part of the line before `.` is stripped away, and first column is expected to be element ID
 
 ```
 ** ELASTIC SETTING FOR EACH ELEMENT
