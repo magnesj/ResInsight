@@ -182,6 +182,9 @@ To create a new fracture template, right-click the **Fracture Template** item in
 
 #### Common Fracture Template Options
 
+![]({{ site.baseurl }}/images/CommonFractureTemplateProperties.png)
+- **Name** -- User defined name for the template. Used when selecting which template to use in the Fracture
+- **ID** -- Assigned ID to be used when addressing this template form a Command file script
 - **Geometry**
   - **Fracture Orientation** -- The fractures orientation
     - **Transverse(normal) to Well Path** -- The fracture plane is vertical and normal to the well path at the intersection point.
