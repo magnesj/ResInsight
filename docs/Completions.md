@@ -199,7 +199,10 @@ To create a new fracture template, right-click the **Fracture Template** item in
   - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path ( Fractures **Along Well Path** only ).
   - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation ( Fractures **Along Well Path** only ).
   - **Well Diameter** -- Used when exporting to Eclipse.
-- **Sensitivity Scale Factors** -- Each of the properties are scaled by the scaling factor. When used interactively, the **Apply** button must be pressed to apply the scaling factors. These scaling factors are also available from command file scripting (TODO : add reference to command file scripts)
+- **Sensitivity Scale Factors** -- Each of the properties are scaled by the scaling factor. When used interactively, the **Apply** button must be pressed to apply the scaling factors. These scaling factors are also available from command file scripting 
+  - **Height, Width** -- Scales the height or the _*Halflength*_ of the fracture template
+  - **D-factor** -- Scales the none-darcy flow factor
+  - **Conductivity** -- Scales the condictivity in the fracture directly
 
 #### Non-Darcy Flow
 
