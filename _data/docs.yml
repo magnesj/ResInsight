@@ -45,6 +45,7 @@
 - title: Import 
   docs:
   - odbsupport
+  - elementpropertytableimport
   - observeddata 
   - pasteexceltimedata
   
