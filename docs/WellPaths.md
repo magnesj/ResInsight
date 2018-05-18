@@ -11,7 +11,7 @@ In addition, a Statoil specific solution to retrieve Well Trajectories from thei
 
 ## Ascii Well Trajectories
 
-The command **File -> Import -> Import Well Paths From File** will read the well paths in the selected file, and create one entry for each trajectory under the  ![]({{ site.baseurl }}/images/WellCollection.png) **Wells** item in the **Project Tree**. 
+The command **File -> Import -> Well Data -> Import Well Paths From File** will read the well paths in the selected file, and create one entry for each trajectory under the  ![]({{ site.baseurl }}/images/WellCollection.png) **Wells** item in the **Project Tree**. 
 
 The supported ASCII format is quite flexible but the main requirements are: 
 
@@ -67,7 +67,7 @@ If the well trajectory file is changed and you would like a running ResInsight t
 
 In order to import from SSI-Hub, a project file must be present and stored to file. All imported well paths from the web service will be stored relative to this project file location. If no project file exists, the menu item is disabled.
 
-The command **File -> Import -> Import Well Paths From SSI-hub** launches a wizard to guide you through the process of selecting the well trajectories you need.
+The command **File -> Import -> Well Data -> Import Well Paths From SSI-hub** launches a wizard to guide you through the process of selecting the well trajectories you need.
 
 <div class="note info">
 <h5>Access to web service</h5>
@@ -97,7 +97,7 @@ The visible wells are always shown in all the 3D Views in the complete project, 
 A well trajectory (well path) will hold well log data and well path data imported from files. A well path file is placed inside the well path item, while one or more well log files are placed as child items under the well path in the project tree.
 
 ### Importing Well Log Files
-Well log data is usually imported from LAS-files (_\*.las_). LAS-files can be imported using the command: **File->Import->Import Well Logs from File**.
+Well log data is usually imported from LAS-files (_\*.las_). LAS-files can be imported using the command: **File->Import-> Well Data->Import Well Logs from File**.
 
 ResInsight will look for the the well name in the imported LAS-files among the existing **Well Paths**.
 If a match is found, the LAS-file is placed as a child of that trajectory. If not, a new empty well path entry is created with the imported LAS-file under it. A well path may have more than one LAS-files as children.
