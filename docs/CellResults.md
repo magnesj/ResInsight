@@ -123,3 +123,10 @@ Several derived cell properties are calculated. Please refer to [Derived Results
 ### Relative Result Options
 
 This group of options controls time-lapse results to be calculated. ( See [Relative Results]({{ site.baseurl }}/docs/derivedresults#relative-results-time-lapse-results) for more information ) 
+
+## Select Color Result
+![]({{ site.baseurl }}/images/SelectColorResult.png)
+
+In the 3D view, the result property for a selected cell can be found by right-clicking on the 3D view and choosing **Select Color Result**. The corresponding result property will be shown in the Property Editor.
+
+![]({{ site.baseurl }}/images/SelectColorResultPropertyEditor.png)
