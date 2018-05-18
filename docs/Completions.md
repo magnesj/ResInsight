@@ -172,7 +172,7 @@ Fractures in ResInsight can be added both to simulation wells and Well Trajector
 
 ### Visualization control
 
-The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. For fractures along the well path the _*Perforation Length*_ is shown as an olive green cylinder around the well path as shown in the image below.
+The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. For fractures along the well path the **Perforation Length** is shown as an olive green cylinder around the well path as shown in the image below.
 
 ![]({{ site.baseurl }}/images/FractureVizControl.png) 
 
