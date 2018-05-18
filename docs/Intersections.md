@@ -13,9 +13,13 @@ There are two main types of intersections. The first one which simply is called 
 
 The second intersection type is called an **Intersection Box**. An Intersection Box can be used as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
 
-All types of intersections are stored in a folder named **Intersections** in a **View** as shown below.
+All types of intersections are stored in a folder named **Intersections** in a **View** as shown below. Once created, the intersections may be copied to other views by selecting the **Copy intersections to all views in case** option from the context menu of each intersection.
 
 ![]({{ site.baseurl }}/images/IntersectionInTree.png)
+
+Once created, the intersections may be copied to other views by selecting the **Copy intersections to all views in case** option from the context menu of each intersection.
+
+![]({{ site.baseurl }}/images/IntersectionInTreeCopy.png)
 
 ## Curve Based **Intersections**
 
