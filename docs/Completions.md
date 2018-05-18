@@ -172,14 +172,17 @@ Fractures in ResInsight can be added both to simulation wells and Well Trajector
 
 ### Visualization control
 
-The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. 
+The **Fractures** item in the **Project Tree** controls whether to show the modeled fractures or not. For fractures along the well path the _*Perforation Length*_ is shown as an olive green cylinder around the well path as shown in the image below.
 
-![]({{ site.baseurl }}/images/FractureVizControl.png) ![]({{ site.baseurl }}/images/FractureResults.png) 
+![]({{ site.baseurl }}/images/FractureVizControl.png) 
 
 - **Colors** -- Control the color settings for the fractures in the View
   - **Result Variable** -- Selects the fracture result to use for coloring the fracture. This is most interesting when you have imported a StimPlan fracture with varying width, conductivity and other parameters. The legend item in the **Project Tree** controls how the legend is set up.
   - **Default Color** -- The color to use if the requested result is not available for some fracture.
-
+- **StimPlan**
+  - **Show Mesh** -- Toggles the visualization of the StimPlan mesh lines, showing the StimPlan cell borders
+  - **Color Interpolation** -- Toggles interpolation of the StimPlan results. When Off, one color per StimplanCell is shown. When on, Resinsight interpolates the color between the cells.
+  
 ### Fracture Templates
 
 To create a fracture you first need a **Fracture Template**. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
