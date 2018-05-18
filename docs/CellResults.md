@@ -117,6 +117,7 @@ Geomechanical results are sorted in different **Result Position**s:
 - **Element Nodal on Face** -- Results with values transformed to element faces or intersections. 
 See [Element Nodal on Face]({{ site.baseurl }}/docs/derivedresults#element-nodal-on-face) for more information 
 - **Formation Names** -- Lists the **Active Formation Names** selected on the case. ( See [Formations]({{ site.baseurl }}/docs/formations) )
+- **Element** -- Imported element property table results. One value pr element. See [Element Property Table Import]({{ site.baseurl }}/docs/elementpropertytableimport)
 
 Several derived cell properties are calculated. Please refer to [Derived Results]({{ site.baseurl }}/docs/derivedresults) for more information.
 
