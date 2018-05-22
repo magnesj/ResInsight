@@ -88,6 +88,8 @@ Press the <b>Apply</b> button to apply consistent appearance settings according 
 </div>
 
 ### Curves
+![]({{site.baseurl}}/images/SummaryPreviewCurves.png)
+
 The curves field displays all summary curves and ensemble curve sets matching the settings in the selection fields. Those are separated in two groups, **Summary Curves** and **Ensemble Curve Sets**. The check box at each item controls which items are displayed in the preview plot.
 
 If the user make a selection that will result in a huge number of ensemble curves, ResInsight will display a drawing performance warning, and the newly created curve set(s) are toggled off by default.
