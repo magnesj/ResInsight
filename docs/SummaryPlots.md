@@ -252,6 +252,8 @@ When the "OK" button is pressed, all checked files are imported.
 ### Origin Files
 ![]({{site.baseurl}}/images/OriginFileDialog.png)
 
+During summary file import, ResInsight checks whether the summary file is restarted, i.e. has an origin file. If an origin file is found, the Origin Files dialog is displayed.
+
 Depending on what triggered the summary file import, the dialog shows slightly different information. If the summary file import was triggered by a grid file import, the dialog displays information about grid files in addition to the summary origin file(s). If the summary file was imported directly, information about grid files are not relevant and thus not displayed.
 
 The dialog contents are organized in groups:
