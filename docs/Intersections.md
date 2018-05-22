@@ -9,7 +9,7 @@ published: true
 
 Intersections are cross sections of the grid model that displays the grid cell values on planes that cut through the grid in various ways. 
 
-There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a piecewise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. These intersections can also be shown in their own separate [2D Intersection View]({{ site.baseurl }}/docs/intersections#2d-intersection-views)
+There are two main types of intersections. The first one which simply is called **Intersection**, is defined by a piece-wise linear curve and an extrusion direction. The curve can be either a Simulation Well, a Well Path, a user defined polyline, or a user defined line. These intersections can also be shown in their own separate [2D Intersection View]({{ site.baseurl }}/docs/intersections#2d-intersection-views)
 
 The second intersection type is called an **Intersection Box**. An Intersection Box can be used as a box cutting the grid cells, or collapsed to a restricted axis aligned plane. 
 
@@ -113,7 +113,7 @@ The length of the plane can also be set manually in the **Property Editor**.
 
 ### 2D Intersection Views
 
-A 2D Intersection View displays the intersection in a separate 2D view along with the defining curve. The intersection and the defining wellpath, simulation well or polyline is flattened to make it easier to see the intersected grid and how the well traverses it. 
+A 2D Intersection View displays the intersection in a separate 2D view along with the defining curve. The intersection and the defining well path, simulation well or polyline is flattened to make it easier to see the intersected grid and how the well traverses it. 
 
 ![]({{ site.baseurl }}/images/IntersectionView.png)
 

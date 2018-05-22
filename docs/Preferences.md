@@ -18,7 +18,7 @@ The preferences are not stored in the project files, but rather in a platform sp
 This group of options controls visual settings that will be used when creating new views.
 
 - **Viewer Background** 
-- **Gridlines** -- Controls whether to show the gridlines by default.
+- **Gridlines** -- Controls whether to show the grid lines by default.
 - **Mesh Color** 
 - **Mesh Color Along Faults**
 - **Well Label Color**

@@ -218,7 +218,7 @@ Export well path completions.
 | compdatExport               | Chose whether transmissibilities are exported. Choices: `TRANSMISSIBILITIES`, `WPIMULT_AND_DEFAULT_CONNECTION_FACTORS`. Defaults to `TRANSMISSIBILITIES`  | Enum           |          |
 | includePerforations         | Whether main bore perforations should be included. Defaults to `true`                                                                                     | Boolean        |          |
 | includeFishbones            | Whether fishbones should be included. Defaults to `true`                                                                                                  | Boolean        |          |
-| excludeMainBoreForFishbones | Whether main bore completions shouldb be excluded for cells with fishbones. Defaults to `false`                                                           | Boolean        |          |
+| excludeMainBoreForFishbones | Whether main bore completions should be excluded for cells with fishbones. Defaults to `false`                                                           | Boolean        |          |
 
 #### Example
 

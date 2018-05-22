@@ -22,7 +22,7 @@ For fishbones completions, multi-segment well information can even be exported t
 
 ![]({{ site.baseurl }}/images/Completions_WellConnectionFactors.png)
 
-Connection factors both from the Simulation Wells and the ones calculated from the modelled completions can be visualized in the 3D view by enabling **Well Connection Factors** in the **Project Tree**. The connection factors are displayed with a symbol as in the example shown above. The color of the symbol displays the magnitude of the connection factor and can be controlled by the legend settings.  Additional details of the connection factor are displayed in the **Result Info** window when clicking on the connection factor symbol.
+Connection factors both from the Simulation Wells and the ones calculated from the modeled completions can be visualized in the 3D view by enabling **Well Connection Factors** in the **Project Tree**. The connection factors are displayed with a symbol as in the example shown above. The color of the symbol displays the magnitude of the connection factor and can be controlled by the legend settings.  Additional details of the connection factor are displayed in the **Result Info** window when clicking on the connection factor symbol.
 
 The **Property Panel** of the **Well Connection Factors** item has a few options:
 
@@ -108,13 +108,13 @@ For multi-segment wells there are additional parameters which should be set. The
   - **Liner Inner  eter** -- The liner inner diameter for the fishbones. 
   - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
   - **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
-  - **Length and Depth** -- Used in WELSEGS export - when specifyig the lenght and depth change for each segment
+  - **Length and Depth** -- Used in WELSEGS export - when specifying the length and depth change for each segment
     - **Incremental** -- length / depth of given segment
     - **Absolute** -- the length down the tube or depth of the last nodal point
 
 ### Fishbones Subs Definition
 
-To add new fishbones completions, select the **New Fishbones Subs Definition** command. This menu item is available by right clicking on **Wells** in the Porject Tree or right clicking on the well trajectory in the 3D View. 
+To add new fishbones completions, select the **New Fishbones Subs Definition** command. This menu item is available by right clicking on **Wells** in the Project Tree or right clicking on the well trajectory in the 3D View. 
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
@@ -181,7 +181,7 @@ The **Fractures** item in the **Project Tree** controls whether to show the mode
   - **Default Color** -- The color to use if the requested result is not available for some fracture.
 - **StimPlan**
   - **Show Mesh** -- Toggles the visualization of the StimPlan mesh lines, showing the StimPlan cell borders
-  - **Color Interpolation** -- Toggles interpolation of the StimPlan results. When Off, one color per StimplanCell is shown. When on, Resinsight interpolates the color between the cells.
+  - **Color Interpolation** -- Toggles interpolation of the StimPlan results. When Off, one color per StimplanCell is shown. When on, ResInsight interpolates the color between the cells.
   
 ### Fracture Templates
 
@@ -191,7 +191,7 @@ Fracture Templates are listed in a folder with the same name in the **Project Tr
 
 ![]({{ site.baseurl }}/images/FractureTemplates.png)
 
-To create a new fracture template, right-click the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New Stimplan Fracture Template**. 
+To create a new fracture template, right-click the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New StimPlan Fracture Template**. 
 
 #### Common Fracture Template Options
 
@@ -210,7 +210,7 @@ To create a new fracture template, right-click the **Fracture Template** item in
 - **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting.
   - **Conductivity in Fracture** 
     - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures.
-    - **Infinite Conductivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the Stimplane data.
+    - **Infinite Conductivity** -- Assume infinite conductivity in the fracture itself. For StimPlan fractures this will ignore the conductivity in the StimPlan data.
   - **Skin Factor** -- Used when exporting to Eclipse.
   - **Perforation Length** -- The length of the intersection between the well bore and the fracture when the fracture is along the well path ( Fractures **Along Well Path** only ).
   - **Perforation Efficiency** -- The efficiency of the wellbore-fracture perforation ( Fractures **Along Well Path** only ).
@@ -218,13 +218,13 @@ To create a new fracture template, right-click the **Fracture Template** item in
 - **Sensitivity Scale Factors** -- Each of the properties are scaled by the scaling factor. When used interactively, the **Apply** button must be pressed to apply the scaling factors. These scaling factors are also available from command file scripting 
   - **Height, Width** -- Scales the height or the _*Halflength*_ of the fracture template
   - **D-factor** -- Scales the none-darcy flow factor
-  - **Conductivity** -- Scales the condictivity in the fracture directly
+  - **Conductivity** -- Scales the conductivity in the fracture directly
 
 #### Non-Darcy Flow
 
 ![]({{ site.baseurl }}/images/FractureNonDarcyFlow.png)
 
-Non-Darcy Flow is used to improve the computation of connection factors for cells penetrated by well pipes. A precomputed D-factor can be set using **User Defined D-factor**. Selecting the option **Compute D-factor** displays the following set of properties:
+Non-Darcy Flow is used to improve the computation of connection factors for cells penetrated by well pipes. A pre-computed D-factor can be set using **User Defined D-factor**. Selecting the option **Compute D-factor** displays the following set of properties:
   - **Inertial Coefficient** -- Beta-factor in Forcheimer units
   - **Effective Permeability**
     - **User Defined** -- Defines the permeability *Ke* in milliDarcy in the property **Effective Permeability** 
@@ -255,22 +255,22 @@ Non-Darcy Flow is used to improve the computation of connection factors for cell
 
 #### Stimplan Fracture Template
 
-Stimplan fracture templates imports XML output from the Stimplan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting condictivity etc. as time varying quantities. Both symmetric and asymmetric stimplan fracture templates are supported.
+StimPlan fracture templates imports XML output from the StimPlan software. These XML files contains results from a simulated hydraulic fracture, describing both geometry, varying crack width, resulting conductivity etc. as time varying quantities. Both symmetric and asymmetric StimPlan fracture templates are supported.
 
 ![]({{ site.baseurl }}/images/StimplanFractureTemplateProperties.png)
 
 - **Name** -- User name of this particular fracture template
 - **Show StimPlan Mesh** -- Show or hide the mesh lines on the fracture in the 3D View
 - **Input**
-  - **File Name** -- Path to the imported StimPLan XML-file
-  - **Active Timestep Index** -- Time step in the StimPlan simulation to use for transmissibility calculations and visualization
+  - **File Name** -- Path to the imported StimPlan XML-file
+  - **Active Time step Index** -- Time step in the StimPlan simulation to use for transmissibility calculations and visualization
   - **Well/fracture Intersection Depth** -- The position of the fracture along the well path as MD.
 - **Geometry**
   - **Fracture Orientation** -- See above
 - **Fracture Truncation** -- See above
 - **Properties**
   - **Conductivity Scaling Factor** -- Scale the overall conductivity to do sensitivity studies.
-- **Sensivity Scale Factors** -- See above
+- **Sensitivity Scale Factors** -- See above
 - **Non-Darcy Flow** -- See above
 
 ### Fracture Instances

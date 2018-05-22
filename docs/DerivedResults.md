@@ -27,7 +27,7 @@ The TRANX, TRANY and TRANZ used in the simulation are divided by the ResInsight 
 
 ### Directional Combined Results
 
-Cell properties with names ending in I, J, K, X, Y, or Z, and an optional "+" or "-" are combined into derived results postfixed with IJK, or XYZ depending on their origin. (Eg. the static cell properties MULTX, MULTY, MULTZ, and their negatives are combined into the result MULTXYZ, while the dynamic cell properties FLRGASI, FLRGASJ, FLRGASK are combined to FLRGASIJK). 
+Cell properties with names ending in I, J, K, X, Y, or Z, and an optional "+" or "-" are combined into derived results post-fixed with IJK, or XYZ depending on their origin. (Eg. the static cell properties MULTX, MULTY, MULTZ, and their negatives are combined into the result MULTXYZ, while the dynamic cell properties FLRGASI, FLRGASJ, FLRGASK are combined to FLRGASIJK). 
 
 These combined cell properties visualize the property as a color in all directions combined when selected in 
 as a **Cell Result** and **Separate Fault Result**. 

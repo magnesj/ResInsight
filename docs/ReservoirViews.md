@@ -6,7 +6,7 @@ published: true
 ---
 ![]({{ site.baseurl }}/images/3DViewOverview.png)
 
-3D Views are the windows displaying the Grid Models. The visualization is controlled by the **Project Tree** item representing the **View** and their subitems.
+3D Views are the windows displaying the Grid Models. The visualization is controlled by the **Project Tree** item representing the **View** and their sub items.
 
 ![]({{ site.baseurl }}/images/ViewTree.png)
 

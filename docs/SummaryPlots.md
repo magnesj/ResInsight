@@ -265,7 +265,7 @@ The dialog contents are organized in groups:
     - **Skip**: Only the main summary file is imported. The origin summary files are skipped.
 - **Origin Grid Files**: If the summary file import was triggered by a grid file import, this group is visible. It contains a list of the grid files associated to the origin summary files
   - **Import Options** There are two options to control how the grid files are imported
-    - **Separate Cases**: All "origin" grid files are imported into sparated grid cases
+    - **Separate Cases**: All "origin" grid files are imported into separate grid cases
     - **Skip**: Only the main grid file is imported. The "origin" grid files are skipped.
 
 By default the file names are displayed using relative path based on the common root folder for all files. In order to display the full path, check the **Show full paths** checkbox. Regardless of the checkbox state, there is always a tooltip showing the full path for every file. It is also possible to copy a full path file name to the clipboard. Right click on the file name and select **Copy file name**.

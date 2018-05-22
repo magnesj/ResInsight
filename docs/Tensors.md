@@ -33,10 +33,10 @@ Choose which of the three principals to be shown. The threshold removes all prin
 ### Vector Colors
 Choose which color palette to use for the three arrows. The colors appear in "correct" order (first color = principal 1). 
 
-The vector color **Result Colors** is special. By choosing this color type, a new legend will appear. This legend is defined by the values in the Legend definition of the Element Tensor Results. The extremal values of the color mapper are the extremals of the three principals combined. In the example below, the color result is SE-S1. The largest arrow (principal 1) is quite similar to the cell color, as expected.
+The vector color **Result Colors** is special. By choosing this color type, a new legend will appear. This legend is defined by the values in the Legend definition of the Element Tensor Results. The extreme values of the color mapper are the extremes of the three principals combined. In the example below, the color result is SE-S1. The largest arrow (principal 1) is quite similar to the cell color, as expected.
 
 ![]({{ site.baseurl }}/images/tensorsResultColor.png)
 
 ### Vector Size
-Scale method **Result** scales the arrows relative to the maximum result value of all components in the model. With scale method **Constant**, the arrows are of equal size. The arrow size can be both minified and magnified by using **Size Scale**.
+Scale method **Result** scales the arrows relative to the maximum result value of all components in the model. With scale method **Constant**, all the arrows are set to an equal constant size. The overall arrow size can be adjusted by using the **Size Scale**.
 
