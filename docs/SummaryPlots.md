@@ -235,7 +235,7 @@ When using the standard file selection dialog, the user is limited to select fil
 ![]({{site.baseurl}}/images/RecursiveImportDialog1.png)
 
 The dialog consists of the following fields:
-- **Root Folder**: The root directory where the file search starts. Alternatively press the browse button next to the field.
+- **Root Folder**: The root directory where the file search starts. Text may be entered directly into the field. Alternatively press the browse button to display the directory selection dialog.
 - **Path Pattern**: The search pattern that applies to the start of the relative search path. If the pattern does not end with a "\*", an implicit wildcard is added silently. Supported wildcards:
   - **\*** Matches any number of any characters except the directory separator
   - **?** Matches one character exception the directory separator
