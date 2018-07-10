@@ -76,6 +76,9 @@ Categories:
 
 When ResInsight parses an eclipse address, it first tries to identify an address category by analyzing the vector name, as described above. If no category could be found, the **Imported** category is used. This category is also used if the address format is wrong (for instance missing parameters) even though the vector name identifies a different category.
 
+**Instantaneous vs Accumulated Data**  
+A valid Eclipse vector having a standard name ending with 'T' or 'TH' are considered accumulated data. In the summary plot, these types of data are plotted slightly different. Instantaneous data are plotted using a stepped curve, while accumulated data are plotted using straight lines between the samples.
+
 **Error data**  
 Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
 
