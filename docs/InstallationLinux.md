@@ -25,7 +25,7 @@ gconftool-2 --type boolean --set /desktop/gnome/interface/menus_have_icons true
 
 This fix was taken from reply number 11 in this [thread](https://bbs.archlinux.org/viewtopic.php?id=117414)
 
-### From Binary Packages on Linux (Not always latest release)
+### From Binary Packages on Linux 
  Packages for ResInsight are available as part of the distribution by the [Opm project](http://opm-project.org/?page_id=36)
 
 #### Red Hat Enterprise Linux 6 or 7
@@ -45,9 +45,9 @@ On the command line do:
     sudo apt-add-repository ppa:opm/ppa
     sudo apt-get update
     sudo apt-get install resinsight
-    sudo apt-get install resinsight-octave
+    sudo apt-get install octave-resinsight
 
-Start ResInsight by typing: ResInsight
+Start ResInsight by typing : `ResInsight`
 
 ## Setup Octave Interface (optional)
 
