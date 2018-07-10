@@ -40,54 +40,39 @@ Dialog fields description:
 - **Preview** -- Preview the first 30 lines of the file contents. The view will reflect the currently selected Cell Separator and the selected time column is marked in yellow.
 
 #### Column data
-Each column must have a header text, which may be a name/description for the data in the column. By formatting the header text in a special way, ResInsight recognizes the column data and will be able to categorize the data in the same way as grid data. ResInsight supports parsing Eclipse text formatted addresses.
+Each column must have a header text, which may be a name/description for the data in the column. By formatting the header text to a valid Eclipse address, ResInsight recognizes the column data and will be able to categorize the data in the same way as grid data. So when plotting these data later, the user will find the data in the correct category in the [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor).
 
 ##### Eclipse address format
-An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are set by the category of the vector. The category is most often determined by the first letter or two first letters of the vector name.
+An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are defined by the category of the vector. The category is most often determined by the first letter or two first letters of the vector name, as described below. A valid standard vector name has 3 to 5 characters. Optionally it may be postfixed by a user defined name of 3 characters. A vector name having both a standard part and a user part must have 8 characters (5+3). In this case, if the standard part has less than 5 characters, it must be padded with underscores up to 5 characters. Example: 'RPR__WEL'. Vector names having only the standard part are not padded.
 
 Categories:
-- Field
-  <VECTOR 'F...'>
-  Ex: 'FOPT'
-- Aquifer
-  <VECTOR 'A...'>:<AQUIFER NUMBER>
-  Ex: 'AAQR:1'
-- Network
-  <VECTOR 'N...'>
-- Misc
-  <VECTOR '...'>
-- Region
-  <VECTOR 'R...'>:<REGION NUMBER>
-  Ex: 'RGIPG:1'
-- Region to Region
-  <VECTOR 'R.F...'>:<REGION NUMBER>-<REGION NUMBER>
-  Ex: 'RGFT:1-2'
-- Group
-  <VECTOR 'G...'>:<GROUP NAME>
-  Ex: 'GGOR:MANI-B1'
-- Well
-  <VECTOR 'W...'>:<WELL NAME>
-  Ex: 'WOPR:B-2H'
-- Completion
-  <VECTOR 'C...'>:<WELL NAME>:<I>,<J>,<K>
-  Ex: 'CWIR:C-1H:26,44,16'
-- LGR Completion
-  <VECTOR 'LC...'>:<LGR NAME>:<WELL NAME>:<I>,<J>,<K>
-  Ex: 'LCWIT:WELLI1:I1:5,5,5'
-- LGR Well
-  <VECTOR 'LW...'>:<LGR NAME>:<WELL NAME>
-  Ex: 'LWWIR:WELLI1:I1'
-- Segment
-  <VECTOR 'S...'>:<WELL NAME>:<SEGMENT NUMBER>
-  Ex: 'SGMT:B-5H:32'
-- Block
-  <Vector 'B...'>:<I>,<J>,<K>
-  Ex: 'BWPR:15,18,21'
-- LGR Block
-  <VECTOR 'LB...'>:<LGR NAME>:<I>,<J>,<K>
-  Ex: 'LBOSAT:CENTER:5,5,5'
-- Imported
-  <TEXT>
+- **Field** - <VECTOR 'F...'>
+  - Example: 'FOPT'
+- **Aquifer** - <VECTOR 'A...'>:<AQUIFER NUMBER>
+  - Example: 'AAQR:1'
+- **Network** - <VECTOR 'N...'>
+- **Misc** - <VECTOR '...'>
+- **Region** - <VECTOR 'R...'>:<REGION NUMBER>
+  - Example: 'RGIPG:1'
+- **Region to Region** - <VECTOR 'R.F...'>:<REGION NUMBER>-<REGION NUMBER>
+  - Example: 'RGFT:1-2'
+- **Group** - <VECTOR 'G...'>:<GROUP NAME>
+  - Example: 'GGOR:MANI-B1'
+- **Well** - <VECTOR 'W...'>:<WELL NAME>
+  - Example: 'WOPR:B-2H'
+- **Completion** - <VECTOR 'C...'>:<WELL NAME>:<I>,<J>,<K>
+  - Example: 'CWIR:C-1H:26,44,16'
+- **LGR Completion** - <VECTOR 'LC...'>:<LGR NAME>:<WELL NAME>:<I>,<J>,<K>
+  - Example: 'LCWIT:WELLI1:I1:5,5,5'
+- **LGR Well** - <VECTOR 'LW...'>:<LGR NAME>:<WELL NAME>
+  - Example: 'LWWIR:WELLI1:I1'
+- **Segment** - <VECTOR 'S...'>:<WELL NAME>:<SEGMENT NUMBER>
+  - Example: 'SGMT:B-5H:32'
+- **Block** - <Vector 'B...'>:<I>,<J>,<K>
+  - Example: 'BWPR:15,18,21'
+- **LGR Block** - <VECTOR 'LB...'>:<LGR NAME>:<I>,<J>,<K>
+  - Example: 'LBOSAT:CENTER:5,5,5'
+- **Imported** - <TEXT>
 
 When ResInsight parses an eclipse address, it first tries to identify an address category by analyzing the vector name, as described above.
 If no category could be found, the Imported category is used.
