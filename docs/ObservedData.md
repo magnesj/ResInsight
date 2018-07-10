@@ -24,7 +24,7 @@ Which summaries that has been detected in a Observed Time History Data file can 
 ## File Formats
 
 ### Import CSV/txt Observed Time History Data
-CSV/txt files are generic ascii files which may have slightly different formatting. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
+CSV/txt files are generic ascii files where data is arranged in columns. Some variations in formatting is supported, for instance cell separator, date and time format, decimal separator etc. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
 
 #### CSV/txt Import Options Dialog
 ![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
@@ -38,6 +38,64 @@ Dialog fields description:
 - **Date Format** -- Select the date format matching the date information in the file.
 - **Time Format** -- Select the time format matching the time information in the file. If the file contains dates only, this field is ignored by ResInsight.
 - **Preview** -- Preview the first 30 lines of the file contents. The view will reflect the currently selected Cell Separator and the selected time column is marked in yellow.
+
+#### Column data
+Each column must have a header text, which may be a name/description for the data in the column. By formatting the header text in a special way, ResInsight recognizes the column data and will be able to categorize the data in the same way as grid data. ResInsight supports parsing Eclipse text formatted addresses.
+
+##### Eclipse address format
+An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are set by the category of the vector. The category is most often determined by the first letter or two first letters of the vector name.
+
+Categories:
+- Field
+  <VECTOR 'F...'>
+  Ex: 'FOPT'
+- Aquifer
+  <VECTOR 'A...'>:<AQUIFER NUMBER>
+  Ex: 'AAQR:1'
+- Network
+  <VECTOR 'N...'>
+- Misc
+  <VECTOR '...'>
+- Region
+  <VECTOR 'R...'>:<REGION NUMBER>
+  Ex: 'RGIPG:1'
+- Region to Region
+  <VECTOR 'R.F...'>:<REGION NUMBER>-<REGION NUMBER>
+  Ex: 'RGFT:1-2'
+- Group
+  <VECTOR 'G...'>:<GROUP NAME>
+  Ex: 'GGOR:MANI-B1'
+- Well
+  <VECTOR 'W...'>:<WELL NAME>
+  Ex: 'WOPR:B-2H'
+- Completion
+  <VECTOR 'C...'>:<WELL NAME>:<I>,<J>,<K>
+  Ex: 'CWIR:C-1H:26,44,16'
+- LGR Completion
+  <VECTOR 'LC...'>:<LGR NAME>:<WELL NAME>:<I>,<J>,<K>
+  Ex: 'LCWIT:WELLI1:I1:5,5,5'
+- LGR Well
+  <VECTOR 'LW...'>:<LGR NAME>:<WELL NAME>
+  Ex: 'LWWIR:WELLI1:I1'
+- Segment
+  <VECTOR 'S...'>:<WELL NAME>:<SEGMENT NUMBER>
+  Ex: 'SGMT:B-5H:32'
+- Block
+  <Vector 'B...'>:<I>,<J>,<K>
+  Ex: 'BWPR:15,18,21'
+- LGR Block
+  <VECTOR 'LB...'>:<LGR NAME>:<I>,<J>,<K>
+  Ex: 'LBOSAT:CENTER:5,5,5'
+- Imported
+  <TEXT>
+
+When ResInsight parses an eclipse address, it first tries to identify an address category by analyzing the vector name, as described above.
+If no category could be found, the Imported category is used.
+This category is also used if the address format is wrong (for instance a missing parameter) even though the vector name identifies a different category.
+
+**Error data**
+Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' og 'ERROR:'
+Example: 'ERR:FOPT'
 
 ### Import RSM observed time history data
 To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the **Observed Time History Data** node in the project tree. RSM files can be either *Column based* or *Keyword based*.
