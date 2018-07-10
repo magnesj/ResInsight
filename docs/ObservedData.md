@@ -77,7 +77,7 @@ Categories:
 When ResInsight parses an eclipse address, it first tries to identify an address category by analyzing the vector name, as described above. If no category could be found, the **Imported** category is used. This category is also used if the address format is wrong (for instance missing parameters) even though the vector name identifies a different category.
 
 **Error data**  
-Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' og 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
+Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
 
 ### Import RSM observed time history data
 To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the **Observed Time History Data** node in the project tree. RSM files can be either *Column based* or *Keyword based*.
