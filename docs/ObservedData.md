@@ -46,7 +46,7 @@ Each column must have a header text, which may be a name/description for the dat
 An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are defined by the category of the vector. The category is most often determined by the first letter or two first letters of the vector name, as described below. A valid standard vector name has 3 to 5 characters. Optionally it may be postfixed by a user defined name of 3 characters. A vector name having both a standard part and a user part must have 8 characters (5+3). In this case, if the standard part has less than 5 characters, it must be padded with underscores up to 5 characters. Example: 'RPR__WEL'. Vector names having only the standard part are not padded.
 
 Categories:
-- **Field** - `<VECTOR 'F....'>`
+- **Field** - \<VECTOR 'F....'>
   - Example: 'FOPT'
 - **Aquifer** - `<VECTOR 'A....'>:<AQUIFER NUMBER>`
   - Example: 'AAQR:1'
@@ -54,7 +54,7 @@ Categories:
 - **Misc** - `<VECTOR '....'>`
 - **Region** - `<VECTOR 'R....'>:<REGION NUMBER>`
   - Example: 'RGIPG:1'
-- **Region to Region** - `<VECTOR 'R.F..'>:<REGION NUMBER>-<REGION NUMBER>`
+- **Region to Region** - \<VECTOR 'R.F..'>:\<REGION NUMBER>-\<REGION NUMBER>
   - Example: 'RGFT:1-2'
 - **Group** - `<VECTOR 'G....'>:<GROUP NAME>`
   - Example: 'GGOR:MANI-B1'
