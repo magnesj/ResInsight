@@ -291,3 +291,19 @@ Instances of fractures can be created along well paths and simulation wells by r
   - **Perforation Length** / **Perforation Efficiency** / **Well Diameter** -- These values are copied from the new template when selecting a different one. See [Common Fracture Template Options]({{ site.baseurl }}/docs/completions#common-fracture-template-options)  
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
 
+### Multiple Fracture Creation
+In some cases the user wants to create a number of fractures on one or more well paths. Doing this by creating one by one fracture, may be very error prone and time consuming. To ease this task, ResInsight has support for creating several fractures in one operation.
+
+Select one or more well paths in the project tree, right click and select **Create Multiple Fractures** from the context menu. Then the **Create Multiple Fractures** dialog appears. In this dialog, the user defines where fractures will be created on the selected well paths. Different fracture templates and spacing can be used in different K layer ranges in the grid. Creating and deleting option lines are done by right clicking the table.
+
+![]({{ site.baseurl }}/images/CreateMultipleFracturesDialog.png)
+
+- **Case** -- Current grid case
+- **Min Distance From Well TD** -- Minimum distance from well tip for created fractures
+- **Max Fractures Per Well** -- Maximum number of fractures to create per well
+- **Options**
+  - **Top K Layer** -- The topmost K layer to add fractures to
+  - **Base K Layer** -- The bottommost K layer to add fractures to
+  - **Template** -- 
+  
+  ... to be continued
