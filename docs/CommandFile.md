@@ -361,7 +361,7 @@ Set fracture template containment parameters.
 
 Create multiple fractures on one or more well paths.
 
-| Parameter    | Description                      | Type    | Required |
+| Parameter           | Description                                            | Type            | Required |
 |---------------------|--------------------------------------------------------|-----------------|----------|
 | caseId              | Case ID                                                | Integer         | &#10004; |
 | templateId          | Fracture template id                                   | Integer         | &#10004; |
