@@ -292,9 +292,9 @@ Instances of fractures can be created along well paths and simulation wells by r
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
 
 ### Multiple Fracture Creation
-In some cases the user wants to create a number of fractures on one or more well paths. Doing this by creating one by one fracture, may be very error prone and time consuming. To ease this task, ResInsight has support for creating several fractures in one operation.
+In some cases the user wants to create a number of fractures on one or more well paths. Doing this by creating one by one fracture can be very error prone and time consuming. To ease this task, ResInsight has support for creating several fractures in one operation.
 
-Select one or more well paths in the project tree, right click and select **Create Multiple Fractures** from the context menu. Then the **Create Multiple Fractures** dialog appears. In this dialog, the user defines where fractures will be created on the selected well paths. Different fracture templates and spacing can be used in different K layer ranges in the grid. Creating and deleting option lines are done by right clicking the table.
+Select one or more well paths in the project tree, right click and select **Create Multiple Fractures** from the context menu. Then the **Create Multiple Fractures** dialog appears. In this dialog, the user defines where fractures will be created on the selected well paths. Different fracture templates and spacing can be used for different K layer ranges in the grid, by adding new options lines to the table. To edit an option line, double click the field to edit. Adding and deleting option lines are done by right clicking the table.
 
 ![]({{ site.baseurl }}/images/CreateMultipleFracturesDialog.png)
 
@@ -304,6 +304,10 @@ Select one or more well paths in the project tree, right click and select **Crea
 - **Options**
   - **Top K Layer** -- The topmost K layer to add fractures to
   - **Base K Layer** -- The bottommost K layer to add fractures to
-  - **Template** -- 
-  
-  ... to be continued
+  - **Template** -- The fracture template used in the specified K layer range
+  - **Spacing** -- The distance between each fracture in the K layer range
+- **Summary** -- Output information to the user. Shows number of fractures that will be created on each selected well path
+- **Replace Fractures** -- Press this button to delete all existing fractures on the selected wells before creating new fractures
+- **Append Fractures** -- Press this button to append the new fractures to all selected wells (not deleting existing fractures)
+
+The Create Multiple Fractures function is also available as a CommandFile command. See the [CommandFile section]({{ site.baseurl }}/docs/commandfile)
