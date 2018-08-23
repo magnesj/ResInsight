@@ -374,4 +374,4 @@ Create multiple fractures on one or more well paths.
 | action              | How to handle existing fractures. Choices: `APPEND_FRACTURES`, `REPLACE_FRACTURES`. The replace option will delete all existing fractures before adding new ones. Default: `APPEND_FRACTURES` | Enum            |          |
 #### Example
 
-`createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"]), action=REPLACE_FRACTURES`
+`createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"]), action=REPLACE_FRACTURES)`
