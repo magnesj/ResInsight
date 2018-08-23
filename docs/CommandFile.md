@@ -38,7 +38,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [setTimeStep](#settimestep)
 * [scaleFractureTemplate](#scalefracturetemplate)
 * [setFractureContainment](#setfracturecontainment)
-
+* [createMultipleFractures](#createMultipleFractures)
 
 ## Syntax
 
@@ -356,3 +356,23 @@ Set fracture template containment parameters.
 #### Example
 
 `setFractureContainment(id=1, topLayer=2, baseLayer=7)`
+
+### createMultipleFractures
+
+Create multiple fractures on one or more well paths.
+
+| Parameter    | Description                      | Type    | Required |
+|---------------------|--------------------------------------------------------|-----------------|----------|
+| caseId              | Case ID                                                | Integer         | &#10004; |
+| templateId          | Fracture template id                                   | Integer         | &#10004; |
+| wellPathNames       | Well path names. Default: All well paths               | List of Strings |          |
+| minDistFromWellTd   | Min distance from well path tip. Default: 100.0 m      | Double          |          |
+| maxFracturesPerWell | Max fractures per well. Default: 100                   | Integer         |          |
+| topLayer            | Top K layer. Default: Top layer from current model     | Integer         |          |
+| baseLayer           | Base K layer. Default: Bottom layer from current model | Integer         |          |
+| spacing             | Distance between fractures. Default: 300.0 m           | Double          |          |
+| action              | How to handle existing fractures. Choices: `APPEND_FRACTURES`, `REPLACE_FRACTURES`. The replace option will delete all existing fractures before adding new ones. Default: `APPEND_FRACTURES`
+                                                                               | Enum            |          |
+#### Example
+
+`createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"]), action=REPLACE_FRACTURES`
