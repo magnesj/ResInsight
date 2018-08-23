@@ -371,8 +371,7 @@ Create multiple fractures on one or more well paths.
 | topLayer            | Top K layer. Default: Top layer from current model     | Integer         |          |
 | baseLayer           | Base K layer. Default: Bottom layer from current model | Integer         |          |
 | spacing             | Distance between fractures. Default: 300.0 m           | Double          |          |
-| action              | How to handle existing fractures. Choices: `APPEND_FRACTURES`, `REPLACE_FRACTURES`. The replace option will delete all existing fractures before adding new ones. Default: `APPEND_FRACTURES`
-                                                                               | Enum            |          |
+| action              | How to handle existing fractures. Choices: `APPEND_FRACTURES`, `REPLACE_FRACTURES`. The replace option will delete all existing fractures before adding new ones. Default: `APPEND_FRACTURES` | Enum            |          |
 #### Example
 
 `createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"]), action=REPLACE_FRACTURES`
