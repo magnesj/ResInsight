@@ -38,7 +38,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [setTimeStep](#settimestep)
 * [scaleFractureTemplate](#scalefracturetemplate)
 * [setFractureContainment](#setfracturecontainment)
-* [createMultipleFractures](#createMultipleFractures)
+* [createMultipleFractures](#createmultiplefractures)
 
 ## Syntax
 
