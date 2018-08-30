@@ -61,6 +61,10 @@ The transmissibility calculation for the fishbones is done following the above d
 
 An example of the exported COMPDAT file is shown below. The calculated transmissibility contribution to the cell connection factor from each lateral or main bore part is included as a comment. 
 
+    WELSPEC
+    -- Well          Grp   I   J    RefDepth   WellType   
+       Well Path B   GR    26  45   1230       Oil        \
+    \
     COMPDAT
     -- Well            I      J      K1     K2     Status     SAT     TR               DIAM     KH     S     Df     DIR     r0     
     -- Well Path B main bore : 0.0569986
@@ -79,6 +83,10 @@ For export with WPIMULT factors, the main bore diameter and direction are given 
 
 The *WPIMULT* parameters are calculated, as for the perforation intervals, by ResInsight calculating both the transmissibility of the completion as described above, and in addition calculating the transmissibility based on the information exported in the COMPDAT keyword. The ratio between these two numbers is then exported as the *WPIMUT* keyword. 
 
+    WELSPEC
+    -- Well          Grp   I   J    RefDepth   WellType   
+       Well Path B   GR    26  45   1230       Oil        \
+    \
     COMPDAT
     -- Well            I      J      K1     K2     Status     SAT     TR     DIAM        KH     S           Df     DIR     r0     
     -- Well Path B main bore : 0.0569986
