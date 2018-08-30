@@ -24,7 +24,7 @@ Which summaries that has been detected in a Observed Time History Data file can 
 ## File Formats
 
 ### Import CSV/txt Observed Time History Data
-CSV/txt files are generic ascii files where data is arranged in columns. Some variations in formatting is supported, for instance cell separator, date and time format, decimal separator etc. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
+CSV/txt files are generic ascii files where data is arranged in columns. Some variations in formatting is supported, for instance deifferent cell separators, date and time format, decimal separator etc. When importing these types of files the user is presented a dialog, where the user may tell ResInsight how to import the selected file(s). If more than one file is selected, the dialog appears once for each file.
 
 #### CSV/txt Import Options Dialog
 ![]({{ site.baseurl }}/images/ImportObservedTimeHistoryDataDialog.png)
@@ -43,7 +43,7 @@ Dialog fields description:
 Each column must have a header text, which may be a name/description for the data in the column. By formatting the header text to a valid Eclipse address, ResInsight recognizes the column data and will be able to categorize the data in the same way as grid data. So when plotting these data later, the user will find the data in the correct category in the [Summary Plot Editor]({{site.baseurl}}/docs/summaryploteditor).
 
 ##### Eclipse address format
-An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are defined by the category of the vector. The category is most often determined by the first letter or two first letters of the vector name, as described below. A valid standard vector name has 3 to 5 characters. Optionally it may be postfixed by a user defined name of 3 characters. A vector name having both a standard part and a user part must have 8 characters (5+3). In this case, if the standard part has less than 5 characters, it must be padded with underscores up to 5 characters. Example: 'RPR__WEL'. Vector names having only the standard part are not padded.
+An Eclipse address consists of a vector name and zero or more parameters. The number of parameters are defined by the category of the vector. The category is determined by looking up the category in an internal vector table. A valid standard vector name has 3 to 5 characters. Optionally it may be postfixed by a user defined name of 3 characters. A vector name having both a standard part and a user part must have 8 characters (5+3). In this case, if the standard part has less than 5 characters, it must be padded with underscores up to 5 characters. Example: 'RPR__WEL'. Vector names having only the standard part are not padded.
 
 Categories:
 - **Field** - \<VECTOR 'F....'>
@@ -53,23 +53,23 @@ Categories:
 - **Network** - \<VECTOR 'N....'>
 - **Misc** - \<VECTOR '....'>
 - **Region** - \<VECTOR 'R....'>:\<REGION NUMBER>
-  - Example: 'RGIPG:1'
+  - Example: 'RPR:1'
 - **Region to Region** - \<VECTOR 'R.F..'>:\<REGION NUMBER>-\<REGION NUMBER>
-  - Example: 'RGFT:1-2'
+  - Example: 'ROFR:1-2'
 - **Group** - \<VECTOR 'G....'>:\<GROUP NAME>
-  - Example: 'GGOR:MANI-B1'
+  - Example: 'GOPR:MANI-B1'
 - **Well** - \<VECTOR 'W....'>:\<WELL NAME>
   - Example: 'WOPR:B-2H'
 - **Completion** - \<VECTOR 'C....'>:\<WELL NAME>:\<I>,\<J>,\<K>
-  - Example: 'CWIR:C-1H:26,44,16'
+  - Example: 'COFRL:C-1H:26,44,16'
 - **LGR Completion** - \<VECTOR 'LC...'>:\<LGR NAME>:\<WELL NAME>:\<I>,\<J>,\<K>
   - Example: 'LCWIT:WELLI1:I1:5,5,5'
 - **LGR Well** - \<VECTOR 'LW...'>:\<LGR NAME>:\<WELL NAME>
   - Example: 'LWWIR:WELLI1:I1'
 - **Segment** - \<VECTOR 'S....'>:\<WELL NAME>:\<SEGMENT NUMBER>
-  - Example: 'SGMT:B-5H:32'
+  - Example: 'SOFR:B-5H:32'
 - **Block** - \<Vector 'B....'>:\<I>,\<J>,\<K>
-  - Example: 'BWPR:15,18,21'
+  - Example: 'BPR:15,18,21'
 - **LGR Block** - \<VECTOR 'LB...'>:\<LGR NAME>:\<I>,\<J>,\<K>
   - Example: 'LBOSAT:CENTER:5,5,5'
 - **Imported** - \<SOME NAME>
