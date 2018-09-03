@@ -219,6 +219,7 @@ Export well path completions.
 | includePerforations         | Whether main bore perforations should be included. Defaults to `true`                                                                                     | Boolean        |          |
 | includeFishbones            | Whether fishbones should be included. Defaults to `true`                                                                                                  | Boolean        |          |
 | excludeMainBoreForFishbones | Whether main bore completions should be excluded for cells with fishbones. Defaults to `false`                                                           | Boolean        |          |
+| combinationMode             | Combination mode. Choices: `INDIVIDUALLY`, `COMBINED`. Defaults to `INDIVIDUALLY`.                                                                       | Enum           |          |
 
 #### Example
 
