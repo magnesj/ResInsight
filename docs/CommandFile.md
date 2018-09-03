@@ -214,7 +214,7 @@ Export well path completions.
 | caseId                      | ID of case to export well paths for                                                                                                                       | Integer        | &#10004; |
 | timeStep                    | The time step to export completions for                                                                                                                   | Integer        | &#10004; |
 | wellPathNames               | Names of well paths to export for. Defaults to all checked wells. If a list of well names are provided, those wells are included even if unchecked        | List of String |          |
-| fileSplit                   | How the files are split. Choices: `UNIFIED_FILE`, `SPLIT_ON_WELL`, `SPLIT_ON_WELL_AND_COMPLETION_TYPE`. Defaults to `UNIFIED_FILE`                        | Enum           |          |
+| fileSplit                   | How the files are split. Choices: `UNIFIED_FILE`, `SPLIT_ON_WELL`, `SPLIT_ON_WELL_AND_COMPLETION_TYPE`. Defaults to `SPLIT_ON_WELL_AND_COMPLETION_TYPE`   | Enum           |          |
 | compdatExport               | Chose whether transmissibilities are exported. Choices: `TRANSMISSIBILITIES`, `WPIMULT_AND_DEFAULT_CONNECTION_FACTORS`. Defaults to `TRANSMISSIBILITIES`  | Enum           |          |
 | includePerforations         | Whether main bore perforations should be included. Defaults to `true`                                                                                     | Boolean        |          |
 | includeFishbones            | Whether fishbones should be included. Defaults to `true`                                                                                                  | Boolean        |          |
