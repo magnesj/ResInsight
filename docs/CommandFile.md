@@ -335,7 +335,7 @@ Scale fracture template parameters.
 | Parameter    | Description                      | Type    | Required |
 |--------------|----------------------------------|---------|----------|
 | id           | ID of fracture template          | Integer | &#10004; |
-| width        | Width scale factor               | Double  |          |
+| halfLength   | Half Length scale factor         | Double  |          |
 | height       | Height scale factor              | Double  |          |
 | dFactor      | D-factor scale factor            | Double  |          |
 | conductivity | Conductivity scale factor        | Double  |          |
