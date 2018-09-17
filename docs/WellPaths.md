@@ -131,4 +131,8 @@ The well path property editor lets the user control the appearance of the well p
 - **Simulation Well group** -- Associated simulation well. ResInsight will try to associate each well path with a simulation well. This is done in the exact same way as looking up an existing well path. If the auto-association fails, the user can set the correct simulation well here.
 - **Well Info group** -- Metadata for the well path
 - **Well Picks group** -- Information about imported [well picks]({{site.baseurl}}/docs/formations#well-picks) file containing data for the current well path
+- **Well Path Attributes group** -- Features on the well path including Well Casing and Well Liner.
+
+#### Well Path Attributes
+The well path attributes, such as Casing (with Casing Shoe) and Liner can be visualised on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
 
