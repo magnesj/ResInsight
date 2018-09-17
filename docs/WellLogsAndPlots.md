@@ -55,8 +55,13 @@ Tracks can be created by right-clicking a **Well Log Plot** and select **New Tra
 
 ![]({{ site.baseurl }}/images/TrackProperties.png)
 
-A track controls the x-axis range of the display, and can be edited from the property panel of the **Track**. 
-Logarithmic display is controlled using the **Logarithmic Scale** option. It is also possible to add **Zonation** or **Formation Names** to the track. See [Formations]({{site.baseurl}}/docs/formations) for details.
+A track controls the x-axis range of the display, and can be edited from the property panel of the **Track**. In addition to the range, logarithmic display is controlled using the **Logarithmic Scale**, grid lines can be tweaked with the **Show Grid Lines** option and tick intervals can be controlled manually wih the **Manually Set Tick Intervals**  option.
+
+It is also possible to visualize **Zonation** or **Formation Names** in the track (see [Formations]({{site.baseurl}}/docs/formations) for details) as well as [Well Attributes]({{site.baseurl}}/docs/wellpaths#well-path-attributes) such as casing and liners.
+![]({{ site.baseurl }}/images/WellAttributeVisualization.png)
+
+Finally, the width of each track can be manipulated using the **Track Width** setting. This allows the creation of plots with varying width tracks.
+![]({{ site.baseurl }}/images/WellLogTracksWidth.png)
 
 ## Curves
 
