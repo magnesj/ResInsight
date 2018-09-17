@@ -134,5 +134,5 @@ The well path property editor lets the user control the appearance of the well p
 - **Well Path Attributes group** -- Features on the well path including Well Casing and Well Liner.
 
 #### Well Path Attributes
-The well path attributes, such as Casing (with Casing Shoe) and Liner can be visualised on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
+In this table, well path containment properties such as Casing (with Casing Shoe) and Liner can be added to the well path along with a start and end depth and a diameter. These can be visualised in Well Log Plots on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
 
