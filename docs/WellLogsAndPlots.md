@@ -103,18 +103,19 @@ Abaqus results are interpolated across the intersected cell-face from the result
 
 #### Change Data Source for Plots and Curves
 
-It is possible to change Case, Well Path, and Time Step in one go for either a full plot or several selected curves. To change the parameters for a whole plot use either the **Data Source** group in the Property Editor for the Well Log Plot or corresponding toolbar which is visible when a Well Log Plot or any of its children are selected. 
-
-![]({{ site.baseurl }}/images/WellLogExtractionChangeDataSource.png)
-
-To change data source for some curves, select the curves you wish to change source for and select **Change Data Source** command form the context menu. The following dialog will appear:
+It is possible to change some data source parameters in one go for either a full plot or several selected curves. To change the parameters for a whole plot use either the **Data Source** group in the Property Editor for the Well Log Plot or corresponding toolbar which is visible when a Well Log Plot or any of its children are selected.
 
 ![]({{ site.baseurl }}/images/WellLogPlotDataSource.png)
 
-- **Case** -- Sets this case for all the curves.
-- **Trajectory Type** -- Sets whether to use Simulation Wells or Well Paths as a data source.
+To change data source for some curves, select the curves you wish to change source for and select **Change Data Source** command form the context menu. The following dialog will appear:
+
+![]({{ site.baseurl }}/images/WellLogExtractionChangeDataSource.png)
+
+In both cases, the following parameters are available to change:
+- **Case** -- Applies the selected case to all the curves.
+- **Trajectory Type** -- Sets whether to use Simulation Wells or Well Paths as a data source for all curves.
 - **Well Name** -- Applies this well path to all the curves.
-- **Time Step** -- Applies this time step.
+- **Time Step** -- Applies this time step to all the curves.
 
 Common for the different ways of changing data source is that if a parameter is not shared among all the curves, the drop down list will show "Mixed Cases, "Mixed Trajectory Types", "Mixed Well Name" or "Mixed Time Step" to indicate that the curves have different values for that parameter. It is still possible to select a common parameter for them which will then be applied across the curves.
 
