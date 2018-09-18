@@ -13,7 +13,7 @@ The third track contains curves showing different stability gradients:
 - **OBG**: Overburden stress gradient: Stress component S_33 over mud weight.
 - **PP**: Pore pressure over hydrostatic pore pressure.
 - **SFG**: Shear Failure Gradient for shale based on Stassi-d'Alia.
-- **SH**: Minimum horizontal stress.
+- **SH**: Minimum horizontal stress over mudweight.
 
 The fourth track contains curves showing the angular orientation of the well path as azimuth (deviation from vertical) and inclination (deviation from x-axis) in degrees.
 
