@@ -103,7 +103,7 @@ Abaqus results are interpolated across the intersected cell-face from the result
 
 #### Change Data Source for Plots and Curves
 
-It is possible to change some data source parameters in one go for either a full plot or several selected curves. To change the parameters for a whole plot use either the **Data Source** group in the Property Editor for the Well Log Plot or corresponding toolbar which is visible when a Well Log Plot or any of its children are selected.
+It is possible to change some data source parameters in one go for either a full plot or several selected curves. To change the parameters for a whole plot use either the **Data Source** group in the Property Editor for the Well Log Plot or corresponding toolbar which is visible when a Well Log Plot or any of its children are selected. Changing parameters in the **Data Source** group for the plot will also change the source for Zonation/Formations and Well Path Attributes in addition to the data source for all **Well Log Extraction Curves** and **Well Log LAS Curves**.
 
 ![]({{ site.baseurl }}/images/WellLogPlotDataSource.png)
 
