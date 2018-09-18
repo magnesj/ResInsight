@@ -8,12 +8,12 @@ ResInsight can create **Well Bore Stability** plots for Geomechanical cases. The
 
 ![]({{ site.baseurl }}/images/WellBoreStability.png)
 
-The third track contains curves showing different stability gradients:
+The third track contains curves showing different stability gradients (all normalized by mud weight):
 - **FG**: Fracture Gradient for sands based on Kirsch.
-- **OBG**: Overburden stress gradient: Stress component S_33 over mud weight.
-- **PP**: Pore pressure over hydrostatic pore pressure.
+- **OBG**: Overburden stress gradient: Stress component S_33.
+- **PP**: Pore pressure.
 - **SFG**: Shear Failure Gradient for shale based on Stassi-d'Alia.
-- **SH**: Minimum horizontal stress over mudweight.
+- **SH**: Minimum horizontal stress.
 
 The fourth track contains curves showing the angular orientation of the well path as azimuth (deviation from vertical) and inclination (deviation from x-axis) in degrees.
 
