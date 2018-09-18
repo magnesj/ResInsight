@@ -117,7 +117,7 @@ In both cases, the following parameters are available to change:
 - **Well Name** -- Applies this well path to all the curves.
 - **Time Step** -- Applies this time step to all the curves.
 
-Common for the different ways of changing data source is that if a parameter is not shared among all the curves, the drop down list will show "Mixed Cases, "Mixed Trajectory Types", "Mixed Well Name" or "Mixed Time Step" to indicate that the curves have different values for that parameter. It is still possible to select a common parameter for them which will then be applied across the curves.
+Common for the different ways of changing data source is that if a parameter is not shared among all the curves, the drop down list will show "Mixed Cases, "Mixed Trajectory Types", "Mixed Well Paths" or "Mixed Time Steps" to indicate that the curves have different values for that parameter. It is still possible to select a common parameter for them which will then be applied across the curves.
 
 ### Well Log RFT Curves
 
