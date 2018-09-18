@@ -19,5 +19,4 @@ The fourth track contains curves showing the angular orientation of the well pat
 
 These plots can be created from the context menu for a well path in the 3D view or from the the context menu of the Well Log Plots entry in the 2D Plot Window. In the former case the well bore stability plot will be created for the selected **Well Path**. In the latter case it will be created for the first well path in the well path list and the well path for the entire plot can be changed with the [Change Data Source Feature]({{site.baseurl}}/docs/welllogandplots#change-data-source-for-plots-and-curves).
 
-![]({{ site.baseurl }}/images/WellBoreStabilityCreation.png)
-![]({{ site.baseurl }}/images/WellBoreStabilityCreation2.png)
+![]({{ site.baseurl }}/images/WellBoreStabilityCreation.png) ![]({{ site.baseurl }}/images/WellBoreStabilityCreation2.png)
