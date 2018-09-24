@@ -9,8 +9,13 @@ The completions defined in ResInsight can be exported to Eclipse for use in new 
 
 ![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
 
+- **Export Settings**
+    - **Calculated Transmissibilities** -- The transmissibilities calculated based on the case and completion data are exported directly
+    - **Default Connection Factors and WPIMULT** -- The information about the connections for Eclipse to be able to make the transmissibility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInsight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
+  - **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
+  - **Use NTG Horizontally** -- Toggles whether NTG in I and J directions is included in the calculation
+  - **Include Multi Segment Well Model** -- Toggles whether to also export the completions as Multi Segment Wells.
 - **File Settings**
-  - **Export Folder** -- Folder for the exported COMPDAT file(s). The folder will be created when performing the export and the names of the exported file(s) will be auto generated.
   - **File Split** -- Controls how ResInsight splits the export in different files
     - **Unified File** -- One file with all the completions. 
     - **Split on Well** -- One file for each well
@@ -18,13 +23,8 @@ The completions defined in ResInsight can be exported to Eclipse for use in new 
   - **Export Completion Types** -- Control how several completions of different type in the same cell are handled
     - **Individually** -- Completions of each type are exported to separate sections in the file and not combined in any way.  
     - **Combined** -- Connection factors from different completion types are added together producing one number for each cell. 
-- **Settings**  
-  - **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
-  - **Export** -- 
-    - **Calculated Transmissibilities** -- The transmissibilities calculated based on the case and completion data are exported directly
-    - **Default Connection Factors and WPIMULT** -- The information about the connections for Eclipse to be able to make the transmissibility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInsight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
-  - **Use NTG Horizontally** -- Toggles whether NTG in I and J directions is included in the calculation
-- **Visible Completions**
+  - **Export Folder** -- Folder for the exported COMPDAT file(s). The folder will be created when performing the export and the names of the exported file(s) will be auto generated.
+- **Completions Export Selection**
   - **Perforations** -- Option to include or exclude perforation intervals in the export. 
     - **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
   - **Fractures** -- Option to include or exclude fracture completions from the export.
