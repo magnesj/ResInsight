@@ -189,17 +189,17 @@ The parameters exported in the WEGVALV keyword are
 ### Export of Fractures and Perforations as Multi-Segment Wells
 Fractures and Perforations may also be exported as Multi-Segment Wells. In the case of Fractures, ResInsight will create one segment for the entire fracture, with a number of COMPSEGS-entries corresponding to the cells intersecting the fracture. In this case, the **Diam** and **Rough** parameters are not used for anything and the length of the fracture segment is nominal. An example of the entries are shown below.
 
-   WSEGVALG
-   -- Fracture Segments
-   -- Diam: MSW - Default Dummy
-   -- Rough: MSW - Default Dummy
-   -- Traversal Fracture 02 connected to Main stem segment 11
+    WSEGVALG
+    -- Fracture Segments
+    -- Diam: MSW - Default Dummy
+    -- Rough: MSW - Default Dummy
+    -- Traversal Fracture 02 connected to Main stem segment 11
       25            25           2              11             0.01000      0.00000          0.15000     0.00005      /
        /
-   COMPSEGS
-   -- Fractures
-   -- Name      
+    COMPSEGS
+    -- Fractures
+    -- Name      
       C-1 H      /
-   -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
       27     43     1      2             11.27214         11.28214        /
       26     44     1      2             11.27214         11.28214        /
