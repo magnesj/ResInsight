@@ -187,7 +187,7 @@ The parameters exported in the WEGVALV keyword are
 - **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icd per Sub.  
     
 ### Export of Fractures and Perforations as Multi-Segment Wells
-Fractures and Perforations may also be exported as Multi-Segment Wells. In the case of Fractures, ResInsight will create one segment for the entire fracture, with a number of COMPSEGS-entries corresponding to the cells intersecting the fracture. In this case, the **Diam** and **Rough** parameters are not used for anything and the length of the fracture segment is nominal. An example of the entries are shown below.
+Fractures and Perforations may also be exported as Multi-Segment Wells. In the case of Fractures, ResInsight will create one segment for the entire fracture, with a number of COMPSEGS-entries corresponding to the cells intersecting the fracture. In this case, the **Diam** and **Rough** parameters are not used for anything and the length of the fracture segment is nominal. An example of a Fracture entry is shown below.
 
     WELSEGS
     -- Name      Dep 1          Tlen 1         Vol 1     Len&Dep     PresDrop     
@@ -206,3 +206,27 @@ Fractures and Perforations may also be exported as Multi-Segment Wells. In the c
     -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
        27     43     1      2             11.27214         11.28214        /
        26     44     1      2             11.27214         11.28214        /
+
+The entries for Perforations are simpler. No additional branches are created as the perforation intervals are all on the main bore and all perforated cells are listed as COMPSEG entries very similar to normal COMPDAT export of perforation intervals.
+
+    WELSEGS
+    -- Name       Dep 1          Tlen 1         Vol 1     Len&Dep     PresDrop     
+       B-1 AH     2530.38706     3137.28258     1*        INC         H--           /
+    -- First Seg     Last Seg     Branch Num     Outlet Seg     Length       Depth Change     Diam        Rough       
+    -- Main Stem Segments
+       2             2            1              1              16.33624     6.96924          0.15200     0.00001      /
+       3             3            1              2              11.77390     4.75668          0.15200     0.00001      /
+       4             4            1              3              9.49721      3.63598          0.15200     0.00001      /
+       5             5            1              4              6.77104      2.59228          0.15200     0.00001      /
+       6             6            1              5              29.44930     10.10431         0.15200     0.00001      /
+       7             7            1              6              27.93603     7.96718          0.15200     0.00001      /
+       8             8            1              7              13.95369     3.66086          0.15200     0.00001      /
+       /
+       
+       COMPSEGS
+    -- Fractures
+    -- Name      
+       C-1 H      /
+    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+       27     43     1      1             16.33624         11.28214        /
+       26     44     1      1             11.27214         11.28214        /
