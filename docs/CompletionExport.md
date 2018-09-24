@@ -222,11 +222,14 @@ The entries for Perforations are simpler. No additional branches are created as 
        7             7            1              6              27.93603     7.96718          0.15200     0.00001      /
        8             8            1              7              13.95369     3.66086          0.15200     0.00001      /
        /
-       
-       COMPSEGS
-    -- Fractures
-    -- Name      
-       C-1 H      /
-    -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
-       27     43     1      1             16.33624         11.28214        /
-       26     44     1      1             11.27214         11.28214        /
+    COMPSEGS
+    -- Name       
+       B-1 AH      /
+    -- I      J      K     Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+       10     24     1     1             3137.28258       3153.61882      /
+       10     24     2     1             3153.61882       3165.39273      /
+       9      24     2     1             3165.39273       3174.88994      /
+       9      25     2     1             3174.88994       3181.66098      /
+       9      25     3     1             3181.66098       3211.11028      /
+       9      25     5     1             3239.04631       3253.00000      /
+       /
