@@ -107,14 +107,10 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
 
 
 
-## Export Well Segments
+## Multi Segment Well Model
 
-It is possible to export all the Fishbone Subs Definitions to a text file containing the Eclipse input data 
-keywords needed to represent the fishbone part of the well as an MSW.
-
-This can be done by the command **Export Well Segments** available as a context command on the **Fishbones** folder. Invoking the command will show a dialog prompting you to enter a target directory and which case to use in the calculations.
-
-![]({{ site.baseurl }}/images/Fishbones_ExportWellSegments.png)
+It is possible to export all the completions to a text file containing the Eclipse input data 
+keywords needed to represent the completions as a Multi Segment Well. This is done by checking the **Include Multi Segment Well Model**. All completions are supported and are exported in somewhat different ways.
 
 ### Exported MSW Data
 
