@@ -306,8 +306,8 @@ Select one or more well paths in the project tree, right click and select **Crea
   - **Base K Layer** -- The bottommost K layer to add fractures to
   - **Template** -- The fracture template used in the specified K layer range
   - **Spacing** -- The distance between each fracture in the K layer range
-- **Summary** -- Output information to the user. Shows number of fractures that will be created on each selected well path
+- **Generated Fractures** -- Output information to the user. Shows number of fractures that will be created on each selected well path
 - **Replace Fractures** -- Press this button to delete all existing fractures on the selected wells before creating new fractures
-- **Append Fractures** -- Press this button to append the new fractures to all selected wells (not deleting existing fractures)
+- **Add Fractures** -- Press this button to add the new fractures to all selected wells (not deleting existing fractures)
 
 The Create Multiple Fractures function is also available as a CommandFile command. See the [CommandFile section]({{ site.baseurl }}/docs/commandfile)
