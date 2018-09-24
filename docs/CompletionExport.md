@@ -117,7 +117,7 @@ keywords needed to represent the completions as a Multi Segment Well. This is do
 In the output file there are data for three Eclipse keyword specified.
 
 ##### WELSEGS
-WELSEGS defines multi-segment well. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A comment above each entry details which element (main bore / ICD / lateral) the entry is for.  Example: 
+WELSEGS defines multi-segment wells. The list of entries contains information on the main stem, the ICDs at the fishbone subs and the fishbone laterals. A comment above each entry details which element (main bore / ICD / lateral) the entry is for.  Example: 
 
     WELSEGS
     -- Name            Dep 1          Tlen 1       Vol 1     Len&Dep     PresDrop     
@@ -152,7 +152,6 @@ WELSEGS defines multi-segment well. The list of entries contains information on 
   - **Depth Change** -- Depth of segment, incremental or absolute as for Length. For ICDs depth is set to 0. 
   - **Diam** -- Diameter of segment. For main bore and ICD entries, the liner inner diameter for the Fishbones collection is used. For laterals, an effective diameter is calculated so that the diameter exported is the diameter which, assuming a circle, would give the same area as the area between the hole diameter and the tubing diameter.  
   - **Rough** -- The roughness factor as entered by the user. Notice that a different value can be specified for the main bore and the laterals, as described above.       
-
     
 ##### COMPSEGS
 An example of the COMPSEGS keyword as exported is shown below.  
@@ -187,3 +186,20 @@ The parameters exported in the WEGVALV keyword are
 - **Cv** -- The ICD Flow Coefficient, as entered by the user.
 - **Ac** -- the total ICD area per sub, calculated as the area per ICD (given by the orifice radius) multiplied with the number of icd per Sub.  
     
+### Export of Fractures and Perforations as Multi-Segment Wells
+Fractures and Perforations may also be exported as Multi-Segment Wells. In the case of Fractures, ResInsight will create one segment for the entire fracture, with a number of COMPSEGS-entries corresponding to the cells intersecting the fracture. In this case, the **Diam** and **Rough** parameters are not used for anything and the length of the fracture segment is nominal. An example of the entries are shown below.
+
+   WSEGVALG
+   -- Fracture Segments
+   -- Diam: MSW - Default Dummy
+   -- Rough: MSW - Default Dummy
+   -- Traversal Fracture 02 connected to Main stem segment 11
+      25            25           2              11             0.01000      0.00000          0.15000     0.00005      /
+       /
+   COMPSEGS
+   -- Fractures
+   -- Name      
+      C-1 H      /
+   -- I      J      K      Branch no     Start Length     End Length     Dir Pen     End Range     Connection Depth     
+      27     43     1      2             11.27214         11.28214        /
+      26     44     1      2             11.27214         11.28214        /
