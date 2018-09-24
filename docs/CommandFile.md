@@ -376,4 +376,4 @@ Create multiple fractures on one or more well paths.
 
 #### Example
 
-`createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"]), action=REPLACE_FRACTURES)`
+`createMultipleFractures(caseId=0, templateId=1, wellPathNames=["B-1H", "B-2H"], action=REPLACE_FRACTURES)`
