@@ -57,6 +57,7 @@
   - exportfluxnummultnum
   - carfinexport
   - completionexport
+  - exportwellpaths
   
 - title: Scripting
   docs:
