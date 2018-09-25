@@ -82,6 +82,33 @@ A valid Eclipse vector having a standard name ending with 'T' or 'TH' are consid
 **Error data**  
 Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
 
+### CSV Line Based Format
+ResInsight supports a 'line based' CSV file format variant as well. As opposed to the normal CSV format, data values are organized in lines. Each line contains at leastt a date (and optionally time), a vector address and a sample value. Optionally it may also contain an error value and a description. The information carried by this format is equivalent to the normal CSV format, it is only a different file layout.
+
+When importing a line based CSV file, no dialog appears. Instead a more stict set of rules apply to this type of files:
+- At least **DATE**, **VECTOR** and **VALUE** columns mut be present. The order of columns may be changed.
+- Optionally the columns **ERROR** and **COMMENTS** may be present
+- ISO date format must be used: 'yyyy-mm-dd' or 'yyyy-mm-dd hh:mm'
+- Semicolon (;) must be used as column separator
+- Point (.) must be used as decimal separator
+
+#### Example
+The two examples below are equvalent and result in identical data after importing to ResInsight
+
+Line based CSV:
+```
+DATE       ;VECTOR ;VALUE ;ERROR
+2018-04-16 ;FOPT   ;12.5  ;0.45
+2018-04-18 ;FOPT   ;8.6   ;0.31
+```
+Normal CSV:
+```
+DATE       ;FOPT ;ERR:FOPT
+2018-04-16 ;12.5 ;0.45
+2018-04-18 ;8.6  ;0.31
+```
+
+
 ### Import RSM observed time history data
 To import RSM files, the only action needed from the user is to select one or more RSM files. When the import is finished, one tree node for each file will appear under the **Observed Time History Data** node in the project tree. RSM files can be either *Column based* or *Keyword based*.
 
