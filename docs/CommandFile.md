@@ -28,6 +28,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [exportWellPathCompletions](#exportwellpathcompletions)
 * [exportSimWellFractureCompletions](#exportsimwellfracturecompletions)
 * [exportMsw](#exportmsw)
+* [exportWellPaths](#exportwellpaths)
 * [setExportFolder](#setexportfolder)
 
 #### Other Commands
@@ -254,6 +255,19 @@ Export multi-segment wells.
 #### Example
 
 `exportMsw(caseId=1, wellPath="MainWell")`
+
+### exportWellPaths
+
+Export well paths.
+
+| Parameter     | Description                                    | Type           | Required |
+|---------------|------------------------------------------------|----------------|----------|
+| wellPathNames | Names of well paths to export for. Defaults to all checked wells. If a list of well names are provided, those wells are included even if unchecked                                   | List of String |          |
+| mdStepSize    | Spacing (measured depth) between each sample along the well path. Default to 5.0                                                                                                        | String         |          |
+
+#### Example
+
+`exportWellPaths(wellPathNames=["B-1H", "B-2H"], mdStepSize=1.5)`
 
 
 ### setExportFolder
