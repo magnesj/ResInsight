@@ -263,7 +263,7 @@ Export well paths.
 | Parameter     | Description                                    | Type           | Required |
 |---------------|------------------------------------------------|----------------|----------|
 | wellPathNames | Names of well paths to export for. Defaults to all checked wells. If a list of well names are provided, those wells are included even if unchecked                                   | List of String |          |
-| mdStepSize    | Spacing (measured depth) between each sample along the well path. Default to 5.0                                                                                                        | String         |          |
+| mdStepSize    | Spacing (measured depth) between each sample along the well path. Default to 5.0                                                                                                        | Double         |          |
 
 #### Example
 
