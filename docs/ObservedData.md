@@ -83,7 +83,7 @@ A valid Eclipse vector having a standard name ending with 'T' or 'TH' are consid
 Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
 
 ### CSV Line Based Format
-ResInsight supports a 'line based' CSV file format variant as well. As opposed to the normal CSV format, data values are organized in lines. Each line must contain at least a date (and time), a vector address and a sample value. Optionally it may also contain an error value and a description. The information carried by this format is equivalent to the normal CSV format, it is only a different file layout.
+ResInsight supports a 'line based' CSV file format variant as well. As opposed to the normal CSV format, data values are organized in lines. Each line must contain at least a date (and time), a vector address and a sample value. Optionally it may also contain an error value and a comment. The information carried by this format is equivalent to the normal CSV format, it is only a different file layout.
 
 When importing a line based CSV file, no dialog appears. Instead a more stict set of rules apply to this type of files:
 - At least **DATE**, **VECTOR** and **VALUE** columns must be present. The order of columns may be changed.
@@ -91,6 +91,7 @@ When importing a line based CSV file, no dialog appears. Instead a more stict se
 - ISO date format must be used: 'yyyy-mm-dd' or 'yyyy-mm-dd hh:mm'
 - Semicolon (;) must be used as column separator
 - Point (.) must be used as decimal separator
+- The comment must not contain any semicolons
 
 #### Example
 The two examples below are equvalent and result in identical data after importing to ResInsight
