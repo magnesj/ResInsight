@@ -70,7 +70,7 @@ One of the tables displays derived data, see the example here:
 
 #### Description of Derived Data
 - **Tr** -- Accumulated computed transmissibilies for all reservoir cells intersected by the fracture
-- **`#con`** -- Number of reservoir cells intersected by the fracture
+- **#con** -- Number of reservoir cells intersected by the fracture
 - **Fcd** -- Area weighted fracture conductivity divided by area weighted matrix transmissibility (Kf/Km)
 - **Area** -- Area of reservoir cells(both active and inactive) intersected by the fracture
 - **KfWf** -- Multiplication of Kf by Wf (Kf * Wf)
