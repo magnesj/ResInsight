@@ -225,13 +225,15 @@ To create a new fracture template, right-click the **Fracture Template** item in
 ![]({{ site.baseurl }}/images/FractureNonDarcyFlow.png)
 
 Non-Darcy Flow is used to improve the computation of connection factors for cells penetrated by well pipes. A pre-computed D-factor can be set using **User Defined D-factor**. Selecting the option **Compute D-factor** displays the following set of properties:
-  - **Inertial Coefficient** -- Beta-factor in Forcheimer units
+  - **Inertial Coefficient** 
+    - **User Defined** -- Beta-factor in Forcheimer units
+    - **Use Fracture Beta Factor** -- Extract beta factor from the fracture template at the well intersection location. For transversal fractures, the conductivity is computed from the geometric average of fracture cells intersected by the fracture perforation length.
   - **Effective Permeability**
     - **User Defined** -- Defines the permeability *Ke* in milliDarcy in the property **Effective Permeability** 
-    - **Use Fracture Conductivity** -- Extract conductivity from the fracture template at the well intersection location and scale with **Relative Permeability**
+    - **Use Fracture Conductivity** -- Extract conductivity from the fracture template at the well intersection location and scale with **Relative Permeability**. For transversal fractures, the conductivity is computed from the weighted average of fracture cells intersected by the fracture perforation length.
   - **Width**
     - **User Defined** -- Defines the width of the fracture
-    - **Use Fracture Width** -- Extract width from the fracture template at the well intersection location
+    - **Use Fracture Width** -- Extract width from the fracture template at the well intersection location. For transversal fractures, the width is based on the weighted average of fracture cells intersected by the fracture perforation length.
   - **Relative Gas Density**
   - **Gas Viscosity**
   - **D Factor** -- Displays the computed value of the D factor
