@@ -65,14 +65,15 @@ At the top of the exported transmissibilities for fractures, a fracture report s
               110.834     24   276.168   9315.748   54.889   3805.029   0.014   61.628   75.580   13.778
 
 #### Description of Derived Data
-- Tr -- Accumulated computed transmissibilies for all reservoir cells intersected by the fracture
-- con -- Number of reservoir cells intersected by the fracture
-- Area -- Area of reservoir cells(both active and inactive) intersected by the fracture
-- KfWf -- Multiplication of Kf by Wf (Kf * Wf)
-- Kf -- Area weighted average of conductivity of fracture cells intersecting reservoir grid cells (using Area defined above)
-- Wf -- Area weighted average of width of fracture cells intersecting reservoir grid cells (using Area defined above)
-- H -- Longest continuous distance along fracture grid cells for a fracture grid column
-- Km -- Area weighted average of matrix transmissibility (using Area defined above)
+- **Tr** -- Accumulated computed transmissibilies for all reservoir cells intersected by the fracture
+- **#con** -- Number of reservoir cells intersected by the fracture
+- **Area** -- Area of reservoir cells(both active and inactive) intersected by the fracture
+- **KfWf** -- Multiplication of Kf by Wf (Kf * Wf)
+- **Kf** -- Area weighted average of conductivity of fracture cells intersecting reservoir grid cells (using Area defined above)
+- **Wf** -- Area weighted average of width of fracture cells intersecting reservoir grid cells (using Area defined above)
+- **Xf** -- Half-length, computed by fracture area / (H/2)
+- **H** -- Longest continuous distance with fracture cells open for flow along a fracture grid column
+- **Km** -- Area weighted average of matrix transmissibility (using Area defined above)
 
 ### Export of Fishbone Completion Data
 
