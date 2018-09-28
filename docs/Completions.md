@@ -236,7 +236,7 @@ Non-Darcy Flow is used to improve the computation of connection factors for cell
     - **Use Fracture Width** -- Extract width from the fracture template at the well intersection location. For transversal fractures, the width is based on the weighted average of fracture cells intersected by the fracture perforation length.
   - **Relative Gas Density**
   - **Gas Viscosity**
-  - **D Factor** -- Displays the computed value of the D factor
+  - **D Factor** -- Displays the computed value of the D factor. NOTE : For *transversal fractures*, the computed D factor is scaled by 1.2 to compensate for a different flow model
   - **D Factor Details** -- Displays the value of variables used to compute the D factor
 
 #### Ellipse Fracture Template
