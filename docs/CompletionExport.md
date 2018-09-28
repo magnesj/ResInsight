@@ -57,7 +57,11 @@ For an example of *COMPDAT* files exported with calculated transmissibilities an
 
 ### Fracture Report Header
 
-At the top of the exported transmissibilities for fractures, a fracture report summary is displayed. This section displays the different properties for the fractures used to compute the transmissibility values. One of the tables displays derived data, see the example here:
+At the top of the exported transmissibilities for fractures, a fracture report summary is displayed. This section displays the different properties for the fractures used to compute the transmissibility values.
+
+#### Description of Derived Data
+
+One of the tables displays derived data, see the example here:
 
                    Tr   #con       Fcd       Area     KfWf         Kf      Wf       Xf        H       Km
     [cP.rm3/day/bars]               []       [m2]    [mDm]       [mD]     [m]      [m]      [m]     [mD]
