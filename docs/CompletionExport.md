@@ -66,7 +66,8 @@ At the top of the exported transmissibilities for fractures, a fracture report s
 
 #### Description of Derived Data
 - **Tr** -- Accumulated computed transmissibilies for all reservoir cells intersected by the fracture
-- **#con** -- Number of reservoir cells intersected by the fracture
+- **`#con`** -- Number of reservoir cells intersected by the fracture
+- **Fcd** -- Area weighted fracture conductivity divided by area weighted matrix transmissibility (Kf/Km)
 - **Area** -- Area of reservoir cells(both active and inactive) intersected by the fracture
 - **KfWf** -- Multiplication of Kf by Wf (Kf * Wf)
 - **Kf** -- Area weighted average of conductivity of fracture cells intersecting reservoir grid cells (using Area defined above)
