@@ -55,6 +55,24 @@ If the *Export Calculated Transmissibilities* is chosen in the export setting (s
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
+### Fracture Report Header
+
+At the top of the exported transmissibilities for fractures, is a text report displayed. This section displays the different properties for the fractures used to compute the transmissibility values. One table displays several derived data, see the example here:
+
+                   Tr   #con       Fcd       Area     KfWf         Kf      Wf       Xf        H       Km
+    [cP.rm3/day/bars]               []       [m2]    [mDm]       [mD]     [m]      [m]      [m]     [mD]
+    ----------------------------------------------------------------------------------------------------
+              110.834     24   276.168   9315.748   54.889   3805.029   0.014   61.628   75.580   13.778
+
+- Tr -- Accumulated computed transmissibilies for all reservoir cells intersected by the fracture
+- con -- Number of reservoir cells intersected by the fracture
+- Area -- Area of reservoir cells(both active and inactive) intersected by the fracture
+- KfWf -- Multiplication of Kf by Wf (Kf * Wf)
+- Kf -- Area weighted average of conductivity of fracture cells intersecting reservoir grid cells (using Area defined above)
+- Wf -- Area weighted average of width of fracture cells intersecting reservoir grid cells (using Area defined above)
+- H -- Longest continuous distance along fracture grid cells for a fracture grid column
+- Km -- Area weighted average of matrix transmissibility (using Area defined above)
+
 ### Export of Fishbone Completion Data
 
 The transmissibility calculation for the fishbones is done following the above description except that when calculating the transmissibility for the laterals, the full cell volume is split among the laterals for calculation of the transmissibility. This is done by finding the direction of the main bore, and then dividing the cell size in this direction by the number of laterals in the cell when calculating the Peaceman radius. 
