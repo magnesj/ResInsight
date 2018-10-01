@@ -11,7 +11,7 @@ The completions defined in ResInsight can be exported to Eclipse for use in new 
 
 - **Export Settings**
     - **Calculated Transmissibilities** -- The transmissibilities calculated based on the case and completion data are exported directly
-    - **Default Connection Factors and WPIMULT** -- The information about the connections for Eclipse to be able to make the transmissibility calculaton is exported for the COMPDAT keyword. In addition, the same transmissibility calculation is performed by ResInsight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
+    - **Default Connection Factors and WPIMULT** -- The information about the connections for Eclipse to be able to make the transmissibility calculaton is exported for the COMPDAT/COMPDATL keywords. In addition, the same transmissibility calculation is performed by ResInsight, and the factor between the actual transmissibility for the connection and the Eclipse calculation is exported in the WPIMULT keyword. 
   - **Case to Apply** -- Select which case to use for the export. Matrix transmissibilities will be read from this case.  
   - **Use NTG Horizontally** -- Toggles whether NTG in I and J directions is included in the calculation
   - **Include Multi Segment Well Model** -- Toggles whether to also export the completions as Multi Segment Wells.
@@ -28,7 +28,7 @@ The completions defined in ResInsight can be exported to Eclipse for use in new 
   - **Perforations** -- Option to include or exclude perforation intervals in the export. 
     - **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
   - **Fractures** -- Option to include or exclude fracture completions from the export.
-  - **Fishbones** -- Option to include or exclude fishbone completions from the export. The direction reported in the COMPDAT keyword  is computed based on the orientation of the main bore cell the fishbone is connected to.
+  - **Fishbones** -- Option to include or exclude fishbone completions from the export. The direction reported in the COMPDAT/COMPDATL keywords is computed based on the orientation of the main bore cell the fishbone is connected to.
     - **Exclude Main Bore Transmissibility** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
 
 ### Transmissibility Calculations
@@ -51,7 +51,7 @@ The y and z component of the transmissibility are calculated in the same manner,
 
 ![]({{ site.baseurl }}/images/Equation_PerfInterval_TotalT.png)
 
-If the *Export Calculated Transmissibilities* is chosen in the export setting (see [Exporting Completion Data to Eclipse](#exporting-completion-data-to-eclipse)), this value is exported in the COMPDAT keyword directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT keyword (perforation length, well radius etc). The ratio between these transmissibilities is then exported as the WPIMULT value. 
+If the *Export Calculated Transmissibilities* is chosen in the export setting (see [Exporting Completion Data to Eclipse](#exporting-completion-data-to-eclipse)), this value is exported in the COMPDAT/COMPDATL keywords directly. If the *Export Default Connection Factors and WPIMULT* the transmissibility is chosen, the transmissibility is calculated as above, and in addition the transmissibility is calculated as Eclipse would do it using values other than transmissibility in the COMPDAT/COMPDATL keywords (perforation length, well radius etc). The ratio between these transmissibilities is then exported as the WPIMULT value. 
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
@@ -129,7 +129,20 @@ The *WPIMULT* parameters are calculated, as for the perforation intervals, by Re
        Well Path B     25.11396     27     41     15      /
     /
 
+### Completions for LGR (WELSPECL and COMPDATL)
+Completion data for LGR grids are exported to a separate file having the same name as the main grid completions file postfixed by "_LGR". Instead of using the WELSPECS and COMPDAT keywords, the WELSPECL and COMPDATL keywords are used. Those tables are simlar to the WELSPECS and COMPDAT tables, except from including the columns **LGR** and **LgrName**, respectively. The extra columns contains the name of the LGR grid.
 
+    WELSPECL
+    -- Well      Grp   LGR      I   J   RefDepth   WellType   
+       UWell-1   1*    WELLI1   2   9   1*         OIL         /
+        /
+    COMPDATL
+    -- Well      LgrName   I   J   K1   K2   Status   SAT   TR             DIAM      KH   S         Df   DIR   
+    -- ---- Completions for completion type Perforation ----
+    -- Perforation Completion : MD In: 63.6509 - MD Out: 67.0264 Transmissibility: 6.10676
+       UWell-1   WELLI1    2   9   6    6    OPEN     1*    6.106763E+00   0.21600   1*   0.00000   1*   'Y'    /
+    -- Perforation Completion : MD In: 67.0264 - MD Out: 70.402 Transmissibility: 6.10679
+       UWell-1   WELLI1    2   8   6    6    OPEN     1*    6.106791E+00   0.21600   1*   0.00000   1*   'Y'    /
 
 ## Multi Segment Well Model
 
