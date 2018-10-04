@@ -189,21 +189,23 @@ Folder to output snapshots should be set using `setExportFolder` with `SNAPSHOTS
 
 ### exportProperty
 
-Exports a property to file in Eclipse format.
+Exports a property to file in Eclipse format. Result from all views associated with the specified case are exported, one file per view.
 
 This command changes the selected property on the first view of the selected case.
 
-| Parameter      | Description                                                                                     | Type    | Required |
-|----------------|-------------------------------------------------------------------------------------------------|---------|----------|
-| caseId         | ID of case to export property from                                                              | Integer | &#10004; |
-| property       | Name of property to export                                                                      | String  | &#10004; |
-| eclipseKeyword | Eclipse keyword to use. Defaults to the value of `property` parameter                           | String  |          |
-| undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |          |
-| exportFile     | File to export to. Defaults to export folder for `PROPERTIES` with `property` name as filename  | String  |          |
+| Parameter      | Description                                                                                    | Type    | Required |
+|----------------|------------------------------------------------------------------------------------------------|---------|----------|
+| caseId         | ID of case to export property from                                                              | Integer | &#10004;|
+| timeStep       | The time step index to export the property for                                                  | Integer | &#10004;|
+| property       | Name of property to export                                                                      | String  | &#10004;|
+| type           | Property type. Choices: `DYNAMIC_NATIVE`, `STATIC_NATIVE`, `SOURSIMRL`, `SOURSIMRL`, `INPUT_PROPERTY`, `FORMATION_NAMES`, `FLOW_DIAGNOSTICS`, `INJECTION_FLOODING`. If not specified, search the fire first types.        | Enum    |         |
+| eclipseKeyword | Eclipse keyword to use. Defaults to the value of `property` parameter                           | String  |         |
+| undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |         |
+| exportFile     | File to export to. Defaults to export folder for `PROPERTIES` with `property` name as filename  | String  |         |
 
 #### Example
 
-`exportProperty(caseId=1, property="SOIL")`
+`exportProperty(caseId=1, timeStep=0, property="SOIL")`
 
 
 ### exportWellPathCompletions
