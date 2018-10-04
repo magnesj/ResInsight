@@ -29,6 +29,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [exportSimWellFractureCompletions](#exportsimwellfracturecompletions)
 * [exportMsw](#exportmsw)
 * [exportWellPaths](#exportwellpaths)
+* [exportVisibleCells](#exportvisiblecells)
 * [setExportFolder](#setexportfolder)
 
 #### Other Commands
@@ -270,6 +271,23 @@ Export well paths.
 #### Example
 
 `exportWellPaths(wellPathNames=["B-1H", "B-2H"], mdStepSize=1.5)`
+
+### exportVisibleCells
+
+Export visible cells
+
+| Parameter               | Description                                                                  | Type           | Required |
+|-------------------------|------------------------------------------------------------------------------|----------------|----------|
+| caseId                  | ID of case to export cells for                                               | Integer        | &#10004; |
+| viewName                | Name of the view associated with the specified case                          | Double         | &#10004; |
+| exportKeyword           | The keyword to export. Choices: `FLUXNUM` or `MULTNUM`. Default: `FLUXNUM`   | Enum           |          |
+| visibleActiveCellsValue | Value to use for visible active cells. Default: 1                            | Integer        |          |
+| hiddenActiveCellsValue  | Value to use for hidden active cells. Default: 0                             | Integer        |          |
+| inactiveCellsValue      | Value to use for inactive cells. Default: 0                                  | Integer        |          |
+
+#### Example
+
+`exporVisibleCells(caseId=0, viewName="View 1", exportKeyword=MULTNUM)`
 
 
 ### setExportFolder
