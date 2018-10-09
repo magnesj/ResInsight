@@ -197,7 +197,7 @@ Exports properties to file in Eclipse format. Result from all views associated w
 | caseId         | ID of case to export property from                                                              | Integer | &#10004;|
 | timeStep       | The time step index to export the property for. Default: Time step from current view            | Integer |         |
 | property       | Name of property to export. Default: Result property/variable from current view                 | String  |         |
-| type           | Property type. Choices: `DYNAMIC_NATIVE`, `STATIC_NATIVE`, `SOURSIMRL`, `SOURSIMRL`, `INPUT_PROPERTY`, `FORMATION_NAMES`, `FLOW_DIAGNOSTICS`, `INJECTION_FLOODING`. Default: Search the five first types. If property is not specified, this parameter is ignored                                                                                               | Enum    |         |
+| type           | Property type. Choices: `DYNAMIC_NATIVE`, `STATIC_NATIVE`, `SOURSIMRL`, `INPUT_PROPERTY`, `FORMATION_NAMES`, `FLOW_DIAGNOSTICS`, `INJECTION_FLOODING`. Default: Search the five first types. If property is not specified, this parameter is ignored                                                                                               | Enum    |         |
 | eclipseKeyword | Eclipse keyword to use. Defaults to the value of `property` parameter                           | String  |         |
 | undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |         |
 
