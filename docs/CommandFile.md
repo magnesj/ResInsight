@@ -205,6 +205,20 @@ Exports properties to file in Eclipse format. Result from all views associated w
 
 `exportProperty(caseId=1, timeStep=0, property="SOIL")`
 
+### exportPropertiesInViews
+
+Exports property for views to file in Eclipse format in one file per view.
+
+| Parameter      | Description                                                                                    | Type    | Required |
+|----------------|------------------------------------------------------------------------------------------------|---------|----------|
+| caseId         | ID of case to export property from                                                              | Integer | &#10004;|
+| viewNames      | The time step index to export the property for. Default: Time step from current view            | Integer |         |
+| undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |         |
+
+#### Example
+
+`exportPropertiesInViews(caseId=1)`
+
 
 ### exportWellPathCompletions
 
