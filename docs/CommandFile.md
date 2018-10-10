@@ -212,13 +212,14 @@ Exports property for views to file in Eclipse format in one file per view.
 
 | Parameter      | Description                                                                            | Type           | Required |
 |----------------|----------------------------------------------------------------------------------------|----------------|----------|
-| caseId         | ID of case to export property from                                                     | Integer        | &#10004;|
-| viewNames      | Name of views to export from. If not specified, all views are exported                 | List of String |
-| undefinedValue | Value to use for undefined values. Defaults to 0.0                                     | Double         |         |
+| caseId         | ID of case to export property from                                                     | Integer        | &#10004; |
+| viewNames      | Name of views to export from. If not specified, all views are exported                 | List of String |          |
+| undefinedValue | Value to use for undefined values. Defaults to 0.0                                     | Double         |          |
 
 #### Example
 
 `exportPropertiesInViews(caseId=1)`
+
 `exportPropertiesInViews(caseId=1, viewNames=["view A", "view 4"])`
 
 
