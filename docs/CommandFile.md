@@ -25,7 +25,7 @@ Once the command file is finished executing, ResInsight will exit.
 * [exportMultiCaseSnapshots](#exportmulticasesnapshots)
 * [exportSnapshots](#exportsnapshots)
 * [exportProperty](#exportproperty)
-* [exportPropertiesInViews](#exportpropertiesinviews)
+* [exportPropertyInViews](#exportpropertyinviews)
 * [exportWellPathCompletions](#exportwellpathcompletions)
 * [exportSimWellFractureCompletions](#exportsimwellfracturecompletions)
 * [exportMsw](#exportmsw)
@@ -206,9 +206,9 @@ Exports properties to file in Eclipse format. Result from all views associated w
 
 `exportProperty(caseId=1, timeStep=0, property="SOIL")`
 
-### exportPropertiesInViews
+### exportPropertyInViews
 
-Exports property for views to file in Eclipse format in one file per view.
+Exports property in views to file in Eclipse format as one file per view.
 
 | Parameter      | Description                                                                            | Type           | Required |
 |----------------|----------------------------------------------------------------------------------------|----------------|----------|
@@ -218,9 +218,9 @@ Exports property for views to file in Eclipse format in one file per view.
 
 #### Example
 
-`exportPropertiesInViews(caseId=1)`
+`exportPropertyInViews(caseId=1)`
 
-`exportPropertiesInViews(caseId=1, viewNames=["view A", "view 4"])`
+`exportPropertyInViews(caseId=1, viewNames=["view A", "view 4"])`
 
 
 ### exportWellPathCompletions
