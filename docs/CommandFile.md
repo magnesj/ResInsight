@@ -310,8 +310,9 @@ Set the folder to export different types of data to. Set this before attempting 
 
 | Parameter | Description                                                                                    | Type   | Required |
 |-----------|------------------------------------------------------------------------------------------------|--------|----------|
-| type      | Type of export folder to set. Choices: `COMPLETIONS`, `SNAPSHOTS`, `PROPERTIES`, `STATISTICS`  | Enum   | &#10004; |
-| path      | Directory to export the given type to                                                          | String | &#10004; |
+| type         | Type of export folder to set. Choices: `COMPLETIONS`, `SNAPSHOTS`, `PROPERTIES`, `STATISTICS`  | Enum      | &#10004; |
+| path         | Directory to export the given type to                                                          | String    | &#10004; |
+| createFolder | If true, create the folder when required. Default false.                                       | Boolean   |          |
 
 #### Example
 
