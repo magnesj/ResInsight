@@ -80,7 +80,7 @@ There are two main selections you need to make: The tracers and the result prope
        - All producers communicating with the selected injectors (and vice-versa) can be selected with the "Add Communicator" buttons.
 - **Phases** -- Select the fluid phase you are interested in: All, Oil, Gas or Water. If one of the separate phases are selected, only the _Time Of Flight_ result property will be available in the list below.
 - **Result property** -- Displays a list of the available results:
-    - **Time Of Flight** -- The time for some fluid in the cell to reach a producer, 
+    - **Residence Time** -- The time for some fluid in the cell to reach a producer, 
     or the time it takes to reach the cell from an injector. The option changes name depending on the selection of injectors and producers and will be Forward Time of Flight if only injectors are selected and Reverse Time of Flight if only producers are selected.
     When selecting several tracers, the time of flight values from each of the tracers are weighted 
     by their cell fraction before they are averaged. The suffix (Average) will then be added to the option label.
