@@ -191,24 +191,24 @@ Folder to output snapshots should be set using `setExportFolder` with `SNAPSHOTS
 
 ### exportProperty
 
-Exports properties to file in Eclipse format. Result from all views associated with the specified case are exported, one file per view.
+Exports property values for all cells in the grid to file in Eclipse format.
 
 | Parameter      | Description                                                                                    | Type    | Required |
 |----------------|------------------------------------------------------------------------------------------------|---------|----------|
-| caseId         | ID of case to export property from                                                              | Integer | &#10004;|
-| timeStep       | The time step index to export the property for. Default: Time step from current view            | Integer |         |
-| property       | Name of property to export. Default: Result property/variable from current view                 | String  |         |
-| type           | Property type. Choices: `DYNAMIC_NATIVE`, `STATIC_NATIVE`, `SOURSIMRL`, `INPUT_PROPERTY`, `FORMATION_NAMES`, `FLOW_DIAGNOSTICS`, `INJECTION_FLOODING`. Default: Search the five first types. If property is not specified, this parameter is ignored                                                                                               | Enum    |         |
-| eclipseKeyword | Eclipse keyword to use. Defaults to the value of `property` parameter                           | String  |         |
-| undefinedValue | Value to use for undefined values. Defaults to 0.0                                              | Double  |         |
+| caseId         | ID of case for export                                                                          | Integer | &#10004;|
+| timeStep       | The time step index for export                                                                 | Integer | &#10004;|
+| property       | Name of property to export                                                                     | String  | &#10004;|
+| eclipseKeyword | Eclipse keyword used as text in export header. Defaults to the value of `property` parameter   | String  |         |
+| undefinedValue | Value to use for undefined values. Defaults to 0.0                                             | Double  |         |
+| exportFile     | Filename for export. Defaults to the value of `property` parameter                             | String  |         |
 
 #### Example
 
-`exportProperty(caseId=1, timeStep=0, property="SOIL")`
+`exportProperty(caseId=1, timeStep=4, property="SOIL")`
 
 ### exportPropertyInViews
 
-Exports property in views to file in Eclipse format as one file per view.
+Exports property values for all cells in the grid to file in Eclipse format. Use specified cell result in view to define the export property. One file per view will be exported.
 
 | Parameter      | Description                                                                            | Type           | Required |
 |----------------|----------------------------------------------------------------------------------------|----------------|----------|
@@ -221,7 +221,6 @@ Exports property in views to file in Eclipse format as one file per view.
 `exportPropertyInViews(caseId=1)`
 
 `exportPropertyInViews(caseId=1, viewNames=["view A", "view 4"])`
-
 
 ### exportWellPathCompletions
 
