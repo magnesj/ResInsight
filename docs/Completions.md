@@ -67,7 +67,7 @@ For multi-segment wells there are additional parameters which should be set. The
   - **Enforce Max Segment Length** -- Limit segment to max size. When this check box is checked, a max segment length input field is displayed.
   
 There are three options for Non-Darcy Flow. **None**, **User defined D-factor** and **Compute D-factor**. The second option displays an input field where the user defined D-factor can be entered. The last options brings up several input fields.
-- **Non-Darcy Flow** - Non-Darcy settings
+- **Non-Darcy Flow** - Non-Darcy settings for D factor computation
   - **Unit Constant** --
   - **Grid Permeability Scaling Factor** --
   - **Well Radius** --
