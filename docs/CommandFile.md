@@ -320,7 +320,7 @@ Export LGRs (CARFIN) for completions on the selected well paths. The splitType p
 #### Example
 
 `exportLgrForCompletions(caseId=0, timeStep=0, wellPathNames=["B-1H", "B-2H"], `
-`    refinementI=2, refinementJ=3, refinementK=4, splitType=LGR_PER_WELL)`
+`refinementI=2, refinementJ=3, refinementK=4, splitType=LGR_PER_WELL)`
 
 ### setExportFolder
 
