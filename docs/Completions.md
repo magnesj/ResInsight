@@ -52,6 +52,31 @@ The perforation intervals will be indicated by different color along the well pa
 
 ![]({{ site.baseurl }}/images/WellPerforationIntervalColor.png)
 
+For each well path there is a top level folder in the **Project Tree** containing all the perforation intervals definitions containing settings that applies to all the perforation intervals for this well path. 
+
+![]({{ site.baseurl }}/images/Perforations_PropEdit.png)
+
+For multi-segment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+- **Multi Segment Well Options** - Options used by the Well Segments Export
+  - **Liner Inner Diameter** -- The liner inner diameter for the perforation intervals.
+  - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
+  - **Pressure Drop** -- can be either *Hydrostatic*, *Hydrostatic + Friction* or *Hydrostatic + Friction + Acceleration*. 
+  - **Length and Depth** -- Used in WELSEGS export - when specifying the length and depth change for each segment
+    - **Incremental** -- length / depth of given segment
+    - **Absolute** -- the length down the tube or depth of the last nodal point
+  - **Enforce Max Segment Length** -- Limit segment to max size. When this check box is checked, a max segment length input field is displayed.
+  
+- **Non-Darcy Flow** - Non-Darcy settings
+  - **Unit Constant** --
+  - **Grid Permeability Scaling Factor** --
+  - **Well Radius** --
+  - **Relative Gas Density** --
+  - **Gas Viscosity** --
+  - **Inertial Coefficient** --
+  - **Permeability Scaling Factor** -
+  - **Porosity Scaling Factor** --
+
+  
 ### Import Perforation Intervals
 
 Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
