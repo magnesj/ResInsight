@@ -68,14 +68,14 @@ For multi-segment wells there are additional parameters which should be set. The
   
 There are three options for Non-Darcy Flow. **None**, **User defined D-factor** and **Compute D-factor**. The second option displays an input field where the user defined D-factor can be entered. The last options brings up several input fields.
 - **Non-Darcy Flow** - Non-Darcy settings for D factor computation
-  - **Unit Constant** --
-  - **Grid Permeability Scaling Factor** --
-  - **Well Radius** --
-  - **Relative Gas Density** --
-  - **Gas Viscosity** --
-  - **Inertial Coefficient** --
-  - **Permeability Scaling Factor** -- Permeability scaling facvtor
-  - **Porosity Scaling Factor** -- Porosity scaling factor
+  - **Unit Constant**
+  - **Grid Permeability Scaling Factor**
+  - **Well Radius**
+  - **Relative Gas Density**
+  - **Gas Viscosity**
+  - **Inertial Coefficient**
+  - **Permeability Scaling Factor**
+  - **Porosity Scaling Factor**
   
 ### Import Perforation Intervals
 
