@@ -7,7 +7,7 @@ published: true
 
 ResInsight supports creating and exporting LGRs (Local Grid Refinement) in main grid cells intersected by completions.
 
-## Create Temporary LGR
+## Create Temporary LGRs
 To create temporary LGR(s), first select one or more well paths in the project tree, right click and select 'Create Temporary LGR'. This command brings up the following dialog.
 
 ![]({{ site.baseurl }}/images/TemporaryLgrDialog.png)
@@ -23,5 +23,14 @@ The dialog contains several input fields
 - **Cell Count I,J,K** -- The size of the LGR, in each main grid cell, in the I, J and K direction
 
 After pressing the OK button, LGR(s) are created and will be visible in the grid view.
+Temporary LGRs are stored in memory, and are thus not saved to file. After restarting ResInsight those LGRs have to be recreated.
+
+### Delete temporary LGRs
+It is possible to explicitly delete all temporary LGRs. Right click on the **View -> Grids -> Temporary LGRs** project tree node and select **Delete Temporary LGRs**. This command deletes all temporary LGRs.
 
 ## Export LGRs for Completions (CARFIN)
+ResInsight supports exporting LGRs for completions on selected well paths. If completions on a well paths already have LGRs, an error message is displayed when exporting LGRs and no export is produced for the affected well paths.
+
+To export LGR(s), first select one or more well paths in the project tree, right click and select 'Export LGR for Completions'. This command brings up the same dialog as the 'Create Temporary LGR' command, with an extra input field, **Export folder**.
+
+The exported files contains the Eclipse keyword CARFIN.
