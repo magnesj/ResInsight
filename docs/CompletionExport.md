@@ -144,6 +144,12 @@ Completion data for LGR grids are exported to a separate file having the same na
     -- Perforation Completion : MD In: 67.0264 - MD Out: 70.402 Transmissibility: 6.10679
        UWell-1   WELLI1    2   8   6    6    OPEN     1*    6.106791E+00   0.21600   1*   0.00000   1*   'Y'    /
 
+### LGR for completions (Temporary LGRs)
+The previous section describes the export of COMPDATL for completions intersecting existing LGRs, loaded from file. This section will describe how to have ResInsight create temporary LGRs around completions, and then export COMPDATL for those LGRs.
+To accomplish this, do the following:
+- Create LGRs for completions on selected well paths. See [Completions LGR](#completionslgr)
+- Export completions the usual way. See [Completion Export](#completionexport)
+
 ## Multi Segment Well Model
 
 It is possible to export all the completions to a text file containing the Eclipse input data 
