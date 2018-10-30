@@ -33,4 +33,4 @@ ResInsight supports exporting LGRs for completions on selected well paths. If co
 
 To export LGR(s), first select one or more well paths in the project tree, right click and select 'Export LGR for Completions'. This command brings up the same dialog as the 'Create Temporary LGR' command, with an extra input field, **Export folder**.
 
-The exported files contains the Eclipse keyword CARFIN.
+The exported files contain the Eclipse keyword CARFIN.
