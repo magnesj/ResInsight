@@ -148,7 +148,7 @@ Completion data for LGR grids are exported to a separate file having the same na
 The previous section describes the export of COMPDATL for completions intersecting existing LGRs, loaded from file. This section will describe how to have ResInsight create temporary LGRs around completions, and then export COMPDATL for those LGRs.
 To accomplish this, do the following:
 - Create LGRs for completions on selected well paths. See [Completions LGR]({{ site.baseurl }}/docs/completionslgr)
-- Export completions the usual way. See [Completion Export](#exportcompletions)
+- Export completions the usual way. See [Completion Export]({{ site.baseurl }}/docs/completionexport)
 
 ## Multi Segment Well Model
 
