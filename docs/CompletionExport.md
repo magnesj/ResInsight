@@ -73,7 +73,7 @@ One of the tables displays derived data, see the example here:
 - **Fcd** -- Area weighted fracture conductivity divided by area weighted matrix transmissibility (Kf/Km)
 - **Area** -- Area of reservoir cells(both active and inactive) intersected by the fracture
 - **KfWf** -- Multiplication of Kf by Wf (Kf * Wf)
-- **Kf** -- Area weighted average of conductivity of fracture cells intersecting reservoir grid cells (using Area defined above)
+- **Kf** -- Area weighted average of permeability of fracture cells intersecting reservoir grid cells (using Area defined above)
 - **Wf** -- Area weighted average of width of fracture cells intersecting reservoir grid cells (using Area defined above)
 - **Xf** -- Half-length, defined as fracture area divided by half-height (Area/(H/2))
 - **H** -- Longest continuous distance with fracture cells open for flow along a fracture grid column
