@@ -100,16 +100,13 @@ One of the tables displays derived data, see the example here:
 
 In addition to scaling the transmissibilities in the fracture output, using pressure differential depletion scaling will also provide a table with information regarding the scaling performed for each well. This table will show the well name, fracture name and the source of the Well Bore Hole Pressure (**WBHP From Summary Case** or **Fixed User Defined WBHP**). For **WBHP From Summary Case** the **User WBHP** column will describe the well pressure used for all time steps before the production starts according to the summary case information and the **Actual WBHP** will describe the well pressure used in the scaling, which will be different from the **User WBHP** if the scaling is performed for a time step following the well productions start. Finally the columns **Min Pressure Drop** and **Max Pressure Drop** describes the minimum and maximum well drawdown for this particular fracture.
 
-    --
-    -- Pressure Depletion Time step: 08.Jul 2002
+    -- Pressure Depletion Time step: 01.Feb 2001
     -- User Defined WBHP: 200
     -- Well    Fracture      WBHP Source              Actual WBHP   Min Pressure Drop   Max Pressure Drop   
-    --------------------------------------------------------------------------------------------------------------------------
-    -- B-1H    Fracture_01   WBHP From Summary Case   217.94514     12.52489            74.55183            
-    -- B-1H    Fracture_02   WBHP From Summary Case   217.94514     3.68163             42.14610            
-    -- B-1H    Fracture_03   WBHP From Summary Case   217.94514     0.00865             43.51244            
-    -- B-4DH   Fracture_07   WBHP From Summary Case   200.00000     33.05643            92.10114            
-    -- 
+    -------------------------------------------------------------------------------------------------------
+    -- B-1H    Fracture_01   WBHP From Summary Case   221.68147     0.04077             45.10402            
+    -- B-1H    Fracture_02   WBHP From Summary Case   221.68147     0.35493             36.02608            
+    -- B-4DH   Fracture_07   WBHP From Summary Case   200.00000     28.21733            97.34970     
 
 ### Export of Fishbone Completion Data
 
