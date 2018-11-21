@@ -60,7 +60,7 @@ For an example of *COMPDAT* files exported with calculated transmissibilities an
 
 #### Pressure Differential Depletion Scaling
 
-For cases with high differential depletion, it is possible to scale the transmissibilities from the grid cells into the well via the fracture by the well drawdown. This enables the simulation to take into account that the flow will take different paths into the well as the pressure differential between the surrounding grid cells increases. If enabled, a time step for the grid pressures have to be selected. The list of time steps will also show the time step in which the wells first show a **Well Bore Hole Pressure** (**WBHP**) larger than zero in the Summary Case information.
+For cases with high differential depletion, it is possible to scale the transmissibilities from the grid cells into the well (via the fracture) by the well drawdown. This enables the simulation to take into account that the flow will take different paths into the well as the pressure differential between the surrounding grid cells increases. If enabled, a time step for the grid pressures have to be selected. The list of time steps will also show the time step in which the wells first show a **Well Bore Hole Pressure** (**WBHP**) larger than zero in the Summary Case information.
 
 ![]({{ site.baseurl }}/images/Completions_Export_PDD_TimeStep.png)
 
