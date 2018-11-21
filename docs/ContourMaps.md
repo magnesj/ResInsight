@@ -32,22 +32,23 @@ A contour Map has many of the same options available as a 3D View, but is always
 
 ![]({{ site.baseurl }}/images/ContourMapProjectionProperties.png)
 
-The Map Projection settings control how the 3D Data is aggregated onto the 2D plane. In all cases the results are calculated for a square 2D Cell. 
+The Map Projection settings control how the 3D Data is aggregated onto the 2D plane. In all cases the results are calculated for a square 2D Cell lying in an arbitrary z-plane of the 3D Grid. For each 2D cell a cuboid extrusion in the full bounding extent of the 3D grid is created and this cuboid extrusion is used to calculate the volume of intersection with the 3D Grid cells for all volume weighted sums and averages. For the regular sums, a vertical ray through the center of the 2D cell is used instead. Since the ray may travel through multiple cells in the same K-layer, all the values from within one K-layer are averaged before being added to the sum.
 
-The first option **Sample Spacing Factor** controls how many 2D Grid Cells are used in the map. The factor is multiplied by the characteristic cell length/width of the 3D grid to get the 2D Cell Size. A smaller factor will thus create a finer Contour Map. The second option **Show Contour Lines** toggles on/off the contour lines in the view.
-
-The final control in the **Projection Settings** box is the **Result Aggregation**. Here the following options are available:
+A set of parameters governs this projection:
+- The first option **Sample Spacing Factor** controls how many 2D Grid Cells are used in the map. The factor is multiplied by the characteristic cell length/width of the 3D grid to get the 2D Cell Size. A smaller factor will thus create a finer Contour Map. 
+- The second option **Show Contour Lines** toggles on/off the contour lines in the view.
+- The final control in the **Projection Settings** box is the **Result Aggregation**. Here the following options are available:
 
 Aggregation Type     | Description                     
 ---------------------|-------------------------------------------------------------------------------------------------------
-Oil Column           | A special sum of SOIL * NTG * PORO * dZ
-Gas Column           | A special sum of SGAS * NTG * PORO * dZ
+Oil Column           | A sum of SOIL * NTG * PORO * dZ
+Gas Column           | A sum of SGAS * NTG * PORO * dZ
 Hydrocarbon Column   | A sum of (SOIL + SGAS)* NTG * PORO * dZ
 Arithmetic Mean      | A volume weighted arithmetic mean of the specified cell result
 Harmonic Mean        | A volume weighted harmonic mean of the specified cell result
 Geometric Mean       | A volume weighted geometric mean of the specified cell result
 Volume Weighted Sum  | A volume weighted sum of the specified cell result. Suitable for volume fractions such as SOIL or PORO
-Sum                  | A sum of the specified cell result, where multiple intersections in the same K-layer are averaged
+Sum                  | A sum of the specified cell result. Suitable for absolute quantities.
 Top Value            | The first value encountered downwards vertically
 Min Value            | The minimum cell result value in the volume underneath the 2D Element
 Max Value            | The maximum cell result value in the volume underneath the 2D Element
