@@ -18,13 +18,9 @@ Contour Maps can be created in many different ways:
 - New Contour Map from 3D View in the Eclipse View context menu. This will create a contour map based on the existing 3D View with matching filters and result.
 - Duplicate Contour Map from the context menu of an existing Contour Map. This will copy the existing map.
 
-![]({{ site.baseurl }}/images/NewContourMapFromCase.png)
+![]({{ site.baseurl }}/images/NewContourMapFromCase.png) ![]({{ site.baseurl }}/images/NewContourMapFromFolder.png)
 
-![]({{ site.baseurl }}/images/NewContourMapFromFolder.png)
-
-![]({{ site.baseurl }}/images/NewContourMapFromView.png)
-
-![]({{ site.baseurl }}/images/NewContourMapFromExisting.png)
+![]({{ site.baseurl }}/images/NewContourMapFromView.png) ![]({{ site.baseurl }}/images/NewContourMapFromExisting.png)
 
 ## Properties of the Contour Maps
 
