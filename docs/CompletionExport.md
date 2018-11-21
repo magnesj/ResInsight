@@ -28,6 +28,7 @@ The completions defined in ResInsight can be exported to Eclipse for use in new 
   - **Perforations** -- Option to include or exclude perforation intervals in the export. 
     - **Time step** -- Which timestep to export. This option is included since perforation intervals have a start time, and thus not all perforations need be present at all time steps. 
   - **Fractures** -- Option to include or exclude fracture completions from the export.
+    - ** Pressure Differential Depletion Scaling -- Options to scale transmissibilities based on the well drawdown. This allows the Eclipse simulation to more accurately model cases with high differential depletion.
   - **Fishbones** -- Option to include or exclude fishbone completions from the export. The direction reported in the COMPDAT/COMPDATL keywords is computed based on the orientation of the main bore cell the fishbone is connected to.
     - **Exclude Main Bore Transmissibility** -- If this options is checked on, only the transmissibilities for the fishbone laterals will be included in the export, and transmissibility along the main bore will not contribute. 
 
@@ -55,11 +56,27 @@ If the *Export Calculated Transmissibilities* is chosen in the export setting (s
 
 For an example of *COMPDAT* files exported with calculated transmissibilities and with defaults and WPIMULT values, see export of fishbones completion data below.  
 
-### Fracture Report Header
+### Fracture Export
+
+#### Pressure Differential Depletion Scaling
+
+For cases with high differential depletion, it is possible to scale the transmissibilities from the grid cells into the well via the fracture by the well drawdown. This enables the simulation to take into account that the flow will take different paths into the well as the pressure differential between the surrounding grid cells increases. If enabled, a time step for the grid pressures have to be selected. The list of time steps will also show the time step in which the wells first show a **Well Bore Hole Pressure** (**WBHP**) larger than zero in the Summary Case information.
+
+![]({{ site.baseurl }}/images/Completions_Export_PDD_TimeStep.png)
+
+Having chosen a time step for differential depletion scaling a source for the well pressures can be chosen. If **WBHP From Summary Case** is picked, the **WBHP** value in the summary case for the chosen time step is used. However, if the chosen time step precedes the production start of a well, the value set in **WBHP Before Production Start** is used.
+
+![]({{ site.baseurl }}/images/Completions_Export_PDD_WBHP.png)
+
+If, however, a **Fixed User Defined WBHP** is chosen, the provided **WBHP** value is used for all wells.
+
+![]({{ site.baseurl }}/images/Completions_Export_PDD_User_WBHP.png)
+
+#### Fracture Report Header
 
 At the top of the exported transmissibilities for fractures, a fracture report summary is displayed. This section displays the different properties for the fractures used to compute the transmissibility values.
 
-#### Description of Derived Data
+##### Description of Derived Data
 
 One of the tables displays derived data, see the example here:
 
@@ -78,6 +95,20 @@ One of the tables displays derived data, see the example here:
 - **Xf** -- Half-length, defined as fracture area divided by half-height (Area/(H/2))
 - **H** -- Longest continuous distance with fracture cells open for flow along a fracture grid column
 - **Km** -- Area weighted average of matrix transmissibility (using Area defined above)
+
+#### Differential Depletion Fracture Output
+
+In addition to scaling the transmissibilities in the fracture output, using pressure differential depletion scaling will also provide a table with information regarding the scaling performed for each well. This table will show the well name, fracture name and the source of the Well Bore Hole Pressure (**WBHP From Summary Case** or **Fixed User Defined WBHP**). For **WBHP From Summary Case** the **User WBHP** column will describe the well pressure used for all time steps before the production starts according to the summary case information and the **Actual WBHP** will describe the well pressure used in the scaling, which will be different from the **User WBHP** if the scaling is performed for a time step following the well productions start. Finally the columns **Min Pressure Drop** and **Max Pressure Drop** describes the minimum and maximum well drawdown for this particular fracture.
+
+    --   
+    -- Well    Fracture      WBHP Source              User WBHP   Actual WBHP   Min Pressure Drop   Max Pressure Drop   
+    ----------------------------------------------------------------------------------------------------------------------
+    -- B-1H    Fracture_01   WBHP From Summary Case   200.00000   214.56441     5.56232             84.30064            
+    -- B-1H    Fracture_02   WBHP From Summary Case   200.00000   214.56441     1.25940             19.79192            
+    -- B-1H    Fracture_04   WBHP From Summary Case   200.00000   214.56441     0.12173             20.12996            
+    -- B-4DH   Fracture_07   WBHP From Summary Case   200.00000   200.00000     20.37234            98.45490            
+    --
+
 
 ### Export of Fishbone Completion Data
 
