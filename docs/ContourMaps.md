@@ -25,6 +25,12 @@ Contour Maps can be created in many different ways:
 
 ## Properties of the Contour Maps
 
-A contour Map has many of the same options available as a 3D View, but is always orthographic/parallel projection with no perspective projection or lighting available. Instead of the 3D Grid Box, the Contour Maps uses a 2D Grid simular to the **2d Intersection Views** with optional Axis Lines controlled with the **Show Axis Lines** toggle.
+A contour Map has many of the same options available as a 3D View, but is always orthographic/parallel projection with no perspective projection or lighting available. Instead of the 3D Grid Box, the Contour Maps uses a 2D Grid simular to the **2d Intersection Views** with optional Axis Lines controlled with the **Show Axis Lines** toggle. The name of the map can be automatically generated from the Case Name, Property Type, Aggregation Type and Sample Spacing (See **Map Projection Properties** for the two latter).
 
 ![]({{ site.baseurl }}/images/ContourMapViewProperties.png)
+
+## Map Projection Properties
+
+The Map Projection settings control how the 3D Data is aggregated onto the 2D plane.
+
+![]({{ site.baseurl }}/images/ContourMapProjectionProperties.png)
