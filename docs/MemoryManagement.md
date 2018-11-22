@@ -8,7 +8,7 @@ published: true
 ResInsight can require a considerable amount of memory to hold all the grids and necessary result variables. If the requirements starts approaching the available physical memory on the workstation, ResInsight may become unstable and crash, as the operating system starts freeing memory to avoid system failure. To help alleviate this, ResInsight has some built-in memory management tools.
 
 ## Memory Indicator
-The tools are available from the memory indicator in the bottom right corner.
+The tools are available from the memory indicator in the bottom right corner of the main 3D window.
 
 ![]({{ site.baseurl }}/images/MemoryIndicator.png)
 
