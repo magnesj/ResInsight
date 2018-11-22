@@ -20,6 +20,4 @@ It is possible to click on the memory used indicator to open up a dialog allowin
 
 By default, results will be shown for the active case. However, a specific case may be selected in the top drop down list. The pictures below show the dialog for both Eclipse and Abaqus results.
 
-![]({{ site.baseurl }}/images/MemoryTool.png)
-
-![]({{ site.baseurl }}/images/MemoryToolGeoMech.png)
+![]({{ site.baseurl }}/images/MemoryTool.png) ![]({{ site.baseurl }}/images/MemoryToolGeoMech.png)
