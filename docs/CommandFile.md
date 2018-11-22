@@ -182,9 +182,10 @@ Export snapshots of specified type.
 
 Folder to output snapshots should be set using `setExportFolder` with `SNAPSHOTS` type.
 
-| Parameter | Description                                                                       | Type | Required |
-|-----------|-----------------------------------------------------------------------------------|------|----------|
-| type      | Type of snapshots to export. Choices: `ALL`, `VIEWS`, `PLOTS`. Defaults to `ALL`  | Enum |          |
+| Parameter | Description                                                                       | Type   | Required |
+|-----------|-----------------------------------------------------------------------------------|--------|----------|
+| type      | Type of snapshots to export. Choices: `ALL`, `VIEWS`, `PLOTS`. Defaults to `ALL`  | Enum   |          |
+| prefix    | Exported file name prefix. Default no prefix                                      | String |          |
 
 #### Example
 
