@@ -15,6 +15,10 @@ To establish a link between views, select ![]({{ site.baseurl }}/images/chain.pn
 
 ![]({{ site.baseurl }}/images/LinkedViewsInProjectTree.png)
 
+It is also possible to link specific views by selecting them and choosing **Link Selected Views** from the context menu. The following image shows the linking of a regular view with a **Contour Map**. Note that contour maps can never be the Master View.
+
+![]({{ site.baseurl }}/images/LinkedContourMap.png)
+
 ## Linked View Options
 
 When selecting a linked view in the project tree, the different options are available in the **Property Editor**. 
