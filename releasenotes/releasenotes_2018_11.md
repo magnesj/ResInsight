@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: What's new in ResInsight 2018.11
-permalink: /docs/releasenotes_2018_11/
+permalink: /releasenotes/releasenotes_2018_11/
 published: true
 ---
 
