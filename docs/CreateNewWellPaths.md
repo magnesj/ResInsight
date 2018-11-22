@@ -22,8 +22,8 @@ Well targets property editor fields
 - **MDRKB at First Target** - Define MD (referenced to Rotary Kelly Bushing) at first target point. Applies to well path export only.
 - **Well Targets:** List of targets. Will have pink background when in picking state.
   - **Point** - Target position relative to reference point
-  - **DL in** - 
-  - **DL out** -
+  - **DL in** - Dog leg inwards. Unit: Degrees/30m
+  - **DL out** - Dog leg outwards. Unit: Degrees/30m
   - **Dir** - Check box for overriding well path auto calculated directions
   - **Azi (deg)** - Azimuth. Y axis is 0 degrees
   - **Inc (deg)** - Inclination. Z axis is 0 degrees
