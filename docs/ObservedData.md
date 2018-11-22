@@ -81,6 +81,9 @@ A valid Eclipse vector having a standard name ending with 'T' or 'TH' are consid
 
 **Error data**  
 Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
+Example:
+
+![]({{ site.baseurl }}/images/ErrorBars.png)
 
 ### CSV Line Based Format
 ResInsight supports a 'line based' CSV file format variant as well. As opposed to the normal CSV format, data values are organized in lines. Each line must contain at least a date (and time), a vector address and a sample value. Optionally it may also contain an error value and a comment. The information carried by this format is equivalent to the normal CSV format, it is only a different file layout.
