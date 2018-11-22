@@ -81,6 +81,7 @@ A valid Eclipse vector having a standard name ending with 'T' or 'TH' are consid
 
 **Error data**  
 Any address may have associated error data. Those type of data will have the same address as their associated data, but are prefixed by 'ER:', 'ERR:' or 'ERROR:'. Example: 'ERR:FOPT'. It is not possible to select error data explicitly in the plot editor selection fields, but when selecting a vector having associated error data, the error data is plotted as error bars in the summary plot.
+
 Example:
 
 ![]({{ site.baseurl }}/images/ErrorBars.png)
