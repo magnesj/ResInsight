@@ -9,9 +9,14 @@ published: true
 
 ## Temporary LGRs and LGR export
 
+![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType.png) ![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType2.png)
 ## Well Path Creation
 
+![]({{ site.baseurl }}/images/WellPathCreation.png)
+
 ## Contour Maps
+
+## Summary Plotting
 
 ## Well Bore Stability Plots and Casing Design
 
