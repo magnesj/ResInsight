@@ -145,15 +145,3 @@ well path containment properties such as Casing (with Casing Shoe) and Liner can
 These can be visualised in the 3D View and Well Log Plots on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
 
 ![]({{ site.baseurl }}/images/CasignDesign3D.png) ![]({{ site.baseurl }}/images/CasignDesignPlot.png)
-
-## Create Well Paths
-ResInsight lets the user create new/custom well paths by clicking in the 3D view. A self created well path will behave the same way as an ordinary imported well path.
-
-To create a well:
-1. Right click **Wells** in the project tree
-2. Select **Create Well Path** in the context menu. A new well node and a well targets node are created.
-3. Click in the 3D view on locations where the well path will pass (targets). Note. A 3D object must be hit when clicking. Clicking in thin air will not work.
-4. When finished placing targets, click on "Stop Picking Targets" in the property editor
-
-![Well Targets Properry Editor]({{ site.baseurl }}/images/WellTargets.png)
-
