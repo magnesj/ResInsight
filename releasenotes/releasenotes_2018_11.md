@@ -7,6 +7,8 @@ published: true
 
 ## Temporary LGRs and LGR export
 
+![]({{ site.baseurl }}/images/TemporaryLGR.png)
+
 ## Well Path Creation
 
 ## Contour Maps
