@@ -7,7 +7,8 @@ published: true
 
 ![]({{ site.baseurl }}/images/TemporaryLGR.png)
 
-## Temporary LGRs and LGR export
+## Local Grid Refinement (LGR)
+ResInsight 2018.11 now supports the creation of Local Grid Refinement (LGR) data for Eclipse simulations. The refined grids can also be visualised in 3D.
 
 ![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType.png) ![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType2.png)
 ## Well Path Creation
