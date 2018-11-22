@@ -1,6 +1,6 @@
 <div class="unit one-fifth hide-on-mobiles">
   <aside>
-    {% for section in site.data.docs %}
+    {% for section in site.data.releasenotes %}
     <h4>{{ section.title }}</h4>
     {% include releasenotes_ul.html items=section.releasenotes %}
     {% endfor %}
