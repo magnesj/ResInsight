@@ -142,10 +142,6 @@ well path containment properties such as Casing (with Casing Shoe) and Liner can
 
 ![]({{ site.baseurl }}/images/CasignDesign.png)
 
-These can be visualised in the 3D View
+These can be visualised in the 3D View and Well Log Plots on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
 
-![]({{ site.baseurl }}/images/CasignDesign3D.png)
-
- and Well Log Plots on a [Well Log Track]({{site.baseurl}}/docs/welllogsandplots#tracks).
-
-![]({{ site.baseurl }}/images/CasignDesignPlot.png)
+![]({{ site.baseurl }}/images/CasignDesign3D.png) ![]({{ site.baseurl }}/images/CasignDesignPlot.png)
