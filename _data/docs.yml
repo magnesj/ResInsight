@@ -26,6 +26,7 @@
   - intersections
   - filters
   - wellpaths
+  - createwellpaths
   - 3dwelllogcurves
   - completions
   - completionslgr
