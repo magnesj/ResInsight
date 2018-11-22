@@ -185,7 +185,7 @@ Folder to output snapshots should be set using `setExportFolder` with `SNAPSHOTS
 | Parameter | Description                                                                       | Type   | Required |
 |-----------|-----------------------------------------------------------------------------------|--------|----------|
 | type      | Type of snapshots to export. Choices: `ALL`, `VIEWS`, `PLOTS`. Defaults to `ALL`  | Enum   |          |
-| prefix    | Exported file name prefix. Default no prefix                                      | String |          |
+| prefix    | Exported file name prefix. Defaults to no prefix                                  | String |          |
 
 #### Example
 
