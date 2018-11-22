@@ -55,5 +55,8 @@ Max Value            | The maximum cell result value in the volume underneath th
 
 For the Column options, no **Cell Result** is available in the property tree under the Contour Map.
 
+### Weighting Means by Cell Result
 
 ![]({{ site.baseurl }}/images/ContourMapProjectionWeights.png)
+
+For the **Arithmetic Mean**, **Geometric Mean** and **Harmonic Mean** it is also possible to specify a cell result as a weighting parameter in addition to the regular weighting by volume of intersection. The total weight will then be the volume of intersection multiplied by the specified cell result. The full range of regular cell results is available for this use.
