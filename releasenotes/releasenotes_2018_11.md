@@ -5,9 +5,9 @@ permalink: /releasenotes/releasenotes_2018_11/
 published: true
 ---
 
-## Temporary LGRs and LGR export
-
 ![]({{ site.baseurl }}/images/TemporaryLGR.png)
+
+## Temporary LGRs and LGR export
 
 ## Well Path Creation
 
