@@ -1,7 +1,9 @@
 - title: Introduction
   docs:
   - home
-  
+  releasenotes:
+  - releasenotes_2018_11
+   
 - title: Getting Started
   docs:
   - installation
