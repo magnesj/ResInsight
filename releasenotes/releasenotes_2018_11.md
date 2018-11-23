@@ -17,10 +17,18 @@ ResInsight 2018.11 now supports the creation of Local Grid Refinement (LGR) data
 
 ## Contour Maps
 
+![]({{ site.baseurl }}/images/ContourMaps1.png)
+
 ## Summary Plotting
 
 ## Well Bore Stability Plots and Casing Design
 
+![]({{ site.baseurl }}/images/WellBoreStabilityPlots.png)
+
 ## Pressure Differential Depletion Scaling of Transmissibility
 
+![]({{ site.baseurl }}/images/Completions_ExportCompletionData.png)
+
 ## Memory Management
+
+![]({{ site.baseurl }}/images/MemoryManagement.png)
