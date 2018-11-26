@@ -135,8 +135,6 @@ The well path property editor lets the user control the appearance of the well p
 ### Casing Design
 Some Casing Design elements can be assigned to the well path by selecting **Create Casign Design** from the context menu of the well path.
 
-![]({{ site.baseurl }}/images/CreateCasignDesign.png)
-
 This will create a new child object for the Well Path, named **Casing Design**. In the **Casign Design** Property editor 
 well path containment properties such as Casing (with Casing Shoe) and Liner can be added to the well path along with a start and end depth and a diameter. 
 
