@@ -12,7 +12,7 @@ ResInsight supports the following type of Eclipse input data:
 - Grid and Property data from  _`*.GRDECL`_ files.
 
 <div class="note">
-Release 2018.11 supports import of simulations from Intersect. The simulation must be exported into Eclipse file format.
+Release 2018.11 supports import of simulations from Intersect. To be able to import into ResInsight, the Intersect simulation must be exported into Eclipse file format.
 </div>
 
 ### Eclipse Results
