@@ -31,7 +31,6 @@ Once the command file is finished executing, ResInsight will exit.
 * [exportMsw](#exportmsw)
 * [exportWellPaths](#exportwellpaths)
 * [exportVisibleCells](#exportvisiblecells)
-* [exportLgrForCompletions](#exportlgrforcompletions)
 * [setExportFolder](#setexportfolder)
 
 #### Other Commands
@@ -304,25 +303,6 @@ Export visible cells
 #### Example
 
 `exporVisibleCells(caseId=0, viewName="View 1", exportKeyword=MULTNUM)`
-
-### exportLgrForCompletions
-
-Export LGRs (CARFIN) for completions on the selected well paths. The splitType parameter controls which main grid cells to split into LGRs. The LGR_PER_CELL option splits only those main grid cells that intersect with a completion. The LGR_PER_COMPLETION option splits all main grid cells that are located within an IJK bounding box covering all intersected cells for each completion. The LGR_PER_WELL works like the previous option, but the bounding box covers intersected cells for all completions on a well path.
-
-| Parameter               | Description                                                                  | Type           | Required |
-|-------------------------|------------------------------------------------------------------------------|----------------|----------|
-| caseId                  | ID of case to export LGRs for                                                | Integer        | &#10004; |
-| timeStep                | The time step to export LGRs for                                             | Integer        | &#10004; |
-| wellPathNames           | Names of well paths to export for. Defaults to all checked wells. If a list of well names are provided, those wells are included even if unchecked                                                               | List of String |          |
-| refinementI             | Size of the LGR along the I axis, in each main grid cell.                    | Integer        | &#10004; |
-| refinementJ             | Size of the LGR along the J axis, in each main grid cell.                    | Integer        | &#10004; |
-| refinementK             | Size of the LGR along the K axis, in each main grid cell.                    | Integer        | &#10004; |
-| splitType               | How to split the LGRs. Options: `LGR_PER_CELL`, `LGR_PER_COMPLETION`, `LGR_PER_WELL`. Default option is `LGR_PER_COMPLETION`                                                                                     | Enum           |          |
-
-#### Example
-
-`exportLgrForCompletions(caseId=0, timeStep=0, wellPathNames=["B-1H", "B-2H"], `
-`refinementI=2, refinementJ=3, refinementK=4, splitType=LGR_PER_WELL)`
 
 ### setExportFolder
 
