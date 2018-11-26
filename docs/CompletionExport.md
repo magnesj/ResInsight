@@ -117,7 +117,7 @@ The transmissibility calculation for the fishbones is done following the above d
 
 An example of the exported COMPDAT file is shown below. The calculated transmissibility contribution to the cell connection factor from each lateral or main bore part is included as a comment. 
 
-    WELSPEC
+    WELSPECS
     -- Well          Grp   I   J    RefDepth   WellType   
        Well Path B   GR    26  45   1230       Oil        \
     \
