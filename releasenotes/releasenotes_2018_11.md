@@ -38,3 +38,4 @@ See [Well Bore Stability Plots]({{ site.baseurl }}/docs/wellborestabilityplots)
 
 ![]({{ site.baseurl }}/images/MemoryManagement.png)
 
+See [Memory Management]({{ site.baseurl }}/docs/memorymanagement)
