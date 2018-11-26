@@ -57,7 +57,9 @@ For each well path there is a top level folder in the **Project Tree** containin
 ![]({{ site.baseurl }}/images/Perforations_PropEdit.png)
 
 For multi-segment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+
 ![]({{ site.baseurl }}/images/PerfIntervalMsw.PNG)
+
 - **Multi Segment Well Options** - Options used by the Well Segments Export
   - **Liner Inner Diameter** -- The liner inner diameter for the perforation intervals.
   - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
