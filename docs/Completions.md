@@ -234,9 +234,11 @@ To create a new fracture template, right-click the **Fracture Template** item in
     - **Along Well Path** -- Fracture is vertical and along the well path. This option enables options to control the perforation length and the efficiency of the well in the fracture. See below.
     - **Azimuth** -- The fracture is vertical and in line with the Azimuth Angle (measured from North) supplied.
 - **Fracture Truncation**
-  - **Fracture Containment** -- Enable this option to limit what K layers you want the fracture to influence. K-Layers outside the range will not be drained by the fracture.
-  - **Top Layer** -- Topmost K-layer that the fracture will drain.
-  - **Base Layer** -- Lowest K-layer that the fracture will drain.
+  - **Use Containment** -- Enable this option to activate layer containment.
+    - **Top Layer** -- Topmost K-layer that the fracture will drain.
+    - **Base Layer** -- Lowest K-layer that the fracture will drain.
+  - **Truncate At Faults** -- Enable this option to activate fault truncation.
+    - **Minimum Fault Throw** -- Fault throw threshold to activate fault truncation.
 - **Properties** -- The availability of these options depend on the **Fracture Orientation** and the **Conductivity in Fracture** setting.
   - **Conductivity in Fracture** 
     - **Finite Conductivity** -- Use a calculated conductivity for flow in the fracture. Either the StimPlan conductivity, or a constant conductivity in Ellipse fractures.
