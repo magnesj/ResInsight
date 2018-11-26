@@ -182,6 +182,10 @@ To accomplish this, do the following:
 - Create LGRs for completions on selected well paths. See [Completions LGR]({{ site.baseurl }}/docs/completionslgr)
 - Export completions the usual way. See [Completion Export]({{ site.baseurl }}/docs/completionexport)
 
+<div class="note info">
+In addition to the completion data, the geometrical definition of all temporary LGRs is also exported into "*.dat" files.
+</div>
+
 ## Multi Segment Well Model
 
 It is possible to export all the completions to a text file containing the Eclipse input data 
