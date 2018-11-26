@@ -25,5 +25,7 @@ The dialog contains several input fields
 After pressing the OK button, LGR(s) are created and will be visible in the grid view.
 Temporary LGRs are stored in memory, and are thus not saved to file. After restarting ResInsight those LGRs have to be recreated.
 
+Individual visibility of generated LGRs can be controlled from the [Grids]({{ site.baseurl }}/docs/reservoirviews/#grids-) section in a view.
+
 ### Delete temporary LGRs
 It is possible to explicitly delete all temporary LGRs. Right click on the **View -> Grids -> Temporary LGRs** project tree node and select **Delete Temporary LGRs**. This command deletes all temporary LGRs.
