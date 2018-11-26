@@ -57,6 +57,7 @@ For each well path there is a top level folder in the **Project Tree** containin
 ![]({{ site.baseurl }}/images/Perforations_PropEdit.png)
 
 For multi-segment wells there are additional parameters which should be set. These are used in the export of WELSEGS data. 
+![]({{ site.baseurl }}/images/PerfIntervalMsw.PNG)
 - **Multi Segment Well Options** - Options used by the Well Segments Export
   - **Liner Inner Diameter** -- The liner inner diameter for the perforation intervals.
   - **Roughness Factor** -- The roughness factor used in export of main bore segments. 
@@ -67,8 +68,10 @@ For multi-segment wells there are additional parameters which should be set. The
   - **Enforce Max Segment Length** -- Limit segment to max size. When this check box is checked, a max segment length input field is displayed.
   
 There are three options for Non-Darcy Flow. **None**, **User defined D-factor** and **Compute D-factor**. The second option displays an input field where the user defined D-factor can be entered. The last options brings up several input fields.
+
+![]({{ site.baseurl }}/images/PerfIntervalNonDarcy.PNG)
+
 - **Non-Darcy Flow** - Non-Darcy settings for D factor computation
-  - **Unit Constant**
   - **Grid Permeability Scaling Factor**
   - **Well Radius**
   - **Relative Gas Density**
