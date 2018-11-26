@@ -27,10 +27,3 @@ Temporary LGRs are stored in memory, and are thus not saved to file. After resta
 
 ### Delete temporary LGRs
 It is possible to explicitly delete all temporary LGRs. Right click on the **View -> Grids -> Temporary LGRs** project tree node and select **Delete Temporary LGRs**. This command deletes all temporary LGRs.
-
-## Export LGRs for Completions (CARFIN)
-ResInsight supports exporting LGRs for completions on selected well paths. If completions on a well paths already have LGRs, an error message is displayed when exporting LGRs and no export is produced for the affected well paths.
-
-To export LGR(s), first select one or more well paths in the project tree, right click and select 'Export LGR for Completions'. This command brings up the same dialog as the 'Create Temporary LGR' command, with an extra input field, **Export folder**.
-
-The exported files contain the Eclipse keyword CARFIN.
