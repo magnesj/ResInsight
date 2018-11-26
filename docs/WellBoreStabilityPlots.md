@@ -4,9 +4,9 @@ title: Well Bore Stability Plots
 permalink: /docs/wellborestabilityplots/
 published: true
 ---
-ResInsight can create **Well Bore Stability** plots for Geomechanical cases. These plots are specialized [Well Log Plots]({{site.baseurl}}/docs/welllogandplots) and contain a visualization of [Formations]({{site.baseurl}}/docs/formations), [Well Path Attributes]({{site.baseurl}}/docs/wellpaths#well-path-attributes) as well as a set of well path derived curves in two different tracks. 
-
 ![]({{ site.baseurl }}/images/WellBoreStability.png)
+
+ResInsight can create **Well Bore Stability** plots for Geomechanical cases. These plots are specialized [Well Log Plots]({{site.baseurl}}/docs/welllogandplots) and contain a visualization of [Formations]({{site.baseurl}}/docs/formations), [Well Path Attributes]({{site.baseurl}}/docs/wellpaths#well-path-attributes) as well as a set of well path derived curves in two different tracks. 
 
 The third track contains curves showing different stability gradients (all normalized by mud weight):
 - **FG**: Fracture Gradient for sands based on Kirsch.
