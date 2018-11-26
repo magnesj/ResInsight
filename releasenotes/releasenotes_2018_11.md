@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: What's new in 2018.11
+title: What's New in 2018.11
 permalink: /releasenotes/releasenotes_2018_11/
 published: true
 ---
