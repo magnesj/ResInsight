@@ -4,6 +4,7 @@ title: Create Well Paths
 permalink: /docs/createwellpaths/
 published: true
 ---
+![]({{ site.baseurl }}/images/WellPathCreation.png)
 
 ResInsight lets the user create new/custom well paths by clicking in the 3D view. A self created well path will behave the same way as an ordinary imported well path.
 
