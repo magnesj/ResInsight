@@ -85,6 +85,13 @@ PCOG | Capilar pressure oil gas        | PC (Right)
 
 Saturation of water and gas in the selected cell, at the current time step, are annotated in the plot by a blue and orange vertical line, respectively. The intersections between the lines and the relevant curves are marked with large circles.
 
+Option                | Description                     
+----------------------|---------------------------------
+Log Scale Kr Axis     | Enable logarithmic Kr-axis
+Show Unscaled         | Display curves unscaled
+Fixed [0, 1] X-axis   | Use a fixed range on X-axis
+Fixed [0, 1] Kr-axis  | Use a fixed range on Kr-axis
+
 ## Mohr's Circle Plot (Geo Mechanical Models Only)
 
 Show the Mohr's Circle Plot window by selecting **Windows -> Mohr's Circle Plot**.  When it is turned on, it will only be visible when the active view is a view of an Geo Mech case.
