@@ -4,7 +4,7 @@ title: Completions LGR
 permalink: /docs/completionslgr/
 published: true
 ---
-![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType.png)
+![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType.png) ![]({{ site.baseurl }}/images/TemporaryLGR_CompletionType2.png)
 
 ResInsight supports creating and exporting LGRs (Local Grid Refinement) in main grid cells intersected by completions.
 
