@@ -38,7 +38,7 @@ ResInsight can create **Well Bore Stability** plots for Geomechanical cases. The
 See [Well Bore Stability Plots]({{ site.baseurl }}/docs/wellborestabilityplots)
 
 ## Memory Management
-![]({{ site.baseurl }}/images/MemoryManagement.png)
+![]({{ site.baseurl }}/images/MemoryManagementBanner.png)
 
 ResInsight can require a considerable amount of memory to hold all the grids and necessary result variables. A Memory Management system is now in place to help the user if available memory is low.
 
