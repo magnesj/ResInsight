@@ -9,6 +9,8 @@ published: true
 ResInsight can import Well trajectories from simple Ascii files. 
 In addition, a Statoil specific solution to retrieve Well Trajectories from their internal web service is implemented.
 
+ResInsight also supports creation of your own user-defined well paths. See [Create Well Paths]({{ site.baseurl }}/docs/createwellpaths)
+
 ## Ascii Well Trajectories
 
 The command **File -> Import -> Well Data -> Import Well Paths From File** will read the well paths in the selected file, and create one entry for each trajectory under the  ![]({{ site.baseurl }}/images/WellCollection.png) **Wells** item in the **Project Tree**. 
