@@ -70,7 +70,7 @@ Pressure for the selected cell, at the current time step, is marked on the plot 
 
 Show the Relative Permeability Plot window by selecting **Windows -> Relative Permeability Plot**.  When it is turned on, it will only be visible when the active view is a view of an Eclipse case.
 
-![]({{ site.baseurl }}/images/relParm.png)
+![]({{ site.baseurl }}/images/RelativePermeability.png)
 
 The Relative Permeability Plot window shows up to six curves, based on SATNUM in the selected cell. The curves can be turned on/off in the top left corner of the window, and they are described in the following table:
 
