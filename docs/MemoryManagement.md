@@ -4,7 +4,7 @@ title: Memory Management
 permalink: /docs/memorymanagement/
 published: true
 ---
-![]({{ site.baseurl }}/images/MemoryManagement.png)
+![]({{ site.baseurl }}/images/MemoryManagementBanner.png)
 
 ResInsight can require a considerable amount of memory to hold all the grids and necessary result variables. If the requirements starts approaching the available physical memory on the workstation, ResInsight may become unstable and crash, as the operating system starts freeing memory to avoid system failure. To help alleviate this, ResInsight has some built-in memory management tools.
 
