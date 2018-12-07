@@ -49,7 +49,7 @@ To create a reach circle annotation, right click **Annotations** or **Reach Circ
 - **Line Appearance** - Set circle color and line thickness
 
 ## User Defined Polyline Annotations
-To create a used defined polyline annotation, right click **Annotations** or **User Defined Polyline Annotations** tree node in the global part of the project tree. The property editor for the newly created annotation is displayed and is in picking points mode. The user may now click on objects in the view to create polyline points. When finished, click **Stop Picking Points** in the property editor.
+To create a user defined polyline annotation, right click **Annotations** or **User Defined Polyline Annotations** tree node in the global part of the project tree. The property editor for the newly created annotation is displayed and is in picking points mode. The user may now click on objects in the view to create polyline points. When finished, click **Stop Picking Points** in the property editor.
 
 ![]({{ site.baseurl }}/images/UserDefinedPolylineAnnotationPropertyEditor.png)
 
@@ -57,7 +57,9 @@ To create a used defined polyline annotation, right click **Annotations** or **U
 - **Line Appearance** - Set line color and thickness
 
 ## Polyline Imported From File
+To import a polyline annotation from file, right click **Annotations** or **Polylines From File** tree node in the global part of the project tree. 
 
+...
 
 
 
