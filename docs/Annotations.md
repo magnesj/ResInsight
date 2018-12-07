@@ -22,3 +22,7 @@ All global annotations also have a representation in the local **Annotation** tr
 ![]({{ site.baseurl }}/images/LocalAnnotationsTree.png)
 ![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)
 
+Local and global annotations in the project tree
+
+
+
