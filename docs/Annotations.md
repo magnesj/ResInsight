@@ -38,5 +38,16 @@ There are two ways of creating a new text annotation.
 
 When a text annotation tree node is selected, target markers in each end of the anchor line are displayed. The targets can be clicked and dragged. Clicking the blue part lets the user drag the target vertically (along Z axis). Clicking the purple part lets the user drag the target in the XY plane.
 
+## Reach Circle Annotations
+To create a reach circle annotation, right click **Annotations** or **Reach Circle Annotations** tree node in the global part of the project tree. Then enter values in the property editor.
+
+![]({{ site.baseurl }}/images/CircleAnnotationPropertyEditor.png)
+
+- **Name** - Name of the circle annotation
+- **Center Point** - Center point of the circle. Format 'x-pos y-pos depth'
+- **Radius** - Circle radius
+- **Line Appearance** - Set circle color and line thickness
+
+
 
 
