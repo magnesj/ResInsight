@@ -20,9 +20,11 @@ Global annotations may be displayed in all views and are located in the **Annota
 All global annotations also have a representation in the local **Annotation** tree node in order to toggle visibilty per view. Those annotations are located in tree nodes starting with **Global**.
 
 ![]({{ site.baseurl }}/images/LocalAnnotationsTree.png)
+
 Local annotations sub tree
 
 ![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)
+
 Global annotations sub tree
 
 ## Text Annotations
@@ -37,10 +39,10 @@ There are two ways of creating a new text annotation.
 - **Text** - The text to display. Multiline supprted. The first line will be the name of the annotation in the project tree
 - **Text appearance** - Set font size, font color, background color and anchor line color
 
-When a text annotation tree node is selected, target markers in each end of the anchor line are displayed. The targets can be clicked and dragged. Clicking the blue part lets the user drag the target vertically (along Z axis). Clicking the purple part lets the user drag the target in the XY plane.
+When a text annotation tree node is selected, target markers in each end of the anchor line are displayed. The targets can be clicked and dragged. Clicking the blue part lets the user drag the target vertically (along Z axis). Clicking the magenta part lets the user drag the target in the XY plane.
 
 ## Reach Circle Annotations
-To create a reach circle annotation, right click **Annotations** or **Reach Circle Annotations** tree node in the global part of the project tree. Then enter values in the property editor.
+To create a reach circle annotation, right click **Annotations** or **Reach Circle Annotations** tree node in the global annotations sub tree. Then enter values in the property editor.
 
 ![]({{ site.baseurl }}/images/CircleAnnotationPropertyEditor.png)
 
@@ -50,12 +52,14 @@ To create a reach circle annotation, right click **Annotations** or **Reach Circ
 - **Line Appearance** - Set circle color and line thickness
 
 ## User Defined Polyline Annotations
-To create a user defined polyline annotation, right click **Annotations** or **User Defined Polyline Annotations** tree node in the global part of the project tree. The property editor for the newly created annotation is displayed and is in picking points mode. The user may now click on objects in the view to create polyline points. When finished, click **Stop Picking Points** in the property editor.
+To create a user defined polyline annotation, right click **Annotations** or **User Defined Polyline Annotations** tree node in the global annotations sub tree. The property editor for the newly created annotation is displayed and is in picking points mode. The user may now click on objects in the view to create polyline points. When finished, click **Stop Picking Points** in the property editor.
 
 ![]({{ site.baseurl }}/images/UserDefinedPolylineAnnotationPropertyEditor.png)
 
 - **Targets** - Polyline points. Can be edited in the table or interactively in the view
 - **Line Appearance** - Set line color and thickness
+
+When a user defined polyline annotation tree node is selected, the polyline target markers become visible. Those can be dragged around as decribed above.
 
 ## Polyline Imported From File
 To import a polyline annotation from file, right click **Annotations** or **Polylines From File** tree node in the global part of the project tree. 
