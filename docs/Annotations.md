@@ -15,19 +15,20 @@ ResInsight supports displaying a few types of annotations in 3D views and Contou
 ![]({{ site.baseurl }}/images/Annotations.png)
 
 ## Global scope vs local scope annotations
-Global annotations may be displayed in all views and are located in the **Annotations** project tree node right below **Grid Models**. Local annotations are associated with a specific view and are located in the **Annotations** project tree node below the view node. All annotation types except text annotations are global only. Text annotation may be either global or local.
+Global annotations may be displayed in all views and are located in the **Annotations** project tree node right below **Grid Models** (Global annotations sub tree). Local annotations are associated with a specific view and are located in the **Annotations** project tree node below the view node (Local annotations sub tree). All annotation types except text annotations are global only. Text annotation may be either global or local.
 
-All global annotations also have a representation in the local **Annotation** tree node in order to toggle visibilty per view. Those anotations are located in tree nodes starting with **Global**.
+All global annotations also have a representation in the local **Annotation** tree node in order to toggle visibilty per view. Those annotations are located in tree nodes starting with **Global**.
 
 ![]({{ site.baseurl }}/images/LocalAnnotationsTree.png)
-![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)
+Local annotations sub tree
 
-Local and global annotations in the project tree
+![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)
+Global annotations sub tree
 
 ## Text Annotations
 There are two ways of creating a new text annotation.
-- Right click **Annotations** or **Text Annotations** tree node. The scope of the annotation depends on which node was clicked, one of the global nodes or one og the local nodes. In this case alle text annotation fields must be entered in the property editor.
-- Right click on an object in the view and select **Create Text Annotation**. ResInsight will then create a text annotation at the clicked point. The text must be entered in the property editor. When creating a text annotation this way, it will become a local annotation by default.
+- Right click **Annotations** or **Text Annotations** tree node in either the global annotatyion sub tree or the local annotations sub tree. The scope of the annotation depends on which node was clicked. When text annotations are created this way, all text annotation fields must be entered manunally in the property editor.
+- Right click on an object in the view and select **Create Text Annotation**. ResInsight will then create a text annotation at the clicked point. In this case, only th text must be entered manually in the property editor. When creating a text annotation this way, it will become a local annotation by default.
 
 ![]({{ site.baseurl }}/images/TextAnnotationPropertyEditor.png)
 
