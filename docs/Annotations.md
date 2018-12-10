@@ -19,12 +19,10 @@ Global annotations may be displayed in all views and are located in the **Annota
 
 All global annotations also have a representation in the local **Annotation** tree node in order to toggle visibilty per view. Those annotations are located in tree nodes starting with **Global**.
 
-![]({{ site.baseurl }}/images/LocalAnnotationsTree.png)
-
+![]({{ site.baseurl }}/images/LocalAnnotationsTree.png)<br/>
 Local annotations sub tree
 
-![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)
-
+![]({{ site.baseurl }}/images/GlobalAnnotationsTree.png)<br/>
 Global annotations sub tree
 
 ## Text Annotations
