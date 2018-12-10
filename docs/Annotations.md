@@ -57,6 +57,7 @@ To create a user defined polyline annotation, right click **Annotations** or **U
 ![]({{ site.baseurl }}/images/UserDefinedPolylineAnnotationPropertyEditor.png)
 
 - **Targets** - Polyline points. Can be edited in the table or interactively in the view
+- **Start Picking Points / Stop Picking Points** - Button to start / stop picking mode
 - **Line Appearance** - Set line color and thickness
 
 When a user defined polyline annotation tree node is selected, the polyline target markers become visible. Those can be dragged around as decribed above.
