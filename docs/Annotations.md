@@ -62,9 +62,12 @@ To create a user defined polyline annotation, right click **Annotations** or **U
 When a user defined polyline annotation tree node is selected, the polyline target markers become visible. Those can be dragged around as decribed above.
 
 ## Polyline Imported From File
-To import a polyline annotation from file, right click **Annotations** or **Polylines From File** tree node in the global annotations sub tree. Then select the file to import and click OK.
+To import a polyline annotation from file, right click **Annotations** or **Polylines From File** tree node in the global annotations sub tree. Then select the file to import and click OK. Imported polyline annotations are not editable.
 
 ![]({{ site.baseurl }}/images/PolylineFromFileAnnotationPropertyEditor.png)
+
+- **File** - Name of the imported file
+- **Line Appearance** - Set line color and line thickness
 
 ## Annotations visibility
 Local annotations visibility is controlled by the check boxes in the local annotations sub tree only. Global annotations visibility, on the other hand, is controlled by the check boxes in both the global and local annotations sub trees. So in order to display a global annotation in a specific view, both the annotation tree note itself and its representation in the local sub tree must have visibilty enabled.
