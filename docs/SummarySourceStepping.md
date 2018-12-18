@@ -1,7 +1,7 @@
 ---
 layout: docs
 title: Summary Plot Source Stepping
-permalink: /docs/summaryplotssourcestepping/
+permalink: /docs/summaryplotsourcestepping/
 published: true
 ---
 ![]({{ site.baseurl }}/images/SummarySourceSteppingBanner.png)
