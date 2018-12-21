@@ -12,3 +12,9 @@ ResInsight supports measurements in the 3D views. To enter measurement mode, pre
 When ResInsight is in measurement mode, clicking on an object in the 3D view will set a measurement point. Each click will set a new measurement point, making a poly line, and when there are at least two points, a label appears. The label contains total length of the measurement polyline and length of the last segment.
 
 By double clicking in the 3D view, all current measurement points are removed, making it possible to start a new measurement. To leave measurement mode, press the toolbar button again.
+
+The measurement label contains several lengths.
+- **Total length** - The total length of the measurement polyline
+- **Last length** - The length of the last polyline segment
+- **Total horizontal length** - The total length of the measurement polyline projected onto the XY plane
+- **Last horizontal length** - The length of the last polyline segment projected onto the XY plane
