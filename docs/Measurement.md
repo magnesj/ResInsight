@@ -7,7 +7,7 @@ published: true
 
 ![]({{ site.baseurl }}/images/Measurement.png)
 
-ResInsight supports measurements in the 3D views. To enter measurement mode, press the ruler toolbar button []({{site.baseurl}}/images/MeasurementButton.png).
+ResInsight supports measurements in the 3D views. To enter measurement mode, press the ruler toolbar button ![]({{site.baseurl}}/images/MeasurementButton.png).
 
 When ResInsight is in measurement mode, clicking on an object in the 3D view will set a measurement point. Each click will set a new measurement point, making a poly line, and when there are at least two points, a label appears. The label contains total length of the measurement polyline and length of the last segment.
 
