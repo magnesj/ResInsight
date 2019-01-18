@@ -17,11 +17,11 @@ The measurement label contains the following:
 
 If **CTRL** button is pressed during clicking, multiple points can be added to create a polyline. The measurement label will now contain additional measurements.
 
-To leave measurement mode, press the toolbar button or press the **Esc** button.
-
 The measurement label contains several lengths.
 - **Segment Length** - The length of the last segment
 - **Segment Horizontal Length** - The length of the last segment projected onto the XY plane
 - **Total Length** - The total length of the measurement polyline
 - **Total Horizontal Length** - The total length of the measurement polyline projected onto the XY plane
 - **Horizontal area** - The area of the polyline projected onto the XY plane
+
+To leave measurement mode, press the toolbar button or press the **Esc** button.
