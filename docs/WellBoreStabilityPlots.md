@@ -29,6 +29,7 @@ In order to calculate **FG**  and **SFG** these curves the following input param
 These parameters may be read in in the following ways. The numbering for import is order of preference if multiple sources are found.
 
 | Parameter     | Default | Import mechanisms |
+|---------------|---------|-------------------|
 | Pore Pressure | Hydrostatic Pore Pressure (TVD x 9.81 / 100 bar) | 1. Grid (Grid units), 2. LAS-file as mud-weight (kg / m^3), 3. Element Property Table (Pascal)|
 | Poissons' Ratio | 0.25 | 1. LAS-file, 2. Element Property Table |
 | UCS             | 100 bar | 1. Las-file (bar), 2. Element Property Table (Pascal) |
