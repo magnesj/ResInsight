@@ -119,6 +119,8 @@ For ICVs only one valve is added at a time so only the measured depth of that va
 
 ![]({{ site.baseurl }}/images/ValveProperties_ICV.png)
 
+When you have a valid valve template selected, there is an **Edit** button next to the valve template selection. Clicking this will take you straight to modify the valve template.
+
 ### Import Perforation Intervals
 
 Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
