@@ -108,8 +108,14 @@ New templates can also be added by selecting the **New Valve Template** option f
 
 ![]({{ site.baseurl }}/images/NewValveTemplate.png)  
 
-For ICDs and AICDs, multiple valves can be added in the same go.
-![]({{ site.baseurl }}/images/ValveProperties_ICD.png
+For ICDs and AICDs, multiple valves can be added in the same go by specifying the number of valves, spacing of valves or specific positions of valves as chosen in the **Location Defined By** drop down list.
+
+![]({{ site.baseurl }}/images/ValveProperties_ICD.png)
+
+For ICVs only one valve is added at a time so only the measured depth of that valve can be chosen.
+
+![]({{ site.baseurl }}/images/ValveProperties_ICV.png)
+
 ### Import Perforation Intervals
 
 Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
