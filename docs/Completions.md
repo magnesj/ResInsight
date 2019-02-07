@@ -215,13 +215,15 @@ The **Fractures** item in the **Project Tree** controls whether to show the mode
   
 ### Fracture Templates
 
-To create a fracture you first need a **Fracture Template**. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
+To create a functioning fracture you first need a **Fracture Template**. The template collects settings that are likely to be shared among several fractures, most importantly the fracture geometry. A fracture at a particular place refers to the template, and it is thereby possible to share fracture geometry and other settings between fracture instances. 
 
-Fracture Templates are listed in a folder with the same name in the **Project Tree**
+Fracture Templates are listed in a folder with the same name in the **Project Tree**.
 
 ![]({{ site.baseurl }}/images/FractureTemplates.png)
 
-To create a new fracture template, right-click the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New StimPlan Fracture Template**. 
+To create a new fracture template, right-click the **Fracture Template** item in the tree, and select either **New Ellipse Fracture Template** or **New StimPlan Fracture Template**. If you have no existing fracture templates, you will be given the opportunity to create such templates through two buttons in the Fracture Property Editor as seen below.
+
+![]({{ site.baseurl }}/images/CreateFractureTemplate.png)
 
 #### Common Fracture Template Options
 
