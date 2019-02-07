@@ -97,9 +97,9 @@ Each Valve require a **Valve Template** containing properties which can be share
 ![]({{ site.baseurl }}/images/NewValveWithoutTemplate.png)  
 
 This will create a new **Valve Template** which can be of three different types:
-- ** ICD ** - In-flow Control Device, allowing the setting of **Orifice Diameter** and **Flow Coefficient**
-- ** AICD** - Autonomous In-flow Control Device, providing several more parameters associated with the Eclipse simulation and seen in the picture below.
-- ** ICV ** - Interval Control Valves. Contains the same parameters as ICDs. The difference between the two in ResInsight is that many ICDs can be added at the same time, while there is only expected to be one ICV per perforation interval.
+- ** ICD ** - In-flow Control Device, allowing the setting of **Orifice Diameter** and **Flow Coefficient**. ICDs are displayed in Orange.
+- ** AICD** - Autonomous In-flow Control Device, providing several more parameters associated with the Eclipse simulation and seen in the picture below. AICDs are displayed in Dark Purple.
+- ** ICV ** - Interval Control Valves. Contains the same parameters as ICDs. The difference between the two in ResInsight is that many ICDs can be added at the same time, while there is only expected to be one ICV per perforation interval. ICVs are displayed in Pink.
   
 ![]({{ site.baseurl }}/images/ValveTemplate.png)  
 ![]({{ site.baseurl }}/images/ValveTemplate_AICD.png)  
