@@ -323,6 +323,7 @@ Instances of fractures can be created along well paths and simulation wells by r
   - **Dip** -- Dip of fracture plane
   - **Tilt** -- Rotation of fracture about its plane normal
 - **Properties**
+  - **Fracture Unit System** -- Read only display of the units used for the current template
   - **StimPlan Time Step** -- Displays the time step used by the template 
   - **Perforation Length** / **Perforation Efficiency** / **Well Diameter** -- These values are copied from the new template when selecting a different one. See [Common Fracture Template Options]({{ site.baseurl }}/docs/completions#common-fracture-template-options)  
 - **Fracture Center Info** -- This group displays info on where the center of the fracture is positioned. The center is defined to be where the well path intersects the fracture.
