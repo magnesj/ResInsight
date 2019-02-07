@@ -82,6 +82,34 @@ There are three options for Non-Darcy Flow. **None**, **User defined D-factor** 
   - **Permeability Scaling Factor**
   - **Porosity Scaling Factor**
   
+### Perforation Interval Valves
+
+Perforation Intervals can have valves (ICDs/AICDs/ICVs) associated with them.
+
+![]({{ site.baseurl }}/images/ValveVisualisation.png)  
+
+These valves can be created by right-clicking on the Perforation Interval and selecting **New Valve**.
+
+![]({{ site.baseurl }}/images/NewValve.png)  
+
+Each Valve require a **Valve Template** containing properties which can be shared among multiple Valves. If you have no Valve Template, a new one can be created by clicking the **New** button next to the Valve Template selection list.
+
+![]({{ site.baseurl }}/images/NewValveWithoutTemplate.png)  
+
+This will create a new **Valve Template** which can be of three different types:
+- ** ICD ** - In-flow Control Device, allowing the setting of **Orifice Diameter** and **Flow Coefficient**
+- ** AICD** - Autonomous In-flow Control Device, providing several more parameters associated with the Eclipse simulation and seen in the picture below.
+- ** ICV ** - Interval Control Valves. Contains the same parameters as ICDs. The difference between the two in ResInsight is that many ICDs can be added at the same time, while there is only expected to be one ICV per perforation interval.
+  
+![]({{ site.baseurl }}/images/ValveTemplate.png)  
+![]({{ site.baseurl }}/images/ValveTemplate_AICD.png)  
+
+New templates can also be added by selecting the **New Valve Template** option from the context menu of the **Valve Templates** entry in the **Completion Templates** Project Tree item.
+
+![]({{ site.baseurl }}/images/NewValveTemplate.png)  
+
+For ICDs and AICDs, multiple valves can be added in the same go.
+![]({{ site.baseurl }}/images/ValveProperties_ICD.png
 ### Import Perforation Intervals
 
 Perforation intervals can be imported into ResInsight from _`*.ev`_ files. These files consist of a list of wells, and their corresponding measured depth values for perforation start and end. 
