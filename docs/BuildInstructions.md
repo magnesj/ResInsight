@@ -100,12 +100,15 @@ You will find the ResInsight binary under the Install directory in your build di
 | `RESINSIGHT_ENABLE_PROTOTYPE_FEATURE_SOURING`     | ON     | Enable Souring features |
 | `RESINSIGHT_PRIVATE_INSTALL`                      | ON      | Linux only: Install the libecl shared libraries along the executable |
 | `RESINSIGHT_ENABLE_COTIRE`                        | OFF     | Experimental speedup of compilation using cotire |
+| `RESINSIGHT_HDF5_BUNDLE_LIBRARIES`                | OFF     | Bundle HDF5 libraries with ResInsight  |
 
 ### Optional Libraries and features
 
 #### HDF5
 
 HDF5 is used to read SourSimRL result files. On windows this is optional, while on linux the installed HDF5 library will be used if present.
+
+Use an advanced flag RESINSIGHT_HDF5_BUNDLE_LIBRARIES to enable bundling of HDF5 libraries.
 
 Tested with 1.8.18 on windows, and default installation on RedHat 6.
 
