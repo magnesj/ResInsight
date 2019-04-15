@@ -32,7 +32,7 @@ This group contains the different fonts which are used through ResInsight.
 - **Viewer Font Size** -- The fonts used for axes labels, legends and info boxes in the 3d View.
 - **Annotation Font Size** -- The font used as default for Text Annotations.
 - **Well Label Font Size** -- The font used for all Well Path labels.
-- **Plot Font Size** - The font used for legends, axes labels, values in Plots.
+- **Plot Font Size** - The font used for legends, axes labels, values in Plots. This affects the docked plots in the main 3D window as well (Result Plot, Relative Permeability etc), although because of the reduces space available in these plots, the font size applied will be one less than the **Plot Font Size**.
 
 ### 3d Views
 
