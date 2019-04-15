@@ -16,7 +16,7 @@ For continuous grouping parameters, the parameter will be divided into a set of 
 
 Each cross plot can contain any number of **Data Sets**, representing a collection of cross plot points, where the **Data Set** can have a case source, time step and cell filter associated with it. This way, dynamic parameters for different time steps can be compared, or results from different case realizations.
 
-The Grid Cross plots may have a Symbol Legend below the plot, separating the Data Sets, and a Color Legend within the plot separating between the different Grouping categories or intervals. In addition, an Info Box will be added to the upper right corner of the plot, showing the different data sets in the plot and the parameters used.
+The Grid Cross plots may have a Symbol Legend below the plot, separating the Data Sets, and a Color Legend within the plot separating between the different Grouping categories or intervals. In addition, an Info Box will be added to the upper right corner of the plot, showing the different data sets in the plot and the parameters used. The Color Legends and Info Box can be moved to other parts of the plot and will snap to edges and corners when moved close to them.
 
 ## Creating Grid Cross Plots
 ![]({{ site.baseurl }}/images/GridCrossPlot_CreateFromView.png)
@@ -29,10 +29,10 @@ Grid Cross Plots can be created in a couple of ways:
 Having created a Grid Cross Plot, the appearance of the Legends, the Info box and the Plot Title can be set in the Property Editor of the Grid Cross Plot.
 
 ![]({{ site.baseurl }}/images/GridCrossPlot_PropertyEditor.png)
+![]({{ site.baseurl }}/images/GridCrossPlotAxis_PropertyEditor.png)
 
 The plot also have some available settings for the two plot axes (X and Y), where the title position and font size can be altered plus the axis range may be controlled and the axis may be set as logarithmic and inverted so the smallest value is first (default for DEPTH on the Y-axis).
 
-![]({{ site.baseurl }}/images/GridCrossPlotAxis_PropertyEditor.png)
 
 ## Grid Cross Plot Data Sets
 Further Grid Cross Plot data sets can be added to a Plot by right clicking on the plot in the Project Tree and selecting **New Data Set**.
@@ -55,3 +55,13 @@ The available parameters are:
 | X-Axis Property | The property representing the X-axis in the cross plot |
 | Y-Axis Property | The property representing the Y-axis in the cross plot |
 | Name Configuration | Add Case Name, Axis Variables, Time Step and/or Data Group to the name of the Data set |
+
+## Show Plot Data
+The data used to create the Cross Plot can be exported by either right-clicking on the Cross Plot in the project tree or right clicking on the plot itself and selecting **Show Plot Data**.
+
+![]({{ site.baseurl }}/images/GridCrossPlotShowData_ProjectTree.png)
+![]({{ site.baseurl }}/images/GridCrossPlotShowData_PlotContext.png)
+
+Either method will bring up a dialog containing column-based text showing the X and Y result values, the Group index and Group Description (the latter two if Grouping is enabled). One tab in the dialog will be added for each Data Set.
+
+![]({{ site.baseurl }}/images/GridCrossPlotShowData.png)
