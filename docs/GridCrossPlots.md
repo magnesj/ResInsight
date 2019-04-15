@@ -64,7 +64,7 @@ The data used to create the Cross Plot can be exported by either right-clicking 
 
 Either method will bring up a dialog containing column-based text showing the X and Y result values, the Group index and Group Description (the latter two if Grouping is enabled). One tab in the dialog will be added for each Data Set.
 
-![]({{ site.baseurl }}/images/GridCrossPlotShowData.png)
+![]({{ site.baseurl }}/images/GridCrossPlot_ShowData.png)
 
 ## Swap Axes
 The X- and Y-axes can be swapped, both for invididual data sets, by choosing **Swap Axis Properties** from the right-click menu of the Grid Cross Plot **Data Set**, or for all data sets by right clicking on either the Cross Plot in the Project Tree or on the plot itself and selecting **Swap Axis Properties for all Data Sets in Plot**. The X- and Y-axis will swap place retaining the properties, such as Logarithmic or inverted axes.
