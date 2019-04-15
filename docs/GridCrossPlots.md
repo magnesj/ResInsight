@@ -59,8 +59,8 @@ The available parameters are:
 ## Show Plot Data
 The data used to create the Cross Plot can be exported by either right-clicking on the Cross Plot in the project tree or right clicking on the plot itself and selecting **Show Plot Data**.
 
-![]({{ site.baseurl }}/images/GridCrossPlotShowData_ProjectTree.png)
-![]({{ site.baseurl }}/images/GridCrossPlotShowData_PlotContext.png)
+![]({{ site.baseurl }}/images/GridCrossPlot_ShowData_ProjectTree.png)
+![]({{ site.baseurl }}/images/GridCrossPlot_ShowData_PlotContext.png)
 
 Either method will bring up a dialog containing column-based text showing the X and Y result values, the Group index and Group Description (the latter two if Grouping is enabled). One tab in the dialog will be added for each Data Set.
 
