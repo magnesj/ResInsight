@@ -35,7 +35,7 @@ A combined view of well connection factors and the derived result **Completion T
 
 ## Perforation Intervals
 
-A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **New Perforation interval**. 
+A new perforation interval on a well can be set up by right-clicking on the well in the **3D View** or in the **Project Tree**, and choosing the command **Create Perforation interval** in the **Create Completions** sub-menu. In the 3D View the completion will be created at the specific depth the right-click occured at.
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
@@ -88,7 +88,7 @@ Perforation Intervals can have valves (ICDs/AICDs/ICVs) associated with them.
 
 ![]({{ site.baseurl }}/images/ValveVisualisation.png)  
 
-These valves can be created by right-clicking on the Perforation Interval and selecting **New Valve**.
+These valves can be created by right-clicking on the Perforation Interval and selecting **Create Valve**.
 
 ![]({{ site.baseurl }}/images/NewValve.png)  
 
