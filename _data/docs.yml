@@ -67,6 +67,7 @@
   - exportfluxnummultnum
   - completionexport
   - exportwellpaths
+  - exportsectormodel
   
 - title: Scripting
   docs:
