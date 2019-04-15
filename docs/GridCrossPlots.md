@@ -62,7 +62,7 @@ The data used to create the Cross Plot can be exported by either right-clicking 
 ![]({{ site.baseurl }}/images/GridCrossPlot_ShowData_ProjectTree.png)
 ![]({{ site.baseurl }}/images/GridCrossPlot_ShowData_PlotContext.png)
 
-Either method will bring up a dialog containing column-based text showing the X and Y result values, the Group index and Group Description (the latter two if Grouping is enabled). One tab in the dialog will be added for each Data Set.
+Either method will bring up a dialog containing column-based text showing the X and Y result values, the Group index and Group Description (the latter two if Grouping is enabled). One tab in the dialog will be added for each Data Set. The data can be copied to the clipboard or exported to file by right-clicking on the text area.
 
 ![]({{ site.baseurl }}/images/GridCrossPlot_ShowData.png)
 
