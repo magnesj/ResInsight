@@ -51,6 +51,7 @@
   - rftplot
   - pltplot
   - flowdiagnosticsplots
+  - gridcrossplots
      
 - title: Import 
   docs:
