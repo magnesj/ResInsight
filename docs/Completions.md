@@ -161,10 +161,10 @@ Here is an example:
 
 ## Fishbones
 
-Fishbones are completions created by drilling or etching a set of small holes nearly perpendicular to the main bore.
-Each set of holes is created in the same operation and is callea a _sub_ while each individual hole is called a _lateral_.
+Fishbones are completions created by drilling or by jetting a set of small lateral holes with a high deviation from the main bore.
+Each set of holes created at the same location along the main bore, is referred to as a _sub_ while each individual hole is called a _lateral_.
 
-For each well path there is a top level folder in the **Project Tree** containing all the fish bone definitions containing settings that applies to all the fishbones for this well path. 
+For each well path there is a top level folder in the **Project Tree** containing all the Fishbones definitions containing settings that applies to all the fishbones for this well path. To make use of the Multi Segment Well option for pressure loss along laterals, the grid resolution needs to be fine enough to allow a grid cell to be connected to only one lateral. 
 
 ![]({{ site.baseurl }}/images/Fishbones_PropEdit.png)
 
