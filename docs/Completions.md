@@ -187,7 +187,7 @@ To add new fishbones completions, select the **New Fishbones Subs Definition** c
 
 ![]({{ site.baseurl }}/images/CreateCompletionOnWellPath.png)
 
-The new **Fishbones Subs Definition** (a group of fishbone subs) is created in the Project tree. Several subs definitions can be created on the same well trajectory to give more flexibility in placing of the fishbones. 
+The new **Fishbones Subs Definition** (a group of fishbone subs) is created in the Project tree. Several subs definitions can be created on the same well trajectory to give more flexibility in placing of the fishbones. The default sub definition is based on the Fishbones Drilling System with 3 laterals exiting per sub in a 8 1/2" main bore. 
 
 ![]({{ site.baseurl }}/images/Fishbones_SubDefPropEdit.png)
 - **Appearance**
