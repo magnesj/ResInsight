@@ -30,7 +30,7 @@ See [Export Sector Model]({{ site.baseurl }}/docs/exportsectormodel)
 ## Well model for ICD and AICD
 ![]({{ site.baseurl }}/images/ValveVisualisation.png)
 
-Sub-sections of the Eclipse Grid with Parameters and Faults can be exported to Eclipse ASCII files in order to create new Simulations on the sub-section.
+ResInsight supporst interactive modeling of ICD and AICD. It is possible to export completions to a text file containing the Eclipse input data keywords needed to represent the completions as a Multi Segment Well - **MSW**. 
 
 See [Completions]({{ site.baseurl }}/docs/completions)
 See [Completion Export]({{ site.baseurl }}/docs/completionexport)
