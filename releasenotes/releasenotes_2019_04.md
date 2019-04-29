@@ -5,7 +5,6 @@ permalink: /releasenotes/releasenotes_2019_04/
 published: true
 ---
 
-![]({{ site.baseurl }}/images/GridCrossPlot.png)
 ResInsight 2019.04 is the latest version of ResInsight, the professional quality, open source 3D visualization, curve plotting and post-processing tool for Eclipse reservoir models. Version 2019.04 contains a larger number of new and exciting features, some of which are listed below.
 
 ## Grid Cross Plots
@@ -16,14 +15,13 @@ ResInsight supports the creation of cross plots of two results against each othe
 See [Grid Cross Plots]({{ site.baseurl }}/docs/gridcrossplots)
 
 ## Saturation Pressure Plots
-![]({{ site.baseurl }}/images/ContourMaps1.png)
+![]({{ site.baseurl }}/images/SaturationPressurePlot.png)
 
-ResInsight can create contour maps based on different forms of aggregation of 3D Eclipse data onto a 2D map.
+ResInsight can create plots displaying bubble and dew point pressures, together with initial pressure in model, versus depth. Fluid contacts (GOC and/or OWC) are displayed as annotation lines in the generated plots.
 
-See [Contour Maps]({{ site.baseurl }}/docs/contourmaps)
+See [Saturation Pressure Plots]({{ site.baseurl }}/docs/saturationpressureplots)
 
 ## Sector Model Export
-![]({{ site.baseurl }}/images/GridCrossPlot.png)
 
 Sub-sections of the Eclipse Grid with Parameters and Faults can be exported to Eclipse ASCII files in order to create new Simulations on the sub-section.
 
