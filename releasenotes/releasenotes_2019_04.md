@@ -32,8 +32,7 @@ See [Export Sector Model]({{ site.baseurl }}/docs/exportsectormodel)
 
 ResInsight supporst interactive modeling of ICD and AICD. It is possible to export completions to a text file containing the Eclipse input data keywords needed to represent the completions as a Multi Segment Well - **MSW**. 
 
-See [Completions]({{ site.baseurl }}/docs/completions)
-See [Completion Export]({{ site.baseurl }}/docs/completionexport)
+See [Completions]({{ site.baseurl }}/docs/completions) and  [Completion Export]({{ site.baseurl }}/docs/completionexport)
 
 ## Grid Model Annotations
 ![]({{ site.baseurl }}/images/Annotations.png)
