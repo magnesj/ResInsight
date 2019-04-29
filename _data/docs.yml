@@ -2,8 +2,8 @@
   docs:
   - home
   releasenotes:
-  - releasenotes_2018_11
   - releasenotes_2019_04
+  - releasenotes_2018_11
    
 - title: Getting Started
   docs:
