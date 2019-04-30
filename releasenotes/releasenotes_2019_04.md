@@ -27,10 +27,10 @@ Sub-sections of the Eclipse Grid with Parameters and Faults can be exported to E
 
 See [Export Sector Model]({{ site.baseurl }}/docs/exportsectormodel)
 
-## Well model for ICD and AICD
+## Well model for ICD, AICD and ICV
 ![]({{ site.baseurl }}/images/ValveVisualisation.png)
 
-ResInsight supporst interactive modeling of ICD and AICD. It is possible to export completions to a text file containing the Eclipse input data keywords needed to represent the completions as a Multi Segment Well - **MSW**. 
+ResInsight supports interactive modeling of ICD, AICD and ICV. It is possible to export completions to a text file containing the Eclipse input data keywords needed to represent the completions as a Multi Segment Well - **MSW**. 
 
 See [Completions]({{ site.baseurl }}/docs/completions) and  [Completion Export]({{ site.baseurl }}/docs/completionexport)
 
