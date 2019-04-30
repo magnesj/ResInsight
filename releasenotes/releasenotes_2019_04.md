@@ -22,8 +22,9 @@ ResInsight can create plots displaying bubble and dew point pressures, together 
 See [Saturation Pressure Plots]({{ site.baseurl }}/docs/saturationpressureplots)
 
 ## Sector Model Export
+![]({{ site.baseurl }}/images/ExportSectorModel_Grid.png)
 
-Sub-sections of the Eclipse Grid with Parameters and Faults can be exported to Eclipse ASCII files in order to create new Simulations on the sub-section.
+Sub-sections of the Eclipse Grid with Parameters and Faults can be exported to Eclipse ASCII files in order to create new Simulations on the sub-section. These sub-sections can also be refined to a higher resolution.
 
 See [Export Sector Model]({{ site.baseurl }}/docs/exportsectormodel)
 
