@@ -28,6 +28,6 @@ The color mapping of the displayed cell result is controlled by the **Color Lege
   - **Current Timestep** -- use current (one) time step to find min and max values  
   - **User Defined Range** -- user specifies numeric values for min and max  
 
-Furthermore the legend can have a semi-transparent background applied to it by selecting the **Enable Legend Background** option in the Preferences dialog.
+Furthermore the legend can have a semi-transparent background applied to it by selecting the **Show Box around Legends* option in the Preferences dialog.
 
 ![Legend Background]({{ site.baseurl }}/images/legend_background.png) ![Show Box around legends]({{ site.baseurl }}/images/legend_with_background.png)
