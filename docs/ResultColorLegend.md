@@ -5,7 +5,7 @@ permalink: /docs/resultcolorlegend/
 published: true
 ---
 
-The color mapping of the displayed cell result is controlled by the **Legend Definition** located below a result node in the **Project Tree**. The legend can be shown or hidden by checking or unchecking the box in front of the Legend Definition.
+The color mapping of the displayed cell result is controlled by the **Color Legend** located below a result node in the **Project Tree**. The legend can be shown or hidden by checking or unchecking the box in front of the Legend Definition.
 
 ![Legend Configuration]({{ site.baseurl }}/images/legend_configuration.PNG)
 
@@ -30,4 +30,4 @@ The color mapping of the displayed cell result is controlled by the **Legend Def
 
 Furthermore the legend can have a semi-transparent background applied to it by selecting the **Enable Legend Background** option in the Preferences dialog.
 
-![Legend Background]({{ site.baseurl }}/images/legend_background.png) ![Legend With or Without Background]({{ site.baseurl }}/images/legend_with_background.png)
+![Legend Background]({{ site.baseurl }}/images/legend_background.png) ![Show Box around legends]({{ site.baseurl }}/images/legend_with_background.png)
