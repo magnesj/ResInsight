@@ -40,3 +40,13 @@ See [Completions]({{ site.baseurl }}/docs/completions) and  [Completion Export](
 Annotation objects like text, lines and plolylines can easily be added to a view.
 
 See [Annotations]({{ site.baseurl }}/docs/annotations)
+
+## Keyboard Shortcuts
+Several new keyboard shortcuts have been added to ResInsight for convenience. The shortcut can be seen by hovering over tool bar icons to show the tooltip for the given action, or seen in the right-click menu for project tree items.
+
+![]({{ site.baseurl }}/images/KeyboardDel.png)
+![]({{ site.baseurl }}/images/KeyboardEast.png)
+
+For instance will the **Delete** key now delete any deletable item in the project tree and **Ctrl-Alt-S/N/W/E/D/U** will change the 3d Camera view to South, North, West East, Down and Up respectively.
+
+![]({{ site.baseurl }}/images/ValveVisualisation.png)
