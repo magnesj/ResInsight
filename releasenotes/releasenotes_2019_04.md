@@ -41,7 +41,7 @@ Annotation objects like text, lines and plolylines can easily be added to a view
 
 See [Annotations]({{ site.baseurl }}/docs/annotations)
 
-## Grid View Measurements
+## Grid Measurements
 ![]({{ site.baseurl }}/images/Measurement.png)
 
 ResInsight now supports measuring distances and polyline lengths across a Grid.
