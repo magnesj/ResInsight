@@ -49,3 +49,4 @@ Several new keyboard shortcuts have been added to ResInsight for convenience. Th
 
 For instance will the **Delete** key now delete any deletable item in the project tree and **Ctrl-Alt-S/N/W/E/D/U** will change the 3d Camera view to South, North, West East, Down and Up respectively.
 
+See [Keyboard Shortcuts]({{ site.baseurl }}/docs/keyboard)
