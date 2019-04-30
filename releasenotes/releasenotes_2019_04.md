@@ -41,6 +41,13 @@ Annotation objects like text, lines and plolylines can easily be added to a view
 
 See [Annotations]({{ site.baseurl }}/docs/annotations)
 
+## Grid View Measurements
+![]({{ site.baseurl }}/images/Measurement.png)
+
+ResInsight now supports measuring distances and polyline lengths across a Grid.
+
+See [Measurements]({{ site.baseurl }}/docs/measurement)
+
 ## Keyboard Shortcuts
 Several new keyboard shortcuts have been added to ResInsight for convenience. The shortcut can be seen by hovering over tool bar icons to show the tooltip for the given action, or seen in the right-click menu for project tree items.
 
