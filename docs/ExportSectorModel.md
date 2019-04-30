@@ -37,7 +37,7 @@ inactive (ACTNUM = 0) in the exported grid.
 
 #### Grid Refinement
 
-The grid can be refined by a different integer in all three directions by changing the default value of Cell Count = 1 for I, J or K.
+The grid can be refined by a different integer in all three directions by changing the default value of Cell Count = 1 for I, J or K. The grid results will be not be interpolated but all new cells will inherit the value of their original cell.
 
 #### Faults
 
