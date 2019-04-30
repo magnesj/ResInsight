@@ -105,7 +105,7 @@ You will find the ResInsight binary under the Install directory in your build di
 
 #### HDF5
 
-HDF5 is used to read SourSimRL result files. On windows this is optional, while on linux the installed HDF5 library will be used if present.
+HDF5 is used to read SourSimRL result files. On Windows this is optional, while on Linux the installed HDF5 library will be used if present.
 
 Use an advanced flag RESINSIGHT_HDF5_BUNDLE_LIBRARIES to enable bundling of HDF5 libraries.
 
