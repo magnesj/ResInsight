@@ -15,7 +15,7 @@ Examples on how command line options are used are given [below]({{ site.baseurl 
 |-----------|-------------|
 | &#45;&#45;last                   | Open last used project. |
 | &#45;&#45;project &lt;filename&gt;     | Open project file &lt;filename&gt;. |
-| &#45;&#45;case &lt;casename&gt;        | Import Eclipse case &lt;casename&gt; (do not include .GRID/.EGRID) |
+| &#45;&#45;case &lt;case name without extension or filename&gt;        | If case or grid filename, import simulation grid data. If summary file name, import summary data |
 | &#45;&#45;startdir &lt;folder&gt;      | Set startup directory. |
 | &#45;&#45;savesnapshots all&#124;views&#124;plots&#124;          | Save snapshot of all views/plots or all(both views and plots) to **snapshots** folder in project file folder. If no argument option is given, views are exported. Application closes after snapshots have been written. |
 | &#45;&#45;size &lt;width&gt; &lt;height&gt;  | Set size of the main application window. |
