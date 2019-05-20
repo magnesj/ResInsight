@@ -104,6 +104,7 @@ nav li {
 }
 .ceesol-nav {
   background-color: #0c3c60;
+  border-bottom: 5px #fc0 solid;
 }
 
 .ceesol-nav li {
