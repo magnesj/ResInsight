@@ -10,7 +10,7 @@ body {
   font: 300 18px Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif;
   color: #ddd;
   background-color: #333;
-  border-top: 5px solid #fc0;
+  border-top: 5px solid #0c3c60;
   -webkit-box-shadow: inset 0 3px 30px rgba(0,0,0,.3);
   -moz-box-shadow: inset 0 3px 30px rgba(0,0,0,.3);
   box-shadow: inset 0 3px 30px rgba(0,0,0,.3);
