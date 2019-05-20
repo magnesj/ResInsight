@@ -107,6 +107,7 @@ nav li {
 
 .ceesol-nav li {
   margin-right: 8px;
+  text-transform: uppercase;
 }
 
 .ceesol-nav li a {
