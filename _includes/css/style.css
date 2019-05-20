@@ -108,6 +108,10 @@ nav li {
   margin-right: 6px;
 }
 
+.ceesol-nav-right li {
+  text-align: right;
+}
+
 .ceesol-nav li a {
   color: #dddddd;
   font-weight: 900;
