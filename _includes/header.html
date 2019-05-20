@@ -1,11 +1,17 @@
 <header>
- <div id="CEETRON_HEADER">
-   <a href="https://www.ceetronsolutions.com/">
-     <span>Ceetron Solutions</span>
-     <img src="{{ site.baseurl }}/images/CeetronSolutionsLogo.png" alt="CeetronSolutionLogo" />
-   </a>
- </div>
-
+  <div class="grid">
+    <div class="unit one-third center-on-mobiles">
+      <h1>
+        <a href="https://www.ceetronsolutions.com/">
+          <span>Ceetron Solutions</span>
+          <img src="{{ site.baseurl }}/images/CeetronSolutionsLogo.png" alt="CeetronSolutionLogo" />
+        </a>
+      </h1>
+    </div>
+    <nav class="main-nav unit two-thirds hide-on-mobiles">
+      {% include ceetron-nav-items.html %}
+    </nav>
+  </div>
   <nav class="mobile-nav show-on-mobiles">
     {% include primary-nav-items.html %}
   </nav>
