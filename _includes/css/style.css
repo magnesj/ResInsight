@@ -98,6 +98,7 @@ nav li {
 
 .ceesol-nav {
   margin-top: 12px;
+  background-color: #0c3c60;
 }
 
 .ceesol-nav li {
@@ -105,6 +106,7 @@ nav li {
 }
 
 .ceesol-nav li a {
+  color: #ccccdd;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;
