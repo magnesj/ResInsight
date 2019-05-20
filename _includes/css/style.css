@@ -98,7 +98,11 @@ nav li {
 .ceesol-header {
     background-color: #0c3c60;
     text-align: right;
-    border-bottom: 5px #fc0 solid;
+    border-bottom: 1px #fc0 solid;
+}
+
+.ceesol-logo {
+    margin-top: 2px; 
 }
 
 .ceesol-nav li {
@@ -107,6 +111,11 @@ nav li {
 
 .ceesol-nav li a {
   color: #dddddd;
+  font-weight: 900;
+  font-size: 12px;
+  padding: 0.5em 1em;
+  text-shadow: none;
+  text-transform: uppercase;
 }
 
 .ceesol-nav li a:hover {
