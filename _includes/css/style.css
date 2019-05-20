@@ -106,11 +106,11 @@ nav li {
 }
 
 .ceesol-nav li {
-  margin-right: 4px;
+  margin-right: 8px;
 }
 
 .ceesol-nav li a {
-  color: #cfcfcf;
+  color: #dddddd;
   font-weight: 900;
   font-size: 13px;
   padding: 0.5em 0.5em;
