@@ -115,6 +115,7 @@ nav li {
   font-size: 12px;
   padding: 0.5em 0.5em;
   text-shadow: none;
+  vertical-align: middle;
 }
 
 .ceesol-nav li a:hover {
