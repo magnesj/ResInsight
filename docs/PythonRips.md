@@ -117,8 +117,38 @@ if resInsight is None:
 # App Module
 
 
-#### rips.App()
-alias of `rips.App`
+#### class rips.App(channel)
+ResInsight application information and control.
+Allows retrieving of information and controlling the running instance
+Not meant to be constructed manually, but exists as part of the Instance method
+
+
+#### exit()
+Tell ResInsight instance to quit
+
+
+#### isConsole()
+Returns true if the connected ResInsight instance is a console app
+
+
+#### isGui()
+Returns true if the connected ResInsight instance is a GUI app
+
+
+#### majorVersion()
+Get an integer with the major version number
+
+
+#### minorVersion()
+Get an integer with the minor version number
+
+
+#### patchVersion()
+Get an integer with the patch version number
+
+
+#### versionString()
+Get a full version string, i.e. 2019.04.01
 
 ## Example
 
@@ -266,9 +296,157 @@ if resInsight is not None:
 # Commands Module
 
 
-#### rips.Commands()
-alias of `rips.Commands`
+#### class rips.Commands(channel)
+Command executor which can run ResInsight Command File commands nearly verbatim
 
+Documentation Command File Interface:
+
+    [https://resinsight.org/docs/commandfile/](https://resinsight.org/docs/commandfile/)
+
+The differences are:
+
+    * Enum values have to be provided as strings. I.e. "ALL" instead of ALL.
+
+    * Booleans have to be specified as correct Python. True instead of true.
+
+
+#### closeProject()
+Close the current project (and reopen empty one)
+
+
+#### computeCaseGroupStatistics(caseIds)
+
+#### createLgrForCompletions(caseId, timeStep, wellPathNames, refinementI, refinementJ, refinementK, splitType)
+
+#### createMultipleFractures(caseId, templateId, wellPathNames, minDistFromWellTd, maxFracturesPerWell, topLayer, baseLayer, spacing, action)
+
+#### createSaturationPressurePlots(caseIds)
+
+#### exportMsw(caseId, wellPath)
+
+#### exportMultiCaseSnapshots(gridListFile)
+Export snapshots for a set of cases
+
+
+* **Parameters**
+
+    **gridListFile** (*string*) -- Path to a file containing a list of grids to export snapshot for
+
+
+
+#### exportProperty(caseId, timeStep, property, eclipseKeyword=<class 'property'>, undefinedValue=0.0, exportFile=<class 'property'>)
+Export an Eclipse property
+
+
+* **Parameters**
+
+    * **caseId** (*int*) -- case id
+
+    * **timeStep** (*int*) -- time step index
+
+    * **property** (*string*) -- property to export
+
+    * **eclipseKeyword** (*string*) -- Eclipse keyword used as text in export header. Defaults to the value of property parameter.
+
+    * **undefinedValue** (*double*) -- Value to use for undefined values. Defaults to 0.0
+
+    * **exportFile** (*string*) -- Filename for export. Defaults to the value of property parameter
+
+
+
+#### exportPropertyInViews(caseId, viewNames, undefinedValue)
+
+#### exportSimWellFractureCompletions(caseId, viewName, timeStep, simulationWellNames, fileSplit, compdatExport)
+
+#### exportSnapshots(type='ALL', prefix='')
+Export snapshots of a given type
+
+
+* **Parameters**
+
+    * **type** (*string*) -- Enum string ('ALL', 'VIEWS' or 'PLOTS')
+
+    * **prefix** (*string*) -- Exported file name prefix
+
+
+
+#### exportVisibleCells(caseId, viewName, exportKeyword='FLUXNUM', visibleActiveCellsValue=1, hiddenActiveCellsValue=0, inactiveCellsValue=0)
+
+#### exportWellPathCompletions(caseId, timeStep, wellPathNames, fileSplit, compdatExport, includePerforations, includeFishbones, excludeMainBoreForFishbones, combinationMode)
+
+#### exportWellPaths(wellPaths=[], mdStepSize=5.0)
+
+#### loadCase(path)
+Load a case
+
+
+* **Parameters**
+
+    **path** (*string*) -- path to EGRID file
+
+
+
+* **Returns**
+
+    A Case object
+
+
+
+#### openProject(path)
+Open a project
+
+
+* **Parameters**
+
+    **path** (*string*) -- path to project file
+
+
+
+#### replaceCase(newGridFile, caseId=0)
+Replace the given case with a new case loaded from file
+
+
+* **Parameters**
+
+    * **newGridFile** (*string*) -- path to EGRID file
+
+    * **caseId** (*int*) -- case Id to replace
+
+
+
+#### replaceSourceCases(gridListFile, caseGroupId=0)
+Replace all source cases within a case group
+
+
+* **Parameters**
+
+    * **gridListFile** (*string*) -- path to file containing a list of cases
+
+    * **caseGroupId** (*int*) -- id of the case group to replace
+
+
+
+#### runOctaveScript(path, cases)
+
+#### scaleFractureTemplate(id, halfLength, height, dFactor, conductivity)
+
+#### setExportFolder(type, path, createFolder=False)
+
+#### setFractureContainment(id, topLayer, baseLayer)
+
+#### setMainWindowSize(width, height)
+
+#### setStartDir(path)
+Set current start directory
+
+
+* **Parameters**
+
+    **path** (*string*) -- path to directory
+
+
+
+#### setTimeStep(caseId, timeStep)
 # Grid Module
 
 
@@ -296,8 +474,74 @@ The dimensions in i, j, k direction
 # Project Module
 
 
-#### rips.Project()
-alias of `rips.Project`
+#### class rips.Project(channel)
+ResInsight project. Not intended to be created separately.
+
+Automatically created and assigned to Instance.
+
+
+#### case(id)
+Get a specific case from the provided case Id
+
+
+* **Parameters**
+
+    **id** (*int*) -- case id
+
+
+
+* **Returns**
+
+    A rips Case object
+
+
+
+#### cases()
+Get a list of all cases in the project
+
+
+* **Returns**
+
+    A list of rips Case objects
+
+
+
+#### close()
+Close the current project (and open new blank project)
+
+
+#### loadCase(path)
+Load a new case from the given file path
+
+
+* **Parameters**
+
+    **path** (*string*) -- file path to case
+
+
+
+* **Returns**
+
+    A rips Case object
+
+
+
+#### open(path)
+Open a new project from the given path
+
+Argument:
+
+    path(string): path to project file
+
+
+#### selectedCases()
+Get a list of all cases selected in the project tree
+
+
+* **Returns**
+
+    A list of rips Case objects
+
 
 # Properties Module
 
@@ -336,6 +580,7 @@ Get a list of available properties
 * **Parameters**
 
     * **propertyType** (*string*) -- string corresponding to propertyType enum.
+
       Can be one of the following:
 
       'DYNAMIC_NATIVE'
