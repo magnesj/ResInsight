@@ -1,3 +1,10 @@
+---
+layout: docs
+title: rips Python API
+permalink: /docs/python/
+published: true
+---
+
 # rips package
 
 ## Submodules
