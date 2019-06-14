@@ -5,6 +5,8 @@ permalink: /docs/python/
 published: true
 ---
 
+ResInsight has a [gRPC Remote Procedure Call]([https://www.grpc.io](https://www.grpc.io)) interface with a Python Client interface. This interface allows you to interact with a running ResInsight instance from a Python script.
+
 # rips package
 
 ## Submodules
