@@ -1,15 +1,13 @@
 ---
 layout: docs
-title: Python API
+title: Python API - rips
 permalink: /docs/python/
 published: true
 ---
 
-ResInsight has a [gRPC Remote Procedure Call](https://www.grpc.io/) interface with a Python Client interface. This interface allows you to interact with a running ResInsight instance from a Python script.
+ResInsight has a [gRPC Remote Procedure Call](https://www.grpc.io/) interface with a Python Client interface. This interface, called rips, allows you to interact with a running ResInsight instance from a Python script.
 
-The Python client package is available for install via the Python PIP package system with `pip install rips` as admin user, or `pip install --user rips` as a regular user.
-
-On some systems the `pip` command may have to be replaced by `python -m pip`.
+The Python client package is available for install via the Python PIP package system with `pip install rips` as admin user, or `pip install --user rips` as a regular user. On some systems the `pip` command may have to be replaced by `python -m pip`. See the [rips page on pypi.org](https://test.pypi.org/project/rips/) for more information about releases of the rips package.
 
 In order for gRPC to be available, ResInsight needs to be built with the `RESINSIGHT_ENABLE_GRPC` option set. A valid gRPC build will show a message in the About dialog confirming gRPC is available:
 
