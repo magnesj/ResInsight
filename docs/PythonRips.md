@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: rips Python API
+title: rips - gRPC Python API
 permalink: /docs/python/
 published: true
 ---
