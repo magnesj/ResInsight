@@ -21,7 +21,7 @@ Furthermore, gRPC needs to be enabled in the Scripting tab of the Preference dia
 
 
 
-![image](images/PrefGrpc.png)
+![image](/images/PrefGrpc.png)
 
 # Instance Module
 
