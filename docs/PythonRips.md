@@ -9,8 +9,6 @@ published: true
 
 ## Submodules
 
-## rips.App module
-
 
 #### class rips.App.App(channel)
 Bases: `object`
@@ -46,8 +44,6 @@ Get an integer with the patch version number
 
 #### versionString()
 Get a full version string, i.e. 2019.04.01
-
-## rips.Case module
 
 
 #### class rips.Case.Case(channel, id)
@@ -97,8 +93,8 @@ total number of cells
 
 * **Parameters**
 
-    **porosityModel** (*string*) – String representing an enum.
-    must be ‘MATRIX_MODEL’ or ‘FRACTURE_MODEL’.
+    **porosityModel** (*string*) -- String representing an enum.
+    must be 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
 
@@ -121,8 +117,8 @@ Get Stream of cell info objects for current case
 
 * **Parameters**
 
-    **porosityModel** (*string*) – String representing an enum.
-    must be ‘MATRIX_MODEL’ or ‘FRACTURE_MODEL’.
+    **porosityModel** (*string*) -- String representing an enum.
+    must be 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
 
@@ -152,7 +148,7 @@ Get Grid of a given index. Returns a rips Grid object
 
 * **Parameters**
 
-    **index** (*int*) – The grid index
+    **index** (*int*) -- The grid index
 
 
 Returns: Grid object
@@ -169,8 +165,6 @@ Get a list of all rips Grid objects in the case
 #### timeSteps()
 Get a list containing time step strings for all time steps
 
-## rips.Commands module
-
 
 #### class rips.Commands.Commands(channel)
 Bases: `object`
@@ -183,7 +177,7 @@ Documentation Command File Interface:
 
 The differences are:
 
-    1. Enum values have to be provided as strings. I.e. “ALL” instead of ALL.
+    1. Enum values have to be provided as strings. I.e. "ALL" instead of ALL.
 
     1. Booleans have to be specified as correct Python. True instead of true.
 
@@ -208,7 +202,7 @@ Export snapshots for a set of cases
 
 * **Parameters**
 
-    **gridListFile** (*string*) – Path to a file containing a list of grids to export snapshot for
+    **gridListFile** (*string*) -- Path to a file containing a list of grids to export snapshot for
 
 
 
@@ -218,17 +212,17 @@ Export an Eclipse property
 
 * **Parameters**
 
-    * **caseId** (*int*) – case id
+    * **caseId** (*int*) -- case id
 
-    * **timeStep** (*int*) – time step index
+    * **timeStep** (*int*) -- time step index
 
-    * **property** (*string*) – property to export
+    * **property** (*string*) -- property to export
 
-    * **eclipseKeyword** (*string*) – Eclipse keyword used as text in export header. Defaults to the value of property parameter.
+    * **eclipseKeyword** (*string*) -- Eclipse keyword used as text in export header. Defaults to the value of property parameter.
 
-    * **undefinedValue** (*double*) – Value to use for undefined values. Defaults to 0.0
+    * **undefinedValue** (*double*) -- Value to use for undefined values. Defaults to 0.0
 
-    * **exportFile** (*string*) – Filename for export. Defaults to the value of property parameter
+    * **exportFile** (*string*) -- Filename for export. Defaults to the value of property parameter
 
 
 
@@ -242,9 +236,9 @@ Export snapshots of a given type
 
 * **Parameters**
 
-    * **type** (*string*) – Enum string (‘ALL’, ‘VIEWS’ or ‘PLOTS’)
+    * **type** (*string*) -- Enum string ('ALL', 'VIEWS' or 'PLOTS')
 
-    * **prefix** (*string*) – Exported file name prefix
+    * **prefix** (*string*) -- Exported file name prefix
 
 
 
@@ -260,7 +254,7 @@ Load a case
 
 * **Parameters**
 
-    **path** (*string*) – path to EGRID file
+    **path** (*string*) -- path to EGRID file
 
 
 
@@ -276,7 +270,7 @@ Open a project
 
 * **Parameters**
 
-    **path** (*string*) – path to project file
+    **path** (*string*) -- path to project file
 
 
 
@@ -286,9 +280,9 @@ Replace the given case with a new case loaded from file
 
 * **Parameters**
 
-    * **newGridFile** (*string*) – path to EGRID file
+    * **newGridFile** (*string*) -- path to EGRID file
 
-    * **caseId** (*int*) – case Id to replace
+    * **caseId** (*int*) -- case Id to replace
 
 
 
@@ -298,9 +292,9 @@ Replace all source cases within a case group
 
 * **Parameters**
 
-    * **gridListFile** (*string*) – path to file containing a list of cases
+    * **gridListFile** (*string*) -- path to file containing a list of cases
 
-    * **caseGroupId** (*int*) – id of the case group to replace
+    * **caseGroupId** (*int*) -- id of the case group to replace
 
 
 
@@ -320,13 +314,11 @@ Set current start directory
 
 * **Parameters**
 
-    **path** (*string*) – path to directory
+    **path** (*string*) -- path to directory
 
 
 
 #### setTimeStep(caseId, timeStep)
-## rips.Grid module
-
 
 #### class rips.Grid.Grid(index, case)
 Bases: `object`
@@ -350,8 +342,6 @@ The dimensions in i, j, k direction
 
     Vec3i
 
-
-## rips.Instance module
 
 
 #### class rips.Instance.Instance(port=50051)
@@ -412,9 +402,9 @@ RESINSIGHT_GRPC_PORT to RESINSIGHT_GRPC_PORT+20
 
 * **Parameters**
 
-    * **startPort** (*int*) – start searching from this port
+    * **startPort** (*int*) -- start searching from this port
 
-    * **endPort** (*int*) – search up to but not including this port
+    * **endPort** (*int*) -- search up to but not including this port
 
 
 
@@ -426,11 +416,11 @@ The RESINSIGHT_GRPC_PORT environment variable can be set to an alternative port 
 
 * **Parameters**
 
-    * **resInsightExecutable** (*str*) – Path to a valid ResInsight executable. If set
+    * **resInsightExecutable** (*str*) -- Path to a valid ResInsight executable. If set
       will take precedence over what is provided in the RESINSIGHT_EXECUTABLE
       environment variable.
 
-    * **console** (*bool*) – If True, launch as console application, without GUI.
+    * **console** (*bool*) -- If True, launch as console application, without GUI.
 
 
 
@@ -444,8 +434,6 @@ The RESINSIGHT_GRPC_PORT environment variable can be set to an alternative port 
 
     Instance
 
-
-## rips.Project module
 
 
 #### class rips.Project.Project(channel)
@@ -462,7 +450,7 @@ Get a specific case from the provided case Id
 
 * **Parameters**
 
-    **id** (*int*) – case id
+    **id** (*int*) -- case id
 
 
 
@@ -492,7 +480,7 @@ Load a new case from the given file path
 
 * **Parameters**
 
-    **path** (*string*) – file path to case
+    **path** (*string*) -- file path to case
 
 
 
@@ -519,8 +507,6 @@ Get a list of all cases selected in the project tree
     A list of rips Case objects
 
 
-## rips.Properties module
-
 
 #### class rips.Properties.Properties(case)
 Bases: `object`
@@ -534,13 +520,13 @@ Get a cell property for all active cells. Async, so returns an iterator
 
 * **Parameters**
 
-    * **propertyType** (*string*) – string enum. See available()
+    * **propertyType** (*string*) -- string enum. See available()
 
-    * **propertyName** (*string*) – name of an Eclipse property
+    * **propertyName** (*string*) -- name of an Eclipse property
 
-    * **timeStep** (*int*) – the time step for which to get the property for
+    * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) – string enum. See available()
+    * **porosityModel** (*string*) -- string enum. See available()
 
 
 
@@ -557,21 +543,21 @@ Get a list of available properties
 
 * **Parameters**
 
-    * **propertyType** (*string*) – string corresponding to propertyType enum.
+    * **propertyType** (*string*) -- string corresponding to propertyType enum.
       Can be one of the following:
 
-      ’DYNAMIC_NATIVE’
+      'DYNAMIC_NATIVE'
 
-          ’STATIC_NATIVE’
-          ‘SOURSIMRL’
-          ‘GENERATED’
-          ‘INPUT_PROPERTY’
-          ‘FORMATION_NAMES’
-          ‘FLOW_DIAGNOSTICS’
-          ‘INJECTION_FLOODING’
+          'STATIC_NATIVE'
+          'SOURSIMRL'
+          'GENERATED'
+          'INPUT_PROPERTY'
+          'FORMATION_NAMES'
+          'FLOW_DIAGNOSTICS'
+          'INJECTION_FLOODING'
 
 
-    * **porosityModel** (*string*) – ‘MATRIX_MODEL’ or ‘FRACTURE_MODEL’.
+    * **porosityModel** (*string*) -- 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
 
@@ -581,15 +567,15 @@ Get a cell property for all grid cells. Async, so returns an iterator
 
 * **Parameters**
 
-    * **propertyType** (*string*) – string enum. See available()
+    * **propertyType** (*string*) -- string enum. See available()
 
-    * **propertyName** (*string*) – name of an Eclipse property
+    * **propertyName** (*string*) -- name of an Eclipse property
 
-    * **timeStep** (*int*) – the time step for which to get the property for
+    * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **gridIndex** (*int*) – index to the grid we’re getting values for
+    * **gridIndex** (*int*) -- index to the grid we're getting values for
 
-    * **porosityModel** (*string*) – string enum. See available()
+    * **porosityModel** (*string*) -- string enum. See available()
 
 
 
@@ -606,15 +592,15 @@ Set a cell property for all active cells.
 
 * **Parameters**
 
-    * **values** (*list*) – a list of double precision floating point numbers
+    * **values** (*list*) -- a list of double precision floating point numbers
 
-    * **propertyType** (*string*) – string enum. See available()
+    * **propertyType** (*string*) -- string enum. See available()
 
-    * **propertyName** (*string*) – name of an Eclipse property
+    * **propertyName** (*string*) -- name of an Eclipse property
 
-    * **timeStep** (*int*) – the time step for which to get the property for
+    * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) – string enum. See available()
+    * **porosityModel** (*string*) -- string enum. See available()
 
 
 
@@ -624,15 +610,15 @@ Set a cell property for all active cells. Async, and so takes an iterator to the
 
 * **Parameters**
 
-    * **values_iterator** (*iterator*) – an iterator to the properties to be set
+    * **values_iterator** (*iterator*) -- an iterator to the properties to be set
 
-    * **propertyType** (*string*) – string enum. See available()
+    * **propertyType** (*string*) -- string enum. See available()
 
-    * **propertyName** (*string*) – name of an Eclipse property
+    * **propertyName** (*string*) -- name of an Eclipse property
 
-    * **timeStep** (*int*) – the time step for which to get the property for
+    * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) – string enum. See available()
+    * **porosityModel** (*string*) -- string enum. See available()
 
 
 
@@ -642,17 +628,17 @@ Set a cell property for all grid cells.
 
 * **Parameters**
 
-    * **values** (*list*) – a list of double precision floating point numbers
+    * **values** (*list*) -- a list of double precision floating point numbers
 
-    * **propertyType** (*string*) – string enum. See available()
+    * **propertyType** (*string*) -- string enum. See available()
 
-    * **propertyName** (*string*) – name of an Eclipse property
+    * **propertyName** (*string*) -- name of an Eclipse property
 
-    * **timeStep** (*int*) – the time step for which to get the property for
+    * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **gridIndex** (*int*) – index to the grid we’re setting values for
+    * **gridIndex** (*int*) -- index to the grid we're setting values for
 
-    * **porosityModel** (*string*) – string enum. See available()
+    * **porosityModel** (*string*) -- string enum. See available()
 
 
 ## Module contents
