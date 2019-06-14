@@ -21,6 +21,8 @@ Furthermore, gRPC needs to be enabled in the Scripting tab of the Preference dia
 
 ![image](../images/PrefGrpc.png)
 
+It is actually possible to interact with ResInsight using a number of other programming languages, C++, C#, Web Javascript, Go, Node.js, PHP, Java, etc. This requires familiarity with gRPC and Protocol Buffers and is currently undocumented and unsupported from a ResInsight point of view.
+
 # Instance Module
 
 
