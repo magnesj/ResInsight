@@ -15,13 +15,13 @@ In order for gRPC to be available, ResInsight needs to be built with the RESINSI
 
 
 
-![image](./images/AboutGrpc.png)
+![image](../images/AboutGrpc.png)
 
 Furthermore, gRPC needs to be enabled in the Scripting tab of the Preference dialog:
 
 
 
-![image](./images/PrefGrpc.png)
+![image](../images/PrefGrpc.png)
 
 # Instance Module
 
