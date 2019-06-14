@@ -105,7 +105,7 @@ The RESINSIGHT_GRPC_PORT environment variable can be set to an alternative port 
 
 ## Example
 
-```
+```python
 import rips
 
 resInsight  = rips.Instance.find()
