@@ -281,6 +281,8 @@ Get a list of all rips Grid objects in the case
 #### timeSteps()
 Get a list containing time step strings for all time steps
 
+## Example
+
 ```python
 import rips
 
@@ -447,6 +449,33 @@ Set current start directory
 
 
 #### setTimeStep(caseId, timeStep)
+## Example
+
+```python
+import rips
+
+# Load instance
+resInsight = rips.Instance.find()
+
+# Run a couple of commands
+resInsight.commands.setTimeStep(caseId=0, timeStep=3)
+resInsight.commands.setMainWindowSize(width=800, height=500)
+#resInsight.commands.exportWellPaths()
+with tempfile.TemporaryDirectory(prefix="rips") as tmpdirname:
+    print("Temporary folder: ", tmpdirname)
+    resInsight.commands.setExportFolder(type='SNAPSHOTS', path=tmpdirname)
+    resInsight.commands.setExportFolder(type='PROPERTIES', path=tmpdirname)
+    resInsight.commands.exportSnapshots()
+    print(os.listdir(tmpdirname))
+    assert(len(os.listdir(tmpdirname)) > 0)
+    case = resInsight.project.case(id=0)
+    resInsight.commands.exportPropertyInViews(0, "3D View", 0)
+    expectedFileName = case.name + "-" + str("3D_View") + "-" + "T3" + "-SOIL"
+    fullPath = tmpdirname + "/" + expectedFileName
+    assert(os.path.exists(fullPath))
+
+```
+
 # Grid Module
 
 
@@ -470,6 +499,19 @@ The dimensions in i, j, k direction
 
     Vec3i
 
+
+## Example
+
+```python
+    case = rips_instance.project.loadCase(path=casePath)
+print (case.gridCount())
+    if case.gridCount() > 0:
+            grid = case.grid(index=0)
+            dimensions = grid.dimensions()
+            print(dimensions.i)
+            print(dimensions.j)
+            print(dimensions.k)
+```
 
 # Project Module
 
@@ -529,9 +571,11 @@ Load a new case from the given file path
 #### open(path)
 Open a new project from the given path
 
-Argument:
 
-    path(string): path to project file
+* **Parameters**
+
+    **path** (*string*) -- path to project file
+
 
 
 #### selectedCases()
@@ -676,3 +720,74 @@ Set a cell property for all grid cells.
     * **gridIndex** (*int*) -- index to the grid we're setting values for
 
     * **porosityModel** (*string*) -- string enum. See available()
+
+
+## Synchronous Example
+
+Read two properties, multiply them together and push the results back to ResInsight in a naïve way, by reading PORO into a list, then reading PERMX into a list, then multiplying them both in a resulting list and finally transferring back the list.
+
+This is slow and inefficient, but works.
+
+```python
+import rips
+import time
+
+resInsight     = rips.Instance.find()
+start = time.time()
+case = resInsight.project.case(id=0)
+
+poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
+poroResults = []
+for poroChunk in poroChunks:
+    for poro in poroChunk.values:
+        poroResults.append(poro)
+
+permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
+permxResults = []
+for permxChunk in permxChunks:
+    for permx in permxChunk.values:
+        permxResults.append(permx)
+
+results = []
+for (poro, permx) in zip(poroResults, permxResults):
+    results.append(poro * permx)
+
+case.properties.setActiveCellProperty(results, 'GENERATED', 'POROPERMXSY', 0)
+
+end = time.time()
+print("Time elapsed: ", end - start)
+
+print("Transferred all results back")
+```
+
+## Asynchronous Example
+
+Read two properties at the same time chunk by chunk, multiply each chunk together and start transferring the result back to ResInsight as soon as the chunk is finished.
+
+This is far more efficient.
+
+```python
+import rips
+import time
+
+def createResult(poroChunks, permxChunks):
+    for (poroChunk, permxChunk) in zip(poroChunks, permxChunks):
+        resultChunk = []
+        for (poro, permx) in zip(poroChunk.values, permxChunk.values):
+            resultChunk.append(poro * permx)
+        yield resultChunk
+
+resInsight     = rips.Instance.find()
+start = time.time()
+case = resInsight.project.case(id=0)
+
+poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
+permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
+
+case.properties.setActiveCellPropertyAsync(createResult(poroChunks, permxChunks), 'GENERATED', 'POROPERMXAS', 0)
+
+end = time.time()
+print("Time elapsed: ", end - start)
+
+print("Transferred all results back")
+```
