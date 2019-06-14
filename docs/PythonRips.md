@@ -152,7 +152,7 @@ Get a full version string, i.e. 2019.04.01
 
 ## Example
 
-```
+```python
 import rips
 
 resInsight  = rips.Instance.find()
@@ -281,7 +281,7 @@ Get a list of all rips Grid objects in the case
 #### timeSteps()
 Get a list containing time step strings for all time steps
 
-```
+```python
 import rips
 
 resInsight  = rips.Instance.find()
