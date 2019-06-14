@@ -188,7 +188,7 @@ Case name
 
 * **Type**
 
-    string
+    str
 
 
 
@@ -209,7 +209,7 @@ total number of cells
 
 * **Parameters**
 
-    **porosityModel** (*string*) -- String representing an enum.
+    **porosityModel** (*str*) -- String representing an enum.
     must be 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
@@ -233,7 +233,7 @@ Get Stream of cell info objects for current case
 
 * **Parameters**
 
-    **porosityModel** (*string*) -- String representing an enum.
+    **porosityModel** (*str*) -- String representing an enum.
     must be 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
@@ -332,7 +332,7 @@ Export snapshots for a set of cases
 
 * **Parameters**
 
-    **gridListFile** (*string*) -- Path to a file containing a list of grids to export snapshot for
+    **gridListFile** (*str*) -- Path to a file containing a list of grids to export snapshot for
 
 
 
@@ -346,13 +346,13 @@ Export an Eclipse property
 
     * **timeStep** (*int*) -- time step index
 
-    * **property** (*string*) -- property to export
+    * **property** (*str*) -- property to export
 
-    * **eclipseKeyword** (*string*) -- Eclipse keyword used as text in export header. Defaults to the value of property parameter.
+    * **eclipseKeyword** (*str*) -- Eclipse keyword used as text in export header. Defaults to the value of property parameter.
 
     * **undefinedValue** (*double*) -- Value to use for undefined values. Defaults to 0.0
 
-    * **exportFile** (*string*) -- Filename for export. Defaults to the value of property parameter
+    * **exportFile** (*str*) -- Filename for export. Defaults to the value of property parameter
 
 
 
@@ -366,9 +366,9 @@ Export snapshots of a given type
 
 * **Parameters**
 
-    * **type** (*string*) -- Enum string ('ALL', 'VIEWS' or 'PLOTS')
+    * **type** (*str*) -- Enum string ('ALL', 'VIEWS' or 'PLOTS')
 
-    * **prefix** (*string*) -- Exported file name prefix
+    * **prefix** (*str*) -- Exported file name prefix
 
 
 
@@ -384,7 +384,7 @@ Load a case
 
 * **Parameters**
 
-    **path** (*string*) -- path to EGRID file
+    **path** (*str*) -- path to EGRID file
 
 
 
@@ -400,7 +400,7 @@ Open a project
 
 * **Parameters**
 
-    **path** (*string*) -- path to project file
+    **path** (*str*) -- path to project file
 
 
 
@@ -410,7 +410,7 @@ Replace the given case with a new case loaded from file
 
 * **Parameters**
 
-    * **newGridFile** (*string*) -- path to EGRID file
+    * **newGridFile** (*str*) -- path to EGRID file
 
     * **caseId** (*int*) -- case Id to replace
 
@@ -422,7 +422,7 @@ Replace all source cases within a case group
 
 * **Parameters**
 
-    * **gridListFile** (*string*) -- path to file containing a list of cases
+    * **gridListFile** (*str*) -- path to file containing a list of cases
 
     * **caseGroupId** (*int*) -- id of the case group to replace
 
@@ -444,7 +444,7 @@ Set current start directory
 
 * **Parameters**
 
-    **path** (*string*) -- path to directory
+    **path** (*str*) -- path to directory
 
 
 
@@ -558,7 +558,7 @@ Load a new case from the given file path
 
 * **Parameters**
 
-    **path** (*string*) -- file path to case
+    **path** (*str*) -- file path to case
 
 
 
@@ -574,7 +574,7 @@ Open a new project from the given path
 
 * **Parameters**
 
-    **path** (*string*) -- path to project file
+    **path** (*str*) -- path to project file
 
 
 
@@ -600,13 +600,13 @@ Get a cell property for all active cells. Async, so returns an iterator
 
 * **Parameters**
 
-    * **propertyType** (*string*) -- string enum. See available()
+    * **propertyType** (*str*) -- string enum. See available()
 
-    * **propertyName** (*string*) -- name of an Eclipse property
+    * **propertyName** (*str*) -- name of an Eclipse property
 
     * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) -- string enum. See available()
+    * **porosityModel** (*str*) -- string enum. See available()
 
 
 
@@ -623,7 +623,7 @@ Get a list of available properties
 
 * **Parameters**
 
-    * **propertyType** (*string*) -- string corresponding to propertyType enum.
+    * **propertyType** (*str*) -- string corresponding to propertyType enum.
 
       Can be one of the following:
 
@@ -638,7 +638,7 @@ Get a list of available properties
           'INJECTION_FLOODING'
 
 
-    * **porosityModel** (*string*) -- 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
+    * **porosityModel** (*str*) -- 'MATRIX_MODEL' or 'FRACTURE_MODEL'.
 
 
 
@@ -648,15 +648,15 @@ Get a cell property for all grid cells. Async, so returns an iterator
 
 * **Parameters**
 
-    * **propertyType** (*string*) -- string enum. See available()
+    * **propertyType** (*str*) -- string enum. See available()
 
-    * **propertyName** (*string*) -- name of an Eclipse property
+    * **propertyName** (*str*) -- name of an Eclipse property
 
     * **timeStep** (*int*) -- the time step for which to get the property for
 
     * **gridIndex** (*int*) -- index to the grid we're getting values for
 
-    * **porosityModel** (*string*) -- string enum. See available()
+    * **porosityModel** (*str*) -- string enum. See available()
 
 
 
@@ -675,13 +675,13 @@ Set a cell property for all active cells.
 
     * **values** (*list*) -- a list of double precision floating point numbers
 
-    * **propertyType** (*string*) -- string enum. See available()
+    * **propertyType** (*str*) -- string enum. See available()
 
-    * **propertyName** (*string*) -- name of an Eclipse property
+    * **propertyName** (*str*) -- name of an Eclipse property
 
     * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) -- string enum. See available()
+    * **porosityModel** (*str*) -- string enum. See available()
 
 
 
@@ -693,13 +693,13 @@ Set a cell property for all active cells. Async, and so takes an iterator to the
 
     * **values_iterator** (*iterator*) -- an iterator to the properties to be set
 
-    * **propertyType** (*string*) -- string enum. See available()
+    * **propertyType** (*str*) -- string enum. See available()
 
-    * **propertyName** (*string*) -- name of an Eclipse property
+    * **propertyName** (*str*) -- name of an Eclipse property
 
     * **timeStep** (*int*) -- the time step for which to get the property for
 
-    * **porosityModel** (*string*) -- string enum. See available()
+    * **porosityModel** (*str*) -- string enum. See available()
 
 
 
@@ -711,15 +711,15 @@ Set a cell property for all grid cells.
 
     * **values** (*list*) -- a list of double precision floating point numbers
 
-    * **propertyType** (*string*) -- string enum. See available()
+    * **propertyType** (*str*) -- string enum. See available()
 
-    * **propertyName** (*string*) -- name of an Eclipse property
+    * **propertyName** (*str*) -- name of an Eclipse property
 
     * **timeStep** (*int*) -- the time step for which to get the property for
 
     * **gridIndex** (*int*) -- index to the grid we're setting values for
 
-    * **porosityModel** (*string*) -- string enum. See available()
+    * **porosityModel** (*str*) -- string enum. See available()
 
 
 ## Synchronous Example
@@ -784,7 +784,8 @@ case = resInsight.project.case(id=0)
 poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
 permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
 
-case.properties.setActiveCellPropertyAsync(createResult(poroChunks, permxChunks), 'GENERATED', 'POROPERMXAS', 0)
+case.properties.setActiveCellPropertyAsync(createResult(poroChunks, permxChunks),
+                                           'GENERATED', 'POROPERMXAS', 0)
 
 end = time.time()
 print("Time elapsed: ", end - start)
