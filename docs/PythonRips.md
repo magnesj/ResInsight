@@ -1,6 +1,6 @@
 ---
 layout: docs
-title: rips - gRPC Python API
+title: Python API
 permalink: /docs/python/
 published: true
 ---
@@ -11,7 +11,7 @@ The Python client package is available for install via the Python PIP package sy
 
 On some systems the `pip` command may have to be replaced by `python -m pip`.
 
-In order for gRPC to be available, ResInsight needs to be built with the RESINSIGHT_ENABLE_GRPC option set. A valid gRPC build will show a message in the About dialog confirming gRPC is available:
+In order for gRPC to be available, ResInsight needs to be built with the `RESINSIGHT_ENABLE_GRPC` option set. A valid gRPC build will show a message in the About dialog confirming gRPC is available:
 
 
 
@@ -118,11 +118,11 @@ The RESINSIGHT_GRPC_PORT environment variable can be set to an alternative port 
 ## Example
 
 ```python
-import rips
-
-resInsight  = rips.Instance.find()
-
-if resInsight is None:
+import rips
+
+resInsight  = rips.Instance.find()
+
+if resInsight is None:
     print('ERROR: could not find ResInsight')
 ```
 
@@ -165,12 +165,12 @@ Get a full version string, i.e. 2019.04.01
 ## Example
 
 ```python
-import rips
-
-resInsight  = rips.Instance.find()
-if resInsight is not None:
-    print(resInsight.app.versionString())
-    print("Is this a console run?", resInsight.app.isConsole())
+import rips
+
+resInsight  = rips.Instance.find()
+if resInsight is not None:
+    print(resInsight.app.versionString())
+    print("Is this a console run?", resInsight.app.isConsole())
 ```
 
 # Case Module
@@ -741,34 +741,34 @@ Read two properties, multiply them together and push the results back to ResInsi
 This is slow and inefficient, but works.
 
 ```python
-import rips
-import time
-
-resInsight     = rips.Instance.find()
-start = time.time()
-case = resInsight.project.case(id=0)
-
-poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
-poroResults = []
-for poroChunk in poroChunks:
-    for poro in poroChunk.values:
-        poroResults.append(poro)
-
-permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
-permxResults = []
-for permxChunk in permxChunks:
-    for permx in permxChunk.values:
-        permxResults.append(permx)
-
-results = []
-for (poro, permx) in zip(poroResults, permxResults):
-    results.append(poro * permx)
-
-case.properties.setActiveCellProperty(results, 'GENERATED', 'POROPERMXSY', 0)
-
-end = time.time()
-print("Time elapsed: ", end - start)
-
+import rips
+import time
+
+resInsight     = rips.Instance.find()
+start = time.time()
+case = resInsight.project.case(id=0)
+
+poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
+poroResults = []
+for poroChunk in poroChunks:
+    for poro in poroChunk.values:
+        poroResults.append(poro)
+
+permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
+permxResults = []
+for permxChunk in permxChunks:
+    for permx in permxChunk.values:
+        permxResults.append(permx)
+
+results = []
+for (poro, permx) in zip(poroResults, permxResults):
+    results.append(poro * permx)
+
+case.properties.setActiveCellProperty(results, 'GENERATED', 'POROPERMXSY', 0)
+
+end = time.time()
+print("Time elapsed: ", end - start)
+
 print("Transferred all results back")
 ```
 
@@ -779,28 +779,28 @@ Read two properties at the same time chunk by chunk, multiply each chunk togethe
 This is far more efficient.
 
 ```python
-import rips
-import time
-
-def createResult(poroChunks, permxChunks):
-    for (poroChunk, permxChunk) in zip(poroChunks, permxChunks):
-        resultChunk = []
-        for (poro, permx) in zip(poroChunk.values, permxChunk.values):
-            resultChunk.append(poro * permx)
-        yield resultChunk
-
-resInsight     = rips.Instance.find()
-start = time.time()
-case = resInsight.project.case(id=0)
-
-poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
-permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
-
-case.properties.setActiveCellPropertyAsync(createResult(poroChunks, permxChunks),
-                                           'GENERATED', 'POROPERMXAS', 0)
-
-end = time.time()
-print("Time elapsed: ", end - start)
-
+import rips
+import time
+
+def createResult(poroChunks, permxChunks):
+    for (poroChunk, permxChunk) in zip(poroChunks, permxChunks):
+        resultChunk = []
+        for (poro, permx) in zip(poroChunk.values, permxChunk.values):
+            resultChunk.append(poro * permx)
+        yield resultChunk
+
+resInsight     = rips.Instance.find()
+start = time.time()
+case = resInsight.project.case(id=0)
+
+poroChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PORO', 0)
+permxChunks = case.properties.activeCellProperty('STATIC_NATIVE', 'PERMX', 0)
+
+case.properties.setActiveCellPropertyAsync(createResult(poroChunks, permxChunks),
+                                           'GENERATED', 'POROPERMXAS', 0)
+
+end = time.time()
+print("Time elapsed: ", end - start)
+
 print("Transferred all results back")
 ```
