@@ -9,6 +9,8 @@ ResInsight has a [gRPC Remote Procedure Call](https://www.grpc.io/) interface wi
 
 The Python client package is available for install via the Python PIP package system with `pip install rips` as admin user, or `pip install --user rips` as a regular user.
 
+On some systems the `pip` command may have to be replaced by `python -m pip`.
+
 # rips package
 
 ## Submodules
@@ -48,6 +50,15 @@ Get an integer with the patch version number
 
 #### versionString()
 Get a full version string, i.e. 2019.04.01
+
+```
+import rips
+
+resInsight  = rips.Instance.find()
+if resInsight is not None:
+    print(resInsight.app.versionString())
+    print("Is this a console run?", resInsight.app.isConsole())
+```
 
 
 #### class rips.Case.Case(channel, id)
