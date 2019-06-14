@@ -17,8 +17,6 @@ On some systems the `pip` command may have to be replaced by `python -m pip`.
 
 
 #### class rips.App.App(channel)
-Bases: `object`
-
 ResInsight application information and control.
 Allows retrieving of information and controlling the running instance
 Not meant to be constructed manually, but exists as part of the Instance method
@@ -51,13 +49,15 @@ Get an integer with the patch version number
 #### versionString()
 Get a full version string, i.e. 2019.04.01
 
+## Example:
+
 ```
-import rips
-
-resInsight  = rips.Instance.find()
-if resInsight is not None:
-    print(resInsight.app.versionString())
-    print("Is this a console run?", resInsight.app.isConsole())
+import rips
+
+resInsight  = rips.Instance.find()
+if resInsight is not None:
+    print(resInsight.app.versionString())
+    print("Is this a console run?", resInsight.app.isConsole())
 ```
 
 
