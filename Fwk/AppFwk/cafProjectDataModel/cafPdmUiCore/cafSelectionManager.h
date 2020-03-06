@@ -40,6 +40,7 @@
 #include "cafPdmObjectHandle.h"
 #include "cafPdmPointer.h"
 #include "cafPdmField.h"
+#include "cafPdmUiItem.h"
 
 #include <QString>
 #include <vector>
