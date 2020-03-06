@@ -7,7 +7,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: windows-latest
             triplet: x64-windows
@@ -15,6 +15,10 @@ jobs:
             vcpkgPackages: 'grpc'
           - os: ubuntu-latest
             triplet: x64-linux
+            vcpkgGitCommitId: '6282cab61d175974b1af06473db584b9b80dcd48'
+            vcpkgPackages: 'grpc'
+          - os: macos-latest
+            triplet: x64-osx
             vcpkgGitCommitId: '6282cab61d175974b1af06473db584b9b80dcd48'
             vcpkgPackages: 'grpc'
     steps:
