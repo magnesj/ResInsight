@@ -71,7 +71,7 @@ jobs:
           make package
           rm -rf packages/_CPack_Packages
       - name: Build ResInsight-x64 Mac
-        if: "contains( matrix.os, 'osx')"
+        if: "contains( matrix.os, 'macos')"
         run: |
           mkdir cmakebuild
           cd cmakebuild
