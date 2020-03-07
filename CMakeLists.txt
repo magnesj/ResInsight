@@ -391,7 +391,7 @@ set_property(TARGET cafCommandFeatures PROPERTY FOLDER "AppFwk")
 #add_subdirectory(Fwk/AppFwk/cafTests/cafTestCvfApplication)
 
 add_subdirectory(Fwk/AppFwk/cafTensor)
-add_subdirectory(Fwk/AppFwk/cafHexInterpolator)
+#add_subdirectory(Fwk/AppFwk/cafHexInterpolator)
 
 list(APPEND APP_FWK_LIBRARIES
     cafPdmCore
@@ -412,7 +412,7 @@ list(APPEND APP_FWK_LIBRARIES
 
 set_property(TARGET  
     ${APP_FWK_LIBRARIES}
-	cafHexInterpolator
+	#cafHexInterpolator
 	PROPERTY FOLDER "AppFwk"
 )
 
