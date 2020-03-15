@@ -34,4 +34,10 @@ jobs:
         if: "!contains( matrix.os, 'windows')"
       - name: dir
         run: gci -recurse ${{ runner.workspace }}
-        if: contains( matrix.os, 'windows')      
+        if: contains( matrix.os, 'windows')  
+      - name: Run Unit Tests
+        shell: bash
+        run: |
+          cmakebuild/cafProjectDataModel/cafPdmCore/cafPdmCore_UnitTests/cafPdmCore_UnitTests
+          cmakebuild/cafProjectDataModel/cafPdmXml/cafPdmXml_UnitTests/cafPdmXml_UnitTests
+          cmakebuild/cafProjectDataModel/cafProjectDataModel_UnitTests/cafProjectDataModel_UnitTests
