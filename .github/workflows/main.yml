@@ -1,6 +1,6 @@
 name: ResInsight Build
 
-on: [push, pull_request]
+on: [pull_request]
 jobs:
   ResInsight-x64:
     runs-on: ${{ matrix.os }}
