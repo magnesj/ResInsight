@@ -1,6 +1,6 @@
 name: Application Framework Build with Unit Tests
 
-on: [pull_request]
+on: [push, pull_request]
 jobs:
   ResInsight-x64:
     runs-on: ${{ matrix.os }}
