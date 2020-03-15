@@ -89,6 +89,7 @@ endif(USE_COMMAND_FRAMEWORK)
 if (${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     list(APPEND EXTERNAL_LINK_LIBRARIES
         rt
+        pthread
     )
 endif()
 
