@@ -27,7 +27,6 @@ jobs:
           mirror: 'http://mirrors.ocf.berkeley.edu/qt/'
       - name: Install Python dependencies
         run: |
-          where python
           python -m pip install --upgrade pip
           pip install grpcio-tools
           pip install pytest
