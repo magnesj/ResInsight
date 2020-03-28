@@ -66,10 +66,17 @@ jobs:
       - name: dir
         run: gci -recurse ${{ runner.workspace }}
         if: contains( matrix.os, 'windows')      
-      - name: Test with pytest
+      - name: Test with pytest (Windows)
         if: "contains( matrix.os, 'windows')" # To be used when RESINSIGHT_GRPC_PYTHON_EXECUTABLE can be 'python' without extention in PATH
         env:
           RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ApplicationCode/Release/ResInsight.exe
+        run: |
+          cd ApplicationCode/GrpcInterface/Python/rips
+          pytest --console
+      - name: Ryn pytest (Linux)
+        if: "!contains( matrix.os, 'windows')" 
+        env:
+          RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ApplicationCode/ResInsight.exe
         run: |
           cd ApplicationCode/GrpcInterface/Python/rips
           pytest --console
