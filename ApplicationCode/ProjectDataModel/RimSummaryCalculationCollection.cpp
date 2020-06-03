@@ -35,8 +35,8 @@ RimSummaryCalculationCollection::RimSummaryCalculationCollection()
 {
     CAF_PDM_InitObject( "Calculation Collection", ":/chain.png", "", "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_calcuations, "Calculations", "Calculations", "", "", "" );
-    m_calcuations.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    CAF_PDM_InitFieldNoDefault( &m_calculations, "Calculations", "Calculations", "", "", "" );
+    m_calculations.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_calcuationSummaryCase, "CalculationsSummaryCase", "Calculations Summary Case", "", "", "" );
     m_calcuationSummaryCase.xmlCapability()->disableIO();
@@ -56,7 +56,7 @@ RimSummaryCalculation* RimSummaryCalculationCollection::addCalculation()
     calculation->setExpression( varName + " := x + y" );
     calculation->parseExpression();
 
-    m_calcuations.push_back( calculation );
+    m_calculations.push_back( calculation );
 
     rebuildCaseMetaData();
 
@@ -73,7 +73,7 @@ RimSummaryCalculation* RimSummaryCalculationCollection::addCalculationCopy( cons
     CVF_ASSERT( calcCopy );
 
     std::set<QString> calcNames;
-    for ( const auto& calc : m_calcuations )
+    for ( const auto& calc : m_calculations )
     {
         calcNames.insert( calc->findLeftHandSide( calc->expression() ) );
     }
@@ -90,7 +90,7 @@ RimSummaryCalculation* RimSummaryCalculationCollection::addCalculationCopy( cons
     expression.replace( currVarName, newVarName );
     calcCopy->setExpression( expression );
 
-    m_calcuations.push_back( calcCopy );
+    m_calculations.push_back( calcCopy );
 
     calcCopy->resolveReferencesRecursively();
     rebuildCaseMetaData();
@@ -104,7 +104,7 @@ RimSummaryCalculation* RimSummaryCalculationCollection::addCalculationCopy( cons
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationCollection::deleteCalculation( RimSummaryCalculation* calculation )
 {
-    m_calcuations.removeChildObject( calculation );
+    m_calculations.removeChildObject( calculation );
 
     rebuildCaseMetaData();
 
@@ -116,7 +116,7 @@ void RimSummaryCalculationCollection::deleteCalculation( RimSummaryCalculation* 
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCalculation*> RimSummaryCalculationCollection::calculations() const
 {
-    return m_calcuations.childObjects();
+    return m_calculations.childObjects();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -124,7 +124,7 @@ std::vector<RimSummaryCalculation*> RimSummaryCalculationCollection::calculation
 //--------------------------------------------------------------------------------------------------
 RimSummaryCalculation* RimSummaryCalculationCollection::findCalculationById( int id ) const
 {
-    for ( RimSummaryCalculation* calc : m_calcuations )
+    for ( RimSummaryCalculation* calc : m_calculations )
     {
         if ( calc->id() == id )
         {
@@ -148,7 +148,7 @@ RimSummaryCase* RimSummaryCalculationCollection::calculationSummaryCase()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationCollection::deleteAllContainedObjects()
 {
-    m_calcuations.deleteAllChildObjects();
+    m_calculations.deleteAllChildObjects();
 
     rebuildCaseMetaData();
 }
@@ -158,7 +158,7 @@ void RimSummaryCalculationCollection::deleteAllContainedObjects()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationCollection::rebuildCaseMetaData()
 {
-    for ( RimSummaryCalculation* calculation : m_calcuations )
+    for ( RimSummaryCalculation* calculation : m_calculations )
     {
         if ( calculation->id() == -1 )
         {

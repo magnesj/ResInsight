@@ -529,7 +529,7 @@ void Rim3dView::setCurrentTimeStep( int frameIndex )
     if ( m_currentTimeStep != oldTimeStep )
     {
         RiuTimeStepChangedHandler::instance()->handleTimeStepChanged( this );
-        this->onClearReservoirCellVisibilitiesIfNeccessary();
+        this->onClearReservoirCellVisibilitiesIfNecessary();
     }
 
     this->hasUserRequestedAnimation = true;

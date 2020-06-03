@@ -25,7 +25,7 @@
 
 #include "RimWellLogCurve.h"
 
-#include "laswell.hpp"
+#include "las well.hpp"
 #include "well.hpp"
 
 #include <QFileInfo>

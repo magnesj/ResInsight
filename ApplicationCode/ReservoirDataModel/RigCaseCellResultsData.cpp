@@ -1307,7 +1307,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
         // Add one more result to result container
         size_t timeStepCount = this->infoForEachResultIndex()[scalarResultIndex].timeStepInfos().size();
 
-        bool resultLoadingSucess = true;
+        bool resultLoadingSuccess = true;
 
         size_t tempGridCellCount = m_ownerMainGrid->totalTemporaryGridCellCount();
 
@@ -1321,7 +1321,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
                 std::vector<double>& values = m_cellScalarResults[scalarResultIndex][i];
                 if ( !m_readerInterface->dynamicResult( resultName, m_porosityModel, i, &values ) )
                 {
-                    resultLoadingSucess = false;
+                    resultLoadingSuccess = false;
                 }
                 else if ( tempGridCellCount > 0 )
                 {
@@ -1341,7 +1341,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
             std::vector<double>& values = m_cellScalarResults[scalarResultIndex][0];
             if ( !m_readerInterface->staticResult( resultName, m_porosityModel, &values ) )
             {
-                resultLoadingSucess = false;
+                resultLoadingSuccess = false;
             }
             else if ( tempGridCellCount > 0 )
             {
@@ -1354,7 +1354,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
             }
         }
 
-        if ( !resultLoadingSucess )
+        if ( !resultLoadingSuccess )
         {
             // Remove last scalar result because loading of result failed
             m_cellScalarResults[scalarResultIndex].clear();
@@ -1483,7 +1483,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
     {
         size_t timeStepCount = this->infoForEachResultIndex()[scalarResultIndex].timeStepInfos().size();
 
-        bool resultLoadingSucess = true;
+        bool resultLoadingSuccess = true;
 
         if ( type == RiaDefines::DYNAMIC_NATIVE && timeStepCount > 0 )
         {
@@ -1494,7 +1494,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
             {
                 if ( !m_readerInterface->dynamicResult( resultName, m_porosityModel, timeStepIndex, &values ) )
                 {
-                    resultLoadingSucess = false;
+                    resultLoadingSuccess = false;
                 }
             }
         }
@@ -1505,11 +1505,11 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
             std::vector<double>& values = m_cellScalarResults[scalarResultIndex][0];
             if ( !m_readerInterface->staticResult( resultName, m_porosityModel, &values ) )
             {
-                resultLoadingSucess = false;
+                resultLoadingSuccess = false;
             }
         }
 
-        if ( !resultLoadingSucess )
+        if ( !resultLoadingSuccess )
         {
             // Error logging
             CVF_ASSERT( false );
@@ -2123,7 +2123,7 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
             }
             else
             {
-                faceAreaVec = nativeCell.faceNormalWithAreaLenght( faceId );
+                faceAreaVec = nativeCell.faceNormalWithAreaLength( faceId );
             }
 
             if ( !isFaceNormalsOutwards ) faceAreaVec = -faceAreaVec;
@@ -2565,7 +2565,7 @@ void RigCaseCellResultsData::computeRiTRANSbyAreaComponent( const QString& riTra
             }
             else
             {
-                faceAreaVec = nativeCell.faceNormalWithAreaLenght( faceId );
+                faceAreaVec = nativeCell.faceNormalWithAreaLength( faceId );
             }
 
             double areaOfOverlap  = faceAreaVec.length();
@@ -3022,7 +3022,7 @@ void RigCaseCellResultsData::computeAllenResults( RigCaseCellResultsData* cellRe
         auto fnBinAllenResAddr =
             RigEclipseResultAddress( RiaDefines::ALLEN_DIAGRAMS, RiaDefines::formationBinaryAllenResultName() );
 
-        // Create and retreive nnc result arrays
+        // Create and retrieve nnc result arrays
 
         std::vector<double>& fnAllenNncResults =
             mainGrid->nncData()->makeStaticConnectionScalarResult( RiaDefines::formationAllenResultName() );

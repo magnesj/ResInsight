@@ -600,7 +600,7 @@ RigFemScalarResultFrames*
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Convert POR NODAL result to POR-Bar Elment Nodal result
+/// Convert POR NODAL result to POR-Bar Element Nodal result
 //--------------------------------------------------------------------------------------------------
 RigFemScalarResultFrames*
     RigFemPartResultsCollection::calculateEnIpPorBarResult( int partIndex, const RigFemResultAddress& convertedResultAddr )
@@ -640,7 +640,7 @@ RigFemScalarResultFrames*
 
             if ( elmType == HEX8P )
             {
-                int elmNodeCount = RigFemTypes::elmentNodeCount( elmType );
+                int elmNodeCount = RigFemTypes::elementNodeCount( elmType );
                 for ( int elmNodIdx = 0; elmNodIdx < elmNodeCount; ++elmNodIdx )
                 {
                     size_t elmNodResIdx        = femPart->elementNodeResultIdx( elmIdx, elmNodIdx );
@@ -1072,7 +1072,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateStressGradients(
             // Find the corresponding corner values for the element
             std::array<double, 8> cornerValues;
 
-            int elmNodeCount = RigFemTypes::elmentNodeCount( elmType );
+            int elmNodeCount = RigFemTypes::elementNodeCount( elmType );
             for ( int elmNodIdx = 0; elmNodIdx < elmNodeCount; ++elmNodIdx )
             {
                 size_t elmNodResIdx     = femPart->elementNodeResultIdx( elmIdx, elmNodIdx );
@@ -1172,7 +1172,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateNodalGradients( 
                     std::array<cvf::Vec3d, 8> hexCorners;
                     std::array<double, 8>     cornerValues;
 
-                    int elmNodeCount = RigFemTypes::elmentNodeCount( elmType );
+                    int elmNodeCount = RigFemTypes::elementNodeCount( elmType );
                     for ( int elmNodIdx = 0; elmNodIdx < elmNodeCount; ++elmNodIdx )
                     {
                         size_t elmNodResIdx   = femPart->elementNodeResultIdx( elmIdx, elmNodIdx );
@@ -1603,7 +1603,7 @@ RigFemScalarResultFrames*
         for ( int elmIdx = 0; elmIdx < elementCount; ++elmIdx )
         {
             RigElementType elmType        = femPart->elementType( elmIdx );
-            int            faceCount      = RigFemTypes::elmentFaceCount( elmType );
+            int            faceCount      = RigFemTypes::elementFaceCount( elmType );
             const int*     elmNodeIndices = femPart->connectivities( elmIdx );
 
             int elmNodFaceResIdxElmStart = elmIdx * 24; // HACK should get from part
@@ -1722,7 +1722,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateSurfaceAngles( i
         for ( int elmIdx = 0; elmIdx < elementCount; ++elmIdx )
         {
             RigElementType elmType        = femPart->elementType( elmIdx );
-            int            faceCount      = RigFemTypes::elmentFaceCount( elmType );
+            int            faceCount      = RigFemTypes::elementFaceCount( elmType );
             const int*     elmNodeIndices = femPart->connectivities( elmIdx );
 
             int elmNodFaceResIdxElmStart = elmIdx * 24; // HACK should get from part
@@ -2169,7 +2169,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateSE( int partInde
         {
             RigElementType elmType = femPart->elementType( elmIdx );
 
-            int elmNodeCount = RigFemTypes::elmentNodeCount( femPart->elementType( elmIdx ) );
+            int elmNodeCount = RigFemTypes::elementNodeCount( femPart->elementType( elmIdx ) );
 
             if ( elmType == HEX8P )
             {
@@ -2246,7 +2246,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateST_11_22_33( int
         {
             RigElementType elmType = femPart->elementType( elmIdx );
 
-            int elmNodeCount = RigFemTypes::elmentNodeCount( femPart->elementType( elmIdx ) );
+            int elmNodeCount = RigFemTypes::elementNodeCount( femPart->elementType( elmIdx ) );
 
             if ( elmType == HEX8P )
             {
@@ -2402,7 +2402,7 @@ RigFemScalarResultFrames* RigFemPartResultsCollection::calculateFormationIndices
         for ( int elmIdx = 0; elmIdx < elementCount; ++elmIdx )
         {
             RigElementType elmType      = femPart->elementType( elmIdx );
-            int            elmNodeCount = RigFemTypes::elmentNodeCount( elmType );
+            int            elmNodeCount = RigFemTypes::elementNodeCount( elmType );
 
             size_t i, j, k;
             bool   validIndex = structGrid->ijkFromCellIndex( elmIdx, &i, &j, &k );
@@ -2641,7 +2641,7 @@ void RigFemPartResultsCollection::calculateGammaFromFrames( int                 
         {
             RigElementType elmType = femPart->elementType( elmIdx );
 
-            int elmNodeCount = RigFemTypes::elmentNodeCount( femPart->elementType( elmIdx ) );
+            int elmNodeCount = RigFemTypes::elementNodeCount( femPart->elementType( elmIdx ) );
 
             if ( elmType == HEX8P )
             {
@@ -3296,15 +3296,15 @@ RigFemClosestResultIndexCalculator::RigFemClosestResultIndexCalculator( RigFemPa
     if ( resultPosition != RIG_ELEMENT_NODAL_FACE || m_face == -1 )
     {
         RigElementType elmType      = femPart->elementType( elementIndex );
-        const int*     elmentConn   = femPart->connectivities( elementIndex );
-        int            elmNodeCount = RigFemTypes::elmentNodeCount( elmType );
+        const int*     elementConn   = femPart->connectivities( elementIndex );
+        int            elmNodeCount = RigFemTypes::elementNodeCount( elmType );
 
         // Find the closest node
         int   closestLocalNode = -1;
         float minDist          = std::numeric_limits<float>::infinity();
         for ( int lNodeIdx = 0; lNodeIdx < elmNodeCount; ++lNodeIdx )
         {
-            int        nodeIdx         = elmentConn[lNodeIdx];
+            int        nodeIdx         = elementConn[lNodeIdx];
             cvf::Vec3f nodePosInDomain = femPart->nodes().coordinates[nodeIdx];
             float      dist            = ( nodePosInDomain - cvf::Vec3f( intersectionPointInDomain ) ).lengthSquared();
             if ( dist < minDist )
@@ -3316,7 +3316,7 @@ RigFemClosestResultIndexCalculator::RigFemClosestResultIndexCalculator( RigFemPa
 
         if ( closestLocalNode >= 0 )
         {
-            int nodeIdx = elmentConn[closestLocalNode];
+            int nodeIdx = elementConn[closestLocalNode];
             m_closestElementNodeResIdx =
                 static_cast<int>( femPart->elementNodeResultIdx( elementIndex, closestLocalNode ) );
 

@@ -30,7 +30,7 @@
 
 #include "cvfAssert.h"
 
-#include "laswell.hpp"
+#include "las well.hpp"
 
 #include <QDir>
 #include <QMessageBox>

@@ -424,13 +424,13 @@ void RimEllipseFractureTemplate::defineUiOrdering( QString uiConfigName, caf::Pd
 {
     if ( fractureTemplateUnit() == RiaEclipseUnitTools::UNITS_METRIC )
     {
-        m_halfLength.uiCapability()->setUiName( "Halflenght X<sub>f</sub> [m]" );
+        m_halfLength.uiCapability()->setUiName( "Halflength X<sub>f</sub> [m]" );
         m_height.uiCapability()->setUiName( "Height [m]" );
         m_width.uiCapability()->setUiName( "Width [m]" );
     }
     else if ( fractureTemplateUnit() == RiaEclipseUnitTools::UNITS_FIELD )
     {
-        m_halfLength.uiCapability()->setUiName( "Halflenght X<sub>f</sub> [ft]" );
+        m_halfLength.uiCapability()->setUiName( "Halflength X<sub>f</sub> [ft]" );
         m_height.uiCapability()->setUiName( "Height [ft]" );
         m_width.uiCapability()->setUiName( "Width [inches]" );
     }
