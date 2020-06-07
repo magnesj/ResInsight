@@ -12,7 +12,7 @@ jobs:
       uses: DoozyX/clang-format-lint-action@v0.6
       with:
         source: './ApplicationCode'
-        exclude: './ApplicationCode/FileInterface/RifReaderEclipseOutput.cpp'
+        exclude: './ApplicationCode/FileInterface'
         extensions: 'h,cpp'
         clangFormatVersion: 6
     
