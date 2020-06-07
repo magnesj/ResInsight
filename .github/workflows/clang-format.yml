@@ -1,0 +1,17 @@
+name: Check Code Format
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Check src format
+      uses: DoozyX/clang-format-lint-action@v0.5
+      with:
+        source: './ApplicationCode'
+        extensions: 'h,cpp'
+        clangFormatVersion: 6
+    
