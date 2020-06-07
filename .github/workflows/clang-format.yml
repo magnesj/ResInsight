@@ -12,6 +12,6 @@ jobs:
       uses: DoozyX/clang-format-lint-action@v0.6
       with:
         source: './ApplicationCode'
-        exclude: './ApplicationCode/FileInterface ./ApplicationCode/Application'
+        exclude: './ApplicationCode/FileInterface ./ApplicationCode/Application/Tools'
         extensions: 'h,cpp'
         clangFormatVersion: 6
