@@ -9,7 +9,7 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: Check src format
-      uses: DoozyX/clang-format-lint-action@v0
+      uses: DoozyX/clang-format-lint-action@v0.6
       with:
         source: './ApplicationCode'
         extensions: 'h,cpp'
