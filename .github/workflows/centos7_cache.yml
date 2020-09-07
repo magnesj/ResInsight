@@ -1,4 +1,4 @@
-name: centOS 7 (without geomech)
+name: centOS 7
 
 on:
   push:
@@ -39,11 +39,11 @@ jobs:
         submodules: true
     
     - name: Cache vcpkg
-        id: cache-vcpkg
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/vcpkg/
-          key: ${{ runner.os }}-vcpkg-v02
+      id: cache-vcpkg
+      uses: actions/cache@v2
+      with:
+        path: ${{ github.workspace }}/vcpkg/
+        key: ${{ runner.os }}-vcpkg-v02
           
     - name: Build ResInsight
       run: | 
