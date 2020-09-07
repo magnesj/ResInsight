@@ -62,27 +62,3 @@ jobs:
         vcpkg/bootstrap-vcpkg.sh 
         vcpkg/vcpkg install grpc
         
-        mkdir cmakebuild
-        cd cmakebuild
-        cmake3 \
-        -DRESINSIGHT_QT5_BUNDLE_LIBRARIES=ON \
-        -DRESINSIGHT_ENABLE_GRPC=true \
-        -DRESINSIGHT_ENABLE_UNITY_BUILD=true \
-        -DVCPKG_TARGET_TRIPLET=x64-linux \
-        -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
-        -DRESINSIGHT_GRPC_PYTHON_EXECUTABLE=python \
-        ..
-        
-        make -j8
-        make package
-        rm -rf packages/_CPack_Packages
-        
-        # Show file structure
-        pwd
-        ls
-
-    - name: Upload artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ResInsight
-        path: ./cmakebuild/packages
