@@ -42,5 +42,5 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../Fwk/AppFwk
-          cmake --build .
+          cmake -GNinja ../Fwk/AppFwk
+          ninja
