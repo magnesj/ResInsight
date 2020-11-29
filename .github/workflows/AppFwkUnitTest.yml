@@ -1,6 +1,9 @@
 name: Application Framework Build with Unit Tests
 
 on: [push, pull_request]
+env:
+  BUILDCACHE_VERSION: 0.23.0
+  BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
 jobs:
   ResInsight-x64:
     runs-on: ${{ matrix.os }}
@@ -40,6 +43,43 @@ jobs:
 
       - name: Use Visual Studio on Windows
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Download buildcache
+        id: buildcache-download
+        shell: cmake -P {0}
+        run: |
+          if ("${{ runner.os }}" STREQUAL "Windows")
+            set(buildcache_suffix "win-msvc.zip")
+          elseif ("${{ runner.os }}" STREQUAL "Linux")
+            set(buildcache_suffix "linux.tar.gz")
+          endif()
+          set(buildcache_version $ENV{BUILDCACHE_VERSION})
+          set(buildcache_url "https://github.com/mbitsnbites/buildcache/releases/download/v${buildcache_version}/buildcache-${buildcache_suffix}")
+          file(DOWNLOAD "${buildcache_url}" ./buildcache.zip)
+          execute_process(COMMAND ${CMAKE_COMMAND} -E tar xvf ./buildcache.zip)
+          if (NOT "${{ runner.os }}" STREQUAL "Windows")
+            execute_process(
+              COMMAND chmod +x buildcache/bin/buildcache
+            )
+          endif()          
+      - name: Prepare cache timestamp
+        id: cache_timestamp_string
+        shell: cmake -P {0}
+        run: |
+          string(TIMESTAMP current_date "%Y-%m-%d" UTC)
+          message("::set-output name=timestamp::${current_date}")
+      - name: Cache Buildcache
+        id: cache-buildcache
+        uses: actions/cache@v2
+        with:
+          path: ${{ env.BUILDCACHE_DIR }}
+          key: ${{ matrix.config.name }}-cache-v02-${{ steps.cache_timestamp_string.outputs.timestamp }}
+      - name: Create Folder for buildcache
+        run: New-Item ${{ env.BUILDCACHE_DIR }} -ItemType "directory" -Force 
+        shell: pwsh
+      - name: Add buildcache to system path
+        run: echo "${{github.workspace}}/buildcache/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
+        shell: pwsh
 
       - name: Configure and build 
         run: |
