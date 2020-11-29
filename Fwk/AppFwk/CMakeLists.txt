@@ -15,6 +15,17 @@ find_program(buildcache_program buildcache)
 if(buildcache_program)
   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${buildcache_program}")
   message( STATUS "Found buildcache from : ${buildcache_program}" )
+
+  if (MSVC)
+    string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+    if(CMAKE_CXX_FLAGS_DEBUG MATCHES "/Zi")
+      message(STATUS "Clearing pdb setting")
+      string(REGEX REPLACE "/Zi" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    endif()
+
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} /Z7")
+  endif()
 else()
   message( STATUS "No buildcache found" )
 endif()
