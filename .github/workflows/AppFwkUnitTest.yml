@@ -39,6 +39,7 @@ jobs:
           ninja --version
 
       - name: Configure and build 
+      - uses: ilammy/msvc-dev-cmd@v1
         run: |
           mkdir build
           cd build
