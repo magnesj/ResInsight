@@ -11,6 +11,14 @@ if(MSVC AND (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 19.11))
   )
 endif()
 
+find_program(buildcache_program buildcache)
+if(buildcache_program)
+  set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "${buildcache_program}")
+  message( STATUS "Found buildcache from : ${buildcache_program}" )
+else()
+  message( STATUS "No buildcache found" )
+endif()
+
 # Qt
 if(NOT DEFINED (CEE_USE_QT5))
   option(CEE_USE_QT5 "Use Qt5" ON)
