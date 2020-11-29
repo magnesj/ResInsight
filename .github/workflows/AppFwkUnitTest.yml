@@ -38,8 +38,10 @@ jobs:
           which ninja
           ninja --version
 
-      - name: Configure and build 
+      - name: Use Visual Studio on Windows
         uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Configure and build 
         run: |
           mkdir build
           cd build
