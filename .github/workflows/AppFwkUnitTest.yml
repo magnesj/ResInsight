@@ -37,3 +37,10 @@ jobs:
           cmake --version
           which ninja
           ninja --version
+
+      - name: Configure and build 
+        run: |
+          mkdir build
+          cd build
+          cmake ../Fwk/AppFwk
+          cmake --build .
