@@ -95,7 +95,7 @@ void RicThemeColorEditorFeature::onActionTriggered( bool isChecked )
         QLayoutItem* item;
         if ( widget->layout() )
         {
-            while ( ( item = widget->layout()->takeAt( 0 ) ) != NULL )
+            while ( ( item = widget->layout()->takeAt( 0 ) ) != nullptr )
             {
                 delete item->widget();
                 delete item;
