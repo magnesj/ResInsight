@@ -34,7 +34,7 @@ public:
         m_name = name;
     }
 
-    ~ItemPdmObject() {}
+    ~ItemPdmObject() override {}
 
     // Fields
     caf::PdmDataValueField<QString> m_name;
@@ -57,7 +57,7 @@ public:
         CAF_PDM_XML_InitField( &m_demoObjs, "DemoObjs" );
     }
 
-    ~ContainerPdmObject() {}
+    ~ContainerPdmObject() override {}
 
     // Fields
     caf::PdmChildArrayField<ItemPdmObject*>      m_items;
@@ -90,7 +90,7 @@ public:
         CAF_PDM_XML_InitField( &m_pointerToDemoObj, "TestPointerToDemo" );
     }
 
-    ~DemoPdmObjectA() {}
+    ~DemoPdmObjectA() override {}
 
     // Fields
     caf::PdmProxyValueField<double>         m_doubleField;
@@ -174,7 +174,7 @@ TEST( AdvancedObjectTest, FieldWrite )
 
             a->readObjectFromXmlString( serializedString, caf::PdmDefaultObjectFactory::instance() );
 
-            ASSERT_TRUE( a->m_pointerToItem() == NULL );
+            ASSERT_TRUE( a->m_pointerToItem() == nullptr );
         }
     }
 

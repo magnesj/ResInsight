@@ -20,7 +20,7 @@ public:
     {
         CAF_PDM_InitObject( "SimpleObj", "", "Tooltip SimpleObj", "WhatsThis SimpleObj" );
     }
-    ~SimpleObj() {}
+    ~SimpleObj() override {}
 };
 CAF_PDM_SOURCE_INIT( SimpleObj, "SimpleObj" );
 
@@ -36,7 +36,7 @@ public:
         CAF_PDM_InitFieldNoDefault( &m_simpleObjPtrField, "SimpleObjPtrField", "SimpleObjPtrField", "", "Tooltip", "WhatsThis" );
     }
 
-    ~DemoPdmObject() { m_simpleObjPtrField.deleteAllChildObjects(); }
+    ~DemoPdmObject() override { m_simpleObjPtrField.deleteAllChildObjects(); }
 
     caf::PdmChildArrayField<caf::PdmObjectHandle*> m_simpleObjPtrField;
 };

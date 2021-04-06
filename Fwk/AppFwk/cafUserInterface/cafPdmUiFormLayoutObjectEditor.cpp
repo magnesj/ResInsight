@@ -441,7 +441,7 @@ void caf::PdmUiFormLayoutObjectEditor::ensureWidgetContainsEmptyGridLayout( QWid
         // Remove all items from the layout, then reparent the layout to a temporary
         // This is because you cannot remove a layout from a widget but it gets moved when reparenting.
         QLayoutItem* item;
-        while ( ( item = layout->takeAt( 0 ) ) != 0 )
+        while ( ( item = layout->takeAt( 0 ) ) != nullptr )
         {
         }
         QWidget().setLayout( layout );
