@@ -24,7 +24,7 @@
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
 #include "RigStatisticsMath.h"
-#include <math.h>
+#include <cmath>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
