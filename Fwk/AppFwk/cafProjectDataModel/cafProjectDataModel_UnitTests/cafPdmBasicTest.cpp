@@ -96,7 +96,7 @@ public:
         m_doubleMember = other.m_doubleMember;
     }
 
-    ~SimpleObj() {}
+    ~SimpleObj() override {}
 
     caf::PdmField<double>              m_position;
     caf::PdmField<double>              m_dir;
@@ -150,7 +150,7 @@ public:
         m_simpleObjPtrField2 = new SimpleObj;
     }
 
-    ~DemoPdmObject()
+    ~DemoPdmObject() override
     {
         delete m_simpleObjPtrField();
         delete m_simpleObjPtrField2();
@@ -193,7 +193,7 @@ public:
                                     "Whatsthis SimpleObjectsField" );
     }
 
-    ~InheritedDemoObj() { m_simpleObjectsField.deleteAllChildObjects(); }
+    ~InheritedDemoObj() override { m_simpleObjectsField.deleteAllChildObjects(); }
 
     caf::PdmField<std::vector<QString>>       m_texts;
     caf::PdmField<caf::AppEnum<TestEnumType>> m_testEnumField;
@@ -212,7 +212,7 @@ public:
         CAF_PDM_InitFieldNoDefault( &objects, "PdmObjects", "", "", "", "" )
     }
 
-    ~MyPdmDocument() { objects.deleteAllChildObjects(); }
+    ~MyPdmDocument() override { objects.deleteAllChildObjects(); }
 
     caf::PdmChildArrayField<PdmObjectHandle*> objects;
 };
@@ -246,7 +246,7 @@ TEST( BaseTest, Start )
     DemoPdmObject* a = new DemoPdmObject;
 
     caf::PdmObjectHandle* demo = caf::PdmDefaultObjectFactory::instance()->create( "DemoPdmObject" );
-    EXPECT_TRUE( demo != NULL );
+    EXPECT_TRUE( demo != nullptr );
 
     QString          xml;
     QXmlStreamWriter xmlStream( &xml );
@@ -549,7 +549,7 @@ TEST( BaseTest, ReadWrite )
             EXPECT_EQ( size_t( 1 ), demoObjs.size() );
         }
 
-        d2->m_simpleObjPtrField = NULL;
+        d2->m_simpleObjPtrField = nullptr;
         xmlDoc.objects.deleteAllChildObjects();
     }
 
@@ -698,8 +698,8 @@ TEST( BaseTest, ReadWrite )
         pog.objectsByType( &demoObjs );
 
         EXPECT_EQ( size_t( 4 ), demoObjs.size() );
-        EXPECT_TRUE( demoObjs[0]->m_simpleObjPtrField == NULL );
-        EXPECT_TRUE( demoObjs[0]->m_simpleObjPtrField2 != NULL );
+        EXPECT_TRUE( demoObjs[0]->m_simpleObjPtrField == nullptr );
+        EXPECT_TRUE( demoObjs[0]->m_simpleObjPtrField2 != nullptr );
 
         // check single pointer field
         std::vector<caf::PdmPointer<SimpleObj>> simpleObjs;
@@ -718,7 +718,7 @@ TEST( BaseTest, PdmPointer )
 
     {
         caf::PdmPointer<caf::PdmDocument> p;
-        EXPECT_TRUE( p == NULL );
+        EXPECT_TRUE( p == nullptr );
     }
 
     {
@@ -727,8 +727,8 @@ TEST( BaseTest, PdmPointer )
 
         EXPECT_TRUE( p == d && p2 == d );
         EXPECT_TRUE( p.p() == d );
-        p = 0;
-        EXPECT_TRUE( p == NULL );
+        p = nullptr;
+        EXPECT_TRUE( p == nullptr );
         EXPECT_TRUE( p.isNull() );
         EXPECT_TRUE( p2 == d );
         p = p2;
@@ -749,30 +749,30 @@ TEST( BaseTest, PdmObjectFactory )
 {
     {
         SimpleObj* s = dynamic_cast<SimpleObj*>( caf::PdmDefaultObjectFactory::instance()->create( "SimpleObj" ) );
-        EXPECT_TRUE( s != NULL );
+        EXPECT_TRUE( s != nullptr );
     }
     {
         DemoPdmObject* s =
             dynamic_cast<DemoPdmObject*>( caf::PdmDefaultObjectFactory::instance()->create( "DemoPdmObject" ) );
-        EXPECT_TRUE( s != NULL );
+        EXPECT_TRUE( s != nullptr );
         delete s;
     }
     {
         InheritedDemoObj* s =
             dynamic_cast<InheritedDemoObj*>( caf::PdmDefaultObjectFactory::instance()->create( "InheritedDemoObj" ) );
-        EXPECT_TRUE( s != NULL );
+        EXPECT_TRUE( s != nullptr );
     }
 
     {
         caf::PdmDocument* s =
             dynamic_cast<caf::PdmDocument*>( caf::PdmDefaultObjectFactory::instance()->create( "PdmDocument" ) );
-        EXPECT_TRUE( s != NULL );
+        EXPECT_TRUE( s != nullptr );
     }
 
     {
         caf::PdmObjectGroup* s =
             dynamic_cast<caf::PdmObjectGroup*>( caf::PdmDefaultObjectFactory::instance()->create( "PdmObjectGroup" ) );
-        EXPECT_TRUE( s != NULL );
+        EXPECT_TRUE( s != nullptr );
     }
 }
 
@@ -956,7 +956,7 @@ TEST( BaseTest, PdmReferenceHelper )
     ihd1->m_simpleObjectsField.push_back( s3 );
 
     {
-        QString refString = caf::PdmReferenceHelper::referenceFromRootToObject( NULL, s3 );
+        QString refString = caf::PdmReferenceHelper::referenceFromRootToObject( nullptr, s3 );
         EXPECT_TRUE( refString.isEmpty() );
 
         refString              = caf::PdmReferenceHelper::referenceFromRootToObject( ihd1, s3 );

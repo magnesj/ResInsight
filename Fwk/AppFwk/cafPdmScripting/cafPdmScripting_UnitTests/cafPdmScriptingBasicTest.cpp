@@ -98,7 +98,7 @@ public:
         m_doubleMember = other.m_doubleMember;
     }
 
-    ~SimpleObj() {}
+    ~SimpleObj() override {}
 
     caf::PdmField<double>              m_position;
     caf::PdmField<double>              m_dir;
@@ -152,7 +152,7 @@ public:
         m_simpleObjPtrField2 = new SimpleObj;
     }
 
-    ~DemoPdmObject()
+    ~DemoPdmObject() override
     {
         delete m_simpleObjPtrField();
         delete m_simpleObjPtrField2();
@@ -201,7 +201,7 @@ public:
                                     "Whatsthis SimpleObjectsField" );
     }
 
-    ~InheritedDemoObj() { m_simpleObjectsField.deleteAllChildObjects(); }
+    ~InheritedDemoObj() override { m_simpleObjectsField.deleteAllChildObjects(); }
 
     caf::PdmField<std::vector<QString>> m_texts;
     caf::PdmField<std::vector<double>>  m_numbers;
@@ -222,7 +222,7 @@ public:
         CAF_PDM_InitFieldNoDefault( &objects, "PdmObjects", "", "", "", "" )
     }
 
-    ~MyPdmDocument() { objects.deleteAllChildObjects(); }
+    ~MyPdmDocument() override { objects.deleteAllChildObjects(); }
 
     caf::PdmChildArrayField<PdmObjectHandle*> objects;
 };

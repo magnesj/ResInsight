@@ -66,7 +66,7 @@ public:
         this->addField( &derivedOtherObjs, "derivedOtherObjs" );
     }
 
-    ~ContainerObj()
+    ~ContainerObj() override
     {
         derivedObjs.deleteAllChildObjects();
         derivedOtherObjs.deleteAllChildObjects();
@@ -106,7 +106,7 @@ TEST( ChildArrayFieldHandle, DerivedObjects )
     EXPECT_EQ( s2, myObj );
 
     myObj = findObjectById<SimpleObjDerived*>( containerObj->derivedObjs.begin(), containerObj->derivedObjs.end(), -1 );
-    EXPECT_EQ( NULL, myObj );
+    EXPECT_EQ( nullptr, myObj );
 
     delete containerObj;
 }
@@ -133,7 +133,7 @@ TEST( ChildArrayFieldHandle, DerivedOtherObjects )
     myObj = findObjectById<SimpleObjDerivedOther*>( containerObj->derivedOtherObjs.begin(),
                                                     containerObj->derivedOtherObjs.end(),
                                                     -1 );
-    EXPECT_EQ( NULL, myObj );
+    EXPECT_EQ( nullptr, myObj );
 
     delete containerObj;
 }

@@ -308,14 +308,14 @@ GTEST_DISABLE_MSC_WARNINGS_POP_()  //  4251
 
 #endif  // GTEST_INCLUDE_GTEST_GTEST_SPI_H_
 
-#include <ctype.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <wchar.h>
-#include <wctype.h>
+#include <cctype>
+#include <cmath>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
+#include <cwchar>
+#include <cwctype>
 
 #include <algorithm>
 #include <iomanip>
@@ -430,11 +430,11 @@ GTEST_DISABLE_MSC_WARNINGS_POP_()  //  4251
 #define GTEST_SRC_GTEST_INTERNAL_INL_H_
 
 #ifndef _WIN32_WCE
-# include <errno.h>
+# include <cerrno>
 #endif  // !_WIN32_WCE
-#include <stddef.h>
-#include <stdlib.h>  // For strtoll/_strtoul64/malloc/free.
-#include <string.h>  // For memmove.
+#include <cstddef>
+#include <cstdlib>  // For strtoll/_strtoul64/malloc/free.
+#include <cstring>  // For memmove.
 
 #include <algorithm>
 #include <memory>
@@ -7698,15 +7698,15 @@ ScopedTrace::~ScopedTrace()
 #  include <crt_externs.h>
 # endif  // GTEST_OS_MAC
 
-# include <errno.h>
+# include <cerrno>
+# include <climits>
 # include <fcntl.h>
-# include <limits.h>
 
 # if GTEST_OS_LINUX
-#  include <signal.h>
+#  include <csignal>
 # endif  // GTEST_OS_LINUX
 
-# include <stdarg.h>
+# include <cstdarg>
 
 # if GTEST_OS_WINDOWS
 #  include <windows.h>
@@ -9333,7 +9333,7 @@ InternalRunDeathTestFlag* ParseInternalRunDeathTestFlag() {
 // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
-#include <stdlib.h>
+#include <cstdlib>
 
 #if GTEST_OS_WINDOWS_MOBILE
 # include <windows.h>
@@ -9341,7 +9341,7 @@ InternalRunDeathTestFlag* ParseInternalRunDeathTestFlag() {
 # include <direct.h>
 # include <io.h>
 #else
-# include <limits.h>
+# include <climits>
 # include <climits>  // Some Linux distributions define PATH_MAX here.
 #endif  // GTEST_OS_WINDOWS_MOBILE
 
@@ -9803,10 +9803,10 @@ Matcher<absl::string_view>::Matcher(absl::string_view s) {
 
 
 
-#include <limits.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <fstream>
 #include <memory>
 
@@ -11208,8 +11208,8 @@ const char* StringFromGTestEnv(const char* flag, const char* default_value) {
 // or void PrintTo(const Foo&, ::std::ostream*) in the namespace that
 // defines Foo.
 
-#include <stdio.h>
 #include <cctype>
+#include <cstdio>
 #include <cwchar>
 #include <ostream>  // NOLINT
 #include <string>

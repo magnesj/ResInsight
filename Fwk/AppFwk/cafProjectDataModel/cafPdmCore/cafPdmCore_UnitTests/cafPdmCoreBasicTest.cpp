@@ -45,7 +45,7 @@ public:
         m_memberStringField = "";
     }
 
-    ~DemoPdmObject() {}
+    ~DemoPdmObject() override {}
 
     // Fields
     caf::PdmProxyValueField<double>  m_proxyDoubleField;
@@ -299,11 +299,11 @@ TEST( BaseTest, PdmChildArrayField )
     EXPECT_EQ( size_t( 3 ), typedObjects.size() );
 
     // set()
-    ihd1->m_childArrayField.set( 1, NULL );
-    EXPECT_TRUE( NULL == ihd1->m_childArrayField[1] );
-    EXPECT_TRUE( s2->parentField() == NULL );
+    ihd1->m_childArrayField.set( 1, nullptr );
+    EXPECT_TRUE( nullptr == ihd1->m_childArrayField[1] );
+    EXPECT_TRUE( s2->parentField() == nullptr );
 
-    ihd1->m_childArrayField.removeChildObject( NULL );
+    ihd1->m_childArrayField.removeChildObject( nullptr );
     EXPECT_EQ( size_t( 2 ), ihd1->m_childArrayField.size() );
     EXPECT_EQ( s3, ihd1->m_childArrayField[1] );
     EXPECT_EQ( s1, ihd1->m_childArrayField[0] );
@@ -322,13 +322,13 @@ TEST( BaseTest, PdmChildArrayField )
     EXPECT_EQ( s3, ihd1->m_childArrayField[1] );
     EXPECT_EQ( s1, ihd1->m_childArrayField[0] );
 
-    EXPECT_TRUE( s2->parentField() == NULL );
+    EXPECT_TRUE( s2->parentField() == nullptr );
 
     // clear()
     ihd1->m_childArrayField.clear();
     EXPECT_EQ( size_t( 0 ), ihd1->m_childArrayField.size() );
 
-    EXPECT_TRUE( s1->parentField() == NULL );
+    EXPECT_TRUE( s1->parentField() == nullptr );
 
     ihd1->m_childArrayField.push_back( s1 );
     ihd1->m_childArrayField.push_back( s2 );
@@ -336,9 +336,9 @@ TEST( BaseTest, PdmChildArrayField )
 
     ihd1->m_childArrayField.deleteAllChildObjects();
     EXPECT_EQ( size_t( 0 ), ihd1->m_childArrayField.size() );
-    EXPECT_TRUE( s1 == NULL );
-    EXPECT_TRUE( s2 == NULL );
-    EXPECT_TRUE( s3 == NULL );
+    EXPECT_TRUE( s1 == nullptr );
+    EXPECT_TRUE( s2 == nullptr );
+    EXPECT_TRUE( s3 == nullptr );
 }
 
 TEST( BaseTest, PdmChildArrayParentField )
@@ -445,7 +445,7 @@ TEST( BaseTest, PdmChildField )
             this->addField( &field2, "field2" );
         }
 
-        ~A() { delete field2(); }
+        ~A() override { delete field2(); }
 
         caf::PdmChildField<Child*> field2;
         int                        b;
@@ -463,7 +463,7 @@ TEST( BaseTest, PdmChildField )
         EXPECT_EQ( static_cast<Child*>( nullptr ), a.field2 );
     }
     {
-        A      a( NULL );
+        A      a( nullptr );
         Child* c2 = new Child;
         // Assign
         a.field2 = c2;
@@ -562,7 +562,7 @@ TEST( BaseTest, PdmPointer )
 
     {
         caf::PdmPointer<InheritedDemoObj> p;
-        EXPECT_TRUE( p == NULL );
+        EXPECT_TRUE( p == nullptr );
     }
 
     {
@@ -571,8 +571,8 @@ TEST( BaseTest, PdmPointer )
 
         EXPECT_TRUE( p == d && p2 == d );
         EXPECT_TRUE( p.p() == d );
-        p = 0;
-        EXPECT_TRUE( p == NULL );
+        p = nullptr;
+        EXPECT_TRUE( p == nullptr );
         EXPECT_TRUE( p.isNull() );
         EXPECT_TRUE( p2 == d );
         p = p2;

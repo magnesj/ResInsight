@@ -41,7 +41,7 @@ public:
         m_enumMember = T1;
     }
 
-    ~DemoPdmObject() {}
+    ~DemoPdmObject() override {}
 
     // Fields
 
@@ -181,7 +181,7 @@ public:
         CAF_PDM_XML_InitField( &m_childArrayField, "DemoPdmObjectects" );
     }
 
-    ~InheritedDemoObj() { m_childArrayField.deleteAllChildObjects(); }
+    ~InheritedDemoObj() override { m_childArrayField.deleteAllChildObjects(); }
 
     caf::PdmDataValueField<QString>         m_texts;
     caf::PdmChildArrayField<DemoPdmObject*> m_childArrayField;
@@ -246,7 +246,7 @@ public:
         CAF_PDM_XML_InitField( &m_simpleObjPtrField2, "SimpleObjPtrField2" );
     }
 
-    ~ReferenceDemoPdmObject()
+    ~ReferenceDemoPdmObject() override
     {
         delete m_pointersField();
         m_simpleObjPtrField2.deleteAllChildObjects();

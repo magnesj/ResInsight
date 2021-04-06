@@ -29,7 +29,7 @@ public:
         m_name = name;
     }
 
-    ~MyItemPdmObject() {}
+    ~MyItemPdmObject() override {}
 
     // Fields
     caf::PdmDataValueField<QString> m_name;
@@ -49,7 +49,7 @@ public:
         CAF_PDM_XML_InitField( &m_containers, "Containers" );
     }
 
-    ~MyContainerPdmObject() {}
+    ~MyContainerPdmObject() override {}
 
     // Fields
     caf::PdmChildArrayField<MyItemPdmObject*> m_items;
