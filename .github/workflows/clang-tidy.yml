@@ -57,10 +57,10 @@ jobs:
       - name: Create compile commands and run clang-tidy
         # https://clang.llvm.org/extra/doxygen/run-clang-tidy_8py_source.html
         run: |
+          sudo apt-get install clang-tidy iwyu
           mkdir build
           cd build
-          cmake -DCMAKE_TOOLCHAIN_FILE=${{ matrix.config.cmake-toolchain }}  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
-          sudo apt-get install clang-tidy
+          cmake -DCMAKE_TOOLCHAIN_FILE=${{ matrix.config.cmake-toolchain }}  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_CXX_INCLUDE_WHAT_YOU_USE=include-what-you-use ..
           mv compile_commands.json compile_commands_original.json
           python ../scripts/fix_json_database.py compile_commands_original.json >> compile_commands.json
       - name: clang-tidy on ApplicationLibCode/Application
