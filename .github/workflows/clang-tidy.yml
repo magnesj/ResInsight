@@ -89,6 +89,7 @@ jobs:
           cd ThirdParty/vcpkg
           git reset --hard HEAD
           git clean -fxd
+          
       - uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
