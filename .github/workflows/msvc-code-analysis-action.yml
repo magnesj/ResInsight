@@ -35,12 +35,12 @@ jobs:
       - name: Set vcpkg's response file path used as part of cache's key.
         uses: lukka/set-shell-env@master
         with:
-          VCPKGRESPONSEFILE: ${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}
+          VCPKGRESPONSEFILE: ${{ github.workspace }}/vcpkg_x64-windows.txt
       - name: Restore from cache and install vcpkg
         uses: lukka/run-vcpkg@v7
         id: runvcpkg
         with:
-          vcpkgArguments: "@${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}"
+          vcpkgArguments: "@${{ github.workspace }}/vcpkg_x64-windows.txt
           vcpkgDirectory:
             "${{ github.workspace }}/ThirdParty/vcpkg"
             # Ensure the cache key changes any time the content of the response file changes.
