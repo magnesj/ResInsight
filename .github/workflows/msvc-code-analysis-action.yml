@@ -40,7 +40,7 @@ jobs:
         uses: lukka/run-vcpkg@v7
         id: runvcpkg
         with:
-          vcpkgArguments: "@${{ github.workspace }}/vcpkg_x64-windows.txt
+          vcpkgArguments: "@${{ github.workspace }}/vcpkg_x64-windows.txt"
           vcpkgDirectory:
             "${{ github.workspace }}/ThirdParty/vcpkg"
             # Ensure the cache key changes any time the content of the response file changes.
