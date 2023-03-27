@@ -13,10 +13,11 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
+          yum update
+          
           yum install -y centos-release-scl
           yum-config-manager --enable rhel-server-rhscl-7-rpms
 
-          sudo yum -y install https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
           yum install -y git
 
           yum install -y qt5-qtbase
