@@ -13,10 +13,9 @@ jobs:
     steps:
       - name: Install Dependencies
         run: |
-          yum update
           
-          yum install -y centos-release-scl
-          yum-config-manager --enable rhel-server-rhscl-7-rpms
+          #yum install -y centos-release-scl
+          #yum-config-manager --enable rhel-server-rhscl-7-rpms
 
           yum install -y git
 
