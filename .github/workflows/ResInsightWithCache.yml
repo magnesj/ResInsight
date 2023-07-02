@@ -129,7 +129,7 @@ jobs:
             !${{ env._VCPKG_ }}/installed
           # The key is composed in a way that it gets properly invalidated whenever a different version of vcpkg is being used.
           key: |
-            ${{ hashFiles( '.git/modules/ThirdParty/vcpkg/HEAD' )}}        
+            ${{ matrix.config.cc }}-${{ hashFiles( '.git/modules/ThirdParty/vcpkg/HEAD' )}}        
 
       - name: Use MSVC (Windows)
         uses: ilammy/msvc-dev-cmd@v1
