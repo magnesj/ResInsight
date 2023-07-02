@@ -2,10 +2,8 @@
   "name": "main",
   "version-string": "latest",
   "dependencies": [
-    "grpc",
     "boost-filesystem",
     "boost-spirit",
-    "eigen3",
-    "openssl"
+    "eigen3"
   ]
 }
