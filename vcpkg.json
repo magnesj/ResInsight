@@ -5,6 +5,6 @@
     "boost-filesystem",
     "boost-spirit",
     "eigen3",
-    "protobuf"
+    "grpc"
   ]
 }
