@@ -64,6 +64,7 @@ out
 build
 builds
 CMakeSettings.json
+CMakeUserPresets.json
 enc_temp_folder
 
 #Visual Studio Code files
