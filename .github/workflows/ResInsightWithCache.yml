@@ -109,6 +109,10 @@ jobs:
       - name: Use CMake
         uses: lukka/get-cmake@latest
 
+      - name: "Create directory '${{ env.VCPKG_DEFAULT_BINARY_CACHE }}'"
+        run: mkdir -p $VCPKG_DEFAULT_BINARY_CACHE
+        shell: bash        
+
       # Restore vcpkg from the GitHub Action cache service. Note that packages are restored by vcpkg's binary caching
       # when it is being run afterwards by CMake.
       - name: Restore vcpkg
