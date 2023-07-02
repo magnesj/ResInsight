@@ -4,6 +4,7 @@
   "dependencies": [
     "boost-filesystem",
     "boost-spirit",
-    "eigen3"
+    "eigen3",
+    "protobuf"
   ]
 }
