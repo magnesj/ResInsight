@@ -16,7 +16,8 @@
                 "CMAKE_TOOLCHAIN_FILE": {
                     "type": "FILEPATH",
                     "value": "${sourceDir}/ThirdParty/vcpkg/scripts/buildsystems/vcpkg.cmake"
-                }
+                },
+                "VCPKG_INSTALL_OPTIONS": "--clean-buildtrees-after-build;--clean-packages-after-build"
             }
         }
     ],
