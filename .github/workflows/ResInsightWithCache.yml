@@ -197,6 +197,7 @@ jobs:
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
+        if: false
         with:
           version: 5.12.12
           dir: "${{ github.workspace }}/Qt/"
