@@ -37,6 +37,18 @@ jobs:
               publish-to-pypi: false,
             }
           - {
+              name: "Windows 2019 MSVC",
+              os: windows-2019,
+              cc: "cl",
+              cxx: "cl",
+              vcpkg-response-file: vcpkg_x64-windows.txt,
+              vcpkg-triplet: x64-windows,
+              build-python-module: true,
+              execute-unit-tests: true,
+              unity-build: true,
+              publish-to-pypi: false,
+            }
+          - {
               name: "Ubuntu Latest gcc",
               os: ubuntu-20.04,
               cc: "gcc",
