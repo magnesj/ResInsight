@@ -211,7 +211,7 @@ jobs:
         if: ${{contains( matrix.config.os, 'windows') }}
         run: |
           .\ThirdParty/vcpkg/bootstrap-vcpkg.bat
-          .\ThirdParty\vcpkg\vcpkg install --feature-flags=manifests
+          .\ThirdParty\vcpkg\vcpkg install --feature-flags=manifests --triplet=x64-windows
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
