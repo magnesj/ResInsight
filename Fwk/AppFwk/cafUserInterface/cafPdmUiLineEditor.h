@@ -49,7 +49,6 @@
 
 class QGridLayout;
 class QCompleter;
-class QStringListModel;
 
 namespace caf
 {
