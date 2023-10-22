@@ -43,6 +43,7 @@
 #include <QLineEdit>
 #include <QPointer>
 #include <QString>
+#include <QStringListModel>
 #include <QToolButton>
 #include <QValidator>
 #include <QWidget>
