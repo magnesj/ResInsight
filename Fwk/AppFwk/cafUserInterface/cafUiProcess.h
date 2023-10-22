@@ -36,6 +36,8 @@
 
 #pragma once
 
+#include "QElapsedTimer"
+#include "QTimer"
 #include <QDateTime>
 #include <QElapsedTimer>
 #include <QtCore/QProcess>
