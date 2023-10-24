@@ -19,9 +19,9 @@ if(CEE_USE_QT6)
   find_package(
     Qt6
     COMPONENTS
-    REQUIRED Core Gui Widgets OpenGL
+    REQUIRED Core Gui Widgets OpenGL Svg
   )
-  set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGL)
+  set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGL Qt6::Svg)
 else()
   find_package(
     Qt5
