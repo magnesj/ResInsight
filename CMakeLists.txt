@@ -15,7 +15,6 @@ if(POLICY CMP0135)
   cmake_policy(SET CMP0135 OLD)
 endif()
 
-
 if(UNIX)
   option(
     RESINSIGHT_PREFER_LEGACY_OPENGL
