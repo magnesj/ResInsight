@@ -164,7 +164,7 @@ jobs:
         uses: lukka/run-vcpkg@v10
         id: runvcpkg
         with:
-          vcpkgArguments: "@${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}"
+          #vcpkgArguments: "@${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}"
           vcpkgDirectory:
             "${{ github.workspace }}/ThirdParty/vcpkg"
           appendedCacheKey: ${{ matrix.config.os }}-${{ matrix.config.cxx }}-cache-key-v2
@@ -177,7 +177,7 @@ jobs:
           key: ${{ matrix.config.os }}-vcpkg-x64-linux-dynamic_v05
 
       - name: Install dynamic version of OpenSSL (Linux)
-        if: ${{contains( matrix.config.os, 'ubuntu') }}
+        if: ${{contains( matrix.config.os, 'ubuntu_disabled') }}
         run: |
           $VCPKG_ROOT/vcpkg install --overlay-triplets=${{ github.workspace }}/ThirdParty/vcpkg-custom-triplets --triplet x64-linux-dynamic openssl
 
