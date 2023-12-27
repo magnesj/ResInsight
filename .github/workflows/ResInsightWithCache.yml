@@ -161,10 +161,10 @@ jobs:
           cache: true
 
       - name: Restore from cache and install vcpkg
-        uses: lukka/run-vcpkg@v10
+        uses: lukka/run-vcpkg@v7
         id: runvcpkg
         with:
-          #vcpkgArguments: "@${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}"
+          vcpkgArguments: "@${{ github.workspace }}/${{ matrix.config.vcpkg-response-file }}"
           vcpkgDirectory:
             "${{ github.workspace }}/ThirdParty/vcpkg"
           appendedCacheKey: ${{ matrix.config.os }}-${{ matrix.config.cxx }}-cache-key-v2
