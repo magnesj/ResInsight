@@ -65,7 +65,7 @@ else()
   find_package(
     Qt5
     COMPONENTS
-    REQUIRED Core Gui Widgets
+    REQUIRED Core Gui Widgets Svg
   )
   set(QT_LIBRARIES Qt5::Core Qt5::Gui Qt5::Widgets Qt5::Svg)
   qt5_wrap_cpp(MOC_SOURCE_FILES ${MOC_HEADER_FILES})
