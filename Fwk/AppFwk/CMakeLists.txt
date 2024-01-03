@@ -21,6 +21,10 @@ if(NOT DEFINED (CEE_USE_QT5))
   option(CEE_USE_QT5 "Use Qt5" ON)
 endif(NOT DEFINED (CEE_USE_QT5))
 
+if(NOT DEFINED (CEE_USE_QT6))
+  option(CEE_USE_QT6 "Use Qt6" OFF)
+endif(NOT DEFINED (CEE_USE_QT6))
+
 if(CEE_USE_QT5)
   find_package(
     Qt5
