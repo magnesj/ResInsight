@@ -328,7 +328,13 @@ PdmObjectHandle* PdmReferenceHelper::objectFromFieldReference( PdmFieldHandle* f
     if ( reference.isEmpty() ) return nullptr;
     if ( reference.trimmed().isEmpty() ) return nullptr;
 
-    QStringList      decodedReference    = reference.split( QRegularExpression( "\\s+" ), QString::SkipEmptyParts );
+#if ( QT_VERSION < QT_VERSION_CHECK( 5, 14, 0 ) )
+    auto SkipEmptyParts = QString::SkipEmptyParts;
+#else
+    auto SkipEmptyParts = Qt::SkipEmptyParts;
+#endif
+
+    QStringList      decodedReference    = reference.split( QRegularExpression( "\\s+" ), SkipEmptyParts );
     PdmObjectHandle* lastCommonAnchestor = fromField->ownerObject();
     CAF_ASSERT( lastCommonAnchestor );
 
