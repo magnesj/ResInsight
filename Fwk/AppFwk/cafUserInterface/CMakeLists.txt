@@ -61,6 +61,7 @@ if(CEE_USE_QT6)
     COMPONENTS
     REQUIRED Core Gui Widgets Svg
   )
+  set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Svg)
 else()
   find_package(
     Qt5
