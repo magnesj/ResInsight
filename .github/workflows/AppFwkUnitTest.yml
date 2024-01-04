@@ -49,6 +49,7 @@ jobs:
         run: |
           cmake -S Fwk/AppFwk ${{matrix.build_flags}} -B cmakebuild -G Ninja
           cmake --build cmakebuild
+          cmake --install . --prefix install
 
       - name: Run Unit Tests
         shell: bash
