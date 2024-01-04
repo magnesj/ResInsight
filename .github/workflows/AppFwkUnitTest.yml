@@ -81,7 +81,7 @@ jobs:
           cmakebuild/install/bin/cafPdmScripting_UnitTests
   
       - name: Run Unit Tests Windows Qt6 (does not work on Linux)
-        if: (contains( matrix.os, 'windows') && (${{matrix.qtver}} == 6.5.3))
+        if: (contains( matrix.os, 'windows') && (matrix.qtver == '6.5.3'))
         shell: bash
         run: cmakebuild/install/bin/cafUserInterface_UnitTests
   
