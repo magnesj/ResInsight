@@ -9,6 +9,7 @@ if(CEE_USE_QT6)
     COMPONENTS
     REQUIRED Core Gui Widgets
   )
+  qt_standard_project_setup()
 else()
   find_package(
     Qt5
@@ -26,12 +27,12 @@ set(PROJECT_FILES cafUserInterface_UnitTests.cpp cafPdmUiTreeViewModelTest.cpp
 )
 
 # add the executable
-add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+qt_add_executable(${PROJECT_NAME} ${PROJECT_FILES})
 
 source_group("" FILES ${PROJECT_FILES})
 
 target_link_libraries(
-  ${PROJECT_NAME} cafUserInterface ${QT_LIBRARIES} ${THREAD_LIBRARY}
+  ${PROJECT_NAME} PRIVATE cafUserInterface ${QT_LIBRARIES} ${THREAD_LIBRARY}
 )
 
 # Copy Qt Dlls
@@ -44,16 +45,18 @@ foreach(qtlib ${QT_LIBRARIES})
   )
 endforeach(qtlib)
 
-# Install
-install(TARGETS ${PROJECT_NAME}
+if(CEE_USE_QT6)
+  # Install
+  install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+  )
 
-qt_generate_deploy_app_script(
+  qt_generate_deploy_app_script(
     TARGET ${PROJECT_NAME}
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
     NO_TRANSLATIONS
-)
-install(SCRIPT ${deploy_script})
+  )
+  install(SCRIPT ${deploy_script})
+endif(CEE_USE_QT6)

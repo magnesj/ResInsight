@@ -21,6 +21,7 @@ if(CEE_USE_QT6)
     COMPONENTS
     REQUIRED Core Gui Widgets OpenGL Svg
   )
+  qt_standard_project_setup()
   set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::Widgets Qt6::OpenGL Qt6::Svg)
 else()
   find_package(
@@ -101,16 +102,18 @@ foreach(qtlib ${QT_LIBRARIES})
   )
 endforeach(qtlib)
 
-# Install
-install(TARGETS ${PROJECT_NAME}
+if(CEE_USE_QT6)
+  # Install
+  install(TARGETS ${PROJECT_NAME}
     BUNDLE  DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-)
+  )
 
-qt_generate_deploy_app_script(
+  qt_generate_deploy_app_script(
     TARGET ${PROJECT_NAME}
     OUTPUT_SCRIPT deploy_script
     NO_UNSUPPORTED_PLATFORM_ERROR
     NO_TRANSLATIONS
-)
-install(SCRIPT ${deploy_script})
+  )
+  install(SCRIPT ${deploy_script})
+endif(CEE_USE_QT6)
