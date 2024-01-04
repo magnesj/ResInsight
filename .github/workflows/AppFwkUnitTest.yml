@@ -12,10 +12,8 @@ jobs:
         include:
           - qtver: 6.5.3
             build_flags: -DCEE_USE_QT6=ON -DCEE_USE_QT5=OFF
-            unit_test_root: cmakebuild/install/bin
           - qtver: 5.12.12
             build_flags: -DCEE_USE_QT6=OFF -DCEE_USE_QT5=ON
-            unit_test_root: cmakebuild
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -60,15 +58,25 @@ jobs:
           cmake --install . --prefix ${{github.workspace}}/cmakebuild/install
 
       - name: Run Unit Tests
+        if: ${{matrix.qtver}} == 5.12.12
         shell: bash
         run: |
-          ${{github.workspace}}/${{matrix.unit_test_root}}/cafProjectDataModel/cafPdmCore/cafPdmCore_UnitTests/cafPdmCore_UnitTests
-          ${{github.workspace}}/${{matrix.unit_test_root}}/cafProjectDataModel/cafPdmXml/cafPdmXml_UnitTests/cafPdmXml_UnitTests
-          ${{github.workspace}}/${{matrix.unit_test_root}}/cafProjectDataModel/cafProjectDataModel_UnitTests/cafProjectDataModel_UnitTests
-          ${{github.workspace}}/${{matrix.unit_test_root}}/cafPdmScripting/cafPdmScripting_UnitTests/cafPdmScripting_UnitTests
+          cmakebuild/cafProjectDataModel/cafPdmCore/cafPdmCore_UnitTests/cafPdmCore_UnitTests
+          cmakebuild/cafProjectDataModel/cafPdmXml/cafPdmXml_UnitTests/cafPdmXml_UnitTests
+          cmakebuild/cafProjectDataModel/cafProjectDataModel_UnitTests/cafProjectDataModel_UnitTests
+          cmakebuild/cafPdmScripting/cafPdmScripting_UnitTests/cafPdmScripting_UnitTests
 
-      - name: Run Unit Tests Windows (does not work on Linux)
-        if: contains( matrix.os, 'windows')
+      - name: Run Unit Tests
+        if: ${{matrix.qtver}} == 6.5.3
         shell: bash
         run: |
-          ${{github.workspace}}/${{matrix.unit_test_root}}/cafUserInterface/cafUserInterface_UnitTests/cafUserInterface_UnitTests
+          cmakebuild/install/bin/cafPdmCore_UnitTests
+          cmakebuild/install/bin/cafPdmXml_UnitTests
+          cmakebuild/install/bin/cafProjectDataModel_UnitTests
+          cmakebuild/install/bin/cafPdmScripting_UnitTests
+  
+      - name: Run Unit Tests Windows (does not work on Linux)
+        if: contains( matrix.os, 'windows') && ${{matrix.qtver}} == 5.12.12
+        shell: bash
+        run: |
+          cmakebuild/cafUserInterface/cafUserInterface_UnitTests/cafUserInterface_UnitTests
