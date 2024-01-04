@@ -26,8 +26,11 @@ set(PROJECT_FILES cafUserInterface_UnitTests.cpp cafPdmUiTreeViewModelTest.cpp
                   cafPdmUiTreeSelectionQModelTest.cpp gtest/gtest-all.cpp
 )
 
-# add the executable
-qt_add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+if(CEE_USE_QT6)
+  qt_add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+else()
+  add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+endif(CEE_USE_QT6)
 
 source_group("" FILES ${PROJECT_FILES})
 
