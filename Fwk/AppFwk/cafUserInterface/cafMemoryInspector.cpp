@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QString>
 #include <QStringList>
+#include <QRegularExpression>
 
 #ifdef _WIN32
 // Define this one to tell windows.h to not define min() and max() as macros
@@ -39,7 +40,7 @@ std::map<QString, uint64_t> readProcessBytesLinux()
     if (procSelfStatus.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QString line(procSelfStatus.readLine(256));
-        QStringList lineWords = line.split(QRegExp("\\s+"), QString::SkipEmptyParts);
+        QStringList lineWords = line.split(QRegularExpression("\\s+"), QString::SkipEmptyParts);
         quantities["VmSize"] = static_cast<uint64_t>(lineWords[0].toLongLong() * pageSize);
         quantities["RSS"] = static_cast<uint64_t>(lineWords[1].toLongLong() * pageSize);
         quantities["Shared"] = static_cast<uint64_t>(lineWords[2].toLongLong() * pageSize);
@@ -67,7 +68,7 @@ std::map<QString, uint64_t> readMemInfoLinuxMiB()
             if (lineLength > 0)
             {
                 QString     line  = QString::fromLatin1(buf, lineLength);
-                QStringList words = line.split(QRegExp(":*\\s+"), QString::SkipEmptyParts);
+                QStringList words = line.split(QRegularExpression(":*\\s+"), QString::SkipEmptyParts);
                 if (words.size() > 1)
                 {
                     bool ok    = true;

@@ -39,6 +39,8 @@
 #include "cafAssert.h"
 #include "cafPdmFieldHandle.h"
 
+#include <QRegularExpression>
+
 #include <algorithm>
 
 namespace caf
@@ -326,7 +328,7 @@ PdmObjectHandle* PdmReferenceHelper::objectFromFieldReference( PdmFieldHandle* f
     if ( reference.isEmpty() ) return nullptr;
     if ( reference.trimmed().isEmpty() ) return nullptr;
 
-    QStringList      decodedReference    = reference.split( " " );
+    QStringList      decodedReference    = reference.split( QRegularExpression( "\\s+" ), QString::SkipEmptyParts );
     PdmObjectHandle* lastCommonAnchestor = fromField->ownerObject();
     CAF_ASSERT( lastCommonAnchestor );
 
