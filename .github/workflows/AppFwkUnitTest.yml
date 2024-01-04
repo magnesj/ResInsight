@@ -57,7 +57,7 @@ jobs:
           cd cmakebuild
           cmake --install . --prefix ${{github.workspace}}/cmakebuild/install
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests Qt5
         if: ${{matrix.qtver}} == 5.12.12
         shell: bash
         run: |
@@ -66,7 +66,12 @@ jobs:
           cmakebuild/cafProjectDataModel/cafProjectDataModel_UnitTests/cafProjectDataModel_UnitTests
           cmakebuild/cafPdmScripting/cafPdmScripting_UnitTests/cafPdmScripting_UnitTests
 
-      - name: Run Unit Tests
+      - name: Run Unit Tests Windows Qt5 (does not work on Linux)
+        if: contains( matrix.os, 'windows') && (${{matrix.qtver}} == 5.12.12)
+        shell: bash
+        run: cmakebuild/cafUserInterface/cafUserInterface_UnitTests/cafUserInterface_UnitTests
+
+      - name: Run Unit Tests Qt6
         if: ${{matrix.qtver}} == 6.5.3
         shell: bash
         run: |
@@ -75,8 +80,8 @@ jobs:
           cmakebuild/install/bin/cafProjectDataModel_UnitTests
           cmakebuild/install/bin/cafPdmScripting_UnitTests
   
-      - name: Run Unit Tests Windows (does not work on Linux)
-        if: contains( matrix.os, 'windows') && ${{matrix.qtver}} == 5.12.12
+      - name: Run Unit Tests Windows Qt6 (does not work on Linux)
+        if: contains( matrix.os, 'windows') && (${{matrix.qtver}} == 6.5.3)
         shell: bash
-        run: |
-          cmakebuild/cafUserInterface/cafUserInterface_UnitTests/cafUserInterface_UnitTests
+        run: cmakebuild/install/cafUserInterface_UnitTests
+  
