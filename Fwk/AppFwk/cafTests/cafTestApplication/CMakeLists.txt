@@ -65,22 +65,22 @@ if(CEE_USE_QT6)
     ${PROJECT_FILES}
     ${MOC_SOURCE_FILES}
     ${QRC_FILES_CPP}
-    $<TARGET_OBJECTS:cafCommandFeatures> # Needed for cmake version < 3.12. Remove
-                                       # when we can use target_link_libraries
-                                       # with OBJECT libraries
-)
+    $<TARGET_OBJECTS:cafCommandFeatures> # Needed for cmake version < 3.12.
+                                         # Remove
+    # when we can use target_link_libraries with OBJECT libraries
+  )
 else()
   add_executable(
     ${PROJECT_NAME}
     ${PROJECT_FILES}
     ${MOC_SOURCE_FILES}
     ${QRC_FILES_CPP}
-    $<TARGET_OBJECTS:cafCommandFeatures> # Needed for cmake version < 3.12. Remove
-                                         # when we can use target_link_libraries
-                                         # with OBJECT libraries
-)
+    $<TARGET_OBJECTS:cafCommandFeatures> # Needed for cmake version < 3.12.
+                                         # Remove when we can use
+                                         # target_link_libraries with OBJECT
+                                         # libraries
+  )
 endif(CEE_USE_QT6)
-
 
 set(TAP_LINK_LIBRARIES cafUserInterface)
 
@@ -100,7 +100,7 @@ endif()
 
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE ${TAP_LINK_LIBRARIES} ${QT_LIBRARIES}
-  ${EXTERNAL_LINK_LIBRARIES}
+                          ${EXTERNAL_LINK_LIBRARIES}
 )
 
 source_group("" FILES ${PROJECT_FILES})
