@@ -55,6 +55,11 @@ jobs:
           cmake --build cmakebuild
           cmake --install . --prefix ./install
 
+      - name: Install
+        run: |
+          cd cmakebuild
+          cmake --install . --prefix ./install
+
       - name: Run Unit Tests
         shell: bash
         run: |
