@@ -28,8 +28,10 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} # required for gtest-all.cpp
 )
 
-set(PROJECT_FILES cafPdmXml_UnitTests.cpp gtest/gtest-all.cpp cafPdmXmlBasicTest.cpp
-  cafPdmAdvancedTemplateTest.cpp cafPdmXmlNumberTest.cpp cafPdmPtrArrayTest.cpp
+set(PROJECT_FILES
+    cafPdmXml_UnitTests.cpp gtest/gtest-all.cpp cafPdmXmlBasicTest.cpp
+    cafPdmAdvancedTemplateTest.cpp cafPdmXmlNumberTest.cpp
+    cafPdmPtrArrayTest.cpp
 )
 
 if(CEE_USE_QT6)
@@ -43,7 +45,6 @@ source_group("" FILES ${PROJECT_FILES})
 target_link_libraries(
   ${PROJECT_NAME} PRIVATE cafPdmXml ${QT_LIBRARIES} ${THREAD_LIBRARY}
 )
-
 
 # Copy Qt Dlls
 if(Qt5Core_FOUND)
