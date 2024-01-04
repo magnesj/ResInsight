@@ -9,6 +9,7 @@ if(CEE_USE_QT6)
     REQUIRED Core Xml
   )
   set(QT_LIBRARIES Qt6::Core Qt6::Xml)
+  qt_standard_project_setup()
 else()
   find_package(
     Qt5
@@ -27,22 +28,22 @@ endif()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} # required for gtest-all.cpp
 )
 
-# add the executable
-add_executable(
-  ${PROJECT_NAME}
-  cafPdmXml_UnitTests.cpp gtest/gtest-all.cpp cafPdmXmlBasicTest.cpp
+set(PROJECT_FILES cafPdmXml_UnitTests.cpp gtest/gtest-all.cpp cafPdmXmlBasicTest.cpp
   cafPdmAdvancedTemplateTest.cpp cafPdmXmlNumberTest.cpp cafPdmPtrArrayTest.cpp
 )
 
-if(Qt5Core_FOUND)
-  set(QT_LIBRARIES Qt5::Core Qt5::Xml)
-endif()
-
-target_link_libraries(
-  ${PROJECT_NAME} cafPdmXml ${QT_LIBRARIES} ${THREAD_LIBRARY}
-)
+if(CEE_USE_QT6)
+  qt_add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+else()
+  add_executable(${PROJECT_NAME} ${PROJECT_FILES})
+endif(CEE_USE_QT6)
 
 source_group("" FILES ${PROJECT_FILES})
+
+target_link_libraries(
+  ${PROJECT_NAME} PRIVATE cafPdmXml ${QT_LIBRARIES} ${THREAD_LIBRARY}
+)
+
 
 # Copy Qt Dlls
 if(Qt5Core_FOUND)
@@ -55,3 +56,18 @@ if(Qt5Core_FOUND)
     )
   endforeach(qtlib)
 endif(Qt5Core_FOUND)
+
+# Install
+install(
+  TARGETS ${PROJECT_NAME}
+  BUNDLE DESTINATION .
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+if(CEE_USE_QT6)
+  qt_generate_deploy_app_script(
+    TARGET ${PROJECT_NAME} OUTPUT_SCRIPT deploy_script
+    NO_UNSUPPORTED_PLATFORM_ERROR NO_TRANSLATIONS
+  )
+  install(SCRIPT ${deploy_script})
+endif(CEE_USE_QT6)

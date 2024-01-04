@@ -7,7 +7,7 @@ if(CEE_USE_QT6)
   find_package(
     Qt6
     COMPONENTS
-    REQUIRED Core Gui Widgets
+    REQUIRED Core Gui Widgets Svg
   )
   qt_standard_project_setup()
 else()
