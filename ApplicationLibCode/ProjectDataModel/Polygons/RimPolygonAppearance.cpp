@@ -18,11 +18,58 @@
 
 #include "RimPolygonAppearance.h"
 
+#include "RimCase.h"
+#include "RimProject.h"
+
 #include "RigPolyLinesData.h"
 
+#include "RiaStdStringTools.h"
+
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmUiLineEditor.h"
+
+#include "cvfBoundingBox.h"
+
+#include "RiaNumericalTools.h"
+#include <xutility>
 
 CAF_PDM_SOURCE_INIT( RimPolygonAppearance, "RimPolygonAppearance" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+class ThicknessValidator : public QValidator
+{
+public:
+    State validate( QString& input, int& pos ) const override
+    {
+        if ( input.isEmpty() ) return State::Intermediate;
+
+        int val = RiaStdStringTools::toInt( input.toStdString() );
+        if ( val > 0 && val < 8 )
+            return State::Acceptable;
+        else
+            return State::Invalid;
+    }
+};
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+class RadiusValidator : public QValidator
+{
+public:
+    State validate( QString& input, int& pos ) const override
+    {
+        if ( input.isEmpty() ) return State::Intermediate;
+
+        double val = RiaStdStringTools::toDouble( input.toStdString() );
+        if ( val > 0.001 && val <= 2.0 )
+            return State::Acceptable;
+        else
+            return State::Invalid;
+    }
+};
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -101,4 +148,56 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
 void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     objectChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygonAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_lineThickness )
+    {
+        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
+        {
+            myAttr->validator = new ThicknessValidator();
+        }
+    }
+    else if ( field == &m_lineThickness )
+    {
+        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
+        {
+            myAttr->validator = new RadiusValidator();
+        }
+    }
+    else if ( field == &m_polygonPlaneDepth )
+    {
+        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
+        {
+            auto allCases = RimProject::current()->allGridCases();
+            if ( allCases.empty() )
+            {
+                attr->m_minimum = 0;
+                attr->m_maximum = 10000.0;
+            }
+            else
+            {
+                double min = std::numeric_limits<double>::max();
+                double max = -std::numeric_limits<double>::max();
+
+                for ( auto gridCase : allCases )
+                {
+                    auto bb = gridCase->allCellsBoundingBox();
+
+                    min = std::min( min, bb.min().z() );
+                    max = std::max( max, bb.max().z() );
+                }
+
+                auto adjustedMin = RiaNumericalTools::roundToNumSignificantDigitsFloor( -min, 2 );
+                auto adjustedMax = RiaNumericalTools::roundToNumSignificantDigitsCeil( -max, 2 );
+
+                attr->m_minimum = adjustedMax;
+                attr->m_maximum = adjustedMin;
+            }
+        }
+    }
 }

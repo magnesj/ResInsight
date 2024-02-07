@@ -31,6 +31,7 @@ RimPolygon::RimPolygon()
 {
     CAF_PDM_InitObject( "Polygon", ":/PolylinesFromFile16x16.png" );
 
+    CAF_PDM_InitField( &m_isReadOnly, "IsReadOnly", false, "Read Only" );
     CAF_PDM_InitFieldNoDefault( &m_pointsInDomainCoords, "PointsInDomainCoords", "Points" );
     CAF_PDM_InitFieldNoDefault( &m_appearance, "Appearance", "Appearance" );
     m_appearance = new RimPolygonAppearance;
@@ -89,6 +90,7 @@ std::vector<cvf::Vec3d> RimPolygon::pointsInDomainCoords() const
 void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( nameField() );
+    uiOrdering.add( &m_isReadOnly );
 
     auto groupPoints = uiOrdering.addNewGroup( "Points" );
     groupPoints->setCollapsedByDefault();

@@ -49,6 +49,7 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
 private:
+    caf::PdmField<bool>                       m_isReadOnly;
     caf::PdmField<std::vector<cvf::Vec3d>>    m_pointsInDomainCoords;
     caf::PdmChildField<RimPolygonAppearance*> m_appearance;
 };
