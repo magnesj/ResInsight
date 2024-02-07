@@ -18,6 +18,9 @@
 
 #include "RimPolygon.h"
 
+#include "RigPolyLinesData.h"
+#include "RimPolygonAppearance.h"
+
 CAF_PDM_SOURCE_INIT( RimPolygon, "RimPolygon" );
 
 //--------------------------------------------------------------------------------------------------
@@ -25,12 +28,13 @@ CAF_PDM_SOURCE_INIT( RimPolygon, "RimPolygon" );
 //--------------------------------------------------------------------------------------------------
 RimPolygon::RimPolygon()
     : objectChanged( this )
-
 {
     CAF_PDM_InitObject( "Polygon", ":/PolylinesFromFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_pointsInDomainCoords, "PointsInDomainCoords", "Points" );
-    CAF_PDM_InitField( &m_isClosed, "IsClosed", true, "Closed Polygon" );
+    CAF_PDM_InitFieldNoDefault( &m_appearance, "Appearance", "Appearance" );
+    m_appearance = new RimPolygonAppearance;
+    m_appearance.uiCapability()->setUiTreeChildrenHidden( true );
 
     setDeletable( true );
 }
@@ -40,6 +44,19 @@ RimPolygon::RimPolygon()
 //--------------------------------------------------------------------------------------------------
 RimPolygon::~RimPolygon()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::ref<RigPolyLinesData> RimPolygon::polyLinesData() const
+{
+    cvf::ref<RigPolyLinesData> pld = new RigPolyLinesData;
+
+    pld->setPolyLine( m_pointsInDomainCoords() );
+    m_appearance->applyAppearanceSettings( pld.p() );
+
+    return pld;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -69,37 +86,16 @@ std::vector<cvf::Vec3d> RimPolygon::pointsInDomainCoords() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimPolygon::isClosed() const
-{
-    return m_isClosed();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygon::onChildDeleted( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& referringObjects )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygon::onChildAdded( caf::PdmFieldHandle* containerForNewObject )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygon::onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    uiOrdering.add( nameField() );
+
+    auto groupPoints = uiOrdering.addNewGroup( "Points" );
+    groupPoints->setCollapsedByDefault();
+    groupPoints->add( &m_pointsInDomainCoords );
+
+    auto group = uiOrdering.addNewGroup( "Appearance" );
+    m_appearance->uiOrdering( uiConfigName, *group );
 }
 
 //--------------------------------------------------------------------------------------------------

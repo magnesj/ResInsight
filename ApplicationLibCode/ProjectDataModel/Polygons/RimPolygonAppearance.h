@@ -17,38 +17,38 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RimNamedObject.h"
-
-#include "RimPolylinesDataInterface.h"
-
-#include "cafPdmFieldCvfVec3d.h"
-
+#include "cafPdmObject.h"
 #include "cvfVector3.h"
 
-class RimPolygonAppearance;
+class RigPolyLinesData;
 
-class RimPolygon : public RimNamedObject, public RimPolylinesDataInterface
+class RimPolygonAppearance : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     caf::Signal<> objectChanged;
 
+    void applyAppearanceSettings( RigPolyLinesData* polyLinesData );
+
 public:
-    RimPolygon();
-    ~RimPolygon() override;
-
-    void                    setPointsInDomainCoords( const std::vector<cvf::Vec3d>& points );
-    void                    appendPointInDomainCoords( const cvf::Vec3d& point );
-    std::vector<cvf::Vec3d> pointsInDomainCoords() const;
-
-    cvf::ref<RigPolyLinesData> polyLinesData() const override;
+    RimPolygonAppearance();
+    ~RimPolygonAppearance() override;
 
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
 private:
-    caf::PdmField<std::vector<cvf::Vec3d>>    m_pointsInDomainCoords;
-    caf::PdmChildField<RimPolygonAppearance*> m_appearance;
+    caf::PdmField<bool>         m_isClosed;
+    caf::PdmField<bool>         m_showLines;
+    caf::PdmField<int>          m_lineThickness;
+    caf::PdmField<cvf::Color3f> m_lineColor;
+
+    caf::PdmField<bool>         m_showSpheres;
+    caf::PdmField<double>       m_sphereRadiusFactor;
+    caf::PdmField<cvf::Color3f> m_sphereColor;
+
+    caf::PdmField<bool>   m_lockPolygonToPlane;
+    caf::PdmField<double> m_polygonPlaneDepth;
 };
