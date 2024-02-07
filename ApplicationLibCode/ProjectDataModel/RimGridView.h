@@ -70,7 +70,7 @@ public:
     bool isGridVisualizationMode() const override;
 
     void updateWellMeasurements();
-    void updateSurfacesInViewTreeItems() override;
+    void updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView itemType ) override;
 
 protected:
     virtual void       updateViewFollowingCellFilterUpdates();

@@ -50,6 +50,9 @@ public:
     void onChildDeleted( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& referringObjects ) override;
 
 private:
+    void updateTreeItemsInViews();
+
+private:
     caf::PdmChildArrayField<RimPolygon*>     m_polygons;
     caf::PdmChildArrayField<RimPolygonFile*> m_polygonFiles;
 };

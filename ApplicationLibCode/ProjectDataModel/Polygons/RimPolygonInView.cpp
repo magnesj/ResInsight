@@ -57,7 +57,7 @@ RimPolygonInView::RimPolygonInView()
 
     CAF_PDM_InitFieldNoDefault( &m_targets, "Targets", "Targets" );
     m_targets.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
-    // m_targets.uiCapability()->setUiTreeHidden(true);
+    //  m_targets.uiCapability()->setUiTreeHidden(true);
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
@@ -314,16 +314,16 @@ void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, 
 
     if ( field == &m_targets )
     {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
+        if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
         {
             tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
 
             if ( m_enablePicking )
             {
-                tvAttribute->baseColor                 = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
-                tvAttribute->alwaysEnforceResizePolicy = true;
+                tvAttribute->baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
             }
+            tvAttribute->alwaysEnforceResizePolicy = true;
+            tvAttribute->heightHint                = 1000;
         }
     }
 }

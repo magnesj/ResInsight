@@ -193,14 +193,19 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         this->setRowSelectionLevel( editorAttrib.rowSelectionLevel );
         this->enableHeaderText( editorAttrib.enableHeaderText );
 
+        QString styleSheetTable;
+        QString styleSheetHeader;
+
         if ( editorAttrib.baseColor.isValid() )
         {
-            m_tableView->setStyleSheet( QString( "background-color: %1;" ).arg( editorAttrib.baseColor.name() ) );
+            styleSheetTable = QString( "background-color: %1;" ).arg( editorAttrib.baseColor.name() );
+            styleSheetHeader =
+                QString( "QHeaderView::section { background-color: %1; }" ).arg( editorAttrib.baseColor.name() );
         }
-        else
-        {
-            m_tableView->setStyleSheet( "" );
-        }
+
+        m_tableView->setStyleSheet( styleSheetTable );
+        m_tableView->horizontalHeader()->setStyleSheet( styleSheetHeader );
+        m_tableView->verticalHeader()->setStyleSheet( styleSheetHeader );
 
         // Drop target settings
         m_tableView->setAcceptDrops( editorAttrib.enableDropTarget );

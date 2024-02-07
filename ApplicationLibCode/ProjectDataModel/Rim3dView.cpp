@@ -1860,7 +1860,7 @@ void Rim3dView::onUpdateScaleTransform()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void Rim3dView::updateSurfacesInViewTreeItems()
+void Rim3dView::updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView itemType )
 {
     // default is to do nothing
 }

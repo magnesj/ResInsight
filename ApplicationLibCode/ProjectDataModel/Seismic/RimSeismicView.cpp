@@ -407,7 +407,7 @@ void RimSeismicView::onUpdateLegends()
 //--------------------------------------------------------------------------------------------------
 void RimSeismicView::onLoadDataAndUpdate()
 {
-    updateSurfacesInViewTreeItems();
+    updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView::ALL );
     syncronizeLocalAnnotationsFromGlobal();
     onUpdateScaleTransform();
 
@@ -461,24 +461,37 @@ void RimSeismicView::updateGridBoxData()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSeismicView::updateSurfacesInViewTreeItems()
+void RimSeismicView::updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView itemType )
 {
-    RimSurfaceCollection* surfColl = RimTools::surfaceCollection();
+    auto bitmaskEnum = BitmaskEnum( itemType );
 
-    if ( surfColl && surfColl->containsSurface() )
+    if ( bitmaskEnum.AnyOf( RiaDefines::ItemIn3dView::SURFACE ) )
     {
-        if ( !m_surfaceCollection() )
+        RimSurfaceCollection* surfColl = RimTools::surfaceCollection();
+
+        if ( surfColl && surfColl->containsSurface() )
         {
-            m_surfaceCollection = new RimSurfaceInViewCollection();
-        }
+            if ( !m_surfaceCollection() )
+            {
+                m_surfaceCollection = new RimSurfaceInViewCollection();
+            }
 
-        m_surfaceCollection->setSurfaceCollection( surfColl );
-        m_surfaceCollection->updateFromSurfaceCollection();
+            m_surfaceCollection->setSurfaceCollection( surfColl );
+            m_surfaceCollection->updateFromSurfaceCollection();
+        }
+        else
+        {
+            delete m_surfaceCollection;
+        }
     }
-    else
-    {
-        delete m_surfaceCollection;
-    }
+
+    // TODO: Handle polygon collection
+    /*
+        if ( bitmaskEnum.AnyOf( RiaDefines::ItemIn3dView::POLYGON ) )
+        {
+            m_polygonCollection->syncPolygonsInView();
+        }
+    */
 
     updateConnectedEditors();
 }

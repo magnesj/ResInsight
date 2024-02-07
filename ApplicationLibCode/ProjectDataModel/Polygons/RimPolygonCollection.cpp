@@ -17,8 +17,11 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimPolygonCollection.h"
+
+#include "Rim3dView.h"
 #include "RimPolygon.h"
 #include "RimPolygonFile.h"
+#include "RimProject.h"
 
 CAF_PDM_SOURCE_INIT( RimPolygonCollection, "RimPolygonCollection" );
 
@@ -69,6 +72,8 @@ RimPolygon* RimPolygonCollection::appendUserDefinedPolygon()
 void RimPolygonCollection::addUserDefinedPolygon( RimPolygon* polygon )
 {
     m_polygons().push_back( polygon );
+
+    updateTreeItemsInViews();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -77,6 +82,8 @@ void RimPolygonCollection::addUserDefinedPolygon( RimPolygon* polygon )
 void RimPolygonCollection::deleteUserDefinedPolygons()
 {
     m_polygons().deleteChildren();
+
+    updateTreeItemsInViews();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -85,6 +92,8 @@ void RimPolygonCollection::deleteUserDefinedPolygons()
 void RimPolygonCollection::addPolygonFile( RimPolygonFile* polygonFile )
 {
     m_polygonFiles().push_back( polygonFile );
+
+    updateTreeItemsInViews();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -131,4 +140,21 @@ std::vector<RimPolygon*> RimPolygonCollection::allPolygons() const
 //--------------------------------------------------------------------------------------------------
 void RimPolygonCollection::onChildDeleted( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& referringObjects )
 {
+    updateTreeItemsInViews();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygonCollection::updateTreeItemsInViews()
+{
+    RimProject* proj = RimProject::current();
+
+    // Make sure the tree items are synchronized
+    std::vector<Rim3dView*> views;
+    proj->allViews( views );
+    for ( auto view : views )
+    {
+        view->updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView::POLYGON );
+    }
 }
