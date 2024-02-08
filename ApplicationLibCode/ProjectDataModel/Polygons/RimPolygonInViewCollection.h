@@ -44,7 +44,6 @@ class RimPolygonInViewCollection : public caf::PdmObject
 
 public:
     RimPolygonInViewCollection();
-    ~RimPolygonInViewCollection() override;
 
     void syncPolygonsInView();
 

@@ -36,10 +36,8 @@ public:
 
 public:
     RimPolygon();
-    ~RimPolygon() override;
 
     void                    setPointsInDomainCoords( const std::vector<cvf::Vec3d>& points );
-    void                    appendPointInDomainCoords( const cvf::Vec3d& point );
     std::vector<cvf::Vec3d> pointsInDomainCoords() const;
 
     cvf::ref<RigPolyLinesData> polyLinesData() const override;
@@ -47,6 +45,7 @@ public:
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
 
 private:
     caf::PdmField<bool>                       m_isReadOnly;

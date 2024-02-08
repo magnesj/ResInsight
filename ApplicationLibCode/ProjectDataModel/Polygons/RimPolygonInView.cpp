@@ -23,12 +23,13 @@
 #include "Rim3dView.h"
 #include "RimPolygon.h"
 #include "RimTools.h"
+
 #include "WellPathCommands/PointTangentManipulator/RicPolyline3dEditor.h"
+#include "WellPathCommands/RicPolylineTargetsPickEventHandler.h"
 
 #include "RiuGuiTheme.h"
-#include "RivPolylinePartMgr.h"
 
-#include "WellPathCommands/RicPolylineTargetsPickEventHandler.h"
+#include "RivPolylinePartMgr.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafDisplayCoordTransform.h"
@@ -64,13 +65,6 @@ RimPolygonInView::RimPolygonInView()
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimPolygonInView::~RimPolygonInView()
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -189,19 +183,12 @@ void RimPolygonInView::onChildrenUpdated( caf::PdmChildArrayFieldHandle* childAr
 //--------------------------------------------------------------------------------------------------
 cvf::ref<RigPolyLinesData> RimPolygonInView::polyLinesData() const
 {
-    cvf::ref<RigPolyLinesData> pld = new RigPolyLinesData;
-
     if ( m_polygon )
     {
-        std::vector<cvf::Vec3d> line;
-        for ( const RimPolylineTarget* target : m_targets )
-        {
-            line.push_back( target->targetPointXYZ() );
-        }
-        pld->setPolyLine( line );
+        return m_polygon->polyLinesData();
     }
 
-    return pld;
+    return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -284,8 +271,7 @@ QList<caf::PdmOptionItemInfo> RimPolygonInView::calculateValueOptions( const caf
 //--------------------------------------------------------------------------------------------------
 void RimPolygonInView::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    RicPolyline3dEditorAttribute* attrib = dynamic_cast<RicPolyline3dEditorAttribute*>( attribute );
-    if ( attrib )
+    if ( auto attrib = dynamic_cast<RicPolyline3dEditorAttribute*>( attribute ) )
     {
         attrib->pickEventHandler = m_pickTargetsEventHandler;
         attrib->enablePicking    = m_enablePicking;

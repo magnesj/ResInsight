@@ -34,7 +34,6 @@ class RimPolygonCollection : public caf::PdmObject
 
 public:
     RimPolygonCollection();
-    ~RimPolygonCollection() override;
 
     void        loadData();
     RimPolygon* appendUserDefinedPolygon();
@@ -49,10 +48,18 @@ public:
 
     void onChildDeleted( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& referringObjects ) override;
 
+    void childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
+
 private:
-    void updateTreeItemsInViews();
+    void updateViewTreeItems();
+    void scheduleRedrawViews();
+    void connectSignals( RimPolygon* polygon );
+    void onObjectChanged( const caf::SignalEmitter* emitter );
 
 private:
     caf::PdmChildArrayField<RimPolygon*>     m_polygons;
     caf::PdmChildArrayField<RimPolygonFile*> m_polygonFiles;
+
+protected:
+    void initAfterRead() override;
 };

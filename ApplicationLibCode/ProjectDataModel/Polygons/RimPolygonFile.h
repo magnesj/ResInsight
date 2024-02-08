@@ -30,7 +30,6 @@ class RimPolygonFile : public RimNamedObject
 
 public:
     RimPolygonFile();
-    ~RimPolygonFile() override;
 
     void loadData();
 

@@ -22,7 +22,9 @@
 #include "RimPolygonCollection.h"
 #include "RimPolygonInView.h"
 #include "RimTools.h"
+
 #include "cafDisplayCoordTransform.h"
+
 #include "cvfModelBasicList.h"
 
 CAF_PDM_SOURCE_INIT( RimPolygonInViewCollection, "RimPolygonInViewCollection" );
@@ -35,13 +37,6 @@ RimPolygonInViewCollection::RimPolygonInViewCollection()
     CAF_PDM_InitObject( "Polygons", ":/PolylinesFromFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_polygons, "Polygons", "Polygons" );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimPolygonInViewCollection::~RimPolygonInViewCollection()
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -92,8 +87,11 @@ void RimPolygonInViewCollection::appendPartsToModel( cvf::ModelBasicList*       
                                                      caf::DisplayCoordTransform* scaleTransform,
                                                      const cvf::BoundingBox&     boundingBox )
 {
-    for ( auto p : m_polygons )
+    for ( auto polygon : m_polygons )
     {
-        p->appendPartsToModel( model, scaleTransform, boundingBox );
+        if ( polygon && polygon->isChecked() )
+        {
+            polygon->appendPartsToModel( model, scaleTransform, boundingBox );
+        }
     }
 }

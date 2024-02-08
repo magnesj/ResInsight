@@ -46,7 +46,6 @@ class RimPolygonInView : public RimCheckableNamedObject, public RimPolylinesData
 
 public:
     RimPolygonInView();
-    ~RimPolygonInView() override;
 
     RimPolygon* polygon() const;
     void        setPolygon( RimPolygon* polygon );

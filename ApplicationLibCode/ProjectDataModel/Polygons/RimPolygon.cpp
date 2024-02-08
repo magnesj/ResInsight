@@ -43,13 +43,6 @@ RimPolygon::RimPolygon()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimPolygon::~RimPolygon()
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 cvf::ref<RigPolyLinesData> RimPolygon::polyLinesData() const
 {
     cvf::ref<RigPolyLinesData> pld = new RigPolyLinesData;
@@ -66,14 +59,8 @@ cvf::ref<RigPolyLinesData> RimPolygon::polyLinesData() const
 void RimPolygon::setPointsInDomainCoords( const std::vector<cvf::Vec3d>& points )
 {
     m_pointsInDomainCoords = points;
-}
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygon::appendPointInDomainCoords( const cvf::Vec3d& point )
-{
-    m_pointsInDomainCoords.v().push_back( point );
+    objectChanged.send();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -109,4 +96,12 @@ void RimPolygon::fieldChangedByUi( const caf::PdmFieldHandle* changedField, cons
     {
         objectChanged.send();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygon::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField )
+{
+    objectChanged.send();
 }
