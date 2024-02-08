@@ -1083,7 +1083,7 @@ void RimEclipseView::appendStreamlinesToModel()
 //--------------------------------------------------------------------------------------------------
 void RimEclipseView::onLoadDataAndUpdate()
 {
-    updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView::ALL);
+    updateSurfacesInViewTreeItems( RiaDefines::ItemIn3dView::ALL );
 
     onUpdateScaleTransform();
 
