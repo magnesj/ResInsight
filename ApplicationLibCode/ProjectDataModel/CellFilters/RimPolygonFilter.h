@@ -122,24 +122,14 @@ private:
 
     void initializeCellList();
 
-    caf::PdmField<bool>                                m_enablePicking;
-    caf::PdmChildArrayField<RimPolylineTarget*>        m_targets;
+    bool isPolygonClosed() const;
+
+private:
     caf::PdmField<caf::AppEnum<PolygonFilterModeType>> m_polyFilterMode;
     caf::PdmField<caf::AppEnum<PolygonIncludeType>>    m_polyIncludeType;
     caf::PdmField<bool>                                m_enableFiltering;
-    caf::PdmField<bool>                                m_showLines;
-    caf::PdmField<bool>                                m_showSpheres;
-    caf::PdmField<int>                                 m_lineThickness;
-    caf::PdmField<double>                              m_sphereRadiusFactor;
-    caf::PdmField<cvf::Color3f>                        m_lineColor;
-    caf::PdmField<cvf::Color3f>                        m_sphereColor;
-    caf::PdmField<double>                              m_polygonPlaneDepth;
-    caf::PdmField<bool>                                m_lockPolygonToPlane;
     caf::PdmField<bool>                                m_enableKFilter;
     caf::PdmField<QString>                             m_kFilterStr;
-    caf::PdmField<bool>                                m_closePolygon;
-
-    std::shared_ptr<RicPolylineTargetsPickEventHandler> m_pickTargetsEventHandler;
 
     std::vector<std::vector<size_t>> m_cells;
 

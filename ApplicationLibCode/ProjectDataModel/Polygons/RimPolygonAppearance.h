@@ -31,6 +31,8 @@ public:
 
     void applyAppearanceSettings( RigPolyLinesData* polyLinesData );
 
+    bool isClosed() const;
+
 public:
     RimPolygonAppearance();
     ~RimPolygonAppearance() override;

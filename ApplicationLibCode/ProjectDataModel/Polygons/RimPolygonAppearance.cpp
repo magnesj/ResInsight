@@ -118,6 +118,14 @@ void RimPolygonAppearance::applyAppearanceSettings( RigPolyLinesData* polyLinesD
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimPolygonAppearance::isClosed() const
+{
+    return m_isClosed();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_showLines );

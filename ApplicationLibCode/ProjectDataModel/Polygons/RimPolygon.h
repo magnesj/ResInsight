@@ -39,6 +39,7 @@ public:
 
     void                    setPointsInDomainCoords( const std::vector<cvf::Vec3d>& points );
     std::vector<cvf::Vec3d> pointsInDomainCoords() const;
+    bool                    isClosed() const;
 
     cvf::ref<RigPolyLinesData> polyLinesData() const override;
 

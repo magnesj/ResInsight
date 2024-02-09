@@ -51,6 +51,7 @@ public:
     void        setPolygon( RimPolygon* polygon );
 
     void appendPartsToModel( cvf::ModelBasicList* model, caf::DisplayCoordTransform* scaleTransform, const cvf::BoundingBox& boundingBox );
+    void enablePicking( bool enable );
 
     // RimPolylinesDataInterface
     void insertTarget( const RimPolylineTarget* targetToInsertBefore, RimPolylineTarget* targetToInsert ) override;

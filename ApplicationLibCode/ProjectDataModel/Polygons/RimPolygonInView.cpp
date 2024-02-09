@@ -100,6 +100,14 @@ void RimPolygonInView::appendPartsToModel( cvf::ModelBasicList*        model,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPolygonInView::enablePicking( bool enable )
+{
+    m_enablePicking = enable;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimPolygonInView::insertTarget( const RimPolylineTarget* targetToInsertBefore, RimPolylineTarget* targetToInsert )
 {
     size_t index = m_targets.indexOf( targetToInsertBefore );
