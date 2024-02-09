@@ -233,7 +233,7 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 {
     updateNameField();
 
-    uiOrdering.add( m_polygon );
+    if ( m_polygon() ) uiOrdering.add( m_polygon );
     uiOrdering.add( &m_enablePicking );
 }
 

@@ -61,6 +61,8 @@ public:
     bool                            pickingEnabled() const override;
     caf::PickEventHandler*          pickEventHandler() const override;
 
+    cvf::ref<RigPolyLinesData> polyLinesData() const override;
+
     void onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects ) override;
 
 protected:
@@ -73,8 +75,7 @@ protected:
     void defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu, QMenu* menu, QWidget* fieldEditorWidget ) override;
 
 private:
-    void                       updateNameField();
-    cvf::ref<RigPolyLinesData> polyLinesData() const override;
+    void updateNameField();
 
     void updatePolygonFromTargets();
     void updateTargetsFromPolygon();

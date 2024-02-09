@@ -25,6 +25,7 @@
 
 #include "cafAppEnum.h"
 #include "cafPdmChildArrayField.h"
+#include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmFieldCvfColor.h"
 #include "cafPdmFieldCvfVec3d.h"
@@ -47,6 +48,8 @@ class RigMainGrid;
 class RigFemPartGrid;
 class RigPolylinesData;
 class RigEclipseCaseData;
+class RimPolygon;
+class RimPolygonInView;
 
 //==================================================================================================
 ///
@@ -96,6 +99,7 @@ public:
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
     QString fullName() const override;
 
@@ -140,4 +144,8 @@ private:
     std::vector<std::vector<size_t>> m_cells;
 
     RimCellFilterIntervalTool m_intervalTool;
+
+    caf::PdmPtrField<RimPolygon*>         m_cellFilterPolygon;
+    caf::PdmChildField<RimPolygon*>       m_localPolygon;
+    caf::PdmChildField<RimPolygonInView*> m_polygonEditor;
 };

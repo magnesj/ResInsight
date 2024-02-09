@@ -28,6 +28,9 @@
 #include "RigPolyLinesData.h"
 #include "RigReservoirGridTools.h"
 
+#include "Polygons/RimPolygon.h"
+#include "Polygons/RimPolygonInView.h"
+
 #include "Rim3dView.h"
 #include "RimCase.h"
 #include "RimCellFilterCollection.h"
@@ -54,6 +57,7 @@
 
 #include <QValidator>
 
+#include "RimTools.h"
 #include <limits>
 
 namespace caf
@@ -128,6 +132,14 @@ RimPolygonFilter::RimPolygonFilter()
     CAF_PDM_InitFieldNoDefault( &m_polyFilterMode, "PolygonFilterType", "Vertical Filter" );
 
     CAF_PDM_InitFieldNoDefault( &m_polyIncludeType, "PolyIncludeType", "Cells to include" );
+
+    CAF_PDM_InitFieldNoDefault( &m_cellFilterPolygon, "Polygon", "Polygon" );
+    CAF_PDM_InitFieldNoDefault( &m_localPolygon, "LocalPolygon", "Local Polygon" );
+    m_localPolygon = new RimPolygon;
+    m_localPolygon->setName( "Local Polygon" );
+
+    CAF_PDM_InitFieldNoDefault( &m_polygonEditor, "LocalPolygonInView", "Local Polygon In View" );
+    m_polygonEditor = new RimPolygonInView;
 
     CAF_PDM_InitField( &m_enablePicking, "EnablePicking", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorForField( &m_enablePicking );
@@ -240,6 +252,8 @@ QString RimPolygonFilter::fullName() const
 //--------------------------------------------------------------------------------------------------
 std::vector<RimPolylineTarget*> RimPolygonFilter::activeTargets() const
 {
+    if ( m_polygonEditor ) return m_polygonEditor->activeTargets();
+
     return m_targets.childrenByType();
 }
 
@@ -248,11 +262,15 @@ std::vector<RimPolylineTarget*> RimPolygonFilter::activeTargets() const
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::insertTarget( const RimPolylineTarget* targetToInsertBefore, RimPolylineTarget* targetToInsert )
 {
-    size_t index = m_targets.indexOf( targetToInsertBefore );
-    if ( index < m_targets.size() )
-        m_targets.insert( index, targetToInsert );
-    else
-        m_targets.push_back( targetToInsert );
+    if ( m_polygonEditor ) m_polygonEditor->insertTarget( targetToInsertBefore, targetToInsert );
+
+    /*
+        size_t index = m_targets.indexOf( targetToInsertBefore );
+        if ( index < m_targets.size() )
+            m_targets.insert( index, targetToInsert );
+        else
+            m_targets.push_back( targetToInsert );
+    */
 
     updateCells();
 }
@@ -262,6 +280,8 @@ void RimPolygonFilter::insertTarget( const RimPolylineTarget* targetToInsertBefo
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::deleteTarget( RimPolylineTarget* targetToDelete )
 {
+    if ( m_polygonEditor ) m_polygonEditor->deleteTarget( targetToDelete );
+
     m_targets.removeChild( targetToDelete );
     delete targetToDelete;
 }
@@ -362,10 +382,13 @@ void RimPolygonFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     group->add( &m_enableFiltering );
     group->add( &m_closePolygon );
 
+    uiOrdering.add( &m_cellFilterPolygon );
+    m_polygonEditor->setPolygon( m_cellFilterPolygon() );
+
     auto group1 = uiOrdering.addNewGroup( "Polygon Selection" );
     group1->add( &m_polyFilterMode );
     if ( m_closePolygon() ) group1->add( &m_polyIncludeType );
-    group1->add( &m_targets );
+    // group1->add( &m_targets );
     group1->add( &m_enablePicking );
 
     m_polyIncludeType.uiCapability()->setUiName( "Cells to " + modeString() );
@@ -411,6 +434,25 @@ void RimPolygonFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     {
         m_polyFilterMode.uiCapability()->setUiReadOnly( readOnlyState );
     }
+
+    caf::PdmUiGroup* polygonEditorGroup = uiOrdering.addNewGroup( "Polygon Editor" );
+    m_polygonEditor->uiOrdering( uiConfigName, *polygonEditorGroup );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimPolygonFilter::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+    if ( fieldNeedingOptions == &m_cellFilterPolygon )
+    {
+        options.push_back( caf::PdmOptionItemInfo( "Local Polygon", m_localPolygon() ) );
+
+        RimTools::polygonOptionItems( &options );
+    }
+
+    return options;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -461,6 +503,8 @@ bool RimPolygonFilter::pickingEnabled() const
 //--------------------------------------------------------------------------------------------------
 caf::PickEventHandler* RimPolygonFilter::pickEventHandler() const
 {
+    if ( m_polygonEditor ) m_polygonEditor->pickEventHandler();
+
     return m_pickTargetsEventHandler.get();
 }
 
@@ -865,10 +909,21 @@ void RimPolygonFilter::updateCells()
 
     // get polyline as vector
     std::vector<cvf::Vec3d> points;
+
+    if ( m_polygonEditor )
+    {
+        for ( auto target : m_polygonEditor->activeTargets() )
+        {
+            points.push_back( target->targetPointXYZ() );
+        }
+    }
+
+    /*
     for ( auto& target : m_targets )
     {
         if ( target->isEnabled() ) points.push_back( target->targetPointXYZ() );
     }
+*/
 
     // We need at least three points to make a closed polygon, or just 2 for a polyline
     if ( ( !m_closePolygon() && ( points.size() < 2 ) ) || ( m_closePolygon() && ( points.size() < 3 ) ) ) return;
@@ -894,6 +949,8 @@ void RimPolygonFilter::updateCells()
 //--------------------------------------------------------------------------------------------------
 cvf::ref<RigPolyLinesData> RimPolygonFilter::polyLinesData() const
 {
+    if ( m_polygonEditor ) return m_polygonEditor->polyLinesData();
+
     cvf::ref<RigPolyLinesData> pld = new RigPolyLinesData;
     std::vector<cvf::Vec3d>    line;
     for ( const RimPolylineTarget* target : m_targets )
