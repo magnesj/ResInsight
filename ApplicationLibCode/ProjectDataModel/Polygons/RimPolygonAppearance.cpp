@@ -147,6 +147,9 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     {
         uiOrdering.add( &m_polygonPlaneDepth );
     }
+
+    uiOrdering.add( &m_isClosed );
+
     uiOrdering.skipRemainingFields();
 }
 
