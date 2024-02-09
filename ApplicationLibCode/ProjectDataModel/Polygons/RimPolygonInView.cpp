@@ -21,6 +21,7 @@
 #include "RigPolyLinesData.h"
 
 #include "Rim3dView.h"
+#include "RimCellFilter.h"
 #include "RimPolygon.h"
 #include "RimTools.h"
 
@@ -36,6 +37,7 @@
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 
+#include "RimCellFilter.h"
 #include "cvfModelBasicList.h"
 
 CAF_PDM_SOURCE_INIT( RimPolygonInView, "RimPolygonInView" );
@@ -81,6 +83,8 @@ RimPolygon* RimPolygonInView::polygon() const
 void RimPolygonInView::setPolygon( RimPolygon* polygon )
 {
     m_polygon = polygon;
+
+    updateTargetsFromPolygon();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -253,6 +257,12 @@ void RimPolygonInView::fieldChangedByUi( const caf::PdmFieldHandle* changedField
     if ( changedField == &m_enablePicking )
     {
         updateAllRequiredEditors();
+
+        auto cellFilter = this->firstAncestorOfType<RimCellFilter>();
+        if ( cellFilter )
+        {
+            cellFilter->updateAllRequiredEditors();
+        }
     }
 
     updateVisualization();

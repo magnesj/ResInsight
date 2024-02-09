@@ -100,6 +100,7 @@ RimPolygonFilter::RimPolygonFilter()
     CAF_PDM_InitFieldNoDefault( &m_localPolygon, "LocalPolygon", "Local Polygon" );
     m_localPolygon = new RimPolygon;
     m_localPolygon->setName( "Local Polygon" );
+    m_cellFilterPolygon = m_localPolygon;
 
     CAF_PDM_InitFieldNoDefault( &m_polygonEditor, "LocalPolygonInView", "Local Polygon In View" );
     m_polygonEditor = new RimPolygonInView;
@@ -110,7 +111,7 @@ RimPolygonFilter::RimPolygonFilter()
     CAF_PDM_InitFieldNoDefault( &m_kFilterStr, "KRangeFilter", "K Range Filter", "", "Example: 2,4-6,10-20:2", "" );
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
-    uiCapability()->setUiTreeChildrenHidden( true );
+    uiCapability()->setUiTreeChildrenHidden( false );
 
     m_propagateToSubGrids = false;
 
@@ -130,6 +131,8 @@ RimPolygonFilter::~RimPolygonFilter()
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::updateVisualization()
 {
+    m_polygonEditor->updateVisualization();
+
     updateCells();
     filterChanged.send();
 }
@@ -139,6 +142,8 @@ void RimPolygonFilter::updateVisualization()
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::updateEditorsAndVisualization()
 {
+    m_polygonEditor->updateEditorsAndVisualization();
+
     updateConnectedEditors();
     updateVisualization();
 }
@@ -187,6 +192,16 @@ QString RimPolygonFilter::fullName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPolygonFilter::initAfterRead()
+{
+    RimCellFilter::initAfterRead();
+
+    connectObjectSignals( m_cellFilterPolygon() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<RimPolylineTarget*> RimPolygonFilter::activeTargets() const
 {
     return m_polygonEditor->activeTargets();
@@ -208,13 +223,6 @@ void RimPolygonFilter::insertTarget( const RimPolylineTarget* targetToInsertBefo
 void RimPolygonFilter::deleteTarget( RimPolylineTarget* targetToDelete )
 {
     m_polygonEditor->deleteTarget( targetToDelete );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygonFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -242,7 +250,6 @@ void RimPolygonFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     group->add( &m_enableFiltering );
 
     uiOrdering.add( &m_cellFilterPolygon );
-    m_polygonEditor->setPolygon( m_cellFilterPolygon() );
 
     auto group1 = uiOrdering.addNewGroup( "Polygon Selection" );
     group1->add( &m_polyFilterMode );
@@ -287,6 +294,22 @@ void RimPolygonFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPolygonFilter::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    m_polygonEditor->defineObjectEditorAttribute( uiConfigName, attribute );
+
+    /*
+        if ( auto attrib = dynamic_cast<RicPolyline3dEditorAttribute*>( attribute ) )
+        {
+            attrib->pickEventHandler = m_pickTargetsEventHandler;
+            attrib->enablePicking    = m_enablePicking;
+        }
+    */
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimPolygonFilter::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     QList<caf::PdmOptionItemInfo> options;
@@ -305,27 +328,17 @@ QList<caf::PdmOptionItemInfo> RimPolygonFilter::calculateValueOptions( const caf
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    /*
-        if ( changedField == &m_enablePicking )
-        {
-            updateConnectedEditors();
+    if ( changedField == &m_cellFilterPolygon )
+    {
+        configurePolygonEditor();
+    }
 
-            enableFilter( !m_enablePicking() );
-            filterChanged.send();
-        }
-        else if ( ( changedField == &m_showLines ) || ( changedField == &m_showSpheres ) || ( changedField == &m_sphereColor ) ||
-                  ( changedField == &m_sphereRadiusFactor ) || ( changedField == &m_lineThickness ) || ( changedField == &m_lineColor ) ||
-                  ( changedField == &m_lockPolygonToPlane ) || ( changedField == &m_polygonPlaneDepth ) )
-        {
-            filterChanged.send();
-        }
-        else if ( changedField != &m_name )
-        {
-            updateCells();
-            filterChanged.send();
-            updateIconState();
-        }
-    */
+    if ( changedField != &m_name )
+    {
+        updateCells();
+        filterChanged.send();
+        updateIconState();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -788,8 +801,18 @@ void RimPolygonFilter::updateCells()
 cvf::ref<RigPolyLinesData> RimPolygonFilter::polyLinesData() const
 {
     return m_polygonEditor->polyLinesData();
+}
 
-    return nullptr;
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygonFilter::configurePolygonEditor()
+{
+    m_polygonEditor->setPolygon( m_cellFilterPolygon() );
+
+    // Must connect the signals after polygon is assigned to the polygon editor
+    // When assigning an object to a ptr field, all signals are disconnected
+    connectObjectSignals( m_cellFilterPolygon() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -814,6 +837,36 @@ bool RimPolygonFilter::isPolygonClosed() const
     if ( m_polygonEditor->polygon() ) return m_polygonEditor->polygon()->isClosed();
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygonFilter::connectObjectSignals( RimPolygon* polygon )
+{
+    if ( m_cellFilterPolygon() )
+    {
+        m_cellFilterPolygon()->objectChanged.disconnect( this );
+    }
+
+    if ( polygon )
+    {
+        m_cellFilterPolygon = polygon;
+
+        polygon->objectChanged.connect( this, &RimPolygonFilter::onObjectChanged );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPolygonFilter::onObjectChanged( const caf::SignalEmitter* emitter )
+{
+    updateCells();
+    filterChanged.send();
+    updateIconState();
+
+    //    updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
