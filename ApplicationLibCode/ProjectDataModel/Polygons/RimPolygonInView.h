@@ -50,7 +50,7 @@ public:
     RimPolygon* polygon() const;
     void        setPolygon( RimPolygon* polygon );
 
-    void appendPartsToModel( cvf::ModelBasicList* model, caf::DisplayCoordTransform* scaleTransform, const cvf::BoundingBox& boundingBox );
+    void appendPartsToModel( cvf::ModelBasicList* model, const caf::DisplayCoordTransform* scaleTransform, const cvf::BoundingBox& boundingBox );
     void enablePicking( bool enable );
 
     // RimPolylinesDataInterface

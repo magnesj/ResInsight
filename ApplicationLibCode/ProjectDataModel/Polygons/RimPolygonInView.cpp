@@ -90,9 +90,9 @@ void RimPolygonInView::setPolygon( RimPolygon* polygon )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPolygonInView::appendPartsToModel( cvf::ModelBasicList*        model,
-                                           caf::DisplayCoordTransform* scaleTransform,
-                                           const cvf::BoundingBox&     boundingBox )
+void RimPolygonInView::appendPartsToModel( cvf::ModelBasicList*              model,
+                                           const caf::DisplayCoordTransform* scaleTransform,
+                                           const cvf::BoundingBox&           boundingBox )
 {
     auto view = firstAncestorOfType<Rim3dView>();
 
