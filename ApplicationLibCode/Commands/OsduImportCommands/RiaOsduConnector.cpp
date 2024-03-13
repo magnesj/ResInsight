@@ -15,9 +15,9 @@
 #include <QDesktopServices>
 #include <QOAuthHttpServerReplyHandler>
 #include <QString>
+#include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
-#include <qeventloop.h>
 
 static const QString FIELD_KIND               = "osdu:wks:master-data--Field:1.0.0";
 static const QString WELL_KIND                = "osdu:wks:master-data--Well:1.1.0";
@@ -41,6 +41,42 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
     , m_clientId( clientId )
 {
     m_networkAccessManager = new QNetworkAccessManager( this );
+
+    m_osdu = new QOAuth2AuthorizationCodeFlow( this );
+
+    printf( "REQUEST TOKEN\n" );
+    int port = 35327;
+
+    connect( m_osdu,
+             &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
+             []( QUrl url )
+             {
+                 printf( "AUTHORIZE WITH URL. Thread: %p\n", QThread::currentThread() );
+                 QUrlQuery query( url );
+                 url.setQuery( query );
+                 QDesktopServices::openUrl( url );
+             } );
+
+    QString authUrl = constructAuthUrl( m_authority );
+    m_osdu->setAuthorizationUrl( QUrl( authUrl ) );
+
+    QString tokenUrl = constructTokenUrl( m_authority );
+    m_osdu->setAccessTokenUrl( QUrl( tokenUrl ) );
+
+    // App key
+    m_osdu->setClientIdentifier( m_clientId );
+    m_osdu->setScope( m_scopes );
+
+    auto replyHandler = new RiaOsduOAuthHttpServerReplyHandler( port, this );
+    m_osdu->setReplyHandler( replyHandler );
+
+    connect( m_osdu, SIGNAL( granted() ), this, SLOT( granted() ), Qt::QueuedConnection );
+}
+
+void RiaOsduConnector::granted()
+{
+    QString token = m_osdu->token();
+    emit    tokenReady( token );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -48,39 +84,7 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestToken()
 {
-    int port = 35327;
-
-    this->osdu = new QOAuth2AuthorizationCodeFlow( this );
-
-    connect( this->osdu,
-             &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
-             []( QUrl url )
-             {
-                 QUrlQuery query( url );
-                 url.setQuery( query );
-                 QDesktopServices::openUrl( url );
-             } );
-
-    QString authUrl = constructAuthUrl( m_authority );
-    this->osdu->setAuthorizationUrl( QUrl( authUrl ) );
-
-    QString tokenUrl = constructTokenUrl( m_authority );
-    this->osdu->setAccessTokenUrl( QUrl( tokenUrl ) );
-
-    // App key
-    this->osdu->setClientIdentifier( m_clientId );
-    this->osdu->setScope( m_scopes );
-
-    auto replyHandler = new RiaOsduOAuthHttpServerReplyHandler( port, this );
-    this->osdu->setReplyHandler( replyHandler );
-
-    connect( this->osdu,
-             &QOAuth2AuthorizationCodeFlow::granted,
-             [&]()
-             {
-                 QString token = this->osdu->token();
-                 emit    tokenReady( token );
-             } );
+    m_osdu->grant();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -88,6 +92,14 @@ void RiaOsduConnector::requestToken()
 //--------------------------------------------------------------------------------------------------
 RiaOsduConnector::~RiaOsduConnector()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestFieldsByName( const QString& token, const QString& fieldName )
+{
+    requestFieldsByName( m_server, m_dataPartitionId, token, fieldName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -373,12 +385,4 @@ QString RiaOsduConnector::generateRandomString( int randomStringLength )
         randomString.append( nextChar );
     }
     return randomString;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaOsduConnector::run()
-{
-    osdu->grant();
 }

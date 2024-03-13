@@ -20,26 +20,14 @@ public:
                       const QString& clientId );
     ~RiaOsduConnector() override;
 
-    QNetworkReply*
-        makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& dataPartitionId, const QString& token );
-
-    QNetworkReply* makeDownloadRequest( const QString& server, const QString& dataPartitionId, const QString& id, const QString& token );
-
-    void requestWellsByFieldId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fieldId );
-    void requestWellboresByWellId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& wellId );
-    void requestWellboreTrajectoryByWellboreId( const QString& server,
-                                                const QString& dataPartitionId,
-                                                const QString& token,
-                                                const QString& wellboreId );
-    void requestFileDownloadByFileId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fileId );
-
-    void requestToken();
+    void requestFieldsByName( const QString& token, const QString& fieldName );
 
 public slots:
-    void run();
+    void requestToken();
     void parseWells( QNetworkReply* reply );
     void parseWellTrajectory( QNetworkReply* reply );
     void saveFile( QNetworkReply* reply );
+    void granted();
 
 signals:
     void finished();
@@ -48,7 +36,19 @@ signals:
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& dataPartitionId );
 
+    QNetworkReply*
+        makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& dataPartitionId, const QString& token );
+
+    QNetworkReply* makeDownloadRequest( const QString& server, const QString& dataPartitionId, const QString& id, const QString& token );
+
     void requestFieldsByName( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fieldName );
+    void requestWellsByFieldId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fieldId );
+    void requestWellboresByWellId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& wellId );
+    void requestWellboreTrajectoryByWellboreId( const QString& server,
+                                                const QString& dataPartitionId,
+                                                const QString& token,
+                                                const QString& wellboreId );
+    void requestFileDownloadByFileId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fileId );
 
     static QString generateRandomString( int length = 20 );
     static QString constructSearchUrl( const QString& server );
@@ -56,7 +56,7 @@ private:
     static QString constructAuthUrl( const QString& authority );
     static QString constructTokenUrl( const QString& authority );
 
-    QOAuth2AuthorizationCodeFlow* osdu;
+    QOAuth2AuthorizationCodeFlow* m_osdu;
     QNetworkAccessManager*        m_networkAccessManager;
 
     const QString m_server;
