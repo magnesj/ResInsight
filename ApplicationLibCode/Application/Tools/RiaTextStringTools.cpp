@@ -161,18 +161,6 @@ QString RiaTextStringTools::replaceTemplateTextWithValues( const QString& templa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const QRegExp& regExp )
-{
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 14, 0 )
-    return text.split( regExp, Qt::SkipEmptyParts );
-#else
-    return text.split( regExp, QString::SkipEmptyParts );
-#endif
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::strong_ordering operator<=>( const QString& lhs, const QString& rhs )
 {
     return lhs.compare( rhs ) <=> 0;

@@ -23,8 +23,6 @@
 
 #include <map>
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -37,7 +35,6 @@ QString commonSuffix( const QStringList& stringList );
 QString trimNonAlphaNumericCharacters( const QString& s );
 
 QStringList splitSkipEmptyParts( const QString& text, const QString& sep = " " );
-QStringList splitSkipEmptyParts( const QString& text, const QRegExp& regExp );
 
 QString replaceTemplateTextWithValues( const QString& templateText, const std::map<QString, QString>& valueMap );
 
