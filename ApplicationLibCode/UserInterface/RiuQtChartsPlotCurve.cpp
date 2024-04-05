@@ -27,8 +27,10 @@
 
 #include <QLegend>
 #include <QLegendMarker>
+#include <QtCharts/QChart>
 #include <QtCharts/QChartView>
 #include <QtCharts/QDateTimeAxis>
+#include <QtCharts/QLineSeries>
 #include <QtCharts/QValueAxis>
 
 #include <limits>
@@ -41,13 +43,13 @@ RiuQtChartsPlotCurve::RiuQtChartsPlotCurve( RimPlotCurve* ownerRimCurve, const Q
 {
     m_plotWidget = nullptr;
 
-    m_lineSeries = new QtCharts::QLineSeries();
+    m_lineSeries = new QLineSeries();
     m_lineSeries->setName( title );
 
-    m_areaSeries = new QtCharts::QAreaSeries();
+    m_areaSeries = new QAreaSeries();
     m_areaSeries->setName( title );
 
-    m_scatterSeries = new QtCharts::QScatterSeries();
+    m_scatterSeries = new QScatterSeries();
     m_scatterSeries->setName( title );
 
     m_axisX = RiuPlotAxis::defaultBottom();
