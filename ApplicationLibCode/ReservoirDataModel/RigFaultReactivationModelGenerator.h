@@ -24,6 +24,7 @@
 #include "cvfVector3.h"
 
 #include <array>
+#include <map>
 #include <utility>
 #include <vector>
 
