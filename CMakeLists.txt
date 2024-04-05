@@ -331,7 +331,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   )
 
   # Update submodules as needed
-  option(RESINSIGHT_UPDATE_SUBMODULES "Check submodules during build" ON)
+  option(RESINSIGHT_UPDATE_SUBMODULES "Check submodules during build" OFF)
   mark_as_advanced(RESINSIGHT_UPDATE_SUBMODULES)
 
   if(RESINSIGHT_UPDATE_SUBMODULES)
@@ -505,11 +505,19 @@ endif()
 # ##############################################################################
 # Qt
 # ##############################################################################
-set(RI_QT_MINIMUM_VERSION 5.12)
+set(RI_QT_MINIMUM_VERSION 6.7)
 
 find_package(
-  Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core Gui OpenGL Network Widgets
+  Qt6
+  COMPONENTS
+  REQUIRED Core Gui OpenGL Network Widgets Charts Core5Compat 
 )
+set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets Qt6::Charts Qt6::Core5Compat)
+qt_standard_project_setup()
+
+#find_package(
+#  Qt6 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core Gui OpenGL Network Widgets
+#)
 
 # Open GL
 find_package(OpenGL)
@@ -517,23 +525,13 @@ find_package(OpenGL)
 # ##############################################################################
 # QtCharts
 # ##############################################################################
-option(RESINSIGHT_USE_QT_CHARTS "Enable QtCharts in the code" ON)
-if(RESINSIGHT_USE_QT_CHARTS)
-  find_package(Qt5 OPTIONAL_COMPONENTS Charts)
-
-  if(Qt5Charts_FOUND)
-    message(STATUS "QtCharts found: ${Qt5Charts_LIBRARIES}")
-    add_definitions(-DUSE_QTCHARTS)
-  else()
-    message(STATUS "QtCharts not found.")
-    set(RESINSIGHT_USE_QT_CHARTS OFF)
-  endif()
-endif()
+set(RESINSIGHT_USE_QT_CHARTS ON)
+add_definitions(-DUSE_QTCHARTS)
 
 # ##############################################################################
 # Qwt
 # ##############################################################################
-
+set(USE_QT6 ON)
 add_subdirectory(ThirdParty/qwt)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -557,14 +555,14 @@ set(ADS_VERSION "4.2.1")
 add_subdirectory(ThirdParty/qtadvanceddocking EXCLUDE_FROM_ALL)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  target_compile_options(qt5advanceddocking PRIVATE -Wno-deprecated-copy)
+  target_compile_options(qt6advanceddocking PRIVATE -Wno-deprecated-copy)
 elseif(MSVC)
-  target_compile_options(qt5advanceddocking PRIVATE /wd4996 /wd4005)
+  target_compile_options(qt6advanceddocking PRIVATE /wd4996 /wd4005)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(qt5advanceddocking PRIVATE -Wno-deprecated)
+  target_compile_options(qt6advanceddocking PRIVATE -Wno-deprecated)
 endif()
 
-list(APPEND THIRD_PARTY_LIBRARIES qt5advanceddocking)
+list(APPEND THIRD_PARTY_LIBRARIES qt6advanceddocking)
 
 # ##############################################################################
 # Nightcharts
@@ -754,12 +752,13 @@ if(CMAKE_COMPILER_IS_GNUCC)
 endif()
 
 # !!! For now, we force Qt to version 5
-message(STATUS "Forcing setting of CEE_USE_QT5 to ON")
-set(CEE_USE_QT5
+set(CEE_USE_QT5 OFF)
+message(STATUS "Forcing setting of CEE_USE_QT6 to ON")
+set(CEE_USE_QT6
     ON
-    CACHE BOOL "Force usage of Qt5" FORCE
+    CACHE BOOL "Force usage of Qt6" FORCE
 )
-message(STATUS "CEE_USE_QT5=${CEE_USE_QT5}")
+message(STATUS "CEE_USE_QT6=${CEE_USE_QT6}")
 
 add_subdirectory(${VIZ_MODULES_FOLDER_NAME}/LibCore)
 add_subdirectory(${VIZ_MODULES_FOLDER_NAME}/LibGeometry)

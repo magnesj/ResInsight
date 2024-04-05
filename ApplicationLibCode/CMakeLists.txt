@@ -23,38 +23,6 @@ option(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS
        "Treat warnings as errors (stops build)" OFF
 )
 
-find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
-
-if(Qt5Core_FOUND)
-  find_package(
-    Qt5 ${RI_QT_MINIMUM_VERSION}
-    COMPONENTS Core
-               Gui
-               OpenGL
-               Network
-               Widgets
-               Xml
-               Concurrent
-               PrintSupport
-               Svg
-    OPTIONAL_COMPONENTS Charts
-  )
-  set(QT_LIBRARIES
-      Qt5::Core
-      Qt5::Gui
-      Qt5::Network
-      Qt5::OpenGL
-      Qt5::Widgets
-      Qt5::Xml
-      Qt5::Concurrent
-      Qt5::PrintSupport
-      Qt5::Svg
-  )
-  if(Qt5Charts_FOUND)
-    list(APPEND QT_LIBRARIES Qt5::Charts)
-  endif(Qt5Charts_FOUND)
-endif(Qt5Core_FOUND)
-
 if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
   set(Python3_EXECUTABLE ${RESINSIGHT_GRPC_PYTHON_EXECUTABLE})
   find_package(Python3)
@@ -221,14 +189,14 @@ endif()
 # Qt specifics: Moc, ui, resources
 # ##############################################################################
 
-set(QT_MOC_HEADERS
-    ${QT_MOC_HEADERS} ProjectDataModel/RimMimeData.h
-    ProjectDataModel/Intersections/RimBoxIntersection.h
-    SocketInterface/RiaSocketServer.h
-)
+#set(QT_MOC_HEADERS
+#    ${QT_MOC_HEADERS} ProjectDataModel/RimMimeData.h
+#    ProjectDataModel/Intersections/RimBoxIntersection.h
+#    SocketInterface/RiaSocketServer.h
+#)
 
-qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
-qt5_wrap_ui(FORM_FILES_CPP ${QT_UI_FILES})
+#qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
+#qt5_wrap_ui(FORM_FILES_CPP ${QT_UI_FILES})
 
 # ##############################################################################
 # Create source groups - see also included CMakeLists_files.cmake

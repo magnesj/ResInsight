@@ -19,12 +19,12 @@ endif()
 # Open GL
 find_package(OpenGL)
 
-find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
+#find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
 
-if(Qt5Core_FOUND)
-  find_package(
-    Qt5 ${RI_QT_MINIMUM_VERSION}
-    COMPONENTS Core
+find_package(
+  Qt6
+  COMPONENTS
+               Core
                Gui
                OpenGL
                Network
@@ -34,22 +34,9 @@ if(Qt5Core_FOUND)
                PrintSupport
                Svg
     OPTIONAL_COMPONENTS Charts
-  )
-  set(QT_LIBRARIES
-      Qt5::Core
-      Qt5::Gui
-      Qt5::Network
-      Qt5::OpenGL
-      Qt5::Widgets
-      Qt5::Xml
-      Qt5::Concurrent
-      Qt5::PrintSupport
-      Qt5::Svg
-  )
-  if(Qt5Charts_FOUND)
-    list(APPEND QT_LIBRARIES Qt5::Charts)
-  endif(Qt5Charts_FOUND)
-endif(Qt5Core_FOUND)
+)
+set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets Qt6::Xml Qt6::Concurrent Qt6::PrintSupport Qt6::Svg)
+qt_standard_project_setup()
 
 if(MSVC)
   # Avoid Qt warnings about macro redefinitions for math constants
@@ -123,8 +110,8 @@ list(APPEND CPP_SOURCES ${CODE_SOURCE_FILES})
 set(QRC_FILES ${QRC_FILES} Resources/ResInsight.qrc)
 
 # Runs RCC and MOC on specified files
-qt5_add_resources(QRC_FILES_CPP ${QRC_FILES})
-qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
+#qt5_add_resources(QRC_FILES_CPP ${QRC_FILES})
+#qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
 
 # Adding resource (RC) files for Windows
 if(MSVC)
