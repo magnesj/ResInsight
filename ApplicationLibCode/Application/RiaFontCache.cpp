@@ -23,8 +23,6 @@
 #include "cafAssert.h"
 #include "cafFixedAtlasFont.h"
 
-#include <QDesktopWidget>
-
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
@@ -70,10 +68,7 @@ cvf::ref<caf::FixedAtlasFont> RiaFontCache::getFont( FontSize pointFontSize )
 cvf::ref<caf::FixedAtlasFont> RiaFontCache::getFont( int pointSize )
 {
     int currentDPI = 96;
-    if ( RiaGuiApplication::isRunning() )
-    {
-        currentDPI = RiaGuiApplication::desktop()->logicalDpiX();
-    }
+
     // the Fixed Atlas Fonts appear to be assuming a DPI of 96, so we need scaling.
     double scaling       = currentDPI / 96.0;
     int    scaledSize    = scaling * pointSize;
