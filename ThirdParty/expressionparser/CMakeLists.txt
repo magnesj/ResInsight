@@ -8,8 +8,8 @@ if(MSVC)
  endif() 
 
  
-find_package(Qt5 COMPONENTS REQUIRED Core)
-set(QT_LIBRARIES Qt5::Core)
+find_package(Qt6 COMPONENTS REQUIRED Core)
+set(QT_LIBRARIES Qt6::Core)
 
 list (APPEND MAIN_SOURCE_FILES
     ExpressionParser.h
