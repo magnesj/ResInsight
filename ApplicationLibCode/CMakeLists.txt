@@ -189,14 +189,12 @@ endif()
 # Qt specifics: Moc, ui, resources
 # ##############################################################################
 
-#set(QT_MOC_HEADERS
-#    ${QT_MOC_HEADERS} ProjectDataModel/RimMimeData.h
-#    ProjectDataModel/Intersections/RimBoxIntersection.h
-#    SocketInterface/RiaSocketServer.h
-#)
+# set(QT_MOC_HEADERS ${QT_MOC_HEADERS} ProjectDataModel/RimMimeData.h
+# ProjectDataModel/Intersections/RimBoxIntersection.h
+# SocketInterface/RiaSocketServer.h )
 
-#qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
-#qt5_wrap_ui(FORM_FILES_CPP ${QT_UI_FILES})
+# qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS}) qt5_wrap_ui(FORM_FILES_CPP
+# ${QT_UI_FILES})
 
 # ##############################################################################
 # Create source groups - see also included CMakeLists_files.cmake
