@@ -26,6 +26,7 @@
 
 #include <QFile>
 #include <QFileInfo>
+#include <QRegularExpression>
 
 #include "cvfColor3.h"
 
@@ -91,7 +92,7 @@ cvf::ref<RigFormationNames> RifColorLegendData::readLyrFormationNameFile( const 
             if ( QColor::isValidColor( colorWord ) ) numberString.remove( colorWord ); // remove color if present as last word on line
 
             // extract words containing formation number(s)
-            QStringList numberWords = RiaTextStringTools::splitSkipEmptyParts( numberString, QRegExp( "-" ) );
+            QStringList numberWords = RiaTextStringTools::splitSkipEmptyParts( numberString, QRegularExpression( "-" ) );
 
             if ( numberWords.size() == 2 ) // formation range with or without color at end of line
             {
