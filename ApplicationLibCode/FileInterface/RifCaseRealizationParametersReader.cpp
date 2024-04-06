@@ -21,8 +21,11 @@
 
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
+#include "RiaTextStringTools.h"
 
 #include <QDir>
+#include <QLocale>
+#include <QRegExp>
 #include <QString>
 #include <QStringList>
 
@@ -119,7 +122,7 @@ void RifCaseRealizationParametersReader::parse()
         QString line = dataStream.readLine();
 
         lineNo++;
-        QStringList cols = RifFileParseTools::splitLineAndTrim( line, QRegExp( "[ \t]" ), true );
+        QStringList cols = RifFileParseTools::splitLineAndTrim( line, QRegularExpression( "[ \t]" ), true );
 
         if ( cols.size() != 2 )
         {
@@ -131,7 +134,7 @@ void RifCaseRealizationParametersReader::parse()
         QString& name     = cols[0];
         QString& strValue = cols[1];
 
-        if ( RiaStdStringTools::isNumber( strValue.toStdString(), QLocale::c().decimalPoint().toLatin1() ) )
+        if ( RiaStdStringTools::isNumber( strValue.toStdString(), QLocale::c().decimalPoint().toLatin1()[0] ) )
         {
             bool   parseOk = true;
             double value   = QLocale::c().toDouble( strValue, &parseOk );
@@ -191,23 +194,23 @@ void RifCaseRealizationRunspecificationReader::parse()
 
         if ( xml.isStartElement() )
         {
-            if ( xml.name() == "modifier" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), "modifier" ) )
             {
                 paramName = "";
             }
 
-            if ( xml.name() == "id" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), "id" ) )
             {
                 paramName = xml.readElementText();
             }
 
-            if ( xml.name() == "value" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), "value" ) )
             {
                 QString paramStrValue = xml.readElementText();
 
                 if ( paramName.isEmpty() ) continue;
 
-                if ( RiaStdStringTools::isNumber( paramStrValue.toStdString(), QLocale::c().decimalPoint().toLatin1() ) )
+                if ( RiaStdStringTools::isNumber( paramStrValue.toStdString(), QLocale::c().decimalPoint().toLatin1()[0] ) )
                 {
                     bool   parseOk = true;
                     double value   = QLocale::c().toDouble( paramStrValue, &parseOk );
@@ -229,7 +232,7 @@ void RifCaseRealizationRunspecificationReader::parse()
         }
         else if ( xml.isEndElement() )
         {
-            if ( xml.name() == "modifier" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), "modifier" ) )
             {
                 paramName = "";
             }
