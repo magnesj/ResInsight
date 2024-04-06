@@ -108,18 +108,18 @@ cvf::ref<RigStimPlanFractureDefinition> RifStimPlanXmlReader::readStimPlanXMLFil
 
         if ( xmlStream2.isStartElement() )
         {
-            if ( isTextEqual( xmlStream2.name(), "properties" ) )
+            if ( RiaTextStringTools::isTextEqual( xmlStream2.name(), "properties" ) )
             {
                 propertiesElementCount++;
             }
-            else if ( isTextEqual( xmlStream2.name(), "property" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream2.name(), "property" ) )
             {
                 unit      = getAttributeValueString( xmlStream2, "uom" );
                 parameter = getAttributeValueString( xmlStream2, "name" );
 
                 RiaLogging::info( QString( "%1 [%2]" ).arg( parameter, unit ) );
             }
-            else if ( isTextEqual( xmlStream2.name(), "time" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream2.name(), "time" ) )
             {
                 double timeStepValue = getAttributeValueDouble( xmlStream2, "value" );
 
@@ -202,7 +202,7 @@ void RifStimPlanXmlReader::readStimplanGridAndTimesteps( QXmlStreamReader&      
         {
             RiaDefines::EclipseUnitSystem destinationUnit = requiredUnit;
 
-            if ( isTextEqual( xmlStream.name(), "grid" ) )
+            if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "grid" ) )
             {
                 // Support for one grid per file
                 if ( gridSectionCount < 1 )
@@ -235,42 +235,42 @@ void RifStimPlanXmlReader::readStimplanGridAndTimesteps( QXmlStreamReader&      
 
                 gridSectionCount++;
             }
-            else if ( isTextEqual( xmlStream.name(), "perf" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "perf" ) )
             {
                 QString perfUnit = getAttributeValueString( xmlStream, "uom" );
                 QString fracName = getAttributeValueString( xmlStream, "frac" );
             }
-            else if ( isTextEqual( xmlStream.name(), "topTVD" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "topTVD" ) )
             {
                 auto valText = xmlStream.readElementText();
                 tvdToTopPerf = valText.toDouble();
             }
-            else if ( isTextEqual( xmlStream.name(), "bottomTVD" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "bottomTVD" ) )
             {
                 auto valText = xmlStream.readElementText();
                 tvdToBotPerf = valText.toDouble();
             }
-            else if ( isTextEqual( xmlStream.name(), "topMD" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "topMD" ) )
             {
                 auto valText = xmlStream.readElementText();
                 mdToTopPerf  = valText.toDouble();
             }
-            else if ( isTextEqual( xmlStream.name(), "bottomMD" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "bottomMD" ) )
             {
                 auto valText = xmlStream.readElementText();
                 mdToBotPerf  = valText.toDouble();
             }
-            else if ( isTextEqual( xmlStream.name(), "FmDip" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "FmDip" ) )
             {
                 auto valText = xmlStream.readElementText();
                 formationDip = valText.toDouble();
             }
-            else if ( isTextEqual( xmlStream.name(), "orientation" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "orientation" ) )
             {
                 auto valText = xmlStream.readElementText();
                 orientation  = mapTextToOrientation( valText.trimmed() );
             }
-            else if ( isTextEqual( xmlStream.name(), "xs" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "xs" ) )
             {
                 std::vector<double> gridValuesXs;
                 {
@@ -286,7 +286,7 @@ void RifStimPlanXmlReader::readStimplanGridAndTimesteps( QXmlStreamReader&      
                 stimPlanFileData->generateXsFromFileXs( mirrorMode == MirrorMode::MIRROR_AUTO ? !hasNegativeValues( gridValuesXs )
                                                                                               : (bool)mirrorMode );
             }
-            else if ( isTextEqual( xmlStream.name(), "ys" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "ys" ) )
             {
                 std::vector<double> gridValuesYs;
                 {
@@ -305,7 +305,7 @@ void RifStimPlanXmlReader::readStimplanGridAndTimesteps( QXmlStreamReader&      
                 stimPlanFileData->m_Ys = ys;
             }
 
-            else if ( isTextEqual( xmlStream.name(), "time" ) )
+            else if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "time" ) )
             {
                 double timeStepValue = getAttributeValueDouble( xmlStream, "value" );
                 stimPlanFileData->addTimeStep( timeStepValue );
@@ -356,11 +356,11 @@ std::vector<std::vector<double>> RifStimPlanXmlReader::getAllDepthDataAtTimeStep
 {
     std::vector<std::vector<double>> propertyValuesAtTimestep;
 
-    while ( !( xmlStream.isEndElement() && isTextEqual( xmlStream.name(), "time" ) ) )
+    while ( !( xmlStream.isEndElement() && RiaTextStringTools::isTextEqual( xmlStream.name(), "time" ) ) )
     {
         xmlStream.readNext();
 
-        if ( isTextEqual( xmlStream.name(), "depth" ) )
+        if ( RiaTextStringTools::isTextEqual( xmlStream.name(), "depth" ) )
         {
             xmlStream.readElementText().toDouble();
             std::vector<double> propertyValuesAtDepth;
@@ -450,14 +450,6 @@ double RifStimPlanXmlReader::valueInRequiredUnitSystem( RiaDefines::EclipseUnitS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifStimPlanXmlReader::isTextEqual( const QStringView& text, const QString& compareText )
-{
-    return text.compare( compareText, Qt::CaseInsensitive ) == 0;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RifStimPlanXmlReader::getGriddingValues( QXmlStreamReader& xmlStream, std::vector<double>& gridValues, size_t& startNegValues )
 {
     QString gridValuesString = xmlStream.readElementText().replace( '\n', ' ' );
@@ -482,7 +474,7 @@ double RifStimPlanXmlReader::getAttributeValueDouble( QXmlStreamReader& xmlStrea
     double value = HUGE_VAL;
     for ( const QXmlStreamAttribute& attr : xmlStream.attributes() )
     {
-        if ( isTextEqual( attr.name(), parameterName ) )
+        if ( RiaTextStringTools::isTextEqual( attr.name(), parameterName ) )
         {
             value = attr.value().toString().toDouble();
         }
@@ -498,7 +490,7 @@ QString RifStimPlanXmlReader::getAttributeValueString( QXmlStreamReader& xmlStre
     QString parameterValue;
     for ( const QXmlStreamAttribute& attr : xmlStream.attributes() )
     {
-        if ( isTextEqual( attr.name(), parameterName ) )
+        if ( RiaTextStringTools::isTextEqual( attr.name(), parameterName ) )
         {
             parameterValue = attr.value().toString();
         }

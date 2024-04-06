@@ -64,6 +64,4 @@ private:
 
     static double
         valueInRequiredUnitSystem( RiaDefines::EclipseUnitSystem sourceUnit, RiaDefines::EclipseUnitSystem requiredUnit, double value );
-
-    static bool isTextEqual( const QStringView& text, const QString& compareText );
 };
