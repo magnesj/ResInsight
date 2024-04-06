@@ -4,6 +4,7 @@
 
 #include "RifTextDataTableFormatter.h"
 
+#include <QRegularExpression>
 #include <QString>
 #include <QStringList>
 
@@ -108,7 +109,7 @@ TEST( RifTextDataTableFormatter, LongLine )
     formatter.rowCompleted();
     formatter.tableCompleted();
 
-    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegExp( "[\r\n]" ) );
+    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegularExpression( "[\r\n]" ) );
     for ( QString line : tableLines )
     {
         std::cout << QString( "Line: \"%1\"" ).arg( line ).toStdString() << std::endl;
@@ -155,7 +156,7 @@ TEST( RifTextDataTableFormatter, LongLine132 )
     formatter.rowCompleted();
     formatter.tableCompleted();
 
-    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegExp( "[\r\n]" ) );
+    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegularExpression( "[\r\n]" ) );
     for ( QString line : tableLines )
     {
         std::cout << QString( "Line: \"%1\"" ).arg( line ).toStdString() << std::endl;
@@ -202,7 +203,7 @@ TEST( RifTextDataTableFormatter, LongLine133 )
     formatter.rowCompleted();
     formatter.tableCompleted();
 
-    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegExp( "[\r\n]" ) );
+    QStringList tableLines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegularExpression( "[\r\n]" ) );
     for ( QString line : tableLines )
     {
         std::cout << QString( "Line: \"%1\"" ).arg( line ).toStdString() << std::endl;
