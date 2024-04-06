@@ -510,14 +510,28 @@ set(RI_QT_MINIMUM_VERSION 6.7)
 find_package(
   Qt6
   COMPONENTS
-  REQUIRED Core Gui OpenGL Network Widgets Charts Core5Compat 
+  REQUIRED
+  Core
+  Gui
+  OpenGL
+  Network
+  Widgets
+  Charts
+  Core5Compat
 )
-set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets Qt6::Charts Qt6::Core5Compat)
+set(QT_LIBRARIES
+    Qt6::Core
+    Qt6::Gui
+    Qt6::OpenGL
+    Qt6::Network
+    Qt6::Widgets
+    Qt6::Charts
+    Qt6::Core5Compat
+)
 qt_standard_project_setup()
 
-#find_package(
-#  Qt6 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core Gui OpenGL Network Widgets
-#)
+# find_package( Qt6 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core Gui OpenGL Network
+# Widgets )
 
 # Open GL
 find_package(OpenGL)
