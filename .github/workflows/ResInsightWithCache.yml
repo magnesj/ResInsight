@@ -177,6 +177,7 @@ jobs:
           version: 6.5.3
           dir: "${{ github.workspace }}/Qt/"
           cache: true
+          modules: 'qtcharts'
 
       - name: Restore from cache and install vcpkg
         uses: lukka/run-vcpkg@v7
