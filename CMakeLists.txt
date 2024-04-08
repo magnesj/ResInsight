@@ -730,7 +730,7 @@ if(RESINSIGHT_ENABLE_UNITY_BUILD)
   # message("Cmake Unity build is enabled on : custom-opm-common")
   # set_property(TARGET custom-opm-common PROPERTY UNITY_BUILD true)
   message("Cmake Unity build is enabled on : qtadvanceddocking")
-  set_property(TARGET qt5advanceddocking PROPERTY UNITY_BUILD true)
+  set_property(TARGET qt6advanceddocking PROPERTY UNITY_BUILD true)
 endif()
 
 # ##############################################################################
