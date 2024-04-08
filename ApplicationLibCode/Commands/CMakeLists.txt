@@ -86,10 +86,7 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  target_compile_options(
-    Commands
-    PRIVATE -Wno-deprecated-declarations
-  )
+  target_compile_options(Commands PRIVATE -Wno-deprecated-declarations)
 endif()
 
 if(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS)
