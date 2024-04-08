@@ -331,7 +331,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   )
 
   # Update submodules as needed
-  option(RESINSIGHT_UPDATE_SUBMODULES "Check submodules during build" OFF)
+  option(RESINSIGHT_UPDATE_SUBMODULES "Check submodules during build" ON)
   mark_as_advanced(RESINSIGHT_UPDATE_SUBMODULES)
 
   if(RESINSIGHT_UPDATE_SUBMODULES)
