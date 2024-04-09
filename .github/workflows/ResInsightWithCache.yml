@@ -233,6 +233,25 @@ jobs:
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "Bad exit status")
           endif()
+
+      - name: List content of unity files
+        shell: pwsh
+        run: |
+          ls cmakebuild/
+          ls cmakebuild/ApplicationLibCode/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/Unity
+
+          $files = Get-ChildItem -Path "cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/Unity"
+          foreach ($file in $files) {
+            if (-not $file.PSIsContainer) {
+              Write-Host "Content of $($file.FullName):"
+              Get-Content $file.FullName
+              Write-Host "-----------------------------"
+            }
+          }
+          
       - name: Build
         shell: cmake -P {0}
         run: |
