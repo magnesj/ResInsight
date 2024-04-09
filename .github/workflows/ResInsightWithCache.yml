@@ -236,6 +236,7 @@ jobs:
 
       - name: List content of unity files
         shell: pwsh
+        if: false
         run: |
           ls cmakebuild/
           ls cmakebuild/ApplicationLibCode/
@@ -251,7 +252,7 @@ jobs:
               Write-Host "-----------------------------"
             }
           }
-          
+
       - name: Build
         shell: cmake -P {0}
         run: |
