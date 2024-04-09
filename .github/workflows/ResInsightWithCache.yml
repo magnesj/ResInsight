@@ -174,7 +174,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: 6.5.3
+          version: 6.7.0
           dir: "${{ github.workspace }}/Qt/"
           cache: true
           modules: 'qtcharts qt5compat'
