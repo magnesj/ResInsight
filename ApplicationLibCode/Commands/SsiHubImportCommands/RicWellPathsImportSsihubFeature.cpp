@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2015-     Statoil ASA
 //  Copyright (C) 2015-     Ceetron Solutions AS
@@ -94,7 +94,7 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
     // Get password/username from application cache
     {
 #ifdef _DEBUG
-        // Valid credentials for ssihubfake received in mail from H�kon
+        // Valid credentials for ssihubfake received in mail from Håkon
         QString ssihubUsername = "admin";
         QString ssihubPassword = "resinsight";
 #else
