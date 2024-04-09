@@ -382,10 +382,11 @@ set(UNITY_EXCLUDE_FILES
     ProjectDataModel/RimVfpPlot.cpp
 )
 
-# Exclude moc files from unity build. These files will be included when using Ninja
+# Exclude moc files from unity build. These files will be included when using
+# Ninja
 file(GLOB AUTOGEN_CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/*_autogen/mocs_*.cpp)
 foreach(AUTOGEN_CPP_FILE ${AUTOGEN_CPP_FILES})
-    list(APPEND UNITY_EXCLUDE_FILES ${AUTOGEN_CPP_FILE})
+  list(APPEND UNITY_EXCLUDE_FILES ${AUTOGEN_CPP_FILE})
 endforeach()
 
 message("Files excluded from UNITY_BUILD : ${UNITY_EXCLUDE_FILES}")
