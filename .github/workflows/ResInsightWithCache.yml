@@ -36,6 +36,7 @@ jobs:
               execute-pytests: true,
               unity-build: true,
               publish-to-pypi: false,
+              qt-version: 6.7.0,
             }
           - {
               name: "Ubuntu 20.04 gcc",
@@ -49,6 +50,7 @@ jobs:
               execute-pytests: true,
               unity-build: false,
               publish-to-pypi: true,
+              qt-version: 6.5.3,
             }
           - {
               name: "Ubuntu 22.04 clang-16",
@@ -62,6 +64,7 @@ jobs:
               execute-pytests: false,
               unity-build: false,
               publish-to-pypi: false,
+              qt-version: 6.5.3,
             }
     steps:
       - name: Checkout
@@ -174,7 +177,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: 6.6.3
+          version: ${{ matrix.config.qt-version }}
           dir: "${{ github.workspace }}/Qt/"
           cache: true
           modules: 'qtcharts qt5compat'
