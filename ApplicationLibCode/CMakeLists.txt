@@ -385,7 +385,9 @@ set(UNITY_EXCLUDE_FILES
 # Exclude moc files from unity build. These files will be included when using
 # Ninja
 message("CMAKE_CURRENT_BINARY_DIR : ${CMAKE_CURRENT_BINARY_DIR}")
-file(GLOB AUTOGEN_CPP_FILES ${CMAKE_CURRENT_BINARY_DIR}/ApplicationLibCode_autogen/*)
+file(GLOB AUTOGEN_CPP_FILES
+     ${CMAKE_CURRENT_BINARY_DIR}/ApplicationLibCode_autogen/*
+)
 message("AUTOGEN_CPP_FILES : ${AUTOGEN_CPP_FILES}")
 foreach(AUTOGEN_CPP_FILE ${AUTOGEN_CPP_FILES})
   list(APPEND UNITY_EXCLUDE_FILES ${AUTOGEN_CPP_FILE})
