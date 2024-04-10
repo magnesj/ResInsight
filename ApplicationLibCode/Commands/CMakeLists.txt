@@ -22,7 +22,6 @@ if(RESINSIGHT_ENABLE_UNITY_BUILD)
   endforeach(fileToExclude)
 endif()
 
-
 set(COMMAND_REFERENCED_CMAKE_FILES
     CMakeLists_files.cmake
     AnalysisPlotCommands/CMakeLists_files.cmake
