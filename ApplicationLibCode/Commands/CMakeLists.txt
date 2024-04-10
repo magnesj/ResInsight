@@ -6,6 +6,23 @@ if(RESINSIGHT_ENABLE_UNITY_BUILD)
   set(CMAKE_UNITY_BUILD true)
 endif()
 
+set(UNITY_EXCLUDE_FILES
+    # Exclude moc files as they cause template instanciation issues
+    # https://cmake.org/cmake/help/latest/prop_tgt/AUTOGEN_BUILD_DIR.html
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp
+)
+
+message("Files excluded from UNITY_BUILD : ${UNITY_EXCLUDE_FILES}")
+
+if(RESINSIGHT_ENABLE_UNITY_BUILD)
+  foreach(fileToExclude ${UNITY_EXCLUDE_FILES})
+    set_source_files_properties(
+      ${fileToExclude} PROPERTIES SKIP_UNITY_BUILD_INCLUSION TRUE
+    )
+  endforeach(fileToExclude)
+endif()
+
+
 set(COMMAND_REFERENCED_CMAKE_FILES
     CMakeLists_files.cmake
     AnalysisPlotCommands/CMakeLists_files.cmake
