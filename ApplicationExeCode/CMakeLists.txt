@@ -46,6 +46,7 @@ set(QT_LIBRARIES
     Qt6::Svg
 )
 qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
 
 if(MSVC)
   # Avoid Qt warnings about macro redefinitions for math constants
@@ -148,7 +149,7 @@ set(EXE_FILES
     ${CPP_SOURCES}
     ${MOC_SOURCE_FILES}
     ${FORM_FILES_CPP}
-    ${QRC_FILES_CPP}
+    ${QRC_FILES}
     ${WIN_RESOURCE}
     ${HEADER_FILES}
     ${REFERENCED_CMAKE_FILES}
