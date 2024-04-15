@@ -921,7 +921,9 @@ endif()
 # Installation settings
 # ##############################################################################
 
-set(RESINSIGHT_INSTALL_FOLDER ".")
+# Set the install folder to be the bin folder. 
+# TODO: Move Python scripts to a separate folder
+set(RESINSIGHT_INSTALL_FOLDER "./bin")
 
 # override system install prefix if private installation chosen
 option(RESINSIGHT_PRIVATE_INSTALL
