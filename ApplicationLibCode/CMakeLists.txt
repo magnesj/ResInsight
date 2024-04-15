@@ -380,7 +380,6 @@ set(UNITY_EXCLUDE_FILES
     # Exclude files including opm-common
     ProjectDataModel/RimVfpTableExtractor.cpp
     ProjectDataModel/RimVfpPlot.cpp
-
     # Exclude moc files as they cause template instanciation issues
     # https://cmake.org/cmake/help/latest/prop_tgt/AUTOGEN_BUILD_DIR.html
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp

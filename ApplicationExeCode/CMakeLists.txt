@@ -48,9 +48,11 @@ set(QT_LIBRARIES
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)
 
-# qt_standard_project_setup() should set CMAKE_RUNTIME_OUTPUT_DIRECTORY correctly, but does not work as expected for Visual Studio.
-# Set the output folder to the current binary directory to make sure all binaries ends up in the same folder.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}) 
+# qt_standard_project_setup() should set CMAKE_RUNTIME_OUTPUT_DIRECTORY
+# correctly, but does not work as expected for Visual Studio. Set the output
+# folder to the current binary directory to make sure all binaries ends up in
+# the same folder.
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 if(MSVC)
   # Avoid Qt warnings about macro redefinitions for math constants
@@ -573,8 +575,8 @@ endif(RESINSIGHT_BUNDLE_OPENSSL)
 # ##############################################################################
 
 qt_generate_deploy_app_script(
-TARGET ResInsight OUTPUT_SCRIPT deploy_script
-NO_UNSUPPORTED_PLATFORM_ERROR NO_TRANSLATIONS
+  TARGET ResInsight OUTPUT_SCRIPT deploy_script NO_UNSUPPORTED_PLATFORM_ERROR
+  NO_TRANSLATIONS
 )
 install(SCRIPT ${deploy_script})
 
