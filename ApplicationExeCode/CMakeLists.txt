@@ -163,7 +163,7 @@ set(EXE_FILES
     .clang-tidy
 )
 
-add_executable(ResInsight ${EXE_FILES})
+qt_add_executable(ResInsight ${EXE_FILES})
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   set_target_properties(
@@ -286,10 +286,10 @@ if(RESINSIGHT_USE_ODB_API)
   list(APPEND LINK_LIBRARIES RifOdbReader)
 endif()
 
-target_link_libraries(ResInsight ${LINK_LIBRARIES})
+target_link_libraries(ResInsight PRIVATE ${LINK_LIBRARIES})
 
 if(UNIX AND NOT APPLE)
-  target_link_libraries(ResInsight xcb)
+  target_link_libraries(ResInsight PRIVATE xcb)
 endif()
 
 # ##############################################################################
