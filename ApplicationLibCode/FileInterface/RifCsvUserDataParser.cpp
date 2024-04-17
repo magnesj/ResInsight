@@ -348,7 +348,7 @@ bool RifCsvUserDataParser::parseColumnInfo( QTextStream*                        
             QStringList candidateColumnHeaders = RifFileParseTools::splitLineAndTrim( candidateLine, parseOptions.cellSeparator );
             for ( const auto& text : candidateColumnHeaders )
             {
-                if ( RiaStdStringTools::isNumber( text.toStdString(), parseOptions.locale.decimalPoint().toLatin1() ) )
+                if ( RiaTextStringTools::isNumber( text, parseOptions.locale.decimalPoint() ) )
                 {
                     hasDataValues = true;
                 }
@@ -503,8 +503,8 @@ bool RifCsvUserDataParser::parseColumnBasedData( const AsciiDataParseOptions&   
         {
             for ( int iCol = 0; iCol < colCount; iCol++ )
             {
-                std::string colData = lineColumns[iCol].toStdString();
-                Column&     col     = columnInfoList[iCol];
+                auto    colData = lineColumns[iCol];
+                Column& col     = columnInfoList[iCol];
 
                 // Determine column data type
                 if ( col.dataType == Column::NONE )
@@ -516,7 +516,7 @@ bool RifCsvUserDataParser::parseColumnBasedData( const AsciiDataParseOptions&   
                     else
                     {
                         if ( parseOptions.assumeNumericDataColumns ||
-                             RiaStdStringTools::isNumber( colData, parseOptions.locale.decimalPoint().toLatin1() ) )
+                             RiaTextStringTools::isNumber( colData, parseOptions.locale.decimalPoint() ) )
                         {
                             col.dataType = Column::NUMERIC;
                         }

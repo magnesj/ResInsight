@@ -18,6 +18,7 @@
 
 #include "RiaTextStringTools.h"
 
+#include "RiaStdStringTools.h"
 #include <QRegularExpression>
 #include <QString>
 #include <QStringList>
@@ -156,6 +157,31 @@ QString RiaTextStringTools::replaceTemplateTextWithValues( const QString& templa
     }
 
     return resolvedText;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Qt recommends pass-by-value instead of pass-by-const-ref for QStringView
+/// https://doc.qt.io/qt-6/qstringview.html
+//--------------------------------------------------------------------------------------------------
+bool RiaTextStringTools::isTextEqual( QStringView text, QStringView compareText )
+{
+    return text.compare( compareText, Qt::CaseInsensitive ) == 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaTextStringTools::isNumber( const QString& text, const QString& decimalPoint )
+{
+    if ( text.isEmpty() || decimalPoint.isEmpty() )
+    {
+        return false;
+    }
+
+    auto stdString   = text.toStdString();
+    auto decimalChar = decimalPoint.toLatin1()[0];
+
+    return RiaStdStringTools::isNumber( stdString, decimalChar );
 }
 
 //--------------------------------------------------------------------------------------------------

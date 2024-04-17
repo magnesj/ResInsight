@@ -21,6 +21,7 @@
 
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
+#include "RiaTextStringTools.h"
 
 #include <QDir>
 #include <QString>
@@ -131,7 +132,7 @@ void RifCaseRealizationParametersReader::parse()
         QString& name     = cols[0];
         QString& strValue = cols[1];
 
-        if ( RiaStdStringTools::isNumber( strValue.toStdString(), QLocale::c().decimalPoint().toLatin1() ) )
+        if ( RiaTextStringTools::isNumber( strValue, QLocale::c().decimalPoint() ) )
         {
             bool   parseOk = true;
             double value   = QLocale::c().toDouble( strValue, &parseOk );
@@ -191,23 +192,23 @@ void RifCaseRealizationRunspecificationReader::parse()
 
         if ( xml.isStartElement() )
         {
-            if ( xml.name() == "modifier" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), QString( "modifier" ) ) )
             {
                 paramName = "";
             }
 
-            if ( xml.name() == "id" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), QString( "id" ) ) )
             {
                 paramName = xml.readElementText();
             }
 
-            if ( xml.name() == "value" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), QString( "value" ) ) )
             {
                 QString paramStrValue = xml.readElementText();
 
                 if ( paramName.isEmpty() ) continue;
 
-                if ( RiaStdStringTools::isNumber( paramStrValue.toStdString(), QLocale::c().decimalPoint().toLatin1() ) )
+                if ( RiaTextStringTools::isNumber( paramStrValue, QLocale::c().decimalPoint() ) )
                 {
                     bool   parseOk = true;
                     double value   = QLocale::c().toDouble( paramStrValue, &parseOk );
@@ -229,7 +230,7 @@ void RifCaseRealizationRunspecificationReader::parse()
         }
         else if ( xml.isEndElement() )
         {
-            if ( xml.name() == "modifier" )
+            if ( RiaTextStringTools::isTextEqual( xml.name(), QString( "modifier" ) ) )
             {
                 paramName = "";
             }

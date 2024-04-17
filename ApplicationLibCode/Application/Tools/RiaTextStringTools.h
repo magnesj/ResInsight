@@ -39,6 +39,8 @@ QStringList splitSkipEmptyParts( const QString& text, const QString& sep = " " )
 QStringList splitSkipEmptyParts( const QString& text, const QRegExp& regExp );
 
 QString replaceTemplateTextWithValues( const QString& templateText, const std::map<QString, QString>& valueMap );
+bool    isTextEqual( QStringView text, QStringView compareText );
+bool    isNumber( const QString& text, const QString& decimalPoint );
 
 } // namespace RiaTextStringTools
 
