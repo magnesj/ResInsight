@@ -124,7 +124,6 @@
 #include "cvfqtUtils.h"
 
 #include <QDebug>
-#include <QDesktopWidget>
 #include <QDir>
 #include <QErrorMessage>
 #include <QGridLayout>
@@ -1131,8 +1130,8 @@ void RiaGuiApplication::showFormattedTextInMessageBoxOrConsole( const QString& t
     // Resize dialog to fit text etc.
     textEdit->document()->adjustSize();
     QSizeF docSize = textEdit->document()->size();
-    dlg.resize( 20 + docSize.width() + 2 * layout->margin(),
-                20 + docSize.height() + 2 * layout->margin() + layout->spacing() + okButton->sizeHint().height() );
+    dlg.resize( 20 + docSize.width() + 2 * layout->contentsMargins().left(),
+                20 + docSize.height() + 2 * layout->contentsMargins().left() + layout->spacing() + okButton->sizeHint().height() );
 
     dlg.exec();
 }
@@ -1518,7 +1517,7 @@ void RiaGuiApplication::applyGuiPreferences( const RiaPreferences*              
 //--------------------------------------------------------------------------------------------------
 int RiaGuiApplication::applicationResolution()
 {
-    return QApplication::desktop()->logicalDpiX();
+    return RiuMainWindow::instance()->logicalDpiX();
 }
 
 //--------------------------------------------------------------------------------------------------
