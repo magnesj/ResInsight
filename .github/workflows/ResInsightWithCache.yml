@@ -36,6 +36,7 @@ jobs:
               execute-pytests: true,
               unity-build: true,
               publish-to-pypi: false,
+              qt-version: 6.7.0,
             }
           - {
               name: "Ubuntu 20.04 gcc",
@@ -49,6 +50,7 @@ jobs:
               execute-pytests: true,
               unity-build: false,
               publish-to-pypi: true,
+              qt-version: 6.5.3,
             }
           - {
               name: "Ubuntu 22.04 clang-16",
@@ -62,6 +64,7 @@ jobs:
               execute-pytests: false,
               unity-build: false,
               publish-to-pypi: false,
+              qt-version: 6.5.3,
             }
     steps:
       - name: Checkout
@@ -91,6 +94,8 @@ jobs:
 
       - name: Use CMake
         uses: lukka/get-cmake@latest
+        with:
+          cmakeVersion: "~3.28.0"
 
       - name: Use MSVC (Windows)
         uses: ilammy/msvc-dev-cmd@v1
@@ -172,9 +177,10 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v3
         with:
-          version: 5.12.12
+          version: ${{ matrix.config.qt-version }}
           dir: "${{ github.workspace }}/Qt/"
           cache: true
+          modules: 'qtcharts qt5compat'
 
       - name: Restore from cache and install vcpkg
         uses: lukka/run-vcpkg@v7
@@ -227,6 +233,26 @@ jobs:
           if (NOT result EQUAL 0)
             message(FATAL_ERROR "Bad exit status")
           endif()
+
+      - name: List content of unity files
+        shell: pwsh
+        if: false
+        run: |
+          ls cmakebuild/
+          ls cmakebuild/ApplicationLibCode/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/
+          ls cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/Unity
+
+          $files = Get-ChildItem -Path "cmakebuild/ApplicationLibCode/CMakeFiles/ApplicationLibCode.dir/Unity"
+          foreach ($file in $files) {
+            if (-not $file.PSIsContainer) {
+              Write-Host "Content of $($file.FullName):"
+              Get-Content $file.FullName
+              Write-Host "-----------------------------"
+            }
+          }
+
       - name: Build
         shell: cmake -P {0}
         run: |
