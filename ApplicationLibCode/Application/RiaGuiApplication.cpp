@@ -1517,7 +1517,10 @@ void RiaGuiApplication::applyGuiPreferences( const RiaPreferences*              
 //--------------------------------------------------------------------------------------------------
 int RiaGuiApplication::applicationResolution()
 {
-    return RiuMainWindow::instance()->logicalDpiX();
+    if ( RiuMainWindow::instance() ) return RiuMainWindow::instance()->logicalDpiX();
+
+    int defaultDPI = 96;
+    return defaultDPI;
 }
 
 //--------------------------------------------------------------------------------------------------
