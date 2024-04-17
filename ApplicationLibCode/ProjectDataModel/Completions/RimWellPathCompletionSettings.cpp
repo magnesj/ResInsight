@@ -264,15 +264,6 @@ QString RimWellPathCompletionSettings::fluidInPlaceRegionForExport() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QRegExp RimWellPathCompletionSettings::wellNameForExportRegExp()
-{
-    QRegExp rx( "[\\w\\-\\_]{1,8}" );
-    return rx;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimMswCompletionParameters* RimWellPathCompletionSettings::mswCompletionParameters() const
 {
     return m_mswParameters();

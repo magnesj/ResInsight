@@ -34,6 +34,7 @@
 
 #include "SummaryPlotCommands/RicSummaryPlotFeatureImpl.h"
 
+#include <QRegExp>
 #include <QRegularExpression>
 
 //--------------------------------------------------------------------------------------------------
@@ -217,7 +218,7 @@ std::pair<std::vector<RimSummaryCase*>, std::vector<RimSummaryCaseCollection*>>
 //--------------------------------------------------------------------------------------------------
 QStringList RiaSummaryStringTools::splitIntoWords( const QString& text )
 {
-    return RiaTextStringTools::splitSkipEmptyParts( text, QRegExp( "\\s+" ) );
+    return RiaTextStringTools::splitSkipEmptyParts( text, QRegularExpression( "\\s+" ) );
 }
 
 //--------------------------------------------------------------------------------------------------

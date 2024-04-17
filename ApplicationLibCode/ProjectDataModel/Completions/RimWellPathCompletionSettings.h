@@ -82,8 +82,6 @@ public:
     QString hydrostaticDensityForExport() const;
     QString fluidInPlaceRegionForExport() const;
 
-    static QRegExp wellNameForExportRegExp();
-
     RimMswCompletionParameters* mswCompletionParameters() const;
 
 protected:

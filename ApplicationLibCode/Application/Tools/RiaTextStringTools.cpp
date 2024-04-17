@@ -138,6 +138,14 @@ QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const QRegularExpression& regExp )
+{
+    return text.split( regExp, Qt::SkipEmptyParts );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RiaTextStringTools::replaceTemplateTextWithValues( const QString& templateText, const std::map<QString, QString>& valueMap )
 {
     QString resolvedText = templateText;
@@ -161,13 +169,9 @@ QString RiaTextStringTools::replaceTemplateTextWithValues( const QString& templa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const QRegExp& regExp )
+bool RiaTextStringTools::isTextEqual( const QStringView& text, const QString& compareText )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 14, 0 )
-    return text.split( regExp, Qt::SkipEmptyParts );
-#else
-    return text.split( regExp, QString::SkipEmptyParts );
-#endif
+    return text.compare( compareText, Qt::CaseInsensitive ) == 0;
 }
 
 //--------------------------------------------------------------------------------------------------

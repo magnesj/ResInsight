@@ -23,6 +23,7 @@
 #include "RifEclEclipseSummary.h"
 #include "RiuSummaryQuantityNameInfoProvider.h"
 
+#include <QRegularExpression>
 #include <QStringList>
 #include <QTextStream>
 
@@ -781,9 +782,11 @@ bool RifEclipseSummaryAddress::isUiTextMatchingFilterText( const QString& filter
     if ( filterString.isEmpty() ) return true;
     if ( filterString.trimmed() == "*" ) return !value.empty();
 
-    QRegExp searcher( filterString, Qt::CaseInsensitive, QRegExp::WildcardUnix );
-    QString qstrValue = QString::fromStdString( value );
-    return searcher.exactMatch( qstrValue );
+    QRegularExpression searcher( filterString, QRegularExpression::CaseInsensitiveOption );
+    QString            qstrValue = QString::fromStdString( value );
+    auto               match     = searcher.match( qstrValue );
+
+    return match.hasMatch();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1213,7 +1216,7 @@ std::string RifEclipseSummaryAddress::blockAsString() const
 //--------------------------------------------------------------------------------------------------
 std::tuple<int, int, int> RifEclipseSummaryAddress::ijkTupleFromUiText( const std::string& s )
 {
-    QStringList ijk = QString().fromStdString( s ).trimmed().split( QRegExp( "[,]" ) );
+    QStringList ijk = QString().fromStdString( s ).trimmed().split( QRegularExpression( "[,]" ) );
 
     if ( ijk.size() != 3 ) return std::make_tuple( -1, -1, -1 );
 
@@ -1235,7 +1238,7 @@ std::string RifEclipseSummaryAddress::formatUiTextRegionToRegion() const
 //--------------------------------------------------------------------------------------------------
 std::pair<int, int> RifEclipseSummaryAddress::regionToRegionPairFromUiText( const std::string& s )
 {
-    QStringList r2r = QString().fromStdString( s ).trimmed().split( QRegExp( "[-]" ) );
+    QStringList r2r = QString().fromStdString( s ).trimmed().split( QRegularExpression( "[-]" ) );
 
     if ( r2r.size() != 2 ) return std::make_pair( -1, -1 );
 

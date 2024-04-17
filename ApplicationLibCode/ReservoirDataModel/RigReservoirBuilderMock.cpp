@@ -29,6 +29,8 @@
 #include "RigWellResultFrame.h"
 #include "RigWellResultPoint.h"
 
+#include <QRegularExpression>
+
 /* rand example: guess the number */
 #include <cstdio>
 #include <cstdlib>
@@ -145,11 +147,11 @@ bool RigReservoirBuilderMock::dynamicResult( RigEclipseCaseData* eclipseCase, co
 {
     int resultIndex = 1;
 
-    QRegExp rx( "[0-9]{1,2}" ); // Find number 0-99
-    int     digitPos = rx.indexIn( result );
-    if ( digitPos > -1 )
+    QRegularExpression rx( "[0-9]{1,2}" ); // Find number 0-99
+    auto               digitPos = rx.match( result );
+    if ( digitPos.hasMatch() )
     {
-        resultIndex = rx.cap( 0 ).toInt() + 1;
+        resultIndex = digitPos.captured( 0 ).toInt() + 1;
     }
 
     double scaleValue  = 1.0 + resultIndex * 0.1;

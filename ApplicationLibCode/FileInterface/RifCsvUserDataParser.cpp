@@ -35,6 +35,7 @@
 #include "cvfAssert.h"
 
 #include <QFile>
+#include <QRegExp>
 #include <QString>
 #include <QTextStream>
 
@@ -348,7 +349,7 @@ bool RifCsvUserDataParser::parseColumnInfo( QTextStream*                        
             QStringList candidateColumnHeaders = RifFileParseTools::splitLineAndTrim( candidateLine, parseOptions.cellSeparator );
             for ( const auto& text : candidateColumnHeaders )
             {
-                if ( RiaStdStringTools::isNumber( text.toStdString(), parseOptions.locale.decimalPoint().toLatin1() ) )
+                if ( RiaStdStringTools::isNumber( text.toStdString(), parseOptions.locale.decimalPoint().toLatin1()[0] ) )
                 {
                     hasDataValues = true;
                 }
@@ -516,7 +517,7 @@ bool RifCsvUserDataParser::parseColumnBasedData( const AsciiDataParseOptions&   
                     else
                     {
                         if ( parseOptions.assumeNumericDataColumns ||
-                             RiaStdStringTools::isNumber( colData, parseOptions.locale.decimalPoint().toLatin1() ) )
+                             RiaStdStringTools::isNumber( colData, parseOptions.locale.decimalPoint().toLatin1()[0] ) )
                         {
                             col.dataType = Column::NUMERIC;
                         }

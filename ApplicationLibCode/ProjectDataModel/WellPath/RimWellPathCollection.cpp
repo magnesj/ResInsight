@@ -63,6 +63,7 @@
 #include <QCollator>
 #include <QFile>
 #include <QFileInfo>
+#include <QRegExp>
 #include <QString>
 
 #include <cmath>
