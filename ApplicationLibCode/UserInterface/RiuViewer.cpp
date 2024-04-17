@@ -1106,7 +1106,7 @@ void RiuViewer::mouseMoveEvent( QMouseEvent* mouseEvent )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuViewer::enterEvent( QEvent* e )
+void RiuViewer::enterEvent( QEnterEvent* e )
 {
     if ( s_hoverCursor )
     {
