@@ -129,10 +129,33 @@ QString RiaTextStringTools::trimNonAlphaNumericCharacters( const QString& s )
 //--------------------------------------------------------------------------------------------------
 QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const QString& sep /*= " " */ )
 {
+    bool skipEmptyParts = true;
+    return splitString( text, sep, skipEmptyParts );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QStringList RiaTextStringTools::splitString( const QString& text, const QString& sep, bool skipEmptyParts )
+{
 #if QT_VERSION >= QT_VERSION_CHECK( 5, 14, 0 )
-    return text.split( sep, Qt::SkipEmptyParts, Qt::CaseInsensitive );
+    return text.split( sep, skipEmptyParts ? Qt::SkipEmptyParts : Qt::KeepEmptyParts, Qt::CaseInsensitive );
 #else
-    return text.split( sep, QString::SkipEmptyParts, Qt::CaseInsensitive );
+    return text.split( sep, skipEmptyParts ? QString::SkipEmptyParts : QString::KeepEmptyParts, Qt::CaseInsensitive );
+#endif
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QStringList RiaTextStringTools::splitString( const QString& text, const QRegExp& regExp, bool skipEmptyParts )
+{
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 0, 0 )
+    return regExp.splitString( text, skipEmptyParts ? Qt::SkipEmptyParts : Qt::KeepEmptyParts );
+#elif QT_VERSION >= QT_VERSION_CHECK( 5, 14, 0 )
+    return text.split( regExp, skipEmptyParts ? Qt::SkipEmptyParts : Qt::KeepEmptyParts );
+#else
+    return text.split( regExp, skipEmptyParts ? QString::SkipEmptyParts : QString::KeepEmptyParts );
 #endif
 }
 
@@ -189,13 +212,9 @@ bool RiaTextStringTools::isNumber( const QString& text, const QString& decimalPo
 //--------------------------------------------------------------------------------------------------
 QStringList RiaTextStringTools::splitSkipEmptyParts( const QString& text, const QRegExp& regExp )
 {
-#if QT_VERSION >= QT_VERSION_CHECK( 6, 0, 0 )
-    return regExp.splitString( text, Qt::SkipEmptyParts );
-#elif QT_VERSION >= QT_VERSION_CHECK( 5, 14, 0 )
-    return text.split( regExp, Qt::SkipEmptyParts );
-#else
-    return text.split( regExp, QString::SkipEmptyParts );
-#endif
+    bool skipEmptyParts = true;
+
+    return splitString( text, regExp, skipEmptyParts );
 }
 
 //--------------------------------------------------------------------------------------------------
