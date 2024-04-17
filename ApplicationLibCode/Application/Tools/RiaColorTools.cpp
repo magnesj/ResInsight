@@ -205,6 +205,23 @@ QColor RiaColorTools::blendQColors( const QColor& color1, const QColor& color2, 
 //--------------------------------------------------------------------------------------------------
 cvf::Color3f RiaColorTools::makeLighter( const cvf::Color3f& color, float normalizedScalingFactor )
 {
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 0, 0 )
+    auto qColor = toQColor( color );
+
+    float h = 0.0;
+    float s = 0.0;
+    float l = 0.0;
+    qColor.getHslF( &h, &s, &l );
+
+    // A negative value will make the color darker
+    l = l + ( 1.0 - l ) * normalizedScalingFactor;
+
+    l = std::clamp( l, 0.0f, 1.0f );
+
+    qColor.setHslF( h, s, l );
+
+    return fromQColorTo3f( qColor );
+#else
     auto qColor = toQColor( color );
 
     double h = 0.0;
@@ -220,6 +237,7 @@ cvf::Color3f RiaColorTools::makeLighter( const cvf::Color3f& color, float normal
     qColor.setHslF( h, s, l );
 
     return fromQColorTo3f( qColor );
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -227,6 +245,16 @@ cvf::Color3f RiaColorTools::makeLighter( const cvf::Color3f& color, float normal
 //--------------------------------------------------------------------------------------------------
 QColor RiaColorTools::modifySaturation( const QColor& color, double factor )
 {
+#if QT_VERSION >= QT_VERSION_CHECK( 6, 0, 0 )
+    auto  colorSaturation( color );
+    float h, s, v;
+    color.getHsvF( &h, &s, &v );
+
+    s = std::clamp( (float)( s * factor ), 0.0f, 1.0f );
+
+    colorSaturation.setHsvF( h, s, v );
+    return colorSaturation;
+#else
     auto  colorSaturation( color );
     qreal h, s, v;
     color.getHsvF( &h, &s, &v );
@@ -235,6 +263,7 @@ QColor RiaColorTools::modifySaturation( const QColor& color, double factor )
 
     colorSaturation.setHsvF( h, s, v );
     return colorSaturation;
+#endif
 }
 
 //--------------------------------------------------------------------------------------------------
