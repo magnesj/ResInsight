@@ -18,26 +18,17 @@
 
 #pragma once
 
-// #include <QAbstractOAuth>
-// #include <QJsonDocument>
-// #include <QJsonObject>
-// #include <QNetworkAccessManager>
-// #include <QNetworkReply>
-// #include <QNetworkRequest>
-// #include <QOAuth2AuthorizationCodeFlow>
 #include <QObject>
 
-// #include <QDesktopServices>
 #include <QOAuthHttpServerReplyHandler>
 #include <QString>
-// #include <QUrl>
-// #include <QUrlQuery>
 
 //==================================================================================================
 ///
 //==================================================================================================
 class RiaOsduOAuthHttpServerReplyHandler : public QOAuthHttpServerReplyHandler
 {
+    Q_OBJECT
 public:
     RiaOsduOAuthHttpServerReplyHandler( quint16 port, QObject* parent );
 

@@ -44,6 +44,10 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
 
     m_osdu = new QOAuth2AuthorizationCodeFlow( this );
 
+    qDebug() << "SSL BUILD VERSION: " << QSslSocket::sslLibraryBuildVersionString();
+    qDebug() << "SSL SUPPORTS SSL: " << QSslSocket::supportsSsl();
+    qDebug() << "SSL VERSION STRING: " << QSslSocket::sslLibraryVersionString();
+
     printf( "REQUEST TOKEN\n" );
     int port = 35327;
 
