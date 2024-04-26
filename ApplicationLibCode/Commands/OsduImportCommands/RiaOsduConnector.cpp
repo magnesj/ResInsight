@@ -74,11 +74,12 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
     auto replyHandler = new RiaOsduOAuthHttpServerReplyHandler( port, this );
     m_osdu->setReplyHandler( replyHandler );
 
-    connect( m_osdu, SIGNAL( granted() ), this, SLOT( granted() ), Qt::QueuedConnection );
+    connect( m_osdu, SIGNAL( granted() ), this, SLOT( accessGranted() ) );
 }
 
-void RiaOsduConnector::granted()
+void RiaOsduConnector::accessGranted()
 {
+    qDebug() << "ACCESS GRANTED!!" << QThread::currentThread();
     QString token = m_osdu->token();
     emit    tokenReady( token );
 }
@@ -88,6 +89,7 @@ void RiaOsduConnector::granted()
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestToken()
 {
+    qDebug() << "Request token: " << QThread::currentThread();
     m_osdu->grant();
 }
 

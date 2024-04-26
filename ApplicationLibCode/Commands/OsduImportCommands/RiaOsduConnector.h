@@ -29,7 +29,7 @@ public slots:
     void parseWells( QNetworkReply* reply );
     void parseWellTrajectory( QNetworkReply* reply );
     void saveFile( QNetworkReply* reply );
-    void granted();
+    void accessGranted();
 
 signals:
     void finished();
