@@ -23,6 +23,10 @@ public:
     ~RiaOsduConnector() override;
 
     void requestFieldsByName( const QString& token, const QString& fieldName );
+    void requestFieldsByName( const QString& fieldName );
+
+    QString server() const;
+    QString dataPartition() const;
 
 public slots:
     void requestToken();
@@ -66,4 +70,6 @@ private:
     const QString m_authority;
     const QString m_scopes;
     const QString m_clientId;
+
+    QString m_token;
 };

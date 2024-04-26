@@ -41,8 +41,6 @@
 
 #include <QMenu>
 #include <QObject>
-#include <QSslConfiguration>
-#include <QSslSocket>
 
 #include <QtNetwork>
 #include <QtWidgets>
@@ -54,8 +52,7 @@ CAF_PDM_XML_ABSTRACT_SOURCE_INIT( ObjectGroupWithHeaders, "ObjectGroupWithHeader
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RiuWellImportWizard::RiuWellImportWizard( const QString&     webServiceAddress,
-                                          const QString&     downloadFolder,
+RiuWellImportWizard::RiuWellImportWizard( const QString&     downloadFolder,
                                           RiaOsduConnector*  osduConnector,
                                           RimWellPathImport* wellPathImportObject,
                                           QWidget*           parent /*= 0*/ )
@@ -69,7 +66,7 @@ RiuWellImportWizard::RiuWellImportWizard( const QString&     webServiceAddress,
     m_myProgressDialog                  = nullptr;
     m_firstTimeRequestingAuthentication = true;
 
-    addPage( new AuthenticationPage( webServiceAddress, this ) );
+    addPage( new AuthenticationPage( m_osduConnector, this ) );
     m_fieldSelectionPageId = addPage( new FieldSelectionPage( m_wellPathImportObject, this ) );
     m_wellSelectionPageId  = addPage( new WellSelectionPage( m_wellPathImportObject, this ) );
     m_wellSummaryPageId    = addPage( new WellSummaryPage( m_wellPathImportObject, this ) );
@@ -82,7 +79,6 @@ RiuWellImportWizard::RiuWellImportWizard( const QString&     webServiceAddress,
 //--------------------------------------------------------------------------------------------------
 RiuWellImportWizard::~RiuWellImportWizard()
 {
-    printf( "~RIU WELL IMPORT WIZARD\n" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -90,53 +86,9 @@ RiuWellImportWizard::~RiuWellImportWizard()
 //--------------------------------------------------------------------------------------------------
 void RiuWellImportWizard::downloadFields()
 {
-    // QString wellFileName = jsonWellsFilePath();
-    // if ( caf::Utils::fileExists( wellFileName ) )
-    // {
-    //     QFile::remove( wellFileName );
-    // }
-
-    // QString completeUrlText     = m_webServiceAddress + "/resinsight/projects";
-    // QString destinationFileName = jsonFieldsFilePath();
-
     m_currentDownloadState = DOWNLOAD_FIELDS;
 
-    // m_osduConnector->requestFieldsByName( token, "IVAR" );
-    //     issueHttpRequestToFile( completeUrlText, destinationFileName );
-
-    return;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::issueHttpRequestToFile( QString completeUrlText, QString destinationFileName )
-{
-    // setUrl( completeUrlText );
-    // m_file = new QFile( destinationFileName );
-    // if ( !m_file->open( QIODevice::WriteOnly ) )
-    // {
-    //     QMessageBox::information( this,
-    //                               tr( "HTTP" ),
-    //                               tr( "Unable to save the file %1: %2." ).arg( destinationFileName ).arg( m_file->errorString() ) );
-    //     delete m_file;
-    //     m_file = nullptr;
-    //     return;
-    // }
-
-    // // schedule the request
-    // m_httpRequestAborted = false;
-    // startRequest( m_url );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::cancelDownload()
-{
-    // m_statusLabel->setText(tr("Download canceled."));
-    // m_httpRequestAborted = true;
-    // m_reply->abort();
+    m_osduConnector->requestFieldsByName( "IVAR" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -187,62 +139,63 @@ void RiuWellImportWizard::httpFinished()
     //     // m_statusLabel->setText(tr("Downloaded data to %1.").arg(m_destinationFolder));
     // }
 
-    if ( m_currentDownloadState == DOWNLOAD_WELL_PATH )
-    {
-        QString singleWellPathFilePath = "junk"; // m_file->fileName();
+    // if ( m_currentDownloadState == DOWNLOAD_WELL_PATH )
+    // {
+    //     QString singleWellPathFilePath = "junk"; // m_file->fileName();
 
-        QFile file( singleWellPathFilePath );
-        if ( file.open( QFile::ReadOnly ) )
-        {
-            QString singleWellPathContent = file.readAll();
+    //     QFile file( singleWellPathFilePath );
+    //     if ( file.open( QFile::ReadOnly ) )
+    //     {
+    //         QString singleWellPathContent = file.readAll();
 
-            // Strip leading and trailing []
+    //         // Strip leading and trailing []
 
-            if ( singleWellPathContent.indexOf( '{' ) > 0 )
-            {
-                singleWellPathContent = singleWellPathContent.right( singleWellPathContent.size() - singleWellPathContent.indexOf( '{' ) );
-            }
+    //         if ( singleWellPathContent.indexOf( '{' ) > 0 )
+    //         {
+    //             singleWellPathContent = singleWellPathContent.right( singleWellPathContent.size() - singleWellPathContent.indexOf( '{' )
+    //             );
+    //         }
 
-            if ( singleWellPathContent[singleWellPathContent.size() - 1] == ']' )
-            {
-                singleWellPathContent = singleWellPathContent.left( singleWellPathContent.size() - 1 );
-            }
+    //         if ( singleWellPathContent[singleWellPathContent.size() - 1] == ']' )
+    //         {
+    //             singleWellPathContent = singleWellPathContent.left( singleWellPathContent.size() - 1 );
+    //         }
 
-            QString wellPathName = getValue( "name", singleWellPathContent );
-            if ( !singleWellPathContent.isEmpty() && !wellPathName.isEmpty() )
-            {
-                // Write out the content without leading/trailing []
-                file.close();
-                QFile::remove( singleWellPathFilePath );
+    //         QString wellPathName = getValue( "name", singleWellPathContent );
+    //         if ( !singleWellPathContent.isEmpty() && !wellPathName.isEmpty() )
+    //         {
+    //             // Write out the content without leading/trailing []
+    //             file.close();
+    //             QFile::remove( singleWellPathFilePath );
 
-                if ( file.open( QFile::WriteOnly ) )
-                {
-                    QTextStream out( &file );
-                    out << singleWellPathContent;
-                }
-            }
+    //             if ( file.open( QFile::WriteOnly ) )
+    //             {
+    //                 QTextStream out( &file );
+    //                 out << singleWellPathContent;
+    //             }
+    //         }
 
-            progressDialog()->setLabelText( QString( "Downloaded well path : %1" ).arg( wellPathName ) );
-        }
+    //         progressDialog()->setLabelText( QString( "Downloaded well path : %1" ).arg( wellPathName ) );
+    //     }
 
-        int newValue = progressDialog()->maximum() - m_wellRequestQueue.size();
-        progressDialog()->setValue( newValue );
-    }
+    //     int newValue = progressDialog()->maximum() - m_wellRequestQueue.size();
+    //     progressDialog()->setValue( newValue );
+    // }
 
-    // m_reply->deleteLater();
-    // m_reply = nullptr;
-    // delete m_file;
-    // m_file = nullptr;
+    // // m_reply->deleteLater();
+    // // m_reply = nullptr;
+    // // delete m_file;
+    // // m_file = nullptr;
 
-    if ( m_currentDownloadState == DOWNLOAD_WELLS || m_currentDownloadState == DOWNLOAD_WELL_PATH )
-    {
-        checkDownloadQueueAndIssueRequests();
-    }
-    else if ( m_currentDownloadState == DOWNLOAD_FIELDS )
-    {
-        updateFieldsModel();
-        m_currentDownloadState = DOWNLOAD_UNDEFINED;
-    }
+    // if ( m_currentDownloadState == DOWNLOAD_WELLS || m_currentDownloadState == DOWNLOAD_WELL_PATH )
+    // {
+    //     checkDownloadQueueAndIssueRequests();
+    // }
+    // else if ( m_currentDownloadState == DOWNLOAD_FIELDS )
+    // {
+    //     updateFieldsModel();
+    //     m_currentDownloadState = DOWNLOAD_UNDEFINED;
+    // }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -253,10 +206,6 @@ void RiuWellImportWizard::slotAuthenticationRequired( QNetworkReply* networkRepl
 {
     if ( m_firstTimeRequestingAuthentication )
     {
-        // Use credentials from first wizard page
-        authenticator->setUser( field( "username" ).toString() );
-        authenticator->setPassword( field( "password" ).toString() );
-
         m_firstTimeRequestingAuthentication = false;
     }
     else
@@ -269,48 +218,6 @@ void RiuWellImportWizard::slotAuthenticationRequired( QNetworkReply* networkRepl
 
         restart();
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::startRequest( QUrl url )
-{
-    auto request = QNetworkRequest( url );
-
-#if !defined( QT_NO_OPENSSL ) && !defined( CVF_OSX )
-    bool supportsSsl = QSslSocket::supportsSsl();
-    if ( supportsSsl )
-    {
-        QSslConfiguration config = QSslConfiguration::defaultConfiguration();
-        config.setProtocol( QSsl::TlsV1_0 );
-        request.setSslConfiguration( config );
-    }
-#endif
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Search for string, and find the associated value inside the next quoted string
-//  text content : "A" : "B"
-//  A search for key "A" returns B
-//--------------------------------------------------------------------------------------------------
-QString RiuWellImportWizard::getValue( const QString& key, const QString& stringContent )
-{
-    QString quotedKey = "\"" + key + "\"";
-
-    int pos = stringContent.indexOf( quotedKey );
-    if ( pos >= 0 )
-    {
-        int valueStartPos = stringContent.indexOf( "\"", pos + quotedKey.size() );
-        int valueEndPos   = stringContent.indexOf( "\"", valueStartPos + 1 );
-
-        if ( valueStartPos >= 0 && valueEndPos > valueStartPos )
-        {
-            return stringContent.mid( valueStartPos + 1, valueEndPos - valueStartPos - 1 );
-        }
-    }
-
-    return QString();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -450,55 +357,55 @@ void RiuWellImportWizard::downloadWellPaths()
 //--------------------------------------------------------------------------------------------------
 void RiuWellImportWizard::checkDownloadQueueAndIssueRequests()
 {
-    if ( !m_wellRequestQueue.empty() )
-    {
-        DownloadEntity firstItem = m_wellRequestQueue[0];
-        m_wellRequestQueue.pop_front();
+    // if ( !m_wellRequestQueue.empty() )
+    // {
+    //     DownloadEntity firstItem = m_wellRequestQueue[0];
+    //     m_wellRequestQueue.pop_front();
 
-        QString completeUrlText  = firstItem.requestUrl;
-        QString absoluteFilePath = firstItem.responseFilename;
+    //     QString completeUrlText  = firstItem.requestUrl;
+    //     QString absoluteFilePath = firstItem.responseFilename;
 
-        issueHttpRequestToFile( completeUrlText, absoluteFilePath );
+    //     issueHttpRequestToFile( completeUrlText, absoluteFilePath );
 
-        return;
-    }
+    //     return;
+    // }
 
-    if ( m_currentDownloadState == DOWNLOAD_WELLS )
-    {
-        hideProgressDialog();
+    // if ( m_currentDownloadState == DOWNLOAD_WELLS )
+    // {
+    //     hideProgressDialog();
 
-        // Update UI with downloaded wells
+    //     // Update UI with downloaded wells
 
-        for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
-        {
-            RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
-            if ( oilRegion->selected )
-            {
-                for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
-                {
-                    RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
-                    if ( oilField->selected )
-                    {
-                        parseWellsResponse( oilField );
-                    }
-                }
-            }
-        }
+    //     for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
+    //     {
+    //         RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
+    //         if ( oilRegion->selected )
+    //         {
+    //             for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
+    //             {
+    //                 RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
+    //                 if ( oilField->selected )
+    //                 {
+    //                     parseWellsResponse( oilField );
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        m_wellPathImportObject->updateConnectedEditors();
-    }
-    else if ( m_currentDownloadState == DOWNLOAD_WELL_PATH )
-    {
-        WellSummaryPage* wellSummaryPage = dynamic_cast<WellSummaryPage*>( page( m_wellSummaryPageId ) );
-        if ( wellSummaryPage )
-        {
-            wellSummaryPage->updateSummaryPage();
-        }
-    }
+    //     m_wellPathImportObject->updateConnectedEditors();
+    // }
+    // else if ( m_currentDownloadState == DOWNLOAD_WELL_PATH )
+    // {
+    //     WellSummaryPage* wellSummaryPage = dynamic_cast<WellSummaryPage*>( page( m_wellSummaryPageId ) );
+    //     if ( wellSummaryPage )
+    //     {
+    //         wellSummaryPage->updateSummaryPage();
+    //     }
+    // }
 
-    m_currentDownloadState = DOWNLOAD_UNDEFINED;
+    // m_currentDownloadState = DOWNLOAD_UNDEFINED;
 
-    hideProgressDialog();
+    // hideProgressDialog();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -542,17 +449,17 @@ void RiuWellImportWizard::slotCurrentIdChanged( int currentId )
     bool hideWells = true;
     if ( currentId == m_wellSelectionPageId ) hideWells = false;
 
-    for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
-    {
-        RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
-        {
-            for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
-            {
-                RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
-                oilField->wells.uiCapability()->setUiHidden( hideWells );
-            }
-        }
-    }
+    // for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
+    // {
+    //     RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
+    //     {
+    //         for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
+    //         {
+    //             RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
+    //             oilField->wells.uiCapability()->setUiHidden( hideWells );
+    //         }
+    //     }
+    // }
 
     // Update the editors to propagate the changes to UI
     m_wellPathImportObject->updateConnectedEditors();
@@ -655,16 +562,6 @@ void RiuWellImportWizard::parseWellsResponse( RimOilFieldEntry* oilFieldEntry )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::setCredentials( const QString& username, const QString& password )
-{
-    // Set the initial value of the fields defined in the Authorization page
-    setField( "username", username );
-    setField( "password", password );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 int RiuWellImportWizard::wellSelectionPageId()
 {
     return m_wellSelectionPageId;
@@ -673,32 +570,29 @@ int RiuWellImportWizard::wellSelectionPageId()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-AuthenticationPage::AuthenticationPage( const QString& webServiceAddress, QWidget* parent /*= 0*/ )
+AuthenticationPage::AuthenticationPage( RiaOsduConnector* osduConnector, QWidget* parent /*= 0*/ )
     : QWizardPage( parent )
+    , m_accessOk( false )
 {
     setTitle( "OSDU - Login" );
 
     QVBoxLayout* layout = new QVBoxLayout;
 
-    QLabel* label = new QLabel( "Please enter your login information for SSIHUB at : " + webServiceAddress );
+    QLabel* label = new QLabel( "Checking OSDU connection..." );
     layout->addWidget( label );
 
     QFormLayout* formLayout = new QFormLayout;
     layout->addLayout( formLayout );
 
-    QLineEdit* usernameLineEdit  = new QLineEdit( "", this );
-    QLineEdit* passwordlLineEdit = new QLineEdit( "", this );
-    passwordlLineEdit->setEchoMode( QLineEdit::Password );
+    QLineEdit* serverLineEdit    = new QLineEdit( osduConnector->server(), this );
+    QLineEdit* partitionLineEdit = new QLineEdit( osduConnector->dataPartition(), this );
 
-    formLayout->addRow( "&Username:", usernameLineEdit );
-    formLayout->addRow( "&Password:", passwordlLineEdit );
+    formLayout->addRow( "Server:", serverLineEdit );
+    formLayout->addRow( "Data Partition:", partitionLineEdit );
 
     setLayout( layout );
 
-    // Make variables accessible to other pages in wizard
-    // Use * at end of field name to indicate mandatory field
-    registerField( "username", usernameLineEdit );
-    registerField( "password", passwordlLineEdit );
+    connect( osduConnector, SIGNAL( tokenReady( const QString& ) ), this, SLOT( accessOk() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -708,6 +602,23 @@ void AuthenticationPage::initializePage()
 {
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
     wiz->resetAuthenticationCount();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool AuthenticationPage::isComplete() const
+{
+    return m_accessOk;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void AuthenticationPage::accessOk()
+{
+    m_accessOk = true;
+    emit( completeChanged() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -819,50 +730,50 @@ void WellSelectionPage::buildWellTreeView()
     // Delete all temporary pdm object groups
     m_regionsWithVisibleWells->objects.deleteChildren();
 
-    for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
-    {
-        RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
-        if ( oilRegion->selected )
-        {
-            caf::PdmObjectCollection* regGroup = new caf::PdmObjectCollection;
-            regGroup->objects.uiCapability()->setUiHidden( true );
+    // for ( size_t rIdx = 0; rIdx < m_wellPathImportObject->regions.size(); rIdx++ )
+    // {
+    //     RimOilRegionEntry* oilRegion = m_wellPathImportObject->regions[rIdx];
+    //     if ( oilRegion->selected )
+    //     {
+    //         caf::PdmObjectCollection* regGroup = new caf::PdmObjectCollection;
+    //         regGroup->objects.uiCapability()->setUiHidden( true );
 
-            regGroup->setUiName( oilRegion->userDescriptionField()->uiCapability()->uiValue().toString() );
+    //         regGroup->setUiName( oilRegion->userDescriptionField()->uiCapability()->uiValue().toString() );
 
-            m_regionsWithVisibleWells->objects.push_back( regGroup );
+    //         m_regionsWithVisibleWells->objects.push_back( regGroup );
 
-            for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
-            {
-                RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
-                if ( oilField->selected )
-                {
-                    caf::PdmObjectCollection* fieldGroup = new caf::PdmObjectCollection;
-                    fieldGroup->objects.uiCapability()->setUiHidden( true );
+    //         for ( size_t fIdx = 0; fIdx < oilRegion->fields.size(); fIdx++ )
+    //         {
+    //             RimOilFieldEntry* oilField = oilRegion->fields[fIdx];
+    //             if ( oilField->selected )
+    //             {
+    //                 caf::PdmObjectCollection* fieldGroup = new caf::PdmObjectCollection;
+    //                 fieldGroup->objects.uiCapability()->setUiHidden( true );
 
-                    fieldGroup->setUiName( oilField->userDescriptionField()->uiCapability()->uiValue().toString() );
+    //                 fieldGroup->setUiName( oilField->userDescriptionField()->uiCapability()->uiValue().toString() );
 
-                    regGroup->objects.push_back( fieldGroup );
+    //                 regGroup->objects.push_back( fieldGroup );
 
-                    for ( size_t wIdx = 0; wIdx < oilField->wells.size(); wIdx++ )
-                    {
-                        RimWellPathEntry* wellPathEntry = oilField->wells[wIdx];
+    //                 for ( size_t wIdx = 0; wIdx < oilField->wells.size(); wIdx++ )
+    //                 {
+    //                     RimWellPathEntry* wellPathEntry = oilField->wells[wIdx];
 
-                        // Create a copy of the PdmObject, as it is not supported to have multiple parents of any
-                        // objects
-                        QString objStr = wellPathEntry->writeObjectToXmlString();
+    //                     // Create a copy of the PdmObject, as it is not supported to have multiple parents of any
+    //                     // objects
+    //                     QString objStr = wellPathEntry->writeObjectToXmlString();
 
-                        RimWellPathEntry* wellPathCopy = new RimWellPathEntry;
-                        wellPathCopy->readObjectFromXmlString( objStr, caf::PdmDefaultObjectFactory::instance() );
-                        wellPathCopy->selected = true;
+    //                     RimWellPathEntry* wellPathCopy = new RimWellPathEntry;
+    //                     wellPathCopy->readObjectFromXmlString( objStr, caf::PdmDefaultObjectFactory::instance() );
+    //                     wellPathCopy->selected = true;
 
-                        fieldGroup->objects.push_back( wellPathCopy );
-                    }
+    //                     fieldGroup->objects.push_back( wellPathCopy );
+    //                 }
 
-                    sortObjectsByDescription( fieldGroup );
-                }
-            }
-        }
-    }
+    //                 sortObjectsByDescription( fieldGroup );
+    //             }
+    //         }
+    //     }
+    // }
 
     m_wellSelectionTreeView->setPdmItem( m_regionsWithVisibleWells );
     m_regionsWithVisibleWells->updateConnectedEditors();

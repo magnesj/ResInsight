@@ -56,9 +56,16 @@ class AuthenticationPage : public QWizardPage
     Q_OBJECT
 
 public:
-    AuthenticationPage( const QString& webServiceAddress, QWidget* parent = nullptr );
+    AuthenticationPage( RiaOsduConnector* osduConnector, QWidget* parent = nullptr );
 
     void initializePage() override;
+    bool isComplete() const override;
+
+private slots:
+    void accessOk();
+
+private:
+    bool m_accessOk;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -201,14 +208,12 @@ public:
     };
 
 public:
-    RiuWellImportWizard( const QString&     webServiceAddress,
-                         const QString&     downloadFolder,
+    RiuWellImportWizard( const QString&     downloadFolder,
                          RiaOsduConnector*  osduConnector,
                          RimWellPathImport* wellPathImportObject,
                          QWidget*           parent = nullptr );
     ~RiuWellImportWizard() override;
 
-    void        setCredentials( const QString& username, const QString& password );
     QStringList absoluteFilePathsToWellPaths() const;
 
     // Methods used from the wizard pages
@@ -221,9 +226,6 @@ public slots:
 
     void checkDownloadQueueAndIssueRequests();
 
-    void issueHttpRequestToFile( QString completeUrlText, QString destinationFileName );
-    void cancelDownload();
-
     void httpFinished();
 
     void slotAuthenticationRequired( QNetworkReply* networkReply, QAuthenticator* authenticator );
@@ -234,9 +236,6 @@ private slots:
     void slotCurrentIdChanged( int currentId );
 
 private:
-    void startRequest( QUrl url );
-    void setUrl( const QString& httpAddress );
-
     void updateFieldsModel();
     void parseWellsResponse( RimOilFieldEntry* oilFieldEntry );
 

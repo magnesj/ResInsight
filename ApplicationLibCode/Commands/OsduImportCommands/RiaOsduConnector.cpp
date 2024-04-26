@@ -80,8 +80,8 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
 void RiaOsduConnector::accessGranted()
 {
     qDebug() << "ACCESS GRANTED!!" << QThread::currentThread();
-    QString token = m_osdu->token();
-    emit    tokenReady( token );
+    m_token = m_osdu->token();
+    emit tokenReady( m_token );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -106,6 +106,14 @@ RiaOsduConnector::~RiaOsduConnector()
 void RiaOsduConnector::requestFieldsByName( const QString& token, const QString& fieldName )
 {
     requestFieldsByName( m_server, m_dataPartitionId, token, fieldName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestFieldsByName( const QString& fieldName )
+{
+    requestFieldsByName( m_token, fieldName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -265,9 +273,9 @@ void RiaOsduConnector::parseWells( QNetworkReply* reply )
         QString kind = resultObj["kind"].toString();
 
         qDebug() << "Id:" << id << " kind: " << kind;
-
-        printf( "%s\n", id.toStdString().c_str() );
+        qDebug() << resultObj;
     }
+
     emit finished();
 }
 
@@ -391,4 +399,20 @@ QString RiaOsduConnector::generateRandomString( int randomStringLength )
         randomString.append( nextChar );
     }
     return randomString;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaOsduConnector::server() const
+{
+    return m_server;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaOsduConnector::dataPartition() const
+{
+    return m_dataPartitionId;
 }

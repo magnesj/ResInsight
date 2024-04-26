@@ -71,83 +71,83 @@ void RimWellPathImport::updateRegions( const QStringList& regionStrings, const Q
 {
     assert( regionStrings.size() == fieldStrings.size() && regionStrings.size() == edmIds.size() );
 
-    std::vector<RimOilRegionEntry*> regionsToRemove;
+    // std::vector<RimOilRegionEntry*> regionsToRemove;
 
-    // Remove regions and fields not present in last request
-    for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
-    {
-        if ( !regionStrings.contains( regions[regionIdx]->name ) )
-        {
-            regionsToRemove.push_back( regions[regionIdx] );
-        }
-        else
-        {
-            std::vector<RimOilFieldEntry*> fieldsToRemove;
+    // // Remove regions and fields not present in last request
+    // for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
+    // {
+    //     if ( !regionStrings.contains( regions[regionIdx]->name ) )
+    //     {
+    //         regionsToRemove.push_back( regions[regionIdx] );
+    //     }
+    //     else
+    //     {
+    //         std::vector<RimOilFieldEntry*> fieldsToRemove;
 
-            for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
-            {
-                if ( !fieldStrings.contains( regions[regionIdx]->fields[fIdx]->name ) )
-                {
-                    fieldsToRemove.push_back( regions[regionIdx]->fields[fIdx] );
-                }
-            }
+    //         for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
+    //         {
+    //             if ( !fieldStrings.contains( regions[regionIdx]->fields[fIdx]->name ) )
+    //             {
+    //                 fieldsToRemove.push_back( regions[regionIdx]->fields[fIdx] );
+    //             }
+    //         }
 
-            for ( size_t i = 0; i < fieldsToRemove.size(); i++ )
-            {
-                regions[regionIdx]->fields.removeChild( fieldsToRemove[i] );
+    //         for ( size_t i = 0; i < fieldsToRemove.size(); i++ )
+    //         {
+    //             regions[regionIdx]->fields.removeChild( fieldsToRemove[i] );
 
-                delete fieldsToRemove[i];
-            }
-        }
-    }
+    //             delete fieldsToRemove[i];
+    //         }
+    //     }
+    // }
 
-    for ( size_t i = 0; i < regionsToRemove.size(); i++ )
-    {
-        regions.removeChild( regionsToRemove[i] );
+    // for ( size_t i = 0; i < regionsToRemove.size(); i++ )
+    // {
+    //     regions.removeChild( regionsToRemove[i] );
 
-        delete regionsToRemove[i];
-    }
+    //     delete regionsToRemove[i];
+    // }
 
-    for ( int i = 0; i < regionStrings.size(); i++ )
-    {
-        RimOilRegionEntry* oilRegionEntry = nullptr;
-        RimOilFieldEntry*  oilFieldEntry  = nullptr;
+    // for ( int i = 0; i < regionStrings.size(); i++ )
+    // {
+    //     RimOilRegionEntry* oilRegionEntry = nullptr;
+    //     RimOilFieldEntry*  oilFieldEntry  = nullptr;
 
-        for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
-        {
-            if ( regions[regionIdx]->name == regionStrings[i] )
-            {
-                oilRegionEntry = regions[regionIdx];
+    //     for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
+    //     {
+    //         if ( regions[regionIdx]->name == regionStrings[i] )
+    //         {
+    //             oilRegionEntry = regions[regionIdx];
 
-                for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
-                {
-                    if ( regions[regionIdx]->fields[fIdx]->edmId == edmIds[i] )
-                    {
-                        oilFieldEntry = regions[regionIdx]->fields[fIdx];
-                    }
-                }
-            }
-        }
+    //             for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
+    //             {
+    //                 if ( regions[regionIdx]->fields[fIdx]->edmId == edmIds[i] )
+    //                 {
+    //                     oilFieldEntry = regions[regionIdx]->fields[fIdx];
+    //                 }
+    //             }
+    //         }
+    //     }
 
-        if ( !oilRegionEntry )
-        {
-            oilRegionEntry       = new RimOilRegionEntry;
-            oilRegionEntry->name = regionStrings[i];
+    //     if ( !oilRegionEntry )
+    //     {
+    //         oilRegionEntry       = new RimOilRegionEntry;
+    //         oilRegionEntry->name = regionStrings[i];
 
-            regions.push_back( oilRegionEntry );
-        }
+    //         regions.push_back( oilRegionEntry );
+    //     }
 
-        assert( oilRegionEntry );
+    //     assert( oilRegionEntry );
 
-        if ( !oilFieldEntry )
-        {
-            oilFieldEntry        = new RimOilFieldEntry;
-            oilFieldEntry->name  = fieldStrings[i];
-            oilFieldEntry->edmId = edmIds[i];
+    //     if ( !oilFieldEntry )
+    //     {
+    //         oilFieldEntry        = new RimOilFieldEntry;
+    //         oilFieldEntry->name  = fieldStrings[i];
+    //         oilFieldEntry->edmId = edmIds[i];
 
-            oilRegionEntry->fields.push_back( oilFieldEntry );
-        }
-    }
+    //         oilRegionEntry->fields.push_back( oilFieldEntry );
+    //     }
+    // }
 
     updateFieldVisibility();
 }
@@ -219,28 +219,28 @@ RimWellPathImport::~RimWellPathImport()
 //--------------------------------------------------------------------------------------------------
 void RimWellPathImport::updateFilePaths()
 {
-    QString wellPathsFolderPath = RimFileWellPath::getCacheDirectoryPath();
+    // QString wellPathsFolderPath = RimFileWellPath::getCacheDirectoryPath();
 
-    for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
-    {
-        for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
-        {
-            RimOilFieldEntry* oilField = regions[regionIdx]->fields[fIdx];
+    // for ( size_t regionIdx = 0; regionIdx < regions.size(); regionIdx++ )
+    // {
+    //     for ( size_t fIdx = 0; fIdx < regions[regionIdx]->fields.size(); fIdx++ )
+    //     {
+    //         RimOilFieldEntry* oilField = regions[regionIdx]->fields[fIdx];
 
-            QFileInfo fi( oilField->wellsFilePath );
+    //         QFileInfo fi( oilField->wellsFilePath );
 
-            QString newWellsFilePath = wellPathsFolderPath + "/" + fi.fileName();
-            oilField->wellsFilePath  = newWellsFilePath;
+    //         QString newWellsFilePath = wellPathsFolderPath + "/" + fi.fileName();
+    //         oilField->wellsFilePath  = newWellsFilePath;
 
-            for ( size_t wIdx = 0; wIdx < oilField->wells.size(); wIdx++ )
-            {
-                RimWellPathEntry* rimWellPathEntry = oilField->wells[wIdx];
+    //         for ( size_t wIdx = 0; wIdx < oilField->wells.size(); wIdx++ )
+    //         {
+    //             RimWellPathEntry* rimWellPathEntry = oilField->wells[wIdx];
 
-                QFileInfo fiWell( rimWellPathEntry->wellPathFilePath );
+    //             QFileInfo fiWell( rimWellPathEntry->wellPathFilePath );
 
-                QString newFilePath                = wellPathsFolderPath + "/" + fiWell.fileName();
-                rimWellPathEntry->wellPathFilePath = newFilePath;
-            }
-        }
-    }
+    //             QString newFilePath                = wellPathsFolderPath + "/" + fiWell.fileName();
+    //             rimWellPathEntry->wellPathFilePath = newFilePath;
+    //         }
+    //     }
+    // }
 }

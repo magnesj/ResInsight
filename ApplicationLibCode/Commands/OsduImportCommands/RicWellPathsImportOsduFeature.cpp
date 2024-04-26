@@ -99,11 +99,7 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 
     auto m_osduConnector = new RiaOsduConnector( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
 
-    RiuWellImportWizard wellImportwizard( app->preferences()->ssihubAddress,
-                                          wellPathsFolderPath,
-                                          m_osduConnector,
-                                          app->project()->wellPathImport(),
-                                          RiuMainWindow::instance() );
+    RiuWellImportWizard wellImportwizard( wellPathsFolderPath, m_osduConnector, app->project()->wellPathImport(), RiuMainWindow::instance() );
 
     if ( QDialog::Accepted == wellImportwizard.exec() )
     {
@@ -128,6 +124,6 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicWellPathsImportSsihubFeature::setupActionLook( QAction* actionToSetup )
 {
-    actionToSetup->setText( "Import Well Paths from &SSI-hub" );
+    actionToSetup->setText( "Import Well Paths from &OSDU" );
     actionToSetup->setIcon( QIcon( ":/WellCollection.png" ) );
 }
