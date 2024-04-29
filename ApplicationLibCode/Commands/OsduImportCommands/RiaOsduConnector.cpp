@@ -127,7 +127,15 @@ void RiaOsduConnector::requestFieldsByName( const QString& server, const QString
     params["query"] = "data.FieldName:IVAR*";
     makeRequest( params, server, dataPartitionId, token );
 
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseWells( QNetworkReply* ) ) );
+    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseFields( QNetworkReply* ) ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestWellsByFieldId( const QString& fieldId )
+{
+    requestWellsByFieldId( m_server, m_dataPartitionId, m_token, fieldId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -247,6 +255,46 @@ QNetworkReply* RiaOsduConnector::makeRequest( const std::map<QString, QString>& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::parseFields( QNetworkReply* reply )
+{
+    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
+
+    QByteArray result = reply->readAll();
+
+    reply->deleteLater();
+
+    QJsonDocument doc = QJsonDocument::fromJson( result );
+    // Extract the JSON object from the QJsonDocument
+    QJsonObject jsonObj = doc.object();
+
+    // Access "results" array from the JSON object
+    QJsonArray resultsArray = jsonObj["results"].toArray();
+
+    // Iterate through each element in the "results" array
+    qDebug() << "Found " << resultsArray.size() << " items.";
+
+    m_fields.clear();
+
+    foreach ( const QJsonValue& value, resultsArray )
+    {
+        QJsonObject resultObj = value.toObject();
+
+        // Accessing specific fields from the result object
+        QString id        = resultObj["id"].toString();
+        QString kind      = resultObj["kind"].toString();
+        QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
+
+        qDebug() << "Id:" << id << " kind: " << kind << " name: " << fieldName;
+        qDebug() << resultObj;
+        m_fields.push_back( OsduField{ id, kind, fieldName } );
+    }
+
+    emit wellsFinished();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::parseWells( QNetworkReply* reply )
 {
     qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
@@ -269,10 +317,11 @@ void RiaOsduConnector::parseWells( QNetworkReply* reply )
         QJsonObject resultObj = value.toObject();
 
         // Accessing specific fields from the result object
-        QString id   = resultObj["id"].toString();
-        QString kind = resultObj["kind"].toString();
+        QString id        = resultObj["id"].toString();
+        QString kind      = resultObj["kind"].toString();
+        QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
 
-        qDebug() << "Id:" << id << " kind: " << kind;
+        qDebug() << "Id:" << id << " kind: " << kind << " name: " << fieldName;
         qDebug() << resultObj;
     }
 
@@ -415,4 +464,12 @@ QString RiaOsduConnector::server() const
 QString RiaOsduConnector::dataPartition() const
 {
     return m_dataPartitionId;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<OsduField> RiaOsduConnector::fields() const
+{
+    return m_fields;
 }

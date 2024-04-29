@@ -29,16 +29,17 @@
 #include <QUrl>
 #include <QWizard>
 
+#include "RiaOsduConnector.h"
+
 class QFile;
 class QProgressDialog;
 class QLabel;
 class QTextEdit;
+class QTableView;
 
 class RimWellPathImport;
 class RimOilFieldEntry;
 class RimWellPathEntry;
-
-class RiaOsduConnector;
 
 namespace caf
 {
@@ -47,6 +48,94 @@ class PdmUiListView;
 class PdmUiPropertyView;
 class PdmObjectCollection;
 } // namespace caf
+
+class OsduFieldTableModel : public QAbstractTableModel
+{
+    Q_OBJECT
+
+public:
+    explicit OsduFieldTableModel( QObject* parent = nullptr )
+        : QAbstractTableModel( parent )
+    {
+    }
+
+    // ~OsduFieldTableModel() override {}
+
+    int rowCount( const QModelIndex& parent = QModelIndex() ) const override
+    {
+        Q_UNUSED( parent );
+        return m_osduFields.size();
+    }
+
+    int columnCount( const QModelIndex& parent = QModelIndex() ) const override
+    {
+        Q_UNUSED( parent );
+        // Assuming you have three fields: id, kind, and name
+        return 3;
+    }
+
+    QVariant data( const QModelIndex& index, int role = Qt::DisplayRole ) const override
+    {
+        if ( !index.isValid() ) return QVariant();
+
+        if ( index.row() >= static_cast<int>( m_osduFields.size() ) || index.row() < 0 ) return QVariant();
+
+        if ( role == Qt::DisplayRole )
+        {
+            const OsduField& field = m_osduFields.at( index.row() );
+            switch ( index.column() )
+            {
+                case 0:
+                    return field.id;
+                case 1:
+                    return field.kind;
+                case 2:
+                    return field.name;
+                default:
+                    return QVariant();
+            }
+        }
+
+        return QVariant();
+    }
+
+    QVariant headerData( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const override
+    {
+        if ( role != Qt::DisplayRole ) return QVariant();
+
+        if ( orientation == Qt::Horizontal )
+        {
+            switch ( section )
+            {
+                case 0:
+                    return tr( "ID" );
+                case 1:
+                    return tr( "Kind" );
+                case 2:
+                    return tr( "Name" );
+                default:
+                    return QVariant();
+            }
+        }
+        return QVariant();
+    }
+
+    void setOsduFields( const std::vector<OsduField>& osduFields )
+    {
+        beginInsertRows( QModelIndex(), 0, 0 ); // notify views and proxy models that a line will be inserted
+
+        m_osduFields = osduFields;
+        // auto topLeft     = createIndex( 0, 0 );
+        // auto bottomRight = createIndex( m_osduFields.size(), 3 );
+        // m_data.prepend( somedata ); // do the modification to the model data
+        endInsertRows();
+
+        // emit dataChanged( topLeft, bottomRight );
+    }
+
+private:
+    std::vector<OsduField> m_osduFields;
+};
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -68,6 +157,8 @@ private:
     bool m_accessOk;
 };
 
+class OsduFieldTableModel;
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -76,13 +167,19 @@ class FieldSelectionPage : public QWizardPage
     Q_OBJECT
 
 public:
-    FieldSelectionPage( RimWellPathImport* wellPathImport, QWidget* parent = nullptr );
+    FieldSelectionPage( RimWellPathImport* wellPathImport, RiaOsduConnector* m_osduConnector, QWidget* parent = nullptr );
     ~FieldSelectionPage() override;
 
     void initializePage() override;
+    bool isComplete() const override;
+private slots:
+    void wellsFinished();
 
 private:
     caf::PdmUiPropertyView* m_propertyView;
+    RiaOsduConnector*       m_osduConnector;
+    QTableView*             m_tableView;
+    OsduFieldTableModel*    m_osduFieldsModel;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -151,7 +248,6 @@ public:
     ~WellSelectionPage() override;
 
     void initializePage() override;
-    void buildWellTreeView();
 
     void selectedWellPathEntries( std::vector<DownloadEntity>& downloadEntities, caf::PdmObjectHandle* objHandle );
 
@@ -221,10 +317,8 @@ public:
 
 public slots:
     void downloadWellPaths();
-    void downloadWells();
+    void downloadWells( const QString& fieldId );
     void downloadFields();
-
-    void checkDownloadQueueAndIssueRequests();
 
     void httpFinished();
 

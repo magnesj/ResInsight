@@ -7,6 +7,13 @@
 
 #include <map>
 
+struct OsduField
+{
+    QString id;
+    QString kind;
+    QString name;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -25,11 +32,16 @@ public:
     void requestFieldsByName( const QString& token, const QString& fieldName );
     void requestFieldsByName( const QString& fieldName );
 
+    void requestWellsByFieldId( const QString& fieldId );
+
     QString server() const;
     QString dataPartition() const;
 
+    std::vector<OsduField> fields() const;
+
 public slots:
     void requestToken();
+    void parseFields( QNetworkReply* reply );
     void parseWells( QNetworkReply* reply );
     void parseWellTrajectory( QNetworkReply* reply );
     void saveFile( QNetworkReply* reply );
@@ -37,6 +49,7 @@ public slots:
 
 signals:
     void finished();
+    void wellsFinished();
     void tokenReady( const QString& token );
 
 private:
@@ -71,5 +84,6 @@ private:
     const QString m_scopes;
     const QString m_clientId;
 
-    QString m_token;
+    QString                m_token;
+    std::vector<OsduField> m_fields;
 };
