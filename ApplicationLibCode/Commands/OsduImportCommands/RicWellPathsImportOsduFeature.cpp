@@ -103,15 +103,15 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 
     if ( QDialog::Accepted == wellImportwizard.exec() )
     {
-        QStringList wellPaths = wellImportwizard.absoluteFilePathsToWellPaths();
-        if ( !wellPaths.empty() )
-        {
-            QStringList errorMessages;
-            app->addWellPathsToModel( wellPaths, &errorMessages );
-            app->project()->scheduleCreateDisplayModelAndRedrawAllViews();
-        }
+        // QStringList wellPaths = wellImportwizard.absoluteFilePathsToWellPaths();
+        // if ( !wellPaths.empty() )
+        // {
+        //     QStringList errorMessages;
+        //     app->addWellPathsToModel( wellPaths, &errorMessages );
+        //     app->project()->scheduleCreateDisplayModelAndRedrawAllViews();
+        // }
 
-        app->setCacheDataObject( "ssihub_username", wellImportwizard.field( "username" ) );
+        // app->setCacheDataObject( "ssihub_username", wellImportwizard.field( "username" ) );
     }
     else
     {

@@ -4,16 +4,15 @@
 #include "RiaOsduOAuthHttpServerReplyHandler.h"
 
 #include <QAbstractOAuth>
+#include <QDesktopServices>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QOAuth2AuthorizationCodeFlow>
-#include <QObject>
-
-#include <QDesktopServices>
 #include <QOAuthHttpServerReplyHandler>
+#include <QObject>
 #include <QString>
 #include <QTimer>
 #include <QUrl>
@@ -125,9 +124,17 @@ void RiaOsduConnector::requestFieldsByName( const QString& server, const QString
     params["kind"]  = FIELD_KIND;
     params["limit"] = "10000";
     params["query"] = "data.FieldName:IVAR*";
-    makeRequest( params, server, dataPartitionId, token );
 
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseFields( QNetworkReply* ) ) );
+    auto reply = makeRequest( params, server, dataPartitionId, token );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseFields( reply );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -147,9 +154,25 @@ void RiaOsduConnector::requestWellsByFieldId( const QString& server, const QStri
     params["kind"]  = WELL_KIND;
     params["limit"] = "10000";
     params["query"] = QString( "nested(data.GeoContexts, (FieldID:\"%1\"))" ).arg( fieldId );
-    makeRequest( params, server, dataPartitionId, token );
 
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseWells( QNetworkReply* ) ) );
+    auto reply = makeRequest( params, server, dataPartitionId, token );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, fieldId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseWells( reply );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestWellboresByWellId( const QString& wellId )
+{
+    requestWellboresByWellId( m_server, m_dataPartitionId, m_token, wellId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -161,9 +184,17 @@ void RiaOsduConnector::requestWellboresByWellId( const QString& server, const QS
     params["kind"]  = WELLBORE_KIND;
     params["limit"] = "10000";
     params["query"] = "data.WellID: \"" + wellId + "\"";
-    makeRequest( params, server, dataPartitionId, token );
 
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseWells( QNetworkReply* ) ) );
+    auto reply = makeRequest( params, server, dataPartitionId, token );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, wellId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseWellbores( reply, wellId );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -271,7 +302,7 @@ void RiaOsduConnector::parseFields( QNetworkReply* reply )
     QJsonArray resultsArray = jsonObj["results"].toArray();
 
     // Iterate through each element in the "results" array
-    qDebug() << "Found " << resultsArray.size() << " items.";
+    // qDebug() << "Found " << resultsArray.size() << " items.";
 
     m_fields.clear();
 
@@ -289,7 +320,7 @@ void RiaOsduConnector::parseFields( QNetworkReply* reply )
         m_fields.push_back( OsduField{ id, kind, fieldName } );
     }
 
-    emit wellsFinished();
+    emit fieldsFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -311,21 +342,64 @@ void RiaOsduConnector::parseWells( QNetworkReply* reply )
     QJsonArray resultsArray = jsonObj["results"].toArray();
 
     // Iterate through each element in the "results" array
-    qDebug() << "Found " << resultsArray.size() << " items.";
+    qDebug() << "Found " << resultsArray.size() << " wells.";
+
+    m_wells.clear();
     foreach ( const QJsonValue& value, resultsArray )
     {
         QJsonObject resultObj = value.toObject();
 
         // Accessing specific fields from the result object
-        QString id        = resultObj["id"].toString();
-        QString kind      = resultObj["kind"].toString();
-        QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
+        QString id   = resultObj["id"].toString();
+        QString kind = resultObj["kind"].toString();
+        QString name = resultObj["data"].toObject()["FacilityName"].toString();
 
-        qDebug() << "Id:" << id << " kind: " << kind << " name: " << fieldName;
+        qDebug() << "Id:" << id << " kind: " << kind << " name: " << name;
         qDebug() << resultObj;
+        m_wells.push_back( OsduWell{ id, kind, name } );
     }
 
-    emit finished();
+    emit wellsFinished();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::parseWellbores( QNetworkReply* reply, const QString& wellId )
+{
+    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
+
+    QByteArray result = reply->readAll();
+
+    reply->deleteLater();
+
+    QJsonDocument doc = QJsonDocument::fromJson( result );
+    // Extract the JSON object from the QJsonDocument
+    QJsonObject jsonObj = doc.object();
+
+    // Access "results" array from the JSON object
+    QJsonArray resultsArray = jsonObj["results"].toArray();
+
+    // Iterate through each element in the "results" array
+    qDebug() << "Found " << resultsArray.size() << " items.";
+
+    m_wellbores[wellId].clear();
+    foreach ( const QJsonValue& value, resultsArray )
+    {
+        QJsonObject resultObj = value.toObject();
+
+        // Accessing specific fields from the result object
+        QString id   = resultObj["id"].toString();
+        QString kind = resultObj["kind"].toString();
+        QString name = resultObj["data"].toObject()["FacilityName"].toString();
+
+        qDebug() << "Id:" << id << " kind: " << kind << " name: " << name;
+        qDebug() << resultObj;
+
+        m_wellbores[wellId].push_back( OsduWellbore{ id, kind, name, wellId } );
+    }
+
+    emit wellboresFinished( wellId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -472,4 +546,24 @@ QString RiaOsduConnector::dataPartition() const
 std::vector<OsduField> RiaOsduConnector::fields() const
 {
     return m_fields;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<OsduWell> RiaOsduConnector::wells() const
+{
+    return m_wells;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<OsduWellbore> RiaOsduConnector::wellbores( const QString& wellId ) const
+{
+    auto it = m_wellbores.find( wellId );
+    if ( it != m_wellbores.end() )
+        return it->second;
+    else
+        return {};
 }
