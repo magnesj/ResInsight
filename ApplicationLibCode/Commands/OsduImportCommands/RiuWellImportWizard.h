@@ -62,7 +62,7 @@ public:
     int rowCount( const QModelIndex& parent = QModelIndex() ) const override
     {
         Q_UNUSED( parent );
-        return m_osduFields.size();
+        return static_cast<int>( m_osduFields.size() );
     }
 
     int columnCount( const QModelIndex& parent = QModelIndex() ) const override
@@ -142,7 +142,7 @@ public:
     int rowCount( const QModelIndex& parent = QModelIndex() ) const override
     {
         Q_UNUSED( parent );
-        return m_osduWellbores.size();
+        return static_cast<int>( m_osduWellbores.size() );
     }
 
     int columnCount( const QModelIndex& parent = QModelIndex() ) const override
