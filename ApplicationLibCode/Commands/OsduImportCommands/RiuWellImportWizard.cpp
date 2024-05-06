@@ -24,9 +24,6 @@
 #include "RimWellPathImport.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
-#include "cafPdmDocument.h"
-#include "cafPdmObject.h"
-#include "cafPdmObjectGroup.h"
 #include "cafPdmUiListView.h"
 #include "cafPdmUiPropertyView.h"
 #include "cafPdmUiTreeAttributes.h"
@@ -35,7 +32,6 @@
 #include "cafUtils.h"
 
 #include <QAbstractTableModel>
-#include <QMenu>
 #include <QObject>
 #include <QString>
 
@@ -59,13 +55,12 @@ RiuWellImportWizard::RiuWellImportWizard( const QString&     downloadFolder,
     m_osduConnector     = osduConnector;
     m_destinationFolder = downloadFolder;
 
-    m_myProgressDialog                  = nullptr;
     m_firstTimeRequestingAuthentication = true;
 
     addPage( new AuthenticationPage( m_osduConnector, this ) );
-    m_fieldSelectionPageId = addPage( new FieldSelectionPage( m_wellPathImportObject, m_osduConnector, this ) );
-    m_wellSelectionPageId  = addPage( new WellSelectionPage( m_wellPathImportObject, m_osduConnector, this ) );
-    m_wellSummaryPageId    = addPage( new WellSummaryPage( m_wellPathImportObject, this ) );
+    addPage( new FieldSelectionPage( m_wellPathImportObject, m_osduConnector, this ) );
+    addPage( new WellSelectionPage( m_wellPathImportObject, m_osduConnector, this ) );
+    addPage( new WellSummaryPage( m_wellPathImportObject, m_osduConnector, this ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -80,9 +75,7 @@ RiuWellImportWizard::~RiuWellImportWizard()
 //--------------------------------------------------------------------------------------------------
 void RiuWellImportWizard::downloadFields()
 {
-    m_currentDownloadState = DOWNLOAD_FIELDS;
-
-    m_osduConnector->requestFieldsByName( "IVAR" );
+    m_osduConnector->requestFieldsByName( "AZERI" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -109,32 +102,6 @@ void RiuWellImportWizard::slotAuthenticationRequired( QNetworkReply* networkRepl
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QProgressDialog* RiuWellImportWizard::progressDialog()
-{
-    if ( !m_myProgressDialog )
-    {
-        m_myProgressDialog = new QProgressDialog( this );
-    }
-
-    return m_myProgressDialog;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::hideProgressDialog()
-{
-    if ( m_myProgressDialog )
-    {
-        m_myProgressDialog->hide();
-
-        QCoreApplication::processEvents();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RiuWellImportWizard::downloadWells( const QString& fieldId )
 {
     m_osduConnector->requestWellsByFieldId( fieldId );
@@ -143,8 +110,9 @@ void RiuWellImportWizard::downloadWells( const QString& fieldId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::downloadWellPaths()
+void RiuWellImportWizard::downloadWellPaths( const QString& wellboreId )
 {
+    m_osduConnector->requestWellboreTrajectoryByWellboreId( wellboreId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -153,16 +121,39 @@ void RiuWellImportWizard::downloadWellPaths()
 void RiuWellImportWizard::resetAuthenticationCount()
 {
     m_firstTimeRequestingAuthentication = true;
-    QTimer::singleShot( 0, m_osduConnector, SLOT( requestToken() ) );
-    //    m_osduConnector->requestToken();
+    m_osduConnector->requestToken();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiuWellImportWizard::wellSelectionPageId()
+void RiuWellImportWizard::setSelectedFieldId( const QString& fieldId )
 {
-    return m_wellSelectionPageId;
+    m_selectedFieldId = fieldId;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiuWellImportWizard::selectedFieldId() const
+{
+    return m_selectedFieldId;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuWellImportWizard::setSelectedWellboreId( const QString& wellboreId )
+{
+    m_selectedWellboreId = wellboreId;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiuWellImportWizard::selectedWellboreId() const
+{
+    return m_selectedWellboreId;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -274,6 +265,7 @@ void FieldSelectionPage::initializePage()
 void FieldSelectionPage::fieldsFinished()
 {
     std::vector<OsduField> fields = m_osduConnector->fields();
+    qDebug() << "Setting " << fields.size() << " fields";
     m_osduFieldsModel->setOsduFields( fields );
 }
 
@@ -336,6 +328,10 @@ WellSelectionPage::WellSelectionPage( RimWellPathImport* wellPathImport, RiaOsdu
 
     connect( m_tableView->selectionModel(),
              SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
+             SLOT( selectWellbore( const QItemSelection&, const QItemSelection& ) ) );
+
+    connect( m_tableView->selectionModel(),
+             SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
              SIGNAL( completeChanged() ) );
 }
 
@@ -351,7 +347,7 @@ void WellSelectionPage::initializePage()
     qDebug() << "FIELD ID: " << fieldId;
     wiz->downloadWells( fieldId );
 
-    setButtonText( QWizard::NextButton, "Import" );
+    setButtonText( QWizard::NextButton, "Next" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -384,7 +380,7 @@ void WellSelectionPage::wellboresFinished( const QString& wellId )
     std::vector<OsduWellbore> wellbores = m_osduConnector->wellbores( wellId );
     qDebug() << "Wellbores for " << wellId << ": " << wellbores.size();
     // TODO: change to an append operation
-    if ( !wellbores.empty() ) m_osduWellboresModel->setOsduWellbores( wellbores );
+    if ( !wellbores.empty() ) m_osduWellboresModel->setOsduWellbores( wellId, wellbores );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -399,10 +395,28 @@ bool WellSelectionPage::isComplete() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-WellSummaryPage::WellSummaryPage( RimWellPathImport* wellPathImport, QWidget* parent /*= 0*/ )
+void WellSelectionPage::selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection )
+{
+    qDebug() << "Select wellbore: " << newSelection.indexes().size();
+    if ( !newSelection.indexes().empty() )
+    {
+        QModelIndex          index      = newSelection.indexes()[0];
+        int                  column     = 0;
+        QString              wellboreId = m_osduWellboresModel->data( index.siblingAtColumn( column ) ).toString();
+        RiuWellImportWizard* wiz        = dynamic_cast<RiuWellImportWizard*>( wizard() );
+        wiz->setSelectedWellboreId( wellboreId );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+WellSummaryPage::WellSummaryPage( RimWellPathImport* wellPathImport, RiaOsduConnector* osduConnector, QWidget* parent /*= 0*/ )
 {
     m_wellPathImportObject = wellPathImport;
     m_wellPathImportObject->setUiHidden( true );
+
+    m_osduConnector = osduConnector;
 
     QVBoxLayout* layout = new QVBoxLayout;
     setLayout( layout );
@@ -411,18 +425,10 @@ WellSummaryPage::WellSummaryPage( RimWellPathImport* wellPathImport, QWidget* pa
     m_textEdit->setReadOnly( true );
     layout->addWidget( m_textEdit );
 
-    QPushButton* button = new QPushButton( "Show/hide details", this );
-    connect( button, SIGNAL( clicked() ), this, SLOT( slotShowDetails() ) );
-    layout->addWidget( button );
-
-    m_listView = new caf::PdmUiListView( this );
-    layout->setStretchFactor( m_listView, 10 );
-    layout->addWidget( m_listView );
-    m_listView->hide();
-
-    m_objectGroup = new caf::PdmObjectCollection;
-
     setButtonText( QWizard::FinishButton, "Import" );
+
+    connect( m_osduConnector, SIGNAL( wellboreTrajectoryFinished( const QString& ) ), SLOT( wellboreTrajectoryFinished( const QString& ) ) );
+    connect( m_osduConnector, SIGNAL( fileDownloadFinished( const QString& ) ), SLOT( fileDownloadFinished( const QString& ) ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -431,70 +437,38 @@ WellSummaryPage::WellSummaryPage( RimWellPathImport* wellPathImport, QWidget* pa
 void WellSummaryPage::initializePage()
 {
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
-    wiz->downloadWellPaths();
+
+    QString wellboreId = wiz->selectedWellboreId();
+    qDebug() << "WELL BORE ID: " << wellboreId;
+
+    wiz->downloadWellPaths( wellboreId );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void WellSummaryPage::updateSummaryPage()
+void WellSummaryPage::fileDownloadFinished( const QString& fileId )
 {
-    // m_textEdit->setText( "Summary of imported wells\n\n" );
+    m_textEdit->setText( "Summary of imported wells\n\n" );
 
-    // size_t  wellPathCount = 0;
-    // QString errorString;
-
-    // RiuWellImportWizard*        wiz               = dynamic_cast<RiuWellImportWizard*>( wizard() );
-    // WellSelectionPage*          wellSelectionPage = dynamic_cast<WellSelectionPage*>( wiz->page( wiz->wellSelectionPageId() ) );
-    // std::vector<DownloadEntity> downloadEntities;
-    // wellSelectionPage->selectedWellPathEntries( downloadEntities, nullptr );
-
-    // for ( size_t i = 0; i < downloadEntities.size(); i++ )
-    // {
-    //     if ( caf::Utils::fileExists( downloadEntities[i].responseFilename ) )
-    //     {
-    //         wellPathCount++;
-    //     }
-    //     else
-    //     {
-    //         errorString +=
-    //             QString( "Failed to get file '%1' from well '%2'\n" ).arg( downloadEntities[i].responseFilename ).arg(
-    //             downloadEntities[i].name );
-    //     }
-
-    //     SummaryPageDownloadEntity* sumPageEntity = new SummaryPageDownloadEntity;
-    //     sumPageEntity->name                      = downloadEntities[i].name;
-    //     sumPageEntity->responseFilename          = downloadEntities[i].responseFilename;
-    //     sumPageEntity->requestUrl                = downloadEntities[i].requestUrl;
-
-    //     m_objectGroup->objects().push_back( sumPageEntity );
-    // }
-
-    // m_textEdit->setText( QString( "Downloaded successfully %1 well paths.\nPlease push 'Import' button to import well "
-    //                               "paths into ResInsight.\n\n" )
-    //                          .arg( wellPathCount ) );
-    // if ( !errorString.isEmpty() )
-    // {
-    //     m_textEdit->append( "Detected following errors during well path download. See details below." );
-    //     m_textEdit->append( errorString );
-    // }
-
-    // m_listView->setPdmObject( m_objectGroup );
-    // m_objectGroup->updateConnectedEditors();
+    m_textEdit->append( "FileId:" );
+    m_textEdit->append( fileId );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::setSelectedFieldId( const QString& fieldId )
+void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
 {
-    m_selectedFieldId = fieldId;
-}
+    std::vector<OsduWellboreTrajectory> wellboreTrajectories = m_osduConnector->wellboreTrajectories( wellboreId );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RiuWellImportWizard::selectedFieldId() const
-{
-    return m_selectedFieldId;
+    qDebug() << "WELL TRAJECTORY FINISHED: " << wellboreId << ":" << wellboreTrajectories.size();
+
+    for ( auto w : wellboreTrajectories )
+    {
+        QString fileId = w.dataSetId;
+        if ( fileId.endsWith( ":" ) ) fileId.truncate( fileId.lastIndexOf( QChar( ':' ) ) );
+
+        m_osduConnector->requestFileDownloadByFileId( fileId );
+    }
 }

@@ -18,10 +18,6 @@
 
 #pragma once
 
-#include "cafPdmChildArrayField.h"
-#include "cafPdmField.h"
-#include "cafPdmObject.h"
-
 #include <QItemSelection>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -32,21 +28,17 @@
 #include "RiaOsduConnector.h"
 
 class QFile;
-class QProgressDialog;
 class QLabel;
 class QTextEdit;
 class QTableView;
 
 class RimWellPathImport;
-class RimOilFieldEntry;
-class RimWellPathEntry;
 
 namespace caf
 {
 class PdmUiTreeView;
 class PdmUiListView;
 class PdmUiPropertyView;
-class PdmObjectCollection;
 } // namespace caf
 
 class OsduFieldTableModel : public QAbstractTableModel
@@ -120,7 +112,7 @@ public:
 
     void setOsduFields( const std::vector<OsduField>& osduFields )
     {
-        beginInsertRows( QModelIndex(), 0, 0 );
+        beginInsertRows( QModelIndex(), 0, osduFields.size() );
         m_osduFields = osduFields;
         endInsertRows();
     }
@@ -198,15 +190,24 @@ public:
         return QVariant();
     }
 
-    void setOsduWellbores( const std::vector<OsduWellbore>& osduWellbores )
+    void setOsduWellbores( const QString& wellId, const std::vector<OsduWellbore>& osduWellbores )
     {
-        beginInsertRows( QModelIndex(), 0, 0 );
-        m_osduWellbores = osduWellbores;
+        qDebug() << "Setting well bores: " << wellId << " => " << osduWellbores.size();
+        m_map[wellId] = osduWellbores;
+        m_osduWellbores.clear();
+        for ( auto [name, values] : m_map )
+        {
+            for ( auto v : values )
+                m_osduWellbores.push_back( v );
+        }
+
+        beginInsertRows( QModelIndex(), 0, m_osduWellbores.size() );
         endInsertRows();
     }
 
 private:
-    std::vector<OsduWellbore> m_osduWellbores;
+    std::vector<OsduWellbore>                    m_osduWellbores;
+    std::map<QString, std::vector<OsduWellbore>> m_map;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -256,32 +257,6 @@ private:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class DownloadEntity
-{
-public:
-    QString name;
-    QString requestUrl;
-    QString responseFilename;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class SummaryPageDownloadEntity : public caf::PdmObject
-{
-    CAF_PDM_HEADER_INIT;
-
-public:
-    SummaryPageDownloadEntity();
-
-    caf::PdmField<QString> name;
-    caf::PdmField<QString> requestUrl;
-    caf::PdmField<QString> responseFilename;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 class WellSelectionPage : public QWizardPage
 {
     Q_OBJECT
@@ -296,6 +271,7 @@ public:
 private slots:
     void wellboresFinished( const QString& wellId );
     void wellsFinished();
+    void selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection );
 
 private:
     RimWellPathImport*      m_wellPathImportObject;
@@ -312,17 +288,18 @@ class WellSummaryPage : public QWizardPage
     Q_OBJECT
 
 public:
-    WellSummaryPage( RimWellPathImport* wellPathImport, QWidget* parent = nullptr );
+    WellSummaryPage( RimWellPathImport* wellPathImport, RiaOsduConnector* osduConnector, QWidget* parent = nullptr );
 
     void initializePage() override;
 
-    void updateSummaryPage();
+private slots:
+    void wellboreTrajectoryFinished( const QString& wellId );
+    void fileDownloadFinished( const QString& fileId );
 
 private:
-    RimWellPathImport*        m_wellPathImportObject;
-    QTextEdit*                m_textEdit;
-    caf::PdmUiListView*       m_listView;
-    caf::PdmObjectCollection* m_objectGroup;
+    RimWellPathImport* m_wellPathImportObject;
+    RiaOsduConnector*  m_osduConnector;
+    QTextEdit*         m_textEdit;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -331,15 +308,6 @@ private:
 class RiuWellImportWizard : public QWizard
 {
     Q_OBJECT
-
-public:
-    enum DownloadState
-    {
-        DOWNLOAD_FIELDS,
-        DOWNLOAD_WELLS,
-        DOWNLOAD_WELL_PATH,
-        DOWNLOAD_UNDEFINED
-    };
 
 public:
     RiuWellImportWizard( const QString&     downloadFolder,
@@ -353,45 +321,25 @@ public:
 
     void    setSelectedFieldId( const QString& fieldId );
     QString selectedFieldId() const;
+    void    setSelectedWellboreId( const QString& wellboreId );
+    QString selectedWellboreId() const;
 
 public slots:
-    void downloadWellPaths();
+    void downloadWellPaths( const QString& wellboreId );
     void downloadWells( const QString& fieldId );
     void downloadFields();
 
     void slotAuthenticationRequired( QNetworkReply* networkReply, QAuthenticator* authenticator );
 
-    int wellSelectionPageId();
-
-private:
-    void updateFieldsModel();
-    void parseWellsResponse( RimOilFieldEntry* oilFieldEntry );
-
-    QString getValue( const QString& key, const QString& stringContent );
-
-    QProgressDialog* progressDialog();
-    void             hideProgressDialog();
-
 private:
     RiaOsduConnector* m_osduConnector;
     QString           m_selectedFieldId;
+    QString           m_selectedWellboreId;
 
     QString m_destinationFolder;
 
     RimWellPathImport*  m_wellPathImportObject;
     caf::PdmUiTreeView* m_pdmTreeView;
 
-    QProgressDialog* m_myProgressDialog;
-
-    bool m_httpRequestAborted;
-
     bool m_firstTimeRequestingAuthentication;
-
-    QList<DownloadEntity> m_wellRequestQueue;
-
-    DownloadState m_currentDownloadState;
-
-    int m_fieldSelectionPageId;
-    int m_wellSelectionPageId;
-    int m_wellSummaryPageId;
 };

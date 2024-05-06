@@ -29,6 +29,15 @@ struct OsduWellbore
     QString wellId;
 };
 
+struct OsduWellboreTrajectory
+{
+    QString id;
+    QString kind;
+    QString description;
+    QString dataSetId;
+    QString wellboreId;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -48,28 +57,32 @@ public:
     void requestFieldsByName( const QString& fieldName );
     void requestWellsByFieldId( const QString& fieldId );
     void requestWellboresByWellId( const QString& wellId );
+    void requestWellboreTrajectoryByWellboreId( const QString& wellboreId );
+    void requestFileDownloadByFileId( const QString& fileId );
 
     QString server() const;
     QString dataPartition() const;
 
-    std::vector<OsduField>    fields() const;
-    std::vector<OsduWell>     wells() const;
-    std::vector<OsduWellbore> wellbores( const QString& wellId ) const;
+    std::vector<OsduField>              fields() const;
+    std::vector<OsduWell>               wells() const;
+    std::vector<OsduWellbore>           wellbores( const QString& wellId ) const;
+    std::vector<OsduWellboreTrajectory> wellboreTrajectories( const QString& wellboreId ) const;
 
 public slots:
     void requestToken();
     void parseFields( QNetworkReply* reply );
     void parseWells( QNetworkReply* reply );
     void parseWellbores( QNetworkReply* reply, const QString& wellId );
-    void parseWellTrajectory( QNetworkReply* reply );
-    void saveFile( QNetworkReply* reply );
+    void parseWellTrajectory( QNetworkReply* reply, const QString& wellboreId );
+    void saveFile( QNetworkReply* reply, const QString& fileId );
     void accessGranted();
 
 signals:
-    void finished();
+    void fileDownloadFinished( const QString& fileId );
     void fieldsFinished();
     void wellsFinished();
     void wellboresFinished( const QString& wellId );
+    void wellboreTrajectoryFinished( const QString& wellboreId );
     void tokenReady( const QString& token );
 
 private:
@@ -104,8 +117,9 @@ private:
     const QString m_scopes;
     const QString m_clientId;
 
-    QString                                      m_token;
-    std::vector<OsduField>                       m_fields;
-    std::vector<OsduWell>                        m_wells;
-    std::map<QString, std::vector<OsduWellbore>> m_wellbores;
+    QString                                                m_token;
+    std::vector<OsduField>                                 m_fields;
+    std::vector<OsduWell>                                  m_wells;
+    std::map<QString, std::vector<OsduWellbore>>           m_wellbores;
+    std::map<QString, std::vector<OsduWellboreTrajectory>> m_wellboreTrajectories;
 };

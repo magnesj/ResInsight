@@ -1,6 +1,6 @@
-// #include "Downloader.h"
 #include "RiaOsduConnector.h"
 #include "RiaFileDownloader.h"
+#include "RiaLogging.h"
 #include "RiaOsduOAuthHttpServerReplyHandler.h"
 
 #include <QAbstractOAuth>
@@ -19,7 +19,7 @@
 #include <QUrlQuery>
 
 static const QString FIELD_KIND               = "osdu:wks:master-data--Field:1.0.0";
-static const QString WELL_KIND                = "osdu:wks:master-data--Well:1.1.0";
+static const QString WELL_KIND                = "osdu:wks:master-data--Well:1.2.0";
 static const QString WELLBORE_KIND            = "osdu:wks:master-data--Wellbore:1.1.0";
 static const QString WELLBORE_TRAJECTORY_KIND = "osdu:wks:work-product-component--WellboreTrajectory:1.1.0";
 
@@ -123,7 +123,7 @@ void RiaOsduConnector::requestFieldsByName( const QString& server, const QString
     std::map<QString, QString> params;
     params["kind"]  = FIELD_KIND;
     params["limit"] = "10000";
-    params["query"] = "data.FieldName:IVAR*";
+    params["query"] = "data.FieldName:" + fieldName;
 
     auto reply = makeRequest( params, server, dataPartitionId, token );
     connect( reply,
@@ -200,6 +200,22 @@ void RiaOsduConnector::requestWellboresByWellId( const QString& server, const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestWellboreTrajectoryByWellboreId( const QString& wellboreId )
+{
+    requestWellboreTrajectoryByWellboreId( m_server, m_dataPartitionId, m_token, wellboreId );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::requestFileDownloadByFileId( const QString& fileId )
+{
+    requestFileDownloadByFileId( m_server, m_dataPartitionId, m_token, fileId );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestWellboreTrajectoryByWellboreId( const QString& server,
                                                               const QString& dataPartitionId,
                                                               const QString& token,
@@ -209,9 +225,17 @@ void RiaOsduConnector::requestWellboreTrajectoryByWellboreId( const QString& ser
     params["kind"]  = WELLBORE_TRAJECTORY_KIND;
     params["limit"] = "10000";
     params["query"] = "data.WellboreID: \"" + wellboreId + "\"";
-    makeRequest( params, server, dataPartitionId, token );
 
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( parseWellTrajectory( QNetworkReply* ) ) );
+    auto reply = makeRequest( params, server, dataPartitionId, token );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, wellboreId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseWellTrajectory( reply, wellboreId );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -219,10 +243,17 @@ void RiaOsduConnector::requestWellboreTrajectoryByWellboreId( const QString& ser
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestFileDownloadByFileId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fileId )
 {
-    // if ( fileId.endsWith( ":" ) ) fileId.truncate( fileId.lastIndexOf( QChar( ':' ) ) );
-    makeDownloadRequest( server, dataPartitionId, fileId, token );
-
-    connect( m_networkAccessManager, SIGNAL( finished( QNetworkReply* ) ), this, SLOT( saveFile( QNetworkReply* ) ) );
+    qDebug() << "Requesting download of file id: " << fileId;
+    auto reply = makeDownloadRequest( server, dataPartitionId, fileId, token );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, fileId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     saveFile( reply, fileId );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -405,9 +436,9 @@ void RiaOsduConnector::parseWellbores( QNetworkReply* reply, const QString& well
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply )
+void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString& wellboreId )
 {
-    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
+    qDebug() << "WELL TRAJECTORY REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
 
     QByteArray result = reply->readAll();
 
@@ -417,14 +448,16 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply )
     // Extract the JSON object from the QJsonDocument
     QJsonObject jsonObj = doc.object();
 
-    QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
+    // QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
     // qDebug() << formattedJsonString;
+    qDebug() << jsonObj;
 
     // Access "results" array from the JSON object
     QJsonArray resultsArray = jsonObj["results"].toArray();
 
     // Iterate through each element in the "results" array
     //  qDebug() << "Found " << resultsArray.size() << " items.";
+    m_wellboreTrajectories.clear();
     foreach ( const QJsonValue& value, resultsArray )
     {
         QJsonObject resultObj = value.toObject();
@@ -434,21 +467,30 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply )
 
         //    QJsonArray id = resultObj["data"].toArray();
         QJsonArray dataSets = dataObj["Datasets"].toArray();
-        foreach ( const QJsonValue& dataSet, dataSets )
+        if ( dataSets.size() == 1 )
         {
-            printf( "%s\n", dataSet.toString().toStdString().c_str() );
+            QString id          = resultObj["id"].toString();
+            QString kind        = resultObj["kind"].toString();
+            QString dataSetId   = dataSets[0].toString();
+            QString description = dataObj["Description"].toString();
+
+            m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, description, dataSetId, wellboreId } );
+        }
+        else if ( dataSets.size() > 1 )
+        {
+            RiaLogging::error( "Encountered dataset with more than on file: currently not supported." );
         }
     }
 
-    emit finished();
+    emit wellboreTrajectoryFinished( wellboreId );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaOsduConnector::saveFile( QNetworkReply* reply )
+void RiaOsduConnector::saveFile( QNetworkReply* reply, const QString& fileId )
 {
-    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
+    qDebug() << "SAVE FILE: REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
     // if (reply->error() == QNetworkReply::NoError) {
 
     qDebug() << reply->errorString();
@@ -464,18 +506,27 @@ void RiaOsduConnector::saveFile( QNetworkReply* reply )
 
     QString signedUrl = jsonObj["SignedUrl"].toString();
 
-    RiaFileDownloader downloader;
-    QUrl              url( signedUrl );
-    QString           filePath = "/tmp/" + generateRandomString( 30 ) + ".txt";
-    downloader.downloadFile( url, filePath );
+    RiaFileDownloader* downloader = new RiaFileDownloader;
+    QUrl               url( signedUrl );
+    QString            filePath = "/tmp/" + generateRandomString( 30 ) + ".txt";
 
     QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
     qDebug() << formattedJsonString;
 
     printf( "%s => %s\n", signedUrl.toStdString().c_str(), filePath.toStdString().c_str() );
 
-    connect( &downloader, SIGNAL( done() ), this, SIGNAL( finished() ) );
+    connect( downloader,
+             &RiaFileDownloader::done,
+             [this, fileId, filePath]()
+             {
+                 printf( "Download complete %s => %s\n", fileId.toStdString().c_str(), filePath.toStdString().c_str() );
 
+                 emit( fileDownloadFinished( fileId ) );
+             } );
+    printf( "Starting download\n" );
+    downloader->downloadFile( url, filePath );
+
+    downloader->deleteLater();
     loop.exec();
 }
 
@@ -563,6 +614,18 @@ std::vector<OsduWellbore> RiaOsduConnector::wellbores( const QString& wellId ) c
 {
     auto it = m_wellbores.find( wellId );
     if ( it != m_wellbores.end() )
+        return it->second;
+    else
+        return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<OsduWellboreTrajectory> RiaOsduConnector::wellboreTrajectories( const QString& wellboreId ) const
+{
+    auto it = m_wellboreTrajectories.find( wellboreId );
+    if ( it != m_wellboreTrajectories.end() )
         return it->second;
     else
         return {};
