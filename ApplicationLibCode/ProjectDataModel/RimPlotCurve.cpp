@@ -247,9 +247,35 @@ bool RimPlotCurve::isCurveNameTemplateSupported() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimPlotCurve::createCurveAutoName()
+{
+    return "Default Curve Name";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QStringList RimPlotCurve::supportedCurveNameVariables() const
 {
     return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurve::updateZoomInParentPlot()
+{
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurve::onLoadDataAndUpdate( bool updateParentPlot )
+{
+    if ( updateParentPlot )
+    {
+        m_parentPlot->scheduleReplot();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1241,6 +1267,14 @@ void RimPlotCurve::deletePlotCurve()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RiuPlotCurve* RimPlotCurve::plotCurve() const
+{
+    return m_plotCurve;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RimPlotCurve::curveName() const
 {
     return m_curveName;
@@ -1285,4 +1319,17 @@ void RimPlotCurve::onColorTagClicked( const SignalEmitter* emitter, size_t index
     {
         m_curveAppearance->setColorWithFieldChanged( newColor );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    caf::PdmUiGroup* appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
+    RimPlotCurve::appearanceUiOrdering( *appearanceGroup );
+    caf::PdmUiGroup* nameGroup = uiOrdering.addNewGroup( "Curve Name" );
+    nameGroup->add( &m_curveName );
+    nameGroup->add( &m_showLegend );
+    uiOrdering.skipRemainingFields( true );
 }
