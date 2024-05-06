@@ -24,6 +24,8 @@
 #include "cafPdmPointer.h"
 #include "cafPdmPtrField.h"
 
+#include "RiaDefines.h"
+
 #include "RifEclipseSummaryAddressQMetaType.h"
 
 #include "cafAppEnum.h"
