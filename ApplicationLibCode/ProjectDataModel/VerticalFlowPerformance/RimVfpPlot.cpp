@@ -19,15 +19,16 @@
 #include "RimVfpPlot.h"
 
 #include "RiaColorTables.h"
+#include "RiaColorTools.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaOpmParserTools.h"
 
+#include "RimGridCrossPlotCurve.h"
 #include "RimPlotAxisProperties.h"
 #include "RimVfpDefines.h"
 #include "Tools/RimPlotAxisTools.h"
 
 #include "RiuContextMenuLauncher.h"
-#include "RiuPlotCurve.h"
 #include "RiuPlotWidget.h"
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotWheelZoomer.h"
@@ -155,6 +156,8 @@ RimVfpPlot::RimVfpPlot()
 
     connectAxisSignals( m_xAxisProperties() );
     connectAxisSignals( m_yAxisProperties() );
+
+    CAF_PDM_InitFieldNoDefault( &m_plotCurves, "PlotCurves", "Curves" );
 
     m_showWindow               = true;
     m_showPlotLegends          = true;
@@ -333,6 +336,13 @@ QString RimVfpPlot::asciiDataForPlotExport() const
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::reattachAllCurves()
 {
+    for ( auto curve : m_plotCurves() )
+    {
+        if ( curve->isChecked() )
+        {
+            curve->setParentPlotNoReplot( m_plotWidget );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -340,6 +350,10 @@ void RimVfpPlot::reattachAllCurves()
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::detachAllCurves()
 {
+    for ( auto curve : m_plotCurves() )
+    {
+        curve->detach();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -422,8 +436,12 @@ int RimVfpPlot::tableNumber() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpPlot::doRemoveFromCollection()
+void RimVfpPlot::onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects )
 {
+    detachAllCurves();
+    reattachAllCurves();
+
+    m_plotWidget->scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -500,8 +518,6 @@ void RimVfpPlot::onLoadDataAndUpdate()
         return;
     }
 
-    m_plotWidget->detachItems( RiuPlotWidget::PlotItemType::CURVE );
-
     updateLegend();
 
     QString wellName;
@@ -558,6 +574,8 @@ void RimVfpPlot::onLoadDataAndUpdate()
 
     m_plotWidget->setAxisTitleEnabled( RiuPlotAxis::defaultBottom(), true );
     m_plotWidget->setAxisTitleEnabled( RiuPlotAxis::defaultLeft(), true );
+
+    reattachAllCurves();
 
     updatePlotWidgetFromAxisRanges();
 
@@ -637,7 +655,6 @@ void RimVfpPlot::populatePlotWidgetWithCurveData( RiuPlotWidget*                
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, const VfpPlotData& plotData )
 {
-    plotWidget->detachItems( RiuPlotWidget::PlotItemType::CURVE );
     plotWidget->setAxisScale( RiuPlotAxis::defaultBottom(), 0, 1 );
     plotWidget->setAxisScale( RiuPlotAxis::defaultLeft(), 0, 1 );
     plotWidget->setAxisAutoScale( RiuPlotAxis::defaultBottom(), true );
@@ -645,25 +662,41 @@ void RimVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, cons
     plotWidget->setAxisTitleText( RiuPlotAxis::defaultBottom(), plotData.xAxisTitle() );
     plotWidget->setAxisTitleText( RiuPlotAxis::defaultLeft(), plotData.yAxisTitle() );
 
+    if ( m_plotCurves.size() != plotData.size() )
+    {
+        detachAllCurves();
+        m_plotCurves.deleteChildren();
+
+        for ( auto idx = 0u; idx < plotData.size(); idx++ )
+        {
+            QColor qtClr = RiaColorTables::summaryCurveDefaultPaletteColors().cycledQColor( idx );
+
+            auto curve = new RimGridCrossPlotCurve();
+
+            curve->setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
+            curve->setLineThickness( 2 );
+            curve->setColor( RiaColorTools::fromQColorTo3f( qtClr ) );
+            curve->setSymbol( RiuPlotCurveSymbol::SYMBOL_ELLIPSE );
+            curve->setSymbolSize( 6 );
+
+            m_plotCurves.push_back( curve );
+        }
+
+        updateConnectedEditors();
+    }
+
+    auto plotCurves = m_plotCurves.childrenByType();
+
     for ( auto idx = 0u; idx < plotData.size(); idx++ )
     {
-        QColor        qtClr = RiaColorTables::summaryCurveDefaultPaletteColors().cycledQColor( idx );
-        RiuPlotCurve* curve = m_plotWidget->createPlotCurve( nullptr, plotData.curveTitle( idx ) );
+        auto curve = dynamic_cast<RimGridCrossPlotCurve*>( plotCurves[idx] );
+        if ( !curve ) continue;
 
-        curve->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
-                              RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
-                              2,
-                              qtClr );
-
-        RiuPlotCurveSymbol* symbol = curve->createSymbol( RiuPlotCurveSymbol::PointSymbolEnum::SYMBOL_ELLIPSE );
-        symbol->setColor( qtClr );
-        symbol->setSize( 6, 6 );
-        curve->setSymbol( symbol );
-
-        bool useLogarithmicScale = false;
-        curve->setSamplesFromXValuesAndYValues( plotData.xData( idx ), plotData.yData( idx ), useLogarithmicScale );
-        curve->attachToPlot( plotWidget );
-        curve->showInPlot();
+        curve->setCustomName( plotData.curveTitle( idx ) );
+        curve->setParentPlotNoReplot( plotWidget );
+        curve->setSamples( plotData.xData( idx ), plotData.yData( idx ) );
+        curve->updateCurveAppearance();
+        curve->appearanceChanged.connect( this, &RimVfpPlot::curveAppearanceChanged );
     }
 }
 
@@ -749,6 +782,14 @@ void RimVfpPlot::onPlotZoomed()
     setAutoScaleXEnabled( false );
     setAutoScaleYEnabled( false );
     updateAxisRangesFromPlotWidget();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpPlot::curveAppearanceChanged( const caf::SignalEmitter* emitter )
+{
+    scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1098,6 +1139,7 @@ void RimVfpPlot::calculateTableValueOptions( RimVfpDefines::ProductionVariableTy
 void RimVfpPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
+
     loadDataAndUpdate();
     updateLayout();
 }
@@ -1142,4 +1184,15 @@ QString RimVfpPlot::generatePlotTitle( const QString&                          w
 caf::PdmFieldHandle* RimVfpPlot::userDescriptionField()
 {
     return &m_plotTitle;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpPlot::scheduleReplot()
+{
+    if ( m_plotWidget )
+    {
+        m_plotWidget->scheduleReplot();
+    }
 }
