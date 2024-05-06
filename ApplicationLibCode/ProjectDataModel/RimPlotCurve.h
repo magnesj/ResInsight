@@ -133,21 +133,22 @@ public:
     void setParentPlotNoReplot( RiuPlotWidget* );
     void setParentPlotAndReplot( RiuPlotWidget* );
 
-    void attach( RiuPlotWidget* );
-    void detach( bool deletePlotCurve = false );
-    void reattach();
-    bool isSameCurve( const RiuPlotCurve* plotCurve ) const;
-    void deletePlotCurve();
+    void          attach( RiuPlotWidget* );
+    void          detach( bool deletePlotCurve = false );
+    void          reattach();
+    bool          isSameCurve( const RiuPlotCurve* plotCurve ) const;
+    void          deletePlotCurve();
+    RiuPlotCurve* plotCurve() const;
 
     std::vector<RimPlotRectAnnotation*> rectAnnotations() const;
 
 protected:
-    virtual QString createCurveAutoName() = 0;
+    virtual QString createCurveAutoName();
 
     virtual QStringList supportedCurveNameVariables() const;
 
-    virtual void updateZoomInParentPlot()                     = 0;
-    virtual void onLoadDataAndUpdate( bool updateParentPlot ) = 0;
+    virtual void updateZoomInParentPlot();
+    virtual void onLoadDataAndUpdate( bool updateParentPlot );
     void         initAfterRead() override;
     void         updateCurvePresentation( bool updatePlotLegendAndTitle );
 
@@ -191,6 +192,8 @@ protected:
     void defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     void onColorTagClicked( const SignalEmitter* emitter, size_t index );
+
+    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
 private:
     bool isCurveNameTemplateSupported() const;
