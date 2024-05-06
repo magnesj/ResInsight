@@ -23,18 +23,17 @@
 #include "RiaEclipseUnitTools.h"
 #include "RiaOpmParserTools.h"
 
-#include "RimGridCrossPlotCurve.h"
 #include "RimPlotAxisProperties.h"
+#include "RimPlotCurve.h"
 #include "RimVfpDefines.h"
 #include "Tools/RimPlotAxisTools.h"
 
 #include "RiuContextMenuLauncher.h"
+#include "RiuPlotCurve.h"
 #include "RiuPlotWidget.h"
+#include "RiuQwtCurvePointTracker.h"
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotWheelZoomer.h"
-#include "RiuQwtPlotWidget.h"
-
-#include "RiuQwtCurvePointTracker.h"
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtPlotZoomer.h"
 
@@ -671,7 +670,7 @@ void RimVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, cons
         {
             QColor qtClr = RiaColorTables::summaryCurveDefaultPaletteColors().cycledQColor( idx );
 
-            auto curve = new RimGridCrossPlotCurve();
+            auto curve = new RimPlotCurve();
 
             curve->setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
             curve->setLineThickness( 2 );
@@ -689,12 +688,16 @@ void RimVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, cons
 
     for ( auto idx = 0u; idx < plotData.size(); idx++ )
     {
-        auto curve = dynamic_cast<RimGridCrossPlotCurve*>( plotCurves[idx] );
+        auto curve = plotCurves[idx];
         if ( !curve ) continue;
 
         curve->setCustomName( plotData.curveTitle( idx ) );
         curve->setParentPlotNoReplot( plotWidget );
-        curve->setSamples( plotData.xData( idx ), plotData.yData( idx ) );
+        if ( curve->plotCurve() )
+        {
+            bool useLogarithmicScale = false;
+            curve->plotCurve()->setSamplesFromXValuesAndYValues( plotData.xData( idx ), plotData.yData( idx ), useLogarithmicScale );
+        }
         curve->updateCurveAppearance();
         curve->appearanceChanged.connect( this, &RimVfpPlot::curveAppearanceChanged );
     }
