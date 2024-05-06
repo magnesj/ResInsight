@@ -71,15 +71,13 @@ public:
     int  tableNumber() const;
 
 private:
-    // RimPlot implementations
-    void doRemoveFromCollection();
-
-    // RimViewWindow implementations
+    void onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects ) override;
     void deleteViewWidget() override;
     void onLoadDataAndUpdate() override;
 
-    // PDM methods
     caf::PdmFieldHandle* userDescriptionField() override;
+
+    void scheduleReplot();
 
 private:
     RiuPlotWidget* doCreatePlotViewWidget( QWidget* mainWindowParent ) override;
@@ -149,6 +147,7 @@ private:
     void updateAxisRangesFromPlotWidget() override;
 
     void onPlotZoomed();
+    void curveAppearanceChanged( const caf::SignalEmitter* emitter );
 
 private:
     caf::PdmField<QString>                                               m_plotTitle;
@@ -172,6 +171,8 @@ private:
 
     caf::PdmChildField<RimPlotAxisProperties*> m_yAxisProperties;
     caf::PdmChildField<RimPlotAxisProperties*> m_xAxisProperties;
+
+    caf::PdmChildArrayField<RimPlotCurve*> m_plotCurves;
 
     QPointer<RiuPlotWidget>            m_plotWidget;
     std::unique_ptr<Opm::VFPProdTable> m_prodTable;
