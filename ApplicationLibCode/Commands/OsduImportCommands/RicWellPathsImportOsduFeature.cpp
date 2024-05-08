@@ -25,8 +25,11 @@
 #include "RiaPreferences.h"
 
 #include "RimFileWellPath.h"
+#include "RimOilField.h"
+#include "RimOsduWellPath.h"
 #include "RimProject.h"
 #include "RimTools.h"
+#include "RimWellPathCollection.h"
 #include "RimWellPathImport.h"
 
 #include "RiuMainWindow.h"
@@ -38,12 +41,12 @@
 #include <QMessageBox>
 #include <QThread>
 
-CAF_CMD_SOURCE_INIT( RicWellPathsImportSsihubFeature, "RicWellPathsImportSsihubFeature" );
+CAF_CMD_SOURCE_INIT( RicWellPathsImportOsduFeature, "RicWellPathsImportOsduFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
+void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
 {
     RiaApplication* app = RiaApplication::instance();
     if ( !app->project() ) return;
@@ -89,6 +92,14 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 
     if ( !app->preferences() ) return;
 
+    RimProject* project = RimProject::current();
+    if ( !project ) return;
+
+    if ( project->oilFields.empty() ) return;
+
+    RimOilField* oilField = project->activeOilField();
+    if ( !oilField ) return;
+
     const QString server         = "https://npequinor.energy.azure.com";
     const QString dataParitionId = "npequinor-dev";
     const QString authority      = "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0";
@@ -101,17 +112,34 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 
     RiuWellImportWizard wellImportwizard( wellPathsFolderPath, m_osduConnector, app->project()->wellPathImport(), RiuMainWindow::instance() );
 
+    // if ( oilField->wellPathCollection == nullptr )
+    // {
+    //     // printf("Create well path collection.\n");
+    //     oilField->wellPathCollection = std::make_unique<RimWellPathCollection>();
+
+    //     project->updateConnectedEditors();
+    // }
+
     if ( QDialog::Accepted == wellImportwizard.exec() )
     {
-        // QStringList wellPaths = wellImportwizard.absoluteFilePathsToWellPaths();
-        // if ( !wellPaths.empty() )
-        // {
-        //     QStringList errorMessages;
-        //     app->addWellPathsToModel( wellPaths, &errorMessages );
-        //     app->project()->scheduleCreateDisplayModelAndRedrawAllViews();
-        // }
+        std::vector<RiuWellImportWizard::WellInfo> importedWells = wellImportwizard.importedWells();
+        for ( auto w : importedWells )
+        {
+            qDebug() << "IMPORTING WELL: " << w.name;
 
-        // app->setCacheDataObject( "ssihub_username", wellImportwizard.field( "username" ) );
+            auto wellPath = new RimOsduWellPath;
+            wellPath->setName( w.name );
+            wellPath->setWellId( w.wellId );
+            wellPath->setWellboreId( w.wellboreId );
+            wellPath->setWellboreTrajectoryId( w.wellboreTrajectoryId );
+            wellPath->setFileId( w.fileId );
+
+            oilField->wellPathCollection->addWellPath( wellPath );
+            oilField->wellPathCollection->updateConnectedEditors();
+        }
+
+        project->updateConnectedEditors();
+        app->project()->scheduleCreateDisplayModelAndRedrawAllViews();
     }
     else
     {
@@ -122,7 +150,7 @@ void RicWellPathsImportSsihubFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellPathsImportSsihubFeature::setupActionLook( QAction* actionToSetup )
+void RicWellPathsImportOsduFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setText( "Import Well Paths from &OSDU" );
     actionToSetup->setIcon( QIcon( ":/WellCollection.png" ) );

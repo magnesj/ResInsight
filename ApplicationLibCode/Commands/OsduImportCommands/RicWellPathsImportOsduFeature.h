@@ -24,7 +24,7 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RicWellPathsImportSsihubFeature : public caf::CmdFeature
+class RicWellPathsImportOsduFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
 

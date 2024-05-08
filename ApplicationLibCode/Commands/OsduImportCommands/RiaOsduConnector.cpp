@@ -622,6 +622,31 @@ std::vector<OsduWellbore> RiaOsduConnector::wellbores( const QString& wellId ) c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RiaOsduConnector::wellIdForWellboreId( const QString& wellboreId ) const
+{
+    auto findWellIdForWellboreId = []( const std::vector<OsduWellbore>& wellbores, const QString& wellboreId )
+    {
+        auto it = std::find_if( wellbores.begin(), wellbores.end(), [wellboreId]( const OsduWellbore& w ) { return w.id == wellboreId; } );
+        if ( it != wellbores.end() )
+            return it->wellId;
+        else
+            return QString();
+    };
+
+    for ( auto [wellId, wellbores] : m_wellbores )
+    {
+        if ( auto res = findWellIdForWellboreId( wellbores, wellboreId ); !res.isEmpty() )
+        {
+            return wellId;
+        }
+    }
+
+    return QString();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<OsduWellboreTrajectory> RiaOsduConnector::wellboreTrajectories( const QString& wellboreId ) const
 {
     auto it = m_wellboreTrajectories.find( wellboreId );

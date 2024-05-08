@@ -60,6 +60,8 @@ public:
     void requestWellboreTrajectoryByWellboreId( const QString& wellboreId );
     void requestFileDownloadByFileId( const QString& fileId );
 
+    QString wellIdForWellboreId( const QString& wellboreId ) const;
+
     QString server() const;
     QString dataPartition() const;
 

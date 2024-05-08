@@ -39,6 +39,7 @@
 #include <QtWidgets>
 
 #include <algorithm>
+#include <optional>
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------
@@ -159,6 +160,22 @@ QString RiuWellImportWizard::selectedWellboreId() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RiuWellImportWizard::WellInfo> RiuWellImportWizard::importedWells() const
+{
+    return m_wellInfos;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuWellImportWizard::addWellInfo( RiuWellImportWizard::WellInfo wellInfo )
+{
+    m_wellInfos.push_back( wellInfo );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 AuthenticationPage::AuthenticationPage( RiaOsduConnector* osduConnector, QWidget* parent /*= 0*/ )
     : QWizardPage( parent )
     , m_accessOk( false )
@@ -231,10 +248,10 @@ FieldSelectionPage::FieldSelectionPage( RimWellPathImport* wellPathImport, RiaOs
     layout->setStretchFactor( m_tableView, 10 );
 
     // Tree view
-    caf::PdmUiTreeView* treeView = new caf::PdmUiTreeView( this );
-    treeView->setPdmItem( wellPathImport );
-    layout->addWidget( treeView );
-    layout->setStretchFactor( treeView, 10 );
+    // caf::PdmUiTreeView* treeView = new caf::PdmUiTreeView( this );
+    // treeView->setPdmItem( wellPathImport );
+    // layout->addWidget( treeView );
+    // layout->setStretchFactor( treeView, 10 );
 
     setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
@@ -299,7 +316,6 @@ bool FieldSelectionPage::isComplete() const
 //--------------------------------------------------------------------------------------------------
 FieldSelectionPage::~FieldSelectionPage()
 {
-    m_propertyView->showProperties( nullptr );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -461,14 +477,37 @@ void WellSummaryPage::fileDownloadFinished( const QString& fileId )
 void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
 {
     std::vector<OsduWellboreTrajectory> wellboreTrajectories = m_osduConnector->wellboreTrajectories( wellboreId );
+    std::vector<OsduWell>               wells                = m_osduConnector->wells();
 
     qDebug() << "WELL TRAJECTORY FINISHED: " << wellboreId << ":" << wellboreTrajectories.size();
+
+    auto findWellForWellId = []( const std::vector<OsduWell>& wells, const QString& wellId ) -> std::optional<const OsduWell>
+    {
+        auto it = std::find_if( wells.begin(), wells.end(), [wellId]( const OsduWell& w ) { return w.id == wellId; } );
+        if ( it != wells.end() )
+            return std::optional<const OsduWell>( *it );
+        else
+            return {}; // QString();
+    };
+
+    RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
 
     for ( auto w : wellboreTrajectories )
     {
         QString fileId = w.dataSetId;
         if ( fileId.endsWith( ":" ) ) fileId.truncate( fileId.lastIndexOf( QChar( ':' ) ) );
 
-        m_osduConnector->requestFileDownloadByFileId( fileId );
+        QString                       wellId = m_osduConnector->wellIdForWellboreId( w.wellboreId );
+        std::optional<const OsduWell> well   = findWellForWellId( wells, wellId );
+
+        if ( well.has_value() )
+        {
+            QString wellboreTrajectoryId = w.id;
+            wiz->addWellInfo( { .name                 = well.value().name,
+                                .wellId               = well.value().id,
+                                .wellboreId           = w.wellboreId,
+                                .wellboreTrajectoryId = wellboreTrajectoryId,
+                                .fileId               = w.dataSetId } );
+        }
     }
 }

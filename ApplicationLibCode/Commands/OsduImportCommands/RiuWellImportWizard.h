@@ -248,10 +248,10 @@ private slots:
     void selectField( const QItemSelection& newSelection, const QItemSelection& oldSelection );
 
 private:
-    caf::PdmUiPropertyView* m_propertyView;
-    RiaOsduConnector*       m_osduConnector;
-    QTableView*             m_tableView;
-    OsduFieldTableModel*    m_osduFieldsModel;
+    // caf::PdmUiPropertyView* m_propertyView;
+    RiaOsduConnector*    m_osduConnector;
+    QTableView*          m_tableView;
+    OsduFieldTableModel* m_osduFieldsModel;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -310,6 +310,15 @@ class RiuWellImportWizard : public QWizard
     Q_OBJECT
 
 public:
+    struct WellInfo
+    {
+        QString name;
+        QString wellId;
+        QString wellboreId;
+        QString wellboreTrajectoryId;
+        QString fileId;
+    };
+
     RiuWellImportWizard( const QString&     downloadFolder,
                          RiaOsduConnector*  osduConnector,
                          RimWellPathImport* wellPathImportObject,
@@ -323,6 +332,9 @@ public:
     QString selectedFieldId() const;
     void    setSelectedWellboreId( const QString& wellboreId );
     QString selectedWellboreId() const;
+
+    void                                       addWellInfo( RiuWellImportWizard::WellInfo wellInfo );
+    std::vector<RiuWellImportWizard::WellInfo> importedWells() const;
 
 public slots:
     void downloadWellPaths( const QString& wellboreId );
@@ -342,4 +354,6 @@ private:
     caf::PdmUiTreeView* m_pdmTreeView;
 
     bool m_firstTimeRequestingAuthentication;
+
+    std::vector<RiuWellImportWizard::WellInfo> m_wellInfos;
 };
