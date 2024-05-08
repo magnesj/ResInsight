@@ -23,6 +23,8 @@
 #include "RiaEclipseUnitTools.h"
 #include "RiaOpmParserTools.h"
 
+#include "RigVfpTables.h"
+
 #include "RimPlotAxisProperties.h"
 #include "RimPlotCurve.h"
 #include "RimVfpDefines.h"
@@ -50,39 +52,6 @@
 //
 //
 //==================================================================================================
-
-class VfpPlotData
-{
-public:
-    void setXAxisTitle( const QString& xAxisTitle ) { m_xAxisTitle = xAxisTitle; }
-    void setYAxisTitle( const QString& yAxisTitle ) { m_yAxisTitle = yAxisTitle; }
-
-    const QString& xAxisTitle() const { return m_xAxisTitle; }
-    const QString& yAxisTitle() const { return m_yAxisTitle; }
-
-    void appendCurve( const QString& curveTitle, const std::vector<double>& xData, const std::vector<double>& yData )
-    {
-        m_curveTitles.push_back( curveTitle );
-        m_xData.push_back( xData );
-        m_yData.push_back( yData );
-    }
-
-    const QString& curveTitle( size_t idx ) const { return m_curveTitles[idx]; }
-
-    size_t size() const { return m_xData.size(); }
-
-    size_t curveSize( size_t idx ) const { return m_xData[idx].size(); }
-
-    const std::vector<double>& xData( size_t idx ) const { return m_xData[idx]; }
-    const std::vector<double>& yData( size_t idx ) const { return m_yData[idx]; }
-
-private:
-    QString                          m_xAxisTitle;
-    QString                          m_yAxisTitle;
-    std::vector<QString>             m_curveTitles;
-    std::vector<std::vector<double>> m_xData;
-    std::vector<std::vector<double>> m_yData;
-};
 
 CAF_PDM_SOURCE_INIT( RimVfpPlot, "VfpPlot" );
 
@@ -405,6 +374,8 @@ void RimVfpPlot::setProductionTable( const Opm::VFPProdTable& table )
 {
     m_prodTable = std::make_unique<Opm::VFPProdTable>( table );
     m_injectionTable.reset();
+
+    m_vfpTables->addProductionTable( table );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -414,6 +385,8 @@ void RimVfpPlot::setInjectionTable( const Opm::VFPInjTable& table )
 {
     m_prodTable.reset();
     m_injectionTable = std::make_unique<Opm::VFPInjTable>( table );
+
+    m_vfpTables->addInjectionTable( table );
 }
 
 //--------------------------------------------------------------------------------------------------

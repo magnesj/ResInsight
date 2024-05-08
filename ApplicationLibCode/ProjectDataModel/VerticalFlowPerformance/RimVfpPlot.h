@@ -31,6 +31,7 @@
 class RiuPlotWidget;
 class VfpPlotData;
 class RimPlotAxisProperties;
+class RigVfpTables;
 
 //--------------------------------------------------------------------------------------------------
 /// Vertical Flow Performance Plot
@@ -177,6 +178,7 @@ private:
     QPointer<RiuPlotWidget>            m_plotWidget;
     std::unique_ptr<Opm::VFPProdTable> m_prodTable;
     std::unique_ptr<Opm::VFPInjTable>  m_injectionTable;
+    std::unique_ptr<RigVfpTables>      m_vfpTables;
 
     bool m_dataIsImportedExternally;
 };
