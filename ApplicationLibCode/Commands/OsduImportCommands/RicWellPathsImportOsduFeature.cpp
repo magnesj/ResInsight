@@ -24,6 +24,7 @@
 #include "RiaOsduConnector.h"
 #include "RiaPreferences.h"
 
+#include "RiaPreferencesOsdu.h"
 #include "RimFileWellPath.h"
 #include "RimOilField.h"
 #include "RimOsduWellPath.h"
@@ -100,25 +101,17 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
     RimOilField* oilField = project->activeOilField();
     if ( !oilField ) return;
 
-    const QString server         = "https://npequinor.energy.azure.com";
-    const QString dataParitionId = "npequinor-dev";
-    const QString authority      = "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0";
-    const QString scopes         = "openid offline_access "
-                                   "7daee810-3f78-40c4-84c2-7a199428de18/.default "
-                                   "profile";
-    const QString clientId       = "7a414874-4b27-4378-b34f-bc9e5a5faa4f";
+    RiaPreferencesOsdu* osduPreferences = app->preferences()->osduPreferences();
+
+    const QString server         = osduPreferences->server();
+    const QString dataParitionId = osduPreferences->dataPartitionId();
+    const QString authority      = osduPreferences->authority();
+    const QString scopes         = osduPreferences->scopes();
+    const QString clientId       = osduPreferences->clientId();
 
     auto m_osduConnector = new RiaOsduConnector( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
 
     RiuWellImportWizard wellImportwizard( wellPathsFolderPath, m_osduConnector, app->project()->wellPathImport(), RiuMainWindow::instance() );
-
-    // if ( oilField->wellPathCollection == nullptr )
-    // {
-    //     // printf("Create well path collection.\n");
-    //     oilField->wellPathCollection = std::make_unique<RimWellPathCollection>();
-
-    //     project->updateConnectedEditors();
-    // }
 
     if ( QDialog::Accepted == wellImportwizard.exec() )
     {
