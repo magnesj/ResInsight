@@ -39,12 +39,12 @@ public:
 
     void                     addPlot( RimVfpPlot* newPlot ) override;
     std::vector<RimVfpPlot*> plots() const override;
-    void                     deleteChildren();
     RimVfpPlot*              plotForTableNumber( int tableNumber ) const;
 
     size_t plotCount() const final;
     void   insertPlot( RimVfpPlot* vfpPlot, size_t index ) final;
     void   removePlot( RimVfpPlot* vfpPlot ) final;
+    void   deleteAllPlots() override;
 
     RimVfpDeck* addDeck( const QString& filename );
 
