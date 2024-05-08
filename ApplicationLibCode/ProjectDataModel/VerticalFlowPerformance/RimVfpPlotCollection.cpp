@@ -78,14 +78,6 @@ std::vector<RimVfpPlot*> RimVfpPlotCollection::plots() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpPlotCollection::deleteChildren()
-{
-    m_vfpPlots.deleteChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimVfpPlot* RimVfpPlotCollection::plotForTableNumber( int tableNumber ) const
 {
     for ( auto plot : plots() )
@@ -126,6 +118,15 @@ RimVfpDeck* RimVfpPlotCollection::addDeck( const QString& filename )
     m_vfpDecks.push_back( deck );
 
     return deck;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpPlotCollection::deleteAllPlots()
+{
+    m_vfpPlots.deleteChildren();
+    m_vfpDecks.deleteChildren();
 }
 
 //--------------------------------------------------------------------------------------------------
