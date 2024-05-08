@@ -38,6 +38,7 @@
 
 #include <memory>
 
+class RiaOsduConnector;
 class RifWellPathImporter;
 class RigWellPath;
 class RimFileWellPath;
@@ -154,6 +155,8 @@ private:
     static void buildUiTreeOrdering( cafTreeNode* treeNode, caf::PdmUiTreeOrdering* parentUiTreeNode, const QString& uiConfigName );
 
     static QString unGroupedText();
+
+    RigWellPath* loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector, const QString& fileId );
 
 private:
     std::unique_ptr<RifWellPathImporter>           m_wellPathImporter;

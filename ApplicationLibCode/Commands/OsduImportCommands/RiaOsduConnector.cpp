@@ -514,14 +514,13 @@ void RiaOsduConnector::saveFile( QNetworkReply* reply, const QString& fileId )
     qDebug() << formattedJsonString;
 
     printf( "%s => %s\n", signedUrl.toStdString().c_str(), filePath.toStdString().c_str() );
-
+    connect( this, SIGNAL( fileDownloadFinished( const QString&, const QString& ) ), &loop, SLOT( quit() ) );
     connect( downloader,
              &RiaFileDownloader::done,
              [this, fileId, filePath]()
              {
                  printf( "Download complete %s => %s\n", fileId.toStdString().c_str(), filePath.toStdString().c_str() );
-
-                 emit( fileDownloadFinished( fileId ) );
+                 emit( fileDownloadFinished( fileId, filePath ) );
              } );
     printf( "Starting download\n" );
     downloader->downloadFile( url, filePath );
@@ -654,4 +653,47 @@ std::vector<OsduWellboreTrajectory> RiaOsduConnector::wellboreTrajectories( cons
         return it->second;
     else
         return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaOsduConnector::fileDownloadComplete( const QString& fileId, const QString& filePath )
+{
+    m_filePath = filePath;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<QString, QString> RiaOsduConnector::requestFileContentsById( const QString& fileId )
+{
+    // TODO: improve this..
+    QEventLoop loop;
+    connect( this, SIGNAL( tokenReady( const QString& ) ), &loop, SLOT( quit() ) );
+    requestToken();
+    loop.exec();
+
+    qDebug() << "Got token: " << m_token;
+
+    QEventLoop loop2;
+    connect( this,
+             SIGNAL( fileDownloadFinished( const QString&, const QString& ) ),
+             this,
+             SLOT( fileDownloadComplete( const QString&, const QString& ) ) );
+    connect( this, SIGNAL( fileDownloadFinished( const QString&, const QString& ) ), &loop2, SLOT( quit() ) );
+    requestFileDownloadByFileId( m_server, m_dataPartitionId, m_token, fileId );
+    loop2.exec();
+
+    QFile dataFile( m_filePath );
+
+    if ( !dataFile.open( QFile::ReadOnly ) )
+    {
+        return { "", "Unable to open file: " + m_filePath };
+    }
+
+    QTextStream stream( &dataFile );
+    auto        fileContent = stream.readAll();
+
+    return { fileContent, "" };
 }

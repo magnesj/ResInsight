@@ -60,6 +60,8 @@ public:
     void requestWellboreTrajectoryByWellboreId( const QString& wellboreId );
     void requestFileDownloadByFileId( const QString& fileId );
 
+    std::pair<QString, QString> requestFileContentsById( const QString& fileId );
+
     QString wellIdForWellboreId( const QString& wellboreId ) const;
 
     QString server() const;
@@ -78,9 +80,10 @@ public slots:
     void parseWellTrajectory( QNetworkReply* reply, const QString& wellboreId );
     void saveFile( QNetworkReply* reply, const QString& fileId );
     void accessGranted();
+    void fileDownloadComplete( const QString& fileId, const QString& filePath );
 
 signals:
-    void fileDownloadFinished( const QString& fileId );
+    void fileDownloadFinished( const QString& fileId, const QString& filePath );
     void fieldsFinished();
     void wellsFinished();
     void wellboresFinished( const QString& wellId );
@@ -124,4 +127,5 @@ private:
     std::vector<OsduWell>                                  m_wells;
     std::map<QString, std::vector<OsduWellbore>>           m_wellbores;
     std::map<QString, std::vector<OsduWellboreTrajectory>> m_wellboreTrajectories;
+    QString                                                m_filePath;
 };

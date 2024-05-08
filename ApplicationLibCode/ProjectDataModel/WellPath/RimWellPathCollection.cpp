@@ -20,6 +20,7 @@
 
 #include "RimWellPathCollection.h"
 
+#include "OsduImportCommands/RiaOsduConnector.h"
 #include "RiaColorTables.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
@@ -40,6 +41,7 @@
 #include "RimFileWellPath.h"
 #include "RimModeledWellPath.h"
 #include "RimOilField.h"
+#include "RimOsduWellPath.h"
 #include "RimPerforationCollection.h"
 #include "RimProject.h"
 #include "RimStimPlanModel.h"
@@ -49,6 +51,8 @@
 #include "RimWellPath.h"
 #include "RimWellPathCompletionSettings.h"
 #include "RimWellPathTieIn.h"
+
+#include "RiuMainWindow.h"
 
 #include "cafTreeNode.h" // TODO: Move to caf
 
@@ -67,6 +71,7 @@
 
 #include <cmath>
 #include <fstream>
+#include <memory>
 
 namespace caf
 {
@@ -149,6 +154,7 @@ void RimWellPathCollection::loadDataAndUpdate()
 
         auto* fWPath = dynamic_cast<RimFileWellPath*>( wellPath );
         auto* mWPath = dynamic_cast<RimModeledWellPath*>( wellPath );
+        auto* oWPath = dynamic_cast<RimOsduWellPath*>( wellPath );
         if ( fWPath )
         {
             if ( !fWPath->filePath().isEmpty() )
@@ -163,6 +169,24 @@ void RimWellPathCollection::loadDataAndUpdate()
         else if ( mWPath )
         {
             mWPath->createWellPathGeometry();
+        }
+        else if ( oWPath )
+        {
+            RiaApplication* app = RiaApplication::instance();
+
+            RiaPreferencesOsdu* osduPreferences = app->preferences()->osduPreferences();
+
+            const QString server         = osduPreferences->server();
+            const QString dataParitionId = osduPreferences->dataPartitionId();
+            const QString authority      = osduPreferences->authority();
+            const QString scopes         = osduPreferences->scopes();
+            const QString clientId       = osduPreferences->clientId();
+
+            auto osduConnector =
+                std::make_unique<RiaOsduConnector>( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
+
+            RigWellPath* wellPathGeometry = loadWellPathGeometryFromOsdu( osduConnector.get(), oWPath->fileId() );
+            oWPath->setWellPathGeometry( wellPathGeometry );
         }
 
         if ( wellPath )
@@ -1012,4 +1036,15 @@ void RimWellPathCollection::onChildAdded( caf::PdmFieldHandle* containerForNewOb
 
     scheduleRedrawAffectedViews();
     uiCapability()->updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigWellPath* RimWellPathCollection::loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector, const QString& fileId )
+{
+    auto [fileContents, errorMessage] = osduConnector->requestFileContentsById( fileId );
+
+    qDebug() << "File contents:" << fileContents;
+    return nullptr;
 }

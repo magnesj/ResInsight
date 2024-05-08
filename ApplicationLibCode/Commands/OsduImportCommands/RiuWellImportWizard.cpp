@@ -463,7 +463,7 @@ void WellSummaryPage::initializePage()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void WellSummaryPage::fileDownloadFinished( const QString& fileId )
+void WellSummaryPage::fileDownloadFinished( const QString& fileId, const QString& filePath )
 {
     m_textEdit->setText( "Summary of imported wells\n\n" );
 
@@ -494,6 +494,8 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
 
     for ( auto w : wellboreTrajectories )
     {
+        // TODO: remove hack. A lot of the data set IDs in OSDU has trailing ":" which should not be
+        // there (i.e. the real id is without it). Chop them off to make more data sets work.
         QString fileId = w.dataSetId;
         if ( fileId.endsWith( ":" ) ) fileId.truncate( fileId.lastIndexOf( QChar( ':' ) ) );
 
@@ -507,7 +509,7 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
                                 .wellId               = well.value().id,
                                 .wellboreId           = w.wellboreId,
                                 .wellboreTrajectoryId = wellboreTrajectoryId,
-                                .fileId               = w.dataSetId } );
+                                .fileId               = fileId } );
         }
     }
 }

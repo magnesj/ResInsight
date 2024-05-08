@@ -294,7 +294,7 @@ public:
 
 private slots:
     void wellboreTrajectoryFinished( const QString& wellId );
-    void fileDownloadFinished( const QString& fileId );
+    void fileDownloadFinished( const QString& fileId, const QString& filePath );
 
 private:
     RimWellPathImport* m_wellPathImportObject;
