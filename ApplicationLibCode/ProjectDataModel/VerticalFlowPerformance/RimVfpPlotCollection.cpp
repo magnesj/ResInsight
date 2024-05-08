@@ -18,15 +18,6 @@
 
 #include "RimVfpPlotCollection.h"
 
-#include "RiaApplication.h"
-
-#include "RigCaseCellResultsData.h"
-#include "RigEclipseCaseData.h"
-#include "RigEclipseResultAddress.h"
-#include "RigEquil.h"
-
-#include "RimEclipseResultCase.h"
-#include "RimProject.h"
 #include "RimVfpDeck.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
@@ -113,7 +104,7 @@ void RimVfpPlotCollection::removePlot( RimVfpPlot* vfpPlot )
 //--------------------------------------------------------------------------------------------------
 RimVfpDeck* RimVfpPlotCollection::addDeck( const QString& filename )
 {
-    RimVfpDeck* deck = new RimVfpDeck();
+    auto* deck = new RimVfpDeck();
     deck->setFileName( filename );
     m_vfpDecks.push_back( deck );
 
