@@ -27,7 +27,9 @@
 
 #include "RimPlotAxisProperties.h"
 #include "RimPlotCurve.h"
+#include "RimVfpDataCollection.h"
 #include "RimVfpDefines.h"
+#include "RimVfpTableData.h"
 #include "Tools/RimPlotAxisTools.h"
 
 #include "RiuContextMenuLauncher.h"
@@ -67,6 +69,7 @@ RimVfpPlot::RimVfpPlot()
     m_plotTitle.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
+    CAF_PDM_InitFieldNoDefault( &m_vfpTableData, "VfpTableData", "VFP Data Source" );
 
     caf::AppEnum<RimVfpDefines::TableType> defaultTableType = RimVfpDefines::TableType::INJECTION;
     CAF_PDM_InitField( &m_tableType, "TableType", defaultTableType, "Table Type" );
@@ -153,6 +156,14 @@ RimVfpPlot::~RimVfpPlot()
 void RimVfpPlot::setFileName( const QString& filename )
 {
     m_filePath = filename;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpPlot::setDataSource( RimVfpTableData* vfpTableData )
+{
+    m_vfpTableData = vfpTableData;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -724,6 +735,7 @@ void RimVfpPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
 {
     uiOrdering.add( &m_filePath );
     m_filePath.uiCapability()->setUiReadOnly( m_dataIsImportedExternally );
+    uiOrdering.add( &m_vfpTableData );
 
     uiOrdering.add( &m_tableType );
     uiOrdering.add( &m_tableNumber );
@@ -795,6 +807,15 @@ QList<caf::PdmOptionItemInfo> RimVfpPlot::calculateValueOptions( const caf::PdmF
     else if ( fieldNeedingOptions == &m_gasLiquidRatioIdx )
     {
         calculateTableValueOptions( RimVfpDefines::ProductionVariableType::GAS_LIQUID_RATIO, options );
+    }
+
+    else if ( fieldNeedingOptions == &m_vfpTableData )
+    {
+        RimVfpDataCollection* vfpDataCollection = RimVfpDataCollection::instance();
+        for ( auto table : vfpDataCollection->vfpTableData() )
+        {
+            options.push_back( caf::PdmOptionItemInfo( table->uiName(), table ) );
+        }
     }
 
     return options;

@@ -43,6 +43,7 @@ public:
 
 private:
     void updateObjectName();
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
     caf::PdmField<caf::FilePath> m_filePath;
