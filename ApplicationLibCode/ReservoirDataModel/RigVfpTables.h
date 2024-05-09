@@ -89,9 +89,6 @@ struct VfpTableInitialData
 class RigVfpTables
 {
 public:
-    void importFromTextFiles( const std::vector<std::string>& filenames );
-    void importFromSimulatorInputFile( const std::string& filename );
-
     void addInjectionTable( const Opm::VFPInjTable& table );
     void addProductionTable( const Opm::VFPProdTable& table );
 

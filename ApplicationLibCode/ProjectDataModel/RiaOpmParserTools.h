@@ -30,8 +30,6 @@
 //--------------------------------------------------------------------------------------------------
 namespace RiaOpmParserTools
 {
-std::vector<Opm::VFPInjTable>  extractVfpInjectionTables( const std::string& filename );
-std::vector<Opm::VFPProdTable> extractVfpProductionTables( const std::string& filename );
 
 std::pair<std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>> extractVfpTablesFromDataFile( const std::string& dataDeckFilename );
 

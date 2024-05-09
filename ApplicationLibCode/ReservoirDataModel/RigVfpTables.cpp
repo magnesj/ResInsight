@@ -496,27 +496,6 @@ RimVfpDefines::FlowingGasFractionType RigVfpTables::getFlowingGasFractionType( c
     }
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigVfpTables::importFromTextFiles( const std::vector<std::string>& filenames )
-{
-    for ( const std::string& filePath : filenames )
-    {
-        const std::vector<Opm::VFPInjTable> injTables = RiaOpmParserTools::extractVfpInjectionTables( filePath );
-        m_injectionTables.insert( m_injectionTables.end(), injTables.begin(), injTables.end() );
-
-        const std::vector<Opm::VFPProdTable> prodTables = RiaOpmParserTools::extractVfpProductionTables( filePath );
-        m_productionTables.insert( m_productionTables.end(), prodTables.begin(), prodTables.end() );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigVfpTables::importFromSimulatorInputFile( const std::string& filename )
-{
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

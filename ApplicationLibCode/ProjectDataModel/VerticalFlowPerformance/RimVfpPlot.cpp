@@ -456,27 +456,19 @@ void RimVfpPlot::onLoadDataAndUpdate()
             QFileInfo fi( filePath );
             wellName = fi.baseName();
 
-            // Try to read the file as an prod table first (most common)
-            const std::vector<Opm::VFPProdTable> prodTables = RiaOpmParserTools::extractVfpProductionTables( filePath.toStdString() );
-            if ( !prodTables.empty() )
+            const auto [vfpProdTables, vfpInjTables] = RiaOpmParserTools::extractVfpTablesFromDataFile( filePath.toStdString() );
+
+            if ( !vfpProdTables.empty() )
             {
-                auto table = prodTables.front();
-
+                auto table = vfpProdTables.front();
                 m_vfpTables->addProductionTable( table );
-
                 initializeFromTable( table );
             }
-            else
+            else if ( !vfpInjTables.empty() )
             {
-                const std::vector<Opm::VFPInjTable> injTables = RiaOpmParserTools::extractVfpInjectionTables( filePath.toStdString() );
-                if ( !injTables.empty() )
-                {
-                    auto table = injTables.front();
-
-                    m_vfpTables->addInjectionTable( table );
-
-                    initializeFromTable( table );
-                }
+                auto table = vfpInjTables.front();
+                m_vfpTables->addInjectionTable( table );
+                initializeFromTable( table );
             }
         }
     }
