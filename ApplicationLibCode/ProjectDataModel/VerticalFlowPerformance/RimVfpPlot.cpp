@@ -134,6 +134,8 @@ RimVfpPlot::RimVfpPlot()
     setAsPlotMdiWindow();
 
     setDeletable( true );
+
+    m_vfpTables = std::make_unique<RigVfpTables>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -231,18 +233,35 @@ void RimVfpPlot::updateLegend()
 //--------------------------------------------------------------------------------------------------
 QString RimVfpPlot::asciiDataForPlotExport() const
 {
+    auto tableText = m_vfpTables->asciiDataForTable( m_tableNumber(),
+                                                     m_primaryVariable(),
+                                                     m_familyVariable(),
+                                                     m_interpolatedVariable(),
+                                                     m_flowingPhase(),
+                                                     tableSelection() );
+
+    QString wellName;
+
     QString filePath = m_filePath.v().path();
     if ( !filePath.isEmpty() )
     {
         QFileInfo fi( filePath );
         QString   wellName = fi.baseName();
+    }
 
+    QString plotTitle =
+        generatePlotTitle( wellName, m_tableNumber(), m_tableType(), m_interpolatedVariable(), m_primaryVariable(), m_familyVariable() );
+
+    return QString( "%1\n\n%2" ).arg( plotTitle ).arg( tableText );
+
+    /*
         VfpPlotData plotData;
         if ( m_tableType() == RimVfpDefines::TableType::PRODUCTION )
         {
             if ( m_prodTable )
             {
-                populatePlotData( *m_prodTable, m_primaryVariable(), m_familyVariable(), m_interpolatedVariable(), m_flowingPhase(), plotData );
+                populatePlotData( *m_prodTable, m_primaryVariable(), m_familyVariable(), m_interpolatedVariable(), m_flowingPhase(), plotData
+       );
             }
         }
         else
@@ -294,9 +313,7 @@ QString RimVfpPlot::asciiDataForPlotExport() const
         }
 
         return QString( "%1\n\n%2" ).arg( plotTitle ).arg( dataText );
-    }
-
-    return {};
+    */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -372,9 +389,6 @@ void RimVfpPlot::zoomAll()
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::setProductionTable( const Opm::VFPProdTable& table )
 {
-    m_prodTable = std::make_unique<Opm::VFPProdTable>( table );
-    m_injectionTable.reset();
-
     m_vfpTables->addProductionTable( table );
 }
 
@@ -383,9 +397,6 @@ void RimVfpPlot::setProductionTable( const Opm::VFPProdTable& table )
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::setInjectionTable( const Opm::VFPInjTable& table )
 {
-    m_prodTable.reset();
-    m_injectionTable = std::make_unique<Opm::VFPInjTable>( table );
-
     m_vfpTables->addInjectionTable( table );
 }
 
@@ -494,7 +505,7 @@ void RimVfpPlot::onLoadDataAndUpdate()
 
     QString wellName;
 
-    if ( !m_dataIsImportedExternally )
+    if ( !m_dataIsImportedExternally && !m_vfpTables->isAnyTableAvailable() )
     {
         QString filePath = m_filePath.v().path();
         if ( !filePath.isEmpty() )
@@ -503,43 +514,46 @@ void RimVfpPlot::onLoadDataAndUpdate()
             wellName = fi.baseName();
 
             // Try to read the file as an prod table first (most common)
-            const std::vector<Opm::VFPProdTable> tables = RiaOpmParserTools::extractVfpProductionTables( filePath.toStdString() );
-            if ( !tables.empty() )
+            const std::vector<Opm::VFPProdTable> prodTables = RiaOpmParserTools::extractVfpProductionTables( filePath.toStdString() );
+            if ( !prodTables.empty() )
             {
-                setProductionTable( tables[0] );
+                auto table = prodTables.front();
+
+                m_vfpTables->addProductionTable( table );
+
+                m_tableType            = RimVfpDefines::TableType::PRODUCTION;
+                m_tableNumber          = table.getTableNum();
+                m_referenceDepth       = table.getDatumDepth();
+                m_flowingPhase         = getFlowingPhaseType( table );
+                m_flowingGasFraction   = getFlowingGasFractionType( table );
+                m_flowingWaterFraction = getFlowingWaterFractionType( table );
             }
             else
             {
-                const std::vector<Opm::VFPInjTable> tables = RiaOpmParserTools::extractVfpInjectionTables( filePath.toStdString() );
-                if ( !tables.empty() )
+                const std::vector<Opm::VFPInjTable> injTables = RiaOpmParserTools::extractVfpInjectionTables( filePath.toStdString() );
+                if ( !injTables.empty() )
                 {
-                    setInjectionTable( tables[0] );
+                    auto table = injTables.front();
+
+                    m_vfpTables->addInjectionTable( table );
+
+                    m_tableType      = RimVfpDefines::TableType::INJECTION;
+                    m_tableNumber    = table.getTableNum();
+                    m_referenceDepth = table.getDatumDepth();
+                    m_flowingPhase   = getFlowingPhaseType( table );
                 }
             }
         }
     }
 
-    if ( m_prodTable )
-    {
-        auto table             = *m_prodTable;
-        m_tableType            = RimVfpDefines::TableType::PRODUCTION;
-        m_tableNumber          = table.getTableNum();
-        m_referenceDepth       = table.getDatumDepth();
-        m_flowingPhase         = getFlowingPhaseType( table );
-        m_flowingGasFraction   = getFlowingGasFractionType( table );
-        m_flowingWaterFraction = getFlowingWaterFractionType( table );
-        populatePlotWidgetWithCurveData( m_plotWidget, table, m_primaryVariable(), m_familyVariable() );
-    }
-    else if ( m_injectionTable )
-    {
-        auto table = *m_injectionTable;
+    auto vfpPlotData = m_vfpTables->populatePlotData( m_tableNumber(),
+                                                      m_primaryVariable(),
+                                                      m_familyVariable(),
+                                                      m_interpolatedVariable(),
+                                                      m_flowingPhase(),
+                                                      tableSelection() );
 
-        m_tableType      = RimVfpDefines::TableType::INJECTION;
-        m_tableNumber    = table.getTableNum();
-        m_referenceDepth = table.getDatumDepth();
-        m_flowingPhase   = getFlowingPhaseType( table );
-        populatePlotWidgetWithCurveData( m_plotWidget, table );
-    }
+    populatePlotWidgetWithPlotData( m_plotWidget, vfpPlotData );
 
     updatePlotTitle(
         generatePlotTitle( wellName, m_tableNumber(), m_tableType(), m_interpolatedVariable(), m_primaryVariable(), m_familyVariable() ) );
@@ -1096,16 +1110,13 @@ RimVfpDefines::FlowingWaterFractionType RimVfpPlot::getFlowingWaterFractionType(
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::calculateTableValueOptions( RimVfpDefines::ProductionVariableType variableType, QList<caf::PdmOptionItemInfo>& options )
 {
-    if ( m_prodTable )
-    {
-        std::vector<double> values = getProductionTableData( *m_prodTable, variableType );
+    auto values = m_vfpTables->getProductionTableData( m_tableNumber(), variableType );
 
-        for ( size_t i = 0; i < values.size(); i++ )
-        {
-            options.push_back(
-                caf::PdmOptionItemInfo( QString( "%1 %2" ).arg( convertToDisplayUnit( values[i], variableType ) ).arg( getDisplayUnit( variableType ) ),
-                                        static_cast<int>( i ) ) );
-        }
+    for ( size_t i = 0; i < values.size(); i++ )
+    {
+        options.push_back(
+            caf::PdmOptionItemInfo( QString( "%1 %2" ).arg( convertToDisplayUnit( values[i], variableType ) ).arg( getDisplayUnit( variableType ) ),
+                                    static_cast<int>( i ) ) );
     }
 }
 
@@ -1171,4 +1182,12 @@ void RimVfpPlot::scheduleReplot()
     {
         m_plotWidget->scheduleReplot();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+VfpTableSelection RimVfpPlot::tableSelection() const
+{
+    return { m_flowRateIdx(), m_thpIdx(), m_articifialLiftQuantityIdx(), m_waterCutIdx(), m_gasLiquidRatioIdx() };
 }

@@ -32,6 +32,7 @@ class RiuPlotWidget;
 class VfpPlotData;
 class RimPlotAxisProperties;
 class RigVfpTables;
+struct VfpTableSelection;
 
 //--------------------------------------------------------------------------------------------------
 /// Vertical Flow Performance Plot
@@ -81,6 +82,8 @@ private:
     void scheduleReplot();
 
 private:
+    VfpTableSelection tableSelection() const;
+
     RiuPlotWidget* doCreatePlotViewWidget( QWidget* mainWindowParent ) override;
 
     void                populatePlotWidgetWithCurveData( RiuPlotWidget* plotWidget, const Opm::VFPInjTable& table );
@@ -175,10 +178,8 @@ private:
 
     caf::PdmChildArrayField<RimPlotCurve*> m_plotCurves;
 
-    QPointer<RiuPlotWidget>            m_plotWidget;
-    std::unique_ptr<Opm::VFPProdTable> m_prodTable;
-    std::unique_ptr<Opm::VFPInjTable>  m_injectionTable;
-    std::unique_ptr<RigVfpTables>      m_vfpTables;
+    QPointer<RiuPlotWidget>       m_plotWidget;
+    std::unique_ptr<RigVfpTables> m_vfpTables;
 
     bool m_dataIsImportedExternally;
 };
