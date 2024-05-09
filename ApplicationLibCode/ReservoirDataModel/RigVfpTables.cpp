@@ -158,6 +158,59 @@ VfpPlotData RigVfpTables::populatePlotData( const Opm::VFPProdTable&            
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+VfpPlotData RigVfpTables::populatePlotData( int                                     tableIndex,
+                                            RimVfpDefines::ProductionVariableType   primaryVariable,
+                                            RimVfpDefines::ProductionVariableType   familyVariable,
+                                            RimVfpDefines::InterpolatedVariableType interpolatedVariable,
+                                            RimVfpDefines::FlowingPhaseType         flowingPhase,
+                                            const VfpTableSelection&                tableSelection )
+{
+    auto prodTable = productionTable( tableIndex );
+    if ( prodTable.has_value() )
+    {
+        return populatePlotData( *prodTable, primaryVariable, familyVariable, interpolatedVariable, flowingPhase, tableSelection );
+    };
+
+    auto injContainer = injectionTable( tableIndex );
+    if ( injContainer.has_value() )
+    {
+        return populatePlotData( *injContainer, interpolatedVariable, flowingPhase );
+    };
+
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RigVfpTables::asciiDataForTable( int                                     tableNumber,
+                                         RimVfpDefines::ProductionVariableType   primaryVariable,
+                                         RimVfpDefines::ProductionVariableType   familyVariable,
+                                         RimVfpDefines::InterpolatedVariableType interpolatedVariable,
+                                         RimVfpDefines::FlowingPhaseType         flowingPhase,
+                                         const VfpTableSelection&                tableSelection ) const
+{
+    VfpPlotData plotData;
+    auto        prodTable = productionTable( tableNumber );
+    if ( prodTable.has_value() )
+    {
+        plotData = populatePlotData( *prodTable, primaryVariable, familyVariable, interpolatedVariable, flowingPhase, tableSelection );
+    }
+    else
+    {
+        auto injTable = injectionTable( tableNumber );
+        if ( injTable.has_value() )
+        {
+            plotData = populatePlotData( *injTable, interpolatedVariable, flowingPhase );
+        }
+    }
+
+    return textForPlotData( plotData );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RigVfpTables::axisTitle( RimVfpDefines::ProductionVariableType variableType, RimVfpDefines::FlowingPhaseType flowingPhase )
 {
     QString title;
@@ -305,6 +358,20 @@ std::vector<double> RigVfpTables::getProductionTableData( const Opm::VFPProdTabl
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<double> RigVfpTables::getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType )
+{
+    auto prodTable = productionTable( tableIndex );
+    if ( prodTable.has_value() )
+    {
+        return getProductionTableData( *prodTable, variableType );
+    }
+
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 size_t RigVfpTables::getVariableIndex( const Opm::VFPProdTable&              table,
                                        RimVfpDefines::ProductionVariableType targetVariable,
                                        RimVfpDefines::ProductionVariableType primaryVariable,
@@ -360,6 +427,78 @@ std::optional<Opm::VFPProdTable> RigVfpTables::productionTable( int tableNumber 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimVfpDefines::FlowingPhaseType RigVfpTables::getFlowingPhaseType( const Opm::VFPProdTable& table )
+{
+    switch ( table.getFloType() )
+    {
+        case Opm::VFPProdTable::FLO_TYPE::FLO_OIL:
+            return RimVfpDefines::FlowingPhaseType::OIL;
+        case Opm::VFPProdTable::FLO_TYPE::FLO_GAS:
+            return RimVfpDefines::FlowingPhaseType::GAS;
+        case Opm::VFPProdTable::FLO_TYPE::FLO_LIQ:
+            return RimVfpDefines::FlowingPhaseType::LIQUID;
+        default:
+            return RimVfpDefines::FlowingPhaseType::INVALID;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimVfpDefines::FlowingPhaseType RigVfpTables::getFlowingPhaseType( const Opm::VFPInjTable& table )
+{
+    switch ( table.getFloType() )
+    {
+        case Opm::VFPInjTable::FLO_TYPE::FLO_OIL:
+            return RimVfpDefines::FlowingPhaseType::OIL;
+        case Opm::VFPInjTable::FLO_TYPE::FLO_GAS:
+            return RimVfpDefines::FlowingPhaseType::GAS;
+        case Opm::VFPInjTable::FLO_TYPE::FLO_WAT:
+            return RimVfpDefines::FlowingPhaseType::WATER;
+        default:
+            return RimVfpDefines::FlowingPhaseType::INVALID;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimVfpDefines::FlowingWaterFractionType RigVfpTables::getFlowingWaterFractionType( const Opm::VFPProdTable& table )
+{
+    switch ( table.getWFRType() )
+    {
+        case Opm::VFPProdTable::WFR_TYPE::WFR_WOR:
+            return RimVfpDefines::FlowingWaterFractionType::WOR;
+        case Opm::VFPProdTable::WFR_TYPE::WFR_WCT:
+            return RimVfpDefines::FlowingWaterFractionType::WCT;
+        case Opm::VFPProdTable::WFR_TYPE::WFR_WGR:
+            return RimVfpDefines::FlowingWaterFractionType::WGR;
+        default:
+            return RimVfpDefines::FlowingWaterFractionType::INVALID;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimVfpDefines::FlowingGasFractionType RigVfpTables::getFlowingGasFractionType( const Opm::VFPProdTable& table )
+{
+    switch ( table.getGFRType() )
+    {
+        case Opm::VFPProdTable::GFR_TYPE::GFR_GOR:
+            return RimVfpDefines::FlowingGasFractionType::GOR;
+        case Opm::VFPProdTable::GFR_TYPE::GFR_GLR:
+            return RimVfpDefines::FlowingGasFractionType::GLR;
+        case Opm::VFPProdTable::GFR_TYPE::GFR_OGR:
+            return RimVfpDefines::FlowingGasFractionType::OGR;
+        default:
+            return RimVfpDefines::FlowingGasFractionType::INVALID;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RigVfpTables::importFromTextFiles( const std::vector<std::string>& filenames )
 {
     for ( const std::string& filePath : filenames )
@@ -398,36 +537,37 @@ void RigVfpTables::addProductionTable( const Opm::VFPProdTable& table )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RigVfpTables::asciiDataForProductionTable( int                                     tableNumber,
-                                                   RimVfpDefines::ProductionVariableType   primaryVariable,
-                                                   RimVfpDefines::ProductionVariableType   familyVariable,
-                                                   RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                                                   RimVfpDefines::FlowingPhaseType         flowingPhase,
-                                                   const VfpTableSelection&                tableSelection ) const
+bool RigVfpTables::isAnyTableAvailable() const
 {
-    QString wellName = "Injection table well";
-
-    auto tableContainer = productionTable( tableNumber );
-    if ( !tableContainer.has_value() ) return {};
-
-    auto plotData = populatePlotData( *tableContainer, primaryVariable, familyVariable, interpolatedVariable, flowingPhase, tableSelection );
-
-    return textForPlotData( plotData );
+    return !m_injectionTables.empty() || !m_productionTables.empty();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RigVfpTables::asciiDataForInjectionTable( int                                     tableNumber,
-                                                  RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                                                  RimVfpDefines::FlowingPhaseType         flowingPhase ) const
+std::vector<int> RigVfpTables::injectionTableNumbers() const
 {
-    QString wellName = "Injection table well";
+    std::vector<int> tableNumbers;
 
-    auto injTable = injectionTable( tableNumber );
-    if ( !injTable.has_value() ) return {};
+    for ( const auto& table : m_injectionTables )
+    {
+        tableNumbers.push_back( table.getTableNum() );
+    }
 
-    auto plotData = populatePlotData( *injTable, interpolatedVariable, flowingPhase );
+    return tableNumbers;
+}
 
-    return textForPlotData( plotData );
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RigVfpTables::productionTableNumbers() const
+{
+    std::vector<int> tableNumbers;
+
+    for ( const auto& table : m_productionTables )
+    {
+        tableNumbers.push_back( table.getTableNum() );
+    }
+
+    return tableNumbers;
 }

@@ -74,6 +74,15 @@ struct VfpTableSelection
     int m_gasLiquidRatioIdx;
 };
 
+struct VfpTableInitialData
+{
+    int                                     m_tableNumber;
+    double                                  m_referenceDepth;
+    RimVfpDefines::FlowingPhaseType         m_flowingPhase;
+    RimVfpDefines::FlowingWaterFractionType m_waterFraction;
+    RimVfpDefines::FlowingGasFractionType   m_gasFraction;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -86,16 +95,26 @@ public:
     void addInjectionTable( const Opm::VFPInjTable& table );
     void addProductionTable( const Opm::VFPProdTable& table );
 
-    QString asciiDataForProductionTable( int                                     tableNumber,
-                                         RimVfpDefines::ProductionVariableType   primaryVariable,
-                                         RimVfpDefines::ProductionVariableType   familyVariable,
-                                         RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                                         RimVfpDefines::FlowingPhaseType         flowingPhase,
-                                         const VfpTableSelection&                tableSelection ) const;
+    bool isAnyTableAvailable() const;
 
-    QString asciiDataForInjectionTable( int                                     tableNumber,
-                                        RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                                        RimVfpDefines::FlowingPhaseType         flowingPhase ) const;
+    std::vector<int> injectionTableNumbers() const;
+    std::vector<int> productionTableNumbers() const;
+
+    std::vector<double> getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType );
+
+    VfpPlotData populatePlotData( int                                     tableIndex,
+                                  RimVfpDefines::ProductionVariableType   primaryVariable,
+                                  RimVfpDefines::ProductionVariableType   familyVariable,
+                                  RimVfpDefines::InterpolatedVariableType interpolatedVariable,
+                                  RimVfpDefines::FlowingPhaseType         flowingPhase,
+                                  const VfpTableSelection&                tableSelection );
+
+    QString asciiDataForTable( int                                     tableNumber,
+                               RimVfpDefines::ProductionVariableType   primaryVariable,
+                               RimVfpDefines::ProductionVariableType   familyVariable,
+                               RimVfpDefines::InterpolatedVariableType interpolatedVariable,
+                               RimVfpDefines::FlowingPhaseType         flowingPhase,
+                               const VfpTableSelection&                tableSelection ) const;
 
 private:
     void clearTables();
@@ -131,6 +150,11 @@ private:
 
     std::optional<Opm::VFPInjTable>  injectionTable( int tableNumber ) const;
     std::optional<Opm::VFPProdTable> productionTable( int tableNumber ) const;
+
+    static RimVfpDefines::FlowingPhaseType         getFlowingPhaseType( const Opm::VFPProdTable& table );
+    static RimVfpDefines::FlowingPhaseType         getFlowingPhaseType( const Opm::VFPInjTable& table );
+    static RimVfpDefines::FlowingWaterFractionType getFlowingWaterFractionType( const Opm::VFPProdTable& table );
+    static RimVfpDefines::FlowingGasFractionType   getFlowingGasFractionType( const Opm::VFPProdTable& table );
 
 private:
     std::vector<Opm::VFPInjTable>  m_injectionTables;
