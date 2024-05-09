@@ -25,14 +25,17 @@
 
 #include <QPointer>
 
-#include "opm/input/eclipse/Schedule/VFPInjTable.hpp"
-#include "opm/input/eclipse/Schedule/VFPProdTable.hpp"
-
 class RiuPlotWidget;
 class VfpPlotData;
 class RimPlotAxisProperties;
 class RigVfpTables;
 struct VfpTableSelection;
+
+namespace Opm
+{
+class VFPInjTable;
+class VFPProdTable;
+} // namespace Opm
 
 //--------------------------------------------------------------------------------------------------
 /// Vertical Flow Performance Plot
@@ -86,19 +89,6 @@ private:
 
     RiuPlotWidget* doCreatePlotViewWidget( QWidget* mainWindowParent ) override;
 
-    void                populatePlotWidgetWithCurveData( RiuPlotWidget* plotWidget, const Opm::VFPInjTable& table );
-    void                populatePlotWidgetWithCurveData( RiuPlotWidget*                        plotWidget,
-                                                         const Opm::VFPProdTable&              table,
-                                                         RimVfpDefines::ProductionVariableType primaryVariable,
-                                                         RimVfpDefines::ProductionVariableType familyVariable );
-    std::vector<double> getProductionTableData( const Opm::VFPProdTable& table, RimVfpDefines::ProductionVariableType variableType ) const;
-    size_t              getVariableIndex( const Opm::VFPProdTable&              table,
-                                          RimVfpDefines::ProductionVariableType targetVariable,
-                                          RimVfpDefines::ProductionVariableType primaryVariable,
-                                          size_t                                primaryValue,
-                                          RimVfpDefines::ProductionVariableType familyVariable,
-                                          size_t                                familyValue ) const;
-
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
@@ -128,18 +118,6 @@ private:
     static RimVfpDefines::FlowingWaterFractionType getFlowingWaterFractionType( const Opm::VFPProdTable& table );
     static RimVfpDefines::FlowingGasFractionType   getFlowingGasFractionType( const Opm::VFPProdTable& table );
 
-    void populatePlotData( const Opm::VFPProdTable&                table,
-                           RimVfpDefines::ProductionVariableType   primaryVariable,
-                           RimVfpDefines::ProductionVariableType   familyVariable,
-                           RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                           RimVfpDefines::FlowingPhaseType         flowingPhase,
-                           VfpPlotData&                            plotData ) const;
-
-    static void populatePlotData( const Opm::VFPInjTable&                 table,
-                                  RimVfpDefines::InterpolatedVariableType interpolatedVariable,
-                                  RimVfpDefines::FlowingPhaseType         flowingPhase,
-                                  VfpPlotData&                            plotData );
-
     void populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, const VfpPlotData& plotData );
 
     static QString axisTitle( RimVfpDefines::ProductionVariableType variableType, RimVfpDefines::FlowingPhaseType flowingPhase );
@@ -152,6 +130,9 @@ private:
 
     void onPlotZoomed();
     void curveAppearanceChanged( const caf::SignalEmitter* emitter );
+
+    void initializeFromTable( const Opm::VFPProdTable& table );
+    void initializeFromTable( const Opm::VFPInjTable& table );
 
 private:
     caf::PdmField<QString>                                               m_plotTitle;
