@@ -1,0 +1,51 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (C) 2024     Equinor ASA
+//
+//  ResInsight is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  ResInsight is distributed in the hope that it will be useful, but WITHOUT ANY
+//  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+//  FITNESS FOR A PARTICULAR PURPOSE.
+//
+//  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
+//  for more details.
+//
+/////////////////////////////////////////////////////////////////////////////////
+
+#pragma once
+
+#include "RimNamedObject.h"
+
+#include "cafFilePath.h"
+
+#include <memory>
+
+class RigVfpTables;
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+class RimVfpTableData : public RimNamedObject
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimVfpTableData();
+
+    void setFileName( const QString& filename );
+    void loadDataAndUpdate();
+
+    const RigVfpTables* vfpTables() const;
+
+private:
+    void updateObjectName();
+
+private:
+    caf::PdmField<caf::FilePath> m_filePath;
+
+    std::unique_ptr<RigVfpTables> m_vfpTables;
+};

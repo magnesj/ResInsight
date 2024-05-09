@@ -22,7 +22,10 @@
 #include "RiaGuiApplication.h"
 
 #include "RimMainPlotCollection.h"
+#include "RimOilField.h"
+#include "RimProject.h"
 
+#include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpDeck.h"
 #include "VerticalFlowPerformance/RimVfpPlot.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
@@ -85,6 +88,11 @@ void RicImportVfpDataFeature::onActionTriggered( bool isChecked )
 
     for ( const auto& fileName : fileNames )
     {
+        auto vfpDataColl = RimProject::current()->activeOilField()->vfpDataCollection();
+
+        vfpDataColl->importFromFile( fileName );
+        vfpDataColl->updateAllRequiredEditors();
+
         if ( fileName.contains( ".DATA" ) )
         {
             auto vfpDeck = vfpPlotColl->addDeck( fileName );
