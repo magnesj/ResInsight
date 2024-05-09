@@ -18,6 +18,8 @@
 
 #include "RimVfpPlotCollection.h"
 
+#include "RimMainPlotCollection.h"
+#include "RimProject.h"
 #include "RimVfpDeck.h"
 
 #include "cafCmdFeatureMenuBuilder.h"

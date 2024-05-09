@@ -22,6 +22,7 @@
 #include "RimVfpDefines.h"
 
 #include "cafFilePath.h"
+#include "cafPdmPtrField.h"
 
 #include <QPointer>
 
@@ -29,6 +30,7 @@ class RiuPlotWidget;
 class VfpPlotData;
 class RimPlotAxisProperties;
 class RigVfpTables;
+class RimVfpTableData;
 struct VfpTableSelection;
 
 namespace Opm
@@ -49,6 +51,7 @@ public:
     ~RimVfpPlot() override;
 
     void setFileName( const QString& filename );
+    void setDataSource( RimVfpTableData* vfpTableData );
 
     // RimPlot implementations
     RiuPlotWidget* plotWidget() override;
@@ -137,6 +140,7 @@ private:
 private:
     caf::PdmField<QString>                                               m_plotTitle;
     caf::PdmField<caf::FilePath>                                         m_filePath;
+    caf::PdmPtrField<RimVfpTableData*>                                   m_vfpTableData;
     caf::PdmField<int>                                                   m_tableNumber;
     caf::PdmField<double>                                                m_referenceDepth;
     caf::PdmField<caf::AppEnum<RimVfpDefines::FlowingPhaseType>>         m_flowingPhase;

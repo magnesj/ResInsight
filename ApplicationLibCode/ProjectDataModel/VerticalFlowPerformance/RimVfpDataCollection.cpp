@@ -17,6 +17,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimVfpDataCollection.h"
+
+#include "RimOilField.h"
+#include "RimProject.h"
 #include "RimVfpTableData.h"
 
 CAF_PDM_SOURCE_INIT( RimVfpDataCollection, "RimVfpDataCollection" );
@@ -34,6 +37,14 @@ RimVfpDataCollection::RimVfpDataCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimVfpDataCollection* RimVfpDataCollection::instance()
+{
+    return RimProject::current()->activeOilField()->vfpDataCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimVfpDataCollection::importFromFile( const QString& fileName )
 {
     RimVfpTableData* vfpTableData = new RimVfpTableData();
@@ -41,4 +52,12 @@ void RimVfpDataCollection::importFromFile( const QString& fileName )
     vfpTableData->loadDataAndUpdate();
 
     m_vfpTableData.push_back( vfpTableData );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimVfpTableData*> RimVfpDataCollection::vfpTableData() const
+{
+    return m_vfpTableData.childrenByType();
 }

@@ -21,6 +21,8 @@
 #include "RiaOpmParserTools.h"
 #include "RigVfpTables.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
+
 #include <QFileInfo>
 
 CAF_PDM_SOURCE_INIT( RimVfpTableData, "RimVfpTableData" );
@@ -88,4 +90,12 @@ void RimVfpTableData::updateObjectName()
         name += " - " + fileName;
     }
     setName( name );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpTableData::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicNewVfpPlotFeature";
 }

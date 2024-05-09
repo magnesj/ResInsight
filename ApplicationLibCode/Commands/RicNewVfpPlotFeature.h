@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2020- Equinor ASA
+//  Copyright (C) 2020  Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,29 +15,20 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
-
-class RimVfpTableData;
+#include "cafCmdFeature.h"
 
 //==================================================================================================
 ///
-///
 //==================================================================================================
-class RimVfpDataCollection : public caf::PdmObject
+class RicNewVfpPlotFeature : public caf::CmdFeature
 {
-    CAF_PDM_HEADER_INIT;
-
-public:
-    RimVfpDataCollection();
-
-    static RimVfpDataCollection* instance();
-
-    void                          importFromFile( const QString& fileName );
-    std::vector<RimVfpTableData*> vfpTableData() const;
+    CAF_CMD_HEADER_INIT;
 
 private:
-    caf::PdmChildArrayField<RimVfpTableData*> m_vfpTableData;
+    bool isCommandEnabled() const override;
+    void onActionTriggered( bool isChecked ) override;
+    void setupActionLook( QAction* actionToSetup ) override;
 };
