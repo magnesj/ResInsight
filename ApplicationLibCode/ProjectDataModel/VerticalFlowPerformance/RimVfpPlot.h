@@ -31,7 +31,9 @@ class VfpPlotData;
 class RimPlotAxisProperties;
 class RigVfpTables;
 class RimVfpTableData;
+
 struct VfpTableSelection;
+struct VfpTableInitialData;
 
 namespace Opm
 {
@@ -136,6 +138,9 @@ private:
 
     void initializeFromTable( const Opm::VFPProdTable& table );
     void initializeFromTable( const Opm::VFPInjTable& table );
+    void initializeFromInitData( const VfpTableInitialData& table );
+
+    const RigVfpTables* vfpTables() const;
 
 private:
     caf::PdmField<QString>                                               m_plotTitle;

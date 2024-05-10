@@ -76,6 +76,7 @@ struct VfpTableSelection
 
 struct VfpTableInitialData
 {
+    bool                                    m_isProductionTable;
     int                                     m_tableNumber;
     double                                  m_referenceDepth;
     RimVfpDefines::FlowingPhaseType         m_flowingPhase;
@@ -97,14 +98,16 @@ public:
     std::vector<int> injectionTableNumbers() const;
     std::vector<int> productionTableNumbers() const;
 
-    std::vector<double> getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType );
+    VfpTableInitialData getTableInitialData( int tableIndex ) const;
+
+    std::vector<double> getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType ) const;
 
     VfpPlotData populatePlotData( int                                     tableIndex,
                                   RimVfpDefines::ProductionVariableType   primaryVariable,
                                   RimVfpDefines::ProductionVariableType   familyVariable,
                                   RimVfpDefines::InterpolatedVariableType interpolatedVariable,
                                   RimVfpDefines::FlowingPhaseType         flowingPhase,
-                                  const VfpTableSelection&                tableSelection );
+                                  const VfpTableSelection&                tableSelection ) const;
 
     QString asciiDataForTable( int                                     tableNumber,
                                RimVfpDefines::ProductionVariableType   primaryVariable,

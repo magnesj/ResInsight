@@ -36,8 +36,6 @@ RimVfpTableData::RimVfpTableData()
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
 
-    m_vfpTables = std::make_unique<RigVfpTables>();
-
     setDeletable( true );
 }
 
@@ -55,6 +53,8 @@ void RimVfpTableData::setFileName( const QString& filename )
 void RimVfpTableData::loadDataAndUpdate()
 {
     updateObjectName();
+
+    m_vfpTables = std::make_unique<RigVfpTables>();
 
     const auto [vfpProdTables, vfpInjTables] = RiaOpmParserTools::extractVfpTablesFromDataFile( m_filePath().path().toStdString() );
     for ( const auto& prod : vfpProdTables )
@@ -87,7 +87,7 @@ void RimVfpTableData::updateObjectName()
     auto      fileName = fileInfo.fileName();
     if ( !fileName.isEmpty() )
     {
-        name += " - " + fileName;
+        name = fileName;
     }
     setName( name );
 }

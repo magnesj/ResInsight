@@ -163,7 +163,7 @@ VfpPlotData RigVfpTables::populatePlotData( int                                 
                                             RimVfpDefines::ProductionVariableType   familyVariable,
                                             RimVfpDefines::InterpolatedVariableType interpolatedVariable,
                                             RimVfpDefines::FlowingPhaseType         flowingPhase,
-                                            const VfpTableSelection&                tableSelection )
+                                            const VfpTableSelection&                tableSelection ) const
 {
     auto prodTable = productionTable( tableIndex );
     if ( prodTable.has_value() )
@@ -358,7 +358,7 @@ std::vector<double> RigVfpTables::getProductionTableData( const Opm::VFPProdTabl
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RigVfpTables::getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType )
+std::vector<double> RigVfpTables::getProductionTableData( int tableIndex, RimVfpDefines::ProductionVariableType variableType ) const
 {
     auto prodTable = productionTable( tableIndex );
     if ( prodTable.has_value() )
@@ -548,4 +548,37 @@ std::vector<int> RigVfpTables::productionTableNumbers() const
     }
 
     return tableNumbers;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+VfpTableInitialData RigVfpTables::getTableInitialData( int tableIndex ) const
+{
+    auto prodTable = productionTable( tableIndex );
+    if ( prodTable.has_value() )
+    {
+        VfpTableInitialData initialData;
+        initialData.m_isProductionTable = true;
+        initialData.m_tableNumber       = prodTable->getTableNum();
+        initialData.m_referenceDepth    = prodTable->getDatumDepth();
+        initialData.m_flowingPhase      = getFlowingPhaseType( *prodTable );
+        initialData.m_waterFraction     = getFlowingWaterFractionType( *prodTable );
+        initialData.m_gasFraction       = getFlowingGasFractionType( *prodTable );
+
+        return initialData;
+    }
+
+    auto injTable = injectionTable( tableIndex );
+    if ( injTable.has_value() )
+    {
+        VfpTableInitialData initialData;
+        initialData.m_isProductionTable = false;
+        initialData.m_tableNumber       = injTable->getTableNum();
+        initialData.m_referenceDepth    = injTable->getDatumDepth();
+        initialData.m_flowingPhase      = getFlowingPhaseType( *injTable );
+        return initialData;
+    }
+
+    return {};
 }

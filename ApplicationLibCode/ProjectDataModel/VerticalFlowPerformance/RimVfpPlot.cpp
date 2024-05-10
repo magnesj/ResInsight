@@ -244,7 +244,9 @@ void RimVfpPlot::updateLegend()
 //--------------------------------------------------------------------------------------------------
 QString RimVfpPlot::asciiDataForPlotExport() const
 {
-    auto tableText = m_vfpTables->asciiDataForTable( m_tableNumber(),
+    if ( !vfpTables() ) return {};
+
+    auto tableText = vfpTables()->asciiDataForTable( m_tableNumber(),
                                                      m_primaryVariable(),
                                                      m_familyVariable(),
                                                      m_interpolatedVariable(),
@@ -459,39 +461,36 @@ void RimVfpPlot::onLoadDataAndUpdate()
 
     QString wellName;
 
-    if ( !m_dataIsImportedExternally && !m_vfpTables->isAnyTableAvailable() )
+    if ( vfpTables() )
     {
-        QString filePath = m_filePath.v().path();
-        if ( !filePath.isEmpty() )
+        if ( !m_dataIsImportedExternally )
         {
-            QFileInfo fi( filePath );
-            wellName = fi.baseName();
-
-            const auto [vfpProdTables, vfpInjTables] = RiaOpmParserTools::extractVfpTablesFromDataFile( filePath.toStdString() );
-
-            if ( !vfpProdTables.empty() )
+            auto prodTableNumbers = vfpTables()->productionTableNumbers();
+            if ( !prodTableNumbers.empty() )
             {
-                auto table = vfpProdTables.front();
-                m_vfpTables->addProductionTable( table );
-                initializeFromTable( table );
+                auto table = vfpTables()->getTableInitialData( prodTableNumbers.front() );
+                initializeFromInitData( table );
             }
-            else if ( !vfpInjTables.empty() )
+            else
             {
-                auto table = vfpInjTables.front();
-                m_vfpTables->addInjectionTable( table );
-                initializeFromTable( table );
+                auto injTableNumbers = vfpTables()->injectionTableNumbers();
+                if ( !injTableNumbers.empty() )
+                {
+                    auto table = vfpTables()->getTableInitialData( injTableNumbers.front() );
+                    initializeFromInitData( table );
+                }
             }
         }
+
+        auto vfpPlotData = vfpTables()->populatePlotData( m_tableNumber(),
+                                                          m_primaryVariable(),
+                                                          m_familyVariable(),
+                                                          m_interpolatedVariable(),
+                                                          m_flowingPhase(),
+                                                          tableSelection() );
+
+        populatePlotWidgetWithPlotData( m_plotWidget, vfpPlotData );
     }
-
-    auto vfpPlotData = m_vfpTables->populatePlotData( m_tableNumber(),
-                                                      m_primaryVariable(),
-                                                      m_familyVariable(),
-                                                      m_interpolatedVariable(),
-                                                      m_flowingPhase(),
-                                                      tableSelection() );
-
-    populatePlotWidgetWithPlotData( m_plotWidget, vfpPlotData );
 
     updatePlotTitle(
         generatePlotTitle( wellName, m_tableNumber(), m_tableType(), m_interpolatedVariable(), m_primaryVariable(), m_familyVariable() ) );
@@ -679,6 +678,41 @@ void RimVfpPlot::initializeFromTable( const Opm::VFPInjTable& table )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimVfpPlot::initializeFromInitData( const VfpTableInitialData& table )
+{
+    m_tableType            = table.m_isProductionTable ? RimVfpDefines::TableType::PRODUCTION : RimVfpDefines::TableType::INJECTION;
+    m_tableNumber          = table.m_tableNumber;
+    m_referenceDepth       = table.m_referenceDepth;
+    m_flowingPhase         = table.m_flowingPhase;
+    m_flowingGasFraction   = table.m_gasFraction;
+    m_flowingWaterFraction = table.m_waterFraction;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const RigVfpTables* RimVfpPlot::vfpTables() const
+{
+    if ( m_vfpTableData )
+    {
+        if ( !m_vfpTableData->vfpTables() )
+        {
+            m_vfpTableData->loadDataAndUpdate();
+        }
+        return m_vfpTableData->vfpTables();
+    }
+
+    if ( m_vfpTables )
+    {
+        return m_vfpTables.get();
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 double RimVfpPlot::convertToDisplayUnit( double value, RimVfpDefines::ProductionVariableType variableType )
 {
     if ( variableType == RimVfpDefines::ProductionVariableType::THP )
@@ -814,7 +848,7 @@ QList<caf::PdmOptionItemInfo> RimVfpPlot::calculateValueOptions( const caf::PdmF
         RimVfpDataCollection* vfpDataCollection = RimVfpDataCollection::instance();
         for ( auto table : vfpDataCollection->vfpTableData() )
         {
-            options.push_back( caf::PdmOptionItemInfo( table->uiName(), table ) );
+            options.push_back( caf::PdmOptionItemInfo( table->name(), table ) );
         }
     }
 
@@ -898,13 +932,16 @@ RimVfpDefines::FlowingWaterFractionType RimVfpPlot::getFlowingWaterFractionType(
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::calculateTableValueOptions( RimVfpDefines::ProductionVariableType variableType, QList<caf::PdmOptionItemInfo>& options )
 {
-    auto values = m_vfpTables->getProductionTableData( m_tableNumber(), variableType );
-
-    for ( size_t i = 0; i < values.size(); i++ )
+    if ( vfpTables() )
     {
-        options.push_back(
-            caf::PdmOptionItemInfo( QString( "%1 %2" ).arg( convertToDisplayUnit( values[i], variableType ) ).arg( getDisplayUnit( variableType ) ),
-                                    static_cast<int>( i ) ) );
+        auto values = vfpTables()->getProductionTableData( m_tableNumber(), variableType );
+
+        for ( size_t i = 0; i < values.size(); i++ )
+        {
+            options.push_back(
+                caf::PdmOptionItemInfo( QString( "%1 %2" ).arg( convertToDisplayUnit( values[i], variableType ) ).arg( getDisplayUnit( variableType ) ),
+                                        static_cast<int>( i ) ) );
+        }
     }
 }
 
