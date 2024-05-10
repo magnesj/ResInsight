@@ -1053,7 +1053,10 @@ std::pair<cvf::ref<RigWellPath>, QString> RimWellPathCollection::loadWellPathGeo
                                                                                                const QString&    fileId )
 {
     auto [fileContents, errorMessage] = osduConnector->requestFileContentsById( fileId );
-    qDebug() << "File contents:" << fileContents;
+    if ( !errorMessage.isEmpty() )
+    {
+        return { nullptr, errorMessage };
+    }
 
     return RifOsduWellPathReader::parseCsv( fileContents );
 }

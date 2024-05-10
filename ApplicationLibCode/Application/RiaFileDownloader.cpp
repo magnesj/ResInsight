@@ -7,6 +7,8 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 
+#include "RiaLogging.h"
+
 RiaFileDownloader::RiaFileDownloader( QObject* parent )
     : QObject( parent )
 {
@@ -17,7 +19,7 @@ void RiaFileDownloader::downloadFile( const QUrl& url, const QString& filePath )
     QNetworkAccessManager* manager = new QNetworkAccessManager( this );
     QNetworkRequest        request( url );
 
-    qDebug() << "Downloading from:" << url;
+    RiaLogging::debug( "Downloading from: " + url.toString() );
 
     QNetworkReply* reply = manager->get( request );
 
@@ -27,7 +29,7 @@ void RiaFileDownloader::downloadFile( const QUrl& url, const QString& filePath )
              {
                  if ( reply->error() )
                  {
-                     qDebug() << "Download failed:" << reply->errorString();
+                     RiaLogging::error( "Download failed:" + reply->errorString() );
                      emit done();
                  }
                  else
@@ -37,12 +39,12 @@ void RiaFileDownloader::downloadFile( const QUrl& url, const QString& filePath )
                      {
                          file.write( reply->readAll() );
                          file.close();
-                         qDebug() << "Download succeeded. File saved to" << filePath;
+                         RiaLogging::info( "Download succeeded. File saved to " + filePath );
                          emit done();
                      }
                      else
                      {
-                         qDebug() << "Failed to save file to" << filePath;
+                         RiaLogging::info( "Failed to save file to " + filePath );
                          emit done();
                      }
                  }

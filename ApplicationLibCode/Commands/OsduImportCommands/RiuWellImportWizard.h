@@ -192,7 +192,6 @@ public:
 
     void setOsduWellbores( const QString& wellId, const std::vector<OsduWellbore>& osduWellbores )
     {
-        qDebug() << "Setting well bores: " << wellId << " => " << osduWellbores.size();
         m_map[wellId] = osduWellbores;
         m_osduWellbores.clear();
         for ( auto [name, values] : m_map )

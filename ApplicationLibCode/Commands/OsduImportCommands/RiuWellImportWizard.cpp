@@ -282,7 +282,6 @@ void FieldSelectionPage::initializePage()
 void FieldSelectionPage::fieldsFinished()
 {
     std::vector<OsduField> fields = m_osduConnector->fields();
-    qDebug() << "Setting " << fields.size() << " fields";
     m_osduFieldsModel->setOsduFields( fields );
 }
 
@@ -291,7 +290,6 @@ void FieldSelectionPage::fieldsFinished()
 //--------------------------------------------------------------------------------------------------
 void FieldSelectionPage::selectField( const QItemSelection& newSelection, const QItemSelection& oldSelection )
 {
-    qDebug() << "Select field: " << newSelection.indexes().size();
     if ( !newSelection.indexes().empty() )
     {
         QModelIndex          index   = newSelection.indexes()[0];
@@ -360,7 +358,6 @@ void WellSelectionPage::initializePage()
     if ( !wiz ) return;
 
     QString fieldId = wiz->selectedFieldId();
-    qDebug() << "FIELD ID: " << fieldId;
     wiz->downloadWells( fieldId );
 
     setButtonText( QWizard::NextButton, "Next" );
@@ -379,9 +376,6 @@ WellSelectionPage::~WellSelectionPage()
 void WellSelectionPage::wellsFinished()
 {
     std::vector<OsduWell> wells = m_osduConnector->wells();
-
-    qDebug() << "WELLS FINISHED: " << wells.size();
-
     for ( auto w : wells )
     {
         m_osduConnector->requestWellboresByWellId( w.id );
@@ -394,8 +388,6 @@ void WellSelectionPage::wellsFinished()
 void WellSelectionPage::wellboresFinished( const QString& wellId )
 {
     std::vector<OsduWellbore> wellbores = m_osduConnector->wellbores( wellId );
-    qDebug() << "Wellbores for " << wellId << ": " << wellbores.size();
-    // TODO: change to an append operation
     if ( !wellbores.empty() ) m_osduWellboresModel->setOsduWellbores( wellId, wellbores );
 }
 
@@ -413,7 +405,6 @@ bool WellSelectionPage::isComplete() const
 //--------------------------------------------------------------------------------------------------
 void WellSelectionPage::selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection )
 {
-    qDebug() << "Select wellbore: " << newSelection.indexes().size();
     if ( !newSelection.indexes().empty() )
     {
         QModelIndex          index      = newSelection.indexes()[0];
@@ -455,8 +446,6 @@ void WellSummaryPage::initializePage()
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
 
     QString wellboreId = wiz->selectedWellboreId();
-    qDebug() << "WELL BORE ID: " << wellboreId;
-
     wiz->downloadWellPaths( wellboreId );
 }
 
@@ -479,15 +468,13 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
     std::vector<OsduWellboreTrajectory> wellboreTrajectories = m_osduConnector->wellboreTrajectories( wellboreId );
     std::vector<OsduWell>               wells                = m_osduConnector->wells();
 
-    qDebug() << "WELL TRAJECTORY FINISHED: " << wellboreId << ":" << wellboreTrajectories.size();
-
     auto findWellForWellId = []( const std::vector<OsduWell>& wells, const QString& wellId ) -> std::optional<const OsduWell>
     {
         auto it = std::find_if( wells.begin(), wells.end(), [wellId]( const OsduWell& w ) { return w.id == wellId; } );
         if ( it != wells.end() )
             return std::optional<const OsduWell>( *it );
         else
-            return {}; // QString();
+            return {};
     };
 
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );

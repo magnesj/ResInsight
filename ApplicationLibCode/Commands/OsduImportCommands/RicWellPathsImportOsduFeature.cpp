@@ -21,6 +21,7 @@
 
 #include "RiaApplication.h"
 #include "RiaGuiApplication.h"
+#include "RiaLogging.h"
 #include "RiaOsduConnector.h"
 #include "RiaPreferences.h"
 
@@ -122,8 +123,6 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
         std::vector<RiuWellImportWizard::WellInfo> importedWells = wellImportwizard.importedWells();
         for ( auto w : importedWells )
         {
-            qDebug() << "IMPORTING WELL: " << w.name;
-
             auto wellPath = new RimOsduWellPath;
             wellPath->setName( w.name );
             wellPath->setWellId( w.wellId );
@@ -140,7 +139,7 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
             }
             else
             {
-                qDebug() << "IMPORTING WELL FAILED: " << errorMessage;
+                RiaLogging::error( "Importing OSDU well failed: " + errorMessage );
             }
 
             oilField->wellPathCollection->updateConnectedEditors();

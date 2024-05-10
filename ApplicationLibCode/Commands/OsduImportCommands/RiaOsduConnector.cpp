@@ -43,18 +43,16 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
 
     m_osdu = new QOAuth2AuthorizationCodeFlow( this );
 
-    qDebug() << "SSL BUILD VERSION: " << QSslSocket::sslLibraryBuildVersionString();
-    qDebug() << "SSL SUPPORTS SSL: " << QSslSocket::supportsSsl();
-    qDebug() << "SSL VERSION STRING: " << QSslSocket::sslLibraryVersionString();
+    RiaLogging::debug( "SSL BUILD VERSION: " + QSslSocket::sslLibraryBuildVersionString() );
+    RiaLogging::debug( "SSL VERSION STRING: " + QSslSocket::sslLibraryVersionString() );
 
-    printf( "REQUEST TOKEN\n" );
     int port = 35327;
 
     connect( m_osdu,
              &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
              []( QUrl url )
              {
-                 printf( "AUTHORIZE WITH URL. Thread: %p\n", QThread::currentThread() );
+                 RiaLogging::info( "Authorize with url: " + url.toString() );
                  QUrlQuery query( url );
                  url.setQuery( query );
                  QDesktopServices::openUrl( url );
@@ -78,7 +76,6 @@ RiaOsduConnector::RiaOsduConnector( QObject*       parent,
 
 void RiaOsduConnector::accessGranted()
 {
-    qDebug() << "ACCESS GRANTED!!" << QThread::currentThread();
     m_token = m_osdu->token();
     emit tokenReady( m_token );
 }
@@ -88,7 +85,7 @@ void RiaOsduConnector::accessGranted()
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestToken()
 {
-    qDebug() << "Request token: " << QThread::currentThread();
+    RiaLogging::debug( "Requesting token." );
     m_osdu->grant();
 }
 
@@ -243,7 +240,7 @@ void RiaOsduConnector::requestWellboreTrajectoryByWellboreId( const QString& ser
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::requestFileDownloadByFileId( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fileId )
 {
-    qDebug() << "Requesting download of file id: " << fileId;
+    RiaLogging::info( "Requesting download of file id: " + fileId );
     auto reply = makeDownloadRequest( server, dataPartitionId, fileId, token );
     connect( reply,
              &QNetworkReply::finished,
@@ -255,14 +252,13 @@ void RiaOsduConnector::requestFileDownloadByFileId( const QString& server, const
                  }
                  else
                  {
-                     qDebug() << "ERROR!!!!!!!!!!!!!!!!!!!!!!!!";
-                     qDebug() << reply->errorString();
+                     RiaLogging::error( "File request for id " + fileId + " failed." + reply->errorString() );
                  }
              } );
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+//
 //--------------------------------------------------------------------------------------------------
 QString RiaOsduConnector::constructSearchUrl( const QString& server )
 {
@@ -324,39 +320,29 @@ QNetworkReply* RiaOsduConnector::makeRequest( const std::map<QString, QString>& 
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::parseFields( QNetworkReply* reply )
 {
-    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
-
     QByteArray result = reply->readAll();
-
     reply->deleteLater();
 
-    QJsonDocument doc = QJsonDocument::fromJson( result );
-    // Extract the JSON object from the QJsonDocument
-    QJsonObject jsonObj = doc.object();
-
-    // Access "results" array from the JSON object
-    QJsonArray resultsArray = jsonObj["results"].toArray();
-
-    // Iterate through each element in the "results" array
-    // qDebug() << "Found " << resultsArray.size() << " items.";
-
-    m_fields.clear();
-
-    foreach ( const QJsonValue& value, resultsArray )
+    if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonObject resultObj = value.toObject();
+        QJsonDocument doc          = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj      = doc.object();
+        QJsonArray    resultsArray = jsonObj["results"].toArray();
 
-        // Accessing specific fields from the result object
-        QString id        = resultObj["id"].toString();
-        QString kind      = resultObj["kind"].toString();
-        QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
+        m_fields.clear();
 
-        qDebug() << "Id:" << id << " kind: " << kind << " name: " << fieldName;
-        qDebug() << resultObj;
-        m_fields.push_back( OsduField{ id, kind, fieldName } );
+        foreach ( const QJsonValue& value, resultsArray )
+        {
+            QJsonObject resultObj = value.toObject();
+
+            QString id        = resultObj["id"].toString();
+            QString kind      = resultObj["kind"].toString();
+            QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
+            m_fields.push_back( OsduField{ id, kind, fieldName } );
+        }
+
+        emit fieldsFinished();
     }
-
-    emit fieldsFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -364,38 +350,29 @@ void RiaOsduConnector::parseFields( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::parseWells( QNetworkReply* reply )
 {
-    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
-
     QByteArray result = reply->readAll();
-
     reply->deleteLater();
 
-    QJsonDocument doc = QJsonDocument::fromJson( result );
-    // Extract the JSON object from the QJsonDocument
-    QJsonObject jsonObj = doc.object();
-
-    // Access "results" array from the JSON object
-    QJsonArray resultsArray = jsonObj["results"].toArray();
-
-    // Iterate through each element in the "results" array
-    qDebug() << "Found " << resultsArray.size() << " wells.";
-
-    m_wells.clear();
-    foreach ( const QJsonValue& value, resultsArray )
+    if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonObject resultObj = value.toObject();
+        QJsonDocument doc          = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj      = doc.object();
+        QJsonArray    resultsArray = jsonObj["results"].toArray();
 
-        // Accessing specific fields from the result object
-        QString id   = resultObj["id"].toString();
-        QString kind = resultObj["kind"].toString();
-        QString name = resultObj["data"].toObject()["FacilityName"].toString();
+        RiaLogging::info( QString( "Found %1 wells." ).arg( +resultsArray.size() ) );
 
-        qDebug() << "Id:" << id << " kind: " << kind << " name: " << name;
-        qDebug() << resultObj;
-        m_wells.push_back( OsduWell{ id, kind, name } );
+        m_wells.clear();
+        foreach ( const QJsonValue& value, resultsArray )
+        {
+            QJsonObject resultObj = value.toObject();
+            QString     id        = resultObj["id"].toString();
+            QString     kind      = resultObj["kind"].toString();
+            QString     name      = resultObj["data"].toObject()["FacilityName"].toString();
+            m_wells.push_back( OsduWell{ id, kind, name } );
+        }
+
+        emit wellsFinished();
     }
-
-    emit wellsFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -403,39 +380,29 @@ void RiaOsduConnector::parseWells( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::parseWellbores( QNetworkReply* reply, const QString& wellId )
 {
-    qDebug() << "REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
-
     QByteArray result = reply->readAll();
-
     reply->deleteLater();
 
-    QJsonDocument doc = QJsonDocument::fromJson( result );
-    // Extract the JSON object from the QJsonDocument
-    QJsonObject jsonObj = doc.object();
-
-    // Access "results" array from the JSON object
-    QJsonArray resultsArray = jsonObj["results"].toArray();
-
-    // Iterate through each element in the "results" array
-    qDebug() << "Found " << resultsArray.size() << " items.";
-
-    m_wellbores[wellId].clear();
-    foreach ( const QJsonValue& value, resultsArray )
+    if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonObject resultObj = value.toObject();
+        QJsonDocument doc          = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj      = doc.object();
+        QJsonArray    resultsArray = jsonObj["results"].toArray();
 
-        // Accessing specific fields from the result object
-        QString id   = resultObj["id"].toString();
-        QString kind = resultObj["kind"].toString();
-        QString name = resultObj["data"].toObject()["FacilityName"].toString();
+        RiaLogging::info( QString( "Found %1 wellbores." ).arg( resultsArray.size() ) );
 
-        qDebug() << "Id:" << id << " kind: " << kind << " name: " << name;
-        qDebug() << resultObj;
+        m_wellbores[wellId].clear();
+        foreach ( const QJsonValue& value, resultsArray )
+        {
+            QJsonObject resultObj = value.toObject();
+            QString     id        = resultObj["id"].toString();
+            QString     kind      = resultObj["kind"].toString();
+            QString     name      = resultObj["data"].toObject()["FacilityName"].toString();
+            m_wellbores[wellId].push_back( OsduWellbore{ id, kind, name, wellId } );
+        }
 
-        m_wellbores[wellId].push_back( OsduWellbore{ id, kind, name, wellId } );
+        emit wellboresFinished( wellId );
     }
-
-    emit wellboresFinished( wellId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -443,51 +410,37 @@ void RiaOsduConnector::parseWellbores( QNetworkReply* reply, const QString& well
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString& wellboreId )
 {
-    qDebug() << "WELL TRAJECTORY REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
-
     QByteArray result = reply->readAll();
-
     reply->deleteLater();
 
-    QJsonDocument doc = QJsonDocument::fromJson( result );
-    // Extract the JSON object from the QJsonDocument
-    QJsonObject jsonObj = doc.object();
-
-    // QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
-    // qDebug() << formattedJsonString;
-    qDebug() << jsonObj;
-
-    // Access "results" array from the JSON object
-    QJsonArray resultsArray = jsonObj["results"].toArray();
-
-    // Iterate through each element in the "results" array
-    //  qDebug() << "Found " << resultsArray.size() << " items.";
-    m_wellboreTrajectories.clear();
-    foreach ( const QJsonValue& value, resultsArray )
+    if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonObject resultObj = value.toObject();
-
-        // Accessing specific fields from the result object
-        QJsonObject dataObj = resultObj["data"].toObject();
-
-        //    QJsonArray id = resultObj["data"].toArray();
-        QJsonArray dataSets = dataObj["Datasets"].toArray();
-        if ( dataSets.size() == 1 )
+        QJsonDocument doc          = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj      = doc.object();
+        QJsonArray    resultsArray = jsonObj["results"].toArray();
+        m_wellboreTrajectories.clear();
+        foreach ( const QJsonValue& value, resultsArray )
         {
-            QString id          = resultObj["id"].toString();
-            QString kind        = resultObj["kind"].toString();
-            QString dataSetId   = dataSets[0].toString();
-            QString description = dataObj["Description"].toString();
+            QJsonObject resultObj = value.toObject();
+            QJsonObject dataObj   = resultObj["data"].toObject();
+            QJsonArray  dataSets  = dataObj["Datasets"].toArray();
+            if ( dataSets.size() == 1 )
+            {
+                QString id          = resultObj["id"].toString();
+                QString kind        = resultObj["kind"].toString();
+                QString dataSetId   = dataSets[0].toString();
+                QString description = dataObj["Description"].toString();
 
-            m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, description, dataSetId, wellboreId } );
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, description, dataSetId, wellboreId } );
+            }
+            else if ( dataSets.size() > 1 )
+            {
+                RiaLogging::error( "Encountered dataset with more than on file: currently not supported." );
+            }
         }
-        else if ( dataSets.size() > 1 )
-        {
-            RiaLogging::error( "Encountered dataset with more than on file: currently not supported." );
-        }
+
+        emit wellboreTrajectoryFinished( wellboreId );
     }
-
-    emit wellboreTrajectoryFinished( wellboreId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -495,43 +448,39 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
 //--------------------------------------------------------------------------------------------------
 void RiaOsduConnector::saveFile( QNetworkReply* reply, const QString& fileId )
 {
-    qDebug() << "SAVE FILE: REQUEST FINISHED. Error? " << ( reply->error() != QNetworkReply::NoError );
-    // if (reply->error() == QNetworkReply::NoError) {
-
-    qDebug() << reply->errorString();
     QByteArray result = reply->readAll();
-
     reply->deleteLater();
 
-    QEventLoop loop;
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QEventLoop loop;
 
-    QJsonDocument doc = QJsonDocument::fromJson( result );
-    // Extract the JSON object from the QJsonDocument
-    QJsonObject jsonObj = doc.object();
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
 
-    QString signedUrl = jsonObj["SignedUrl"].toString();
+        QString signedUrl = jsonObj["SignedUrl"].toString();
 
-    RiaFileDownloader* downloader = new RiaFileDownloader;
-    QUrl               url( signedUrl );
-    QString            filePath = "/tmp/" + generateRandomString( 30 ) + ".txt";
+        RiaFileDownloader* downloader = new RiaFileDownloader;
+        QUrl               url( signedUrl );
+        QString            filePath = "/tmp/" + generateRandomString( 30 ) + ".txt";
 
-    QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
-    qDebug() << formattedJsonString;
+        QString formattedJsonString = doc.toJson( QJsonDocument::Indented );
 
-    printf( "%s => %s\n", signedUrl.toStdString().c_str(), filePath.toStdString().c_str() );
-    connect( this, SIGNAL( fileDownloadFinished( const QString&, const QString& ) ), &loop, SLOT( quit() ) );
-    connect( downloader,
-             &RiaFileDownloader::done,
-             [this, fileId, filePath]()
-             {
-                 printf( "Download complete %s => %s\n", fileId.toStdString().c_str(), filePath.toStdString().c_str() );
-                 emit( fileDownloadFinished( fileId, filePath ) );
-             } );
-    printf( "Starting download\n" );
-    downloader->downloadFile( url, filePath );
+        RiaLogging::info( QString( "File download: %1 => %2" ).arg( signedUrl ).arg( filePath ) );
+        connect( this, SIGNAL( fileDownloadFinished( const QString&, const QString& ) ), &loop, SLOT( quit() ) );
+        connect( downloader,
+                 &RiaFileDownloader::done,
+                 [this, fileId, filePath]()
+                 {
+                     RiaLogging::info( QString( "Download complete %1 => %2" ).arg( fileId ).arg( filePath ) );
+                     emit( fileDownloadFinished( fileId, filePath ) );
+                 } );
+        RiaLogging::info( "Starting download" );
+        downloader->downloadFile( url, filePath );
 
-    downloader->deleteLater();
-    loop.exec();
+        downloader->deleteLater();
+        loop.exec();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -681,8 +630,6 @@ std::pair<QString, QString> RiaOsduConnector::requestFileContentsById( const QSt
         requestToken();
         loop.exec();
     }
-
-    qDebug() << "Got token: " << m_token;
 
     QEventLoop loop2;
     connect( this,
