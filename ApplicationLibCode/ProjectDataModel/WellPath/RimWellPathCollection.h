@@ -132,6 +132,8 @@ public:
 
     void onChildAdded( caf::PdmFieldHandle* containerForNewObject ) override;
 
+    static std::pair<cvf::ref<RigWellPath>, QString> loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector, const QString& fileId );
+
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
@@ -155,8 +157,6 @@ private:
     static void buildUiTreeOrdering( cafTreeNode* treeNode, caf::PdmUiTreeOrdering* parentUiTreeNode, const QString& uiConfigName );
 
     static QString unGroupedText();
-
-    RigWellPath* loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector, const QString& fileId );
 
 private:
     std::unique_ptr<RifWellPathImporter>           m_wellPathImporter;

@@ -24,6 +24,8 @@
 #include "RiaOsduConnector.h"
 #include "RiaPreferences.h"
 
+#include "RigWellPath.h"
+
 #include "RiaPreferencesOsdu.h"
 #include "RimFileWellPath.h"
 #include "RimOilField.h"
@@ -35,6 +37,8 @@
 
 #include "RiuMainWindow.h"
 #include "RiuWellImportWizard.h"
+
+#include "cvfObject.h"
 
 #include <QAction>
 #include <QDir>
@@ -128,6 +132,17 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
             wellPath->setFileId( w.fileId );
 
             oilField->wellPathCollection->addWellPath( wellPath );
+
+            auto [wellPathGeometry, errorMessage] = RimWellPathCollection::loadWellPathGeometryFromOsdu( m_osduConnector, w.fileId );
+            if ( wellPathGeometry.notNull() )
+            {
+                wellPath->setWellPathGeometry( wellPathGeometry.p() );
+            }
+            else
+            {
+                qDebug() << "IMPORTING WELL FAILED: " << errorMessage;
+            }
+
             oilField->wellPathCollection->updateConnectedEditors();
         }
 

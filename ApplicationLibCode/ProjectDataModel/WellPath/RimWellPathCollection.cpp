@@ -28,6 +28,7 @@
 #include "RiaTextStringTools.h"
 #include "RiaWellNameComparer.h"
 
+#include "RifOsduWellPathReader.h"
 #include "RifWellPathFormationsImporter.h"
 #include "RifWellPathImporter.h"
 
@@ -185,8 +186,15 @@ void RimWellPathCollection::loadDataAndUpdate()
             auto osduConnector =
                 std::make_unique<RiaOsduConnector>( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
 
-            RigWellPath* wellPathGeometry = loadWellPathGeometryFromOsdu( osduConnector.get(), oWPath->fileId() );
-            oWPath->setWellPathGeometry( wellPathGeometry );
+            auto [wellPathGeometry, errorMessage] = loadWellPathGeometryFromOsdu( osduConnector.get(), oWPath->fileId() );
+            if ( wellPathGeometry.notNull() )
+            {
+                oWPath->setWellPathGeometry( wellPathGeometry.p() );
+            }
+            else
+            {
+                RiaLogging::warning( errorMessage );
+            }
         }
 
         if ( wellPath )
@@ -1041,10 +1049,11 @@ void RimWellPathCollection::onChildAdded( caf::PdmFieldHandle* containerForNewOb
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigWellPath* RimWellPathCollection::loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector, const QString& fileId )
+std::pair<cvf::ref<RigWellPath>, QString> RimWellPathCollection::loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector,
+                                                                                               const QString&    fileId )
 {
     auto [fileContents, errorMessage] = osduConnector->requestFileContentsById( fileId );
-
     qDebug() << "File contents:" << fileContents;
-    return nullptr;
+
+    return RifOsduWellPathReader::parseCsv( fileContents );
 }

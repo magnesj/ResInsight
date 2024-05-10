@@ -253,6 +253,11 @@ void RiaOsduConnector::requestFileDownloadByFileId( const QString& server, const
                  {
                      saveFile( reply, fileId );
                  }
+                 else
+                 {
+                     qDebug() << "ERROR!!!!!!!!!!!!!!!!!!!!!!!!";
+                     qDebug() << reply->errorString();
+                 }
              } );
 }
 
@@ -668,11 +673,14 @@ void RiaOsduConnector::fileDownloadComplete( const QString& fileId, const QStrin
 //--------------------------------------------------------------------------------------------------
 std::pair<QString, QString> RiaOsduConnector::requestFileContentsById( const QString& fileId )
 {
-    // TODO: improve this..
-    QEventLoop loop;
-    connect( this, SIGNAL( tokenReady( const QString& ) ), &loop, SLOT( quit() ) );
-    requestToken();
-    loop.exec();
+    if ( m_token.isEmpty() )
+    {
+        // TODO: improve this..
+        QEventLoop loop;
+        connect( this, SIGNAL( tokenReady( const QString& ) ), &loop, SLOT( quit() ) );
+        requestToken();
+        loop.exec();
+    }
 
     qDebug() << "Got token: " << m_token;
 
