@@ -19,6 +19,7 @@
 #include "RimVfpTableData.h"
 
 #include "RiaOpmParserTools.h"
+
 #include "RigVfpTables.h"
 
 #include "cafCmdFeatureMenuBuilder.h"

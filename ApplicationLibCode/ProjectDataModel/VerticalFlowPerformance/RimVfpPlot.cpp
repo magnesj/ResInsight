@@ -661,12 +661,12 @@ void RimVfpPlot::initializeFromTable( const Opm::VFPInjTable& table )
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::initializeFromInitData( const VfpTableInitialData& table )
 {
-    m_tableType            = table.m_isProductionTable ? RimVfpDefines::TableType::PRODUCTION : RimVfpDefines::TableType::INJECTION;
-    m_tableNumber          = table.m_tableNumber;
-    m_referenceDepth       = table.m_referenceDepth;
-    m_flowingPhase         = table.m_flowingPhase;
-    m_flowingGasFraction   = table.m_gasFraction;
-    m_flowingWaterFraction = table.m_waterFraction;
+    m_tableType            = table.isProductionTable ? RimVfpDefines::TableType::PRODUCTION : RimVfpDefines::TableType::INJECTION;
+    m_tableNumber          = table.tableNumber;
+    m_referenceDepth       = table.datumDepth;
+    m_flowingPhase         = table.flowingPhase;
+    m_flowingGasFraction   = table.gasFraction;
+    m_flowingWaterFraction = table.waterFraction;
 }
 
 //--------------------------------------------------------------------------------------------------

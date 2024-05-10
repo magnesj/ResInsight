@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2020  Equinor ASA
+//  Copyright (C) 2024     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -27,17 +27,10 @@
 #include "cafSelectionManagerTools.h"
 
 #include "RiuPlotMainWindowTools.h"
+
 #include <QAction>
 
 CAF_CMD_SOURCE_INIT( RicNewVfpPlotFeature, "RicNewVfpPlotFeature" );
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RicNewVfpPlotFeature::isCommandEnabled() const
-{
-    return true;
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -23,7 +23,6 @@
 #include <QString>
 
 #include <optional>
-#include <string>
 #include <vector>
 
 namespace Opm
@@ -67,21 +66,21 @@ private:
 
 struct VfpTableSelection
 {
-    int m_flowRateIdx;
-    int m_thpIdx;
-    int m_articifialLiftQuantityIdx;
-    int m_waterCutIdx;
-    int m_gasLiquidRatioIdx;
+    int flowRateIdx;
+    int thpIdx;
+    int articifialLiftQuantityIdx;
+    int waterCutIdx;
+    int gasLiquidRatioIdx;
 };
 
 struct VfpTableInitialData
 {
-    bool                                    m_isProductionTable;
-    int                                     m_tableNumber;
-    double                                  m_referenceDepth;
-    RimVfpDefines::FlowingPhaseType         m_flowingPhase;
-    RimVfpDefines::FlowingWaterFractionType m_waterFraction;
-    RimVfpDefines::FlowingGasFractionType   m_gasFraction;
+    bool                                    isProductionTable;
+    int                                     tableNumber;
+    double                                  datumDepth;
+    RimVfpDefines::FlowingPhaseType         flowingPhase;
+    RimVfpDefines::FlowingWaterFractionType waterFraction;
+    RimVfpDefines::FlowingGasFractionType   gasFraction;
 };
 
 //==================================================================================================
@@ -92,8 +91,6 @@ class RigVfpTables
 public:
     void addInjectionTable( const Opm::VFPInjTable& table );
     void addProductionTable( const Opm::VFPProdTable& table );
-
-    bool isAnyTableAvailable() const;
 
     std::vector<int> injectionTableNumbers() const;
     std::vector<int> productionTableNumbers() const;
@@ -117,8 +114,6 @@ public:
                                const VfpTableSelection&                tableSelection ) const;
 
 private:
-    void clearTables();
-
     static VfpPlotData populatePlotData( const Opm::VFPInjTable&                 table,
                                          RimVfpDefines::InterpolatedVariableType interpolatedVariable,
                                          RimVfpDefines::FlowingPhaseType         flowingPhase );
