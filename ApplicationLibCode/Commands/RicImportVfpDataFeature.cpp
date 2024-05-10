@@ -22,8 +22,6 @@
 #include "RiaGuiApplication.h"
 
 #include "RimMainPlotCollection.h"
-#include "RimOilField.h"
-#include "RimProject.h"
 
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpDeck.h"
@@ -86,51 +84,14 @@ void RicImportVfpDataFeature::onActionTriggered( bool isChecked )
     std::vector<RimVfpPlot*> vfpPlots;
     std::vector<RimVfpDeck*> vfpDecks;
 
+    auto vfpDataColl = RimVfpDataCollection::instance();
+
     for ( const auto& fileName : fileNames )
     {
-        auto vfpDataColl = RimProject::current()->activeOilField()->vfpDataCollection();
-
-        vfpDataColl->importFromFile( fileName );
+        auto vfpDataSource = vfpDataColl->importFromFile( fileName );
+        auto firstPlot     = vfpPlotColl->createAndAppendPlots( vfpDataSource );
         vfpDataColl->updateAllRequiredEditors();
-
-        if ( fileName.contains( ".DATA" ) )
-        {
-            auto vfpDeck = vfpPlotColl->addDeck( fileName );
-            vfpDecks.push_back( vfpDeck );
-        }
-        else
-        {
-            auto vfpPlot = new RimVfpPlot();
-            vfpPlot->setFileName( fileName );
-            vfpPlotColl->addPlot( vfpPlot );
-
-            vfpPlots.push_back( vfpPlot );
-        }
-    }
-
-    vfpPlotColl->updateConnectedEditors();
-
-    for ( auto deck : vfpDecks )
-    {
-        deck->loadDataAndUpdate();
-        deck->updateConnectedEditors();
-    }
-
-    for ( auto plot : vfpPlots )
-    {
-        plot->loadDataAndUpdate();
-    }
-
-    RiuPlotMainWindowTools::showPlotMainWindow();
-
-    if ( !vfpPlots.empty() )
-    {
-        RiuPlotMainWindowTools::onObjectAppended( vfpPlots.front() );
-    }
-
-    if ( !vfpDecks.empty() )
-    {
-        RiuPlotMainWindowTools::onObjectAppended( vfpDecks.front() );
+        RiuPlotMainWindowTools::onObjectAppended( firstPlot, firstPlot );
     }
 }
 

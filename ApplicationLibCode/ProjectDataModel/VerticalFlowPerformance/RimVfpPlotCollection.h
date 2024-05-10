@@ -37,6 +37,8 @@ public:
     RimVfpPlotCollection();
     ~RimVfpPlotCollection() override;
 
+    RimVfpPlot* createAndAppendPlots( RimVfpTableData* tableData );
+
     void                     addPlot( RimVfpPlot* newPlot ) override;
     std::vector<RimVfpPlot*> plots() const override;
     RimVfpPlot*              plotForTableNumber( int tableNumber ) const;
@@ -46,13 +48,13 @@ public:
     void   removePlot( RimVfpPlot* vfpPlot ) final;
     void   deleteAllPlots() override;
 
-    RimVfpDeck* addDeck( const QString& filename );
-
 private:
     void loadDataAndUpdateAllPlots() override;
     void onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects ) override;
 
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+
+    void addDeck( RimVfpDeck* deck );
 
 private:
     caf::PdmChildArrayField<RimVfpPlot*> m_vfpPlots;

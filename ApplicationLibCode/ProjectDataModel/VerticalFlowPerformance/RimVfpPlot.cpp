@@ -68,7 +68,9 @@ RimVfpPlot::RimVfpPlot()
     CAF_PDM_InitField( &m_plotTitle, "PlotTitle", QString( "VFP Plot" ), "Plot Title" );
     m_plotTitle.uiCapability()->setUiHidden( true );
 
-    CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
+    CAF_PDM_InitFieldNoDefault( &m_filePath_OBSOLETE, "FilePath", "File Path" );
+    m_filePath_OBSOLETE.xmlCapability()->setIOWritable( false );
+
     CAF_PDM_InitFieldNoDefault( &m_vfpTableData, "VfpTableData", "VFP Data Source" );
 
     caf::AppEnum<RimVfpDefines::TableType> defaultTableType = RimVfpDefines::TableType::INJECTION;
@@ -153,17 +155,28 @@ RimVfpPlot::~RimVfpPlot()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpPlot::setFileName( const QString& filename )
+void RimVfpPlot::setDataSource( RimVfpTableData* vfpTableData )
 {
-    m_filePath = filename;
+    m_vfpTableData = vfpTableData;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpPlot::setDataSource( RimVfpTableData* vfpTableData )
+void RimVfpPlot::setTableNumber( int tableNumber )
 {
-    m_vfpTableData = vfpTableData;
+    m_tableNumber = tableNumber;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpPlot::initializeObject()
+{
+    if ( !vfpTables() ) return;
+
+    auto table = vfpTables()->getTableInitialData( m_tableNumber() );
+    initializeFromInitData( table );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -255,11 +268,18 @@ QString RimVfpPlot::asciiDataForPlotExport() const
 
     QString wellName;
 
-    QString filePath = m_filePath.v().path();
-    if ( !filePath.isEmpty() )
+    if ( m_vfpTableData )
     {
-        QFileInfo fi( filePath );
-        QString   wellName = fi.baseName();
+        wellName = m_vfpTableData->name();
+    }
+    else
+    {
+        QString filePath = m_filePath_OBSOLETE.v().path();
+        if ( !filePath.isEmpty() )
+        {
+            QFileInfo fi( filePath );
+            QString   wellName = fi.baseName();
+        }
     }
 
     QString plotTitle =
@@ -334,26 +354,6 @@ void RimVfpPlot::zoomAll()
     setAutoScaleYEnabled( true );
 
     updatePlotWidgetFromAxisRanges();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimVfpPlot::setProductionTable( const Opm::VFPProdTable& table )
-{
-    m_vfpTables->addProductionTable( table );
-
-    initializeFromTable( table );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimVfpPlot::setInjectionTable( const Opm::VFPInjTable& table )
-{
-    m_vfpTables->addInjectionTable( table );
-
-    initializeFromTable( table );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -463,25 +463,6 @@ void RimVfpPlot::onLoadDataAndUpdate()
 
     if ( vfpTables() )
     {
-        if ( !m_dataIsImportedExternally )
-        {
-            auto prodTableNumbers = vfpTables()->productionTableNumbers();
-            if ( !prodTableNumbers.empty() )
-            {
-                auto table = vfpTables()->getTableInitialData( prodTableNumbers.front() );
-                initializeFromInitData( table );
-            }
-            else
-            {
-                auto injTableNumbers = vfpTables()->injectionTableNumbers();
-                if ( !injTableNumbers.empty() )
-                {
-                    auto table = vfpTables()->getTableInitialData( injTableNumbers.front() );
-                    initializeFromInitData( table );
-                }
-            }
-        }
-
         auto vfpPlotData = vfpTables()->populatePlotData( m_tableNumber(),
                                                           m_primaryVariable(),
                                                           m_familyVariable(),
@@ -695,10 +676,7 @@ const RigVfpTables* RimVfpPlot::vfpTables() const
 {
     if ( m_vfpTableData )
     {
-        if ( !m_vfpTableData->vfpTables() )
-        {
-            m_vfpTableData->loadDataAndUpdate();
-        }
+        m_vfpTableData->ensureDataIsImported();
         return m_vfpTableData->vfpTables();
     }
 
@@ -767,8 +745,6 @@ QString RimVfpPlot::getDisplayUnit( RimVfpDefines::ProductionVariableType variab
 //--------------------------------------------------------------------------------------------------
 void RimVfpPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_filePath );
-    m_filePath.uiCapability()->setUiReadOnly( m_dataIsImportedExternally );
     uiOrdering.add( &m_vfpTableData );
 
     uiOrdering.add( &m_tableType );

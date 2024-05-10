@@ -18,27 +18,16 @@
 
 #include "RicNewVfpPlotFeature.h"
 
-#include "RiaApplication.h"
-#include "RiaGuiApplication.h"
-
 #include "RimMainPlotCollection.h"
-#include "RimOilField.h"
-#include "RimProject.h"
 
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
-#include "VerticalFlowPerformance/RimVfpDeck.h"
-#include "VerticalFlowPerformance/RimVfpPlot.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 #include "VerticalFlowPerformance/RimVfpTableData.h"
 
-#include "RiuFileDialogTools.h"
-#include "RiuPlotMainWindow.h"
-#include "RiuPlotMainWindowTools.h"
-
 #include "cafSelectionManagerTools.h"
 
+#include "RiuPlotMainWindowTools.h"
 #include <QAction>
-#include <QFileInfo>
 
 CAF_CMD_SOURCE_INIT( RicNewVfpPlotFeature, "RicNewVfpPlotFeature" );
 
@@ -63,13 +52,11 @@ void RicNewVfpPlotFeature::onActionTriggered( bool isChecked )
     {
         for ( auto tableData : selectedTableData )
         {
-            auto vfpPlot = new RimVfpPlot();
-            vfpPlot->setDataSource( tableData );
-            vfpPlotColl->addPlot( vfpPlot );
+            RimVfpPlot* firstPlot = vfpPlotColl->createAndAppendPlots( tableData );
+            vfpPlotColl->updateConnectedEditors();
+            RiuPlotMainWindowTools::onObjectAppended( firstPlot, firstPlot );
         }
     }
-
-    vfpPlotColl->updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -18,9 +18,8 @@
 
 #include "RimVfpPlotCollection.h"
 
-#include "RimMainPlotCollection.h"
-#include "RimProject.h"
 #include "RimVfpDeck.h"
+#include "RimVfpTableData.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 
@@ -42,6 +41,48 @@ RimVfpPlotCollection::RimVfpPlotCollection()
 //--------------------------------------------------------------------------------------------------
 RimVfpPlotCollection::~RimVfpPlotCollection()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimVfpPlot* RimVfpPlotCollection::createAndAppendPlots( RimVfpTableData* tableData )
+{
+    if ( !tableData ) return nullptr;
+
+    tableData->ensureDataIsImported();
+
+    if ( !tableData->vfpTables() ) return nullptr;
+
+    RimVfpPlot* firstPlot = nullptr;
+
+    if ( tableData->tableCount() > 1 )
+    {
+        auto* deck = new RimVfpDeck();
+        deck->setDataSource( tableData );
+        addDeck( deck );
+        deck->loadDataAndUpdate();
+        deck->updateAllRequiredEditors();
+
+        auto plots = deck->plots();
+        if ( !plots.empty() )
+        {
+            firstPlot = plots.front();
+        }
+    }
+    else
+    {
+        auto vfpPlot = new RimVfpPlot();
+        vfpPlot->setDataSource( tableData );
+        vfpPlot->initializeObject();
+
+        addPlot( vfpPlot );
+        vfpPlot->loadDataAndUpdate();
+
+        firstPlot = vfpPlot;
+    }
+
+    return firstPlot;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -104,13 +145,9 @@ void RimVfpPlotCollection::removePlot( RimVfpPlot* vfpPlot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimVfpDeck* RimVfpPlotCollection::addDeck( const QString& filename )
+void RimVfpPlotCollection::addDeck( RimVfpDeck* deck )
 {
-    auto* deck = new RimVfpDeck();
-    deck->setFileName( filename );
     m_vfpDecks.push_back( deck );
-
-    return deck;
 }
 
 //--------------------------------------------------------------------------------------------------

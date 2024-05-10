@@ -52,8 +52,9 @@ public:
     RimVfpPlot();
     ~RimVfpPlot() override;
 
-    void setFileName( const QString& filename );
     void setDataSource( RimVfpTableData* vfpTableData );
+    void setTableNumber( int tableNumber );
+    void initializeObject();
 
     // RimPlot implementations
     RiuPlotWidget* plotWidget() override;
@@ -75,8 +76,6 @@ public:
     QImage   snapshotWindowContent() override;
     void     zoomAll() override;
 
-    void setProductionTable( const Opm::VFPProdTable& table );
-    void setInjectionTable( const Opm::VFPInjTable& table );
     void setDataIsImportedExternally( bool dataIsImportedExternally );
     int  tableNumber() const;
 
@@ -144,7 +143,6 @@ private:
 
 private:
     caf::PdmField<QString>                                               m_plotTitle;
-    caf::PdmField<caf::FilePath>                                         m_filePath;
     caf::PdmPtrField<RimVfpTableData*>                                   m_vfpTableData;
     caf::PdmField<int>                                                   m_tableNumber;
     caf::PdmField<double>                                                m_referenceDepth;
@@ -168,8 +166,10 @@ private:
 
     caf::PdmChildArrayField<RimPlotCurve*> m_plotCurves;
 
-    QPointer<RiuPlotWidget>       m_plotWidget;
+    QPointer<RiuPlotWidget> m_plotWidget;
+
     std::unique_ptr<RigVfpTables> m_vfpTables;
+    caf::PdmField<caf::FilePath>  m_filePath_OBSOLETE;
 
     bool m_dataIsImportedExternally;
 };

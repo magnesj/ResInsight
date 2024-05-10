@@ -50,8 +50,10 @@ void RimVfpTableData::setFileName( const QString& filename )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpTableData::loadDataAndUpdate()
+void RimVfpTableData::ensureDataIsImported()
 {
+    if ( m_vfpTables ) return;
+
     updateObjectName();
 
     m_vfpTables = std::make_unique<RigVfpTables>();
@@ -66,6 +68,19 @@ void RimVfpTableData::loadDataAndUpdate()
     {
         m_vfpTables->addInjectionTable( inj );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RimVfpTableData::tableCount() const
+{
+    if ( m_vfpTables )
+    {
+        return m_vfpTables->injectionTableNumbers().size() + m_vfpTables->productionTableNumbers().size();
+    }
+
+    return 0;
 }
 
 //--------------------------------------------------------------------------------------------------

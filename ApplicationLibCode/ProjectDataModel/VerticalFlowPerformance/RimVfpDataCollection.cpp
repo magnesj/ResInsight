@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2020- Equinor ASA
+//  Copyright (C) 2024     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -45,13 +45,15 @@ RimVfpDataCollection* RimVfpDataCollection::instance()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpDataCollection::importFromFile( const QString& fileName )
+RimVfpTableData* RimVfpDataCollection::importFromFile( const QString& fileName )
 {
-    RimVfpTableData* vfpTableData = new RimVfpTableData();
+    auto* vfpTableData = new RimVfpTableData();
     vfpTableData->setFileName( fileName );
-    vfpTableData->loadDataAndUpdate();
+    vfpTableData->ensureDataIsImported();
 
     m_vfpTableData.push_back( vfpTableData );
+
+    return vfpTableData;
 }
 
 //--------------------------------------------------------------------------------------------------

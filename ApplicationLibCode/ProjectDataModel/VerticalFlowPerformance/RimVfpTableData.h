@@ -37,7 +37,9 @@ public:
     RimVfpTableData();
 
     void setFileName( const QString& filename );
-    void loadDataAndUpdate();
+    void ensureDataIsImported();
+
+    size_t tableCount() const;
 
     const RigVfpTables* vfpTables() const;
 
