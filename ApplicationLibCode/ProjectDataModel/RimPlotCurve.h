@@ -24,7 +24,6 @@
 
 #include "RiuPlotAxis.h"
 #include "RiuQwtPlotCurveDefines.h"
-#include "RiuQwtSymbol.h"
 
 #include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
@@ -34,7 +33,6 @@
 #include "cafPdmPtrArrayField.h"
 
 #include <QPointer>
-#include <Qt>
 
 class RiuPlotCurve;
 class RiuPlotWidget;
@@ -104,7 +102,7 @@ public:
 
     virtual void updateCurveVisibility();
     void         updateLegendEntryVisibilityAndPlotLegend();
-    void         updateLegendEntryVisibilityNoPlotUpdate();
+    virtual void updateLegendEntryVisibilityNoPlotUpdate();
     virtual void replotParentPlot();
 
     bool showInLegend() const;
@@ -182,7 +180,7 @@ protected:
     void         onCurveAppearanceChanged( const caf::SignalEmitter* emitter );
     virtual void onFillColorChanged( const caf::SignalEmitter* emitter );
 
-    bool         canCurveBeAttached() const;
+    virtual bool canCurveBeAttached() const;
     virtual void clearErrorBars();
     void         checkAndApplyDefaultFillColor();
 
