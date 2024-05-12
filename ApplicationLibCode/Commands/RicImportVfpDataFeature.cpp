@@ -93,6 +93,8 @@ void RicImportVfpDataFeature::onActionTriggered( bool isChecked )
         vfpDataColl->updateAllRequiredEditors();
         RiuPlotMainWindowTools::onObjectAppended( firstPlot, firstPlot );
     }
+
+    vfpPlotColl->updateAllRequiredEditors();
 }
 
 //--------------------------------------------------------------------------------------------------

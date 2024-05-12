@@ -38,8 +38,7 @@
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
-// NB! Special macro for pure virtual class
-CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimPlotCurve, "PlotCurve" );
+CAF_PDM_SOURCE_INIT( RimPlotCurve, "PlotCurve" );
 
 //--------------------------------------------------------------------------------------------------
 ///
