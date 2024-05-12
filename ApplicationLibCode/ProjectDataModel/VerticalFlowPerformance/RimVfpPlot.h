@@ -117,11 +117,6 @@ private:
 
     static QString getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType );
 
-    static RimVfpDefines::FlowingPhaseType         getFlowingPhaseType( const Opm::VFPProdTable& table );
-    static RimVfpDefines::FlowingPhaseType         getFlowingPhaseType( const Opm::VFPInjTable& table );
-    static RimVfpDefines::FlowingWaterFractionType getFlowingWaterFractionType( const Opm::VFPProdTable& table );
-    static RimVfpDefines::FlowingGasFractionType   getFlowingGasFractionType( const Opm::VFPProdTable& table );
-
     void populatePlotWidgetWithPlotData( RiuPlotWidget* plotWidget, const VfpPlotData& plotData );
 
     static QString axisTitle( RimVfpDefines::ProductionVariableType variableType, RimVfpDefines::FlowingPhaseType flowingPhase );
@@ -135,8 +130,6 @@ private:
     void onPlotZoomed();
     void curveAppearanceChanged( const caf::SignalEmitter* emitter );
 
-    void initializeFromTable( const Opm::VFPProdTable& table );
-    void initializeFromTable( const Opm::VFPInjTable& table );
     void initializeFromInitData( const VfpTableInitialData& table );
 
     const RigVfpTables* vfpTables() const;

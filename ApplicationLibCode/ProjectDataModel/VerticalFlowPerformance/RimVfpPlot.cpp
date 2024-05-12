@@ -175,7 +175,22 @@ void RimVfpPlot::initializeObject()
 {
     if ( !vfpTables() ) return;
 
-    auto table = vfpTables()->getTableInitialData( m_tableNumber() );
+    auto tableNumber = m_tableNumber();
+
+    // Always use the available table number if only one table is available
+    auto prodTableNumbers = vfpTables()->productionTableNumbers();
+    auto injTableNumbers  = vfpTables()->injectionTableNumbers();
+
+    if ( prodTableNumbers.size() == 1 && injTableNumbers.empty() )
+    {
+        tableNumber = prodTableNumbers.front();
+    }
+    else if ( injTableNumbers.size() == 1 && prodTableNumbers.empty() )
+    {
+        tableNumber = injTableNumbers.front();
+    }
+
+    auto table = vfpTables()->getTableInitialData( tableNumber );
     initializeFromInitData( table );
 }
 
@@ -635,30 +650,6 @@ void RimVfpPlot::curveAppearanceChanged( const caf::SignalEmitter* emitter )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimVfpPlot::initializeFromTable( const Opm::VFPProdTable& table )
-{
-    m_tableType            = RimVfpDefines::TableType::PRODUCTION;
-    m_tableNumber          = table.getTableNum();
-    m_referenceDepth       = table.getDatumDepth();
-    m_flowingPhase         = getFlowingPhaseType( table );
-    m_flowingGasFraction   = getFlowingGasFractionType( table );
-    m_flowingWaterFraction = getFlowingWaterFractionType( table );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimVfpPlot::initializeFromTable( const Opm::VFPInjTable& table )
-{
-    m_tableType      = RimVfpDefines::TableType::INJECTION;
-    m_tableNumber    = table.getTableNum();
-    m_referenceDepth = table.getDatumDepth();
-    m_flowingPhase   = getFlowingPhaseType( table );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimVfpPlot::initializeFromInitData( const VfpTableInitialData& table )
 {
     m_tableType            = table.isProductionTable ? RimVfpDefines::TableType::PRODUCTION : RimVfpDefines::TableType::INJECTION;
@@ -829,78 +820,6 @@ QList<caf::PdmOptionItemInfo> RimVfpPlot::calculateValueOptions( const caf::PdmF
     }
 
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimVfpDefines::FlowingPhaseType RimVfpPlot::getFlowingPhaseType( const Opm::VFPProdTable& table )
-{
-    switch ( table.getFloType() )
-    {
-        case Opm::VFPProdTable::FLO_TYPE::FLO_OIL:
-            return RimVfpDefines::FlowingPhaseType::OIL;
-        case Opm::VFPProdTable::FLO_TYPE::FLO_GAS:
-            return RimVfpDefines::FlowingPhaseType::GAS;
-        case Opm::VFPProdTable::FLO_TYPE::FLO_LIQ:
-            return RimVfpDefines::FlowingPhaseType::LIQUID;
-        default:
-            return RimVfpDefines::FlowingPhaseType::INVALID;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimVfpDefines::FlowingPhaseType RimVfpPlot::getFlowingPhaseType( const Opm::VFPInjTable& table )
-{
-    switch ( table.getFloType() )
-    {
-        case Opm::VFPInjTable::FLO_TYPE::FLO_OIL:
-            return RimVfpDefines::FlowingPhaseType::OIL;
-        case Opm::VFPInjTable::FLO_TYPE::FLO_GAS:
-            return RimVfpDefines::FlowingPhaseType::GAS;
-        case Opm::VFPInjTable::FLO_TYPE::FLO_WAT:
-            return RimVfpDefines::FlowingPhaseType::WATER;
-        default:
-            return RimVfpDefines::FlowingPhaseType::INVALID;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimVfpDefines::FlowingGasFractionType RimVfpPlot::getFlowingGasFractionType( const Opm::VFPProdTable& table )
-{
-    switch ( table.getGFRType() )
-    {
-        case Opm::VFPProdTable::GFR_TYPE::GFR_GOR:
-            return RimVfpDefines::FlowingGasFractionType::GOR;
-        case Opm::VFPProdTable::GFR_TYPE::GFR_GLR:
-            return RimVfpDefines::FlowingGasFractionType::GLR;
-        case Opm::VFPProdTable::GFR_TYPE::GFR_OGR:
-            return RimVfpDefines::FlowingGasFractionType::OGR;
-        default:
-            return RimVfpDefines::FlowingGasFractionType::INVALID;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimVfpDefines::FlowingWaterFractionType RimVfpPlot::getFlowingWaterFractionType( const Opm::VFPProdTable& table )
-{
-    switch ( table.getWFRType() )
-    {
-        case Opm::VFPProdTable::WFR_TYPE::WFR_WOR:
-            return RimVfpDefines::FlowingWaterFractionType::WOR;
-        case Opm::VFPProdTable::WFR_TYPE::WFR_WCT:
-            return RimVfpDefines::FlowingWaterFractionType::WCT;
-        case Opm::VFPProdTable::WFR_TYPE::WFR_WGR:
-            return RimVfpDefines::FlowingWaterFractionType::WGR;
-        default:
-            return RimVfpDefines::FlowingWaterFractionType::INVALID;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
