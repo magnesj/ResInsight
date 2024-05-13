@@ -47,6 +47,8 @@ public:
     void   removePlot( RimVfpPlot* vfpPlot ) final;
     void   deleteAllPlots() override;
 
+    static void addImportItems( caf::CmdFeatureMenuBuilder& menuBuilder );
+
 private:
     void loadDataAndUpdateAllPlots() override;
     void onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects ) override;

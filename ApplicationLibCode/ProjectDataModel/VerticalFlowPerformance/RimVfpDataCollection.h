@@ -39,5 +39,8 @@ public:
     std::vector<RimVfpTableData*> vfpTableData() const;
 
 private:
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+
+private:
     caf::PdmChildArrayField<RimVfpTableData*> m_vfpTableData;
 };

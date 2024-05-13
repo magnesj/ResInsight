@@ -20,6 +20,7 @@
 
 #include "RimOilField.h"
 #include "RimProject.h"
+#include "RimVfpPlotCollection.h"
 #include "RimVfpTableData.h"
 
 CAF_PDM_SOURCE_INIT( RimVfpDataCollection, "RimVfpDataCollection" );
@@ -62,4 +63,12 @@ RimVfpTableData* RimVfpDataCollection::importFromFile( const QString& fileName )
 std::vector<RimVfpTableData*> RimVfpDataCollection::vfpTableData() const
 {
     return m_vfpTableData.childrenByType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimVfpDataCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    RimVfpPlotCollection::addImportItems( menuBuilder );
 }

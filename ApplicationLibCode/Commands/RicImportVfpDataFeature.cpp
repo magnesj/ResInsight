@@ -42,15 +42,6 @@ CAF_CMD_SOURCE_INIT( RicImportVfpDataFeature, "RicImportVfpDataFeature" );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicImportVfpDataFeature::isCommandEnabled() const
-{
-    auto plotColl = caf::firstAncestorOfTypeFromSelectedObject<RimVfpPlotCollection>();
-    return ( plotColl != nullptr );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RicImportVfpDataFeature::onActionTriggered( bool isChecked )
 {
     RimVfpPlotCollection* vfpPlotColl = RimMainPlotCollection::current()->vfpPlotCollection();
