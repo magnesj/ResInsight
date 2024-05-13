@@ -35,13 +35,12 @@ class RimVfpPlotCollection : public caf::PdmObject, public RimTypedPlotCollectio
 
 public:
     RimVfpPlotCollection();
-    ~RimVfpPlotCollection() override;
 
     RimVfpPlot* createAndAppendPlots( RimVfpTableData* tableData );
+    RimVfpPlot* plotForTableNumber( int tableNumber ) const;
 
     void                     addPlot( RimVfpPlot* newPlot ) override;
     std::vector<RimVfpPlot*> plots() const override;
-    RimVfpPlot*              plotForTableNumber( int tableNumber ) const;
 
     size_t plotCount() const final;
     void   insertPlot( RimVfpPlot* vfpPlot, size_t index ) final;
