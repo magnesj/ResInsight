@@ -112,7 +112,7 @@ public:
 
     void setOsduFields( const std::vector<OsduField>& osduFields )
     {
-        beginInsertRows( QModelIndex(), 0, osduFields.size() );
+        beginInsertRows( QModelIndex(), 0, (int)osduFields.size() );
         m_osduFields = osduFields;
         endInsertRows();
     }
@@ -200,7 +200,7 @@ public:
                 m_osduWellbores.push_back( v );
         }
 
-        beginInsertRows( QModelIndex(), 0, m_osduWellbores.size() );
+        beginInsertRows( QModelIndex(), 0, (int)m_osduWellbores.size() );
         endInsertRows();
     }
 
