@@ -305,9 +305,6 @@ set(UNITY_EXCLUDE_FILES
     qrc_cafAnimControl.cpp
     qrc_ResInsight.cpp
     qrc_cafCommandFeatures.cpp
-    # Exclude files including opm-common
-    ProjectDataModel/RimVfpTableExtractor.cpp
-    ProjectDataModel/RimVfpPlot.cpp
 )
 
 if(RESINSIGHT_ENABLE_UNITY_BUILD)
