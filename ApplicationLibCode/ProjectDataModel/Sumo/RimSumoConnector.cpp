@@ -21,29 +21,23 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimSumoConnector::RimSumoConnector( QObject*       parent,
-                                    const QString& server,
-                                    const QString& dataPartitionId,
-                                    const QString& authority,
-                                    const QString& scopes,
-                                    const QString& clientId )
+RimSumoConnector::RimSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId )
     : QObject( parent )
     , m_server( server )
-    , m_dataPartitionId( dataPartitionId )
     , m_authority( authority )
     , m_scopes( scopes )
     , m_clientId( clientId )
 {
     m_networkAccessManager = new QNetworkAccessManager( this );
 
-    m_osdu = new QOAuth2AuthorizationCodeFlow( this );
+    m_authCodeFlow = new QOAuth2AuthorizationCodeFlow( this );
 
     RiaLogging::debug( "SSL BUILD VERSION: " + QSslSocket::sslLibraryBuildVersionString() );
     RiaLogging::debug( "SSL VERSION STRING: " + QSslSocket::sslLibraryVersionString() );
 
     int port = 35327;
 
-    connect( m_osdu,
+    connect( m_authCodeFlow,
              &QOAuth2AuthorizationCodeFlow::authorizeWithBrowser,
              []( QUrl url )
              {
@@ -54,24 +48,27 @@ RimSumoConnector::RimSumoConnector( QObject*       parent,
              } );
 
     QString authUrl = constructAuthUrl( m_authority );
-    m_osdu->setAuthorizationUrl( QUrl( authUrl ) );
+    m_authCodeFlow->setAuthorizationUrl( QUrl( authUrl ) );
 
     QString tokenUrl = constructTokenUrl( m_authority );
-    m_osdu->setAccessTokenUrl( QUrl( tokenUrl ) );
+    m_authCodeFlow->setAccessTokenUrl( QUrl( tokenUrl ) );
 
     // App key
-    m_osdu->setClientIdentifier( m_clientId );
-    m_osdu->setScope( m_scopes );
+    m_authCodeFlow->setClientIdentifier( m_clientId );
+    m_authCodeFlow->setScope( m_scopes );
 
     auto replyHandler = new RiaOsduOAuthHttpServerReplyHandler( port, this );
-    m_osdu->setReplyHandler( replyHandler );
+    m_authCodeFlow->setReplyHandler( replyHandler );
 
-    connect( m_osdu, SIGNAL( granted() ), this, SLOT( accessGranted() ) );
+    connect( m_authCodeFlow, SIGNAL( granted() ), this, SLOT( accessGranted() ) );
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSumoConnector::accessGranted()
 {
-    m_token = m_osdu->token();
+    m_token = m_authCodeFlow->token();
     emit tokenReady( m_token );
 }
 
@@ -81,7 +78,7 @@ void RimSumoConnector::accessGranted()
 void RimSumoConnector::requestToken()
 {
     RiaLogging::debug( "Requesting token." );
-    m_osdu->grant();
+    m_authCodeFlow->grant();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -96,7 +93,7 @@ RimSumoConnector::~RimSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSumoConnector::requestFieldsByName( const QString& token, const QString& fieldName )
 {
-    requestFieldsByName( m_server, m_dataPartitionId, token, fieldName );
+    requestFieldsByName( m_server, token, fieldName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,14 +107,14 @@ void RimSumoConnector::requestFieldsByName( const QString& fieldName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestFieldsByName( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fieldName )
+void RimSumoConnector::requestFieldsByName( const QString& server, const QString& token, const QString& fieldName )
 {
     std::map<QString, QString> params;
     params["kind"]  = "kind";
     params["limit"] = "10000";
     params["query"] = "data.FieldName:" + fieldName;
 
-    auto reply = makeRequest( params, server, dataPartitionId, token );
+    auto reply = makeRequest( params, server, token );
     connect( reply,
              &QNetworkReply::finished,
              [this, reply]()
@@ -164,15 +161,12 @@ QString RimSumoConnector::constructTokenUrl( const QString& authority )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QNetworkReply* RimSumoConnector::makeRequest( const std::map<QString, QString>& parameters,
-                                              const QString&                    server,
-                                              const QString&                    dataPartitionId,
-                                              const QString&                    token )
+QNetworkReply* RimSumoConnector::makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& token )
 {
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( constructSearchUrl( server ) ) );
 
-    addStandardHeader( m_networkRequest, token, dataPartitionId );
+    addStandardHeader( m_networkRequest, token );
 
     QJsonObject obj;
     for ( auto [key, value] : parameters )
@@ -260,18 +254,16 @@ void RimSumoConnector::saveFile( QNetworkReply* reply, const QString& fileId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& dataPartitionId )
+void RimSumoConnector::addStandardHeader( QNetworkRequest& networkRequest, const QString& token )
 {
     networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
     networkRequest.setRawHeader( "Authorization", "Bearer " + token.toUtf8() );
-    networkRequest.setRawHeader( QByteArray( "Data-Partition-Id" ), dataPartitionId.toUtf8() );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QNetworkReply*
-    RimSumoConnector::makeDownloadRequest( const QString& server, const QString& dataPartitionId, const QString& id, const QString& token )
+QNetworkReply* RimSumoConnector::makeDownloadRequest( const QString& server, const QString& id, const QString& token )
 {
     QNetworkRequest m_networkRequest;
 
@@ -279,7 +271,7 @@ QNetworkReply*
 
     m_networkRequest.setUrl( QUrl( url ) );
 
-    addStandardHeader( m_networkRequest, token, dataPartitionId );
+    addStandardHeader( m_networkRequest, token );
 
     auto reply = m_networkAccessManager->get( m_networkRequest );
     return reply;
@@ -308,14 +300,6 @@ QString RimSumoConnector::generateRandomString( int randomStringLength )
 QString RimSumoConnector::server() const
 {
     return m_server;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimSumoConnector::dataPartition() const
-{
-    return m_dataPartitionId;
 }
 
 //--------------------------------------------------------------------------------------------------
