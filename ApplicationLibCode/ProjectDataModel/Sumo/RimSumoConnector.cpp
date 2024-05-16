@@ -1,3 +1,21 @@
+/////////////////////////////////////////////////////////////////////////////////
+//
+//  Copyright (C) 2024     Equinor ASA
+//
+//  ResInsight is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  ResInsight is distributed in the hope that it will be useful, but WITHOUT ANY
+//  WARRANTY; without even the implied warranty of MERCHANTABILITY or
+//  FITNESS FOR A PARTICULAR PURPOSE.
+//
+//  See the GNU General Public License at <http://www.gnu.org/licenses/gpl.html>
+//  for more details.
+//
+/////////////////////////////////////////////////////////////////////////////////
+
 #include "RimSumoConnector.h"
 #include "RiaFileDownloader.h"
 #include "RiaLogging.h"
@@ -91,37 +109,30 @@ RimSumoConnector::~RimSumoConnector()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestFieldsByName( const QString& token, const QString& fieldName )
+void RimSumoConnector::requestCasesForField( const QString& fieldName )
 {
-    requestFieldsByName( m_server, token, fieldName );
-}
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( constructSearchUrl( m_server ) ) );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestFieldsByName( const QString& fieldName )
-{
-    requestFieldsByName( m_token, fieldName );
-}
+    addStandardHeader( m_networkRequest, m_token );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestFieldsByName( const QString& server, const QString& token, const QString& fieldName )
-{
-    std::map<QString, QString> params;
-    params["kind"]  = "kind";
-    params["limit"] = "10000";
-    params["query"] = "data.FieldName:" + fieldName;
+    QString payload_caseCountForFieldname = R"(
+{"size":0,"query":{"bool":{"must_not":{"exists":{"field":"_sumo.parent_object"}},"filter":[{"term":{"access.asset.name.keyword":"Drogon"}}]}},"aggs":{"masterdata.smda.field.identifier.keyword":{"terms":{"field":"masterdata.smda.field.identifier.keyword","size":500,"order":{"_key":"asc"}}}}}
+)";
 
-    auto reply = makeRequest( params, server, token );
+    QString payload_fieldNames = R"(
+{"query":{"bool":{"filter":[{"term":{"class.keyword":"case"}},{"term":{"access.asset.name.keyword":"Drogon"}}]}},"sort":[{"tracklog.datetime":{"order":"desc"}}],"track_total_hits":true,"size":20,"from":0}
+)";
+
+    auto reply = m_networkAccessManager->post( m_networkRequest, payload_fieldNames.toUtf8() );
+
     connect( reply,
              &QNetworkReply::finished,
              [this, reply]()
              {
                  if ( reply->error() == QNetworkReply::NoError )
                  {
-                     parseFields( reply );
+                     parseCases( reply );
                  }
              } );
 }
@@ -131,7 +142,7 @@ void RimSumoConnector::requestFieldsByName( const QString& server, const QString
 //--------------------------------------------------------------------------------------------------
 QString RimSumoConnector::constructSearchUrl( const QString& server )
 {
-    return server + "/api/search/v2/query";
+    return server + "/api/v1/search";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -184,30 +195,42 @@ QNetworkReply* RimSumoConnector::makeRequest( const std::map<QString, QString>& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::parseFields( QNetworkReply* reply )
+void RimSumoConnector::parseCases( QNetworkReply* reply )
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
 
     if ( reply->error() == QNetworkReply::NoError )
     {
-        QJsonDocument doc          = QJsonDocument::fromJson( result );
-        QJsonObject   jsonObj      = doc.object();
-        QJsonArray    resultsArray = jsonObj["results"].toArray();
+        QJsonDocument doc      = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj  = doc.object();
+        QJsonObject   rootHits = jsonObj["hits"].toObject();
 
-        m_fields.clear();
+        QJsonArray hitsObjects = rootHits["hits"].toArray();
 
-        foreach ( const QJsonValue& value, resultsArray )
+        m_cases.clear();
+
+        foreach ( const QJsonValue& value, hitsObjects )
         {
             QJsonObject resultObj = value.toObject();
+            auto        keys_1    = resultObj.keys();
 
-            QString id        = resultObj["id"].toString();
-            QString kind      = resultObj["kind"].toString();
-            QString fieldName = resultObj["data"].toObject()["FieldName"].toString();
-            m_fields.push_back( SumoField{ id, kind, fieldName } );
+            QJsonObject sourceObj  = resultObj["_source"].toObject();
+            auto        sourceKeys = sourceObj.keys();
+
+            QJsonObject fmuObj     = sourceObj["fmu"].toObject();
+            auto        fmuObjKeys = fmuObj.keys();
+
+            QJsonObject fmuCase     = fmuObj["case"].toObject();
+            auto        fmuCaseKeys = fmuCase.keys();
+
+            QString id        = resultObj["_id"].toString();
+            QString kind      = "";
+            QString fieldName = fmuCase["name"].toString();
+            m_cases.push_back( SumoCase{ id, kind, fieldName } );
         }
 
-        emit fieldsFinished();
+        emit casesFinished();
     }
 }
 
@@ -308,4 +331,12 @@ QString RimSumoConnector::server() const
 std::vector<SumoField> RimSumoConnector::fields() const
 {
     return m_fields;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<SumoCase> RimSumoConnector::cases() const
+{
+    return m_cases;
 }
