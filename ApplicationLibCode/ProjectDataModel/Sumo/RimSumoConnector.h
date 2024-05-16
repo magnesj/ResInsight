@@ -21,19 +21,13 @@ class RimSumoConnector : public QObject
 {
     Q_OBJECT
 public:
-    RimSumoConnector( QObject*       parent,
-                      const QString& server,
-                      const QString& dataParitionId,
-                      const QString& authority,
-                      const QString& scopes,
-                      const QString& clientId );
+    RimSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId );
     ~RimSumoConnector() override;
 
     void requestFieldsByName( const QString& token, const QString& fieldName );
     void requestFieldsByName( const QString& fieldName );
 
     QString server() const;
-    QString dataPartition() const;
 
     std::vector<SumoField> fields() const;
 
@@ -52,14 +46,13 @@ signals:
     void tokenReady( const QString& token );
 
 private:
-    void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& dataPartitionId );
+    void addStandardHeader( QNetworkRequest& networkRequest, const QString& token );
 
-    QNetworkReply*
-        makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& dataPartitionId, const QString& token );
+    QNetworkReply* makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& token );
 
-    QNetworkReply* makeDownloadRequest( const QString& server, const QString& dataPartitionId, const QString& id, const QString& token );
+    QNetworkReply* makeDownloadRequest( const QString& server, const QString& id, const QString& token );
 
-    void requestFieldsByName( const QString& server, const QString& dataPartitionId, const QString& token, const QString& fieldName );
+    void requestFieldsByName( const QString& server, const QString& token, const QString& fieldName );
 
     static QString generateRandomString( int length = 20 );
     static QString constructSearchUrl( const QString& server );
@@ -67,11 +60,10 @@ private:
     static QString constructAuthUrl( const QString& authority );
     static QString constructTokenUrl( const QString& authority );
 
-    QOAuth2AuthorizationCodeFlow* m_osdu;
+    QOAuth2AuthorizationCodeFlow* m_authCodeFlow;
     QNetworkAccessManager*        m_networkAccessManager;
 
     const QString m_server;
-    const QString m_dataPartitionId;
     const QString m_authority;
     const QString m_scopes;
     const QString m_clientId;
