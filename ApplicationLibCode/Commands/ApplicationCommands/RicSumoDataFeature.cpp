@@ -99,6 +99,10 @@ void SimpleDialog::onAuthClicked()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::onFieldsClicked()
 {
+    m_sumoConnector->requestCasesForField( "Drogon" );
+    m_sumoConnector->fields();
+
+    label->setText( "Requesting fields (see log for response" );
 }
 
 //--------------------------------------------------------------------------------------------------
