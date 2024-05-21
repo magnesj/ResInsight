@@ -25,7 +25,7 @@
 
 #include <map>
 
-struct SumoField
+struct SumoAsset
 {
     QString id;
     QString kind;
@@ -50,14 +50,16 @@ public:
     ~RimSumoConnector() override;
 
     void requestCasesForField( const QString& fieldName );
+    void requestAssets();
 
     QString server() const;
 
-    std::vector<SumoField> fields() const;
+    std::vector<SumoAsset> assets() const;
     std::vector<SumoCase>  cases() const;
 
 public slots:
     void requestToken();
+    void parseAssets( QNetworkReply* reply );
     void parseCases( QNetworkReply* reply );
     void saveFile( QNetworkReply* reply, const QString& fileId );
     void accessGranted();
@@ -92,6 +94,6 @@ private:
 
     QString m_token;
 
-    std::vector<SumoField> m_fields;
+    std::vector<SumoAsset> m_assets;
     std::vector<SumoCase>  m_cases;
 };

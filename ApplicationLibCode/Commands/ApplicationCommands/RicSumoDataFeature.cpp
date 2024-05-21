@@ -44,9 +44,13 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     connect( authButton, &QPushButton::clicked, this, &SimpleDialog::onAuthClicked );
     layout->addWidget( authButton );
 
-    fieldsButton = new QPushButton( "Field Names", this );
-    connect( fieldsButton, &QPushButton::clicked, this, &SimpleDialog::onFieldsClicked );
-    layout->addWidget( fieldsButton );
+    assetsButton = new QPushButton( "Asset Names", this );
+    connect( assetsButton, &QPushButton::clicked, this, &SimpleDialog::onAssetsClicked );
+    layout->addWidget( assetsButton );
+
+    casesButton = new QPushButton( "Cases", this );
+    connect( casesButton, &QPushButton::clicked, this, &SimpleDialog::onCasesClicked );
+    layout->addWidget( casesButton );
 
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
@@ -97,12 +101,22 @@ void SimpleDialog::onAuthClicked()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void SimpleDialog::onFieldsClicked()
+void SimpleDialog::onAssetsClicked()
 {
-    m_sumoConnector->requestCasesForField( "Drogon" );
-    m_sumoConnector->fields();
+    m_sumoConnector->requestAssets();
+    m_sumoConnector->assets();
 
     label->setText( "Requesting fields (see log for response" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SimpleDialog::onCasesClicked()
+{
+    m_sumoConnector->requestCasesForField( "Drogon" );
+
+    label->setText( "Requesting cases (see log for response" );
 }
 
 //--------------------------------------------------------------------------------------------------

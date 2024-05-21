@@ -42,14 +42,16 @@ private:
     void onCancelClicked();
     void onTokenReady( const QString& token );
     void onAuthClicked();
-    void onFieldsClicked();
+    void onAssetsClicked();
+    void onCasesClicked();
 
 private:
     QLabel*      label;
     QPushButton* okButton;
     QPushButton* cancelButton;
     QPushButton* authButton;
-    QPushButton* fieldsButton;
+    QPushButton* assetsButton;
+    QPushButton* casesButton;
 
     RimSumoConnector* m_sumoConnector;
 };

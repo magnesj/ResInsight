@@ -138,6 +138,29 @@ void RimSumoConnector::requestCasesForField( const QString& fieldName )
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestAssets()
+{
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/userpermissions" ) );
+
+    addStandardHeader( m_networkRequest, m_token );
+
+    auto reply = m_networkAccessManager->get( m_networkRequest );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseAssets( reply );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
 QString RimSumoConnector::constructSearchUrl( const QString& server )
@@ -190,6 +213,33 @@ QNetworkReply* RimSumoConnector::makeRequest( const std::map<QString, QString>& 
 
     auto reply = m_networkAccessManager->post( m_networkRequest, strJson.toUtf8() );
     return reply;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::parseAssets( QNetworkReply* reply )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
+
+        m_assets.clear();
+
+        for ( auto key : jsonObj.keys() )
+        {
+            QString id;
+            QString kind;
+            QString fieldName = key;
+            m_assets.push_back( SumoAsset{ id, kind, fieldName } );
+        }
+
+        // emit casesFinished();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -328,9 +378,9 @@ QString RimSumoConnector::server() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<SumoField> RimSumoConnector::fields() const
+std::vector<SumoAsset> RimSumoConnector::assets() const
 {
-    return m_fields;
+    return m_assets;
 }
 
 //--------------------------------------------------------------------------------------------------
