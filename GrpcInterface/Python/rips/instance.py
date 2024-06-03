@@ -34,6 +34,7 @@ from typing import List, Optional, Tuple
 from typing_extensions import Self
 from pathlib import Path
 
+
 class Instance:
     """The ResInsight Instance class. Use to launch or find existing ResInsight instances
 
@@ -129,9 +130,9 @@ class Instance:
             if filename.is_file():
                 f = open(filename)
                 data = json.load(f)
-                resinsight_executable = data['resinsight_executable']
+                resinsight_executable = data["resinsight_executable"]
                 if resinsight_executable:
-                  print("  Found resinsight_executable:", resinsight_executable)
+                    print("  Found resinsight_executable:", resinsight_executable)
 
         if not resinsight_executable:
             resinsight_executable_from_env = os.environ.get("RESINSIGHT_EXECUTABLE")
