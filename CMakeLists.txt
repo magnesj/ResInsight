@@ -1017,6 +1017,22 @@ install(TARGETS extract-projectfile-versions
 )
 
 # ##############################################################################
+# Add OpenSSL 1.1.1 libraries
+# The OpenSSL libraries are needed for the NetworkAuth module in Qt 5
+# Installed by adding openssl-windows in vcpkg.json
+# Required to use fully specified path to the dlls, as it is not trivial to find the path. OpenSSL 3 is installed and used by other modules
+# ##############################################################################
+set(FILE_PATH_LIBCRYPTO_1_1 "${VCPKG_MANIFEST_DIR}/ThirdParty/vcpkg/packages/openssl-windows_x64-windows-release/bin/libcrypto-1_1-x64.dll")
+set(FILE_PATH_LIBOPENSSL_1_1 "${VCPKG_MANIFEST_DIR}/ThirdParty/vcpkg/packages/openssl-windows_x64-windows-release/bin/libssl-1_1-x64.dll")
+install(
+    FILES ${FILE_PATH_LIBCRYPTO_1_1} ${FILE_PATH_LIBOPENSSL_1_1} 
+    DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    OPTIONAL
+  )
+
+
+
+# ##############################################################################
 # Visual Studio : Create the ruleset file to be used by Static Code Analysis
 # https://stackoverflow.com/questions/75031903/how-to-enable-static-analysis-with-custom-ruleset-in-msvc-via-cmakelists-txt
 # ##############################################################################
