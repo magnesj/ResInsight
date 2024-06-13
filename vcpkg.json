@@ -4,6 +4,15 @@
     "boost-filesystem",
     "boost-spirit",
     "eigen3",
-    "grpc"
-  ]
+    "grpc",
+    "openssl-windows"
+  ],
+  "overrides": [
+    { "name": "openssl-windows", "version-string": "1.1.1g" }
+  ],
+  "dependencies-conditional": {
+    "windows": [
+      "openssl-windows"
+    ]
+  }
 }
