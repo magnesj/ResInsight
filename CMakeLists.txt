@@ -1024,31 +1024,27 @@ install(TARGETS extract-projectfile-versions
 # ##############################################################################
 
 if(MSVC)
-    FetchContent_Declare(
-      openssl_1_1_1
-      URL https://github.com/CeetronSolutions/resinsight-dependencies/releases/download/2024.05/openssl_1_1_1.zip
-    )
-    FetchContent_Populate(openssl_1_1_1)
+  FetchContent_Declare(
+    openssl_1_1_1
+    URL https://github.com/CeetronSolutions/resinsight-dependencies/releases/download/2024.05/openssl_1_1_1.zip
+  )
+  FetchContent_Populate(openssl_1_1_1)
 
-set(FILE_PATH_LIBCRYPTO_1_1
-"${openssl_1_1_1_SOURCE_DIR}/libcrypto-1_1-x64.dll"
-)
-set(FILE_PATH_LIBOPENSSL_1_1
-"${openssl_1_1_1_SOURCE_DIR}/libssl-1_1-x64.dll"
-)
+  set(FILE_PATH_LIBCRYPTO_1_1
+      "${openssl_1_1_1_SOURCE_DIR}/libcrypto-1_1-x64.dll"
+  )
+  set(FILE_PATH_LIBOPENSSL_1_1 "${openssl_1_1_1_SOURCE_DIR}/libssl-1_1-x64.dll")
 
-message(STATUS "FILE_PATH_LIBCRYPTO_1_1: ${FILE_PATH_LIBCRYPTO_1_1}")
-message(STATUS "FILE_PATH_LIBOPENSSL_1_1: ${FILE_PATH_LIBOPENSSL_1_1}")
+  message(STATUS "FILE_PATH_LIBCRYPTO_1_1: ${FILE_PATH_LIBCRYPTO_1_1}")
+  message(STATUS "FILE_PATH_LIBOPENSSL_1_1: ${FILE_PATH_LIBOPENSSL_1_1}")
 
-install(
-FILES ${FILE_PATH_LIBCRYPTO_1_1} ${FILE_PATH_LIBOPENSSL_1_1}
-DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
-OPTIONAL
-)
-
+  install(
+    FILES ${FILE_PATH_LIBCRYPTO_1_1} ${FILE_PATH_LIBOPENSSL_1_1}
+    DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    OPTIONAL
+  )
 
 endif() # MSVC
-
 
 # ##############################################################################
 # Visual Studio : Create the ruleset file to be used by Static Code Analysis
