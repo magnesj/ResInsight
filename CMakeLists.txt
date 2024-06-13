@@ -1022,17 +1022,33 @@ install(TARGETS extract-projectfile-versions
 # Required to use fully specified path to the dlls, as it is not trivial to find
 # the path. OpenSSL 3 is installed and used by other modules
 # ##############################################################################
+
+if(MSVC)
+    FetchContent_Declare(
+      openssl_1_1_1
+      URL https://github.com/CeetronSolutions/resinsight-dependencies/releases/download/2024.05/openssl_1_1_1.zip
+    )
+    FetchContent_Populate(openssl_1_1_1)
+
 set(FILE_PATH_LIBCRYPTO_1_1
-    "${VCPKG_MANIFEST_DIR}/ThirdParty/vcpkg/packages/openssl-windows_x64-windows-release/bin/libcrypto-1_1-x64.dll"
+"${openssl_1_1_1_SOURCE_DIR}/libcrypto-1_1-x64.dll"
 )
 set(FILE_PATH_LIBOPENSSL_1_1
-    "${VCPKG_MANIFEST_DIR}/ThirdParty/vcpkg/packages/openssl-windows_x64-windows-release/bin/libssl-1_1-x64.dll"
+"${openssl_1_1_1_SOURCE_DIR}/libssl-1_1-x64.dll"
 )
+
+message(STATUS "FILE_PATH_LIBCRYPTO_1_1: ${FILE_PATH_LIBCRYPTO_1_1}")
+message(STATUS "FILE_PATH_LIBOPENSSL_1_1: ${FILE_PATH_LIBOPENSSL_1_1}")
+
 install(
-  FILES ${FILE_PATH_LIBCRYPTO_1_1} ${FILE_PATH_LIBOPENSSL_1_1}
-  DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
-  OPTIONAL
+FILES ${FILE_PATH_LIBCRYPTO_1_1} ${FILE_PATH_LIBOPENSSL_1_1}
+DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+OPTIONAL
 )
+
+
+endif() # MSVC
+
 
 # ##############################################################################
 # Visual Studio : Create the ruleset file to be used by Static Code Analysis
