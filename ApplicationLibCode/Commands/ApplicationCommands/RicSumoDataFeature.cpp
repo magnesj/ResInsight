@@ -61,6 +61,8 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     layout->addWidget( cancelButton );
 
     setLayout( layout );
+
+    m_sumoConnector = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -86,7 +88,17 @@ void SimpleDialog::createConnection()
 
     m_sumoConnector = new RimSumoConnector( qApp, server, authority, scopes, clientId );
 
-    connect( m_sumoConnector, SIGNAL( tokenReady( const QString& ) ), this, SLOT( onTokenReady( const QString& ) ) );
+    connect( m_sumoConnector, &RimSumoConnector::tokenReady, this, &SimpleDialog::onTokenReady );
+
+    // get token from log first time the token is requested
+
+    QSettings settings;
+    auto      bearerToken = settings.value( m_registryKeyBearerToken_DEBUG_ONLY ).toString();
+
+    if ( !bearerToken.isEmpty() )
+    {
+        m_sumoConnector->setToken( bearerToken );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -103,6 +115,8 @@ void SimpleDialog::onAuthClicked()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::onAssetsClicked()
 {
+    if ( !isTokenValid() ) return;
+
     m_sumoConnector->requestAssets();
     m_sumoConnector->assets();
 
@@ -114,6 +128,8 @@ void SimpleDialog::onAssetsClicked()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::onCasesClicked()
 {
+    if ( !isTokenValid() ) return;
+
     m_sumoConnector->requestCasesForField( "Drogon" );
 
     label->setText( "Requesting cases (see log for response" );
@@ -122,9 +138,30 @@ void SimpleDialog::onCasesClicked()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool SimpleDialog::isTokenValid()
+{
+    if ( !m_sumoConnector )
+    {
+        createConnection();
+    }
+
+    if ( m_sumoConnector->token().isEmpty() )
+    {
+        m_sumoConnector->requestToken();
+    }
+
+    return !m_sumoConnector->token().isEmpty();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void SimpleDialog::onTokenReady( const QString& token )
 {
     RiaLogging::info( "Token ready: " + token );
+
+    QSettings settings;
+    settings.setValue( m_registryKeyBearerToken_DEBUG_ONLY, token );
 }
 
 void SimpleDialog::onOkClicked()

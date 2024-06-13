@@ -45,6 +45,8 @@ private:
     void onAssetsClicked();
     void onCasesClicked();
 
+    bool isTokenValid();
+
 private:
     QLabel*      label;
     QPushButton* okButton;
@@ -53,7 +55,9 @@ private:
     QPushButton* assetsButton;
     QPushButton* casesButton;
 
-    RimSumoConnector* m_sumoConnector;
+    QPointer<RimSumoConnector> m_sumoConnector;
+
+    const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
 };
 
 //==================================================================================================

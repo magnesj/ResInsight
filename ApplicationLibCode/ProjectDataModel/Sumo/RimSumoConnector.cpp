@@ -109,6 +109,22 @@ RimSumoConnector::~RimSumoConnector()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSumoConnector::setToken( const QString& token )
+{
+    m_token = token;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimSumoConnector::token() const
+{
+    return m_token;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSumoConnector::requestCasesForField( const QString& fieldName )
 {
     QNetworkRequest m_networkRequest;
@@ -238,7 +254,10 @@ void RimSumoConnector::parseAssets( QNetworkReply* reply )
             m_assets.push_back( SumoAsset{ id, kind, fieldName } );
         }
 
-        // emit casesFinished();
+        for ( auto a : m_assets )
+        {
+            RiaLogging::info( QString( "Asset: %1" ).arg( a.name ) );
+        }
     }
 }
 

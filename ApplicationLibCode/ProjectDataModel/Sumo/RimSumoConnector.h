@@ -49,6 +49,9 @@ public:
     RimSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId );
     ~RimSumoConnector() override;
 
+    void    setToken( const QString& token );
+    QString token() const;
+
     void requestCasesForField( const QString& fieldName );
     void requestAssets();
 
