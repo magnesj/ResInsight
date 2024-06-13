@@ -137,7 +137,22 @@ void RimSumoConnector::requestCasesForField( const QString& fieldName )
 )";
 
     QString payload_fieldNames = R"(
-{"query":{"bool":{"filter":[{"term":{"class.keyword":"case"}},{"term":{"access.asset.name.keyword":"Drogon"}}]}},"sort":[{"tracklog.datetime":{"order":"desc"}}],"track_total_hits":true,"size":20,"from":0}
+{
+    "query": {
+        "bool": {
+            "filter": [
+                        {"term":{"class.keyword":"case"}},
+                        {"term":{"access.asset.name.keyword":"Drogon"}}
+            ]
+        }
+    },
+    "sort": [
+            {"tracklog.datetime":{"order":"desc"}}
+    ],
+    "track_total_hits":true,
+    "size":20,
+    "from":0
+}
 )";
 
     auto reply = m_networkAccessManager->post( m_networkRequest, payload_fieldNames.toUtf8() );
@@ -172,6 +187,69 @@ void RimSumoConnector::requestAssets()
                  if ( reply->error() == QNetworkReply::NoError )
                  {
                      parseAssets( reply );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestEnsembleByCasesId( const QString& vectorName, const QString& caseId )
+{
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName )
+{
+    QString payload_vectorNames = R"(
+{
+    "track_total_hits": true,
+    "query":  {   "bool": {
+            "must": [
+                {"term": {"class": "table"}},
+                {"term": {"_sumo.parent_object.keyword": "5b783aab-ce10-4b78-b129-baf8d8ce4baa"}},
+                {"term": {"fmu.iteration.name.keyword": "iter-0"}},
+                {"term": {"fmu.context.stage.keyword": "iteration"}},
+                {"term": {"fmu.aggregation.operation.keyword": "collection"}},
+                {"term": {"data.tagname.keyword": "summary"}},
+                {"term": {"data.content.keyword": "timeseries"}}
+            ]}
+        },
+    "aggs": {
+        "smry_tables": {
+            "terms": {
+                "field": "data.name.keyword"
+            },
+            "aggs": {
+                "smry_columns": {
+                    "terms": {
+                        "field": "data.spec.columns.keyword",
+                        "size": 65535
+                    }
+                }
+            }
+        }
+    },
+    "_source": false,
+    "size": 0
+})";
+
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+
+    addStandardHeader( m_networkRequest, m_token );
+
+    auto reply = m_networkAccessManager->post( m_networkRequest, payload_vectorNames.toUtf8() );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseVectorNames( reply );
                  }
              } );
 }
@@ -306,6 +384,40 @@ void RimSumoConnector::parseCases( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSumoConnector::parseVectorNames( QNetworkReply* reply )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    m_vectorNames.clear();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
+
+        QJsonArray tableHits = jsonObj["aggregations"].toObject()["smry_tables"].toObject()["buckets"].toArray();
+        for ( const auto& tableHit : tableHits )
+        {
+            QJsonArray columnHits = tableHit.toObject()["smry_columns"].toObject()["buckets"].toArray();
+            for ( const auto& columnHit : columnHits )
+            {
+                m_vectorNames.push_back( columnHit.toObject()["key"].toString() );
+            }
+        }
+    }
+
+    // print at max 100 vector names
+    const int maxVectorNames = 100;
+    for ( int i = 0; i < std::min( maxVectorNames, static_cast<int>( m_vectorNames.size() ) ); ++i )
+    {
+        RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSumoConnector::saveFile( QNetworkReply* reply, const QString& fileId )
 {
     QByteArray result = reply->readAll();
@@ -408,4 +520,12 @@ std::vector<SumoAsset> RimSumoConnector::assets() const
 std::vector<SumoCase> RimSumoConnector::cases() const
 {
     return m_cases;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimSumoConnector::vectorNames() const
+{
+    return m_vectorNames;
 }

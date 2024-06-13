@@ -52,6 +52,10 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     connect( casesButton, &QPushButton::clicked, this, &SimpleDialog::onCasesClicked );
     layout->addWidget( casesButton );
 
+    vectorNamesButton = new QPushButton( "Vector Names", this );
+    connect( vectorNamesButton, &QPushButton::clicked, this, &SimpleDialog::onVectorNamesClicked );
+    layout->addWidget( vectorNamesButton );
+
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
     layout->addWidget( okButton );
@@ -133,6 +137,21 @@ void SimpleDialog::onCasesClicked()
     m_sumoConnector->requestCasesForField( "Drogon" );
 
     label->setText( "Requesting cases (see log for response" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SimpleDialog::onVectorNamesClicked()
+{
+    if ( !isTokenValid() ) return;
+
+    QString caseId    = "5b783aab-ce10-4b78-b129-baf8d8ce4baa";
+    QString iteration = "iter-0";
+
+    m_sumoConnector->requestVectorNamesForEnsemble( caseId, iteration );
+
+    label->setText( "Requesting vector names (see log for response" );
 }
 
 //--------------------------------------------------------------------------------------------------

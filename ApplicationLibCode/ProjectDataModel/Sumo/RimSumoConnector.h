@@ -55,15 +55,20 @@ public:
     void requestCasesForField( const QString& fieldName );
     void requestAssets();
 
+    void requestEnsembleByCasesId( const QString& vectorName, const QString& caseId );
+    void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
+
     QString server() const;
 
     std::vector<SumoAsset> assets() const;
     std::vector<SumoCase>  cases() const;
+    std::vector<QString>   vectorNames() const;
 
 public slots:
     void requestToken();
     void parseAssets( QNetworkReply* reply );
     void parseCases( QNetworkReply* reply );
+    void parseVectorNames( QNetworkReply* reply );
     void saveFile( QNetworkReply* reply, const QString& fileId );
     void accessGranted();
 
@@ -99,4 +104,5 @@ private:
 
     std::vector<SumoAsset> m_assets;
     std::vector<SumoCase>  m_cases;
+    std::vector<QString>   m_vectorNames;
 };

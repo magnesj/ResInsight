@@ -44,6 +44,7 @@ private:
     void onAuthClicked();
     void onAssetsClicked();
     void onCasesClicked();
+    void onVectorNamesClicked();
 
     bool isTokenValid();
 
@@ -54,6 +55,7 @@ private:
     QPushButton* authButton;
     QPushButton* assetsButton;
     QPushButton* casesButton;
+    QPushButton* vectorNamesButton;
 
     QPointer<RimSumoConnector> m_sumoConnector;
 
