@@ -56,6 +56,10 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     connect( vectorNamesButton, &QPushButton::clicked, this, &SimpleDialog::onVectorNamesClicked );
     layout->addWidget( vectorNamesButton );
 
+    blobIdButton = new QPushButton( "Blob Id", this );
+    connect( blobIdButton, &QPushButton::clicked, this, &SimpleDialog::onFindBlobIdClicked );
+    layout->addWidget( blobIdButton );
+
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
     layout->addWidget( okButton );
@@ -110,6 +114,9 @@ void SimpleDialog::createConnection()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::onAuthClicked()
 {
+    QSettings settings;
+    settings.setValue( m_registryKeyBearerToken_DEBUG_ONLY, "" );
+
     createConnection();
     m_sumoConnector->requestToken();
 }
@@ -134,7 +141,8 @@ void SimpleDialog::onCasesClicked()
 {
     if ( !isTokenValid() ) return;
 
-    m_sumoConnector->requestCasesForField( "Drogon" );
+    QString fieldName = "Drogon";
+    m_sumoConnector->requestCasesForField( fieldName );
 
     label->setText( "Requesting cases (see log for response" );
 }
@@ -152,6 +160,22 @@ void SimpleDialog::onVectorNamesClicked()
     m_sumoConnector->requestVectorNamesForEnsemble( caseId, iteration );
 
     label->setText( "Requesting vector names (see log for response" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SimpleDialog::onFindBlobIdClicked()
+{
+    if ( !isTokenValid() ) return;
+
+    QString caseId     = "5b783aab-ce10-4b78-b129-baf8d8ce4baa";
+    QString iteration  = "iter-0";
+    QString vectorName = "FOPT";
+
+    m_sumoConnector->requestBlobIdForEnsemble( caseId, iteration, vectorName );
+
+    label->setText( "Requesting blob ID for vector name (see log for response" );
 }
 
 //--------------------------------------------------------------------------------------------------

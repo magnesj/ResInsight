@@ -57,6 +57,7 @@ public:
 
     void requestEnsembleByCasesId( const QString& vectorName, const QString& caseId );
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
+    void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
 
     QString server() const;
 
@@ -66,11 +67,16 @@ public:
 
 public slots:
     void requestToken();
+
     void parseAssets( QNetworkReply* reply );
     void parseCases( QNetworkReply* reply );
-    void parseVectorNames( QNetworkReply* reply );
+    void parseVectorNames( QNetworkReply* reply, const QString& caseId, const QString& ensembleName );
+    void parseBlobIds( QNetworkReply* reply, const QString& caseId, const QString& ensembleName, const QString& vectorName );
+
     void saveFile( QNetworkReply* reply, const QString& fileId );
+
     void accessGranted();
+    void requestFailed( const QAbstractOAuth::Error error );
 
 signals:
     void fileDownloadFinished( const QString& fileId, const QString& filePath );
@@ -105,4 +111,6 @@ private:
     std::vector<SumoAsset> m_assets;
     std::vector<SumoCase>  m_cases;
     std::vector<QString>   m_vectorNames;
+
+    std::vector<QString> m_blobId;
 };

@@ -93,6 +93,14 @@ void RimSumoConnector::accessGranted()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestFailed( const QAbstractOAuth::Error error )
+{
+    RiaLogging::error( "Request failed: " );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSumoConnector::requestToken()
 {
     RiaLogging::debug( "Requesting token." );
@@ -136,13 +144,13 @@ void RimSumoConnector::requestCasesForField( const QString& fieldName )
 {"size":0,"query":{"bool":{"must_not":{"exists":{"field":"_sumo.parent_object"}},"filter":[{"term":{"access.asset.name.keyword":"Drogon"}}]}},"aggs":{"masterdata.smda.field.identifier.keyword":{"terms":{"field":"masterdata.smda.field.identifier.keyword","size":500,"order":{"_key":"asc"}}}}}
 )";
 
-    QString payload_fieldNames = R"(
+    QString payloadTemplate = R"(
 {
     "query": {
         "bool": {
             "filter": [
                         {"term":{"class.keyword":"case"}},
-                        {"term":{"access.asset.name.keyword":"Drogon"}}
+                        {"term":{"access.asset.name.keyword":"%1"}}
             ]
         }
     },
@@ -155,7 +163,8 @@ void RimSumoConnector::requestCasesForField( const QString& fieldName )
 }
 )";
 
-    auto reply = m_networkAccessManager->post( m_networkRequest, payload_fieldNames.toUtf8() );
+    QString payload = payloadTemplate.arg( fieldName );
+    auto    reply   = m_networkAccessManager->post( m_networkRequest, payloadTemplate.toUtf8() );
 
     connect( reply,
              &QNetworkReply::finished,
@@ -203,14 +212,14 @@ void RimSumoConnector::requestEnsembleByCasesId( const QString& vectorName, cons
 //--------------------------------------------------------------------------------------------------
 void RimSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName )
 {
-    QString payload_vectorNames = R"(
+    QString payloadTemplate = R"(
 {
     "track_total_hits": true,
     "query":  {   "bool": {
             "must": [
                 {"term": {"class": "table"}},
-                {"term": {"_sumo.parent_object.keyword": "5b783aab-ce10-4b78-b129-baf8d8ce4baa"}},
-                {"term": {"fmu.iteration.name.keyword": "iter-0"}},
+                {"term": {"_sumo.parent_object.keyword": "%1"}},
+                {"term": {"fmu.iteration.name.keyword": "%2"}},
                 {"term": {"fmu.context.stage.keyword": "iteration"}},
                 {"term": {"fmu.aggregation.operation.keyword": "collection"}},
                 {"term": {"data.tagname.keyword": "summary"}},
@@ -241,15 +250,63 @@ void RimSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, con
 
     addStandardHeader( m_networkRequest, m_token );
 
-    auto reply = m_networkAccessManager->post( m_networkRequest, payload_vectorNames.toUtf8() );
+    auto payload = payloadTemplate.arg( caseId ).arg( ensembleName );
+    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
 
     connect( reply,
              &QNetworkReply::finished,
-             [this, reply]()
+             [this, reply, ensembleName, caseId]()
              {
                  if ( reply->error() == QNetworkReply::NoError )
                  {
-                     parseVectorNames( reply );
+                     parseVectorNames( reply, caseId, ensembleName );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+{
+    QString payloadTemplate = R"(
+{
+    "track_total_hits": true,
+    "query":  {   "bool": {
+            "must": [
+                {"term": {"class": "table"}},
+                {"term": {"_sumo.parent_object.keyword": "%1"}},
+                {"term": {"fmu.iteration.name.keyword": "%2"}},
+                {"term": {"fmu.context.stage.keyword": "iteration"}},
+                {"term": {"fmu.aggregation.operation.keyword": "collection"}},
+                {"term": {"data.tagname.keyword": "summary"}},
+                {"term": {"data.spec.columns.keyword": "%3"}}
+            ]}
+        },
+         "fields": [
+            "data.name",
+            "_sumo.blob_name"
+        ],
+    "_source": true,
+    "size": 1
+}
+)";
+
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+
+    addStandardHeader( m_networkRequest, m_token );
+
+    auto payload = payloadTemplate.arg( caseId ).arg( ensembleName ).arg( vectorName );
+    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, ensembleName, caseId, vectorName]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseBlobIds( reply, caseId, ensembleName, vectorName );
                  }
              } );
 }
@@ -384,7 +441,7 @@ void RimSumoConnector::parseCases( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::parseVectorNames( QNetworkReply* reply )
+void RimSumoConnector::parseVectorNames( QNetworkReply* reply, const QString& caseId, const QString& ensembleName )
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
@@ -412,6 +469,41 @@ void RimSumoConnector::parseVectorNames( QNetworkReply* reply )
     for ( int i = 0; i < std::min( maxVectorNames, static_cast<int>( m_vectorNames.size() ) ); ++i )
     {
         RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId, const QString& ensembleName, const QString& vectorName )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    m_blobId.clear();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
+
+        QJsonObject rootHits    = jsonObj["hits"].toObject();
+        QJsonArray  hitsObjects = rootHits["hits"].toArray();
+
+        foreach ( const QJsonValue& value, hitsObjects )
+        {
+            QJsonObject resultObj = value.toObject();
+            auto        keys_1    = resultObj.keys();
+
+            QJsonObject sourceObj  = resultObj["_source"].toObject();
+            auto        sourceKeys = sourceObj.keys();
+
+            QJsonObject fmuObj     = sourceObj["_sumo"].toObject();
+            auto        fmuObjKeys = fmuObj.keys();
+
+            auto blobUrl = fmuObj["blob_url"].toString();
+            m_blobId.push_back( blobUrl );
+        }
     }
 }
 

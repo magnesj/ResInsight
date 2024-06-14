@@ -45,6 +45,7 @@ private:
     void onAssetsClicked();
     void onCasesClicked();
     void onVectorNamesClicked();
+    void onFindBlobIdClicked();
 
     bool isTokenValid();
 
@@ -56,6 +57,7 @@ private:
     QPushButton* assetsButton;
     QPushButton* casesButton;
     QPushButton* vectorNamesButton;
+    QPushButton* blobIdButton;
 
     QPointer<RimSumoConnector> m_sumoConnector;
 
