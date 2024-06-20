@@ -1016,6 +1016,17 @@ install(TARGETS extract-projectfile-versions
         DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
 )
 
+if(MSVC)
+  # Install all the DLLs needed for the executable. System dependencies are not
+  # included
+  install(
+    TARGETS ResInsight
+    DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+    POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+  )
+endif(MSVC)
+
 # ##############################################################################
 # Add OpenSSL 1.1.1 libraries The OpenSSL libraries are needed for the
 # NetworkAuth module in Qt 5 Installed by adding openssl-windows in vcpkg.json

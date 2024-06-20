@@ -19,6 +19,7 @@
 #pragma once
 
 #include <QItemSelection>
+#include <QLineEdit>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QString>
@@ -26,6 +27,8 @@
 #include <QWizard>
 
 #include "RiaOsduConnector.h"
+
+#include <set>
 
 class QFile;
 class QLabel;
@@ -112,9 +115,31 @@ public:
 
     void setOsduFields( const std::vector<OsduField>& osduFields )
     {
-        beginInsertRows( QModelIndex(), 0, static_cast<int>( osduFields.size() ) );
+        beginResetModel();
         m_osduFields = osduFields;
-        endInsertRows();
+        endResetModel();
+    }
+
+    void sort( int column, Qt::SortOrder order = Qt::AscendingOrder ) override
+    {
+        std::sort( m_osduFields.begin(),
+                   m_osduFields.end(),
+                   [column, order]( const OsduField& a, const OsduField& b )
+                   {
+                       switch ( column )
+                       {
+                           case 0:
+                               return ( order == Qt::AscendingOrder ) ? a.id < b.id : a.id > b.id;
+                           case 1:
+                               return ( order == Qt::AscendingOrder ) ? a.kind < b.kind : a.kind > b.kind;
+                           case 2:
+                               return ( order == Qt::AscendingOrder ) ? a.name < b.name : a.name > b.name;
+                           default:
+                               return false;
+                       }
+                   } );
+        emit dataChanged( index( 0, 0 ), index( rowCount() - 1, columnCount() - 1 ) );
+        emit layoutChanged();
     }
 
 private:
@@ -192,6 +217,7 @@ public:
 
     void setOsduWellbores( const QString& wellId, const std::vector<OsduWellbore>& osduWellbores )
     {
+        beginResetModel();
         m_map[wellId] = osduWellbores;
         m_osduWellbores.clear();
         for ( auto [name, values] : m_map )
@@ -200,8 +226,29 @@ public:
                 m_osduWellbores.push_back( v );
         }
 
-        beginInsertRows( QModelIndex(), 0, static_cast<int>( m_osduWellbores.size() ) );
-        endInsertRows();
+        endResetModel();
+    }
+
+    void sort( int column, Qt::SortOrder order = Qt::AscendingOrder ) override
+    {
+        std::sort( m_osduWellbores.begin(),
+                   m_osduWellbores.end(),
+                   [column, order]( const OsduWellbore& a, const OsduWellbore& b )
+                   {
+                       switch ( column )
+                       {
+                           case 0:
+                               return ( order == Qt::AscendingOrder ) ? a.id < b.id : a.id > b.id;
+                           case 1:
+                               return ( order == Qt::AscendingOrder ) ? a.kind < b.kind : a.kind > b.kind;
+                           case 2:
+                               return ( order == Qt::AscendingOrder ) ? a.name < b.name : a.name > b.name;
+                           default:
+                               return false;
+                       }
+                   } );
+        emit dataChanged( index( 0, 0 ), index( rowCount() - 1, columnCount() - 1 ) );
+        emit layoutChanged();
     }
 
 private:
@@ -226,7 +273,8 @@ private slots:
     void accessOk();
 
 private:
-    bool m_accessOk;
+    QLabel* m_connectionLabel;
+    bool    m_accessOk;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -240,14 +288,18 @@ public:
     FieldSelectionPage( RimWellPathImport* wellPathImport, RiaOsduConnector* m_osduConnector, QWidget* parent = nullptr );
     ~FieldSelectionPage() override;
 
-    void initializePage() override;
     bool isComplete() const override;
 private slots:
     void fieldsFinished();
     void selectField( const QItemSelection& newSelection, const QItemSelection& oldSelection );
+    void onSearchTextChanged( const QString& );
+    void searchForFields();
 
 private:
-    // caf::PdmUiPropertyView* m_propertyView;
+    static const int MINIMUM_CHARACTERS_FOR_SEARCH = 3;
+
+    QLineEdit*           m_searchTextEdit;
+    QPushButton*         m_searchButton;
     RiaOsduConnector*    m_osduConnector;
     QTableView*          m_tableView;
     OsduFieldTableModel* m_osduFieldsModel;
@@ -277,6 +329,7 @@ private:
     RiaOsduConnector*       m_osduConnector;
     QTableView*             m_tableView;
     OsduWellboreTableModel* m_osduWellboresModel;
+    QSortFilterProxyModel*  m_proxyModel;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -290,15 +343,17 @@ public:
     WellSummaryPage( RimWellPathImport* wellPathImport, RiaOsduConnector* osduConnector, QWidget* parent = nullptr );
 
     void initializePage() override;
+    bool isComplete() const override;
 
 private slots:
-    void wellboreTrajectoryFinished( const QString& wellId );
-    void fileDownloadFinished( const QString& fileId, const QString& filePath );
+    void wellboreTrajectoryFinished( const QString& wellboreId, int numTrajectories, const QString& errorMessage );
 
 private:
     RimWellPathImport* m_wellPathImportObject;
     RiaOsduConnector*  m_osduConnector;
     QTextEdit*         m_textEdit;
+    std::set<QString>  m_pendingWellboreIds;
+    mutable QMutex     m_mutex;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -315,7 +370,7 @@ public:
         QString wellId;
         QString wellboreId;
         QString wellboreTrajectoryId;
-        QString fileId;
+        double  datumElevation;
     };
 
     RiuWellImportWizard( const QString&     downloadFolder,
@@ -327,10 +382,10 @@ public:
     // Methods used from the wizard pages
     void resetAuthenticationCount();
 
-    void    setSelectedFieldId( const QString& fieldId );
-    QString selectedFieldId() const;
-    void    setSelectedWellboreId( const QString& wellboreId );
-    QString selectedWellboreId() const;
+    void                 setSelectedFieldId( const QString& fieldId );
+    QString              selectedFieldId() const;
+    void                 setSelectedWellboreIds( const std::vector<QString>& wellboreIds );
+    std::vector<QString> selectedWellboreIds() const;
 
     void                                       addWellInfo( RiuWellImportWizard::WellInfo wellInfo );
     std::vector<RiuWellImportWizard::WellInfo> importedWells() const;
@@ -338,14 +393,14 @@ public:
 public slots:
     void downloadWellPaths( const QString& wellboreId );
     void downloadWells( const QString& fieldId );
-    void downloadFields();
+    void downloadFields( const QString& fieldName );
 
     void slotAuthenticationRequired( QNetworkReply* networkReply, QAuthenticator* authenticator );
 
 private:
-    RiaOsduConnector* m_osduConnector;
-    QString           m_selectedFieldId;
-    QString           m_selectedWellboreId;
+    RiaOsduConnector*    m_osduConnector;
+    QString              m_selectedFieldId;
+    std::vector<QString> m_selectedWellboreIds;
 
     QString m_destinationFolder;
 

@@ -18,10 +18,19 @@
 
 #include "RifOsduWellPathReader.h"
 
+#include <arrow/array/array_primitive.h>
+#include <arrow/csv/api.h>
+#include <arrow/io/api.h>
+#include <arrow/scalar.h>
+#include <arrow/util/cancel.h>
+#include <parquet/arrow/reader.h>
+
+#include "RiaLogging.h"
 #include "RiaTextStringTools.h"
 
+#include "RifArrowTools.h"
 #include "RifAsciiDataParseOptions.h"
-
+#include "RifByteArrayArrowRandomAccessFile.h"
 #include "RifCsvUserDataParser.h"
 
 #include "RigWellPath.h"
@@ -32,6 +41,9 @@
 #include <QFileInfo>
 #include <QTextStream>
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const QString& content )
 {
     QString                        errorMessage;
@@ -89,4 +101,71 @@ std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::parseCsv( const
     }
 
     return { nullptr, "Oh no!" };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<cvf::ref<RigWellPath>, QString> RifOsduWellPathReader::readWellPathData( const QByteArray& content, double datumElevation )
+{
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+
+    std::shared_ptr<arrow::io::RandomAccessFile> input = std::make_shared<RifByteArrayArrowRandomAccessFile>( content );
+
+    // Open Parquet file reader
+    std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
+    if ( !parquet::arrow::OpenFile( input, pool, &arrow_reader ).ok() )
+    {
+        return { nullptr, "Unable to read parquet data." };
+    }
+
+    // Read entire file as a single Arrow table
+    std::shared_ptr<arrow::Table> table;
+    if ( !arrow_reader->ReadTable( &table ).ok() )
+    {
+        return { nullptr, "Unable to read parquet table." };
+    }
+
+    const std::string MD  = "MD";
+    const std::string TVD = "TVD";
+    const std::string X   = "X";
+    const std::string Y   = "Y";
+
+    std::vector<std::string> columnNames = { MD, TVD, X, Y };
+
+    std::map<std::string, std::vector<double>> readValues;
+
+    for ( std::string columnName : columnNames )
+    {
+        std::shared_ptr<arrow::ChunkedArray> column = table->GetColumnByName( columnName );
+
+        if ( column->type()->id() == arrow::Type::DOUBLE )
+        {
+            std::vector<double> columnVector = RifArrowTools::convertChunkedArrayToStdVector( column );
+            RiaLogging::debug( QString( "Column name: %1. Size: %2" ).arg( QString::fromStdString( columnName ) ).arg( columnVector.size() ) );
+            readValues[columnName] = columnVector;
+        }
+    }
+
+    const size_t firstSize = readValues[MD].size();
+    if ( ( firstSize == readValues[TVD].size() ) && ( firstSize == readValues[X].size() ) && ( firstSize == readValues[Y].size() ) )
+    {
+        std::vector<cvf::Vec3d> wellPathPoints;
+        std::vector<double>     measuredDepths;
+
+        for ( size_t i = 0; i < firstSize; i++ )
+        {
+            cvf::Vec3d point( readValues[X][i], readValues[Y][i], -readValues[TVD][i] + datumElevation );
+            double     md = readValues[MD][i];
+
+            wellPathPoints.push_back( point );
+            measuredDepths.push_back( md );
+        }
+
+        auto wellPath = cvf::make_ref<RigWellPath>( wellPathPoints, measuredDepths );
+        wellPath->setDatumElevation( datumElevation );
+        return { wellPath, "" };
+    }
+
+    return { nullptr, "" };
 }

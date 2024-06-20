@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024     Equinor ASA
+//  Copyright (C) 2024- Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,21 +18,19 @@
 
 #pragma once
 
-#include "cafCmdFeature.h"
+#include "RigOsduWellLogData.h"
 
-class RimVfpTable;
+#include "cvfObject.h"
+
+#include <QByteArray>
+#include <QString>
 
 //==================================================================================================
-///
+//
+//
 //==================================================================================================
-class RicNewVfpPlotFeature : public caf::CmdFeature
+class RifOsduWellLogReader
 {
-    CAF_CMD_HEADER_INIT;
-
 public:
-    static std::vector<RimVfpTable*> selectedTables();
-
-private:
-    void onActionTriggered( bool isChecked ) override;
-    void setupActionLook( QAction* actionToSetup ) override;
+    static std::pair<cvf::ref<RigOsduWellLogData>, QString> readWellLogData( const QByteArray& contents );
 };

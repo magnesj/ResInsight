@@ -144,9 +144,9 @@ bool RimWellPlotTools::hasPressureData( RimEclipseResultCase* gridCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimWellPlotTools::hasFlowData( const RimWellLogFile* wellLogFile )
+bool RimWellPlotTools::hasFlowData( const RimWellLog* wellLog )
 {
-    for ( RimWellLogChannel* const wellLogChannel : wellLogFile->wellLogChannels() )
+    for ( RimWellLogChannel* const wellLogChannel : wellLog->wellLogChannels() )
     {
         if ( isFlowChannel( wellLogChannel ) ) return true;
     }
@@ -676,17 +676,16 @@ RiaRftPltCurveDefinition RimWellPlotTools::curveDefFromCurve( const RimWellLogCu
     }
     else if ( wellLogFileCurve != nullptr )
     {
-        RimWellLogFile* const wellLogFile = wellLogFileCurve->wellLogFile();
+        RimWellLog* const wellLog = wellLogFileCurve->wellLog();
 
-        if ( wellLogFile != nullptr )
+        if ( wellLog != nullptr )
         {
-            const QDateTime date = wellLogFile->date();
-
+            const QDateTime date = wellLog->date();
             if ( date.isValid() )
             {
-                if ( auto wellLogLasFile = dynamic_cast<RimWellLogLasFile*>( wellLogFile ) )
+                if ( auto wellLogLasFile = dynamic_cast<RimWellLogLasFile*>( wellLog ) )
                 {
-                    return RiaRftPltCurveDefinition( RifDataSourceForRftPlt( wellLogLasFile ), wellLogFile->wellName(), date );
+                    return RiaRftPltCurveDefinition( RifDataSourceForRftPlt( wellLogLasFile ), wellLog->wellName(), date );
                 }
             }
         }

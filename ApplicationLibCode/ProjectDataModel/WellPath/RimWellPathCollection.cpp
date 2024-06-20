@@ -28,12 +28,14 @@
 #include "RiaTextStringTools.h"
 #include "RiaWellNameComparer.h"
 
+#include "RifOsduWellLogReader.h"
 #include "RifOsduWellPathReader.h"
 #include "RifWellPathFormationsImporter.h"
 #include "RifWellPathImporter.h"
 
 #include "RigEclipseCaseData.h"
 #include "RigMainGrid.h"
+#include "RigOsduWellLogData.h"
 #include "RigWellPath.h"
 
 #include "RimEclipseCase.h"
@@ -42,6 +44,7 @@
 #include "RimFileWellPath.h"
 #include "RimModeledWellPath.h"
 #include "RimOilField.h"
+#include "RimOsduWellLog.h"
 #include "RimOsduWellPath.h"
 #include "RimPerforationCollection.h"
 #include "RimProject.h"
@@ -149,6 +152,8 @@ void RimWellPathCollection::loadDataAndUpdate()
 
     readWellPathFormationFiles();
 
+    RiaApplication* app = RiaApplication::instance();
+
     for ( RimWellPath* wellPath : allWellPaths() )
     {
         progress.setProgressDescription( QString( "Reading file %1" ).arg( wellPath->name() ) );
@@ -173,20 +178,9 @@ void RimWellPathCollection::loadDataAndUpdate()
         }
         else if ( oWPath )
         {
-            RiaApplication* app = RiaApplication::instance();
-
-            RiaPreferencesOsdu* osduPreferences = app->preferences()->osduPreferences();
-
-            const QString server         = osduPreferences->server();
-            const QString dataParitionId = osduPreferences->dataPartitionId();
-            const QString authority      = osduPreferences->authority();
-            const QString scopes         = osduPreferences->scopes();
-            const QString clientId       = osduPreferences->clientId();
-
-            auto osduConnector =
-                std::make_unique<RiaOsduConnector>( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
-
-            auto [wellPathGeometry, errorMessage] = loadWellPathGeometryFromOsdu( osduConnector.get(), oWPath->fileId() );
+            RiaOsduConnector* osduConnector = app->makeOsduConnector();
+            auto [wellPathGeometry, errorMessage] =
+                loadWellPathGeometryFromOsdu( osduConnector, oWPath->wellboreTrajectoryId(), oWPath->datumElevationFromOsdu() );
             if ( wellPathGeometry.notNull() )
             {
                 oWPath->setWellPathGeometry( wellPathGeometry.p() );
@@ -199,14 +193,23 @@ void RimWellPathCollection::loadDataAndUpdate()
 
         if ( wellPath )
         {
-            for ( RimWellLogFile* const wellLogFile : wellPath->wellLogFiles() )
+            for ( RimWellLog* wellLog : wellPath->wellLogs() )
             {
-                if ( wellLogFile )
+                if ( RimWellLogFile* wellLogFile = dynamic_cast<RimWellLogFile*>( wellLog ) )
                 {
                     QString errorMessage;
                     if ( !wellLogFile->readFile( &errorMessage ) )
                     {
                         RiaLogging::warning( errorMessage );
+                    }
+                }
+                else if ( RimOsduWellLog* osduWellLog = dynamic_cast<RimOsduWellLog*>( wellLog ) )
+                {
+                    RiaOsduConnector* osduConnector  = app->makeOsduConnector();
+                    auto [wellLogData, errorMessage] = loadWellLogFromOsdu( osduConnector, osduWellLog->wellLogId() );
+                    if ( wellLogData.notNull() )
+                    {
+                        osduWellLog->setWellLogData( wellLogData.p() );
                     }
                 }
             }
@@ -405,7 +408,7 @@ std::vector<RimWellLogLasFile*> RimWellPathCollection::addWellLogs( const QStrin
                 addWellPath( wellPath );
             }
 
-            wellPath->addWellLogFile( logFileInfo );
+            wellPath->addWellLog( logFileInfo );
             logFileInfos.push_back( logFileInfo );
         }
     }
@@ -419,9 +422,9 @@ std::vector<RimWellLogLasFile*> RimWellPathCollection::addWellLogs( const QStrin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellPathCollection::addWellLog( RimWellLogFile* wellLogFile, RimWellPath* wellPath )
+void RimWellPathCollection::addWellLog( RimWellLog* wellLog, RimWellPath* wellPath )
 {
-    wellPath->addWellLogFile( wellLogFile );
+    wellPath->addWellLog( wellLog );
     sortWellsByName();
     updateAllRequiredEditors();
 }
@@ -1050,13 +1053,29 @@ void RimWellPathCollection::onChildAdded( caf::PdmFieldHandle* containerForNewOb
 ///
 //--------------------------------------------------------------------------------------------------
 std::pair<cvf::ref<RigWellPath>, QString> RimWellPathCollection::loadWellPathGeometryFromOsdu( RiaOsduConnector* osduConnector,
-                                                                                               const QString&    fileId )
+                                                                                               const QString&    wellboreTrajectoryId,
+                                                                                               double            datumElevation )
 {
-    auto [fileContents, errorMessage] = osduConnector->requestFileContentsById( fileId );
+    auto [fileContents, errorMessage] = osduConnector->requestWellboreTrajectoryParquetDataById( wellboreTrajectoryId );
     if ( !errorMessage.isEmpty() )
     {
         return { nullptr, errorMessage };
     }
 
-    return RifOsduWellPathReader::parseCsv( fileContents );
+    return RifOsduWellPathReader::readWellPathData( fileContents, datumElevation );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<cvf::ref<RigOsduWellLogData>, QString> RimWellPathCollection::loadWellLogFromOsdu( RiaOsduConnector* osduConnector,
+                                                                                             const QString&    wellLogId )
+{
+    auto [fileContents, errorMessage] = osduConnector->requestWellLogParquetDataById( wellLogId );
+    if ( !errorMessage.isEmpty() )
+    {
+        return { nullptr, errorMessage };
+    }
+
+    return RifOsduWellLogReader::readWellLogData( fileContents );
 }

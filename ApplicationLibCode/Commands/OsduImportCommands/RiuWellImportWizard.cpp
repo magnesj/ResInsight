@@ -74,10 +74,10 @@ RiuWellImportWizard::~RiuWellImportWizard()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::downloadFields()
+void RiuWellImportWizard::downloadFields( const QString& fieldName )
 {
     // TODO: filter by user input
-    m_osduConnector->requestFieldsByName( "AZERI" );
+    m_osduConnector->requestFieldsByName( fieldName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -106,6 +106,7 @@ void RiuWellImportWizard::slotAuthenticationRequired( QNetworkReply* networkRepl
 //--------------------------------------------------------------------------------------------------
 void RiuWellImportWizard::downloadWells( const QString& fieldId )
 {
+    m_osduConnector->clearCachedData();
     m_osduConnector->requestWellsByFieldId( fieldId );
 }
 
@@ -145,17 +146,17 @@ QString RiuWellImportWizard::selectedFieldId() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuWellImportWizard::setSelectedWellboreId( const QString& wellboreId )
+void RiuWellImportWizard::setSelectedWellboreIds( const std::vector<QString>& wellboreIds )
 {
-    m_selectedWellboreId = wellboreId;
+    m_selectedWellboreIds = wellboreIds;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiuWellImportWizard::selectedWellboreId() const
+std::vector<QString> RiuWellImportWizard::selectedWellboreIds() const
 {
-    return m_selectedWellboreId;
+    return m_selectedWellboreIds;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -185,14 +186,16 @@ AuthenticationPage::AuthenticationPage( RiaOsduConnector* osduConnector, QWidget
 
     QVBoxLayout* layout = new QVBoxLayout;
 
-    QLabel* label = new QLabel( "Checking OSDU connection..." );
-    layout->addWidget( label );
+    m_connectionLabel = new QLabel( "Checking OSDU connection. You might need to login." );
+    layout->addWidget( m_connectionLabel );
 
     QFormLayout* formLayout = new QFormLayout;
     layout->addLayout( formLayout );
 
-    QLineEdit* serverLineEdit    = new QLineEdit( osduConnector->server(), this );
+    QLineEdit* serverLineEdit = new QLineEdit( osduConnector->server(), this );
+    serverLineEdit->setReadOnly( true );
     QLineEdit* partitionLineEdit = new QLineEdit( osduConnector->dataPartition(), this );
+    partitionLineEdit->setReadOnly( true );
 
     formLayout->addRow( "Server:", serverLineEdit );
     formLayout->addRow( "Data Partition:", partitionLineEdit );
@@ -224,6 +227,7 @@ bool AuthenticationPage::isComplete() const
 //--------------------------------------------------------------------------------------------------
 void AuthenticationPage::accessOk()
 {
+    m_connectionLabel->setText( "Connection to OSDU: OK." );
     m_accessOk = true;
     emit( completeChanged() );
 }
@@ -238,26 +242,42 @@ FieldSelectionPage::FieldSelectionPage( RimWellPathImport* wellPathImport, RiaOs
     QVBoxLayout* layout = new QVBoxLayout;
     setLayout( layout );
 
+    QHBoxLayout* searchLayout = new QHBoxLayout;
+    m_searchTextEdit          = new QLineEdit( this );
+    searchLayout->addWidget( m_searchTextEdit );
+
+    m_searchButton = new QPushButton( "Search", this );
+    m_searchButton->setEnabled( false );
+    searchLayout->addWidget( m_searchButton );
+
+    layout->addLayout( searchLayout );
+
     QLabel* label = new QLabel( "Select fields" );
     layout->addWidget( label );
 
     m_tableView = new QTableView( this );
     m_tableView->setSelectionBehavior( QAbstractItemView::SelectRows );
+    QHeaderView* header = m_tableView->horizontalHeader();
+    header->setSectionResizeMode( QHeaderView::Interactive );
+    header->setStretchLastSection( true );
+
     m_osduFieldsModel = new OsduFieldTableModel;
     m_tableView->setModel( m_osduFieldsModel );
+    m_tableView->setSortingEnabled( true );
+    int nameColumn = 2;
+    m_tableView->sortByColumn( nameColumn, Qt::AscendingOrder );
+
     layout->addWidget( m_tableView );
     layout->setStretchFactor( m_tableView, 10 );
-
-    // Tree view
-    // caf::PdmUiTreeView* treeView = new caf::PdmUiTreeView( this );
-    // treeView->setPdmItem( wellPathImport );
-    // layout->addWidget( treeView );
-    // layout->setStretchFactor( treeView, 10 );
 
     setSizePolicy( QSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding ) );
 
     m_osduConnector = osduConnector;
     connect( m_osduConnector, SIGNAL( fieldsFinished() ), SLOT( fieldsFinished() ) );
+
+    connect( m_searchTextEdit, SIGNAL( textChanged( const QString& ) ), this, SLOT( onSearchTextChanged( const QString& ) ) );
+
+    connect( m_searchButton, SIGNAL( clicked() ), this, SLOT( searchForFields() ) );
 
     connect( m_tableView->selectionModel(),
              SIGNAL( selectionChanged( const QItemSelection&, const QItemSelection& ) ),
@@ -271,10 +291,20 @@ FieldSelectionPage::FieldSelectionPage( RimWellPathImport* wellPathImport, RiaOs
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void FieldSelectionPage::initializePage()
+void FieldSelectionPage::onSearchTextChanged( const QString& text )
+{
+    m_searchButton->setEnabled( text.length() >= MINIMUM_CHARACTERS_FOR_SEARCH );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void FieldSelectionPage::searchForFields()
 {
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
-    wiz->downloadFields();
+
+    QString text = m_searchTextEdit->text();
+    if ( text.length() >= MINIMUM_CHARACTERS_FOR_SEARCH ) wiz->downloadFields( text );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -328,12 +358,37 @@ WellSelectionPage::WellSelectionPage( RimWellPathImport* wellPathImport, RiaOsdu
     QLabel* label = new QLabel( "Select wells" );
     layout->addWidget( label );
 
+    QHBoxLayout* filterLayout = new QHBoxLayout;
+    filterLayout->addWidget( new QLabel( "Filter:", this ) );
+    QLineEdit* filterLineEdit = new QLineEdit( this );
+    filterLayout->addWidget( filterLineEdit );
+
+    layout->addLayout( filterLayout );
+
     m_tableView = new QTableView( this );
     m_tableView->setSelectionBehavior( QAbstractItemView::SelectRows );
+    m_tableView->setSelectionMode( QAbstractItemView::MultiSelection );
+    m_tableView->setSortingEnabled( true );
+    int nameColumn = 2;
+    m_tableView->sortByColumn( nameColumn, Qt::AscendingOrder );
+
+    QHeaderView* header = m_tableView->horizontalHeader();
+    header->setSectionResizeMode( QHeaderView::Interactive );
+    header->setStretchLastSection( true );
+
     m_osduWellboresModel = new OsduWellboreTableModel;
-    m_tableView->setModel( m_osduWellboresModel );
     layout->addWidget( m_tableView );
     layout->setStretchFactor( m_tableView, 10 );
+
+    m_proxyModel = new QSortFilterProxyModel( this );
+    m_proxyModel->setSourceModel( m_osduWellboresModel );
+    m_proxyModel->setFilterKeyColumn( nameColumn );
+    m_proxyModel->setFilterCaseSensitivity( Qt::CaseInsensitive );
+
+    m_tableView->setModel( m_proxyModel );
+    m_tableView->setSortingEnabled( true );
+
+    QObject::connect( filterLineEdit, &QLineEdit::textChanged, m_proxyModel, &QSortFilterProxyModel::setFilterWildcard );
 
     m_wellPathImportObject = wellPathImport;
 
@@ -398,7 +453,7 @@ void WellSelectionPage::wellboresFinished( const QString& wellId )
 bool WellSelectionPage::isComplete() const
 {
     QItemSelectionModel* select = m_tableView->selectionModel();
-    return select->selectedRows().size() == 1;
+    return !select->selectedRows().empty();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -408,11 +463,21 @@ void WellSelectionPage::selectWellbore( const QItemSelection& newSelection, cons
 {
     if ( !newSelection.indexes().empty() )
     {
-        QModelIndex          index      = newSelection.indexes()[0];
-        int                  column     = 0;
-        QString              wellboreId = m_osduWellboresModel->data( index.siblingAtColumn( column ) ).toString();
-        RiuWellImportWizard* wiz        = dynamic_cast<RiuWellImportWizard*>( wizard() );
-        wiz->setSelectedWellboreId( wellboreId );
+        std::vector<QString> wellboreIds;
+        QModelIndexList      selection = m_tableView->selectionModel()->selectedRows();
+        for ( QModelIndex index : selection )
+        {
+            int idColumn = 0;
+
+            if ( index.column() == idColumn )
+            {
+                QString wellboreId = m_proxyModel->data( index.siblingAtColumn( idColumn ) ).toString();
+                wellboreIds.push_back( wellboreId );
+            }
+        }
+
+        RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
+        wiz->setSelectedWellboreIds( wellboreIds );
     }
 }
 
@@ -435,8 +500,9 @@ WellSummaryPage::WellSummaryPage( RimWellPathImport* wellPathImport, RiaOsduConn
 
     setButtonText( QWizard::FinishButton, "Import" );
 
-    connect( m_osduConnector, SIGNAL( wellboreTrajectoryFinished( const QString& ) ), SLOT( wellboreTrajectoryFinished( const QString& ) ) );
-    connect( m_osduConnector, SIGNAL( fileDownloadFinished( const QString& ) ), SLOT( fileDownloadFinished( const QString& ) ) );
+    connect( m_osduConnector,
+             SIGNAL( wellboreTrajectoryFinished( const QString&, int, const QString& ) ),
+             SLOT( wellboreTrajectoryFinished( const QString&, int, const QString& ) ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -446,28 +512,35 @@ void WellSummaryPage::initializePage()
 {
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
 
-    QString wellboreId = wiz->selectedWellboreId();
-    wiz->downloadWellPaths( wellboreId );
+    QMutexLocker lock( &m_mutex );
+    m_pendingWellboreIds.clear();
+    for ( const QString& wellboreId : wiz->selectedWellboreIds() )
+    {
+        m_pendingWellboreIds.insert( wellboreId );
+    }
+
+    for ( const QString& wellboreId : wiz->selectedWellboreIds() )
+    {
+        wiz->downloadWellPaths( wellboreId );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void WellSummaryPage::fileDownloadFinished( const QString& fileId, const QString& filePath )
-{
-    m_textEdit->setText( "Summary of imported wells\n\n" );
-
-    m_textEdit->append( "FileId:" );
-    m_textEdit->append( fileId );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
+void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId, int numTrajectories, const QString& errorMessage )
 {
     std::vector<OsduWellboreTrajectory> wellboreTrajectories = m_osduConnector->wellboreTrajectories( wellboreId );
     std::vector<OsduWell>               wells                = m_osduConnector->wells();
+
+    auto findWellboreById = []( const std::vector<OsduWellbore>& wellbores, const QString& wellboreId ) -> std::optional<const OsduWellbore>
+    {
+        auto it = std::find_if( wellbores.begin(), wellbores.end(), [wellboreId]( const OsduWellbore& w ) { return w.id == wellboreId; } );
+        if ( it != wellbores.end() )
+            return std::optional<const OsduWellbore>( *it );
+        else
+            return {};
+    };
 
     auto findWellForWellId = []( const std::vector<OsduWell>& wells, const QString& wellId ) -> std::optional<const OsduWell>
     {
@@ -480,24 +553,48 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId )
 
     RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
 
-    for ( auto w : wellboreTrajectories )
     {
-        // TODO: remove hack. A lot of the data set IDs in OSDU has trailing ":" which should not be
-        // there (i.e. the real id is without it). Chop them off to make more data sets work.
-        QString fileId = w.dataSetId;
-        if ( fileId.endsWith( ":" ) ) fileId.truncate( fileId.lastIndexOf( QChar( ':' ) ) );
+        QMutexLocker lock( &m_mutex );
 
-        QString                       wellId = m_osduConnector->wellIdForWellboreId( w.wellboreId );
+        QString                       wellId = m_osduConnector->wellIdForWellboreId( wellboreId );
         std::optional<const OsduWell> well   = findWellForWellId( wells, wellId );
 
-        if ( well.has_value() )
+        std::vector<OsduWellbore>         wellbores = m_osduConnector->wellbores( wellId );
+        std::optional<const OsduWellbore> wellbore  = findWellboreById( wellbores, wellboreId );
+
+        if ( well.has_value() && wellbore.has_value() )
         {
-            QString wellboreTrajectoryId = w.id;
-            wiz->addWellInfo( { .name                 = well.value().name,
-                                .wellId               = well.value().id,
-                                .wellboreId           = w.wellboreId,
-                                .wellboreTrajectoryId = wellboreTrajectoryId,
-                                .fileId               = fileId } );
+            if ( !errorMessage.isEmpty() )
+            {
+                m_textEdit->append( QString( "Wellbore '%1' download failed: %2." ).arg( wellbore.value().name ).arg( errorMessage ) );
+            }
+            else if ( numTrajectories == 0 )
+            {
+                m_textEdit->append( QString( "Wellbore '%1': No trajectory found." ).arg( wellbore.value().name ) );
+            }
+
+            for ( auto w : wellboreTrajectories )
+            {
+                QString wellboreTrajectoryId = w.id;
+                wiz->addWellInfo( { .name                 = wellbore.value().name,
+                                    .wellId               = well.value().id,
+                                    .wellboreId           = w.wellboreId,
+                                    .wellboreTrajectoryId = wellboreTrajectoryId,
+                                    .datumElevation       = wellbore.value().datumElevation } );
+            }
         }
+
+        m_pendingWellboreIds.erase( wellboreId );
     }
+
+    emit( completeChanged() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool WellSummaryPage::isComplete() const
+{
+    QMutexLocker lock( &m_mutex );
+    return m_pendingWellboreIds.empty();
 }

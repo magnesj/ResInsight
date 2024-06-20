@@ -38,6 +38,8 @@
 #include "RiuMainWindow.h"
 #include "RiuWellImportWizard.h"
 
+#include "cafProgressInfo.h"
+
 #include "cvfObject.h"
 
 #include <QAction>
@@ -74,35 +76,32 @@ void RicWellPathsImportOsduFeature::onActionTriggered( bool isChecked )
     RimOilField* oilField = project->activeOilField();
     if ( !oilField ) return;
 
-    RiaPreferencesOsdu* osduPreferences = app->preferences()->osduPreferences();
+    RiaOsduConnector* osduConnector = app->makeOsduConnector();
 
-    const QString server         = osduPreferences->server();
-    const QString dataParitionId = osduPreferences->dataPartitionId();
-    const QString authority      = osduPreferences->authority();
-    const QString scopes         = osduPreferences->scopes();
-    const QString clientId       = osduPreferences->clientId();
-
-    RiaOsduConnector osduConnector( RiuMainWindow::instance(), server, dataParitionId, authority, scopes, clientId );
-
-    RiuWellImportWizard wellImportwizard( wellPathsFolderPath, &osduConnector, app->project()->wellPathImport(), RiuMainWindow::instance() );
+    RiuWellImportWizard wellImportwizard( wellPathsFolderPath, osduConnector, app->project()->wellPathImport(), RiuMainWindow::instance() );
 
     if ( QDialog::Accepted == wellImportwizard.exec() )
     {
         std::vector<RiuWellImportWizard::WellInfo> importedWells = wellImportwizard.importedWells();
+
+        caf::ProgressInfo progress( importedWells.size(), "Importing wells from OSDU" );
         for ( auto w : importedWells )
         {
-            auto wellPath = new RimOsduWellPath;
-            wellPath->setName( w.name );
-            wellPath->setWellId( w.wellId );
-            wellPath->setWellboreId( w.wellboreId );
-            wellPath->setWellboreTrajectoryId( w.wellboreTrajectoryId );
-            wellPath->setFileId( w.fileId );
+            auto task = progress.task( QString( "Importing well: %1" ).arg( w.name ) );
 
-            oilField->wellPathCollection->addWellPath( wellPath );
-
-            auto [wellPathGeometry, errorMessage] = RimWellPathCollection::loadWellPathGeometryFromOsdu( &osduConnector, w.fileId );
+            auto [wellPathGeometry, errorMessage] =
+                RimWellPathCollection::loadWellPathGeometryFromOsdu( osduConnector, w.wellboreTrajectoryId, w.datumElevation );
             if ( wellPathGeometry.notNull() )
             {
+                auto wellPath = new RimOsduWellPath;
+                wellPath->setName( w.name );
+                wellPath->setWellId( w.wellId );
+                wellPath->setWellboreId( w.wellboreId );
+                wellPath->setWellboreTrajectoryId( w.wellboreTrajectoryId );
+                wellPath->setDatumElevationFromOsdu( w.datumElevation );
+
+                oilField->wellPathCollection->addWellPath( wellPath );
+
                 wellPath->setWellPathGeometry( wellPathGeometry.p() );
             }
             else

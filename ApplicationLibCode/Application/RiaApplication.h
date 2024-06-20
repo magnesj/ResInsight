@@ -68,6 +68,7 @@ class RiuMainWindowBase;
 class RiuPlotMainWindow;
 class RiuRecentFileActionProvider;
 class RiaArgumentParser;
+class RiaOsduConnector;
 
 namespace caf
 {
@@ -200,6 +201,8 @@ public:
     virtual void              addToRecentFiles( const QString& fileName ) {}
     virtual void              showFormattedTextInMessageBoxOrConsole( const QString& errMsg ) = 0;
 
+    RiaOsduConnector* makeOsduConnector();
+
 protected:
     // Protected implementation specific overrides
     virtual void invokeProcessEvents( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents ) = 0;
@@ -254,5 +257,6 @@ protected:
     bool m_runningWorkerProcess;
 
 private:
-    static RiaApplication* s_riaApplication;
+    static RiaApplication*     s_riaApplication;
+    QPointer<RiaOsduConnector> m_osduConnector;
 };
