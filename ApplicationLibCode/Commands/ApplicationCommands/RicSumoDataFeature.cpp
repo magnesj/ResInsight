@@ -26,6 +26,7 @@
 #include "Sumo/RimSumoConnector.h"
 
 #include "RiaLogging.h"
+#include "RifOsduWellLogReader.h"
 #include <QAction>
 
 CAF_CMD_SOURCE_INIT( RicSumoDataFeature, "RicSumoDataFeature" );
@@ -63,6 +64,10 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     parquetDownloadButton = new QPushButton( "Parquet", this );
     connect( parquetDownloadButton, &QPushButton::clicked, this, &SimpleDialog::onParquetClicked );
     layout->addWidget( parquetDownloadButton );
+
+    showContentParquetButton = new QPushButton( "Show Content Parquet", this );
+    connect( showContentParquetButton, &QPushButton::clicked, this, &SimpleDialog::onShowContentParquetClicked );
+    layout->addWidget( showContentParquetButton );
 
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
@@ -196,10 +201,25 @@ void SimpleDialog::onParquetClicked()
 
     if ( !m_sumoConnector->blobIds().empty() )
     {
-        m_sumoConnector->requestParquet( m_sumoConnector->blobIds().back() );
+        m_sumoConnector->requestBlobDownload( m_sumoConnector->blobIds().back() );
 
         label->setText( "Requesting blob ID for vector name (see log for response" );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SimpleDialog::onShowContentParquetClicked()
+{
+    if ( m_sumoConnector->blobContents().empty() ) return;
+
+    auto blob = m_sumoConnector->blobContents().back();
+
+    auto content = blob.contents;
+    // TODO: show content using parquet reader
+    auto tableText = RifOsduWellLogReader::readSummaryData( content );
+    RiaLogging::info( tableText );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -229,6 +249,8 @@ void SimpleDialog::onTokenReady( const QString& token )
 
     QSettings settings;
     settings.setValue( m_registryKeyBearerToken_DEBUG_ONLY, token );
+
+    m_sumoConnector->setToken( token );
 }
 
 void SimpleDialog::onOkClicked()

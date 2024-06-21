@@ -27,11 +27,15 @@
 
 #include "RifArrowTools.h"
 
+#include "RifCsvDataTableFormatter.h"
+#include <algorithm>
 #include <arrow/array/array_primitive.h>
 #include <arrow/csv/api.h>
 #include <arrow/io/api.h>
 #include <arrow/scalar.h>
 #include <parquet/arrow/reader.h>
+
+#pragma optimize( "", off )
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -71,4 +75,79 @@ std::pair<cvf::ref<RigOsduWellLogData>, QString> RifOsduWellLogReader::readWellL
     logData->finalizeData();
 
     return { logData, "" };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifOsduWellLogReader::readSummaryData( const QByteArray& contents )
+{
+    arrow::MemoryPool* pool = arrow::default_memory_pool();
+
+    std::shared_ptr<arrow::io::RandomAccessFile> input = std::make_shared<RifByteArrayArrowRandomAccessFile>( contents );
+
+    // Open Parquet file reader
+    std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
+    if ( !parquet::arrow::OpenFile( input, pool, &arrow_reader ).ok() )
+    {
+        return {};
+    }
+
+    // Read entire file as a single Arrow table
+    std::shared_ptr<arrow::Table> table;
+    if ( !arrow_reader->ReadTable( &table ).ok() )
+    {
+        return {};
+    }
+
+    QString                  tableText;
+    QTextStream              stream( &tableText );
+    RifCsvDataTableFormatter formatter( stream, ";" );
+
+    std::vector<RifTextDataTableColumn> header;
+    for ( std::string columnName : table->ColumnNames() )
+    {
+        header.push_back( RifTextDataTableColumn( QString::fromStdString( columnName ) ) );
+    }
+
+    formatter.header( header );
+
+    std::vector<std::vector<double>> columnVectors;
+
+    for ( std::string columnName : table->ColumnNames() )
+    {
+        std::shared_ptr<arrow::ChunkedArray> column = table->GetColumnByName( columnName );
+
+        auto columnType = column->type()->id();
+
+        if ( columnType == arrow::Type::DOUBLE )
+        {
+            std::vector<double> columnVector = RifArrowTools::convertChunkedArrayToStdVector( column );
+            columnVectors.push_back( columnVector );
+        }
+        else if ( column->type()->id() == arrow::Type::FLOAT )
+        {
+            auto                floatVector = RifArrowTools::convertChunkedArrayToStdFloatVector( column );
+            std::vector<double> columnVector( floatVector.begin(), floatVector.end() );
+            columnVectors.push_back( columnVector );
+        }
+    }
+
+    if ( columnVectors.empty() )
+    {
+        return {};
+    }
+
+    for ( int i = 0; i < std::min( 20, int( columnVectors[0].size() ) ); i++ )
+    {
+        for ( int j = 0; j < columnVectors.size(); j++ )
+        {
+            formatter.add( columnVectors[j][i] );
+        }
+        formatter.rowCompleted();
+    }
+
+    formatter.tableCompleted();
+
+    return tableText;
 }

@@ -47,6 +47,7 @@ private:
     void onVectorNamesClicked();
     void onFindBlobIdClicked();
     void onParquetClicked();
+    void onShowContentParquetClicked();
 
     bool isTokenValid();
 
@@ -60,6 +61,7 @@ private:
     QPushButton* vectorNamesButton;
     QPushButton* blobIdButton;
     QPushButton* parquetDownloadButton;
+    QPushButton* showContentParquetButton;
 
     QPointer<RimSumoConnector> m_sumoConnector;
 

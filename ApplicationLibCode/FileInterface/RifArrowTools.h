@@ -31,4 +31,5 @@ class RifArrowTools
 {
 public:
     static std::vector<double> convertChunkedArrayToStdVector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<float>  convertChunkedArrayToStdFloatVector( const std::shared_ptr<arrow::ChunkedArray>& column );
 };

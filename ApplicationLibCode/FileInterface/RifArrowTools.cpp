@@ -60,4 +60,38 @@ std::vector<double> RifArrowTools::convertChunkedArrayToStdVector( const std::sh
     }
 
     return result;
-};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<float> RifArrowTools::convertChunkedArrayToStdFloatVector( const std::shared_ptr<arrow::ChunkedArray>& column )
+{
+    auto convertChunkToFloatVector = []( const std::shared_ptr<arrow::Array>& array ) -> std::vector<float>
+    {
+        std::vector<float> result;
+
+        auto arrowFloatArray = std::static_pointer_cast<arrow::FloatArray>( array );
+        result.resize( arrowFloatArray->length() );
+        for ( int64_t i = 0; i < arrowFloatArray->length(); ++i )
+        {
+            result[i] = arrowFloatArray->Value( i );
+        }
+
+        return result;
+    };
+
+    CAF_ASSERT( column->type()->id() == arrow::Type::FLOAT );
+
+    std::vector<float> result;
+
+    // Iterate over each chunk in the column
+    for ( int i = 0; i < column->num_chunks(); ++i )
+    {
+        std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
+        std::vector<float>            chunk_vector = convertChunkToFloatVector( chunk );
+        result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
+    }
+
+    return result;
+}

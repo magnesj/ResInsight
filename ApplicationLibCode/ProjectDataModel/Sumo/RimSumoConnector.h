@@ -25,27 +25,30 @@
 
 #include <map>
 
+using SumoObjectId = QString;
+
 struct SumoAsset
 {
-    QString id;
-    QString kind;
-    QString name;
+    SumoObjectId id;
+    QString      kind;
+    QString      name;
 };
 
 struct SumoCase
 {
-    QString id;
-    QString kind;
-    QString name;
+    SumoObjectId id;
+    QString      kind;
+    QString      name;
 };
 
 struct SumoRedirect
 {
-    QString objectId;
-    QString blobName;
-    QString blobUrl;
-    QString redirectBaseUri;
-    QString redirectAuth;
+    SumoObjectId objectId;
+    QString      blobName;
+    QString      url;
+    QString      redirectBaseUri;
+    QString      redirectAuth;
+    QByteArray   contents;
 };
 
 //==================================================================================================
@@ -67,16 +70,17 @@ public:
     void requestEnsembleByCasesId( const QString& vectorName, const QString& caseId );
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
     void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
-    void requestParquet( const QString& blobId );
-    void requestBlobWithoutTokenHeader( const QString& url );
+    void requestBlobDownload( const QString& blobId );
+    void requestBlobByRedirectUri( const QString& blobId, const QString& redirectUri );
 
     QString server() const;
 
-    std::vector<SumoAsset> assets() const;
-    std::vector<SumoCase>  cases() const;
-    std::vector<QString>   vectorNames() const;
-    std::vector<QString>   blobUrls() const;
-    std::vector<QString>   blobIds() const;
+    std::vector<SumoAsset>    assets() const;
+    std::vector<SumoCase>     cases() const;
+    std::vector<QString>      vectorNames() const;
+    std::vector<QString>      blobUrls() const;
+    std::vector<QString>      blobIds() const;
+    std::vector<SumoRedirect> blobContents() const;
 
 public slots:
     void requestToken();
@@ -90,7 +94,7 @@ public slots:
 
     void accessGranted();
     void requestFailed( const QAbstractOAuth::Error error );
-    void parquetDownloadComplete( const QByteArray&, const QString& url );
+    void parquetDownloadComplete( const QString& blobId, const QByteArray&, const QString& url );
 
 signals:
     void fileDownloadFinished( const QString& fileId, const QString& filePath );

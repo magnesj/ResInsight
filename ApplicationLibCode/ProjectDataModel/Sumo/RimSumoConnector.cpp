@@ -104,17 +104,14 @@ void RimSumoConnector::requestFailed( const QAbstractOAuth::Error error )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::parquetDownloadComplete( const QByteArray& contents, const QString& url )
+void RimSumoConnector::parquetDownloadComplete( const QString& blobId, const QByteArray& contents, const QString& url )
 {
-    if ( m_redirect.isEmpty() )
-    {
-        m_parquetData = contents;
-    }
-    else
-    {
-        auto url = m_redirect;
-        requestBlobWithoutTokenHeader( url );
-    }
+    SumoRedirect obj;
+    obj.objectId = blobId;
+    obj.contents = contents;
+    obj.url      = url;
+
+    m_redirectInfo.push_back( obj );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -333,44 +330,44 @@ void RimSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestParquet( const QString& blobId )
+void RimSumoConnector::requestBlobDownload( const QString& blobId )
 {
     QString url = constructDownloadUrl( m_server, blobId );
 
-    QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( url );
-    m_networkRequest.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy );
+    QNetworkRequest networkRequest;
+    networkRequest.setUrl( url );
 
-    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
+    // Other redirection policies are NoLessSafeRedirectPolicy, SameOriginRedirectPolicy, UserVerifiedRedirectPolicy. They were tested, but
+    // did not work. Use ManualRedirectPolicy instead, and inspect the reply for the redirection target.
+    networkRequest.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy );
 
-    auto reply = m_networkAccessManager->get( m_networkRequest );
+    addStandardHeader( networkRequest, m_token, RiaDefines::contentTypeJson() );
 
-    connect( this,
-             SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ),
-             this,
-             SLOT( parquetDownloadComplete( const QByteArray&, const QString& ) ) );
+    auto reply = m_networkAccessManager->get( networkRequest );
 
     connect( reply,
              &QNetworkReply::finished,
-             [this, reply, url]()
+             [this, reply, blobId, url]()
              {
                  if ( reply->error() == QNetworkReply::NoError )
                  {
                      auto contents = reply->readAll();
 
                      QVariant redirectUrl = reply->attribute( QNetworkRequest::RedirectionTargetAttribute );
-
-                     // Post the request to the redirected URL
-                     // QNetworkRequest redirectRequest( redirectUrl.toUrl() );
-                     m_redirect = redirectUrl.toString();
-
-                     emit parquetDownloadFinished( contents, url );
+                     if ( redirectUrl.isValid() )
+                     {
+                         requestBlobByRedirectUri( blobId, redirectUrl.toString() );
+                     }
+                     else
+                     {
+                         QString errorMessage = "Not able to parse and interpret valid redirect Url";
+                         RiaLogging::error( errorMessage );
+                     }
                  }
                  else
                  {
                      QString errorMessage = "Download failed: " + url + " failed." + reply->errorString();
                      RiaLogging::error( errorMessage );
-                     emit parquetDownloadFinished( QByteArray(), errorMessage );
                  }
              } );
 }
@@ -378,33 +375,30 @@ void RimSumoConnector::requestParquet( const QString& blobId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::requestBlobWithoutTokenHeader( const QString& url )
+void RimSumoConnector::requestBlobByRedirectUri( const QString& blobId, const QString& redirectUri )
 {
-    QNetworkRequest m_networkRequest;
-    m_networkRequest.setUrl( url );
+    QNetworkRequest networkRequest;
+    networkRequest.setUrl( redirectUri );
 
-    auto reply = m_networkAccessManager->get( m_networkRequest );
-
-    connect( this,
-             SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ),
-             this,
-             SLOT( parquetDownloadComplete( const QByteArray&, const QString& ) ) );
+    auto reply = m_networkAccessManager->get( networkRequest );
 
     connect( reply,
              &QNetworkReply::finished,
-             [this, reply, url]()
+             [this, reply, blobId, redirectUri]()
              {
                  if ( reply->error() == QNetworkReply::NoError )
                  {
                      auto contents = reply->readAll();
 
-                     emit parquetDownloadFinished( contents, url );
+                     QString msg = "Received data from : " + redirectUri;
+                     RiaLogging::info( msg );
+
+                     parquetDownloadComplete( blobId, contents, redirectUri );
                  }
                  else
                  {
-                     QString errorMessage = "Download failed: " + url + " failed." + reply->errorString();
+                     QString errorMessage = "Download failed: " + redirectUri + " failed." + reply->errorString();
                      RiaLogging::error( errorMessage );
-                     emit parquetDownloadFinished( QByteArray(), errorMessage );
                  }
              } );
 }
@@ -762,4 +756,12 @@ std::vector<QString> RimSumoConnector::blobUrls() const
 std::vector<QString> RimSumoConnector::blobIds() const
 {
     return m_blobName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<SumoRedirect> RimSumoConnector::blobContents() const
+{
+    return m_redirectInfo;
 }

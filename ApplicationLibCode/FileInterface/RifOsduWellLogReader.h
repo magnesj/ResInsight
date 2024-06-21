@@ -33,4 +33,6 @@ class RifOsduWellLogReader
 {
 public:
     static std::pair<cvf::ref<RigOsduWellLogData>, QString> readWellLogData( const QByteArray& contents );
+
+    static QString readSummaryData( const QByteArray& contents );
 };
