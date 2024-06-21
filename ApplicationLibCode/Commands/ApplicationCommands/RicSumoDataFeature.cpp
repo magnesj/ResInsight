@@ -20,13 +20,14 @@
 
 #include "RiaApplication.h"
 #include "RiaGuiApplication.h"
+#include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
+#include "RifOsduWellLogReader.h"
+#include "RiuMainWindow.h"
 
 #include "Sumo/RimSumoConnector.h"
 
-#include "RiaLogging.h"
-#include "RifOsduWellLogReader.h"
 #include <QAction>
 
 CAF_CMD_SOURCE_INIT( RicSumoDataFeature, "RicSumoDataFeature" );
