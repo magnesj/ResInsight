@@ -21,6 +21,7 @@
 #include "RiaLogging.h"
 
 #include "OsduImportCommands/RiaOsduOAuthHttpServerReplyHandler.h"
+#include "RiaOsduDefines.h"
 #include <QAbstractOAuth>
 #include <QDesktopServices>
 #include <QJsonDocument>
@@ -35,6 +36,8 @@
 #include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
+
+#pragma optimize( "", off )
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -101,6 +104,22 @@ void RimSumoConnector::requestFailed( const QAbstractOAuth::Error error )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSumoConnector::parquetDownloadComplete( const QByteArray& contents, const QString& url )
+{
+    if ( m_redirect.isEmpty() )
+    {
+        m_parquetData = contents;
+    }
+    else
+    {
+        auto url = m_redirect;
+        requestBlobWithoutTokenHeader( url );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSumoConnector::requestToken()
 {
     RiaLogging::debug( "Requesting token." );
@@ -138,7 +157,7 @@ void RimSumoConnector::requestCasesForField( const QString& fieldName )
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( constructSearchUrl( m_server ) ) );
 
-    addStandardHeader( m_networkRequest, m_token );
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
     QString payload_caseCountForFieldname = R"(
 {"size":0,"query":{"bool":{"must_not":{"exists":{"field":"_sumo.parent_object"}},"filter":[{"term":{"access.asset.name.keyword":"Drogon"}}]}},"aggs":{"masterdata.smda.field.identifier.keyword":{"terms":{"field":"masterdata.smda.field.identifier.keyword","size":500,"order":{"_key":"asc"}}}}}
@@ -185,7 +204,7 @@ void RimSumoConnector::requestAssets()
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( m_server + "/api/v1/userpermissions" ) );
 
-    addStandardHeader( m_networkRequest, m_token );
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
     auto reply = m_networkAccessManager->get( m_networkRequest );
 
@@ -248,7 +267,7 @@ void RimSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, con
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
 
-    addStandardHeader( m_networkRequest, m_token );
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
     auto payload = payloadTemplate.arg( caseId ).arg( ensembleName );
     auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
@@ -295,7 +314,7 @@ void RimSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
 
-    addStandardHeader( m_networkRequest, m_token );
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
     auto payload = payloadTemplate.arg( caseId ).arg( ensembleName ).arg( vectorName );
     auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
@@ -312,6 +331,85 @@ void RimSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestParquet( const QString& blobId )
+{
+    QString url = constructDownloadUrl( m_server, blobId );
+
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( url );
+    m_networkRequest.setAttribute( QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::ManualRedirectPolicy );
+
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
+
+    auto reply = m_networkAccessManager->get( m_networkRequest );
+
+    connect( this,
+             SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ),
+             this,
+             SLOT( parquetDownloadComplete( const QByteArray&, const QString& ) ) );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, url]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     auto contents = reply->readAll();
+
+                     QVariant redirectUrl = reply->attribute( QNetworkRequest::RedirectionTargetAttribute );
+
+                     // Post the request to the redirected URL
+                     // QNetworkRequest redirectRequest( redirectUrl.toUrl() );
+                     m_redirect = redirectUrl.toString();
+
+                     emit parquetDownloadFinished( contents, url );
+                 }
+                 else
+                 {
+                     QString errorMessage = "Download failed: " + url + " failed." + reply->errorString();
+                     RiaLogging::error( errorMessage );
+                     emit parquetDownloadFinished( QByteArray(), errorMessage );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestBlobWithoutTokenHeader( const QString& url )
+{
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( url );
+
+    auto reply = m_networkAccessManager->get( m_networkRequest );
+
+    connect( this,
+             SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ),
+             this,
+             SLOT( parquetDownloadComplete( const QByteArray&, const QString& ) ) );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, url]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     auto contents = reply->readAll();
+
+                     emit parquetDownloadFinished( contents, url );
+                 }
+                 else
+                 {
+                     QString errorMessage = "Download failed: " + url + " failed." + reply->errorString();
+                     RiaLogging::error( errorMessage );
+                     emit parquetDownloadFinished( QByteArray(), errorMessage );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
 //
 //--------------------------------------------------------------------------------------------------
 QString RimSumoConnector::constructSearchUrl( const QString& server )
@@ -322,9 +420,10 @@ QString RimSumoConnector::constructSearchUrl( const QString& server )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimSumoConnector::constructDownloadUrl( const QString& server, const QString& fileId )
+QString RimSumoConnector::constructDownloadUrl( const QString& server, const QString& blobId )
 {
-    return server + "/api/file/v2/files/" + fileId + "/downloadURL";
+    return server + "/api/v1/objects('" + blobId + "')/blob";
+    // https: // main-sumo-prod.radix.equinor.com/api/v1/objects('76d6d11f-2278-3fe2-f12f-77142ad163c6')/blob
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -351,7 +450,7 @@ QNetworkReply* RimSumoConnector::makeRequest( const std::map<QString, QString>& 
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( constructSearchUrl( server ) ) );
 
-    addStandardHeader( m_networkRequest, token );
+    addStandardHeader( m_networkRequest, token, RiaDefines::contentTypeJson() );
 
     QJsonObject obj;
     for ( auto [key, value] : parameters )
@@ -480,7 +579,7 @@ void RimSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId
     QByteArray result = reply->readAll();
     reply->deleteLater();
 
-    m_blobId.clear();
+    m_blobName.clear();
 
     if ( reply->error() == QNetworkReply::NoError )
     {
@@ -501,8 +600,11 @@ void RimSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId
             QJsonObject fmuObj     = sourceObj["_sumo"].toObject();
             auto        fmuObjKeys = fmuObj.keys();
 
-            auto blobUrl = fmuObj["blob_url"].toString();
-            m_blobId.push_back( blobUrl );
+            auto blobName = fmuObj["blob_name"].toString();
+            m_blobName.push_back( blobName );
+
+            auto blobUrl = fmuObj["blob_name"].toString();
+            m_blobName.push_back( blobUrl );
         }
     }
 }
@@ -550,27 +652,51 @@ void RimSumoConnector::saveFile( QNetworkReply* reply, const QString& fileId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSumoConnector::addStandardHeader( QNetworkRequest& networkRequest, const QString& token )
+void RimSumoConnector::addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType )
 {
-    networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
+    networkRequest.setHeader( QNetworkRequest::ContentTypeHeader, contentType );
     networkRequest.setRawHeader( "Authorization", "Bearer " + token.toUtf8() );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QNetworkReply* RimSumoConnector::makeDownloadRequest( const QString& server, const QString& id, const QString& token )
+QNetworkReply* RimSumoConnector::makeDownloadRequest( const QString& url, const QString& token, const QString& contentType )
 {
     QNetworkRequest m_networkRequest;
-
-    QString url = constructDownloadUrl( server, id );
-
     m_networkRequest.setUrl( QUrl( url ) );
 
-    addStandardHeader( m_networkRequest, token );
+    addStandardHeader( m_networkRequest, token, contentType );
 
     auto reply = m_networkAccessManager->get( m_networkRequest );
     return reply;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSumoConnector::requestParquetData( const QString& url, const QString& token )
+{
+    RiaLogging::info( "Requesting download of parquet from: " + url );
+
+    auto reply = makeDownloadRequest( url, token, RiaDefines::contentTypeJson() );
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, url]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     QByteArray contents = reply->readAll();
+                     RiaLogging::info( QString( "Download succeeded: %1 bytes." ).arg( contents.length() ) );
+                     emit parquetDownloadFinished( contents, "" );
+                 }
+                 else
+                 {
+                     QString errorMessage = "Download failed: " + url + " failed." + reply->errorString();
+                     RiaLogging::error( errorMessage );
+                     emit parquetDownloadFinished( QByteArray(), errorMessage );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -620,4 +746,20 @@ std::vector<SumoCase> RimSumoConnector::cases() const
 std::vector<QString> RimSumoConnector::vectorNames() const
 {
     return m_vectorNames;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimSumoConnector::blobUrls() const
+{
+    return m_blobName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimSumoConnector::blobIds() const
+{
+    return m_blobName;
 }

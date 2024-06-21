@@ -60,6 +60,10 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     connect( blobIdButton, &QPushButton::clicked, this, &SimpleDialog::onFindBlobIdClicked );
     layout->addWidget( blobIdButton );
 
+    parquetDownloadButton = new QPushButton( "Parquet", this );
+    connect( parquetDownloadButton, &QPushButton::clicked, this, &SimpleDialog::onParquetClicked );
+    layout->addWidget( parquetDownloadButton );
+
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
     layout->addWidget( okButton );
@@ -181,6 +185,26 @@ void SimpleDialog::onFindBlobIdClicked()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void SimpleDialog::onParquetClicked()
+{
+    if ( !isTokenValid() ) return;
+
+    if ( m_sumoConnector->blobIds().empty() )
+    {
+        onFindBlobIdClicked();
+    }
+
+    if ( !m_sumoConnector->blobIds().empty() )
+    {
+        m_sumoConnector->requestParquet( m_sumoConnector->blobIds().back() );
+
+        label->setText( "Requesting blob ID for vector name (see log for response" );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool SimpleDialog::isTokenValid()
 {
     if ( !m_sumoConnector )
@@ -224,8 +248,11 @@ void SimpleDialog::onCancelClicked()
 //--------------------------------------------------------------------------------------------------
 void RicSumoDataFeature::onActionTriggered( bool isChecked )
 {
-    SimpleDialog dialog;
-    dialog.exec();
+    if ( !m_dialog )
+    {
+        m_dialog = new SimpleDialog( RiaGuiApplication::instance()->mainWindow() );
+    }
+    m_dialog->show();
 }
 
 //--------------------------------------------------------------------------------------------------

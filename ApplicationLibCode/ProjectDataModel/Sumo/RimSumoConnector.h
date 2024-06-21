@@ -39,6 +39,15 @@ struct SumoCase
     QString name;
 };
 
+struct SumoRedirect
+{
+    QString objectId;
+    QString blobName;
+    QString blobUrl;
+    QString redirectBaseUri;
+    QString redirectAuth;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -58,12 +67,16 @@ public:
     void requestEnsembleByCasesId( const QString& vectorName, const QString& caseId );
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
     void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
+    void requestParquet( const QString& blobId );
+    void requestBlobWithoutTokenHeader( const QString& url );
 
     QString server() const;
 
     std::vector<SumoAsset> assets() const;
     std::vector<SumoCase>  cases() const;
     std::vector<QString>   vectorNames() const;
+    std::vector<QString>   blobUrls() const;
+    std::vector<QString>   blobIds() const;
 
 public slots:
     void requestToken();
@@ -77,6 +90,7 @@ public slots:
 
     void accessGranted();
     void requestFailed( const QAbstractOAuth::Error error );
+    void parquetDownloadComplete( const QByteArray&, const QString& url );
 
 signals:
     void fileDownloadFinished( const QString& fileId, const QString& filePath );
@@ -85,16 +99,18 @@ signals:
     void wellboresFinished( const QString& wellId );
     void wellboreTrajectoryFinished( const QString& wellboreId );
     void tokenReady( const QString& token );
+    void parquetDownloadFinished( const QByteArray& contents, const QString& url );
 
 private:
-    void addStandardHeader( QNetworkRequest& networkRequest, const QString& token );
+    void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
 
     QNetworkReply* makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& token );
-    QNetworkReply* makeDownloadRequest( const QString& server, const QString& id, const QString& token );
+    QNetworkReply* makeDownloadRequest( const QString& url, const QString& token, const QString& contentType );
+    void           requestParquetData( const QString& url, const QString& token );
 
     static QString generateRandomString( int length = 20 );
     static QString constructSearchUrl( const QString& server );
-    static QString constructDownloadUrl( const QString& server, const QString& fileId );
+    static QString constructDownloadUrl( const QString& server, const QString& blobId );
     static QString constructAuthUrl( const QString& authority );
     static QString constructTokenUrl( const QString& authority );
 
@@ -112,5 +128,12 @@ private:
     std::vector<SumoCase>  m_cases;
     std::vector<QString>   m_vectorNames;
 
-    std::vector<QString> m_blobId;
+    std::vector<QString> m_blobName;
+    std::vector<QString> m_blobUrl;
+
+    QString m_redirect;
+
+    std::vector<SumoRedirect> m_redirectInfo;
+
+    QByteArray m_parquetData;
 };

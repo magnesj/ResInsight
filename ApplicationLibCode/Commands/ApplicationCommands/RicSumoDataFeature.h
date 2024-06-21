@@ -46,6 +46,7 @@ private:
     void onCasesClicked();
     void onVectorNamesClicked();
     void onFindBlobIdClicked();
+    void onParquetClicked();
 
     bool isTokenValid();
 
@@ -58,6 +59,7 @@ private:
     QPushButton* casesButton;
     QPushButton* vectorNamesButton;
     QPushButton* blobIdButton;
+    QPushButton* parquetDownloadButton;
 
     QPointer<RimSumoConnector> m_sumoConnector;
 
@@ -74,4 +76,7 @@ class RicSumoDataFeature : public caf::CmdFeature
 protected:
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
+
+private:
+    SimpleDialog* m_dialog = nullptr;
 };
