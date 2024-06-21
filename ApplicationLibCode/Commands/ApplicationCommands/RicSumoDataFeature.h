@@ -20,12 +20,12 @@
 
 #include "cafCmdFeature.h"
 
+#include "Sumo/RimSumoConnector.h"
+
 #include <QDialog>
 #include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
-
-class RimSumoConnector;
 
 class SimpleDialog : public QDialog
 {

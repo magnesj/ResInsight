@@ -35,8 +35,6 @@
 #include <arrow/scalar.h>
 #include <parquet/arrow/reader.h>
 
-#pragma optimize( "", off )
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -140,7 +138,7 @@ QString RifOsduWellLogReader::readSummaryData( const QByteArray& contents )
 
     for ( int i = 0; i < std::min( 20, int( columnVectors[0].size() ) ); i++ )
     {
-        for ( int j = 0; j < columnVectors.size(); j++ )
+        for ( int j = 0; j < int( columnVectors.size() ); j++ )
         {
             formatter.add( columnVectors[j][i] );
         }
