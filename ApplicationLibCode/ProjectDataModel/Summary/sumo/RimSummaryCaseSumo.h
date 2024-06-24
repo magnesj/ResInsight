@@ -20,6 +20,8 @@
 #include "RifSummaryReaderInterface.h"
 #include "RimSummaryCase.h"
 
+class RimSummaryEnsembleSumo;
+
 //==================================================================================================
 //
 //
@@ -44,9 +46,13 @@ public:
     std::string                          unitName( const RifEclipseSummaryAddress& resultAddress ) const override;
     RiaDefines::EclipseUnitSystem        unitSystem() const override;
 
-private:
-    caf::PdmField<QString> m_realizationName;
+    void setEnsemble( RimSummaryEnsembleSumo* ensemble );
 
 protected:
     QString caseName() const override;
+
+private:
+    caf::PdmField<QString> m_realizationName;
+
+    RimSummaryEnsembleSumo* m_ensemble;
 };

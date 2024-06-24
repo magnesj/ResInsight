@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimSummaryEnsembleSumo.h"
+#include "RimSummaryCaseSumo.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
@@ -30,4 +31,71 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
     CAF_PDM_InitFieldNoDefault( &m_sumoFieldId, "SumoFieldId", "Field Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress ) const
+{
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<bool, std::vector<double>> RimSummaryEnsembleSumo::values( const RifEclipseSummaryAddress& resultAddress ) const
+{
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::string RimSummaryEnsembleSumo::unitName( const RifEclipseSummaryAddress& resultAddress ) const
+{
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaDefines::EclipseUnitSystem RimSummaryEnsembleSumo::unitSystem() const
+{
+    return RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
+{
+    // create job to download data from sumo
+    // download data, and notify when done
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
+{
+    // load summary data from sumo
+    // create the realizations and add them to the ensemble
+
+    m_cases.deleteChildren();
+
+    size_t realizationCount = 10;
+    for ( size_t i = 0; i < realizationCount; ++i )
+    {
+        auto realization = new RimSummaryCaseSumo();
+        realization->setEnsemble( this );
+        realization->setRealizationName( QString( "Realization %1" ).arg( i ) );
+        
+        m_cases.push_back( realization );
+    }
+
+    // call the base class method after data has been loaded
+    RimSummaryCaseCollection::onLoadDataAndUpdate();
 }
