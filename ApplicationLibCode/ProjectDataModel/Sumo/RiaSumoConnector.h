@@ -51,6 +51,12 @@ struct SumoRedirect
     QByteArray   contents;
 };
 
+struct SumoEnsemble
+{
+    SumoObjectId caseId;
+    QString      name;
+};
+
 //==================================================================================================
 ///
 //==================================================================================================
@@ -67,7 +73,7 @@ public:
     void requestCasesForField( const QString& fieldName );
     void requestAssets();
 
-    void requestEnsembleByCasesId( const QString& vectorName, const QString& caseId );
+    void requestEnsembleByCasesId( const QString& caseId );
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
     void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
     void requestBlobDownload( const QString& blobId );
@@ -77,6 +83,7 @@ public:
 
     std::vector<SumoAsset>    assets() const;
     std::vector<SumoCase>     cases() const;
+    std::vector<QString>      ensembleNamesForCase( const QString& caseId ) const;
     std::vector<QString>      vectorNames() const;
     std::vector<QString>      blobUrls() const;
     std::vector<QString>      blobIds() const;
@@ -86,6 +93,7 @@ public slots:
     void requestToken();
 
     void parseAssets( QNetworkReply* reply );
+    void parseEnsembleNames( QNetworkReply* reply, const QString& caseId );
     void parseCases( QNetworkReply* reply );
     void parseVectorNames( QNetworkReply* reply, const QString& caseId, const QString& ensembleName );
     void parseBlobIds( QNetworkReply* reply, const QString& caseId, const QString& ensembleName, const QString& vectorName );
@@ -104,6 +112,7 @@ signals:
     void wellboreTrajectoryFinished( const QString& wellboreId );
     void tokenReady( const QString& token );
     void parquetDownloadFinished( const QByteArray& contents, const QString& url );
+    void ensembleNamesFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
@@ -130,9 +139,10 @@ private:
 
     QString m_token;
 
-    std::vector<SumoAsset> m_assets;
-    std::vector<SumoCase>  m_cases;
-    std::vector<QString>   m_vectorNames;
+    std::vector<SumoAsset>    m_assets;
+    std::vector<SumoCase>     m_cases;
+    std::vector<QString>      m_vectorNames;
+    std::vector<SumoEnsemble> m_ensembleNames;
 
     std::vector<QString> m_blobName;
     std::vector<QString> m_blobUrl;

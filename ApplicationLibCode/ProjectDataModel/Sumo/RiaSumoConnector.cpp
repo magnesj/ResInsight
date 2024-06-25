@@ -152,6 +152,8 @@ QString RiaSumoConnector::token() const
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestCasesForField( const QString& fieldName )
 {
+    requestTokenBlocking();
+
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( constructSearchUrl( m_server ) ) );
 
@@ -181,7 +183,7 @@ void RiaSumoConnector::requestCasesForField( const QString& fieldName )
 )";
 
     QString payload = payloadTemplate.arg( fieldName );
-    auto    reply   = m_networkAccessManager->post( m_networkRequest, payloadTemplate.toUtf8() );
+    auto    reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
 
     connect( reply,
              &QNetworkReply::finished,
@@ -222,8 +224,48 @@ void RiaSumoConnector::requestAssets()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestEnsembleByCasesId( const QString& vectorName, const QString& caseId )
+void RiaSumoConnector::requestEnsembleByCasesId( const QString& caseId )
 {
+    QString payloadTemplate = R"(
+
+{
+    "query": {
+        "bool": {
+            "filter": [
+                        {"term":{"_sumo.parent_object.keyword":"%1"}}
+            ]
+        }
+    },
+    "aggs": {
+        "aggs_columns": {
+            "terms": { "field": "fmu.iteration.name.keyword", "size": 5 }
+        }
+    },
+    "track_total_hits":true,
+    "size":20,
+    "from":0,
+     "_source": false
+}
+
+)";
+
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
+
+    auto payload = payloadTemplate.arg( caseId );
+    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, caseId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseEnsembleNames( reply, caseId );
+                 }
+             } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -495,6 +537,41 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const QString& caseId )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        m_ensembleNames.clear();
+
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
+        auto          keys_1  = jsonObj.keys();
+
+        auto aggregationsObject = jsonObj["aggregations"].toObject();
+
+        QJsonObject aggregationColumnsObject = aggregationsObject["aggs_columns"].toObject();
+        auto        keys_2                   = aggregationColumnsObject.keys();
+
+        QJsonArray bucketsArray = aggregationColumnsObject["buckets"].toArray();
+        foreach ( const QJsonValue& bucket, bucketsArray )
+        {
+            QJsonObject bucketObj = bucket.toObject();
+            auto        keys_3    = bucketObj.keys();
+
+            auto ensembleName = bucketObj["key"].toString();
+            m_ensembleNames.push_back( { caseId, ensembleName } );
+        }
+    }
+
+    emit ensembleNamesFinished();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::parseCases( QNetworkReply* reply )
 {
     QByteArray result = reply->readAll();
@@ -753,6 +830,22 @@ std::vector<SumoAsset> RiaSumoConnector::assets() const
 std::vector<SumoCase> RiaSumoConnector::cases() const
 {
     return m_cases;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RiaSumoConnector::ensembleNamesForCase( const QString& caseId ) const
+{
+    std::vector<QString> ensembleNames;
+    for ( const auto& ensemble : m_ensembleNames )
+    {
+        if ( ensemble.caseId == caseId )
+        {
+            ensembleNames.push_back( ensemble.name );
+        }
+    }
+    return ensembleNames;
 }
 
 //--------------------------------------------------------------------------------------------------

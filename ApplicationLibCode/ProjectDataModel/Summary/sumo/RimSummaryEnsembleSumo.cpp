@@ -115,6 +115,44 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
             options.push_back( { asset.name, asset.name } );
         }
     }
+    else if ( fieldNeedingOptions == &m_sumoCaseId && !m_sumoFieldName().isEmpty() )
+    {
+        if ( m_sumoConnector->cases().empty() )
+        {
+            m_sumoConnector->requestCasesForField( m_sumoFieldName );
+
+            /*
+                        while ( m_sumoConnector->cases().empty() )
+                        {
+                            qApp->processEvents();
+                        }
+            */
+        }
+
+        for ( const auto& sumoCase : m_sumoConnector->cases() )
+        {
+            options.push_back( { sumoCase.name, sumoCase.id } );
+        }
+    }
+    else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
+    {
+        if ( m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ).empty() )
+        {
+            m_sumoConnector->requestEnsembleByCasesId( m_sumoCaseId );
+
+            /*
+                        while ( m_sumoConnector->cases().empty() )
+                        {
+                            qApp->processEvents();
+                        }
+            */
+        }
+
+        for ( const auto& name : m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ) )
+        {
+            options.push_back( { name, name } );
+        }
+    }
 
     return options;
 }
