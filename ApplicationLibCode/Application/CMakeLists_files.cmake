@@ -10,6 +10,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesGeoMech.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesSystem.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesOsdu.h
+    ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesSumo.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaPorosityModel.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaSummaryCurveDefinition.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveSetDefinition.h
@@ -52,6 +53,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesGeoMech.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesSystem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesOsdu.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaPreferencesSumo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaPorosityModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaSummaryCurveDefinition.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveSetDefinition.cpp

@@ -46,6 +46,7 @@ class RiaPreferencesSummary;
 class RiaPreferencesGeoMech;
 class RiaPreferencesSystem;
 class RiaPreferencesOsdu;
+class RiaPreferencesSumo;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -134,6 +135,7 @@ public:
     RiaPreferencesSummary* summaryPreferences() const;
     RiaPreferencesSystem*  systemPreferences() const;
     RiaPreferencesOsdu*    osduPreferences() const;
+    RiaPreferencesSumo*    sumoPreferences() const;
 
 public:
     caf::PdmField<bool> enableGrpcServer;
@@ -246,6 +248,7 @@ private:
 
     // Osdu settings
     caf::PdmChildField<RiaPreferencesOsdu*> m_osduPreferences;
+    caf::PdmChildField<RiaPreferencesSumo*> m_sumoPreferences;
 
     // 3d view
     caf::PdmField<caf::AppEnum<RiaDefines::MeshModeType>>       m_defaultMeshModeType;

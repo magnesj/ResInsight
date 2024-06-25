@@ -26,6 +26,7 @@
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaPreferencesSumo.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaProjectModifier.h"
 #include "RiaSocketServer.h"
@@ -33,6 +34,7 @@
 #include "RiaVersionInfo.h"
 #include "RiaViewRedrawScheduler.h"
 #include "RiaWellNameComparer.h"
+#include "Sumo/RiaSumoConnector.h"
 
 #include "ExportCommands/RicSnapshotAllViewsToFileFeature.h"
 #include "HoloLensCommands/RicHoloLensSessionManager.h"
@@ -1709,4 +1711,23 @@ RiaOsduConnector* RiaApplication::makeOsduConnector()
     const QString       clientId        = osduPreferences->clientId();
     m_osduConnector = new RiaOsduConnector( RiuMainWindow::instance(), server, dataPartitionId, authority, scopes, clientId );
     return m_osduConnector;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaSumoConnector* RiaApplication::makeSumoConnector()
+{
+    if ( !m_sumoConnector )
+    {
+        auto          sumoPrefs = preferences()->sumoPreferences();
+        const QString server    = sumoPrefs->server();
+        const QString authority = sumoPrefs->authority();
+        const QString scopes    = sumoPrefs->scopes();
+        const QString clientId  = sumoPrefs->clientId();
+
+        m_sumoConnector = new RiaSumoConnector( RiuMainWindow::instance(), server, authority, scopes, clientId );
+    }
+
+    return m_sumoConnector;
 }

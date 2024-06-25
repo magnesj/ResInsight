@@ -54,12 +54,12 @@ struct SumoRedirect
 //==================================================================================================
 ///
 //==================================================================================================
-class RimSumoConnector : public QObject
+class RiaSumoConnector : public QObject
 {
     Q_OBJECT
 public:
-    RimSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId );
-    ~RimSumoConnector() override;
+    RiaSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId );
+    ~RiaSumoConnector() override;
 
     void    setToken( const QString& token );
     QString token() const;
@@ -107,6 +107,8 @@ signals:
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
+
+    QString requestTokenBlocking();
 
     QNetworkReply* makeRequest( const std::map<QString, QString>& parameters, const QString& server, const QString& token );
     QNetworkReply* makeDownloadRequest( const QString& url, const QString& token, const QString& contentType );

@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimSummaryEnsembleSumo.h"
+#include "../../../Application/RiaApplication.h"
 #include "RimSummaryCaseSumo.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
@@ -28,7 +29,7 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 {
     CAF_PDM_InitObject( "Sumo Ensemble", ":/SummaryCase.svg", "", "The Base Class for all Summary Cases" );
 
-    CAF_PDM_InitFieldNoDefault( &m_sumoFieldId, "SumoFieldId", "Field Id" );
+    CAF_PDM_InitFieldNoDefault( &m_sumoFieldName, "SumoFieldId", "Field Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
 }
@@ -79,6 +80,70 @@ bool RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& re
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_sumoFieldName );
+    uiOrdering.add( &m_sumoCaseId );
+    uiOrdering.add( &m_sumoEnsembleId );
+
+    RimSummaryCaseCollection::defineUiOrdering( uiConfigName, uiOrdering );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    createSumoConnector();
+
+    QList<caf::PdmOptionItemInfo> options;
+    if ( fieldNeedingOptions == &m_sumoFieldName )
+    {
+        if ( m_sumoConnector->assets().empty() )
+        {
+            m_sumoConnector->requestAssets();
+
+            // wait in loop until assets is not empty
+            while ( m_sumoConnector->assets().empty() )
+            {
+                qApp->processEvents();
+            }
+        }
+
+        for ( const auto& asset : m_sumoConnector->assets() )
+        {
+            options.push_back( { asset.name, asset.name } );
+        }
+    }
+
+    return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::createSumoConnector()
+{
+    if ( m_sumoConnector != nullptr ) return;
+
+    m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
+
+    QSettings settings;
+    auto      bearerToken = settings.value( m_registryKeyBearerToken_DEBUG_ONLY ).toString();
+
+    if ( bearerToken.isEmpty() )
+    {
+        m_sumoConnector->requestToken();
+    }
+    else
+    {
+        m_sumoConnector->setToken( bearerToken );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
 {
     // load summary data from sumo
@@ -92,7 +157,7 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
         auto realization = new RimSummaryCaseSumo();
         realization->setEnsemble( this );
         realization->setRealizationName( QString( "Realization %1" ).arg( i ) );
-        
+
         m_cases.push_back( realization );
     }
 

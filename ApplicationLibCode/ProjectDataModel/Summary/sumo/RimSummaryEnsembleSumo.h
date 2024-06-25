@@ -19,6 +19,8 @@
 
 #include "RimSummaryCaseCollection.h"
 
+#include "Sumo/RiaSumoConnector.h"
+
 //==================================================================================================
 //
 //
@@ -32,8 +34,8 @@ class RimSummaryEnsembleSumo : public RimSummaryCaseCollection
 public:
     RimSummaryEnsembleSumo();
 
-    QString fieldId() const { return m_sumoFieldId; }
-    void    setFieldId( const QString& fieldId ) { m_sumoFieldId = fieldId; }
+    QString fieldName() const { return m_sumoFieldName; }
+    void    setFieldName( const QString& fieldId ) { m_sumoFieldName = fieldId; }
 
     QString caseId() const { return m_sumoCaseId; }
     void    setCaseId( const QString& caseId ) { m_sumoCaseId = caseId; }
@@ -49,11 +51,21 @@ public:
 
     bool loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
 
+protected:
+    void onLoadDataAndUpdate() override;
+
 private:
-    caf::PdmField<QString> m_sumoFieldId;
+    void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+
+    void createSumoConnector();
+
+private:
+    caf::PdmField<QString> m_sumoFieldName;
     caf::PdmField<QString> m_sumoCaseId;
     caf::PdmField<QString> m_sumoEnsembleId;
 
-protected:
-    void onLoadDataAndUpdate() override;
+    QPointer<RiaSumoConnector> m_sumoConnector;
+
+    const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
 };

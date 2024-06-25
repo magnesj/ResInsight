@@ -20,7 +20,7 @@
 
 #include "cafCmdFeature.h"
 
-#include "Sumo/RimSumoConnector.h"
+#include "Sumo/RiaSumoConnector.h"
 
 #include <QDialog>
 #include <QLabel>
@@ -63,7 +63,7 @@ private:
     QPushButton* parquetDownloadButton;
     QPushButton* showContentParquetButton;
 
-    QPointer<RimSumoConnector> m_sumoConnector;
+    QPointer<RiaSumoConnector> m_sumoConnector;
 
     const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
 };

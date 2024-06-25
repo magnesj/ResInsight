@@ -25,7 +25,7 @@
 #include "RiaPreferencesSystem.h"
 
 #include "../../FileInterface/RifArrowTools.h"
-#include "Sumo/RimSumoConnector.h"
+#include "Sumo/RiaSumoConnector.h"
 
 #include "RiuMainWindow.h"
 
@@ -81,7 +81,7 @@ SimpleDialog::SimpleDialog( QWidget* parent )
 
     setLayout( layout );
 
-    m_sumoConnector = nullptr;
+    m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -100,14 +100,8 @@ SimpleDialog::~SimpleDialog()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::createConnection()
 {
-    const QString server    = "https://main-sumo-prod.radix.equinor.com";
-    const QString authority = "https://login.microsoftonline.com/3aa4a235-b6e2-48d5-9195-7fcf05b459b0";
-    const QString scopes    = "9e5443dd-3431-4690-9617-31eed61cb55a/.default";
-    const QString clientId  = "d57a8f87-4e28-4391-84d6-34356d5876a2";
-
-    m_sumoConnector = new RimSumoConnector( qApp, server, authority, scopes, clientId );
-
-    connect( m_sumoConnector, &RimSumoConnector::tokenReady, this, &SimpleDialog::onTokenReady );
+    m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
+    connect( m_sumoConnector, &RiaSumoConnector::tokenReady, this, &SimpleDialog::onTokenReady );
 
     // get token from log first time the token is requested
 
