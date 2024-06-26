@@ -17,8 +17,13 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimSummaryEnsembleSumo.h"
-#include "../../../Application/RiaApplication.h"
+
+#include "RiaApplication.h"
 #include "RimSummaryCaseSumo.h"
+
+#include "RifEclipseSummaryAddress.h"
+
+#include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
@@ -31,6 +36,8 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 
     CAF_PDM_InitFieldNoDefault( &m_sumoFieldName, "SumoFieldId", "Field Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
+    m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
 }
 
@@ -160,6 +167,17 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+{
+    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
+    {
+        getAvailableVectorNames();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::createSumoConnector()
 {
     if ( m_sumoConnector != nullptr ) return;
@@ -182,10 +200,38 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::getAvailableVectorNames()
+{
+    m_allResultAddresses.clear();
+
+    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_sumoEnsembleId );
+
+    auto vectorNames = m_sumoConnector->vectorNames();
+    for ( auto vectorName : vectorNames )
+    {
+        auto adr = RifEclipseSummaryAddress::fromEclipseTextAddress( vectorName.toStdString() );
+        m_allResultAddresses.insert( adr );
+    }
+
+    /*
+        auto caseName = m_sumoCaseId.uiCapability().uiValue().toString();
+        auto ensName  = m_sumoEnsembleId.uiCapability()->uiValue().toString();
+    */
+    auto caseName = m_sumoCaseId();
+    auto ensName  = m_sumoEnsembleId();
+
+    RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_allResultAddresses.size() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
 {
     // load summary data from sumo
     // create the realizations and add them to the ensemble
+
+    createSumoConnector();
 
     m_cases.deleteChildren();
 
@@ -198,6 +244,8 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
 
         m_cases.push_back( realization );
     }
+
+    getAvailableVectorNames();
 
     // call the base class method after data has been loaded
     RimSummaryCaseCollection::onLoadDataAndUpdate();

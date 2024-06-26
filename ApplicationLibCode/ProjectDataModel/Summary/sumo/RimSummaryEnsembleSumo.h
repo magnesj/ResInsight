@@ -57,8 +57,10 @@ protected:
 private:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
     void createSumoConnector();
+    void getAvailableVectorNames();
 
 private:
     caf::PdmField<QString> m_sumoFieldName;
@@ -68,4 +70,7 @@ private:
     QPointer<RiaSumoConnector> m_sumoConnector;
 
     const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
+
+    // summary data
+    std::set<RifEclipseSummaryAddress> m_allResultAddresses;
 };

@@ -75,6 +75,7 @@ public:
 
     void requestEnsembleByCasesId( const QString& caseId );
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
+    void requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName );
     void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
     void requestBlobDownload( const QString& blobId );
     void requestBlobByRedirectUri( const QString& blobId, const QString& redirectUri );
@@ -113,6 +114,7 @@ signals:
     void tokenReady( const QString& token );
     void parquetDownloadFinished( const QByteArray& contents, const QString& url );
     void ensembleNamesFinished();
+    void vectorNamesFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );

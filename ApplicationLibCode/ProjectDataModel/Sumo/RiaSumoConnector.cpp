@@ -177,7 +177,7 @@ void RiaSumoConnector::requestCasesForField( const QString& fieldName )
             {"tracklog.datetime":{"order":"desc"}}
     ],
     "track_total_hits":true,
-    "size":20,
+    "size":100,
     "from":0
 }
 )";
@@ -323,6 +323,24 @@ void RiaSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, con
                      parseVectorNames( reply, caseId, ensembleName );
                  }
              } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName )
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( vectorNamesFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestVectorNamesForEnsemble( caseId, ensembleName );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -643,6 +661,8 @@ void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const QString& ca
     {
         RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
     }
+
+    emit vectorNamesFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
