@@ -18,6 +18,8 @@
 
 #include "RimSummaryCaseSumo.h"
 
+#include "RimSummaryEnsembleSumo.h"
+
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryCaseSumo, "RimSummaryCaseSumo" );

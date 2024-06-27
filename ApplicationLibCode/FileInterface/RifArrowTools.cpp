@@ -96,6 +96,40 @@ std::vector<float> RifArrowTools::convertChunkedArrayToStdFloatVector( const std
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<int64_t> RifArrowTools::convertChunkedArrayToStdInt64Vector( const std::shared_ptr<arrow::ChunkedArray>& column )
+{
+    auto convertChunkToInt64Vector = []( const std::shared_ptr<arrow::Array>& array ) -> std::vector<int64_t>
+    {
+        std::vector<int64_t> result;
+
+        auto arrowFloatArray = std::static_pointer_cast<arrow::Int64Array>( array );
+        result.resize( arrowFloatArray->length() );
+        for ( int64_t i = 0; i < arrowFloatArray->length(); ++i )
+        {
+            result[i] = arrowFloatArray->Value( i );
+        }
+
+        return result;
+    };
+
+    CAF_ASSERT( column->type()->id() == arrow::Type::TIMESTAMP );
+
+    std::vector<int64_t> result;
+
+    // Iterate over each chunk in the column
+    for ( int i = 0; i < column->num_chunks(); ++i )
+    {
+        std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
+        auto                          chunk_vector = convertChunkToInt64Vector( chunk );
+        result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RifArrowTools::readSummaryData_debug( const QByteArray& contents )
 {
     arrow::MemoryPool* pool = arrow::default_memory_pool();
@@ -141,10 +175,16 @@ QString RifArrowTools::readSummaryData_debug( const QByteArray& contents )
             std::vector<double> columnVector = RifArrowTools::convertChunkedArrayToStdVector( column );
             columnVectors.push_back( columnVector );
         }
-        else if ( column->type()->id() == arrow::Type::FLOAT )
+        else if ( columnType == arrow::Type::FLOAT )
         {
             auto                floatVector = RifArrowTools::convertChunkedArrayToStdFloatVector( column );
             std::vector<double> columnVector( floatVector.begin(), floatVector.end() );
+            columnVectors.push_back( columnVector );
+        }
+        else if ( columnType == arrow::Type::TIMESTAMP )
+        {
+            auto                int64Vector = RifArrowTools::convertChunkedArrayToStdInt64Vector( column );
+            std::vector<double> columnVector( int64Vector.begin(), int64Vector.end() );
             columnVectors.push_back( columnVector );
         }
     }

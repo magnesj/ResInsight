@@ -25,6 +25,10 @@
 
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include "RifByteArrayArrowRandomAccessFile.h"
+
+#include "RiaLogging.h"
+
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
 //--------------------------------------------------------------------------------------------------
@@ -90,7 +94,7 @@ std::set<RifEclipseSummaryAddress> RimSummaryEnsembleSumo::allResultAddresses() 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
+QByteArray RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
 {
     // create job to download data from sumo
     // download data, and notify when done
@@ -101,11 +105,35 @@ bool RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& re
 
     if ( m_parquetData.find( key ) == m_parquetData.end() )
     {
-        // download data
-        m_parquetData[key] = loadParquetData( key );
+        auto contents      = loadParquetData( key );
+        m_parquetData[key] = contents;
+
+        arrow::MemoryPool* pool = arrow::default_memory_pool();
+
+        std::shared_ptr<arrow::io::RandomAccessFile> input = std::make_shared<RifByteArrayArrowRandomAccessFile>( contents );
+
+        std::shared_ptr<arrow::Table>               table;
+        std::unique_ptr<parquet::arrow::FileReader> arrow_reader;
+        if ( parquet::arrow::OpenFile( input, pool, &arrow_reader ).ok() )
+        {
+            if ( arrow_reader->ReadTable( &table ).ok() )
+            {
+                RiaLogging::info( "Parquet: Read table" );
+            }
+            else
+            {
+                RiaLogging::warning( "Parquet: Error detected during parsing of table" );
+            }
+        }
+        else
+        {
+            RiaLogging::warning( "Parquet: Not able to open data stream" );
+        }
+
+        m_parquetTable[key] = table;
     }
 
-    return true;
+    return m_parquetData[key];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -118,6 +146,22 @@ QByteArray RimSummaryEnsembleSumo::loadParquetData( const ParquetKey& parquetKey
     auto data = m_sumoConnector->requestParquetDataBlocking( parquetKey.caseId, parquetKey.ensembleId, parquetKey.vectorName );
 
     return data;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<double> RimSummaryEnsembleSumo::dataForColumn( const QByteArray& parquetData, const QString& columnName )
+{
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<std::string> RimSummaryEnsembleSumo::textForColumn( const QByteArray& parquetData, const QString& columnName )
+{
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------

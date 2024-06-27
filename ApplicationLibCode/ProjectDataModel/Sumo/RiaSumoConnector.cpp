@@ -511,6 +511,14 @@ QByteArray RiaSumoConnector::requestParquetDataBlocking( const QString& caseId, 
     timer.start( timeout );
     loop.exec();
 
+    for ( const auto& blobData : m_redirectInfo )
+    {
+        if ( blobData.objectId == blobId )
+        {
+            return blobData.contents;
+        }
+    }
+
     return {};
 }
 
