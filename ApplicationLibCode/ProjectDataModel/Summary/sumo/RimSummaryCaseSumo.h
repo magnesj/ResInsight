@@ -35,8 +35,10 @@ class RimSummaryCaseSumo : public RimSummaryCase, public RifSummaryReaderInterfa
 public:
     RimSummaryCaseSumo();
 
+    void setEnsemble( RimSummaryEnsembleSumo* ensemble );
+
     QString realizationName() const { return m_realizationName; }
-    void    setRealizationName( const QString& fieldId ) { m_realizationName = fieldId; }
+    void    setRealizationName( const QString& realizationName ) { m_realizationName = realizationName; }
 
     void                       createSummaryReaderInterface() override;
     RifSummaryReaderInterface* summaryReader() override;
@@ -46,10 +48,9 @@ public:
     std::string                          unitName( const RifEclipseSummaryAddress& resultAddress ) const override;
     RiaDefines::EclipseUnitSystem        unitSystem() const override;
 
-    void setEnsemble( RimSummaryEnsembleSumo* ensemble );
-
 protected:
     QString caseName() const override;
+    void    buildMetaData() override;
 
 private:
     caf::PdmField<QString> m_realizationName;

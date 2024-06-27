@@ -30,6 +30,8 @@ RimSummaryCaseSumo::RimSummaryCaseSumo()
     CAF_PDM_InitScriptableObject( "Sumo Realization", ":/SummaryCase.svg" );
 
     CAF_PDM_InitFieldNoDefault( &m_realizationName, "RealizationName", "Realization Name" );
+
+    m_ensemble = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -53,6 +55,7 @@ RifSummaryReaderInterface* RimSummaryCaseSumo::summaryReader()
 //--------------------------------------------------------------------------------------------------
 std::vector<time_t> RimSummaryCaseSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( m_ensemble ) return m_ensemble->timeSteps( resultAddress );
     return {};
 }
 
@@ -61,6 +64,8 @@ std::vector<time_t> RimSummaryCaseSumo::timeSteps( const RifEclipseSummaryAddres
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimSummaryCaseSumo::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( m_ensemble ) return { true, m_ensemble->values( m_realizationName(), resultAddress ) };
+
     return {};
 }
 
@@ -69,6 +74,8 @@ std::pair<bool, std::vector<double>> RimSummaryCaseSumo::values( const RifEclips
 //--------------------------------------------------------------------------------------------------
 std::string RimSummaryCaseSumo::unitName( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( m_ensemble ) return m_ensemble->unitName( resultAddress );
+
     return {};
 }
 
@@ -77,6 +84,8 @@ std::string RimSummaryCaseSumo::unitName( const RifEclipseSummaryAddress& result
 //--------------------------------------------------------------------------------------------------
 RiaDefines::EclipseUnitSystem RimSummaryCaseSumo::unitSystem() const
 {
+    if ( m_ensemble ) return m_ensemble->unitSystem();
+
     return RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
 }
 
@@ -93,5 +102,17 @@ void RimSummaryCaseSumo::setEnsemble( RimSummaryEnsembleSumo* ensemble )
 //--------------------------------------------------------------------------------------------------
 QString RimSummaryCaseSumo::caseName() const
 {
-    return {};
+    return realizationName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCaseSumo::buildMetaData()
+{
+    if ( m_ensemble )
+    {
+        auto addresses       = m_ensemble->allResultAddresses();
+        m_allResultAddresses = addresses;
+    }
 }

@@ -124,7 +124,6 @@ private:
 
     void onCaseNameChanged( const SignalEmitter* emitter );
 
-    void buildMetaData();
     void buildChildNodes();
     void clearChildNodes();
 
@@ -132,6 +131,8 @@ protected:
     virtual void onLoadDataAndUpdate();
     void         defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void         defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
+
+    void buildMetaData();
 
     caf::PdmChildArrayField<RimSummaryCase*> m_cases;
 

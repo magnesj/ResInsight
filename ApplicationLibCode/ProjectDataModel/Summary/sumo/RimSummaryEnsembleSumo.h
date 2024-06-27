@@ -44,10 +44,11 @@ public:
     void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
-    std::vector<time_t>                  timeSteps( const RifEclipseSummaryAddress& resultAddress ) const;
-    std::pair<bool, std::vector<double>> values( const RifEclipseSummaryAddress& resultAddress ) const;
-    std::string                          unitName( const RifEclipseSummaryAddress& resultAddress ) const;
-    RiaDefines::EclipseUnitSystem        unitSystem() const;
+    std::vector<time_t>                timeSteps( const RifEclipseSummaryAddress& resultAddress ) const;
+    std::vector<double>                values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress ) const;
+    std::string                        unitName( const RifEclipseSummaryAddress& resultAddress ) const;
+    RiaDefines::EclipseUnitSystem      unitSystem() const;
+    std::set<RifEclipseSummaryAddress> allResultAddresses() const;
 
     bool loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
 

@@ -52,7 +52,7 @@ std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const RifEclipseSummaryAd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<bool, std::vector<double>> RimSummaryEnsembleSumo::values( const RifEclipseSummaryAddress& resultAddress ) const
+std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress ) const
 {
     return {};
 }
@@ -71,6 +71,14 @@ std::string RimSummaryEnsembleSumo::unitName( const RifEclipseSummaryAddress& re
 RiaDefines::EclipseUnitSystem RimSummaryEnsembleSumo::unitSystem() const
 {
     return RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RifEclipseSummaryAddress> RimSummaryEnsembleSumo::allResultAddresses() const
+{
+    return m_allResultAddresses;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -172,6 +180,13 @@ void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* change
     if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
     {
         getAvailableVectorNames();
+
+        for ( auto sumCase : allSummaryCases() )
+        {
+            sumCase->summaryReader()->buildMetaData();
+        }
+
+        buildMetaData();
     }
 }
 
