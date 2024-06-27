@@ -44,24 +44,30 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress ) const
+std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress )
 {
+    loadSummaryData( resultAddress );
+
     return {};
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress ) const
+std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress )
 {
+    loadSummaryData( resultAddress );
+
     return {};
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::string RimSummaryEnsembleSumo::unitName( const RifEclipseSummaryAddress& resultAddress ) const
+std::string RimSummaryEnsembleSumo::unitName( const RifEclipseSummaryAddress& resultAddress )
 {
+    loadSummaryData( resultAddress );
+
     return {};
 }
 
@@ -78,7 +84,7 @@ RiaDefines::EclipseUnitSystem RimSummaryEnsembleSumo::unitSystem() const
 //--------------------------------------------------------------------------------------------------
 std::set<RifEclipseSummaryAddress> RimSummaryEnsembleSumo::allResultAddresses() const
 {
-    return m_allResultAddresses;
+    return m_resultAddresses;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -89,7 +95,29 @@ bool RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& re
     // create job to download data from sumo
     // download data, and notify when done
 
+    auto resultText = QString::fromStdString( resultAddress.toEclipseTextAddress() );
+
+    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), resultText };
+
+    if ( m_parquetData.find( key ) == m_parquetData.end() )
+    {
+        // download data
+        m_parquetData[key] = loadParquetData( key );
+    }
+
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QByteArray RimSummaryEnsembleSumo::loadParquetData( const ParquetKey& parquetKey )
+{
+    createSumoConnector();
+
+    auto data = m_sumoConnector->requestParquetDataBlocking( parquetKey.caseId, parquetKey.ensembleId, parquetKey.vectorName );
+
+    return data;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -179,6 +207,7 @@ void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* change
 {
     if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
     {
+        clearCachedData();
         getAvailableVectorNames();
 
         for ( auto sumCase : allSummaryCases() )
@@ -217,15 +246,13 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::getAvailableVectorNames()
 {
-    m_allResultAddresses.clear();
-
     m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_sumoEnsembleId );
 
     auto vectorNames = m_sumoConnector->vectorNames();
     for ( auto vectorName : vectorNames )
     {
         auto adr = RifEclipseSummaryAddress::fromEclipseTextAddress( vectorName.toStdString() );
-        m_allResultAddresses.insert( adr );
+        m_resultAddresses.insert( adr );
     }
 
     /*
@@ -235,7 +262,16 @@ void RimSummaryEnsembleSumo::getAvailableVectorNames()
     auto caseName = m_sumoCaseId();
     auto ensName  = m_sumoEnsembleId();
 
-    RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_allResultAddresses.size() ) );
+    RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_resultAddresses.size() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::clearCachedData()
+{
+    m_resultAddresses.clear();
+    m_parquetData.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -261,6 +297,13 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
     }
 
     getAvailableVectorNames();
+
+    for ( auto sumCase : allSummaryCases() )
+    {
+        sumCase->summaryReader()->buildMetaData();
+    }
+
+    buildMetaData();
 
     // call the base class method after data has been loaded
     RimSummaryCaseCollection::onLoadDataAndUpdate();

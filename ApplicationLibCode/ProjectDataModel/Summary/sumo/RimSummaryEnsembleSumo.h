@@ -27,6 +27,20 @@
 //
 //==================================================================================================
 
+struct ParquetKey
+{
+    QString fieldName;
+    QString caseId;
+    QString ensembleId;
+    QString vectorName;
+
+    auto operator<=>( const ParquetKey& other ) const
+    {
+        return std::tie( fieldName, caseId, ensembleId, vectorName ) <=>
+               std::tie( other.fieldName, other.caseId, other.ensembleId, other.vectorName );
+    }
+};
+
 class RimSummaryEnsembleSumo : public RimSummaryCaseCollection
 {
     CAF_PDM_HEADER_INIT;
@@ -44,13 +58,11 @@ public:
     void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
-    std::vector<time_t>                timeSteps( const RifEclipseSummaryAddress& resultAddress ) const;
-    std::vector<double>                values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress ) const;
-    std::string                        unitName( const RifEclipseSummaryAddress& resultAddress ) const;
+    std::vector<time_t>                timeSteps( const RifEclipseSummaryAddress& resultAddress ) ;
+    std::vector<double>                values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress ) ;
+    std::string                        unitName( const RifEclipseSummaryAddress& resultAddress ) ;
     RiaDefines::EclipseUnitSystem      unitSystem() const;
     std::set<RifEclipseSummaryAddress> allResultAddresses() const;
-
-    bool loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
 
 protected:
     void onLoadDataAndUpdate() override;
@@ -62,6 +74,10 @@ private:
 
     void createSumoConnector();
     void getAvailableVectorNames();
+    void clearCachedData();
+
+    bool       loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
+    QByteArray loadParquetData( const ParquetKey& parquetKey );
 
 private:
     caf::PdmField<QString> m_sumoFieldName;
@@ -73,5 +89,6 @@ private:
     const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
 
     // summary data
-    std::set<RifEclipseSummaryAddress> m_allResultAddresses;
+    std::set<RifEclipseSummaryAddress> m_resultAddresses;
+    std::map<ParquetKey, QByteArray>   m_parquetData;
 };

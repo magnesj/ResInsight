@@ -393,6 +393,24 @@ void RiaSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestBlobIdForEnsembleBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( blobIdFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestBlobIdForEnsemble( caseId, ensembleName, vectorName );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestBlobDownload( const QString& blobId )
 {
     QString url = constructDownloadUrl( m_server, blobId );
@@ -457,13 +475,43 @@ void RiaSumoConnector::requestBlobByRedirectUri( const QString& blobId, const QS
                      RiaLogging::info( msg );
 
                      parquetDownloadComplete( blobId, contents, redirectUri );
+
+                     emit parquetDownloadFinished( contents, redirectUri );
                  }
                  else
                  {
                      QString errorMessage = "Download failed: " + redirectUri + " failed." + reply->errorString();
                      RiaLogging::error( errorMessage );
+
+                     emit parquetDownloadFinished( {}, redirectUri );
                  }
              } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QByteArray RiaSumoConnector::requestParquetDataBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+{
+    requestBlobIdForEnsembleBlocking( caseId, ensembleName, vectorName );
+
+    if ( m_blobUrl.empty() ) return {};
+
+    auto blobId = m_blobUrl.back();
+
+    QEventLoop loop;
+    connect( this, SIGNAL( parquetDownloadFinished( const QByteArray&, const QString& ) ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestBlobDownload( blobId );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -673,7 +721,7 @@ void RiaSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId
     QByteArray result = reply->readAll();
     reply->deleteLater();
 
-    m_blobName.clear();
+    m_blobUrl.clear();
 
     if ( reply->error() == QNetworkReply::NoError )
     {
@@ -695,12 +743,11 @@ void RiaSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId
             auto        fmuObjKeys = fmuObj.keys();
 
             auto blobName = fmuObj["blob_name"].toString();
-            m_blobName.push_back( blobName );
-
-            auto blobUrl = fmuObj["blob_name"].toString();
-            m_blobName.push_back( blobUrl );
+            m_blobUrl.push_back( blobName );
         }
     }
+
+    emit blobIdFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -881,15 +928,7 @@ std::vector<QString> RiaSumoConnector::vectorNames() const
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RiaSumoConnector::blobUrls() const
 {
-    return m_blobName;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<QString> RiaSumoConnector::blobIds() const
-{
-    return m_blobName;
+    return m_blobUrl;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -20,6 +20,7 @@
 
 #include <QtCore>
 
+#include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QOAuth2AuthorizationCodeFlow>
 
@@ -74,11 +75,17 @@ public:
     void requestAssets();
 
     void requestEnsembleByCasesId( const QString& caseId );
+
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
     void requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName );
+
     void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
+    void requestBlobIdForEnsembleBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName );
+
     void requestBlobDownload( const QString& blobId );
     void requestBlobByRedirectUri( const QString& blobId, const QString& redirectUri );
+
+    QByteArray requestParquetDataBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName );
 
     QString server() const;
 
@@ -87,7 +94,6 @@ public:
     std::vector<QString>      ensembleNamesForCase( const QString& caseId ) const;
     std::vector<QString>      vectorNames() const;
     std::vector<QString>      blobUrls() const;
-    std::vector<QString>      blobIds() const;
     std::vector<SumoRedirect> blobContents() const;
 
 public slots:
@@ -115,6 +121,7 @@ signals:
     void parquetDownloadFinished( const QByteArray& contents, const QString& url );
     void ensembleNamesFinished();
     void vectorNamesFinished();
+    void blobIdFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
@@ -146,7 +153,6 @@ private:
     std::vector<QString>      m_vectorNames;
     std::vector<SumoEnsemble> m_ensembleNames;
 
-    std::vector<QString> m_blobName;
     std::vector<QString> m_blobUrl;
 
     QString m_redirect;
