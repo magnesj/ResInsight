@@ -152,6 +152,8 @@ QString RiaSumoConnector::token() const
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestCasesForField( const QString& fieldName )
 {
+    m_cases.clear();
+
     requestTokenBlocking();
 
     QNetworkRequest m_networkRequest;
@@ -660,6 +662,7 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
             RiaLogging::info( QString( "Asset: %1" ).arg( a.name ) );
         }
     }
+    emit assetsFinished();
 }
 
 //--------------------------------------------------------------------------------------------------

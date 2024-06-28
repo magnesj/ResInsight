@@ -360,12 +360,25 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
+    if ( changedField == &m_sumoFieldName )
+    {
+        m_sumoCaseId     = "";
+        m_sumoEnsembleId = "";
+    }
+
+    if ( changedField == &m_sumoCaseId )
+    {
+        m_sumoEnsembleId = "";
+    }
+
     if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
     {
         clearCachedData();
         getAvailableVectorNames();
 
         buildMetaData();
+
+        updateConnectedEditors();
     }
 }
 
