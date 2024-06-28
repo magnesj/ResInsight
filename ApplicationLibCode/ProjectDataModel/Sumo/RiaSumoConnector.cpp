@@ -199,6 +199,24 @@ void RiaSumoConnector::requestCasesForField( const QString& fieldName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestCasesForFieldBlocking( const QString& fieldName )
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( casesFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestCasesForField( fieldName );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::requestAssets()
 {
     requestTokenBlocking();
@@ -219,6 +237,24 @@ void RiaSumoConnector::requestAssets()
                      parseAssets( reply );
                  }
              } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestAssetsBlocking()
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( assetsFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestAssets();
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -266,6 +302,24 @@ void RiaSumoConnector::requestEnsembleByCasesId( const QString& caseId )
                      parseEnsembleNames( reply, caseId );
                  }
              } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestEnsembleByCasesIdBlocking( const QString& caseId )
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( ensembleNamesFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestEnsembleByCasesId( caseId );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
 }
 
 //--------------------------------------------------------------------------------------------------

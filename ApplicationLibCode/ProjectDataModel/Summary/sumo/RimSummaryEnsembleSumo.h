@@ -59,12 +59,10 @@ public:
     QString caseId() const { return m_sumoCaseId; }
     void    setCaseId( const QString& caseId ) { m_sumoCaseId = caseId; }
 
-    QString ensembleId() const { return m_ensembleId; }
-    void    setEnsembleId( const QString& ensembleId ) { m_ensembleId = ensembleId; }
+    QString ensembleId() const { return m_sumoEnsembleId; }
+    void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
-    std::vector<time_t>                timeSteps( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress );
-    std::vector<double>                values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress );
     std::string                        unitName( const RifEclipseSummaryAddress& resultAddress );
     RiaDefines::EclipseUnitSystem      unitSystem() const;
     std::set<RifEclipseSummaryAddress> allResultAddresses() const;
@@ -81,17 +79,16 @@ private:
     void getAvailableVectorNames();
     void clearCachedData();
 
-    QByteArray loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
+    void       loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
     QByteArray loadParquetData( const ParquetKey& parquetKey );
 
     void distributeDataToRealizations( const RifEclipseSummaryAddress& resultAddress, std::shared_ptr<arrow::Table> table );
-
-    std::vector<double> dataForColumn( std::shared_ptr<arrow::Table> table, const QString& realizationName, const QString& columnName );
+    void buildMetaData();
 
 private:
     caf::PdmField<QString> m_sumoFieldName;
     caf::PdmField<QString> m_sumoCaseId;
-    caf::PdmField<QString> m_ensembleId;
+    caf::PdmField<QString> m_sumoEnsembleId;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 
@@ -99,6 +96,5 @@ private:
 
     // summary data
     std::set<RifEclipseSummaryAddress>                  m_resultAddresses;
-    std::map<ParquetKey, QByteArray>                    m_parquetData;
     std::map<ParquetKey, std::shared_ptr<arrow::Table>> m_parquetTable;
 };

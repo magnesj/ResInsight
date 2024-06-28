@@ -71,10 +71,14 @@ public:
     void    setToken( const QString& token );
     QString token() const;
 
-    void requestCasesForField( const QString& fieldName );
     void requestAssets();
+    void requestAssetsBlocking();
+
+    void requestCasesForField( const QString& fieldName );
+    void requestCasesForFieldBlocking( const QString& fieldName );
 
     void requestEnsembleByCasesId( const QString& caseId );
+    void requestEnsembleByCasesIdBlocking( const QString& caseId );
 
     void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
     void requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName );
@@ -122,6 +126,7 @@ signals:
     void ensembleNamesFinished();
     void vectorNamesFinished();
     void blobIdFinished();
+    void assetsFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );

@@ -19,19 +19,16 @@
 #include "RimSummaryEnsembleSumo.h"
 
 #include "RiaApplication.h"
-#include "RimSummaryCaseSumo.h"
+#include "RiaLogging.h"
+#include "RiaTimeTTools.h"
 
+#include "RifArrowTools.h"
+#include "RifByteArrayArrowRandomAccessFile.h"
 #include "RifEclipseSummaryAddress.h"
 
+#include "RimSummaryCaseSumo.h"
+
 #include "cafPdmUiTreeSelectionEditor.h"
-
-#include "RifByteArrayArrowRandomAccessFile.h"
-
-#include "../../../Application/Tools/RiaTimeTTools.h"
-#include "../../../FileInterface/RifArrowTools.h"
-#include "RiaLogging.h"
-
-#pragma optimize( "", off )
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
@@ -46,57 +43,9 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
     m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
-    CAF_PDM_InitFieldNoDefault( &m_ensembleId, "SumoEnsembleId", "Ensemble Id" );
+    CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
 
     setAsEnsemble( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress )
-{
-    loadSummaryData( resultAddress );
-
-    auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
-
-    // check if the table is loaded
-    if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
-
-    auto table = m_parquetTable[key];
-
-    auto timeColumn = dataForColumn( table, "real-0", "Date" );
-
-    // convert from double to time_t
-    std::vector<time_t> timeSteps;
-    for ( auto time : timeColumn )
-    {
-        time_t timeStep = static_cast<time_t>( time );
-        timeSteps.push_back( timeStep );
-    }
-
-    return timeSteps;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress )
-{
-    loadSummaryData( resultAddress );
-
-    auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
-
-    // check if the table is loaded
-    if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
-
-    auto table = m_parquetTable[key];
-
-    auto dataValues = dataForColumn( table, "real-0", QString::fromStdString( resultAddress.toEclipseTextAddress() ) );
-
-    return dataValues;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -128,19 +77,18 @@ std::set<RifEclipseSummaryAddress> RimSummaryEnsembleSumo::allResultAddresses() 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QByteArray RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
+void RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
 {
     // create job to download data from sumo
     // download data, and notify when done
 
     auto resultText = QString::fromStdString( resultAddress.toEclipseTextAddress() );
 
-    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), resultText };
+    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), resultText };
 
-    if ( m_parquetData.find( key ) == m_parquetData.end() )
+    if ( m_parquetTable.find( key ) == m_parquetTable.end() )
     {
-        auto contents      = loadParquetData( key );
-        m_parquetData[key] = contents;
+        auto contents = loadParquetData( key );
 
         arrow::MemoryPool* pool = arrow::default_memory_pool();
 
@@ -168,8 +116,6 @@ QByteArray RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddre
 
         distributeDataToRealizations( resultAddress, table );
     }
-
-    return m_parquetData[key];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -208,7 +154,7 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
     }
 
     std::vector<time_t>  timeSteps;
-    std::vector<int16_t> realisation;
+    std::vector<int16_t> realizations;
     std::vector<float>   values;
 
     {
@@ -227,6 +173,7 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
         else
         {
             RiaLogging::warning( "Failed to find DATE column" );
+            return;
         }
     }
 
@@ -235,11 +182,12 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
         std::shared_ptr<arrow::ChunkedArray> column     = table->GetColumnByName( columnName );
         if ( column && column->type()->id() == arrow::Type::INT16 )
         {
-            realisation = RifArrowTools::convertChunkedArrayToStdInt16Vector( column );
+            realizations = RifArrowTools::convertChunkedArrayToStdInt16Vector( column );
         }
         else
         {
             RiaLogging::warning( "Failed to find realization column" );
+            return;
         }
     }
 
@@ -253,12 +201,13 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
         else
         {
             RiaLogging::warning( "Failed to find values column" );
+            return;
         }
     }
 
     // find unique realizations
     std::set<int16_t> uniqueRealizations;
-    for ( auto realizationNumber : realisation )
+    for ( auto realizationNumber : realizations )
     {
         uniqueRealizations.insert( realizationNumber );
     }
@@ -270,9 +219,9 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
 
     // find start and end index for a given realization number
     std::map<int16_t, std::pair<size_t, size_t>> realizationIndex;
-    for ( size_t i = 0; i < realisation.size(); ++i )
+    for ( size_t i = 0; i < realizations.size(); ++i )
     {
-        auto realizationNumber = realisation[i];
+        auto realizationNumber = realizations[i];
         uniqueRealizations.insert( realizationNumber );
 
         if ( realizationIndex.find( realizationNumber ) == realizationIndex.end() )
@@ -323,9 +272,6 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
 
     if ( anyCaseCreated )
     {
-        auto firstCase = allSummaryCases().front();
-        firstCase->summaryReader()->buildMetaData();
-
         buildMetaData();
     }
 }
@@ -333,24 +279,16 @@ void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSumma
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double>
-    RimSummaryEnsembleSumo::dataForColumn( std::shared_ptr<arrow::Table> table, const QString& realizationName, const QString& columnName )
+void RimSummaryEnsembleSumo::buildMetaData()
 {
-    std::shared_ptr<arrow::ChunkedArray> column = table->GetColumnByName( columnName.toStdString() );
-
-    if ( column->type()->id() == arrow::Type::DOUBLE )
+    if ( !allSummaryCases().empty() )
     {
-        return RifArrowTools::convertChunkedArrayToStdVector( column );
+        auto firstCase = allSummaryCases().front();
+
+        firstCase->summaryReader()->buildMetaData();
     }
 
-    if ( column->type()->id() == arrow::Type::FLOAT )
-    {
-        auto                floatVector = RifArrowTools::convertChunkedArrayToStdFloatVector( column );
-        std::vector<double> columnVector( floatVector.begin(), floatVector.end() );
-        return columnVector;
-    }
-
-    return {};
+    RimSummaryCaseCollection::buildMetaData();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -360,9 +298,11 @@ void RimSummaryEnsembleSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 {
     uiOrdering.add( &m_sumoFieldName );
     uiOrdering.add( &m_sumoCaseId );
-    uiOrdering.add( &m_ensembleId );
+    uiOrdering.add( &m_sumoEnsembleId );
 
-    RimSummaryCaseCollection::defineUiOrdering( uiConfigName, uiOrdering );
+    auto group = uiOrdering.addNewGroup( "General" );
+
+    RimSummaryCaseCollection::defineUiOrdering( uiConfigName, *group );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -377,13 +317,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
     {
         if ( m_sumoConnector->assets().empty() )
         {
-            m_sumoConnector->requestAssets();
-
-            // wait in loop until assets is not empty
-            while ( m_sumoConnector->assets().empty() )
-            {
-                qApp->processEvents();
-            }
+            m_sumoConnector->requestAssetsBlocking();
         }
 
         for ( const auto& asset : m_sumoConnector->assets() )
@@ -395,14 +329,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
     {
         if ( m_sumoConnector->cases().empty() )
         {
-            m_sumoConnector->requestCasesForField( m_sumoFieldName );
-
-            /*
-                        while ( m_sumoConnector->cases().empty() )
-                        {
-                            qApp->processEvents();
-                        }
-            */
+            m_sumoConnector->requestCasesForFieldBlocking( m_sumoFieldName );
         }
 
         for ( const auto& sumoCase : m_sumoConnector->cases() )
@@ -410,18 +337,11 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
             options.push_back( { sumoCase.name, sumoCase.id } );
         }
     }
-    else if ( fieldNeedingOptions == &m_ensembleId && !m_sumoCaseId().isEmpty() )
+    else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
     {
         if ( m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ).empty() )
         {
             m_sumoConnector->requestEnsembleByCasesId( m_sumoCaseId );
-
-            /*
-                        while ( m_sumoConnector->cases().empty() )
-                        {
-                            qApp->processEvents();
-                        }
-            */
         }
 
         for ( const auto& name : m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ) )
@@ -438,15 +358,10 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_ensembleId )
+    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
     {
         clearCachedData();
         getAvailableVectorNames();
-
-        for ( auto sumCase : allSummaryCases() )
-        {
-            sumCase->summaryReader()->buildMetaData();
-        }
 
         buildMetaData();
     }
@@ -479,7 +394,7 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::getAvailableVectorNames()
 {
-    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_ensembleId );
+    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_sumoEnsembleId );
 
     auto vectorNames = m_sumoConnector->vectorNames();
     for ( auto vectorName : vectorNames )
@@ -488,12 +403,8 @@ void RimSummaryEnsembleSumo::getAvailableVectorNames()
         m_resultAddresses.insert( adr );
     }
 
-    /*
-        auto caseName = m_sumoCaseId.uiCapability().uiValue().toString();
-        auto ensName  = m_sumoEnsembleId.uiCapability()->uiValue().toString();
-    */
     auto caseName = m_sumoCaseId();
-    auto ensName  = m_ensembleId();
+    auto ensName  = m_sumoEnsembleId();
 
     RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_resultAddresses.size() ) );
 }
@@ -504,7 +415,7 @@ void RimSummaryEnsembleSumo::getAvailableVectorNames()
 void RimSummaryEnsembleSumo::clearCachedData()
 {
     m_resultAddresses.clear();
-    m_parquetData.clear();
+    m_parquetTable.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -530,11 +441,6 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
     }
 
     getAvailableVectorNames();
-
-    for ( auto sumCase : allSummaryCases() )
-    {
-        sumCase->summaryReader()->buildMetaData();
-    }
 
     buildMetaData();
 
