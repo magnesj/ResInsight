@@ -37,6 +37,11 @@ public:
 
     void setEnsemble( RimSummaryEnsembleSumo* ensemble );
 
+    void setValues( const std::vector<time_t>& timeSteps, const std::string& vectorName, const std::vector<float>& values );
+
+    int32_t realizationNumber() const { return m_realizationNumber; }
+    void    setRealizationNumber( int32_t realizationNumber ) { m_realizationNumber = realizationNumber; }
+
     QString realizationName() const { return m_realizationName; }
     void    setRealizationName( const QString& realizationName ) { m_realizationName = realizationName; }
 
@@ -56,4 +61,8 @@ private:
     caf::PdmField<QString> m_realizationName;
 
     RimSummaryEnsembleSumo* m_ensemble;
+
+    int32_t                                   m_realizationNumber;
+    std::vector<time_t>                       m_timeSteps;
+    std::map<std::string, std::vector<float>> m_values;
 };

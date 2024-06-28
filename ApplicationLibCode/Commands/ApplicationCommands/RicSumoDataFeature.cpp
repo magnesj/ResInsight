@@ -213,6 +213,14 @@ void SimpleDialog::onShowContentParquetClicked()
     auto blob = m_sumoConnector->blobContents().back();
 
     auto content = blob.contents;
+
+    QFile file( "f:/scratch/parquet.parquet" );
+    if ( file.open( QIODevice::WriteOnly ) )
+    {
+        file.write( blob.contents );
+        file.close();
+    }
+
     // TODO: show content using parquet reader
     auto tableText = RifArrowTools::readSummaryData_debug( content );
     RiaLogging::info( tableText );

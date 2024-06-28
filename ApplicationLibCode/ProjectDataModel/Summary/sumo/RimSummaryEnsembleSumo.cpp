@@ -27,7 +27,11 @@
 
 #include "RifByteArrayArrowRandomAccessFile.h"
 
+#include "../../../Application/Tools/RiaTimeTTools.h"
+#include "../../../FileInterface/RifArrowTools.h"
 #include "RiaLogging.h"
+
+#pragma optimize( "", off )
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
@@ -43,16 +47,36 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
     m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
+
+    setAsEnsemble( true );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress )
+std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress )
 {
     loadSummaryData( resultAddress );
 
-    return {};
+    auto key =
+        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+
+    // check if the table is loaded
+    if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
+
+    auto table = m_parquetTable[key];
+
+    auto timeColumn = dataForColumn( table, "real-0", "Date" );
+
+    // convert from double to time_t
+    std::vector<time_t> timeSteps;
+    for ( auto time : timeColumn )
+    {
+        time_t timeStep = static_cast<time_t>( time );
+        timeSteps.push_back( timeStep );
+    }
+
+    return timeSteps;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -62,7 +86,17 @@ std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationNa
 {
     loadSummaryData( resultAddress );
 
-    return {};
+    auto key =
+        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+
+    // check if the table is loaded
+    if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
+
+    auto table = m_parquetTable[key];
+
+    auto dataValues = dataForColumn( table, "real-0", QString::fromStdString( resultAddress.toEclipseTextAddress() ) );
+
+    return dataValues;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -131,6 +165,8 @@ QByteArray RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddre
         }
 
         m_parquetTable[key] = table;
+
+        distributeDataToRealizations( resultAddress, table );
     }
 
     return m_parquetData[key];
@@ -151,16 +187,169 @@ QByteArray RimSummaryEnsembleSumo::loadParquetData( const ParquetKey& parquetKey
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RimSummaryEnsembleSumo::dataForColumn( const QByteArray& parquetData, const QString& columnName )
+void RimSummaryEnsembleSumo::distributeDataToRealizations( const RifEclipseSummaryAddress& resultAddress, std::shared_ptr<arrow::Table> table )
 {
-    return {};
+    if ( !table )
+    {
+        RiaLogging::warning( "Failed to load table" );
+        return;
+    }
+
+    {
+        // print header information
+        QString txt = "Column Names: ";
+
+        for ( std::string columnName : table->ColumnNames() )
+        {
+            txt += QString::fromStdString( columnName ) + " ";
+        }
+
+        RiaLogging::info( txt );
+    }
+
+    std::vector<time_t>  timeSteps;
+    std::vector<int16_t> realisation;
+    std::vector<float>   values;
+
+    {
+        const std::string                    columnName = "DATE";
+        std::shared_ptr<arrow::ChunkedArray> column     = table->GetColumnByName( columnName );
+        if ( column && column->type()->id() == arrow::Type::TIMESTAMP )
+        {
+            auto timeColumn = RifArrowTools::convertChunkedArrayToStdInt64Vector( column );
+            timeSteps       = std::vector<time_t>( timeColumn.size() );
+
+            for ( size_t i = 0; i < timeColumn.size(); ++i )
+            {
+                timeSteps[i] = RiaTimeTTools::fromDouble( timeColumn[i] );
+            }
+        }
+        else
+        {
+            RiaLogging::warning( "Failed to find DATE column" );
+        }
+    }
+
+    {
+        const std::string                    columnName = "REAL";
+        std::shared_ptr<arrow::ChunkedArray> column     = table->GetColumnByName( columnName );
+        if ( column && column->type()->id() == arrow::Type::INT16 )
+        {
+            realisation = RifArrowTools::convertChunkedArrayToStdInt16Vector( column );
+        }
+        else
+        {
+            RiaLogging::warning( "Failed to find realization column" );
+        }
+    }
+
+    {
+        const std::string                    columnName = resultAddress.toEclipseTextAddress();
+        std::shared_ptr<arrow::ChunkedArray> column     = table->GetColumnByName( columnName );
+        if ( column && column->type()->id() == arrow::Type::FLOAT )
+        {
+            values = RifArrowTools::convertChunkedArrayToStdFloatVector( column );
+        }
+        else
+        {
+            RiaLogging::warning( "Failed to find values column" );
+        }
+    }
+
+    // find unique realizations
+    std::set<int16_t> uniqueRealizations;
+    for ( auto realizationNumber : realisation )
+    {
+        uniqueRealizations.insert( realizationNumber );
+    }
+
+    if ( m_cases.size() != uniqueRealizations.size() )
+    {
+        m_cases.deleteChildren();
+    }
+
+    // find start and end index for a given realization number
+    std::map<int16_t, std::pair<size_t, size_t>> realizationIndex;
+    for ( size_t i = 0; i < realisation.size(); ++i )
+    {
+        auto realizationNumber = realisation[i];
+        uniqueRealizations.insert( realizationNumber );
+
+        if ( realizationIndex.find( realizationNumber ) == realizationIndex.end() )
+        {
+            realizationIndex[realizationNumber] = { i, i };
+        }
+        else
+        {
+            realizationIndex[realizationNumber].second = i;
+        }
+    }
+
+    auto findSummaryCase = [this]( int16_t realizationNumber ) -> RimSummaryCaseSumo*
+    {
+        for ( auto sumCase : allSummaryCases() )
+        {
+            auto sumCaseSumo = dynamic_cast<RimSummaryCaseSumo*>( sumCase );
+            if ( sumCaseSumo->realizationNumber() == realizationNumber ) return sumCaseSumo;
+        }
+
+        return nullptr;
+    };
+
+    bool anyCaseCreated = false;
+
+    for ( auto realizationNumber : uniqueRealizations )
+    {
+        auto summaryCase = findSummaryCase( realizationNumber );
+        if ( !summaryCase )
+        {
+            summaryCase = new RimSummaryCaseSumo();
+            summaryCase->setEnsemble( this );
+            summaryCase->setRealizationNumber( realizationNumber );
+            summaryCase->setRealizationName( QString( "Realization %1" ).arg( realizationNumber ) );
+            m_cases.push_back( summaryCase );
+
+            anyCaseCreated = true;
+        }
+
+        auto start = realizationIndex[realizationNumber].first;
+        auto end   = realizationIndex[realizationNumber].second;
+
+        std::vector<time_t> realizationTimeSteps( timeSteps.begin() + start, timeSteps.begin() + end );
+        std::vector<float>  realizationValues( values.begin() + start, values.begin() + end );
+
+        summaryCase->setValues( realizationTimeSteps, resultAddress.toEclipseTextAddress(), realizationValues );
+    }
+
+    if ( anyCaseCreated )
+    {
+        auto firstCase = allSummaryCases().front();
+        firstCase->summaryReader()->buildMetaData();
+
+        buildMetaData();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<std::string> RimSummaryEnsembleSumo::textForColumn( const QByteArray& parquetData, const QString& columnName )
+std::vector<double>
+    RimSummaryEnsembleSumo::dataForColumn( std::shared_ptr<arrow::Table> table, const QString& realizationName, const QString& columnName )
 {
+    std::shared_ptr<arrow::ChunkedArray> column = table->GetColumnByName( columnName.toStdString() );
+
+    if ( column->type()->id() == arrow::Type::DOUBLE )
+    {
+        return RifArrowTools::convertChunkedArrayToStdVector( column );
+    }
+
+    if ( column->type()->id() == arrow::Type::FLOAT )
+    {
+        auto                floatVector = RifArrowTools::convertChunkedArrayToStdFloatVector( column );
+        std::vector<double> columnVector( floatVector.begin(), floatVector.end() );
+        return columnVector;
+    }
+
     return {};
 }
 

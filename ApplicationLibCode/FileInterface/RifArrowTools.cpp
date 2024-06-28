@@ -23,6 +23,8 @@
 
 #include "cafAssert.h"
 
+#include "arrow/array/array_binary.h"
+
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------
@@ -121,6 +123,108 @@ std::vector<int64_t> RifArrowTools::convertChunkedArrayToStdInt64Vector( const s
     {
         std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
         auto                          chunk_vector = convertChunkToInt64Vector( chunk );
+        result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int32_t> RifArrowTools::convertChunkedArrayToStdInt32Vector( const std::shared_ptr<arrow::ChunkedArray>& column )
+{
+    auto convertChunkToInt64Vector = []( const std::shared_ptr<arrow::Array>& array ) -> std::vector<int32_t>
+    {
+        std::vector<int32_t> result;
+
+        auto arrowFloatArray = std::static_pointer_cast<arrow::Int64Array>( array );
+        result.resize( arrowFloatArray->length() );
+        for ( int32_t i = 0; i < arrowFloatArray->length(); ++i )
+        {
+            result[i] = arrowFloatArray->Value( i );
+        }
+
+        return result;
+    };
+
+    CAF_ASSERT( column->type()->id() == arrow::Type::TIMESTAMP );
+
+    std::vector<int32_t> result;
+
+    // Iterate over each chunk in the column
+    for ( int i = 0; i < column->num_chunks(); ++i )
+    {
+        std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
+        auto                          chunk_vector = convertChunkToInt64Vector( chunk );
+        result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int16_t> RifArrowTools::convertChunkedArrayToStdInt16Vector( const std::shared_ptr<arrow::ChunkedArray>& column )
+{
+    auto convertChunkToInt64Vector = []( const std::shared_ptr<arrow::Array>& array ) -> std::vector<int16_t>
+    {
+        std::vector<int16_t> result;
+
+        auto arrowFloatArray = std::static_pointer_cast<arrow::Int16Array>( array );
+        result.resize( arrowFloatArray->length() );
+        for ( int32_t i = 0; i < arrowFloatArray->length(); ++i )
+        {
+            result[i] = arrowFloatArray->Value( i );
+        }
+
+        return result;
+    };
+
+    CAF_ASSERT( column->type()->id() == arrow::Type::INT16 );
+
+    std::vector<int16_t> result;
+
+    // Iterate over each chunk in the column
+    for ( int i = 0; i < column->num_chunks(); ++i )
+    {
+        std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
+        auto                          chunk_vector = convertChunkToInt64Vector( chunk );
+        result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<std::string> RifArrowTools::convertChunkedArrayToStringVector( const std::shared_ptr<arrow::ChunkedArray>& column )
+{
+    auto convertChunkToStringVector = []( const std::shared_ptr<arrow::Array>& array ) -> std::vector<std::string>
+    {
+        std::vector<std::string> result;
+
+        auto arrowFloatArray = std::static_pointer_cast<arrow::StringArray>( array );
+        result.resize( arrowFloatArray->length() );
+        for ( int64_t i = 0; i < arrowFloatArray->length(); ++i )
+        {
+            result[i] = arrowFloatArray->Value( i );
+        }
+
+        return result;
+    };
+
+    CAF_ASSERT( column->type()->id() == arrow::Type::STRING );
+
+    std::vector<std::string> result;
+
+    // Iterate over each chunk in the column
+    for ( int i = 0; i < column->num_chunks(); ++i )
+    {
+        std::shared_ptr<arrow::Array> chunk        = column->chunk( i );
+        auto                          chunk_vector = convertChunkToStringVector( chunk );
         result.insert( result.end(), chunk_vector.begin(), chunk_vector.end() );
     }
 

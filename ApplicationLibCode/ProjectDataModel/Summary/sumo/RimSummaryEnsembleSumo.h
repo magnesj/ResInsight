@@ -63,7 +63,7 @@ public:
     void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
-    std::vector<time_t>                timeSteps( const RifEclipseSummaryAddress& resultAddress );
+    std::vector<time_t>                timeSteps( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress );
     std::vector<double>                values( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress );
     std::string                        unitName( const RifEclipseSummaryAddress& resultAddress );
     RiaDefines::EclipseUnitSystem      unitSystem() const;
@@ -84,8 +84,9 @@ private:
     QByteArray loadSummaryData( const RifEclipseSummaryAddress& resultAddress );
     QByteArray loadParquetData( const ParquetKey& parquetKey );
 
-    std::vector<double>      dataForColumn( const QByteArray& parquetData, const QString& columnName );
-    std::vector<std::string> textForColumn( const QByteArray& parquetData, const QString& columnName );
+    void distributeDataToRealizations( const RifEclipseSummaryAddress& resultAddress, std::shared_ptr<arrow::Table> table );
+
+    std::vector<double> dataForColumn( std::shared_ptr<arrow::Table> table, const QString& realizationName, const QString& columnName );
 
 private:
     caf::PdmField<QString> m_sumoFieldName;

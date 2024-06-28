@@ -33,9 +33,12 @@
 class RifArrowTools
 {
 public:
-    static std::vector<double> convertChunkedArrayToStdVector( const std::shared_ptr<arrow::ChunkedArray>& column );
-    static std::vector<float>  convertChunkedArrayToStdFloatVector( const std::shared_ptr<arrow::ChunkedArray>& column );
-    static std::vector<int64_t> convertChunkedArrayToStdInt64Vector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<double>      convertChunkedArrayToStdVector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<float>       convertChunkedArrayToStdFloatVector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<int64_t>     convertChunkedArrayToStdInt64Vector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<int32_t>     convertChunkedArrayToStdInt32Vector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<int16_t>     convertChunkedArrayToStdInt16Vector( const std::shared_ptr<arrow::ChunkedArray>& column );
+    static std::vector<std::string> convertChunkedArrayToStringVector( const std::shared_ptr<arrow::ChunkedArray>& column );
 
     static QString readSummaryData_debug( const QByteArray& contents );
 };

@@ -712,11 +712,13 @@ void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const QString& ca
     }
 
     // print at max 100 vector names
-    const int maxVectorNames = 100;
-    for ( int i = 0; i < std::min( maxVectorNames, static_cast<int>( m_vectorNames.size() ) ); ++i )
-    {
-        RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
-    }
+    /*
+        const int maxVectorNames = 100;
+        for ( int i = 0; i < std::min( maxVectorNames, static_cast<int>( m_vectorNames.size() ) ); ++i )
+        {
+            RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
+        }
+    */
 
     emit vectorNamesFinished();
 }

@@ -57,8 +57,7 @@ RifSummaryReaderInterface* RimSummaryCaseSumo::summaryReader()
 //--------------------------------------------------------------------------------------------------
 std::vector<time_t> RimSummaryCaseSumo::timeSteps( const RifEclipseSummaryAddress& resultAddress ) const
 {
-    if ( m_ensemble ) return m_ensemble->timeSteps( resultAddress );
-    return {};
+    return m_timeSteps;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -66,7 +65,18 @@ std::vector<time_t> RimSummaryCaseSumo::timeSteps( const RifEclipseSummaryAddres
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimSummaryCaseSumo::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
-    if ( m_ensemble ) return { true, m_ensemble->values( m_realizationName(), resultAddress ) };
+    auto it = m_values.find( resultAddress.vectorName() );
+
+    if ( it != m_values.end() )
+    {
+        std::vector<double> doubleValues;
+        doubleValues.reserve( it->second.size() );
+        for ( auto value : it->second )
+        {
+            doubleValues.push_back( value );
+        }
+        return { true, doubleValues };
+    }
 
     return {};
 }
@@ -97,6 +107,15 @@ RiaDefines::EclipseUnitSystem RimSummaryCaseSumo::unitSystem() const
 void RimSummaryCaseSumo::setEnsemble( RimSummaryEnsembleSumo* ensemble )
 {
     m_ensemble = ensemble;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCaseSumo::setValues( const std::vector<time_t>& timeSteps, const std::string& vectorName, const std::vector<float>& values )
+{
+    m_timeSteps          = timeSteps;
+    m_values[vectorName] = values;
 }
 
 //--------------------------------------------------------------------------------------------------
