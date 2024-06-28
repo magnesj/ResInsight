@@ -23,7 +23,9 @@
 
 #include "cafAssert.h"
 
+#undef signals
 #include "arrow/array/array_binary.h"
+#define signals Q_SIGNALS
 
 #include <vector>
 

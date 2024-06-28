@@ -18,12 +18,15 @@
 
 #include "RifOsduWellPathReader.h"
 
+#undef signals
+#include "arrow/array/array_binary.h"
 #include <arrow/array/array_primitive.h>
 #include <arrow/csv/api.h>
 #include <arrow/io/api.h>
 #include <arrow/scalar.h>
 #include <arrow/util/cancel.h>
 #include <parquet/arrow/reader.h>
+#define signals Q_SIGNALS
 
 #include "RiaLogging.h"
 #include "RiaTextStringTools.h"

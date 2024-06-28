@@ -18,7 +18,9 @@
 
 #pragma once
 
+#undef signals
 #include <arrow/array/array_primitive.h>
+#define signals Q_SIGNALS
 
 #include <QByteArray>
 #include <QString>

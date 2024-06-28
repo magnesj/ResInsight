@@ -79,6 +79,8 @@ std::set<RifEclipseSummaryAddress> RimSummaryEnsembleSumo::allResultAddresses() 
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
 {
+    if ( resultAddress.category() == SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS ) return;
+
     // create job to download data from sumo
     // download data, and notify when done
 
