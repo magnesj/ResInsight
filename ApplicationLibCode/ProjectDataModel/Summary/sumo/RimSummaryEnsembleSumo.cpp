@@ -58,8 +58,7 @@ std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const QString& realizatio
 {
     loadSummaryData( resultAddress );
 
-    auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
 
     // check if the table is loaded
     if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
@@ -86,8 +85,7 @@ std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationNa
 {
     loadSummaryData( resultAddress );
 
-    auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
 
     // check if the table is loaded
     if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
