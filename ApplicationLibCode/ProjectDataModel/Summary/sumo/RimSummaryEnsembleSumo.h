@@ -59,8 +59,8 @@ public:
     QString caseId() const { return m_sumoCaseId; }
     void    setCaseId( const QString& caseId ) { m_sumoCaseId = caseId; }
 
-    QString ensembleId() const { return m_sumoEnsembleId; }
-    void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
+    QString ensembleId() const { return m_ensembleId; }
+    void    setEnsembleId( const QString& ensembleId ) { m_ensembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
     std::vector<time_t>                timeSteps( const QString& realizationName, const RifEclipseSummaryAddress& resultAddress );
@@ -91,7 +91,7 @@ private:
 private:
     caf::PdmField<QString> m_sumoFieldName;
     caf::PdmField<QString> m_sumoCaseId;
-    caf::PdmField<QString> m_sumoEnsembleId;
+    caf::PdmField<QString> m_ensembleId;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 

@@ -143,7 +143,7 @@ private:
     caf::PdmField<bool>                              m_isEnsemble;
     caf::PdmChildField<RimSummaryAddressCollection*> m_dataVectorFolders;
 
-    caf::PdmField<int> m_sumoEnsembleId;
+    caf::PdmField<int> m_ensembleId;
 
     size_t m_commonAddressCount; // if different address count among cases, set to 0
 

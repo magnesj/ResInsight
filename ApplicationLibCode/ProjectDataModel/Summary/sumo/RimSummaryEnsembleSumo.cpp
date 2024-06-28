@@ -46,7 +46,7 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
     m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
-    CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
+    CAF_PDM_InitFieldNoDefault( &m_ensembleId, "SumoEnsembleId", "Ensemble Id" );
 
     setAsEnsemble( true );
 }
@@ -59,7 +59,7 @@ std::vector<time_t> RimSummaryEnsembleSumo::timeSteps( const QString& realizatio
     loadSummaryData( resultAddress );
 
     auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
 
     // check if the table is loaded
     if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
@@ -87,7 +87,7 @@ std::vector<double> RimSummaryEnsembleSumo::values( const QString& realizationNa
     loadSummaryData( resultAddress );
 
     auto key =
-        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
+        ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), QString::fromStdString( resultAddress.toEclipseTextAddress() ) };
 
     // check if the table is loaded
     if ( m_parquetTable.find( key ) == m_parquetTable.end() ) return {};
@@ -135,7 +135,7 @@ QByteArray RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddre
 
     auto resultText = QString::fromStdString( resultAddress.toEclipseTextAddress() );
 
-    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), resultText };
+    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_ensembleId(), resultText };
 
     if ( m_parquetData.find( key ) == m_parquetData.end() )
     {
@@ -360,7 +360,7 @@ void RimSummaryEnsembleSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 {
     uiOrdering.add( &m_sumoFieldName );
     uiOrdering.add( &m_sumoCaseId );
-    uiOrdering.add( &m_sumoEnsembleId );
+    uiOrdering.add( &m_ensembleId );
 
     RimSummaryCaseCollection::defineUiOrdering( uiConfigName, uiOrdering );
 }
@@ -410,7 +410,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
             options.push_back( { sumoCase.name, sumoCase.id } );
         }
     }
-    else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
+    else if ( fieldNeedingOptions == &m_ensembleId && !m_sumoCaseId().isEmpty() )
     {
         if ( m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ).empty() )
         {
@@ -438,7 +438,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
+    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_ensembleId )
     {
         clearCachedData();
         getAvailableVectorNames();
@@ -479,7 +479,7 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::getAvailableVectorNames()
 {
-    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_sumoEnsembleId );
+    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_ensembleId );
 
     auto vectorNames = m_sumoConnector->vectorNames();
     for ( auto vectorName : vectorNames )
@@ -493,7 +493,7 @@ void RimSummaryEnsembleSumo::getAvailableVectorNames()
         auto ensName  = m_sumoEnsembleId.uiCapability()->uiValue().toString();
     */
     auto caseName = m_sumoCaseId();
-    auto ensName  = m_sumoEnsembleId();
+    auto ensName  = m_ensembleId();
 
     RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_resultAddresses.size() ) );
 }

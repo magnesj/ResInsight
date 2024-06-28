@@ -114,10 +114,10 @@ RimSummaryCaseCollection::RimSummaryCaseCollection()
     CAF_PDM_InitScriptableField( &m_isEnsemble, "IsEnsemble", false, "Is Ensemble" );
     m_isEnsemble.uiCapability()->setUiHidden( true );
 
-    CAF_PDM_InitScriptableField( &m_sumoEnsembleId, "Id", -1, "Ensemble ID" );
-    m_sumoEnsembleId.registerKeywordAlias( "EnsembleId" );
-    m_sumoEnsembleId.uiCapability()->setUiReadOnly( true );
-    m_sumoEnsembleId.capability<caf::PdmAbstractFieldScriptingCapability>()->setIOWriteable( false );
+    CAF_PDM_InitScriptableField( &m_ensembleId, "Id", -1, "Ensemble ID" );
+    m_ensembleId.registerKeywordAlias( "EnsembleId" );
+    m_ensembleId.uiCapability()->setUiReadOnly( true );
+    m_ensembleId.capability<caf::PdmAbstractFieldScriptingCapability>()->setIOWriteable( false );
 
     CAF_PDM_InitFieldNoDefault( &m_dataVectorFolders, "DataVectorFolders", "Data Folders" );
     m_dataVectorFolders = new RimSummaryAddressCollection();
@@ -1022,7 +1022,7 @@ void RimSummaryCaseCollection::updateIcon()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseCollection::initAfterRead()
 {
-    if ( m_sumoEnsembleId() == -1 )
+    if ( m_ensembleId() == -1 )
     {
         RimProject* project = RimProject::current();
         project->assignIdToEnsemble( this );
@@ -1075,7 +1075,7 @@ void RimSummaryCaseCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_name );
     if ( m_isEnsemble() )
     {
-        uiOrdering.add( &m_sumoEnsembleId );
+        uiOrdering.add( &m_ensembleId );
     }
     uiOrdering.skipRemainingFields( true );
 }
@@ -1109,7 +1109,7 @@ void RimSummaryCaseCollection::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiT
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseCollection::setEnsembleId( int ensembleId )
 {
-    m_sumoEnsembleId = ensembleId;
+    m_ensembleId = ensembleId;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1117,7 +1117,7 @@ void RimSummaryCaseCollection::setEnsembleId( int ensembleId )
 //--------------------------------------------------------------------------------------------------
 int RimSummaryCaseCollection::ensembleId() const
 {
-    return m_sumoEnsembleId();
+    return m_ensembleId();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1143,7 +1143,7 @@ void RimSummaryCaseCollection::buildChildNodes()
 {
     if ( m_dataVectorFolders->isEmpty() )
     {
-        m_dataVectorFolders->updateFolderStructure( ensembleSummaryAddresses(), -1, m_sumoEnsembleId );
+        m_dataVectorFolders->updateFolderStructure( ensembleSummaryAddresses(), -1, m_ensembleId );
     }
 }
 
@@ -1163,7 +1163,7 @@ void RimSummaryCaseCollection::buildMetaData()
 void RimSummaryCaseCollection::onCalculationUpdated()
 {
     m_dataVectorFolders->deleteCalculatedAddresses();
-    m_dataVectorFolders->updateFolderStructure( ensembleSummaryAddresses(), -1, m_sumoEnsembleId );
+    m_dataVectorFolders->updateFolderStructure( ensembleSummaryAddresses(), -1, m_ensembleId );
 
     m_analyzer.reset();
 
