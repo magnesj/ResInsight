@@ -19,6 +19,7 @@
 #pragma once
 
 #include "cafPdmChildArrayField.h"
+#include "cafPdmObject.h"
 
 #include "Sumo/RiaSumoConnector.h"
 
