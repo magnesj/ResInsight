@@ -18,6 +18,7 @@
 
 #include "RimCloudDataSourceCollection.h"
 
+#include "RiaApplication.h"
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "sumo/RimSummarySumoDataSource.h"

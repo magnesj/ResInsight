@@ -34,6 +34,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "RimAdvancedSnapshotExportDefinition.h"
