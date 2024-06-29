@@ -21,6 +21,8 @@
 
 #include "Sumo/RiaSumoConnector.h"
 
+class RimSummarySumoDataSource;
+
 //==================================================================================================
 //
 //
@@ -29,15 +31,13 @@
 
 struct ParquetKey
 {
-    QString fieldName;
-    QString caseId;
-    QString ensembleId;
-    QString vectorName;
+    SumoCaseId caseId;
+    QString    ensembleId;
+    QString    vectorName;
 
     auto operator<=>( const ParquetKey& other ) const
     {
-        return std::tie( fieldName, caseId, ensembleId, vectorName ) <=>
-               std::tie( other.fieldName, other.caseId, other.ensembleId, other.vectorName );
+        return std::tie( caseId, ensembleId, vectorName ) <=> std::tie( other.caseId, other.ensembleId, other.vectorName );
     }
 };
 
@@ -52,15 +52,6 @@ class RimSummaryEnsembleSumo : public RimSummaryCaseCollection
 
 public:
     RimSummaryEnsembleSumo();
-
-    QString fieldName() const { return m_sumoFieldName; }
-    void    setFieldName( const QString& fieldId ) { m_sumoFieldName = fieldId; }
-
-    QString caseId() const { return m_sumoCaseId; }
-    void    setCaseId( const QString& caseId ) { m_sumoCaseId = caseId; }
-
-    QString ensembleId() const { return m_sumoEnsembleId; }
-    void    setEnsembleId( const QString& ensembleId ) { m_sumoEnsembleId = ensembleId; }
 
     // To be called by the RimSummaryCaseSumo
     std::string                        unitName( const RifEclipseSummaryAddress& resultAddress );
@@ -86,9 +77,7 @@ private:
     void buildMetaData();
 
 private:
-    caf::PdmField<QString> m_sumoFieldName;
-    caf::PdmField<QString> m_sumoCaseId;
-    caf::PdmField<QString> m_sumoEnsembleId;
+    caf::PdmPtrField<RimSummarySumoDataSource*> m_sumoDataSource;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 

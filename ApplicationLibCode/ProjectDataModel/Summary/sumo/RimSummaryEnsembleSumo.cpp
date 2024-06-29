@@ -26,10 +26,13 @@
 #include "RifByteArrayArrowRandomAccessFile.h"
 #include "RifEclipseSummaryAddress.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "RimSummaryCaseSumo.h"
+#include "RimSummarySumoDataSource.h"
 
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include "../../../Application/Tools/RiaSummaryTools.h"
 #include <QSettings>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
@@ -41,11 +44,7 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 {
     CAF_PDM_InitObject( "Sumo Ensemble", ":/SummaryCase.svg", "", "The Base Class for all Summary Cases" );
 
-    CAF_PDM_InitFieldNoDefault( &m_sumoFieldName, "SumoFieldId", "Field Id" );
-    CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
-    m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
-
-    CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
+    CAF_PDM_InitFieldNoDefault( &m_sumoDataSource, "SumoDataSource", "Sumo Data Source" );
 
     setAsEnsemble( true );
 }
@@ -83,12 +82,14 @@ void RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& re
 {
     if ( resultAddress.category() == SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS ) return;
 
-    // create job to download data from sumo
-    // download data, and notify when done
+    if ( !m_sumoDataSource() ) return;
 
     auto resultText = QString::fromStdString( resultAddress.toEclipseTextAddress() );
 
-    auto key = ParquetKey{ m_sumoFieldName(), m_sumoCaseId(), m_sumoEnsembleId(), resultText };
+    auto sumoCaseId       = m_sumoDataSource->caseId();
+    auto sumoEnsembleName = m_sumoDataSource->ensembleName();
+
+    auto key = ParquetKey{ sumoCaseId, sumoEnsembleName, resultText };
 
     if ( m_parquetTable.find( key ) == m_parquetTable.end() )
     {
@@ -300,10 +301,6 @@ void RimSummaryEnsembleSumo::buildMetaData()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_sumoFieldName );
-    uiOrdering.add( &m_sumoCaseId );
-    uiOrdering.add( &m_sumoEnsembleId );
-
     auto group = uiOrdering.addNewGroup( "General" );
 
     RimSummaryCaseCollection::defineUiOrdering( uiConfigName, *group );
@@ -317,40 +314,11 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
     createSumoConnector();
 
     QList<caf::PdmOptionItemInfo> options;
-    if ( fieldNeedingOptions == &m_sumoFieldName )
+    if ( fieldNeedingOptions == &m_sumoDataSource )
     {
-        if ( m_sumoConnector->assets().empty() )
+        for ( const auto& sumoDataSource : RimCloudDataSourceCollection::instance()->sumoDataSources() )
         {
-            m_sumoConnector->requestAssetsBlocking();
-        }
-
-        for ( const auto& asset : m_sumoConnector->assets() )
-        {
-            options.push_back( { asset.name, asset.name } );
-        }
-    }
-    else if ( fieldNeedingOptions == &m_sumoCaseId && !m_sumoFieldName().isEmpty() )
-    {
-        if ( m_sumoConnector->cases().empty() )
-        {
-            m_sumoConnector->requestCasesForFieldBlocking( m_sumoFieldName );
-        }
-
-        for ( const auto& sumoCase : m_sumoConnector->cases() )
-        {
-            options.push_back( { sumoCase.name, sumoCase.caseId.get() } );
-        }
-    }
-    else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
-    {
-        if ( m_sumoConnector->ensembleNamesForCase( SumoCaseId( m_sumoCaseId ) ).empty() )
-        {
-            m_sumoConnector->requestEnsembleByCasesId( SumoCaseId( m_sumoCaseId ) );
-        }
-
-        for ( const auto& name : m_sumoConnector->ensembleNamesForCase( SumoCaseId( m_sumoCaseId ) ) )
-        {
-            options.push_back( { name, name } );
+            options.push_back( { sumoDataSource->name(), sumoDataSource } );
         }
     }
 
@@ -362,18 +330,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_sumoFieldName )
-    {
-        m_sumoCaseId     = "";
-        m_sumoEnsembleId = "";
-    }
-
-    if ( changedField == &m_sumoCaseId )
-    {
-        m_sumoEnsembleId = "";
-    }
-
-    if ( changedField == &m_sumoFieldName || changedField == &m_sumoCaseId || changedField == &m_sumoEnsembleId )
+    if ( changedField == &m_sumoDataSource )
     {
         clearCachedData();
         getAvailableVectorNames();
@@ -381,6 +338,8 @@ void RimSummaryEnsembleSumo::fieldChangedByUi( const caf::PdmFieldHandle* change
         buildMetaData();
 
         updateConnectedEditors();
+
+        RiaSummaryTools::reloadSummaryEnsemble( this );
     }
 }
 
@@ -411,7 +370,10 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::getAvailableVectorNames()
 {
-    m_sumoConnector->requestVectorNamesForEnsembleBlocking( SumoCaseId( m_sumoCaseId ), m_sumoEnsembleId );
+    if ( !m_sumoConnector ) return;
+    if ( !m_sumoDataSource() ) return;
+
+    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoDataSource->caseId(), m_sumoDataSource->ensembleName() );
 
     auto vectorNames = m_sumoConnector->vectorNames();
     for ( auto vectorName : vectorNames )
@@ -420,8 +382,8 @@ void RimSummaryEnsembleSumo::getAvailableVectorNames()
         m_resultAddresses.insert( adr );
     }
 
-    auto caseName = m_sumoCaseId();
-    auto ensName  = m_sumoEnsembleId();
+    auto caseName = m_sumoDataSource->caseId().get();
+    auto ensName  = m_sumoDataSource->ensembleName();
 
     RiaLogging::info( QString( "Case: %1, ens: %2,  vector count: %3" ).arg( caseName ).arg( ensName ).arg( m_resultAddresses.size() ) );
 }

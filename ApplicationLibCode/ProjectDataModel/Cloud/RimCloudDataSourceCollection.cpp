@@ -60,6 +60,14 @@ RimCloudDataSourceCollection* RimCloudDataSourceCollection::instance()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::sumoDataSources() const
+{
+    return m_sumoDataSources.childrenByType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( changedField == &m_addEnsemble )

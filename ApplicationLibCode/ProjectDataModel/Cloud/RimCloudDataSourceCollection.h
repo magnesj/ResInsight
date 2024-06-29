@@ -39,6 +39,8 @@ public:
 
     static RimCloudDataSourceCollection* instance();
 
+    std::vector<RimSummarySumoDataSource*> sumoDataSources() const;
+
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
