@@ -1462,6 +1462,10 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
             {
                 uiTreeOrdering.add( oilField->vfpDataCollection() );
             }
+            if ( oilField->cloudDataCollection() )
+            {
+                uiTreeOrdering.add( oilField->cloudDataCollection() );
+            }
         }
     }
     else if ( uiConfigName == "PlotWindow.Scripts" || uiConfigName == "MainWindow.Scripts" )

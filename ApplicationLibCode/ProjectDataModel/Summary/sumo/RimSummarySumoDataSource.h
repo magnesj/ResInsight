@@ -36,10 +36,19 @@ public:
     SumoCaseId caseId() const;
     void       setCaseId( const SumoCaseId& caseId );
 
+    QString caseName() const;
+    void    setCaseName( const QString& caseName );
+
     QString ensembleName() const;
     void    setEnsembleName( const QString& ensembleName );
 
 private:
+    void updateName();
+
+private:
     caf::PdmField<QString> m_caseId;
+    caf::PdmField<QString> m_caseName;
     caf::PdmField<QString> m_ensembleName;
+
+    caf::PdmField<QString> m_customName;
 };

@@ -25,10 +25,14 @@ CAF_PDM_SOURCE_INIT( RimSummarySumoDataSource, "RimSummarySumoDataSource" );
 //--------------------------------------------------------------------------------------------------
 RimSummarySumoDataSource::RimSummarySumoDataSource()
 {
-    CAF_PDM_InitScriptableObject( "Sumo Data Source", ":/SummaryCase.svg" );
+    CAF_PDM_InitObject( "Sumo Data Source", ":/SummaryCase.svg" );
 
     CAF_PDM_InitFieldNoDefault( &m_caseId, "CaseId", "Case Id" );
+    CAF_PDM_InitFieldNoDefault( &m_caseName, "CaseName", "Case Name" );
     CAF_PDM_InitFieldNoDefault( &m_ensembleName, "EnsembleName", "Ensemble Name" );
+    CAF_PDM_InitFieldNoDefault( &m_customName, "CustomName", "Custom Name" );
+
+    setDeletable( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -50,6 +54,24 @@ void RimSummarySumoDataSource::setCaseId( const SumoCaseId& caseId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimSummarySumoDataSource::caseName() const
+{
+    return m_caseName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummarySumoDataSource::setCaseName( const QString& caseName )
+{
+    m_caseName = caseName;
+
+    updateName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RimSummarySumoDataSource::ensembleName() const
 {
     return m_ensembleName();
@@ -61,4 +83,22 @@ QString RimSummarySumoDataSource::ensembleName() const
 void RimSummarySumoDataSource::setEnsembleName( const QString& ensembleName )
 {
     m_ensembleName = ensembleName;
+
+    updateName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummarySumoDataSource::updateName()
+{
+    if ( !m_customName().isEmpty() )
+    {
+        setName( m_customName() );
+        return;
+    }
+
+    auto name = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
+
+    setName( name );
 }
