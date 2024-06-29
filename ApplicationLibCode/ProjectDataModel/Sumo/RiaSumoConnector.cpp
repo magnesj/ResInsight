@@ -264,7 +264,7 @@ void RiaSumoConnector::requestAssetsBlocking()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestEnsembleByCasesId( const QString& caseId )
+void RiaSumoConnector::requestEnsembleByCasesId( const SumoCaseId& caseId )
 {
     QString payloadTemplate = R"(
 
@@ -294,7 +294,7 @@ void RiaSumoConnector::requestEnsembleByCasesId( const QString& caseId )
 
     addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
-    auto payload = payloadTemplate.arg( caseId );
+    auto payload = payloadTemplate.arg( caseId.get() );
     auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
 
     connect( reply,
@@ -311,7 +311,7 @@ void RiaSumoConnector::requestEnsembleByCasesId( const QString& caseId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestEnsembleByCasesIdBlocking( const QString& caseId )
+void RiaSumoConnector::requestEnsembleByCasesIdBlocking( const SumoCaseId& caseId )
 {
     QEventLoop loop;
     connect( this, SIGNAL( ensembleNamesFinished() ), &loop, SLOT( quit() ) );
@@ -329,7 +329,7 @@ void RiaSumoConnector::requestEnsembleByCasesIdBlocking( const QString& caseId )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName )
+void RiaSumoConnector::requestVectorNamesForEnsemble( const SumoCaseId& caseId, const QString& ensembleName )
 {
     QString payloadTemplate = R"(
 {
@@ -369,7 +369,7 @@ void RiaSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, con
 
     addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
-    auto payload = payloadTemplate.arg( caseId ).arg( ensembleName );
+    auto payload = payloadTemplate.arg( caseId.get() ).arg( ensembleName );
     auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
 
     connect( reply,
@@ -386,7 +386,7 @@ void RiaSumoConnector::requestVectorNamesForEnsemble( const QString& caseId, con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName )
+void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName )
 {
     QEventLoop loop;
     connect( this, SIGNAL( vectorNamesFinished() ), &loop, SLOT( quit() ) );
@@ -404,7 +404,7 @@ void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const QString& cas
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+void RiaSumoConnector::requestBlobIdForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName )
 {
     QString payloadTemplate = R"(
 {
@@ -434,7 +434,7 @@ void RiaSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
 
     addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
 
-    auto payload = payloadTemplate.arg( caseId ).arg( ensembleName ).arg( vectorName );
+    auto payload = payloadTemplate.arg( caseId.get() ).arg( ensembleName ).arg( vectorName );
     auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
 
     connect( reply,
@@ -451,7 +451,7 @@ void RiaSumoConnector::requestBlobIdForEnsemble( const QString& caseId, const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::requestBlobIdForEnsembleBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+void RiaSumoConnector::requestBlobIdForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName )
 {
     QEventLoop loop;
     connect( this, SIGNAL( blobIdFinished() ), &loop, SLOT( quit() ) );
@@ -549,7 +549,7 @@ void RiaSumoConnector::requestBlobByRedirectUri( const QString& blobId, const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QByteArray RiaSumoConnector::requestParquetDataBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName )
+QByteArray RiaSumoConnector::requestParquetDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName )
 {
     requestBlobIdForEnsembleBlocking( caseId, ensembleName, vectorName );
 
@@ -670,7 +670,7 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const QString& caseId )
+void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const SumoCaseId& caseId )
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
@@ -695,7 +695,7 @@ void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const QString& 
             auto        keys_3    = bucketObj.keys();
 
             auto ensembleName = bucketObj["key"].toString();
-            m_ensembleNames.push_back( { SumoCaseId( caseId ), ensembleName } );
+            m_ensembleNames.push_back( { caseId, ensembleName } );
         }
     }
 
@@ -747,7 +747,7 @@ void RiaSumoConnector::parseCases( QNetworkReply* reply )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const QString& caseId, const QString& ensembleName )
+void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName )
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
@@ -785,7 +785,7 @@ void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const QString& ca
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSumoConnector::parseBlobIds( QNetworkReply* reply, const QString& caseId, const QString& ensembleName, const QString& vectorName )
+void RiaSumoConnector::parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName )
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
@@ -971,12 +971,12 @@ std::vector<SumoCase> RiaSumoConnector::cases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RiaSumoConnector::ensembleNamesForCase( const QString& caseId ) const
+std::vector<QString> RiaSumoConnector::ensembleNamesForCase( const SumoCaseId& caseId ) const
 {
     std::vector<QString> ensembleNames;
     for ( const auto& ensemble : m_ensembleNames )
     {
-        if ( ensemble.caseId == SumoCaseId( caseId ) )
+        if ( ensemble.caseId == caseId )
         {
             ensembleNames.push_back( ensemble.name );
         }

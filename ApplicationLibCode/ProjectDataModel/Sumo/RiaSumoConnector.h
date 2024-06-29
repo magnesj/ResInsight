@@ -82,25 +82,25 @@ public:
     void requestCasesForField( const QString& fieldName );
     void requestCasesForFieldBlocking( const QString& fieldName );
 
-    void requestEnsembleByCasesId( const QString& caseId );
-    void requestEnsembleByCasesIdBlocking( const QString& caseId );
+    void requestEnsembleByCasesId( const SumoCaseId& caseId );
+    void requestEnsembleByCasesIdBlocking( const SumoCaseId& caseId );
 
-    void requestVectorNamesForEnsemble( const QString& caseId, const QString& ensembleName );
-    void requestVectorNamesForEnsembleBlocking( const QString& caseId, const QString& ensembleName );
+    void requestVectorNamesForEnsemble( const SumoCaseId& caseId, const QString& ensembleName );
+    void requestVectorNamesForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName );
 
-    void requestBlobIdForEnsemble( const QString& caseId, const QString& ensembleName, const QString& vectorName );
-    void requestBlobIdForEnsembleBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName );
+    void requestBlobIdForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
+    void requestBlobIdForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
     void requestBlobDownload( const QString& blobId );
     void requestBlobByRedirectUri( const QString& blobId, const QString& redirectUri );
 
-    QByteArray requestParquetDataBlocking( const QString& caseId, const QString& ensembleName, const QString& vectorName );
+    QByteArray requestParquetDataBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
     QString server() const;
 
     std::vector<SumoAsset>    assets() const;
     std::vector<SumoCase>     cases() const;
-    std::vector<QString>      ensembleNamesForCase( const QString& caseId ) const;
+    std::vector<QString>      ensembleNamesForCase( const SumoCaseId& caseId ) const;
     std::vector<QString>      vectorNames() const;
     std::vector<QString>      blobUrls() const;
     std::vector<SumoRedirect> blobContents() const;
@@ -109,10 +109,10 @@ public slots:
     void requestToken();
 
     void parseAssets( QNetworkReply* reply );
-    void parseEnsembleNames( QNetworkReply* reply, const QString& caseId );
+    void parseEnsembleNames( QNetworkReply* reply, const SumoCaseId& caseId );
     void parseCases( QNetworkReply* reply );
-    void parseVectorNames( QNetworkReply* reply, const QString& caseId, const QString& ensembleName );
-    void parseBlobIds( QNetworkReply* reply, const QString& caseId, const QString& ensembleName, const QString& vectorName );
+    void parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
+    void parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
     void saveFile( QNetworkReply* reply, const QString& fileId );
 

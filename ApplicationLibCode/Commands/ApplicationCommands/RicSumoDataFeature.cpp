@@ -160,8 +160,8 @@ void SimpleDialog::onVectorNamesClicked()
 {
     if ( !isTokenValid() ) return;
 
-    QString caseId    = "5b783aab-ce10-4b78-b129-baf8d8ce4baa";
-    QString iteration = "iter-0";
+    SumoCaseId caseId( "5b783aab-ce10-4b78-b129-baf8d8ce4baa" );
+    QString    iteration = "iter-0";
 
     m_sumoConnector->requestVectorNamesForEnsemble( caseId, iteration );
 
@@ -175,9 +175,9 @@ void SimpleDialog::onFindBlobIdClicked()
 {
     if ( !isTokenValid() ) return;
 
-    QString caseId     = "5b783aab-ce10-4b78-b129-baf8d8ce4baa";
-    QString iteration  = "iter-0";
-    QString vectorName = "FOPT";
+    SumoCaseId caseId( "5b783aab-ce10-4b78-b129-baf8d8ce4baa" );
+    QString    iteration  = "iter-0";
+    QString    vectorName = "FOPT";
 
     m_sumoConnector->requestBlobIdForEnsemble( caseId, iteration, vectorName );
 

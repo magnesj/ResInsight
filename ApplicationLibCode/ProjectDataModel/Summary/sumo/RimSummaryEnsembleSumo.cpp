@@ -129,7 +129,7 @@ QByteArray RimSummaryEnsembleSumo::loadParquetData( const ParquetKey& parquetKey
 {
     createSumoConnector();
 
-    auto data = m_sumoConnector->requestParquetDataBlocking( parquetKey.caseId, parquetKey.ensembleId, parquetKey.vectorName );
+    auto data = m_sumoConnector->requestParquetDataBlocking( SumoCaseId( parquetKey.caseId ), parquetKey.ensembleId, parquetKey.vectorName );
 
     return data;
 }
@@ -343,12 +343,12 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
     }
     else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
     {
-        if ( m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ).empty() )
+        if ( m_sumoConnector->ensembleNamesForCase( SumoCaseId( m_sumoCaseId ) ).empty() )
         {
-            m_sumoConnector->requestEnsembleByCasesId( m_sumoCaseId );
+            m_sumoConnector->requestEnsembleByCasesId( SumoCaseId( m_sumoCaseId ) );
         }
 
-        for ( const auto& name : m_sumoConnector->ensembleNamesForCase( m_sumoCaseId ) )
+        for ( const auto& name : m_sumoConnector->ensembleNamesForCase( SumoCaseId( m_sumoCaseId ) ) )
         {
             options.push_back( { name, name } );
         }
@@ -411,7 +411,7 @@ void RimSummaryEnsembleSumo::createSumoConnector()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::getAvailableVectorNames()
 {
-    m_sumoConnector->requestVectorNamesForEnsembleBlocking( m_sumoCaseId, m_sumoEnsembleId );
+    m_sumoConnector->requestVectorNamesForEnsembleBlocking( SumoCaseId( m_sumoCaseId ), m_sumoEnsembleId );
 
     auto vectorNames = m_sumoConnector->vectorNames();
     for ( auto vectorName : vectorNames )
