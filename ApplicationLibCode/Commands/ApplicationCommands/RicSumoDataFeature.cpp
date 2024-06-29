@@ -30,6 +30,7 @@
 #include "RiuMainWindow.h"
 
 #include <QAction>
+#include <QSettings>
 
 CAF_CMD_SOURCE_INIT( RicSumoDataFeature, "RicSumoDataFeature" );
 

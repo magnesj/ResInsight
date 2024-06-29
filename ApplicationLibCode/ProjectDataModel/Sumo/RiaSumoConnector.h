@@ -18,28 +18,33 @@
 
 #pragma once
 
-#include <QtCore>
-
 #include <QByteArray>
 #include <QNetworkAccessManager>
 #include <QOAuth2AuthorizationCodeFlow>
 
 #include <map>
 
+#include "nonstd/type.hpp"
+
+using SumoAssetId = nonstd::ordered<QString, struct sumo_asset_tag>;
+using SumoCaseId  = nonstd::ordered<QString, struct sumo_case_tag>;
+
 using SumoObjectId = QString;
 
 struct SumoAsset
 {
-    SumoObjectId id;
-    QString      kind;
-    QString      name;
+    SumoAssetId assetId;
+
+    QString kind;
+    QString name;
 };
 
 struct SumoCase
 {
-    SumoObjectId id;
-    QString      kind;
-    QString      name;
+    SumoCaseId caseId;
+
+    QString kind;
+    QString name;
 };
 
 struct SumoRedirect
@@ -54,8 +59,8 @@ struct SumoRedirect
 
 struct SumoEnsemble
 {
-    SumoObjectId caseId;
-    QString      name;
+    SumoCaseId caseId;
+    QString    name;
 };
 
 //==================================================================================================

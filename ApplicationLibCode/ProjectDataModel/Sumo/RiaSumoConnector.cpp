@@ -27,6 +27,7 @@
 #include <QAbstractOAuth>
 #include <QDesktopServices>
 #include <QEventLoop>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QNetworkAccessManager>
@@ -39,6 +40,7 @@
 #include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
+#include <QtCore>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -654,7 +656,7 @@ void RiaSumoConnector::parseAssets( QNetworkReply* reply )
             QString id;
             QString kind;
             QString fieldName = key;
-            m_assets.push_back( SumoAsset{ id, kind, fieldName } );
+            m_assets.push_back( SumoAsset{ SumoAssetId( id ), kind, fieldName } );
         }
 
         for ( auto a : m_assets )
@@ -693,7 +695,7 @@ void RiaSumoConnector::parseEnsembleNames( QNetworkReply* reply, const QString& 
             auto        keys_3    = bucketObj.keys();
 
             auto ensembleName = bucketObj["key"].toString();
-            m_ensembleNames.push_back( { caseId, ensembleName } );
+            m_ensembleNames.push_back( { SumoCaseId( caseId ), ensembleName } );
         }
     }
 
@@ -735,7 +737,7 @@ void RiaSumoConnector::parseCases( QNetworkReply* reply )
             QString id        = resultObj["_id"].toString();
             QString kind      = "";
             QString fieldName = fmuCase["name"].toString();
-            m_cases.push_back( SumoCase{ id, kind, fieldName } );
+            m_cases.push_back( SumoCase{ SumoCaseId( id ), kind, fieldName } );
         }
 
         emit casesFinished();
@@ -974,7 +976,7 @@ std::vector<QString> RiaSumoConnector::ensembleNamesForCase( const QString& case
     std::vector<QString> ensembleNames;
     for ( const auto& ensemble : m_ensembleNames )
     {
-        if ( ensemble.caseId == caseId )
+        if ( ensemble.caseId == SumoCaseId( caseId ) )
         {
             ensembleNames.push_back( ensemble.name );
         }

@@ -30,6 +30,8 @@
 
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include <QSettings>
+
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
 
 //--------------------------------------------------------------------------------------------------
@@ -336,7 +338,7 @@ QList<caf::PdmOptionItemInfo> RimSummaryEnsembleSumo::calculateValueOptions( con
 
         for ( const auto& sumoCase : m_sumoConnector->cases() )
         {
-            options.push_back( { sumoCase.name, sumoCase.id } );
+            options.push_back( { sumoCase.name, sumoCase.caseId.get() } );
         }
     }
     else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
