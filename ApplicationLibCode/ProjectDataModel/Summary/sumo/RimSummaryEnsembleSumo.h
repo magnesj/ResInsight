@@ -21,6 +21,10 @@
 
 #include "Sumo/RiaSumoConnector.h"
 
+#include "cafPdmPtrField.h"
+
+#include <QPointer>
+
 class RimSummarySumoDataSource;
 
 //==================================================================================================
