@@ -38,11 +38,11 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
     m_sumoCaseId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
-    CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleId, "SumoEnsembleId", "Ensemble Id" );
-    m_sumoEnsembleId.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+    CAF_PDM_InitFieldNoDefault( &m_sumoEnsembleNames, "SumoEnsembleNames", "Ensembles" );
+    m_sumoEnsembleNames.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
-    CAF_PDM_InitFieldNoDefault( &m_addEnsemble, "ClearSelectedData", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsemble );
+    CAF_PDM_InitFieldNoDefault( &m_addEnsembles, "AddEnsembles", "" );
+    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsembles );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSources, "SumoDataSources", "Sumo Data Sources" );
 
@@ -70,11 +70,11 @@ std::vector<RimSummarySumoDataSource*> RimCloudDataSourceCollection::sumoDataSou
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_addEnsemble )
+    if ( changedField == &m_addEnsembles )
     {
         addEnsemble();
 
-        m_addEnsemble = false;
+        m_addEnsembles = false;
     }
 }
 
@@ -108,7 +108,7 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
             options.push_back( { sumoCase.name, sumoCase.caseId.get() } );
         }
     }
-    else if ( fieldNeedingOptions == &m_sumoEnsembleId && !m_sumoCaseId().isEmpty() )
+    else if ( fieldNeedingOptions == &m_sumoEnsembleNames && !m_sumoCaseId().isEmpty() )
     {
         if ( m_sumoConnector->ensembleNamesForCase( SumoCaseId( m_sumoCaseId ) ).empty() )
         {
@@ -131,7 +131,7 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
 {
     uiOrdering.add( &m_sumoFieldName );
     uiOrdering.add( &m_sumoCaseId );
-    uiOrdering.add( &m_sumoEnsembleId );
+    uiOrdering.add( &m_sumoEnsembleNames );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -141,12 +141,11 @@ void RimCloudDataSourceCollection::defineEditorAttribute( const caf::PdmFieldHan
                                                           QString                    uiConfigName,
                                                           caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_addEnsemble )
+    if ( field == &m_addEnsembles )
     {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
+        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
         {
-            attrib->m_buttonText = "Add Ensemble";
+            attrib->m_buttonText = "Add Ensemble(s)";
         }
     }
 }
@@ -156,23 +155,37 @@ void RimCloudDataSourceCollection::defineEditorAttribute( const caf::PdmFieldHan
 //--------------------------------------------------------------------------------------------------
 void RimCloudDataSourceCollection::addEnsemble()
 {
-    auto dataSource = new RimSummarySumoDataSource();
-
-    auto sumoCaseId = SumoCaseId( m_sumoCaseId );
-    dataSource->setCaseId( sumoCaseId );
-    dataSource->setEnsembleName( m_sumoEnsembleId );
-
-    QString caseName;
-    for ( const auto& sumoCase : m_sumoConnector->cases() )
+    for ( const auto& ensembleName : m_sumoEnsembleNames() )
     {
-        if ( sumoCase.caseId == sumoCaseId )
+        auto    sumoCaseId = SumoCaseId( m_sumoCaseId );
+        QString caseName;
+        for ( const auto& sumoCase : m_sumoConnector->cases() )
         {
-            caseName = sumoCase.name;
-            break;
+            if ( sumoCase.caseId == sumoCaseId )
+            {
+                caseName = sumoCase.name;
+                break;
+            }
+        }
+
+        bool createNewDataSource = true;
+        for ( const auto dataSource : sumoDataSources() )
+        {
+            if ( dataSource->caseId() == sumoCaseId && dataSource->ensembleName() == ensembleName )
+            {
+                createNewDataSource = false;
+                break;
+            }
+        }
+
+        if ( createNewDataSource )
+        {
+            auto dataSource = new RimSummarySumoDataSource();
+            dataSource->setCaseId( sumoCaseId );
+            dataSource->setCaseName( caseName );
+            dataSource->setEnsembleName( ensembleName );
+
+            m_sumoDataSources.push_back( dataSource );
         }
     }
-
-    dataSource->setCaseName( caseName );
-
-    m_sumoDataSources.push_back( dataSource );
 }

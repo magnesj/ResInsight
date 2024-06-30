@@ -18,6 +18,8 @@
 
 #include "RimSummarySumoDataSource.h"
 
+#include "Sumo/RiaSumoConnector.h"
+
 CAF_PDM_SOURCE_INIT( RimSummarySumoDataSource, "RimSummarySumoDataSource" );
 
 //--------------------------------------------------------------------------------------------------

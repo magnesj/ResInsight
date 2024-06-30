@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaLogging.h"
+#include "RiaSummaryTools.h"
 #include "RiaTimeTTools.h"
 
 #include "RifArrowTools.h"
@@ -30,9 +31,6 @@
 #include "RimSummaryCaseSumo.h"
 #include "RimSummarySumoDataSource.h"
 
-#include "cafPdmUiTreeSelectionEditor.h"
-
-#include "../../../Application/Tools/RiaSummaryTools.h"
 #include <QSettings>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );
