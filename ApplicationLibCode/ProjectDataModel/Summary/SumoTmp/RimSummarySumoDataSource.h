@@ -18,7 +18,8 @@
 #pragma once
 
 #include "RimNamedObject.h"
-#include "Sumo/RiaSumoConnector.h"
+
+#include "Cloud/RiaSumoConnector.h"
 
 //==================================================================================================
 //

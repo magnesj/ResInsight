@@ -18,14 +18,14 @@
 
 #include "RicSumoDataFeature.h"
 
+#include "Cloud/RiaSumoConnector.h"
 #include "RiaApplication.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 
-#include "../../FileInterface/RifArrowTools.h"
-#include "Sumo/RiaSumoConnector.h"
+#include "RifArrowTools.h"
 
 #include "RiuMainWindow.h"
 

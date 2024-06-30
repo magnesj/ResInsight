@@ -19,7 +19,7 @@
 
 #include "RimSummaryCaseCollection.h"
 
-#include "Sumo/RiaSumoConnector.h"
+#include "Cloud/RiaSumoConnector.h"
 
 #include "cafPdmPtrField.h"
 

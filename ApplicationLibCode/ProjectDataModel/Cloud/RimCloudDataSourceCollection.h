@@ -22,7 +22,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
-#include "Sumo/RiaSumoConnector.h"
+#include "Cloud/RiaSumoConnector.h"
 
 #include <QPointer>
 #include <QString>

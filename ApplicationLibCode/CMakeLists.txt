@@ -93,6 +93,7 @@ list(
   Application/CMakeLists_files.cmake
   Application/Tools/CMakeLists_files.cmake
   Application/Tools/WellPathTools/CMakeLists_files.cmake
+  Application/Tools/Cloud/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_filesNotToUnitTest.cmake
   ReservoirDataModel/Completions/CMakeLists_files.cmake
@@ -108,7 +109,7 @@ list(
   ProjectDataModel/GridCrossPlots/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CellFilters/CMakeLists_files.cmake
   ProjectDataModel/Summary/CMakeLists_files.cmake
-  ProjectDataModel/Summary/sumo/CMakeLists_files.cmake
+  ProjectDataModel/Summary/SumoTmp/CMakeLists_files.cmake
   ProjectDataModel/Flow/CMakeLists_files.cmake
   ProjectDataModel/Annotations/CMakeLists_files.cmake
   ProjectDataModel/Completions/CMakeLists_files.cmake
@@ -119,7 +120,6 @@ list(
   ProjectDataModel/Streamlines/CMakeLists_files.cmake
   ProjectDataModel/Seismic/CMakeLists_files.cmake
   ProjectDataModel/Surfaces/CMakeLists_files.cmake
-  ProjectDataModel/Sumo/CMakeLists_files.cmake
   ProjectDataModel/Intersections/CMakeLists_files.cmake
   ProjectDataModel/CellFilters/CMakeLists_files.cmake
   ProjectDataModel/ProcessControl/CMakeLists_files.cmake

@@ -20,8 +20,6 @@
 
 #include "cafCmdFeature.h"
 
-#include "Sumo/RiaSumoConnector.h"
-
 #include <QDialog>
 #include <QLabel>
 #include <QPointer>

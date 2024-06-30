@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include "RiaApplication.h"
 
+#include "Cloud/RiaSumoConnector.h"
 #include "OsduImportCommands/RiaOsduConnector.h"
 #include "RiaArgumentParser.h"
 #include "RiaBaseDefs.h"
@@ -34,7 +35,6 @@
 #include "RiaVersionInfo.h"
 #include "RiaViewRedrawScheduler.h"
 #include "RiaWellNameComparer.h"
-#include "Sumo/RiaSumoConnector.h"
 
 #include "ExportCommands/RicSnapshotAllViewsToFileFeature.h"
 #include "HoloLensCommands/RicHoloLensSessionManager.h"

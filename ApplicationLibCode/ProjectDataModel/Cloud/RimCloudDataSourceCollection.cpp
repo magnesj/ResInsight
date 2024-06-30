@@ -21,7 +21,7 @@
 #include "RiaApplication.h"
 #include "RimOilField.h"
 #include "RimProject.h"
-#include "sumo/RimSummarySumoDataSource.h"
+#include "SumoTmp/RimSummarySumoDataSource.h"
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
