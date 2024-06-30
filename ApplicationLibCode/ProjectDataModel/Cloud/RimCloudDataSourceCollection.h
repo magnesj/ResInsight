@@ -24,6 +24,7 @@
 #include "Sumo/RiaSumoConnector.h"
 
 #include <QPointer>
+#include <QString>
 
 class RimSummarySumoDataSource;
 
