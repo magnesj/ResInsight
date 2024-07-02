@@ -28,6 +28,7 @@ CAF_PDM_SOURCE_INIT( RimSummaryCaseSumo, "RimSummaryCaseSumo" );
 ///
 //--------------------------------------------------------------------------------------------------
 RimSummaryCaseSumo::RimSummaryCaseSumo()
+    : m_realizationNumber( -1 )
 {
     CAF_PDM_InitScriptableObject( "Sumo Realization", ":/SummaryCase.svg" );
 
