@@ -34,6 +34,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "RimAdvancedSnapshotExportDefinition.h"
@@ -1446,6 +1447,10 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
         RimOilField* oilField = activeOilField();
         if ( oilField )
         {
+            if ( oilField->cloudDataCollection() )
+            {
+                uiTreeOrdering.add( oilField->cloudDataCollection() );
+            }
             if ( oilField->summaryCaseMainCollection() )
             {
                 uiTreeOrdering.add( oilField->summaryCaseMainCollection() );

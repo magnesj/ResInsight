@@ -93,6 +93,7 @@ list(
   Application/CMakeLists_files.cmake
   Application/Tools/CMakeLists_files.cmake
   Application/Tools/WellPathTools/CMakeLists_files.cmake
+  Application/Tools/Cloud/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_filesNotToUnitTest.cmake
   ReservoirDataModel/Completions/CMakeLists_files.cmake
@@ -102,11 +103,13 @@ list(
   ProjectDataModel/CMakeLists_files.cmake
   ProjectDataModel/AnalysisPlots/CMakeLists_files.cmake
   ProjectDataModel/CorrelationPlots/CMakeLists_files.cmake
+  ProjectDataModel/Cloud/CMakeLists_files.cmake
   ProjectDataModel/Faults/CMakeLists_files.cmake
   ProjectDataModel/GeoMech/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CellFilters/CMakeLists_files.cmake
   ProjectDataModel/Summary/CMakeLists_files.cmake
+  ProjectDataModel/Summary/Sumo/CMakeLists_files.cmake
   ProjectDataModel/Flow/CMakeLists_files.cmake
   ProjectDataModel/Annotations/CMakeLists_files.cmake
   ProjectDataModel/Completions/CMakeLists_files.cmake
@@ -415,6 +418,7 @@ set(UNITY_EXCLUDE_FILES
     FileInterface/RifOsduWellPathReader.cpp
     FileInterface/RifOsduWellLogReader.cpp
     FileInterface/RifByteArrayArrowRandomAccessFile.cpp
+    FileInterface/RifArrowTools.cpp
 )
 
 if(RESINSIGHT_ENABLE_UNITY_BUILD)
