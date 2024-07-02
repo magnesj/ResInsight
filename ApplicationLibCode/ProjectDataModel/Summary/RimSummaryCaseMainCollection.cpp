@@ -261,6 +261,15 @@ void RimSummaryCaseMainCollection::removeCaseCollection( RimSummaryCaseCollectio
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryCaseMainCollection::addEnsemble( RimSummaryCaseCollection* ensemble )
+{
+    m_caseCollections.push_back( ensemble );
+    dataSourceHasChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimSummaryCase* RimSummaryCaseMainCollection::summaryCase( size_t idx )
 {
     return m_cases[idx];

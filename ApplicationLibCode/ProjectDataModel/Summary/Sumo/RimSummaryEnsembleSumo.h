@@ -57,6 +57,8 @@ class RimSummaryEnsembleSumo : public RimSummaryCaseCollection
 public:
     RimSummaryEnsembleSumo();
 
+    void setSumoDataSource( RimSummarySumoDataSource* sumoDataSource );
+
     // To be called by the RimSummaryCaseSumo
     std::string                        unitName( const RifEclipseSummaryAddress& resultAddress );
     RiaDefines::EclipseUnitSystem      unitSystem() const;

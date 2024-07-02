@@ -50,6 +50,14 @@ RimSummaryEnsembleSumo::RimSummaryEnsembleSumo()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimSummaryEnsembleSumo::setSumoDataSource( RimSummarySumoDataSource* sumoDataSource )
+{
+    m_sumoDataSource = sumoDataSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::string RimSummaryEnsembleSumo::unitName( const RifEclipseSummaryAddress& resultAddress )
 {
     loadSummaryData( resultAddress );

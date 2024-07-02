@@ -19,6 +19,7 @@
 #include "RimSummarySumoDataSource.h"
 
 #include "Cloud/RiaSumoConnector.h"
+#include "cafCmdFeatureMenuBuilder.h"
 
 CAF_PDM_SOURCE_INIT( RimSummarySumoDataSource, "RimSummarySumoDataSource" );
 
@@ -103,4 +104,12 @@ void RimSummarySumoDataSource::updateName()
     auto name = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
 
     setName( name );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummarySumoDataSource::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder.addCmdFeature( "RicCreateSumoEnsembleFeature" );
 }
