@@ -30,10 +30,6 @@ QString RiaConnectorTools::tokenDataAsJson( QOAuth2AuthorizationCodeFlow* authCo
     QJsonObject obj;
     obj.insert( "token", authCodeFlow->token() );
     obj.insert( "refreshToken", authCodeFlow->refreshToken() );
-    obj.insert( "scope", authCodeFlow->scope() );
-    obj.insert( "clientIdentifier", authCodeFlow->clientIdentifier() );
-    obj.insert( "authorizationUrl", authCodeFlow->authorizationUrl().toString() );
-    obj.insert( "accessTokenUrl", authCodeFlow->accessTokenUrl().toString() );
 
     QJsonDocument doc( obj );
     return doc.toJson( QJsonDocument::Indented );
@@ -49,10 +45,6 @@ void RiaConnectorTools::initializeTokenDataFromJson( QOAuth2AuthorizationCodeFlo
 
     authCodeFlow->setToken( obj["token"].toString() );
     authCodeFlow->setRefreshToken( obj["refreshToken"].toString() );
-    authCodeFlow->setScope( obj["scope"].toString() );
-    authCodeFlow->setClientIdentifier( obj["clientIdentifier"].toString() );
-    authCodeFlow->setAuthorizationUrl( QUrl( obj["authorizationUrl"].toString() ) );
-    authCodeFlow->setAccessTokenUrl( QUrl( obj["accessTokenUrl"].toString() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
