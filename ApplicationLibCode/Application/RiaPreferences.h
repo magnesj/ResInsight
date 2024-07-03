@@ -145,8 +145,6 @@ public:
     caf::PdmField<QString> scriptEditorExecutable;
     caf::PdmField<bool>    showPythonDebugInfo;
 
-    caf::PdmField<QString> ssihubAddress;
-
     caf::PdmField<cvf::Color3f> defaultGridLineColors;
     caf::PdmField<cvf::Color3f> defaultFaultGridLineColors;
     caf::PdmField<cvf::Color3f> defaultViewerBackgroundColor;
@@ -180,7 +178,6 @@ private:
     static QString tabNamePlotting();
     static QString tabNameScripting();
     static QString tabNameSystem();
-    static QString tabNameOsdu();
     static QString tabNameImportExport();
 
     static double defaultMarginSize( QPageSize::PageSizeId pageSizeId );

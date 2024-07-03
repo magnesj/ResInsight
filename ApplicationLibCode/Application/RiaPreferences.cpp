@@ -148,9 +148,6 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitField( &m_storeBackupOfProjectFile, "storeBackupOfProjectFile", true, "Store Backup of Project Files" );
 
-    CAF_PDM_InitField( &ssihubAddress, "ssihubAddress", QString( "http://" ), "SSIHUB Address" );
-    ssihubAddress.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-
     CAF_PDM_InitFieldNoDefault( &m_defaultMeshModeType, "defaultMeshModeType", "Show Grid Lines" );
     CAF_PDM_InitField( &defaultGridLineColors, "defaultGridLineColors", RiaColorTables::defaultGridLineColor(), "Mesh Color" );
     CAF_PDM_InitField( &defaultFaultGridLineColors,
@@ -390,8 +387,15 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         viewsGroup->add( &m_showInfoBox );
         viewsGroup->add( &m_showGridBox, { .newRow = false, .totalColumnSpan = 1 } );
 
+        caf::PdmUiGroup* loggingGroup = uiOrdering.addNewGroup( "Logging and Backup" );
+        loggingGroup->add( &m_storeBackupOfProjectFile );
+        loggingGroup->add( &m_loggerFilename );
+        loggingGroup->add( &m_loggerFlushInterval );
+        loggingGroup->add( &m_loggerTrapSignalAndFlush );
+        m_loggerTrapSignalAndFlush.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
+        m_loggerFlushInterval.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
+
         caf::PdmUiGroup* otherGroup = uiOrdering.addNewGroup( "Other" );
-        otherGroup->add( &ssihubAddress );
         otherGroup->add( &holoLensDisableCertificateVerification );
         otherGroup->add( &m_useUndoRedo );
     }
@@ -492,20 +496,11 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         otherGroup->add( &m_gridCalculationExpressionFolder );
         otherGroup->add( &m_summaryCalculationExpressionFolder );
 
+        caf::PdmUiGroup* osduGroup = uiOrdering.addNewGroup( "OSDU" );
+        m_osduPreferences()->uiOrdering( uiConfigName, *osduGroup );
+
         caf::PdmUiGroup* sumoGroup = uiOrdering.addNewGroup( "SUMO" );
         m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
-
-        caf::PdmUiGroup* loggingGroup = uiOrdering.addNewGroup( "Logging and Backup" );
-        loggingGroup->add( &m_storeBackupOfProjectFile );
-        loggingGroup->add( &m_loggerFilename );
-        loggingGroup->add( &m_loggerFlushInterval );
-        loggingGroup->add( &m_loggerTrapSignalAndFlush );
-        m_loggerTrapSignalAndFlush.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
-        m_loggerFlushInterval.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
-    }
-    else if ( uiConfigName == RiaPreferences::tabNameOsdu() )
-    {
-        m_osduPreferences()->uiOrdering( uiConfigName, uiOrdering );
     }
     else if ( RiaApplication::enableDevelopmentFeatures() && uiConfigName == RiaPreferences::tabNameSystem() )
     {
@@ -637,14 +632,6 @@ QString RiaPreferences::tabNameSystem()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiaPreferences::tabNameOsdu()
-{
-    return "Osdu";
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RiaPreferences::tabNameImportExport()
 {
     return "Import/Export";
@@ -682,7 +669,6 @@ QStringList RiaPreferences::tabNames()
     names << tabNameGeomech();
 #endif
     names << tabNameImportExport();
-    names << tabNameOsdu();
 
     if ( RiaApplication::enableDevelopmentFeatures() )
     {
