@@ -214,10 +214,12 @@ QString RiaSumoConnector::token() const
 //--------------------------------------------------------------------------------------------------
 void RiaSumoConnector::importTokenFromFile()
 {
-    QString tokenDataJson = readTokenData( m_tokenDataFilePath );
-    initializeTokenDataFromJson( m_authCodeFlow, tokenDataJson );
-
-    m_token = m_authCodeFlow->token();
+    auto tokenDataJson = readTokenData( m_tokenDataFilePath );
+    if ( !tokenDataJson.isEmpty() )
+    {
+        initializeTokenDataFromJson( m_authCodeFlow, tokenDataJson );
+        m_token = m_authCodeFlow->token();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
