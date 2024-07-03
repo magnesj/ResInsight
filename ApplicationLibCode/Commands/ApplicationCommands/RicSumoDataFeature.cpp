@@ -102,16 +102,6 @@ void SimpleDialog::createConnection()
 {
     m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
     connect( m_sumoConnector, &RiaSumoConnector::tokenReady, this, &SimpleDialog::onTokenReady );
-
-    // get token from log first time the token is requested
-
-    QSettings settings;
-    auto      bearerToken = settings.value( m_registryKeyBearerToken_DEBUG_ONLY ).toString();
-
-    if ( !bearerToken.isEmpty() )
-    {
-        m_sumoConnector->setToken( bearerToken );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -119,9 +109,6 @@ void SimpleDialog::createConnection()
 //--------------------------------------------------------------------------------------------------
 void SimpleDialog::onAuthClicked()
 {
-    QSettings settings;
-    settings.setValue( m_registryKeyBearerToken_DEBUG_ONLY, "" );
-
     createConnection();
     m_sumoConnector->requestToken();
 }
@@ -250,11 +237,6 @@ bool SimpleDialog::isTokenValid()
 void SimpleDialog::onTokenReady( const QString& token )
 {
     RiaLogging::info( "Token ready: " + token );
-
-    QSettings settings;
-    settings.setValue( m_registryKeyBearerToken_DEBUG_ONLY, token );
-
-    m_sumoConnector->setToken( token );
 }
 
 void SimpleDialog::onOkClicked()

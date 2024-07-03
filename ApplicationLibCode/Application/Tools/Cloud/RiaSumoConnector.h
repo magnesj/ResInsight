@@ -70,8 +70,10 @@ public:
     RiaSumoConnector( QObject* parent, const QString& server, const QString& authority, const QString& scopes, const QString& clientId );
     ~RiaSumoConnector() override;
 
-    void    setToken( const QString& token );
     QString token() const;
+
+    void importTokenFromFile();
+    void setTokenDataFilePath( const QString& filePath );
 
     void requestAssets();
     void requestAssetsBlocking();
@@ -145,6 +147,12 @@ private:
     static QString constructAuthUrl( const QString& authority );
     static QString constructTokenUrl( const QString& authority );
 
+    static QString tokenDataAsJson( QOAuth2AuthorizationCodeFlow* authCodeFlow );
+    static void    initializeTokenDataFromJson( QOAuth2AuthorizationCodeFlow* authCodeFlow, const QString& tokenDataJson );
+    static void    writeTokenData( const QString& filePath, const QString& tokenDataJson );
+    static QString readTokenData( const QString& filePath );
+
+private:
     QOAuth2AuthorizationCodeFlow* m_authCodeFlow;
     QNetworkAccessManager*        m_networkAccessManager;
 
@@ -167,4 +175,6 @@ private:
     std::vector<SumoRedirect> m_redirectInfo;
 
     QByteArray m_parquetData;
+
+    QString m_tokenDataFilePath;
 };

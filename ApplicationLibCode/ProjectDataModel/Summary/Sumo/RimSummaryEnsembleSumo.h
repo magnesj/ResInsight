@@ -87,8 +87,6 @@ private:
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 
-    const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
-
     // summary data
     std::set<RifEclipseSummaryAddress>                  m_resultAddresses;
     std::map<ParquetKey, std::shared_ptr<arrow::Table>> m_parquetTable;

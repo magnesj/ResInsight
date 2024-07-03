@@ -1,9 +1,11 @@
 set(SOURCE_GROUP_HEADER_FILES ${CMAKE_CURRENT_LIST_DIR}/RiaSumoConnector.h
                               ${CMAKE_CURRENT_LIST_DIR}/RiaSumoDefines.h
+                              ${CMAKE_CURRENT_LIST_DIR}/RiaConnectorTools.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES ${CMAKE_CURRENT_LIST_DIR}/RiaSumoConnector.cpp
                               ${CMAKE_CURRENT_LIST_DIR}/RiaSumoDefines.cpp
+                              ${CMAKE_CURRENT_LIST_DIR}/RiaConnectorTools.cpp
 )
 
 list(APPEND QT_MOC_HEADERS ${CMAKE_CURRENT_LIST_DIR}/RiaSumoConnector.h)

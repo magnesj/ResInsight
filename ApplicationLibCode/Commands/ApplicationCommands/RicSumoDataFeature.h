@@ -65,8 +65,6 @@ private:
     QPushButton* showContentParquetButton;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
-
-    const QString m_registryKeyBearerToken_DEBUG_ONLY = "PrivateBearerToken";
 };
 
 //==================================================================================================

@@ -16,15 +16,16 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RiaSumoDefines.h"
+#pragma once
 
-#include <QDir>
+#include <QString>
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RiaSumoDefines::tokenPath()
+class QOAuth2AuthorizationCodeFlow;
+
+namespace RiaConnectorTools
 {
-    QString homePath = QDir::homePath();
-    return homePath + "/.resinsight/sumo_token.json";
-}
+QString tokenDataAsJson( QOAuth2AuthorizationCodeFlow* authCodeFlow );
+void    initializeTokenDataFromJson( QOAuth2AuthorizationCodeFlow* authCodeFlow, const QString& tokenDataJson );
+void    writeTokenData( const QString& filePath, const QString& tokenDataJson );
+QString readTokenData( const QString& filePath );
+} // namespace RiaConnectorTools

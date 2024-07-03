@@ -18,7 +18,9 @@
 #include "RiaApplication.h"
 
 #include "Cloud/RiaSumoConnector.h"
+#include "Cloud/RiaSumoDefines.h"
 #include "OsduImportCommands/RiaOsduConnector.h"
+
 #include "RiaArgumentParser.h"
 #include "RiaBaseDefs.h"
 #include "RiaFilePathTools.h"
@@ -1727,6 +1729,9 @@ RiaSumoConnector* RiaApplication::makeSumoConnector()
         const QString clientId  = sumoPrefs->clientId();
 
         m_sumoConnector = new RiaSumoConnector( RiuMainWindow::instance(), server, authority, scopes, clientId );
+
+        m_sumoConnector->setTokenDataFilePath( RiaSumoDefines::tokenPath() );
+        m_sumoConnector->importTokenFromFile();
     }
 
     return m_sumoConnector;

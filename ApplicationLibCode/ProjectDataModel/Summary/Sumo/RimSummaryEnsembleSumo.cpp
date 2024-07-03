@@ -357,18 +357,6 @@ void RimSummaryEnsembleSumo::createSumoConnector()
     if ( m_sumoConnector != nullptr ) return;
 
     m_sumoConnector = RiaApplication::instance()->makeSumoConnector();
-
-    QSettings settings;
-    auto      bearerToken = settings.value( m_registryKeyBearerToken_DEBUG_ONLY ).toString();
-
-    if ( bearerToken.isEmpty() )
-    {
-        m_sumoConnector->requestToken();
-    }
-    else
-    {
-        m_sumoConnector->setToken( bearerToken );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
