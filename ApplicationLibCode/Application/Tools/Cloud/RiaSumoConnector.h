@@ -87,6 +87,9 @@ public:
     void requestVectorNamesForEnsemble( const SumoCaseId& caseId, const QString& ensembleName );
     void requestVectorNamesForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName );
 
+    void requestRealizationIdsForEnsemble( const SumoCaseId& caseId, const QString& ensembleName );
+    void requestRealizationIdsForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName );
+
     void requestBlobIdForEnsemble( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
     void requestBlobIdForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
@@ -101,6 +104,7 @@ public:
     std::vector<SumoCase>     cases() const;
     std::vector<QString>      ensembleNamesForCase( const SumoCaseId& caseId ) const;
     std::vector<QString>      vectorNames() const;
+    std::vector<QString>      realizationIds() const;
     std::vector<QString>      blobUrls() const;
     std::vector<SumoRedirect> blobContents() const;
 
@@ -111,6 +115,7 @@ public slots:
     void parseEnsembleNames( QNetworkReply* reply, const SumoCaseId& caseId );
     void parseCases( QNetworkReply* reply );
     void parseVectorNames( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
+    void parseRealizationNumbers( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName );
     void parseBlobIds( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName, const QString& vectorName );
 
     void saveFile( QNetworkReply* reply, const QString& fileId );
@@ -131,6 +136,7 @@ signals:
     void vectorNamesFinished();
     void blobIdFinished();
     void assetsFinished();
+    void realizationIdsFinished();
 
 private:
     void addStandardHeader( QNetworkRequest& networkRequest, const QString& token, const QString& contentType );
@@ -166,6 +172,7 @@ private:
     std::vector<SumoAsset>    m_assets;
     std::vector<SumoCase>     m_cases;
     std::vector<QString>      m_vectorNames;
+    std::vector<QString>      m_realizationIds;
     std::vector<SumoEnsemble> m_ensembleNames;
 
     std::vector<QString> m_blobUrl;

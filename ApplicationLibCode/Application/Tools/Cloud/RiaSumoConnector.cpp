@@ -42,6 +42,8 @@
 #include <QUrlQuery>
 #include <QtCore>
 
+#pragma optimize( "", off )
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -243,10 +245,6 @@ void RiaSumoConnector::requestCasesForField( const QString& fieldName )
     m_networkRequest.setUrl( QUrl( constructSearchUrl( m_server ) ) );
 
     addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
-
-    QString payload_caseCountForFieldname = R"(
-{"size":0,"query":{"bool":{"must_not":{"exists":{"field":"_sumo.parent_object"}},"filter":[{"term":{"access.asset.name.keyword":"Drogon"}}]}},"aggs":{"masterdata.smda.field.identifier.keyword":{"terms":{"field":"masterdata.smda.field.identifier.keyword","size":500,"order":{"_key":"asc"}}}}}
-)";
 
     QString payloadTemplate = R"(
 {
@@ -474,6 +472,76 @@ void RiaSumoConnector::requestVectorNamesForEnsembleBlocking( const SumoCaseId& 
     QTimer timer;
 
     requestVectorNamesForEnsemble( caseId, ensembleName );
+
+    // Start the timer
+    timer.setSingleShot( true );
+    int timeout = 10000;
+    timer.start( timeout );
+    loop.exec();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestRealizationIdsForEnsemble( const SumoCaseId& caseId, const QString& ensembleName )
+{
+    QString payloadTemplate = R"(
+{
+    "track_total_hits": true,
+    "query":  {
+           "bool": {
+            "must": [
+                {"term": {"class": "table"}},
+                {"term": {"_sumo.parent_object.keyword": "%1"}},
+                {"term": {"fmu.iteration.name.keyword": "%2"}},
+                {"term": {"fmu.context.stage.keyword": "iteration"}},
+                {"term": {"fmu.aggregation.operation.keyword": "collection"}},
+                {"term": {"data.tagname.keyword": "summary"}},
+                {"term": {"data.content.keyword": "timeseries"}}
+            ]}
+    },
+    "aggs": {
+        "realization-ids": {
+            "terms": {
+            "field": "fmu.aggregation.realization_ids",
+            "size":1000
+            }
+        }
+    },
+    "_source": false,
+    "size":0
+}
+)";
+
+    QNetworkRequest m_networkRequest;
+    m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
+
+    addStandardHeader( m_networkRequest, m_token, RiaDefines::contentTypeJson() );
+
+    auto payload = payloadTemplate.arg( caseId.get() ).arg( ensembleName );
+    auto reply   = m_networkAccessManager->post( m_networkRequest, payload.toUtf8() );
+
+    connect( reply,
+             &QNetworkReply::finished,
+             [this, reply, ensembleName, caseId]()
+             {
+                 if ( reply->error() == QNetworkReply::NoError )
+                 {
+                     parseRealizationNumbers( reply, caseId, ensembleName );
+                 }
+             } );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::requestRealizationIdsForEnsembleBlocking( const SumoCaseId& caseId, const QString& ensembleName )
+{
+    QEventLoop loop;
+    connect( this, SIGNAL( realizationIdsFinished() ), &loop, SLOT( quit() ) );
+    QTimer timer;
+
+    requestRealizationIdsForEnsemble( caseId, ensembleName );
 
     // Start the timer
     timer.setSingleShot( true );
@@ -851,16 +919,39 @@ void RiaSumoConnector::parseVectorNames( QNetworkReply* reply, const SumoCaseId&
         }
     }
 
-    // print at max 100 vector names
-    /*
-        const int maxVectorNames = 100;
-        for ( int i = 0; i < std::min( maxVectorNames, static_cast<int>( m_vectorNames.size() ) ); ++i )
-        {
-            RiaLogging::info( QString( "Vector: %1" ).arg( m_vectorNames[i] ) );
-        }
-    */
-
     emit vectorNamesFinished();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaSumoConnector::parseRealizationNumbers( QNetworkReply* reply, const SumoCaseId& caseId, const QString& ensembleName )
+{
+    QByteArray result = reply->readAll();
+    reply->deleteLater();
+
+    m_realizationIds.clear();
+
+    if ( reply->error() == QNetworkReply::NoError )
+    {
+        QJsonDocument doc     = QJsonDocument::fromJson( result );
+        QJsonObject   jsonObj = doc.object();
+
+        QJsonArray hits = jsonObj["aggregations"].toObject()["realization-ids"].toObject()["buckets"].toArray();
+        for ( const auto& hit : hits )
+        {
+            QJsonObject resultObj = hit.toObject();
+            auto        keys_1    = resultObj.keys();
+
+            auto val      = resultObj.value( "key" );
+            auto intValue = val.toInt();
+
+            auto realizationId = QString::number( intValue );
+            m_realizationIds.push_back( realizationId );
+        }
+    }
+
+    emit realizationIdsFinished();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1071,6 +1162,14 @@ std::vector<QString> RiaSumoConnector::ensembleNamesForCase( const SumoCaseId& c
 std::vector<QString> RiaSumoConnector::vectorNames() const
 {
     return m_vectorNames;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RiaSumoConnector::realizationIds() const
+{
+    return m_realizationIds;
 }
 
 //--------------------------------------------------------------------------------------------------

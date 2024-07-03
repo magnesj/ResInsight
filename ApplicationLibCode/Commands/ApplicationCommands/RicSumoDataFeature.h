@@ -49,6 +49,7 @@ private:
     void onFindBlobIdClicked();
     void onParquetClicked();
     void onShowContentParquetClicked();
+    void onRealizationsClicked();
 
     bool isTokenValid();
 
@@ -63,6 +64,7 @@ private:
     QPushButton* blobIdButton;
     QPushButton* parquetDownloadButton;
     QPushButton* showContentParquetButton;
+    QPushButton* realizationIdsButton;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
 };

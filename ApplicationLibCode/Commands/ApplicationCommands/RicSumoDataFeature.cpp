@@ -71,6 +71,10 @@ SimpleDialog::SimpleDialog( QWidget* parent )
     connect( showContentParquetButton, &QPushButton::clicked, this, &SimpleDialog::onShowContentParquetClicked );
     layout->addWidget( showContentParquetButton );
 
+    realizationIdsButton = new QPushButton( "Realizations", this );
+    connect( realizationIdsButton, &QPushButton::clicked, this, &SimpleDialog::onRealizationsClicked );
+    layout->addWidget( realizationIdsButton );
+
     okButton = new QPushButton( "OK", this );
     connect( okButton, &QPushButton::clicked, this, &SimpleDialog::onOkClicked );
     layout->addWidget( okButton );
@@ -211,6 +215,25 @@ void SimpleDialog::onShowContentParquetClicked()
     // TODO: show content using parquet reader
     auto tableText = RifArrowTools::readFirstRowsOfTable( content );
     RiaLogging::info( tableText );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SimpleDialog::onRealizationsClicked()
+{
+    if ( !isTokenValid() ) return;
+
+    SumoCaseId caseId( "485041ce-ad72-48a3-ac8c-484c0ed95cf8" );
+    QString    iteration = "iter-0";
+
+    m_sumoConnector->requestRealizationIdsForEnsembleBlocking( caseId, iteration );
+
+    auto ids = m_sumoConnector->realizationIds();
+    for ( const auto& id : ids )
+    {
+        RiaLogging::info( id );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
