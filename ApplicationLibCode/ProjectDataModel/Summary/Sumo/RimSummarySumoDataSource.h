@@ -43,14 +43,24 @@ public:
     QString ensembleName() const;
     void    setEnsembleName( const QString& ensembleName );
 
-private:
+    std::vector<QString> realizationIds() const;
+    void                 setRealizationIds( const std::vector<QString>& realizationIds );
+
+    std::vector<QString> vectorNames() const;
+    void                 setVectorNames( const std::vector<QString>& vectorNames );
+
     void updateName();
+
+private:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
     caf::PdmField<QString> m_caseId;
     caf::PdmField<QString> m_caseName;
     caf::PdmField<QString> m_ensembleName;
+
+    caf::PdmField<std::vector<QString>> m_realizationIds;
+    caf::PdmField<std::vector<QString>> m_vectorNames;
 
     caf::PdmField<QString> m_customName;
 };

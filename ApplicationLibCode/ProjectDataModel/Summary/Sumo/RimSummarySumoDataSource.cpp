@@ -19,6 +19,7 @@
 #include "RimSummarySumoDataSource.h"
 
 #include "Cloud/RiaSumoConnector.h"
+
 #include "cafCmdFeatureMenuBuilder.h"
 
 CAF_PDM_SOURCE_INIT( RimSummarySumoDataSource, "RimSummarySumoDataSource" );
@@ -34,6 +35,13 @@ RimSummarySumoDataSource::RimSummarySumoDataSource()
     CAF_PDM_InitFieldNoDefault( &m_caseName, "CaseName", "Case Name" );
     CAF_PDM_InitFieldNoDefault( &m_ensembleName, "EnsembleName", "Ensemble Name" );
     CAF_PDM_InitFieldNoDefault( &m_customName, "CustomName", "Custom Name" );
+
+    CAF_PDM_InitFieldNoDefault( &m_realizationIds, "RealizationIds", "Realizations Ids" );
+    m_realizationIds.uiCapability()->setUiReadOnly( true );
+    // m_realizationIds.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
+
+    CAF_PDM_InitFieldNoDefault( &m_vectorNames, "VectorNames", "Vector Names" );
+    // m_vectorNames.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
 
     setDeletable( true );
 }
@@ -68,8 +76,6 @@ QString RimSummarySumoDataSource::caseName() const
 void RimSummarySumoDataSource::setCaseName( const QString& caseName )
 {
     m_caseName = caseName;
-
-    updateName();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -86,8 +92,38 @@ QString RimSummarySumoDataSource::ensembleName() const
 void RimSummarySumoDataSource::setEnsembleName( const QString& ensembleName )
 {
     m_ensembleName = ensembleName;
+}
 
-    updateName();
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimSummarySumoDataSource::realizationIds() const
+{
+    return m_realizationIds();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummarySumoDataSource::setRealizationIds( const std::vector<QString>& realizationIds )
+{
+    m_realizationIds = realizationIds;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RimSummarySumoDataSource::vectorNames() const
+{
+    return m_vectorNames();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummarySumoDataSource::setVectorNames( const std::vector<QString>& vectorNames )
+{
+    m_vectorNames = vectorNames;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -101,7 +137,12 @@ void RimSummarySumoDataSource::updateName()
         return;
     }
 
-    auto name = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
+    auto name             = QString( "%1 (%2)" ).arg( ensembleName(), caseName() );
+    auto realizationCount = realizationIds().size();
+    if ( realizationCount > 0 )
+    {
+        name += QString( " - %1 realizations" ).arg( realizationCount );
+    }
 
     setName( name );
 }

@@ -180,10 +180,19 @@ void RimCloudDataSourceCollection::addEnsemble()
 
         if ( createNewDataSource )
         {
+            m_sumoConnector->requestRealizationIdsForEnsembleBlocking( sumoCaseId, ensembleName );
+            m_sumoConnector->requestVectorNamesForEnsembleBlocking( sumoCaseId, ensembleName );
+
+            auto realizationIds = m_sumoConnector->realizationIds();
+            auto vectorNames    = m_sumoConnector->vectorNames();
+
             auto dataSource = new RimSummarySumoDataSource();
             dataSource->setCaseId( sumoCaseId );
             dataSource->setCaseName( caseName );
             dataSource->setEnsembleName( ensembleName );
+            dataSource->setRealizationIds( realizationIds );
+            dataSource->setVectorNames( vectorNames );
+            dataSource->updateName();
 
             m_sumoDataSources.push_back( dataSource );
         }

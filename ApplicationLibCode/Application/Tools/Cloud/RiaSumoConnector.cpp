@@ -512,6 +512,7 @@ void RiaSumoConnector::requestRealizationIdsForEnsemble( const SumoCaseId& caseI
     "size":0
 }
 )";
+    m_realizationIds.clear();
 
     QNetworkRequest m_networkRequest;
     m_networkRequest.setUrl( QUrl( m_server + "/api/v1/search" ) );
@@ -929,8 +930,6 @@ void RiaSumoConnector::parseRealizationNumbers( QNetworkReply* reply, const Sumo
 {
     QByteArray result = reply->readAll();
     reply->deleteLater();
-
-    m_realizationIds.clear();
 
     if ( reply->error() == QNetworkReply::NoError )
     {
