@@ -917,7 +917,7 @@ QString RiuResultTextBuilder::nncDetails()
             {
                 text += "-- NNC details --\n";
                 {
-                    const RigConnection&               conn = nncData->allConnections()[m_nncIndex];
+                    const RigConnection&             conn = nncData->allConnections()[m_nncIndex];
                     cvf::StructGridDefines::FaceEnum face( conn.face() );
 
                     // First cell of NNC
@@ -958,9 +958,9 @@ QString RiuResultTextBuilder::nncDetails()
                             j++;
                             k++;
 
-                            QString                            gridName = QString::fromStdString( hostGrid->gridName() );
+                            QString                          gridName = QString::fromStdString( hostGrid->gridName() );
                             cvf::StructGridDefines::FaceEnum oppositeFaceEnum( cvf::StructGridDefines::oppositeFace( face ) );
-                            QString                            faceText = oppositeFaceEnum.text();
+                            QString                          faceText = oppositeFaceEnum.text();
 
                             text.append(
                                 QString( "NNC 2 : cell [%1, %2, %3] face %4 (%5)\n" ).arg( i ).arg( j ).arg( k ).arg( faceText ).arg( gridName ) );

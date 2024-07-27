@@ -118,11 +118,11 @@ private:
 class CellFaceVisibilityFilter
 {
 public:
-    virtual bool isFaceVisible( size_t                        i,
-                                size_t                        j,
-                                size_t                        k,
+    virtual bool isFaceVisible( size_t                      i,
+                                size_t                      j,
+                                size_t                      k,
                                 StructGridDefines::FaceType face,
-                                const UByteArray*             cellVisibility ) const = 0;
+                                const UByteArray*           cellVisibility ) const = 0;
 };
 
 class StructGridQuadToCellFaceMapper : public Object
@@ -130,15 +130,15 @@ class StructGridQuadToCellFaceMapper : public Object
 public:
     size_t quadCount() const { return m_quadsToCells.size(); }
 
-    size_t                        cellIndex( size_t quadIdx ) const { return m_quadsToCells[quadIdx]; }
+    size_t                      cellIndex( size_t quadIdx ) const { return m_quadsToCells[quadIdx]; }
     StructGridDefines::FaceType cellFace( size_t quadIdx ) const { return m_quadsToFace[quadIdx]; }
 
     // Interface for building the mappings
-    std::vector<size_t>&                        quadToCellIndexMap() { return m_quadsToCells; }
+    std::vector<size_t>&                      quadToCellIndexMap() { return m_quadsToCells; }
     std::vector<StructGridDefines::FaceType>& quadToCellFaceMap() { return m_quadsToFace; }
 
 private:
-    std::vector<size_t>                        m_quadsToCells;
+    std::vector<size_t>                      m_quadsToCells;
     std::vector<StructGridDefines::FaceType> m_quadsToFace;
 };
 

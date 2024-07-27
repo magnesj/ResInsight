@@ -250,8 +250,8 @@ bool RigCell::isCollapsedCell( double nodeNearTolerance ) const
     {
         cvf::StructGridDefines::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
         cvf::StructGridDefines::cellFaceVertexIndices( cvf::StructGridDefines::oppositeFace(
-                                                             static_cast<cvf::StructGridDefines::FaceType>( face ) ),
-                                                         oppFaceVertexIndices );
+                                                           static_cast<cvf::StructGridDefines::FaceType>( face ) ),
+                                                       oppFaceVertexIndices );
 
         cvf::Vec3d c0 = nodes[m_cornerIndices[faceVertexIndices[0]]];
         cvf::Vec3d c1 = nodes[m_cornerIndices[faceVertexIndices[1]]];

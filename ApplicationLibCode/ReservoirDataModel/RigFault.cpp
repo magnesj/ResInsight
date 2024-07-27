@@ -94,7 +94,7 @@ const std::vector<size_t>& RigFault::connectionIndices() const
 //--------------------------------------------------------------------------------------------------
 bool RigFault::ordering( CellAndFace first, CellAndFace second )
 {
-    size_t                             i1, i2, j1, j2, k1, k2;
+    size_t                           i1, i2, j1, j2, k1, k2;
     cvf::StructGridDefines::FaceType f1, f2;
     std::tie( i1, j1, k1, f1 ) = first;
     std::tie( i2, j2, k2, f2 ) = second;

@@ -124,16 +124,16 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
 
     if ( !firstHitPart ) return false;
 
-    size_t                             gridIndex          = cvf::UNDEFINED_SIZE_T;
-    size_t                             gridLocalCellIndex = cvf::UNDEFINED_SIZE_T;
+    size_t                           gridIndex          = cvf::UNDEFINED_SIZE_T;
+    size_t                           gridLocalCellIndex = cvf::UNDEFINED_SIZE_T;
     cvf::StructGridDefines::FaceType face               = cvf::StructGridDefines::NO_FACE;
-    int                                gmFace             = -1;
-    bool                               intersectionHit    = false;
-    std::array<cvf::Vec3f, 3>          intersectionTriangleHit;
-    RimGeoMechResultDefinition*        geomResDef     = nullptr;
-    RimEclipseResultDefinition*        eclResDef      = nullptr;
-    size_t                             timestepIndex  = cvf::UNDEFINED_SIZE_T;
-    int                                dataFrameIndex = -2; // needs to be less than -1, as -1 means last step
+    int                              gmFace             = -1;
+    bool                             intersectionHit    = false;
+    std::array<cvf::Vec3f, 3>        intersectionTriangleHit;
+    RimGeoMechResultDefinition*      geomResDef     = nullptr;
+    RimEclipseResultDefinition*      eclResDef      = nullptr;
+    size_t                           timestepIndex  = cvf::UNDEFINED_SIZE_T;
+    int                              dataFrameIndex = -2; // needs to be less than -1, as -1 means last step
 
     RimIntersectionResultDefinition* sepInterResDef = nullptr;
 

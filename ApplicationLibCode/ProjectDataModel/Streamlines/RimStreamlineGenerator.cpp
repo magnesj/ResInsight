@@ -41,8 +41,8 @@ public:
     bool operator<( const StreamlineSeedPoint& other ) const { return m_rate < other.m_rate; };
 
 public:
-    double                             m_rate;
-    size_t                             m_cellIdx;
+    double                           m_rate;
+    size_t                           m_cellIdx;
     cvf::StructGridDefines::FaceType m_faceIdx;
 };
 
@@ -83,7 +83,7 @@ void RimStreamlineGenerator::generateTracer( RigCell cell, double direction, QSt
 
     while ( !m_seeds.empty() )
     {
-        const size_t                             cellIdx = m_seeds.top().m_cellIdx;
+        const size_t                           cellIdx = m_seeds.top().m_cellIdx;
         const cvf::StructGridDefines::FaceType faceIdx = m_seeds.top().m_faceIdx;
         m_seeds.pop();
 

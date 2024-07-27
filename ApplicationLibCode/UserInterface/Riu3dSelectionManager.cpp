@@ -157,15 +157,15 @@ void Riu3dSelectionManager::deleteAllItemsFromSelection( int role )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RiuEclipseSelectionItem::RiuEclipseSelectionItem( RimGridView*                       view,
-                                                  RimEclipseResultDefinition*        resultDefinition,
-                                                  size_t                             timestepIdx,
-                                                  size_t                             gridIndex,
-                                                  size_t                             gridLocalCellIndex,
-                                                  size_t                             nncIndex,
-                                                  cvf::Color3f                       color,
+RiuEclipseSelectionItem::RiuEclipseSelectionItem( RimGridView*                     view,
+                                                  RimEclipseResultDefinition*      resultDefinition,
+                                                  size_t                           timestepIdx,
+                                                  size_t                           gridIndex,
+                                                  size_t                           gridLocalCellIndex,
+                                                  size_t                           nncIndex,
+                                                  cvf::Color3f                     color,
                                                   cvf::StructGridDefines::FaceType face,
-                                                  const cvf::Vec3d&                  localIntersectionPointInDisplay )
+                                                  const cvf::Vec3d&                localIntersectionPointInDisplay )
     : m_view( view )
     , m_resultDefinition( resultDefinition )
     , m_timestepIdx( timestepIdx )

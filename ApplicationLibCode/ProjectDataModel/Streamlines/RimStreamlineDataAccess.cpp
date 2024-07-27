@@ -199,11 +199,11 @@ double RimStreamlineDataAccess::faceRate( RigCell cell, cvf::StructGridDefines::
 /// Return the face scalar value for the given cell and face, by combining flow for all specified phases
 /// Positive values is flow out of the cell, negative values is flow into the cell
 //--------------------------------------------------------------------------------------------------
-double RimStreamlineDataAccess::combinedFaceRate( RigCell                            cell,
+double RimStreamlineDataAccess::combinedFaceRate( RigCell                          cell,
                                                   cvf::StructGridDefines::FaceType faceIdx,
-                                                  std::list<RiaDefines::PhaseType>   phases,
-                                                  double                             direction,
-                                                  RiaDefines::PhaseType&             outDominantPhase ) const
+                                                  std::list<RiaDefines::PhaseType> phases,
+                                                  double                           direction,
+                                                  RiaDefines::PhaseType&           outDominantPhase ) const
 {
     double retValue  = 0.0;
     outDominantPhase = phases.front();

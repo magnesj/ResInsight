@@ -68,12 +68,12 @@ size_t findNeighborReservoirCellIndex( const RigMainGrid* mainGrid, cvf::StructG
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFractureContainmentTools::appendNeighborCellForFace( const std::set<size_t>&            allFracturedCells,
-                                                             const RigMainGrid*                 mainGrid,
-                                                             size_t                             currentCell,
+void RimFractureContainmentTools::appendNeighborCellForFace( const std::set<size_t>&          allFracturedCells,
+                                                             const RigMainGrid*               mainGrid,
+                                                             size_t                           currentCell,
                                                              cvf::StructGridDefines::FaceType face,
-                                                             std::set<size_t>&                  connectedCells,
-                                                             double                             minimumFaultThrow )
+                                                             std::set<size_t>&                connectedCells,
+                                                             double                           minimumFaultThrow )
 {
     size_t candidate = findNeighborReservoirCellIndex( mainGrid, face, currentCell );
     if ( candidate != cvf::UNDEFINED_SIZE_T )
@@ -114,12 +114,12 @@ double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t global
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFractureContainmentTools::checkFaultAndAppendNeighborCell( const std::set<size_t>&            allFracturedCells,
-                                                                   const RigMainGrid*                 mainGrid,
-                                                                   size_t                             globalReservoirCellIndex,
+void RimFractureContainmentTools::checkFaultAndAppendNeighborCell( const std::set<size_t>&          allFracturedCells,
+                                                                   const RigMainGrid*               mainGrid,
+                                                                   size_t                           globalReservoirCellIndex,
                                                                    cvf::StructGridDefines::FaceType face,
-                                                                   std::set<size_t>&                  connectedCells,
-                                                                   double                             minimumFaultThrow )
+                                                                   std::set<size_t>&                connectedCells,
+                                                                   double                           minimumFaultThrow )
 {
     const RigFault* fault = mainGrid->findFaultFromCellIndexAndCellFace( globalReservoirCellIndex, face );
     if ( fault )

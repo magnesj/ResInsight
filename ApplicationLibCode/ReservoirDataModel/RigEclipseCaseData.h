@@ -100,8 +100,8 @@ public:
 
     const RigCell& cellFromWellResultCell( const RigWellResultPoint& wellResultCell ) const;
     bool           findSharedSourceFace( cvf::StructGridDefines::FaceType& sharedSourceFace,
-                                         const RigWellResultPoint&           sourceWellCellResult,
-                                         const RigWellResultPoint&           otherWellCellResult ) const;
+                                         const RigWellResultPoint&         sourceWellCellResult,
+                                         const RigWellResultPoint&         otherWellCellResult ) const;
 
     void computeActiveCellBoundingBoxes( bool useOptimizedVersion );
 

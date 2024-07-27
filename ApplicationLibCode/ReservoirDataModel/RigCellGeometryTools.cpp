@@ -285,7 +285,7 @@ void RigCellGeometryTools::findCellLocalXYZ( const std::array<cvf::Vec3d, 8>& he
                                              cvf::Vec3d&                      localYdirection,
                                              cvf::Vec3d&                      localZdirection )
 {
-    cvf::ubyte                         faceVertexIndices[4];
+    cvf::ubyte                       faceVertexIndices[4];
     cvf::StructGridDefines::FaceEnum face;
 
     face = cvf::StructGridDefines::NEG_I;

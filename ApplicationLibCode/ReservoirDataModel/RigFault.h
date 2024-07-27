@@ -73,9 +73,9 @@ public:
         {
         }
 
-        size_t                             m_nativeReservoirCellIndex;
+        size_t                           m_nativeReservoirCellIndex;
         cvf::StructGridDefines::FaceType m_nativeFace;
-        size_t                             m_oppositeReservoirCellIndex;
+        size_t                           m_oppositeReservoirCellIndex;
     };
 
 public:

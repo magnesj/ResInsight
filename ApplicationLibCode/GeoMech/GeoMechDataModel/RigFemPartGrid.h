@@ -58,7 +58,7 @@ private: // Unused, Not implemented
     bool       isCellValid( size_t i, size_t j, size_t k ) const override;
     cvf::Vec3d minCoordinate() const override;
     cvf::Vec3d maxCoordinate() const override;
-    bool       cellIJKNeighbor( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const override;
+    bool cellIJKNeighbor( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const override;
 
     bool       cellIJKFromCoordinate( const cvf::Vec3d& coord, size_t* i, size_t* j, size_t* k ) const override;
     void       cellMinMaxCordinates( size_t cellIndex, cvf::Vec3d* minCoordinate, cvf::Vec3d* maxCoordinate ) const override;

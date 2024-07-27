@@ -62,10 +62,10 @@ public:
     RigWellLogExtractor( gsl::not_null<const RigWellPath*> wellpath, const std::string& wellCaseErrorMsgName );
     ~RigWellLogExtractor() override;
 
-    const std::vector<double>&                             cellIntersectionMDs() const;
-    const std::vector<double>&                             cellIntersectionTVDs() const;
-    const std::vector<size_t>&                             intersectedCellsGlobIdx() const;
-    const std::vector<cvf::Vec3d>&                         intersections() const;
+    const std::vector<double>&                           cellIntersectionMDs() const;
+    const std::vector<double>&                           cellIntersectionTVDs() const;
+    const std::vector<size_t>&                           intersectedCellsGlobIdx() const;
+    const std::vector<cvf::Vec3d>&                       intersections() const;
     const std::vector<cvf::StructGridDefines::FaceType>& intersectedCellFaces() const;
 
     const RigWellPath* wellPathGeometry() const;
@@ -95,9 +95,9 @@ protected:
     std::string            m_wellCaseErrorMsgName;
 
 private:
-    std::vector<cvf::Vec3d>                         m_intersections;
-    std::vector<size_t>                             m_intersectedCellsGlobIdx;
+    std::vector<cvf::Vec3d>                       m_intersections;
+    std::vector<size_t>                           m_intersectedCellsGlobIdx;
     std::vector<cvf::StructGridDefines::FaceType> m_intersectedCellFaces;
-    std::vector<double>                             m_intersectionMeasuredDepths;
-    std::vector<double>                             m_intersectionTVDs;
+    std::vector<double>                           m_intersectionMeasuredDepths;
+    std::vector<double>                           m_intersectionTVDs;
 };

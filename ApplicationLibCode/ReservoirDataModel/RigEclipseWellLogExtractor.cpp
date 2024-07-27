@@ -182,9 +182,9 @@ void RigEclipseWellLogExtractor::curveData( const RigResultAccessor* resultAcces
 
     for ( size_t cpIdx = 0; cpIdx < intersections().size(); ++cpIdx )
     {
-        size_t                             cellIdx  = intersectedCellsGlobIdx()[cpIdx];
+        size_t                           cellIdx  = intersectedCellsGlobIdx()[cpIdx];
         cvf::StructGridDefines::FaceType cellFace = intersectedCellFaces()[cpIdx];
-        ( *values )[cpIdx]                          = resultAccessor->cellFaceScalarGlobIdx( cellIdx, cellFace );
+        ( *values )[cpIdx]                        = resultAccessor->cellFaceScalarGlobIdx( cellIdx, cellFace );
     }
 }
 

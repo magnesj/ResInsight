@@ -94,11 +94,11 @@ void RigWellLogExtractor::resampleIntersections( double maxDistanceBetweenInters
 {
     if ( maxDistanceBetweenIntersections <= 0.0 ) return;
 
-    std::vector<cvf::Vec3d>                         resampledIntersections;
-    std::vector<size_t>                             resampledIntersectedCellsGlobIdx;
+    std::vector<cvf::Vec3d>                       resampledIntersections;
+    std::vector<size_t>                           resampledIntersectedCellsGlobIdx;
     std::vector<cvf::StructGridDefines::FaceType> resampledIntersectedCellFaces;
-    std::vector<double>                             resampledIntersectionMeasuredDepths;
-    std::vector<double>                             resampledIntersectionTVDs;
+    std::vector<double>                           resampledIntersectionMeasuredDepths;
+    std::vector<double>                           resampledIntersectionTVDs;
 
     if ( m_intersections.size() > 1 )
     {

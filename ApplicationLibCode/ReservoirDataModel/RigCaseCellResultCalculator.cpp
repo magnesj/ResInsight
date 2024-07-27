@@ -258,7 +258,7 @@ bool RigCaseCellResultCalculator::computeDivideByCellFaceArea( RigMainGrid*     
     size_t maxGridCount = mainGrid->gridCount();
 
     cvf::StructGridDefines::FaceType cellFace   = cvf::StructGridDefines::NO_FACE;
-    QString                            resultName = address.resultName();
+    QString                          resultName = address.resultName();
     if ( resultName.contains( "I+" ) )
         cellFace = cvf::StructGridDefines::POS_I;
     else if ( resultName.contains( "J+" ) )

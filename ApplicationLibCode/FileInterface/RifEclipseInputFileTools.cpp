@@ -643,15 +643,15 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
     // Sort order: i, j, face then k.
     std::sort( faultCellAndFaces.begin(), faultCellAndFaces.end(), RigFault::ordering );
 
-    size_t                             lastI        = std::numeric_limits<size_t>::max();
-    size_t                             lastJ        = std::numeric_limits<size_t>::max();
-    size_t                             lastK        = std::numeric_limits<size_t>::max();
-    size_t                             startK       = std::numeric_limits<size_t>::max();
+    size_t                           lastI        = std::numeric_limits<size_t>::max();
+    size_t                           lastJ        = std::numeric_limits<size_t>::max();
+    size_t                           lastK        = std::numeric_limits<size_t>::max();
+    size_t                           startK       = std::numeric_limits<size_t>::max();
     cvf::StructGridDefines::FaceType lastFaceType = cvf::StructGridDefines::FaceType::NO_FACE;
 
     for ( const RigFault::CellAndFace& faultCellAndFace : faultCellAndFaces )
     {
-        size_t                             i, j, k;
+        size_t                           i, j, k;
         cvf::StructGridDefines::FaceType faceType;
         std::tie( i, j, k, faceType ) = faultCellAndFace;
 
@@ -1009,12 +1009,12 @@ qint64 RifEclipseInputFileTools::findKeyword( const QString& keyword, QFile& fil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifEclipseInputFileTools::writeFaultLine( QTextStream&                       stream,
-                                               QString                            faultName,
-                                               size_t                             i,
-                                               size_t                             j,
-                                               size_t                             startK,
-                                               size_t                             endK,
+void RifEclipseInputFileTools::writeFaultLine( QTextStream&                     stream,
+                                               QString                          faultName,
+                                               size_t                           i,
+                                               size_t                           j,
+                                               size_t                           startK,
+                                               size_t                           endK,
                                                cvf::StructGridDefines::FaceType faceType )
 {
     // Convert indices to eclipse format

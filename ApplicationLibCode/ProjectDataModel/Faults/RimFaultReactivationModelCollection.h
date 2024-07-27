@@ -51,13 +51,13 @@ public:
     RimFaultReactivationModelCollection();
     ~RimFaultReactivationModelCollection() override;
 
-    RimFaultReactivationModel* addNewModel( RimFaultInView*                    fault,
-                                            size_t                             cellIndex,
+    RimFaultReactivationModel* addNewModel( RimFaultInView*                  fault,
+                                            size_t                           cellIndex,
                                             cvf::StructGridDefines::FaceType face,
-                                            cvf::Vec3d                         target1,
-                                            cvf::Vec3d                         target2,
-                                            QString                            baseDir,
-                                            QString&                           errMsg );
+                                            cvf::Vec3d                       target1,
+                                            cvf::Vec3d                       target2,
+                                            QString                          baseDir,
+                                            QString&                         errMsg );
 
     bool empty();
     int  size();

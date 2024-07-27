@@ -138,15 +138,15 @@ public:
 class RiuEclipseSelectionItem : public RiuSelectionItem
 {
 public:
-    explicit RiuEclipseSelectionItem( RimGridView*                       view,
-                                      RimEclipseResultDefinition*        resultDefinition,
-                                      size_t                             timestepIdx,
-                                      size_t                             gridIndex,
-                                      size_t                             gridLocalCellIndex,
-                                      size_t                             nncIndex,
-                                      cvf::Color3f                       color,
+    explicit RiuEclipseSelectionItem( RimGridView*                     view,
+                                      RimEclipseResultDefinition*      resultDefinition,
+                                      size_t                           timestepIdx,
+                                      size_t                           gridIndex,
+                                      size_t                           gridLocalCellIndex,
+                                      size_t                           nncIndex,
+                                      cvf::Color3f                     color,
                                       cvf::StructGridDefines::FaceType face,
-                                      const cvf::Vec3d&                  localIntersectionPointInDisplay );
+                                      const cvf::Vec3d&                localIntersectionPointInDisplay );
 
     ~RiuEclipseSelectionItem() override{};
 
@@ -160,7 +160,7 @@ public:
     size_t                                      m_gridLocalCellIndex;
     size_t                                      m_nncIndex;
     cvf::Color3f                                m_color;
-    cvf::StructGridDefines::FaceType          m_face;
+    cvf::StructGridDefines::FaceType            m_face;
     cvf::Vec3d                                  m_localIntersectionPointInDisplay;
 };
 

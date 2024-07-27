@@ -62,10 +62,10 @@ public:
 private:
     void computeArrays( bool onlyShowFacesWithDefinedNeighbors );
 
-    bool hasConnection( size_t                             cellIdx,
+    bool hasConnection( size_t                           cellIdx,
                         cvf::StructGridDefines::FaceType face,
-                        const RigConnectionContainer&      conns,
-                        const std::vector<size_t>&         nncConnectionIndices );
+                        const RigConnectionContainer&    conns,
+                        const std::vector<size_t>&       nncConnectionIndices );
 
 private:
     // Input
@@ -80,7 +80,7 @@ private:
     cvf::ref<cvf::Vec3fArray> m_vertices;
 
     // Mappings
-    std::vector<size_t>                             m_quadsToGridCells;
+    std::vector<size_t>                           m_quadsToGridCells;
     std::vector<cvf::StructGridDefines::FaceType> m_quadsToFace;
 
     cvf::ref<cvf::StructGridQuadToCellFaceMapper>    m_quadMapper;

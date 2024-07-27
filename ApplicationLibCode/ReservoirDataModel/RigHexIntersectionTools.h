@@ -39,10 +39,10 @@ public:
     {
     }
 
-    cvf::Vec3d                         m_intersectionPoint;
-    bool                               m_isIntersectionEntering;
+    cvf::Vec3d                       m_intersectionPoint;
+    bool                             m_isIntersectionEntering;
     cvf::StructGridDefines::FaceType m_face;
-    size_t                             m_hexIndex;
+    size_t                           m_hexIndex;
 };
 
 bool operator<( const HexIntersectionInfo& hi1, const HexIntersectionInfo& hi2 );

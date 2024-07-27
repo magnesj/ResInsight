@@ -71,8 +71,8 @@ void RigNNCData::buildPolygonsForEclipseConnections()
         const RigCell& c1 = m_mainGrid->globalCellArray()[m_connections[cnIdx].c1GlobIdx()];
         const RigCell& c2 = m_mainGrid->globalCellArray()[m_connections[cnIdx].c2GlobIdx()];
 
-        std::vector<size_t>                connectionPolygon;
-        std::vector<cvf::Vec3d>            connectionIntersections;
+        std::vector<size_t>              connectionPolygon;
+        std::vector<cvf::Vec3d>          connectionIntersections;
         cvf::StructGridDefines::FaceType connectionFace = cvf::StructGridDefines::NO_FACE;
 
         connectionFace =

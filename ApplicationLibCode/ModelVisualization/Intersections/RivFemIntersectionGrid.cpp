@@ -121,8 +121,7 @@ void RivFemIntersectionGrid::cellCornerIndices( size_t globalCellIndex, size_t c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigFault* RivFemIntersectionGrid::findFaultFromCellIndexAndCellFace( size_t                             reservoirCellIndex,
-                                                                           cvf::StructGridDefines::FaceType face ) const
+const RigFault* RivFemIntersectionGrid::findFaultFromCellIndexAndCellFace( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face ) const
 {
     return nullptr;
 }

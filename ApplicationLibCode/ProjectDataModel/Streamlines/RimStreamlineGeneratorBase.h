@@ -63,9 +63,9 @@ protected:
     std::list<RiaDefines::PhaseType> m_phases;
 
     const std::list<cvf::StructGridDefines::FaceType> m_allFaces = { cvf::StructGridDefines::FaceType::POS_I,
-                                                                       cvf::StructGridDefines::FaceType::NEG_I,
-                                                                       cvf::StructGridDefines::FaceType::POS_J,
-                                                                       cvf::StructGridDefines::FaceType::NEG_J,
-                                                                       cvf::StructGridDefines::FaceType::POS_K,
-                                                                       cvf::StructGridDefines::FaceType::NEG_K };
+                                                                     cvf::StructGridDefines::FaceType::NEG_I,
+                                                                     cvf::StructGridDefines::FaceType::POS_J,
+                                                                     cvf::StructGridDefines::FaceType::NEG_J,
+                                                                     cvf::StructGridDefines::FaceType::POS_K,
+                                                                     cvf::StructGridDefines::FaceType::NEG_K };
 };

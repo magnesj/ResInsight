@@ -108,9 +108,9 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
 
     float arrowScaling = arrowConstantScaling / maxAbsResult;
 
-    std::vector<RigEclipseResultAddress>            resultAddresses;
+    std::vector<RigEclipseResultAddress>          resultAddresses;
     std::vector<cvf::StructGridDefines::FaceType> directions;
-    RigCaseCellResultsData*                         resultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    RigCaseCellResultsData*                       resultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     {
         std::vector<RigEclipseResultAddress> addresses;
         result->resultAddressesIJK( addresses );
@@ -152,10 +152,10 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
 
     const std::vector<RigCell>& cells = eclipseCase->mainGrid()->globalCellArray();
 
-    auto getFaceCenterAndNormal = [cells, arrowScaling, displayCordXf]( size_t                             globalCellIdx,
+    auto getFaceCenterAndNormal = [cells, arrowScaling, displayCordXf]( size_t                           globalCellIdx,
                                                                         cvf::StructGridDefines::FaceType faceType,
-                                                                        cvf::Vec3d&                        faceCenter,
-                                                                        cvf::Vec3d&                        faceNormal )
+                                                                        cvf::Vec3d&                      faceCenter,
+                                                                        cvf::Vec3d&                      faceNormal )
     {
         faceCenter            = displayCordXf->transformToDisplayCoord( cells[globalCellIdx].faceCenter( faceType ) );
         cvf::Vec3d cellCenter = displayCordXf->transformToDisplayCoord( cells[globalCellIdx].center() );

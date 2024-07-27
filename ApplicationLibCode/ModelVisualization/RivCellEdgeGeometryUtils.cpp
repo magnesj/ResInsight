@@ -114,7 +114,7 @@ void RivCellEdgeGeometryUtils::addCellEdgeResultsToDrawableGeo( size_t          
         size_t cellIndex = quadToCellFaceMapper->cellIndex( quadIdx );
         {
             cvf::StructGridDefines::FaceType cellFace    = quadToCellFaceMapper->cellFace( quadIdx );
-            double                             scalarValue = cellCenterDataAccessObject->cellFaceScalar( cellIndex, cellFace );
+            double                           scalarValue = cellCenterDataAccessObject->cellFaceScalar( cellIndex, cellFace );
 
             {
                 float cellColorTextureCoord = 0.5f; // If no results exists, the texture will have a special color

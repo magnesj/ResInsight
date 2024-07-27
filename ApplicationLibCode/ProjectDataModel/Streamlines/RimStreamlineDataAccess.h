@@ -48,11 +48,11 @@ public:
     bool setupDataAccess( RigMainGrid* grid, RigEclipseCaseData* data, std::list<RiaDefines::PhaseType> phases, int timeIdx );
 
     double faceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
-    double combinedFaceRate( RigCell                            cell,
+    double combinedFaceRate( RigCell                          cell,
                              cvf::StructGridDefines::FaceType faceIdx,
-                             std::list<RiaDefines::PhaseType>   phases,
-                             double                             direction,
-                             RiaDefines::PhaseType&             dominantPhaseOut ) const;
+                             std::list<RiaDefines::PhaseType> phases,
+                             double                           direction,
+                             RiaDefines::PhaseType&           dominantPhaseOut ) const;
 
     const RigMainGrid* grid() const { return m_grid; }
 

@@ -1949,11 +1949,11 @@ void RigCaseCellResultsData::computeNncsCells()
 
 namespace RigTransmissibilityCalcTools
 {
-void calculateConnectionGeometry( const RigCell&                     c1,
-                                  const RigCell&                     c2,
-                                  const std::vector<cvf::Vec3d>&     nodes,
+void calculateConnectionGeometry( const RigCell&                   c1,
+                                  const RigCell&                   c2,
+                                  const std::vector<cvf::Vec3d>&   nodes,
                                   cvf::StructGridDefines::FaceType faceId,
-                                  cvf::Vec3d*                        faceAreaVec )
+                                  cvf::Vec3d*                      faceAreaVec )
 {
     CVF_TIGHT_ASSERT( faceAreaVec );
 
@@ -2049,7 +2049,7 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
     // Set up which component to compute
 
     cvf::StructGridDefines::FaceType faceId = cvf::StructGridDefines::NO_FACE;
-    QString                            permCompName;
+    QString                          permCompName;
 
     if ( riTransComponentResultName == RiaResultNames::riTranXResultName() )
     {
@@ -2291,8 +2291,8 @@ void RigCaseCellResultsData::computeNncCombRiTrans()
     const RigConnectionContainer& nncConnections = m_ownerMainGrid->nncData()->allConnections();
     for ( size_t connIdx = 0; connIdx < nncConnections.size(); connIdx++ )
     {
-        size_t                             nativeResvCellIndex = nncConnections[connIdx].c1GlobIdx();
-        size_t                             neighborResvCellIdx = nncConnections[connIdx].c2GlobIdx();
+        size_t                           nativeResvCellIndex = nncConnections[connIdx].c1GlobIdx();
+        size_t                           neighborResvCellIdx = nncConnections[connIdx].c2GlobIdx();
         cvf::StructGridDefines::FaceType faceId = static_cast<cvf::StructGridDefines::FaceType>( nncConnections[connIdx].face() );
 
         ResultIndexFunction  permIdxFunc = nullptr;
@@ -2516,7 +2516,7 @@ void RigCaseCellResultsData::computeRiTRANSbyAreaComponent( const QString& riTra
     // Set up which component to compute
 
     cvf::StructGridDefines::FaceType faceId = cvf::StructGridDefines::NO_FACE;
-    QString                            transCompName;
+    QString                          transCompName;
 
     if ( riTransByAreaCompResultName == RiaResultNames::riAreaNormTranXResultName() )
     {

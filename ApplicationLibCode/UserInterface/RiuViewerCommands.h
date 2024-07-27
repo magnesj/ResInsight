@@ -93,13 +93,13 @@ private:
     static void removeDefaultPickEventHandler( RicDefaultPickEventHandler* pickEventHandler );
 
 private:
-    size_t                             m_currentGridIdx;
-    size_t                             m_currentCellIndex;
+    size_t                           m_currentGridIdx;
+    size_t                           m_currentCellIndex;
     cvf::StructGridDefines::FaceType m_currentFaceIndex;
-    cvf::Vec3d                         m_currentPickPositionInDomainCoords;
-    bool                               m_isCurrentPickInComparisonView;
-    caf::PdmPointer<Rim3dView>         m_reservoirView;
-    QPointer<RiuViewer>                m_viewer;
+    cvf::Vec3d                       m_currentPickPositionInDomainCoords;
+    bool                             m_isCurrentPickInComparisonView;
+    caf::PdmPointer<Rim3dView>       m_reservoirView;
+    QPointer<RiuViewer>              m_viewer;
 
     static Ric3dViewPickEventHandler*               sm_overridingPickHandler;
     static std::vector<RicDefaultPickEventHandler*> sm_defaultPickEventHandlers;

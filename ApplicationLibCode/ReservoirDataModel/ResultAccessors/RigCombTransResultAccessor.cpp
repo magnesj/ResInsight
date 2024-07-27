@@ -59,9 +59,9 @@ double RigCombTransResultAccessor::cellScalar( size_t gridLocalCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 /// Get tran value from neighbor cell. Return 0.0 on active/inactive cell borders and end of grid
 //--------------------------------------------------------------------------------------------------
-double RigCombTransResultAccessor::neighborCellTran( size_t                             gridLocalCellIndex,
+double RigCombTransResultAccessor::neighborCellTran( size_t                           gridLocalCellIndex,
                                                      cvf::StructGridDefines::FaceType faceId,
-                                                     const RigResultAccessor*           transAccessor ) const
+                                                     const RigResultAccessor*         transAccessor ) const
 {
     if ( transAccessor != nullptr )
     {
