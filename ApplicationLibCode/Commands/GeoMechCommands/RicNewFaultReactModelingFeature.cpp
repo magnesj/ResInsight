@@ -75,7 +75,7 @@ void RicNewFaultReactModelingFeature::onActionTriggered( bool isChecked )
         size_t currentCellIndex = static_cast<size_t>( list[0].toULongLong() );
         int    currentFaceIndex = list[1].toInt();
 
-        auto face = cvf::StructGridInterface::FaceType( currentFaceIndex );
+        auto face = cvf::StructGridDefines::FaceType( currentFaceIndex );
 
         const RigFault* fault = eclView->mainGrid()->findFaultFromCellIndexAndCellFace( currentCellIndex, face );
         if ( fault )

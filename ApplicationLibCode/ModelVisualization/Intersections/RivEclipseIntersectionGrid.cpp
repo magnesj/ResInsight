@@ -100,7 +100,7 @@ void RivEclipseIntersectionGrid::cellCornerIndices( size_t cellIndex, size_t cor
 ///
 //--------------------------------------------------------------------------------------------------
 const RigFault* RivEclipseIntersectionGrid::findFaultFromCellIndexAndCellFace( size_t                             reservoirCellIndex,
-                                                                               cvf::StructGridInterface::FaceType face ) const
+                                                                               cvf::StructGridDefines::FaceType face ) const
 {
     return m_mainGrid->findFaultFromCellIndexAndCellFace( reservoirCellIndex, face );
 }

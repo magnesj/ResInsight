@@ -586,9 +586,9 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
         {
             auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( faultCellAndFace.m_nativeFace );
 
-            if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_I )
+            if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I )
             {
-                if ( faultCellAndFace.m_nativeFace == cvf::StructGridInterface::POS_I )
+                if ( faultCellAndFace.m_nativeFace == cvf::StructGridDefines::POS_I )
                 {
                     shifted_i += refinement.x() - 1;
                 }
@@ -601,9 +601,9 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
                     }
                 }
             }
-            else if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_J )
+            else if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_J )
             {
-                if ( faultCellAndFace.m_nativeFace == cvf::StructGridInterface::POS_J )
+                if ( faultCellAndFace.m_nativeFace == cvf::StructGridDefines::POS_J )
                 {
                     shifted_j += refinement.y() - 1;
                 }
@@ -617,9 +617,9 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
                     }
                 }
             }
-            else if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_K )
+            else if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_K )
             {
-                if ( faultCellAndFace.m_nativeFace == cvf::StructGridInterface::POS_K )
+                if ( faultCellAndFace.m_nativeFace == cvf::StructGridDefines::POS_K )
                 {
                     shifted_k += refinement.z() - 1;
                 }
@@ -647,18 +647,18 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
     size_t                             lastJ        = std::numeric_limits<size_t>::max();
     size_t                             lastK        = std::numeric_limits<size_t>::max();
     size_t                             startK       = std::numeric_limits<size_t>::max();
-    cvf::StructGridInterface::FaceType lastFaceType = cvf::StructGridInterface::FaceType::NO_FACE;
+    cvf::StructGridDefines::FaceType lastFaceType = cvf::StructGridDefines::FaceType::NO_FACE;
 
     for ( const RigFault::CellAndFace& faultCellAndFace : faultCellAndFaces )
     {
         size_t                             i, j, k;
-        cvf::StructGridInterface::FaceType faceType;
+        cvf::StructGridDefines::FaceType faceType;
         std::tie( i, j, k, faceType ) = faultCellAndFace;
 
         if ( i != lastI || j != lastJ || lastFaceType != faceType || k != lastK + 1 )
         {
             // No fault should have no face
-            if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
+            if ( lastFaceType != cvf::StructGridDefines::FaceType::NO_FACE )
             {
                 writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
             }
@@ -675,7 +675,7 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
     }
 
     // No fault should have no face
-    if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
+    if ( lastFaceType != cvf::StructGridDefines::FaceType::NO_FACE )
     {
         writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
     }
@@ -1015,7 +1015,7 @@ void RifEclipseInputFileTools::writeFaultLine( QTextStream&                     
                                                size_t                             j,
                                                size_t                             startK,
                                                size_t                             endK,
-                                               cvf::StructGridInterface::FaceType faceType )
+                                               cvf::StructGridDefines::FaceType faceType )
 {
     // Convert indices to eclipse format
     i++;
@@ -1032,21 +1032,21 @@ void RifEclipseInputFileTools::writeFaultLine( QTextStream&                     
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RifEclipseInputFileTools::faultFaceText( cvf::StructGridInterface::FaceType faceType )
+QString RifEclipseInputFileTools::faultFaceText( cvf::StructGridDefines::FaceType faceType )
 {
     switch ( faceType )
     {
-        case cvf::StructGridInterface::POS_I:
+        case cvf::StructGridDefines::POS_I:
             return QString( "I " );
-        case cvf::StructGridInterface::NEG_I:
+        case cvf::StructGridDefines::NEG_I:
             return QString( "I-" );
-        case cvf::StructGridInterface::POS_J:
+        case cvf::StructGridDefines::POS_J:
             return QString( "J " );
-        case cvf::StructGridInterface::NEG_J:
+        case cvf::StructGridDefines::NEG_J:
             return QString( "J-" );
-        case cvf::StructGridInterface::POS_K:
+        case cvf::StructGridDefines::POS_K:
             return QString( "K " );
-        case cvf::StructGridInterface::NEG_K:
+        case cvf::StructGridDefines::NEG_K:
             return QString( "K-" );
         default:
             CVF_ASSERT( false );
@@ -1382,7 +1382,7 @@ RiaDefines::EclipseUnitSystem RifEclipseInputFileTools::readUnitSystem( QFile& f
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::StructGridInterface::FaceEnum RifEclipseInputFileTools::faceEnumFromText( const QString& faceString )
+cvf::StructGridDefines::FaceEnum RifEclipseInputFileTools::faceEnumFromText( const QString& faceString )
 {
     QString upperCaseText = faceString.toUpper().trimmed();
 
@@ -1390,25 +1390,25 @@ cvf::StructGridInterface::FaceEnum RifEclipseInputFileTools::faceEnumFromText( c
     {
         QString firstTwoChars = upperCaseText.mid( 0, 2 );
 
-        if ( firstTwoChars == "X+" || firstTwoChars == "I+" ) return cvf::StructGridInterface::POS_I;
-        if ( firstTwoChars == "Y+" || firstTwoChars == "J+" ) return cvf::StructGridInterface::POS_J;
-        if ( firstTwoChars == "Z+" || firstTwoChars == "K+" ) return cvf::StructGridInterface::POS_K;
+        if ( firstTwoChars == "X+" || firstTwoChars == "I+" ) return cvf::StructGridDefines::POS_I;
+        if ( firstTwoChars == "Y+" || firstTwoChars == "J+" ) return cvf::StructGridDefines::POS_J;
+        if ( firstTwoChars == "Z+" || firstTwoChars == "K+" ) return cvf::StructGridDefines::POS_K;
 
-        if ( firstTwoChars == "X-" || firstTwoChars == "I-" ) return cvf::StructGridInterface::NEG_I;
-        if ( firstTwoChars == "Y-" || firstTwoChars == "J-" ) return cvf::StructGridInterface::NEG_J;
-        if ( firstTwoChars == "Z-" || firstTwoChars == "K-" ) return cvf::StructGridInterface::NEG_K;
+        if ( firstTwoChars == "X-" || firstTwoChars == "I-" ) return cvf::StructGridDefines::NEG_I;
+        if ( firstTwoChars == "Y-" || firstTwoChars == "J-" ) return cvf::StructGridDefines::NEG_J;
+        if ( firstTwoChars == "Z-" || firstTwoChars == "K-" ) return cvf::StructGridDefines::NEG_K;
     }
 
     if ( upperCaseText.size() > 0 )
     {
         QString firstChar = upperCaseText.mid( 0, 1 );
 
-        if ( firstChar == "X" || firstChar == "I" ) return cvf::StructGridInterface::POS_I;
-        if ( firstChar == "Y" || firstChar == "J" ) return cvf::StructGridInterface::POS_J;
-        if ( firstChar == "Z" || firstChar == "K" ) return cvf::StructGridInterface::POS_K;
+        if ( firstChar == "X" || firstChar == "I" ) return cvf::StructGridDefines::POS_I;
+        if ( firstChar == "Y" || firstChar == "J" ) return cvf::StructGridDefines::POS_J;
+        if ( firstChar == "Z" || firstChar == "K" ) return cvf::StructGridDefines::POS_K;
     }
 
-    return cvf::StructGridInterface::NO_FACE;
+    return cvf::StructGridDefines::NO_FACE;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1554,7 +1554,7 @@ void RifEclipseInputFileTools::readFaults( QFile& data, qint64 filePos, cvf::Col
 
         QString faceString = entries[7];
 
-        cvf::StructGridInterface::FaceEnum cellFaceEnum = RifEclipseInputFileTools::faceEnumFromText( faceString );
+        cvf::StructGridDefines::FaceEnum cellFaceEnum = RifEclipseInputFileTools::faceEnumFromText( faceString );
 
         // Adjust from 1-based to 0-based cell indices
         // Guard against invalid cell ranges by limiting lowest possible range value to zero

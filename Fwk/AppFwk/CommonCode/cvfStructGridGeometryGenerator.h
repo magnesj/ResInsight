@@ -121,7 +121,7 @@ public:
     virtual bool isFaceVisible( size_t                        i,
                                 size_t                        j,
                                 size_t                        k,
-                                StructGridInterface::FaceType face,
+                                StructGridDefines::FaceType face,
                                 const UByteArray*             cellVisibility ) const = 0;
 };
 
@@ -131,15 +131,15 @@ public:
     size_t quadCount() const { return m_quadsToCells.size(); }
 
     size_t                        cellIndex( size_t quadIdx ) const { return m_quadsToCells[quadIdx]; }
-    StructGridInterface::FaceType cellFace( size_t quadIdx ) const { return m_quadsToFace[quadIdx]; }
+    StructGridDefines::FaceType cellFace( size_t quadIdx ) const { return m_quadsToFace[quadIdx]; }
 
     // Interface for building the mappings
     std::vector<size_t>&                        quadToCellIndexMap() { return m_quadsToCells; }
-    std::vector<StructGridInterface::FaceType>& quadToCellFaceMap() { return m_quadsToFace; }
+    std::vector<StructGridDefines::FaceType>& quadToCellFaceMap() { return m_quadsToFace; }
 
 private:
     std::vector<size_t>                        m_quadsToCells;
-    std::vector<StructGridInterface::FaceType> m_quadsToFace;
+    std::vector<StructGridDefines::FaceType> m_quadsToFace;
 };
 
 class StuctGridTriangleToCellFaceMapper : public Object
@@ -152,7 +152,7 @@ public:
     size_t triangleCount() const { return 2 * m_quadMapper->quadCount(); }
 
     size_t cellIndex( size_t triangleIdx ) const { return m_quadMapper->cellIndex( triangleIdx / 2 ); }
-    StructGridInterface::FaceType cellFace( size_t triangleIdx ) const
+    StructGridDefines::FaceType cellFace( size_t triangleIdx ) const
     {
         return m_quadMapper->cellFace( triangleIdx / 2 );
     }
@@ -203,7 +203,7 @@ public:
     static ref<UIntArray>   lineIndicesFromQuadVertexArray( const Vec3fArray* vertexArray );
 
 private:
-    bool isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const;
+    bool isCellFaceVisible( size_t i, size_t j, size_t k, StructGridDefines::FaceType face ) const;
 
     void computeArrays();
 

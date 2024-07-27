@@ -71,7 +71,7 @@ public:
     std::pair<cvf::Vec3d, cvf::Vec3d> modelLocalNormalsXY() const;
     cvf::Vec3d                        transformPointIfNeeded( const cvf::Vec3d point ) const;
 
-    void updateGeometry( size_t startCell, cvf::StructGridInterface::FaceType startFace );
+    void updateGeometry( size_t startCell, cvf::StructGridDefines::FaceType startFace );
 
     void                        setPartColors( cvf::Color3f part1Color, cvf::Color3f part2Color );
     std::vector<cvf::Vec3d>     rect( int nPart ) const;

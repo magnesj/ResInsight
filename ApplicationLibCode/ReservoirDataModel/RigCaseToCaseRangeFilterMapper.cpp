@@ -287,15 +287,15 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRange
                                    cvf::UNDEFINED_SIZE_T };
             for ( int faceIdx = 0; faceIdx < 6; ++faceIdx )
             {
-                auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( cvf::StructGridInterface::FaceType( faceIdx ) );
+                auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( cvf::StructGridDefines::FaceType( faceIdx ) );
 
                 int ijOrk = 0;
-                if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_I ) ijOrk = 0;
-                if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_J ) ijOrk = 1;
-                if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_K ) ijOrk = 2;
+                if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I ) ijOrk = 0;
+                if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_J ) ijOrk = 1;
+                if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_K ) ijOrk = 2;
 
                 cvf::ubyte surfCorners[4];
-                cvf::StructGridInterface::cellFaceVertexIndices( (cvf::StructGridInterface::FaceType)faceIdx, surfCorners );
+                cvf::StructGridInterface::cellFaceVertexIndices( (cvf::StructGridDefines::FaceType)faceIdx, surfCorners );
                 bool foundAcceptedMatch = false;
                 for ( int cIdx = 0; cIdx < 4; ++cIdx )
                 {
@@ -339,12 +339,12 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRange
             }
 #endif
 
-            dst.EndI   = faceIJKs[cvf::StructGridInterface::POS_I];
-            dst.StartI = faceIJKs[cvf::StructGridInterface::NEG_I];
-            dst.EndJ   = faceIJKs[cvf::StructGridInterface::POS_J];
-            dst.StartJ = faceIJKs[cvf::StructGridInterface::NEG_J];
-            dst.EndK   = faceIJKs[cvf::StructGridInterface::POS_K];
-            dst.StartK = faceIJKs[cvf::StructGridInterface::NEG_K];
+            dst.EndI   = faceIJKs[cvf::StructGridDefines::POS_I];
+            dst.StartI = faceIJKs[cvf::StructGridDefines::NEG_I];
+            dst.EndJ   = faceIJKs[cvf::StructGridDefines::POS_J];
+            dst.StartJ = faceIJKs[cvf::StructGridDefines::NEG_J];
+            dst.EndK   = faceIJKs[cvf::StructGridDefines::POS_K];
+            dst.StartK = faceIJKs[cvf::StructGridDefines::NEG_K];
         }
     }
 }

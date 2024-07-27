@@ -62,7 +62,7 @@ RimFaultReactivationModelCollection::~RimFaultReactivationModelCollection()
 //--------------------------------------------------------------------------------------------------
 RimFaultReactivationModel* RimFaultReactivationModelCollection::addNewModel( RimFaultInView*                    fault,
                                                                              size_t                             cellIndex,
-                                                                             cvf::StructGridInterface::FaceType face,
+                                                                             cvf::StructGridDefines::FaceType face,
                                                                              cvf::Vec3d                         target1,
                                                                              cvf::Vec3d                         target2,
                                                                              QString                            baseDir,

@@ -95,7 +95,7 @@ private:
 private:
     size_t                             m_currentGridIdx;
     size_t                             m_currentCellIndex;
-    cvf::StructGridInterface::FaceType m_currentFaceIndex;
+    cvf::StructGridDefines::FaceType m_currentFaceIndex;
     cvf::Vec3d                         m_currentPickPositionInDomainCoords;
     bool                               m_isCurrentPickInComparisonView;
     caf::PdmPointer<Rim3dView>         m_reservoirView;

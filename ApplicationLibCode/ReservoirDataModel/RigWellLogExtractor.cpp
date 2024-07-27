@@ -96,7 +96,7 @@ void RigWellLogExtractor::resampleIntersections( double maxDistanceBetweenInters
 
     std::vector<cvf::Vec3d>                         resampledIntersections;
     std::vector<size_t>                             resampledIntersectedCellsGlobIdx;
-    std::vector<cvf::StructGridInterface::FaceType> resampledIntersectedCellFaces;
+    std::vector<cvf::StructGridDefines::FaceType> resampledIntersectedCellFaces;
     std::vector<double>                             resampledIntersectionMeasuredDepths;
     std::vector<double>                             resampledIntersectionTVDs;
 
@@ -197,7 +197,7 @@ const std::vector<cvf::Vec3d>& RigWellLogExtractor::intersections() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<cvf::StructGridInterface::FaceType>& RigWellLogExtractor::intersectedCellFaces() const
+const std::vector<cvf::StructGridDefines::FaceType>& RigWellLogExtractor::intersectedCellFaces() const
 {
     return m_intersectedCellFaces;
 }
@@ -311,7 +311,7 @@ void RigWellLogExtractor::populateReturnArrays( std::map<RigMDCellIdxEnterLeaveK
             // Needs wellpath start point in front
             HexIntersectionInfo firstLeavingPoint      = it->second;
             firstLeavingPoint.m_intersectionPoint      = m_wellPathGeometry->wellPathPoints()[0];
-            firstLeavingPoint.m_face                   = cvf::StructGridInterface::NO_FACE;
+            firstLeavingPoint.m_face                   = cvf::StructGridDefines::NO_FACE;
             firstLeavingPoint.m_isIntersectionEntering = true;
 
             sortedUniqueIntersections.insert( std::make_pair( RigMDEnterLeaveCellIdxKey( m_wellPathGeometry->measuredDepths()[0],
@@ -331,7 +331,7 @@ void RigWellLogExtractor::populateReturnArrays( std::map<RigMDCellIdxEnterLeaveK
             HexIntersectionInfo lastEnterPoint      = rit->second;
             lastEnterPoint.m_intersectionPoint      = m_wellPathGeometry->wellPathPoints().back();
             lastEnterPoint.m_isIntersectionEntering = false;
-            lastEnterPoint.m_face                   = cvf::StructGridInterface::NO_FACE;
+            lastEnterPoint.m_face                   = cvf::StructGridDefines::NO_FACE;
 
             sortedUniqueIntersections.insert( std::make_pair( RigMDEnterLeaveCellIdxKey( m_wellPathGeometry->measuredDepths().back(),
                                                                                          false,

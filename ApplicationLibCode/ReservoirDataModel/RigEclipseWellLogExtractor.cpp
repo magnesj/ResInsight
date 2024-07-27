@@ -137,7 +137,7 @@ void RigEclipseWellLogExtractor::calculateIntersection()
                             // Mark the first well path point as entering the cell
 
                             bool                      isEntering = true;
-                            HexIntersectionInfo       info( firstPoint, isEntering, cvf::StructGridInterface::NO_FACE, globalCellIndex );
+                            HexIntersectionInfo       info( firstPoint, isEntering, cvf::StructGridDefines::NO_FACE, globalCellIndex );
                             RigMDCellIdxEnterLeaveKey enterLeaveKey( m_wellPathGeometry->measuredDepths().front(),
                                                                      globalCellIndex,
                                                                      isEntering,
@@ -150,7 +150,7 @@ void RigEclipseWellLogExtractor::calculateIntersection()
                             // Mark the last well path point as leaving cell
 
                             bool                      isEntering = false;
-                            HexIntersectionInfo       info( lastPoint, isEntering, cvf::StructGridInterface::NO_FACE, globalCellIndex );
+                            HexIntersectionInfo       info( lastPoint, isEntering, cvf::StructGridDefines::NO_FACE, globalCellIndex );
                             RigMDCellIdxEnterLeaveKey enterLeaveKey( m_wellPathGeometry->measuredDepths().back(),
                                                                      globalCellIndex,
                                                                      isEntering,
@@ -183,7 +183,7 @@ void RigEclipseWellLogExtractor::curveData( const RigResultAccessor* resultAcces
     for ( size_t cpIdx = 0; cpIdx < intersections().size(); ++cpIdx )
     {
         size_t                             cellIdx  = intersectedCellsGlobIdx()[cpIdx];
-        cvf::StructGridInterface::FaceType cellFace = intersectedCellFaces()[cpIdx];
+        cvf::StructGridDefines::FaceType cellFace = intersectedCellFaces()[cpIdx];
         ( *values )[cpIdx]                          = resultAccessor->cellFaceScalarGlobIdx( cellIdx, cellFace );
     }
 }

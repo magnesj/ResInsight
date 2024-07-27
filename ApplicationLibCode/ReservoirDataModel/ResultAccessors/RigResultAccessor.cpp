@@ -32,7 +32,7 @@ double RigHugeValResultAccessor::cellScalar( size_t gridLocalCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigHugeValResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigHugeValResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     return cellScalar( gridLocalCellIndex );
 }
@@ -48,7 +48,7 @@ double RigHugeValResultAccessor::cellScalarGlobIdx( size_t globCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigHugeValResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigHugeValResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     return HUGE_VAL;
 }

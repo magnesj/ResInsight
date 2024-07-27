@@ -40,21 +40,6 @@
 
 #include <algorithm>
 
-namespace caf
-{
-template <>
-void cvf::StructGridInterface::FaceEnum::setUp()
-{
-    addItem( cvf::StructGridInterface::POS_I, "POS I", "" );
-    addItem( cvf::StructGridInterface::NEG_I, "NEG I", "" );
-    addItem( cvf::StructGridInterface::POS_J, "POS J", "" );
-    addItem( cvf::StructGridInterface::NEG_J, "NEG J", "" );
-    addItem( cvf::StructGridInterface::POS_K, "POS K", "" );
-    addItem( cvf::StructGridInterface::NEG_K, "NEG K", "" );
-    addItem( cvf::StructGridInterface::NO_FACE, "UnDef", "" );
-}
-} // namespace caf
-
 namespace cvf
 {
 //--------------------------------------------------------------------------------------------------
@@ -70,7 +55,7 @@ StructGridInterface::StructGridInterface()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void StructGridInterface::cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] )
+void StructGridInterface::cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] )
 {
     //
     //     7---------6
@@ -82,42 +67,42 @@ void StructGridInterface::cellFaceVertexIndices( FaceType face, cvf::ubyte verte
     //  |/        |/
     //  0---------1
 
-    if ( face == NEG_K )
+    if ( face == StructGridDefines::NEG_K )
     {
         vertexIndices[0] = 0;
         vertexIndices[1] = 3;
         vertexIndices[2] = 2;
         vertexIndices[3] = 1;
     }
-    else if ( face == POS_K )
+    else if ( face == StructGridDefines::POS_K )
     {
         vertexIndices[0] = 4;
         vertexIndices[1] = 5;
         vertexIndices[2] = 6;
         vertexIndices[3] = 7;
     }
-    else if ( face == NEG_J )
+    else if ( face == StructGridDefines::NEG_J )
     {
         vertexIndices[0] = 0;
         vertexIndices[1] = 1;
         vertexIndices[2] = 5;
         vertexIndices[3] = 4;
     }
-    else if ( face == POS_I )
+    else if ( face == StructGridDefines::POS_I )
     {
         vertexIndices[0] = 1;
         vertexIndices[1] = 2;
         vertexIndices[2] = 6;
         vertexIndices[3] = 5;
     }
-    else if ( face == POS_J )
+    else if ( face == StructGridDefines::POS_J )
     {
         vertexIndices[0] = 3;
         vertexIndices[1] = 7;
         vertexIndices[2] = 6;
         vertexIndices[3] = 2;
     }
-    else if ( face == NEG_I )
+    else if ( face == StructGridDefines::NEG_I )
     {
         vertexIndices[0] = 0;
         vertexIndices[1] = 4;
@@ -129,7 +114,8 @@ void StructGridInterface::cellFaceVertexIndices( FaceType face, cvf::ubyte verte
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<ubyte, ubyte> StructGridInterface::edgeVertexIndices( FaceType face1, FaceType face2 )
+std::pair<ubyte, ubyte> StructGridInterface::edgeVertexIndices( StructGridDefines::FaceType face1,
+                                                                StructGridDefines::FaceType face2 )
 {
     // Return the two shared vertex indices between two faces
     // The ordering is identical to the ordering in StructGridInterface::cellFaceVertexIndices
@@ -137,32 +123,32 @@ std::pair<ubyte, ubyte> StructGridInterface::edgeVertexIndices( FaceType face1, 
     // Ensure face1 has the largest enum value
     if ( face2 > face1 ) std::swap( face1, face2 );
 
-    if ( face1 == NEG_K )
+    if ( face1 == StructGridDefines::NEG_K )
     {
-        if ( face2 == NEG_I ) return { 0, 3 };
-        if ( face2 == POS_I ) return { 2, 1 };
-        if ( face2 == NEG_J ) return { 1, 0 };
-        if ( face2 == POS_J ) return { 3, 2 };
+        if ( face2 == StructGridDefines::NEG_I ) return { 0, 3 };
+        if ( face2 == StructGridDefines::POS_I ) return { 2, 1 };
+        if ( face2 == StructGridDefines::NEG_J ) return { 1, 0 };
+        if ( face2 == StructGridDefines::POS_J ) return { 3, 2 };
     }
 
-    if ( face1 == POS_K )
+    if ( face1 == StructGridDefines::POS_K )
     {
-        if ( face2 == NEG_I ) return { 7, 4 };
-        if ( face2 == POS_I ) return { 5, 6 };
-        if ( face2 == NEG_J ) return { 4, 5 };
-        if ( face2 == POS_J ) return { 6, 7 };
+        if ( face2 == StructGridDefines::NEG_I ) return { 7, 4 };
+        if ( face2 == StructGridDefines::POS_I ) return { 5, 6 };
+        if ( face2 == StructGridDefines::NEG_J ) return { 4, 5 };
+        if ( face2 == StructGridDefines::POS_J ) return { 6, 7 };
     }
 
-    if ( face1 == NEG_J )
+    if ( face1 == StructGridDefines::NEG_J )
     {
-        if ( face2 == NEG_I ) return { 4, 0 };
-        if ( face2 == POS_I ) return { 1, 5 };
+        if ( face2 == StructGridDefines::NEG_I ) return { 4, 0 };
+        if ( face2 == StructGridDefines::POS_I ) return { 1, 5 };
     }
 
-    if ( face1 == POS_J )
+    if ( face1 == StructGridDefines::POS_J )
     {
-        if ( face2 == NEG_I ) return { 3, 7 };
-        if ( face2 == POS_I ) return { 6, 2 };
+        if ( face2 == StructGridDefines::NEG_I ) return { 3, 7 };
+        if ( face2 == StructGridDefines::POS_I ) return { 6, 2 };
     }
 
     return {};
@@ -171,32 +157,32 @@ std::pair<ubyte, ubyte> StructGridInterface::edgeVertexIndices( FaceType face1, 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-StructGridInterface::FaceType StructGridInterface::oppositeFace( FaceType face )
+StructGridDefines::FaceType StructGridInterface::oppositeFace( StructGridDefines::FaceType face )
 {
-    FaceType opposite;
+    StructGridDefines::FaceType opposite;
 
     switch ( face )
     {
-        case NEG_I:
-            opposite = POS_I;
+        case StructGridDefines::NEG_I:
+            opposite = StructGridDefines::POS_I;
             break;
-        case POS_I:
-            opposite = NEG_I;
+        case StructGridDefines::POS_I:
+            opposite = StructGridDefines::NEG_I;
             break;
-        case NEG_J:
-            opposite = POS_J;
+        case StructGridDefines::NEG_J:
+            opposite = StructGridDefines::POS_J;
             break;
-        case POS_J:
-            opposite = NEG_J;
+        case StructGridDefines::POS_J:
+            opposite = StructGridDefines::NEG_J;
             break;
-        case NEG_K:
-            opposite = POS_K;
+        case StructGridDefines::NEG_K:
+            opposite = StructGridDefines::POS_K;
             break;
-        case POS_K:
-            opposite = NEG_K;
+        case StructGridDefines::POS_K:
+            opposite = StructGridDefines::NEG_K;
             break;
         default:
-            opposite = POS_I;
+            opposite = StructGridDefines::POS_I;
             CVF_ASSERT( false );
     }
 
@@ -206,22 +192,28 @@ StructGridInterface::FaceType StructGridInterface::oppositeFace( FaceType face )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<StructGridInterface::FaceType> StructGridInterface::validFaceTypes()
+std::vector<StructGridDefines::FaceType> StructGridInterface::validFaceTypes()
 {
     return {
-        cvf::StructGridInterface::FaceType::NEG_I,
-        cvf::StructGridInterface::FaceType::POS_I,
-        cvf::StructGridInterface::FaceType::NEG_J,
-        cvf::StructGridInterface::FaceType::POS_J,
-        cvf::StructGridInterface::FaceType::NEG_K,
-        cvf::StructGridInterface::FaceType::POS_K,
+        cvf::StructGridDefines::FaceType::NEG_I,
+        cvf::StructGridDefines::FaceType::POS_I,
+        cvf::StructGridDefines::FaceType::NEG_J,
+        cvf::StructGridDefines::FaceType::POS_J,
+        cvf::StructGridDefines::FaceType::NEG_K,
+        cvf::StructGridDefines::FaceType::POS_K,
     };
 }
 
 //--------------------------------------------------------------------------------------------------
 /// Return values are set to cvf::UNDEFINED_SIZE_T if the neighbor is in the negative area
 //--------------------------------------------------------------------------------------------------
-void StructGridInterface::neighborIJKAtCellFace( size_t i, size_t j, size_t k, FaceType face, size_t* ni, size_t* nj, size_t* nk )
+void StructGridInterface::neighborIJKAtCellFace( size_t                      i,
+                                                 size_t                      j,
+                                                 size_t                      k,
+                                                 StructGridDefines::FaceType face,
+                                                 size_t*                     ni,
+                                                 size_t*                     nj,
+                                                 size_t*                     nk )
 {
     *ni = i;
     *nj = j;
@@ -229,28 +221,28 @@ void StructGridInterface::neighborIJKAtCellFace( size_t i, size_t j, size_t k, F
 
     switch ( face )
     {
-        case POS_I:
+        case StructGridDefines::POS_I:
             ( *ni )++;
             break;
-        case NEG_I:
+        case StructGridDefines::NEG_I:
             if ( i > 0 )
                 ( *ni )--;
             else
                 ( *ni ) = cvf::UNDEFINED_SIZE_T;
             break;
-        case POS_J:
+        case StructGridDefines::POS_J:
             ( *nj )++;
             break;
-        case NEG_J:
+        case StructGridDefines::NEG_J:
             if ( j > 0 )
                 ( *nj )--;
             else
                 ( *nj ) = cvf::UNDEFINED_SIZE_T;
             break;
-        case POS_K:
+        case StructGridDefines::POS_K:
             ( *nk )++;
             break;
-        case NEG_K:
+        case StructGridDefines::NEG_K:
             if ( k > 0 )
                 ( *nk )--;
             else
@@ -264,21 +256,21 @@ void StructGridInterface::neighborIJKAtCellFace( size_t i, size_t j, size_t k, F
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-StructGridInterface::GridAxisType StructGridInterface::gridAxisFromFace( FaceType face )
+StructGridDefines::GridAxisType StructGridInterface::gridAxisFromFace( StructGridDefines::FaceType face )
 {
-    GridAxisType axis = GridAxisType::NO_AXIS;
+    StructGridDefines::GridAxisType axis = StructGridDefines::GridAxisType::NO_AXIS;
 
-    if ( face == cvf::StructGridInterface::POS_I || face == cvf::StructGridInterface::NEG_I )
+    if ( face == cvf::StructGridDefines::POS_I || face == cvf::StructGridDefines::NEG_I )
     {
-        axis = GridAxisType::AXIS_I;
+        axis = StructGridDefines::GridAxisType::AXIS_I;
     }
-    else if ( face == cvf::StructGridInterface::POS_J || face == cvf::StructGridInterface::NEG_J )
+    else if ( face == cvf::StructGridDefines::POS_J || face == cvf::StructGridDefines::NEG_J )
     {
-        axis = GridAxisType::AXIS_J;
+        axis = StructGridDefines::GridAxisType::AXIS_J;
     }
-    else if ( face == cvf::StructGridInterface::POS_K || face == cvf::StructGridInterface::NEG_K )
+    else if ( face == cvf::StructGridDefines::POS_K || face == cvf::StructGridDefines::NEG_K )
     {
-        axis = GridAxisType::AXIS_K;
+        axis = StructGridDefines::GridAxisType::AXIS_K;
     }
 
     return axis;
@@ -340,22 +332,22 @@ void StructGridInterface::computeCharacteristicCellSize( const std::vector<size_
     if ( globalCellIndices.empty() ) return;
 
     ubyte faceConnPosI[4];
-    cellFaceVertexIndices( StructGridInterface::POS_I, faceConnPosI );
+    cellFaceVertexIndices( StructGridDefines::POS_I, faceConnPosI );
 
     ubyte faceConnNegI[4];
-    cellFaceVertexIndices( StructGridInterface::NEG_I, faceConnNegI );
+    cellFaceVertexIndices( StructGridDefines::NEG_I, faceConnNegI );
 
     ubyte faceConnPosJ[4];
-    cellFaceVertexIndices( StructGridInterface::POS_J, faceConnPosJ );
+    cellFaceVertexIndices( StructGridDefines::POS_J, faceConnPosJ );
 
     ubyte faceConnNegJ[4];
-    cellFaceVertexIndices( StructGridInterface::NEG_J, faceConnNegJ );
+    cellFaceVertexIndices( StructGridDefines::NEG_J, faceConnNegJ );
 
     ubyte faceConnPosK[4];
-    cellFaceVertexIndices( StructGridInterface::POS_K, faceConnPosK );
+    cellFaceVertexIndices( StructGridDefines::POS_K, faceConnPosK );
 
     ubyte faceConnNegK[4];
-    cellFaceVertexIndices( StructGridInterface::NEG_K, faceConnNegK );
+    cellFaceVertexIndices( StructGridDefines::NEG_K, faceConnNegK );
 
     double    tolerance         = 0.2;
     int       iterationIndex    = 0;

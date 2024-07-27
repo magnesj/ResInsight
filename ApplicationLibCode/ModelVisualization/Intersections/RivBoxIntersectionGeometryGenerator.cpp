@@ -129,7 +129,7 @@ const cvf::Vec3fArray* RivBoxIntersectionGeometryGenerator::triangleVxes() const
 class Box
 {
 public:
-    using FaceType = cvf::StructGridInterface::FaceType;
+    using FaceType = cvf::StructGridDefines::FaceType;
 
     Box( const cvf::Mat4d& origin, const cvf::Vec3d& size )
         : m_origin( origin )

@@ -73,12 +73,12 @@ void RigNNCData::buildPolygonsForEclipseConnections()
 
         std::vector<size_t>                connectionPolygon;
         std::vector<cvf::Vec3d>            connectionIntersections;
-        cvf::StructGridInterface::FaceType connectionFace = cvf::StructGridInterface::NO_FACE;
+        cvf::StructGridDefines::FaceType connectionFace = cvf::StructGridDefines::NO_FACE;
 
         connectionFace =
             RigCellFaceGeometryTools::calculateCellFaceOverlap( c1, c2, *m_mainGrid, &connectionPolygon, &connectionIntersections );
 
-        if ( connectionFace != cvf::StructGridInterface::NO_FACE )
+        if ( connectionFace != cvf::StructGridDefines::NO_FACE )
         {
             m_connections[cnIdx].setFace( connectionFace );
             m_connections[cnIdx].setPolygon(

@@ -113,7 +113,7 @@ void RivCellEdgeGeometryUtils::addCellEdgeResultsToDrawableGeo( size_t          
 
         size_t cellIndex = quadToCellFaceMapper->cellIndex( quadIdx );
         {
-            cvf::StructGridInterface::FaceType cellFace    = quadToCellFaceMapper->cellFace( quadIdx );
+            cvf::StructGridDefines::FaceType cellFace    = quadToCellFaceMapper->cellFace( quadIdx );
             double                             scalarValue = cellCenterDataAccessObject->cellFaceScalar( cellIndex, cellFace );
 
             {
@@ -157,7 +157,7 @@ void RivCellEdgeGeometryUtils::addCellEdgeResultsToDrawableGeo( size_t          
             float edgeColor = -1.0f; // Undefined texture coord. Shader handles this.
 
             double scalarValue =
-                cellEdgeResultAccessor->cellFaceScalar( cellIndex, static_cast<cvf::StructGridInterface::FaceType>( cubeFaceIdx ) );
+                cellEdgeResultAccessor->cellFaceScalar( cellIndex, static_cast<cvf::StructGridDefines::FaceType>( cubeFaceIdx ) );
 
             if ( !hideScalarValue( scalarValue, ignoredScalarValue, 1e-2 ) )
             {
@@ -264,7 +264,7 @@ void RivCellEdgeGeometryUtils::addTernaryCellEdgeResultsToDrawableGeo( size_t   
             float edgeColor = -1.0f; // Undefined texture coord. Shader handles this.
 
             double scalarValue =
-                cellEdgeResultAccessor->cellFaceScalar( cellIndex, static_cast<cvf::StructGridInterface::FaceType>( cubeFaceIdx ) );
+                cellEdgeResultAccessor->cellFaceScalar( cellIndex, static_cast<cvf::StructGridDefines::FaceType>( cubeFaceIdx ) );
 
             if ( !hideScalarValue( scalarValue, ignoredScalarValue, 1e-2 ) )
             {
@@ -325,7 +325,7 @@ cvf::ref<RigResultAccessor> RivCellEdgeGeometryUtils::createCellEdgeResultAccess
                                                                                                porosityModel,
                                                                                                adjustedTimeStep,
                                                                                                resultAddresses[cubeFaceIdx] );
-        cellEdgeResultAccessor->setDataAccessObjectForFace( static_cast<cvf::StructGridInterface::FaceType>( cubeFaceIdx ), daObj.p() );
+        cellEdgeResultAccessor->setDataAccessObjectForFace( static_cast<cvf::StructGridDefines::FaceType>( cubeFaceIdx ), daObj.p() );
     }
 
     return cellEdgeResultAccessor;

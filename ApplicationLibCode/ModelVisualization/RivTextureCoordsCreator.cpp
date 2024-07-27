@@ -108,7 +108,7 @@ void RivTextureCoordsCreator::createTextureCoords( cvf::Vec2fArray*             
 #pragma omp parallel for
     for ( int i = 0; i < static_cast<int>( quadMapper->quadCount() ); i++ )
     {
-        cvf::StructGridInterface::FaceType faceId  = quadMapper->cellFace( i );
+        cvf::StructGridDefines::FaceType faceId  = quadMapper->cellFace( i );
         size_t                             cellIdx = quadMapper->cellIndex( i );
 
         double     resultValue = resultAccessor->cellFaceScalar( cellIdx, faceId );

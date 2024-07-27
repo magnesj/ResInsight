@@ -145,7 +145,7 @@ public:
                                       size_t                             gridLocalCellIndex,
                                       size_t                             nncIndex,
                                       cvf::Color3f                       color,
-                                      cvf::StructGridInterface::FaceType face,
+                                      cvf::StructGridDefines::FaceType face,
                                       const cvf::Vec3d&                  localIntersectionPointInDisplay );
 
     ~RiuEclipseSelectionItem() override{};
@@ -160,7 +160,7 @@ public:
     size_t                                      m_gridLocalCellIndex;
     size_t                                      m_nncIndex;
     cvf::Color3f                                m_color;
-    cvf::StructGridInterface::FaceType          m_face;
+    cvf::StructGridDefines::FaceType          m_face;
     cvf::Vec3d                                  m_localIntersectionPointInDisplay;
 };
 

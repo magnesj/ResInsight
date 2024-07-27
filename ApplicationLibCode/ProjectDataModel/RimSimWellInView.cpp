@@ -238,7 +238,7 @@ void RimSimWellInView::wellHeadTopBottomPosition( int frameIndex, cvf::Vec3d* to
 
     // Match this position with pipe start position in RivWellPipesPartMgr::calculateWellPipeCenterline()
 
-    ( *bottom ) = whCell.faceCenter( cvf::StructGridInterface::NEG_K );
+    ( *bottom ) = whCell.faceCenter( cvf::StructGridDefines::NEG_K );
 
     // Compute well head based on the z position of the top of the K column the well head is part of
     ( *top ) = ( *bottom );
@@ -260,7 +260,7 @@ void RimSimWellInView::wellHeadTopBottomPosition( int frameIndex, cvf::Vec3d* to
         }
 
         const RigCell& topActiveCell = rigReservoir->mainGrid()->cell( topActiveCellIndex );
-        cvf::Vec3d     topCellPos    = topActiveCell.faceCenter( cvf::StructGridInterface::NEG_K );
+        cvf::Vec3d     topCellPos    = topActiveCell.faceCenter( cvf::StructGridDefines::NEG_K );
 
         // Modify position if top active cell is closer to sea than well head
         if ( kIndexWellHeadCell > k )

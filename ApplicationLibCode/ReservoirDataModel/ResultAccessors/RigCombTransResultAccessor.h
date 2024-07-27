@@ -36,12 +36,12 @@ public:
     void setTransResultAccessors( RigResultAccessor* xTransAccessor, RigResultAccessor* yTransAccessor, RigResultAccessor* zTransAccessor );
 
     double cellScalar( size_t gridLocalCellIndex ) const override;
-    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
     double cellScalarGlobIdx( size_t globCellIndex ) const override;
-    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
 
 private:
-    double neighborCellTran( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId, const RigResultAccessor* transAccessor ) const;
+    double neighborCellTran( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId, const RigResultAccessor* transAccessor ) const;
 
     cvf::ref<RigResultAccessor> m_xTransAccessor;
     cvf::ref<RigResultAccessor> m_yTransAccessor;

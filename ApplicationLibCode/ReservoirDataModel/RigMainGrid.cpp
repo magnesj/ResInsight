@@ -557,12 +557,12 @@ void RigMainGrid::addUnNamedFaultFaces( int                               gcIdx,
     bool               firstNO_FAULTFaceForCell = true;
     bool               isCellActive             = true;
 
-    char upperLimitForFaceType = cvf::StructGridInterface::FaceType::POS_K;
+    char upperLimitForFaceType = cvf::StructGridDefines::FaceType::POS_K;
 
     // Compare only I and J faces
     for ( char faceIdx = 0; faceIdx < upperLimitForFaceType; ++faceIdx )
     {
-        cvf::StructGridInterface::FaceType face = cvf::StructGridInterface::FaceType( faceIdx );
+        cvf::StructGridDefines::FaceType face = cvf::StructGridDefines::FaceType( faceIdx );
 
         // For faces that has no used defined Fault assigned:
 
@@ -655,7 +655,7 @@ void RigMainGrid::distributeNNCsToFaults()
         int                  fIdx1 = RigFaultsPrCellAccumulator::NO_FAULT;
         int                  fIdx2 = RigFaultsPrCellAccumulator::NO_FAULT;
 
-        if ( conn.face() != StructGridInterface::NO_FACE )
+        if ( conn.face() != cvf::StructGridDefines::NO_FACE )
         {
             fIdx1 = m_faultsPrCellAcc->faultIdx( conn.c1GlobIdx(), conn.face() );
             fIdx2 = m_faultsPrCellAcc->faultIdx( conn.c2GlobIdx(), StructGridInterface::oppositeFace( conn.face() ) );
@@ -713,7 +713,7 @@ bool RigMainGrid::isFaceNormalsOutwards() const
 void RigMainGrid::computeFaceNormalsDirection( const std::vector<size_t>& reservoirCellIndices ) const
 {
     auto isValidAndFaceNormalDir =
-        []( const double ijSize, const double kSize, const RigCell& cell, cvf::StructGridInterface::FaceType face ) -> std::pair<bool, bool>
+        []( const double ijSize, const double kSize, const RigCell& cell, cvf::StructGridDefines::FaceType face ) -> std::pair<bool, bool>
     {
         const cvf::Vec3d cellCenter = cell.center();
         const cvf::Vec3d faceCenter = cell.faceCenter( face );
@@ -748,10 +748,10 @@ void RigMainGrid::computeFaceNormalsDirection( const std::vector<size_t>& reserv
             const double cellVolume = cell.volume();
             if ( cellVolume < characteristicVolume * 0.8 ) continue;
 
-            auto [isValid1, direction1] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::NEG_I );
-            auto [isValid2, direction2] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::POS_I );
-            auto [isValid3, direction3] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::NEG_J );
-            auto [isValid4, direction4] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::POS_J );
+            auto [isValid1, direction1] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridDefines::FaceType::NEG_I );
+            auto [isValid2, direction2] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridDefines::FaceType::POS_I );
+            auto [isValid3, direction3] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridDefines::FaceType::NEG_J );
+            auto [isValid4, direction4] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridDefines::FaceType::POS_J );
 
             if ( !isValid1 || !isValid2 || !isValid3 || !isValid4 ) continue;
 
@@ -782,11 +782,11 @@ void RigMainGrid::computeFaceNormalsDirection( const std::vector<size_t>& reserv
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigFault* RigMainGrid::findFaultFromCellIndexAndCellFace( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face ) const
+const RigFault* RigMainGrid::findFaultFromCellIndexAndCellFace( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face ) const
 {
     if ( m_faultsPrCellAcc.isNull() ) return nullptr;
 
-    if ( face == cvf::StructGridInterface::NO_FACE ) return nullptr;
+    if ( face == cvf::StructGridDefines::NO_FACE ) return nullptr;
 
     int faultIdx = m_faultsPrCellAcc->faultIdx( reservoirCellIndex, face );
     if ( faultIdx != RigFaultsPrCellAccumulator::NO_FAULT )

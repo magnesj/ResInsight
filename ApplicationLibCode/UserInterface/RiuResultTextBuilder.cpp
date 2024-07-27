@@ -70,7 +70,7 @@ RiuResultTextBuilder::RiuResultTextBuilder( RimGridView*                settings
 
     m_nncIndex                   = cvf::UNDEFINED_SIZE_T;
     m_intersectionPointInDisplay = cvf::Vec3d::UNDEFINED;
-    m_face                       = cvf::StructGridInterface::NO_FACE;
+    m_face                       = cvf::StructGridDefines::NO_FACE;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,7 +110,7 @@ RiuResultTextBuilder::RiuResultTextBuilder( RimGridView*                settings
 
     m_nncIndex                   = cvf::UNDEFINED_SIZE_T;
     m_intersectionPointInDisplay = cvf::Vec3d::UNDEFINED;
-    m_face                       = cvf::StructGridInterface::NO_FACE;
+    m_face                       = cvf::StructGridDefines::NO_FACE;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ void RiuResultTextBuilder::set2dIntersectionView( Rim2dIntersectionView* interse
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuResultTextBuilder::setFace( cvf::StructGridInterface::FaceType face )
+void RiuResultTextBuilder::setFace( cvf::StructGridDefines::FaceType face )
 {
     m_face = face;
 }
@@ -221,9 +221,9 @@ QString RiuResultTextBuilder::geometrySelectionText( const QString& itemSeparato
                     j++;
                     k++;
 
-                    if ( m_face != cvf::StructGridInterface::NO_FACE )
+                    if ( m_face != cvf::StructGridDefines::NO_FACE )
                     {
-                        cvf::StructGridInterface::FaceEnum faceEnum( m_face );
+                        cvf::StructGridDefines::FaceEnum faceEnum( m_face );
 
                         QString faceText = faceEnum.text();
 
@@ -412,7 +412,7 @@ QString RiuResultTextBuilder::faultResultDetails()
 
             text += QString( "Fault Name: %1\n" ).arg( fault->name() );
 
-            cvf::StructGridInterface::FaceEnum faceHelper( m_face );
+            cvf::StructGridDefines::FaceEnum faceHelper( m_face );
             text += "Fault Face : " + faceHelper.text() + "\n";
 
             if ( m_eclipseView && m_eclipseView->faultResultSettings()->hasValidCustomResult() )
@@ -507,7 +507,7 @@ QString RiuResultTextBuilder::faultResultText()
 
         if ( fault )
         {
-            cvf::StructGridInterface::FaceEnum faceHelper( m_face );
+            cvf::StructGridDefines::FaceEnum faceHelper( m_face );
             if ( m_eclipseView && m_eclipseView->faultResultSettings()->hasValidCustomResult() )
             {
                 text = cellResultText( { m_eclipseView->currentFaultResultColors() } );
@@ -541,7 +541,7 @@ QString RiuResultTextBuilder::nncResultText()
             {
                 const RigConnection& conn = nncData->allConnections()[m_nncIndex];
 
-                cvf::StructGridInterface::FaceEnum face( conn.face() );
+                cvf::StructGridDefines::FaceEnum face( conn.face() );
 
                 if ( m_eclipseView && m_eclipseView->currentFaultResultColors() )
                 {
@@ -697,13 +697,13 @@ void RiuResultTextBuilder::appendTextFromResultColors( RigEclipseCaseData*      
                                                                        RigEclipseResultAddress(
                                                                            RiaResultNames::combinedTransmissibilityResultName() ) );
                 {
-                    double scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_I );
+                    double scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_I );
                     resultInfoText->append( QString( "Tran X : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_J );
+                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_J );
                     resultInfoText->append( QString( "Tran Y : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_K );
+                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_K );
                     resultInfoText->append( QString( "Tran Z : %1\n" ).arg( scalarValue ) );
                 }
 
@@ -718,19 +718,19 @@ void RiuResultTextBuilder::appendTextFromResultColors( RigEclipseCaseData*      
                                                                        0,
                                                                        RigEclipseResultAddress( RiaResultNames::combinedMultResultName() ) );
                 {
-                    double scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_I );
+                    double scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_I );
                     resultInfoText->append( QString( "MULTX : %1\n" ).arg( scalarValue ) );
-                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::NEG_I );
+                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::NEG_I );
                     resultInfoText->append( QString( "MULTX- : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_J );
+                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_J );
                     resultInfoText->append( QString( "MULTY : %1\n" ).arg( scalarValue ) );
-                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::NEG_J );
+                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::NEG_J );
                     resultInfoText->append( QString( "MULTY- : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_K );
+                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_K );
                     resultInfoText->append( QString( "MULTZ : %1\n" ).arg( scalarValue ) );
-                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::NEG_K );
+                    scalarValue = multResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::NEG_K );
                     resultInfoText->append( QString( "MULTZ- : %1\n" ).arg( scalarValue ) );
                 }
 
@@ -745,13 +745,13 @@ void RiuResultTextBuilder::appendTextFromResultColors( RigEclipseCaseData*      
                                                                        0,
                                                                        RigEclipseResultAddress( RiaResultNames::combinedRiTranResultName() ) );
                 {
-                    double scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_I );
+                    double scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_I );
                     resultInfoText->append( QString( "riTran X : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_J );
+                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_J );
                     resultInfoText->append( QString( "riTran Y : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_K );
+                    scalarValue = transResultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_K );
                     resultInfoText->append( QString( "riTran Z : %1\n" ).arg( scalarValue ) );
                 }
 
@@ -766,13 +766,13 @@ void RiuResultTextBuilder::appendTextFromResultColors( RigEclipseCaseData*      
                                                                        0,
                                                                        RigEclipseResultAddress( RiaResultNames::combinedRiMultResultName() ) );
                 {
-                    double scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_I );
+                    double scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_I );
                     resultInfoText->append( QString( "riMult X : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_J );
+                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_J );
                     resultInfoText->append( QString( "riMult Y : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_K );
+                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_K );
                     resultInfoText->append( QString( "riMult Z : %1\n" ).arg( scalarValue ) );
                 }
                 return;
@@ -787,13 +787,13 @@ void RiuResultTextBuilder::appendTextFromResultColors( RigEclipseCaseData*      
                                                                        RigEclipseResultAddress(
                                                                            RiaResultNames::combinedRiAreaNormTranResultName() ) );
                 {
-                    double scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_I );
+                    double scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_I );
                     resultInfoText->append( QString( "riTransByArea X : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_J );
+                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_J );
                     resultInfoText->append( QString( "riTransByArea Y : %1\n" ).arg( scalarValue ) );
 
-                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridInterface::POS_K );
+                    scalarValue = resultAccessor->cellFaceScalar( cellIndex, cvf::StructGridDefines::POS_K );
                     resultInfoText->append( QString( "riTransByArea Z : %1\n" ).arg( scalarValue ) );
                 }
 
@@ -918,7 +918,7 @@ QString RiuResultTextBuilder::nncDetails()
                 text += "-- NNC details --\n";
                 {
                     const RigConnection&               conn = nncData->allConnections()[m_nncIndex];
-                    cvf::StructGridInterface::FaceEnum face( conn.face() );
+                    cvf::StructGridDefines::FaceEnum face( conn.face() );
 
                     // First cell of NNC
                     {
@@ -959,7 +959,7 @@ QString RiuResultTextBuilder::nncDetails()
                             k++;
 
                             QString                            gridName = QString::fromStdString( hostGrid->gridName() );
-                            cvf::StructGridInterface::FaceEnum oppositeFaceEnum( cvf::StructGridInterface::oppositeFace( face ) );
+                            cvf::StructGridDefines::FaceEnum oppositeFaceEnum( cvf::StructGridInterface::oppositeFace( face ) );
                             QString                            faceText = oppositeFaceEnum.text();
 
                             text.append(

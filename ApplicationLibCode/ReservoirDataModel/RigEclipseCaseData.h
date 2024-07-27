@@ -99,7 +99,7 @@ public:
     const cvf::UIntArray*  gridCellToResultWellIndex( size_t gridIndex );
 
     const RigCell& cellFromWellResultCell( const RigWellResultPoint& wellResultCell ) const;
-    bool           findSharedSourceFace( cvf::StructGridInterface::FaceType& sharedSourceFace,
+    bool           findSharedSourceFace( cvf::StructGridDefines::FaceType& sharedSourceFace,
                                          const RigWellResultPoint&           sourceWellCellResult,
                                          const RigWellResultPoint&           otherWellCellResult ) const;
 

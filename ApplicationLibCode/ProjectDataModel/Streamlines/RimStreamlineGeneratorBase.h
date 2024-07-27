@@ -62,10 +62,10 @@ protected:
     RimStreamlineDataAccess*         m_dataAccess;
     std::list<RiaDefines::PhaseType> m_phases;
 
-    const std::list<cvf::StructGridInterface::FaceType> m_allFaces = { cvf::StructGridInterface::FaceType::POS_I,
-                                                                       cvf::StructGridInterface::FaceType::NEG_I,
-                                                                       cvf::StructGridInterface::FaceType::POS_J,
-                                                                       cvf::StructGridInterface::FaceType::NEG_J,
-                                                                       cvf::StructGridInterface::FaceType::POS_K,
-                                                                       cvf::StructGridInterface::FaceType::NEG_K };
+    const std::list<cvf::StructGridDefines::FaceType> m_allFaces = { cvf::StructGridDefines::FaceType::POS_I,
+                                                                       cvf::StructGridDefines::FaceType::NEG_I,
+                                                                       cvf::StructGridDefines::FaceType::POS_J,
+                                                                       cvf::StructGridDefines::FaceType::NEG_J,
+                                                                       cvf::StructGridDefines::FaceType::POS_K,
+                                                                       cvf::StructGridDefines::FaceType::NEG_K };
 };

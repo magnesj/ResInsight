@@ -135,7 +135,7 @@ private:
 
     template <typename T>
     T interpolateGridResultValue( RigFemResultPosEnum resultPosType, const std::vector<T>& gridResultValues, int64_t intersectionIdx ) const;
-    size_t              gridResultIndexFace( size_t elementIdx, cvf::StructGridInterface::FaceType cellFace, int faceLocalNodeIdx ) const;
+    size_t              gridResultIndexFace( size_t elementIdx, cvf::StructGridDefines::FaceType cellFace, int faceLocalNodeIdx ) const;
     void                calculateIntersection();
     std::vector<size_t> findCloseCells( const cvf::BoundingBox& bb );
     cvf::Vec3d          calculateLengthInCell( size_t cellIndex, const cvf::Vec3d& startPoint, const cvf::Vec3d& endPoint ) const override;

@@ -132,7 +132,7 @@ RiuViewerCommands::RiuViewerCommands( RiuViewer* ownerViewer )
     : QObject( ownerViewer )
     , m_currentGridIdx( -1 )
     , m_currentCellIndex( -1 )
-    , m_currentFaceIndex( cvf::StructGridInterface::NO_FACE )
+    , m_currentFaceIndex( cvf::StructGridDefines::NO_FACE )
     , m_currentPickPositionInDomainCoords( cvf::Vec3d::UNDEFINED )
     , m_isCurrentPickInComparisonView( false )
     , m_viewer( ownerViewer )
@@ -304,7 +304,7 @@ void RiuViewerCommands::displayContextMenu( QMouseEvent* event )
                                       &m_currentCellIndex,
                                       &m_currentGridIdx );
 
-                m_currentFaceIndex = cvf::StructGridInterface::NO_FACE;
+                m_currentFaceIndex = cvf::StructGridDefines::NO_FACE;
 
                 RiuSelectionItem* selItem = new RiuGeneralSelectionItem( surfIntersectSourceInfo->intersection() );
                 Riu3dSelectionManager::instance()->setSelectedItem( selItem, Riu3dSelectionManager::RUI_TEMPORARY );
@@ -323,7 +323,7 @@ void RiuViewerCommands::displayContextMenu( QMouseEvent* event )
                                       &m_currentCellIndex,
                                       &m_currentGridIdx );
 
-                m_currentFaceIndex = cvf::StructGridInterface::NO_FACE;
+                m_currentFaceIndex = cvf::StructGridDefines::NO_FACE;
 
                 RiuSelectionItem* selItem = new RiuGeneralSelectionItem( crossSectionSourceInfo->intersection() );
                 Riu3dSelectionManager::instance()->setSelectedItem( selItem, Riu3dSelectionManager::RUI_TEMPORARY );
@@ -348,7 +348,7 @@ void RiuViewerCommands::displayContextMenu( QMouseEvent* event )
                                       &m_currentCellIndex,
                                       &m_currentGridIdx );
 
-                m_currentFaceIndex = cvf::StructGridInterface::NO_FACE;
+                m_currentFaceIndex = cvf::StructGridDefines::NO_FACE;
 
                 RiuSelectionItem* selItem = new RiuGeneralSelectionItem( intersectionBoxSourceInfo->intersectionBox() );
                 Riu3dSelectionManager::instance()->setSelectedItem( selItem, Riu3dSelectionManager::RUI_TEMPORARY );

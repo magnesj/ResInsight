@@ -257,20 +257,20 @@ bool RigCaseCellResultCalculator::computeDivideByCellFaceArea( RigMainGrid*     
 
     size_t maxGridCount = mainGrid->gridCount();
 
-    cvf::StructGridInterface::FaceType cellFace   = cvf::StructGridInterface::NO_FACE;
+    cvf::StructGridDefines::FaceType cellFace   = cvf::StructGridDefines::NO_FACE;
     QString                            resultName = address.resultName();
     if ( resultName.contains( "I+" ) )
-        cellFace = cvf::StructGridInterface::POS_I;
+        cellFace = cvf::StructGridDefines::POS_I;
     else if ( resultName.contains( "J+" ) )
-        cellFace = cvf::StructGridInterface::POS_J;
+        cellFace = cvf::StructGridDefines::POS_J;
     else if ( resultName.contains( "K+" ) )
-        cellFace = cvf::StructGridInterface::POS_K;
+        cellFace = cvf::StructGridDefines::POS_K;
     else if ( resultName.contains( "TRANX" ) )
-        cellFace = cvf::StructGridInterface::POS_I;
+        cellFace = cvf::StructGridDefines::POS_I;
     else if ( resultName.contains( "TRANY" ) )
-        cellFace = cvf::StructGridInterface::POS_J;
+        cellFace = cvf::StructGridDefines::POS_J;
     else if ( resultName.contains( "TRANZ" ) )
-        cellFace = cvf::StructGridInterface::POS_K;
+        cellFace = cvf::StructGridDefines::POS_K;
 
     for ( size_t gridIdx = 0; gridIdx < maxGridCount; ++gridIdx )
     {

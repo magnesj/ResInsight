@@ -59,12 +59,12 @@ bool RimStreamlineDataAccess::setupDataAccess( RigMainGrid* grid, RigEclipseCase
         m_dataAccess[phase] = std::vector<cvf::ref<RigResultAccessor>>();
 
         // Note: NEG_? accessors are set to POS_? accessors, but will be referring the neighbor cell when used
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_I, phase, timeIdx ) );
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_I, phase, timeIdx ) );
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_J, phase, timeIdx ) );
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_J, phase, timeIdx ) );
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_K, phase, timeIdx ) );
-        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridInterface::FaceType::POS_K, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_I, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_I, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_J, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_J, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_K, phase, timeIdx ) );
+        m_dataAccess[phase].push_back( getDataAccessor( cvf::StructGridDefines::FaceType::POS_K, phase, timeIdx ) );
     }
 
     for ( auto& pair : m_dataAccess )
@@ -82,7 +82,7 @@ bool RimStreamlineDataAccess::setupDataAccess( RigMainGrid* grid, RigEclipseCase
 /// Return a data accessor for the given phase and face and time step
 //--------------------------------------------------------------------------------------------------
 cvf::ref<RigResultAccessor>
-    RimStreamlineDataAccess::getDataAccessor( cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase, int timeIdx )
+    RimStreamlineDataAccess::getDataAccessor( cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase, int timeIdx )
 {
     RiaDefines::PorosityModelType porModel = RiaDefines::PorosityModelType::MATRIX_MODEL;
 
@@ -103,7 +103,7 @@ cvf::ref<RigResultAccessor>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimStreamlineDataAccess::gridResultNameFromPhase( RiaDefines::PhaseType phase, cvf::StructGridInterface::FaceType faceIdx ) const
+QString RimStreamlineDataAccess::gridResultNameFromPhase( RiaDefines::PhaseType phase, cvf::StructGridDefines::FaceType faceIdx ) const
 {
     QString retval = "";
     switch ( phase )
@@ -124,13 +124,13 @@ QString RimStreamlineDataAccess::gridResultNameFromPhase( RiaDefines::PhaseType 
 
     switch ( faceIdx )
     {
-        case cvf::StructGridInterface::FaceType::POS_I:
+        case cvf::StructGridDefines::FaceType::POS_I:
             retval += "I+";
             break;
-        case cvf::StructGridInterface::FaceType::POS_J:
+        case cvf::StructGridDefines::FaceType::POS_J:
             retval += "J+";
             break;
-        case cvf::StructGridInterface::FaceType::POS_K:
+        case cvf::StructGridDefines::FaceType::POS_K:
             retval += "K+";
             break;
         default:
@@ -144,7 +144,7 @@ QString RimStreamlineDataAccess::gridResultNameFromPhase( RiaDefines::PhaseType 
 //--------------------------------------------------------------------------------------------------
 /// Return the face scalar value for the given cell and NEG_? face, by using the neighbor cell
 //--------------------------------------------------------------------------------------------------
-double RimStreamlineDataAccess::negFaceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const
+double RimStreamlineDataAccess::negFaceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const
 {
     double retval = 0.0;
 
@@ -170,7 +170,7 @@ double RimStreamlineDataAccess::negFaceRate( RigCell cell, cvf::StructGridInterf
 //--------------------------------------------------------------------------------------------------
 /// Return the face scalar value for the given cell and POS_? face
 //--------------------------------------------------------------------------------------------------
-double RimStreamlineDataAccess::posFaceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const
+double RimStreamlineDataAccess::posFaceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const
 {
     std::vector<cvf::ref<RigResultAccessor>> access = m_dataAccess.at( phase );
     double                                   retval = access[faceIdx]->cellScalar( cell.mainGridCellIndex() );
@@ -189,7 +189,7 @@ double RimStreamlineDataAccess::posFaceRate( RigCell cell, cvf::StructGridInterf
 /// Return the face scalar value for the given cell and face
 /// Positive values is flow out of the cell, negative values is flow into the cell
 //--------------------------------------------------------------------------------------------------
-double RimStreamlineDataAccess::faceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const
+double RimStreamlineDataAccess::faceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const
 {
     if ( faceIdx % 2 == 0 ) return posFaceRate( cell, faceIdx, phase );
     return negFaceRate( cell, faceIdx, phase );
@@ -200,7 +200,7 @@ double RimStreamlineDataAccess::faceRate( RigCell cell, cvf::StructGridInterface
 /// Positive values is flow out of the cell, negative values is flow into the cell
 //--------------------------------------------------------------------------------------------------
 double RimStreamlineDataAccess::combinedFaceRate( RigCell                            cell,
-                                                  cvf::StructGridInterface::FaceType faceIdx,
+                                                  cvf::StructGridDefines::FaceType faceIdx,
                                                   std::list<RiaDefines::PhaseType>   phases,
                                                   double                             direction,
                                                   RiaDefines::PhaseType&             outDominantPhase ) const

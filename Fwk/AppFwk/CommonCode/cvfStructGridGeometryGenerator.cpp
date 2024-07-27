@@ -279,9 +279,9 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
 
     std::vector<Vec3f> vertices;
 
-    for ( int enumInt = cvf::StructGridInterface::POS_I; enumInt < cvf::StructGridInterface::NO_FACE; enumInt++ )
+    for ( int enumInt = cvf::StructGridDefines::POS_I; enumInt < cvf::StructGridDefines::NO_FACE; enumInt++ )
     {
-        cvf::StructGridInterface::FaceType face = static_cast<cvf::StructGridInterface::FaceType>( enumInt );
+        cvf::StructGridDefines::FaceType face = static_cast<cvf::StructGridDefines::FaceType>( enumInt );
 
         ubyte faceConn[4];
         grid->cellFaceVertexIndices( face, faceConn );
@@ -354,7 +354,7 @@ void StructGridGeometryGenerator::addFaceVisibilityFilter( const CellFaceVisibil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool StructGridGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const
+bool StructGridGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t k, StructGridDefines::FaceType face ) const
 {
     size_t idx;
     for ( idx = 0; idx < m_cellVisibilityFilters.size(); idx++ )
@@ -395,21 +395,21 @@ void StructGridGeometryGenerator::computeArrays()
                     continue;
                 }
 
-                std::vector<StructGridInterface::FaceType> visibleFaces;
+                std::vector<StructGridDefines::FaceType> visibleFaces;
                 visibleFaces.reserve( 6 );
 
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_I ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_I );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_I ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_I );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_J ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_J );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_J ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_J );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_K ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_K );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_K ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_K );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_I ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_I );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_I ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_I );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_J ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_J );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_J ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_J );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_K ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_K );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_K ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_K );
 
                 if ( !visibleFaces.empty() )
                 {
@@ -419,7 +419,7 @@ void StructGridGeometryGenerator::computeArrays()
                     size_t idx;
                     for ( idx = 0; idx < visibleFaces.size(); idx++ )
                     {
-                        cvf::StructGridInterface::FaceType face = visibleFaces[idx];
+                        cvf::StructGridDefines::FaceType face = visibleFaces[idx];
 
                         ubyte faceConn[4];
                         m_grid->cellFaceVertexIndices( face, faceConn );

@@ -301,7 +301,7 @@ int RigCaseToCaseCellMapperTools::findMatchingPOSKFaceIdx( const cvf::Vec3d base
 {
     int        faceNodeCount;
     const int* posKFace =
-        RigFemTypes::localElmNodeIndicesForFace( RigElementType::HEX8, (int)( cvf::StructGridInterface::POS_K ), &faceNodeCount );
+        RigFemTypes::localElmNodeIndicesForFace( RigElementType::HEX8, (int)( cvf::StructGridDefines::POS_K ), &faceNodeCount );
 
     double sign = isBaseCellNormalsOutwards ? 1.0 : -1.0;
 
@@ -474,7 +474,7 @@ for (size_t ij = 0; ij < minIJCount; ++ij )
     if (!isCellNormal(vertices))
         continue;
 
-    const RigFault* fault = masterEclGrid->findFaultFromCellIndexAndCellFace(reservoirCellIdx, cvf::StructGridInterface::POS_I);
+    const RigFault* fault = masterEclGrid->findFaultFromCellIndexAndCellFace(reservoirCellIdx, cvf::StructGridDefines::POS_I);
 
 }
 #endif

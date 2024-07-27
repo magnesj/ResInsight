@@ -109,8 +109,8 @@ public:
     cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const override;
 
     bool isCellValid( size_t i, size_t j, size_t k ) const override;
-    bool cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const override;
-    void cellIJKNeighborUnguarded( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const;
+    bool cellIJKNeighbor( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const override;
+    void cellIJKNeighborUnguarded( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const;
 
 private:
     std::string      m_gridName;
@@ -133,7 +133,7 @@ public:
     {
     }
 
-    bool isFaceVisible( size_t i, size_t j, size_t k, cvf::StructGridInterface::FaceType face, const cvf::UByteArray* cellVisibility ) const override;
+    bool isFaceVisible( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, const cvf::UByteArray* cellVisibility ) const override;
 
 private:
     const RigGridBase* m_grid;

@@ -1043,9 +1043,9 @@ T RigGeoMechWellLogExtractor::interpolateGridResultValue( RigFemResultPosEnum   
         return gridResultValues[elmIdx];
     }
 
-    cvf::StructGridInterface::FaceType cellFace = intersectedCellFaces()[intersectionIdx];
+    cvf::StructGridDefines::FaceType cellFace = intersectedCellFaces()[intersectionIdx];
 
-    if ( cellFace == cvf::StructGridInterface::NO_FACE )
+    if ( cellFace == cvf::StructGridDefines::NO_FACE )
     {
         if ( resultPosType == RIG_ELEMENT_NODAL_FACE )
         {
@@ -1110,9 +1110,9 @@ T RigGeoMechWellLogExtractor::interpolateGridResultValue( RigFemResultPosEnum   
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RigGeoMechWellLogExtractor::gridResultIndexFace( size_t elementIdx, cvf::StructGridInterface::FaceType cellFace, int faceLocalNodeIdx ) const
+size_t RigGeoMechWellLogExtractor::gridResultIndexFace( size_t elementIdx, cvf::StructGridDefines::FaceType cellFace, int faceLocalNodeIdx ) const
 {
-    CVF_ASSERT( cellFace != cvf::StructGridInterface::NO_FACE && faceLocalNodeIdx < 4 );
+    CVF_ASSERT( cellFace != cvf::StructGridDefines::NO_FACE && faceLocalNodeIdx < 4 );
     return elementIdx * 24 + static_cast<int>( cellFace ) * 4 + faceLocalNodeIdx;
 }
 

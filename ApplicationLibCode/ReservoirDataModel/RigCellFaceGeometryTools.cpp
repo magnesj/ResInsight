@@ -32,11 +32,11 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::StructGridInterface::FaceType RigCellFaceGeometryTools::calculateCellFaceOverlap( const RigCell&           c1,
-                                                                                       const RigCell&           c2,
-                                                                                       const RigMainGrid&       mainGrid,
-                                                                                       std::vector<size_t>*     connectionPolygon,
-                                                                                       std::vector<cvf::Vec3d>* connectionIntersections )
+cvf::StructGridDefines::FaceType RigCellFaceGeometryTools::calculateCellFaceOverlap( const RigCell&           c1,
+                                                                                     const RigCell&           c2,
+                                                                                     const RigMainGrid&       mainGrid,
+                                                                                     std::vector<size_t>*     connectionPolygon,
+                                                                                     std::vector<cvf::Vec3d>* connectionIntersections )
 {
     // Try to find the shared face
 
@@ -51,17 +51,17 @@ cvf::StructGridInterface::FaceType RigCellFaceGeometryTools::calculateCellFaceOv
         size_t i2, j2, k2;
         c2.hostGrid()->ijkFromCellIndex( c2.gridLocalCellIndex(), &i2, &j2, &k2 );
 
-        isPossibleNeighborInDirection[cvf::StructGridInterface::POS_I] = ( ( i1 + 1 ) == i2 );
-        isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_I] = ( ( i2 + 1 ) == i1 );
-        isPossibleNeighborInDirection[cvf::StructGridInterface::POS_J] = ( ( j1 + 1 ) == j2 );
-        isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_J] = ( ( j2 + 1 ) == j1 );
-        isPossibleNeighborInDirection[cvf::StructGridInterface::POS_K] = ( ( k1 + 1 ) == k2 );
-        isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_K] = ( ( k2 + 1 ) == k1 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::POS_I] = ( ( i1 + 1 ) == i2 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_I] = ( ( i2 + 1 ) == i1 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::POS_J] = ( ( j1 + 1 ) == j2 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_J] = ( ( j2 + 1 ) == j1 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::POS_K] = ( ( k1 + 1 ) == k2 );
+        isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_K] = ( ( k2 + 1 ) == k1 );
 
         hasNeighbourInAnyDirection =
-            isPossibleNeighborInDirection[cvf::StructGridInterface::POS_I] + isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_I] +
-            isPossibleNeighborInDirection[cvf::StructGridInterface::POS_J] + isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_J] +
-            isPossibleNeighborInDirection[cvf::StructGridInterface::POS_K] + isPossibleNeighborInDirection[cvf::StructGridInterface::NEG_K];
+            isPossibleNeighborInDirection[cvf::StructGridDefines::POS_I] + isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_I] +
+            isPossibleNeighborInDirection[cvf::StructGridDefines::POS_J] + isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_J] +
+            isPossibleNeighborInDirection[cvf::StructGridDefines::POS_K] + isPossibleNeighborInDirection[cvf::StructGridDefines::NEG_K];
 
         // If cell 2 is not adjancent with respect to any of the six ijk directions,
         // assume that we have no overlapping area.
@@ -69,12 +69,12 @@ cvf::StructGridInterface::FaceType RigCellFaceGeometryTools::calculateCellFaceOv
         if ( !hasNeighbourInAnyDirection )
         {
             // Add to search map
-            // m_cellIdxToFaceToConnectionIdxMap[m_connections[cnIdx].m_c1GlobIdx][cvf::StructGridInterface::NO_FACE].push_back(cnIdx);
-            // m_cellIdxToFaceToConnectionIdxMap[m_connections[cnIdx].m_c2GlobIdx][cvf::StructGridInterface::NO_FACE].push_back(cnIdx);
+            // m_cellIdxToFaceToConnectionIdxMap[m_connections[cnIdx].m_c1GlobIdx][cvf::StructGridDefines::NO_FACE].push_back(cnIdx);
+            // m_cellIdxToFaceToConnectionIdxMap[m_connections[cnIdx].m_c2GlobIdx][cvf::StructGridDefines::NO_FACE].push_back(cnIdx);
 
             // cvf::Trace::show("NNC: No direct neighbors : C1: " + cvf::String((int)m_connections[cnIdx].m_c1GlobIdx) +
             // " C2: " + cvf::String((int)m_connections[cnIdx].m_c2GlobIdx));
-            return cvf::StructGridInterface::NO_FACE;
+            return cvf::StructGridDefines::NO_FACE;
         }
     }
 
@@ -91,8 +91,8 @@ cvf::StructGridInterface::FaceType RigCellFaceGeometryTools::calculateCellFaceOv
         std::vector<cvf::Vec3d> intersections;
         std::array<size_t, 4>   face1;
         std::array<size_t, 4>   face2;
-        c1.faceIndices( ( cvf::StructGridInterface::FaceType )( fIdx ), &face1 );
-        c2.faceIndices( cvf::StructGridInterface::oppositeFace( ( cvf::StructGridInterface::FaceType )( fIdx ) ), &face2 );
+        c1.faceIndices( ( cvf::StructGridDefines::FaceType )( fIdx ), &face1 );
+        c2.faceIndices( cvf::StructGridInterface::oppositeFace( ( cvf::StructGridDefines::FaceType )( fIdx ) ), &face2 );
 
         bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
                                                                                    &intersections,
@@ -106,11 +106,11 @@ cvf::StructGridInterface::FaceType RigCellFaceGeometryTools::calculateCellFaceOv
         {
             if ( connectionPolygon ) ( *connectionPolygon ) = polygon;
             if ( connectionIntersections ) ( *connectionIntersections ) = intersections;
-            return ( cvf::StructGridInterface::FaceType )( fIdx );
+            return ( cvf::StructGridDefines::FaceType )( fIdx );
         }
     }
 
-    return cvf::StructGridInterface::NO_FACE;
+    return cvf::StructGridDefines::NO_FACE;
 }
 
 void assignThreadConnections( RigConnectionContainer& allConnections, RigConnectionContainer& threadConnections )
@@ -217,8 +217,8 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
                                                           const std::set<std::pair<unsigned, unsigned>>& nativeCellPairs,
                                                           RigConnectionContainer&                        connections )
 {
-    size_t                             sourceReservoirCellIndex = face.m_nativeReservoirCellIndex;
-    cvf::StructGridInterface::FaceType sourceCellFace           = face.m_nativeFace;
+    size_t                           sourceReservoirCellIndex = face.m_nativeReservoirCellIndex;
+    cvf::StructGridDefines::FaceType sourceCellFace           = face.m_nativeFace;
 
     if ( sourceReservoirCellIndex >= mainGrid->cellCount() )
     {
@@ -238,7 +238,7 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
 
     std::vector<size_t> closeCells = mainGrid->findIntersectingCells( bb );
 
-    cvf::StructGridInterface::FaceType candidateFace = cvf::StructGridInterface::oppositeFace( sourceCellFace );
+    cvf::StructGridDefines::FaceType candidateFace = cvf::StructGridInterface::oppositeFace( sourceCellFace );
 
     size_t neighborCellIndex = std::numeric_limits<size_t>::max();
     size_t ni                = std::numeric_limits<size_t>::max();
@@ -289,21 +289,21 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
             mainGrid->ijkFromCellIndexUnguarded( candidateCellIndex, &ci, &cj, &ck );
 
             auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( sourceCellFace );
-            if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_I )
+            if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I )
             {
                 if ( ni != ci )
                 {
                     continue;
                 }
             }
-            else if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_J )
+            else if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_J )
             {
                 if ( nj != cj )
                 {
                     continue;
                 }
             }
-            else if ( gridAxis == cvf::StructGridInterface::GridAxisType::AXIS_K )
+            else if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_K )
             {
                 if ( nk != ck )
                 {

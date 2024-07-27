@@ -1012,14 +1012,14 @@ std::vector<WellPathCellIntersectionInfo>
         extraIntersection.endPoint              = firstIntersection.startPoint;
         extraIntersection.startMD               = initialMD;
         extraIntersection.endMD                 = firstIntersection.startMD;
-        extraIntersection.intersectedCellFaceIn = cvf::StructGridInterface::NO_FACE;
+        extraIntersection.intersectedCellFaceIn = cvf::StructGridDefines::NO_FACE;
 
-        if ( firstIntersection.intersectedCellFaceIn != cvf::StructGridInterface::NO_FACE )
+        if ( firstIntersection.intersectedCellFaceIn != cvf::StructGridDefines::NO_FACE )
 
         {
             extraIntersection.intersectedCellFaceOut = cvf::StructGridInterface::oppositeFace( firstIntersection.intersectedCellFaceIn );
         }
-        else if ( firstIntersection.intersectedCellFaceOut != cvf::StructGridInterface::NO_FACE )
+        else if ( firstIntersection.intersectedCellFaceOut != cvf::StructGridDefines::NO_FACE )
         {
             extraIntersection.intersectedCellFaceOut = firstIntersection.intersectedCellFaceOut;
         }
@@ -1056,7 +1056,7 @@ std::vector<WellPathCellIntersectionInfo>
             extraIntersection.endPoint               = intersection.endPoint;
             extraIntersection.startMD                = initialMD;
             extraIntersection.endMD                  = intersection.endMD;
-            extraIntersection.intersectedCellFaceIn  = cvf::StructGridInterface::NO_FACE;
+            extraIntersection.intersectedCellFaceIn  = cvf::StructGridDefines::NO_FACE;
             extraIntersection.intersectedCellFaceOut = intersection.intersectedCellFaceOut;
 
             const RigMainGrid* grid = eclipseCase->mainGrid();

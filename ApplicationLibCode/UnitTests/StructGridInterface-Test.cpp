@@ -30,8 +30,8 @@ TEST( StructGridInterfaceTest, TestEdgeVertices )
     {
         // Baseline
 
-        StructGridInterface::FaceType face1 = StructGridInterface::NEG_K;
-        StructGridInterface::FaceType face2 = StructGridInterface::POS_I;
+        StructGridDefines::FaceType face1 = StructGridDefines::NEG_K;
+        StructGridDefines::FaceType face2 = StructGridDefines::POS_I;
 
         auto indices = StructGridInterface::edgeVertexIndices( face1, face2 );
         EXPECT_EQ( indices.first, 2 );
@@ -41,8 +41,8 @@ TEST( StructGridInterfaceTest, TestEdgeVertices )
     {
         // Opposite order as baseline test
 
-        StructGridInterface::FaceType face1 = StructGridInterface::POS_I;
-        StructGridInterface::FaceType face2 = StructGridInterface::NEG_K;
+        StructGridDefines::FaceType face1 = StructGridDefines::POS_I;
+        StructGridDefines::FaceType face2 = StructGridDefines::NEG_K;
 
         auto indices = StructGridInterface::edgeVertexIndices( face1, face2 );
         EXPECT_EQ( indices.first, 2 );

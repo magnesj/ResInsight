@@ -96,7 +96,7 @@ public:
                               const cvf::Vec3d&       p1 )
     {
 #define isFace( faceEnum ) ( 0 <= faceEnum && faceEnum <= 5 )
-        using FaceType = cvf::StructGridInterface::FaceType;
+        using FaceType = cvf::StructGridDefines::FaceType;
 
         if ( isFace( cellFaceForEachClippedTriangleEdge[triVxIdx] ) )
         {

@@ -40,7 +40,7 @@ class RigMainGrid;
 class RigCellFaceGeometryTools
 {
 public:
-    static cvf::StructGridInterface::FaceType calculateCellFaceOverlap( const RigCell&           c1,
+    static cvf::StructGridDefines::FaceType calculateCellFaceOverlap( const RigCell&           c1,
                                                                         const RigCell&           c2,
                                                                         const RigMainGrid&       mainGrid,
                                                                         std::vector<size_t>*     connectionPolygon,

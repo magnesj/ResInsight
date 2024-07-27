@@ -38,7 +38,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t findNeighborReservoirCellIndex( const RigMainGrid* mainGrid, cvf::StructGridInterface::FaceType face, size_t globalReservoirCellIndex )
+size_t findNeighborReservoirCellIndex( const RigMainGrid* mainGrid, cvf::StructGridDefines::FaceType face, size_t globalReservoirCellIndex )
 {
     size_t neighborGlobalReservoirCellIndex = cvf::UNDEFINED_SIZE_T;
 
@@ -71,7 +71,7 @@ size_t findNeighborReservoirCellIndex( const RigMainGrid* mainGrid, cvf::StructG
 void RimFractureContainmentTools::appendNeighborCellForFace( const std::set<size_t>&            allFracturedCells,
                                                              const RigMainGrid*                 mainGrid,
                                                              size_t                             currentCell,
-                                                             cvf::StructGridInterface::FaceType face,
+                                                             cvf::StructGridDefines::FaceType face,
                                                              std::set<size_t>&                  connectedCells,
                                                              double                             minimumFaultThrow )
 {
@@ -85,7 +85,7 @@ void RimFractureContainmentTools::appendNeighborCellForFace( const std::set<size
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t globalReservoirCellIndex, cvf::StructGridInterface::FaceType face )
+double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t globalReservoirCellIndex, cvf::StructGridDefines::FaceType face )
 {
     cvf::Vec3d hexCorners[8];
     mainGrid->cellCornerVertices( globalReservoirCellIndex, hexCorners );
@@ -117,7 +117,7 @@ double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t global
 void RimFractureContainmentTools::checkFaultAndAppendNeighborCell( const std::set<size_t>&            allFracturedCells,
                                                                    const RigMainGrid*                 mainGrid,
                                                                    size_t                             globalReservoirCellIndex,
-                                                                   cvf::StructGridInterface::FaceType face,
+                                                                   cvf::StructGridDefines::FaceType face,
                                                                    std::set<size_t>&                  connectedCells,
                                                                    double                             minimumFaultThrow )
 {
@@ -178,14 +178,14 @@ void RimFractureContainmentTools::appendNeighborCells( const std::set<size_t>& a
     connectedCells.insert( currentCell );
 
     // Check faults in IJ directions
-    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::NEG_I, connectedCells, minimumFaultThrow );
-    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::POS_I, connectedCells, minimumFaultThrow );
-    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::NEG_J, connectedCells, minimumFaultThrow );
-    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::POS_J, connectedCells, minimumFaultThrow );
+    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::NEG_I, connectedCells, minimumFaultThrow );
+    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::POS_I, connectedCells, minimumFaultThrow );
+    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::NEG_J, connectedCells, minimumFaultThrow );
+    checkFaultAndAppendNeighborCell( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::POS_J, connectedCells, minimumFaultThrow );
 
     // Append cells without fault check in K direction
-    appendNeighborCellForFace( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::NEG_K, connectedCells, minimumFaultThrow );
-    appendNeighborCellForFace( allFracturedCells, mainGrid, currentCell, cvf::StructGridInterface::POS_K, connectedCells, minimumFaultThrow );
+    appendNeighborCellForFace( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::NEG_K, connectedCells, minimumFaultThrow );
+    appendNeighborCellForFace( allFracturedCells, mainGrid, currentCell, cvf::StructGridDefines::POS_K, connectedCells, minimumFaultThrow );
 }
 
 //--------------------------------------------------------------------------------------------------

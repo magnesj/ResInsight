@@ -126,7 +126,7 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
 
     size_t                             gridIndex          = cvf::UNDEFINED_SIZE_T;
     size_t                             gridLocalCellIndex = cvf::UNDEFINED_SIZE_T;
-    cvf::StructGridInterface::FaceType face               = cvf::StructGridInterface::NO_FACE;
+    cvf::StructGridDefines::FaceType face               = cvf::StructGridDefines::NO_FACE;
     int                                gmFace             = -1;
     bool                               intersectionHit    = false;
     std::array<cvf::Vec3f, 3>          intersectionTriangleHit;
@@ -337,7 +337,7 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                         gridLocalCellIndex = c2LocalIdx;
                         gridIndex = c2GridIdx; 
                         
-                        if (face == cvf::StructGridInterface::NO_FACE)
+                        if (face == cvf::StructGridDefines::NO_FACE)
                         {
                             face = nncConn.face();
                         }
@@ -350,7 +350,7 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                     {
                         gridLocalCellIndex = c1LocalIdx;
                         gridIndex = c1GridIdx;
-                        if (face == cvf::StructGridInterface::NO_FACE)
+                        if (face == cvf::StructGridDefines::NO_FACE)
                         {
                             face = cvf::StructGridInterface::oppositeFace(nncConn.face());
                         }

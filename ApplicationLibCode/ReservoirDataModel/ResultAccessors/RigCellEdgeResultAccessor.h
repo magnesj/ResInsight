@@ -31,13 +31,13 @@ class RigCellEdgeResultAccessor : public RigResultAccessor
 public:
     RigCellEdgeResultAccessor();
 
-    void setDataAccessObjectForFace( cvf::StructGridInterface::FaceType faceId, RigResultAccessor* resultAccessObject );
+    void setDataAccessObjectForFace( cvf::StructGridDefines::FaceType faceId, RigResultAccessor* resultAccessObject );
 
     double cellScalar( size_t gridLocalCellIndex ) const override;
-    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
 
     double cellScalarGlobIdx( size_t globCellIndex ) const override;
-    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
 
 private:
     std::array<cvf::ref<RigResultAccessor>, 6> m_resultAccessObjects;

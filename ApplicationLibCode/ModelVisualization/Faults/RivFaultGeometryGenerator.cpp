@@ -126,11 +126,11 @@ cvf::ref<cvf::DrawableGeo> RivFaultGeometryGenerator::createOutlineMeshDrawable(
 ///
 //--------------------------------------------------------------------------------------------------
 bool RivFaultGeometryGenerator::hasConnection( size_t                             cellIdx,
-                                               cvf::StructGridInterface::FaceType face,
+                                               cvf::StructGridDefines::FaceType face,
                                                const RigConnectionContainer&      conns,
                                                const std::vector<size_t>&         nncConnectionIndices )
 {
-    cvf::StructGridInterface::FaceType oppositeFace = cvf::StructGridInterface::oppositeFace( face );
+    cvf::StructGridDefines::FaceType oppositeFace = cvf::StructGridInterface::oppositeFace( face );
 
     for ( auto i : nncConnectionIndices )
     {
@@ -172,7 +172,7 @@ void RivFaultGeometryGenerator::computeArrays( bool onlyShowFacesWithDefinedNeig
 
     std::vector<std::vector<cvf::Vec3f>>                         threadVertices( numberOfThreads );
     std::vector<std::vector<size_t>>                             threadCellIndices( numberOfThreads );
-    std::vector<std::vector<cvf::StructGridInterface::FaceType>> threadFaceTypes( numberOfThreads );
+    std::vector<std::vector<cvf::StructGridDefines::FaceType>> threadFaceTypes( numberOfThreads );
 
 #pragma omp parallel
     {
@@ -186,7 +186,7 @@ void RivFaultGeometryGenerator::computeArrays( bool onlyShowFacesWithDefinedNeig
         for ( int fIdx = 0; fIdx < static_cast<int>( faultFaces.size() ); fIdx++ )
         {
             size_t                             cellIndex = faultFaces[fIdx].m_nativeReservoirCellIndex;
-            cvf::StructGridInterface::FaceType face      = faultFaces[fIdx].m_nativeFace;
+            cvf::StructGridDefines::FaceType face      = faultFaces[fIdx].m_nativeFace;
 
             if ( !m_computeNativeFaultFaces )
             {

@@ -244,7 +244,7 @@ void RigSimulationWellCenterLineCalculator::calculateWellPipeCenterlineForTimeSt
     // Match this position with well head position in RivWellHeadPartMgr::buildWellHeadParts()
 
     const RigCell& whCell     = eclipseCaseData->cellFromWellResultCell( wellFrame.wellHeadOrStartCell() );
-    cvf::Vec3d     whStartPos = whCell.faceCenter( cvf::StructGridInterface::NEG_K );
+    cvf::Vec3d     whStartPos = whCell.faceCenter( cvf::StructGridDefines::NEG_K );
 
     RigWellResultPoint        wellHead  = wellFrame.wellHeadOrStartCell();
     const RigWellResultPoint* whResCell = &wellHead;
@@ -363,7 +363,7 @@ void RigSimulationWellCenterLineCalculator::calculateWellPipeCenterlineForTimeSt
 
             // Check if this and the previous cells has shared faces
 
-            cvf::StructGridInterface::FaceType sharedFace;
+            cvf::StructGridDefines::FaceType sharedFace;
             if ( prevWellResPoint && prevWellResPoint->isCell() &&
                  eclipseCaseData->findSharedSourceFace( sharedFace, currentWellResPoint, *prevWellResPoint ) )
             {

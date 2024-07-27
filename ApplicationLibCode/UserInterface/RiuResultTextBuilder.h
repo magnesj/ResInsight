@@ -50,7 +50,7 @@ public:
     RiuResultTextBuilder( RimGridView* settingsView, RimEclipseResultDefinition* eclResDef, size_t gridIndex, size_t cellIndex, size_t timeStepIndex );
     RiuResultTextBuilder( RimGridView* settingsView, RimEclipseResultDefinition* eclResDef, size_t reservoirCellIndex, size_t timeStepIndex );
 
-    void setFace( cvf::StructGridInterface::FaceType face );
+    void setFace( cvf::StructGridDefines::FaceType face );
     void setNncIndex( size_t nncIndex );
     void setIntersectionPointInDisplay( cvf::Vec3d intersectionPointInDisplay );
     void set2dIntersectionView( Rim2dIntersectionView* intersectionView );
@@ -100,7 +100,7 @@ private:
     size_t m_cellIndex;
     size_t m_timeStepIndex;
 
-    cvf::StructGridInterface::FaceType m_face;
+    cvf::StructGridDefines::FaceType m_face;
 
     size_t m_nncIndex;
 

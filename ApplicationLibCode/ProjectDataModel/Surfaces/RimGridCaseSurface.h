@@ -63,8 +63,8 @@ private:
 
     void addGeometryForFaultFaces( const RigMainGrid*                 grid,
                                    size_t                             currentCellIndex,
-                                   cvf::StructGridInterface::FaceType extractionFace,
-                                   cvf::StructGridInterface::FaceType faultFace,
+                                   cvf::StructGridDefines::FaceType extractionFace,
+                                   cvf::StructGridDefines::FaceType faultFace,
                                    cvf::Vec3d*                        currentCornerVerts,
                                    std::vector<cvf::Vec3d>&           vertices,
                                    std::vector<unsigned>&             triangleIndices );
@@ -74,7 +74,7 @@ private:
     void extractStructuredSurfaceFromGridData();
 
     bool findValidCellIndex( const RigMainGrid*                       grid,
-                             const cvf::StructGridInterface::FaceType faceType,
+                             const cvf::StructGridDefines::FaceType faceType,
                              size_t&                                  cellIndex,
                              const size_t                             row,
                              const size_t                             column,

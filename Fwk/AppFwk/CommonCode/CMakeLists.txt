@@ -59,6 +59,8 @@ add_library(
   cvfStructGridScalarDataAccess.h
   cafVecIjk.cpp
   cafVecIjk.h
+  cvfStructGridDefines.cpp
+  cvfStructGridDefines.h
   ${MOC_SOURCE_FILES}
 )
 

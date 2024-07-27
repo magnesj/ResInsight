@@ -179,13 +179,13 @@ void RimGridCaseSurface::extractStructuredSurfaceFromGridData()
 
             size_t zeroBasedLayerIndex = static_cast<size_t>( m_oneBasedSliceIndex ) - 1;
 
-            cvf::StructGridInterface::FaceType faceType = cvf::StructGridInterface::NO_FACE;
+            cvf::StructGridDefines::FaceType faceType = cvf::StructGridDefines::NO_FACE;
             {
                 auto sliceDirection = RiaDefines::GridCaseAxis::AXIS_K;
 
                 if ( sliceDirection == RiaDefines::GridCaseAxis::AXIS_K )
                 {
-                    faceType = cvf::StructGridInterface::NEG_K;
+                    faceType = cvf::StructGridDefines::NEG_K;
 
                     minK      = zeroBasedLayerIndex;
                     maxK      = zeroBasedLayerIndex;
@@ -194,7 +194,7 @@ void RimGridCaseSurface::extractStructuredSurfaceFromGridData()
                 }
                 else if ( sliceDirection == RiaDefines::GridCaseAxis::AXIS_J )
                 {
-                    faceType  = cvf::StructGridInterface::NEG_J;
+                    faceType  = cvf::StructGridDefines::NEG_J;
                     minJ      = zeroBasedLayerIndex;
                     maxJ      = zeroBasedLayerIndex;
                     maxRow    = maxK;
@@ -202,7 +202,7 @@ void RimGridCaseSurface::extractStructuredSurfaceFromGridData()
                 }
                 else if ( sliceDirection == RiaDefines::GridCaseAxis::AXIS_I )
                 {
-                    faceType  = cvf::StructGridInterface::NEG_I;
+                    faceType  = cvf::StructGridDefines::NEG_I;
                     minI      = zeroBasedLayerIndex;
                     maxI      = zeroBasedLayerIndex;
                     maxRow    = maxK;
@@ -222,15 +222,15 @@ void RimGridCaseSurface::extractStructuredSurfaceFromGridData()
                     {
                         switch ( faceType )
                         {
-                            case cvf::StructGridInterface::NEG_I:
+                            case cvf::StructGridDefines::NEG_I:
                                 row    = k;
                                 column = j;
                                 break;
-                            case cvf::StructGridInterface::NEG_J:
+                            case cvf::StructGridDefines::NEG_J:
                                 row    = k;
                                 column = i;
                                 break;
-                            case cvf::StructGridInterface::NEG_K:
+                            case cvf::StructGridDefines::NEG_K:
                                 row    = j;
                                 column = i;
                                 break;
@@ -297,7 +297,7 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
 
         size_t zeroBasedLayerIndex = static_cast<size_t>( m_oneBasedSliceIndex ) - 1;
 
-        cvf::StructGridInterface::FaceType extractionFace = cvf::StructGridInterface::NEG_K;
+        cvf::StructGridDefines::FaceType extractionFace = cvf::StructGridDefines::NEG_K;
 
         std::vector<unsigned>   triangleIndices;
         std::vector<cvf::Vec3d> vertices;
@@ -345,7 +345,7 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
                     addGeometryForFaultFaces( grid,
                                               currentCellIndex,
                                               extractionFace,
-                                              cvf::StructGridInterface::POS_I,
+                                              cvf::StructGridDefines::POS_I,
                                               currentCornerVerts,
                                               vertices,
                                               triangleIndices );
@@ -353,7 +353,7 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
                     addGeometryForFaultFaces( grid,
                                               currentCellIndex,
                                               extractionFace,
-                                              cvf::StructGridInterface::POS_J,
+                                              cvf::StructGridDefines::POS_J,
                                               currentCornerVerts,
                                               vertices,
                                               triangleIndices );
@@ -371,8 +371,8 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
 //--------------------------------------------------------------------------------------------------
 void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*                 grid,
                                                    size_t                             currentCellIndex,
-                                                   cvf::StructGridInterface::FaceType extractionFace,
-                                                   cvf::StructGridInterface::FaceType faultFace,
+                                                   cvf::StructGridDefines::FaceType extractionFace,
+                                                   cvf::StructGridDefines::FaceType faultFace,
                                                    cvf::Vec3d*                        currentCornerVerts,
                                                    std::vector<cvf::Vec3d>&           vertices,
                                                    std::vector<unsigned>&             triangleIndices )
@@ -414,7 +414,7 @@ void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*           
 ///
 //--------------------------------------------------------------------------------------------------
 bool RimGridCaseSurface::findValidCellIndex( const RigMainGrid*                       grid,
-                                             const cvf::StructGridInterface::FaceType faceType,
+                                             const cvf::StructGridDefines::FaceType faceType,
                                              size_t&                                  cellIndex,
                                              const size_t                             row,
                                              const size_t                             column,
@@ -423,19 +423,19 @@ bool RimGridCaseSurface::findValidCellIndex( const RigMainGrid*                 
 {
     auto getCellFromRowColumnLayer = [grid, faceType]( size_t row, size_t column, size_t layer ) -> size_t
     {
-        if ( faceType == cvf::StructGridInterface::NEG_I ) return grid->cellIndexFromIJK( layer, column, row );
-        if ( faceType == cvf::StructGridInterface::NEG_J ) return grid->cellIndexFromIJK( column, layer, row );
+        if ( faceType == cvf::StructGridDefines::NEG_I ) return grid->cellIndexFromIJK( layer, column, row );
+        if ( faceType == cvf::StructGridDefines::NEG_J ) return grid->cellIndexFromIJK( column, layer, row );
         return grid->cellIndexFromIJK( column, row, layer );
     };
 
     auto isCellValid = [grid, faceType]( size_t row, size_t column, size_t layer ) -> bool
     {
-        if ( faceType == cvf::StructGridInterface::NEG_I )
+        if ( faceType == cvf::StructGridDefines::NEG_I )
         {
             return column < grid->cellCountJ() && row < grid->cellCountK() &&
                    !grid->cell( grid->cellIndexFromIJK( layer, column, row ) ).isInvalid();
         }
-        if ( faceType == cvf::StructGridInterface::NEG_J )
+        if ( faceType == cvf::StructGridDefines::NEG_J )
         {
             return column < grid->cellCountI() && row < grid->cellCountK() &&
                    !grid->cell( grid->cellIndexFromIJK( column, layer, row ) ).isInvalid();

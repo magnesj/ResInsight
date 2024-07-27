@@ -89,7 +89,7 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     CAF_PDM_InitFieldNoDefault( &m_startCellIndex, "StartCellIndex", "Start Cell Index" );
     CAF_PDM_InitFieldNoDefault( &m_startCellFace, "StartCellFace", "Start Cell Face" );
     m_startCellIndex = 0;
-    m_startCellFace  = cvf::StructGridInterface::FaceType::NO_FACE;
+    m_startCellFace  = cvf::StructGridDefines::FaceType::NO_FACE;
 
     CAF_PDM_InitField( &m_faultExtendUpwards, "FaultExtendUpwards", 0.0, "Above Reservoir" );
     m_faultExtendUpwards.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -230,7 +230,7 @@ std::pair<bool, std::string> RimFaultReactivationModel::validateModel() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFaultReactivationModel::setFaultInformation( RimFaultInView* fault, size_t cellIndex, cvf::StructGridInterface::FaceType face )
+void RimFaultReactivationModel::setFaultInformation( RimFaultInView* fault, size_t cellIndex, cvf::StructGridDefines::FaceType face )
 {
     m_fault          = fault;
     m_startCellIndex = cellIndex;
@@ -313,7 +313,7 @@ void RimFaultReactivationModel::updateVisualization()
     if ( !view ) return;
 
     if ( m_startCellIndex() == 0 ) return;
-    if ( m_startCellFace() == cvf::StructGridInterface::FaceType::NO_FACE ) return;
+    if ( m_startCellFace() == cvf::StructGridDefines::FaceType::NO_FACE ) return;
     if ( m_targets.size() < 2 ) return;
 
     auto normal = m_targets[1]->targetPointXYZ() - m_targets[0]->targetPointXYZ();
@@ -340,7 +340,7 @@ void RimFaultReactivationModel::updateVisualization()
 
     m_2Dmodel->setPartColors( m_modelPart1Color, m_modelPart2Color );
     m_2Dmodel->setGenerator( generator );
-    m_2Dmodel->updateGeometry( m_startCellIndex, (cvf::StructGridInterface::FaceType)m_startCellFace() );
+    m_2Dmodel->updateGeometry( m_startCellIndex, (cvf::StructGridDefines::FaceType)m_startCellFace() );
     m_2Dmodel->postProcessElementSets( eclipseCase() );
 
     view->scheduleCreateDisplayModelAndRedraw();

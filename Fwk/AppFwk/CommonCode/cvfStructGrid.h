@@ -37,10 +37,12 @@
 #pragma once
 
 #include "cvfObject.h"
+#include "cvfStructGridDefines.h"
 #include "cvfVector3.h"
-#include <cstddef>
 
 #include "cafAppEnum.h"
+
+#include <cstddef>
 
 namespace cvf
 {
@@ -53,27 +55,6 @@ class CellFilterBase;
 class StructGridInterface : public Object
 {
 public:
-    enum FaceType
-    {
-        POS_I,
-        NEG_I,
-        POS_J,
-        NEG_J,
-        POS_K,
-        NEG_K,
-        NO_FACE
-    };
-
-    typedef caf::AppEnum<StructGridInterface::FaceType> FaceEnum;
-
-    enum class GridAxisType
-    {
-        AXIS_I,
-        AXIS_J,
-        AXIS_K,
-        NO_AXIS
-    };
-
 public:
     StructGridInterface();
 
@@ -92,7 +73,8 @@ public:
 
     virtual cvf::Vec3d displayModelOffset() const;
 
-    virtual bool cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const = 0;
+    virtual bool
+        cellIJKNeighbor( size_t i, size_t j, size_t k, StructGridDefines::FaceType face, size_t* neighborCellIndex ) const = 0;
 
     virtual size_t cellIndexFromIJK( size_t i, size_t j, size_t k ) const                      = 0;
     virtual bool   ijkFromCellIndex( size_t cellIndex, size_t* i, size_t* j, size_t* k ) const = 0;
@@ -107,21 +89,21 @@ public:
     virtual cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const   = 0;
 
 public:
-    static void     cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] );
-    static FaceType oppositeFace( FaceType face );
-    static void     neighborIJKAtCellFace( size_t                        i,
-                                           size_t                        j,
-                                           size_t                        k,
-                                           StructGridInterface::FaceType face,
-                                           size_t*                       ni,
-                                           size_t*                       nj,
-                                           size_t*                       nk );
+    static void cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] );
+    static StructGridDefines::FaceType oppositeFace( StructGridDefines::FaceType face );
+    static void                        neighborIJKAtCellFace( size_t                      i,
+                                                              size_t                      j,
+                                                              size_t                      k,
+                                                              StructGridDefines::FaceType face,
+                                                              size_t*                     ni,
+                                                              size_t*                     nj,
+                                                              size_t*                     nk );
 
-    static GridAxisType gridAxisFromFace( FaceType face );
+    static StructGridDefines::GridAxisType gridAxisFromFace( StructGridDefines::FaceType face );
 
-    static std::pair<ubyte, ubyte> edgeVertexIndices( cvf::StructGridInterface::FaceType face1,
-                                                      cvf::StructGridInterface::FaceType face2 );
-    static std::vector<FaceType>   validFaceTypes();
+    static std::pair<ubyte, ubyte>                  edgeVertexIndices( cvf::StructGridDefines::FaceType face1,
+                                                                       cvf::StructGridDefines::FaceType face2 );
+    static std::vector<StructGridDefines::FaceType> validFaceTypes();
 
 private:
     mutable double m_characteristicCellSizeI;

@@ -164,7 +164,7 @@ RiuEclipseSelectionItem::RiuEclipseSelectionItem( RimGridView*                  
                                                   size_t                             gridLocalCellIndex,
                                                   size_t                             nncIndex,
                                                   cvf::Color3f                       color,
-                                                  cvf::StructGridInterface::FaceType face,
+                                                  cvf::StructGridDefines::FaceType face,
                                                   const cvf::Vec3d&                  localIntersectionPointInDisplay )
     : m_view( view )
     , m_resultDefinition( resultDefinition )

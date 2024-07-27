@@ -77,7 +77,7 @@ cvf::Vec3d RigCell::center() const
 //--------------------------------------------------------------------------------------------------
 /// Get the coordinates of the 4 corners of the given face
 //--------------------------------------------------------------------------------------------------
-std::array<cvf::Vec3d, 4> RigCell::faceCorners( cvf::StructGridInterface::FaceType face ) const
+std::array<cvf::Vec3d, 4> RigCell::faceCorners( cvf::StructGridDefines::FaceType face ) const
 {
     std::array<cvf::Vec3d, 4> corners;
     cvf::ubyte                faceVertexIndices[4];
@@ -115,7 +115,7 @@ bool RigCell::isLongPyramidCell( double maxHeightFactor, double nodeNearToleranc
     int face;
     for ( face = 0; face < 6; ++face )
     {
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridInterface::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
         int zeroLengthEdgeCount = 0;
 
         const cvf::Vec3d& c0 = nodes[m_cornerIndices[faceVertexIndices[0]]];
@@ -146,26 +146,26 @@ bool RigCell::isLongPyramidCell( double maxHeightFactor, double nodeNearToleranc
             // "face" has the index to the collapsed face. We need the size of the opposite face
             // to compare it with the pyramid "roof" length.
 
-            cvf::StructGridInterface::FaceType oppositeFace = cvf::StructGridInterface::POS_I;
+            cvf::StructGridDefines::FaceType oppositeFace = cvf::StructGridDefines::POS_I;
             switch (face)
             {
-            case cvf::StructGridInterface::POS_I:
-                oppositeFace = cvf::StructGridInterface::NEG_I;
+            case cvf::StructGridDefines::POS_I:
+                oppositeFace = cvf::StructGridDefines::NEG_I;
                 break;
-            case cvf::StructGridInterface::POS_J:
-                oppositeFace = cvf::StructGridInterface::NEG_J;
+            case cvf::StructGridDefines::POS_J:
+                oppositeFace = cvf::StructGridDefines::NEG_J;
                 break;
-            case cvf::StructGridInterface::POS_K:
-                oppositeFace = cvf::StructGridInterface::NEG_K;
+            case cvf::StructGridDefines::POS_K:
+                oppositeFace = cvf::StructGridDefines::NEG_K;
                 break;
-            case cvf::StructGridInterface::NEG_I:
-                oppositeFace = cvf::StructGridInterface::POS_I;
+            case cvf::StructGridDefines::NEG_I:
+                oppositeFace = cvf::StructGridDefines::POS_I;
                 break;
-            case cvf::StructGridInterface::NEG_J:
-                oppositeFace = cvf::StructGridInterface::POS_J;
+            case cvf::StructGridDefines::NEG_J:
+                oppositeFace = cvf::StructGridDefines::POS_J;
                 break;
-            case cvf::StructGridInterface::NEG_K:
-                oppositeFace = cvf::StructGridInterface::POS_K;
+            case cvf::StructGridDefines::NEG_K:
+                oppositeFace = cvf::StructGridDefines::POS_K;
                 break;
             default:
                 CVF_ASSERT(false);
@@ -248,9 +248,9 @@ bool RigCell::isCollapsedCell( double nodeNearTolerance ) const
     int face;
     for ( face = 0; face < 6; face += 2 )
     {
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridInterface::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
         cvf::StructGridInterface::cellFaceVertexIndices( cvf::StructGridInterface::oppositeFace(
-                                                             static_cast<cvf::StructGridInterface::FaceType>( face ) ),
+                                                             static_cast<cvf::StructGridDefines::FaceType>( face ) ),
                                                          oppFaceVertexIndices );
 
         cvf::Vec3d c0 = nodes[m_cornerIndices[faceVertexIndices[0]]];
@@ -293,7 +293,7 @@ bool RigCell::isCollapsedCell( double nodeNearTolerance ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3d RigCell::faceCenter( cvf::StructGridInterface::FaceType face ) const
+cvf::Vec3d RigCell::faceCenter( cvf::StructGridDefines::FaceType face ) const
 {
     cvf::Vec3d avg( cvf::Vec3d::ZERO );
 
@@ -320,7 +320,7 @@ cvf::Vec3d RigCell::faceCenter( cvf::StructGridInterface::FaceType face ) const
 /// the corresponding plane.
 /// See http://geomalgorithms.com/a01-_area.html
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3d RigCell::faceNormalWithAreaLength( cvf::StructGridInterface::FaceType face ) const
+cvf::Vec3d RigCell::faceNormalWithAreaLength( cvf::StructGridDefines::FaceType face ) const
 {
     cvf::ubyte faceVertexIndices[4];
     cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
@@ -365,9 +365,9 @@ int RigCell::firstIntersectionPoint( const cvf::Ray& ray, cvf::Vec3d* intersecti
 
     for ( face = 0; face < 6; ++face )
     {
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridInterface::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
         cvf::Vec3d intersection;
-        cvf::Vec3d faceCenter = this->faceCenter( static_cast<cvf::StructGridInterface::FaceType>( face ) );
+        cvf::Vec3d faceCenter = this->faceCenter( static_cast<cvf::StructGridDefines::FaceType>( face ) );
 
         for ( size_t i = 0; i < 4; ++i )
         {
@@ -399,7 +399,7 @@ int RigCell::firstIntersectionPoint( const cvf::Ray& ray, cvf::Vec3d* intersecti
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCell::faceIndices( cvf::StructGridInterface::FaceType face, std::array<size_t, 4>* indices ) const
+void RigCell::faceIndices( cvf::StructGridDefines::FaceType face, std::array<size_t, 4>* indices ) const
 {
     cvf::ubyte faceVertexIndices[4];
     cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
@@ -432,7 +432,7 @@ cvf::BoundingBox RigCell::boundingBox() const
 //--------------------------------------------------------------------------------------------------
 /// Return the main grid neighbor cell of the given face
 //--------------------------------------------------------------------------------------------------
-RigCell RigCell::neighborCell( cvf::StructGridInterface::FaceType face ) const
+RigCell RigCell::neighborCell( cvf::StructGridDefines::FaceType face ) const
 {
     size_t i, j, k;
 

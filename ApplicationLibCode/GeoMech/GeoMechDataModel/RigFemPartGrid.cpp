@@ -392,7 +392,7 @@ cvf::Vec3d RigFemPartGrid::maxCoordinate() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigFemPartGrid::cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const
+bool RigFemPartGrid::cellIJKNeighbor( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const
 {
     CVF_ASSERT( false );
     return false;
