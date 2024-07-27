@@ -37,6 +37,7 @@
 #pragma once
 
 #include "cafAppEnum.h"
+#include "cvfBase.h"
 
 namespace cvf
 {
