@@ -35,7 +35,9 @@
 //##################################################################################################
 
 #include "cvfStructGridDefines.h"
+#include "cvfMath.h"
 
+template <>
 void cvf::StructGridDefines::FaceEnum::setUp()
 {
     addItem( cvf::StructGridDefines::POS_I, "POS I", "" );
