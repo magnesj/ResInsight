@@ -46,10 +46,10 @@ namespace cvf
 ///
 //--------------------------------------------------------------------------------------------------
 StructGridInterface::StructGridInterface()
+    : m_characteristicCellSizeI( cvf::UNDEFINED_DOUBLE )
+    , m_characteristicCellSizeJ( cvf::UNDEFINED_DOUBLE )
+    , m_characteristicCellSizeK( cvf::UNDEFINED_DOUBLE )
 {
-    m_characteristicCellSizeI = cvf::UNDEFINED_DOUBLE;
-    m_characteristicCellSizeJ = cvf::UNDEFINED_DOUBLE;
-    m_characteristicCellSizeK = cvf::UNDEFINED_DOUBLE;
 }
 
 //--------------------------------------------------------------------------------------------------

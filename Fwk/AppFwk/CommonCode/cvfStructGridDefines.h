@@ -42,6 +42,8 @@ namespace cvf
 {
 namespace StructGridDefines
 {
+    // This enum should be changed to enum class. This is difficult, as the enum int value is used several places in the
+    // code.
     enum FaceType
     {
         POS_I,
@@ -53,7 +55,7 @@ namespace StructGridDefines
         NO_FACE
     };
 
-    typedef caf::AppEnum<StructGridDefines::FaceType> FaceEnum;
+    typedef caf::AppEnum<FaceType> FaceEnum;
 
     enum class GridAxisType
     {
@@ -63,15 +65,13 @@ namespace StructGridDefines
         NO_AXIS
     };
 
-    void                        cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] );
-    StructGridDefines::FaceType oppositeFace( StructGridDefines::FaceType face );
-    void neighborIJKAtCellFace( size_t i, size_t j, size_t k, StructGridDefines::FaceType face, size_t* ni, size_t* nj, size_t* nk );
+    void     cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] );
+    FaceType oppositeFace( FaceType face );
+    void     neighborIJKAtCellFace( size_t i, size_t j, size_t k, FaceType face, size_t* ni, size_t* nj, size_t* nk );
 
-    StructGridDefines::GridAxisType gridAxisFromFace( StructGridDefines::FaceType face );
-
-    std::pair<ubyte, ubyte>                  edgeVertexIndices( cvf::StructGridDefines::FaceType face1,
-                                                                cvf::StructGridDefines::FaceType face2 );
-    std::vector<StructGridDefines::FaceType> validFaceTypes();
+    GridAxisType            gridAxisFromFace( FaceType face );
+    std::pair<ubyte, ubyte> edgeVertexIndices( FaceType face1, FaceType face2 );
+    std::vector<FaceType>   validFaceTypes();
 
 } //namespace StructGridDefines
 } //namespace cvf

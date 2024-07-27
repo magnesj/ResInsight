@@ -40,8 +40,6 @@
 #include "cvfStructGridDefines.h"
 #include "cvfVector3.h"
 
-#include "cafAppEnum.h"
-
 #include <cstddef>
 
 namespace cvf
