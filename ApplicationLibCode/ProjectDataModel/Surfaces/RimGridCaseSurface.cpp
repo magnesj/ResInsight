@@ -244,7 +244,7 @@ void RimGridCaseSurface::extractStructuredSurfaceFromGridData()
                         grid->cellCornerVertices( cellIndex, cornerVerts );
 
                         cvf::ubyte faceConn[4];
-                        RigMainGrid::cellFaceVertexIndices( faceType, faceConn );
+                        cvf::StructGridDefines::cellFaceVertexIndices( faceType, faceConn );
 
                         structGridVertexIndices.emplace_back( static_cast<cvf::uint>( column + 1 ), static_cast<cvf::uint>( row + 1 ) );
 
@@ -322,7 +322,7 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
                 {
                     cvf::ubyte currentFaceConn[4];
                     grid->cellCornerVertices( currentCellIndex, currentCornerVerts );
-                    RigMainGrid::cellFaceVertexIndices( extractionFace, currentFaceConn );
+                    cvf::StructGridDefines::cellFaceVertexIndices( extractionFace, currentFaceConn );
 
                     auto currentCellStartIndex = static_cast<unsigned>( vertices.size() );
 
@@ -369,13 +369,13 @@ void RimGridCaseSurface::extractGridDataUsingFourVerticesPerCell()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*                 grid,
-                                                   size_t                             currentCellIndex,
+void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*               grid,
+                                                   size_t                           currentCellIndex,
                                                    cvf::StructGridDefines::FaceType extractionFace,
                                                    cvf::StructGridDefines::FaceType faultFace,
-                                                   cvf::Vec3d*                        currentCornerVerts,
-                                                   std::vector<cvf::Vec3d>&           vertices,
-                                                   std::vector<unsigned>&             triangleIndices )
+                                                   cvf::Vec3d*                      currentCornerVerts,
+                                                   std::vector<cvf::Vec3d>&         vertices,
+                                                   std::vector<unsigned>&           triangleIndices )
 {
     if ( grid->findFaultFromCellIndexAndCellFace( currentCellIndex, faultFace ) )
     {
@@ -388,13 +388,13 @@ void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*           
 
             auto startIndex = static_cast<unsigned>( vertices.size() );
             {
-                auto edgeVertexIndices = RigMainGrid::edgeVertexIndices( extractionFace, faultFace );
+                auto edgeVertexIndices = cvf::StructGridDefines::edgeVertexIndices( extractionFace, faultFace );
                 vertices.push_back( currentCornerVerts[edgeVertexIndices.first] );
                 vertices.push_back( currentCornerVerts[edgeVertexIndices.second] );
             }
             {
-                auto oppositeFaultFace = cvf::StructGridInterface::oppositeFace( faultFace );
-                auto edgeVertexIndices = RigMainGrid::edgeVertexIndices( extractionFace, oppositeFaultFace );
+                auto oppositeFaultFace = cvf::StructGridDefines::oppositeFace( faultFace );
+                auto edgeVertexIndices = cvf::StructGridDefines::edgeVertexIndices( extractionFace, oppositeFaultFace );
                 vertices.push_back( nextCellCornerVerts[edgeVertexIndices.first] );
                 vertices.push_back( nextCellCornerVerts[edgeVertexIndices.second] );
             }
@@ -413,13 +413,13 @@ void RimGridCaseSurface::addGeometryForFaultFaces( const RigMainGrid*           
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimGridCaseSurface::findValidCellIndex( const RigMainGrid*                       grid,
+bool RimGridCaseSurface::findValidCellIndex( const RigMainGrid*                     grid,
                                              const cvf::StructGridDefines::FaceType faceType,
-                                             size_t&                                  cellIndex,
-                                             const size_t                             row,
-                                             const size_t                             column,
-                                             const size_t                             layer,
-                                             size_t&                                  cellFaceIndex )
+                                             size_t&                                cellIndex,
+                                             const size_t                           row,
+                                             const size_t                           column,
+                                             const size_t                           layer,
+                                             size_t&                                cellFaceIndex )
 {
     auto getCellFromRowColumnLayer = [grid, faceType]( size_t row, size_t column, size_t layer ) -> size_t
     {

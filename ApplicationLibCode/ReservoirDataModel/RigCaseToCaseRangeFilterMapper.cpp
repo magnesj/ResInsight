@@ -287,7 +287,7 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRange
                                    cvf::UNDEFINED_SIZE_T };
             for ( int faceIdx = 0; faceIdx < 6; ++faceIdx )
             {
-                auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( cvf::StructGridDefines::FaceType( faceIdx ) );
+                auto gridAxis = cvf::StructGridDefines::gridAxisFromFace( cvf::StructGridDefines::FaceType( faceIdx ) );
 
                 int ijOrk = 0;
                 if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I ) ijOrk = 0;
@@ -295,7 +295,7 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRange
                 if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_K ) ijOrk = 2;
 
                 cvf::ubyte surfCorners[4];
-                cvf::StructGridInterface::cellFaceVertexIndices( (cvf::StructGridDefines::FaceType)faceIdx, surfCorners );
+                cvf::StructGridDefines::cellFaceVertexIndices( (cvf::StructGridDefines::FaceType)faceIdx, surfCorners );
                 bool foundAcceptedMatch = false;
                 for ( int cIdx = 0; cIdx < 4; ++cIdx )
                 {

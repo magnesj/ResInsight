@@ -126,7 +126,7 @@ void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t c
         // find next cell and entry face
         cell = cell.neighborCell( faceIdx );
         if ( cell.isInvalid() ) break;
-        faceIdx = cvf::StructGridInterface::oppositeFace( faceIdx );
+        faceIdx = cvf::StructGridDefines::oppositeFace( faceIdx );
 
         // grow from given face center to cell center, exiting if we reach the max length
         if ( !growStreamlineFromTo( streamline, cell.faceCenter( faceIdx ), cell.center(), rate, dominantPhaseOut ) ) break;

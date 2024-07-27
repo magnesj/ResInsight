@@ -1017,7 +1017,7 @@ std::vector<WellPathCellIntersectionInfo>
         if ( firstIntersection.intersectedCellFaceIn != cvf::StructGridDefines::NO_FACE )
 
         {
-            extraIntersection.intersectedCellFaceOut = cvf::StructGridInterface::oppositeFace( firstIntersection.intersectedCellFaceIn );
+            extraIntersection.intersectedCellFaceOut = cvf::StructGridDefines::oppositeFace( firstIntersection.intersectedCellFaceIn );
         }
         else if ( firstIntersection.intersectedCellFaceOut != cvf::StructGridDefines::NO_FACE )
         {

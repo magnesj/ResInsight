@@ -584,7 +584,7 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
 
         if ( refinement != cvf::Vec3st( 1, 1, 1 ) )
         {
-            auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( faultCellAndFace.m_nativeFace );
+            auto gridAxis = cvf::StructGridDefines::gridAxisFromFace( faultCellAndFace.m_nativeFace );
 
             if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I )
             {

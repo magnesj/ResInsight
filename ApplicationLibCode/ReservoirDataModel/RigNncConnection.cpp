@@ -51,7 +51,7 @@ RigConnection::RigConnection( unsigned                           c1GlobIdx,
         if ( c1Face != cvf::StructGridDefines::FaceType::NO_FACE )
         {
             // The face type is related to cell 1, so use opposite face
-            m_c1Face = cvf::StructGridInterface::oppositeFace( c1Face );
+            m_c1Face = cvf::StructGridDefines::oppositeFace( c1Face );
         }
     }
 }
@@ -76,7 +76,7 @@ RigConnection::RigConnection( size_t c1GlobIdx, size_t c2GlobIdx, cvf::StructGri
         if ( c1Face != cvf::StructGridDefines::FaceType::NO_FACE )
         {
             // The face type is related to cell 1, so use opposite face
-            m_c1Face = cvf::StructGridInterface::oppositeFace( c1Face );
+            m_c1Face = cvf::StructGridDefines::oppositeFace( c1Face );
         }
     }
 }

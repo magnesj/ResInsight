@@ -63,5 +63,15 @@ namespace StructGridDefines
         NO_AXIS
     };
 
+    void                        cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] );
+    StructGridDefines::FaceType oppositeFace( StructGridDefines::FaceType face );
+    void neighborIJKAtCellFace( size_t i, size_t j, size_t k, StructGridDefines::FaceType face, size_t* ni, size_t* nj, size_t* nk );
+
+    StructGridDefines::GridAxisType gridAxisFromFace( StructGridDefines::FaceType face );
+
+    std::pair<ubyte, ubyte>                  edgeVertexIndices( cvf::StructGridDefines::FaceType face1,
+                                                                cvf::StructGridDefines::FaceType face2 );
+    std::vector<StructGridDefines::FaceType> validFaceTypes();
+
 } //namespace StructGridDefines
 } //namespace cvf

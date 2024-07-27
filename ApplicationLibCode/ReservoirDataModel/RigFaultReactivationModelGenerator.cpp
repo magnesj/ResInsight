@@ -209,7 +209,7 @@ const std::array<int, 4> RigFaultReactivationModelGenerator::faceIJCornerIndexes
 //--------------------------------------------------------------------------------------------------
 size_t RigFaultReactivationModelGenerator::oppositeStartCellIndex( const std::vector<size_t> cellIndexColumn, FaceType face )
 {
-    auto   oppositeStartFace  = cvf::StructGridInterface::oppositeFace( face );
+    auto   oppositeStartFace  = cvf::StructGridDefines::oppositeFace( face );
     bool   bFoundOppositeCell = false;
     size_t oppositeCellIdx    = 0;
 
@@ -532,7 +532,7 @@ void RigFaultReactivationModelGenerator::generateGeometry( size_t            sta
     {
         if ( cidx != startCellIndex ) cellColumnBackSearch.push_back( cidx );
     }
-    auto   oppositeStartFace    = cvf::StructGridInterface::oppositeFace( startFace );
+    auto   oppositeStartFace    = cvf::StructGridDefines::oppositeFace( startFace );
     size_t oppositeStartCellIdx = oppositeStartCellIndex( cellColumnBackSearch, startFace );
 
     // build cell column of cells in front of fault, opposite to the cell column behind the fault

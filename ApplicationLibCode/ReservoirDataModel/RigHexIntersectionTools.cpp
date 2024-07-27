@@ -41,7 +41,7 @@ int RigHexIntersectionTools::lineHexCellIntersection( const cvf::Vec3d          
     for ( int face = 0; face < 6; ++face )
     {
         cvf::ubyte faceVertexIndices[4];
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridDefines::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
 
         cvf::Vec3d intersection;
         bool       isEntering = false;
@@ -87,7 +87,7 @@ bool RigHexIntersectionTools::lineIntersectsHexCell( const cvf::Vec3d p1, const 
     for ( int face = 0; face < 6; ++face )
     {
         cvf::ubyte faceVertexIndices[4];
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridDefines::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
 
         cvf::Vec3d intersection;
         bool       isEntering = false;
@@ -128,7 +128,7 @@ bool RigHexIntersectionTools::isPointInCell( const cvf::Vec3d point, const cvf::
     for ( int face = 0; face < 6; ++face )
     {
         cvf::ubyte faceVertexIndices[4];
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridDefines::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
         cvf::Vec3d faceCenter = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],
                                                                        hexCorners[faceVertexIndices[2]],
@@ -161,7 +161,7 @@ bool RigHexIntersectionTools::planeHexCellIntersection( cvf::Vec3d*             
 
     for ( int face = 0; face < 6; ++face )
     {
-        cvf::StructGridInterface::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
+        cvf::StructGridDefines::cellFaceVertexIndices( static_cast<cvf::StructGridDefines::FaceType>( face ), faceVertexIndices );
 
         cvf::Vec3d faceCenter = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],

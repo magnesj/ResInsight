@@ -33,7 +33,7 @@ TEST( StructGridInterfaceTest, TestEdgeVertices )
         StructGridDefines::FaceType face1 = StructGridDefines::NEG_K;
         StructGridDefines::FaceType face2 = StructGridDefines::POS_I;
 
-        auto indices = StructGridInterface::edgeVertexIndices( face1, face2 );
+        auto indices = cvf::StructGridDefines::edgeVertexIndices( face1, face2 );
         EXPECT_EQ( indices.first, 2 );
         EXPECT_EQ( indices.second, 1 );
     }
@@ -44,7 +44,7 @@ TEST( StructGridInterfaceTest, TestEdgeVertices )
         StructGridDefines::FaceType face1 = StructGridDefines::POS_I;
         StructGridDefines::FaceType face2 = StructGridDefines::NEG_K;
 
-        auto indices = StructGridInterface::edgeVertexIndices( face1, face2 );
+        auto indices = cvf::StructGridDefines::edgeVertexIndices( face1, face2 );
         EXPECT_EQ( indices.first, 2 );
         EXPECT_EQ( indices.second, 1 );
     }

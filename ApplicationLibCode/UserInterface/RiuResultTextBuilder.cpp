@@ -959,7 +959,7 @@ QString RiuResultTextBuilder::nncDetails()
                             k++;
 
                             QString                            gridName = QString::fromStdString( hostGrid->gridName() );
-                            cvf::StructGridDefines::FaceEnum oppositeFaceEnum( cvf::StructGridInterface::oppositeFace( face ) );
+                            cvf::StructGridDefines::FaceEnum oppositeFaceEnum( cvf::StructGridDefines::oppositeFace( face ) );
                             QString                            faceText = oppositeFaceEnum.text();
 
                             text.append(

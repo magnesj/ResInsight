@@ -284,7 +284,7 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
         cvf::StructGridDefines::FaceType face = static_cast<cvf::StructGridDefines::FaceType>( enumInt );
 
         ubyte faceConn[4];
-        grid->cellFaceVertexIndices( face, faceConn );
+        cvf::StructGridDefines::cellFaceVertexIndices( face, faceConn );
 
         int n;
         for ( n = 0; n < 4; n++ )
@@ -422,7 +422,7 @@ void StructGridGeometryGenerator::computeArrays()
                         cvf::StructGridDefines::FaceType face = visibleFaces[idx];
 
                         ubyte faceConn[4];
-                        m_grid->cellFaceVertexIndices( face, faceConn );
+                        cvf::StructGridDefines::cellFaceVertexIndices( face, faceConn );
 
 // Critical section to avoid two threads accessing the arrays at the same time.
 #pragma omp critical( critical_section_StructGridGeometryGenerator_computeArrays )

@@ -92,7 +92,7 @@ cvf::StructGridDefines::FaceType RigCellFaceGeometryTools::calculateCellFaceOver
         std::array<size_t, 4>   face1;
         std::array<size_t, 4>   face2;
         c1.faceIndices( ( cvf::StructGridDefines::FaceType )( fIdx ), &face1 );
-        c2.faceIndices( cvf::StructGridInterface::oppositeFace( ( cvf::StructGridDefines::FaceType )( fIdx ) ), &face2 );
+        c2.faceIndices( cvf::StructGridDefines::oppositeFace( ( cvf::StructGridDefines::FaceType )( fIdx ) ), &face2 );
 
         bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
                                                                                    &intersections,
@@ -238,7 +238,7 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
 
     std::vector<size_t> closeCells = mainGrid->findIntersectingCells( bb );
 
-    cvf::StructGridDefines::FaceType candidateFace = cvf::StructGridInterface::oppositeFace( sourceCellFace );
+    cvf::StructGridDefines::FaceType candidateFace = cvf::StructGridDefines::oppositeFace( sourceCellFace );
 
     size_t neighborCellIndex = std::numeric_limits<size_t>::max();
     size_t ni                = std::numeric_limits<size_t>::max();
@@ -251,7 +251,7 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
         size_t k;
         mainGrid->ijkFromCellIndexUnguarded( sourceReservoirCellIndex, &i, &j, &k );
 
-        RigMainGrid::neighborIJKAtCellFace( i, j, k, sourceCellFace, &ni, &nj, &nk );
+        cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, sourceCellFace, &ni, &nj, &nk );
 
         if ( mainGrid->isCellValid( ni, nj, nk ) )
         {
@@ -288,7 +288,7 @@ void RigCellFaceGeometryTools::extractConnectionsForFace( const RigFault::FaultF
             size_t ck = std::numeric_limits<size_t>::max();
             mainGrid->ijkFromCellIndexUnguarded( candidateCellIndex, &ci, &cj, &ck );
 
-            auto gridAxis = cvf::StructGridInterface::gridAxisFromFace( sourceCellFace );
+            auto gridAxis = cvf::StructGridDefines::gridAxisFromFace( sourceCellFace );
             if ( gridAxis == cvf::StructGridDefines::GridAxisType::AXIS_I )
             {
                 if ( ni != ci )

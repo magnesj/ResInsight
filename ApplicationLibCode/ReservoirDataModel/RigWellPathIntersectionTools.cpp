@@ -211,8 +211,8 @@ std::vector<WellPathCellIntersectionInfo>
             extraIntersection.endPoint                    = next.startPoint;
             extraIntersection.startMD                     = current.endMD;
             extraIntersection.endMD                       = next.startMD;
-            extraIntersection.intersectedCellFaceIn       = cvf::StructGridInterface::oppositeFace( current.intersectedCellFaceOut );
-            extraIntersection.intersectedCellFaceOut      = cvf::StructGridInterface::oppositeFace( next.intersectedCellFaceIn );
+            extraIntersection.intersectedCellFaceIn       = cvf::StructGridDefines::oppositeFace( current.intersectedCellFaceOut );
+            extraIntersection.intersectedCellFaceOut      = cvf::StructGridDefines::oppositeFace( next.intersectedCellFaceIn );
             extraIntersection.intersectionLengthsInCellCS = cvf::Vec3d::ZERO;
 
             intersectionsNoGap.push_back( extraIntersection );

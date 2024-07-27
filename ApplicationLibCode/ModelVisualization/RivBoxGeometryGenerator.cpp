@@ -38,7 +38,7 @@ cvf::ref<cvf::Part> RivBoxGeometryGenerator::createBoxFromVertices( const std::v
         cvf::StructGridDefines::FaceType face = static_cast<cvf::StructGridDefines::FaceType>( enumInt );
 
         cvf::ubyte faceConn[4];
-        cvf::StructGridInterface::cellFaceVertexIndices( face, faceConn );
+        cvf::StructGridDefines::cellFaceVertexIndices( face, faceConn );
 
         for ( int n = 0; n < 4; n++ )
         {

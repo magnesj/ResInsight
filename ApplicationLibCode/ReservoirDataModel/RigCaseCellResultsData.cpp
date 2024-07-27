@@ -1964,7 +1964,7 @@ void calculateConnectionGeometry( const RigCell&                     c1,
     std::array<size_t, 4>   face1;
     std::array<size_t, 4>   face2;
     c1.faceIndices( faceId, &face1 );
-    c2.faceIndices( cvf::StructGridInterface::oppositeFace( faceId ), &face2 );
+    c2.faceIndices( cvf::StructGridDefines::oppositeFace( faceId ), &face2 );
 
     bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
                                                                                &intersections,
@@ -2204,7 +2204,7 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
 
             // Neighbor cell half cell transm
             {
-                cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridInterface::oppositeFace( faceId ) ) - neighborCell.center();
+                cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridDefines::oppositeFace( faceId ) ) - neighborCell.center();
 
                 double perm = permResults[neighborCellPermResIdx];
 
@@ -2373,7 +2373,7 @@ void RigCaseCellResultsData::computeNncCombRiTrans()
 
         // Neighbor cell half cell transm
         {
-            cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridInterface::oppositeFace( faceId ) ) - neighborCell.center();
+            cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridDefines::oppositeFace( faceId ) ) - neighborCell.center();
 
             double perm = ( *permResults )[neighborCellPermResIdx];
 

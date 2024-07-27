@@ -167,7 +167,7 @@ void RigFault::computeFaultFacesFromCellRanges( const RigMainGrid* mainGrid )
                         // size_t reservoirCellIndex = grid->reservoirCellIndex(gridLocalCellIndex);
 
                         size_t ni, nj, nk;
-                        RigMainGrid::neighborIJKAtCellFace( i, j, k, faceEnum, &ni, &nj, &nk );
+                        cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, faceEnum, &ni, &nj, &nk );
                         if ( ni < mainGrid->cellCountI() && nj < mainGrid->cellCountJ() && nk < mainGrid->cellCountK() )
                         {
                             size_t gridLocalCellIndex = mainGrid->cellIndexFromIJK( i, j, k );
@@ -198,7 +198,7 @@ void RigFault::accumulateFaultsPrCell( RigFaultsPrCellAccumulator* faultsPrCellA
         // >= 0)
 
         faultsPrCellAcc->setFaultIdx( ff.m_nativeReservoirCellIndex, ff.m_nativeFace, faultIdx );
-        faultsPrCellAcc->setFaultIdx( ff.m_oppositeReservoirCellIndex, cvf::StructGridInterface::oppositeFace( ff.m_nativeFace ), faultIdx );
+        faultsPrCellAcc->setFaultIdx( ff.m_oppositeReservoirCellIndex, cvf::StructGridDefines::oppositeFace( ff.m_nativeFace ), faultIdx );
     }
 }
 

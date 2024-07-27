@@ -93,12 +93,12 @@ double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t global
     double avgZ = 0.0;
 
     cvf::ubyte faceVertexIndices[4];
-    cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+    cvf::StructGridDefines::cellFaceVertexIndices( face, faceVertexIndices );
 
     for ( const auto& faceIdx : faceVertexIndices )
     {
         // Face indices 0-3 are defined to have deepest Z
-        // See void StructGridInterface::cellFaceVertexIndices(FaceType face, cvf::ubyte vertexIndices[4])
+        // See void StructGridDefines::cellFaceVertexIndices(FaceType face, cvf::ubyte vertexIndices[4])
 
         if ( faceIdx < 4 )
         {
@@ -141,7 +141,7 @@ void RimFractureContainmentTools::checkFaultAndAppendNeighborCell( const std::se
 
             double currentCellAvgZ = computeAverageZForTwoDeepestZ( mainGrid, globalReservoirCellIndex, face );
             double neighborCellAvgZ =
-                computeAverageZForTwoDeepestZ( mainGrid, neighborGlobalReservoirCellIndex, cvf::StructGridInterface::oppositeFace( face ) );
+                computeAverageZForTwoDeepestZ( mainGrid, neighborGlobalReservoirCellIndex, cvf::StructGridDefines::oppositeFace( face ) );
 
             double faultThrow = fabs( currentCellAvgZ - neighborCellAvgZ );
             if ( faultThrow > minimumFaultThrow )

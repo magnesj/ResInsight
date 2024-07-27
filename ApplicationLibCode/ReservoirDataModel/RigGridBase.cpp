@@ -549,7 +549,7 @@ bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                     
     }
 
     size_t ni, nj, nk;
-    cvf::StructGridInterface::neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
+    cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
 
     // If the cell is on the edge of the grid, Interpret as having an invisible neighbour
     if ( ni >= m_grid->cellCountI() || nj >= m_grid->cellCountJ() || nk >= m_grid->cellCountK() )

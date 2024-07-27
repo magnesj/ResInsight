@@ -88,23 +88,6 @@ public:
     virtual size_t     gridPointIndexFromIJK( size_t i, size_t j, size_t k ) const = 0;
     virtual cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const   = 0;
 
-public:
-    static void cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] );
-    static StructGridDefines::FaceType oppositeFace( StructGridDefines::FaceType face );
-    static void                        neighborIJKAtCellFace( size_t                      i,
-                                                              size_t                      j,
-                                                              size_t                      k,
-                                                              StructGridDefines::FaceType face,
-                                                              size_t*                     ni,
-                                                              size_t*                     nj,
-                                                              size_t*                     nk );
-
-    static StructGridDefines::GridAxisType gridAxisFromFace( StructGridDefines::FaceType face );
-
-    static std::pair<ubyte, ubyte>                  edgeVertexIndices( cvf::StructGridDefines::FaceType face1,
-                                                                       cvf::StructGridDefines::FaceType face2 );
-    static std::vector<StructGridDefines::FaceType> validFaceTypes();
-
 private:
     mutable double m_characteristicCellSizeI;
     mutable double m_characteristicCellSizeJ;

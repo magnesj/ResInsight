@@ -207,7 +207,7 @@ public:
     std::array<FaceType, 4> adjacentFaces( FaceType face )
     {
         std::array<FaceType, 4> clipFaces     = { FaceType::NO_FACE, FaceType::NO_FACE, FaceType::NO_FACE, FaceType::NO_FACE };
-        FaceType                oppFace       = cvf::StructGridInterface::oppositeFace( face );
+        FaceType                oppFace       = cvf::StructGridDefines::oppositeFace( face );
         int                     clipFaceCount = 0;
         for ( int faceCand = 0; faceCand < 6; ++faceCand )
         {

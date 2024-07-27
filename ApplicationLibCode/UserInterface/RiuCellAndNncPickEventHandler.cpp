@@ -343,7 +343,7 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                         }
                         else
                         {
-                            face = cvf::StructGridInterface::oppositeFace(face);
+                            face = cvf::StructGridDefines::oppositeFace(face);
                         }
                     }
                     else if (gridLocalCellIndex == c2LocalIdx && gridIndex == c2GridIdx)
@@ -352,11 +352,11 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                         gridIndex = c1GridIdx;
                         if (face == cvf::StructGridDefines::NO_FACE)
                         {
-                            face = cvf::StructGridInterface::oppositeFace(nncConn.face());
+                            face = cvf::StructGridDefines::oppositeFace(nncConn.face());
                         }
                         else
                         {
-                            face = cvf::StructGridInterface::oppositeFace(face);
+                            face = cvf::StructGridDefines::oppositeFace(face);
                         }
                     }
                     else
