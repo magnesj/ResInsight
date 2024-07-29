@@ -29,6 +29,7 @@ set(PROJECT_FILES
     CommonCode_UnitTests.cpp
     gtest/gtest-all.cpp
     cvfStructGrid-Test.cpp
+    cvfStructGridDefines-Test.cpp
 )
 
 if(CEE_USE_QT6)
