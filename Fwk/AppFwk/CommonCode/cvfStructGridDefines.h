@@ -66,6 +66,8 @@ namespace StructGridDefines
         NO_AXIS
     };
 
+    auto createFaceIndicesMap();
+
     void     cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] );
     FaceType oppositeFace( FaceType face );
     void     neighborIJKAtCellFace( size_t i, size_t j, size_t k, FaceType face, size_t* ni, size_t* nj, size_t* nk );
