@@ -24,13 +24,9 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR} # required for gtest-all.cpp
 
 find_package(OpenGL)
 
-
 set(PROJECT_FILES
-    CommonCode_UnitTests.cpp
-    gtest/gtest-all.cpp
-    cvfCellRange-Test.cpp
-    cvfCellRangeFilter-Test.cpp
-    cvfStructGridDefines-Test.cpp
+    CommonCode_UnitTests.cpp gtest/gtest-all.cpp cvfCellRange-Test.cpp
+    cvfCellRangeFilter-Test.cpp cvfStructGridDefines-Test.cpp
 )
 
 if(CEE_USE_QT6)
@@ -54,7 +50,14 @@ if(Qt5Core_FOUND)
 endif()
 
 target_link_libraries(
-  ${PROJECT_NAME} PRIVATE CommonCode cafPdmCore LibCore LibRender ${QT_LIBRARIES} ${OPENGL_LIBRARIES} ${THREAD_LIBRARY}
+  ${PROJECT_NAME}
+  PRIVATE CommonCode
+          cafPdmCore
+          LibCore
+          LibRender
+          ${QT_LIBRARIES}
+          ${OPENGL_LIBRARIES}
+          ${THREAD_LIBRARY}
 )
 
 # Copy Qt Dlls
