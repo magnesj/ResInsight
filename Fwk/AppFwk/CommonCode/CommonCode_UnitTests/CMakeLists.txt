@@ -26,7 +26,7 @@ find_package(OpenGL)
 
 set(PROJECT_FILES
     CommonCode_UnitTests.cpp gtest/gtest-all.cpp cvfCellRange-Test.cpp
-    cvfCellRangeFilter-Test.cpp cvfStructGridDefines-Test.cpp
+    cvfCellRangeFilter-Test.cpp cvfStructGridDefines-Test.cpp cafVecIjk-Test.cpp
 )
 
 if(CEE_USE_QT6)
