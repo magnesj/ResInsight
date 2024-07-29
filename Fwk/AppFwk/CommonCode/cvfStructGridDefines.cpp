@@ -150,31 +150,22 @@ namespace StructGridDefines
         switch ( face )
         {
             case POS_I:
-                ( *ni )++;
+                ++( *ni );
                 break;
             case NEG_I:
-                if ( i > 0 )
-                    ( *ni )--;
-                else
-                    ( *ni ) = cvf::UNDEFINED_SIZE_T;
+                *ni = ( i > 0 ) ? i - 1 : cvf::UNDEFINED_SIZE_T;
                 break;
             case POS_J:
-                ( *nj )++;
+                ++( *nj );
                 break;
             case NEG_J:
-                if ( j > 0 )
-                    ( *nj )--;
-                else
-                    ( *nj ) = cvf::UNDEFINED_SIZE_T;
+                *nj = ( j > 0 ) ? j - 1 : cvf::UNDEFINED_SIZE_T;
                 break;
             case POS_K:
-                ( *nk )++;
+                ++( *nk );
                 break;
             case NEG_K:
-                if ( k > 0 )
-                    ( *nk )--;
-                else
-                    ( *nk ) = cvf::UNDEFINED_SIZE_T;
+                *nk = ( k > 0 ) ? k - 1 : cvf::UNDEFINED_SIZE_T;
                 break;
             default:
                 break;
@@ -215,34 +206,26 @@ namespace StructGridDefines
         // Ensure face1 has the largest enum value
         if ( face2 > face1 ) std::swap( face1, face2 );
 
-        if ( face1 == NEG_K )
-        {
-            if ( face2 == NEG_I ) return { 0, 3 };
-            if ( face2 == POS_I ) return { 2, 1 };
-            if ( face2 == NEG_J ) return { 1, 0 };
-            if ( face2 == POS_J ) return { 3, 2 };
-        }
+        // Define a map for the shared vertex indices between two faces
+        static const std::map<std::pair<FaceType, FaceType>, std::pair<cvf::ubyte, cvf::ubyte>> edgeMap =
+            { { { NEG_K, NEG_I }, { 0, 3 } },
+              { { NEG_K, POS_I }, { 2, 1 } },
+              { { NEG_K, NEG_J }, { 1, 0 } },
+              { { NEG_K, POS_J }, { 3, 2 } },
+              { { POS_K, NEG_I }, { 7, 4 } },
+              { { POS_K, POS_I }, { 5, 6 } },
+              { { POS_K, NEG_J }, { 4, 5 } },
+              { { POS_K, POS_J }, { 6, 7 } },
+              { { NEG_J, NEG_I }, { 4, 0 } },
+              { { NEG_J, POS_I }, { 1, 5 } },
+              { { POS_J, NEG_I }, { 3, 7 } },
+              { { POS_J, POS_I }, { 6, 2 } } };
 
-        if ( face1 == POS_K )
+        auto it = edgeMap.find( { face1, face2 } );
+        if ( it != edgeMap.end() )
         {
-            if ( face2 == NEG_I ) return { 7, 4 };
-            if ( face2 == POS_I ) return { 5, 6 };
-            if ( face2 == NEG_J ) return { 4, 5 };
-            if ( face2 == POS_J ) return { 6, 7 };
+            return it->second;
         }
-
-        if ( face1 == NEG_J )
-        {
-            if ( face2 == NEG_I ) return { 4, 0 };
-            if ( face2 == POS_I ) return { 1, 5 };
-        }
-
-        if ( face1 == POS_J )
-        {
-            if ( face2 == NEG_I ) return { 3, 7 };
-            if ( face2 == POS_I ) return { 6, 2 };
-        }
-
         return {};
     }
 
