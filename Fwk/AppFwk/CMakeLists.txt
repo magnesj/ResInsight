@@ -58,6 +58,7 @@ add_subdirectory(cafProjectDataModel/cafPdmXml/cafPdmXml_UnitTests)
 add_subdirectory(cafProjectDataModel/cafProjectDataModel_UnitTests)
 add_subdirectory(cafUserInterface/cafUserInterface_UnitTests)
 add_subdirectory(cafPdmScripting/cafPdmScripting_UnitTests)
+add_subdirectory(CommonCode/CommonCode_UnitTests)
 
 # Organize sub-projects into folders on Visual Studio Turn on using solution
 # folders
