@@ -28,7 +28,8 @@ find_package(OpenGL)
 set(PROJECT_FILES
     CommonCode_UnitTests.cpp
     gtest/gtest-all.cpp
-    cvfStructGrid-Test.cpp
+    cvfCellRange-Test.cpp
+    cvfCellRangeFilter-Test.cpp
     cvfStructGridDefines-Test.cpp
 )
 

@@ -50,6 +50,8 @@ add_library(
   cvfStructGrid.h
   cvfCellRange.cpp
   cvfCellRange.h
+  cvfCellRangeFilter.cpp
+  cvfCellRangeFilter.h
   cafColorTable.cpp
   cafColorTable.h
   cafContourLines.cpp
