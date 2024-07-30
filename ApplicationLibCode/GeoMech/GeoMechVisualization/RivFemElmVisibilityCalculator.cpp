@@ -35,8 +35,8 @@
 #include "RimViewController.h"
 #include "RimViewLinker.h"
 
-#include "cvfStructGrid.h"
 #include "cvfCellRangeFilter.h"
+#include "cvfStructGrid.h"
 
 #include <cmath>
 
