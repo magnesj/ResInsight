@@ -84,7 +84,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    auto cvf::StructGridDefines::createFaceIndicesMap()
+    auto createFaceIndicesMap()
     {
         std::map<cvf::StructGridDefines::FaceType, std::array<cvf::ubyte, 4>> faultFaceToFaceIdxs;
 
@@ -99,7 +99,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    void cvf::StructGridDefines::cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] )
+    void cellFaceVertexIndices( StructGridDefines::FaceType face, cvf::ubyte vertexIndices[4] )
     {
         static const auto faceIndicesMap = createFaceIndicesMap();
 
@@ -113,7 +113,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    cvf::StructGridDefines::FaceType cvf::StructGridDefines::oppositeFace( StructGridDefines::FaceType face )
+    cvf::StructGridDefines::FaceType oppositeFace( StructGridDefines::FaceType face )
     {
         switch ( face )
         {
@@ -138,7 +138,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    void cvf::StructGridDefines::neighborIJKAtCellFace( size_t                      i,
+    void neighborIJKAtCellFace( size_t                      i,
                                                         size_t                      j,
                                                         size_t                      k,
                                                         StructGridDefines::FaceType face,
@@ -178,7 +178,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    cvf::StructGridDefines::GridAxisType cvf::StructGridDefines::gridAxisFromFace( StructGridDefines::FaceType face )
+    cvf::StructGridDefines::GridAxisType gridAxisFromFace( StructGridDefines::FaceType face )
     {
         GridAxisType axis = GridAxisType::NO_AXIS;
 
@@ -201,7 +201,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    std::pair<cvf::ubyte, cvf::ubyte> cvf::StructGridDefines::edgeVertexIndices( FaceType face1, FaceType face2 )
+    std::pair<cvf::ubyte, cvf::ubyte> edgeVertexIndices( FaceType face1, FaceType face2 )
     {
         // Return the two shared vertex indices between two faces
         // The ordering is identical to the ordering in StructGridDefines::cellFaceVertexIndices
@@ -235,7 +235,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    std::vector<cvf::StructGridDefines::FaceType> cvf::StructGridDefines::validFaceTypes()
+    std::vector<cvf::StructGridDefines::FaceType> validFaceTypes()
     {
         return {
             FaceType::NEG_I,
