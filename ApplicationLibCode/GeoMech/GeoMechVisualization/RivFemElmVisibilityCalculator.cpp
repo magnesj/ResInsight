@@ -36,7 +36,7 @@
 #include "RimViewLinker.h"
 
 #include "cvfStructGrid.h"
-#include "cvfStructGridGeometryGenerator.h"
+#include "cvfCellRangeFilter.h"
 
 #include <cmath>
 
