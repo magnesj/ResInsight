@@ -138,13 +138,7 @@ namespace StructGridDefines
     //--------------------------------------------------------------------------------------------------
     ///
     //--------------------------------------------------------------------------------------------------
-    void neighborIJKAtCellFace( size_t                      i,
-                                                        size_t                      j,
-                                                        size_t                      k,
-                                                        StructGridDefines::FaceType face,
-                                                        size_t*                     ni,
-                                                        size_t*                     nj,
-                                                        size_t*                     nk )
+    void neighborIJKAtCellFace( size_t i, size_t j, size_t k, StructGridDefines::FaceType face, size_t* ni, size_t* nj, size_t* nk )
     {
         *ni = i;
         *nj = j;
