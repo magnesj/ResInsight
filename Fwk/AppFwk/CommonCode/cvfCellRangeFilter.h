@@ -1,7 +1,7 @@
 //##################################################################################################
 //
 //   Custom Visualization Core library
-//   Copyright (C) 2017 Ceetron Solutions AS
+//   Copyright (C) 2011-2013 Ceetron AS
 //
 //   This library may be used under the terms of either the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
@@ -34,48 +34,49 @@
 //
 //##################################################################################################
 
-#include "cafVecIjk.h"
+#pragma once
 
-namespace caf
+#include "cvfVector3.h"
+#include <vector>
+
+namespace cvf
 {
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-VecIjk::VecIjk( size_t i, size_t j, size_t k )
-    : m_values( i, j, k )
+class CellRangeFilter
 {
-}
+public:
+    CellRangeFilter();
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-size_t VecIjk::i() const
-{
-    return m_values[0];
-}
+    void addCellIncludeRange( size_t minI, size_t minJ, size_t minK, size_t maxI, size_t maxJ, size_t maxK, bool applyToSubGridAreas );
+    void addCellInclude( size_t i, size_t j, size_t k, bool applyToSubGridAreas );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-size_t VecIjk::j() const
-{
-    return m_values[1];
-}
+    void addCellExcludeRange( size_t minI, size_t minJ, size_t minK, size_t maxI, size_t maxJ, size_t maxK, bool applyToSubGridAreas );
+    void addCellExclude( size_t i, size_t j, size_t k, bool applyToSubGridAreas );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-size_t VecIjk::k() const
-{
-    return m_values[2];
-}
+    bool isCellVisible( size_t i, size_t j, size_t k, bool isInSubGridArea ) const;
+    bool isCellExcluded( size_t i, size_t j, size_t k, bool isInSubGridArea ) const;
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::string VecIjk::toString() const
-{
-    return std::to_string( i() ) + ", " + std::to_string( j() ) + ", " + std::to_string( k() );
-}
+    bool hasIncludeRanges() const;
 
-}; // namespace caf
+private:
+    class CellRange
+    {
+    public:
+        CellRange();
+        CellRange( size_t minI, size_t minJ, size_t minK, size_t maxI, size_t maxJ, size_t maxK, bool applyToSubGridAreas );
+        bool isInRange( size_t i, size_t j, size_t k, bool isInSubGridArea ) const;
+
+    public:
+        cvf::Vec3st m_min;
+        cvf::Vec3st m_max;
+        bool        m_applyToSubGridAreas;
+    };
+
+private:
+    std::vector<CellRange> m_includeRanges;
+    std::vector<CellRange> m_excludeRanges;
+};
+
+} // namespace cvf

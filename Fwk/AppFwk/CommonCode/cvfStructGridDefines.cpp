@@ -37,6 +37,9 @@
 #include "cvfStructGridDefines.h"
 #include "cvfMath.h"
 
+#include <array>
+#include <map>
+
 template <>
 void cvf::StructGridDefines::FaceEnum::setUp()
 {
