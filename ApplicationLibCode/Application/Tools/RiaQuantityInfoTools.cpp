@@ -102,6 +102,17 @@ namespace internal
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaQuantityInfoTools::initializeSummaryKeywords()
+{
+    QString keywordEclipseFilePath = ":keywords/keyword-description/keywords_eclipse.json";
+    QString keyword6XFilePath      = ":keywords/keyword-description/keywords_6x.json";
+
+    RiaQuantityInfoTools::importKeywords( keywordEclipseFilePath, keyword6XFilePath );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaQuantityInfoTools::importKeywords( const QString& keywordEclipseFilePath, const QString& keyword6XFilePath )
 {
     auto quantityInfos = internal::importFromFile( keywordEclipseFilePath );

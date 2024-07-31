@@ -86,14 +86,7 @@ int main( int argc, char* argv[] )
 
     // Create feature manager before the application object is created
     RiaMainTools::initializeSingletons();
-
-    // Write the keyword data to a file
-    QString keywordEclipseFilePath = ":keywords/keyword-description/keywords_eclipse.json";
-    QString keyword6XFilePath      = ":keywords/keyword-description/keywords_6x.json";
-
-    // RiaQuantityInfoTools::writeEclipseKeywordToFile( "keywords_eclipse.json" );
-    // RiaQuantityInfoTools::write6XKeywordToFile( "keywords_6x.json" );
-    RiaQuantityInfoTools::importKeywords( keywordEclipseFilePath, keyword6XFilePath );
+    RiaQuantityInfoTools::initializeSummaryKeywords();
 
     // https://www.w3.org/wiki/CSS/Properties/color/keywords
     caf::UiAppearanceSettings::instance()->setAutoValueEditorColor( "moccasin" );

@@ -25,6 +25,7 @@
 //==================================================================================================
 namespace RiaQuantityInfoTools
 {
+void initializeSummaryKeywords();
 void importKeywords( const QString& keywordEclipseFilePath, const QString& keyword6XFilePath );
 
 } // namespace RiaQuantityInfoTools

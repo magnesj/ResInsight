@@ -231,13 +231,19 @@ set(QT_MOC_HEADERS
 qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
 qt5_wrap_ui(FORM_FILES_CPP ${QT_UI_FILES})
 
+set(LOCAL_QRC_FILES Application/Resources/ApplicationLibCode.qrc)
+
+# Runs RCC and MOC on specified files
+qt5_add_resources(QRC_FILES_CPP ${LOCAL_QRC_FILES})
+
+
 # ##############################################################################
 # Create source groups - see also included CMakeLists_files.cmake
 # ##############################################################################
 source_group("ModelVisualization" FILES ${MODEL_VISUALIZATION_FILES})
 
 list(APPEND ALL_SOURCE_FILES ${CPP_SOURCES} ${MOC_SOURCE_FILES}
-     ${FORM_FILES_CPP}
+     ${FORM_FILES_CPP} ${QRC_FILES_CPP}
 )
 
 add_library(${PROJECT_NAME} OBJECT ${ALL_SOURCE_FILES})
@@ -411,6 +417,7 @@ set(UNITY_EXCLUDE_FILES
     qrc_cafAnimControl.cpp
     qrc_ResInsight.cpp
     qrc_cafCommandFeatures.cpp
+    qrc_ApplicationLibCode.cpp
     # Exclude files including opm-common
     ProjectDataModel/RimVfpTableExtractor.cpp
     ProjectDataModel/RimVfpPlot.cpp

@@ -314,8 +314,4 @@
         <file>components/images/well.svg</file>
         <file>components/images/well-completion.svg</file>
     </qresource>
-    <qresource prefix="/keywords">
-        <file>keyword-description/keywords_eclipse.json</file>
-        <file>keyword-description/keywords_6x.json</file>
-    </qresource>
 </RCC>
