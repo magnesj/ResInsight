@@ -1127,31 +1127,23 @@ std::unordered_map<std::string, RiuSummaryQuantityNameInfoProvider::RiuSummaryQu
        A::SUMMARY_GROUP, "Group or node minimum pressure as specified with GNETDP in the production network" } } ); info.insert( { "GMXP", {
        A::SUMMARY_GROUP, "Group or node maximum pressure as specified with GNETDP in the production network" } } ); info.insert( { "GPRINC",
        { A::SUMMARY_GROUP, "Group or node pressure increment as specified with GNETDP in the production network" } } ); info.insert( {
-       "GPRDEC", { A::SUMMARY_GROUP, "Group or node pressure decrement as specified with GNETDP in the production network" } } ); info.insert(
-       { "GCPR", { A::SUMMARY_GROUP, "Polymer Production Rate" } } ); info.insert( { "GCPC", { A::SUMMARY_GROUP, "Polymer Production
-       Concentration" } } ); info.insert( { "GCPT", { A::SUMMARY_GROUP, "Polymer Production Total" } } ); info.insert( { "GCIR", {
-       A::SUMMARY_GROUP, "Polymer Injection Rate" } } ); info.insert( { "GCIC", { A::SUMMARY_GROUP, "Polymer Injection Concentration" } } );
-        info.insert( { "GCIT", { A::SUMMARY_GROUP, "Polymer Injection Total" } } );
-        info.insert( { "GSPR", { A::SUMMARY_GROUP, "Salt Production Rate" } } );
-        info.insert( { "GSPT", { A::SUMMARY_GROUP, "Salt Production Total" } } );
-        info.insert( { "GSIR", { A::SUMMARY_GROUP, "Salt Injection Rate" } } );
-        info.insert( { "GSIT", { A::SUMMARY_GROUP, "Salt Injection Total" } } );
-        info.insert( { "GOPRL", { A::SUMMARY_GROUP, "Group Oil Production Rate Target" } } );
-        info.insert( { "GOIRL", { A::SUMMARY_GROUP, "Group Oil Injection Rate Target" } } );
-        info.insert( { "GWPRL", { A::SUMMARY_GROUP, "Group Water Production Rate Target" } } );
-        info.insert( { "GWIRL", { A::SUMMARY_GROUP, "Group Water Injection Rate Target" } } );
-        info.insert( { "GGPRL", { A::SUMMARY_GROUP, "Group Gas Production Rate Target" } } );
-        info.insert( { "GGIRL", { A::SUMMARY_GROUP, "Group Gas Injection Rate Target" } } );
-        info.insert( { "GLPRL", { A::SUMMARY_GROUP, "Group Liquid Production Rate Target" } } );
-        info.insert( { "GVPRL", { A::SUMMARY_GROUP, "Group reservoir Volume Production Rate Target" } } );
-        info.insert( { "GVIRL", { A::SUMMARY_GROUP, "Group reservoir Volume Injection Rate Target" } } );
-        info.insert( { "GNPR", { A::SUMMARY_GROUP, "Solvent Production Rate" } } );
-        info.insert( { "GNPT", { A::SUMMARY_GROUP, "Solvent Production Total" } } );
-        info.insert( { "GNIR", { A::SUMMARY_GROUP, "Solvent Injection Rate" } } );
-        info.insert( { "GNIT", { A::SUMMARY_GROUP, "Solvent Injection Total" } } );
-        info.insert( { "GTPRSUR", { A::SUMMARY_GROUP, "Production Rate" } } );
-        info.insert( { "GTPTSUR", { A::SUMMARY_GROUP, "Production Total" } } );
-        info.insert( { "GTIRSUR", { A::SUMMARY_GROUP, "Injection Rate" } } );
+       "GPRDEC", { A::SUMMARY_GROUP, "Group or node pressure decrement as specified with GNETDP in the production network" } } );
+       info.insert( { "GCPR", { A::SUMMARY_GROUP, "Polymer Production Rate" } } ); info.insert( { "GCPC", { A::SUMMARY_GROUP, "Polymer
+       Production Concentration" } } ); info.insert( { "GCPT", { A::SUMMARY_GROUP, "Polymer Production Total" } } ); info.insert( { "GCIR",
+       { A::SUMMARY_GROUP, "Polymer Injection Rate" } } ); info.insert( { "GCIC", { A::SUMMARY_GROUP, "Polymer Injection Concentration" } }
+       ); info.insert( { "GCIT", { A::SUMMARY_GROUP, "Polymer Injection Total" } } ); info.insert( { "GSPR", { A::SUMMARY_GROUP, "Salt
+       Production Rate" } } ); info.insert( { "GSPT", { A::SUMMARY_GROUP, "Salt Production Total" } } ); info.insert( { "GSIR", {
+       A::SUMMARY_GROUP, "Salt Injection Rate" } } ); info.insert( { "GSIT", { A::SUMMARY_GROUP, "Salt Injection Total" } } ); info.insert(
+       { "GOPRL", { A::SUMMARY_GROUP, "Group Oil Production Rate Target" } } ); info.insert( { "GOIRL", { A::SUMMARY_GROUP, "Group Oil
+       Injection Rate Target" } } ); info.insert( { "GWPRL", { A::SUMMARY_GROUP, "Group Water Production Rate Target" } } ); info.insert( {
+       "GWIRL", { A::SUMMARY_GROUP, "Group Water Injection Rate Target" } } ); info.insert( { "GGPRL", { A::SUMMARY_GROUP, "Group Gas
+       Production Rate Target" } } ); info.insert( { "GGIRL", { A::SUMMARY_GROUP, "Group Gas Injection Rate Target" } } ); info.insert( {
+       "GLPRL", { A::SUMMARY_GROUP, "Group Liquid Production Rate Target" } } ); info.insert( { "GVPRL", { A::SUMMARY_GROUP, "Group
+       reservoir Volume Production Rate Target" } } ); info.insert( { "GVIRL", { A::SUMMARY_GROUP, "Group reservoir Volume Injection Rate
+       Target" } } ); info.insert( { "GNPR", { A::SUMMARY_GROUP, "Solvent Production Rate" } } ); info.insert( { "GNPT", { A::SUMMARY_GROUP,
+       "Solvent Production Total" } } ); info.insert( { "GNIR", { A::SUMMARY_GROUP, "Solvent Injection Rate" } } ); info.insert( { "GNIT", {
+       A::SUMMARY_GROUP, "Solvent Injection Total" } } ); info.insert( { "GTPRSUR", { A::SUMMARY_GROUP, "Production Rate" } } ); info.insert(
+       { "GTPTSUR", { A::SUMMARY_GROUP, "Production Total" } } ); info.insert( { "GTIRSUR", { A::SUMMARY_GROUP, "Injection Rate" } } );
         info.insert( { "GTITSUR", { A::SUMMARY_GROUP, "Injection Total" } } );
         info.insert( { "GTPRALK", { A::SUMMARY_GROUP, "Production Rate" } } );
         info.insert( { "GTPTALK", { A::SUMMARY_GROUP, "Production Total" } } );
@@ -1825,89 +1817,72 @@ std::unordered_map<std::string, RiuSummaryQuantityNameInfoProvider::RiuSummaryQu
        -Y direction" } } ); info.insert( { "BOKRZ", { A::SUMMARY_BLOCK, "Oil relative permeability in the Z direction" } } ); info.insert( {
        "BOKRZ", { A::SUMMARY_BLOCK, "- Oil relative permeability in the -Z direction" } } ); info.insert( { "BWKRX", { A::SUMMARY_BLOCK,
        "Water relative permeability in the X direction" } } ); info.insert( { "BWKRX", { A::SUMMARY_BLOCK, "- Water relative permeability in
-       the -X direction" } } ); info.insert( { "BWKRY", { A::SUMMARY_BLOCK, "Water relative permeability in the Y direction" } } ); info.insert(
-       { "BWKRY", { A::SUMMARY_BLOCK, "- Water relative permeability in the -Y direction" } } ); info.insert( { "BWKRZ", { A::SUMMARY_BLOCK,
-       "Water relative permeability in the Z direction" } } ); info.insert( { "BWKRZ", { A::SUMMARY_BLOCK, "- Water relative permeability in
-       the -Z direction" } } ); info.insert( { "BGKRX", { A::SUMMARY_BLOCK, "Gas relative permeability in the X direction" } } ); info.insert(
-       { "BGKRX", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -X direction" } } ); info.insert( { "BGKRY", { A::SUMMARY_BLOCK,
-       "Gas relative permeability in the Y direction" } } ); info.insert( { "BGKRY", { A::SUMMARY_BLOCK, "- Gas relative permeability in the
-       -Y direction" } } ); info.insert( { "BGKRZ", { A::SUMMARY_BLOCK, "Gas relative permeability in the Z direction" } } ); info.insert( {
-       "BGKRZ", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -Z direction" } } ); info.insert( { "BOKRI", { A::SUMMARY_BLOCK,
-       "Oil relative permeability in the I direction" } } ); info.insert( { "BOKRI", { A::SUMMARY_BLOCK, "- Oil relative permeability in the
-       -I direction" } } ); info.insert( { "BOKRJ", { A::SUMMARY_BLOCK, "Oil relative permeability in the J direction" } } ); info.insert( {
-       "BOKRJ", { A::SUMMARY_BLOCK, "- Oil relative permeability in the -J direction" } } ); info.insert( { "BOKRK", { A::SUMMARY_BLOCK,
-       "Oil relative permeability in the K direction" } } ); info.insert( { "BOKRK", { A::SUMMARY_BLOCK, "- Oil relative permeability in the
-       -K direction" } } ); info.insert( { "BWKRI", { A::SUMMARY_BLOCK, "Water relative permeability in the I direction" } } ); info.insert(
-       { "BWKRI", { A::SUMMARY_BLOCK, "- Water relative permeability in the -I direction" } } ); info.insert( { "BWKRJ", { A::SUMMARY_BLOCK,
-       "Water relative permeability in the J direction" } } ); info.insert( { "BWKRJ", { A::SUMMARY_BLOCK, "- Water relative permeability in
-       the -J direction" } } ); info.insert( { "BWKRK", { A::SUMMARY_BLOCK, "Water relative permeability in the K direction" } } ); info.insert(
-       { "BWKRK", { A::SUMMARY_BLOCK, "- Water relative permeability in the -K direction" } } ); info.insert( { "BGKRI", { A::SUMMARY_BLOCK,
-       "Gas relative permeability in the I direction" } } ); info.insert( { "BGKRI", { A::SUMMARY_BLOCK, "- Gas relative permeability in the
-       -I direction" } } ); info.insert( { "BGKRJ", { A::SUMMARY_BLOCK, "Gas relative permeability in the J direction" } } ); info.insert( {
-       "BGKRJ", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -J direction" } } ); info.insert( { "BGKRK", { A::SUMMARY_BLOCK,
-       "Gas relative permeability in the K direction" } } ); info.insert( { "BGKRK", { A::SUMMARY_BLOCK, "- Gas relative permeability in the
-       -K direction" } } ); info.insert( { "BOKRR", { A::SUMMARY_BLOCK, "Oil relative permeability in the R" } } ); info.insert( { "BOKRR",
-       { A::SUMMARY_BLOCK, "- Oil relative permeability in the -R" } } ); info.insert( { "BOKRT", { A::SUMMARY_BLOCK, "Oil relative
-       permeability in the T" } } ); info.insert( { "BOKRT", { A::SUMMARY_BLOCK, "- Oil relative permeability in the -T" } } ); info.insert(
-       { "BWKRR", { A::SUMMARY_BLOCK, "Water relative permeability in the R" } } ); info.insert( { "BWKRR", { A::SUMMARY_BLOCK, "- Water
-       relative permeability in the -R" } } ); info.insert( { "BWKRT", { A::SUMMARY_BLOCK, "Water relative permeability in the T" } } );
-        info.insert( { "BWKRT", { A::SUMMARY_BLOCK, "- Water relative permeability in the -T" } } );
-        info.insert( { "BGKRR", { A::SUMMARY_BLOCK, "Gas relative permeability in the R" } } );
-        info.insert( { "BGKRR", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -R" } } );
-        info.insert( { "BGKRT", { A::SUMMARY_BLOCK, "Gas relative permeability in the T" } } );
-        info.insert( { "BGKRT", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -T" } } );
-        info.insert( { "BRPV", { A::SUMMARY_BLOCK, "Pore Volume at Reservoir conditions" } } );
-        info.insert( { "BPORV", { A::SUMMARY_BLOCK, "Cell Pore Volumes at Reference conditions" } } );
-        info.insert( { "BOPV", { A::SUMMARY_BLOCK, "Pore Volume containing Oil" } } );
-        info.insert( { "BWPV", { A::SUMMARY_BLOCK, "Pore Volume containing Water" } } );
-        info.insert( { "BGPV", { A::SUMMARY_BLOCK, "Pore Volume containing Gas" } } );
-        info.insert( { "BHPV", { A::SUMMARY_BLOCK, "Pore Volume containing Hydrocarbon" } } );
-        info.insert( { "BRTM", { A::SUMMARY_BLOCK, "Transmissibility Multiplier associated with rock compaction" } } );
-        info.insert( { "BPERMMOD", { A::SUMMARY_BLOCK, "Transmissibility Multiplier associated with rock compaction" } } );
-        info.insert( { "BPERMMDX",
-                       { A::SUMMARY_BLOCK, "Directional Transmissibility Multipliers in the X direction, associated with rock compaction" }
-       } ); info.insert( { "BPERMMDY", { A::SUMMARY_BLOCK, "Directional Transmissibility Multipliers in the Y direction, associated with
-       rock compaction" } } ); info.insert( { "BPERMMDZ", { A::SUMMARY_BLOCK, "Directional Transmissibility Multipliers in the Z direction,
-       associated with rock compaction" } } ); info.insert( { "BPORVMOD", { A::SUMMARY_BLOCK, "Pore Volume Multiplier associated with rock
-       compaction" } } ); info.insert( { "BSIGMMOD", { A::SUMMARY_BLOCK, "Dual Porosity Sigma Multiplier associated with rock compaction" }
-       } ); info.insert( { "BTCNF", { A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert( { "BTCNS", { A::SUMMARY_BLOCK, "Tracer
-       Concentration" } } ); info.insert( { "BTCN", { A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert( { "BTIPT", {
-       A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( { "BTIPF", { A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( {
-       "BTIPS", { A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( { "BAPI", { A::SUMMARY_BLOCK, "Oil API" } } ); info.insert( {
-       "BSCN", { A::SUMMARY_BLOCK, "Salt Cell Concentration" } } ); info.insert( { "BSIP", { A::SUMMARY_BLOCK, "Salt In Place" } } );
-        info.insert( { "BEWV_SAL", { A::SUMMARY_BLOCK, "Effective water viscosity due to salt concentration" } } );
-        info.insert( { "BTCNFANI", { A::SUMMARY_BLOCK, "Anion Flowing Concentration" } } );
-        info.insert( { "BTCNFCAT", { A::SUMMARY_BLOCK, "Cation Flowing Concentration" } } );
-        info.insert( { "BTRADCAT", { A::SUMMARY_BLOCK, "Cation Rock Associated Concentration" } } );
-        info.insert( { "BTSADCAT", { A::SUMMARY_BLOCK, "Cation Surfactant Associated Concentration" } } );
-        info.insert( { "BESALSUR", { A::SUMMARY_BLOCK, "Effective Salinity with respect to Surfactant" } } );
-        info.insert( { "BESALPLY", { A::SUMMARY_BLOCK, "Effective Salinity with respect to Polymer" } } );
-        info.insert( { "BTCNFHEA", { A::SUMMARY_BLOCK, "Block Temperature" } } );
-        info.insert( { "BTIPTHEA", { A::SUMMARY_BLOCK, "Difference in Energy in place between current and initial time" } } );
-        info.insert( { "BTCNF", { A::SUMMARY_BLOCK, "Tracer Concentration" } } );
-        info.insert( { "BTCNS", { A::SUMMARY_BLOCK, "Tracer Concentration" } } );
-        info.insert( { "BTCN#", { A::SUMMARY_BLOCK, "Tracer concentration in phase # (1,2,3,...)" } } );
-        info.insert( { "BTIPT", { A::SUMMARY_BLOCK, "Tracer In Place" } } );
-        info.insert( { "BTIPF", { A::SUMMARY_BLOCK, "Tracer In Place" } } );
-        info.insert( { "BTIPS", { A::SUMMARY_BLOCK, "Tracer In Place" } } );
-        info.insert( { "BTIP#", { A::SUMMARY_BLOCK, "Tracer In Place in phase # (1,2,3,...)" } } );
-        info.insert( { "BTADS", { A::SUMMARY_BLOCK, "Tracer Adsorption" } } );
-        info.insert( { "BTDCY", { A::SUMMARY_BLOCK, "Decayed tracer" } } );
-        info.insert( { "BCGC", { A::SUMMARY_BLOCK, "Bulk Coal Gas Concentration" } } );
-        info.insert( { "BCSC", { A::SUMMARY_BLOCK, "Bulk Coal Solvent Concentration" } } );
-        info.insert( { "BTCNFFOA", { A::SUMMARY_BLOCK, "Concentration" } } );
-        info.insert( { "BFOAM", { A::SUMMARY_BLOCK, "Surfactant concentration" } } );
-        info.insert( { "BTCNMFOA", { A::SUMMARY_BLOCK, "Capillary number" } } );
-        info.insert( { "BFOAMCNM", { A::SUMMARY_BLOCK, "Capillary number" } } );
-        info.insert( { "BTIPTFOA", { A::SUMMARY_BLOCK, "In Solution" } } );
-        info.insert( { "BTADSFOA", { A::SUMMARY_BLOCK, "Adsorption" } } );
-        info.insert( { "BTDCYFOA", { A::SUMMARY_BLOCK, "Decayed tracer" } } );
-        info.insert( { "BTMOBFOA", { A::SUMMARY_BLOCK, "Gas mobility factor" } } );
-        info.insert( { "BFOAMMOB", { A::SUMMARY_BLOCK, "Gas mobility factor" } } );
-        info.insert( { "BTHLFFOA", { A::SUMMARY_BLOCK, "Decay Half life" } } );
-        info.insert( { "BGI", { A::SUMMARY_BLOCK, "Block Gi value" } } );
-        info.insert( { "BCCN", { A::SUMMARY_BLOCK, "Polymer Concentration" } } );
-        info.insert( { "BCIP", { A::SUMMARY_BLOCK, "Polymer In Solution" } } );
+       the -X direction" } } ); info.insert( { "BWKRY", { A::SUMMARY_BLOCK, "Water relative permeability in the Y direction" } } );
+       info.insert( { "BWKRY", { A::SUMMARY_BLOCK, "- Water relative permeability in the -Y direction" } } ); info.insert( { "BWKRZ", {
+       A::SUMMARY_BLOCK, "Water relative permeability in the Z direction" } } ); info.insert( { "BWKRZ", { A::SUMMARY_BLOCK, "- Water
+       relative permeability in the -Z direction" } } ); info.insert( { "BGKRX", { A::SUMMARY_BLOCK, "Gas relative permeability in the X
+       direction" } } ); info.insert( { "BGKRX", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -X direction" } } ); info.insert( {
+       "BGKRY", { A::SUMMARY_BLOCK, "Gas relative permeability in the Y direction" } } ); info.insert( { "BGKRY", { A::SUMMARY_BLOCK, "- Gas
+       relative permeability in the -Y direction" } } ); info.insert( { "BGKRZ", { A::SUMMARY_BLOCK, "Gas relative permeability in the Z
+       direction" } } ); info.insert( { "BGKRZ", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -Z direction" } } ); info.insert( {
+       "BOKRI", { A::SUMMARY_BLOCK, "Oil relative permeability in the I direction" } } ); info.insert( { "BOKRI", { A::SUMMARY_BLOCK, "- Oil
+       relative permeability in the -I direction" } } ); info.insert( { "BOKRJ", { A::SUMMARY_BLOCK, "Oil relative permeability in the J
+       direction" } } ); info.insert( { "BOKRJ", { A::SUMMARY_BLOCK, "- Oil relative permeability in the -J direction" } } ); info.insert( {
+       "BOKRK", { A::SUMMARY_BLOCK, "Oil relative permeability in the K direction" } } ); info.insert( { "BOKRK", { A::SUMMARY_BLOCK, "- Oil
+       relative permeability in the -K direction" } } ); info.insert( { "BWKRI", { A::SUMMARY_BLOCK, "Water relative permeability in the I
+       direction" } } ); info.insert( { "BWKRI", { A::SUMMARY_BLOCK, "- Water relative permeability in the -I direction" } } ); info.insert(
+       { "BWKRJ", { A::SUMMARY_BLOCK, "Water relative permeability in the J direction" } } ); info.insert( { "BWKRJ", { A::SUMMARY_BLOCK, "-
+       Water relative permeability in the -J direction" } } ); info.insert( { "BWKRK", { A::SUMMARY_BLOCK, "Water relative permeability in
+       the K direction" } } ); info.insert( { "BWKRK", { A::SUMMARY_BLOCK, "- Water relative permeability in the -K direction" } } );
+       info.insert( { "BGKRI", { A::SUMMARY_BLOCK, "Gas relative permeability in the I direction" } } ); info.insert( { "BGKRI", {
+       A::SUMMARY_BLOCK, "- Gas relative permeability in the -I direction" } } ); info.insert( { "BGKRJ", { A::SUMMARY_BLOCK, "Gas relative
+       permeability in the J direction" } } ); info.insert( { "BGKRJ", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -J direction"
+       } } ); info.insert( { "BGKRK", { A::SUMMARY_BLOCK, "Gas relative permeability in the K direction" } } ); info.insert( { "BGKRK", {
+       A::SUMMARY_BLOCK, "- Gas relative permeability in the -K direction" } } ); info.insert( { "BOKRR", { A::SUMMARY_BLOCK, "Oil relative
+       permeability in the R" } } ); info.insert( { "BOKRR", { A::SUMMARY_BLOCK, "- Oil relative permeability in the -R" } } ); info.insert(
+       { "BOKRT", { A::SUMMARY_BLOCK, "Oil relative permeability in the T" } } ); info.insert( { "BOKRT", { A::SUMMARY_BLOCK, "- Oil
+       relative permeability in the -T" } } ); info.insert( { "BWKRR", { A::SUMMARY_BLOCK, "Water relative permeability in the R" } } );
+       info.insert( { "BWKRR", { A::SUMMARY_BLOCK, "- Water relative permeability in the -R" } } ); info.insert( { "BWKRT", {
+       A::SUMMARY_BLOCK, "Water relative permeability in the T" } } ); info.insert( { "BWKRT", { A::SUMMARY_BLOCK, "- Water relative
+       permeability in the -T" } } ); info.insert( { "BGKRR", { A::SUMMARY_BLOCK, "Gas relative permeability in the R" } } ); info.insert( {
+       "BGKRR", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -R" } } ); info.insert( { "BGKRT", { A::SUMMARY_BLOCK, "Gas relative
+       permeability in the T" } } ); info.insert( { "BGKRT", { A::SUMMARY_BLOCK, "- Gas relative permeability in the -T" } } ); info.insert(
+       { "BRPV", { A::SUMMARY_BLOCK, "Pore Volume at Reservoir conditions" } } ); info.insert( { "BPORV", { A::SUMMARY_BLOCK, "Cell Pore
+       Volumes at Reference conditions" } } ); info.insert( { "BOPV", { A::SUMMARY_BLOCK, "Pore Volume containing Oil" } } ); info.insert( {
+       "BWPV", { A::SUMMARY_BLOCK, "Pore Volume containing Water" } } ); info.insert( { "BGPV", { A::SUMMARY_BLOCK, "Pore Volume containing
+       Gas" } } ); info.insert( { "BHPV", { A::SUMMARY_BLOCK, "Pore Volume containing Hydrocarbon" } } ); info.insert( { "BRTM", {
+       A::SUMMARY_BLOCK, "Transmissibility Multiplier associated with rock compaction" } } ); info.insert( { "BPERMMOD", { A::SUMMARY_BLOCK,
+       "Transmissibility Multiplier associated with rock compaction" } } ); info.insert( { "BPERMMDX", { A::SUMMARY_BLOCK, "Directional
+       Transmissibility Multipliers in the X direction, associated with rock compaction" } } ); info.insert( { "BPERMMDY", {
+       A::SUMMARY_BLOCK, "Directional Transmissibility Multipliers in the Y direction, associated with rock compaction" } } ); info.insert(
+       { "BPERMMDZ", { A::SUMMARY_BLOCK, "Directional Transmissibility Multipliers in the Z direction, associated with rock compaction" } }
+       ); info.insert( { "BPORVMOD", { A::SUMMARY_BLOCK, "Pore Volume Multiplier associated with rock compaction" } } ); info.insert( {
+       "BSIGMMOD", { A::SUMMARY_BLOCK, "Dual Porosity Sigma Multiplier associated with rock compaction" } } ); info.insert( { "BTCNF", {
+       A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert( { "BTCNS", { A::SUMMARY_BLOCK, "Tracer Concentration" } } );
+       info.insert( { "BTCN", { A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert( { "BTIPT", { A::SUMMARY_BLOCK, "Tracer In
+       Place" } } ); info.insert( { "BTIPF", { A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( { "BTIPS", { A::SUMMARY_BLOCK,
+       "Tracer In Place" } } ); info.insert( { "BAPI", { A::SUMMARY_BLOCK, "Oil API" } } ); info.insert( { "BSCN", { A::SUMMARY_BLOCK, "Salt
+       Cell Concentration" } } ); info.insert( { "BSIP", { A::SUMMARY_BLOCK, "Salt In Place" } } ); info.insert( { "BEWV_SAL", {
+       A::SUMMARY_BLOCK, "Effective water viscosity due to salt concentration" } } ); info.insert( { "BTCNFANI", { A::SUMMARY_BLOCK, "Anion
+       Flowing Concentration" } } ); info.insert( { "BTCNFCAT", { A::SUMMARY_BLOCK, "Cation Flowing Concentration" } } ); info.insert( {
+       "BTRADCAT", { A::SUMMARY_BLOCK, "Cation Rock Associated Concentration" } } ); info.insert( { "BTSADCAT", { A::SUMMARY_BLOCK, "Cation
+       Surfactant Associated Concentration" } } ); info.insert( { "BESALSUR", { A::SUMMARY_BLOCK, "Effective Salinity with respect to
+       Surfactant" } } ); info.insert( { "BESALPLY", { A::SUMMARY_BLOCK, "Effective Salinity with respect to Polymer" } } ); info.insert( {
+       "BTCNFHEA", { A::SUMMARY_BLOCK, "Block Temperature" } } ); info.insert( { "BTIPTHEA", { A::SUMMARY_BLOCK, "Difference in Energy in
+       place between current and initial time" } } ); info.insert( { "BTCNF", { A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert(
+       { "BTCNS", { A::SUMMARY_BLOCK, "Tracer Concentration" } } ); info.insert( { "BTCN#", { A::SUMMARY_BLOCK, "Tracer concentration in
+       phase # (1,2,3,...)" } } ); info.insert( { "BTIPT", { A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( { "BTIPF", {
+       A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( { "BTIPS", { A::SUMMARY_BLOCK, "Tracer In Place" } } ); info.insert( {
+       "BTIP#", { A::SUMMARY_BLOCK, "Tracer In Place in phase # (1,2,3,...)" } } ); info.insert( { "BTADS", { A::SUMMARY_BLOCK, "Tracer
+       Adsorption" } } ); info.insert( { "BTDCY", { A::SUMMARY_BLOCK, "Decayed tracer" } } ); info.insert( { "BCGC", { A::SUMMARY_BLOCK,
+       "Bulk Coal Gas Concentration" } } ); info.insert( { "BCSC", { A::SUMMARY_BLOCK, "Bulk Coal Solvent Concentration" } } ); info.insert(
+       { "BTCNFFOA", { A::SUMMARY_BLOCK, "Concentration" } } ); info.insert( { "BFOAM", { A::SUMMARY_BLOCK, "Surfactant concentration" } }
+       ); info.insert( { "BTCNMFOA", { A::SUMMARY_BLOCK, "Capillary number" } } ); info.insert( { "BFOAMCNM", { A::SUMMARY_BLOCK, "Capillary
+       number" } } ); info.insert( { "BTIPTFOA", { A::SUMMARY_BLOCK, "In Solution" } } ); info.insert( { "BTADSFOA", { A::SUMMARY_BLOCK,
+       "Adsorption" } } ); info.insert( { "BTDCYFOA", { A::SUMMARY_BLOCK, "Decayed tracer" } } ); info.insert( { "BTMOBFOA", {
+       A::SUMMARY_BLOCK, "Gas mobility factor" } } ); info.insert( { "BFOAMMOB", { A::SUMMARY_BLOCK, "Gas mobility factor" } } ); info.insert(
+       { "BTHLFFOA", { A::SUMMARY_BLOCK, "Decay Half life" } } ); info.insert( { "BGI", { A::SUMMARY_BLOCK, "Block Gi value" } } ); info.insert(
+       { "BCCN", { A::SUMMARY_BLOCK, "Polymer Concentration" } } ); info.insert( { "BCIP", { A::SUMMARY_BLOCK, "Polymer In Solution" } } );
         info.insert( { "BEPVIS", { A::SUMMARY_BLOCK, "Effective polymer solution viscosity" } } );
         info.insert( { "BVPOLY", { A::SUMMARY_BLOCK, "Effective polymer solution viscosity" } } );
         info.insert( { "BEMVIS", { A::SUMMARY_BLOCK, "Effective mixture" } } );
