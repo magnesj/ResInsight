@@ -20,22 +20,11 @@
 
 #include <QString>
 
-#include <string>
-#include <unordered_map>
-
 //==================================================================================================
 //
 //==================================================================================================
 namespace RiaQuantityInfoTools
 {
-void writeEclipseKeywordToFile( const QString& filePath );
-void write6XKeywordToFile( const QString& filePath );
-
-void importEclipseKeywords( const QString& filePath );
-void import6XKeywords( const QString& filePath );
 void importKeywords( const QString& keywordEclipseFilePath, const QString& keyword6XFilePath );
-
-std::unordered_map<std::string, std::pair<std::string, std::string>> importFromFile( const QString& filePath );
-void writeToFile( const QString& filePath, const std::unordered_map<std::string, std::pair<std::string, std::string>>& data );
 
 } // namespace RiaQuantityInfoTools
