@@ -35,6 +35,11 @@ public:
 
     std::string longNameFromVectorName( const std::string& vectorName, bool returnVectorNameIfNotFound = false ) const;
 
+    static std::unordered_map<std::string, std::pair<std::string, std::string>> keywordDataEclipse();
+    static std::unordered_map<std::string, std::pair<std::string, std::string>> KeywordData6X();
+
+    void setQuantityInfos( const std::unordered_map<std::string, std::pair<std::string, std::string>>& infos );
+
 private:
     class RiuSummaryQuantityInfo
     {
@@ -61,6 +66,9 @@ private:
 
     static std::unordered_map<std::string, RiuSummaryQuantityInfo> createInfoForEclipseKeywords();
     static std::unordered_map<std::string, RiuSummaryQuantityInfo> createInfoFor6xKeywords();
+
+    static std::string                                      stringFromEnum( RifEclipseSummaryAddressDefines::SummaryCategory category );
+    static RifEclipseSummaryAddressDefines::SummaryCategory enumFromString( const std::string& category );
 
 private:
     std::unordered_map<std::string, RiuSummaryQuantityInfo> m_summaryToDescMap;

@@ -19,6 +19,7 @@
 #include "RiaArgumentParser.h"
 #include "RiaMainTools.h"
 #include "RiaPreferences.h"
+#include "RiaQuantityInfoTools.h"
 
 #ifdef ENABLE_GRPC
 #include "RiaGrpcConsoleApplication.h"
@@ -85,6 +86,14 @@ int main( int argc, char* argv[] )
 
     // Create feature manager before the application object is created
     RiaMainTools::initializeSingletons();
+
+    // Write the keyword data to a file
+    QString keywordEclipseFilePath = "keywords_eclipse.json";
+    QString keyword6XFilePath      = "keywords_6x.json";
+
+    // RiaQuantityInfoTools::writeEclipseKeywordToFile( "keywords_eclipse.json" );
+    // RiaQuantityInfoTools::write6XKeywordToFile( "keywords_6x.json" );
+    RiaQuantityInfoTools::importKeywords( keywordEclipseFilePath, keyword6XFilePath );
 
     // https://www.w3.org/wiki/CSS/Properties/color/keywords
     caf::UiAppearanceSettings::instance()->setAutoValueEditorColor( "moccasin" );

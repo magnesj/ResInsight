@@ -193,18 +193,63 @@ std::string RiuSummaryQuantityNameInfoProvider::longNameFromVectorName( const st
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::unordered_map<std::string, std::pair<std::string, std::string>> RiuSummaryQuantityNameInfoProvider::keywordDataEclipse()
+{
+    auto tmp = createInfoForEclipseKeywords();
+
+    std::unordered_map<std::string, std::pair<std::string, std::string>> result;
+    for ( const auto& item : tmp )
+    {
+        result[item.first] = { stringFromEnum( item.second.category ), item.second.longName };
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::unordered_map<std::string, std::pair<std::string, std::string>> RiuSummaryQuantityNameInfoProvider::KeywordData6X()
+{
+    auto tmp = createInfoFor6xKeywords();
+
+    std::unordered_map<std::string, std::pair<std::string, std::string>> result;
+    for ( const auto& item : tmp )
+    {
+        result[item.first] = { stringFromEnum( item.second.category ), item.second.longName };
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuSummaryQuantityNameInfoProvider::setQuantityInfos( const std::unordered_map<std::string, std::pair<std::string, std::string>>& infos )
+{
+    for ( const auto& [key, content] : infos )
+    {
+        m_summaryToDescMap.insert( { key, { enumFromString( content.first ), content.second } } );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiuSummaryQuantityNameInfoProvider::RiuSummaryQuantityNameInfoProvider()
 {
-    m_summaryToDescMap = createInfoForEclipseKeywords();
+    /*
+        m_summaryToDescMap = createInfoForEclipseKeywords();
 
-    auto infoFor6x = createInfoFor6xKeywords();
-    for ( const auto& other : infoFor6x )
-    {
-        if ( m_summaryToDescMap.count( other.first ) == 0 )
+        auto infoFor6x = createInfoFor6xKeywords();
+        for ( const auto& other : infoFor6x )
         {
-            m_summaryToDescMap.insert( other );
+            if ( m_summaryToDescMap.count( other.first ) == 0 )
+            {
+                m_summaryToDescMap.insert( other );
+            }
         }
-    }
+    */
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2333,4 +2378,20 @@ std::unordered_map<std::string, RiuSummaryQuantityNameInfoProvider::RiuSummaryQu
     info.insert( { "TSCHOPS", { A::SUMMARY_MISC, "Number of Time Step Chops at Current Time Step" } } );
 
     return info;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::string RiuSummaryQuantityNameInfoProvider::stringFromEnum( RifEclipseSummaryAddressDefines::SummaryCategory category )
+{
+    return caf::AppEnum<RifEclipseSummaryAddressDefines::SummaryCategory>::text( category ).toStdString();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RifEclipseSummaryAddressDefines::SummaryCategory RiuSummaryQuantityNameInfoProvider::enumFromString( const std::string& category )
+{
+    return caf::AppEnum<RifEclipseSummaryAddressDefines::SummaryCategory>::fromText( QString::fromStdString( category ) );
 }
