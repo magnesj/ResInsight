@@ -88,8 +88,8 @@ int main( int argc, char* argv[] )
     RiaMainTools::initializeSingletons();
 
     // Write the keyword data to a file
-    QString keywordEclipseFilePath = "keywords_eclipse.json";
-    QString keyword6XFilePath      = "keywords_6x.json";
+    QString keywordEclipseFilePath = ":keywords/keyword-description/keywords_eclipse.json";
+    QString keyword6XFilePath      = ":keywords/keyword-description/keywords_6x.json";
 
     // RiaQuantityInfoTools::writeEclipseKeywordToFile( "keywords_eclipse.json" );
     // RiaQuantityInfoTools::write6XKeywordToFile( "keywords_6x.json" );
