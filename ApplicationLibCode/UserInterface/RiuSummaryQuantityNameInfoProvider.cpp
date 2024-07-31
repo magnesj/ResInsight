@@ -20,6 +20,8 @@
 
 #include "RifEclipseSummaryAddress.h"
 
+#include "cafAppEnum.h"
+
 #include <regex>
 #include <sstream>
 
