@@ -236,7 +236,6 @@ set(LOCAL_QRC_FILES Application/Resources/ApplicationLibCode.qrc)
 # Runs RCC and MOC on specified files
 qt5_add_resources(QRC_FILES_CPP ${LOCAL_QRC_FILES})
 
-
 # ##############################################################################
 # Create source groups - see also included CMakeLists_files.cmake
 # ##############################################################################
