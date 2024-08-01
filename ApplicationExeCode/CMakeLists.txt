@@ -303,7 +303,6 @@ set(UNITY_EXCLUDE_FILES
     # used in precompiled headers
     ${ResInsight_SOURCE_DIR}/ThirdParty/gtest/gtest-all.cc
     qrc_cafAnimControl.cpp qrc_ResInsight.cpp qrc_cafCommandFeatures.cpp
-    qrc_ApplicationLibCode.cpp
 )
 
 if(RESINSIGHT_ENABLE_UNITY_BUILD)
