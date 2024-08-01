@@ -96,6 +96,25 @@ namespace internal
         return map;
     }
 
+    //--------------------------------------------------------------------------------------------------
+    ///
+    //--------------------------------------------------------------------------------------------------
+    void importKeywords( const QString& keywordEclipseFilePath, const QString& keyword6XFilePath )
+    {
+        auto quantityInfos = internal::importFromFile( keywordEclipseFilePath );
+        auto info6x        = internal::importFromFile( keyword6XFilePath );
+
+        for ( const auto& other : info6x )
+        {
+            if ( !quantityInfos.contains( other.first ) )
+            {
+                quantityInfos.insert( other );
+            }
+        }
+
+        RiuSummaryQuantityNameInfoProvider::instance()->setQuantityInfos( quantityInfos );
+    }
+
 } // namespace internal
 } // namespace RiaQuantityInfoTools
 
@@ -107,24 +126,5 @@ void RiaQuantityInfoTools::initializeSummaryKeywords()
     QString keywordEclipseFilePath = ":keywords/keyword-description/keywords_eclipse.json";
     QString keyword6XFilePath      = ":keywords/keyword-description/keywords_6x.json";
 
-    RiaQuantityInfoTools::importKeywords( keywordEclipseFilePath, keyword6XFilePath );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaQuantityInfoTools::importKeywords( const QString& keywordEclipseFilePath, const QString& keyword6XFilePath )
-{
-    auto quantityInfos = internal::importFromFile( keywordEclipseFilePath );
-    auto info6x        = internal::importFromFile( keyword6XFilePath );
-
-    for ( const auto& other : info6x )
-    {
-        if ( !quantityInfos.contains( other.first ) )
-        {
-            quantityInfos.insert( other );
-        }
-    }
-
-    RiuSummaryQuantityNameInfoProvider::instance()->setQuantityInfos( quantityInfos );
+    RiaQuantityInfoTools::internal::importKeywords( keywordEclipseFilePath, keyword6XFilePath );
 }
