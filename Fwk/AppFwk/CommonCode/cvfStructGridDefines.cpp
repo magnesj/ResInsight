@@ -104,10 +104,8 @@ namespace StructGridDefines
         static const auto faceIndicesMap = createFaceIndicesMap();
 
         const auto& faceIndices = faceIndicesMap.at( face );
-        vertexIndices[0]        = faceIndices[0];
-        vertexIndices[1]        = faceIndices[1];
-        vertexIndices[2]        = faceIndices[2];
-        vertexIndices[3]        = faceIndices[3];
+
+        std::copy( faceIndices.begin(), faceIndices.end(), vertexIndices );
     }
 
     //--------------------------------------------------------------------------------------------------
