@@ -432,9 +432,8 @@ RiaScopeTimer::~RiaScopeTimer()
     auto end = std::chrono::high_resolution_clock::now();
 
     // Default unit for duration is seconds
-    std::chrono::duration<double> duration = end - m_startTime;
-
-    auto text = m_message + QString( " (duration : %1 seconds)" ).arg( duration.count() );
+    std::chrono::duration duration = std::chrono::duration_cast(end - m_startTime);
+    auto text = m_message + QString(" (duration : %1 milliseconds)").arg(duration.count());
 
     RiaLogging::debug( text );
 }
