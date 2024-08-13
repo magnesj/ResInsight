@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           submodules: recursive
 
@@ -26,7 +26,7 @@ jobs:
       - name: Update submodules to latest release
         run: |
           cd ThirdParty
-          submodules=("fast_float" "spdlog" ) # Specify your submodules here
+          submodules=("fast_float" "qtadvanceddocking" "regression-analysis" "roff-cpp" "spdlog" "tomlplusplus" )
           for submodule in "${submodules[@]}"; do
             BRANCH_NAME=ci-update-$submodule
             if git show-ref --verify --quiet refs/heads/$BRANCH_NAME; then
@@ -46,7 +46,7 @@ jobs:
             git commit -m "Update $submodule to $latest_tag" || echo "No changes to commit"
             git push origin $BRANCH_NAME
             git checkout dev
-            
+
             git reset --hard origin/dev --recurse-submodule
           done
         env:
@@ -54,7 +54,7 @@ jobs:
 
       - name: Create Pull Requests for each submodule
         run: |
-          submodules=("fast_float" "spdlog") # Specify your submodules here
+          submodules=("fast_float" "qtadvanceddocking" "regression-analysis" "roff-cpp" "spdlog" "tomlplusplus" )
           for submodule in "${submodules[@]}"; do
             gh pr create --title "Update $submodule to latest release" --body "This PR updates the $submodule submodule to its latest release." --head ci-update-$submodule --base dev
           done
