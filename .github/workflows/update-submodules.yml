@@ -46,7 +46,13 @@ jobs:
             git commit -m "Update $submodule to latest release" || echo "No changes to commit"
             git push origin $BRANCH_NAME
             git checkout dev
+            
             git reset --hard origin/dev
+            git reset --hard origin/dev
+            git submodule sync --recursive
+            git submodule update --init --force --recursive
+            git clean -ffdx
+            git submodule foreach --recursive git clean -ffdx
           done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
