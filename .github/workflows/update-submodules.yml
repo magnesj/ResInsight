@@ -43,7 +43,7 @@ jobs:
             git fetch --tags
             latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
-            if [ -n "$VAR" ]; then
+            if [ -n "$latest_tag" ]; then
               git checkout $latest_tag
             else
               echo "Empty tag detected in $submodule. Nothing to do."
