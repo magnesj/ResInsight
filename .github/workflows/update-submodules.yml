@@ -26,7 +26,6 @@ jobs:
       - name: Update submodules to latest release
         run: |
           cd ThirdParty
-          git fetch --tags
           
           submodules=("fast_float" "spdlog" "tomlplusplus" )
           for submodule in "${submodules[@]}"; do
@@ -40,6 +39,7 @@ jobs:
             fi
 
             cd $submodule
+            git fetch --tags
             latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
             if [ -n "$latest_tag" ]; then
