@@ -28,6 +28,7 @@ jobs:
           cd ThirdParty
           submodules=("fast_float" "spdlog" ) # Specify your submodules here
           for submodule in "${submodules[@]}"; do
+            git branch HEAD:update-$submodule
             cd $submodule
             git fetch --tags
             latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
