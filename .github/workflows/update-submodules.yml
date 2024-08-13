@@ -25,16 +25,18 @@ jobs:
 
       - name: Update submodules to latest release
         run: |
+          git fetch origin
+          
           cd ThirdParty
           submodules=("fast_float" "qtadvanceddocking" "regression-analysis" "roff-cpp" "spdlog" "tomlplusplus" )
           for submodule in "${submodules[@]}"; do
             BRANCH_NAME=ci-update-$submodule
             if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
               echo "Branch $BRANCH_NAME exists."
-              git checkout -b $BRANCH_NAME origin/$BRANCH_NAME
+              git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
             else
               echo "Branch $BRANCH_NAME does not exist. Creating branch."
-              git checkout -b $BRANCH_NAME
+              git checkout -b "$BRANCH_NAME"
             fi
 
             cd $submodule
@@ -48,7 +50,7 @@ jobs:
             else
               git add $submodule
               git commit -m "Update $submodule to $latest_tag" || echo "No changes to commit"
-              git push origin $BRANCH_NAME
+              git push origin "$BRANCH_NAME"
             fi
             
             git checkout dev
