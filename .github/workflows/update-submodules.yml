@@ -45,6 +45,7 @@ jobs:
               git checkout $latest_tag
             else
               echo "Empty tag detected in $submodule. Nothing to do."
+            fi
             
             cd ..
             if git diff --quiet; then
