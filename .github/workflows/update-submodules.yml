@@ -1,0 +1,64 @@
+name: Update Specific Submodules to Latest Release
+
+on:
+  # Trigger the workflow on a schedule (e.g., every week on Sunday at 00:00 UTC)
+  schedule:
+    - cron: "0 0 * * 0"
+  # Trigger the workflow manually
+  workflow_dispatch:
+
+jobs:
+  update-submodules:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        submodules: recursive  # Fetch submodules
+
+    - name: Update and Create PR for Each Submodule
+      run: |
+        # List of submodules you want to update
+        SUBMODULES=("ThirdParty/fast_float" "ThirdParty/spdlog" )
+
+        for submodule in "${SUBMODULES[@]}"; do
+          echo "Updating $submodule to latest release"
+          cd $submodule
+          latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
+          git checkout $latest_tag
+          git pull origin $latest_tag
+          cd -
+
+          # Stage changes for the submodule
+          git add $submodule
+
+          # Check if there are changes to commit
+          if git diff-index --quiet HEAD --; then
+            echo "No changes in $submodule, skipping PR creation."
+          else
+            # Commit the changes
+            git commit -m "Update $submodule to latest release ($latest_tag)"
+            
+            # Create a branch name for the PR
+            branch_name="update-${submodule//\//-}-$latest_tag"
+            git checkout -b $branch_name
+
+            # Push the branch to origin
+            git push origin $branch_name
+
+            # Create a pull request using peter-evans/create-pull-request
+            gh workflow run peter-evans/create-pull-request@v5
+            with:
+              token: ${{ secrets.GITHUB_TOKEN }}
+              commit-message: "Update $submodule to latest release ($latest_tag)"
+              branch: $branch_name
+              base: main
+              title: "Update $submodule to latest release"
+              body: "This PR updates the submodule $submodule to the latest tagged release ($latest_tag)."
+              labels: submodules, automated-pr
+
+            # Switch back to the main branch
+            git checkout main
+          fi
+        done
