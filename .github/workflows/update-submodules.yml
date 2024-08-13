@@ -20,7 +20,8 @@ jobs:
 
       - name: Update submodules to latest release
         run: |
-          submodules=("ThirdParty/fast_float" "ThirdParty/spdlog" ) # Specify your submodules here
+          cd ThirdParty
+          submodules=("fast_float" "spdlog" ) # Specify your submodules here
           for submodule in "${submodules[@]}"; do
             cd $submodule
             git fetch --tags
@@ -36,7 +37,7 @@ jobs:
 
       - name: Create Pull Requests for each submodule
         run: |
-          submodules=("ThirdParty/fast_float" "ThirdParty/spdlog") # Specify your submodules here
+          submodules=("fast_float" "spdlog") # Specify your submodules here
           for submodule in "${submodules[@]}"; do
             gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
             gh pr create --title "Update $submodule to latest release" --body "This PR updates the $submodule submodule to its latest release." --head update-$submodule --base main
