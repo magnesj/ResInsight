@@ -16,7 +16,15 @@ updates:
       - dependency-name: "ThirdParty/tomlplusplus"
     schedule:
       interval: "weekly"
-  - package-ecosystem: "pip"
-    directory: "/GrpcInterface/Python"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "weekly"
+      interval: weekly
+    groups:
+      ci-dependencies:
+        patterns:
+          - "*"
+    commit-message:
+      prefix: "[ci]"
+    labels:
+      - maintenance
