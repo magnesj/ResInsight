@@ -39,7 +39,6 @@ jobs:
         run: |
           submodules=("fast_float" "spdlog") # Specify your submodules here
           for submodule in "${submodules[@]}"; do
-            gh auth login --with-token <<< "${{ secrets.GITHUB_TOKEN }}"
             gh pr create --title "Update $submodule to latest release" --body "This PR updates the $submodule submodule to its latest release." --head update-$submodule --base main
           done
         env:
