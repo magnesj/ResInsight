@@ -16,3 +16,7 @@ updates:
       - dependency-name: "ThirdParty/tomlplusplus"
     schedule:
       interval: "weekly"
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
