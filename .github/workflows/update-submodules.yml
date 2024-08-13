@@ -25,7 +25,7 @@ jobs:
 
       - name: Update submodules to latest release
         run: |
-          git fetch origin
+          git fetch origin --tags
           
           cd ThirdParty
           submodules=("fast_float" "qtadvanceddocking" "regression-analysis" "roff-cpp" "spdlog" "tomlplusplus" )
