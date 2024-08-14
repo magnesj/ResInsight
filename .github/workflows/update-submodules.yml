@@ -27,6 +27,7 @@ jobs:
 
           if [ -n "$latest_tag" ]; then
             git checkout $latest_tag
+            echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
           else
             echo "Empty tag detected in ${{ matrix.submodule }}. Nothing to do."
           fi
@@ -34,7 +35,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update ${{ matrix.submodule }}"
-          title: "Update ${{ matrix.submodule }}"
+          commit-message: "Update ${{ matrix.submodule }} to $LATEST_TAG"
+          title: "Update ${{ matrix.submodule }} to $LATEST_TAG"
           branch: ci-update-${{ matrix.submodule }}
           branch-suffix: random
