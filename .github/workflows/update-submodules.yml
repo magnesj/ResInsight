@@ -8,10 +8,10 @@ on:
 jobs:
   update-submodules:
     runs-on: ubuntu-latest
-     strategy:
-      matrix:
-        submodule: 
-          - tomlplusplus
+      strategy:
+        matrix:
+          submodule: 
+            - tomlplusplus
 
     steps:
       - name: Checkout repository
