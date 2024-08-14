@@ -34,7 +34,7 @@ jobs:
           fi
 
       - name: Create PR
-      - uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: "Update ${{ matrix.submodule }} to ${{ steps.git-change-job.outputs.LATEST_TAG }}"
