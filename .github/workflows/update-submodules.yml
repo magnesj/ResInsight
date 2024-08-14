@@ -37,7 +37,7 @@ jobs:
       - uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update ${{ matrix.submodule }} to ${{ steps.color-selector.outputs.SELECTED_COLOR }}"
-          title: "Update ${{ matrix.submodule }} to ${{ steps.color-selector.outputs.SELECTED_COLOR }}"
+          commit-message: "Update ${{ matrix.submodule }} to ${{ steps.git-change-job.outputs.LATEST_TAG }}"
+          title: "Update ${{ matrix.submodule }} to ${{ steps.git-change-job.outputs.LATEST_TAG }}"s
           branch: ci-update-${{ matrix.submodule }}
           branch-suffix: random
