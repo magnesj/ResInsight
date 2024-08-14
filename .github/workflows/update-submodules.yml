@@ -29,20 +29,7 @@ jobs:
 
       - name: Update submodules to latest release
         run: |
-          cd ThirdParty
-
-          git fetch --all
-          
-          BRANCH_NAME=ci-update-${{ matrix.submodule }}
-          if git ls-remote --heads origin "$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
-            echo "Branch $BRANCH_NAME exists."
-            git checkout -b "$BRANCH_NAME" "origin/$BRANCH_NAME"
-          else
-            echo "Branch $BRANCH_NAME does not exist. Creating branch."
-            git checkout -b "$BRANCH_NAME"
-          fi
-
-          cd ${{ matrix.submodule }}
+          cd ThirdParty/${{ matrix.submodule }}
           git fetch --tags
           latest_tag=$(git describe --tags `git rev-list --tags --max-count=1`)
 
@@ -51,24 +38,6 @@ jobs:
           else
             echo "Empty tag detected in ${{ matrix.submodule }}. Nothing to do."
           fi
-            
-          cd ..
-          if git diff --quiet; then
-            echo "No changes detected in ${{ matrix.submodule }}"
-          else
-            git add ${{ matrix.submodule }}
-            git commit -m "Update ${{ matrix.submodule }} to $latest_tag" || echo "No changes to commit"
-            git push origin "$BRANCH_NAME"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: "Pull request for ${{ matrix.submodule }}"
-          labels: "automated-pr"
 
       - uses: peter-evans/create-pull-request@v6
         with:
