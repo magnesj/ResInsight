@@ -20,6 +20,7 @@ jobs:
           submodules: recursive
 
       - name: Update submodules to latest release
+        id: git-change-job
         run: |
           cd ThirdParty/${{ matrix.submodule }}
           git fetch --tags
@@ -27,15 +28,16 @@ jobs:
 
           if [ -n "$latest_tag" ]; then
             git checkout $latest_tag
-            echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
+            echo "LATEST_TAG=$latest_tag" >> "$GITHUB_OUTPUT"
           else
             echo "Empty tag detected in ${{ matrix.submodule }}. Nothing to do."
           fi
 
+      - name: Create PR
       - uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Update ${{ matrix.submodule }} to $LATEST_TAG"
-          title: "Update ${{ matrix.submodule }} to $LATEST_TAG"
+          commit-message: "Update ${{ matrix.submodule }} to ${{ steps.color-selector.outputs.SELECTED_COLOR }}"
+          title: "Update ${{ matrix.submodule }} to ${{ steps.color-selector.outputs.SELECTED_COLOR }}"
           branch: ci-update-${{ matrix.submodule }}
           branch-suffix: random
