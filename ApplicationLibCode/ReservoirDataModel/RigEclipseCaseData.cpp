@@ -349,9 +349,9 @@ const RigCell& RigEclipseCaseData::cellFromWellResultCell( const RigWellResultPo
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigEclipseCaseData::findSharedSourceFace( cvf::StructGridInterface::FaceType& sharedSourceFace,
-                                               const RigWellResultPoint&           sourceWellCellResult,
-                                               const RigWellResultPoint&           otherWellCellResult ) const
+bool RigEclipseCaseData::findSharedSourceFace( cvf::StructGridDefines::FaceType& sharedSourceFace,
+                                               const RigWellResultPoint&         sourceWellCellResult,
+                                               const RigWellResultPoint&         otherWellCellResult ) const
 {
     size_t gridIndex     = sourceWellCellResult.gridIndex();
     size_t gridCellIndex = sourceWellCellResult.cellIndex();
@@ -371,10 +371,10 @@ bool RigEclipseCaseData::findSharedSourceFace( cvf::StructGridInterface::FaceTyp
     size_t faceIdx;
     for ( faceIdx = 0; faceIdx < 6; faceIdx++ )
     {
-        cvf::StructGridInterface::FaceType sourceFace = static_cast<cvf::StructGridInterface::FaceType>( faceIdx );
+        cvf::StructGridDefines::FaceType sourceFace = static_cast<cvf::StructGridDefines::FaceType>( faceIdx );
 
         size_t ni, nj, nk;
-        RigGridBase::neighborIJKAtCellFace( i, j, k, sourceFace, &ni, &nj, &nk );
+        cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, sourceFace, &ni, &nj, &nk );
 
         if ( grid->isCellValid( ni, nj, nk ) )
         {

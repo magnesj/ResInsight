@@ -124,16 +124,16 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
 
     if ( !firstHitPart ) return false;
 
-    size_t                             gridIndex          = cvf::UNDEFINED_SIZE_T;
-    size_t                             gridLocalCellIndex = cvf::UNDEFINED_SIZE_T;
-    cvf::StructGridInterface::FaceType face               = cvf::StructGridInterface::NO_FACE;
-    int                                gmFace             = -1;
-    bool                               intersectionHit    = false;
-    std::array<cvf::Vec3f, 3>          intersectionTriangleHit;
-    RimGeoMechResultDefinition*        geomResDef     = nullptr;
-    RimEclipseResultDefinition*        eclResDef      = nullptr;
-    size_t                             timestepIndex  = cvf::UNDEFINED_SIZE_T;
-    int                                dataFrameIndex = -2; // needs to be less than -1, as -1 means last step
+    size_t                           gridIndex          = cvf::UNDEFINED_SIZE_T;
+    size_t                           gridLocalCellIndex = cvf::UNDEFINED_SIZE_T;
+    cvf::StructGridDefines::FaceType face               = cvf::StructGridDefines::NO_FACE;
+    int                              gmFace             = -1;
+    bool                             intersectionHit    = false;
+    std::array<cvf::Vec3f, 3>        intersectionTriangleHit;
+    RimGeoMechResultDefinition*      geomResDef     = nullptr;
+    RimEclipseResultDefinition*      eclResDef      = nullptr;
+    size_t                           timestepIndex  = cvf::UNDEFINED_SIZE_T;
+    int                              dataFrameIndex = -2; // needs to be less than -1, as -1 means last step
 
     RimIntersectionResultDefinition* sepInterResDef = nullptr;
 
@@ -337,26 +337,26 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                         gridLocalCellIndex = c2LocalIdx;
                         gridIndex = c2GridIdx; 
                         
-                        if (face == cvf::StructGridInterface::NO_FACE)
+                        if (face == cvf::StructGridDefines::NO_FACE)
                         {
                             face = nncConn.face();
                         }
                         else
                         {
-                            face = cvf::StructGridInterface::oppositeFace(face);
+                            face = cvf::StructGridDefines::oppositeFace(face);
                         }
                     }
                     else if (gridLocalCellIndex == c2LocalIdx && gridIndex == c2GridIdx)
                     {
                         gridLocalCellIndex = c1LocalIdx;
                         gridIndex = c1GridIdx;
-                        if (face == cvf::StructGridInterface::NO_FACE)
+                        if (face == cvf::StructGridDefines::NO_FACE)
                         {
-                            face = cvf::StructGridInterface::oppositeFace(nncConn.face());
+                            face = cvf::StructGridDefines::oppositeFace(nncConn.face());
                         }
                         else
                         {
-                            face = cvf::StructGridInterface::oppositeFace(face);
+                            face = cvf::StructGridDefines::oppositeFace(face);
                         }
                     }
                     else

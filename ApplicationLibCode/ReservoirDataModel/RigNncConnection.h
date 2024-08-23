@@ -31,15 +31,15 @@ class RigConnection
 {
 public:
     RigConnection();
-    RigConnection( unsigned                           c1GlobIdx,
-                   unsigned                           c2GlobIdx,
-                   cvf::StructGridInterface::FaceType c1Face  = cvf::StructGridInterface::NO_FACE,
-                   const std::vector<cvf::Vec3f>&     polygon = {} );
+    RigConnection( unsigned                         c1GlobIdx,
+                   unsigned                         c2GlobIdx,
+                   cvf::StructGridDefines::FaceType c1Face  = cvf::StructGridDefines::NO_FACE,
+                   const std::vector<cvf::Vec3f>&   polygon = {} );
 
-    RigConnection( size_t                             c1GlobIdx,
-                   size_t                             c2GlobIdx,
-                   cvf::StructGridInterface::FaceType c1Face  = cvf::StructGridInterface::NO_FACE,
-                   const std::vector<cvf::Vec3f>&     polygon = {} );
+    RigConnection( size_t                           c1GlobIdx,
+                   size_t                           c2GlobIdx,
+                   cvf::StructGridDefines::FaceType c1Face  = cvf::StructGridDefines::NO_FACE,
+                   const std::vector<cvf::Vec3f>&   polygon = {} );
 
     RigConnection( const RigConnection& rhs );
 
@@ -48,10 +48,10 @@ public:
     bool           operator<( const RigConnection& other ) const;
     bool           hasCommonArea() const;
 
-    inline size_t                             c1GlobIdx() const { return m_c1GlobIdx; }
-    inline size_t                             c2GlobIdx() const { return m_c2GlobIdx; }
-    inline cvf::StructGridInterface::FaceType face() const { return static_cast<cvf::StructGridInterface::FaceType>( m_c1Face ); }
-    inline void setFace( cvf::StructGridInterface::FaceType face ) { m_c1Face = static_cast<unsigned char>( face ); }
+    inline size_t                           c1GlobIdx() const { return m_c1GlobIdx; }
+    inline size_t                           c2GlobIdx() const { return m_c2GlobIdx; }
+    inline cvf::StructGridDefines::FaceType face() const { return static_cast<cvf::StructGridDefines::FaceType>( m_c1Face ); }
+    inline void setFace( cvf::StructGridDefines::FaceType face ) { m_c1Face = static_cast<unsigned char>( face ); }
     inline const std::vector<cvf::Vec3f>& polygon() const { return m_polygon; }
     inline void                           setPolygon( const std::vector<cvf::Vec3f>& polygon ) { m_polygon = polygon; }
 

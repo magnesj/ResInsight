@@ -38,7 +38,7 @@ class RigCell;
 
 class RigFaultReactivationModelGenerator : cvf::Object
 {
-    using FaceType = cvf::StructGridInterface::FaceType;
+    using FaceType = cvf::StructGridDefines::FaceType;
 
 public:
     RigFaultReactivationModelGenerator( cvf::Vec3d position, cvf::Vec3d modelNormal, cvf::Vec3d direction );

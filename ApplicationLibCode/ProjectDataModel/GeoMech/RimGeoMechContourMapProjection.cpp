@@ -44,10 +44,10 @@
 
 #include "cvfArray.h"
 #include "cvfCellRange.h"
+#include "cvfCellRangeFilter.h"
 #include "cvfGeometryTools.h"
 #include "cvfGeometryUtils.h"
 #include "cvfScalarMapper.h"
-#include "cvfStructGridGeometryGenerator.h"
 #include "cvfVector3.h"
 
 #include <QDebug>

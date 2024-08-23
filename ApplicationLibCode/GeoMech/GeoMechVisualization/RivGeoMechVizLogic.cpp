@@ -38,8 +38,8 @@
 #include "RivGeoMechPartMgrCache.h"
 #include "RivReservoirViewPartMgr.h"
 
+#include "cvfCellRangeFilter.h"
 #include "cvfModelBasicList.h"
-#include "cvfStructGridGeometryGenerator.h"
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -108,9 +108,9 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
 
     float arrowScaling = arrowConstantScaling / maxAbsResult;
 
-    std::vector<RigEclipseResultAddress>            resultAddresses;
-    std::vector<cvf::StructGridInterface::FaceType> directions;
-    RigCaseCellResultsData*                         resultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    std::vector<RigEclipseResultAddress>          resultAddresses;
+    std::vector<cvf::StructGridDefines::FaceType> directions;
+    RigCaseCellResultsData*                       resultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     {
         std::vector<RigEclipseResultAddress> addresses;
         result->resultAddressesIJK( addresses );
@@ -119,7 +119,7 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
         {
             if ( result->showVectorI() )
             {
-                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridInterface::POS_I );
+                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridDefines::POS_I );
 
                 auto candidate = addresses[0 + fluidIndex];
                 if ( resultsData->hasResultEntry( candidate ) && !resultsData->cellScalarResults( candidate, timeStepIndex ).empty() )
@@ -129,7 +129,7 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
             }
             if ( result->showVectorJ() )
             {
-                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridInterface::POS_J );
+                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridDefines::POS_J );
                 auto candidate = addresses[1 + fluidIndex];
                 if ( resultsData->hasResultEntry( candidate ) && !resultsData->cellScalarResults( candidate, timeStepIndex ).empty() )
                 {
@@ -138,7 +138,7 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
             }
             if ( result->showVectorK() )
             {
-                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridInterface::POS_K );
+                if ( fluidIndex == 0 ) directions.push_back( cvf::StructGridDefines::POS_K );
                 auto candidate = addresses[2 + fluidIndex];
                 if ( resultsData->hasResultEntry( candidate ) && !resultsData->cellScalarResults( candidate, timeStepIndex ).empty() )
                 {
@@ -152,10 +152,10 @@ void RivElementVectorResultPartMgr::appendDynamicGeometryPartsToModel( cvf::Mode
 
     const std::vector<RigCell>& cells = eclipseCase->mainGrid()->globalCellArray();
 
-    auto getFaceCenterAndNormal = [cells, arrowScaling, displayCordXf]( size_t                             globalCellIdx,
-                                                                        cvf::StructGridInterface::FaceType faceType,
-                                                                        cvf::Vec3d&                        faceCenter,
-                                                                        cvf::Vec3d&                        faceNormal )
+    auto getFaceCenterAndNormal = [cells, arrowScaling, displayCordXf]( size_t                           globalCellIdx,
+                                                                        cvf::StructGridDefines::FaceType faceType,
+                                                                        cvf::Vec3d&                      faceCenter,
+                                                                        cvf::Vec3d&                      faceNormal )
     {
         faceCenter            = displayCordXf->transformToDisplayCoord( cells[globalCellIdx].faceCenter( faceType ) );
         cvf::Vec3d cellCenter = displayCordXf->transformToDisplayCoord( cells[globalCellIdx].center() );

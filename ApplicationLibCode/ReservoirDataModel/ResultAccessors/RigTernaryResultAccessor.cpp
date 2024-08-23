@@ -92,7 +92,7 @@ cvf::Vec2d RigTernaryResultAccessor::cellScalar( size_t gridLocalCellIndex ) con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec2d RigTernaryResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+cvf::Vec2d RigTernaryResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     return cellScalar( gridLocalCellIndex );
 }

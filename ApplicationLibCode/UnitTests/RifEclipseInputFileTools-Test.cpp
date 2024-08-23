@@ -24,11 +24,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "i"
                   << "i+";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::POS_I, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::POS_I, faceType );
         }
     }
 
@@ -39,11 +39,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "x-"
                   << "i-";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::NEG_I, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::NEG_I, faceType );
         }
     }
 
@@ -58,11 +58,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "j"
                   << "j+";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::POS_J, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::POS_J, faceType );
         }
     }
 
@@ -73,11 +73,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "y-"
                   << "j-";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::NEG_J, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::NEG_J, faceType );
         }
     }
 
@@ -92,11 +92,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "k"
                   << "k+";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::POS_K, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::POS_K, faceType );
         }
     }
 
@@ -107,11 +107,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "z-"
                   << "k-";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::NEG_K, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::NEG_K, faceType );
         }
     }
 
@@ -123,11 +123,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << "z/"
                   << " y /";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_NE( cvf::StructGridInterface::NO_FACE, faceType );
+            EXPECT_NE( cvf::StructGridDefines::NO_FACE, faceType );
         }
     }
 
@@ -138,11 +138,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << " -k "
                   << "   +k-  ";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::NO_FACE, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::NO_FACE, faceType );
         }
     }
 
@@ -154,11 +154,11 @@ TEST( RifEclipseInputFileToolsTest, FaultFaces )
                   << " I "
                   << " i+  ";
 
-        cvf::StructGridInterface::FaceEnum faceType;
+        cvf::StructGridDefines::FaceEnum faceType;
         foreach ( QString text, faceTexts )
         {
             faceType = RifEclipseInputFileTools::faceEnumFromText( text );
-            EXPECT_EQ( cvf::StructGridInterface::POS_I, faceType );
+            EXPECT_EQ( cvf::StructGridDefines::POS_I, faceType );
         }
     }
 }

@@ -41,12 +41,12 @@ public:
                                  RigResultAccessor* multZNegAccessor );
 
     double cellScalar( size_t gridLocalCellIndex ) const override;
-    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
     double cellScalarGlobIdx( size_t globCellIndex ) const override;
-    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
 
 private:
-    double nativeMultScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const;
+    double nativeMultScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const;
 
 private:
     cvf::ref<RigResultAccessor> m_multXPosAccessor;

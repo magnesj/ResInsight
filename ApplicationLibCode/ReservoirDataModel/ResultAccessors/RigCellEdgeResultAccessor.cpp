@@ -31,7 +31,7 @@ RigCellEdgeResultAccessor::RigCellEdgeResultAccessor()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCellEdgeResultAccessor::setDataAccessObjectForFace( cvf::StructGridInterface::FaceType faceId, RigResultAccessor* resultAccessObject )
+void RigCellEdgeResultAccessor::setDataAccessObjectForFace( cvf::StructGridDefines::FaceType faceId, RigResultAccessor* resultAccessObject )
 {
     m_resultAccessObjects[faceId] = resultAccessObject;
 }
@@ -50,7 +50,7 @@ double RigCellEdgeResultAccessor::cellScalar( size_t gridLocalCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigCellEdgeResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigCellEdgeResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     const RigResultAccessor* resultAccessObj = m_resultAccessObjects[faceId].p();
     if ( resultAccessObj != nullptr )
@@ -75,7 +75,7 @@ double RigCellEdgeResultAccessor::cellScalarGlobIdx( size_t globCellIndex ) cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigCellEdgeResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigCellEdgeResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     const RigResultAccessor* resultAccessObj = m_resultAccessObjects[faceId].p();
     if ( resultAccessObj != nullptr )

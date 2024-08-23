@@ -18,7 +18,7 @@
 
 #include "RimUserDefinedFilter.h"
 
-#include "cvfStructGridGeometryGenerator.h"
+#include "cvfCellRangeFilter.h"
 
 CAF_PDM_SOURCE_INIT( RimUserDefinedFilter, "UserDefinedFilter" );
 

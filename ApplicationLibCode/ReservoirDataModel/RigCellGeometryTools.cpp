@@ -285,33 +285,33 @@ void RigCellGeometryTools::findCellLocalXYZ( const std::array<cvf::Vec3d, 8>& he
                                              cvf::Vec3d&                      localYdirection,
                                              cvf::Vec3d&                      localZdirection )
 {
-    cvf::ubyte                         faceVertexIndices[4];
-    cvf::StructGridInterface::FaceEnum face;
+    cvf::ubyte                       faceVertexIndices[4];
+    cvf::StructGridDefines::FaceEnum face;
 
-    face = cvf::StructGridInterface::NEG_I;
-    cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+    face = cvf::StructGridDefines::NEG_I;
+    cvf::StructGridDefines::cellFaceVertexIndices( face, faceVertexIndices );
     cvf::Vec3d faceCenterNegI = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],
                                                                        hexCorners[faceVertexIndices[2]],
                                                                        hexCorners[faceVertexIndices[3]] );
     // TODO: Should we use face centroids instead of face centers?
 
-    face = cvf::StructGridInterface::POS_I;
-    cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+    face = cvf::StructGridDefines::POS_I;
+    cvf::StructGridDefines::cellFaceVertexIndices( face, faceVertexIndices );
     cvf::Vec3d faceCenterPosI = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],
                                                                        hexCorners[faceVertexIndices[2]],
                                                                        hexCorners[faceVertexIndices[3]] );
 
-    face = cvf::StructGridInterface::NEG_J;
-    cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+    face = cvf::StructGridDefines::NEG_J;
+    cvf::StructGridDefines::cellFaceVertexIndices( face, faceVertexIndices );
     cvf::Vec3d faceCenterNegJ = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],
                                                                        hexCorners[faceVertexIndices[2]],
                                                                        hexCorners[faceVertexIndices[3]] );
 
-    face = cvf::StructGridInterface::POS_J;
-    cvf::StructGridInterface::cellFaceVertexIndices( face, faceVertexIndices );
+    face = cvf::StructGridDefines::POS_J;
+    cvf::StructGridDefines::cellFaceVertexIndices( face, faceVertexIndices );
     cvf::Vec3d faceCenterPosJ = cvf::GeometryTools::computeFaceCenter( hexCorners[faceVertexIndices[0]],
                                                                        hexCorners[faceVertexIndices[1]],
                                                                        hexCorners[faceVertexIndices[2]],

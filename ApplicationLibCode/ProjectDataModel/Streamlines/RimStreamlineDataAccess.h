@@ -47,21 +47,21 @@ public:
 
     bool setupDataAccess( RigMainGrid* grid, RigEclipseCaseData* data, std::list<RiaDefines::PhaseType> phases, int timeIdx );
 
-    double faceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
-    double combinedFaceRate( RigCell                            cell,
-                             cvf::StructGridInterface::FaceType faceIdx,
-                             std::list<RiaDefines::PhaseType>   phases,
-                             double                             direction,
-                             RiaDefines::PhaseType&             dominantPhaseOut ) const;
+    double faceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
+    double combinedFaceRate( RigCell                          cell,
+                             cvf::StructGridDefines::FaceType faceIdx,
+                             std::list<RiaDefines::PhaseType> phases,
+                             double                           direction,
+                             RiaDefines::PhaseType&           dominantPhaseOut ) const;
 
     const RigMainGrid* grid() const { return m_grid; }
 
 protected:
-    cvf::ref<RigResultAccessor> getDataAccessor( cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase, int timeIdx );
-    QString                     gridResultNameFromPhase( RiaDefines::PhaseType phase, cvf::StructGridInterface::FaceType faceIdx ) const;
+    cvf::ref<RigResultAccessor> getDataAccessor( cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase, int timeIdx );
+    QString                     gridResultNameFromPhase( RiaDefines::PhaseType phase, cvf::StructGridDefines::FaceType faceIdx ) const;
 
-    double posFaceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
-    double negFaceRate( RigCell cell, cvf::StructGridInterface::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
+    double posFaceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
+    double negFaceRate( RigCell cell, cvf::StructGridDefines::FaceType faceIdx, RiaDefines::PhaseType phase ) const;
 
 private:
     RigMainGrid*        m_grid;

@@ -32,7 +32,7 @@
 class StreamlineSeedPoint
 {
 public:
-    StreamlineSeedPoint( double rate, size_t cellIdx, cvf::StructGridInterface::FaceType faceIdx )
+    StreamlineSeedPoint( double rate, size_t cellIdx, cvf::StructGridDefines::FaceType faceIdx )
         : m_rate( rate )
         , m_cellIdx( cellIdx )
         , m_faceIdx( faceIdx ){};
@@ -41,9 +41,9 @@ public:
     bool operator<( const StreamlineSeedPoint& other ) const { return m_rate < other.m_rate; };
 
 public:
-    double                             m_rate;
-    size_t                             m_cellIdx;
-    cvf::StructGridInterface::FaceType m_faceIdx;
+    double                           m_rate;
+    size_t                           m_cellIdx;
+    cvf::StructGridDefines::FaceType m_faceIdx;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -83,8 +83,8 @@ void RimStreamlineGenerator::generateTracer( RigCell cell, double direction, QSt
 
     while ( !m_seeds.empty() )
     {
-        const size_t                             cellIdx = m_seeds.top().m_cellIdx;
-        const cvf::StructGridInterface::FaceType faceIdx = m_seeds.top().m_faceIdx;
+        const size_t                           cellIdx = m_seeds.top().m_cellIdx;
+        const cvf::StructGridDefines::FaceType faceIdx = m_seeds.top().m_faceIdx;
         m_seeds.pop();
 
         RimStreamline* streamline = new RimStreamline( simWellName );
@@ -105,7 +105,7 @@ void RimStreamlineGenerator::generateTracer( RigCell cell, double direction, QSt
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t cellIdx, cvf::StructGridInterface::FaceType faceIdx, double direction )
+void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t cellIdx, cvf::StructGridDefines::FaceType faceIdx, double direction )
 {
     // get the cell
     RigCell cell = m_dataAccess->grid()->cell( cellIdx );
@@ -126,7 +126,7 @@ void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t c
         // find next cell and entry face
         cell = cell.neighborCell( faceIdx );
         if ( cell.isInvalid() ) break;
-        faceIdx = cvf::StructGridInterface::oppositeFace( faceIdx );
+        faceIdx = cvf::StructGridDefines::oppositeFace( faceIdx );
 
         // grow from given face center to cell center, exiting if we reach the max length
         if ( !growStreamlineFromTo( streamline, cell.faceCenter( faceIdx ), cell.center(), rate, dominantPhaseOut ) ) break;
@@ -139,8 +139,8 @@ void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t c
         m_visitedCells.insert( cellIdx );
 
         // find the face with max flow where we should exit the cell
-        cvf::StructGridInterface::FaceType                   exitFace = cvf::StructGridInterface::FaceType::NO_FACE;
-        std::map<cvf::StructGridInterface::FaceType, double> rateMap;
+        cvf::StructGridDefines::FaceType                   exitFace = cvf::StructGridDefines::FaceType::NO_FACE;
+        std::map<cvf::StructGridDefines::FaceType, double> rateMap;
 
         double maxRate = 0.0;
 
@@ -166,7 +166,7 @@ void RimStreamlineGenerator::growStreamline( RimStreamline* streamline, size_t c
         }
 
         // did we find an exit?
-        if ( exitFace == cvf::StructGridInterface::FaceType::NO_FACE ) break;
+        if ( exitFace == cvf::StructGridDefines::FaceType::NO_FACE ) break;
 
         // add seeds for other faces with flow > threshold
         for ( auto& kvp : rateMap )

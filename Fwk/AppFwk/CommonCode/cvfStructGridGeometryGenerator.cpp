@@ -57,114 +57,6 @@ namespace cvf
 ///
 //==================================================================================================
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-CellRangeFilter::CellRangeFilter()
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void CellRangeFilter::addCellIncludeRange( size_t minI,
-                                           size_t minJ,
-                                           size_t minK,
-                                           size_t maxI,
-                                           size_t maxJ,
-                                           size_t maxK,
-                                           bool   applyToSubGridAreas )
-{
-    m_includeRanges.push_back( CellRange( minI, minJ, minK, maxI, maxJ, maxK, applyToSubGridAreas ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void CellRangeFilter::addCellInclude( size_t i, size_t j, size_t k, bool applyToSubGridAreas )
-{
-    m_includeRanges.push_back( CellRange( i, j, k, i + 1, j + 1, k + 1, applyToSubGridAreas ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void CellRangeFilter::addCellExcludeRange( size_t minI,
-                                           size_t minJ,
-                                           size_t minK,
-                                           size_t maxI,
-                                           size_t maxJ,
-                                           size_t maxK,
-                                           bool   applyToSubGridAreas )
-{
-    m_excludeRanges.push_back( CellRange( minI, minJ, minK, maxI, maxJ, maxK, applyToSubGridAreas ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void CellRangeFilter::addCellExclude( size_t i, size_t j, size_t k, bool applyToSubGridAreas )
-{
-    m_excludeRanges.push_back( CellRange( i, j, k, i + 1, j + 1, k + 1, applyToSubGridAreas ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool CellRangeFilter::isCellVisible( size_t i, size_t j, size_t k, bool isInSubGridArea ) const
-{
-    if ( m_includeRanges.empty() )
-    {
-        return false;
-    }
-
-    size_t idx;
-    for ( idx = 0; idx < m_excludeRanges.size(); idx++ )
-    {
-        if ( m_excludeRanges[idx].isInRange( i, j, k, isInSubGridArea ) )
-        {
-            return false;
-        }
-    }
-
-    for ( idx = 0; idx < m_includeRanges.size(); idx++ )
-    {
-        if ( m_includeRanges[idx].isInRange( i, j, k, isInSubGridArea ) )
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool CellRangeFilter::isCellExcluded( size_t i, size_t j, size_t k, bool isInSubGridArea ) const
-{
-    for ( size_t idx = 0; idx < m_excludeRanges.size(); idx++ )
-    {
-        if ( m_excludeRanges[idx].isInRange( i, j, k, isInSubGridArea ) )
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool CellRangeFilter::hasIncludeRanges() const
-{
-    if ( !m_includeRanges.empty() )
-        return true;
-    else
-        return false;
-}
-
 //==================================================================================================
 ///
 /// \class cvf::StructGridGeometry
@@ -279,12 +171,12 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
 
     std::vector<Vec3f> vertices;
 
-    for ( int enumInt = cvf::StructGridInterface::POS_I; enumInt < cvf::StructGridInterface::NO_FACE; enumInt++ )
+    for ( int enumInt = cvf::StructGridDefines::POS_I; enumInt < cvf::StructGridDefines::NO_FACE; enumInt++ )
     {
-        cvf::StructGridInterface::FaceType face = static_cast<cvf::StructGridInterface::FaceType>( enumInt );
+        cvf::StructGridDefines::FaceType face = static_cast<cvf::StructGridDefines::FaceType>( enumInt );
 
         ubyte faceConn[4];
-        grid->cellFaceVertexIndices( face, faceConn );
+        cvf::StructGridDefines::cellFaceVertexIndices( face, faceConn );
 
         int n;
         for ( n = 0; n < 4; n++ )
@@ -354,7 +246,7 @@ void StructGridGeometryGenerator::addFaceVisibilityFilter( const CellFaceVisibil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool StructGridGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const
+bool StructGridGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t k, StructGridDefines::FaceType face ) const
 {
     size_t idx;
     for ( idx = 0; idx < m_cellVisibilityFilters.size(); idx++ )
@@ -395,21 +287,21 @@ void StructGridGeometryGenerator::computeArrays()
                     continue;
                 }
 
-                std::vector<StructGridInterface::FaceType> visibleFaces;
+                std::vector<StructGridDefines::FaceType> visibleFaces;
                 visibleFaces.reserve( 6 );
 
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_I ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_I );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_I ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_I );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_J ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_J );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_J ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_J );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::NEG_K ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::NEG_K );
-                if ( isCellFaceVisible( i, j, k, StructGridInterface::POS_K ) )
-                    visibleFaces.push_back( cvf::StructGridInterface::POS_K );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_I ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_I );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_I ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_I );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_J ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_J );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_J ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_J );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::NEG_K ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::NEG_K );
+                if ( isCellFaceVisible( i, j, k, StructGridDefines::POS_K ) )
+                    visibleFaces.push_back( cvf::StructGridDefines::POS_K );
 
                 if ( !visibleFaces.empty() )
                 {
@@ -419,10 +311,10 @@ void StructGridGeometryGenerator::computeArrays()
                     size_t idx;
                     for ( idx = 0; idx < visibleFaces.size(); idx++ )
                     {
-                        cvf::StructGridInterface::FaceType face = visibleFaces[idx];
+                        cvf::StructGridDefines::FaceType face = visibleFaces[idx];
 
                         ubyte faceConn[4];
-                        m_grid->cellFaceVertexIndices( face, faceConn );
+                        cvf::StructGridDefines::cellFaceVertexIndices( face, faceConn );
 
 // Critical section to avoid two threads accessing the arrays at the same time.
 #pragma omp critical( critical_section_StructGridGeometryGenerator_computeArrays )

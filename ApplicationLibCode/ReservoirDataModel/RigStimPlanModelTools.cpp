@@ -66,7 +66,7 @@ cvf::Vec3d RigStimPlanModelTools::calculateTSTDirection( RigEclipseCaseData* ecl
 
         if ( !cell.isInvalid() )
         {
-            direction += cell.faceNormalWithAreaLength( cvf::StructGridInterface::NEG_K ).getNormalized();
+            direction += cell.faceNormalWithAreaLength( cvf::StructGridDefines::NEG_K ).getNormalized();
             numContributingCells++;
         }
     }

@@ -31,7 +31,7 @@
 #include "cafPdmUiSliderEditor.h"
 
 #include "cvfAssert.h"
-#include "cvfStructGrid.h"
+#include "cvfCellRangeFilter.h"
 
 CAF_PDM_SOURCE_INIT( RimCellRangeFilter, "CellRangeFilter" );
 

@@ -1889,30 +1889,30 @@ void RigCaseCellResultsData::computeDepthRelatedResults()
 
         if ( computeDx || isTemporaryGrid )
         {
-            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridInterface::NEG_I ) - cell.faceCenter( cvf::StructGridInterface::POS_I );
+            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridDefines::NEG_I ) - cell.faceCenter( cvf::StructGridDefines::POS_I );
             dx[0][resultIndex]   = cellWidth.length();
         }
 
         if ( computeDy || isTemporaryGrid )
         {
-            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridInterface::NEG_J ) - cell.faceCenter( cvf::StructGridInterface::POS_J );
+            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridDefines::NEG_J ) - cell.faceCenter( cvf::StructGridDefines::POS_J );
             dy[0][resultIndex]   = cellWidth.length();
         }
 
         if ( computeDz || isTemporaryGrid )
         {
-            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridInterface::NEG_K ) - cell.faceCenter( cvf::StructGridInterface::POS_K );
+            cvf::Vec3d cellWidth = cell.faceCenter( cvf::StructGridDefines::NEG_K ) - cell.faceCenter( cvf::StructGridDefines::POS_K );
             dz[0][resultIndex]   = cellWidth.length();
         }
 
         if ( computeTops || isTemporaryGrid )
         {
-            tops[0][resultIndex] = cvf::Math::abs( cell.faceCenter( cvf::StructGridInterface::NEG_K ).z() );
+            tops[0][resultIndex] = cvf::Math::abs( cell.faceCenter( cvf::StructGridDefines::NEG_K ).z() );
         }
 
         if ( computeBottom || isTemporaryGrid )
         {
-            bottom[0][resultIndex] = cvf::Math::abs( cell.faceCenter( cvf::StructGridInterface::POS_K ).z() );
+            bottom[0][resultIndex] = cvf::Math::abs( cell.faceCenter( cvf::StructGridDefines::POS_K ).z() );
         }
     }
 }
@@ -1949,11 +1949,11 @@ void RigCaseCellResultsData::computeNncsCells()
 
 namespace RigTransmissibilityCalcTools
 {
-void calculateConnectionGeometry( const RigCell&                     c1,
-                                  const RigCell&                     c2,
-                                  const std::vector<cvf::Vec3d>&     nodes,
-                                  cvf::StructGridInterface::FaceType faceId,
-                                  cvf::Vec3d*                        faceAreaVec )
+void calculateConnectionGeometry( const RigCell&                   c1,
+                                  const RigCell&                   c2,
+                                  const std::vector<cvf::Vec3d>&   nodes,
+                                  cvf::StructGridDefines::FaceType faceId,
+                                  cvf::Vec3d*                      faceAreaVec )
 {
     CVF_TIGHT_ASSERT( faceAreaVec );
 
@@ -1964,7 +1964,7 @@ void calculateConnectionGeometry( const RigCell&                     c1,
     std::array<size_t, 4>   face1;
     std::array<size_t, 4>   face2;
     c1.faceIndices( faceId, &face1 );
-    c2.faceIndices( cvf::StructGridInterface::oppositeFace( faceId ), &face2 );
+    c2.faceIndices( cvf::StructGridDefines::oppositeFace( faceId ), &face2 );
 
     bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
                                                                                &intersections,
@@ -2048,23 +2048,23 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
 {
     // Set up which component to compute
 
-    cvf::StructGridInterface::FaceType faceId = cvf::StructGridInterface::NO_FACE;
-    QString                            permCompName;
+    cvf::StructGridDefines::FaceType faceId = cvf::StructGridDefines::NO_FACE;
+    QString                          permCompName;
 
     if ( riTransComponentResultName == RiaResultNames::riTranXResultName() )
     {
         permCompName = "PERMX";
-        faceId       = cvf::StructGridInterface::POS_I;
+        faceId       = cvf::StructGridDefines::POS_I;
     }
     else if ( riTransComponentResultName == RiaResultNames::riTranYResultName() )
     {
         permCompName = "PERMY";
-        faceId       = cvf::StructGridInterface::POS_J;
+        faceId       = cvf::StructGridDefines::POS_J;
     }
     else if ( riTransComponentResultName == RiaResultNames::riTranZResultName() )
     {
         permCompName = "PERMZ";
-        faceId       = cvf::StructGridInterface::POS_K;
+        faceId       = cvf::StructGridDefines::POS_K;
     }
     else
     {
@@ -2193,7 +2193,7 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
                 double perm       = permResults[permResIdx];
 
                 double ntg = 1.0;
-                if ( hasNTGResults && faceId != cvf::StructGridInterface::POS_K )
+                if ( hasNTGResults && faceId != cvf::StructGridDefines::POS_K )
                 {
                     size_t ntgResIdx = ( *ntgIdxFunc )( activeCellInfo, nativeResvCellIndex );
                     ntg              = ( *ntgResults )[ntgResIdx];
@@ -2204,12 +2204,12 @@ void RigCaseCellResultsData::computeRiTransComponent( const QString& riTransComp
 
             // Neighbor cell half cell transm
             {
-                cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridInterface::oppositeFace( faceId ) ) - neighborCell.center();
+                cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridDefines::oppositeFace( faceId ) ) - neighborCell.center();
 
                 double perm = permResults[neighborCellPermResIdx];
 
                 double ntg = 1.0;
-                if ( hasNTGResults && faceId != cvf::StructGridInterface::POS_K )
+                if ( hasNTGResults && faceId != cvf::StructGridDefines::POS_K )
                 {
                     size_t ntgResIdx = ( *ntgIdxFunc )( activeCellInfo, neighborResvCellIdx );
                     ntg              = ( *ntgResults )[ntgResIdx];
@@ -2291,27 +2291,27 @@ void RigCaseCellResultsData::computeNncCombRiTrans()
     const RigConnectionContainer& nncConnections = m_ownerMainGrid->nncData()->allConnections();
     for ( size_t connIdx = 0; connIdx < nncConnections.size(); connIdx++ )
     {
-        size_t                             nativeResvCellIndex = nncConnections[connIdx].c1GlobIdx();
-        size_t                             neighborResvCellIdx = nncConnections[connIdx].c2GlobIdx();
-        cvf::StructGridInterface::FaceType faceId = static_cast<cvf::StructGridInterface::FaceType>( nncConnections[connIdx].face() );
+        size_t                           nativeResvCellIndex = nncConnections[connIdx].c1GlobIdx();
+        size_t                           neighborResvCellIdx = nncConnections[connIdx].c2GlobIdx();
+        cvf::StructGridDefines::FaceType faceId = static_cast<cvf::StructGridDefines::FaceType>( nncConnections[connIdx].face() );
 
         ResultIndexFunction  permIdxFunc = nullptr;
         std::vector<double>* permResults = nullptr;
 
         switch ( faceId )
         {
-            case cvf::StructGridInterface::POS_I:
-            case cvf::StructGridInterface::NEG_I:
+            case cvf::StructGridDefines::POS_I:
+            case cvf::StructGridDefines::NEG_I:
                 permIdxFunc = permXIdxFunc;
                 permResults = &permXResults;
                 break;
-            case cvf::StructGridInterface::POS_J:
-            case cvf::StructGridInterface::NEG_J:
+            case cvf::StructGridDefines::POS_J:
+            case cvf::StructGridDefines::NEG_J:
                 permIdxFunc = permYIdxFunc;
                 permResults = &permYResults;
                 break;
-            case cvf::StructGridInterface::POS_K:
-            case cvf::StructGridInterface::NEG_K:
+            case cvf::StructGridDefines::POS_K:
+            case cvf::StructGridDefines::NEG_K:
                 permIdxFunc = permZIdxFunc;
                 permResults = &permZResults;
                 break;
@@ -2362,7 +2362,7 @@ void RigCaseCellResultsData::computeNncCombRiTrans()
             double perm = ( *permResults )[nativeCellPermResIdx];
 
             double ntg = 1.0;
-            if ( hasNTGResults && faceId != cvf::StructGridInterface::POS_K )
+            if ( hasNTGResults && faceId != cvf::StructGridDefines::POS_K )
             {
                 size_t ntgResIdx = ( *ntgIdxFunc )( activeCellInfo, nativeResvCellIndex );
                 ntg              = ( *ntgResults )[ntgResIdx];
@@ -2373,12 +2373,12 @@ void RigCaseCellResultsData::computeNncCombRiTrans()
 
         // Neighbor cell half cell transm
         {
-            cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridInterface::oppositeFace( faceId ) ) - neighborCell.center();
+            cvf::Vec3d centerToFace = neighborCell.faceCenter( cvf::StructGridDefines::oppositeFace( faceId ) ) - neighborCell.center();
 
             double perm = ( *permResults )[neighborCellPermResIdx];
 
             double ntg = 1.0;
-            if ( hasNTGResults && faceId != cvf::StructGridInterface::POS_K )
+            if ( hasNTGResults && faceId != cvf::StructGridDefines::POS_K )
             {
                 size_t ntgResIdx = ( *ntgIdxFunc )( activeCellInfo, neighborResvCellIdx );
                 ntg              = ( *ntgResults )[ntgResIdx];
@@ -2515,23 +2515,23 @@ void RigCaseCellResultsData::computeRiTRANSbyAreaComponent( const QString& riTra
 {
     // Set up which component to compute
 
-    cvf::StructGridInterface::FaceType faceId = cvf::StructGridInterface::NO_FACE;
-    QString                            transCompName;
+    cvf::StructGridDefines::FaceType faceId = cvf::StructGridDefines::NO_FACE;
+    QString                          transCompName;
 
     if ( riTransByAreaCompResultName == RiaResultNames::riAreaNormTranXResultName() )
     {
         transCompName = "TRANX";
-        faceId        = cvf::StructGridInterface::POS_I;
+        faceId        = cvf::StructGridDefines::POS_I;
     }
     else if ( riTransByAreaCompResultName == RiaResultNames::riAreaNormTranYResultName() )
     {
         transCompName = "TRANY";
-        faceId        = cvf::StructGridInterface::POS_J;
+        faceId        = cvf::StructGridDefines::POS_J;
     }
     else if ( riTransByAreaCompResultName == RiaResultNames::riAreaNormTranZResultName() )
     {
         transCompName = "TRANZ";
-        faceId        = cvf::StructGridInterface::POS_K;
+        faceId        = cvf::StructGridDefines::POS_K;
     }
     else
     {

@@ -37,7 +37,7 @@ public:
     /// Returns [SOIL, SGAS] regardless of which one of the three is missing. if Soil or SWat is missing, it is
     /// calculated based on the two others
     cvf::Vec2d cellScalar( size_t gridLocalCellIndex ) const;
-    cvf::Vec2d cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const;
+    cvf::Vec2d cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const;
     cvf::Vec2d cellScalarGlobIdx( size_t globCellIndex ) const;
 
 private:

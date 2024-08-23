@@ -347,7 +347,7 @@ bool RigGridBase::isCellValid( size_t i, size_t j, size_t k ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigGridBase::cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const
+bool RigGridBase::cellIJKNeighbor( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const
 {
     size_t ni, nj, nk;
     neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
@@ -368,7 +368,7 @@ bool RigGridBase::cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigGridBase::cellIJKNeighborUnguarded( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const
+void RigGridBase::cellIJKNeighborUnguarded( size_t i, size_t j, size_t k, cvf::StructGridDefines::FaceType face, size_t* neighborCellIndex ) const
 {
     size_t ni, nj, nk;
     neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
@@ -398,7 +398,7 @@ cvf::Vec3d RigGridBase::displayModelOffset() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the min size of the I and J charactristic cell sizes
+/// Returns the min size of the I and J characteristic cell sizes
 //--------------------------------------------------------------------------------------------------
 double RigGridBase::characteristicIJCellSize() const
 {
@@ -533,11 +533,11 @@ size_t RigGridBase::cellCount() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                             i,
-                                                     size_t                             j,
-                                                     size_t                             k,
-                                                     cvf::StructGridInterface::FaceType face,
-                                                     const cvf::UByteArray*             cellVisibility ) const
+bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                           i,
+                                                     size_t                           j,
+                                                     size_t                           k,
+                                                     cvf::StructGridDefines::FaceType face,
+                                                     const cvf::UByteArray*           cellVisibility ) const
 {
     CVF_TIGHT_ASSERT( m_grid );
 
@@ -549,7 +549,7 @@ bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                     
     }
 
     size_t ni, nj, nk;
-    cvf::StructGridInterface::neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
+    cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, face, &ni, &nj, &nk );
 
     // If the cell is on the edge of the grid, Interpret as having an invisible neighbour
     if ( ni >= m_grid->cellCountI() || nj >= m_grid->cellCountJ() || nk >= m_grid->cellCountK() )

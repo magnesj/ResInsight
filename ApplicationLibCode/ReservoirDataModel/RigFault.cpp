@@ -33,7 +33,7 @@ RigFault::RigFault()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFault::addCellRangeForFace( cvf::StructGridInterface::FaceType face, const cvf::CellRange& cellRange )
+void RigFault::addCellRangeForFace( cvf::StructGridDefines::FaceType face, const cvf::CellRange& cellRange )
 {
     size_t faceIndex = static_cast<size_t>( face );
     CVF_ASSERT( faceIndex < 6 );
@@ -94,8 +94,8 @@ const std::vector<size_t>& RigFault::connectionIndices() const
 //--------------------------------------------------------------------------------------------------
 bool RigFault::ordering( CellAndFace first, CellAndFace second )
 {
-    size_t                             i1, i2, j1, j2, k1, k2;
-    cvf::StructGridInterface::FaceType f1, f2;
+    size_t                           i1, i2, j1, j2, k1, k2;
+    cvf::StructGridDefines::FaceType f1, f2;
     std::tie( i1, j1, k1, f1 ) = first;
     std::tie( i2, j2, k2, f2 ) = second;
     if ( i1 == i2 )
@@ -133,7 +133,7 @@ void RigFault::computeFaultFacesFromCellRanges( const RigMainGrid* mainGrid )
 
     for ( size_t faceType = 0; faceType < 6; faceType++ )
     {
-        cvf::StructGridInterface::FaceType faceEnum = cvf::StructGridInterface::FaceType( faceType );
+        cvf::StructGridDefines::FaceType faceEnum = cvf::StructGridDefines::FaceType( faceType );
 
         const std::vector<cvf::CellRange>& cellRanges = m_cellRangesForFaces[faceType];
 
@@ -167,7 +167,7 @@ void RigFault::computeFaultFacesFromCellRanges( const RigMainGrid* mainGrid )
                         // size_t reservoirCellIndex = grid->reservoirCellIndex(gridLocalCellIndex);
 
                         size_t ni, nj, nk;
-                        RigMainGrid::neighborIJKAtCellFace( i, j, k, faceEnum, &ni, &nj, &nk );
+                        cvf::StructGridDefines::neighborIJKAtCellFace( i, j, k, faceEnum, &ni, &nj, &nk );
                         if ( ni < mainGrid->cellCountI() && nj < mainGrid->cellCountJ() && nk < mainGrid->cellCountK() )
                         {
                             size_t gridLocalCellIndex = mainGrid->cellIndexFromIJK( i, j, k );
@@ -198,7 +198,7 @@ void RigFault::accumulateFaultsPrCell( RigFaultsPrCellAccumulator* faultsPrCellA
         // >= 0)
 
         faultsPrCellAcc->setFaultIdx( ff.m_nativeReservoirCellIndex, ff.m_nativeFace, faultIdx );
-        faultsPrCellAcc->setFaultIdx( ff.m_oppositeReservoirCellIndex, cvf::StructGridInterface::oppositeFace( ff.m_nativeFace ), faultIdx );
+        faultsPrCellAcc->setFaultIdx( ff.m_oppositeReservoirCellIndex, cvf::StructGridDefines::oppositeFace( ff.m_nativeFace ), faultIdx );
     }
 }
 
@@ -214,7 +214,7 @@ RigFaultsPrCellAccumulator::RigFaultsPrCellAccumulator( size_t reservoirCellCoun
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RigFaultsPrCellAccumulator::faultIdx( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face ) const
+int RigFaultsPrCellAccumulator::faultIdx( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face ) const
 {
     // Ensure no crash after creating temporary LGRs
     if ( reservoirCellIndex < m_faultIdxForCellFace.size() )
@@ -227,7 +227,7 @@ int RigFaultsPrCellAccumulator::faultIdx( size_t reservoirCellIndex, cvf::Struct
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFaultsPrCellAccumulator::setFaultIdx( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face, int faultIdx )
+void RigFaultsPrCellAccumulator::setFaultIdx( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face, int faultIdx )
 {
     m_faultIdxForCellFace[reservoirCellIndex][face] = faultIdx;
 }

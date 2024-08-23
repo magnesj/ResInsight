@@ -151,7 +151,7 @@ cvf::Vec3d RigFaultReactivationModel::transformPointIfNeeded( const cvf::Vec3d p
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFaultReactivationModel::updateGeometry( size_t startCell, cvf::StructGridInterface::FaceType startFace )
+void RigFaultReactivationModel::updateGeometry( size_t startCell, cvf::StructGridDefines::FaceType startFace )
 {
     reset();
 

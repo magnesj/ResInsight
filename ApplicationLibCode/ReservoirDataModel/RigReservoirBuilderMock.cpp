@@ -328,7 +328,7 @@ void RigReservoirBuilderMock::addFaults( RigEclipseCaseData* eclipseCase )
 
         cvf::CellRange cellRange( min, max );
 
-        fault->addCellRangeForFace( cvf::StructGridInterface::POS_I, cellRange );
+        fault->addCellRangeForFace( cvf::StructGridDefines::POS_I, cellRange );
         faults.push_back( fault.p() );
     }
 

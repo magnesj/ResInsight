@@ -122,7 +122,7 @@ public:
 
     static RiaDefines::EclipseUnitSystem readUnitSystem( QFile& file, qint64 gridunitPos );
 
-    static cvf::StructGridInterface::FaceEnum faceEnumFromText( const QString& faceString );
+    static cvf::StructGridDefines::FaceEnum faceEnumFromText( const QString& faceString );
 
     static bool hasGridData( const QString& fileName );
 
@@ -152,13 +152,13 @@ private:
 
     static qint64 findKeyword( const QString& keyword, QFile& file, qint64 startPos );
 
-    static void writeFaultLine( QTextStream&                       stream,
-                                QString                            faultName,
-                                size_t                             i,
-                                size_t                             j,
-                                size_t                             startK,
-                                size_t                             endK,
-                                cvf::StructGridInterface::FaceType faceType );
+    static void writeFaultLine( QTextStream&                     stream,
+                                QString                          faultName,
+                                size_t                           i,
+                                size_t                           j,
+                                size_t                           startK,
+                                size_t                           endK,
+                                cvf::StructGridDefines::FaceType faceType );
 
-    static QString faultFaceText( cvf::StructGridInterface::FaceType faceType );
+    static QString faultFaceText( cvf::StructGridDefines::FaceType faceType );
 };

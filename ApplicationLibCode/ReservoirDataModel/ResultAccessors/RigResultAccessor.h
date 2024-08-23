@@ -30,10 +30,10 @@
 class RigResultAccessor : public cvf::Object
 {
 public:
-    virtual double cellScalar( size_t gridLocalCellIndex ) const                                                  = 0;
-    virtual double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const   = 0;
-    virtual double cellScalarGlobIdx( size_t globCellIndex ) const                                                = 0;
-    virtual double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const = 0;
+    virtual double cellScalar( size_t gridLocalCellIndex ) const                                                = 0;
+    virtual double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const   = 0;
+    virtual double cellScalarGlobIdx( size_t globCellIndex ) const                                              = 0;
+    virtual double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const = 0;
 };
 
 //==================================================================================================
@@ -43,7 +43,7 @@ class RigHugeValResultAccessor : public RigResultAccessor
 {
 public:
     double cellScalar( size_t gridLocalCellIndex ) const override;
-    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
     double cellScalarGlobIdx( size_t globCellIndex ) const override;
-    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const override;
+    double cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const override;
 };

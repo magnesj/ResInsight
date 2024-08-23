@@ -50,6 +50,8 @@ add_library(
   cvfStructGrid.h
   cvfCellRange.cpp
   cvfCellRange.h
+  cvfCellRangeFilter.cpp
+  cvfCellRangeFilter.h
   cafColorTable.cpp
   cafColorTable.h
   cafContourLines.cpp
@@ -59,6 +61,8 @@ add_library(
   cvfStructGridScalarDataAccess.h
   cafVecIjk.cpp
   cafVecIjk.h
+  cvfStructGridDefines.cpp
+  cvfStructGridDefines.h
   ${MOC_SOURCE_FILES}
 )
 

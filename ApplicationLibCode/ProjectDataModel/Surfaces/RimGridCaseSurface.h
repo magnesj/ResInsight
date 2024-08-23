@@ -61,25 +61,25 @@ private:
     // Extract 4 vertices per grid cell
     void extractGridDataUsingFourVerticesPerCell();
 
-    void addGeometryForFaultFaces( const RigMainGrid*                 grid,
-                                   size_t                             currentCellIndex,
-                                   cvf::StructGridInterface::FaceType extractionFace,
-                                   cvf::StructGridInterface::FaceType faultFace,
-                                   cvf::Vec3d*                        currentCornerVerts,
-                                   std::vector<cvf::Vec3d>&           vertices,
-                                   std::vector<unsigned>&             triangleIndices );
+    void addGeometryForFaultFaces( const RigMainGrid*               grid,
+                                   size_t                           currentCellIndex,
+                                   cvf::StructGridDefines::FaceType extractionFace,
+                                   cvf::StructGridDefines::FaceType faultFace,
+                                   cvf::Vec3d*                      currentCornerVerts,
+                                   std::vector<cvf::Vec3d>&         vertices,
+                                   std::vector<unsigned>&           triangleIndices );
 
     // This method will populate m_structGridIndices used when exporting to PTL file format
     // Fault geometry will be smoothed using this method
     void extractStructuredSurfaceFromGridData();
 
-    bool findValidCellIndex( const RigMainGrid*                       grid,
-                             const cvf::StructGridInterface::FaceType faceType,
-                             size_t&                                  cellIndex,
-                             const size_t                             row,
-                             const size_t                             column,
-                             const size_t                             layer,
-                             size_t&                                  cellFaceIndex );
+    bool findValidCellIndex( const RigMainGrid*                     grid,
+                             const cvf::StructGridDefines::FaceType faceType,
+                             size_t&                                cellIndex,
+                             const size_t                           row,
+                             const size_t                           column,
+                             const size_t                           layer,
+                             size_t&                                cellFaceIndex );
 
 private:
     caf::PdmPtrField<RimCase*> m_case;

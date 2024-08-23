@@ -64,7 +64,7 @@ double RigCombMultResultAccessor::cellScalar( size_t gridLocalCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigCombMultResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigCombMultResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     size_t i, j, k, neighborGridCellIdx;
     m_grid->ijkFromCellIndex( gridLocalCellIndex, &i, &j, &k );
@@ -74,7 +74,7 @@ double RigCombMultResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf
     double faceScalarNeighborCell = 1.0;
     if ( m_grid->cellIJKNeighbor( i, j, k, faceId, &neighborGridCellIdx ) )
     {
-        faceScalarNeighborCell = nativeMultScalar( neighborGridCellIdx, cvf::StructGridInterface::oppositeFace( faceId ) );
+        faceScalarNeighborCell = nativeMultScalar( neighborGridCellIdx, cvf::StructGridDefines::oppositeFace( faceId ) );
     }
 
     return faceScalarThisCell * faceScalarNeighborCell;
@@ -83,13 +83,13 @@ double RigCombMultResultAccessor::cellFaceScalar( size_t gridLocalCellIndex, cvf
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     double faceScalar = 1.0;
 
     switch ( faceId )
     {
-        case cvf::StructGridInterface::POS_I:
+        case cvf::StructGridDefines::POS_I:
         {
             if ( m_multXPosAccessor.notNull() )
             {
@@ -97,7 +97,7 @@ double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, c
             }
             break;
         }
-        case cvf::StructGridInterface::NEG_I:
+        case cvf::StructGridDefines::NEG_I:
         {
             if ( m_multXNegAccessor.notNull() )
             {
@@ -106,7 +106,7 @@ double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, c
             break;
         }
 
-        case cvf::StructGridInterface::POS_J:
+        case cvf::StructGridDefines::POS_J:
         {
             if ( m_multYPosAccessor.notNull() )
             {
@@ -114,7 +114,7 @@ double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, c
             }
             break;
         }
-        case cvf::StructGridInterface::NEG_J:
+        case cvf::StructGridDefines::NEG_J:
         {
             if ( m_multYNegAccessor.notNull() )
             {
@@ -123,7 +123,7 @@ double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, c
             break;
         }
 
-        case cvf::StructGridInterface::POS_K:
+        case cvf::StructGridDefines::POS_K:
         {
             if ( m_multZPosAccessor.notNull() )
             {
@@ -131,7 +131,7 @@ double RigCombMultResultAccessor::nativeMultScalar( size_t gridLocalCellIndex, c
             }
             break;
         }
-        case cvf::StructGridInterface::NEG_K:
+        case cvf::StructGridDefines::NEG_K:
         {
             if ( m_multZNegAccessor.notNull() )
             {
@@ -166,7 +166,7 @@ double RigCombMultResultAccessor::cellScalarGlobIdx( size_t globCellIndex ) cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigCombMultResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridInterface::FaceType faceId ) const
+double RigCombMultResultAccessor::cellFaceScalarGlobIdx( size_t globCellIndex, cvf::StructGridDefines::FaceType faceId ) const
 {
     size_t gridLocalCellIndex = m_grid->mainGrid()->cell( globCellIndex ).gridLocalCellIndex();
     return cellFaceScalar( gridLocalCellIndex, faceId );

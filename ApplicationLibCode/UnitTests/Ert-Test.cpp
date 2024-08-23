@@ -185,7 +185,7 @@ TEST(RigReservoirTest, ReadFaultsRecursively)
 
         for (size_t faceType = 0; faceType < 6; faceType++)
         {
-            cvf::StructGridInterface::FaceType faceEnum = cvf::StructGridInterface::FaceType(faceType);
+            cvf::StructGridDefines::FaceType faceEnum = cvf::StructGridDefines::FaceType(faceType);
 //             const std::vector<cvf::CellRange>& cellRanges = rigFault->cellRangeForFace(faceEnum);
 // 
 //             for (size_t i = 0; i < cellRanges.size(); i++)

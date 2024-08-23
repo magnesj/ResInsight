@@ -99,9 +99,9 @@ public:
     const cvf::UIntArray*  gridCellToResultWellIndex( size_t gridIndex );
 
     const RigCell& cellFromWellResultCell( const RigWellResultPoint& wellResultCell ) const;
-    bool           findSharedSourceFace( cvf::StructGridInterface::FaceType& sharedSourceFace,
-                                         const RigWellResultPoint&           sourceWellCellResult,
-                                         const RigWellResultPoint&           otherWellCellResult ) const;
+    bool           findSharedSourceFace( cvf::StructGridDefines::FaceType& sharedSourceFace,
+                                         const RigWellResultPoint&         sourceWellCellResult,
+                                         const RigWellResultPoint&         otherWellCellResult ) const;
 
     void computeActiveCellBoundingBoxes( bool useOptimizedVersion );
 

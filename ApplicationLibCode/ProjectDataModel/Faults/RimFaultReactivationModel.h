@@ -78,7 +78,7 @@ public:
 
     std::pair<bool, std::string> validateModel() const;
 
-    void            setFaultInformation( RimFaultInView* fault, size_t cellIndex, cvf::StructGridInterface::FaceType face );
+    void            setFaultInformation( RimFaultInView* fault, size_t cellIndex, cvf::StructGridDefines::FaceType face );
     RimFaultInView* fault() const;
 
     void setTargets( cvf::Vec3d target1, cvf::Vec3d target2 );

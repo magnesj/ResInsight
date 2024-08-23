@@ -26,17 +26,14 @@
 RigConnection::RigConnection()
     : m_c1GlobIdx( cvf::UNDEFINED_UINT )
     , m_c2GlobIdx( cvf::UNDEFINED_UINT )
-    , m_c1Face( static_cast<unsigned char>( cvf::StructGridInterface::NO_FACE ) )
+    , m_c1Face( static_cast<unsigned char>( cvf::StructGridDefines::NO_FACE ) )
 {
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigConnection::RigConnection( unsigned                           c1GlobIdx,
-                              unsigned                           c2GlobIdx,
-                              cvf::StructGridInterface::FaceType c1Face,
-                              const std::vector<cvf::Vec3f>&     polygon )
+RigConnection::RigConnection( unsigned c1GlobIdx, unsigned c2GlobIdx, cvf::StructGridDefines::FaceType c1Face, const std::vector<cvf::Vec3f>& polygon )
     : m_c1GlobIdx( c1GlobIdx )
     , m_c2GlobIdx( c2GlobIdx )
     , m_c1Face( static_cast<unsigned char>( c1Face ) )
@@ -48,10 +45,10 @@ RigConnection::RigConnection( unsigned                           c1GlobIdx,
         m_c1GlobIdx = c2GlobIdx;
         m_c2GlobIdx = c1GlobIdx;
 
-        if ( c1Face != cvf::StructGridInterface::FaceType::NO_FACE )
+        if ( c1Face != cvf::StructGridDefines::FaceType::NO_FACE )
         {
             // The face type is related to cell 1, so use opposite face
-            m_c1Face = cvf::StructGridInterface::oppositeFace( c1Face );
+            m_c1Face = cvf::StructGridDefines::oppositeFace( c1Face );
         }
     }
 }
@@ -59,7 +56,7 @@ RigConnection::RigConnection( unsigned                           c1GlobIdx,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigConnection::RigConnection( size_t c1GlobIdx, size_t c2GlobIdx, cvf::StructGridInterface::FaceType c1Face, const std::vector<cvf::Vec3f>& polygon )
+RigConnection::RigConnection( size_t c1GlobIdx, size_t c2GlobIdx, cvf::StructGridDefines::FaceType c1Face, const std::vector<cvf::Vec3f>& polygon )
     : m_c1GlobIdx( static_cast<unsigned>( c1GlobIdx ) )
     , m_c2GlobIdx( static_cast<unsigned>( c2GlobIdx ) )
     , m_c1Face( static_cast<unsigned char>( c1Face ) )
@@ -73,10 +70,10 @@ RigConnection::RigConnection( size_t c1GlobIdx, size_t c2GlobIdx, cvf::StructGri
         m_c1GlobIdx = static_cast<unsigned>( c2GlobIdx );
         m_c2GlobIdx = static_cast<unsigned>( c1GlobIdx );
 
-        if ( c1Face != cvf::StructGridInterface::FaceType::NO_FACE )
+        if ( c1Face != cvf::StructGridDefines::FaceType::NO_FACE )
         {
             // The face type is related to cell 1, so use opposite face
-            m_c1Face = cvf::StructGridInterface::oppositeFace( c1Face );
+            m_c1Face = cvf::StructGridDefines::oppositeFace( c1Face );
         }
     }
 }

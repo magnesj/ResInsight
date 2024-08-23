@@ -39,7 +39,7 @@ public:
     std::array<size_t, 8>&       cornerIndices() { return m_cornerIndices; }
     const std::array<size_t, 8>& cornerIndices() const { return m_cornerIndices; }
 
-    void faceIndices( cvf::StructGridInterface::FaceType face, std::array<size_t, 4>* faceIndices ) const;
+    void faceIndices( cvf::StructGridDefines::FaceType face, std::array<size_t, 4>* faceIndices ) const;
 
     bool isInvalid() const { return m_isInvalid; }
     void setInvalid( bool val ) { m_isInvalid = val; }
@@ -63,9 +63,9 @@ public:
     void   setCoarseningBoxIndex( size_t coarseningBoxIndex ) { m_coarseningBoxIndex = coarseningBoxIndex; }
 
     cvf::Vec3d                center() const;
-    std::array<cvf::Vec3d, 4> faceCorners( cvf::StructGridInterface::FaceType face ) const;
-    cvf::Vec3d                faceCenter( cvf::StructGridInterface::FaceType face ) const;
-    cvf::Vec3d                faceNormalWithAreaLength( cvf::StructGridInterface::FaceType face ) const;
+    std::array<cvf::Vec3d, 4> faceCorners( cvf::StructGridDefines::FaceType face ) const;
+    cvf::Vec3d                faceCenter( cvf::StructGridDefines::FaceType face ) const;
+    cvf::Vec3d                faceNormalWithAreaLength( cvf::StructGridDefines::FaceType face ) const;
     double                    volume() const;
 
     int  firstIntersectionPoint( const cvf::Ray& ray, cvf::Vec3d* intersectionPoint ) const;
@@ -74,7 +74,7 @@ public:
 
     cvf::BoundingBox boundingBox() const;
 
-    RigCell             neighborCell( cvf::StructGridInterface::FaceType face ) const;
+    RigCell             neighborCell( cvf::StructGridDefines::FaceType face ) const;
     std::vector<size_t> allNeighborMainGridCellIndexes() const;
 
 private:

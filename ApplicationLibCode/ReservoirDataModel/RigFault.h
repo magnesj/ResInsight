@@ -48,9 +48,9 @@ public:
 public:
     explicit RigFaultsPrCellAccumulator( size_t reservoirCellCount );
 
-    int faultIdx( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face ) const;
+    int faultIdx( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face ) const;
 
-    void setFaultIdx( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face, int faultIdx );
+    void setFaultIdx( size_t reservoirCellIndex, cvf::StructGridDefines::FaceType face, int faultIdx );
 
 private:
     std::vector<std::array<int, 6>> m_faultIdxForCellFace;
@@ -62,20 +62,20 @@ private:
 class RigFault : public cvf::Object
 {
 public:
-    using CellAndFace = std::tuple<size_t, size_t, size_t, cvf::StructGridInterface::FaceType>;
+    using CellAndFace = std::tuple<size_t, size_t, size_t, cvf::StructGridDefines::FaceType>;
 
     struct FaultFace
     {
-        FaultFace( size_t nativeReservoirCellIndex, cvf::StructGridInterface::FaceType nativeFace, size_t oppositeReservoirCellIndex )
+        FaultFace( size_t nativeReservoirCellIndex, cvf::StructGridDefines::FaceType nativeFace, size_t oppositeReservoirCellIndex )
             : m_nativeReservoirCellIndex( nativeReservoirCellIndex )
             , m_nativeFace( nativeFace )
             , m_oppositeReservoirCellIndex( oppositeReservoirCellIndex )
         {
         }
 
-        size_t                             m_nativeReservoirCellIndex;
-        cvf::StructGridInterface::FaceType m_nativeFace;
-        size_t                             m_oppositeReservoirCellIndex;
+        size_t                           m_nativeReservoirCellIndex;
+        cvf::StructGridDefines::FaceType m_nativeFace;
+        size_t                           m_oppositeReservoirCellIndex;
     };
 
 public:
@@ -84,7 +84,7 @@ public:
     void    setName( const QString& name );
     QString name() const;
 
-    void addCellRangeForFace( cvf::StructGridInterface::FaceType face, const cvf::CellRange& cellRange );
+    void addCellRangeForFace( cvf::StructGridDefines::FaceType face, const cvf::CellRange& cellRange );
     void computeFaultFacesFromCellRanges( const RigMainGrid* grid );
 
     void accumulateFaultsPrCell( RigFaultsPrCellAccumulator* faultsPrCellAcc, int faultIdx );

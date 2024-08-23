@@ -59,7 +59,7 @@ RiuFemResultTextBuilder::RiuFemResultTextBuilder( RimGridView*                di
     m_frameIndex       = frameIndex;
 
     m_intersectionPointInDisplay = cvf::Vec3d::UNDEFINED;
-    m_face                       = cvf::StructGridInterface::NO_FACE;
+    m_face                       = cvf::StructGridDefines::NO_FACE;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -440,7 +440,7 @@ QString RiuFemResultTextBuilder::closestNodeResultText( RimGeoMechResultDefiniti
             {
                 text.append( QString( "Closest result: N[%1], on face: %2, %3\n" )
                                  .arg( closestNodeId )
-                                 .arg( caf::AppEnum<cvf::StructGridInterface::FaceType>::textFromIndex( m_face ) )
+                                 .arg( caf::AppEnum<cvf::StructGridDefines::FaceType>::textFromIndex( m_face ) )
                                  .arg( scalarValue ) );
             }
             else if ( m_isIntersectionTriangleSet && activeResultPosition == RIG_ELEMENT_NODAL_FACE )

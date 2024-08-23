@@ -82,7 +82,7 @@ void RigFaultDistanceResultCalculator::calculate( const RigEclipseResultAddress&
 
     long long numCells = static_cast<long long>( globalCellArray.size() );
 
-    std::vector<cvf::StructGridInterface::FaceType> faceTypes = cvf::StructGridInterface::validFaceTypes();
+    std::vector<cvf::StructGridDefines::FaceType> faceTypes = cvf::StructGridDefines::validFaceTypes();
 
     // Preprocessing: create vector of all fault face centers.
     std::vector<cvf::Vec3d> faultFaceCenters;

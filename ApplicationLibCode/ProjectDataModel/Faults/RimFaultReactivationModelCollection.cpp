@@ -60,13 +60,13 @@ RimFaultReactivationModelCollection::~RimFaultReactivationModelCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFaultReactivationModel* RimFaultReactivationModelCollection::addNewModel( RimFaultInView*                    fault,
-                                                                             size_t                             cellIndex,
-                                                                             cvf::StructGridInterface::FaceType face,
-                                                                             cvf::Vec3d                         target1,
-                                                                             cvf::Vec3d                         target2,
-                                                                             QString                            baseDir,
-                                                                             QString&                           outErrMsg )
+RimFaultReactivationModel* RimFaultReactivationModelCollection::addNewModel( RimFaultInView*                  fault,
+                                                                             size_t                           cellIndex,
+                                                                             cvf::StructGridDefines::FaceType face,
+                                                                             cvf::Vec3d                       target1,
+                                                                             cvf::Vec3d                       target2,
+                                                                             QString                          baseDir,
+                                                                             QString&                         outErrMsg )
 {
     auto newModel = new RimFaultReactivationModel();
     newModel->setFaultInformation( fault, cellIndex, face );

@@ -185,17 +185,17 @@ const std::array<int, 4> RigFaultReactivationModelGenerator::faceIJCornerIndexes
 {
     switch ( face )
     {
-        case cvf::StructGridInterface::POS_I:
-        case cvf::StructGridInterface::NEG_J:
+        case cvf::StructGridDefines::POS_I:
+        case cvf::StructGridDefines::NEG_J:
             return { 0, 1, 3, 2 };
 
-        case cvf::StructGridInterface::NEG_I:
-        case cvf::StructGridInterface::POS_J:
+        case cvf::StructGridDefines::NEG_I:
+        case cvf::StructGridDefines::POS_J:
             return { 0, 3, 1, 2 };
 
-        case cvf::StructGridInterface::POS_K:
-        case cvf::StructGridInterface::NEG_K:
-        case cvf::StructGridInterface::NO_FACE:
+        case cvf::StructGridDefines::POS_K:
+        case cvf::StructGridDefines::NEG_K:
+        case cvf::StructGridDefines::NO_FACE:
         default:
             break;
     }
@@ -209,7 +209,7 @@ const std::array<int, 4> RigFaultReactivationModelGenerator::faceIJCornerIndexes
 //--------------------------------------------------------------------------------------------------
 size_t RigFaultReactivationModelGenerator::oppositeStartCellIndex( const std::vector<size_t> cellIndexColumn, FaceType face )
 {
-    auto   oppositeStartFace  = cvf::StructGridInterface::oppositeFace( face );
+    auto   oppositeStartFace  = cvf::StructGridDefines::oppositeFace( face );
     bool   bFoundOppositeCell = false;
     size_t oppositeCellIdx    = 0;
 
@@ -532,7 +532,7 @@ void RigFaultReactivationModelGenerator::generateGeometry( size_t            sta
     {
         if ( cidx != startCellIndex ) cellColumnBackSearch.push_back( cidx );
     }
-    auto   oppositeStartFace    = cvf::StructGridInterface::oppositeFace( startFace );
+    auto   oppositeStartFace    = cvf::StructGridDefines::oppositeFace( startFace );
     size_t oppositeStartCellIdx = oppositeStartCellIndex( cellColumnBackSearch, startFace );
 
     // build cell column of cells in front of fault, opposite to the cell column behind the fault
@@ -656,27 +656,27 @@ void RigFaultReactivationModelGenerator::generateGeometry( size_t            sta
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<cvf::StructGridInterface::FaceType, cvf::StructGridInterface::FaceType> RigFaultReactivationModelGenerator::sideFacesIJ( FaceType face )
+std::pair<cvf::StructGridDefines::FaceType, cvf::StructGridDefines::FaceType> RigFaultReactivationModelGenerator::sideFacesIJ( FaceType face )
 {
     switch ( face )
     {
-        case cvf::StructGridInterface::POS_I:
-        case cvf::StructGridInterface::NEG_I:
-            return { cvf::StructGridInterface::NEG_J, cvf::StructGridInterface::POS_J };
+        case cvf::StructGridDefines::POS_I:
+        case cvf::StructGridDefines::NEG_I:
+            return { cvf::StructGridDefines::NEG_J, cvf::StructGridDefines::POS_J };
 
-        case cvf::StructGridInterface::POS_J:
-        case cvf::StructGridInterface::NEG_J:
-            return { cvf::StructGridInterface::NEG_I, cvf::StructGridInterface::POS_I };
+        case cvf::StructGridDefines::POS_J:
+        case cvf::StructGridDefines::NEG_J:
+            return { cvf::StructGridDefines::NEG_I, cvf::StructGridDefines::POS_I };
 
-        case cvf::StructGridInterface::POS_K:
-        case cvf::StructGridInterface::NEG_K:
-        case cvf::StructGridInterface::NO_FACE:
+        case cvf::StructGridDefines::POS_K:
+        case cvf::StructGridDefines::NEG_K:
+        case cvf::StructGridDefines::NO_FACE:
         default:
             break;
     }
 
     CVF_ASSERT( false ); // not supported for K faces
-    return { cvf::StructGridInterface::NO_FACE, cvf::StructGridInterface::NO_FACE };
+    return { cvf::StructGridDefines::NO_FACE, cvf::StructGridDefines::NO_FACE };
 }
 
 //--------------------------------------------------------------------------------------------------

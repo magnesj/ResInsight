@@ -287,7 +287,7 @@ QString RimGridTimeHistoryCurve::quantityName() const
         {
             if ( geoMechTopItem->m_elementFace >= 0 )
             {
-                text.append( ", " + caf::AppEnum<cvf::StructGridInterface::FaceType>::textFromIndex( geoMechTopItem->m_elementFace ) );
+                text.append( ", " + caf::AppEnum<cvf::StructGridDefines::FaceType>::textFromIndex( geoMechTopItem->m_elementFace ) );
             }
             else
             {
