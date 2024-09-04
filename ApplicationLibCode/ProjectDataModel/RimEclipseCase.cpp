@@ -25,14 +25,13 @@
 #include "RiaDefines.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaLogging.h"
-#include "RiaPreferences.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaQDateTimeTools.h"
 
 #include "CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
 
 #include "RicfCommandObject.h"
 #include "RifInputPropertyLoader.h"
-#include "RifReaderSettings.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -129,6 +128,8 @@ RimEclipseCase::RimEclipseCase()
     m_fractureModelResults.uiCapability()->setUiTreeChildrenHidden( true );
 
     setReservoirData( nullptr );
+
+    m_readerSettings = RiaPreferencesGrid::current()->readerSettings();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -184,15 +185,6 @@ void RimEclipseCase::ensureDeckIsParsedForEquilData()
 {
     if ( m_rigEclipseCase.notNull() )
     {
-        QString includeFileAbsolutePathPrefix;
-        {
-            RiaPreferences* prefs = RiaPreferences::current();
-            if ( prefs->readerSettings() )
-            {
-                includeFileAbsolutePathPrefix = prefs->readerSettings()->includeFileAbsolutePathPrefix();
-            }
-        }
-
         QString dataDeckFile;
         {
             QFileInfo fi( gridFileName() );
@@ -200,7 +192,7 @@ void RimEclipseCase::ensureDeckIsParsedForEquilData()
             dataDeckFile = caf::Utils::constructFullFileName( fi.absolutePath(), fi.baseName(), ".DATA" );
         }
 
-        m_rigEclipseCase->ensureDeckIsParsedForEquilData( dataDeckFile, includeFileAbsolutePathPrefix );
+        m_rigEclipseCase->ensureDeckIsParsedForEquilData( dataDeckFile, m_readerSettings.includeFileAbsolutePathPrefix );
     }
 }
 
@@ -279,31 +271,28 @@ void RimEclipseCase::initAfterRead()
 {
     RimCase::initAfterRead();
 
-    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.03.0" ) )
+    // Move views to view collection.
+    RimEclipseViewCollection* viewColl = viewCollection();
+    for ( RimEclipseView* riv : m_reservoirViews_OBSOLETE.childrenByType() )
     {
-        // Move views to view collection.
-        RimEclipseViewCollection* viewColl = viewCollection();
-        for ( RimEclipseView* riv : m_reservoirViews_OBSOLETE.childrenByType() )
-        {
-            CVF_ASSERT( riv );
-            riv->setEclipseCase( this );
-            m_reservoirViews_OBSOLETE.removeChild( riv );
-            viewColl->addView( riv );
-        }
-
-        m_reservoirViews_OBSOLETE.clearWithoutDelete();
-
-        // Move contour maps
-        auto mapViewColl = contourMapCollection();
-        for ( RimEclipseContourMapView* contourMap : m_contourMapCollection_OBSOLETE->views() )
-        {
-            contourMap->setEclipseCase( this );
-            m_contourMapCollection_OBSOLETE->removeChild( contourMap );
-            mapViewColl->addView( contourMap );
-        }
-
-        m_contourMapCollection_OBSOLETE->clearWithoutDelete();
+        CVF_ASSERT( riv );
+        riv->setEclipseCase( this );
+        m_reservoirViews_OBSOLETE.removeChild( riv );
+        viewColl->addView( riv );
     }
+
+    m_reservoirViews_OBSOLETE.clearWithoutDelete();
+
+    // Move contour maps
+    auto mapViewColl = contourMapCollection();
+    for ( RimEclipseContourMapView* contourMap : m_contourMapCollection_OBSOLETE->views() )
+    {
+        contourMap->setEclipseCase( this );
+        m_contourMapCollection_OBSOLETE->removeChild( contourMap );
+        mapViewColl->addView( contourMap );
+    }
+
+    m_contourMapCollection_OBSOLETE->clearWithoutDelete();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -332,8 +321,7 @@ RimEclipseView* RimEclipseCase::createCopyAndAddView( const RimEclipseView* sour
 {
     CVF_ASSERT( sourceView );
 
-    RimEclipseView* rimEclipseView =
-        dynamic_cast<RimEclipseView*>( sourceView->xmlCapability()->copyByXmlSerialization( caf::PdmDefaultObjectFactory::instance() ) );
+    auto rimEclipseView = sourceView->copyObject<RimEclipseView>();
     CVF_ASSERT( rimEclipseView );
     rimEclipseView->setEclipseCase( this );
 
@@ -734,9 +722,7 @@ void RimEclipseCase::ensureFaultDataIsComputed()
     RigEclipseCaseData* rigEclipseCase = eclipseCaseData();
     if ( rigEclipseCase )
     {
-        bool computeFaults = ( m_readerSettings && m_readerSettings->importFaults() ) ||
-                             ( !m_readerSettings && RiaPreferences::current()->readerSettings()->importFaults() );
-        if ( computeFaults )
+        if ( m_readerSettings.importFaults )
         {
             RigActiveCellInfo* actCellInfo = rigEclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
             rigEclipseCase->mainGrid()->calculateFaults( actCellInfo );
@@ -784,6 +770,12 @@ void RimEclipseCase::computeActiveCellsBoundingBox()
     if ( !eclipseCaseData() ) return;
 
     bool useOptimizedVersion = true;
+
+    const auto gridPref = RiaPreferencesGrid::current();
+    if ( ( gridPref != nullptr ) && ( gridPref->gridModelReader() == RiaDefines::GridModelReader::OPM_COMMON ) )
+    {
+        useOptimizedVersion = !gridPref->onlyLoadActiveCells();
+    }
 
     if ( auto proj = RimProject::current() )
     {
@@ -1183,7 +1175,7 @@ bool RimEclipseCase::importAsciiInputProperties( const QStringList& fileNames )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseCase::setReaderSettings( std::shared_ptr<RifReaderSettings> readerSettings )
+void RimEclipseCase::setReaderSettings( RifReaderSettings& readerSettings )
 {
     m_readerSettings = readerSettings;
 }

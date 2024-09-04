@@ -57,14 +57,6 @@ RimFractureTemplateCollection::RimFractureTemplateCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFractureTemplateCollection::~RimFractureTemplateCollection()
-{
-    m_fractureDefinitions.deleteChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimFractureTemplate* RimFractureTemplateCollection::fractureTemplate( int id ) const
 {
     for ( const auto& templ : m_fractureDefinitions )
@@ -221,11 +213,9 @@ void RimFractureTemplateCollection::createAndAssignTemplateCopyForNonMatchingUni
                 {
                     if ( !templateWithMatchingUnit )
                     {
-                        templateWithMatchingUnit = dynamic_cast<RimFractureTemplate*>(
-                            fractureTemplate->xmlCapability()->copyByXmlSerialization( caf::PdmDefaultObjectFactory::instance() ) );
-
-                        auto currentUnit = fractureTemplate->fractureTemplateUnit();
-                        auto neededUnit  = RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
+                        templateWithMatchingUnit = fractureTemplate->copyObject<RimFractureTemplate>();
+                        auto currentUnit         = fractureTemplate->fractureTemplateUnit();
+                        auto neededUnit          = RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
                         if ( currentUnit == RiaDefines::EclipseUnitSystem::UNITS_METRIC )
                         {
                             neededUnit = RiaDefines::EclipseUnitSystem::UNITS_FIELD;

@@ -22,6 +22,7 @@
 
 #include "RiaCellDividingTools.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 #include "RiaStringEncodingTools.h"
 #include "RiaTextStringTools.h"
 
@@ -341,7 +342,7 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
 
     // Do not perform the transformation (applyMapaxes == false):
     // The coordinates have been transformed to the map axes coordinate system already.
-    // However, send the map axes data in to libecl so that the coordinate system description is saved.
+    // However, send the map axes data in to resdata so that the coordinate system description is saved.
     bool           applyMapaxes = false;
     ecl_grid_type* mainEclGrid =
         ecl_grid_alloc_GRID_data( (int)ecl_coords.size(), ecl_nx, ecl_ny, ecl_nz, 5, &ecl_coords[0], &ecl_corners[0], applyMapaxes, mapAxes.data() );
@@ -439,7 +440,7 @@ bool RifEclipseInputFileTools::exportKeywords( const QString&              resul
         if ( resultValues.empty() ) continue;
 
         double defaultExportValue = 0.0;
-        if ( keyword.endsWith( "NUM" ) )
+        if ( RiaResultNames::isCategoryResult( keyword ) )
         {
             defaultExportValue = 1.0;
         }
@@ -1051,6 +1052,107 @@ QString RifEclipseInputFileTools::faultFaceText( cvf::StructGridInterface::FaceT
             CVF_ASSERT( false );
     }
     return "";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifEclipseInputFileTools::parsePflotranInputFile( const QString& fileName, cvf::Collection<RigFault>* faults )
+{
+    QStringList gridSectionFilenames;
+
+    RiaLogging::info( "Looking for 'Pflotran' fault definitions in " + fileName );
+
+    {
+        // Find all referenced grdecl files in a pflotran input file, in the GRID section, example
+        /*
+            GRID
+                TYPE grdecl ../include/ccs_3df_kh.grdecl
+                TYPE grdecl ../include/ccs_3df_other.grdecl
+            END
+        */
+
+        QFile file( fileName );
+        if ( !file.open( QFile::ReadOnly ) ) return;
+
+        bool continueParsing  = true;
+        bool foundGridKeyword = false;
+        bool foundEndKeyword  = false;
+        do
+        {
+            QString line;
+            line = file.readLine().trimmed();
+
+            if ( line.startsWith( "GRID" ) ) foundGridKeyword = true;
+
+            if ( foundGridKeyword )
+            {
+                if ( line.startsWith( "TYPE" ) )
+                {
+                    auto words = RiaTextStringTools::splitSkipEmptyParts( line, " " );
+                    if ( words.size() == 3 && words[1].startsWith( "grdecl", Qt::CaseInsensitive ) )
+                    {
+                        QFileInfo fi( fileName );
+                        QDir      currentFileFolder = fi.absoluteDir();
+
+                        QString absoluteFilePath = currentFileFolder.absoluteFilePath( words.back() );
+                        gridSectionFilenames.push_back( absoluteFilePath );
+                    }
+                }
+
+                if ( line.startsWith( "END" ) ) foundEndKeyword = true;
+            }
+
+            if ( foundEndKeyword || file.atEnd() )
+            {
+                continueParsing = false;
+            }
+
+        } while ( continueParsing );
+    }
+
+    // Find all grdecl files defined by the external_file keyword
+    // For all these files, search for the FAULTS keyword and create fault objects
+    /*
+        external_file ccs_3df_kh.grdecl
+        external_file ccs_3df_other.grdecl
+    */
+
+    for ( const auto& gridSectionFilename : gridSectionFilenames )
+    {
+        QFile file( gridSectionFilename );
+        if ( !file.open( QFile::ReadOnly ) ) continue;
+
+        do
+        {
+            QString line;
+            line = file.readLine().trimmed();
+
+            if ( line.startsWith( "external_file", Qt::CaseInsensitive ) )
+            {
+                auto words = RiaTextStringTools::splitSkipEmptyParts( line, " " );
+                if ( words.size() == 2 )
+                {
+                    QFileInfo fi( gridSectionFilename );
+                    QDir      currentFileFolder = fi.absoluteDir();
+
+                    QString absoluteFilePath = currentFileFolder.absoluteFilePath( words.back() );
+                    QFile   grdeclFilename( absoluteFilePath );
+                    if ( !grdeclFilename.open( QFile::ReadOnly ) ) continue;
+
+                    auto currentFaultCount = faults->size();
+
+                    readFaults( grdeclFilename, 0, faults, nullptr );
+
+                    if ( currentFaultCount != faults->size() )
+                    {
+                        RiaLogging::info( "Imported faults from " + absoluteFilePath );
+                    }
+                }
+            }
+
+        } while ( !file.atEnd() );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

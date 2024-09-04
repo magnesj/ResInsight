@@ -22,6 +22,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFemPartCollection.h"
 
+#include "Polygons/RimPolygonInView.h"
 #include "Rim3dView.h"
 #include "RimCellEdgeColors.h"
 #include "RimCellFilterCollection.h"
@@ -38,6 +39,7 @@
 #include "RimGeoMechContourMapViewCollection.h"
 #include "RimGeoMechView.h"
 #include "RimOilField.h"
+#include "RimPolygonFilter.h"
 #include "RimProject.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSimWellInViewCollection.h"
@@ -48,7 +50,7 @@
 
 #include "RiaColorTools.h"
 #include "RiaLogging.h"
-#include "RiaPreferences.h"
+#include "RiaPreferencesGrid.h"
 
 #include "cafPdmDocument.h"
 #include "cafSelectionManager.h"
@@ -154,6 +156,7 @@ void RicNewContourMapViewFeature::onActionTriggered( bool isChecked )
         oilField->eclipseContourMapCollection()->updateConnectedEditors();
 
         Riu3DMainWindowTools::setExpanded( eclipseContourMap );
+        Riu3DMainWindowTools::selectAsCurrentItem( eclipseContourMap );
     }
     else if ( geoMechContourMap )
     {
@@ -169,6 +172,7 @@ void RicNewContourMapViewFeature::onActionTriggered( bool isChecked )
             geoMechContourMap->createDisplayModelAndRedraw();
             geoMechContourMap->zoomAll();
             Riu3DMainWindowTools::setExpanded( geoMechContourMap );
+            Riu3DMainWindowTools::selectAsCurrentItem( geoMechContourMap );
         }
     }
 }
@@ -206,10 +210,8 @@ RimEclipseContourMapView*
     RicNewContourMapViewFeature::createEclipseContourMapFromExistingContourMap( RimEclipseCase*           eclipseCase,
                                                                                 RimEclipseContourMapView* existingContourMap )
 {
-    RimEclipseContourMapView* contourMap = dynamic_cast<RimEclipseContourMapView*>(
-        existingContourMap->xmlCapability()->copyByXmlSerialization( caf::PdmDefaultObjectFactory::instance() ) );
+    auto contourMap = existingContourMap->copyObject<RimEclipseContourMapView>();
     CVF_ASSERT( contourMap );
-
     contourMap->setEclipseCase( eclipseCase );
 
     auto col = RiuGuiTheme::getColorByVariableName( "backgroundColor2" );
@@ -277,6 +279,30 @@ RimEclipseContourMapView* RicNewContourMapViewFeature::createEclipseContourMapFr
 
     eclipseCase->contourMapCollection()->updateConnectedEditors();
 
+    // Polygon cell filters are not working due to different organization of the project tree for Eclipse view and contour map view
+    // Manually assign pointers to polygon objects
+    //
+    // TODO: Find a more robust solution, perhaps introduce a root token making it possible to have a reference string pointing to objects
+    // relative root "$root$ PolygonCollection 0 Polygon 2"
+    // Make sure this concept works for geomech contour maps
+
+    auto sourceFilters      = sourceView->cellFilterCollection()->filters();
+    auto destinationFilters = contourMap->cellFilterCollection()->filters();
+    if ( sourceFilters.size() == destinationFilters.size() )
+    {
+        for ( size_t i = 0; i < sourceFilters.size(); ++i )
+        {
+            auto sourcePolygonFilter      = dynamic_cast<RimPolygonFilter*>( sourceFilters[i] );
+            auto destinationPolygonFilter = dynamic_cast<RimPolygonFilter*>( destinationFilters[i] );
+
+            if ( sourcePolygonFilter && sourcePolygonFilter->polygonInView() && destinationPolygonFilter )
+            {
+                destinationPolygonFilter->setPolygon( sourcePolygonFilter->polygonInView()->polygon() );
+                destinationPolygonFilter->configurePolygonEditor();
+            }
+        }
+    }
+
     return contourMap;
 }
 
@@ -330,10 +356,8 @@ RimGeoMechContourMapView*
     RicNewContourMapViewFeature::createGeoMechContourMapFromExistingContourMap( RimGeoMechCase*           geoMechCase,
                                                                                 RimGeoMechContourMapView* existingContourMap )
 {
-    RimGeoMechContourMapView* contourMap = dynamic_cast<RimGeoMechContourMapView*>(
-        existingContourMap->xmlCapability()->copyByXmlSerialization( caf::PdmDefaultObjectFactory::instance() ) );
+    auto contourMap = existingContourMap->copyObject<RimGeoMechContourMapView>();
     CVF_ASSERT( contourMap );
-
     contourMap->setGeoMechCase( geoMechCase );
 
     auto col = RiuGuiTheme::getColorByVariableName( "backgroundColor2" );
@@ -414,7 +438,7 @@ void RicNewContourMapViewFeature::assignDefaultResultAndLegend( RimEclipseContou
     {
         contourMap->cellResult()->setResultType( RiaDefines::ResultCatType::DYNAMIC_NATIVE );
 
-        if ( RiaPreferences::current()->loadAndShowSoil )
+        if ( RiaPreferencesGrid::current()->loadAndShowSoil() )
         {
             contourMap->cellResult()->setResultVariable( "SOIL" );
         }

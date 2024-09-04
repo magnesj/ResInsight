@@ -12,6 +12,8 @@ import logging
 import time
 import tempfile
 import signal
+import sys
+import json
 
 import grpc
 
@@ -30,6 +32,7 @@ from .generated.generated_classes import CommandRouter
 
 from typing import List, Optional, Tuple
 from typing_extensions import Self
+from pathlib import Path
 
 
 class Instance:
@@ -94,7 +97,7 @@ class Instance:
     def launch(
         resinsight_executable: str = "",
         console: bool = False,
-        launch_port: int = -1,
+        launch_port: int = 0,
         command_line_parameters: List[str] = [],
     ) -> Optional[Instance]:
         """Launch a new Instance of ResInsight. This requires the environment variable
@@ -106,9 +109,10 @@ class Instance:
                 will take precedence over what is provided in the RESINSIGHT_EXECUTABLE
                 environment variable.
             console (bool): If True, launch as console application, without GUI.
-            launch_port(int): If -1 will use the default port 50051 or RESINSIGHT_GRPC_PORT
-                             if anything else, ResInsight will try to launch with this port.
-                             If 0 a random port will be used.
+            launch_port(int): If 0, GRPC will find an available port.
+                             If -1, use the default port 50051 or RESINSIGHT_GRPC_PORT
+                             If anything else, ResInsight will try to launch with the specified portnumber.
+
             command_line_parameters(list): Additional parameters as string entries in the list.
         Returns:
             Instance: an instance object if it worked. None if not.
@@ -120,6 +124,18 @@ class Instance:
             requested_port = int(port_env)
         if launch_port != -1:
             requested_port = launch_port
+
+        if not resinsight_executable:
+            filename = Path(sys.prefix) / "share" / "rips" / "rips_config.json"
+            if filename.is_file():
+                f = open(filename)
+                data = json.load(f)
+                resinsight_executable = data["resinsight_executable"]
+                if resinsight_executable:
+                    print(
+                        "In './share/rips/rips_config.json', found resinsight_executable:",
+                        resinsight_executable,
+                    )
 
         if not resinsight_executable:
             resinsight_executable_from_env = os.environ.get("RESINSIGHT_EXECUTABLE")

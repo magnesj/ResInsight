@@ -24,7 +24,9 @@
 #include "RiaFieldHandleTools.h"
 #include "RiaFilePathTools.h"
 #include "RiaGuiApplication.h"
-#include "RiaProjectFileVersionTools.h"
+#include "RiaPreferences.h"
+#include "RiaProjectBackupTools.h"
+#include "RiaProjectFileTools.h"
 #include "RiaTextStringTools.h"
 #include "RiaVersionInfo.h"
 
@@ -32,6 +34,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 
+#include "Cloud/RimCloudDataSourceCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "RimAdvancedSnapshotExportDefinition.h"
@@ -81,8 +84,8 @@
 #include "RimStimPlanModelPlotCollection.h"
 #include "RimSummaryCalculation.h"
 #include "RimSummaryCalculationCollection.h"
-#include "RimSummaryCaseCollection.h"
 #include "RimSummaryCaseMainCollection.h"
+#include "RimSummaryEnsemble.h"
 #include "RimSummaryMultiPlotCollection.h"
 #include "RimSummaryTableCollection.h"
 #include "RimSurfaceCollection.h"
@@ -90,7 +93,6 @@
 #include "RimUserDefinedPolylinesAnnotation.h"
 #include "RimValveTemplate.h"
 #include "RimValveTemplateCollection.h"
-#include "RimVfpPlotCollection.h"
 #include "RimViewLinker.h"
 #include "RimViewLinkerCollection.h"
 #include "RimViewWindow.h"
@@ -98,6 +100,9 @@
 #include "RimWellLogPlotCollection.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
+
+#include "VerticalFlowPerformance/RimVfpDataCollection.h"
+#include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
 #include "Tools/RiaVariableMapper.h"
 
@@ -107,8 +112,6 @@
 #include "RimGridStatisticsPlot.h"
 #include "RimGridStatisticsPlotCollection.h"
 #endif
-
-#include "SsiHubImportCommands/RimWellPathImport.h"
 
 #include "RiuMainWindow.h"
 #include "RiuPlotMainWindow.h"
@@ -126,6 +129,7 @@
 #include <QMenu>
 
 #include <algorithm>
+#include <memory>
 
 CAF_PDM_SOURCE_INIT( RimProject, "ResInsightProject" );
 //--------------------------------------------------------------------------------------------------
@@ -155,10 +159,6 @@ RimProject::RimProject()
 
     CAF_PDM_InitFieldNoDefault( &scriptCollection, "ScriptCollection", "Octave Scripts", ":/octave.png" );
     scriptCollection.xmlCapability()->disableIO();
-
-    CAF_PDM_InitFieldNoDefault( &wellPathImport, "WellPathImport", "WellPathImport" );
-    wellPathImport = new RimWellPathImport();
-    wellPathImport.uiCapability()->setUiTreeChildrenHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
 
@@ -266,8 +266,6 @@ void RimProject::close()
     casesObsolete.deleteChildren();
     caseGroupsObsolete.deleteChildren();
 
-    wellPathImport->regions().deleteChildren();
-
     commandObjects.deleteChildren();
 
     multiSnapshotDefinitions.deleteChildren();
@@ -281,7 +279,7 @@ void RimProject::close()
     delete viewLinkerCollection->viewLinker();
     viewLinkerCollection->viewLinker = nullptr;
 
-    fileName = "";
+    setFileName( "" );
 
     m_globalPathList = "";
 
@@ -301,7 +299,7 @@ void RimProject::close()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimProject::beforeInitAfterRead()
+void RimProject::updatesAfterProjectFileIsRead()
 {
     distributePathsFromGlobalPathList();
 
@@ -405,10 +403,23 @@ RimMainPlotCollection* RimProject::mainPlotCollection() const
 bool RimProject::writeProjectFile()
 {
     transferPathsToGlobalPathList();
-    bool couldOpenFile = writeFile();
+
+    QFile xmlFile( fileName() );
+    if ( !xmlFile.open( QIODevice::WriteOnly | QIODevice::Text ) ) return false;
+
+    QString content = documentAsString();
+    xmlFile.write( content.toUtf8() );
+
+    if ( RiaPreferences::current()->storeBackupOfProjectFiles() )
+    {
+        QString   backupFilename     = fileName() + "db";
+        const int maximumRecordCount = 50;
+        RiaProjectBackupTools::appendTextToDatabase( backupFilename, maximumRecordCount, content );
+    }
+
     distributePathsFromGlobalPathList();
 
-    return couldOpenFile;
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -464,7 +475,7 @@ bool RimProject::isProjectFileVersionEqualOrOlderThan( const QString& otherProje
 {
     QString candidateProjectFileVersion = projectFileVersionString();
 
-    return !RiaProjectFileVersionTools::isCandidateVersionNewerThanOther( candidateProjectFileVersion, otherProjectFileVersion );
+    return !RiaProjectFileTools::isCandidateVersionNewerThanOther( candidateProjectFileVersion, otherProjectFileVersion );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -473,9 +484,10 @@ bool RimProject::isProjectFileVersionEqualOrOlderThan( const QString& otherProje
 void RimProject::setProjectFileNameAndUpdateDependencies( const QString& projectFileName )
 {
     // Extract the filename of the project file when it was saved
-    QString oldProjectFileName = fileName;
+    QString oldProjectFileName = fileName();
+
     // Replace with the new actual filename
-    fileName = projectFileName;
+    setFileName( projectFileName );
 
     QFileInfo fileInfo( projectFileName );
     QString   newProjectPath = fileInfo.path();
@@ -495,7 +507,6 @@ void RimProject::setProjectFileNameAndUpdateDependencies( const QString& project
         filePath->setPath( newFilePath );
     }
 
-    wellPathImport->updateFilePaths();
     auto* wellPathColl = RimTools::wellPathCollection();
     if ( wellPathColl )
     {
@@ -528,11 +539,11 @@ void RimProject::assignCaseIdToSummaryCase( RimSummaryCase* summaryCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimProject::assignIdToEnsemble( RimSummaryCaseCollection* summaryCaseCollection )
+void RimProject::assignIdToEnsemble( RimSummaryEnsemble* summaryCaseCollection )
 {
     if ( summaryCaseCollection )
     {
-        for ( RimSummaryCaseCollection* s : RimProject::summaryGroups() )
+        for ( RimSummaryEnsemble* s : RimProject::summaryGroups() )
         {
             m_nextValidEnsembleId = std::max( m_nextValidEnsembleId, s->ensembleId() + 1 );
         }
@@ -705,9 +716,9 @@ std::vector<RimSummaryCase*> RimProject::allSummaryCases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummaryCaseCollection*> RimProject::summaryGroups() const
+std::vector<RimSummaryEnsemble*> RimProject::summaryGroups() const
 {
-    std::vector<RimSummaryCaseCollection*> groups;
+    std::vector<RimSummaryEnsemble*> groups;
 
     for ( RimOilField* oilField : oilFields )
     {
@@ -715,7 +726,7 @@ std::vector<RimSummaryCaseCollection*> RimProject::summaryGroups() const
         RimSummaryCaseMainCollection* sumCaseMainColl = oilField->summaryCaseMainCollection();
         if ( sumCaseMainColl )
         {
-            std::vector<RimSummaryCaseCollection*> g = sumCaseMainColl->summaryCaseCollections();
+            std::vector<RimSummaryEnsemble*> g = sumCaseMainColl->summaryCaseCollections();
             groups.insert( groups.end(), g.begin(), g.end() );
         }
     }
@@ -896,46 +907,6 @@ const RimOilField* RimProject::activeOilField() const
     CVF_ASSERT( oilFields.size() == 1 );
 
     return oilFields[0];
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimProject::computeUtmAreaOfInterest()
-{
-    cvf::BoundingBox projectBB;
-    for ( RimCase* rimCase : allGridCases() )
-    {
-        RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( rimCase );
-        if ( eclipseCase && eclipseCase->eclipseCaseData() )
-        {
-            for ( size_t gridIdx = 0; gridIdx < eclipseCase->eclipseCaseData()->gridCount(); gridIdx++ )
-            {
-                RigGridBase* rigGrid = eclipseCase->eclipseCaseData()->grid( gridIdx );
-                projectBB.add( rigGrid->boundingBox() );
-            }
-        }
-        else
-        {
-            // Todo : calculate BBox of GeoMechCase
-        }
-    }
-
-    if ( projectBB.isValid() )
-    {
-        double north, south, east, west;
-
-        north = projectBB.max().y();
-        south = projectBB.min().y();
-
-        west = projectBB.min().x();
-        east = projectBB.max().x();
-
-        wellPathImport->north = north;
-        wellPathImport->south = south;
-        wellPathImport->east  = east;
-        wellPathImport->west  = west;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1196,28 +1167,6 @@ std::vector<RimReachCircleAnnotation*> RimProject::reachCircleAnnotations() cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimPolylinesAnnotation*> RimProject::polylineAnnotations() const
-{
-    std::vector<RimPolylinesAnnotation*> annotations;
-    for ( const auto& oilField : oilFields() )
-    {
-        auto annotationColl = oilField->annotationCollection();
-        for ( const auto& annotation : annotationColl->userDefinedPolylineAnnotations() )
-        {
-            annotations.push_back( annotation );
-        }
-
-        for ( const auto& annotation : annotationColl->polylinesFromFileAnnotations() )
-        {
-            annotations.push_back( annotation );
-        }
-    }
-    return annotations;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::vector<RimGeoMechCase*> RimProject::geoMechCases() const
 {
     std::vector<RimGeoMechCase*> cases;
@@ -1344,7 +1293,7 @@ RimPlotTemplateFolderItem* RimProject::rootPlotTemplateItem() const
 std::vector<caf::FilePath*> RimProject::allFilePaths() const
 {
     std::vector<caf::FilePath*> filePaths;
-    fieldContentsByType( this, filePaths );
+    RiaProjectFileTools::fieldContentsByType( this, filePaths );
 
     return filePaths;
 }
@@ -1371,6 +1320,11 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     {
         if ( m_mainPlotCollection )
         {
+            if ( activeOilField()->cloudDataCollection() )
+            {
+                uiTreeOrdering.add( activeOilField()->cloudDataCollection() );
+            }
+
             if ( m_mainPlotCollection->summaryMultiPlotCollection() )
             {
                 uiTreeOrdering.add( m_mainPlotCollection->summaryMultiPlotCollection() );
@@ -1464,6 +1418,10 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
             if ( oilField->ensembleWellLogsCollection() )
             {
                 uiTreeOrdering.add( oilField->ensembleWellLogsCollection() );
+            }
+            if ( oilField->vfpDataCollection() )
+            {
+                uiTreeOrdering.add( oilField->vfpDataCollection() );
             }
         }
     }
@@ -1582,25 +1540,43 @@ void RimProject::transferPathsToGlobalPathList()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapper* pathListMapper /*=nullptr*/ ) const
+{
+    std::unique_ptr<RiaVariableMapper> internalMapper;
+
+    if ( pathListMapper == nullptr )
+    {
+        internalMapper = std::make_unique<RiaVariableMapper>( m_globalPathList );
+        pathListMapper = internalMapper.get();
+    }
+
+    QString     returnValue      = filePath;
+    QString     pathIdCandidate  = filePath.trimmed();
+    QStringList pathIdComponents = pathIdCandidate.split( RiaVariableMapper::variableToken() );
+
+    if ( pathIdComponents.size() == 3 && pathIdComponents[0].size() == 0 && pathIdComponents[1].size() > 0 && pathIdComponents[2].size() == 0 )
+    {
+        bool    isFound = false;
+        QString path    = pathListMapper->valueForVariable( pathIdCandidate, &isFound );
+        if ( isFound )
+        {
+            returnValue = path;
+        }
+    }
+
+    return returnValue;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimProject::distributePathsFromGlobalPathList()
 {
     RiaVariableMapper pathListMapper( m_globalPathList() );
 
     for ( caf::FilePath* filePath : allFilePaths() )
     {
-        QString     pathIdCandidate  = filePath->path().trimmed();
-        QStringList pathIdComponents = pathIdCandidate.split( RiaVariableMapper::variableToken() );
-
-        if ( pathIdComponents.size() == 3 && pathIdComponents[0].size() == 0 && pathIdComponents[1].size() > 0 &&
-             pathIdComponents[2].size() == 0 )
-        {
-            bool    isFound = false;
-            QString path    = pathListMapper.valueForVariable( pathIdCandidate, &isFound );
-            if ( isFound )
-            {
-                filePath->setPath( path );
-            }
-        }
+        filePath->setPath( updatedFilePathFromPathId( filePath->path(), &pathListMapper ) );
     }
 
     for ( auto summaryCase : allSummaryCases() )

@@ -24,7 +24,7 @@
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaLogging.h"
-#include "RiaPreferences.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaResultNames.h"
 
 #include "RifReaderEclipseOutput.h"
@@ -795,8 +795,8 @@ RigEclipseResultAddress RigCaseCellResultsData::defaultResult() const
 
     if ( maxTimeStepCount() > 0 )
     {
-        auto prefs = RiaPreferences::current();
-        if ( prefs->loadAndShowSoil ) return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
+        auto prefs = RiaPreferencesGrid::current();
+        if ( prefs->loadAndShowSoil() ) return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
 
         auto dynamicResult = std::find_if( allResults.begin(),
                                            allResults.end(),
@@ -1116,14 +1116,20 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
 
     // Cell Volume
     {
-        addStaticScalarResult( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::riCellVolumeResultName(), needsToBeStored, 0 );
+        if ( !hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::riCellVolumeResultName() ) ) )
+        {
+            addStaticScalarResult( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::riCellVolumeResultName(), needsToBeStored, 0 );
+        }
     }
 
     // Mobile Pore Volume
     {
         if ( hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, "PORV" ) ) )
         {
-            addStaticScalarResult( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::mobilePoreVolumeName(), needsToBeStored, 0 );
+            if ( !hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::mobilePoreVolumeName() ) ) )
+            {
+                addStaticScalarResult( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::mobilePoreVolumeName(), needsToBeStored, 0 );
+            }
         }
     }
 
@@ -1611,11 +1617,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
 
     size_t scalarResultIndex = findScalarResultIndexFromAddress( resVarAddr );
     if ( scalarResultIndex == cvf::UNDEFINED_SIZE_T ) return cvf::UNDEFINED_SIZE_T;
-
-    if ( type == RiaDefines::ResultCatType::GENERATED )
-    {
-        return cvf::UNDEFINED_SIZE_T;
-    }
+    if ( type == RiaDefines::ResultCatType::GENERATED ) return scalarResultIndex;
 
     if ( m_readerInterface.notNull() )
     {
@@ -1641,9 +1643,12 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
             m_cellScalarResults[scalarResultIndex].resize( 1 );
 
             std::vector<double>& values = m_cellScalarResults[scalarResultIndex][0];
-            if ( !m_readerInterface->staticResult( resultName, m_porosityModel, &values ) )
+            if ( values.empty() )
             {
-                resultLoadingSuccess = false;
+                if ( !m_readerInterface->staticResult( resultName, m_porosityModel, &values ) )
+                {
+                    resultLoadingSuccess = false;
+                }
             }
         }
 

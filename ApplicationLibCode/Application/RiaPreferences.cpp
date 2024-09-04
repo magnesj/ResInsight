@@ -23,13 +23,15 @@
 
 #include "RiaApplication.h"
 #include "RiaColorTables.h"
+#include "RiaLogging.h"
 #include "RiaPreferencesGeoMech.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaPreferencesSummary.h"
+#include "RiaPreferencesSumo.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaValidRegExpValidator.h"
 
-#include "RifReaderSettings.h"
 #include "RiuGuiTheme.h"
 
 #include "cafPdmFieldCvfColor.h"
@@ -116,11 +118,14 @@ RiaPreferences::RiaPreferences()
     m_octaveExecutable.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
     m_octaveExecutable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
 
-    CAF_PDM_InitField( &octaveShowHeaderInfoWhenExecutingScripts,
+    CAF_PDM_InitField( &m_octaveShowHeaderInfoWhenExecutingScripts,
                        "octaveShowHeaderInfoWhenExecutingScripts",
                        false,
                        "Show Text Header When Executing Scripts" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &octaveShowHeaderInfoWhenExecutingScripts );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_octaveShowHeaderInfoWhenExecutingScripts );
+
+    CAF_PDM_InitFieldNoDefault( &m_octavePortNumber, "octavePortNumber", "Octave Port Number" );
+    m_octavePortNumber.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_pythonExecutable, "pythonExecutable", QString( "python" ), "Python Executable Location" );
     m_pythonExecutable.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
@@ -140,8 +145,7 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitField( &m_loggerFlushInterval, "loggerFlushInterval", 500, "Logging Flush Interval [ms]" );
     CAF_PDM_InitField( &m_loggerTrapSignalAndFlush, "loggerTrapSignalAndFlush", false, "Trap SIGNAL and Flush File Logs" );
 
-    CAF_PDM_InitField( &ssihubAddress, "ssihubAddress", QString( "http://" ), "SSIHUB Address" );
-    ssihubAddress.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
+    CAF_PDM_InitField( &m_storeBackupOfProjectFile, "storeBackupOfProjectFile", true, "Store Backup of Project Files" );
 
     CAF_PDM_InitFieldNoDefault( &m_defaultMeshModeType, "defaultMeshModeType", "Show Grid Lines" );
     CAF_PDM_InitField( &defaultGridLineColors, "defaultGridLineColors", RiaColorTables::defaultGridLineColor(), "Mesh Color" );
@@ -187,18 +191,6 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitFieldNoDefault( &lastUsedProjectFileName, "lastUsedProjectFileName", "Last Used Project File" );
     lastUsedProjectFileName.uiCapability()->setUiHidden( true );
 
-    CAF_PDM_InitField( &autocomputeDepthRelatedProperties,
-                       "autocomputeDepth",
-                       true,
-                       "Compute DEPTH Related Properties",
-                       "",
-                       "DEPTH, DX, DY, DZ, TOP, BOTTOM",
-                       "" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &autocomputeDepthRelatedProperties );
-
-    CAF_PDM_InitField( &loadAndShowSoil, "loadAndShowSoil", true, "Load and Show SOIL" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &loadAndShowSoil );
-
     CAF_PDM_InitField( &holoLensDisableCertificateVerification,
                        "holoLensDisableCertificateVerification",
                        false,
@@ -207,10 +199,6 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitField( &csvTextExportFieldSeparator, "csvTextExportFieldSeparator", QString( "," ), "CSV Text Export Field Separator" );
 
-    CAF_PDM_InitFieldNoDefault( &m_gridModelReader, "gridModelReader", "Grid Model Reader" );
-
-    CAF_PDM_InitFieldNoDefault( &m_readerSettings, "readerSettings", "Reader Settings" );
-    m_readerSettings = new RifReaderSettings;
     CAF_PDM_InitFieldNoDefault( &m_dateFormat, "dateFormat", "Date Format" );
     m_dateFormat.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     m_dateFormat = RiaQDateTimeTools::supportedDateFormats().front();
@@ -272,11 +260,20 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitFieldNoDefault( &m_summaryPreferences, "summaryPreferences", "summaryPreferences" );
     m_summaryPreferences = new RiaPreferencesSummary;
 
+    CAF_PDM_InitFieldNoDefault( &m_gridPreferences, "gridPreferences", "gridPreferences" );
+    m_gridPreferences = new RiaPreferencesGrid();
+
     CAF_PDM_InitFieldNoDefault( &m_geoMechPreferences, "geoMechPreferences", "geoMechPreferences" );
     m_geoMechPreferences = new RiaPreferencesGeoMech;
 
     CAF_PDM_InitFieldNoDefault( &m_systemPreferences, "systemPreferences", "systemPreferences" );
     m_systemPreferences = new RiaPreferencesSystem;
+
+    CAF_PDM_InitFieldNoDefault( &m_osduPreferences, "osduPreferences", "osduPreferences" );
+    m_osduPreferences = new RiaPreferencesOsdu;
+
+    CAF_PDM_InitFieldNoDefault( &m_sumoPreferences, "sumoPreferences", "sumoPreferences" );
+    m_sumoPreferences = new RiaPreferencesSumo;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -284,7 +281,6 @@ RiaPreferences::RiaPreferences()
 //--------------------------------------------------------------------------------------------------
 RiaPreferences::~RiaPreferences()
 {
-    delete m_readerSettings;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -300,7 +296,6 @@ RiaPreferences* RiaPreferences::current()
 //--------------------------------------------------------------------------------------------------
 void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    m_readerSettings->defineEditorAttribute( field, uiConfigName, attribute );
     m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
 
     {
@@ -376,20 +371,21 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         viewsGroup->add( &m_showInfoBox );
         viewsGroup->add( &m_showGridBox, { .newRow = false, .totalColumnSpan = 1 } );
 
+        caf::PdmUiGroup* loggingGroup = uiOrdering.addNewGroup( "Logging and Backup" );
+        loggingGroup->add( &m_storeBackupOfProjectFile );
+        loggingGroup->add( &m_loggerFilename );
+        loggingGroup->add( &m_loggerFlushInterval );
+        loggingGroup->add( &m_loggerTrapSignalAndFlush );
+        m_loggerTrapSignalAndFlush.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
+        m_loggerFlushInterval.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
+
         caf::PdmUiGroup* otherGroup = uiOrdering.addNewGroup( "Other" );
-        otherGroup->add( &ssihubAddress );
         otherGroup->add( &holoLensDisableCertificateVerification );
         otherGroup->add( &m_useUndoRedo );
     }
     else if ( uiConfigName == RiaPreferences::tabNameGrid() )
     {
-        uiOrdering.add( &m_gridModelReader );
-
-        caf::PdmUiGroup* newCaseBehaviourGroup = uiOrdering.addNewGroup( "Behavior When Loading Data" );
-        newCaseBehaviourGroup->add( &autocomputeDepthRelatedProperties );
-        newCaseBehaviourGroup->add( &loadAndShowSoil );
-
-        m_readerSettings->uiOrdering( uiConfigName, *newCaseBehaviourGroup );
+        m_gridPreferences()->appendItems( uiOrdering );
     }
     else if ( uiConfigName == RiaPreferences::tabNameSummary() )
     {
@@ -442,7 +438,8 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     {
         caf::PdmUiGroup* octaveGroup = uiOrdering.addNewGroup( "Octave" );
         octaveGroup->add( &m_octaveExecutable );
-        octaveGroup->add( &octaveShowHeaderInfoWhenExecutingScripts );
+        octaveGroup->add( &m_octaveShowHeaderInfoWhenExecutingScripts );
+        octaveGroup->add( &m_octavePortNumber );
 
 #ifdef ENABLE_GRPC
         caf::PdmUiGroup* pythonGroup = uiOrdering.addNewGroup( "Python" );
@@ -477,12 +474,13 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         otherGroup->add( &m_gridCalculationExpressionFolder );
         otherGroup->add( &m_summaryCalculationExpressionFolder );
 
-        caf::PdmUiGroup* loggingGroup = uiOrdering.addNewGroup( "Logging" );
-        loggingGroup->add( &m_loggerFilename );
-        loggingGroup->add( &m_loggerFlushInterval );
-        loggingGroup->add( &m_loggerTrapSignalAndFlush );
-        m_loggerTrapSignalAndFlush.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
-        m_loggerFlushInterval.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
+        caf::PdmUiGroup* osduGroup = uiOrdering.addNewGroup( "OSDU" );
+        osduGroup->setCollapsedByDefault();
+        m_osduPreferences()->uiOrdering( uiConfigName, *osduGroup );
+
+        caf::PdmUiGroup* sumoGroup = uiOrdering.addNewGroup( "SUMO" );
+        sumoGroup->setCollapsedByDefault();
+        m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
     }
     else if ( RiaApplication::enableDevelopmentFeatures() && uiConfigName == RiaPreferences::tabNameSystem() )
     {
@@ -658,22 +656,6 @@ QStringList RiaPreferences::tabNames()
     }
 
     return names;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const RifReaderSettings* RiaPreferences::readerSettings() const
-{
-    return m_readerSettings;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RiaDefines::GridModelReader RiaPreferences::gridModelReader() const
-{
-    return m_gridModelReader();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -957,6 +939,24 @@ QString RiaPreferences::octaveExecutable() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RiaPreferences::octaveShowHeaderInfoWhenExecutingScripts() const
+{
+    return m_octaveShowHeaderInfoWhenExecutingScripts();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaPreferences::octavePortNumber() const
+{
+    if ( m_octavePortNumber().first ) return m_octavePortNumber().second;
+
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RiaPreferences::loggerFilename() const
 {
     if ( m_loggerFilename().first )
@@ -986,6 +986,14 @@ bool RiaPreferences::loggerTrapSignalAndFlush() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RiaPreferences::storeBackupOfProjectFiles() const
+{
+    return m_storeBackupOfProjectFile();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiaPreferencesSummary* RiaPreferences::summaryPreferences() const
 {
     return m_summaryPreferences();
@@ -1010,7 +1018,31 @@ RiaPreferencesGeoMech* RiaPreferences::geoMechPreferences() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RiaPreferencesOsdu* RiaPreferences::osduPreferences() const
+{
+    return m_osduPreferences();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesSumo* RiaPreferences::sumoPreferences() const
+{
+    return m_sumoPreferences();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RiaPreferences::enableFaultsByDefault() const
 {
     return m_enableFaultsByDefault;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesGrid* RiaPreferences::gridPreferences() const
+{
+    return m_gridPreferences();
 }

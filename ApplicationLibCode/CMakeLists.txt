@@ -23,6 +23,42 @@ option(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS
        "Treat warnings as errors (stops build)" OFF
 )
 
+find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
+
+if(Qt5Core_FOUND)
+  find_package(
+    Qt5 ${RI_QT_MINIMUM_VERSION}
+    COMPONENTS Core
+               Gui
+               OpenGL
+               Network
+               NetworkAuth
+               Widgets
+               Xml
+               Concurrent
+               PrintSupport
+               Svg
+               Sql
+    OPTIONAL_COMPONENTS Charts
+  )
+  set(QT_LIBRARIES
+      Qt5::Core
+      Qt5::Gui
+      Qt5::Network
+      Qt5::NetworkAuth
+      Qt5::OpenGL
+      Qt5::Widgets
+      Qt5::Xml
+      Qt5::Concurrent
+      Qt5::PrintSupport
+      Qt5::Svg
+      Qt5::Sql
+  )
+  if(Qt5Charts_FOUND)
+    list(APPEND QT_LIBRARIES Qt5::Charts)
+  endif(Qt5Charts_FOUND)
+endif(Qt5Core_FOUND)
+
 if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
   set(Python3_EXECUTABLE ${RESINSIGHT_GRPC_PYTHON_EXECUTABLE})
   find_package(Python3)
@@ -45,13 +81,6 @@ if(MSVC)
   add_definitions(-D_USE_MATH_DEFINES)
 endif()
 
-# ##############################################################################
-# Eigen
-# ##############################################################################
-if(RESINSIGHT_VCPKG_AUTO_INSTALL)
-  vcpkg_install(eigen3)
-endif()
-
 find_package(Eigen3 REQUIRED)
 
 # ##############################################################################
@@ -64,6 +93,7 @@ list(
   Application/CMakeLists_files.cmake
   Application/Tools/CMakeLists_files.cmake
   Application/Tools/WellPathTools/CMakeLists_files.cmake
+  Application/Tools/Cloud/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_filesNotToUnitTest.cmake
   ReservoirDataModel/Completions/CMakeLists_files.cmake
@@ -73,11 +103,13 @@ list(
   ProjectDataModel/CMakeLists_files.cmake
   ProjectDataModel/AnalysisPlots/CMakeLists_files.cmake
   ProjectDataModel/CorrelationPlots/CMakeLists_files.cmake
+  ProjectDataModel/Cloud/CMakeLists_files.cmake
   ProjectDataModel/Faults/CMakeLists_files.cmake
   ProjectDataModel/GeoMech/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CellFilters/CMakeLists_files.cmake
   ProjectDataModel/Summary/CMakeLists_files.cmake
+  ProjectDataModel/Summary/Sumo/CMakeLists_files.cmake
   ProjectDataModel/Flow/CMakeLists_files.cmake
   ProjectDataModel/Annotations/CMakeLists_files.cmake
   ProjectDataModel/Completions/CMakeLists_files.cmake
@@ -98,6 +130,7 @@ list(
   ProjectDataModel/Tools/CMakeLists_files.cmake
   ProjectDataModelCommands/CMakeLists_files.cmake
   ProjectDataModelCommands/CommandRouter/CMakeLists_files.cmake
+  ProjectDataModel/VerticalFlowPerformance/CMakeLists_files.cmake
   GeoMech/GeoMechVisualization/CMakeLists_files.cmake
   ModelVisualization/CMakeLists_files.cmake
   ModelVisualization/Faults/CMakeLists_files.cmake
@@ -383,6 +416,11 @@ set(UNITY_EXCLUDE_FILES
     # Exclude moc files as they cause template instanciation issues
     # https://cmake.org/cmake/help/latest/prop_tgt/AUTOGEN_BUILD_DIR.html
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_autogen/mocs_compilation.cpp
+    ProjectDataModel/RiaOpmParserTools.cpp
+    FileInterface/RifOsduWellPathReader.cpp
+    FileInterface/RifOsduWellLogReader.cpp
+    FileInterface/RifByteArrayArrowRandomAccessFile.cpp
+    FileInterface/RifArrowTools.cpp
 )
 
 message("Files excluded from UNITY_BUILD : ${UNITY_EXCLUDE_FILES}")

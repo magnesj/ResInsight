@@ -82,15 +82,6 @@ RimIntersectionCollection::RimIntersectionCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimIntersectionCollection::~RimIntersectionCollection()
-{
-    m_intersections.deleteChildren();
-    m_intersectionBoxes.deleteChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 caf::PdmFieldHandle* RimIntersectionCollection::objectToggleField()
 {
     return &m_isActive;
@@ -537,7 +528,7 @@ void RimIntersectionCollection::defineEditorAttribute( const caf::PdmFieldHandle
         {
             RimEclipseView* eclView = eclipseView();
 
-            if ( eclView )
+            if ( eclView && eclView->mainGrid() )
             {
                 const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
 
