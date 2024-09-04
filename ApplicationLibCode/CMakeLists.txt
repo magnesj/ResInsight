@@ -23,41 +23,40 @@ option(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS
        "Treat warnings as errors (stops build)" OFF
 )
 
-find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
+find_package(
+  Qt6
+  COMPONENTS Core
+             Gui
+             OpenGL
+             Network
+             NetworkAuth
+             Widgets
+             Xml
+             Concurrent
+             PrintSupport
+             Svg
+             Sql
+             Core5Compat
+  OPTIONAL_COMPONENTS Charts
+)
+set(QT_LIBRARIES
+    Qt6::Core
+    Qt6::Gui
+    Qt6::OpenGL
+    Qt6::Network
+    Qt6::NetworkAuth
+    Qt6::Widgets
+    Qt6::Xml
+    Qt6::Concurrent
+    Qt6::PrintSupport
+    Qt6::Svg
+    Qt6::Sql
+    Qt6::Core5Compat
+    Qt6::Charts
+)
+qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
 
-if(Qt5Core_FOUND)
-  find_package(
-    Qt5 ${RI_QT_MINIMUM_VERSION}
-    COMPONENTS Core
-               Gui
-               OpenGL
-               Network
-               NetworkAuth
-               Widgets
-               Xml
-               Concurrent
-               PrintSupport
-               Svg
-               Sql
-    OPTIONAL_COMPONENTS Charts
-  )
-  set(QT_LIBRARIES
-      Qt5::Core
-      Qt5::Gui
-      Qt5::Network
-      Qt5::NetworkAuth
-      Qt5::OpenGL
-      Qt5::Widgets
-      Qt5::Xml
-      Qt5::Concurrent
-      Qt5::PrintSupport
-      Qt5::Svg
-      Qt5::Sql
-  )
-  if(Qt5Charts_FOUND)
-    list(APPEND QT_LIBRARIES Qt5::Charts)
-  endif(Qt5Charts_FOUND)
-endif(Qt5Core_FOUND)
 
 if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
   set(Python3_EXECUTABLE ${RESINSIGHT_GRPC_PYTHON_EXECUTABLE})
