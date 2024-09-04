@@ -27,11 +27,13 @@ find_package(
              Gui
              OpenGL
              Network
+             NetworkAuth
              Widgets
              Xml
              Concurrent
              PrintSupport
              Svg
+             Sql
   OPTIONAL_COMPONENTS Charts
 )
 set(QT_LIBRARIES
@@ -39,11 +41,13 @@ set(QT_LIBRARIES
     Qt6::Gui
     Qt6::OpenGL
     Qt6::Network
+    Qt6::NetworkAuth
     Qt6::Widgets
     Qt6::Xml
     Qt6::Concurrent
     Qt6::PrintSupport
     Qt6::Svg
+    Qt6::Sql
 )
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)
