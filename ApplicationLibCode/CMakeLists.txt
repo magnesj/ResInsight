@@ -57,7 +57,6 @@ set(QT_LIBRARIES
 qt_standard_project_setup()
 set(CMAKE_AUTORCC ON)
 
-
 if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
   set(Python3_EXECUTABLE ${RESINSIGHT_GRPC_PYTHON_EXECUTABLE})
   find_package(Python3)
