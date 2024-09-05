@@ -484,8 +484,7 @@ if(RESINSIGHT_PRIVATE_INSTALL)
 
   endif()
 
- install(TARGETS ResInsight DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
-
+  install(TARGETS ResInsight DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
   install(FILES ${RESINSIGHT_FILES} DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
 
   # Add a post-build command to run windeployqt. This makes it possible to debug the binary from a debugger without any manual steps. This also 
@@ -494,11 +493,18 @@ if(RESINSIGHT_PRIVATE_INSTALL)
   #
   # TODO: This command copies all required dlls, so we should probably not use the Install() command to copy external dlls dependencies.
   #
-if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
+  if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
     add_custom_command(TARGET ResInsight POST_BUILD
         COMMAND ${WINDEPLOYQT_EXECUTABLE}  $<TARGET_FILE:ResInsight> --release --no-translations
         COMMENT "Running windeployqt to deploy Qt dependencies"
     )
+
+  install(
+    TARGETS ResInsight
+    DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
+    POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
+  )
 endif()
 
 
