@@ -48,6 +48,7 @@ set(QT_LIBRARIES
     Qt6::Sql
 )
 qt_standard_project_setup()
+set(CMAKE_AUTORCC ON)
 
 # qt_standard_project_setup() should set CMAKE_RUNTIME_OUTPUT_DIRECTORY
 # correctly, but does not work as expected for Visual Studio. Set the output
