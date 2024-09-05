@@ -25,7 +25,7 @@ CMakeCache.txt
 cmake_install.cmake
 CPack*.cmake
 CTest*.cmake
-cmakebuild/
+cmakebuild*/
 
 #Unit test binaries
 *_UnitTests
