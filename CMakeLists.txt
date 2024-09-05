@@ -10,9 +10,8 @@ set(VIZ_MODULES_FOLDER_NAME Fwk/VizFwk)
 # !!! For now, we force Qt to version 5
 set(CEE_USE_QT5 OFF)
 message(STATUS "Forcing setting of CEE_USE_QT6 to ON")
-set(CEE_USE_QT6 ON )
+set(CEE_USE_QT6 ON)
 message(STATUS "CEE_USE_QT6=${CEE_USE_QT6}")
-
 
 cmake_policy(SET CMP0020 NEW)
 if(POLICY CMP0077)
@@ -790,7 +789,6 @@ endif()
 # ##############################################################################
 # Vizualization Framework
 # ##############################################################################
-
 
 add_subdirectory(${VIZ_MODULES_FOLDER_NAME}/LibCore)
 add_subdirectory(${VIZ_MODULES_FOLDER_NAME}/LibGeometry)
