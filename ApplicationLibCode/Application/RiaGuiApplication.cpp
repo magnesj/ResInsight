@@ -1528,10 +1528,12 @@ void RiaGuiApplication::applyGuiPreferences( const RiaPreferences*              
 //--------------------------------------------------------------------------------------------------
 int RiaGuiApplication::applicationResolution()
 {
-    if (auto screen = QGuiApplication::primaryScreen())
+    if ( auto screen = QGuiApplication::primaryScreen() )
+    {
         return screen->logicalDotsPerInchX();
+    }
 
-    int defaultDPI = 96;
+    const int defaultDPI = 96;
     return defaultDPI;
 }
 
