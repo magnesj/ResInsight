@@ -944,7 +944,7 @@ endif()
 
 # Set the install folder to be the bin folder. TODO: Move Python scripts to a
 # separate folder
-set(RESINSIGHT_INSTALL_FOLDER "./bin")
+set(RESINSIGHT_INSTALL_FOLDER "bin")
 
 # override system install prefix if private installation chosen
 option(RESINSIGHT_PRIVATE_INSTALL
@@ -1074,17 +1074,6 @@ add_subdirectory(ThirdParty/extract-projectfile-versions)
 install(TARGETS extract-projectfile-versions
         DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
 )
-
-if(MSVC)
-  # Install all the DLLs needed for the executable. System dependencies are not
-  # included
-  install(
-    TARGETS ResInsight
-    DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
-    RUNTIME_DEPENDENCIES PRE_EXCLUDE_REGEXES "api-ms-" "ext-ms-"
-    POST_EXCLUDE_REGEXES ".*system32/.*\\.dll"
-  )
-endif(MSVC)
 
 # ##############################################################################
 # Add OpenSSL 1.1.1 libraries The OpenSSL libraries are needed for the
