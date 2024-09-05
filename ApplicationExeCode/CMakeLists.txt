@@ -19,8 +19,6 @@ endif()
 # Open GL
 find_package(OpenGL)
 
-# find_package(Qt5 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core)
-
 find_package(
   Qt6
   COMPONENTS Core
@@ -50,7 +48,6 @@ set(QT_LIBRARIES
     Qt6::Sql
 )
 qt_standard_project_setup()
-set(CMAKE_AUTORCC ON)
 
 # qt_standard_project_setup() should set CMAKE_RUNTIME_OUTPUT_DIRECTORY
 # correctly, but does not work as expected for Visual Studio. Set the output
@@ -487,24 +484,25 @@ if(RESINSIGHT_PRIVATE_INSTALL)
   install(TARGETS ResInsight DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
   install(FILES ${RESINSIGHT_FILES} DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
 
-  # Add a post-build command to run windeployqt. This makes it possible to debug
-  # the binary from a debugger without any manual steps. This also fixes an
-  # issue related to the Install() command and usage of windeployqt as part of
-  # installation. The installation tried to use windeployqt on the executable in
-  # the build directory, which did not find the Qt libraries.
-  #
-  # TODO: This command copies all required dlls, so we should probably not use
-  # the Install() command to copy external dlls dependencies.
-  #
   if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
+    # Add a post-build command to run windeployqt. This makes it possible to debug
+    # the binary from a debugger without any manual steps. This also fixes an
+    # issue related to the Install() command and usage of windeployqt as part of
+    # installation. The installation tried to use windeployqt on the executable in
+    # the build directory, which did not find the Qt libraries.
+    #
+    # TODO: This command copies all required dlls, so we should probably not use
+    # the Install() command to copy external dlls dependencies.
+    #
     add_custom_command(
       TARGET ResInsight
       POST_BUILD
       COMMAND ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE:ResInsight> --release
               --no-translations
-      COMMENT "Running windeployqt to deploy Qt dependencies"
+      COMMENT "Running windeployqt to deploy Qt dependencies to the build folder, required by install()"
     )
 
+    # Running windeployqt to deploy Qt dependencies to the install folder"
     install(
       TARGETS ResInsight
       DESTINATION ${RESINSIGHT_INSTALL_FOLDER}

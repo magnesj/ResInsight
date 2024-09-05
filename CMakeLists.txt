@@ -532,7 +532,6 @@ endif()
 # ##############################################################################
 # Qt
 # ##############################################################################
-set(RI_QT_MINIMUM_VERSION 6.7)
 
 find_package(
   Qt6
@@ -557,8 +556,6 @@ set(QT_LIBRARIES
 )
 qt_standard_project_setup()
 
-# find_package( Qt6 ${RI_QT_MINIMUM_VERSION} COMPONENTS Core Gui OpenGL Network
-# Widgets )
 
 # Open GL
 find_package(OpenGL)

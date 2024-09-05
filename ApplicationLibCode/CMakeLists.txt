@@ -55,7 +55,6 @@ set(QT_LIBRARIES
     Qt6::Charts
 )
 qt_standard_project_setup()
-set(CMAKE_AUTORCC ON)
 
 if(RESINSIGHT_GRPC_PYTHON_EXECUTABLE)
   set(Python3_EXECUTABLE ${RESINSIGHT_GRPC_PYTHON_EXECUTABLE})
@@ -216,16 +215,6 @@ if(RESINSIGHT_FOUND_HDF5)
 
 endif()
 
-# ##############################################################################
-# Qt specifics: Moc, ui, resources
-# ##############################################################################
-
-# set(QT_MOC_HEADERS ${QT_MOC_HEADERS} ProjectDataModel/RimMimeData.h
-# ProjectDataModel/Intersections/RimBoxIntersection.h
-# SocketInterface/RiaSocketServer.h )
-
-# qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS}) qt5_wrap_ui(FORM_FILES_CPP
-# ${QT_UI_FILES})
 
 # ##############################################################################
 # Create source groups - see also included CMakeLists_files.cmake

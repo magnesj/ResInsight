@@ -68,9 +68,6 @@ endforeach(referencedfile)
 
 find_package(Eigen3 REQUIRED)
 
-# Prefix files with COMMAND_ to avoid clash with application global lists
-# qt5_wrap_cpp(COMMAND_MOC_SOURCE_FILES ${COMMAND_QT_MOC_HEADERS})
-
 add_library(
   ${PROJECT_NAME} OBJECT
   ${COMMAND_CODE_SOURCE_FILES} ${COMMAND_CODE_HEADER_FILES}
