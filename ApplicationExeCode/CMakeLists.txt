@@ -127,9 +127,6 @@ list(APPEND CPP_SOURCES ${CODE_SOURCE_FILES})
 
 set(QRC_FILES ${QRC_FILES} Resources/ResInsight.qrc)
 
-# Runs RCC and MOC on specified files qt5_add_resources(QRC_FILES_CPP
-# ${QRC_FILES}) qt5_wrap_cpp(MOC_SOURCE_FILES ${QT_MOC_HEADERS})
-
 # Adding resource (RC) files for Windows
 if(MSVC)
   set(WIN_RESOURCE Resources/ResInsight.rc)
