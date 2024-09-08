@@ -38,6 +38,7 @@ jobs:
               vcpkg-bootstrap: bootstrap-vcpkg.bat,
               vcpkg-triplet: x64-windows-release,
               qt-version: 6.7.0,
+              ri-unit-test-path: "",
             }
           - {
               name: "Ubuntu 22.04 gcc",
@@ -52,6 +53,7 @@ jobs:
               vcpkg-bootstrap: bootstrap-vcpkg.sh,
               vcpkg-triplet: x64-linux-release,
               qt-version: 6.7.0,
+              ri-unit-test-path: "ApplicationLibCode/UnitTests",
             }
           - {
               name: "Ubuntu 22.04 clang-16",
@@ -66,6 +68,7 @@ jobs:
               vcpkg-bootstrap: bootstrap-vcpkg.sh,
               vcpkg-triplet: x64-linux-release,
               qt-version: 6.7.0,
+              ri-unit-test-path: "ApplicationLibCode/UnitTests",
             }
     steps:
       - name: Checkout
@@ -228,7 +231,9 @@ jobs:
         if: matrix.config.execute-unit-tests
         shell: bash
         run: |
-          cmakebuild/ApplicationLibCode/UnitTests/ResInsight-tests
+          echo "Content of unit test folder "
+          ls cmakebuild/${{ matrix.config.ri-unit-test-path }}
+          cmakebuild/${{ matrix.config.ri-unit-test-path }}/ResInsight-tests
 
       - name: (Python) Check types using mypy
         if: matrix.config.build-python-module
