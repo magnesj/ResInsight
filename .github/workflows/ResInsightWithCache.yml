@@ -246,7 +246,7 @@ jobs:
       - name: Run pytest
         if: matrix.config.execute-pytests
         env:
-          RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ApplicationExeCode/ResInsight
+          RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ResInsight
         run: |
           cd GrpcInterface/Python
           python setup.py sdist          
