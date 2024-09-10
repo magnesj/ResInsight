@@ -5,6 +5,9 @@ include(FetchContent)
 
 project(ResInsight)
 
+# Ensure all binary files ensd up in the same folder as the executable
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+
 set(VIZ_MODULES_FOLDER_NAME Fwk/VizFwk)
 
 # !!! For now, we force Qt to version 5
