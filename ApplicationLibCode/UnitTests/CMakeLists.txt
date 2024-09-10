@@ -150,7 +150,7 @@ foreach(riFileName ${RI_FILENAMES})
     -E
     copy_if_different
     ${riFileName}
-    $<TARGET_FILE_DIR:ResInsightDummyTestTarget>
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
   )
 endforeach()
 add_custom_target(PreBuildFileCopyTest ${copyCommands})
