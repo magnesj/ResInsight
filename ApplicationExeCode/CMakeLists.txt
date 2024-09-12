@@ -369,51 +369,6 @@ endif(RESINSIGHT_ENABLE_GRPC)
 
 # bundle libraries together with private installation
 if(RESINSIGHT_PRIVATE_INSTALL)
-  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-
-    set(RESINSIGHT_INSTALL_RPATH
-        ""
-        CACHE STRING "RPATH to be injected into binary"
-    )
-    mark_as_advanced(FORCE RESINSIGHT_INSTALL_RPATH)
-
-    # Add ORIGIN to represent the directory where the binary is located
-    set(RESINSIGHT_INSTALL_RPATH ${RESINSIGHT_INSTALL_RPATH} "\$ORIGIN")
-
-    if(${RESINSIGHT_USE_ODB_API})
-      # This is a "hack" to make ResInsight runtime find the ODB so files used
-      # when compiling. statoil wanted it this way, but we should probbly make a
-      # different installoptions that does things this way, and really do copy
-      # them when doing PRIVATE_INSTALL
-      set(RESINSIGHT_INSTALL_RPATH ${RESINSIGHT_INSTALL_RPATH}
-                                   ${RESINSIGHT_ODB_API_DIR}/lib
-      )
-    endif()
-
-    if(EXISTS ${RESINSIGHT_ERT_EXTERNAL_LIB_ROOT})
-      # append the external ERT lib root
-      set(RESINSIGHT_INSTALL_RPATH ${RESINSIGHT_INSTALL_RPATH}
-                                   ${RESINSIGHT_ERT_EXTERNAL_LIB_ROOT}
-      )
-    endif()
-
-    # message("RESINSIGHT_INSTALL_RPATH : " "${RESINSIGHT_INSTALL_RPATH}")
-
-    set_target_properties(
-      ResInsight PROPERTIES INSTALL_RPATH "${RESINSIGHT_INSTALL_RPATH}"
-    )
-
-    # bundle Qt5 libraries
-    option(RESINSIGHT_QT5_BUNDLE_LIBRARIES "Bundle Qt5 libraries" OFF)
-    mark_as_advanced(FORCE RESINSIGHT_QT5_BUNDLE_LIBRARIES)
-    if(RESINSIGHT_QT5_BUNDLE_LIBRARIES)
-      message(STATUS "Bundling of Qt5 libraries is enabled")
-
-      install(FILES qt.conf DESTINATION ${RESINSIGHT_INSTALL_FOLDER}/)
-
-    endif(RESINSIGHT_QT5_BUNDLE_LIBRARIES)
-
-  endif()
 
   if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
     # put a .exe.local file in the target directory to pick up DLLs from there
