@@ -403,7 +403,9 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
 
         if ( plotOnWhichYAxis == RIGHT_YAXIS )
         {
-            qwtCurve->setYAxis( RiuPlotAxis::defaultRight() );
+            QwtAxisId relatedYAxis( QwtAxis::YRight, 0 );
+
+            qwtCurve->QwtPlotCurve::setYAxis( relatedYAxis );
             shouldEnableRightYAxis = true;
         }
 
@@ -432,9 +434,15 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
     }
 
     if ( shouldEnableRightYAxis )
+    {
         plot->setAxesCount( QwtAxis::YRight, 1 );
+        plot->setAxisVisible( QwtAxis::YRight, true );
+    }
     else
+    {
         plot->setAxesCount( QwtAxis::YRight, 0 );
+        plot->setAxisVisible( QwtAxis::YRight, false );
+    }
 
     addTransparentCurve( plot, points, axes, logScaleLeftAxis );
 
