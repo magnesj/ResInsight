@@ -27,14 +27,12 @@
 #include "RiuDockedQwtPlot.h"
 #include "RiuGuiTheme.h"
 #include "RiuPlotCurveSymbol.h"
-#include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotTools.h"
 #include "RiuQwtSymbol.h"
 #include "RiuRelativePermeabilityPlotUpdater.h"
 #include "RiuTextDialog.h"
 
 #include "cvfAssert.h"
-#include "cvfTrace.h"
 
 #include "qwt_legend.h"
 #include "qwt_plot.h"
@@ -89,6 +87,14 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     , m_swat( HUGE_VAL )
     , m_sgas( HUGE_VAL )
     , m_plotUpdater( new RiuRelativePermeabilityPlotUpdater( this ) )
+    , m_qwtPlot( nullptr )
+    , m_selectedCurvesButtonGroup( nullptr )
+    , m_groupBox( nullptr )
+    , m_logarithmicScaleKrAxisCheckBox( nullptr )
+    , m_showUnscaledCheckBox( nullptr )
+    , m_fixedXAxisCheckBox( nullptr )
+    , m_fixedLeftYAxisCheckBox( nullptr )
+
 {
     m_qwtPlot = new RelPermQwtPlot( this );
     m_qwtPlot->setProperty( "qss-class", "RelPermPlot" );
@@ -153,13 +159,6 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     slotShowCurveSelectionWidgets( showCurveSelection->checkState() );
 
     plotUiSelectedCurves();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RiuRelativePermeabilityPlotPanel::~RiuRelativePermeabilityPlotPanel()
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -352,11 +351,11 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
             plotOnWhichYAxis = RIGHT_YAXIS;
         }
 
-        RiuQwtPlotCurve* qwtCurve = new RiuQwtPlotCurve( nullptr, curve.name.c_str() );
+        QwtPlotCurve* qwtCurve = new QwtPlotCurve( curve.name.c_str() );
 
         CVF_ASSERT( curve.saturationVals.size() == curve.yVals.size() );
         const bool includePositiveValuesOnly = ( logScaleLeftAxis && plotOnWhichYAxis == LEFT_YAXIS );
-        qwtCurve->setSamplesFromXValuesAndYValues( curve.saturationVals, curve.yVals, includePositiveValuesOnly );
+        qwtCurve->setSamples( curve.saturationVals.data(), curve.yVals.data(), static_cast<int>( curve.saturationVals.size() ) );
 
         qwtCurve->setTitle( curve.name.c_str() );
 
@@ -390,7 +389,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         const QPen curvePen( QBrush(), 1, penStyle );
         qwtCurve->setPen( curvePen );
 
-        RiuQwtSymbol* curveSymbol = new RiuQwtSymbol( RiuPlotCurveSymbol::SYMBOL_ELLIPSE );
+        auto* curveSymbol = new RiuQwtSymbol( RiuPlotCurveSymbol::SYMBOL_ELLIPSE );
         curveSymbol->setSize( 6, 6 );
         curveSymbol->setBrush( Qt::NoBrush );
         qwtCurve->setSymbol( curveSymbol );
@@ -405,7 +404,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         {
             QwtAxisId relatedYAxis( QwtAxis::YRight, 0 );
 
-            qwtCurve->QwtPlotCurve::setYAxis( relatedYAxis );
+            qwtCurve->setYAxis( relatedYAxis );
             shouldEnableRightYAxis = true;
         }
 
