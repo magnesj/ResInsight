@@ -161,7 +161,7 @@ bool RifEclipseInputFileTools::openGridFile( const QString& fileName, RigEclipse
 
         ecl_grid_type* inputGrid = ecl_grid_alloc_GRDECL_kw( nx, ny, nz, zCornKw, coordKw, actNumKw, mapAxesKw );
 
-        RifReaderEclipseOutput::transferGeometry( inputGrid, eclipseCase );
+        RifReaderEclipseOutput::transferGeometry( inputGrid, eclipseCase, false );
 
         if ( readFaultData )
         {
@@ -1061,10 +1061,11 @@ void RifEclipseInputFileTools::parsePflotranInputFile( const QString& fileName, 
 {
     QStringList gridSectionFilenames;
 
-    RiaLogging::info( "Looking for 'Pflotran' fault definitions in " + fileName );
+    RiaLogging::info( "Looking for faults in 'PFLOTRAN' file: " + fileName );
 
     {
         // Find all referenced grdecl files in a pflotran input file, in the GRID section, example
+        // The line can optionally contain a '/' at the end, which is ignored
         /*
             GRID
                 TYPE grdecl ../include/ccs_3df_kh.grdecl
@@ -1090,12 +1091,12 @@ void RifEclipseInputFileTools::parsePflotranInputFile( const QString& fileName, 
                 if ( line.startsWith( "TYPE" ) )
                 {
                     auto words = RiaTextStringTools::splitSkipEmptyParts( line, " " );
-                    if ( words.size() == 3 && words[1].startsWith( "grdecl", Qt::CaseInsensitive ) )
+                    if ( words.size() > 2 && words[1].startsWith( "grdecl", Qt::CaseInsensitive ) )
                     {
                         QFileInfo fi( fileName );
                         QDir      currentFileFolder = fi.absoluteDir();
 
-                        QString absoluteFilePath = currentFileFolder.absoluteFilePath( words.back() );
+                        QString absoluteFilePath = currentFileFolder.absoluteFilePath( words[2] );
                         gridSectionFilenames.push_back( absoluteFilePath );
                     }
                 }
@@ -1113,6 +1114,7 @@ void RifEclipseInputFileTools::parsePflotranInputFile( const QString& fileName, 
 
     // Find all grdecl files defined by the external_file keyword
     // For all these files, search for the FAULTS keyword and create fault objects
+    // The line can optionally contain a '/' at the end, which is ignored
     /*
         external_file ccs_3df_kh.grdecl
         external_file ccs_3df_other.grdecl
@@ -1131,19 +1133,13 @@ void RifEclipseInputFileTools::parsePflotranInputFile( const QString& fileName, 
             if ( line.startsWith( "external_file", Qt::CaseInsensitive ) )
             {
                 auto words = RiaTextStringTools::splitSkipEmptyParts( line, " " );
-                if ( words.size() == 2 )
+                if ( words.size() > 1 )
                 {
                     QFileInfo fi( gridSectionFilename );
                     QDir      currentFileFolder = fi.absoluteDir();
-
-                    QString absoluteFilePath = currentFileFolder.absoluteFilePath( words.back() );
-                    QFile   grdeclFilename( absoluteFilePath );
-                    if ( !grdeclFilename.open( QFile::ReadOnly ) ) continue;
-
-                    auto currentFaultCount = faults->size();
-
-                    readFaults( grdeclFilename, 0, faults, nullptr );
-
+                    auto      currentFaultCount = faults->size();
+                    QString   absoluteFilePath  = currentFileFolder.absoluteFilePath( words[1] );
+                    parseAndReadFaults( absoluteFilePath, faults );
                     if ( currentFaultCount != faults->size() )
                     {
                         RiaLogging::info( "Imported faults from " + absoluteFilePath );

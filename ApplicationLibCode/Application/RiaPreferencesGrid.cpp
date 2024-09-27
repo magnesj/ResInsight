@@ -89,8 +89,11 @@ RiaPreferencesGrid::RiaPreferencesGrid()
     CAF_PDM_InitField( &m_loadAndShowSoil, "loadAndShowSoil", true, "Load and Show SOIL" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_loadAndShowSoil );
 
-    CAF_PDM_InitField( &m_onlyLoadActiveCells, "onlyLoadActiveCells", false, "Only Load Active Cell Geometry" );
+    CAF_PDM_InitField( &m_onlyLoadActiveCells, "onlyLoadActiveCells", false, "Only Load Active Cell Geometry (Experimental)" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_onlyLoadActiveCells );
+
+    CAF_PDM_InitField( &m_invalidateLongThinCells, "invalidateLongThinCells", false, "Skip Long, Thin Cells" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_invalidateLongThinCells );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -109,6 +112,7 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
     auto newCBGroup = uiOrdering.addNewGroup( "Behavior When Loading Data" );
     newCBGroup->add( &m_autoComputeDepthRelatedProperties );
     newCBGroup->add( &m_loadAndShowSoil );
+    newCBGroup->add( &m_invalidateLongThinCells );
 
     auto faultGrp = uiOrdering.addNewGroup( "Fault Import" );
 
@@ -133,8 +137,9 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
     auto resdataGrp = uiOrdering.addNewGroup( "ResData Reader Settings" );
     resdataGrp->add( &m_useResultIndexFile );
 
-    auto opmcGrp = uiOrdering.addNewGroup( "OPM Common Reader Settings" );
-    opmcGrp->add( &m_onlyLoadActiveCells );
+    // TODO: Disabled for the 2024.09 release, enable after release
+    // auto opmcGrp = uiOrdering.addNewGroup( "OPM Common Reader Settings" );
+    // opmcGrp->add( &m_onlyLoadActiveCells );
 
     const bool setFaultImportSettingsReadOnly = !importFaults();
 
@@ -158,7 +163,8 @@ RifReaderSettings RiaPreferencesGrid::gridOnlyReaderSettings()
         true, // skipWellData
         false, // import summary data
         "", // include prefix,
-        false // only active cells
+        false, // only active cells
+        true // ignore long thin cells
     };
     return rs;
 }
@@ -176,7 +182,8 @@ RifReaderSettings RiaPreferencesGrid::readerSettings()
                           m_skipWellData,
                           true, // import summary data
                           m_includeFileAbsolutePathPrefix,
-                          m_onlyLoadActiveCells };
+                          onlyLoadActiveCells(),
+                          m_invalidateLongThinCells };
     return rs;
 }
 
@@ -257,7 +264,16 @@ bool RiaPreferencesGrid::autoComputeDepthRelatedProperties() const
 //--------------------------------------------------------------------------------------------------
 bool RiaPreferencesGrid::onlyLoadActiveCells() const
 {
-    return m_onlyLoadActiveCells;
+    return false;
+    // return m_onlyLoadActiveCells;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaPreferencesGrid::invalidateLongThinCells() const
+{
+    return m_invalidateLongThinCells;
 }
 
 //--------------------------------------------------------------------------------------------------

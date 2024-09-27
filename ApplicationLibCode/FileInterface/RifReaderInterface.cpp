@@ -92,6 +92,14 @@ bool RifReaderInterface::onlyLoadActiveCells() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RifReaderInterface::invalidateLongThinCells() const
+{
+    return m_readerSettings.invalidateLongThinCells;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RifReaderInterface::setTimeStepFilter( const std::vector<size_t>& fileTimeStepIndices )
 {
     m_fileTimeStepIndices = fileTimeStepIndices;
@@ -181,8 +189,6 @@ void RifReaderInterface::importFaults( const QStringList& fileSet, cvf::Collecti
 
         if ( !isDataFileFound )
         {
-            RiaLogging::info( "No *.DATA file is found" );
-
             for ( const auto& filename : fileSet )
             {
                 if ( filename.endsWith( ".IN", Qt::CaseInsensitive ) )

@@ -1,7 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2015-     Statoil ASA
-//  Copyright (C) 2015-     Ceetron Solutions AS
+//  Copyright (C) 2024- Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -17,53 +16,72 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicEclipsePropertyFilterNewExec.h"
+#include "RimCameraPosition.h"
 
-#include "RicEclipsePropertyFilterFeatureImpl.h"
+#include "RimEclipseCase.h"
 
-#include "RimEclipsePropertyFilter.h"
-#include "RimEclipsePropertyFilterCollection.h"
-#include "RimGridView.h"
+CAF_PDM_SOURCE_INIT( RimCameraPosition, "RimCameraPosition" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicEclipsePropertyFilterNewExec::RicEclipsePropertyFilterNewExec( RimEclipsePropertyFilterCollection* propertyFilterCollection )
-    : CmdExecuteCommand( nullptr )
+RimCameraPosition::RimCameraPosition()
 {
-    assert( propertyFilterCollection );
-    m_propertyFilterCollection = propertyFilterCollection;
+    CAF_PDM_InitObject( "Camera Position for Case" );
+
+    CAF_PDM_InitFieldNoDefault( &m_eclipseCase, "EclipseCase", "Eclipse Case" );
+
+    CAF_PDM_InitField( &m_cameraPosition, "CameraPosition", cvf::Mat4d::IDENTITY, "" );
+    m_cameraPosition.uiCapability()->setUiHidden( true );
+
+    CAF_PDM_InitField( &m_cameraPointOfInterest, "CameraPointOfInterest", cvf::Vec3d::ZERO, "" );
+    m_cameraPointOfInterest.uiCapability()->setUiHidden( true );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicEclipsePropertyFilterNewExec::~RicEclipsePropertyFilterNewExec()
+RimEclipseCase* RimCameraPosition::eclipseCase() const
 {
+    return m_eclipseCase();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RicEclipsePropertyFilterNewExec::name()
+void RimCameraPosition::setEclipseCase( RimEclipseCase* eclipseCase )
 {
-    return "New Property Filter";
+    m_eclipseCase = eclipseCase;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicEclipsePropertyFilterNewExec::redo()
+cvf::Mat4d RimCameraPosition::cameraPosition() const
 {
-    RicEclipsePropertyFilterFeatureImpl::addPropertyFilter( m_propertyFilterCollection );
+    return m_cameraPosition();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicEclipsePropertyFilterNewExec::undo()
+void RimCameraPosition::setCameraPosition( const cvf::Mat4d& cameraPosition )
 {
-    m_propertyFilterCollection->propertyFiltersField().erase( m_propertyFilterCollection->propertyFilters().size() - 1 );
+    m_cameraPosition = cameraPosition;
+}
 
-    m_propertyFilterCollection->updateConnectedEditors();
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::Vec3d RimCameraPosition::cameraPointOfInterest() const
+{
+    return m_cameraPointOfInterest();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCameraPosition::setCameraPointOfInterest( const cvf::Vec3d& cameraPointOfInterest )
+{
+    m_cameraPointOfInterest = cameraPointOfInterest;
 }

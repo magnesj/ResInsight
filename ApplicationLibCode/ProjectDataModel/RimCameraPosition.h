@@ -1,7 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) Statoil ASA
-//  Copyright (C) Ceetron Solutions AS
+//  Copyright (C) 2024- Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -19,22 +18,37 @@
 
 #pragma once
 
-#include <QString>
+#include "cafPdmObject.h"
+
+#include "cafPdmField.h"
+#include "cafPdmFieldCvfMat4d.h"
+#include "cafPdmFieldCvfVec3d.h"
+#include "cafPdmPtrField.h"
+
+class RimEclipseCase;
 
 //==================================================================================================
 ///
 ///
 //==================================================================================================
-struct RifReaderSettings
+class RimCameraPosition : public caf::PdmObject
 {
-    bool    importFaults;
-    bool    importNNCs;
-    bool    includeInactiveCellsInFaultGeometry;
-    bool    importAdvancedMswData;
-    bool    useResultIndexFile;
-    bool    skipWellData;
-    bool    importSummaryData;
-    QString includeFileAbsolutePathPrefix;
-    bool    onlyLoadActiveCells;
-    bool    invalidateLongThinCells;
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimCameraPosition();
+
+    RimEclipseCase* eclipseCase() const;
+    void            setEclipseCase( RimEclipseCase* eclipseCase );
+
+    cvf::Mat4d cameraPosition() const;
+    void       setCameraPosition( const cvf::Mat4d& cameraPosition );
+
+    cvf::Vec3d cameraPointOfInterest() const;
+    void       setCameraPointOfInterest( const cvf::Vec3d& cameraPointOfInterest );
+
+private:
+    caf::PdmPtrField<RimEclipseCase*> m_eclipseCase;
+    caf::PdmField<cvf::Mat4d>         m_cameraPosition;
+    caf::PdmField<cvf::Vec3d>         m_cameraPointOfInterest;
 };

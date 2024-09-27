@@ -47,6 +47,7 @@
 #include "Rim3dOverlayInfoConfig.h"
 #include "RimAnnotationCollection.h"
 #include "RimAnnotationInViewCollection.h"
+#include "RimCameraPosition.h"
 #include "RimCellEdgeColors.h"
 #include "RimCellFilterCollection.h"
 #include "RimEclipseCase.h"
@@ -100,6 +101,7 @@
 
 #include "Riu3dSelectionManager.h"
 #include "RiuMainWindow.h"
+#include "RiuTools.h"
 #include "RiuViewer.h"
 
 #include "RivReservoirSimWellsPartMgr.h"
@@ -117,6 +119,7 @@
 #include "cafOverlayScalarMapperLegend.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include "cvfDrawable.h"
@@ -126,7 +129,23 @@
 #include "cvfViewport.h"
 #include "cvfqtUtils.h"
 
+#include <QApplication>
+
 #include <climits>
+
+namespace caf
+{
+template <>
+void caf::AppEnum<RimEclipseView::RimCaseChangeBehaviour>::setUp()
+{
+    addItem( RimEclipseView::RimCaseChangeBehaviour::KEEP_CURRENT_SETTINGS, "KEEP_CURRENT_SETTINGS", "Keep Current View Settings" );
+    addItem( RimEclipseView::RimCaseChangeBehaviour::STORE_VIEW_SETTINGS_FOR_CASE,
+             "STORE_VIEW_SETTINGS_FOR_CASE",
+             "Store View Settings for Case" );
+    addItem( RimEclipseView::RimCaseChangeBehaviour::ZOOM_TO_FIT, "ZOOM_TO_FIT", "Zoom to Fit" );
+    setDefault( RimEclipseView::RimCaseChangeBehaviour::KEEP_CURRENT_SETTINGS );
+}
+} // namespace caf
 
 CAF_PDM_XML_SOURCE_INIT( RimEclipseView, "ReservoirView" );
 //--------------------------------------------------------------------------------------------------
@@ -147,6 +166,7 @@ RimEclipseView::RimEclipseView()
     CAF_PDM_InitFieldNoDefault( &m_customEclipseCase_OBSOLETE, "CustomEclipseCase", "Custom Case" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_eclipseCase, "EclipseCase", "Eclipse Case" );
+    CAF_PDM_InitFieldNoDefault( &m_caseChangeBehaviour, "CaseChangeBehaviour", "Zoom Operation When Changing Case" );
 
     CAF_PDM_InitScriptableFieldWithScriptKeywordNoDefault( &m_cellResult, "GridCellResult", "CellResult", "Cell Result", ":/CellResult.png" );
     m_cellResult = new RimEclipseCellColors();
@@ -217,6 +237,8 @@ RimEclipseView::RimEclipseView()
     m_additionalResultsForResultInfo->setEclipseView( this );
 
     m_cellResult()->setAdditionalUiTreeObjects( { m_additionalResultsForResultInfo() } );
+
+    CAF_PDM_InitFieldNoDefault( &m_cameraPositions, "CameraPositions", "Camera Positions for Cases" );
 
     setDeletable( true );
 
@@ -397,6 +419,55 @@ void RimEclipseView::propagateEclipseCaseToChildObjects()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEclipseView::storeCurrentAndApplyNewCameraPosition( RimEclipseCase* currentCase, RimEclipseCase* newCase )
+{
+    auto settingsForCases = m_cameraPositions.childrenByType();
+
+    // Propagate viewer UI settings to RimEclipseView before accessing camera positions
+    setupBeforeSave();
+
+    auto findSettingsForCase = [&]( RimEclipseCase* eclipseCase ) -> RimCameraPosition*
+    {
+        for ( auto settingsForCase : settingsForCases )
+        {
+            if ( settingsForCase->eclipseCase() == eclipseCase )
+            {
+                return settingsForCase;
+            }
+        }
+        return nullptr;
+    };
+
+    if ( currentCase )
+    {
+        RimCameraPosition* settingsForCurrentCase = findSettingsForCase( currentCase );
+        if ( !settingsForCurrentCase )
+        {
+            settingsForCurrentCase = new RimCameraPosition;
+            settingsForCurrentCase->setEclipseCase( currentCase );
+            m_cameraPositions.push_back( settingsForCurrentCase );
+        }
+
+        settingsForCurrentCase->setCameraPosition( cameraPosition() );
+        settingsForCurrentCase->setCameraPointOfInterest( cameraPointOfInterest() );
+    }
+
+    if ( newCase )
+    {
+        if ( RimCameraPosition* settingsForNewCase = findSettingsForCase( newCase ) )
+        {
+            viewer()->mainCamera()->setViewMatrix( settingsForNewCase->cameraPosition() );
+            viewer()->setPointOfInterest( settingsForNewCase->cameraPointOfInterest() );
+            return;
+        }
+    }
+
+    zoomAll();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimEclipseView::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimGridView::fieldChangedByUi( changedField, oldValue, newValue );
@@ -410,7 +481,18 @@ void RimEclipseView::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
         updateGridBoxData();
         updateAnnotationItems();
 
-        zoomAll();
+        if ( m_caseChangeBehaviour() == RimEclipseView::RimCaseChangeBehaviour::STORE_VIEW_SETTINGS_FOR_CASE )
+        {
+            auto currentEclipseCase = dynamic_cast<RimEclipseCase*>( oldValue.value<caf::PdmPointer<PdmObjectHandle>>().rawPtr() );
+            storeCurrentAndApplyNewCameraPosition( currentEclipseCase, m_eclipseCase );
+        }
+        else if ( m_caseChangeBehaviour() == RimEclipseView::RimCaseChangeBehaviour::ZOOM_TO_FIT )
+        {
+            // Required to update the view after the case change. zoomAll() is not working without this.
+            QApplication::processEvents();
+
+            zoomAll();
+        }
 
         return;
     }
@@ -449,6 +531,17 @@ void RimEclipseView::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
         currentGridCellResults()->recalculateStatistics( m_cellResult->eclipseResultAddress() );
         setCurrentTimeStepAndUpdate( currentTimeStep() );
         createDisplayModelAndRedraw();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseView::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField )
+{
+    if ( changedChildField == &m_cellResult )
+    {
+        updateMdiWindowTitle();
     }
 }
 
@@ -1564,6 +1657,8 @@ void RimEclipseView::updateLegendRangesTextAndVisibility( RimRegularLegendConfig
 //--------------------------------------------------------------------------------------------------
 void RimEclipseView::setEclipseCase( RimEclipseCase* reservoir )
 {
+    // TODO: How should we manage the view settings? See storeCurrentAndApplyNewCameraPosition()
+
     m_eclipseCase = reservoir;
 
     propagateEclipseCaseToChildObjects();
@@ -1900,7 +1995,13 @@ const std::vector<RivCellSetEnum>& RimEclipseView::visibleGridParts() const
 void RimEclipseView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     // Only show case option when not under a case in the project tree.
-    if ( !firstAncestorOrThisOfType<RimEclipseCase>() ) uiOrdering.add( &m_eclipseCase );
+    if ( !firstAncestorOrThisOfType<RimEclipseCase>() )
+    {
+        caf::PdmUiGroup* dataSourceGroup = uiOrdering.addNewGroup( "Data Source" );
+
+        dataSourceGroup->add( &m_eclipseCase );
+        dataSourceGroup->add( &m_caseChangeBehaviour );
+    }
 
     Rim3dView::defineUiOrdering( uiConfigName, uiOrdering );
 
@@ -1991,8 +2092,6 @@ QList<caf::PdmOptionItemInfo> RimEclipseView::calculateValueOptions( const caf::
     {
         QList<caf::PdmOptionItemInfo> options;
 
-        options.push_back( caf::PdmOptionItemInfo( "None", nullptr ) );
-
         for ( auto eclCase : RimEclipseCaseTools::allEclipseGridCases() )
         {
             options.push_back( caf::PdmOptionItemInfo( eclCase->caseUserDescription(), eclCase, false, eclCase->uiIconProvider() ) );
@@ -2002,6 +2101,17 @@ QList<caf::PdmOptionItemInfo> RimEclipseView::calculateValueOptions( const caf::
     }
 
     return RimGridView::calculateValueOptions( fieldNeedingOptions );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_eclipseCase )
+    {
+        RiuTools::enableUpDownArrowsForComboBox( attribute );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2253,6 +2363,8 @@ void RimEclipseView::calculateCurrentTotalCellVisibility( cvf::UByteArray* total
 //--------------------------------------------------------------------------------------------------
 void RimEclipseView::calculateCellVisibility( cvf::UByteArray* visibility, std::vector<RivCellSetEnum> geomTypes, int timeStep )
 {
+    if ( !mainGrid() ) return;
+
     size_t cellCount = mainGrid()->globalCellArray().size();
 
     visibility->resize( cellCount );

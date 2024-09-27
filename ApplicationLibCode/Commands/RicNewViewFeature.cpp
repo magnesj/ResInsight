@@ -42,7 +42,7 @@ CAF_CMD_SOURCE_INIT( RicNewViewFeature, "RicNewViewFeature" );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicNewViewFeature::addReservoirView( RimEclipseCase* eclipseCase, RimGeoMechCase* geomCase, RimEclipseViewCollection* viewColl )
+Rim3dView* RicNewViewFeature::addReservoirView( RimEclipseCase* eclipseCase, RimGeoMechCase* geomCase, RimEclipseViewCollection* viewColl )
 {
     Rim3dView* newView = createReservoirView( eclipseCase, geomCase, viewColl );
 
@@ -53,6 +53,8 @@ void RicNewViewFeature::addReservoirView( RimEclipseCase* eclipseCase, RimGeoMec
         // Select the new view to make sure RiaApplication::setActiveReservoirView() is called
         Riu3DMainWindowTools::selectAsCurrentItem( newView );
     }
+
+    return newView;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -99,7 +101,7 @@ void RicNewViewFeature::onActionTriggered( bool isChecked )
         {
             // Use cases from grid ensemble if applicable
             auto gridEnsemble = viewCollection->firstAncestorOfType<RimEclipseCaseEnsemble>();
-            auto eclipseCases = gridEnsemble ? gridEnsemble->cases() : RimEclipseCaseTools::allEclipseGridCases();
+            auto eclipseCases = gridEnsemble ? gridEnsemble->cases() : RimEclipseCaseTools::nativeEclipseGridCases();
 
             if ( !eclipseCases.empty() )
             {
