@@ -187,7 +187,7 @@ void VariableClient::connectVariable( const QString& name )
         if ( variable )
         {
             variable->addListener( &m_doubleValue );
-            m_doubleValue = variable->valuem_doubleValue;
+            //m_doubleValue = variable->valuem_doubleValue;
         }
     }
 }
