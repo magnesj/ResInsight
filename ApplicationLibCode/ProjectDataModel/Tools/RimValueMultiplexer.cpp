@@ -20,6 +20,8 @@
 
 #include "RimProject.h"
 
+#include "cafPdmUiTreeSelectionEditor.h"
+
 CAF_PDM_SOURCE_INIT( RimValueMultiplexer, "RimValueMultiplexer" );
 
 //--------------------------------------------------------------------------------------------------
@@ -30,9 +32,13 @@ RimValueMultiplexer::RimValueMultiplexer()
     CAF_PDM_InitObject( "RimValueMultiplexer" );
 
     CAF_PDM_InitFieldNoDefault( &m_source, "Source", "Source" );
+    m_source.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+
     CAF_PDM_InitFieldNoDefault( &m_sourceFieldName, "SourceFieldName", "Source Fieldname" );
 
     CAF_PDM_InitFieldNoDefault( &m_destination, "Destination", "Destination" );
+    m_destination.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+
     CAF_PDM_InitFieldNoDefault( &m_destinationFieldName, "DestinationFieldName", "Destination Fieldname" );
 }
 

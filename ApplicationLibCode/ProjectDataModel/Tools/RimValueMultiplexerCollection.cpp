@@ -20,6 +20,8 @@
 
 #include "RimValueMultiplexer.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
+
 CAF_PDM_SOURCE_INIT( RimValueMultiplexerCollection, "RimValueMultiplexerCollection" );
 
 //--------------------------------------------------------------------------------------------------
@@ -58,31 +60,29 @@ void RimValueMultiplexerCollection::addMultiplexer( caf::PdmObject* source,
                                                     caf::PdmObject* destination,
                                                     const QString&  destinationFieldName )
 {
-    if ( !source || !destination )
+    if ( source && destination )
     {
-        return;
-    }
+        auto sourceValueField      = dynamic_cast<caf::PdmValueField*>( source->findField( fieldName ) );
+        auto destinationValueField = dynamic_cast<caf::PdmValueField*>( destination->findField( destinationFieldName ) );
 
-    auto sourceValueField      = dynamic_cast<caf::PdmValueField*>( source->findField( fieldName ) );
-    auto destinationValueField = dynamic_cast<caf::PdmValueField*>( destination->findField( destinationFieldName ) );
-
-    if ( sourceValueField && destinationValueField )
-    {
-        for ( auto m : m_valueMultiplexers )
+        if ( sourceValueField && destinationValueField )
         {
-            if ( m->source() == source && m->sourceFieldName() == fieldName && m->destination() == destination &&
-                 m->destinationFieldName() == destinationFieldName )
+            for ( auto m : m_valueMultiplexers )
             {
-                return;
+                if ( m->source() == source && m->sourceFieldName() == fieldName && m->destination() == destination &&
+                     m->destinationFieldName() == destinationFieldName )
+                {
+                    return;
+                }
             }
         }
-
-        auto multiplexer = new RimValueMultiplexer();
-        multiplexer->setSource( source, fieldName );
-        multiplexer->setDestination( destination, destinationFieldName );
-
-        m_valueMultiplexers.push_back( multiplexer );
     }
+
+    auto multiplexer = new RimValueMultiplexer();
+    multiplexer->setSource( source, fieldName );
+    multiplexer->setDestination( destination, destinationFieldName );
+
+    m_valueMultiplexers.push_back( multiplexer );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -132,4 +132,12 @@ void RimValueMultiplexerCollection::notifyFieldChanged( caf::PdmObject* source, 
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimValueMultiplexerCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicCreateValueMultiplexerFeature";
 }
