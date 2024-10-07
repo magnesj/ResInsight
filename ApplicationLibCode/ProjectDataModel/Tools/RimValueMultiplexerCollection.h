@@ -18,6 +18,10 @@
 
 #pragma once
 
+#include "cafPdmChildArrayField.h"
+#include "cafPdmObject.h"
+#include "cafPdmPtrField.h"
+
 class RimValueMultiplexer;
 
 //--------------------------------------------------------------------------------------------------
@@ -37,6 +41,9 @@ public:
     void removeMultiplexer( caf::PdmObject* source, const QString& fieldName, caf::PdmObject* destination, const QString& destinationFieldName );
 
     void notifyFieldChanged( caf::PdmObject* source, const QString& fieldName, QVariant newValue );
+
+private:
+    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
     caf::PdmPtrField<caf::PdmObject*>             m_root;

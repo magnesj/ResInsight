@@ -105,7 +105,7 @@
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
 #include "Tools/RiaVariableMapper.h"
-#include "Tools/RimValueMultiplexer.h"
+#include "Tools/RimValueMultiplexerCollection.h"
 
 #ifdef USE_QTCHARTS
 #include "RimEnsembleFractureStatisticsPlot.h"
@@ -162,7 +162,7 @@ RimProject::RimProject()
     scriptCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
-    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexer, "ValueMultiplexer", "Value Multiplexer" );
+    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexerCollection, "ValueMultiplexerCollection", "Value Multiplexer Collection" );
 
     CAF_PDM_InitFieldNoDefault( &viewLinkerCollection, "LinkedViews", "Linked Views", ":/LinkView.svg" );
     viewLinkerCollection = new RimViewLinkerCollection;
@@ -225,7 +225,7 @@ RimProject::RimProject()
 
     m_mainPlotCollection = new RimMainPlotCollection();
 
-    m_valueMultiplexer = new RimValueMultiplexer();
+    m_valueMultiplexerCollection = new RimValueMultiplexerCollection();
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -1482,6 +1482,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
         }
 
         uiTreeOrdering.add( colorLegendCollection() );
+        uiTreeOrdering.add( valueMultiplexerCollection() );
     }
 
     uiTreeOrdering.skipRemainingChildren( true );
@@ -1584,9 +1585,9 @@ QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapp
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimValueMultiplexer* RimProject::valueMultiplexer() const
+RimValueMultiplexerCollection* RimProject::valueMultiplexerCollection() const
 {
-    return m_valueMultiplexer();
+    return m_valueMultiplexerCollection();
 }
 
 //--------------------------------------------------------------------------------------------------

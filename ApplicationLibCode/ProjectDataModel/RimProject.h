@@ -71,7 +71,7 @@ class RimValveTemplate;
 class RimCompletionTemplateCollection;
 class RimPlotTemplateFolderItem;
 class RimGridCalculationCollection;
-class RimValueMultiplexer;
+class RimValueMultiplexerCollection;
 
 namespace caf
 {
@@ -191,7 +191,7 @@ public:
 
     void updatesAfterProjectFileIsRead();
 
-    RimValueMultiplexer* valueMultiplexer() const;
+    RimValueMultiplexerCollection* valueMultiplexerCollection() const;
 
 protected:
     void initAfterRead() override;
@@ -207,7 +207,7 @@ private:
 private:
     caf::PdmChildField<RimMainPlotCollection*> m_mainPlotCollection;
 
-    caf::PdmChildField<RimValueMultiplexer*> m_valueMultiplexer;
+    caf::PdmChildField<RimValueMultiplexerCollection*> m_valueMultiplexerCollection;
 
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;
