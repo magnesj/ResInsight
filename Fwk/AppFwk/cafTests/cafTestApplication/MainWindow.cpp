@@ -1447,8 +1447,16 @@ void MainWindow::buildVariableModel()
     m_variableServer = new VariableServer();
 
     m_testRoot->objects.push_back( m_variableServer );
-    m_testRoot->objects.push_back( new VariableClient() );
-    m_testRoot->objects.push_back( new VariableClient() );
+
+    auto firstObject = new VariableClient();
+    m_testRoot->objects.push_back( firstObject );
+
+    auto secondObject = new VariableClient();
+    m_testRoot->objects.push_back( secondObject );
+
+    // Add multiplexers
+    m_variableServer->setRoot( m_testRoot );
+    m_variableServer->addMultiplexer( firstObject, "DoubleValue", secondObject, "DoubleValue" );
 }
 
 //--------------------------------------------------------------------------------------------------

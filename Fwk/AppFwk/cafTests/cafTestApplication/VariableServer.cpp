@@ -101,9 +101,28 @@ VariableServer::VariableServer()
                         "This object is a demo of the CAF framework",
                         "This object is a demo of the CAF framework" );
 
+    CAF_PDM_InitFieldNoDefault( &m_root, "Root", "Root" );
+
     CAF_PDM_InitFieldNoDefault( &m_variables, "Variables", "Variables" );
+    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexers, "ValueMultiplexers", "Value Multiplexers" );
 
     setVariableValue( "MyVariable", 12.0 );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void VariableServer::setRoot( caf::PdmObject* root )
+{
+    m_root = root;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmObject* VariableServer::root() const
+{
+    return m_root;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -120,6 +139,91 @@ NamedVariable* VariableServer::variable( const QString& name )
     }
 
     return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void VariableServer::addMultiplexer( caf::PdmObject* source,
+                                     const QString&  fieldName,
+                                     caf::PdmObject* destination,
+                                     const QString&  destinationFieldName )
+{
+    if ( !source || !destination )
+    {
+        return;
+    }
+
+    auto sourceValueField      = dynamic_cast<caf::PdmValueField*>( source->findField( fieldName ) );
+    auto destinationValueField = dynamic_cast<caf::PdmValueField*>( destination->findField( destinationFieldName ) );
+
+    if ( sourceValueField && destinationValueField )
+    {
+        for ( auto m : m_valueMultiplexers )
+        {
+            if ( m->source() == source && m->sourceFieldName() == fieldName && m->destination() == destination &&
+                 m->destinationFieldName() == destinationFieldName )
+            {
+                return;
+            }
+        }
+
+        auto multiplexer = new ValueMultiplexer();
+        multiplexer->setSource( source, fieldName );
+        multiplexer->setDestination( destination, destinationFieldName );
+
+        m_valueMultiplexers.push_back( multiplexer );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void VariableServer::removeMultiplexer( caf::PdmObject* source,
+                                        const QString&  fieldName,
+                                        caf::PdmObject* destination,
+                                        const QString&  destinationFieldName )
+{
+    if ( !source || !destination )
+    {
+        return;
+    }
+
+    std::vector<ValueMultiplexer*> objectsToDelete;
+
+    for ( auto m : m_valueMultiplexers )
+    {
+        // erase the multiplexer if it exists
+        if ( m->source() == source && m->sourceFieldName() == fieldName && m->destination() == destination &&
+             m->destinationFieldName() == destinationFieldName )
+        {
+            objectsToDelete.push_back( m );
+        }
+    }
+
+    for ( auto m : objectsToDelete )
+    {
+        m_valueMultiplexers.removeChild( m );
+
+        delete m;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void VariableServer::notifyFieldChanged( caf::PdmObject* source, const QString& fieldName, QVariant newValue )
+{
+    for ( auto m : m_valueMultiplexers )
+    {
+        if ( m->source() == source && m->sourceFieldName() == fieldName )
+        {
+            if ( auto destinationField = m->destinationField() )
+            {
+                destinationField->setFromQVariant( newValue );
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -255,4 +359,168 @@ void VariableClient::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 
         disconnectVariable( "MyVariable" );
     }
+    else if ( &m_doubleValue == changedField )
+    {
+        auto mainWindows    = MainWindow::instance();
+        auto variableServer = mainWindows->variableServer();
+        if ( variableServer )
+        {
+            variableServer->notifyFieldChanged( this, m_doubleValue.keyword(), newValue );
+        }
+    }
+}
+
+CAF_PDM_SOURCE_INIT( ValueMultiplexer, "ValueMultiplexer" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+ValueMultiplexer::ValueMultiplexer()
+{
+    CAF_PDM_InitObject( "ValueMultiplexer",
+                        ":/images/win/filenew.png",
+                        "This object is a demo of the CAF framework",
+                        "This object is a demo of the CAF framework" );
+
+    CAF_PDM_InitFieldNoDefault( &m_source, "Source", "Source" );
+    CAF_PDM_InitFieldNoDefault( &m_sourceFieldName, "SourceFieldName", "Source Fieldname" );
+
+    CAF_PDM_InitFieldNoDefault( &m_destination, "Destination", "Destination" );
+    CAF_PDM_InitFieldNoDefault( &m_destinationFieldName, "DestinationFieldName", "Destination Fieldname" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmObject* ValueMultiplexer::source() const
+{
+    return m_source();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString ValueMultiplexer::sourceFieldName() const
+{
+    return m_sourceFieldName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmValueField* ValueMultiplexer::sourceField() const
+{
+    if ( m_source )
+    {
+        if ( auto valueField = dynamic_cast<caf::PdmValueField*>( m_source->findField( m_sourceFieldName() ) ) )
+        {
+            return valueField;
+        }
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmObject* ValueMultiplexer::destination() const
+{
+    return m_destination();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString ValueMultiplexer::destinationFieldName() const
+{
+    return m_destinationFieldName();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmValueField* ValueMultiplexer::destinationField() const
+{
+    if ( m_destination )
+    {
+        if ( auto valueField = dynamic_cast<caf::PdmValueField*>( m_destination->findField( m_destinationFieldName() ) ) )
+        {
+            return valueField;
+        }
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void ValueMultiplexer::setSource( caf::PdmObject* source, const QString& fieldName )
+{
+    m_source          = source;
+    m_sourceFieldName = fieldName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void ValueMultiplexer::setDestination( caf::PdmObject* destination, const QString& fieldName )
+{
+    m_destination          = destination;
+    m_destinationFieldName = fieldName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> ValueMultiplexer::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_source || fieldNeedingOptions == &m_destination )
+    {
+        auto root = MainWindow::instance()->variableServer()->root();
+        if ( root )
+        {
+            auto allObjects = root->descendantsOfType<caf::PdmObject>();
+
+            for ( auto obj : allObjects )
+            {
+                options.push_back( caf::PdmOptionItemInfo( obj->uiName(), obj ) );
+            }
+        }
+    }
+    else if ( fieldNeedingOptions == &m_sourceFieldName )
+    {
+        if ( m_source() )
+        {
+            auto allFields = m_source()->fields();
+
+            for ( auto field : allFields )
+            {
+                if ( auto valueField = dynamic_cast<caf::PdmValueField*>( field ) )
+                {
+                    options.push_back( caf::PdmOptionItemInfo( valueField->keyword(), valueField->keyword() ) );
+                }
+            }
+        }
+    }
+    else if ( fieldNeedingOptions == &m_destinationFieldName )
+    {
+        if ( m_destination() )
+        {
+            auto allFields = m_destination()->fields();
+
+            for ( auto field : allFields )
+            {
+                if ( auto valueField = dynamic_cast<caf::PdmValueField*>( field ) )
+                {
+                    options.push_back( caf::PdmOptionItemInfo( valueField->keyword(), valueField->keyword() ) );
+                }
+            }
+        }
+    }
+
+    return options;
 }

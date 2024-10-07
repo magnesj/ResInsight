@@ -3,6 +3,39 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+class ValueMultiplexer : public caf::PdmObject
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    ValueMultiplexer();
+
+    caf::PdmObject*     source() const;
+    QString             sourceFieldName() const;
+    caf::PdmValueField* sourceField() const;
+
+    caf::PdmObject*     destination() const;
+    QString             destinationFieldName() const;
+    caf::PdmValueField* destinationField() const;
+
+    void setSource( caf::PdmObject* source, const QString& fieldName );
+    void setDestination( caf::PdmObject* destination, const QString& fieldName );
+
+private:
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+
+private:
+    caf::PdmPtrField<caf::PdmObject*> m_source;
+    caf::PdmField<QString>            m_sourceFieldName;
+
+    caf::PdmPtrField<caf::PdmObject*> m_destination;
+    caf::PdmField<QString>            m_destinationFieldName;
+};
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -43,11 +76,30 @@ class VariableServer : public caf::PdmObject
 public:
     VariableServer();
 
+    void            setRoot( caf::PdmObject* root );
+    caf::PdmObject* root() const;
+
     void           setVariableValue( const QString& name, double value );
     NamedVariable* variable( const QString& name );
 
+    void addMultiplexer( caf::PdmObject* source,
+                         const QString&  fieldName,
+                         caf::PdmObject* destination,
+                         const QString&  destinationFieldName );
+
+    void removeMultiplexer( caf::PdmObject* source,
+                            const QString&  fieldName,
+                            caf::PdmObject* destination,
+                            const QString&  destinationFieldName );
+
+    void notifyFieldChanged( caf::PdmObject* source, const QString& fieldName, QVariant newValue );
+
 private:
+    caf::PdmPtrField<caf::PdmObject*> m_root;
+
     caf::PdmChildArrayField<NamedVariable*> m_variables;
+
+    caf::PdmChildArrayField<ValueMultiplexer*> m_valueMultiplexers;
 };
 
 //--------------------------------------------------------------------------------------------------
