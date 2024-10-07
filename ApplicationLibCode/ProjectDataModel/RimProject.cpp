@@ -105,6 +105,7 @@
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
 #include "Tools/RiaVariableMapper.h"
+#include "Tools/RimValueMultiplexer.h"
 
 #ifdef USE_QTCHARTS
 #include "RimEnsembleFractureStatisticsPlot.h"
@@ -161,6 +162,7 @@ RimProject::RimProject()
     scriptCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
+    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexer, "ValueMultiplexer", "Value Multiplexer" );
 
     CAF_PDM_InitFieldNoDefault( &viewLinkerCollection, "LinkedViews", "Linked Views", ":/LinkView.svg" );
     viewLinkerCollection = new RimViewLinkerCollection;
@@ -222,6 +224,8 @@ RimProject::RimProject()
     scriptCollection->uiCapability()->setUiIconFromResourceString( ":/octave.png" );
 
     m_mainPlotCollection = new RimMainPlotCollection();
+
+    m_valueMultiplexer = new RimValueMultiplexer();
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -1575,6 +1579,14 @@ QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapp
     }
 
     return returnValue;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimValueMultiplexer* RimProject::valueMultiplexer() const
+{
+    return m_valueMultiplexer();
 }
 
 //--------------------------------------------------------------------------------------------------
