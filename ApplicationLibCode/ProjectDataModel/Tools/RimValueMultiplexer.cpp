@@ -40,6 +40,8 @@ RimValueMultiplexer::RimValueMultiplexer()
     m_destination.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_destinationFieldName, "DestinationFieldName", "Destination Fieldname" );
+
+    setDeletable( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -130,11 +132,16 @@ QList<caf::PdmOptionItemInfo> RimValueMultiplexer::calculateValueOptions( const 
         auto root = RimProject::current();
         if ( root )
         {
-            auto allObjects = root->descendantsOfType<caf::PdmObject>();
+            auto allObjects = root->descendantsOfType<caf::PdmObjectHandle>();
 
-            for ( auto obj : allObjects )
+            for ( auto objHandle : allObjects )
             {
-                options.push_back( caf::PdmOptionItemInfo( obj->uiName(), obj ) );
+                auto obj = dynamic_cast<caf::PdmObject*>( objHandle );
+                if ( obj )
+                {
+                    QString text = obj->uiName() + " - " + obj->classKeyword();
+                    options.push_back( caf::PdmOptionItemInfo( text, obj ) );
+                }
             }
         }
     }
