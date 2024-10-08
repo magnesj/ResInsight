@@ -21,13 +21,14 @@
 #include "cafPdmChildArrayField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPtrField.h"
+#include "cafPdmUiCommandSystemProxy.h"
 
 class RimValueMultiplexer;
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class RimValueMultiplexerCollection : public caf::PdmObject
+class RimValueMultiplexerCollection : public caf::PdmObject, public caf::PdmFieldChangedMultiplexerInterface
 {
     CAF_PDM_HEADER_INIT;
 
@@ -44,6 +45,8 @@ public:
 
 private:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+
+    std::vector<caf::PdmFieldHandle*> connectedFields( caf::PdmFieldHandle* sourceField ) override;
 
 private:
     caf::PdmPtrField<caf::PdmObject*>             m_root;

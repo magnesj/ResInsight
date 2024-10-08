@@ -122,7 +122,9 @@
 #include "cafCmdFeature.h"
 #include "cafCmdFeatureManager.h"
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiTreeOrdering.h"
+
 #include "cvfBoundingBox.h"
 
 #include <QDebug>
@@ -225,7 +227,9 @@ RimProject::RimProject()
 
     m_mainPlotCollection = new RimMainPlotCollection();
 
-    m_valueMultiplexerCollection = new RimValueMultiplexerCollection();
+    auto multiplexerCollection = new RimValueMultiplexerCollection();
+    caf::PdmUiCommandSystemProxy::instance()->setFieldChangedMultiplexer( multiplexerCollection );
+    m_valueMultiplexerCollection = multiplexerCollection;
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
