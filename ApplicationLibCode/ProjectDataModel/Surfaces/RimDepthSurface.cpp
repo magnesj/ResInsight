@@ -22,6 +22,9 @@
 
 #include "RimSurfaceCollection.h"
 
+#include "RimProject.h"
+#include "Tools/RimValueMultiplexerCollection.h"
+
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
@@ -143,6 +146,11 @@ void RimDepthSurface::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 
     auto surfColl = firstAncestorOrThisOfTypeAsserted<RimSurfaceCollection>();
     surfColl->updateViews( { this } );
+
+    if ( changedField == &m_depth )
+    {
+        RimProject::current()->valueMultiplexerCollection()->notifyFieldChanged( this, m_depth.keyword(), newValue );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

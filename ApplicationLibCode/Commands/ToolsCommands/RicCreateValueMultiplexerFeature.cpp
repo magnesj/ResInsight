@@ -18,6 +18,7 @@
 
 #include "RicCreateValueMultiplexerFeature.h"
 
+#include "RimProject.h"
 #include "Tools/RimValueMultiplexerCollection.h"
 
 #include "cafSelectionManagerTools.h"
@@ -31,14 +32,23 @@ CAF_CMD_SOURCE_INIT( RicCreateValueMultiplexerFeature, "RicCreateValueMultiplexe
 //--------------------------------------------------------------------------------------------------
 void RicCreateValueMultiplexerFeature::onActionTriggered( bool isChecked )
 {
-    auto multiplexerCollections = caf::selectedObjectsByType<RimValueMultiplexerCollection*>();
+    auto            generalObjects = caf::selectedObjectsByType<caf::PdmObject*>();
+    caf::PdmObject* firstObject    = nullptr;
+    caf::PdmObject* secondObject   = nullptr;
 
-    if ( !multiplexerCollections.empty() )
+    if ( !generalObjects.empty() )
     {
-        auto multiplexerCollection = multiplexerCollections.front();
-        multiplexerCollection->addMultiplexer( nullptr, "", nullptr, "" );
-        multiplexerCollection->updateAllRequiredEditors();
+        firstObject = generalObjects.front();
     }
+
+    if ( generalObjects.size() > 1 )
+    {
+        secondObject = generalObjects.at( 1 );
+    }
+
+    auto multiplexerCollection = RimProject::current()->valueMultiplexerCollection();
+    multiplexerCollection->addMultiplexer( firstObject, "", secondObject, "" );
+    multiplexerCollection->updateAllRequiredEditors();
 }
 
 //--------------------------------------------------------------------------------------------------

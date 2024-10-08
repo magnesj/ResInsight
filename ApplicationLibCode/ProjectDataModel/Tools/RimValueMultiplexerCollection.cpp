@@ -128,7 +128,13 @@ void RimValueMultiplexerCollection::notifyFieldChanged( caf::PdmObject* source, 
         {
             if ( auto destinationField = multiplexer->destinationField() )
             {
+                auto fh = destinationField->uiCapability();
+
+                auto old = destinationField->toQVariant();
+
                 destinationField->setFromQVariant( newValue );
+
+                fh->notifyFieldChanged( old, newValue );
             }
         }
     }
