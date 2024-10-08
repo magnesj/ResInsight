@@ -147,3 +147,27 @@ void RimValueMultiplexerCollection::appendMenuItems( caf::CmdFeatureMenuBuilder&
 {
     menuBuilder << "RicCreateValueMultiplexerFeature";
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmFieldHandle*> RimValueMultiplexerCollection::connectedFields( caf::PdmFieldHandle* sourceField )
+{
+    std::vector<caf::PdmFieldHandle*> fields;
+
+    for ( auto multiplexer : m_valueMultiplexers )
+    {
+        if ( auto source = multiplexer->sourceField() )
+        {
+            if ( source == sourceField )
+            {
+                if ( auto destination = multiplexer->destinationField() )
+                {
+                    fields.push_back( destination );
+                }
+            }
+        }
+    }
+
+    return fields;
+}

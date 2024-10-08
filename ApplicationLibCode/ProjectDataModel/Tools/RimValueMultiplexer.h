@@ -20,6 +20,7 @@
 
 #include "cafPdmObject.h"
 #include "cafPdmPtrField.h"
+#include "cafPdmUiCommandSystemProxy.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
