@@ -59,7 +59,6 @@ public:
     QString         asciiDataForPlotExport() const override;
     void            reattachAllCurves() override;
     void            detachAllCurves() override;
-    caf::PdmObject* findPdmObjectFromPlotCurve( const RiuPlotCurve* curve ) const override;
     void            onAxisSelected( RiuPlotAxis axis, bool toggle ) override;
 
     // RimPlotWindow implementations
