@@ -975,8 +975,6 @@ void RiuQwtPlotWidget::highlightPlotItems( const std::set<caf::PdmObject*>& clos
 {
     highlightPlotCurves( closestItems );
 
-    // highlightPlotShapeItems( closestItems );
-
     updateCurveOrder();
 }
 
@@ -994,6 +992,7 @@ void RiuQwtPlotWidget::highlightPlotCurves( const std::set<caf::PdmObject*>& clo
     for ( QwtPlotItem* plotItem : plotItemList )
     {
         auto* riuPlotCurve = dynamic_cast<RiuPlotCurve*>( plotItem );
+        if ( !riuPlotCurve ) continue;
 
         auto pdmObject = riuPlotCurve->ownerRimCurve();
 
@@ -1056,26 +1055,6 @@ void RiuQwtPlotWidget::highlightPlotCurves( const std::set<caf::PdmObject*>& clo
             m_originalZValues.insert( std::make_pair( plotCurve, zValue ) );
 
             continue;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuQwtPlotWidget::highlightPlotShapeItems( const std::set<const QwtPlotItem*>& closestItems )
-{
-    auto plotItemList = m_plot->itemList();
-    for ( QwtPlotItem* plotItem : plotItemList )
-    {
-        auto* plotShapeItem = dynamic_cast<QwtPlotShapeItem*>( plotItem );
-        if ( plotShapeItem && closestItems.count( plotItem ) > 0 )
-        {
-            QPen pen = plotShapeItem->pen();
-            pen.setColor( QColor( Qt::green ) );
-            pen.setWidth( 3 );
-            plotShapeItem->setPen( pen );
-            plotShapeItem->setZ( plotShapeItem->z() + 100.0 );
         }
     }
 }

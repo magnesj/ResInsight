@@ -208,7 +208,6 @@ private:
     void highlightPlotItemsForQwtAxis( QwtAxisId axisId );
     void highlightPlotItems( const std::set<caf::PdmObject*>& closestItems );
     void highlightPlotCurves( const std::set<caf::PdmObject*>& closestItems );
-    void highlightPlotShapeItems( const std::set<const QwtPlotItem*>& closestItems );
     void resetPlotItemHighlighting( bool doUpdateCurveOrder = true );
     void resetPlotCurveHighlighting();
     void resetPlotShapeItemHighlighting();
