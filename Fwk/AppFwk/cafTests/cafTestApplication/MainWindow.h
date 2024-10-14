@@ -9,6 +9,7 @@ class DemoPdmObjectGroup;
 class QTreeView;
 class QUndoView;
 class QLabel;
+class VariableServer;
 
 namespace caf
 {
@@ -32,12 +33,16 @@ public:
     static MainWindow* instance();
     void               setPdmRoot( caf::PdmObjectHandle* pdmRoot );
 
+    VariableServer* variableServer() const;
+
 private:
     void createActions();
     void createDockPanels();
 
     void buildTestModel();
     void releaseTestData();
+
+    void buildVariableModel();
 
 private slots:
     void slotInsert();
@@ -63,6 +68,7 @@ private:
     caf::PdmUiPropertyView* m_pdmUiPropertyView;
     caf::PdmUiTableView*    m_pdmUiTableView;
     DemoPdmObjectGroup*     m_testRoot;
+    VariableServer*         m_variableServer;
 
     caf::CustomObjectEditor* m_customObjectEditor;
 

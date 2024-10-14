@@ -49,6 +49,12 @@ class PdmFieldHandle;
 class PdmUiFieldHandle;
 class PdmUiCommandSystemInterface;
 
+class PdmFieldChangedMultiplexerInterface
+{
+public:
+    virtual std::vector<caf::PdmFieldHandle*> connectedFields( caf::PdmFieldHandle* sourceField ) = 0;
+};
+
 class PdmUiCommandSystemProxy
 {
 public:
@@ -56,6 +62,9 @@ public:
 
     static PdmUiCommandSystemProxy* instance();
     void                            setCommandInterface( PdmUiCommandSystemInterface* undoCommandInterface );
+
+    void setFieldChangedMultiplexer( PdmFieldChangedMultiplexerInterface* fieldChangedMultiplexer );
+    PdmFieldChangedMultiplexerInterface* fieldChangedMultiplexer() const;
 
     void setUiValueToField( PdmUiFieldHandle* uiFieldHandle, const QVariant& newUiValue );
     void setCurrentContextMenuTargetWidget( QWidget* targetWidget );
@@ -65,7 +74,8 @@ private:
     static std::vector<PdmFieldHandle*> fieldsFromSelection( PdmFieldHandle* editorField );
 
 private:
-    PdmUiCommandSystemInterface* m_commandInterface;
+    PdmUiCommandSystemInterface*         m_commandInterface;
+    PdmFieldChangedMultiplexerInterface* m_fieldChangedMultiplexer;
 };
 
 } // End of namespace caf

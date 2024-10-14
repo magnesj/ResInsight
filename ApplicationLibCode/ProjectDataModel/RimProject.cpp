@@ -105,6 +105,7 @@
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
 #include "Tools/RiaVariableMapper.h"
+#include "Tools/RimValueMultiplexerCollection.h"
 
 #ifdef USE_QTCHARTS
 #include "RimEnsembleFractureStatisticsPlot.h"
@@ -121,7 +122,9 @@
 #include "cafCmdFeature.h"
 #include "cafCmdFeatureManager.h"
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiTreeOrdering.h"
+
 #include "cvfBoundingBox.h"
 
 #include <QDebug>
@@ -161,6 +164,7 @@ RimProject::RimProject()
     scriptCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
+    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexerCollection, "ValueMultiplexerCollection", "Value Multiplexer Collection" );
 
     CAF_PDM_InitFieldNoDefault( &viewLinkerCollection, "LinkedViews", "Linked Views", ":/LinkView.svg" );
     viewLinkerCollection = new RimViewLinkerCollection;
@@ -222,6 +226,10 @@ RimProject::RimProject()
     scriptCollection->uiCapability()->setUiIconFromResourceString( ":/octave.png" );
 
     m_mainPlotCollection = new RimMainPlotCollection();
+
+    auto multiplexerCollection = new RimValueMultiplexerCollection();
+    caf::PdmUiCommandSystemProxy::instance()->setFieldChangedMultiplexer( multiplexerCollection );
+    m_valueMultiplexerCollection = multiplexerCollection;
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -1478,6 +1486,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
         }
 
         uiTreeOrdering.add( colorLegendCollection() );
+        uiTreeOrdering.add( valueMultiplexerCollection() );
     }
 
     uiTreeOrdering.skipRemainingChildren( true );
@@ -1575,6 +1584,14 @@ QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapp
     }
 
     return returnValue;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimValueMultiplexerCollection* RimProject::valueMultiplexerCollection() const
+{
+    return m_valueMultiplexerCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
