@@ -176,6 +176,7 @@ public:
     std::vector<RigEclipseResultAddress> additionalResultsForResultInfo() const;
 
     std::vector<caf::PdmFieldHandle*> quickAccessFields() override;
+    void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) override;
 
 protected:
     void                 initAfterRead() override;

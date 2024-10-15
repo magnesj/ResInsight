@@ -80,16 +80,15 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
 
     if ( auto quickInterface = dynamic_cast<RimFieldQuickAccessInterface*>( object ) )
     {
-        auto fields = quickInterface->quickAccessFields();
-        for ( auto field : fields )
-        {
-            addField( field );
-        }
+        m_objectReferences.push_back( object );
 
-        if ( quickInterface->hasUiOrdering() )
-        {
-            m_objectReferences.push_back( object );
-        }
+        /*
+                auto fields = quickInterface->quickAccessFields();
+                for ( auto field : fields )
+                {
+                    addField( field );
+                }
+        */
     }
 }
 
@@ -198,10 +197,7 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     for ( auto qaObj : objectsForView )
     {
-        if ( qaObj->hasUiOrdering() )
-        {
-            qaObj->quickAccessUiOrdering( *group );
-        }
+        qaObj->quickAccessUiOrdering( *group );
     }
 }
 

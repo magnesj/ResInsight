@@ -29,7 +29,6 @@ class PdmUiOrdering;
 class RimFieldQuickAccessInterface
 {
 public:
-    virtual std::vector<caf::PdmFieldHandle*> quickAccessFields() = 0;
-    virtual void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ){};
-    virtual bool                              hasUiOrdering() const { return false; };
+    virtual std::vector<caf::PdmFieldHandle*> quickAccessFields()                                     = 0;
+    virtual void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) = 0;
 };

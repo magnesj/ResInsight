@@ -59,7 +59,6 @@ public:
 
     std::vector<caf::PdmFieldHandle*> quickAccessFields() override;
     void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) override;
-    bool                              hasUiOrdering() const override;
 
 private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;

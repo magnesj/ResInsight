@@ -148,6 +148,7 @@ void caf::AppEnum<RimEclipseView::RimCaseChangeBehaviour>::setUp()
 } // namespace caf
 
 CAF_PDM_XML_SOURCE_INIT( RimEclipseView, "ReservoirView" );
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -1762,6 +1763,14 @@ std::vector<RigEclipseResultAddress> RimEclipseView::additionalResultsForResultI
 std::vector<caf::PdmFieldHandle*> RimEclipseView::quickAccessFields()
 {
     return { &m_eclipseCase };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseView::quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_eclipseCase );
 }
 
 //--------------------------------------------------------------------------------------------------

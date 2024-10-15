@@ -61,6 +61,7 @@ public:
     void updateCompundFilter( cvf::CellRangeFilter* cellRangeFilter, int gridIndex ) override;
 
     std::vector<caf::PdmFieldHandle*> quickAccessFields() override;
+    void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) override;
 
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;

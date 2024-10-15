@@ -277,14 +277,6 @@ void RimEclipsePropertyFilter::quickAccessUiOrdering( caf::PdmUiOrdering& uiOrde
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimEclipsePropertyFilter::hasUiOrdering() const
-{
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName )
 {
     PdmObject::defineUiTreeOrdering( uiTreeOrdering, uiConfigName );

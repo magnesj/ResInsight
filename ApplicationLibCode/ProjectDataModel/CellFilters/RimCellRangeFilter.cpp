@@ -184,6 +184,16 @@ std::vector<caf::PdmFieldHandle*> RimCellRangeFilter::quickAccessFields()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimCellRangeFilter::quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering )
+{
+    if ( cellCountI == 1 ) uiOrdering.add( &startIndexI );
+    if ( cellCountJ == 1 ) uiOrdering.add( &startIndexJ );
+    if ( cellCountK == 1 ) uiOrdering.add( &startIndexK );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimCellRangeFilter::setDefaultValues( int sliceDirection, int defaultSlice )
 {
     const cvf::StructGridInterface* grid = selectedGrid();
