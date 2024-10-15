@@ -143,7 +143,6 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
     m_objectReferences.removeChild( nullptr );
 
     std::vector<RimFieldQuickAccess*> fieldsForView;
-
     for ( auto fieldRef : m_fieldReferences )
     {
         if ( !fieldRef ) continue;
@@ -163,41 +162,45 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
         }
     }
 
-    if ( !fieldsForView.empty() )
+    std::vector<RimFieldQuickAccessInterface*> objectsForView;
+    for ( auto obj : m_objectReferences.ptrReferencedObjectsByType() )
     {
-        QString groupName;
-        auto    uiCapability = activeView->uiCapability();
-        if ( uiCapability->userDescriptionField() && uiCapability->userDescriptionField()->uiCapability() )
+        if ( !obj ) continue;
+
+        auto view = obj->firstAncestorOrThisOfType<RimGridView>();
+        if ( view != activeView ) continue;
+
+        if ( auto qaInterface = dynamic_cast<RimFieldQuickAccessInterface*>( obj ) )
         {
-            groupName = uiCapability->userDescriptionField()->uiCapability()->uiValue().toString();
+            objectsForView.push_back( qaInterface );
         }
-        else
+    }
+
+    if ( fieldsForView.empty() && objectsForView.empty() ) return;
+
+    QString groupName;
+    auto    uiCapability = activeView->uiCapability();
+    if ( uiCapability->userDescriptionField() && uiCapability->userDescriptionField()->uiCapability() )
+    {
+        groupName = uiCapability->userDescriptionField()->uiCapability()->uiValue().toString();
+    }
+    else
+    {
+        groupName = "Group ";
+    }
+
+    auto group = uiOrdering.addNewGroup( groupName );
+
+    for ( auto fieldRef : fieldsForView )
+    {
+        fieldRef->uiOrdering( uiConfigName, *group );
+    }
+
+    for ( auto qaObj : objectsForView )
+    {
+        if ( qaObj->hasUiOrdering() )
         {
-            groupName = "Group ";
-        }
-
-        auto group = uiOrdering.addNewGroup( groupName );
-
-        for ( auto fieldRef : fieldsForView )
-        {
-            fieldRef->uiOrdering( uiConfigName, *group );
-        }
-
-        auto objects = m_objectReferences.ptrReferencedObjectsByType();
-        for ( auto obj : objects )
-        {
-            if ( !obj ) continue;
-
-            auto view = obj->firstAncestorOrThisOfType<RimGridView>();
-            if ( view != activeView ) continue;
-
-            if ( auto qaInterface = dynamic_cast<RimFieldQuickAccessInterface*>( obj ) )
-            {
-                if ( qaInterface->hasUiOrdering() )
-                {
-                    qaInterface->quickAccessUiOrdering( *group );
-                }
-            }
+            qaObj->quickAccessUiOrdering( *group );
         }
     }
 }
