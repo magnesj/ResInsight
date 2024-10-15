@@ -38,7 +38,7 @@ RimFieldQuickAccess::RimFieldQuickAccess()
     m_selectObjectButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
     m_selectObjectButton.xmlCapability()->disableIO();
 
-    CAF_PDM_InitField( &m_removeItemButton, "RemoveItem", false, "...", ":/Erase.svg", "Remove Quick Access" );
+    CAF_PDM_InitField( &m_removeItemButton, "RemoveItem", false, "...", ":/pin.svg", "Remove Quick Access" );
     m_removeItemButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
     m_removeItemButton.xmlCapability()->disableIO();
 
