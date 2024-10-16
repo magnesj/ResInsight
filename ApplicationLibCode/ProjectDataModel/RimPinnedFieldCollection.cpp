@@ -177,27 +177,14 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     if ( fieldsForView.empty() && objectsForView.empty() ) return;
 
-    QString groupName;
-    auto    uiCapability = activeView->uiCapability();
-    if ( uiCapability->userDescriptionField() && uiCapability->userDescriptionField()->uiCapability() )
-    {
-        groupName = uiCapability->userDescriptionField()->uiCapability()->uiValue().toString();
-    }
-    else
-    {
-        groupName = "Group ";
-    }
-
-    auto group = uiOrdering.addNewGroup( groupName );
-
     for ( auto fieldRef : fieldsForView )
     {
-        fieldRef->uiOrdering( uiConfigName, *group );
+        fieldRef->uiOrdering( uiConfigName, uiOrdering );
     }
 
     for ( auto qaObj : objectsForView )
     {
-        qaObj->quickAccessUiOrdering( *group );
+        qaObj->quickAccessUiOrdering( uiOrdering );
     }
 }
 
