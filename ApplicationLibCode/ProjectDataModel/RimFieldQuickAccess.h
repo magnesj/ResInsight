@@ -45,11 +45,10 @@ public:
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     void onSelectObjectButton( const bool& state );
     void onRemoveObjectButton( const bool& state );
-
-    bool buttonState() const;
 
 private:
     caf::PdmChildField<RimFieldReference*> m_fieldReference;
@@ -58,6 +57,8 @@ private:
     caf::PdmProxyValueField<bool> m_removeItemButton;
 
     bool m_markedForRemoval;
+
+protected:
 };
 
 //==================================================================================================
@@ -71,7 +72,7 @@ class RimFieldQuickAccessGroup : public RimNamedObject
 public:
     RimFieldQuickAccessGroup();
 
-    void addFields( std::vector<caf::PdmFieldHandle*> fields );
+    void addFields( const std::vector<caf::PdmFieldHandle*>& fields );
 
     std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
     caf::PdmObjectHandle*             ownerObject() const;

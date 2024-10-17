@@ -81,9 +81,7 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
 
     if ( auto quickInterface = dynamic_cast<RimFieldQuickAccessInterface*>( object ) )
     {
-        auto fields = quickInterface->quickAccessFields();
-
-        for ( const auto& [groupName, fields] : fields )
+        for ( const auto& [groupName, fields] : quickInterface->quickAccessFields() )
         {
             if ( groupName.isEmpty() )
             {

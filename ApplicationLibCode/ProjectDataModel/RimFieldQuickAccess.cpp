@@ -39,12 +39,10 @@ RimFieldQuickAccess::RimFieldQuickAccess()
 
     CAF_PDM_InitFieldNoDefault( &m_selectObjectButton, "SelectObject", "...", ":/Bullet.png", "Select Object in Property Editor" );
     m_selectObjectButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    m_selectObjectButton.registerGetMethod( this, &RimFieldQuickAccess::buttonState );
     m_selectObjectButton.registerSetMethod( this, &RimFieldQuickAccess::onSelectObjectButton );
 
     CAF_PDM_InitFieldNoDefault( &m_removeItemButton, "RemoveItem", "...", ":/pin.svg", "Remove Quick Access" );
     m_removeItemButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    m_removeItemButton.registerGetMethod( this, &RimFieldQuickAccess::buttonState );
     m_removeItemButton.registerSetMethod( this, &RimFieldQuickAccess::onRemoveObjectButton );
 
     m_markedForRemoval = false;
@@ -103,9 +101,13 @@ void RimFieldQuickAccess::onRemoveObjectButton( const bool& state )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimFieldQuickAccess::buttonState() const
+void RimFieldQuickAccess::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    return true;
+    if ( auto attr = dynamic_cast<caf::PdmUiToolButtonEditorAttribute*>( attribute ) )
+    {
+        attr->m_checkable          = false;
+        attr->m_invertCurrentValue = true;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -177,7 +179,7 @@ RimFieldQuickAccessGroup::RimFieldQuickAccessGroup()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFieldQuickAccessGroup::addFields( std::vector<caf::PdmFieldHandle*> fields )
+void RimFieldQuickAccessGroup::addFields( const std::vector<caf::PdmFieldHandle*>& fields )
 {
     bool rebuildObject = false;
 
