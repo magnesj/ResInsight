@@ -178,7 +178,7 @@ std::map<QString, std::vector<caf::PdmFieldHandle*>> RimCellRangeFilter::quickAc
 
     if ( cellCountI == 1 ) fields[""].push_back( &startIndexI );
     if ( cellCountJ == 1 ) fields[""].push_back( &startIndexJ );
-    if ( cellCountK == 1 ) fields[""].push_back( &startIndexI );
+    if ( cellCountK == 1 ) fields[""].push_back( &startIndexK );
 
     return fields;
 }

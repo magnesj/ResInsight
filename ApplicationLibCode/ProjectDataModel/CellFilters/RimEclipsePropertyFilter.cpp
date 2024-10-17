@@ -192,8 +192,8 @@ void RimEclipsePropertyFilter::setToDefaultValues()
 
     computeResultValueRange();
 
-    m_lowerBound = m_minimumResultValue;
-    m_upperBound = m_maximumResultValue;
+    m_lowerBound.setValueWithFieldChanged( m_minimumResultValue );
+    m_upperBound.setValueWithFieldChanged( m_maximumResultValue );
 
     m_selectedCategoryValues = m_categoryValues;
     m_useCategorySelection   = true;

@@ -427,6 +427,9 @@ RimCellRangeFilter* RimCellFilterCollection::addNewCellRangeFilter( RimCase* src
     addFilter( pFilter );
     pFilter->setGridIndex( gridIndex );
     pFilter->setDefaultValues( sliceDirection, defaultSlice );
+
+    RimPinnedFieldCollection::instance()->addQuickAccessFields( pFilter );
+
     onFilterUpdated( pFilter );
     return pFilter;
 }
@@ -450,9 +453,6 @@ void RimCellFilterCollection::addFilter( RimCellFilter* pFilter )
 {
     setAutoName( pFilter );
     m_cellFilters.push_back( pFilter );
-
-    RimPinnedFieldCollection::instance()->addQuickAccessFields( pFilter );
-
     connectToFilterUpdates( pFilter );
     updateConnectedEditors();
 }

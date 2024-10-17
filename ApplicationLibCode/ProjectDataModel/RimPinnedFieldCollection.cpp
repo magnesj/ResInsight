@@ -37,6 +37,8 @@ RimPinnedFieldCollection::RimPinnedFieldCollection()
     CAF_PDM_InitObject( "Field Reference Collection" );
 
     CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccesses, "FieldReferences", "Field References" );
+    m_fieldQuickAccesses = new RimFieldQuickAccessGroup();
+
     CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccesGroups, "FieldReferencesGroup", "Field References Group" );
 }
 
@@ -83,17 +85,27 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
 
         for ( const auto& [groupName, fields] : fields )
         {
-            auto group = findGroup( groupName );
-            if ( group )
+            if ( groupName.isEmpty() )
             {
-                group->addFields( fields );
+                for ( auto f : fields )
+                {
+                    addField( f );
+                }
             }
             else
             {
-                group = new RimFieldQuickAccessGroup();
-                group->setName( groupName );
-                group->addFields( fields );
-                m_fieldQuickAccesGroups.push_back( group );
+                auto group = findGroup( groupName );
+                if ( group )
+                {
+                    group->addFields( fields );
+                }
+                else
+                {
+                    group = new RimFieldQuickAccessGroup();
+                    group->setName( groupName );
+                    group->addFields( fields );
+                    m_fieldQuickAccesGroups.push_back( group );
+                }
             }
         }
     }
@@ -106,7 +118,7 @@ void RimPinnedFieldCollection::addField( caf::PdmFieldHandle* field )
 {
     if ( !field ) return;
 
-    for ( auto quickAccess : m_fieldQuickAccesses )
+    for ( auto quickAccess : m_fieldQuickAccesses->fieldQuickAccesses() )
     {
         if ( field == quickAccess->field() )
         {
@@ -117,7 +129,7 @@ void RimPinnedFieldCollection::addField( caf::PdmFieldHandle* field )
     auto qa = new RimFieldQuickAccess();
     qa->setField( field );
 
-    m_fieldQuickAccesses.push_back( qa );
+    m_fieldQuickAccesses->addFieldQuickAccess( qa );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -127,7 +139,7 @@ void RimPinnedFieldCollection::removeField( caf::PdmFieldHandle* field )
 {
     if ( !field ) return;
 
-    for ( auto fieldRef : m_fieldQuickAccesses )
+    for ( auto fieldRef : m_fieldQuickAccesses->fieldQuickAccesses() )
     {
         if ( field == fieldRef->field() )
         {
@@ -159,31 +171,68 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     deleteMarkedObjects();
 
-    std::vector<RimFieldQuickAccess*> objForView;
-    for ( auto qa : m_fieldQuickAccesses )
     {
-        if ( !qa ) continue;
-
-        if ( auto field = qa->field() )
+        std::set<RimFieldQuickAccess*> objForView;
+        for ( auto qa : m_fieldQuickAccesses->fieldQuickAccesses() )
         {
-            if ( auto ownerObject = field->ownerObject() )
-            {
-                auto view = ownerObject->firstAncestorOrThisOfType<RimGridView>();
-                if ( view != activeView )
-                {
-                    continue;
-                }
+            if ( !qa ) continue;
 
-                objForView.push_back( qa );
+            if ( auto field = qa->field() )
+            {
+                if ( auto ownerObject = field->ownerObject() )
+                {
+                    auto view = ownerObject->firstAncestorOrThisOfType<RimGridView>();
+                    if ( view == activeView )
+                    {
+                        objForView.insert( qa );
+                    }
+                }
             }
+        }
+
+        for ( auto qa : objForView )
+        {
+            qa->uiOrdering( uiConfigName, uiOrdering );
         }
     }
 
-    if ( objForView.empty() ) return;
-
-    for ( auto qa : objForView )
     {
-        qa->uiOrdering( uiConfigName, uiOrdering );
+        std::set<RimFieldQuickAccessGroup*> groupsForView;
+        for ( auto group : m_fieldQuickAccesGroups )
+        {
+            for ( auto qa : group->fieldQuickAccesses() )
+            {
+                if ( !qa ) continue;
+
+                if ( auto field = qa->field() )
+                {
+                    if ( auto ownerObject = field->ownerObject() )
+                    {
+                        auto view = ownerObject->firstAncestorOrThisOfType<RimGridView>();
+                        if ( view == activeView )
+                        {
+                            groupsForView.insert( group );
+                        }
+                    }
+                }
+            }
+        }
+
+        for ( auto group : groupsForView )
+        {
+            auto name = group->name();
+
+            caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( name );
+            if ( !uiGroup )
+            {
+                uiGroup = uiOrdering.addNewGroup( name );
+            }
+
+            for ( auto qa : group->fieldQuickAccesses() )
+            {
+                qa->uiOrdering( uiConfigName, *uiGroup );
+            }
+        }
     }
 }
 
@@ -192,11 +241,14 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimPinnedFieldCollection::deleteMarkedObjects()
 {
-    for ( auto qa : m_fieldQuickAccesses )
+    for ( auto group : allGroups() )
     {
-        if ( qa->markedForRemoval() )
+        for ( auto qa : group->fieldQuickAccesses() )
         {
-            m_toBeDeleted.insert( qa );
+            if ( qa->markedForRemoval() )
+            {
+                m_toBeDeleted.insert( qa );
+            }
         }
     }
 
@@ -229,4 +281,20 @@ RimFieldQuickAccessGroup* RimPinnedFieldCollection::findGroup( const QString& gr
     }
 
     return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimFieldQuickAccessGroup*> RimPinnedFieldCollection::allGroups() const
+{
+    std::vector<RimFieldQuickAccessGroup*> all;
+    all.push_back( m_fieldQuickAccesses );
+
+    for ( auto a : m_fieldQuickAccesGroups )
+    {
+        all.push_back( a );
+    }
+
+    return all;
 }

@@ -52,8 +52,10 @@ private:
 
     RimFieldQuickAccessGroup* findGroup( const QString& groupName ) const;
 
+    std::vector<RimFieldQuickAccessGroup*> allGroups() const;
+
 private:
-    caf::PdmChildArrayField<RimFieldQuickAccess*>      m_fieldQuickAccesses;
+    caf::PdmChildField<RimFieldQuickAccessGroup*>      m_fieldQuickAccesses;
     caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldQuickAccesGroups;
 
     std::set<RimFieldQuickAccess*> m_toBeDeleted;
