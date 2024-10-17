@@ -64,16 +64,14 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     m_toolButton->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
     m_toolButton->setToolTip( uiField()->uiToolTip( uiConfigName ) );
 
-    PdmUiToolButtonEditorAttribute attributes;
-
     PdmUiObjectHandle* pdmUiOjectHandle = uiObj( uiField()->fieldHandle()->ownerObject() );
     if ( pdmUiOjectHandle )
     {
-        pdmUiOjectHandle->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
+        pdmUiOjectHandle->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
     }
-    bool isCheckable = attributes.m_checkable;
+    bool isCheckable = m_attributes.m_checkable;
     m_toolButton->setCheckable( isCheckable );
-    m_toolButton->setSizePolicy( attributes.m_sizePolicy );
+    m_toolButton->setSizePolicy( m_attributes.m_sizePolicy );
 
     QVariant variantFieldValue = uiField()->uiValue();
     if ( isCheckable )
@@ -106,7 +104,20 @@ QWidget* PdmUiToolButtonEditor::createLabelWidget( QWidget* parent )
 void PdmUiToolButtonEditor::slotClicked( bool checked )
 {
     QVariant v;
-    v = checked;
+
+    if ( m_attributes.m_invertCurrentValue )
+    {
+        // If we have a field with no getter function, the default constructed value for the field is returned, see
+        // PdmProxyValueField::value()
+        // In order to trigger the set method we need write the inverted bool value to the field.
+
+        QVariant currentValue = uiField()->uiValue();
+        v                     = !currentValue.toBool();
+    }
+    else
+    {
+        v = checked;
+    }
     this->setValueToField( v );
 }
 
