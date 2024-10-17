@@ -212,14 +212,13 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
                         if ( view == activeView )
                         {
                             groupsForView.insert( group );
+
+                            updateGroupName( ownerObject, group, field );
                         }
                     }
                 }
             }
-        }
 
-        for ( auto group : groupsForView )
-        {
             auto name = group->name();
 
             caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( name );
@@ -297,4 +296,28 @@ std::vector<RimFieldQuickAccessGroup*> RimPinnedFieldCollection::allGroups() con
     }
 
     return all;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPinnedFieldCollection::updateGroupName( caf::PdmObjectHandle*     sourceObject,
+                                                RimFieldQuickAccessGroup* quickAccessGroup,
+                                                caf::PdmFieldHandle*      fieldInQuickAccessGroup )
+{
+    if ( auto fieldInterface = dynamic_cast<RimFieldQuickAccessInterface*>( sourceObject ) )
+    {
+        auto ownerFields = fieldInterface->quickAccessFields();
+        for ( const auto& [groupName, fields] : ownerFields )
+        {
+            for ( auto f : fields )
+            {
+                if ( f == fieldInQuickAccessGroup )
+                {
+                    quickAccessGroup->setName( groupName );
+                    break;
+                }
+            }
+        }
+    }
 }

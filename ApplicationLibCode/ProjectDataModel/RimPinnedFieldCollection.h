@@ -54,6 +54,8 @@ private:
 
     std::vector<RimFieldQuickAccessGroup*> allGroups() const;
 
+    static void updateGroupName( caf::PdmObjectHandle* sourceObject, RimFieldQuickAccessGroup* group, caf::PdmFieldHandle* field );
+
 private:
     caf::PdmChildField<RimFieldQuickAccessGroup*>      m_fieldQuickAccesses;
     caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldQuickAccesGroups;

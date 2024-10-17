@@ -66,6 +66,7 @@ public:
     void addFields( std::vector<caf::PdmFieldHandle*> fields );
 
     std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
+    caf::PdmObjectHandle*             ownerObject() const;
 
     void addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
     void removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );

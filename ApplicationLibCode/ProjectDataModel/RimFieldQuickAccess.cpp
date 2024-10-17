@@ -179,6 +179,22 @@ std::vector<RimFieldQuickAccess*> RimFieldQuickAccessGroup::fieldQuickAccesses()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+caf::PdmObjectHandle* RimFieldQuickAccessGroup::ownerObject() const
+{
+    for ( auto f : m_fieldQuickAccess )
+    {
+        if ( f && f->field() )
+        {
+            return f->field()->ownerObject();
+        }
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimFieldQuickAccessGroup::addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess )
 {
     if ( !fieldQuickAccess ) return;
