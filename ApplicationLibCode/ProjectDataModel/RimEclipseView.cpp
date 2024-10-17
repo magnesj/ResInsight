@@ -148,7 +148,6 @@ void caf::AppEnum<RimEclipseView::RimCaseChangeBehaviour>::setUp()
 } // namespace caf
 
 CAF_PDM_XML_SOURCE_INIT( RimEclipseView, "ReservoirView" );
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

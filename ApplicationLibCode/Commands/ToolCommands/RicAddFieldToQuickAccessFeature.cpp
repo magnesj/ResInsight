@@ -21,10 +21,9 @@
 #include "RimFieldReference.h"
 #include "RimPinnedFieldCollection.h"
 
-#include "cafPdmUiPropertyViewDialog.h"
-
 #include "Riu3DMainWindowTools.h"
 
+#include "cafPdmUiPropertyViewDialog.h"
 #include "cafSelectionManagerTools.h"
 
 #include <QAction>

@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RimNamedObject.h"
+
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"

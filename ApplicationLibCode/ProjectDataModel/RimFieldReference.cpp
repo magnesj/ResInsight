@@ -18,8 +18,6 @@
 
 #include "RimFieldReference.h"
 
-#include "cafPdmUiToolButtonEditor.h"
-
 CAF_PDM_SOURCE_INIT( RimFieldReference, "RimFieldReference" );
 
 //--------------------------------------------------------------------------------------------------

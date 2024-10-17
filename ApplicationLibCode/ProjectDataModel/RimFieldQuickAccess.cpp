@@ -18,11 +18,12 @@
 
 #include "RimFieldQuickAccess.h"
 
+#include "RiaQuickAccessScheduler.h"
+
 #include "RimFieldReference.h"
 
 #include "Riu3DMainWindowTools.h"
 
-#include "RiaQuickAccessScheduler.h"
 #include "cafPdmUiToolButtonEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimFieldQuickAccess, "RimFieldQuickAccess" );
