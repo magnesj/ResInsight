@@ -22,6 +22,7 @@
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
+#include "cafPdmProxyValueField.h"
 
 class RimFieldReference;
 
@@ -45,11 +46,18 @@ private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
+    void onSelectObjectButton( const bool& state );
+    void onRemoveObjectButton( const bool& state );
+
+    bool buttonState() const;
+
+private:
     caf::PdmChildField<RimFieldReference*> m_fieldReference;
 
-    caf::PdmField<bool> m_selectObjectButton;
-    caf::PdmField<bool> m_removeItemButton;
-    bool                m_markedForRemoval;
+    caf::PdmProxyValueField<bool> m_selectObjectButton;
+    caf::PdmProxyValueField<bool> m_removeItemButton;
+
+    bool m_markedForRemoval;
 };
 
 //==================================================================================================

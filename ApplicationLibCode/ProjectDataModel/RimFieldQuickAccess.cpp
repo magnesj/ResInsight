@@ -22,6 +22,7 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "RiaQuickAccessScheduler.h"
 #include "cafPdmUiToolButtonEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimFieldQuickAccess, "RimFieldQuickAccess" );
@@ -36,13 +37,15 @@ RimFieldQuickAccess::RimFieldQuickAccess()
     CAF_PDM_InitFieldNoDefault( &m_fieldReference, "FieldReference", "FieldReference" );
     m_fieldReference = new RimFieldReference();
 
-    CAF_PDM_InitField( &m_selectObjectButton, "SelectObject", false, "...", ":/Bullet.png", "Select Object in Property Editor" );
+    CAF_PDM_InitFieldNoDefault( &m_selectObjectButton, "SelectObject", "...", ":/Bullet.png", "Select Object in Property Editor" );
     m_selectObjectButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    m_selectObjectButton.xmlCapability()->disableIO();
+    m_selectObjectButton.registerGetMethod( this, &RimFieldQuickAccess::buttonState );
+    m_selectObjectButton.registerSetMethod( this, &RimFieldQuickAccess::onSelectObjectButton );
 
-    CAF_PDM_InitField( &m_removeItemButton, "RemoveItem", false, "...", ":/pin.svg", "Remove Quick Access" );
+    CAF_PDM_InitFieldNoDefault( &m_removeItemButton, "RemoveItem", "...", ":/pin.svg", "Remove Quick Access" );
     m_removeItemButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    m_removeItemButton.xmlCapability()->disableIO();
+    m_removeItemButton.registerGetMethod( this, &RimFieldQuickAccess::buttonState );
+    m_removeItemButton.registerSetMethod( this, &RimFieldQuickAccess::onRemoveObjectButton );
 
     m_markedForRemoval = false;
 }
@@ -71,6 +74,38 @@ void RimFieldQuickAccess::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     uiOrdering.add( &m_removeItemButton, { .newRow = false } );
 
     uiOrdering.skipRemainingFields();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccess::onSelectObjectButton( const bool& state )
+{
+    if ( m_fieldReference() )
+    {
+        if ( auto pdmObj = dynamic_cast<caf::PdmObject*>( m_fieldReference->object() ) )
+        {
+            Riu3DMainWindowTools::selectAsCurrentItem( pdmObj );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccess::onRemoveObjectButton( const bool& state )
+{
+    m_markedForRemoval = true;
+
+    RiaQuickAccessScheduler::instance()->scheduleDisplayModelUpdateAndRedraw();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimFieldQuickAccess::buttonState() const
+{
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
