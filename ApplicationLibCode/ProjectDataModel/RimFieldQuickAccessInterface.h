@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include <map>
 #include <vector>
+
+#include <QString>
 
 namespace caf
 {
@@ -29,6 +32,5 @@ class PdmUiOrdering;
 class RimFieldQuickAccessInterface
 {
 public:
-    virtual std::vector<caf::PdmFieldHandle*> quickAccessFields()                                     = 0;
-    virtual void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) = 0;
+    virtual std::map<QString, std::vector<caf::PdmFieldHandle*>> quickAccessFields() = 0;
 };

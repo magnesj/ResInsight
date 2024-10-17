@@ -1760,17 +1760,12 @@ std::vector<RigEclipseResultAddress> RimEclipseView::additionalResultsForResultI
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<caf::PdmFieldHandle*> RimEclipseView::quickAccessFields()
+std::map<QString, std::vector<caf::PdmFieldHandle*>> RimEclipseView::quickAccessFields()
 {
-    return { &m_eclipseCase };
-}
+    std::map<QString, std::vector<caf::PdmFieldHandle*>> fields;
+    fields[""].push_back( &m_eclipseCase );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseView::quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering )
-{
-    uiOrdering.add( &m_eclipseCase );
+    return fields;
 }
 
 //--------------------------------------------------------------------------------------------------

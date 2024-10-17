@@ -172,23 +172,15 @@ void RimCellRangeFilter::computeAndSetValidValues()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<caf::PdmFieldHandle*> RimCellRangeFilter::quickAccessFields()
+std::map<QString, std::vector<caf::PdmFieldHandle*>> RimCellRangeFilter::quickAccessFields()
 {
-    if ( cellCountI == 1 ) return { &startIndexI };
-    if ( cellCountJ == 1 ) return { &startIndexJ };
-    if ( cellCountK == 1 ) return { &startIndexK };
+    std::map<QString, std::vector<caf::PdmFieldHandle*>> fields;
 
-    return {};
-}
+    if ( cellCountI == 1 ) fields[""].push_back( &startIndexI );
+    if ( cellCountJ == 1 ) fields[""].push_back( &startIndexJ );
+    if ( cellCountK == 1 ) fields[""].push_back( &startIndexI );
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimCellRangeFilter::quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering )
-{
-    if ( cellCountI == 1 ) uiOrdering.add( &startIndexI );
-    if ( cellCountJ == 1 ) uiOrdering.add( &startIndexJ );
-    if ( cellCountK == 1 ) uiOrdering.add( &startIndexK );
+    return fields;
 }
 
 //--------------------------------------------------------------------------------------------------

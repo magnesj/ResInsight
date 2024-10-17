@@ -57,8 +57,7 @@ public:
 
     void updateUiFieldsFromActiveResult();
 
-    std::vector<caf::PdmFieldHandle*> quickAccessFields() override;
-    void                              quickAccessUiOrdering( caf::PdmUiOrdering& uiOrdering ) override;
+    std::map<QString, std::vector<caf::PdmFieldHandle*>> quickAccessFields() override;
 
 private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;

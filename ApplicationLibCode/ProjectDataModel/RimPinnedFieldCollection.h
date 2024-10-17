@@ -24,6 +24,7 @@
 #include "cafPdmPtrArrayField.h"
 
 class RimFieldQuickAccess;
+class RimFieldQuickAccessGroup;
 
 //==================================================================================================
 ///
@@ -41,7 +42,7 @@ public:
     void addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object );
     void addQuickAccessFields( caf::PdmObjectHandle* object );
 
-    void addField( caf::PdmFieldHandle* field );
+    void addField( const QString& groupName, caf::PdmFieldHandle* field );
     void removeField( caf::PdmFieldHandle* field );
 
 private:
@@ -49,9 +50,11 @@ private:
 
     void deleteMarkedObjects();
 
+    RimFieldQuickAccessGroup* findGroup( const QString& groupName ) const;
+
 private:
-    caf::PdmChildArrayField<RimFieldQuickAccess*> m_fieldReferences;
-    caf::PdmPtrArrayField<caf::PdmObjectHandle*>  m_objectReferences;
+    caf::PdmChildArrayField<RimFieldQuickAccess*>      m_fieldReferences;
+    caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldReferenceGroups;
 
     std::set<RimFieldQuickAccess*> m_toBeDeleted;
 };

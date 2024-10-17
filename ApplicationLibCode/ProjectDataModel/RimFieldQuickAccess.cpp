@@ -114,3 +114,88 @@ void RimFieldQuickAccess::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
         m_markedForRemoval = true;
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+///
+///
+///
+///
+///
+///
+//--------------------------------------------------------------------------------------------------
+
+CAF_PDM_SOURCE_INIT( RimFieldQuickAccessGroup, "RimFieldQuickAccessGroup" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimFieldQuickAccessGroup::RimFieldQuickAccessGroup()
+{
+    CAF_PDM_InitObject( "Quick Access Group" );
+
+    CAF_PDM_InitFieldNoDefault( &m_fieldReferences, "FieldReferences", "FieldReferences" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::addFields( std::vector<caf::PdmFieldHandle*> fields )
+{
+    bool rebuildObject = false;
+
+    for ( auto field : fields )
+    {
+        if ( !field ) continue;
+
+        if ( !hasField( field ) ) rebuildObject = true;
+    }
+
+    if ( !rebuildObject ) return;
+
+    m_fieldReferences.deleteChildren();
+
+    for ( auto field : fields )
+    {
+        if ( !field ) continue;
+
+        auto fieldReference = new RimFieldReference();
+        fieldReference->setField( field );
+
+        addFieldReference( fieldReference );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::addFieldReference( RimFieldReference* fieldReference )
+{
+    if ( !fieldReference ) return;
+
+    m_fieldReferences.push_back( fieldReference );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::deleteFieldReference( RimFieldReference* fieldReference )
+{
+    m_fieldReferences.removeChild( fieldReference );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimFieldQuickAccessGroup::hasField( const caf::PdmFieldHandle* field ) const
+{
+    for ( auto fieldRef : m_fieldReferences )
+    {
+        if ( field == fieldRef->field() )
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

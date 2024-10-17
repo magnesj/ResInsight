@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "RimNamedObject.h"
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
@@ -49,4 +50,27 @@ private:
     caf::PdmField<bool> m_selectObjectButton;
     caf::PdmField<bool> m_removeItemButton;
     bool                m_markedForRemoval;
+};
+
+//==================================================================================================
+///
+///
+//==================================================================================================
+class RimFieldQuickAccessGroup : public RimNamedObject
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimFieldQuickAccessGroup();
+
+    void addFields( std::vector<caf::PdmFieldHandle*> fields );
+
+    void addFieldReference( RimFieldReference* fieldReference );
+    void deleteFieldReference( RimFieldReference* fieldReference );
+
+private:
+    bool hasField( const caf::PdmFieldHandle* field ) const;
+
+private:
+    caf::PdmChildArrayField<RimFieldReference*> m_fieldReferences;
 };
