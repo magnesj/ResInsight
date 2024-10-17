@@ -42,7 +42,7 @@ public:
     void addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object );
     void addQuickAccessFields( caf::PdmObjectHandle* object );
 
-    void addField( const QString& groupName, caf::PdmFieldHandle* field );
+    void addField( caf::PdmFieldHandle* field );
     void removeField( caf::PdmFieldHandle* field );
 
 private:
@@ -53,8 +53,8 @@ private:
     RimFieldQuickAccessGroup* findGroup( const QString& groupName ) const;
 
 private:
-    caf::PdmChildArrayField<RimFieldQuickAccess*>      m_fieldReferences;
-    caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldReferenceGroups;
+    caf::PdmChildArrayField<RimFieldQuickAccess*>      m_fieldQuickAccesses;
+    caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldQuickAccesGroups;
 
     std::set<RimFieldQuickAccess*> m_toBeDeleted;
 };

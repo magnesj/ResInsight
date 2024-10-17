@@ -52,7 +52,7 @@ void RicAddFieldToQuickAccessFeature::onActionTriggered( bool isChecked )
         auto field = fieldRef.field();
         if ( field )
         {
-            RimPinnedFieldCollection::instance()->addField( "", field );
+            RimPinnedFieldCollection::instance()->addField( field );
             RimPinnedFieldCollection::instance()->updateAllRequiredEditors();
         }
     }

@@ -31,6 +31,8 @@ CAF_PDM_SOURCE_INIT( RimFieldQuickAccess, "RimFieldQuickAccess" );
 //--------------------------------------------------------------------------------------------------
 RimFieldQuickAccess::RimFieldQuickAccess()
 {
+    CAF_PDM_InitObject( "Quick Access" );
+
     CAF_PDM_InitFieldNoDefault( &m_fieldReference, "FieldReference", "FieldReference" );
     m_fieldReference = new RimFieldReference();
 
@@ -134,7 +136,7 @@ RimFieldQuickAccessGroup::RimFieldQuickAccessGroup()
 {
     CAF_PDM_InitObject( "Quick Access Group" );
 
-    CAF_PDM_InitFieldNoDefault( &m_fieldReferences, "FieldReferences", "FieldReferences" );
+    CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccess, "FieldReferences", "FieldReferences" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -153,35 +155,43 @@ void RimFieldQuickAccessGroup::addFields( std::vector<caf::PdmFieldHandle*> fiel
 
     if ( !rebuildObject ) return;
 
-    m_fieldReferences.deleteChildren();
+    m_fieldQuickAccess.deleteChildren();
 
     for ( auto field : fields )
     {
         if ( !field ) continue;
 
-        auto fieldReference = new RimFieldReference();
+        auto fieldReference = new RimFieldQuickAccess();
         fieldReference->setField( field );
 
-        addFieldReference( fieldReference );
+        addFieldQuickAccess( fieldReference );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFieldQuickAccessGroup::addFieldReference( RimFieldReference* fieldReference )
+std::vector<RimFieldQuickAccess*> RimFieldQuickAccessGroup::fieldQuickAccesses() const
 {
-    if ( !fieldReference ) return;
-
-    m_fieldReferences.push_back( fieldReference );
+    return m_fieldQuickAccess.childrenByType();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFieldQuickAccessGroup::deleteFieldReference( RimFieldReference* fieldReference )
+void RimFieldQuickAccessGroup::addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess )
 {
-    m_fieldReferences.removeChild( fieldReference );
+    if ( !fieldQuickAccess ) return;
+
+    m_fieldQuickAccess.push_back( fieldQuickAccess );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess )
+{
+    m_fieldQuickAccess.removeChild( fieldQuickAccess );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -189,7 +199,7 @@ void RimFieldQuickAccessGroup::deleteFieldReference( RimFieldReference* fieldRef
 //--------------------------------------------------------------------------------------------------
 bool RimFieldQuickAccessGroup::hasField( const caf::PdmFieldHandle* field ) const
 {
-    for ( auto fieldRef : m_fieldReferences )
+    for ( auto fieldRef : m_fieldQuickAccess )
     {
         if ( field == fieldRef->field() )
         {

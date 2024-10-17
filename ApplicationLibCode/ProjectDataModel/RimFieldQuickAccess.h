@@ -65,12 +65,14 @@ public:
 
     void addFields( std::vector<caf::PdmFieldHandle*> fields );
 
-    void addFieldReference( RimFieldReference* fieldReference );
-    void deleteFieldReference( RimFieldReference* fieldReference );
+    std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
+
+    void addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
+    void removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
 
 private:
     bool hasField( const caf::PdmFieldHandle* field ) const;
 
 private:
-    caf::PdmChildArrayField<RimFieldReference*> m_fieldReferences;
+    caf::PdmChildArrayField<RimFieldQuickAccess*> m_fieldQuickAccess;
 };
