@@ -77,9 +77,9 @@
 #include "RimOsduWellLogDataLoader.h"
 #include "RimOsduWellPath.h"
 #include "RimOsduWellPathDataLoader.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimPlotWindow.h"
 #include "RimProject.h"
+#include "RimQuickAccessCollection.h"
 #include "RimScriptCollection.h"
 #include "RimSeismicData.h"
 #include "RimSeismicDataCollection.h"
@@ -519,7 +519,7 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
     // Traverse objects recursively and add quick access fields for old projects
     if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.09.2" ) )
     {
-        RimPinnedFieldCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
+        RimQuickAccessCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
     }
 
     // Migrate all RimGridCases to RimFileSummaryCase

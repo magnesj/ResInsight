@@ -21,12 +21,12 @@
 
 #include "RiaResultNames.h"
 
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipsePropertyFilter.h"
 #include "RimEclipsePropertyFilterCollection.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimEclipseView.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimViewController.h"
 
 #include "Riu3DMainWindowTools.h"
@@ -66,7 +66,7 @@ void RicEclipsePropertyFilterFeatureImpl::addPropertyFilter( RimEclipsePropertyF
     propertyFilterCollection->propertyFiltersField().push_back( propertyFilter );
     setDefaults( propertyFilter );
 
-    RimPinnedFieldCollection::instance()->addQuickAccessFields( propertyFilter );
+    RimQuickAccessCollection::instance()->addQuickAccessFields( propertyFilter );
 
     propertyFilterCollection->reservoirView()->scheduleGeometryRegen( PROPERTY_FILTERED );
     propertyFilterCollection->reservoirView()->scheduleCreateDisplayModelAndRedraw();
@@ -86,7 +86,7 @@ void RicEclipsePropertyFilterFeatureImpl::insertPropertyFilter( RimEclipseProper
     propertyFilterCollection->propertyFiltersField().insertAt( static_cast<int>( index ), propertyFilter );
     setDefaults( propertyFilter );
 
-    RimPinnedFieldCollection::instance()->addQuickAccessFields( propertyFilter );
+    RimQuickAccessCollection::instance()->addQuickAccessFields( propertyFilter );
 
     propertyFilterCollection->reservoirView()->scheduleGeometryRegen( PROPERTY_FILTERED );
     propertyFilterCollection->reservoirView()->scheduleCreateDisplayModelAndRedraw();

@@ -18,13 +18,13 @@
 
 #include "RimCellFilterCollection.h"
 
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "Rim3dView.h"
 #include "RimCase.h"
 #include "RimCellFilter.h"
 #include "RimCellIndexFilter.h"
 #include "RimCellRangeFilter.h"
 #include "RimOilField.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimPolygonFilter.h"
 #include "RimProject.h"
 #include "RimUserDefinedFilter.h"
@@ -428,7 +428,7 @@ RimCellRangeFilter* RimCellFilterCollection::addNewCellRangeFilter( RimCase* src
     pFilter->setGridIndex( gridIndex );
     pFilter->setDefaultValues( sliceDirection, defaultSlice );
 
-    RimPinnedFieldCollection::instance()->addQuickAccessFields( pFilter );
+    RimQuickAccessCollection::instance()->addQuickAccessFields( pFilter );
 
     onFilterUpdated( pFilter );
     return pFilter;

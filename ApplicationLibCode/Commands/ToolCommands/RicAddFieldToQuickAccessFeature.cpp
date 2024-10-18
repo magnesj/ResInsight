@@ -19,7 +19,7 @@
 #include "RicAddFieldToQuickAccessFeature.h"
 
 #include "QuickAccess/RimFieldReference.h"
-#include "QuickAccess/RimPinnedFieldCollection.h"
+#include "QuickAccess/RimQuickAccessCollection.h"
 
 #include "Riu3DMainWindowTools.h"
 
@@ -49,8 +49,8 @@ void RicAddFieldToQuickAccessFeature::onActionTriggered( bool isChecked )
 
     if ( propertyDialog.exec() == QDialog::Accepted )
     {
-        RimPinnedFieldCollection::instance()->addQuickAccessField( fieldRef );
-        RimPinnedFieldCollection::instance()->updateAllRequiredEditors();
+        RimQuickAccessCollection::instance()->addQuickAccessField( fieldRef );
+        RimQuickAccessCollection::instance()->updateAllRequiredEditors();
     }
 }
 

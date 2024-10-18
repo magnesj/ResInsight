@@ -29,6 +29,7 @@
 
 #include "RicGridCalculatorDialog.h"
 
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "Rim2dIntersectionView.h"
 #include "Rim3dView.h"
 #include "RimCellEdgeColors.h"
@@ -43,7 +44,6 @@
 #include "RimFaultInViewCollection.h"
 #include "RimGeoMechCase.h"
 #include "RimGeoMechView.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimProject.h"
 #include "RimSimWellInViewCollection.h"
 #include "RimViewLinker.h"
@@ -245,7 +245,7 @@ void RiuMainWindow::initializeGuiNewProjectLoaded()
         m_pdmUiPropertyView->currentObject()->uiCapability()->updateConnectedEditors();
     }
 
-    m_pinnedFieldView->showProperties( RimPinnedFieldCollection::instance() );
+    m_pinnedFieldView->showProperties( RimQuickAccessCollection::instance() );
 
     if ( statusBar() && !RiaRegressionTestRunner::instance()->isRunningRegressionTests() )
     {
@@ -1558,7 +1558,7 @@ void RiuMainWindow::selectedObjectsChanged()
     }
 
     // The update of pinned view is depending on active view, and must be done after the active view is set
-    m_pinnedFieldView->showProperties( RimPinnedFieldCollection::instance() );
+    m_pinnedFieldView->showProperties( RimQuickAccessCollection::instance() );
 }
 
 //--------------------------------------------------------------------------------------------------

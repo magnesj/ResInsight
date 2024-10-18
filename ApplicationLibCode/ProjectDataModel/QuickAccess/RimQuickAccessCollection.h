@@ -31,14 +31,14 @@ class RimFieldReference;
 ///
 ///
 //==================================================================================================
-class RimPinnedFieldCollection : public caf::PdmObject
+class RimQuickAccessCollection : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimPinnedFieldCollection();
+    RimQuickAccessCollection();
 
-    static RimPinnedFieldCollection* instance();
+    static RimQuickAccessCollection* instance();
 
     void addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object );
     void addQuickAccessFields( caf::PdmObjectHandle* object );

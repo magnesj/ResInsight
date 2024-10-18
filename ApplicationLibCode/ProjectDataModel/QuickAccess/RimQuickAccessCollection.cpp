@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RimPinnedFieldCollection.h"
+#include "RimQuickAccessCollection.h"
 
 #include "RiaApplication.h"
 
@@ -28,12 +28,12 @@
 
 #include "cafAssert.h"
 
-CAF_PDM_SOURCE_INIT( RimPinnedFieldCollection, "RimFieldReferenceCollection" );
+CAF_PDM_SOURCE_INIT( RimQuickAccessCollection, "RimQuickAccessCollection" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimPinnedFieldCollection::RimPinnedFieldCollection()
+RimQuickAccessCollection::RimQuickAccessCollection()
 {
     CAF_PDM_InitObject( "Field Reference Collection" );
 
@@ -43,10 +43,10 @@ RimPinnedFieldCollection::RimPinnedFieldCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimPinnedFieldCollection* RimPinnedFieldCollection::instance()
+RimQuickAccessCollection* RimQuickAccessCollection::instance()
 {
     auto proj = RimProject::current();
-    CAF_ASSERT( proj && "RimProject is nullptr when trying to access RimFieldReferenceCollection::instance()" );
+    CAF_ASSERT( proj && "RimProject is nullptr when trying to access RimQuickAccessCollection::instance()" );
 
     return proj->pinnedFieldCollection();
 }
@@ -54,7 +54,7 @@ RimPinnedFieldCollection* RimPinnedFieldCollection::instance()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object )
+void RimQuickAccessCollection::addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object )
 {
     if ( object == nullptr ) return;
     addQuickAccessFields( object );
@@ -73,7 +73,7 @@ void RimPinnedFieldCollection::addQuickAccessFieldsRecursively( caf::PdmObjectHa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* object )
+void RimQuickAccessCollection::addQuickAccessFields( caf::PdmObjectHandle* object )
 {
     if ( !object ) return;
 
@@ -92,7 +92,7 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::addQuickAccessField( const RimFieldReference& fieldReference )
+void RimQuickAccessCollection::addQuickAccessField( const RimFieldReference& fieldReference )
 {
     auto object = fieldReference.object();
     auto field  = fieldReference.field();
@@ -108,7 +108,7 @@ void RimPinnedFieldCollection::addQuickAccessField( const RimFieldReference& fie
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+void RimQuickAccessCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     auto activeView = RiaApplication::instance()->activeGridView();
     if ( !activeView ) return;
@@ -154,7 +154,7 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::deleteMarkedObjects()
+void RimQuickAccessCollection::deleteMarkedObjects()
 {
     // Delete marked objects and objects pointing to fields that are no longer valid
     {
@@ -204,7 +204,7 @@ void RimPinnedFieldCollection::deleteMarkedObjects()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFieldQuickAccessGroup* RimPinnedFieldCollection::findOrCreateGroup( caf::PdmObjectHandle* object, const QString& groupName )
+RimFieldQuickAccessGroup* RimQuickAccessCollection::findOrCreateGroup( caf::PdmObjectHandle* object, const QString& groupName )
 {
     if ( !object ) return nullptr;
 
@@ -235,7 +235,7 @@ RimFieldQuickAccessGroup* RimPinnedFieldCollection::findOrCreateGroup( caf::PdmO
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickAccessGroup )
+void RimQuickAccessCollection::updateGroupName( RimFieldQuickAccessGroup* quickAccessGroup )
 {
     if ( !quickAccessGroup ) return;
 
@@ -279,7 +279,7 @@ void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickA
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimPinnedFieldCollection::defaultGroupName()
+QString RimQuickAccessCollection::defaultGroupName()
 {
     return "Quick Access for View";
 }

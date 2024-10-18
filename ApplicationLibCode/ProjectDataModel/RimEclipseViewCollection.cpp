@@ -23,6 +23,7 @@
 
 #include "RigCaseCellResultsData.h"
 
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "Rim3dView.h"
 #include "RimCase.h"
 #include "RimCellEdgeColors.h"
@@ -30,7 +31,6 @@
 #include "RimEclipseView.h"
 #include "RimFaultInViewCollection.h"
 #include "RimGridView.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimProject.h"
 #include "RimStimPlanColors.h"
 
@@ -110,7 +110,7 @@ RimEclipseView* RimEclipseViewCollection::addView( RimEclipseCase* eclipseCase )
 
     m_views.push_back( view );
 
-    RimPinnedFieldCollection::instance()->addQuickAccessFields( view );
+    RimQuickAccessCollection::instance()->addQuickAccessFields( view );
 
     view->loadDataAndUpdate();
 

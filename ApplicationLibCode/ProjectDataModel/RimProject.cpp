@@ -37,6 +37,7 @@
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "RimAdvancedSnapshotExportDefinition.h"
 #include "RimAnalysisPlotCollection.h"
 #include "RimAnnotationCollection.h"
@@ -72,7 +73,6 @@
 #include "RimObservedDataCollection.h"
 #include "RimObservedSummaryData.h"
 #include "RimOilField.h"
-#include "RimPinnedFieldCollection.h"
 #include "RimPlotWindow.h"
 #include "RimPltPlotCollection.h"
 #include "RimPolylinesFromFileAnnotation.h"
@@ -224,7 +224,7 @@ RimProject::RimProject()
     scriptCollection->uiCapability()->setUiIconFromResourceString( ":/octave.png" );
 
     m_mainPlotCollection    = new RimMainPlotCollection();
-    m_pinnedFieldCollection = new RimPinnedFieldCollection();
+    m_pinnedFieldCollection = new RimQuickAccessCollection();
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -358,7 +358,7 @@ void RimProject::updatesAfterProjectFileIsRead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimPinnedFieldCollection* RimProject::pinnedFieldCollection() const
+RimQuickAccessCollection* RimProject::pinnedFieldCollection() const
 {
     return m_pinnedFieldCollection();
 }

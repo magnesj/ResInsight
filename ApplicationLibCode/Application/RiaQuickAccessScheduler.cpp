@@ -18,7 +18,7 @@
 
 #include "RiaQuickAccessScheduler.h"
 
-#include "RimPinnedFieldCollection.h"
+#include "QuickAccess/RimQuickAccessCollection.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -50,7 +50,7 @@ void RiaQuickAccessScheduler::scheduleDisplayModelUpdateAndRedraw()
 //--------------------------------------------------------------------------------------------------
 void RiaQuickAccessScheduler::performScheduledUpdates()
 {
-    auto quickColl = RimPinnedFieldCollection::instance();
+    auto quickColl = RimQuickAccessCollection::instance();
     if ( quickColl )
     {
         quickColl->updateAllRequiredEditors();

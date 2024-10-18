@@ -71,7 +71,7 @@ class RimValveTemplate;
 class RimCompletionTemplateCollection;
 class RimPlotTemplateFolderItem;
 class RimGridCalculationCollection;
-class RimPinnedFieldCollection;
+class RimQuickAccessCollection;
 
 namespace caf
 {
@@ -191,7 +191,7 @@ public:
 
     void updatesAfterProjectFileIsRead();
 
-    RimPinnedFieldCollection* pinnedFieldCollection() const;
+    RimQuickAccessCollection* pinnedFieldCollection() const;
 
 protected:
     void initAfterRead() override;
@@ -206,7 +206,7 @@ private:
 
 private:
     caf::PdmChildField<RimMainPlotCollection*>    m_mainPlotCollection;
-    caf::PdmChildField<RimPinnedFieldCollection*> m_pinnedFieldCollection;
+    caf::PdmChildField<RimQuickAccessCollection*> m_pinnedFieldCollection;
 
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;
