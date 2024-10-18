@@ -22,6 +22,7 @@
 
 #include "RimFieldQuickAccess.h"
 #include "RimFieldQuickAccessInterface.h"
+#include "RimFieldReference.h"
 #include "RimGridView.h"
 #include "RimProject.h"
 
@@ -35,9 +36,6 @@ CAF_PDM_SOURCE_INIT( RimPinnedFieldCollection, "RimFieldReferenceCollection" );
 RimPinnedFieldCollection::RimPinnedFieldCollection()
 {
     CAF_PDM_InitObject( "Field Reference Collection" );
-
-    CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccesses, "FieldReferences", "Field References" );
-    m_fieldQuickAccesses = new RimFieldQuickAccessGroup();
 
     CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccesGroups, "FieldReferencesGroup", "Field References Group" );
 }
@@ -83,27 +81,9 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
     {
         for ( const auto& [groupName, fields] : quickInterface->quickAccessFields() )
         {
-            if ( groupName.isEmpty() )
+            if ( auto group = findOrCreateGroup( object, groupName ) )
             {
-                for ( auto f : fields )
-                {
-                    addField( f );
-                }
-            }
-            else
-            {
-                auto group = findGroup( groupName );
-                if ( group )
-                {
-                    group->addFields( fields );
-                }
-                else
-                {
-                    group = new RimFieldQuickAccessGroup();
-                    group->setName( groupName );
-                    group->addFields( fields );
-                    m_fieldQuickAccesGroups.push_back( group );
-                }
+                group->addFields( fields );
             }
         }
     }
@@ -112,49 +92,15 @@ void RimPinnedFieldCollection::addQuickAccessFields( caf::PdmObjectHandle* objec
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::addField( caf::PdmFieldHandle* field )
+void RimPinnedFieldCollection::addQuickAccessField( const RimFieldReference& fieldReference )
 {
-    if ( !field ) return;
-
-    for ( auto quickAccess : m_fieldQuickAccesses->fieldQuickAccesses() )
+    auto object = fieldReference.object();
+    auto field  = fieldReference.field();
+    if ( object && field )
     {
-        if ( field == quickAccess->field() )
+        if ( auto group = findOrCreateGroup( object, "" ) )
         {
-            return;
-        }
-    }
-
-    auto qa = new RimFieldQuickAccess();
-    qa->setField( field );
-
-    m_fieldQuickAccesses->addFieldQuickAccess( qa );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::removeField( caf::PdmFieldHandle* field )
-{
-    if ( !field ) return;
-
-    for ( auto fieldRef : m_fieldQuickAccesses->fieldQuickAccesses() )
-    {
-        if ( field == fieldRef->field() )
-        {
-            m_toBeDeleted.insert( fieldRef );
-            return;
-        }
-    }
-
-    for ( auto group : m_fieldQuickAccesGroups )
-    {
-        for ( auto fieldRef : group->fieldQuickAccesses() )
-        {
-            if ( field == fieldRef->field() )
-            {
-                m_toBeDeleted.insert( fieldRef );
-                return;
-            }
+            group->addField( field );
         }
     }
 }
@@ -169,66 +115,31 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     deleteMarkedObjects();
 
+    std::set<RimFieldQuickAccessGroup*> groupsForView;
+
+    for ( auto group : m_fieldQuickAccesGroups )
     {
-        std::set<RimFieldQuickAccess*> objForView;
-        for ( auto qa : m_fieldQuickAccesses->fieldQuickAccesses() )
+        if ( group->ownerView() == activeView )
         {
-            if ( !qa ) continue;
-
-            if ( auto field = qa->field() )
-            {
-                if ( auto ownerObject = field->ownerObject() )
-                {
-                    auto view = ownerObject->firstAncestorOrThisOfType<RimGridView>();
-                    if ( view == activeView )
-                    {
-                        objForView.insert( qa );
-                    }
-                }
-            }
-        }
-
-        for ( auto qa : objForView )
-        {
-            qa->uiOrdering( uiConfigName, uiOrdering );
+            updateGroupName( group );
+            groupsForView.insert( group );
         }
     }
 
+    for ( auto group : groupsForView )
     {
-        std::set<RimFieldQuickAccessGroup*> groupsForView;
-        for ( auto group : m_fieldQuickAccesGroups )
+        auto name = group->name();
+        if ( name.isEmpty() ) name = defaultGroupName();
+
+        caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( name );
+        if ( !uiGroup )
         {
-            for ( auto qa : group->fieldQuickAccesses() )
-            {
-                if ( !qa ) continue;
+            uiGroup = uiOrdering.addNewGroup( name );
+        }
 
-                if ( auto field = qa->field() )
-                {
-                    if ( auto ownerObject = field->ownerObject() )
-                    {
-                        auto view = ownerObject->firstAncestorOrThisOfType<RimGridView>();
-                        if ( view == activeView )
-                        {
-                            groupsForView.insert( group );
-
-                            updateGroupName( ownerObject, group, field );
-                        }
-                    }
-                }
-            }
-
-            auto name = group->name();
-
-            caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( name );
-            if ( !uiGroup )
-            {
-                uiGroup = uiOrdering.addNewGroup( name );
-            }
-
-            for ( auto qa : group->fieldQuickAccesses() )
-            {
-                qa->uiOrdering( uiConfigName, *uiGroup );
-            }
+        for ( auto qa : group->fieldQuickAccesses() )
+        {
+            qa->uiOrdering( uiConfigName, *uiGroup );
         }
     }
 }
@@ -238,21 +149,21 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimPinnedFieldCollection::deleteMarkedObjects()
 {
-    for ( auto group : allGroups() )
+    std::set<RimFieldQuickAccess*> toBeDeleted;
+
+    for ( auto group : m_fieldQuickAccesGroups.childrenByType() )
     {
         for ( auto qa : group->fieldQuickAccesses() )
         {
             if ( qa->markedForRemoval() )
             {
-                m_toBeDeleted.insert( qa );
+                toBeDeleted.insert( qa );
             }
         }
     }
 
-    for ( auto qa : m_toBeDeleted )
+    for ( auto qa : toBeDeleted )
     {
-        m_fieldQuickAccesses.removeChild( qa );
-
         for ( auto group : m_fieldQuickAccesGroups )
         {
             group->removeFieldQuickAccess( qa );
@@ -260,62 +171,79 @@ void RimPinnedFieldCollection::deleteMarkedObjects()
 
         delete qa;
     }
-
-    m_toBeDeleted.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFieldQuickAccessGroup* RimPinnedFieldCollection::findGroup( const QString& groupName ) const
+RimFieldQuickAccessGroup* RimPinnedFieldCollection::findOrCreateGroup( caf::PdmObjectHandle* object, const QString& groupName )
 {
+    if ( !object ) return nullptr;
+
+    auto parentView = object->firstAncestorOrThisOfType<RimGridView>();
+    if ( !parentView ) return nullptr;
+
     for ( auto group : m_fieldQuickAccesGroups )
     {
-        if ( group->name() == groupName )
+        if ( group && ( group->name() == groupName ) && ( group->ownerView() == parentView ) ) return group;
+    }
+
+    auto group = new RimFieldQuickAccessGroup();
+    group->setName( groupName );
+    group->setOwnerView( parentView );
+    m_fieldQuickAccesGroups.push_back( group );
+
+    return group;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickAccessGroup )
+{
+    if ( !quickAccessGroup ) return;
+
+    caf::PdmObjectHandle* commonOwnerObject       = nullptr;
+    caf::PdmFieldHandle*  firstFieldInQuickAccess = nullptr;
+
+    for ( auto qa : quickAccessGroup->fieldQuickAccesses() )
+    {
+        if ( !qa || !qa->field() || !qa->field()->ownerObject() ) continue;
+
+        if ( !firstFieldInQuickAccess ) firstFieldInQuickAccess = qa->field();
+
+        auto ownerToField = qa->field()->ownerObject();
+        if ( !commonOwnerObject )
         {
-            return group;
+            commonOwnerObject = ownerToField;
+        }
+        else
+        {
+            if ( commonOwnerObject != ownerToField ) return;
         }
     }
 
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<RimFieldQuickAccessGroup*> RimPinnedFieldCollection::allGroups() const
-{
-    std::vector<RimFieldQuickAccessGroup*> all;
-    all.push_back( m_fieldQuickAccesses );
-
-    for ( auto a : m_fieldQuickAccesGroups )
-    {
-        all.push_back( a );
-    }
-
-    return all;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPinnedFieldCollection::updateGroupName( caf::PdmObjectHandle*     sourceObject,
-                                                RimFieldQuickAccessGroup* quickAccessGroup,
-                                                caf::PdmFieldHandle*      fieldInQuickAccessGroup )
-{
-    if ( auto fieldInterface = dynamic_cast<RimFieldQuickAccessInterface*>( sourceObject ) )
+    if ( auto fieldInterface = dynamic_cast<RimFieldQuickAccessInterface*>( commonOwnerObject ) )
     {
         auto ownerFields = fieldInterface->quickAccessFields();
         for ( const auto& [groupName, fields] : ownerFields )
         {
             for ( auto f : fields )
             {
-                if ( f == fieldInQuickAccessGroup )
+                if ( f == firstFieldInQuickAccess )
                 {
                     quickAccessGroup->setName( groupName );
-                    break;
+                    return;
                 }
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimPinnedFieldCollection::defaultGroupName()
+{
+    return "RimPinnedFieldCollection_GroupName";
 }

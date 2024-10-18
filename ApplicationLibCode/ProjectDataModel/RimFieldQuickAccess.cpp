@@ -174,7 +174,24 @@ RimFieldQuickAccessGroup::RimFieldQuickAccessGroup()
 {
     CAF_PDM_InitObject( "Quick Access Group" );
 
-    CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccess, "FieldReferences", "FieldReferences" );
+    CAF_PDM_InitFieldNoDefault( &m_fieldQuickAccess, "FieldReferences", "Field References" );
+    CAF_PDM_InitFieldNoDefault( &m_ownerView, "OwnerView", "Owner View" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimGridView* RimFieldQuickAccessGroup::ownerView() const
+{
+    return m_ownerView;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::setOwnerView( RimGridView* viewObject )
+{
+    m_ownerView = viewObject;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -182,28 +199,45 @@ RimFieldQuickAccessGroup::RimFieldQuickAccessGroup()
 //--------------------------------------------------------------------------------------------------
 void RimFieldQuickAccessGroup::addFields( const std::vector<caf::PdmFieldHandle*>& fields )
 {
-    bool rebuildObject = false;
+    if ( !m_ownerView ) return;
+
+    /*
+        bool rebuildObject = false;
+
+        for ( auto field : fields )
+        {
+            if ( !field ) continue;
+
+            if ( !hasField( field ) ) rebuildObject = true;
+        }
+
+        if ( !rebuildObject ) return;
+
+        m_fieldQuickAccess.deleteChildren();
+    */
 
     for ( auto field : fields )
     {
-        if ( !field ) continue;
+        if ( findField( field ) ) continue;
 
-        if ( !hasField( field ) ) rebuildObject = true;
+        addField( field );
     }
+}
 
-    if ( !rebuildObject ) return;
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimFieldQuickAccessGroup::addField( caf::PdmFieldHandle* field )
+{
+    if ( !field ) return;
+    if ( !m_ownerView ) return;
 
-    m_fieldQuickAccess.deleteChildren();
+    if ( !isOwnerViewMatching( field ) ) return;
 
-    for ( auto field : fields )
-    {
-        if ( !field ) continue;
+    auto fieldReference = new RimFieldQuickAccess();
+    fieldReference->setField( field );
 
-        auto fieldReference = new RimFieldQuickAccess();
-        fieldReference->setField( field );
-
-        addFieldQuickAccess( fieldReference );
-    }
+    addFieldQuickAccess( fieldReference );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -217,7 +251,7 @@ std::vector<RimFieldQuickAccess*> RimFieldQuickAccessGroup::fieldQuickAccesses()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimFieldQuickAccessGroup::ownerObject() const
+caf::PdmObjectHandle* RimFieldQuickAccessGroup::ownerObject_obsolete() const
 {
     for ( auto f : m_fieldQuickAccess )
     {
@@ -251,7 +285,7 @@ void RimFieldQuickAccessGroup::removeFieldQuickAccess( RimFieldQuickAccess* fiel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimFieldQuickAccessGroup::hasField( const caf::PdmFieldHandle* field ) const
+bool RimFieldQuickAccessGroup::findField( const caf::PdmFieldHandle* field ) const
 {
     for ( auto fieldRef : m_fieldQuickAccess )
     {
@@ -262,4 +296,21 @@ bool RimFieldQuickAccessGroup::hasField( const caf::PdmFieldHandle* field ) cons
     }
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimFieldQuickAccessGroup::isOwnerViewMatching( caf::PdmFieldHandle* field )
+{
+    if ( !field || !field->ownerObject() ) return false;
+    auto parentView = field->ownerObject()->firstAncestorOrThisOfType<RimGridView>();
+
+    if ( parentView != m_ownerView )
+    {
+        RiaLogging::debug( "Field does not belong to the owner view" );
+        return false;
+    }
+
+    return true;
 }

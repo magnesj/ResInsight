@@ -24,6 +24,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
 
 class RimFieldReference;
 
@@ -73,17 +74,24 @@ class RimFieldQuickAccessGroup : public RimNamedObject
 public:
     RimFieldQuickAccessGroup();
 
+    RimGridView* ownerView() const;
+    void         setOwnerView( RimGridView* owner );
+
     void addFields( const std::vector<caf::PdmFieldHandle*>& fields );
+    void addField( caf::PdmFieldHandle* field );
 
     std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
-    caf::PdmObjectHandle*             ownerObject() const;
+    caf::PdmObjectHandle*             ownerObject_obsolete() const;
 
-    void addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
     void removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
 
 private:
-    bool hasField( const caf::PdmFieldHandle* field ) const;
+    void addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
+    bool findField( const caf::PdmFieldHandle* field ) const;
+
+    bool isOwnerViewMatching( caf::PdmFieldHandle* field );
 
 private:
     caf::PdmChildArrayField<RimFieldQuickAccess*> m_fieldQuickAccess;
+    caf::PdmPtrField<RimGridView*>                m_ownerView;
 };

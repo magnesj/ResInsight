@@ -25,6 +25,7 @@
 
 class RimFieldQuickAccess;
 class RimFieldQuickAccessGroup;
+class RimFieldReference;
 
 //==================================================================================================
 ///
@@ -42,23 +43,18 @@ public:
     void addQuickAccessFieldsRecursively( caf::PdmObjectHandle* object );
     void addQuickAccessFields( caf::PdmObjectHandle* object );
 
-    void addField( caf::PdmFieldHandle* field );
-    void removeField( caf::PdmFieldHandle* field );
+    void addQuickAccessField( const RimFieldReference& fieldReference );
 
 private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
+    RimFieldQuickAccessGroup* findOrCreateGroup( caf::PdmObjectHandle* object, const QString& groupName );
+
     void deleteMarkedObjects();
 
-    RimFieldQuickAccessGroup* findGroup( const QString& groupName ) const;
-
-    std::vector<RimFieldQuickAccessGroup*> allGroups() const;
-
-    static void updateGroupName( caf::PdmObjectHandle* sourceObject, RimFieldQuickAccessGroup* group, caf::PdmFieldHandle* field );
+    static void    updateGroupName( RimFieldQuickAccessGroup* group );
+    static QString defaultGroupName();
 
 private:
-    caf::PdmChildField<RimFieldQuickAccessGroup*>      m_fieldQuickAccesses;
     caf::PdmChildArrayField<RimFieldQuickAccessGroup*> m_fieldQuickAccesGroups;
-
-    std::set<RimFieldQuickAccess*> m_toBeDeleted;
 };

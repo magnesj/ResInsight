@@ -39,6 +39,7 @@ void RicAddFieldToQuickAccessFeature::onActionTriggered( bool isChecked )
     if ( objects.empty() ) return;
 
     auto firstObject = objects.front();
+    if ( !firstObject ) return;
 
     RimFieldReference fieldRef;
     fieldRef.setObject( firstObject );
@@ -48,12 +49,8 @@ void RicAddFieldToQuickAccessFeature::onActionTriggered( bool isChecked )
 
     if ( propertyDialog.exec() == QDialog::Accepted )
     {
-        auto field = fieldRef.field();
-        if ( field )
-        {
-            RimPinnedFieldCollection::instance()->addField( field );
-            RimPinnedFieldCollection::instance()->updateAllRequiredEditors();
-        }
+        RimPinnedFieldCollection::instance()->addQuickAccessField( fieldRef );
+        RimPinnedFieldCollection::instance()->updateAllRequiredEditors();
     }
 }
 
