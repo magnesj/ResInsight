@@ -26,6 +26,7 @@
 #include "cafPdmPtrField.h"
 
 class RimGridView;
+class RimFieldQuickAccess;
 
 //==================================================================================================
 ///
