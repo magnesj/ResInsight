@@ -20,42 +20,42 @@
 
 #include "RimNamedObject.h"
 
-#include "cafPdmChildField.h"
+#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-#include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
 
-class RimFieldReference;
+class RimGridView;
 
 //==================================================================================================
 ///
 ///
 //==================================================================================================
-class RimFieldQuickAccess : public caf::PdmObject
+class RimFieldQuickAccessGroup : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimFieldQuickAccess();
+    RimFieldQuickAccessGroup();
 
-    void                 setField( caf::PdmFieldHandle* field );
-    caf::PdmFieldHandle* field() const;
+    RimGridView* ownerView() const;
+    void         setOwnerView( RimGridView* owner );
 
-    bool markedForRemoval() const;
+    void addFields( const std::vector<caf::PdmFieldHandle*>& fields );
+    void addField( caf::PdmFieldHandle* field );
 
-private:
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+    std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
+    caf::PdmObjectHandle*             groupOwner() const;
 
-    void onSelectObjectButton( const bool& state );
-    void onRemoveObjectButton( const bool& state );
+    void removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
 
 private:
-    caf::PdmChildField<RimFieldReference*> m_fieldReference;
+    void addFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
+    bool findField( const caf::PdmFieldHandle* field ) const;
 
-    caf::PdmProxyValueField<bool> m_selectObjectButton;
-    caf::PdmProxyValueField<bool> m_removeItemButton;
+    bool isOwnerViewMatching( caf::PdmFieldHandle* field );
 
-    bool m_markedForRemoval;
+private:
+    caf::PdmChildArrayField<RimFieldQuickAccess*> m_fieldQuickAccess;
+    caf::PdmPtrField<RimGridView*>                m_ownerView;
 };

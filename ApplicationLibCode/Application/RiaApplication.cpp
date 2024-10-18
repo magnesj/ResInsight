@@ -45,7 +45,7 @@
 
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
-
+#include "QuickAccess/RimQuickAccessCollection.h"
 #include "Rim2dIntersectionViewCollection.h"
 #include "RimCellFilterCollection.h"
 #include "RimCommandRouter.h"
@@ -79,7 +79,6 @@
 #include "RimOsduWellPathDataLoader.h"
 #include "RimPlotWindow.h"
 #include "RimProject.h"
-#include "RimQuickAccessCollection.h"
 #include "RimScriptCollection.h"
 #include "RimSeismicData.h"
 #include "RimSeismicDataCollection.h"
