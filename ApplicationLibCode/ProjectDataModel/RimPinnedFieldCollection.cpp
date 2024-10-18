@@ -115,14 +115,14 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     deleteMarkedObjects();
 
-    std::set<RimFieldQuickAccessGroup*> groupsForView;
+    std::vector<RimFieldQuickAccessGroup*> groupsForView;
 
     for ( auto group : m_fieldQuickAccesGroups )
     {
         if ( group->ownerView() == activeView )
         {
             updateGroupName( group );
-            groupsForView.insert( group );
+            groupsForView.push_back( group );
         }
     }
 
@@ -131,15 +131,22 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
         auto name = group->name();
         if ( name.isEmpty() ) name = defaultGroupName();
 
-        caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( name );
-        if ( !uiGroup )
+        // Make sure the name of the group is unique in the UI ordering. This is a requirement for the UI ordering, as the groups are
+        // identified by name.
+        auto             uiName  = name;
+        caf::PdmUiGroup* uiGroup = uiOrdering.findGroup( uiName );
+        int              index   = 1;
+        while ( uiGroup )
         {
-            uiGroup = uiOrdering.addNewGroup( name );
+            uiName  = "(" + QString::number( index++ ) + ") " + name;
+            uiGroup = uiOrdering.findGroup( uiName );
         }
 
-        for ( auto qa : group->fieldQuickAccesses() )
+        uiGroup = uiOrdering.addNewGroup( uiName );
+
+        for ( auto quickAccess : group->fieldQuickAccesses() )
         {
-            qa->uiOrdering( uiConfigName, *uiGroup );
+            quickAccess->uiOrdering( uiConfigName, *uiGroup );
         }
     }
 }
@@ -149,27 +156,48 @@ void RimPinnedFieldCollection::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimPinnedFieldCollection::deleteMarkedObjects()
 {
-    std::set<RimFieldQuickAccess*> toBeDeleted;
-
-    for ( auto group : m_fieldQuickAccesGroups.childrenByType() )
+    // Delete marked objects and objects pointing to fields that are no longer valid
     {
-        for ( auto qa : group->fieldQuickAccesses() )
+        std::set<RimFieldQuickAccess*> toBeDeleted;
+
+        for ( auto group : m_fieldQuickAccesGroups.childrenByType() )
         {
-            if ( qa->markedForRemoval() )
+            for ( auto quickAccess : group->fieldQuickAccesses() )
             {
-                toBeDeleted.insert( qa );
+                if ( quickAccess->markedForRemoval() || !quickAccess->field() )
+                {
+                    toBeDeleted.insert( quickAccess );
+                }
             }
+        }
+
+        for ( auto quickAccess : toBeDeleted )
+        {
+            for ( auto group : m_fieldQuickAccesGroups )
+            {
+                group->removeFieldQuickAccess( quickAccess );
+            }
+
+            delete quickAccess;
         }
     }
 
-    for ( auto qa : toBeDeleted )
+    // Delete groups with no quick access fields
     {
-        for ( auto group : m_fieldQuickAccesGroups )
+        std::set<RimFieldQuickAccessGroup*> toBeDeleted;
+        for ( auto group : m_fieldQuickAccesGroups.childrenByType() )
         {
-            group->removeFieldQuickAccess( qa );
+            if ( group->fieldQuickAccesses().empty() )
+            {
+                toBeDeleted.insert( group );
+            }
         }
 
-        delete qa;
+        for ( auto group : toBeDeleted )
+        {
+            m_fieldQuickAccesGroups.removeChild( group );
+            delete group;
+        }
     }
 }
 
@@ -185,7 +213,15 @@ RimFieldQuickAccessGroup* RimPinnedFieldCollection::findOrCreateGroup( caf::PdmO
 
     for ( auto group : m_fieldQuickAccesGroups )
     {
-        if ( group && ( group->name() == groupName ) && ( group->ownerView() == parentView ) ) return group;
+        if ( !group ) continue;
+
+        if ( groupName.isEmpty() && group->name().isEmpty() && group->ownerView() == parentView )
+        {
+            // If group name is empty, we assume that this is the default group for the view
+            return group;
+        }
+
+        if ( group->groupOwner() == object ) return group;
     }
 
     auto group = new RimFieldQuickAccessGroup();
@@ -206,13 +242,13 @@ void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickA
     caf::PdmObjectHandle* commonOwnerObject       = nullptr;
     caf::PdmFieldHandle*  firstFieldInQuickAccess = nullptr;
 
-    for ( auto qa : quickAccessGroup->fieldQuickAccesses() )
+    for ( auto quickAccess : quickAccessGroup->fieldQuickAccesses() )
     {
-        if ( !qa || !qa->field() || !qa->field()->ownerObject() ) continue;
+        if ( !quickAccess || !quickAccess->field() || !quickAccess->field()->ownerObject() ) continue;
 
-        if ( !firstFieldInQuickAccess ) firstFieldInQuickAccess = qa->field();
+        if ( !firstFieldInQuickAccess ) firstFieldInQuickAccess = quickAccess->field();
 
-        auto ownerToField = qa->field()->ownerObject();
+        auto ownerToField = quickAccess->field()->ownerObject();
         if ( !commonOwnerObject )
         {
             commonOwnerObject = ownerToField;
@@ -228,9 +264,9 @@ void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickA
         auto ownerFields = fieldInterface->quickAccessFields();
         for ( const auto& [groupName, fields] : ownerFields )
         {
-            for ( auto f : fields )
+            for ( auto field : fields )
             {
-                if ( f == firstFieldInQuickAccess )
+                if ( field == firstFieldInQuickAccess )
                 {
                     quickAccessGroup->setName( groupName );
                     return;
@@ -245,5 +281,5 @@ void RimPinnedFieldCollection::updateGroupName( RimFieldQuickAccessGroup* quickA
 //--------------------------------------------------------------------------------------------------
 QString RimPinnedFieldCollection::defaultGroupName()
 {
-    return "RimPinnedFieldCollection_GroupName";
+    return "Quick Access for View";
 }

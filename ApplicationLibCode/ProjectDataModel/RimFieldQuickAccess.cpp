@@ -69,10 +69,9 @@ void RimFieldQuickAccess::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     if ( m_fieldReference() && m_fieldReference()->field() )
     {
         uiOrdering.add( m_fieldReference()->field() );
+        uiOrdering.add( &m_selectObjectButton, { .newRow = false } );
+        uiOrdering.add( &m_removeItemButton, { .newRow = false } );
     }
-
-    uiOrdering.add( &m_selectObjectButton, { .newRow = false } );
-    uiOrdering.add( &m_removeItemButton, { .newRow = false } );
 
     uiOrdering.skipRemainingFields();
 }
@@ -253,7 +252,7 @@ std::vector<RimFieldQuickAccess*> RimFieldQuickAccessGroup::fieldQuickAccesses()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimFieldQuickAccessGroup::ownerObject_obsolete() const
+caf::PdmObjectHandle* RimFieldQuickAccessGroup::groupOwner() const
 {
     for ( auto f : m_fieldQuickAccess )
     {

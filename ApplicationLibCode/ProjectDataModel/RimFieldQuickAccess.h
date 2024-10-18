@@ -81,7 +81,7 @@ public:
     void addField( caf::PdmFieldHandle* field );
 
     std::vector<RimFieldQuickAccess*> fieldQuickAccesses() const;
-    caf::PdmObjectHandle*             ownerObject_obsolete() const;
+    caf::PdmObjectHandle*             groupOwner() const;
 
     void removeFieldQuickAccess( RimFieldQuickAccess* fieldQuickAccess );
 
