@@ -516,8 +516,11 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
     m_project->resolveReferencesRecursively();
     m_project->initAfterReadRecursively();
 
-    // Traverse objects recursively and add quick access fields
-    RimPinnedFieldCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
+    // Traverse objects recursively and add quick access fields for old projects
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.09.2" ) )
+    {
+        RimPinnedFieldCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
+    }
 
     // Migrate all RimGridCases to RimFileSummaryCase
     RimGridSummaryCase_obsolete::convertGridCasesToSummaryFileCases( m_project.get() );

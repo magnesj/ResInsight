@@ -41,10 +41,12 @@ RimFieldQuickAccess::RimFieldQuickAccess()
     CAF_PDM_InitFieldNoDefault( &m_selectObjectButton, "SelectObject", "...", ":/Bullet.png", "Select Object in Property Editor" );
     m_selectObjectButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
     m_selectObjectButton.registerSetMethod( this, &RimFieldQuickAccess::onSelectObjectButton );
+    m_selectObjectButton.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_removeItemButton, "RemoveItem", "...", ":/pin.svg", "Remove Quick Access" );
     m_removeItemButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
     m_removeItemButton.registerSetMethod( this, &RimFieldQuickAccess::onRemoveObjectButton );
+    m_removeItemButton.xmlCapability()->disableIO();
 
     m_markedForRemoval = false;
 }
