@@ -47,11 +47,16 @@ namespace caf
 class PdmUiToolButtonEditorAttribute : public PdmUiEditorAttribute
 {
 public:
-    PdmUiToolButtonEditorAttribute() { m_checkable = true; }
+    PdmUiToolButtonEditorAttribute()
+    {
+        m_checkable          = true;
+        m_invertCurrentValue = false;
+    }
 
 public:
     bool        m_checkable;
     QSizePolicy m_sizePolicy;
+    bool        m_invertCurrentValue;
 };
 
 class PdmUiToolButtonEditor : public PdmUiFieldEditorHandle
@@ -72,7 +77,8 @@ protected slots:
     void slotClicked( bool checked );
 
 private:
-    QPointer<QToolButton> m_toolButton;
+    QPointer<QToolButton>          m_toolButton;
+    PdmUiToolButtonEditorAttribute m_attributes;
 };
 
 } // end namespace caf
