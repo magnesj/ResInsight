@@ -20,7 +20,7 @@
 
 #pragma once
 
-#include "RimFieldQuickAccessInterface.h"
+#include "QuickAccess/RimFieldQuickAccessInterface.h"
 #include "RimPropertyFilter.h"
 
 #include "cafPdmChildField.h"

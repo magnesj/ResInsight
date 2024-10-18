@@ -18,8 +18,8 @@
 
 #include "RicAddFieldToQuickAccessFeature.h"
 
-#include "RimFieldReference.h"
-#include "RimPinnedFieldCollection.h"
+#include "QuickAccess/RimFieldReference.h"
+#include "QuickAccess/RimPinnedFieldCollection.h"
 
 #include "Riu3DMainWindowTools.h"
 

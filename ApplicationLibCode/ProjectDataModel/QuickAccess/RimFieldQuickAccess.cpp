@@ -24,6 +24,7 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "RiaLogging.h"
 #include "cafPdmUiToolButtonEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimFieldQuickAccess, "RimFieldQuickAccess" );

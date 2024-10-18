@@ -20,8 +20,8 @@
 
 #pragma once
 
+#include "QuickAccess/RimFieldQuickAccessInterface.h"
 #include "RimCellFilter.h"
-#include "RimFieldQuickAccessInterface.h"
 
 #include "cafPdmFieldCvfVec3d.h"
 
