@@ -22,6 +22,9 @@
 
 #include "RimSurfaceCollection.h"
 
+#include "RimProject.h"
+#include "Tools/RimValueMultiplexerCollection.h"
+
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"

@@ -47,6 +47,8 @@ set(PROJECT_FILES
     TamComboBox.cpp
     LineEditAndPushButtons.h
     LineEditAndPushButtons.cpp
+    VariableServer.h
+    VariableServer.cpp
 )
 
 qt_add_executable(
