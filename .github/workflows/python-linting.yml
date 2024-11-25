@@ -10,6 +10,7 @@ jobs:
       - uses: astral-sh/ruff-action@v1
         with:
           src: "./GrpcInterface"
+          args: "check --fix"
       - uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
