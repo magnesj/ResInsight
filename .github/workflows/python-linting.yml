@@ -19,7 +19,7 @@ jobs:
 
       - name: Run Ruff Fix
         run: |
-          ruff check ./GrpcInterface --fix
+          ruff check ./GrpcInterface --fixv --unsafe-fixes
       
       - uses: peter-evans/create-pull-request@v7
         with:
