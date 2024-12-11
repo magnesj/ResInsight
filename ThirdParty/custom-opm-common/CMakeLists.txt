@@ -7,111 +7,112 @@ else()
   set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
 
- if(MSVC)
-  add_definitions( "/wd4996 /wd4244 /wd4267 /wd4101 /wd4477" )
+if(MSVC)
+  add_definitions("/wd4996 /wd4244 /wd4267 /wd4101 /wd4477")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /permissive-")
 endif(MSVC)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-switch -Wno-sign-compare -Wno-deprecated-copy -Wno-missing-field-initializers")
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -Wno-unused-parameter -Wno-switch -Wno-sign-compare -Wno-deprecated-copy -Wno-missing-field-initializers"
+  )
 endif()
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-missing-field-initializers -Wno-deprecated-copy")
+  set(CMAKE_CXX_FLAGS
+      "${CMAKE_CXX_FLAGS} -Wno-sign-compare -Wno-missing-field-initializers -Wno-deprecated-copy"
+  )
 endif()
 
-# Set defines to include required files for ResInsight. Make sure that these defines are set before including the opm-common CMakeLists
+# Set defines to include required files for ResInsight. Make sure that these
+# defines are set before including the opm-common CMakeLists
 set(ENABLE_ECL_INPUT true)
 set(ENABLE_ECL_OUTPUT true)
 set(BUILD_TESTING false)
-set(ENABLE_MOCKSIM false) 
+set(ENABLE_MOCKSIM false)
 set(OPM_ENABLE_PYTHON false)
 set(OPM_INSTALL_PYTHON false)
 set(OPM_ENABLE_EMBEDDED_PYTHON false)
 set(OPM_ENABLE_DUNE false)
 set(BUILD_EXAMPLES false)
 
-if (CREATE_OPM_COMMON_KEYWORDS)
-    # In ResInsight, we need a subset of the files in opm-common. We also need to generate the keywords. The flag CREATE_OPM_COMMON_KEYWORDS is set in the main CMakeLists.txt file.
-    # When this flag is set, the opm-common is added to the solution. Build a test target to trigger the c++ code generation using the tool genkw, use CarfinTest.exe
-    # Copy files generated code from build/ThirdParty/custom-opm-common/opm-common:
-    #   copy ParserInit.cpp and config.h to source folder ThirdParty/custom-opm-common/generated-opm-common/
-    #   copy the folders "ParserKeywords" and "include" to source folder ThirdParty/custom-opm-common/generated-opm-common/
-    add_subdirectory(opm-common)
-    message(STATUS "opm-common is added to the solution used to create keywords from JSON files")
+if(CREATE_OPM_COMMON_KEYWORDS)
+  # In ResInsight, we need a subset of the files in opm-common. We also need to
+  # generate the keywords. The flag CREATE_OPM_COMMON_KEYWORDS is set in the
+  # main CMakeLists.txt file. When this flag is set, the opm-common is added to
+  # the solution. Build a test target to trigger the c++ code generation using
+  # the tool genkw, use CarfinTest.exe Copy files generated code from
+  # build/ThirdParty/custom-opm-common/opm-common: copy ParserInit.cpp and
+  # config.h to source folder ThirdParty/custom-opm-common/generated-opm-common/
+  # copy the folders "ParserKeywords" and "include" to source folder
+  # ThirdParty/custom-opm-common/generated-opm-common/
+  add_subdirectory(opm-common)
+  message(
+    STATUS
+      "opm-common is added to the solution used to create keywords from JSON files"
+  )
 
 else(CREATE_OPM_COMMON_KEYWORDS)
 
-    project (custom-opm-common)
-    
-    find_package(Boost)
+  project(custom-opm-common)
 
-    list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/opm-common/cmake/Modules)
+  find_package(Boost)
 
-      if(NOT cjson_FOUND)
-        include(DownloadCjson)
-      endif()
+  list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/opm-common/cmake/Modules)
 
-    include_directories(${cjson_SOURCE_DIR})
-    list(APPEND opm-common_SOURCES ${cjson_SOURCE_DIR}/cJSON.c)
+  if(NOT cjson_FOUND)
+    include(DownloadCjson)
+  endif()
 
+  include_directories(${cjson_SOURCE_DIR})
+  list(APPEND opm-common_SOURCES ${cjson_SOURCE_DIR}/cJSON.c)
 
-    include_directories(
-        opm-common
-        generated-opm-common 
-        generated-opm-common/include
-    )
+  include_directories(
+    opm-common generated-opm-common generated-opm-common/include
+  )
 
-    add_definitions(-DFMT_HEADER_ONLY)
-       include_directories(SYSTEM ../fmtlib/include)
+  add_definitions(-DFMT_HEADER_ONLY)
+  include_directories(SYSTEM ../fmtlib/include)
 
+  include(opm-common/CMakeLists_files.cmake)
 
-    include(opm-common/CMakeLists_files.cmake)
+  set(opm_parser_source_files_short_path ${MAIN_SOURCE_FILES})
 
-    set(opm_parser_source_files_short_path 
-	    ${MAIN_SOURCE_FILES}
-    )
+  foreach(file ${opm_parser_source_files_short_path})
+    list(APPEND opm_parser_source_files_long_path "opm-common/${file}")
+  endforeach()
 
-    foreach (file ${opm_parser_source_files_short_path} )
-        list(APPEND opm_parser_source_files_long_path "opm-common/${file}" )
-    endforeach()
+  set(opm_parser_source_files ${opm_parser_source_files_long_path}
+                              ${opm_parser_generated_source_files}
+  )
 
-    set(opm_parser_source_files
-	    ${opm_parser_source_files_long_path}
-        ${opm_parser_generated_source_files} 
-    ) 
+  # Add generated files These files are generated by the parser generator genkw
+  file(GLOB ALL_FILES_IN_FOLDER generated-opm-common/ParserKeywords/*.cpp)
+  list(APPEND opm-common_SOURCES ${ALL_FILES_IN_FOLDER})
+  list(APPEND opm-common_SOURCES generated-opm-common/ParserInit.cpp)
 
-    # Add generated files
-    # These files are generated by the parser generator genkw
-    file(GLOB ALL_FILES_IN_FOLDER generated-opm-common/ParserKeywords/*.cpp)
-    list(APPEND opm-common_SOURCES ${ALL_FILES_IN_FOLDER})
-    list(APPEND opm-common_SOURCES generated-opm-common/ParserInit.cpp)
-
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-      if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
-        list(APPEND ADDITIONAL_LINK_LIBRARIES stdc++fs)
-      endif()
+  if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 9.0)
+      list(APPEND ADDITIONAL_LINK_LIBRARIES stdc++fs)
     endif()
+  endif()
 
-    add_library(${PROJECT_NAME} 
-        STATIC
-	    ${opm_parser_source_files_long_path}
-	    ${opm-common_SOURCES}
-    )
+  add_library(
+    ${PROJECT_NAME} STATIC ${opm_parser_source_files_long_path}
+                           ${opm-common_SOURCES}
+  )
 
-    find_path(BOOST_SPIRIT_INCLUDE_DIRS "boost/spirit.hpp" HINTS ${Boost_INCLUDE_DIRS})
+  find_path(BOOST_SPIRIT_INCLUDE_DIRS "boost/spirit.hpp"
+            HINTS ${Boost_INCLUDE_DIRS}
+  )
 
-    target_link_libraries(custom-opm-common 
-      ${ADDITIONAL_LINK_LIBRARIES}
-    )
+  target_link_libraries(custom-opm-common ${ADDITIONAL_LINK_LIBRARIES})
 
-    target_include_directories(custom-opm-common 
-      PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/opm-common
-        ${CMAKE_CURRENT_SOURCE_DIR}/generated-opm-common/include
-      PRIVATE
-        ${BOOST_SPIRIT_INCLUDE_DIRS}
-    
-    )
+  target_include_directories(
+    custom-opm-common
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/opm-common
+           ${CMAKE_CURRENT_SOURCE_DIR}/generated-opm-common/include
+    PRIVATE ${BOOST_SPIRIT_INCLUDE_DIRS}
+  )
 
 endif(CREATE_OPM_COMMON_KEYWORDS)
