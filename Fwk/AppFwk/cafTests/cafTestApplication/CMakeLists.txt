@@ -78,31 +78,30 @@ target_link_libraries(
 
 source_group("" FILES ${PROJECT_FILES})
 
-  if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
-    # Add a post-build command to run windeployqt. This makes it possible to
-    # debug the binary from a debugger without any manual steps. This also fixes
-    # an issue related to the Install() command and usage of windeployqt as part
-    # of installation. The installation tried to use windeployqt on the
-    # executable in the build directory, which did not find the Qt libraries.
-    #
-    # TODO: This command copies all required dlls, so we should probably not use
-    # the Install() command to copy external dlls dependencies.
-    #
-    # The statements " >NUL 2>NUL" are used to suppress text output from
-    # windeployqt. ">NUL" suppresses standard output. "2>NUL" suppresses
-    # standard error.
-    #
-    add_custom_command(
-      TARGET cafTestApplication
-      POST_BUILD
-      COMMAND
-        ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE:cafTestApplication>
-        "$<IF:$<CONFIG:Debug>,--debug,--release>" --no-translations >NUL 2>NUL
-      COMMENT
-        "Running windeployqt to deploy Qt dependencies to the build folder, required by install()"
-    )
-  endif()
-
+if(WIN32 AND WINDEPLOYQT_EXECUTABLE)
+  # Add a post-build command to run windeployqt. This makes it possible to debug
+  # the binary from a debugger without any manual steps. This also fixes an
+  # issue related to the Install() command and usage of windeployqt as part of
+  # installation. The installation tried to use windeployqt on the executable in
+  # the build directory, which did not find the Qt libraries.
+  #
+  # TODO: This command copies all required dlls, so we should probably not use
+  # the Install() command to copy external dlls dependencies.
+  #
+  # The statements " >NUL 2>NUL" are used to suppress text output from
+  # windeployqt. ">NUL" suppresses standard output. "2>NUL" suppresses standard
+  # error.
+  #
+  add_custom_command(
+    TARGET cafTestApplication
+    POST_BUILD
+    COMMAND
+      ${WINDEPLOYQT_EXECUTABLE} $<TARGET_FILE:cafTestApplication>
+      "$<IF:$<CONFIG:Debug>,--debug,--release>" --no-translations >NUL 2>NUL
+    COMMENT
+      "Running windeployqt to deploy Qt dependencies to the build folder, required by install()"
+  )
+endif()
 
 # Install
 install(
