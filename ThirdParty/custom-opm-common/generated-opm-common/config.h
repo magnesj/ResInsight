@@ -6,3 +6,5 @@
 /* #undef HAVE_CXA_DEMANGLE */
 /* #undef HAVE_FNMATCH_H */
 #define HAVE_DYNAMIC_BOOST_TEST 1
+
+#define _USE_MATH_DEFINES
