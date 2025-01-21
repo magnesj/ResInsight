@@ -8,11 +8,5 @@
         "type-lite",
         "fast-float",
         "spdlog"
-    ],
-    "overrides": [
-        {
-            "name": "fmt",
-            "version": "10.1.1"
-        }
     ]
 }
