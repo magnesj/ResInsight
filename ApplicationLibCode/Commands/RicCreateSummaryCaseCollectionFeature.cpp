@@ -56,9 +56,7 @@ RimSummaryEnsemble*
 //--------------------------------------------------------------------------------------------------
 bool RicCreateSummaryCaseCollectionFeature::isCommandEnabled() const
 {
-    std::vector<RimSummaryCase*> selection;
-    caf::SelectionManager::instance()->objectsByType( &selection );
-
+    auto selection = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
     if ( selection.empty() )
     {
         return false;
@@ -79,8 +77,7 @@ bool RicCreateSummaryCaseCollectionFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicCreateSummaryCaseCollectionFeature::onActionTriggered( bool isChecked )
 {
-    std::vector<RimSummaryCase*> selection;
-    caf::SelectionManager::instance()->objectsByType( &selection );
+    auto selection = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
     if ( selection.empty() ) return;
 
     std::vector<RimSummaryCase*> duplicates;
