@@ -150,13 +150,12 @@ RicFishbonesSystemParameters RicNewFishbonesSubsFeature::acidJettingParameters()
 //--------------------------------------------------------------------------------------------------
 RimFishbonesCollection* RicNewFishbonesSubsFeature::selectedFishbonesCollection()
 {
-    std::vector<caf::PdmUiItem*> allSelectedItems;
-    caf::SelectionManager::instance()->selectedItems( allSelectedItems );
-    if ( allSelectedItems.size() != 1u ) return nullptr;
+    const auto selectedItems = caf::SelectionManager::instance()->selectedItems();
+    if ( selectedItems.size() != 1u ) return nullptr;
 
     RimFishbonesCollection* objToFind = nullptr;
 
-    caf::PdmUiItem* pdmUiItem = allSelectedItems.front();
+    caf::PdmUiItem* pdmUiItem = selectedItems.front();
 
     auto* objHandle = dynamic_cast<caf::PdmObjectHandle*>( pdmUiItem );
     if ( objHandle )
@@ -166,8 +165,7 @@ RimFishbonesCollection* RicNewFishbonesSubsFeature::selectedFishbonesCollection(
 
     if ( objToFind == nullptr )
     {
-        std::vector<RimWellPath*> wellPaths;
-        caf::SelectionManager::instance()->objectsByType( &wellPaths );
+        auto wellPaths = caf::SelectionManager::instance()->objectsByType<RimWellPath>();
         if ( !wellPaths.empty() )
         {
             return wellPaths[0]->fishbonesCollection();
