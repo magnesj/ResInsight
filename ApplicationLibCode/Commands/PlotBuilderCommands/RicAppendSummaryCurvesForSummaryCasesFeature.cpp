@@ -82,15 +82,11 @@ std::vector<caf::PdmObjectHandle*> RicAppendSummaryCurvesForSummaryCasesFeature:
     std::vector<caf::PdmObjectHandle*> generalObjects;
 
     {
-        std::vector<RimSummaryCase*> objects;
-        caf::SelectionManager::instance()->objectsByType( &objects );
-
+        const auto objects = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
         generalObjects.insert( generalObjects.begin(), objects.begin(), objects.end() );
     }
     {
-        std::vector<RimSummaryEnsemble*> objects;
-        caf::SelectionManager::instance()->objectsByType( &objects );
-
+        const auto objects = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
         generalObjects.insert( generalObjects.begin(), objects.begin(), objects.end() );
     }
 
