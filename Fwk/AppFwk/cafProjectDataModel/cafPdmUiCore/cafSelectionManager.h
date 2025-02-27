@@ -112,7 +112,7 @@ public:
     template <typename T>
     std::vector<T*> objectsByTypeStrict( int selectionLevel = 0 ) const
     {
-        std::vector<PdmUiItem*> items = selectedItems( items, selectionLevel );
+        std::vector<PdmUiItem*> items = selectedItems( selectionLevel );
 
         std::vector<T*> typedObjects;
         for ( size_t i = 0; i < items.size(); i++ )
@@ -120,8 +120,7 @@ public:
             T* obj = dynamic_cast<T*>( items[i] );
             if ( !obj )
             {
-                typedObjects->clear();
-                break;
+                return {};
             }
             typedObjects.push_back( obj );
         }

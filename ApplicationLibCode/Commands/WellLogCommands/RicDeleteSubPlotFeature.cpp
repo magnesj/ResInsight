@@ -54,8 +54,7 @@ void RicDeleteSubPlotFeature::onActionTriggered( bool isChecked )
 {
     if ( RicWellLogPlotCurveFeatureImpl::parentWellAllocationPlot() ) return;
 
-    std::vector<RimPlot*> selection;
-    getSelection( selection );
+    std::vector<RimPlot*> selection = getSelection();
 
     std::set<RimMultiPlot*> alteredPlotWindows;
 
@@ -98,8 +97,7 @@ void RicDeleteSubPlotFeature::onActionTriggered( bool isChecked )
 void RicDeleteSubPlotFeature::setupActionLook( QAction* actionToSetup )
 {
     QString               actionText;
-    std::vector<RimPlot*> selection;
-    getSelection( selection );
+    std::vector<RimPlot*> selection = getSelection();
 
     size_t tracksSelected = 0u;
     for ( RimPlot* object : selection )
@@ -147,6 +145,8 @@ std::vector<RimPlot*> RicDeleteSubPlotFeature::getSelection() const
     {
         selection = caf::SelectionManager::instance()->objectsByType<RimPlot>();
     }
+
+    return selection;
 }
 
 //--------------------------------------------------------------------------------------------------

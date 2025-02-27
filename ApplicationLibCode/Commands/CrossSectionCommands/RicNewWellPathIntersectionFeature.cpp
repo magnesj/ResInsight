@@ -50,7 +50,7 @@ void RicNewWellPathIntersectionFeature::onActionTriggered( bool isChecked )
     RimGridView* activeView = RiaApplication::instance()->activeMainOrComparisonGridView();
     if ( !activeView ) return;
 
-    if ( auto wellPath = caf::SelectionManager::instance()->objectsByType<RimWellPath>() )
+    if ( auto wellPath = caf::SelectionManager::instance()->selectedItemOfType<RimWellPath>() )
     {
         RicNewWellPathIntersectionFeatureCmd* cmd = new RicNewWellPathIntersectionFeatureCmd( activeView->intersectionCollection(), wellPath );
         caf::CmdExecCommandManager::instance()->processExecuteCommand( cmd );
