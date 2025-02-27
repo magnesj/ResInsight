@@ -56,7 +56,7 @@ void RicCloseSummaryCaseFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCloseSummaryCaseFeature::deleteSummaryCases( std::vector<RimSummaryCase*>& cases )
+void RicCloseSummaryCaseFeature::deleteSummaryCases( std::vector<RimSummaryCase*> cases )
 {
     RimSummaryMultiPlotCollection* summaryPlotColl           = RiaSummaryTools::summaryMultiPlotCollection();
     RimSummaryCaseMainCollection*  summaryCaseMainCollection = RiaSummaryTools::summaryCaseMainCollection();

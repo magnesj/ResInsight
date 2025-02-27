@@ -124,5 +124,5 @@ void RicSeismicSectionFromIntersectionFeature::setupActionLook( QAction* actionT
 //--------------------------------------------------------------------------------------------------
 RimExtrudedCurveIntersection* RicSeismicSectionFromIntersectionFeature::getSelectedIntersection() const
 {
-    return caf::SelectionManager::instance()::selectedItemOfType<RimExtrudedCurveIntersection>();
+    return caf::SelectionManager::instance()->selectedItemOfType<RimExtrudedCurveIntersection>();
 }
