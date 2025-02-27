@@ -69,10 +69,7 @@ template <typename T>
 template <typename T>
 [[nodiscard]] std::vector<T> selectedObjectsByType()
 {
-    std::vector<T> objectByType;
-    caf::SelectionManager::instance()->objectsByType( &objectByType );
-
-    return objectByType;
+    return caf::SelectionManager::instance()->objectsByType<T>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -82,10 +79,7 @@ template <typename T>
 template <typename T>
 [[nodiscard]] std::vector<T> selectedObjectsByTypeStrict()
 {
-    std::vector<T> objectByType;
-    caf::SelectionManager::instance()->objectsByTypeStrict( &objectByType );
-
-    return objectByType;
+    return caf::SelectionManager::instance()->objectsByTypeStrict<T>();
 }
 
 } // end namespace caf

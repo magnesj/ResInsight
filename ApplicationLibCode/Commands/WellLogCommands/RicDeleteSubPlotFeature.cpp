@@ -130,8 +130,9 @@ void RicDeleteSubPlotFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicDeleteSubPlotFeature::getSelection( std::vector<RimPlot*>& selection ) const
+std::vector<RimPlot*> RicDeleteSubPlotFeature::getSelection() const
 {
+    std::vector<RimPlot*> selection;
     if ( sender() )
     {
         QVariant userData = this->userData();
@@ -144,7 +145,7 @@ void RicDeleteSubPlotFeature::getSelection( std::vector<RimPlot*>& selection ) c
 
     if ( selection.empty() )
     {
-        caf::SelectionManager::instance()->objectsByType( &selection );
+        selection = caf::SelectionManager::instance()->objectsByType<RimPlot>();
     }
 }
 
@@ -153,10 +154,7 @@ void RicDeleteSubPlotFeature::getSelection( std::vector<RimPlot*>& selection ) c
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteSubPlotFeature::isAnyDeletablePlotSelected() const
 {
-    std::vector<RimPlot*> selection;
-    getSelection( selection );
-
-    for ( RimPlot* plot : selection )
+    for ( RimPlot* plot : getSelection() )
     {
         if ( !plot ) continue;
 
