@@ -38,6 +38,7 @@
 #include "RimWellPathCollection.h"
 
 #include "Cloud/RimCloudDataSourceCollection.h"
+#include "OpmGui/RimOpmDeckGui.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 
@@ -100,6 +101,9 @@ RimOilField::RimOilField()
 
     CAF_PDM_InitFieldNoDefault( &cloudDataCollection, "CloudDataCollection", "Cloud Data" );
     cloudDataCollection = new RimCloudDataSourceCollection();
+
+    CAF_PDM_InitFieldNoDefault( &opmDeck, "OpmDeck", "Opm Deck" );
+    opmDeck = new PdmDeck();
 
     m_fractureTemplateCollection_OBSOLETE = new RimFractureTemplateCollection;
     m_fractureTemplateCollection_OBSOLETE.xmlCapability()->setIOWritable( false );

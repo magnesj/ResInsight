@@ -46,6 +46,7 @@ class RimEclipseViewCollection;
 class RimEclipseContourMapViewCollection;
 class RimVfpDataCollection;
 class RimCloudDataSourceCollection;
+class PdmDeck;
 
 //==================================================================================================
 ///
@@ -83,6 +84,8 @@ public:
     caf::PdmChildField<RimEclipseContourMapViewCollection*> eclipseContourMapCollection;
     caf::PdmChildField<RimVfpDataCollection*>               vfpDataCollection;
     caf::PdmChildField<RimCloudDataSourceCollection*>       cloudDataCollection;
+
+    caf::PdmChildField<PdmDeck*> opmDeck;
 
 protected:
     void initAfterRead() override;

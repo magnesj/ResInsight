@@ -37,6 +37,7 @@
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
+#include "OpmGui/RimOpmDeckGui.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "QuickAccess/RimQuickAccessCollection.h"
@@ -1503,6 +1504,8 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
             if ( oilField->completionTemplateCollection() ) uiTreeOrdering.add( oilField->completionTemplateCollection() );
             if ( oilField->annotationCollection() ) uiTreeOrdering.add( oilField->annotationCollection() );
             if ( oilField->eclipseContourMapCollection() ) uiTreeOrdering.add( oilField->eclipseContourMapCollection() );
+
+            uiTreeOrdering.add( oilField->opmDeck() );
         }
 
         uiTreeOrdering.add( colorLegendCollection() );
