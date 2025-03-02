@@ -1,10 +1,18 @@
 #include "RimOpmDeckGui.h"
 
 #include "cafPdmUiListEditor.h"
+#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafSelectionManager.h"
+
+#include "RiaLogging.h"
+#include "opm/input/eclipse/Deck/Deck.hpp"
+#include "opm/input/eclipse/Deck/DeckItem.hpp"
+#include "opm/input/eclipse/Deck/DeckKeyword.hpp"
+#include "opm/input/eclipse/Deck/DeckRecord.hpp"
+#include "opm/input/eclipse/Parser/Parser.hpp"
 
 CAF_PDM_SOURCE_INIT( PdmDeckItem, "PdmDeckItem" );
 CAF_PDM_SOURCE_INIT( PdmDeckRecord, "PdmDeckRecord" );
@@ -18,13 +26,14 @@ PdmDeckItem::PdmDeckItem()
 {
     CAF_PDM_InitObject( "Deck Item", "", "", "" );
 
-    CAF_PDM_InitField( &m_name, "Name", QString(), "Name", "", "", "" );
     CAF_PDM_InitField( &m_dataType, "DataType", QString(), "Data Type", "", "", "" );
     CAF_PDM_InitField( &m_valueRepresentation, "ValueRepresentation", QString(), "Representation", "", "", "" );
     CAF_PDM_InitField( &m_dataSize, "DataSize", size_t( 0 ), "Size", "", "", "" );
     CAF_PDM_InitField( &m_defaultApplied, "DefaultApplied", false, "Default Applied", "", "", "" );
     CAF_PDM_InitField( &m_stringValues, "StringValues", {}, "String Values", "", "", "" );
     CAF_PDM_InitField( &m_doubleValues, "DoubleValues", std::vector<double>(), "Double Values", "", "", "" );
+    m_doubleValues.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
+
     CAF_PDM_InitField( &m_intValues, "IntValues", std::vector<int>(), "Int Values", "", "", "" );
 }
 
@@ -36,45 +45,54 @@ PdmDeckItem::PdmDeckItem( const Opm::DeckItem& deckItem )
 
 void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
 {
-    /*
-        m_name           = QString::fromStdString( deckItem.name() );
-        m_dataSize       = deckItem.size();
-        m_defaultApplied = deckItem.defaultApplied();
+    try
+    {
+        setName( QString::fromStdString( deckItem.name() ) );
+        m_dataSize = deckItem.data_size();
+        // m_defaultApplied = deckItem.defaultApplied();
+
+        auto nonConst = const_cast<Opm::DeckItem&>( deckItem );
 
         // Determine type and extract values
-        if ( deckItem.defaultApplied() )
-        {
-            m_valueRepresentation = "Default Applied";
-        }
+        /*
+            if ( deckItem.defaultApplied() )
+            {
+                m_valueRepresentation = "Default Applied";
+            }
+        */
 
         // Handle different types of data
-        if ( deckItem.dataSize() > 0 )
+        if ( deckItem.data_size() > 0 )
         {
-            if ( deckItem.isInt() )
+            if ( nonConst.is_int() )
             {
                 m_dataType = "Integer";
                 m_intValues.v().clear();
-                for ( size_t i = 0; i < deckItem.size(); ++i )
+                for ( size_t i = 0; i < deckItem.data_size(); ++i )
                 {
+                    if ( !deckItem.hasValue( i ) ) continue;
                     m_intValues.v().push_back( deckItem.get<int>( i ) );
                 }
             }
-            else if ( deckItem.isDouble() )
+            else if ( nonConst.is_double() )
             {
                 m_dataType = "Double";
                 m_doubleValues.v().clear();
-                for ( size_t i = 0; i < deckItem.size(); ++i )
+                for ( size_t i = 0; i < deckItem.data_size(); ++i )
                 {
+                    if ( !deckItem.hasValue( i ) ) continue;
                     m_doubleValues.v().push_back( deckItem.get<double>( i ) );
                 }
             }
-            else if ( deckItem.isString() )
+            else if ( nonConst.is_string() )
             {
                 m_dataType = "String";
                 m_stringValues.v().clear();
-                for ( size_t i = 0; i < deckItem.size(); ++i )
+                for ( size_t i = 0; i < deckItem.data_size(); ++i )
                 {
-                    m_stringValues.v().append( QString::fromStdString( deckItem.get<std::string>( i ) ) );
+                    if ( !deckItem.hasValue( i ) ) continue;
+
+                    m_stringValues.v().push_back( QString::fromStdString( deckItem.get<std::string>( i ) ) );
                 }
             }
             else
@@ -86,12 +104,17 @@ void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
         {
             m_dataType = "Empty";
         }
-    */
+    }
+    catch ( ... )
+    {
+        // QString error = QString( "Error: %1" ).arg( e->what() );
+        QString error = "exception";
+        RiaLogging::error( error );
+    }
 }
 
 void PdmDeckItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_name );
     uiOrdering.add( &m_dataType );
     uiOrdering.add( &m_dataSize );
     uiOrdering.add( &m_defaultApplied );
@@ -165,7 +188,6 @@ PdmDeckKeyword::PdmDeckKeyword()
 {
     CAF_PDM_InitObject( "Deck Keyword", "", "", "" );
 
-    CAF_PDM_InitField( &m_name, "Name", QString(), "Name", "", "", "" );
     CAF_PDM_InitField( &m_fileName, "FileName", QString(), "File", "", "", "" );
     CAF_PDM_InitField( &m_lineNumber, "LineNumber", -1, "Line", "", "", "" );
     CAF_PDM_InitField( &m_isDataKeyword, "IsDataKeyword", false, "Is Data Keyword", "", "", "" );
@@ -181,7 +203,7 @@ PdmDeckKeyword::PdmDeckKeyword( const Opm::DeckKeyword& keyword )
 
 void PdmDeckKeyword::setFromDeckKeyword( const Opm::DeckKeyword& keyword )
 {
-    m_name = QString::fromStdString( keyword.name() );
+    setName( QString::fromStdString( keyword.name() ) );
     /*
         m_fileName      = QString::fromStdString( keyword.getFileName() );
         m_lineNumber    = keyword.getLineNumber();
@@ -203,7 +225,6 @@ void PdmDeckKeyword::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 {
     // Header section
     caf::PdmUiGroup* headerGroup = uiOrdering.addNewGroup( "Keyword Info" );
-    headerGroup->add( &m_name );
     headerGroup->add( &m_fileName );
     headerGroup->add( &m_lineNumber );
     headerGroup->add( &m_isDataKeyword );
@@ -237,6 +258,9 @@ PdmDeck::PdmDeck()
     CAF_PDM_InitField( &m_keywordCount, "KeywordCount", size_t( 0 ), "Keyword Count", "", "", "" );
     CAF_PDM_InitFieldNoDefault( &m_keywords, "Keywords", "Keywords", "", "", "" );
     CAF_PDM_InitField( &m_activeKeywords, "ActiveKeywords", {}, "Active Keywords", "", "", "" );
+
+    CAF_PDM_InitField( &m_loadData, "LoadData", false, "Active Keywords", "", "", "" );
+    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_loadData );
 }
 
 PdmDeck::PdmDeck( const Opm::Deck& deck )
@@ -249,18 +273,6 @@ void PdmDeck::setFromDeck( const Opm::Deck& deck )
 {
     m_keywords.deleteChildren();
 
-    // Get file name from any keyword if available
-    /*
-        if ( !deck.getKeywordList().empty() )
-        {
-            const auto& firstKeyword = deck.getKeywordList().front();
-            if ( !firstKeyword.getFileName().empty() )
-            {
-                m_fileName = QString::fromStdString( firstKeyword.getFileName() );
-            }
-        }
-    */
-
     m_keywordCount = deck.size();
 
     // Create keyword objects
@@ -269,21 +281,21 @@ void PdmDeck::setFromDeck( const Opm::Deck& deck )
         PdmDeckKeyword* pdmKeyword = new PdmDeckKeyword( deck[i] );
         m_keywords.push_back( pdmKeyword );
     }
+}
 
-    // Create list of available keywords for filtering
-    /*
-        QStringList keywordNames;
-        for ( const auto& keyword : deck.getKeywordList() )
-        {
-            QString keywordName = QString::fromStdString( keyword.name() );
-            if ( !keywordNames.contains( keywordName ) )
-            {
-                keywordNames.append( keywordName );
-            }
-        }
-    keywordNames.sort();
-    m_activeKeywords = keywordNames;
-    */
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmDeck::loadDeck( const QString& fileName )
+{
+    if ( fileName.isEmpty() ) return;
+
+    // Parse deck using OPM parser
+    std::string fileNameStd = fileName.toStdString();
+    Opm::Parser parser;
+    Opm::Deck   deck = parser.parseFile( fileNameStd );
+
+    setFromDeck( deck );
 }
 
 void PdmDeck::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
@@ -333,5 +345,10 @@ void PdmDeck::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const Q
     if ( changedField == &m_activeKeywords )
     {
         // Could implement filtering based on active keywords
+    }
+    else if ( changedField == &m_loadData )
+    {
+        loadDeck( m_fileName() );
+        m_loadData = false;
     }
 }

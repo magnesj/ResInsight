@@ -9,11 +9,7 @@
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiOrdering.h"
 
-#include "opm/input/eclipse/Deck/Deck.hpp"
-#include "opm/input/eclipse/Deck/DeckItem.hpp"
-#include "opm/input/eclipse/Deck/DeckKeyword.hpp"
-#include "opm/input/eclipse/Deck/DeckRecord.hpp"
-
+#include "RimNamedObject.h"
 #include <QString>
 #include <QStringList>
 #include <memory>
@@ -31,7 +27,7 @@ class Deck;
 //==================================================================================================
 /// A CAF wrapper for DeckItem
 //==================================================================================================
-class PdmDeckItem : public caf::PdmObject
+class PdmDeckItem : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
@@ -44,7 +40,6 @@ public:
     void setFromDeckItem( const Opm::DeckItem& deckItem );
 
     // Fields for UI display
-    caf::PdmField<QString>              m_name;
     caf::PdmField<QString>              m_dataType;
     caf::PdmField<QString>              m_valueRepresentation;
     caf::PdmField<size_t>               m_dataSize;
@@ -85,7 +80,7 @@ protected:
 //==================================================================================================
 /// A CAF wrapper for DeckKeyword
 //==================================================================================================
-class PdmDeckKeyword : public caf::PdmObject
+class PdmDeckKeyword : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
@@ -98,7 +93,6 @@ public:
     void setFromDeckKeyword( const Opm::DeckKeyword& keyword );
 
     // Fields for UI display
-    caf::PdmField<QString>                  m_name;
     caf::PdmField<QString>                  m_fileName;
     caf::PdmField<int>                      m_lineNumber;
     caf::PdmField<bool>                     m_isDataKeyword;
@@ -130,6 +124,10 @@ public:
     caf::PdmField<size_t>                    m_keywordCount;
     caf::PdmChildArrayField<PdmDeckKeyword*> m_keywords;
     caf::PdmField<std::vector<QString>>      m_activeKeywords;
+    caf::PdmField<bool>                      m_loadData;
+
+private:
+    void loadDeck( const QString& fileName );
 
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
