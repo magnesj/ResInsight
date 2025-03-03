@@ -35,15 +35,21 @@ PdmDeckItem::PdmDeckItem()
     m_doubleValues.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_intValues, "IntValues", std::vector<int>(), "Int Values", "", "", "" );
+
+    CAF_PDM_InitFieldNoDefault( &m_fractureCreationSummary, "FractureCreationSummary", "Generated Fractures" );
+    m_fractureCreationSummary.registerGetMethod( this, &PdmDeckItem::fieldText );
+    m_fractureCreationSummary.registerSetMethod( this, &PdmDeckItem::setFieldText );
+    m_fractureCreationSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
+    m_fractureCreationSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 }
 
-PdmDeckItem::PdmDeckItem( const Opm::DeckItem& deckItem )
+PdmDeckItem::PdmDeckItem( Opm::DeckItem& deckItem )
     : PdmDeckItem()
 {
     setFromDeckItem( deckItem );
 }
 
-void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
+void PdmDeckItem::setFromDeckItem( Opm::DeckItem& deckItem )
 {
     try
     {
@@ -51,7 +57,7 @@ void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
         m_dataSize = deckItem.data_size();
         // m_defaultApplied = deckItem.defaultApplied();
 
-        auto nonConst = const_cast<Opm::DeckItem&>( deckItem );
+        // assign the deck item to the member variable
 
         // Determine type and extract values
         /*
@@ -64,7 +70,7 @@ void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
         // Handle different types of data
         if ( deckItem.data_size() > 0 )
         {
-            if ( nonConst.is_int() )
+            if ( deckItem.is_int() )
             {
                 m_dataType = "Integer";
                 m_intValues.v().clear();
@@ -74,7 +80,7 @@ void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
                     m_intValues.v().push_back( deckItem.get<int>( i ) );
                 }
             }
-            else if ( nonConst.is_double() )
+            else if ( deckItem.is_double() )
             {
                 m_dataType = "Double";
                 m_doubleValues.v().clear();
@@ -84,7 +90,7 @@ void PdmDeckItem::setFromDeckItem( const Opm::DeckItem& deckItem )
                     m_doubleValues.v().push_back( deckItem.get<double>( i ) );
                 }
             }
-            else if ( nonConst.is_string() )
+            else if ( deckItem.is_string() )
             {
                 m_dataType = "String";
                 m_stringValues.v().clear();
@@ -132,6 +138,10 @@ void PdmDeckItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& ui
     {
         uiOrdering.add( &m_intValues );
     }
+
+    uiOrdering.add( &m_fractureCreationSummary );
+
+    uiOrdering.skipRemainingFields();
 }
 
 QList<caf::PdmOptionItemInfo> PdmDeckItem::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
@@ -146,6 +156,82 @@ void PdmDeckItem::fieldChangedByUi( const caf::PdmFieldHandle* changedField, con
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString PdmDeckItem::fieldText() const
+{
+    // TODO: Find a way to store the reference to the deck item, and read out the values from it
+    // This is currently not possible, as the deck item is not stored in the PdmDeckItem object
+
+    QString text;
+    /*
+        if ( m_deckItem )
+        {
+            if ( m_deckItem->data_size() > 0 )
+            {
+                if ( m_deckItem->is_int() )
+                {
+                    for ( size_t i = 0; i < m_deckItem->data_size(); ++i )
+                    {
+                        if ( !m_deckItem->hasValue( i ) ) continue;
+                        text += QString( " %1" ).arg( m_deckItem->get<int>( i ) );
+                    }
+                }
+                else if ( m_deckItem->is_double() )
+                {
+                    for ( size_t i = 0; i < m_deckItem->data_size(); ++i )
+                    {
+                        if ( !m_deckItem->hasValue( i ) ) continue;
+                        text += QString( " %1" ).arg( m_deckItem->get<double>( i ) );
+                    }
+                }
+                else if ( m_deckItem->is_string() )
+                {
+                    for ( size_t i = 0; i < m_deckItem->data_size(); ++i )
+                    {
+                        if ( !m_deckItem->hasValue( i ) ) continue;
+                        text += QString( " %1" ).arg( QString::fromStdString( m_deckItem->get<std::string>( i ) ) );
+                    }
+                }
+
+                / *
+                else if ( nonConst.is_double() )
+                {
+                    m_dataType = "Double";
+                    m_doubleValues.v().clear();
+                    for ( size_t i = 0; i < deckItem.data_size(); ++i )
+                    {
+                        if ( !deckItem.hasValue( i ) ) continue;
+                        m_doubleValues.v().push_back( deckItem.get<double>( i ) );
+                    }
+                }
+                else if ( nonConst.is_string() )
+                {
+                    m_dataType = "String";
+                    m_stringValues.v().clear();
+                    for ( size_t i = 0; i < deckItem.data_size(); ++i )
+                    {
+                        if ( !deckItem.hasValue( i ) ) continue;
+
+                        m_stringValues.v().push_back( QString::fromStdString( deckItem.get<std::string>( i ) ) );
+                    }
+                }
+    * /
+            }
+        }
+    */
+
+    return QString();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmDeckItem::setFieldText( const QString& text )
+{
+}
+
+//--------------------------------------------------------------------------------------------------
 /// PdmDeckRecord Implementation
 //--------------------------------------------------------------------------------------------------
 PdmDeckRecord::PdmDeckRecord()
@@ -156,13 +242,13 @@ PdmDeckRecord::PdmDeckRecord()
     CAF_PDM_InitFieldNoDefault( &m_items, "Items", "Items", "", "", "" );
 }
 
-PdmDeckRecord::PdmDeckRecord( const Opm::DeckRecord& deckRecord )
+PdmDeckRecord::PdmDeckRecord( Opm::DeckRecord& deckRecord )
     : PdmDeckRecord()
 {
     setFromDeckRecord( deckRecord );
 }
 
-void PdmDeckRecord::setFromDeckRecord( const Opm::DeckRecord& deckRecord )
+void PdmDeckRecord::setFromDeckRecord( Opm::DeckRecord& deckRecord )
 {
     // Clear existing items
     m_items.deleteChildren();
@@ -213,10 +299,12 @@ void PdmDeckKeyword::setFromDeckKeyword( const Opm::DeckKeyword& keyword )
 
     m_records.deleteChildren();
 
+    auto nonConst = const_cast<Opm::DeckKeyword&>( keyword );
+
     // Create new records
     for ( size_t i = 0; i < keyword.size(); ++i )
     {
-        PdmDeckRecord* pdmRecord = new PdmDeckRecord( keyword.getRecord( i ) );
+        PdmDeckRecord* pdmRecord = new PdmDeckRecord( nonConst.getRecord( i ) );
         m_records.push_back( pdmRecord );
     }
 }
@@ -263,22 +351,16 @@ PdmDeck::PdmDeck()
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_loadData );
 }
 
-PdmDeck::PdmDeck( const Opm::Deck& deck )
-    : PdmDeck()
-{
-    setFromDeck( deck );
-}
-
-void PdmDeck::setFromDeck( const Opm::Deck& deck )
+void PdmDeck::setFromDeck()
 {
     m_keywords.deleteChildren();
 
-    m_keywordCount = deck.size();
+    m_keywordCount = m_deck.size();
 
     // Create keyword objects
-    for ( size_t i = 0; i < deck.size(); ++i )
+    for ( size_t i = 0; i < m_deck.size(); ++i )
     {
-        PdmDeckKeyword* pdmKeyword = new PdmDeckKeyword( deck[i] );
+        auto pdmKeyword = new PdmDeckKeyword( m_deck[i] );
         m_keywords.push_back( pdmKeyword );
     }
 }
@@ -293,9 +375,9 @@ void PdmDeck::loadDeck( const QString& fileName )
     // Parse deck using OPM parser
     std::string fileNameStd = fileName.toStdString();
     Opm::Parser parser;
-    Opm::Deck   deck = parser.parseFile( fileNameStd );
 
-    setFromDeck( deck );
+    m_deck = parser.parseFile( fileNameStd );
+    setFromDeck();
 }
 
 void PdmDeck::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )

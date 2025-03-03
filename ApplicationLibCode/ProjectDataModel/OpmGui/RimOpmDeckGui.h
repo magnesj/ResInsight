@@ -10,8 +10,12 @@
 #include "cafPdmUiOrdering.h"
 
 #include "RimNamedObject.h"
+#include "cafPdmProxyValueField.h"
 #include <QString>
 #include <QStringList>
+
+#include "opm/input/eclipse/Deck/Deck.hpp"
+
 #include <memory>
 #include <vector>
 
@@ -33,11 +37,11 @@ class PdmDeckItem : public RimNamedObject
 
 public:
     PdmDeckItem();
-    explicit PdmDeckItem( const Opm::DeckItem& deckItem );
+    explicit PdmDeckItem( Opm::DeckItem& deckItem );
     ~PdmDeckItem() override = default;
 
     // Initialize from a DeckItem
-    void setFromDeckItem( const Opm::DeckItem& deckItem );
+    void setFromDeckItem( Opm::DeckItem& deckItem );
 
     // Fields for UI display
     caf::PdmField<QString>              m_dataType;
@@ -48,10 +52,16 @@ public:
     caf::PdmField<std::vector<double>>  m_doubleValues;
     caf::PdmField<std::vector<int>>     m_intValues;
 
+    caf::PdmProxyValueField<QString> m_fractureCreationSummary;
+
 protected:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+
+private:
+    QString fieldText() const;
+    void    setFieldText( const QString& text );
 };
 
 //==================================================================================================
@@ -63,11 +73,11 @@ class PdmDeckRecord : public caf::PdmObject
 
 public:
     PdmDeckRecord();
-    explicit PdmDeckRecord( const Opm::DeckRecord& deckRecord );
+    explicit PdmDeckRecord( Opm::DeckRecord& deckRecord );
     ~PdmDeckRecord() override = default;
 
     // Initialize from a DeckRecord
-    void setFromDeckRecord( const Opm::DeckRecord& deckRecord );
+    void setFromDeckRecord( Opm::DeckRecord& deckRecord );
 
     // Fields for UI display
     caf::PdmField<size_t>                 m_itemCount;
@@ -113,11 +123,10 @@ class PdmDeck : public caf::PdmObject
 
 public:
     PdmDeck();
-    explicit PdmDeck( const Opm::Deck& deck );
     ~PdmDeck() override = default;
 
     // Initialize from a Deck
-    void setFromDeck( const Opm::Deck& deck );
+    void setFromDeck();
 
     // Fields for UI display
     caf::PdmField<QString>                   m_fileName;
@@ -134,4 +143,7 @@ protected:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+
+private:
+    Opm::Deck m_deck;
 };
