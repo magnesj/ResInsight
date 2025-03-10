@@ -58,14 +58,15 @@
 #include "ert/ecl/ecl_grid.hpp"
 #include "ert/ecl/ecl_kw.h"
 
+#include "opm/common/utility/OpmInputError.hpp"
 #include "opm/input/eclipse/Deck/Deck.hpp"
 #include "opm/input/eclipse/EclipseState/Grid/EclipseGrid.hpp"
+#include "opm/input/eclipse/Parser/ErrorGuard.hpp"
 #include "opm/input/eclipse/Parser/InputErrorAction.hpp"
 #include "opm/input/eclipse/Parser/ParseContext.hpp"
 #include "opm/input/eclipse/Parser/Parser.hpp"
 
 /*
-#include "opm/common/utility/OpmInputError.hpp"
 #include "opm/input/eclipse/Deck/Deck.hpp"
 #include "opm/input/eclipse/Parser/Parser.hpp"
 */
@@ -245,6 +246,10 @@ bool RifEclipseInputFileTools::openGridFileOpmCommon( const QString&      fileNa
 
         Opm::ParseContext parseContext( Opm::InputErrorAction::WARN );
 
+        Opm::ErrorGuard errorGuard;
+
+        auto opmGrid = Opm::Parser::parseGrid( stdFilename, parseContext, errorGuard );
+        /*
         Opm::Parser parser;
         auto        deck = parser.parseFile( stdFilename, parseContext );
 
@@ -256,7 +261,8 @@ bool RifEclipseInputFileTools::openGridFileOpmCommon( const QString&      fileNa
         }
 
         Opm::EclipseGrid opmGrid( deck, actunumValues );
-        auto             numActive = opmGrid.getNumActive();
+*/
+        auto numActive = opmGrid.getNumActive();
 
         auto mainGrid = eclipseCase->mainGrid();
 

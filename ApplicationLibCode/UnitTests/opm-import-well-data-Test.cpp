@@ -70,10 +70,30 @@ TEST( OpmGridImportGrdecl, TestImport )
         */
 
         // auto stdFilename = baseFolder.absoluteFilePath( filename ).toStdString();
-        std::string stdFilename = "c:/gitroot/ResInsight/TestModels/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.grdecl";
+
+        // std::string stdFilename = "c:/gitroot/ResInsight/TestModels/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.grdecl";
+        std::string stdFilename = "f:/Models/equinor_azure/2024.12.2-grdecl-crash/GRID.GRDECL";
 
         Opm::Parser parser;
         auto        deck = parser.parseFile( stdFilename );
+
+        for ( size_t i = 0; i < deck.size(); i++ )
+        {
+            auto& keyword = deck[i];
+            std::cout << keyword.name();
+            if ( keyword.isDataKeyword() )
+            {
+                std::cout << " Data size: " << keyword.getDataSize();
+            }
+            else
+            {
+                std::cout << keyword;
+            }
+
+            std::cout << std::endl;
+        }
+
+        return;
 
         Opm::EclipseGrid opmGrid( deck );
         auto             numActive = opmGrid.getNumActive();
