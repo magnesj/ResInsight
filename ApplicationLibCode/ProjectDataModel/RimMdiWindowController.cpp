@@ -23,6 +23,8 @@
 #include "RimViewWindow.h"
 #include "RiuMainWindowBase.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QMdiSubWindow>
 
 CAF_PDM_XML_SOURCE_INIT( RimMdiWindowController, "MdiWindowController" );

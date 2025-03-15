@@ -28,6 +28,9 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiFieldHandle.h"
+
 
 #include <QPainter>
 

@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 

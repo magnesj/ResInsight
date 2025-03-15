@@ -1,6 +1,8 @@
 #include "Parent.h"
 #include "Child.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "gtest/gtest.h"
 
 CAF_PDM_SOURCE_INIT( Parent, "Parent" );

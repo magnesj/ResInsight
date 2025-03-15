@@ -1,6 +1,8 @@
 #include "TapProject.h"
 #include "TapCvfSpecialization.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( TapProject, "RPMProject" );
 
 //--------------------------------------------------------------------------------------------------

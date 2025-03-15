@@ -19,6 +19,7 @@
 #include "RimPlotAxisPropertiesInterface.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmUiFieldHandle.h"
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimPlotAxisPropertiesInterface, "PlotAxisPropertiesInterface", "RimPlotAxisPropertiesInterface" );
 

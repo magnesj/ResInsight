@@ -1,6 +1,8 @@
 #include "TapCvfSpecialization.h"
 
 #include "cafPdmUiListEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( TapCvfSpecialization, "TapCvfSpecialization" );
 

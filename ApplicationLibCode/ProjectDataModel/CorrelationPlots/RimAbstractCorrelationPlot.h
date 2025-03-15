@@ -23,6 +23,7 @@
 #include "RiuQwtPlotWidget.h"
 
 #include "cafPdmPtrField.h"
+#include "cafPdmChildArrayField.h"
 
 #include <QDateTime>
 #include <QString>

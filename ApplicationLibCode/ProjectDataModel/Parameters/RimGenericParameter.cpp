@@ -24,6 +24,7 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <cmath>
 

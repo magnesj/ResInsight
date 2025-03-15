@@ -8,6 +8,7 @@
 #include "cafPdmReferenceHelper.h"
 #include "cafPdmXmlObjectHandle.h"
 #include "cafPdmXmlObjectHandleMacros.h"
+#include "cafInternalPdmXmlFieldCapability.h"
 
 class MyItemPdmObject : public caf::PdmObjectHandle, public caf::PdmXmlObjectHandle
 {

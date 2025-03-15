@@ -25,6 +25,7 @@
 #include "RimProject.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include "cvfVector3.h"
 

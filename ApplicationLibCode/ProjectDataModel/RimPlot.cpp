@@ -28,7 +28,7 @@
 #include "RiuPlotMainWindowTools.h"
 #include "RiuPlotWidget.h"
 
-#include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 
 #include "qwt_legend_data.h"
 

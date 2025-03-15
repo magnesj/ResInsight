@@ -20,6 +20,7 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RimStreamline, "Streamline" );
 

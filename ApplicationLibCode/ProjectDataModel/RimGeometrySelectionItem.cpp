@@ -18,6 +18,7 @@
 
 #include "RimGeometrySelectionItem.h"
 
+
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimGeometrySelectionItem_OBSOLETE, "GeometrySelectionItem" );
 
 //--------------------------------------------------------------------------------------------------

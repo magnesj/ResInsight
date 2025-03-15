@@ -35,6 +35,7 @@
 #include "RiuQwtPlotWidget.h"
 
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include "cvfAssert.h"
 

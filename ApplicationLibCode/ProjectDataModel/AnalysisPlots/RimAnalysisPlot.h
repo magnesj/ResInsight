@@ -24,6 +24,7 @@
 
 #include "RigEnsembleParameter.h"
 
+#include "cafPdmChildArrayField.h"
 #include "cafPdmPtrField.h"
 
 #include <QDateTime>

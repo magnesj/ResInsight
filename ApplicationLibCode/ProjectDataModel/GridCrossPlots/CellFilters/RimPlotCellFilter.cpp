@@ -18,6 +18,8 @@
 
 #include "RimPlotCellFilter.h"
 
+#include "cafPdmObjectImpl.h"
+
 namespace caf
 {
 template <>

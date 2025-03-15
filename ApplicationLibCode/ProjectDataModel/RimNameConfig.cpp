@@ -21,6 +21,8 @@
 #include "Rim3dWellLogCurve.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
+
 //==================================================================================================
 ///
 ///

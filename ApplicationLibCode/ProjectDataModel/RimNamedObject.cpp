@@ -19,7 +19,9 @@
 #include "RimNamedObject.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiFieldHandle.h"
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimNamedObject, "NamedObject" ); // Do not use. Abstract class
 

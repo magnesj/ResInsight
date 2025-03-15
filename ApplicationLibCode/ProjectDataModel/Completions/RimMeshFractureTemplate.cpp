@@ -42,6 +42,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <algorithm>
 #include <cmath>

@@ -23,6 +23,8 @@
 
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimUserDefinedCalculationCollection, "RimUserDefinedCalculationCollection" );
 

@@ -26,7 +26,7 @@
 #include <QDir>
 #include <QString>
 #include <QStringList>
-#include <QTextStream>
+#include <QXmlStreamReader>
 
 #include <functional>
 #include <memory>

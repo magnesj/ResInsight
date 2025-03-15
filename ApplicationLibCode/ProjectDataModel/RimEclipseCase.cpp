@@ -78,6 +78,8 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
+#include "cafPdmUiFieldHandle.h"
+
 
 #include "cafUtils.h"
 #include <QFileInfo>

@@ -45,13 +45,14 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectGroup.h"
+#include "cafPdmObjectImpl.h"
+#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmPointer.h"
 #include "cafPdmProxyValueField.h"
 #include "cafPdmReferenceHelper.h"
 
 #include <QFile>
 
-#include "cafPdmObjectScriptingCapability.h"
 #include <memory>
 
 /// Demo objects to show the usage of the Pdm system

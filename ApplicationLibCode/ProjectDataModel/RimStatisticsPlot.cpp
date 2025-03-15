@@ -36,8 +36,9 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
-
 #include "cafPdmUiSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 #include "cvfAssert.h"
 
 #include <QtCharts/QBarSeries>
