@@ -93,6 +93,8 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "caf.h"
 #include "cvfAssert.h"

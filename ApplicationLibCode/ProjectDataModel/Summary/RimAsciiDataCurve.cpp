@@ -31,6 +31,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_date.h"
 #include "qwt_plot.h"

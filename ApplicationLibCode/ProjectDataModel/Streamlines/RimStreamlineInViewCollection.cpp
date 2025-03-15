@@ -46,6 +46,8 @@
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfCollection.h"
 

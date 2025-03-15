@@ -32,6 +32,8 @@
 #include "RimWellLogRftCurveNameConfig.h"
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
+
 //==================================================================================================
 ///
 ///

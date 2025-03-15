@@ -29,6 +29,8 @@
 
 #include "cafPdmObject.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QStringList>
 

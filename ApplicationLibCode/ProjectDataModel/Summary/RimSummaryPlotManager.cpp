@@ -54,6 +54,8 @@
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 // Multi plot
 #include "RimMainPlotCollection.h"

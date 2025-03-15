@@ -31,6 +31,8 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDoubleValidator>
 

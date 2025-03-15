@@ -35,6 +35,8 @@
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeViewEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_plot.h"
 

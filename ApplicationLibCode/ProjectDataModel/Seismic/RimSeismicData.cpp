@@ -35,6 +35,8 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfBoundingBox.h"
 

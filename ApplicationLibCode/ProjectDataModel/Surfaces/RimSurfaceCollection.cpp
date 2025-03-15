@@ -40,6 +40,8 @@
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFile>
 #include <QFileInfo>

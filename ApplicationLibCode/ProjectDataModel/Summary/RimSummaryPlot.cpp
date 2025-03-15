@@ -77,6 +77,8 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_date.h"
 #include "qwt_plot.h"

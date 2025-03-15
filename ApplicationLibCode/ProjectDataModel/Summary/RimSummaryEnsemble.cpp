@@ -43,6 +43,8 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

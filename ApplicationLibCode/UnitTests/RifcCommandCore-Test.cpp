@@ -6,6 +6,7 @@
 
 #include "cafPdmField.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmScriptIOMessages.h"
 
 class TestCommand1 : public RicfCommandObject

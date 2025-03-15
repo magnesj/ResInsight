@@ -32,6 +32,8 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTimeEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfAssert.h"
 

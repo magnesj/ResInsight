@@ -32,6 +32,8 @@
 #include "RimSummaryCaseSumo.h"
 #include "RimSummarySumoDataSource.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <arrow/type_fwd.h>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsembleSumo, "RimSummaryEnsembleSumo" );

@@ -42,6 +42,8 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <memory>
 

@@ -48,6 +48,8 @@
 #include "RimWellPath.h"
 
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

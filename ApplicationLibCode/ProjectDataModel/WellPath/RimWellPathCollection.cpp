@@ -70,6 +70,8 @@
 #include "cafPdmUiEditorHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QCollator>
 #include <QFile>

@@ -36,6 +36,8 @@
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiSliderTools.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "ExponentialRegression.hpp"
 #include "LinearRegression.hpp"

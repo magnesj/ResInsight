@@ -47,6 +47,8 @@
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTableViewEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfMath.h"
 

@@ -38,6 +38,8 @@
 #include "RivPolylinePartMgr.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cafDisplayCoordTransform.h"
 #include "cvfModelBasicList.h"

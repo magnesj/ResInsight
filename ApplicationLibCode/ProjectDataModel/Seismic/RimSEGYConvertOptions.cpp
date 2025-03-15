@@ -20,6 +20,8 @@
 
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiLineEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QCoreApplication>
 

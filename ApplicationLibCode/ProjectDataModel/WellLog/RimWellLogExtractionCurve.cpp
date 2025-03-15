@@ -72,6 +72,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <algorithm>
 #include <cmath>

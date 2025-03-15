@@ -41,6 +41,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cvfAssert.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QKeyEvent>
 

@@ -23,6 +23,7 @@
 #include "RimSummaryPlot.h"
 
 #include "cafPdmFieldReorderCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryTableCollection, "RimSummaryTableCollection" );
 

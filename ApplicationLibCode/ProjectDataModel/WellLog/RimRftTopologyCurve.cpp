@@ -34,6 +34,10 @@
 
 #include "RiuPlotCurve.h"
 
+#include "cafPdmObjectImpl.h"
+
+
+
 CAF_PDM_SOURCE_INIT( RimRftTopologyCurve, "RimRftTopologyCurve" );
 
 namespace caf

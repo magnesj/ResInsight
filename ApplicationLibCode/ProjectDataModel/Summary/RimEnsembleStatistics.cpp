@@ -24,6 +24,8 @@
 #include "RimEnsembleCurveSetInterface.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimEnsembleStatistics, "RimEnsembleStatistics" );
 
 //--------------------------------------------------------------------------------------------------

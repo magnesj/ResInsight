@@ -29,6 +29,8 @@
 #include "RimSummaryPlot.h"
 
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDateTime>
 

@@ -54,6 +54,8 @@
 #include "cafColorTable.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_plot_panner.h"
 

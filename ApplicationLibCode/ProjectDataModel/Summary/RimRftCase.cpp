@@ -24,6 +24,8 @@
 #include "RimSummaryCase.h"
 
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 //==================================================================================================
 //

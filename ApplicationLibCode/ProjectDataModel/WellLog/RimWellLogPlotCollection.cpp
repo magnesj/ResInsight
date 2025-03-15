@@ -36,6 +36,8 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfAssert.h"
 

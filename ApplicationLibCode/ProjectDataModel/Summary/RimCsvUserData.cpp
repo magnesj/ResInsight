@@ -34,6 +34,8 @@
 #include "RimSummaryCalculationCollection.h"
 
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFile>
 

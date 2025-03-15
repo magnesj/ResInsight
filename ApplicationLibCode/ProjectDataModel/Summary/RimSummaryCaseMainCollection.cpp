@@ -49,6 +49,8 @@
 
 #include "cafPdmFieldReorderCapability.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QCoreApplication>
 #include <QDir>

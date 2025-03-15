@@ -32,6 +32,8 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfVector3.h"
 

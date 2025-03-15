@@ -53,6 +53,8 @@
 #include "cafPdmUiCheckBoxTristateEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <algorithm>
 

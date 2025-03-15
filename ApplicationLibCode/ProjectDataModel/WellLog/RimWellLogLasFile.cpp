@@ -36,6 +36,8 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QFileInfo>
 #include <QString>
 #include <QStringList>

@@ -26,6 +26,8 @@
 #include "RimWellPathAttributeCollection.h"
 
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <cmath>
 

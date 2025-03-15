@@ -44,6 +44,8 @@
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfBoundingBox.h"
 #include "cvfScalarMapper.h"

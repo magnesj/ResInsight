@@ -32,6 +32,8 @@
 
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLabelEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimWellPathTieIn, "RimWellPathTieIn" );
 

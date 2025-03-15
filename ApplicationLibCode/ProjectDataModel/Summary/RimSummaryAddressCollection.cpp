@@ -25,6 +25,8 @@
 #include "RimSummaryAddress.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 using namespace RifEclipseSummaryAddressDefines;
 

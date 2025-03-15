@@ -79,6 +79,8 @@
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafTitledOverlayFrame.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <algorithm>
 #include <memory>

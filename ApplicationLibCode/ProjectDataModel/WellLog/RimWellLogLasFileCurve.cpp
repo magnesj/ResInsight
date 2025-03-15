@@ -43,6 +43,8 @@
 #include "RiuQwtPlotWidget.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

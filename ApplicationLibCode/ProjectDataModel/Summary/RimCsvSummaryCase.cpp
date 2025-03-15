@@ -28,6 +28,8 @@
 
 #include "cafPdmUiTextEditor.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

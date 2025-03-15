@@ -65,6 +65,8 @@
 #include "cafPdmObject.h"
 #include "cafVecIjk.h"
 #include "cvfAssert.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <qwt_plot.h>
 

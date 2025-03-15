@@ -28,6 +28,8 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimStimPlanModelTemplateCollection, "StimPlanModelTemplateCollection" );
 

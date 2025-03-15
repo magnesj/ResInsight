@@ -33,11 +33,12 @@
 
 #include "RivSeismicSectionPartMgr.h"
 
+#include "cafDisplayCoordTransform.h"
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiTreeSelectionEditor.h"
+
 #include "cvfBoundingBox.h"
 #include "cvfModelBasicList.h"
-
-#include "cafDisplayCoordTransform.h"
-#include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSeismicSectionCollection, "SeismicSectionCollection" );
 

@@ -21,6 +21,9 @@
 #include "RimEnsembleWellLogs.h"
 
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 CAF_PDM_SOURCE_INIT( RimEnsembleWellLogsCollection, "EnsembleWellLogsCollection" );
 

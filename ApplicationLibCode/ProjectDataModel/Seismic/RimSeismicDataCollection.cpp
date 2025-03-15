@@ -27,6 +27,8 @@
 #include "RimSeismicDifferenceData.h"
 #include "RimSeismicSectionCollection.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QFile>
 #include <QFileInfo>
 

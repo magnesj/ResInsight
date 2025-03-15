@@ -27,6 +27,8 @@
 #include "RimSurface.h"
 #include "RimSurfaceInView.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSurfaceResultDefinition, "SurfaceResultDefinition" );
 
 //--------------------------------------------------------------------------------------------------

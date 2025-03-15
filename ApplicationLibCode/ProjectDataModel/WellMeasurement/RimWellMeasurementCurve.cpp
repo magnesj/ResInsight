@@ -40,6 +40,8 @@
 #include "RiaPreferences.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

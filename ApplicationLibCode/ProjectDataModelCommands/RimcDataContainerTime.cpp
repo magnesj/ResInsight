@@ -19,8 +19,9 @@
 #include "RimcDataContainerTime.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimcDataContainerTime, "DataContainerTime" );
 
