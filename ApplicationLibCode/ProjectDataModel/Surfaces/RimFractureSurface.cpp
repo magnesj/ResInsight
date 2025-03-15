@@ -28,6 +28,7 @@
 #include "RifSurfaceImporter.h"
 #include "RifVtkSurfaceImporter.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimFractureSurface, "RimFractureSurface" );

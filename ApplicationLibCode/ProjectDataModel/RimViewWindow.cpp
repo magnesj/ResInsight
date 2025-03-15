@@ -32,6 +32,7 @@
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeViewEditor.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmObjectImpl.h"
 
 
 #include <QDebug>

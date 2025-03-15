@@ -23,6 +23,7 @@
 
 #include "RigPolyLinesData.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFieldHandle.h"
 
 #include "cvfBoundingBox.h"

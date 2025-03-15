@@ -79,9 +79,9 @@
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
 #include "cafPdmUiFieldHandle.h"
-
-
+#include "cafPdmObjectImpl.h"
 #include "cafUtils.h"
+
 #include <QFileInfo>
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimEclipseCase, "RimReservoir" );

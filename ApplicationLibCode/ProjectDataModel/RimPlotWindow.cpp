@@ -30,6 +30,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmObjectImpl.h"
 
 
 #include <QPainter>

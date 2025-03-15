@@ -58,6 +58,7 @@
 
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmObjectImpl.h"
 
 
 #include <set>
