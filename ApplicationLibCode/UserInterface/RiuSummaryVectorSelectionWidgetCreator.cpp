@@ -23,6 +23,8 @@
 
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUiGroup.h"
+#include "cafPdmUiFieldHandle.h"
+
 
 #include "QMinimizePanel.h"
 

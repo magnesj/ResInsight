@@ -26,6 +26,7 @@
 #include "RimGeoMechView.h"
 #include "RimViewWindow.h"
 
+#include "cafPdmUiFieldHandle.h"
 #include "cafUtils.h"
 
 //--------------------------------------------------------------------------------------------------

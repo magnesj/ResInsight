@@ -22,6 +22,7 @@
 #include "RiaApplication.h"
 
 #include "ContourMap/RimEclipseContourMapView.h"
+#include "RimGeoMechContourMapView.h"
 #include "RimGridView.h"
 #include "RimProject.h"
 #include "RimViewController.h"
@@ -30,7 +31,8 @@
 
 #include "Riu3DMainWindowTools.h"
 
-#include "RimGeoMechContourMapView.h"
+#include "cafPdmUiFieldHandle.h"
+
 #include <QAction>
 #include <QTreeView>
 

@@ -31,6 +31,8 @@
 
 #include "cafCmdFeatureManager.h"
 #include "cafSelectionManager.h"
+#include "cafPdmUiFieldHandle.h"
+
 
 #include <QAction>
 

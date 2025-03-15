@@ -28,6 +28,7 @@
 
 #include "RiuMainWindow.h"
 
+#include "cafPdmReferenceHelper.h"
 #include "cafPdmUiPropertyViewDialog.h"
 
 //==================================================================================================

@@ -41,6 +41,7 @@
 #include "RiuSummaryCurveDefinitionKeywords.h"
 #include "RiuSummaryQuantityNameInfoProvider.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmPointer.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeSelectionEditor.h"

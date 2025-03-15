@@ -40,6 +40,8 @@
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafSelectionManager.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QAction>
 #include <QFileInfo>

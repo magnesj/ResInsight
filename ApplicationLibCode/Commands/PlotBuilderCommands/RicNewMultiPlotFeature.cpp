@@ -28,6 +28,8 @@
 
 #include "cafSelectionManager.h"
 #include "cvfAssert.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QAction>
 

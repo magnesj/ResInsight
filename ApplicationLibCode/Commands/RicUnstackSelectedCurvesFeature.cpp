@@ -26,6 +26,8 @@
 #include "cafPdmScriptResponse.h"
 #include "cafPdmUiItem.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QAction>
 

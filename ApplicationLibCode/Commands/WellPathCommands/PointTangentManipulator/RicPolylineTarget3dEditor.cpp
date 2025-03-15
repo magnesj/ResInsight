@@ -28,6 +28,7 @@
 
 #include "cafDisplayCoordTransform.h"
 #include "cafPdmUiCommandSystemProxy.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafSelectionManager.h"
 
 #include "cvfModelBasicList.h"

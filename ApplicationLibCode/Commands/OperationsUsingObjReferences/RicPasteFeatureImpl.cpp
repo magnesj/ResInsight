@@ -31,6 +31,7 @@
 #include "cafCmdFeature.h"
 #include "cafPdmObjectGroup.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmReferenceHelper.h"
 
 #include <QAction>
 #include <QApplication>

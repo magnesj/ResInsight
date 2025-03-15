@@ -26,6 +26,8 @@
 #include "RiuMainWindow.h"
 #include "RiuViewer.h"
 
+#include "cafPdmUiFieldHandle.h"
+
 #include <QAction>
 
 CAF_CMD_SOURCE_INIT( RicTogglePerspectiveViewFeature, "RicTogglePerspectiveViewFeature" );
