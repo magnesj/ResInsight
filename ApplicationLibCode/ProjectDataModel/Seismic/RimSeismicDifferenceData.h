@@ -22,7 +22,6 @@
 #include "RiaSeismicDefines.h"
 
 #include "cafFilePath.h"
-#include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmProxyValueField.h"

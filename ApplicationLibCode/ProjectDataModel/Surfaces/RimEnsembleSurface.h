@@ -22,7 +22,6 @@
 
 #include "RigSurfaceStatisticsCalculator.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmPtrField.h"
 
 #include "cvfObject.h"

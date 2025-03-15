@@ -25,12 +25,8 @@
 #include "RiuPlotAxis.h"
 
 #include "cafAppEnum.h"
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-
-#include <QObject>
-#include <QPointer>
 
 #include <any>
 
@@ -40,6 +36,8 @@ class RiuPlotWidget;
 class RiuPlotCurve;
 class RiuPlotItem;
 class RimPlotCurve;
+
+class caf::PdmChildArrayFieldHandle;
 
 //==================================================================================================
 ///

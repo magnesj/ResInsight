@@ -20,6 +20,8 @@
 #include "RimPlot.h"
 #include "RimTimeStepFilter.h"
 
+#include "RiuQwtPlotWidget.h"
+
 #include "cafPdmPtrField.h"
 
 #include <QDateTime>

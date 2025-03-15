@@ -42,8 +42,6 @@
 #include "cafPdmReferenceHelper.h"
 #include "cafSelectionManager.h"
 
-#include "cafPdmChildArrayField.h"
-
 namespace caf
 {
 //--------------------------------------------------------------------------------------------------

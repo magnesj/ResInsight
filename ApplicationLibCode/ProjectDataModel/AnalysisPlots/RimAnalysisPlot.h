@@ -27,6 +27,7 @@
 #include "cafPdmPtrField.h"
 
 #include <QDateTime>
+#include <QPointer>
 
 class RiuSummaryQwtPlot;
 class RiuGroupedBarChartBuilder;

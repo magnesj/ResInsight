@@ -23,7 +23,6 @@
 
 #include "Well/RigWellLogLasFile.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"

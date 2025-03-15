@@ -40,7 +40,6 @@
 #include "cafCmdExecuteCommand.h"
 #include "cafCmdFeatureManager.h"
 #include "cafCmdFieldChangeExec.h"
-#include "cafPdmChildArrayField.h"
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmReferenceHelper.h"

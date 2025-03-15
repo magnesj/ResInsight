@@ -22,7 +22,6 @@
 #include "RimCase.h"
 
 #include "cafFilePath.h"
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"

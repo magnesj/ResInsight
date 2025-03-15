@@ -24,7 +24,6 @@
 #include "RimDialogData.h"
 #include "RimProject.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafSelectionManager.h"
 
 #include <QAction>
