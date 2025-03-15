@@ -1,6 +1,6 @@
 
 #include "ManyGroups.h"
-#include "cafInternalPdmUiFieldCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafPdmUiOrdering.h"

@@ -4,6 +4,8 @@
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
 
+#include <iostream>
+
 class ManyGroups : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;

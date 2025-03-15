@@ -1,10 +1,10 @@
 #include "cafPdmXmlObjectHandle.h"
 
 #include "cafAssert.h"
+#include "cafPdmFieldHandle.h"
+#include "cafPdmObjectFactory.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmXmlFieldHandle.h"
-
-#include "cafPdmFieldHandle.h"
 
 #include <QDebug>
 #include <QXmlStreamReader>

@@ -1,6 +1,7 @@
 
 #include "ApplicationEnum.h"
-#include "cafInternalPdmUiFieldCapability.h"
+
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

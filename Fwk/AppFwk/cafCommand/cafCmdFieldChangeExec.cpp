@@ -41,6 +41,8 @@
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiOrdering.h"
 
+#include <QXmlStreamWriter>
+
 namespace caf
 {
 //--------------------------------------------------------------------------------------------------

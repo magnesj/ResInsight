@@ -1,7 +1,7 @@
 #include "Child.h"
 #include "TestObj.h"
 
-#include "cafInternalPdmUiFieldCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( Child, "Child" );
 

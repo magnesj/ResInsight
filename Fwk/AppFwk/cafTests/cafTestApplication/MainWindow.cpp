@@ -21,10 +21,10 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafFilePath.h"
-#include "cafInternalPdmUiFieldCapability.h"
 #include "cafPdmDocument.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectGroup.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmProxyValueField.h"
 #include "cafPdmPtrField.h"
 #include "cafPdmReferenceHelper.h"
