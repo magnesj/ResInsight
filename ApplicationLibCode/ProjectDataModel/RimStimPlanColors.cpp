@@ -28,6 +28,7 @@
 #include "RimRegularLegendConfig.h"
 #include "RimStimPlanFractureTemplate.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafSelectionManagerTools.h"

@@ -18,6 +18,7 @@
 
 #include "RimSEGYConvertOptions.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiLineEditor.h"
 

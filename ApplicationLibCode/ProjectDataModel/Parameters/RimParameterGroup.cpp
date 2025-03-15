@@ -29,6 +29,8 @@
 #include "RimParameterList.h"
 #include "RimStringParameter.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <cmath>
 
 CAF_PDM_SOURCE_INIT( RimParameterGroup, "ParameterGroup" );

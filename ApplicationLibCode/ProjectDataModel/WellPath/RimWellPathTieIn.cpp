@@ -30,6 +30,7 @@
 
 #include "RiuMainWindow.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLabelEditor.h"
 

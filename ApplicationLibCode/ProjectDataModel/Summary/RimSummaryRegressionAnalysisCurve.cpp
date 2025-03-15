@@ -31,6 +31,7 @@
 #include "RimSummaryPlot.h"
 #include "RimTimeAxisAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiSliderEditor.h"

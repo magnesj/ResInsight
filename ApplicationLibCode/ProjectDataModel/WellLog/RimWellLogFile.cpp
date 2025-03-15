@@ -18,6 +18,8 @@
 
 #include "RimWellLogFile.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QString>
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RimWellLogFile, "WellLogFileInterface" );

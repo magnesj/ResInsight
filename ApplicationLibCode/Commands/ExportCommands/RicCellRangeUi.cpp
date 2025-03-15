@@ -29,6 +29,7 @@
 #include "RimCase.h"
 #include "RimEclipseCase.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiSliderEditor.h"
 
 #include "cvfStructGrid.h"

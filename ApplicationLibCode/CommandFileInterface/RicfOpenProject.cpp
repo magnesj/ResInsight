@@ -24,6 +24,7 @@
 #include "RiaLogging.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QDir>
 #include <QFileInfo>

@@ -30,6 +30,8 @@
 
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "qwt_legend.h"
 #include "qwt_legend_label.h"
 #include "qwt_plot.h"

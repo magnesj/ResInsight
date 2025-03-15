@@ -18,6 +18,7 @@
 
 #include "RimCommandRouter.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimCommandRouter, "RimCommandRouter" );

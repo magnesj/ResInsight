@@ -37,6 +37,7 @@
 #include "RiuPlotMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmSettings.h"
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafPdmUiPropertyViewDialog.h"

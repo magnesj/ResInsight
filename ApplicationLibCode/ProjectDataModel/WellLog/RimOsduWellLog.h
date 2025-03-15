@@ -22,7 +22,6 @@
 
 #include "Well/RigOsduWellLogData.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"

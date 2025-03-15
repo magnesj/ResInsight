@@ -51,6 +51,7 @@
 #include "RiuSummaryVectorSelectionUi.h"
 #include "RiuTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 

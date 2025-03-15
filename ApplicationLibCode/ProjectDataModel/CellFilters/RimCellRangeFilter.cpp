@@ -28,6 +28,7 @@
 #include "RimCase.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiSliderEditor.h"
 

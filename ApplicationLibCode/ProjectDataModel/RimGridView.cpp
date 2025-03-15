@@ -56,6 +56,8 @@
 #include "cvfPart.h"
 #include "cvfScene.h"
 
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include <set>

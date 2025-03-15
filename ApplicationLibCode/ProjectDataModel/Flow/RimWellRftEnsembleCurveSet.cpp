@@ -30,6 +30,7 @@
 
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"

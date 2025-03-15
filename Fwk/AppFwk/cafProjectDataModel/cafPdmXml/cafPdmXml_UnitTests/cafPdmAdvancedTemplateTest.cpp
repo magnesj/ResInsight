@@ -3,6 +3,7 @@
 
 #include "cafAppEnum.h"
 #include "cafFilePath.h"
+#include "cafInternalPdmXmlFieldCapability.h"
 #include "cafPdmChildArrayField.h"
 #include "cafPdmDataValueField.h"
 #include "cafPdmObjectHandle.h"

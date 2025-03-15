@@ -26,6 +26,8 @@
 #include "RimWellPath.h"
 #include "RimWellPathCompletions.h"
 
+#include "cafPdmObjectImpl.h"
+
 namespace caf
 {
 template <>

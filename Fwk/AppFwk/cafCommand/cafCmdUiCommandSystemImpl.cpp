@@ -44,6 +44,7 @@
 #include "cafPdmFieldHandle.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmReferenceHelper.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafSelectionManager.h"
 
 #include <QMenu>

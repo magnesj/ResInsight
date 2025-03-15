@@ -23,6 +23,7 @@
 
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimElasticProperties, RimcElasticProperties_addPropertyScaling, "AddPropertyScaling" );
 

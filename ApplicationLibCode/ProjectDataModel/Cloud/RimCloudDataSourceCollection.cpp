@@ -30,6 +30,7 @@
 
 #include "RiuPlotMainWindowTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

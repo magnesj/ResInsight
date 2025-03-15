@@ -42,6 +42,7 @@
 #include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include <QFileInfo>

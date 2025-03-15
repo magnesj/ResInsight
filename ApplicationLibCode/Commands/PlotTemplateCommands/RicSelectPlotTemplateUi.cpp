@@ -28,6 +28,7 @@
 #include "RimProject.h"
 #include "RimSummaryPlot.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RicSelectPlotTemplateUi, "RicSelectPlotTemplateUi" );

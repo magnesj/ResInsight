@@ -46,6 +46,7 @@
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafPdmObjectHandle.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLabelEditor.h"

@@ -55,6 +55,7 @@
 #include "RimTimeStepFilter.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTableViewEditor.h"

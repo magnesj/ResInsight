@@ -1,6 +1,7 @@
 
 #include "TamComboBox.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 
 CAF_PDM_SOURCE_INIT( TamComboBox, "TamComboBox" );

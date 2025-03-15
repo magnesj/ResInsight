@@ -38,6 +38,7 @@
 #include "RimWellPathTieIn.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 

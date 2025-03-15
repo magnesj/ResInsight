@@ -33,6 +33,7 @@
 #include "RiuViewer.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTableViewEditor.h"

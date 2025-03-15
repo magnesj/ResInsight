@@ -23,6 +23,9 @@
 #include "RimViewController.h"
 #include "RimViewLinker.h"
 
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiFieldHandle.h"
+
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimPropertyFilterCollection, "RimPropertyFilterCollection" ); // Abstract class
 
 //--------------------------------------------------------------------------------------------------

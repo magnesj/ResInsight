@@ -41,6 +41,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiFieldEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include "cafFactory.h"
 

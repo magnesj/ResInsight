@@ -39,6 +39,7 @@
 #include <zgyaccess/seismicslice.h>
 #include <zgyaccess/zgy_histogram.h>
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"

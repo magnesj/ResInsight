@@ -32,6 +32,7 @@
 #include "RimWellPath.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTextEditor.h"

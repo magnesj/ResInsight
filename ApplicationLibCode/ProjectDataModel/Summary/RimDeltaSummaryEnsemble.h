@@ -21,7 +21,6 @@
 #include "RimDeltaSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"

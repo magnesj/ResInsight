@@ -28,6 +28,8 @@
 #include "RimSummaryEnsemble.h"
 #include "RimSummaryEnsembleTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimCorrelationPlotCollection, "CorrelationPlotCollection" );
 
 //--------------------------------------------------------------------------------------------------

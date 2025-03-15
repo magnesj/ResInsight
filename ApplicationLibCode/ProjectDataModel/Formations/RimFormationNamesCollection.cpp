@@ -22,6 +22,8 @@
 #include "RimCase.h"
 #include "RimFormationNames.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimFormationNamesCollection, "FormationNamesCollectionObject" );
 
 //--------------------------------------------------------------------------------------------------

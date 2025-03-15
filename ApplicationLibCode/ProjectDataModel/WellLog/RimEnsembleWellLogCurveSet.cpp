@@ -58,6 +58,7 @@
 #include "RiuTextContentFrame.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiTreeOrdering.h"
 

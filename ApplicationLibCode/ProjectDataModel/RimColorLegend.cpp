@@ -24,6 +24,7 @@
 #include "RimColorLegendItem.h"
 
 #include "cafPdmFieldReorderCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 #include <algorithm>

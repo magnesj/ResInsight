@@ -28,6 +28,7 @@
 
 #include "RiuQwtPlotCurve.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiTreeOrdering.h"

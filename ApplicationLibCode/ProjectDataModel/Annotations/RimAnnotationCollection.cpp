@@ -36,6 +36,8 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "Polygons/RimPolygonFile.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QString>
 
 CAF_PDM_SOURCE_INIT( RimAnnotationCollection, "RimAnnotationCollection" );

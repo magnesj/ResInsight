@@ -20,6 +20,7 @@
 
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicSelectViewUI, "RicSelectViewUI" );
 

@@ -32,6 +32,7 @@
 #include "RivEclipseIntersectionGrid.h"
 #include "RivFemIntersectionGrid.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RimIntersection, "RimIntersectionHandle" );

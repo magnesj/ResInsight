@@ -59,5 +59,3 @@ private:
 };
 
 } // End of namespace caf
-
-#include "cafInternalPdmXmlFieldCapability.h"

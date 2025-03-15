@@ -32,6 +32,7 @@
 #include "RiuSummaryQwtPlot.h"
 
 #include "cafPdmFieldReorderCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeViewEditor.h"

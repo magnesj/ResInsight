@@ -33,6 +33,7 @@
 #include "RiuFileDialogTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QAction>
 #include <QDir>

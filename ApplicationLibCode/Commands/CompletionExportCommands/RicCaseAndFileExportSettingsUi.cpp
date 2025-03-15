@@ -20,6 +20,7 @@
 
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 
 CAF_PDM_SOURCE_INIT( RicCaseAndFileExportSettingsUi, "RicCaseAndFileExportSettingsUi" );

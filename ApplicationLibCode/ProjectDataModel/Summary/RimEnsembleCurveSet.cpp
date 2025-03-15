@@ -68,6 +68,7 @@
 #include "RiuTextContentFrame.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiColorEditor.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"

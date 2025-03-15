@@ -19,6 +19,8 @@
 #include "RimFieldReference.h"
 #include "RimFieldQuickAccessInterface.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimFieldReference, "RimFieldReference" );
 
 //--------------------------------------------------------------------------------------------------

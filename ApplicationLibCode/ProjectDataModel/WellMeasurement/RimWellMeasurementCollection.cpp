@@ -26,6 +26,7 @@
 #include "RimWellMeasurementCurve.h"
 #include "RimWellMeasurementFilePath.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"

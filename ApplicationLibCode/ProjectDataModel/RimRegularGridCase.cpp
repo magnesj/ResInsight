@@ -26,6 +26,8 @@
 
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimRegularGridCase, "EclipseBoundingBoxCase" );
 //--------------------------------------------------------------------------------------------------
 ///

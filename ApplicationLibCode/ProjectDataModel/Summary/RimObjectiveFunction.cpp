@@ -28,6 +28,7 @@
 #include "RiaStdStringTools.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmObjectImpl.h"
 
 #include <climits>
 #include <cmath>

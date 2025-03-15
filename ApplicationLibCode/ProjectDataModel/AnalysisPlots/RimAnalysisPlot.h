@@ -24,9 +24,11 @@
 
 #include "RigEnsembleParameter.h"
 
+#include "cafPdmChildArrayField.h"
 #include "cafPdmPtrField.h"
 
 #include <QDateTime>
+#include <QPointer>
 
 class RiuSummaryQwtPlot;
 class RiuGroupedBarChartBuilder;

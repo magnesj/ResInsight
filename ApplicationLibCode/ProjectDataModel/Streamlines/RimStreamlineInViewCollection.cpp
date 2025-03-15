@@ -42,6 +42,7 @@
 
 #include "RiuViewer.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeOrdering.h"

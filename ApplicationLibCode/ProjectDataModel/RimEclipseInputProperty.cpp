@@ -26,6 +26,7 @@
 #include "RimEclipseInputCase.h"
 #include "RimEclipseResultDefinition.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiLineEditor.h"
 #include "cvfAssert.h"
 

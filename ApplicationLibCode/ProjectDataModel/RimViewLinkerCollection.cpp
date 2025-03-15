@@ -23,6 +23,7 @@
 #include "RimViewController.h"
 #include "RimViewLinker.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimViewLinkerCollection, "RimViewLinkerCollection" );

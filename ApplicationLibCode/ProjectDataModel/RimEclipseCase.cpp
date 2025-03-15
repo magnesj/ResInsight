@@ -75,11 +75,13 @@
 
 #include "cafPdmDocument.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
-
 #include "cafUtils.h"
+
 #include <QFileInfo>
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimEclipseCase, "RimReservoir" );

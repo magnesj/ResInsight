@@ -31,6 +31,7 @@
 #include "RimProject.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafProgressInfo.h"
 #include "cafUtils.h"
 

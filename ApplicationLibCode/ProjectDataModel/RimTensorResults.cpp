@@ -28,6 +28,7 @@
 #include "RigGeoMechCaseData.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

@@ -29,6 +29,7 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiPropertyViewDialog.h"
 
 #include <QAction>

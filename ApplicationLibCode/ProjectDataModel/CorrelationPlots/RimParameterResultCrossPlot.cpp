@@ -36,6 +36,7 @@
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiValueRangeEditor.h"

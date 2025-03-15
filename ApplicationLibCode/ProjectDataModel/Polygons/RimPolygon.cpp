@@ -30,6 +30,7 @@
 #include "RiuGuiTheme.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiColorEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeAttributes.h"

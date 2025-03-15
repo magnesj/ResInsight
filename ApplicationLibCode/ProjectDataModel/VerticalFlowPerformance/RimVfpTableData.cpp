@@ -25,6 +25,7 @@
 #include "RimVfpTable.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>
 

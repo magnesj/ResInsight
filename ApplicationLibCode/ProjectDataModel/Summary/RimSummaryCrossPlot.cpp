@@ -21,6 +21,8 @@
 #include "RimSummaryCurveCollection.h"
 #include "RimSummaryPlotSourceStepping.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSummaryCrossPlot, "SummaryCrossPlot" );
 
 //--------------------------------------------------------------------------------------------------

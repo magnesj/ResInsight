@@ -54,6 +54,7 @@
 
 #include "expressionparser/ExpressionParser.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"

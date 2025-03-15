@@ -23,6 +23,8 @@
 #include "RimVfpPlotCollection.h"
 #include "RimVfpTableData.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimVfpDataCollection, "RimVfpDataCollection" );
 
 //--------------------------------------------------------------------------------------------------

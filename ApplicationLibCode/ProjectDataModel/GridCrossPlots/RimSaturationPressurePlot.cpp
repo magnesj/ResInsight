@@ -34,6 +34,8 @@
 
 #include "CellFilters/RimPlotCellPropertyFilter.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSaturationPressurePlot, "RimSaturationPressurePlot" );
 
 //--------------------------------------------------------------------------------------------------

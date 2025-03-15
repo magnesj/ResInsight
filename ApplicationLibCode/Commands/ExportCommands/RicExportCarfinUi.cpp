@@ -23,6 +23,7 @@
 #include "RimEclipseCase.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafVecIjk.h"
 

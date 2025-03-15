@@ -40,6 +40,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmObjectGroup.h"
 #include "cafPdmUiEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include <QGridLayout>
 #include <QTableView>

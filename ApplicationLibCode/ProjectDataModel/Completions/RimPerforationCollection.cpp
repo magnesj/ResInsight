@@ -34,6 +34,7 @@
 #include "Riu3DMainWindowTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimPerforationCollection, "PerforationCollection" );

@@ -24,6 +24,7 @@
 
 #include "RigMainGrid.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 //--------------------------------------------------------------------------------------------------

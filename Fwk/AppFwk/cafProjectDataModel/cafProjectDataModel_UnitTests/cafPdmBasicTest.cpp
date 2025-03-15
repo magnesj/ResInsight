@@ -44,6 +44,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectGroup.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmPointer.h"
 #include "cafPdmProxyValueField.h"
 #include "cafPdmReferenceHelper.h"

@@ -27,6 +27,7 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiActionPushButtonEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"

@@ -65,6 +65,7 @@
 
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"

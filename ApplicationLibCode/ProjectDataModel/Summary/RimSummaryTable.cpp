@@ -35,6 +35,7 @@
 
 #include "RiuMatrixPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiPushButtonEditor.h"

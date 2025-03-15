@@ -21,6 +21,7 @@
 #include "RimNamedObject.h"
 
 #include "cafFilePath.h"
+#include "cafPdmChildArrayField.h"
 
 #include <memory>
 

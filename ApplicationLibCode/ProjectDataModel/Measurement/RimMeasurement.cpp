@@ -29,6 +29,9 @@
 #include "RiuViewerCommands.h"
 
 #include "RiuMainWindow.h"
+
+#include "cafPdmObjectImpl.h"
+
 #include "cvfGeometryTools.h"
 
 CAF_PDM_SOURCE_INIT( RimMeasurement, "RimMeasurement" );

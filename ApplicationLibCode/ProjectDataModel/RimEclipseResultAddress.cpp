@@ -21,6 +21,8 @@
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimEclipseResultAddress, "EclipseResultAddress" );
 
 //--------------------------------------------------------------------------------------------------

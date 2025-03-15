@@ -21,6 +21,8 @@
 #include "RiaLogging.h"
 #include "Summary/RiaSummaryDefines.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QRegularExpression>
 
 namespace caf

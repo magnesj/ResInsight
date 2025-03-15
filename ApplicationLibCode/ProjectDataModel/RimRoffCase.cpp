@@ -34,6 +34,7 @@
 #include "RimEclipseInputPropertyCollection.h"
 #include "RimReservoirCellResultsStorage.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafProgressInfo.h"
 

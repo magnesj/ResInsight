@@ -23,6 +23,7 @@
 #include "RiaLogging.h"
 
 #include "cafPdmField.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 
 #include <QFileInfo>

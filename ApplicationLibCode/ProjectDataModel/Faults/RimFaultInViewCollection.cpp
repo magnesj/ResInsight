@@ -35,6 +35,7 @@
 
 #include "cafAppEnum.h"
 #include "cafPdmFieldCvfColor.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTreeOrdering.h"

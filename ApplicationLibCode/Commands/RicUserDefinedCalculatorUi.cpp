@@ -22,6 +22,7 @@
 #include "RimUserDefinedCalculationCollection.h"
 
 #include "cafAssert.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafPdmUiPushButtonEditor.h"

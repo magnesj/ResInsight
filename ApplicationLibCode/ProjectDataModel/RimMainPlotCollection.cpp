@@ -68,6 +68,7 @@
 #include "RiuMainWindow.h"
 #include "RiuProjectPropertyView.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafProgressInfo.h"
 
 CAF_PDM_SOURCE_INIT( RimMainPlotCollection, "MainPlotCollection" );

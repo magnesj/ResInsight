@@ -27,6 +27,8 @@
 
 #include "RiaQDateTimeTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QFileInfo>
 
 //==================================================================================================

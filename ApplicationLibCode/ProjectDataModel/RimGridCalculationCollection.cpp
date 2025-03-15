@@ -22,6 +22,7 @@
 #include "RigEclipseResultAddress.h"
 #include "RimGridCalculation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

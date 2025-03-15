@@ -29,6 +29,7 @@
 #include "RivBoxIntersectionPartMgr.h"
 
 #include "cafDisplayCoordTransform.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiSliderEditor.h"

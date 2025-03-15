@@ -42,6 +42,7 @@
 #include "RiuPlotMainWindow.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmReferenceHelper.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafSelectionManager.h"
 #include "cafUtils.h"

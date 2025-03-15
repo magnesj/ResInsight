@@ -26,6 +26,7 @@
 
 #include "RicVec3dPickEventHandler.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPickableLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 

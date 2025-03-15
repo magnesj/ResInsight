@@ -24,6 +24,7 @@
 #include "RimContourMapProjection.h"
 
 #include "cafPdmChildArrayField.h"
+#include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmPtrArrayField.h"
 #include "cafPdmPtrField.h"

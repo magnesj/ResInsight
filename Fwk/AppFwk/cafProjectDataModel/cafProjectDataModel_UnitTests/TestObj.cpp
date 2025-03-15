@@ -1,5 +1,7 @@
 #include "TestObj.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( TestObj, "TestObj" );
 
 TestObj::TestObj()

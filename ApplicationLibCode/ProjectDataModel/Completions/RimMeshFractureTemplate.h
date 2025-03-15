@@ -19,7 +19,6 @@
 
 #include "RimFractureTemplate.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmFieldHandle.h"

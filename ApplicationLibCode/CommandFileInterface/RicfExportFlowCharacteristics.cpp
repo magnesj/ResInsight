@@ -29,6 +29,7 @@
 #include "RimMainPlotCollection.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QDir>
 #include <QFile>

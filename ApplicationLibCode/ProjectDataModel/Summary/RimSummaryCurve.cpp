@@ -53,6 +53,7 @@
 #include "RiuSummaryVectorSelectionDialog.h"
 
 #include "cafAssert.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"

@@ -41,6 +41,8 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimOilField, "ResInsightOilField" );
 //--------------------------------------------------------------------------------------------------
 ///

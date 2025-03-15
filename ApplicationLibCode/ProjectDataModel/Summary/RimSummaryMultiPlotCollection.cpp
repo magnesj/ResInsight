@@ -24,6 +24,7 @@
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafPdmFieldReorderCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryMultiPlotCollection, "RimSummaryMultiPlotCollection" );

@@ -31,6 +31,8 @@
 
 #include "RivSurfacePartMgr.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSurfaceInView, "SurfaceInView" );
 
 //--------------------------------------------------------------------------------------------------

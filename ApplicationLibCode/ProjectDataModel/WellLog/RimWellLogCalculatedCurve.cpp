@@ -34,6 +34,7 @@
 
 #include "RiuPlotCurve.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 

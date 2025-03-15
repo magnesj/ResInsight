@@ -28,6 +28,8 @@
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSummaryCalculationCollection, "RimSummaryCalculationCollection" );
 //--------------------------------------------------------------------------------------------------
 ///

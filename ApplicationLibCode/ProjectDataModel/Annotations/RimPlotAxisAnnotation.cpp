@@ -29,6 +29,7 @@
 #include "RiaColorTools.h"
 
 #include "cafPdmFieldCvfColor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <cmath>
 

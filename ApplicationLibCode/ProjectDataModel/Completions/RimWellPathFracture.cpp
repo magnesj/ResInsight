@@ -26,6 +26,7 @@
 #include "RimWellPath.h"
 #include "RimWellPathFractureCollection.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 

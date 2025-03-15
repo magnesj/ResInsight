@@ -25,6 +25,7 @@
 #include "RiaFieldHandleTools.h"
 #include "RiaQDateTimeTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDateEditor.h"
 
 #include <QString>

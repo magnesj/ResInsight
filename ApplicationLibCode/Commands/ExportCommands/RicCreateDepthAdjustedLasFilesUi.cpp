@@ -29,6 +29,7 @@
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"

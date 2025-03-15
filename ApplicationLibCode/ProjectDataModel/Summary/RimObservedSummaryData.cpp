@@ -21,6 +21,7 @@
 #include "RifSummaryReaderInterface.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTextEditor.h"
 
 #include <QFileInfo>

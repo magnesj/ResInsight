@@ -30,6 +30,7 @@
 #include "RimTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiSliderEditor.h"
 

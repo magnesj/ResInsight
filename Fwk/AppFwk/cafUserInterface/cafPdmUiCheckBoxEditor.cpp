@@ -42,6 +42,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiFieldEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafQShortenedLabel.h"
 
 namespace caf

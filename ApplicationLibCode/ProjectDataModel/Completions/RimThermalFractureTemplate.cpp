@@ -42,6 +42,7 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"

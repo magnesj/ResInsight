@@ -32,6 +32,7 @@
 #include "RivTernarySaturationOverlayItem.h"
 #include "RivTernaryScalarMapper.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
 

@@ -23,6 +23,7 @@
 #include "RimMainPlotCollection.h"
 #include "RimSummaryCase.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 
 //==================================================================================================

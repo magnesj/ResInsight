@@ -23,6 +23,7 @@
 
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiTextEditor.h"
 

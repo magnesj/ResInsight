@@ -22,6 +22,7 @@
 
 #include "RimPlotTemplateFileItem.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafUtils.h"
 

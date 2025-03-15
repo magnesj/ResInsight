@@ -21,6 +21,7 @@
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 

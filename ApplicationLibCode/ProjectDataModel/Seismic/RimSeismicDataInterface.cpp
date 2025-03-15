@@ -23,6 +23,9 @@
 
 #include "RigPolyLinesData.h"
 
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiFieldHandle.h"
+
 #include "cvfBoundingBox.h"
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimSeismicDataInterface, "SeismicDataInterface" ); // Abstract class.

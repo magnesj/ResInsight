@@ -64,6 +64,7 @@
 #include "RiuViewer.h"
 
 #include "caf.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QLocale>
 #include <memory>

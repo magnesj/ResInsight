@@ -25,6 +25,8 @@
 #include "RimWellLogLasFile.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmObjectImpl.h"
+
 #include "cvfAssert.h"
 
 #include <QString>

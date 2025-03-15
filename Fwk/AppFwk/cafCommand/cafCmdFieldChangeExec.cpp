@@ -38,7 +38,10 @@
 
 #include "cafNotificationCenter.h"
 #include "cafPdmReferenceHelper.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiOrdering.h"
+
+#include <QXmlStreamWriter>
 
 namespace caf
 {

@@ -27,6 +27,8 @@
 
 #include "RigFemResultAddress.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "cvfAssert.h"
 
 CAF_PDM_SOURCE_INIT( RimGeoMechPropertyFilterCollection, "GeoMechPropertyFilters" );

@@ -35,6 +35,8 @@
 #include "RimProject.h"
 #include "RimStimPlanColors.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimEclipseViewCollection, "EclipseViewCollection", "EclipseViewCollection" );
 
 //--------------------------------------------------------------------------------------------------

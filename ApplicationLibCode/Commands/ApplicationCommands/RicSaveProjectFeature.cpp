@@ -22,6 +22,8 @@
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QAction>
 
 RICF_SOURCE_INIT( RicSaveProjectFeature, "RicSaveProjectFeature", "saveProject" );

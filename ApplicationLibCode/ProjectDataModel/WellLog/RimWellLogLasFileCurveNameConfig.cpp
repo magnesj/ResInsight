@@ -18,6 +18,8 @@
 
 #include "RimWellLogLasFileCurveNameConfig.h"
 
+#include "cafPdmObjectImpl.h"
+
 //==================================================================================================
 ///
 ///

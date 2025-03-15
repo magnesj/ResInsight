@@ -40,6 +40,7 @@
 #include "cafPdmXmlObjectHandle.h"
 
 #include <QSettings>
+#include <QXmlStreamReader>
 
 namespace caf
 {

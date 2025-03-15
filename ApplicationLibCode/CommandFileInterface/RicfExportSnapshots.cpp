@@ -33,6 +33,7 @@
 #include "DockManager.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>
 

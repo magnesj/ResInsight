@@ -18,6 +18,7 @@
 
 #include "RimUserDefinedIndexFilter.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiListEditor.h"
 
 #include "cvfStructGridGeometryGenerator.h"

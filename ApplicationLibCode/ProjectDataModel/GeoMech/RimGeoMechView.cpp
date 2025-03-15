@@ -73,6 +73,7 @@
 #include "cafDisplayCoordTransform.h"
 #include "cafFrameAnimationControl.h"
 #include "cafOverlayScalarMapperLegend.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
 

@@ -49,6 +49,7 @@
 
 #include "RiuTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiCheckBoxTristateEditor.h"
 #include "cafPdmUiComboBoxEditor.h"

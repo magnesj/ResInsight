@@ -24,6 +24,7 @@
 #include "RimGridView.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 
 CAF_PDM_SOURCE_INIT( RicExportWellPathsUi, "RicExportWellPathsUi" );

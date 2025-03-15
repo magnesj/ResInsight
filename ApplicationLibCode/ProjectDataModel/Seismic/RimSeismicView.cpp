@@ -37,6 +37,7 @@
 
 #include "RivPolylinePartMgr.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include "cafDisplayCoordTransform.h"

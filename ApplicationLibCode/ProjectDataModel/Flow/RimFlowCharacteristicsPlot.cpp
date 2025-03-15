@@ -41,6 +41,7 @@
 #include "RiuFlowCharacteristicsPlot.h"
 #include "RiuMainWindow.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafUtils.h"

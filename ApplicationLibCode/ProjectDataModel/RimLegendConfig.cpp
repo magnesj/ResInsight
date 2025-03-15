@@ -20,6 +20,8 @@
 
 #include "RiaPreferences.h"
 
+#include "cafPdmUiFieldHandle.h"
+
 // NB! Special macro for pure virtual class
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimLegendConfig, "LegendConfig" );
 

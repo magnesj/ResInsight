@@ -19,6 +19,7 @@
 #include "RimPropertyFilter.h"
 
 #include "RimPropertyFilterCollection.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RimPropertyFilter, "PropertyFilter" );
 

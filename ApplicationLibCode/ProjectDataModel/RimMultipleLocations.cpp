@@ -18,6 +18,7 @@
 
 #include "RimMultipleLocations.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiListEditor.h"
 

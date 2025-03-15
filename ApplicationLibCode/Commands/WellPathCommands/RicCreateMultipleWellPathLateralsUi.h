@@ -20,7 +20,6 @@
 
 #include "RimMultipleLocations.h"
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"

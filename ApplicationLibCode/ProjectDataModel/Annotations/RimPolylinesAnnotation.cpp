@@ -18,7 +18,6 @@
 
 #include "RimPolylinesAnnotation.h"
 
-#include "QFile"
 #include "RimAnnotationCollection.h"
 #include "RimAnnotationInViewCollection.h"
 #include "RimAnnotationLineAppearance.h"
@@ -26,7 +25,10 @@
 #include "RimProject.h"
 #include "RimTools.h"
 
-#include "QFileInfo"
+#include "cafPdmObjectImpl.h"
+
+#include <QFile>
+#include <QFileInfo>
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RimPolylinesAnnotation, "RimPolylinesAnnotation" );
 

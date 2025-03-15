@@ -29,6 +29,8 @@
 #include "RimMdiWindowController.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeViewEditor.h"
 

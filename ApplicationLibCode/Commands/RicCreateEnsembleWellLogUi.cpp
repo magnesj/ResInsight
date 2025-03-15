@@ -32,6 +32,7 @@
 
 #include "cafAppEnum.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"

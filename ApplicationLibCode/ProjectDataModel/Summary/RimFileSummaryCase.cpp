@@ -36,6 +36,7 @@
 #include "RimSummaryCalculationCollection.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeOrdering.h"

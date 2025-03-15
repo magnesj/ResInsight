@@ -24,6 +24,8 @@
 #include "RimEclipseView.h"
 #include "RimIntersectionCollection.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimFaultInView, "Fault" );
 
 //--------------------------------------------------------------------------------------------------

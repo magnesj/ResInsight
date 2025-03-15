@@ -18,6 +18,8 @@
 
 #include "RimUserDefinedCalculationVariable.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimUserDefinedCalculationVariable, "RimUserDefinedCalculationVariable" );
 
 //--------------------------------------------------------------------------------------------------

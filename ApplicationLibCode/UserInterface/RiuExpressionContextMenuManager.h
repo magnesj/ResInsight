@@ -18,12 +18,11 @@
 
 #pragma once
 
-#include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
+
 #include <QAction>
 #include <QPointer>
-#include <memory>
 
 class RimSummaryCalculationVariable;
 class QTextEdit;

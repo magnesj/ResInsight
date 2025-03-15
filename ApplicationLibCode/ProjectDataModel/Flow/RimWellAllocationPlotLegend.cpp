@@ -19,6 +19,8 @@
 #include "RimWellAllocationPlotLegend.h"
 #include "RimWellAllocationPlot.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimWellAllocationPlotLegend, "WellAllocationPlotLegend" );
 
 //--------------------------------------------------------------------------------------------------

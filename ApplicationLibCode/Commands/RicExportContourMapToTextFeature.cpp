@@ -37,6 +37,7 @@
 
 #include "cafCmdFeatureManager.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafSelectionManager.h"
 #include "cafUtils.h"

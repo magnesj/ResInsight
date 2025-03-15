@@ -40,6 +40,7 @@
 #include "RimSummaryPlotAxisFormatter.h"
 
 #include "cafFontTools.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

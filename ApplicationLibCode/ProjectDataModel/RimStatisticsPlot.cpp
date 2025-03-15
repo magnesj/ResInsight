@@ -32,12 +32,13 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
-
 #include "cafPdmUiSliderEditor.h"
+
 #include "cvfAssert.h"
 
 #include <QtCharts/QBarSeries>

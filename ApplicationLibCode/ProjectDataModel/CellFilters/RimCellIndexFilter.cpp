@@ -25,6 +25,7 @@
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimCellIndexFilter, "CellIndexFilter" );

@@ -18,6 +18,7 @@
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeView.h"
 #include "cafSelectionManager.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include <QAction>
 #include <QDockWidget>

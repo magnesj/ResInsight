@@ -28,6 +28,8 @@
 
 #include "RiuExpressionContextMenuManager.h"
 
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"

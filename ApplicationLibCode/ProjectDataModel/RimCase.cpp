@@ -34,6 +34,7 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectFactory.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 #include <QFileInfo>

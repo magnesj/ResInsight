@@ -34,6 +34,7 @@
 
 #include "CompletionCommands/RicNewValveTemplateFeature.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 

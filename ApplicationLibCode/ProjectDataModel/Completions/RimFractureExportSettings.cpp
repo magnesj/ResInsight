@@ -20,6 +20,8 @@
 
 #include "RimEclipseCase.h"
 #include "RimTools.h"
+
+#include "cafPdmObjectImpl.h"
 #include "cafPdmPtrField.h"
 #include "cafPdmUiFilePathEditor.h"
 

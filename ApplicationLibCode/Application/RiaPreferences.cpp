@@ -41,6 +41,7 @@
 #include "RiuGuiTheme.h"
 
 #include "cafPdmFieldCvfColor.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmSettings.h"
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiCheckBoxEditor.h"

@@ -26,6 +26,7 @@
 
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafUtils.h"
 

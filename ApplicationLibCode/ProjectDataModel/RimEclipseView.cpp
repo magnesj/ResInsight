@@ -117,6 +117,7 @@
 #include "cafFrameAnimationControl.h"
 #include "cafOverlayScalarMapperLegend.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"

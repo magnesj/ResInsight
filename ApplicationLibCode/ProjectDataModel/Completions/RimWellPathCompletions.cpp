@@ -37,6 +37,7 @@
 
 #include "cafPdmDoubleStringValidator.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"

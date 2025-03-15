@@ -23,6 +23,8 @@
 #include "RimEclipseCase.h"
 #include "RimIdenticalGridCaseGroup.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimCaseCollection, "RimCaseCollection" );
 
 //--------------------------------------------------------------------------------------------------

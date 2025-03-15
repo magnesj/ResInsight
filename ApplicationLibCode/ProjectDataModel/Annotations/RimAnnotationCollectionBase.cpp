@@ -27,6 +27,8 @@
 #include "RimGridView.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QString>
 
 CAF_PDM_SOURCE_INIT( RimAnnotationCollectionBase, "RimAnnotationCollectionBase" );

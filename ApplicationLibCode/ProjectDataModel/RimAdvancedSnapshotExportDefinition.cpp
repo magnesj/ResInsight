@@ -31,6 +31,7 @@
 #include "RimReservoirCellResultsStorage.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmPointer.h"
 #include "cafPdmUiComboBoxEditor.h"
 

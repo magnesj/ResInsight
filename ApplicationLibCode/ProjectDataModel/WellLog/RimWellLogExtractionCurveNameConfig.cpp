@@ -18,6 +18,8 @@
 
 #include "RimWellLogExtractionCurveNameConfig.h"
 
+#include "cafPdmObjectImpl.h"
+
 //==================================================================================================
 ///
 ///

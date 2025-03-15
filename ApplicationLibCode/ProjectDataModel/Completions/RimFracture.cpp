@@ -50,7 +50,9 @@
 
 #include "cafHexGridIntersectionTools/cafHexGridIntersectionTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"

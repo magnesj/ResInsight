@@ -22,6 +22,8 @@
 #include "RimWellMeasurementCollection.h"
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimWellMeasurement, "WellMeasurement" );
 
 //--------------------------------------------------------------------------------------------------

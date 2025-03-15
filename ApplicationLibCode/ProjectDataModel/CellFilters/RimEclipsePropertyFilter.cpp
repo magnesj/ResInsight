@@ -40,6 +40,7 @@
 
 #include "RiuMainWindow.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiSliderEditor.h"

@@ -1,6 +1,7 @@
 #include "RimOsduWellPath.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimOsduWellPath, "OsduWellPath" );

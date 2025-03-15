@@ -28,6 +28,7 @@
 #include "RimWellPathValve.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include <QStringList>

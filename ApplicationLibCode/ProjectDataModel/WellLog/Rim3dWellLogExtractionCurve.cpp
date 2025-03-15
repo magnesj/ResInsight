@@ -47,6 +47,7 @@
 #include "RimWellLogLasFile.h"
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafUtils.h"
 
 #include <QFileInfo>

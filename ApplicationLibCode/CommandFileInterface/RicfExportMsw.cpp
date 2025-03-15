@@ -37,6 +37,7 @@
 #include "CompletionExportCommands/RicWellPathExportMswCompletionsImpl.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicfExportMsw, "exportMsw" );
 

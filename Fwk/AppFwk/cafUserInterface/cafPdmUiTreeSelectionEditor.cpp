@@ -38,6 +38,7 @@
 #include "cafAssert.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiCommandSystemProxy.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeSelectionQModel.h"
 
 #include <QBoxLayout>

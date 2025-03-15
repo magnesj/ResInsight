@@ -1,6 +1,7 @@
 
 #include "gtest/gtest.h"
 
+#include "cafInternalPdmXmlFieldCapability.h"
 #include "cafPdmDataValueField.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmXmlObjectHandle.h"

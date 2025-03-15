@@ -3,6 +3,8 @@
 #include "RimCase.h"
 #include "RimGeoMechContourMapView.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimGeoMechContourMapViewCollection, "GeoMech2dViewCollection" );
 
 //--------------------------------------------------------------------------------------------------

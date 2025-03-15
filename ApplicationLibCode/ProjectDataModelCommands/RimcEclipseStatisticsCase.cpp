@@ -27,6 +27,7 @@
 #include "RimEclipseStatisticsCase.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimEclipseStatisticsCase, RimcEclipseStatisticsCase_setSourceProperties, "set_source_properties" );
 

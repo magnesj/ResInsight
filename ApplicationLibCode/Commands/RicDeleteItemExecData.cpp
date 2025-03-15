@@ -19,4 +19,6 @@
 
 #include "RicDeleteItemExecData.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RicDeleteItemExecData, "RicDeleteItemExecData" );

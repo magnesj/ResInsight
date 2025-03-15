@@ -24,8 +24,9 @@
 
 #include "RiuTextContentFrame.h"
 
-#include <cafPdmUiPushButtonEditor.h>
-#include <cafPdmUiTreeOrdering.h>
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimEnsembleCurveFilterCollection, "RimEnsembleCurveFilterCollection" );
 

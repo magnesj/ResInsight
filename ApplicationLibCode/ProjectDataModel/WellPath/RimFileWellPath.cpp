@@ -7,6 +7,7 @@
 #include "RimProject.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafUtils.h"
 
 #include "QDir"

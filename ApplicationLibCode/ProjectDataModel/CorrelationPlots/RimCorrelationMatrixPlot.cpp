@@ -46,6 +46,7 @@
 #include "RiuQwtPlotTools.h"
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"

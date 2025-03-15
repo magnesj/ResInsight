@@ -39,12 +39,14 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+
 #include "cvfGeometryTools.h"
 
 CAF_PDM_SOURCE_INIT( RimWellPathGeometryDef, "WellPathGeometryDef", "WellPathGeometry" );

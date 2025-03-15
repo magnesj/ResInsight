@@ -3,6 +3,7 @@
 
 #include "cafPdmChildArrayField.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeView.h"
 
 #include <QApplication>

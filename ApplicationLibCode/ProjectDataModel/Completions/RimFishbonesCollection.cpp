@@ -28,6 +28,8 @@
 #include "RimProject.h"
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QColor>
 
 #include <algorithm>

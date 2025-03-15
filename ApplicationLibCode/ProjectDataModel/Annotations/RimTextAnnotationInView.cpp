@@ -21,6 +21,8 @@
 #include "RimAnnotationGroupCollection.h"
 #include "RimTextAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimTextAnnotationInView, "RimTextAnnotationInView" );
 
 //--------------------------------------------------------------------------------------------------

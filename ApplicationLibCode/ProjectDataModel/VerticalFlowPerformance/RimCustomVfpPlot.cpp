@@ -52,6 +52,7 @@
 #include "RiuTools.h"
 
 #include "cafColorTable.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

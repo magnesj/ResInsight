@@ -21,6 +21,7 @@
 #include "RimProject.h"
 #include "RimUserDefinedCalculation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

@@ -61,6 +61,7 @@
 #include "RimWellPathCollection.h"
 #include "RimWellPlotTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafVecIjk.h"

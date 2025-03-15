@@ -41,6 +41,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUniqueIdValidator.h"
 #include "cafSelectionManager.h"
 #include "cafUiAppearanceSettings.h"

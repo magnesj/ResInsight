@@ -44,6 +44,7 @@
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiDragDropInterface.h"
 #include "cafPdmUiEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeViewItemDelegate.h"
 #include "cafPdmUiTreeViewQModel.h"

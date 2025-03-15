@@ -35,6 +35,7 @@
 #include "CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>
 

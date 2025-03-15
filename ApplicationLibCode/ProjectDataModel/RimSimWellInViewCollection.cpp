@@ -46,6 +46,7 @@
 
 #include "RivReservoirViewPartMgr.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxTristateEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"

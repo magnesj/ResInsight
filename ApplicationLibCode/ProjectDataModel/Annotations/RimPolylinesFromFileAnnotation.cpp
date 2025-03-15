@@ -25,6 +25,7 @@
 #include "RimAnnotationCollection.h"
 #include "RimAnnotationLineAppearance.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 
 #include <QFile>

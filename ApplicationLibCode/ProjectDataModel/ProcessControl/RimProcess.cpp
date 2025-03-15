@@ -22,6 +22,7 @@
 #include "RimProcessMonitor.h"
 
 #include "cafPdmFieldCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QApplication>
 #include <QProcess>

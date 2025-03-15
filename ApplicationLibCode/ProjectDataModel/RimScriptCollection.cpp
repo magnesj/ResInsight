@@ -23,6 +23,7 @@
 #include "RimCalcScript.h"
 #include "RiuMainWindow.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafUtils.h"
 

@@ -22,6 +22,7 @@
 #include "RimEclipseCaseTools.h"
 #include "RimEclipseResultDefinition.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 

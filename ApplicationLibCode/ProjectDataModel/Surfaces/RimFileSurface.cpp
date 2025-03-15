@@ -29,6 +29,7 @@
 #include "RigTriangleMeshData.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 #include <QFileInfo>

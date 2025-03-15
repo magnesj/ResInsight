@@ -20,6 +20,8 @@
 
 #include "RiaFieldHandleTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimOsduWellLogChannel, "OsduWellLogChannel" );
 
 //--------------------------------------------------------------------------------------------------

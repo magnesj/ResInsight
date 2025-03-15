@@ -27,6 +27,7 @@
 #include "RimSummaryMultiPlot.h"
 #include "RimSummaryPlot.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiLineEditor.h"

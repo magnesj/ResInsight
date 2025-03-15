@@ -33,6 +33,7 @@
 #include "RimWellPathValve.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"

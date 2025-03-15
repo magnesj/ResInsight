@@ -21,6 +21,7 @@
 #include "RimGridStatisticsPlot.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimGridStatisticsPlotCollection, "GridStatisticsPlotCollection" );

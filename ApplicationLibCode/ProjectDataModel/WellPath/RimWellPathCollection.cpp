@@ -66,6 +66,7 @@
 #include "cafDataLoadController.h"
 #include "cafDataLoader.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiEditorHandle.h"
 #include "cafPdmUiTreeOrdering.h"

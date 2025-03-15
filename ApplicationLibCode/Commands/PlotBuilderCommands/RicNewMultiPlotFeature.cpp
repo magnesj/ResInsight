@@ -26,6 +26,7 @@
 
 #include "RiuPlotMainWindowTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafSelectionManager.h"
 #include "cvfAssert.h"
 

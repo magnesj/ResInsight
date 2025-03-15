@@ -26,6 +26,7 @@
 
 #include "PlotTemplates/RimPlotTemplateFileItem.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiListEditor.h"

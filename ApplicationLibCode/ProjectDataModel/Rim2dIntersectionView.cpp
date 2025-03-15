@@ -49,6 +49,7 @@
 #include "RivWellPathPartMgr.h"
 
 #include "cafDisplayCoordTransform.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include "cvfModelBasicList.h"

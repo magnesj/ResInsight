@@ -21,6 +21,8 @@
 #include "RimAnnotationGroupCollection.h"
 #include "RimReachCircleAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimReachCircleAnnotationInView, "RimReachCircleAnnotationInView" );
 
 //--------------------------------------------------------------------------------------------------

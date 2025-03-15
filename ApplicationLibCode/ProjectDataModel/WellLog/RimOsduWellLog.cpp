@@ -26,6 +26,8 @@
 #include "RimWellPathCollection.h"
 #include "RimWellPlotTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QString>
 
 CAF_PDM_SOURCE_INIT( RimOsduWellLog, "OsduWellLog" );

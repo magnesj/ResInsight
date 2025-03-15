@@ -38,7 +38,7 @@
 
 #include "cafCmdExecCommandManager.h"
 #include "cafCmdSelectionChangeExec.h"
-
+#include "cafPdmReferenceHelper.h"
 #include "cafSelectionManager.h"
 
 namespace caf

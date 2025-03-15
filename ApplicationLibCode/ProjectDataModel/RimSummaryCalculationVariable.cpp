@@ -34,6 +34,7 @@
 #include "RiuDragDrop.h"
 #include "RiuSummaryVectorSelectionDialog.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 

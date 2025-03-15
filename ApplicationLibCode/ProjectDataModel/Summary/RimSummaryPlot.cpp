@@ -74,6 +74,7 @@
 #include "cvfColor3.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafSelectionManager.h"

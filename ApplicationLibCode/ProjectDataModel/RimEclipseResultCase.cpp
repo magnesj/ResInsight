@@ -59,6 +59,7 @@
 #include "RimTimeStepFilter.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiPropertyViewDialog.h"

@@ -58,7 +58,10 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapabilityCvfColor3.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmUiFieldHandle.h"
+
 #include "cvfCamera.h"
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"

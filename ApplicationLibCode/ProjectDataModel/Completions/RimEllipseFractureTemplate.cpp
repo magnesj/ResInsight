@@ -38,7 +38,7 @@
 #include "RimProject.h"
 #include "RimStimPlanColors.h"
 
-#include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 
 #include "cvfGeometryTools.h"
 #include "cvfVector3.h"

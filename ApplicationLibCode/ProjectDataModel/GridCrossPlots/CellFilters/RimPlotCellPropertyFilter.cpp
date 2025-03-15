@@ -30,6 +30,7 @@
 #include "RimEclipseResultDefinition.h"
 #include "RimGeoMechResultDefinition.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 
 #include <algorithm>

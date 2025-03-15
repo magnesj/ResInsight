@@ -23,6 +23,8 @@
 #include "RimExtrudedCurveIntersection.h"
 #include "RimGridView.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( Rim2dIntersectionViewCollection, "Intersection2dViewCollection" );
 
 //--------------------------------------------------------------------------------------------------

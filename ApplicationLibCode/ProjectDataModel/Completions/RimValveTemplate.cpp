@@ -21,6 +21,7 @@
 #include "RimWellPathAicdParameters.h"
 #include "RimWellPathValve.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include "opm/input/eclipse/Parser/ParserKeywords/W.hpp"

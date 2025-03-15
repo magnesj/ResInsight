@@ -20,6 +20,8 @@
 
 #include "RimCellEdgeColors.h"
 
+#include "RiaLogging.h"
+
 #include "RicCreateEnsembleWellLogUi.h"
 
 #include "RigCaseCellResultsData.h"
@@ -31,12 +33,12 @@
 #include "RimRegularLegendConfig.h"
 #include "RimReservoirCellResultsStorage.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include "cvfMath.h"
 
-#include "RiaLogging.h"
 #include <array>
 
 namespace caf

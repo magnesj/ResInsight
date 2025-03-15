@@ -25,6 +25,7 @@
 #include "RimPolygon.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeAttributes.h"
 
 #include <QFileInfo>

@@ -22,6 +22,7 @@
 #include "RimVfpTable.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RimVfpPlotCollection, "RimVfpPlotCollection" );
 

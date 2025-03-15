@@ -37,6 +37,7 @@
 #include "RimSummaryMultiPlotCollection.h"
 #include "RimSummaryPlot.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 
 #include "expressionparser/ExpressionParser.h"
