@@ -41,6 +41,8 @@
 
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimStatisticsContourMapView, "RimStatisticsContourMapView" );
 

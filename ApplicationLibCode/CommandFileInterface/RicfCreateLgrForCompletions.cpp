@@ -38,6 +38,7 @@
 
 #include "cafCmdFeatureManager.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QStringList>
 

@@ -33,6 +33,7 @@
 #include "H5Cpp.h"
 #endif
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 
 #include <QDir>

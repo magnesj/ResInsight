@@ -33,6 +33,8 @@
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QPaintDevice>
 #include <QRegularExpression>

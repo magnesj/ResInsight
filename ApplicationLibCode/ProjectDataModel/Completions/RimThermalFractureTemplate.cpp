@@ -45,6 +45,8 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfMath.h"
 #include "cvfVector3.h"

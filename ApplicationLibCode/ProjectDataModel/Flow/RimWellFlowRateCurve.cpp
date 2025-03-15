@@ -30,6 +30,8 @@
 
 #include "RiaColorTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "qwt_plot.h"
 
 #include <QPen>

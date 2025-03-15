@@ -24,6 +24,8 @@
 #include "RimValveTemplateCollection.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfAssert.h"
 

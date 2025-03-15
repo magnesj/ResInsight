@@ -22,6 +22,7 @@
 #include "RiuPlotMainWindow.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicfSetPlotWindowSize, "setPlotWindowSize" );
 

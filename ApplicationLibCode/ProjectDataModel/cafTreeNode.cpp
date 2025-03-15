@@ -19,6 +19,8 @@
 #include "cafTreeNode.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( cafTreeNode, "cafTreeNode" );
 

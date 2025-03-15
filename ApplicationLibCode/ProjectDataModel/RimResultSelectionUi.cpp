@@ -24,6 +24,8 @@
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimResultSelectionUi, "RimResultSelectionUi" );
 

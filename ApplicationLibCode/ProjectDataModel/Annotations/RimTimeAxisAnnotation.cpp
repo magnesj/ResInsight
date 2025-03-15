@@ -27,6 +27,8 @@
 
 #include "RiuGuiTheme.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QDateTime>
 
 #include <cmath>

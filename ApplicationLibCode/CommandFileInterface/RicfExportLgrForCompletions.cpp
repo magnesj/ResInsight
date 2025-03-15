@@ -36,6 +36,7 @@
 #include "RiaWellNameComparer.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QStringList>
 

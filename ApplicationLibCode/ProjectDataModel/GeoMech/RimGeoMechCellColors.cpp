@@ -24,6 +24,8 @@
 #include "RimViewController.h"
 #include "RimViewLinker.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimGeoMechCellColors, "GeoMechResultSlot" );
 
 //--------------------------------------------------------------------------------------------------

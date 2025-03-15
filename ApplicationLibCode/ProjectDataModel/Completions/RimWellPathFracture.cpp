@@ -28,6 +28,8 @@
 
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimWellPathFracture, "WellPathFracture" );
 

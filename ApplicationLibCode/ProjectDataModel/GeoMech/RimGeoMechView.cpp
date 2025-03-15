@@ -75,6 +75,8 @@
 #include "cafOverlayScalarMapperLegend.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"

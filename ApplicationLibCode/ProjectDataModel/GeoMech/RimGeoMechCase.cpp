@@ -60,6 +60,8 @@
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfVector3.h"
 

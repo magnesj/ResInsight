@@ -23,6 +23,8 @@
 #include "RiuPlotCurve.h"
 #include "RiuPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimGridCrossPlotCurve, "GridCrossPlotCurve" );
 
 //--------------------------------------------------------------------------------------------------

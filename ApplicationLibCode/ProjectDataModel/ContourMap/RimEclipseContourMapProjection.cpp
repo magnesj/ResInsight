@@ -35,6 +35,8 @@
 #include "RimEclipseView.h"
 #include "RimRegularLegendConfig.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <algorithm>
 
 CAF_PDM_SOURCE_INIT( RimEclipseContourMapProjection, "RimEclipseContourMapProjection" );

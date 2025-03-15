@@ -25,6 +25,9 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiLineEditor.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 #include <limits>
 

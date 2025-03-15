@@ -49,6 +49,8 @@
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 namespace caf
 {

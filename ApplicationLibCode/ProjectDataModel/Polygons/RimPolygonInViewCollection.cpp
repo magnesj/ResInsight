@@ -25,6 +25,8 @@
 #include "RimPolygonInView.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimPolygonInViewCollection, "RimPolygonInViewCollection" );
 
 //--------------------------------------------------------------------------------------------------

@@ -42,6 +42,8 @@
 #include "cafFontTools.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_plot.h"
 #include "qwt_plot_barchart.h"

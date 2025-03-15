@@ -41,6 +41,8 @@
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFile>
 

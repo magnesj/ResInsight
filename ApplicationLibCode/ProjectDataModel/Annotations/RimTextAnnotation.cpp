@@ -34,6 +34,9 @@
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 #include <QAction>
 #include <QPointer>

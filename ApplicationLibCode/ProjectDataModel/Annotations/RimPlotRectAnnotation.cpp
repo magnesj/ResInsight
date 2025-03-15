@@ -22,6 +22,8 @@
 #include "RimTools.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <cmath>
 

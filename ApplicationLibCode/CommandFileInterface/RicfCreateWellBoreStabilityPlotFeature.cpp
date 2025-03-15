@@ -29,6 +29,7 @@
 #include "RimWellPath.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QAction>
 

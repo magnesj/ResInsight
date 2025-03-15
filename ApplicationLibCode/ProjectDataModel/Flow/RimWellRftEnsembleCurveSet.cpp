@@ -33,6 +33,8 @@
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFrame>
 

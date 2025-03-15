@@ -22,6 +22,8 @@
 
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <cstdlib>
 
 CAF_PDM_SOURCE_INIT( RimFishbonesPipeProperties, "FishbonesPipeProperties" );

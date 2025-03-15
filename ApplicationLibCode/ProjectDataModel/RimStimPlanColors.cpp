@@ -31,6 +31,8 @@
 #include "cafPdmUiItem.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafSelectionManagerTools.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfqtUtils.h"
 

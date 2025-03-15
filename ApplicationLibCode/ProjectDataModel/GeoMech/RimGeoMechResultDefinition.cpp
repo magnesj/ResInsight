@@ -50,6 +50,8 @@
 
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDoubleValidator>
 

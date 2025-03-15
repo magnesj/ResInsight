@@ -34,6 +34,8 @@
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDateTime>
 

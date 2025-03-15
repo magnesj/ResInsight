@@ -20,6 +20,10 @@
 #include "RimGridCrossPlot.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
+
+
+
 CAF_PDM_SOURCE_INIT( RimGridCrossPlotCollection, "RimGridCrossPlotCollection" );
 
 //--------------------------------------------------------------------------------------------------

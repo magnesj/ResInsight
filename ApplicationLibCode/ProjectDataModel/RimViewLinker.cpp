@@ -46,7 +46,9 @@
 #include "RiuViewer.h"
 
 #include "cafIconProvider.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
+
 #include "cvfCamera.h"
 #include "cvfScene.h"
 

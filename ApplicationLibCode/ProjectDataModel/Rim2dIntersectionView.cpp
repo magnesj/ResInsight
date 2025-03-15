@@ -50,6 +50,8 @@
 
 #include "cafDisplayCoordTransform.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"

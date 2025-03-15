@@ -20,6 +20,7 @@
 
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <cmath>
 

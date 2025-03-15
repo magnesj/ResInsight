@@ -29,6 +29,8 @@
 
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QAction>
 

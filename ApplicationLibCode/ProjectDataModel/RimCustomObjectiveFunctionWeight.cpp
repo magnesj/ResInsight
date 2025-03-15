@@ -31,6 +31,8 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimCustomObjectiveFunctionWeight, "RimCustomObjectiveFunctionWeight" );
 

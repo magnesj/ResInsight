@@ -124,7 +124,9 @@
 #include "cafCmdFeature.h"
 #include "cafCmdFeatureManager.h"
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
+
 #include "cvfBoundingBox.h"
 
 #include <QDebug>

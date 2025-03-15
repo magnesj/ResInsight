@@ -51,6 +51,8 @@
 #include "RiuViewer.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QMessageBox>
 

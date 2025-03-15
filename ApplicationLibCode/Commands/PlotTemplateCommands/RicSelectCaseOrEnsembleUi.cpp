@@ -24,6 +24,8 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RicSelectCaseOrEnsembleUi, "RicSelectCaseOrEnsembleUi" );
 
 //--------------------------------------------------------------------------------------------------

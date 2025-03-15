@@ -33,6 +33,8 @@
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafSelectionManagerTools.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfBoundingBox.h"
 

@@ -30,9 +30,11 @@
 
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiSliderEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include "cvfAssert.h"
 #include "cvfStructGrid.h"
+
 
 CAF_PDM_SOURCE_INIT( RimCellRangeFilter, "CellRangeFilter" );
 

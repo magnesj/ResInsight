@@ -32,6 +32,8 @@
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 namespace caf
 {

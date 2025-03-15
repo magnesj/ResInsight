@@ -24,9 +24,9 @@
 #include "RimProject.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>
-
 CAF_PDM_SOURCE_INIT( RicfImportFormationNames, "importFormationNames" );
 
 //--------------------------------------------------------------------------------------------------

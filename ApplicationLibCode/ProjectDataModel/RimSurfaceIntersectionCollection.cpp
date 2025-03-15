@@ -21,6 +21,8 @@
 #include "RimSurfaceIntersectionBand.h"
 #include "RimSurfaceIntersectionCurve.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSurfaceIntersectionCollection, "RimSurfaceIntersectionCollection" );
 
 //--------------------------------------------------------------------------------------------------

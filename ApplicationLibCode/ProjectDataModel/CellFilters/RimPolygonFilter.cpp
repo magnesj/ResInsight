@@ -44,6 +44,8 @@
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <limits>
 

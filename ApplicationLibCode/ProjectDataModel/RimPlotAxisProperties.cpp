@@ -29,6 +29,8 @@
 
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfVector2.h"
 

@@ -16,7 +16,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 #include "RicSaveMultiPlotTemplateFeatureSettings.h"
+
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RicSaveMultiPlotTemplateFeatureSettings, "RicSaveMultiPlotTemplateFeatureSettings" );
 

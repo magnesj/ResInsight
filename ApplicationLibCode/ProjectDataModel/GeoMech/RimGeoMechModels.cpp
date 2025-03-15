@@ -28,6 +28,8 @@
 #include "RimIntersectionResultDefinition.h"
 #include "RimIntersectionResultsDefinitionCollection.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimGeoMechModels, "ResInsightGeoMechModels" );
 //--------------------------------------------------------------------------------------------------
 ///

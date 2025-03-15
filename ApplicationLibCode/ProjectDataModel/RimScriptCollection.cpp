@@ -25,6 +25,8 @@
 
 #include "cafPdmUiFilePathEditor.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDir>
 

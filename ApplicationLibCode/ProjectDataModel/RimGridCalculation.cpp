@@ -57,6 +57,8 @@
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QCheckBox>
 #include <QMessageBox>

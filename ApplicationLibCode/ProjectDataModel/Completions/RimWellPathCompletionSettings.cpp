@@ -28,6 +28,8 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 namespace caf
 {

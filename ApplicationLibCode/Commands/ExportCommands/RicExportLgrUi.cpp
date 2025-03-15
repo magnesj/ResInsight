@@ -26,6 +26,7 @@
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafVecIjk.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicExportLgrUi, "RicExportLgrUi" );
 

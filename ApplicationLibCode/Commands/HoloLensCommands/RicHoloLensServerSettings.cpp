@@ -18,6 +18,8 @@
 
 #include "RicHoloLensServerSettings.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RicHoloLensServerSettings, "RicHoloLensServerSettings" );
 
 //--------------------------------------------------------------------------------------------------

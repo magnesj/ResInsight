@@ -20,6 +20,8 @@
 #include "RimPolylinePickerInterface.h"
 
 #include "cafPdmUiCheckBoxEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <cmath>
 

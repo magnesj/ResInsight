@@ -55,6 +55,9 @@
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
+
 #include "cvfBoundingBox.h"
 #include "cvfGeometryTools.h"
 

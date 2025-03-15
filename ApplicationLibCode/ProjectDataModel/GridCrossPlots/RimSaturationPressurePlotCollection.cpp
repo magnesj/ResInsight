@@ -27,6 +27,8 @@
 #include "RimProject.h"
 #include "RimSaturationPressurePlot.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimSaturationPressurePlotCollection, "RimSaturationPressurePlotCollection" );
 
 //--------------------------------------------------------------------------------------------------

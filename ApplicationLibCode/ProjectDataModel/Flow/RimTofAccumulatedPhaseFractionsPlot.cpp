@@ -35,6 +35,8 @@
 #include "RiuTofAccumulatedPhaseFractionsPlot.h"
 #include "RiuWellAllocationPlot.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "cvfColor3.h"
 
 CAF_PDM_SOURCE_INIT( RimTofAccumulatedPhaseFractionsPlot, "TofAccumulatedPhaseFractionsPlot" );

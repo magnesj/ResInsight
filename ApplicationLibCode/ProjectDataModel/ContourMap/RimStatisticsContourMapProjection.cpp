@@ -33,6 +33,8 @@
 #include "RimStatisticsContourMap.h"
 #include "RimStatisticsContourMapView.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <memory>
 
 CAF_PDM_SOURCE_INIT( RimStatisticsContourMapProjection, "RimStatisticsContourMapProjection" );

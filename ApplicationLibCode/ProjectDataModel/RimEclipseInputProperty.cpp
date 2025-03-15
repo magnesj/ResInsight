@@ -28,6 +28,8 @@
 
 #include "cafPdmUiLineEditor.h"
 #include "cvfAssert.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QString>
 

@@ -21,6 +21,10 @@
 #include "RimEclipseResultCase.h"
 #include "RimEclipseResultDefinition.h"
 
+#include "cafPdmObjectImpl.h"
+
+
+
 CAF_PDM_SOURCE_INIT( RimPlotCellFilterCollection, "RimPlotCellFilterCollection" );
 
 //--------------------------------------------------------------------------------------------------

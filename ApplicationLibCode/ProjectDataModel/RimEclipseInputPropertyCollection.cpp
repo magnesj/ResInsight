@@ -22,6 +22,8 @@
 
 #include "RimEclipseInputProperty.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <QFileInfo>
 
 CAF_PDM_SOURCE_INIT( RimEclipseInputPropertyCollection, "RimInputPropertyCollection" );

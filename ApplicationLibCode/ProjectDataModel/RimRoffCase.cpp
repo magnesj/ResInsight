@@ -36,6 +36,8 @@
 
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDir>
 #include <QFileInfo>

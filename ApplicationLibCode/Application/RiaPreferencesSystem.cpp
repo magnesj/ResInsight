@@ -23,6 +23,7 @@
 
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
 
 namespace caf
 {

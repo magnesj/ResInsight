@@ -33,9 +33,10 @@
 #include "RimTextAnnotationInView.h"
 #include "RimUserDefinedPolylinesAnnotation.h"
 
-#include <cvfBoundingBox.h>
+#include "cvfBoundingBox.h"
 
-#include <cafPdmUiDoubleSliderEditor.h>
+#include "cafPdmObjectImpl.h"
+#include "cafPdmUiDoubleSliderEditor.h"
 
 //--------------------------------------------------------------------------------------------------
 /// Internal function

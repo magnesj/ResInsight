@@ -34,6 +34,7 @@
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QDialog>
 #include <QTextEdit>

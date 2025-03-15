@@ -30,6 +30,8 @@
 #include "cafAppEnum.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimTensorResults, "RimTensorResults" );
 

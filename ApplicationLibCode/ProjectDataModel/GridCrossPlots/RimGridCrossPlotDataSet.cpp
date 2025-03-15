@@ -65,6 +65,8 @@
 #include "cafTitledOverlayFrame.h"
 
 #include "cvfScalarMapper.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QString>
 

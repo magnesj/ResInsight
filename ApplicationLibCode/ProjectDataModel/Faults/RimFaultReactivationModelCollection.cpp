@@ -32,6 +32,7 @@
 #include "cvfModelBasicList.h"
 
 #include "cafDisplayCoordTransform.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RimFaultReactivationModelCollection, "FaultReactivationModelCollection" );
 

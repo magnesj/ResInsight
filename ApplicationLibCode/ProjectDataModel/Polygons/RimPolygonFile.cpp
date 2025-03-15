@@ -26,6 +26,8 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

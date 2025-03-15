@@ -21,6 +21,8 @@
 #include "RimEclipseResultAddress.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimEclipseResultAddressCollection, "RimEclipseResultAddressCollection" );
 

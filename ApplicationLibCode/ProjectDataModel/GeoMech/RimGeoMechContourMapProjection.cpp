@@ -38,6 +38,8 @@
 #include "RivFemElmVisibilityCalculator.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfArray.h"
 #include "cvfStructGridGeometryGenerator.h"

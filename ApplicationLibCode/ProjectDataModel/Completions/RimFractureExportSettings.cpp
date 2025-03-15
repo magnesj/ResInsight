@@ -20,8 +20,11 @@
 
 #include "RimEclipseCase.h"
 #include "RimTools.h"
+
 #include "cafPdmPtrField.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimFractureExportSettings, "RimFractureExportSettings" );
 

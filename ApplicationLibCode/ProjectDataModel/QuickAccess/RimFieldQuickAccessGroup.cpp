@@ -22,6 +22,8 @@
 
 #include "RiaLogging.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimFieldQuickAccessGroup, "RimFieldQuickAccessGroup" );
 
 //--------------------------------------------------------------------------------------------------

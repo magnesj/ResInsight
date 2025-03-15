@@ -22,7 +22,8 @@
 #include "RimProject.h"
 #include "RimWellPathFracture.h"
 
-#include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimWellPathFractureCollection, "WellPathFractureCollection" );
 

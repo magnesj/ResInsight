@@ -23,6 +23,8 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RicCreateEnsembleSurfaceUi, "RicCreateEnsembleSurfaceUi" );
 

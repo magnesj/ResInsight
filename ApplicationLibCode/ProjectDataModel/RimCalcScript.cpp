@@ -24,6 +24,8 @@
 
 #include "cafPdmField.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFileInfo>
 

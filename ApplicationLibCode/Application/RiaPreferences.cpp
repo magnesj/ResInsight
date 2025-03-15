@@ -49,6 +49,7 @@
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QCoreApplication>
 #include <QDate>

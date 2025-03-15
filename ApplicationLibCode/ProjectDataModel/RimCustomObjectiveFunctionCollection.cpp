@@ -20,7 +20,10 @@
 
 #include "RimCustomObjectiveFunction.h"
 
-#include <cafPdmUiTreeOrdering.h>
+#include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 CAF_PDM_SOURCE_INIT( RimCustomObjectiveFunctionCollection, "RimCustomObjectiveFunctionCollection" );
 

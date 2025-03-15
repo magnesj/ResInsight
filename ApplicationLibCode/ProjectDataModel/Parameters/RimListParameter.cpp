@@ -18,6 +18,8 @@
 
 #include "RimListParameter.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include <cmath>
 
 CAF_PDM_SOURCE_INIT( RimListParameter, "ListParameter" );

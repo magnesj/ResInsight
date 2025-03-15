@@ -21,6 +21,10 @@
 #include "RimProject.h"
 #include "RimValveTemplate.h"
 
+#include "cafPdmObjectImpl.h"
+
+
+
 CAF_PDM_SOURCE_INIT( RimValveTemplateCollection, "ValveTemplateCollection" );
 
 //--------------------------------------------------------------------------------------------------

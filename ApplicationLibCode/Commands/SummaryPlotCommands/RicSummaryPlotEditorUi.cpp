@@ -53,6 +53,8 @@
 
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QInputDialog>
 #include <QMessageBox>

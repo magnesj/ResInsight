@@ -32,6 +32,8 @@
 
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfAssert.h"
 

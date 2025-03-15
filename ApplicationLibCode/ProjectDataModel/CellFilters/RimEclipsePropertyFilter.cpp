@@ -44,6 +44,8 @@
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeAttributes.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfAssert.h"
 

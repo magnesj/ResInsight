@@ -36,6 +36,8 @@
 #include "RiuQwtPlotTools.h"
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "qwt_legend.h"
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"

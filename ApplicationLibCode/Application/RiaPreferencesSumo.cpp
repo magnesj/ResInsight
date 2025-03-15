@@ -20,6 +20,7 @@
 
 #include "RiaPreferences.h"
 #include "RiaPreferencesSumo.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesSumo, "RiaPreferencesSumo" );
 

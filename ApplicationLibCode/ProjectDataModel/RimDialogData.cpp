@@ -30,6 +30,8 @@
 #include "RicCreateEnsembleSurfaceUi.h"
 #include "RicCreateEnsembleWellLogUi.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimDialogData, "RimDialogData" );
 
 //--------------------------------------------------------------------------------------------------

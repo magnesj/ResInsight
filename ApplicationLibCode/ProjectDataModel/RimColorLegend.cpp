@@ -25,6 +25,8 @@
 
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <algorithm>
 

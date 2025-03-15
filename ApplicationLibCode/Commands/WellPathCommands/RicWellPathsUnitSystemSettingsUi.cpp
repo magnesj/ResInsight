@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RicWellPathsUnitSystemSettingsUi.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicWellPathsUnitSystemSettingsUi, "RicWellPathsUnitSystemSettingsUi" );
 

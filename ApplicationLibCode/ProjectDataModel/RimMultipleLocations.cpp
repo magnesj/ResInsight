@@ -20,6 +20,8 @@
 
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiListEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <cmath>
 

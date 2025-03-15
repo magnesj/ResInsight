@@ -49,6 +49,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfScalarMapper.h"
 

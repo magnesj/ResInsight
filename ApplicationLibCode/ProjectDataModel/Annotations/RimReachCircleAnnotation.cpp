@@ -28,6 +28,8 @@
 
 #include "cafPdmUiPickableLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimReachCircleAnnotation, "RimReachCircleAnnotation" );
 

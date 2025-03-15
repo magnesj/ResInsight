@@ -51,6 +51,8 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfBoundingBox.h"
 

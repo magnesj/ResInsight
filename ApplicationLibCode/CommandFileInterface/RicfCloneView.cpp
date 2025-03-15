@@ -15,6 +15,7 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafSelectionManager.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QAction>
 

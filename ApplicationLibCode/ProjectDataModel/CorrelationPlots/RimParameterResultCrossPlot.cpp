@@ -39,6 +39,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiValueRangeEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "qwt_picker_machine.h"
 #include "qwt_plot.h"

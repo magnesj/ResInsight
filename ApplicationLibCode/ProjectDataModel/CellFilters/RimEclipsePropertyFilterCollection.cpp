@@ -31,6 +31,8 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiEditorHandle.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimEclipsePropertyFilterCollection, "CellPropertyFilters" );
 

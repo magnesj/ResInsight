@@ -41,6 +41,9 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 #include <cmath>
 

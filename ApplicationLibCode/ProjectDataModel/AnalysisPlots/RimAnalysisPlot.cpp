@@ -57,6 +57,8 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <cmath>
 #include <limits>

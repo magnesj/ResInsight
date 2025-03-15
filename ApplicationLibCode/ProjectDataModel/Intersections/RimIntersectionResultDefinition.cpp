@@ -37,6 +37,8 @@
 #include "RiuViewer.h"
 
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimIntersectionResultDefinition, "IntersectionResultDefinition" );
 

@@ -35,6 +35,8 @@
 
 #include "cafAssert.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QDebug>
 #include <QImage>

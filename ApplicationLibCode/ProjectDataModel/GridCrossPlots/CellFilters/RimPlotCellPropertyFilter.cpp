@@ -31,6 +31,9 @@
 #include "RimGeoMechResultDefinition.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 #include <algorithm>
 

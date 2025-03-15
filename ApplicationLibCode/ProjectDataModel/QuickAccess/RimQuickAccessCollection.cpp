@@ -28,6 +28,7 @@
 #include "RimProject.h"
 
 #include "cafAssert.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RimQuickAccessCollection, "RimQuickAccessCollection" );
 

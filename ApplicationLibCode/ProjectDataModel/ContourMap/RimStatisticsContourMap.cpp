@@ -56,6 +56,8 @@
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <limits>
 #include <set>

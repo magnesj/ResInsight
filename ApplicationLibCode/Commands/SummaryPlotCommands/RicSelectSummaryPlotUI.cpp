@@ -27,6 +27,8 @@
 #include "RimSummaryMultiPlotCollection.h"
 #include "RimSummaryPlot.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RicSelectSummaryPlotUI, "RicSelectSummaryPlotUI" );
 
 //--------------------------------------------------------------------------------------------------

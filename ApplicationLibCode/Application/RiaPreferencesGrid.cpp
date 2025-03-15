@@ -22,7 +22,9 @@
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesGrid, "RifReaderSettings" );
 

@@ -64,6 +64,8 @@
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafProgressInfo.h"
 #include "cafUtils.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QApplication>
 #include <QDir>

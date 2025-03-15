@@ -49,6 +49,7 @@
 #include "FractureCommands/RicNewStimPlanFractureTemplateFeature.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiToolButtonEditor.h"

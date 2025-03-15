@@ -32,6 +32,7 @@
 #include "RimTools.h"
 
 #include "cafProgressInfo.h"
+#include "cafPdmObjectImpl.h"
 #include "cafUtils.h"
 
 #include "cvfGeometryTools.h"

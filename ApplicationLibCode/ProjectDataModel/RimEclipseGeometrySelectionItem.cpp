@@ -31,6 +31,8 @@
 
 #include "Riu3dSelectionManager.h"
 
+#include "cafPdmObjectImpl.h"
+
 CAF_PDM_SOURCE_INIT( RimEclipseGeometrySelectionItem, "EclipseGeometrySelectionItem" );
 
 //--------------------------------------------------------------------------------------------------

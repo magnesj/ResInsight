@@ -38,6 +38,8 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiGroup.h"
+#include "cafPdmObjectImpl.h"
+
 
 CAF_PDM_SOURCE_INIT( RimWellBoreStabilityPlot, "WellBoreStabilityPlot" );
 

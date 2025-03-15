@@ -34,6 +34,7 @@
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmObjectImpl.h"
 
 #include <QDir>
 #include <QFileInfo>

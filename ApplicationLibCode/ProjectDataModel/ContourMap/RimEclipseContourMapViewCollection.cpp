@@ -3,6 +3,10 @@
 #include "RimEclipseCase.h"
 #include "RimEclipseContourMapView.h"
 
+#include "cafPdmObjectImpl.h"
+
+
+
 CAF_PDM_SOURCE_INIT( RimEclipseContourMapViewCollection, "Eclipse2dViewCollection" );
 
 //--------------------------------------------------------------------------------------------------

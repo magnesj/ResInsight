@@ -50,6 +50,8 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 //--------------------------------------------------------------------------------------------------
 /// Internal functions

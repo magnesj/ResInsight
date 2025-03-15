@@ -34,6 +34,8 @@
 
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfqtUtils.h"
 

@@ -22,8 +22,10 @@
 #include "RimEnsembleCurveSet.h"
 #include "RimSummaryEnsemble.h"
 
-#include <cafPdmUiLineEditor.h>
-#include <cafPdmUiTreeOrdering.h>
+#include "cafPdmUiLineEditor.h"
+#include "cafPdmUiTreeOrdering.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QString>
 #include <QStringList>

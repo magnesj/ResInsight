@@ -20,6 +20,8 @@
 #include "RimWellPath.h"
 
 #include "cafPdmUiObjectEditorHandle.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <limits>
 

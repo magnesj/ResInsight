@@ -31,6 +31,8 @@
 
 #include "cafAssert.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include <QFile>
 #include <QFileInfo>

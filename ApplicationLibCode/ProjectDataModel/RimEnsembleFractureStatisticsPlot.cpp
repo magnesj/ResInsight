@@ -28,6 +28,9 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmObjectImpl.h"
+
+
 
 #include "cvfAssert.h"
 

@@ -62,6 +62,8 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
+#include "cafPdmObjectImpl.h"
+
 
 #include "cvfMath.h"
 #include "cvfScalarMapperContinuousLinear.h"

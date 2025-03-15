@@ -30,6 +30,8 @@
 #include "RimWellPathCollection.h"
 #include "RimWellRftPlot.h"
 
+#include "cafPdmObjectImpl.h"
+
 #include "cvfAssert.h"
 
 CAF_PDM_SOURCE_INIT( RimRftPlotCollection, "WellRftPlotCollection" );
