@@ -1,6 +1,7 @@
 
 #include "LineEditAndPushButtons.h"
 
+#include "cafInternalPdmUiFieldCapability.h"
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiListEditor.h"

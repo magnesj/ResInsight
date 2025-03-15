@@ -38,6 +38,7 @@
 
 #include "cafCmdExecuteCommand.h"
 
+#include "cafInternalPdmUiFieldCapability.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 

@@ -21,6 +21,7 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafFilePath.h"
+#include "cafInternalPdmUiFieldCapability.h"
 #include "cafPdmDocument.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectGroup.h"

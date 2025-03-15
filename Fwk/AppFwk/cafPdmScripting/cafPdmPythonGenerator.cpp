@@ -43,6 +43,7 @@
 #include "cafPdmObjectMethod.h"
 #include "cafPdmObjectScriptingCapabilityRegister.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmXmlFieldHandle.h"
 
 #ifndef CAF_EXCLUDE_CVF

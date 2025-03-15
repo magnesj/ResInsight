@@ -41,6 +41,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include <QHBoxLayout>
 #include <QIntValidator>

@@ -40,6 +40,7 @@
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPickEventHandler.h"
+#include "cafPdmUiFieldHandle.h"
 
 using namespace caf;
 

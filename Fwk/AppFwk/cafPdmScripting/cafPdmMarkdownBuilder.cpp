@@ -44,6 +44,7 @@
 #include "cafPdmObjectScriptingCapabilityRegister.h"
 #include "cafPdmProxyValueField.h"
 #include "cafPdmPythonGenerator.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmXmlFieldHandle.h"
 
 #include <QRegularExpression>

@@ -35,6 +35,7 @@
 //##################################################################################################
 
 #include "cafPdmDocument.h"
+#include "cafInternalPdmUiFieldCapability.h"
 
 #include <QFile>
 #include <QXmlStreamReader>

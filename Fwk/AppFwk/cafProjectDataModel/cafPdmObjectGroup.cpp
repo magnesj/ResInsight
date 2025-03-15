@@ -1,6 +1,7 @@
 
 
 #include "cafPdmObjectGroup.h"
+#include "cafInternalPdmUiFieldCapability.h"
 #include "cafInternalPdmXmlFieldCapability.h"
 
 #include <QFile>

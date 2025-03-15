@@ -39,6 +39,8 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
+#include "cafInternalPdmUiFieldCapability.h"
+
 namespace caf
 {
 //==================================================================================================

@@ -40,6 +40,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLineEditor.h"
 
 #include <QHBoxLayout>

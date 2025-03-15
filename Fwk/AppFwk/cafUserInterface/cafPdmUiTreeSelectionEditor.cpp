@@ -39,6 +39,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiCommandSystemProxy.h"
 #include "cafPdmUiTreeSelectionQModel.h"
+#include "cafPdmUiFieldHandle.h"
 
 #include <QBoxLayout>
 #include <QCheckBox>

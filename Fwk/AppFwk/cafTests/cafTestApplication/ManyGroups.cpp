@@ -1,7 +1,9 @@
 
 #include "ManyGroups.h"
+#include "cafInternalPdmUiFieldCapability.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafPdmUiOrdering.h"
 
 CAF_PDM_SOURCE_INIT( ManyGroups, "LargeObject" );
 
