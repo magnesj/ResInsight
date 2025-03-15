@@ -37,8 +37,6 @@ class RiuPlotCurve;
 class RiuPlotItem;
 class RimPlotCurve;
 
-class caf::PdmChildArrayFieldHandle;
-
 //==================================================================================================
 ///
 ///
