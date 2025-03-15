@@ -24,6 +24,7 @@
 
 #include "RiuPlotCurveSymbol.h"
 
+#include "cafPdmChildArrayField.h"
 #include "cafPdmPtrArrayField.h"
 #include "cafPdmPtrField.h"
 

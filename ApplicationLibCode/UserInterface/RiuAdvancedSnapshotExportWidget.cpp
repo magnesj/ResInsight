@@ -33,6 +33,7 @@
 #include "RiuTools.h"
 
 #include "cafCmdFeatureManager.h"
+#include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiTableView.h"
 #include "cafSelectionManager.h"
 

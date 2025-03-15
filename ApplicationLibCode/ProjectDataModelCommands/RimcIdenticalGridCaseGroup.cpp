@@ -22,6 +22,7 @@
 #include "RimIdenticalGridCaseGroup.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimIdenticalGridCaseGroup, RimcIdenticalGridCaseGroup_createStatisticsCase, "create_statistics_case" );
 
