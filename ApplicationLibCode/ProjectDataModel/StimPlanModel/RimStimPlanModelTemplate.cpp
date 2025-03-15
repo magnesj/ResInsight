@@ -44,6 +44,7 @@
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiItem.h"
@@ -52,8 +53,6 @@
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfBoundingBox.h"
 

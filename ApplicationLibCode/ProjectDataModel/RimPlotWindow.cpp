@@ -27,11 +27,9 @@
 #include "RiuMultiPlotPage.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiFieldHandle.h"
-#include "cafPdmUiFieldHandle.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QPainter>
 

@@ -24,10 +24,9 @@
 #include "RimEclipseCellColors.h"
 #include "RimEclipseView.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimMultipleEclipseResults, "RimMultipleEclipseResults" );
 

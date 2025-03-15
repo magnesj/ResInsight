@@ -41,8 +41,8 @@
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
-#include "cafPdmUiLineEditor.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiLineEditor.h"
 
 #include <QApplication>
 #include <QBoxLayout>

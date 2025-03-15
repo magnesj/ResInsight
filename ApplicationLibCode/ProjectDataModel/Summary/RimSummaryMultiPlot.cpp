@@ -61,13 +61,12 @@
 #include "RiuSummaryMultiPlotBook.h"
 #include "RiuSummaryVectorSelectionUi.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "qwt_scale_engine.h"
 

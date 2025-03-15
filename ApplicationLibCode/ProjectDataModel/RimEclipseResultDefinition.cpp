@@ -66,11 +66,10 @@
 #endif
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafUtils.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QRegularExpression>
 

@@ -23,9 +23,8 @@
 #include "RimStimPlanModelTemplateCollection.h"
 #include "RimValveTemplateCollection.h"
 
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeOrdering.h"
 
 #include "cvfAssert.h"
 

@@ -27,10 +27,9 @@
 #include "cafPdmFieldReorderCapability.h"
 
 #include "cafPdmAbstractFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectMethod.h"
 #include "cafPdmObjectScriptingCapability.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimSummaryPlotCollection, "SummaryPlotCollection" );
 

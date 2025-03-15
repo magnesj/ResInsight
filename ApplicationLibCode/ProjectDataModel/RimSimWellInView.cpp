@@ -49,9 +49,8 @@
 #include "RivReservoirViewPartMgr.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeOrdering.h"
 
 //--------------------------------------------------------------------------------------------------
 /// Internal functions

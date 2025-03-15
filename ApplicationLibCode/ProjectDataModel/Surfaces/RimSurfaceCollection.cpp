@@ -39,9 +39,8 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldReorderCapability.h"
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmObjectScriptingCapability.h"
 
 #include <QFile>
 #include <QFileInfo>

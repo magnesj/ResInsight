@@ -51,10 +51,9 @@
 #include "RiuSummaryVectorSelectionUi.h"
 #include "RiuTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QInputDialog>
 #include <QMessageBox>

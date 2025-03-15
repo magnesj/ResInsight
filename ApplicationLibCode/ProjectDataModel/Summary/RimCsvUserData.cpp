@@ -33,9 +33,8 @@
 #include "RimProject.h"
 #include "RimSummaryCalculationCollection.h"
 
-#include "cafUtils.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafUtils.h"
 
 #include <QFile>
 

@@ -34,9 +34,8 @@
 #include "RiuQwtPlotWidget.h"
 
 #include "cafAssert.h"
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeOrdering.h"
 
 #include <QDebug>
 #include <QImage>

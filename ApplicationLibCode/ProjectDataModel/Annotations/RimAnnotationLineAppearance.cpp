@@ -23,9 +23,8 @@
 
 #include <QValidator>
 
-#include "cafPdmUiLineEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiLineEditor.h"
 
 //--------------------------------------------------------------------------------------------------
 ///

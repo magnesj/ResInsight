@@ -24,9 +24,9 @@
 #include "RimSummaryEnsemble.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmReferenceHelper.h"
 #include "cafPdmUiItem.h"
 #include "cafSelectionManager.h"
-#include "cafPdmReferenceHelper.h"
 
 #include <QAction>
 #include <QApplication>

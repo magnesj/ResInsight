@@ -23,9 +23,8 @@
 
 #include "RicHoloLensServerSettings.h"
 
-#include "cafPdmSettings.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmSettings.h"
 
 #include "cvfAssert.h"
 

@@ -30,9 +30,8 @@
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafAssert.h"
-#include "cafPdmUiFilePathEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiFilePathEditor.h"
 
 #include <QFile>
 #include <QFileInfo>

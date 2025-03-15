@@ -36,7 +36,6 @@
 #include "cafPdmObjectFactory.h"
 #include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
-#include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>
 

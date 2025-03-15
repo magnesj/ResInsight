@@ -20,9 +20,9 @@
 
 #include "RiaColorTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiCommandSystemProxy.h"
-#include "cafPdmObjectImpl.h"
 
 #include "cvfAssert.h"
 

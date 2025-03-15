@@ -37,12 +37,11 @@
 #include "RiuWellLogPlot.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cvfAssert.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QKeyEvent>
 

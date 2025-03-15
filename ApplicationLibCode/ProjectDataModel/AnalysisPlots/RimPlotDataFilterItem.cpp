@@ -27,13 +27,12 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiActionPushButtonEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QFontMetrics>
 

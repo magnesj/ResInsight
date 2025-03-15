@@ -30,11 +30,11 @@
 
 #include "RimEclipseResultDefinition.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include <QDir>
 #include <QFileInfo>

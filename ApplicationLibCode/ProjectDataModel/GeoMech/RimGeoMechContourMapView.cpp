@@ -32,10 +32,9 @@
 #include "RimSimWellInViewCollection.h"
 #include "RimViewNameConfig.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfCamera.h"
 #include "cvfModelBasicList.h"

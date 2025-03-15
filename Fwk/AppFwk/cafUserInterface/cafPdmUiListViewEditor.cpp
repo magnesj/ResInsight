@@ -42,7 +42,6 @@
 #include "cafPdmUiEditorHandle.h"
 #include "cafPdmUiFieldHandle.h"
 
-
 #include <QGridLayout>
 #include <QTableView>
 #include <QWidget>

@@ -26,7 +26,6 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
 
-
 #include <QAction>
 
 RICF_SOURCE_INIT( RicSaveProjectAsFeature, "RicSaveProjectAsFeature", "saveProjectAs" );

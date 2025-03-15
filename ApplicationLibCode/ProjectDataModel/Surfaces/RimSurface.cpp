@@ -29,9 +29,9 @@
 #include "RigSurface.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include "cvfBoundingBox.h"
 

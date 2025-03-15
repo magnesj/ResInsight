@@ -41,6 +41,7 @@
 #include "RiuGuiTheme.h"
 
 #include "cafPdmFieldCvfColor.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmSettings.h"
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiCheckBoxEditor.h"
@@ -49,7 +50,6 @@
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include <QCoreApplication>
 #include <QDate>

@@ -21,8 +21,8 @@
 #include "RiaApplication.h"
 #include "RiaPreferences.h"
 
-#include "cafPdmUiFilePathEditor.h"
 #include "cafPdmObjectImpl.h"
+#include "cafPdmUiFilePathEditor.h"
 
 #include <QDir>
 

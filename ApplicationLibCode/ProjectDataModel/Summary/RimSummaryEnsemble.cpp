@@ -39,12 +39,11 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QFileInfo>
 

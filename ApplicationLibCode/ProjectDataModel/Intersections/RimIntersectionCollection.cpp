@@ -39,12 +39,11 @@
 #include "RivBoxIntersectionPartMgr.h"
 #include "RivExtrudedCurveIntersectionPartMgr.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfModelBasicList.h"
 

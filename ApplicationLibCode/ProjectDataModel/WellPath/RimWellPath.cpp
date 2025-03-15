@@ -59,12 +59,11 @@
 #include "RiuMainWindow.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeViewEditor.h"
 #include "cafUtils.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QDateTime>
 #include <QDir>

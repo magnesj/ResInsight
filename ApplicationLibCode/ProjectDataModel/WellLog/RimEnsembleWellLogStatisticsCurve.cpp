@@ -30,9 +30,8 @@
 #include "RiuQwtPlotCurve.h"
 #include "RiuQwtPlotWidget.h"
 
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimEnsembleWellLogStatisticsCurve, "EnsembleWellLogStatisticsCurve" );
 

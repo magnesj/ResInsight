@@ -41,14 +41,13 @@
 
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTableViewEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfMath.h"
 

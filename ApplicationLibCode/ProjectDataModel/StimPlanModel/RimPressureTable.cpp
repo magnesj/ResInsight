@@ -22,11 +22,10 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimPressureTable, "PressureTable" );
 

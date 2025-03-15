@@ -59,13 +59,12 @@
 #include "RimTimeStepFilter.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafProgressInfo.h"
 #include "cafUtils.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QApplication>
 #include <QDir>

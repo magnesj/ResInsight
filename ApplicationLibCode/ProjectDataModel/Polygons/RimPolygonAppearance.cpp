@@ -26,10 +26,9 @@
 #include "RiaNumericalTools.h"
 #include "RiaStdStringTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfBoundingBox.h"
 

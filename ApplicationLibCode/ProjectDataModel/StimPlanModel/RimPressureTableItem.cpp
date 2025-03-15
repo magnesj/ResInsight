@@ -19,11 +19,10 @@
 #include "RimPressureTableItem.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimPressureTableItem, "PressureTableItem" );
 

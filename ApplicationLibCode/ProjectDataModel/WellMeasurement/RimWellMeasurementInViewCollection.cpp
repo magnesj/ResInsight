@@ -32,12 +32,11 @@
 #include "RimWellPathCollection.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <cmath>
 

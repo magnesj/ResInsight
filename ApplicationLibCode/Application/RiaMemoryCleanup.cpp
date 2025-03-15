@@ -32,9 +32,9 @@
 #include "RimGeoMechResultDefinition.h"
 #include "RimProject.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include <QDialog>
 #include <QTextEdit>

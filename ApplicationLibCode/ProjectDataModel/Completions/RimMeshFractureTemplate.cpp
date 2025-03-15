@@ -40,9 +40,9 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiFilePathEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include <algorithm>
 #include <cmath>

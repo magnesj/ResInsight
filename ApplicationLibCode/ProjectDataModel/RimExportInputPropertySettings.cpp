@@ -20,9 +20,8 @@
 
 #include "RiaPreferences.h"
 
-#include "cafPdmUiFilePathEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiFilePathEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimExportInputSettings, "RimExportInputSettings" );
 

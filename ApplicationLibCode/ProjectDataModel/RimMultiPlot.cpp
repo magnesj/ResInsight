@@ -31,10 +31,9 @@
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafPdmFieldReorderCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QPaintDevice>
 #include <QRegularExpression>

@@ -34,11 +34,10 @@
 #include "RiuPlotWidget.h"
 
 #include "cafAssert.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiColorEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimPlotCurve, "PlotCurve" );
 

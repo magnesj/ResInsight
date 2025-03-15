@@ -34,7 +34,6 @@
 
 #include "cvfGeometryTools.h"
 
-
 CAF_PDM_SOURCE_INIT( RimMeasurement, "RimMeasurement" );
 
 //--------------------------------------------------------------------------------------------------

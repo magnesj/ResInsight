@@ -20,9 +20,8 @@
 
 #include "RimFieldQuickAccessInterface.h"
 
-#include "cafPdmUiTreeSelectionEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimFieldSelection, "RimFieldSelection" );
 

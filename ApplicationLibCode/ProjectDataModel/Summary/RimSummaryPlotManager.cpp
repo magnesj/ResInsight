@@ -46,6 +46,7 @@
 #include "RiuPlotMainWindowTools.h"
 
 #include "cafPdmObjectHandle.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLabelEditor.h"
@@ -54,8 +55,6 @@
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafSelectionManager.h"
-#include "cafPdmObjectImpl.h"
-
 
 // Multi plot
 #include "RimMainPlotCollection.h"

@@ -38,11 +38,10 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafDisplayCoordTransform.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeAttributes.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfModelBasicList.h"
 

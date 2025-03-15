@@ -29,7 +29,6 @@
 #include "cafPdmObjectHandle.h"
 #include "cafPdmObjectImpl.h"
 
-
 #include <QDir>
 #include <QFileInfo>
 

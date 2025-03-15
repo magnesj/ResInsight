@@ -49,10 +49,9 @@
 #include "RimWellPathCollection.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfBoundingBox.h"
 

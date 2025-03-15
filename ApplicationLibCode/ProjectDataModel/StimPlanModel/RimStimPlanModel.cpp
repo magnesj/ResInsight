@@ -65,14 +65,13 @@
 
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmFieldScriptingCapabilityCvfVec3d.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfBoundingBox.h"
 #include "cvfMath.h"

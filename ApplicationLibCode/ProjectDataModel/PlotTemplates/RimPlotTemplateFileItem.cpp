@@ -23,9 +23,8 @@
 #include "RiaPreferencesSummary.h"
 
 #include "cafPdmField.h"
-#include "cafPdmUiFilePathEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiFilePathEditor.h"
 
 #include <QFileInfo>
 

@@ -38,10 +38,9 @@
 #include "RimWellPathTieIn.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimModeledWellPath, "ModeledWellPath" );
 

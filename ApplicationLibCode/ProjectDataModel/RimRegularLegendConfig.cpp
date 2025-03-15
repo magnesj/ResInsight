@@ -58,12 +58,11 @@
 #include "cafFactory.h"
 #include "cafPdmFieldCvfColor.h"
 #include "cafPdmFieldCvfMat4d.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfMath.h"
 #include "cvfScalarMapperContinuousLinear.h"

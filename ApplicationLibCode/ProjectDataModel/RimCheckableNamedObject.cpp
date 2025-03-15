@@ -19,10 +19,8 @@
 #include "RimCheckableNamedObject.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
-
-
+#include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimCheckableNamedObject, "CheckableNamedObject" ); // Do not use. Abstract class
 

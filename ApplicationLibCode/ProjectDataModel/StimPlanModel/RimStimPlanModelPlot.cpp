@@ -33,11 +33,10 @@
 #include "cafPdmBase.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiToolButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimStimPlanModelPlot, "StimPlanModelPlot" );
 

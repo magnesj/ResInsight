@@ -27,7 +27,6 @@
 #include "RimTools.h"
 #include "RimWellLogChannel.h"
 
-
 #include "cafPdmObjectImpl.h"
 
 #include <QFileInfo>

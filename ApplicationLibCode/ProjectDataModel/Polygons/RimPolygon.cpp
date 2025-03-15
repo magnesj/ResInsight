@@ -30,11 +30,10 @@
 #include "RiuGuiTheme.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiColorEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeAttributes.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimPolygon, "RimPolygon" );
 

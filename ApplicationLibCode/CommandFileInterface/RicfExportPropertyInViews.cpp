@@ -34,8 +34,8 @@
 #include "RimProject.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafUtils.h"
 #include "cafPdmObjectImpl.h"
+#include "cafUtils.h"
 
 #include <limits>
 

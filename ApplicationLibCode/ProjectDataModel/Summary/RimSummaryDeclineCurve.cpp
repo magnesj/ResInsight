@@ -27,11 +27,10 @@
 #include "RimSummaryPlot.h"
 #include "RimTimeAxisAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiSliderEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QDateTime>
 

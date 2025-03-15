@@ -23,10 +23,9 @@
 
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 namespace caf
 {

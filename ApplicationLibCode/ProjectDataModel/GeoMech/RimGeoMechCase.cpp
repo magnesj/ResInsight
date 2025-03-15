@@ -54,14 +54,13 @@
 
 #include "cafCmdFeatureManager.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafUtils.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfVector3.h"
 

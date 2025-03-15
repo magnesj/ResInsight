@@ -40,11 +40,11 @@
 #include "RiuSummaryVectorSelectionDialog.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include "qwt_plot.h"
 

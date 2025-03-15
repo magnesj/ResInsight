@@ -25,8 +25,8 @@
 #include "RimWellConnectivityTable.h"
 #include "RimWellDistributionPlotCollection.h"
 
-#include "cafProgressInfo.h"
 #include "cafPdmObjectImpl.h"
+#include "cafProgressInfo.h"
 
 #include "cvfAssert.h"
 

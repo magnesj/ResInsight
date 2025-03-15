@@ -29,9 +29,9 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RimSummaryCase, "SummaryCase" );
 

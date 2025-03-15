@@ -32,9 +32,8 @@
 #include "RiuViewer.h"
 
 #include "cafAppEnum.h"
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeOrdering.h"
 
 CAF_PDM_SOURCE_INIT( RimElementVectorResult, "RimElementVectorResult" );
 

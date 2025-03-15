@@ -35,9 +35,8 @@
 #include "RimWellPathCollection.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmObjectScriptingCapability.h"
 
 #include "cvfAssert.h"
 

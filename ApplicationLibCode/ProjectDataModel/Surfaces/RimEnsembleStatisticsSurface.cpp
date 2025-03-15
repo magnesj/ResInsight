@@ -24,9 +24,8 @@
 #include "RimSurfaceCollection.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmObjectScriptingCapability.h"
 
 #include <QFileInfo>
 

@@ -33,10 +33,9 @@
 
 #include "RiuSummaryVectorSelectionDialog.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimSummaryAddressSelector, "RimSummaryAddressSelector" );
 
