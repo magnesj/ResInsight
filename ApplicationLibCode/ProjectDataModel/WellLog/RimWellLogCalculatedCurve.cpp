@@ -34,10 +34,9 @@
 
 #include "RiuPlotCurve.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimWellLogCalculatedCurve, "WellLogCalculatedCurve" );
 

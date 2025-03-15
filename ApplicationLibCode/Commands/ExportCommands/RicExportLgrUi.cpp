@@ -23,10 +23,10 @@
 #include "RimEclipseCase.h"
 #include "RimTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafVecIjk.h"
-#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicExportLgrUi, "RicExportLgrUi" );
 

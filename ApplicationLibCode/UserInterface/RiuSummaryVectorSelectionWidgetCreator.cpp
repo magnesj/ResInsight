@@ -22,9 +22,8 @@
 #include "RiuSummaryVectorSelectionUi.h"
 
 #include "cafPdmUiFieldEditorHandle.h"
-#include "cafPdmUiGroup.h"
 #include "cafPdmUiFieldHandle.h"
-
+#include "cafPdmUiGroup.h"
 
 #include "QMinimizePanel.h"
 

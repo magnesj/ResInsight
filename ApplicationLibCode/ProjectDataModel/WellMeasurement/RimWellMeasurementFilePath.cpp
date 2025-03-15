@@ -18,9 +18,8 @@
 
 #include "RimWellMeasurementFilePath.h"
 
-#include "cafPdmUiLineEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiLineEditor.h"
 
 #include <QFileInfo>
 

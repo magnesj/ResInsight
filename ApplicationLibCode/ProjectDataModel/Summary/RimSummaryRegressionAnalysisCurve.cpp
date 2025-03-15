@@ -31,13 +31,12 @@
 #include "RimSummaryPlot.h"
 #include "RimTimeAxisAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiSliderTools.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "ExponentialRegression.hpp"
 #include "LinearRegression.hpp"

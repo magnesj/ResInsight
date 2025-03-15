@@ -49,12 +49,11 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfMath.h"
 #include "cvfVector3.h"

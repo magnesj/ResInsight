@@ -28,11 +28,10 @@
 #include "RimStimPlanModelTemplate.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimElasticPropertyScaling, "ElasticPropertyScaling" );
 

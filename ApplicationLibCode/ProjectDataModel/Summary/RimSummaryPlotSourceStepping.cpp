@@ -44,12 +44,11 @@
 #include "RiuPlotMainWindow.h"
 #include "RiuTools.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiToolBarEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QString>
 

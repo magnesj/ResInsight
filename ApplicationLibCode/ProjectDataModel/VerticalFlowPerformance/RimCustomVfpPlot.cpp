@@ -52,10 +52,9 @@
 #include "RiuTools.h"
 
 #include "cafColorTable.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "qwt_plot_panner.h"
 

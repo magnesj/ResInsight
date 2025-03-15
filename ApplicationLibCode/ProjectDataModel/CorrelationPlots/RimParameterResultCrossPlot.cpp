@@ -36,11 +36,10 @@
 #include "RiuQwtPlotWidget.h"
 #include "RiuQwtSymbol.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiValueRangeEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "qwt_picker_machine.h"
 #include "qwt_plot.h"

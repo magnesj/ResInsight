@@ -32,11 +32,10 @@
 
 #include "RivSurfacePartMgr.h"
 
-#include "cafPdmUiTreeOrdering.h"
 #include "cafPdmObjectImpl.h"
+#include "cafPdmUiTreeOrdering.h"
 
 #include "cvfModelBasicList.h"
-
 
 CAF_PDM_SOURCE_INIT( RimSurfaceInViewCollection, "SurfaceInViewCollection" );
 

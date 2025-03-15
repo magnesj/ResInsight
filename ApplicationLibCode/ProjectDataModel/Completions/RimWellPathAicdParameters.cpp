@@ -22,12 +22,10 @@
 #include "RimWellPathValve.h"
 
 #include "cafPdmDoubleStringValidator.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmObjectImpl.h"
-
-
 
 #include <limits>
 

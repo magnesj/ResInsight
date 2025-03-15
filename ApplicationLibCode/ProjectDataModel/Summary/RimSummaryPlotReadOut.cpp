@@ -20,9 +20,8 @@
 
 #include "RimAnnotationLineAppearance.h"
 
-#include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiCheckBoxEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryPlotReadOut, "RimSummaryPlotReadOut" );
 

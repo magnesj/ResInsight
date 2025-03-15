@@ -35,12 +35,11 @@
 #include "PolynomialRegression.hpp"
 #include "PowerFitRegression.hpp"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfMath.h"
 

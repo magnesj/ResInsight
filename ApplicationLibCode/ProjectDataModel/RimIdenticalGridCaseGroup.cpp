@@ -42,10 +42,9 @@
 #include "Riu3DMainWindowTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafProgressInfo.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QDir>
 

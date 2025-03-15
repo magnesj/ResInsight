@@ -30,9 +30,8 @@
 #include "RimViewLinkerCollection.h"
 
 #include "cafCmdFeatureManager.h"
-#include "cafSelectionManager.h"
 #include "cafPdmUiFieldHandle.h"
-
+#include "cafSelectionManager.h"
 
 #include <QAction>
 

@@ -33,8 +33,6 @@
 
 #include "cafPdmObjectImpl.h"
 
-
-
 CAF_PDM_SOURCE_INIT( RimFlowDiagSolution, "FlowDiagSolution" );
 
 #define CROSS_FLOW_ENDING "-XF"

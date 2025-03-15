@@ -48,9 +48,8 @@
 #include "RimSummaryPlot.h"
 
 #include "cafPdmFieldReorderCapability.h"
-#include "cafProgressInfo.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafProgressInfo.h"
 
 #include <QCoreApplication>
 #include <QDir>

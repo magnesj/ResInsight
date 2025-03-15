@@ -45,9 +45,8 @@
 #include "RiuPlotCurve.h"
 #include "RiuPlotMainWindowTools.h"
 
-#include "cafPdmUiTreeAttributes.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeAttributes.h"
 
 CAF_PDM_SOURCE_INIT( RimGridTimeHistoryCurve, "GridTimeHistoryCurve" );
 

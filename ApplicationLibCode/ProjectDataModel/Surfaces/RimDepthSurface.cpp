@@ -22,11 +22,10 @@
 
 #include "RimSurfaceCollection.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiDoubleValueEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include "cvfVector3.h"
 

@@ -21,9 +21,8 @@
 #include "RimStimPlanModelPlot.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmObjectScriptingCapability.h"
 
 CAF_PDM_SOURCE_INIT( RimStimPlanModelPlotCollection, "StimPlanModelPlotCollection" );
 

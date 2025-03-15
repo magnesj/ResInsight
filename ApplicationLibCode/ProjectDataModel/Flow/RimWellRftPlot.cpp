@@ -59,10 +59,9 @@
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <algorithm>
 #include <iterator>

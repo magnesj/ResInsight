@@ -19,9 +19,8 @@
 #include "RimColorLegendItem.h"
 #include "RimColorLegend.h"
 
-#include "cafPdmUiSliderEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiSliderEditor.h"
 
 #include "cvfColor3.h"
 

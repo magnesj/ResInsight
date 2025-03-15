@@ -20,9 +20,8 @@
 
 #include "RimTools.h"
 
-#include "cafPdmUiFilePathEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiFilePathEditor.h"
 
 CAF_PDM_SOURCE_INIT( RicSaturationPressureUi, "RicSaturationPressureUi" );
 

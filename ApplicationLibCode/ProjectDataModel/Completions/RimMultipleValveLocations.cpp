@@ -27,10 +27,9 @@
 #include "RimWellPath.h"
 #include "RimWellPathValve.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiListEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <cmath>
 

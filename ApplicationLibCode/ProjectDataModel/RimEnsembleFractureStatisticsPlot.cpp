@@ -26,11 +26,9 @@
 #include "RigHistogramData.h"
 
 #include "cafPdmFieldScriptingCapability.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
-#include "cafPdmObjectImpl.h"
-
-
 
 #include "cvfAssert.h"
 

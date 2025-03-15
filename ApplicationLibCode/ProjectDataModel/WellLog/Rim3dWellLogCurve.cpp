@@ -24,8 +24,8 @@
 #include "Rim3dWellLogCurveCollection.h"
 #include "RimProject.h"
 
-#include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmObjectImpl.h"
+#include "cafPdmUiDoubleSliderEditor.h"
 
 #include "cvfVector3.h"
 

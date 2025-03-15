@@ -63,10 +63,9 @@
 #include "RiuQwtPlotWidget.h"
 
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafVecIjk.h"
 #include "cvfAssert.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <qwt_plot.h>
 

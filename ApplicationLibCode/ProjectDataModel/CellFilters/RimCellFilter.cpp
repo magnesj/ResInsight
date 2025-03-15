@@ -26,9 +26,8 @@
 #include "RimTools.h"
 #include "RimViewController.h"
 
-#include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiComboBoxEditor.h"
 
 #include "cvfStructGridGeometryGenerator.h"
 

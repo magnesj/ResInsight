@@ -29,10 +29,9 @@
 #include "RimProject.h"
 #include "RimSummaryCaseMainCollection.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmPtrField.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QFileInfo>
 

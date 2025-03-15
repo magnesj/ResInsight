@@ -18,10 +18,10 @@
 
 #include "RiaRegressionTest.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmSettings.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTextEditor.h"
-#include "cafPdmObjectImpl.h"
 
 template <>
 void caf::AppEnum<RiaRegressionTest::PlotEngine>::setUp()

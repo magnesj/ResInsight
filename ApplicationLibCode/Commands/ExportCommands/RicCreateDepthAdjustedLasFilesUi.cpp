@@ -29,10 +29,10 @@
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
 
 CAF_PDM_SOURCE_INIT( RicCreateDepthAdjustedLasFilesUi, "RicCreateDepthAdjustedLasFilesUi" );
 

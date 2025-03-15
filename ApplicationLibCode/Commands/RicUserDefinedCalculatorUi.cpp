@@ -22,10 +22,10 @@
 #include "RimUserDefinedCalculationCollection.h"
 
 #include "cafAssert.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RicUserDefinedCalculatorUi, "RicUserDefinedCalculator" );
 

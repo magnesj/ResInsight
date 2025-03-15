@@ -26,11 +26,11 @@
 
 #include "PlotTemplates/RimPlotTemplateFileItem.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
-#include "cafPdmObjectImpl.h"
 
 #include <algorithm>
 #include <vector>

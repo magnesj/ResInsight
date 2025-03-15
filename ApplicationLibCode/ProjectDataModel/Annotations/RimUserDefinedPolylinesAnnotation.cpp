@@ -32,11 +32,10 @@
 #include "cvfBoundingBox.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimUserDefinedPolylinesAnnotation, "UserDefinedPolylinesAnnotation" );
 

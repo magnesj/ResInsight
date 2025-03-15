@@ -24,9 +24,8 @@
 #include "RimSurfaceCollection.h"
 #include "RimTools.h"
 
-#include "cafPdmUiTreeSelectionEditor.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSurfaceIntersectionCurve, "RimSurfaceIntersectionCurve" );
 

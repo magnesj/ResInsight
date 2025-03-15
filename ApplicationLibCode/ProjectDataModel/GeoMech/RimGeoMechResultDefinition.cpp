@@ -48,10 +48,9 @@
 #include "RimViewLinker.h"
 #include "RimWellPath.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 #include <QDoubleValidator>
 

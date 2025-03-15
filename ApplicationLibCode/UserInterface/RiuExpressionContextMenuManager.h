@@ -24,7 +24,6 @@
 #include <QAction>
 #include <QPointer>
 
-
 class RimSummaryCalculationVariable;
 class QTextEdit;
 

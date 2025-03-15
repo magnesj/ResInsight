@@ -23,9 +23,9 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObject.h"
+#include "cafPdmObjectImpl.h"
 #include "cafPdmScriptResponse.h"
 #include "cafPdmUiItem.h"
-#include "cafPdmObjectImpl.h"
 
 #include "cafSelectionManager.h"
 

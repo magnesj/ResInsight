@@ -27,8 +27,8 @@
 #include "Riu3DMainWindowTools.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafSelectionManager.h"
 #include "cafPdmObjectImpl.h"
+#include "cafSelectionManager.h"
 
 #include <QAction>
 

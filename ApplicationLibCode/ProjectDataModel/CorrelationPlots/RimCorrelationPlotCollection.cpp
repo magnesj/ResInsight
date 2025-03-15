@@ -30,8 +30,6 @@
 
 #include "cafPdmObjectImpl.h"
 
-
-
 CAF_PDM_SOURCE_INIT( RimCorrelationPlotCollection, "CorrelationPlotCollection" );
 
 //--------------------------------------------------------------------------------------------------

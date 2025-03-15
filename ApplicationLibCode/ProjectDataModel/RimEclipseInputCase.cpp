@@ -41,9 +41,8 @@
 #include "RimReservoirCellResultsStorage.h"
 #include "RimTools.h"
 
-#include "cafProgressInfo.h"
 #include "cafPdmObjectImpl.h"
-
+#include "cafProgressInfo.h"
 
 #include <QDir>
 #include <QFileInfo>

@@ -35,11 +35,10 @@
 #include "Riu3DMainWindowTools.h"
 #include "RiuDragDrop.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiPropertyViewDialog.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
-#include "cafPdmObjectImpl.h"
-
 
 CAF_PDM_SOURCE_INIT( RimGridCalculationVariable, "RimGridCalculationVariable" );
 

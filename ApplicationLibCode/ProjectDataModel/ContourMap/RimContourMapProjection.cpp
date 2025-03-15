@@ -30,10 +30,10 @@
 #include "RimRegularLegendConfig.h"
 #include "RimTextAnnotation.h"
 
+#include "cafPdmObjectImpl.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
-#include "cafPdmObjectImpl.h"
 
 #include "cvfArray.h"
 #include "cvfScalarMapper.h"
