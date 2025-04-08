@@ -82,8 +82,8 @@ bool RicDeleteSummaryCaseCollectionFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteSummaryCaseCollectionFeature::onActionTriggered( bool isChecked )
 {
-    const auto selection = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
-    if ( selection.empty() ) return;
+    const auto ensembles = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
+    if ( ensembles.empty() ) return;
 
     QMessageBox msgBox;
     msgBox.setIcon( QMessageBox::Question );

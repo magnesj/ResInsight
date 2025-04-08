@@ -77,14 +77,11 @@ std::vector<caf::PdmObjectHandle*> RicAppendSummaryCurvesForSummaryCasesFeature:
     // Make the object type general to match the expected type for handleDroppedObjects();
     std::vector<caf::PdmObjectHandle*> objects;
 
-    {
-        const auto objects = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
-        generalObjects.insert( generalObjects.begin(), objects.begin(), objects.end() );
-    }
-    {
-        const auto objects = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
-        generalObjects.insert( generalObjects.begin(), objects.begin(), objects.end() );
-    }
+    const auto summaryCases = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
+    objects.insert( objects.begin(), summaryCases.begin(), summaryCases.end() );
+
+    const auto ensembles = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
+    objects.insert( objects.begin(), ensembles.begin(), ensembles.end() );
 
     return objects;
 }
