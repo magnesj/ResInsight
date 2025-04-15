@@ -71,10 +71,7 @@ QString RimPathPatternFileSet::rangeString() const
 //--------------------------------------------------------------------------------------------------
 std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStringList& filePaths, const QString& placeholderString )
 {
-    if ( filePaths.isEmpty() )
-    {
-        return {};
-    }
+    if ( filePaths.isEmpty() ) return {};
 
     std::vector<std::vector<int>> tableOfNumbers;
 
@@ -94,19 +91,18 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         tableOfNumbers.push_back( valuesInString );
     }
 
-    if ( tableOfNumbers.empty() )
-    {
-        return {};
-    }
+    if ( tableOfNumbers.empty() ) return {};
 
-    const auto       valuesFirstRow = tableOfNumbers[0];
+    const auto valuesFirstRow = tableOfNumbers[0];
+    if ( valuesFirstRow.empty() ) return {};
+
     std::vector<int> valueCountEachIndex;
     valueCountEachIndex.resize( valuesFirstRow.size(), 1 );
 
     for ( int rowIndex = 1; rowIndex < tableOfNumbers.size(); ++rowIndex )
     {
         const auto& values = tableOfNumbers[rowIndex];
-        for ( int j = 0; j < std::min( valueCountEachIndex.size(), values.size() ); ++j )
+        for ( int j = 0; j < std::min( valuesFirstRow.size(), values.size() ); ++j )
         {
             if ( values[j] != valuesFirstRow[j] )
             {
