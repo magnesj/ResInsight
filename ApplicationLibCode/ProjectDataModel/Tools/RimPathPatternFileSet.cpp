@@ -144,8 +144,8 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
     {
         if ( numbers.empty() && valueCountEachIndex[i] == tableOfNumbers.size() )
-        // Find the first varying position
-        int varyingPosition = -1;
+            // Find the first varying position
+            int varyingPosition = -1;
         for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
         {
             if ( valueCountEachIndex[i] == tableOfNumbers.size() )
@@ -156,51 +156,52 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         }
 
         // Extract numbers from the varying position
-        if (varyingPosition >= 0)
+        if ( varyingPosition >= 0 )
         {
             for ( auto& values : tableOfNumbers )
             {
-                if (varyingPosition < values.size())
+                if ( varyingPosition < values.size() )
                 {
                     numbers.push_back( values[varyingPosition] );
                 }
             }
         }
 
-    if ( numbers.size() != filePaths.size() ) return {};
+        if ( numbers.size() != filePaths.size() ) return {};
 
-    auto pattern = filePaths.front();
+        auto pattern = filePaths.front();
 
-    // Loop over varying number positions in reverse order to avoid messing up the positions when replacing the varying part with a placeholder
-    for ( int i = varyingNumberPositions.size() - 1; i >= 0; --i )
-    {
-        const auto& [start, length] = varyingNumberPositions[i];
+        // Loop over varying number positions in reverse order to avoid messing up the positions when replacing the varying part with a
+        // placeholder
+        for ( int i = varyingNumberPositions.size() - 1; i >= 0; --i )
+        {
+            const auto& [start, length] = varyingNumberPositions[i];
 
-        pattern.replace( start, length, placeholderString );
+            pattern.replace( start, length, placeholderString );
+        }
+
+        auto rangeString = QString::fromStdString( RiaStdStringTools::formatRangeSelection( numbers ) );
+
+        return { pattern, rangeString };
     }
 
-    auto rangeString = QString::fromStdString( RiaStdStringTools::formatRangeSelection( numbers ) );
-
-    return { pattern, rangeString };
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QString, QString>& pathPattern, const QString& placeholderString )
-{
-    QStringList paths;
-
-    QString basePath    = pathPattern.first;
-    QString numberRange = pathPattern.second;
-
-    auto numbers = RiaStdStringTools::valuesFromRangeSelection( numberRange.toStdString() );
-    for ( const auto& number : numbers )
+    //--------------------------------------------------------------------------------------------------
+    ///
+    //--------------------------------------------------------------------------------------------------
+    QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QString, QString>& pathPattern, const QString& placeholderString )
     {
-        QString path = basePath;
-        path.replace( placeholderString, QString::number( number ) );
-        paths.push_back( path );
-    }
+        QStringList paths;
 
-    return paths;
-}
+        QString basePath    = pathPattern.first;
+        QString numberRange = pathPattern.second;
+
+        auto numbers = RiaStdStringTools::valuesFromRangeSelection( numberRange.toStdString() );
+        for ( const auto& number : numbers )
+        {
+            QString path = basePath;
+            path.replace( placeholderString, QString::number( number ) );
+            paths.push_back( path );
+        }
+
+        return paths;
+    }
