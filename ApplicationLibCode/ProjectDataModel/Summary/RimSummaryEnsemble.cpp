@@ -97,7 +97,7 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     CAF_PDM_InitFieldNoDefault( &m_pathPatternFileSet, "PathPatternFileSet", "Path Pattern File Set" );
     m_pathPatternFileSet = new RimPathPatternFileSet();
 
-    CAF_PDM_InitField( &m_populatePathPattern, "PopulatePathPattern", false, "Populate Path Patter" );
+    CAF_PDM_InitField( &m_populatePathPattern, "PopulatePathPattern", false, "Populate Path Pattern" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_populatePathPattern );
 
     CAF_PDM_InitFieldNoDefault( &m_ensembleDescription, "Description", "Description" );
