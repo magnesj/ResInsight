@@ -144,16 +144,28 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
     {
         if ( numbers.empty() && valueCountEachIndex[i] == tableOfNumbers.size() )
+        // Find the first varying position
+        int varyingPosition = -1;
+        for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
+        {
+            if ( valueCountEachIndex[i] == tableOfNumbers.size() )
+            {
+                varyingPosition = i;
+                break;
+            }
+        }
+
+        // Extract numbers from the varying position
+        if (varyingPosition >= 0)
         {
             for ( auto& values : tableOfNumbers )
             {
-                if ( i < values.size() )
+                if (varyingPosition < values.size())
                 {
-                    numbers.push_back( values[i] );
+                    numbers.push_back( values[varyingPosition] );
                 }
             }
         }
-    }
 
     if ( numbers.size() != filePaths.size() ) return {};
 
