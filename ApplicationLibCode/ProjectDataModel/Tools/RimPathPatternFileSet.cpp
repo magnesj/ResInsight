@@ -141,37 +141,35 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     // Extract the varying numbers
     std::vector<int> numbers;
 
+    // Find the first varying position
+    int varyingPosition = -1;
     for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
     {
-        if ( numbers.empty() && valueCountEachIndex[i] == tableOfNumbers.size() )
-        // Find the first varying position
-        int varyingPosition = -1;
-        for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
+        if ( valueCountEachIndex[i] == tableOfNumbers.size() )
         {
-            if ( valueCountEachIndex[i] == tableOfNumbers.size() )
-            {
-                varyingPosition = i;
-                break;
-            }
+            varyingPosition = i;
+            break;
         }
+    }
 
-        // Extract numbers from the varying position
-        if (varyingPosition >= 0)
+    // Extract numbers from the varying position
+    if ( varyingPosition >= 0 )
+    {
+        for ( auto& values : tableOfNumbers )
         {
-            for ( auto& values : tableOfNumbers )
+            if ( varyingPosition < values.size() )
             {
-                if (varyingPosition < values.size())
-                {
-                    numbers.push_back( values[varyingPosition] );
-                }
+                numbers.push_back( values[varyingPosition] );
             }
         }
+    }
 
     if ( numbers.size() != filePaths.size() ) return {};
 
     auto pattern = filePaths.front();
 
-    // Loop over varying number positions in reverse order to avoid messing up the positions when replacing the varying part with a placeholder
+    // Loop over varying number positions in reverse order to avoid messing up the positions when replacing the varying part with a
+    // placeholder
     for ( int i = varyingNumberPositions.size() - 1; i >= 0; --i )
     {
         const auto& [start, length] = varyingNumberPositions[i];
