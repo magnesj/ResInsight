@@ -69,7 +69,7 @@ QString RimPathPatternFileSet::rangeString() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStringList& filePaths, const QString& placeHolderText )
+std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStringList& filePaths, const QString& placeholderString )
 {
     if ( filePaths.isEmpty() )
     {
@@ -82,14 +82,12 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 
     for ( auto f : filePaths )
     {
-        std::vector<int>                valuesInString;
-        QRegularExpressionMatchIterator matchIterator = numberRegex.globalMatch( f );
+        std::vector<int> valuesInString;
+        auto             matchIterator = numberRegex.globalMatch( f );
         while ( matchIterator.hasNext() )
         {
-            QRegularExpressionMatch match    = matchIterator.next();
-            QString                 number   = match.captured( 0 );
-            int                     position = match.capturedStart( 0 );
-            int                     length   = match.capturedLength( 0 );
+            auto    match  = matchIterator.next();
+            QString number = match.captured( 0 );
 
             valuesInString.push_back( number.toInt() );
         }
@@ -101,14 +99,14 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         return {};
     }
 
-    auto             valuesFirstRow = tableOfNumbers[0];
+    const auto       valuesFirstRow = tableOfNumbers[0];
     std::vector<int> valueCountEachIndex;
     valueCountEachIndex.resize( valuesFirstRow.size(), 1 );
 
     for ( int rowIndex = 1; rowIndex < tableOfNumbers.size(); ++rowIndex )
     {
-        auto& values = tableOfNumbers[rowIndex];
-        for ( int j = 0; j < values.size(); ++j )
+        const auto& values = tableOfNumbers[rowIndex];
+        for ( int j = 0; j < std::min( valueCountEachIndex.size(), values.size() ); ++j )
         {
             if ( values[j] != valuesFirstRow[j] )
             {
@@ -117,15 +115,14 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         }
     }
 
-    // Analyze the first path to find number positions
     QString                firstPath = filePaths[0];
     QList<QPair<int, int>> numberPositions; // start pos, length
 
-    int                             pos = 0;
-    QRegularExpressionMatchIterator i   = numberRegex.globalMatch( firstPath );
+    int  pos = 0;
+    auto i   = numberRegex.globalMatch( firstPath );
     while ( i.hasNext() )
     {
-        QRegularExpressionMatch match = i.next();
+        auto match = i.next();
         numberPositions.append( qMakePair( match.capturedStart(), match.capturedLength() ) );
     }
 
@@ -134,7 +131,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         return {};
     }
 
-    // For each number position, check if all paths have the same number at that position
+    // For each number position, check if there are unique values for all rows
     QList<QPair<int, int>> varyingNumberPositions;
 
     for ( auto i = 0; i < numberPositions.size(); i++ )
@@ -160,7 +157,10 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         {
             for ( auto& values : tableOfNumbers )
             {
-                numbers.push_back( values[i] );
+                if ( i < values.size() )
+                {
+                    numbers.push_back( values[i] );
+                }
             }
         }
     }
@@ -172,16 +172,12 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 
     auto pattern = filePaths.front();
 
-    // loop over varying number positions in reverse order
-    // to avoid messing up the positions when replacing
-    // the varying part with a placeholder
+    // Loop over varying number positions in reverse order to avoid messing up the positions when replacing the varying part with a placeholder
     for ( int i = varyingNumberPositions.size() - 1; i >= 0; --i )
     {
-        const auto& varyPos = varyingNumberPositions[i];
-        int         start   = varyPos.first;
-        int         length  = varyPos.second;
-        // Replace the varying part with a placeholder
-        pattern.replace( start, length, placeHolderText );
+        const auto& [start, length] = varyingNumberPositions[i];
+
+        pattern.replace( start, length, placeholderString );
     }
 
     auto rangeString = QString::fromStdString( RiaStdStringTools::formatRangeSelection( numbers ) );
@@ -192,7 +188,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QString, QString>& pathPattern, const QString& placeHolderText )
+QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QString, QString>& pathPattern, const QString& placeholderString )
 {
     QStringList paths;
 
@@ -203,7 +199,7 @@ QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QStri
     for ( const auto& number : numbers )
     {
         QString path = basePath;
-        path.replace( placeHolderText, QString::number( number ) );
+        path.replace( placeholderString, QString::number( number ) );
         paths.push_back( path );
     }
 
