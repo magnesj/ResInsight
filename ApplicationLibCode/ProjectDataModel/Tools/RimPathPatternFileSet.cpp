@@ -122,10 +122,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         numberPositions.append( qMakePair( match.capturedStart(), match.capturedLength() ) );
     }
 
-    if ( numberPositions.isEmpty() )
-    {
-        return {};
-    }
+    if ( numberPositions.isEmpty() ) return {};
 
     // For each number position, check if there are unique values for all rows
     QList<QPair<int, int>> varyingNumberPositions;
@@ -139,10 +136,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         }
     }
 
-    if ( varyingNumberPositions.empty() )
-    {
-        return {};
-    }
+    if ( varyingNumberPositions.empty() ) return {};
 
     // Extract the varying numbers
     std::vector<int> numbers;
@@ -161,10 +155,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         }
     }
 
-    if ( numbers.size() != filePaths.size() )
-    {
-        return {};
-    }
+    if ( numbers.size() != filePaths.size() ) return {};
 
     auto pattern = filePaths.front();
 
