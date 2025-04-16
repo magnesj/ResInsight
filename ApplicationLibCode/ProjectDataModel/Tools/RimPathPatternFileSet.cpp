@@ -127,7 +127,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     // For each number position, check if there are unique values for all rows
     QList<QPair<int, int>> varyingNumberPositions;
 
-    for ( size_t i = 0; i < numberPositions.size(); i++ )
+    for ( size_t i = 0; i < static_cast<size_t>( numberPositions.size() ); i++ )
     {
         const auto& varyPos = numberPositions[i];
         if ( i < valueCountEachIndex.size() && valueCountEachIndex[i] == tableOfNumbers.size() )
@@ -147,7 +147,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     {
         if ( valueCountEachIndex[i] == tableOfNumbers.size() )
         {
-            varyingPosition = i;
+            varyingPosition = static_cast<int>( i );
             break;
         }
     }
