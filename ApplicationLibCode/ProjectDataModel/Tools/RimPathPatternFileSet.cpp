@@ -99,10 +99,10 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     std::vector<int> valueCountEachIndex;
     valueCountEachIndex.resize( valuesFirstRow.size(), 1 );
 
-    for ( int rowIndex = 1; rowIndex < tableOfNumbers.size(); ++rowIndex )
+    for ( size_t rowIndex = 1; rowIndex < tableOfNumbers.size(); ++rowIndex )
     {
         const auto& values = tableOfNumbers[rowIndex];
-        for ( int j = 0; j < std::min( valuesFirstRow.size(), values.size() ); ++j )
+        for ( size_t j = 0; j < std::min( valuesFirstRow.size(), values.size() ); ++j )
         {
             if ( values[j] != valuesFirstRow[j] )
             {
@@ -127,7 +127,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     // For each number position, check if there are unique values for all rows
     QList<QPair<int, int>> varyingNumberPositions;
 
-    for ( auto i = 0; i < numberPositions.size(); i++ )
+    for ( size_t i = 0; i < numberPositions.size(); i++ )
     {
         const auto& varyPos = numberPositions[i];
         if ( i < valueCountEachIndex.size() && valueCountEachIndex[i] == tableOfNumbers.size() )
@@ -143,7 +143,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 
     // Find the first varying position
     int varyingPosition = -1;
-    for ( auto i = 0; i < valueCountEachIndex.size(); i++ )
+    for ( size_t i = 0; i < valueCountEachIndex.size(); i++ )
     {
         if ( valueCountEachIndex[i] == tableOfNumbers.size() )
         {
@@ -164,7 +164,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
         }
     }
 
-    if ( numbers.size() != filePaths.size() ) return {};
+    if ( numbers.size() != static_cast<size_t>( filePaths.size() ) ) return {};
 
     auto pattern = filePaths.front();
 
