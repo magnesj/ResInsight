@@ -71,8 +71,8 @@ jobs:
       BUILDCACHE_ACCURACY: SLOPPY
       USERNAME: magnesj
       VCPKG_EXE: ${{ github.workspace }}/ThirdParty/vcpkg/vcpkg${{ matrix.config.os == 'windows-2022' && '.exe' || '' }}
-      FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-      VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/magnesj/index.json,readwrite"
+      FEED_URL: https://nuget.pkg.github.com/ceetronsolutions/index.json
+      VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/ceetronsolutions/index.json,readwrite"
 
     steps:
       - name: Checkout
