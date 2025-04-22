@@ -70,7 +70,7 @@ jobs:
       BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
       BUILDCACHE_ACCURACY: SLOPPY
       USERNAME: magnesj
-      VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg${{ matrix.config.os == 'windows-latest' && '.exe' || '' }}
+      VCPKG_EXE: ${{ github.workspace }}/ThirdParty/vcpkg/vcpkg${{ matrix.config.os == 'windows-2022' && '.exe' || '' }}
       FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
       VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/magnesj/index.json,readwrite"
 
