@@ -7,14 +7,6 @@ on:
     # Every day at 1am to make sure we have a build cache for the current date
     # build cache is
     - cron: '0 1 * * *'
-env:
-  BUILD_TYPE: Release
-  BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
-  BUILDCACHE_ACCURACY: SLOPPY
-  USERNAME: magnesj
-  VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg${{ matrix.os == 'windows-latest' && '.exe' || '' }}
-  FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
-  VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/magnesj/index.json,readwrite"
 
 concurrency:
   group: build-${{ github.event.pull_request.number || github.ref }}
@@ -73,6 +65,15 @@ jobs:
               qt-version: 6.7.0,
               ri-unit-test-path: "ResInsight-tests",
             }
+    env:
+      BUILD_TYPE: Release
+      BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
+      BUILDCACHE_ACCURACY: SLOPPY
+      USERNAME: magnesj
+      VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg${{ matrix.config.os == 'windows-latest' && '.exe' || '' }}
+      FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+      VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/magnesj/index.json,readwrite"
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
