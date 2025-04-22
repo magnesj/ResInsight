@@ -11,7 +11,10 @@ env:
   BUILD_TYPE: Release
   BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
   BUILDCACHE_ACCURACY: SLOPPY
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+  USERNAME: magnesj
+  VCPKG_EXE: ${{ github.workspace }}/vcpkg/vcpkg${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+  FEED_URL: https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+  VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/magnesj/index.json,readwrite"
 
 concurrency:
   group: build-${{ github.event.pull_request.number || github.ref }}
@@ -157,6 +160,7 @@ jobs:
         run: |
           sudo apt-get update --option="APT::Acquire::Retries=3"
           sudo apt-get install --option="APT::Acquire::Retries=3" libxkbcommon-x11-0 libgl1-mesa-dev mesa-common-dev libglfw3-dev libglu1-mesa-dev libhdf5-dev
+          sudo apt install mono-complete
 
       - name: Install clang-18
         if: contains( matrix.config.cc, 'clang')
@@ -177,6 +181,35 @@ jobs:
       - name: vcpkg bootstrap
         run: |
           ThirdParty/vcpkg/${{ matrix.config.vcpkg-bootstrap }}
+
+      - name: Configure NuGet for binary caching (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+            sources add \
+            -Source "${{ env.FEED_URL }}" \
+            -StorePasswordInClearText \
+            -Name GitHubPackages \
+            -UserName "${{ env.USERNAME }}" \
+            -Password "${{ secrets.GH_PACKAGES_TOKEN }}"
+          mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
+            setapikey "${{ secrets.GH_PACKAGES_TOKEN }}" \
+            -Source "${{ env.FEED_URL }}"
+        
+      - name: Configure NuGet for binary caching (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          .$(${{ env.VCPKG_EXE }} fetch nuget) `
+            sources add `
+            -Source "${{ env.FEED_URL }}" `
+            -StorePasswordInClearText `
+            -Name GitHubPackages `
+            -UserName "${{ env.USERNAME }}" `
+            -Password "${{ secrets.GH_PACKAGES_TOKEN }}"
+          .$(${{ env.VCPKG_EXE }} fetch nuget) `
+            setapikey "${{ secrets.GH_PACKAGES_TOKEN }}" `
+            -Source "${{ env.FEED_URL }}"
 
       - name: Configure
         shell: bash
