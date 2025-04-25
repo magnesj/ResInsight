@@ -20,6 +20,7 @@
 
 #include "cafPdmField.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmXmlFieldHandle.h"
 
 #include <QString>
 
