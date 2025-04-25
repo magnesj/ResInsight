@@ -18,6 +18,7 @@
 
 #include "RimSummaryEnsemble.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaFilePathTools.h"
@@ -49,7 +50,6 @@
 
 #include <QFileInfo>
 
-#include "RicImportSummaryCasesFeature.h"
 #include <cmath>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsemble, "SummaryCaseSubCollection" );
@@ -912,8 +912,8 @@ void RimSummaryEnsemble::initAfterRead()
         {
             RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
 
-            RicImportSummaryCasesFeature::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
-            auto [isOk, newCases] = RicImportSummaryCasesFeature::createSummaryCasesFromFiles( paths, createConfig );
+            RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
+            auto [isOk, newCases] = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
             if ( !isOk || newCases.empty() )
             {
                 RiaLogging::warning( "No new cases are created." );
