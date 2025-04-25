@@ -905,8 +905,9 @@ void RimSummaryEnsemble::initAfterRead()
     if ( m_usePathPatternFileSet )
     {
         const auto placeholderString = "$(NUMBER)";
-        auto       pathAndRange      = std::make_pair( m_pathPatternFileSet->pathPattern(), m_pathPatternFileSet->rangeString() );
-        auto       paths             = RimPathPatternFileSet::createPathsFromPattern( pathAndRange, placeholderString );
+        auto       paths             = RimPathPatternFileSet::createPathsFromPattern( m_pathPatternFileSet->pathPattern(),
+                                                                    m_pathPatternFileSet->rangeString(),
+                                                                    placeholderString );
 
         {
             RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;

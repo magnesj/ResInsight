@@ -185,12 +185,9 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RimPathPatternFileSet::createPathsFromPattern( const std::pair<QString, QString>& pathPattern, const QString& placeholderString )
+QStringList RimPathPatternFileSet::createPathsFromPattern( const QString& basePath, const QString& numberRange, const QString& placeholderString )
 {
     QStringList paths;
-
-    QString basePath    = pathPattern.first;
-    QString numberRange = pathPattern.second;
 
     auto numbers = RiaStdStringTools::valuesFromRangeSelection( numberRange.toStdString() );
     for ( const auto& number : numbers )

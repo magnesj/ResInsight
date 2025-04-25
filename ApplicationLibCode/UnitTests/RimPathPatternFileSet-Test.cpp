@@ -18,12 +18,12 @@ TEST( RimPathPatternFileSetTest, OneVaryingNumberRealizations )
                               "drogon-varying-grid-geometry/realization-3/iter-0/eclipse/model/DROGON-3.EGRID",
                               "drogon-varying-grid-geometry/realization-13/iter-0/eclipse/model/DROGON-13.EGRID" };
 
-    auto result = RimPathPatternFileSet::findPathPattern( filePaths, internal::placeholderText() );
-    EXPECT_STREQ( result.first.toStdString().data(),
+    const auto& [basePath, numberRange] = RimPathPatternFileSet::findPathPattern( filePaths, internal::placeholderText() );
+    EXPECT_STREQ( basePath.toStdString().data(),
                   "drogon-varying-grid-geometry/realization-$(INDEX)/iter-0/eclipse/model/DROGON-$(INDEX).EGRID" );
-    EXPECT_STREQ( result.second.toStdString().data(), "0-3, 13" );
+    EXPECT_STREQ( numberRange.toStdString().data(), "0-3, 13" );
 
-    auto paths = RimPathPatternFileSet::createPathsFromPattern( result, internal::placeholderText() );
+    const auto paths = RimPathPatternFileSet::createPathsFromPattern( basePath, numberRange, internal::placeholderText() );
     EXPECT_EQ( paths.size(), 5 );
     if ( paths.size() != filePaths.size() ) return;
     for ( auto i = 0; i < paths.size(); i++ )
@@ -35,11 +35,11 @@ TEST( RimPathPatternFileSetTest, OneVaryingNumberRealizations )
 TEST( RimPathPatternFileSetTest, OneVaryingNumberMultipleLocations )
 {
     QStringList filePaths = { "file_1/path-02/real-1.txt", "file_2/path-02/real-2.txt", "file_3/path-02/real-3.txt", "file_13/path-02/real-13.txt" };
-    auto result = RimPathPatternFileSet::findPathPattern( filePaths, internal::placeholderText() );
-    EXPECT_STREQ( result.first.toStdString().data(), "file_$(INDEX)/path-02/real-$(INDEX).txt" );
-    EXPECT_STREQ( result.second.toStdString().data(), "1-3, 13" );
+    const auto& [basePath, numberRange] = RimPathPatternFileSet::findPathPattern( filePaths, internal::placeholderText() );
+    EXPECT_STREQ( basePath.toStdString().data(), "file_$(INDEX)/path-02/real-$(INDEX).txt" );
+    EXPECT_STREQ( numberRange.toStdString().data(), "1-3, 13" );
 
-    auto paths = RimPathPatternFileSet::createPathsFromPattern( result, internal::placeholderText() );
+    const auto paths = RimPathPatternFileSet::createPathsFromPattern( basePath, numberRange, internal::placeholderText() );
     EXPECT_EQ( paths.size(), 4 );
     EXPECT_STREQ( paths[0].toStdString().data(), "file_1/path-02/real-1.txt" );
     EXPECT_STREQ( paths[1].toStdString().data(), "file_2/path-02/real-2.txt" );
