@@ -18,7 +18,6 @@
 
 #include "RiaEnsembleImportTools.h"
 
-#include "RiaApplication.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "Summary/RiaSummaryTools.h"
@@ -35,13 +34,9 @@ namespace RiaEnsembleImportTools
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<RimSummaryCase*>> createSummaryCasesFromFiles( const QStringList& fileNames, CreateConfig createConfig )
 {
-    RiaApplication* app  = RiaApplication::instance();
-    RimProject*     proj = app->project();
-
     RimSummaryCaseMainCollection* sumCaseColl = RiaSummaryTools::summaryCaseMainCollection();
 
     std::vector<RimSummaryCase*> newCases;
-
     if ( !sumCaseColl ) return std::make_pair( false, newCases );
 
     std::vector<RifSummaryCaseFileResultInfo> importFileInfos;
@@ -68,7 +63,7 @@ std::pair<bool, std::vector<RimSummaryCase*>> createSummaryCasesFromFiles( const
     else
     {
         // No restart files for these file types: just copy to result info
-        for ( auto f : fileNames )
+        for ( const auto& f : fileNames )
         {
             importFileInfos.push_back( RifSummaryCaseFileResultInfo( f, false, createConfig.fileType ) );
         }
