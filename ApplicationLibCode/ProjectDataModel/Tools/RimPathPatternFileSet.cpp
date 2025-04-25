@@ -77,7 +77,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
 
     QRegularExpression numberRegex( "\\d+" );
 
-    for ( auto f : filePaths )
+    for ( const auto& f : filePaths )
     {
         std::vector<int> valuesInString;
         auto             matchIterator = numberRegex.globalMatch( f );
@@ -96,7 +96,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     const auto valuesFirstRow = tableOfNumbers[0];
     if ( valuesFirstRow.empty() ) return {};
 
-    std::vector<int> valueCountEachIndex;
+    std::vector<size_t> valueCountEachIndex;
     valueCountEachIndex.resize( valuesFirstRow.size(), 1 );
 
     for ( size_t rowIndex = 1; rowIndex < tableOfNumbers.size(); ++rowIndex )
@@ -114,8 +114,7 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     QString                firstPath = filePaths[0];
     QList<QPair<int, int>> numberPositions; // start pos, length
 
-    int  pos = 0;
-    auto i   = numberRegex.globalMatch( firstPath );
+    auto i = numberRegex.globalMatch( firstPath );
     while ( i.hasNext() )
     {
         auto match = i.next();
@@ -155,9 +154,9 @@ std::pair<QString, QString> RimPathPatternFileSet::findPathPattern( const QStrin
     // Extract numbers from the varying position
     if ( varyingPosition >= 0 )
     {
-        for ( auto& values : tableOfNumbers )
+        for ( const auto& values : tableOfNumbers )
         {
-            if ( varyingPosition < values.size() )
+            if ( varyingPosition < static_cast<int>( values.size() ) )
             {
                 numbers.push_back( values[varyingPosition] );
             }
