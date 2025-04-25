@@ -147,6 +147,8 @@ private:
 
     QString ensembleDescription() const;
 
+    void updateSerializationState();
+
 protected:
     caf::PdmChildArrayField<RimSummaryCase*> m_cases;
     caf::PdmField<QString>                   m_name;

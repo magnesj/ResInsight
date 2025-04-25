@@ -49,6 +49,7 @@
 
 #include <QFileInfo>
 
+#include "RicImportSummaryCasesFeature.h"
 #include <cmath>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsemble, "SummaryCaseSubCollection" );
@@ -104,6 +105,7 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_ensembleDescription.registerGetMethod( this, &RimSummaryEnsemble::ensembleDescription );
     m_ensembleDescription.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_ensembleDescription.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
+    m_ensembleDescription.xmlCapability()->disableIO();
 
     m_commonAddressCount = 0;
 }
@@ -213,10 +215,8 @@ void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summa
 
         // Do what is required to add the case, avoid updates until all cases are added
         summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
-        if ( m_cases.empty() )
-        {
-            summaryCase->setShowVectorItemsInProjectTree( true );
-        }
+        summaryCase->setShowVectorItemsInProjectTree( m_cases.empty() );
+
         m_cases.push_back( summaryCase );
     }
 
@@ -899,6 +899,36 @@ void RimSummaryEnsemble::initAfterRead()
     {
         m_nameTemplateString = m_name;
     }
+
+    updateSerializationState();
+
+    if ( m_usePathPatternFileSet )
+    {
+        const auto placeholderString = "$(NUMBER)";
+        auto       pathAndRange      = std::make_pair( m_pathPatternFileSet->pathPattern(), m_pathPatternFileSet->rangeString() );
+        auto       paths             = RimPathPatternFileSet::createPathsFromPattern( pathAndRange, placeholderString );
+
+        {
+            RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
+
+            RicImportSummaryCasesFeature::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
+            auto [isOk, newCases] = RicImportSummaryCasesFeature::createSummaryCasesFromFiles( paths, createConfig );
+            if ( !isOk || newCases.empty() )
+            {
+                RiaLogging::warning( "No new cases are created." );
+                return;
+            }
+
+            replaceCases( newCases );
+
+            // Update name of cases and ensemble after all cases are added
+            for ( auto summaryCase : newCases )
+            {
+                summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
+                summaryCase->updateAutoShortName();
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -933,6 +963,8 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 
         m_populatePathPattern = false;
     }
+
+    updateSerializationState();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1074,6 +1106,14 @@ QString RimSummaryEnsemble::ensembleDescription() const
     }
 
     return txt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::updateSerializationState()
+{
+    m_cases.xmlCapability()->setIOWritable( !m_usePathPatternFileSet() );
 }
 
 //--------------------------------------------------------------------------------------------------
