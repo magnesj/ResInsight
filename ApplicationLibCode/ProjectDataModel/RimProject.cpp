@@ -424,6 +424,30 @@ void RimProject::setupBeforeSave()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
+{
+    std::vector<caf::PdmFieldHandle*> ordered;
+
+    ordered.push_back( fileNameHandle() );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_projectFileVersionString ) ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_globalPathList ) ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFilesetCollection ) ) );
+
+    // Append the rest of the fields
+    for ( auto handle : fields() )
+    {
+        if ( std::find( ordered.begin(), ordered.end(), handle ) == ordered.end() )
+        {
+            ordered.push_back( handle );
+        }
+    }
+
+    return ordered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimMainPlotCollection* RimProject::mainPlotCollection() const
 {
     return m_mainPlotCollection();
