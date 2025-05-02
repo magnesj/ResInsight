@@ -42,10 +42,12 @@ RimEnsembleFileset::RimEnsembleFileset()
     : fileSetChanged( this )
 
 {
-    CAF_PDM_InitObject( "Ensemble Fileset", "", "", "" );
+    CAF_PDM_InitObject( "Ensemble Fileset", ":/Cases16x16.png", "", "" );
 
     CAF_PDM_InitField( &m_pathPattern, "PathPattern", QString(), "Path Pattern", "", "", "" );
     CAF_PDM_InitField( &m_realizationSubSet, "RealizationSubSet", QString(), "Realization SubSet", "", "", "" );
+
+    setDeletable( true );
 }
 
 //--------------------------------------------------------------------------------------------------

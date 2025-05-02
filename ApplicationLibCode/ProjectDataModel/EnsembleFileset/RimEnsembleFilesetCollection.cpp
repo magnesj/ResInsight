@@ -19,7 +19,7 @@
 #include "RimEnsembleFilesetCollection.h"
 #include "RimEnsembleFileset.h"
 
-#include "../../../Fwk/AppFwk/cafCommand/cafCmdFeatureMenuBuilder.h"
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
@@ -30,7 +30,7 @@ CAF_PDM_SOURCE_INIT( RimEnsembleFilesetCollection, "EnsembleFilesetCollection" )
 //--------------------------------------------------------------------------------------------------
 RimEnsembleFilesetCollection::RimEnsembleFilesetCollection()
 {
-    CAF_PDM_InitObject( "Ensemble Fileset Collection", ":/Folder.png", "", "" );
+    CAF_PDM_InitObject( "Ensemble Fileset Collection", ":/Cases16x16.png", "", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_filesets, "Filesets", "Filesets", "", "", "" );
     m_filesets.uiCapability()->setUiHidden( true );

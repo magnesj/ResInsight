@@ -242,6 +242,11 @@ void RimSummaryEnsemble::setNameTemplate( const QString& name )
 //--------------------------------------------------------------------------------------------------
 QString RimSummaryEnsemble::name() const
 {
+    if ( m_ensembleFileSet() )
+    {
+        return m_ensembleFileSet()->name();
+    }
+
     return m_name;
 }
 
@@ -936,6 +941,7 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
             m_ensembleFileSet()->fileSetChanged.connect( this, &RimSummaryEnsemble::onFilterChanged );
         }
         createSummaryCasesFromEnsembleFileSet();
+        caseNameChanged.send();
     }
 }
 

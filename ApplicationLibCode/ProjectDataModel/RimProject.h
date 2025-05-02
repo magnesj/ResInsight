@@ -200,7 +200,7 @@ public:
 protected:
     void                              initAfterRead() override;
     void                              setupBeforeSave() override;
-    std::vector<caf::PdmFieldHandle*> fieldsForExport() const;
+    std::vector<caf::PdmFieldHandle*> fieldsForExport() const override;
 
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
