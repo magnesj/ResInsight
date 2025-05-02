@@ -198,8 +198,9 @@ public:
     RimEnsembleFilesetCollection* ensembleFilesetCollection() const;
 
 protected:
-    void initAfterRead() override;
-    void setupBeforeSave() override;
+    void                              initAfterRead() override;
+    void                              setupBeforeSave() override;
+    std::vector<caf::PdmFieldHandle*> fieldsForExport() const;
 
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
