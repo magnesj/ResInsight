@@ -63,7 +63,8 @@ public:
     static void updateUiIconStateRecursively( PdmObjectHandle* root );
 
 protected:
-    QString documentAsString();
+    QString         documentAsString();
+    PdmFieldHandle* fileNameHandle() const;
 
 private:
     void writeDocumentToXmlStream( QXmlStreamWriter& xmlStream );
