@@ -65,10 +65,13 @@ public:
 protected: // Virtual
     /// Method gets called from PdmDocument after all objects are read.
     /// Re-implement to set up internal pointers etc. in your data structure
-    virtual void initAfterRead() {};
+    virtual void initAfterRead(){};
     /// Method gets called from PdmDocument before saving document.
     /// Re-implement to make sure your fields have correct data before saving
-    virtual void setupBeforeSave() {};
+    virtual void setupBeforeSave(){};
+
+    /// Override this method if you need to exclude or reorder fields for export to XML
+    [[nodiscard]] virtual std::vector<PdmFieldHandle*> fieldsForExport() const;
 
     /// This method is intended to be used in macros to make compile time errors
     // if user uses them on wrong type of objects
