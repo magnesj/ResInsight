@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2017     Statoil ASA
+//  Copyright (C) 2025     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,24 +16,25 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicCreateEnsembleFilesetFeature.h"
+#include "RicImportEnsembleFilesetFeature.h"
 
 #include "EnsembleFileset/RimEnsembleFileset.h"
 #include "EnsembleFileset/RimEnsembleFilesetCollection.h"
 #include "RimProject.h"
 
 #include "RiaApplication.h"
+#include "RiaEnsembleNameTools.h"
 
 #include "RicImportSummaryCasesFeature.h"
 
 #include <QAction>
 
-CAF_CMD_SOURCE_INIT( RicCreateEnsembleFilesetFeature, "RicCreateEnsembleFilesetFeature" );
+CAF_CMD_SOURCE_INIT( RicImportEnsembleFilesetFeature, "RicImportEnsembleFilesetFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicCreateEnsembleFilesetFeature::isCommandEnabled() const
+bool RicImportEnsembleFilesetFeature::isCommandEnabled() const
 {
     return true;
 }
@@ -41,7 +42,7 @@ bool RicCreateEnsembleFilesetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleFilesetFeature::onActionTriggered( bool isChecked )
+void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
 {
     QString pathCacheName = "ENSEMBLE_FILES";
     auto    result = RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( "Import Ensemble", pathCacheName );
@@ -52,18 +53,24 @@ void RicCreateEnsembleFilesetFeature::onActionTriggered( bool isChecked )
 
     auto collection = RimProject::current()->ensembleFilesetCollection();
 
-    auto ensembleFileset = new RimEnsembleFileset();
-    ensembleFileset->findAndSetPathPatternAndRangeString( result.files );
+    auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( result.files, result.groupingMode );
+    for ( const auto& [groupName, fileNames] : grouping )
+    {
+        auto ensembleFileset = new RimEnsembleFileset();
+        ensembleFileset->setName( groupName );
+        ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
 
-    collection->addFileset( ensembleFileset );
+        collection->addFileset( ensembleFileset );
+    }
+
     collection->updateAllRequiredEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleFilesetFeature::setupActionLook( QAction* actionToSetup )
+void RicImportEnsembleFilesetFeature::setupActionLook( QAction* actionToSetup )
 {
-    // actionToSetup->setIcon(QIcon(":/new_icon16x16.png"));
-    actionToSetup->setText( "Create Ensemble Fileset" );
+    actionToSetup->setIcon( QIcon( ":/Cases16x16.png" ) );
+    actionToSetup->setText( "Import Ensemble File Set" );
 }
