@@ -39,7 +39,6 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsembleTools.h"
 #include "RimSummaryPlot.h"
-#include "Tools/RimPathPatternFileSet.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
