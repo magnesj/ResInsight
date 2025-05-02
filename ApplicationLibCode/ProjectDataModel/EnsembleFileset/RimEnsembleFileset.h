@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "RimNamedObject.h"
+
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
@@ -26,18 +28,30 @@
 ///
 ///
 //==================================================================================================
-class RimEnsembleFileset : public caf::PdmObject
+class RimEnsembleFileset : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
+    caf::Signal<> fileSetChanged;
+
+public:
     RimEnsembleFileset();
 
-    caf::PdmField<QString> m_pathPattern;
-    caf::PdmField<QString> m_realizationSubSet;
+    QStringList createPaths( const QString& extension ) const;
+    void        findAndSetPathPatternAndRangeString( const QStringList& filePaths );
 
-protected:
+    static QList<caf::PdmOptionItemInfo> ensembleFilSetOptions();
+
+private:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+
+    void setPathPattern( const QString& pathPattern );
+    void setRangeString( const QString& rangeString );
+
+private:
+    caf::PdmField<QString> m_pathPattern;
+    caf::PdmField<QString> m_realizationSubSet;
 };

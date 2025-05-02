@@ -31,6 +31,7 @@
 
 #include "RifSummaryReaderInterface.h"
 
+#include "EnsembleFileset/RimEnsembleFileset.h"
 #include "RimDeltaSummaryEnsemble.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimProject.h"
@@ -98,14 +99,13 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_dataVectorFolders->uiCapability()->setUiTreeHidden( true );
     m_dataVectorFolders.xmlCapability()->disableIO();
 
-    CAF_PDM_InitFieldNoDefault( &m_pathPatternFileSet, "PathPatternFileSet", "Path Pattern File Set" );
-    m_pathPatternFileSet = new RimPathPatternFileSet();
-
     CAF_PDM_InitFieldNoDefault( &m_ensembleDescription, "Description", "Description" );
     m_ensembleDescription.registerGetMethod( this, &RimSummaryEnsemble::ensembleDescription );
     m_ensembleDescription.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_ensembleDescription.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_ensembleDescription.xmlCapability()->disableIO();
+
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFileSet, "EnsembleFileSet", "Ensemble File Set" );
 
     m_commonAddressCount = 0;
 }
@@ -908,30 +908,10 @@ void RimSummaryEnsemble::initAfterRead()
     // populate the summary path of summary cases in the project file.
     m_cases.xmlCapability()->setIOWritable( false );
 
-    // Usually we check for project file version using isProjectFileVersionEqualOrOlderThan, but here we can simplify by checking if any
-    // path pattern is present
-    if ( !m_pathPatternFileSet->pathPattern().isEmpty() )
+    if ( m_ensembleFileSet() )
     {
-        auto paths = m_pathPatternFileSet->createPaths( internal::pathPatternPlaceholder );
-
-        RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
-
-        RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
-        auto [isOk, newCases] = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
-        if ( !isOk || newCases.empty() )
-        {
-            RiaLogging::warning( "No new cases are created." );
-            return;
-        }
-
-        replaceCases( newCases );
-
-        // Update name of cases and ensemble after all cases are added
-        for ( auto summaryCase : newCases )
-        {
-            summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
-            summaryCase->updateAutoShortName();
-        }
+        m_ensembleFileSet()->fileSetChanged.connect( this, &RimSummaryEnsemble::onFilterChanged );
+        createSummaryCasesFromEnsembleFileSet();
     }
 
     populatePathPattern();
@@ -950,6 +930,26 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     {
         RiaSummaryTools::updateSummaryEnsembleNames();
     }
+    else if ( changedField == &m_ensembleFileSet )
+    {
+        if ( m_ensembleFileSet() )
+        {
+            m_ensembleFileSet()->fileSetChanged.connect( this, &RimSummaryEnsemble::onFilterChanged );
+        }
+        createSummaryCasesFromEnsembleFileSet();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimSummaryEnsemble::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    if ( fieldNeedingOptions == &m_ensembleFileSet )
+    {
+        return RimEnsembleFileset::ensembleFilSetOptions();
+    }
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -999,8 +999,7 @@ bool RimSummaryEnsemble::isAutoNameChecked() const
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    auto group = uiOrdering.addNewGroup( "Path Pattern" );
-    m_pathPatternFileSet->uiOrdering( uiConfigName, *group );
+    uiOrdering.add( &m_ensembleFileSet );
 
     uiOrdering.add( &m_autoName );
 
@@ -1107,7 +1106,49 @@ void RimSummaryEnsemble::populatePathPattern()
         filePaths.push_back( fileName );
     }
 
-    m_pathPatternFileSet->findAndSetPathPatternAndRangeString( filePaths, internal::pathPatternPlaceholder );
+    //    m_pathPatternFileSet->findAndSetPathPatternAndRangeString( filePaths, internal::pathPatternPlaceholder );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::onFilterChanged( const caf::SignalEmitter* emitter )
+{
+    createSummaryCasesFromEnsembleFileSet();
+    buildChildNodes();
+    updateAllRequiredEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::createSummaryCasesFromEnsembleFileSet()
+{
+    m_cases.deleteChildrenAsync();
+
+    if ( m_ensembleFileSet() )
+    {
+        auto paths = m_ensembleFileSet()->createPaths( ".SMSPEC" );
+
+        RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
+
+        RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
+        auto [isOk, newCases] = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
+        if ( !isOk || newCases.empty() )
+        {
+            RiaLogging::warning( "No new cases are created." );
+            return;
+        }
+
+        replaceCases( newCases );
+
+        // Update name of cases and ensemble after all cases are added
+        for ( auto summaryCase : newCases )
+        {
+            summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
+            summaryCase->updateAutoShortName();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

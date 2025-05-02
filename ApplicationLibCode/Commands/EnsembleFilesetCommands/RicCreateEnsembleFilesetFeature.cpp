@@ -45,10 +45,17 @@ void RicCreateEnsembleFilesetFeature::onActionTriggered( bool isChecked )
 {
     QString pathCacheName = "ENSEMBLE_FILES";
     auto    result = RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( "Import Ensemble", pathCacheName );
+    if ( !result.ok )
+    {
+        return;
+    }
 
     auto collection = RimProject::current()->ensembleFilesetCollection();
 
-    collection->addFileset( new RimEnsembleFileset() );
+    auto ensembleFileset = new RimEnsembleFileset();
+    ensembleFileset->findAndSetPathPatternAndRangeString( result.files );
+
+    collection->addFileset( ensembleFileset );
     collection->updateAllRequiredEditors();
 }
 

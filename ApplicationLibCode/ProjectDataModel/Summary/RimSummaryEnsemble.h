@@ -30,6 +30,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
 
 #include <QString>
 
@@ -40,7 +41,7 @@
 class RimSummaryCase;
 class RimSummaryAddressCollection;
 class RiaSummaryAddressAnalyzer;
-class RimPathPatternFileSet;
+class RimEnsembleFileset;
 
 //==================================================================================================
 ///
@@ -128,6 +129,7 @@ protected:
     bool isAutoNameChecked() const;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
     caf::PdmFieldHandle* userDescriptionField() override;
@@ -148,6 +150,9 @@ private:
     QString ensembleDescription() const;
 
     void populatePathPattern();
+    void onFilterChanged( const caf::SignalEmitter* emitter );
+
+    void createSummaryCasesFromEnsembleFileSet();
 
 protected:
     caf::PdmChildArrayField<RimSummaryCase*> m_cases;
@@ -166,7 +171,7 @@ private:
     caf::PdmField<bool>                              m_isEnsemble;
     caf::PdmChildField<RimSummaryAddressCollection*> m_dataVectorFolders;
 
-    caf::PdmChildField<RimPathPatternFileSet*> m_pathPatternFileSet;
+    caf::PdmPtrField<RimEnsembleFileset*> m_ensembleFileSet;
 
     caf::PdmField<int> m_ensembleId;
 

@@ -40,6 +40,8 @@ public:
     void                             removeFileset( RimEnsembleFileset* fileset );
     std::vector<RimEnsembleFileset*> filesets() const;
 
+    QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
+
     void updateConnectedEditors();
 
 private:
@@ -47,7 +49,6 @@ private:
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
-
 
 private:
     caf::PdmChildArrayField<RimEnsembleFileset*> m_filesets;

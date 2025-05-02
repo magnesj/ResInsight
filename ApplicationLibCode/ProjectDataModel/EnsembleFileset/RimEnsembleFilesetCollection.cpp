@@ -65,6 +65,19 @@ std::vector<RimEnsembleFileset*> RimEnsembleFilesetCollection::filesets() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimEnsembleFilesetCollection::ensembleFileSetOptions() const
+{
+    QList<caf::PdmOptionItemInfo> options;
+    for ( const auto& fileset : m_filesets )
+    {
+        options.push_back( caf::PdmOptionItemInfo( fileset->name(), fileset, false, fileset->uiIconProvider() ) );
+    }
+    return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimEnsembleFilesetCollection::updateConnectedEditors()
 {
     for ( const auto& fileset : m_filesets )
