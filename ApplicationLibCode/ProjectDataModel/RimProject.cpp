@@ -36,6 +36,7 @@
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
+#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
@@ -235,6 +236,9 @@ RimProject::RimProject()
     CAF_PDM_InitFieldNoDefault( &m_automationSettings, "AutomationSettings", "Automation Settings" );
     m_automationSettings = new RimAutomationSettings();
 
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFilesetCollection, "EnsembleFilesetCollection", "Ensemble Filesets" );
+    m_ensembleFilesetCollection = new RimEnsembleFilesetCollection();
+
     // For now, create a default first oilfield that contains the rest of the project
     oilFields.push_back( new RimOilField );
 
@@ -374,6 +378,14 @@ RimQuickAccessCollection* RimProject::pinnedFieldCollection() const
 RimAutomationSettings* RimProject::automationSettings() const
 {
     return m_automationSettings();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimEnsembleFilesetCollection* RimProject::ensembleFilesetCollection() const
+{
+    return m_ensembleFilesetCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1433,6 +1445,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.DataSources" )
     {
+        uiTreeOrdering.add( &m_ensembleFilesetCollection );
         RimOilField* oilField = activeOilField();
         if ( oilField )
         {
@@ -1484,6 +1497,8 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     {
         // Use object instead of field to avoid duplicate entries in the tree view
         uiTreeOrdering.add( viewLinkerCollection() );
+
+        uiTreeOrdering.add( &m_ensembleFilesetCollection );
 
         RimOilField* oilField = activeOilField();
         if ( oilField )
