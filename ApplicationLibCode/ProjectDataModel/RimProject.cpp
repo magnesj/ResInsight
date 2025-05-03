@@ -428,7 +428,7 @@ std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
 {
     std::vector<caf::PdmFieldHandle*> ordered;
 
-    ordered.push_back( fileNameHandle() );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( fileNameHandle() ) );
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_projectFileVersionString ) ) );
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_globalPathList ) ) );
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFilesetCollection ) ) );
