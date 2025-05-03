@@ -36,6 +36,7 @@
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
+#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
@@ -235,6 +236,9 @@ RimProject::RimProject()
     CAF_PDM_InitFieldNoDefault( &m_automationSettings, "AutomationSettings", "Automation Settings" );
     m_automationSettings = new RimAutomationSettings();
 
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFilesetCollection, "EnsembleFilesetCollection", "Ensemble Filesets" );
+    m_ensembleFilesetCollection = new RimEnsembleFilesetCollection();
+
     // For now, create a default first oilfield that contains the rest of the project
     oilFields.push_back( new RimOilField );
 
@@ -379,6 +383,14 @@ RimAutomationSettings* RimProject::automationSettings() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimEnsembleFilesetCollection* RimProject::ensembleFilesetCollection() const
+{
+    return m_ensembleFilesetCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimProject::initAfterRead()
 {
     // Function moved to beforeInitAfterRead() to make sure that file path objects are replaced before other initAfterRead() is called
@@ -407,6 +419,30 @@ void RimProject::setupBeforeSave()
     }
 
     m_projectFileVersionString = STRPRODUCTVER;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
+{
+    std::vector<caf::PdmFieldHandle*> ordered;
+
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( fileNameHandle() ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_projectFileVersionString ) ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_globalPathList ) ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFilesetCollection ) ) );
+
+    // Append the rest of the fields
+    for ( auto handle : fields() )
+    {
+        if ( std::find( ordered.begin(), ordered.end(), handle ) == ordered.end() )
+        {
+            ordered.push_back( handle );
+        }
+    }
+
+    return ordered;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1432,6 +1468,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.DataSources" )
     {
+        uiTreeOrdering.add( &m_ensembleFilesetCollection );
         RimOilField* oilField = activeOilField();
         if ( oilField )
         {
@@ -1483,6 +1520,8 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     {
         // Use object instead of field to avoid duplicate entries in the tree view
         uiTreeOrdering.add( viewLinkerCollection() );
+
+        uiTreeOrdering.add( &m_ensembleFilesetCollection );
 
         RimOilField* oilField = activeOilField();
         if ( oilField )
