@@ -73,9 +73,6 @@ protected: // Virtual
     /// Override this method if you need to exclude or reorder fields for export to XML
     [[nodiscard]] virtual std::vector<PdmFieldHandle*> fieldsForExport() const;
 
-    /// Override this method if you need to exclude or reorder fields for export to XML
-    [[nodiscard]] virtual std::vector<PdmFieldHandle*> fieldsForExport() const;
-
     /// This method is intended to be used in macros to make compile time errors
     // if user uses them on wrong type of objects
     bool isInheritedFromPdmXmlSerializable() { return true; }
