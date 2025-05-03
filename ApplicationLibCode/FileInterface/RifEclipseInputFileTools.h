@@ -58,6 +58,7 @@ public:
     ~RifEclipseInputFileTools() override;
 
     static bool openGridFile( const QString& fileName, RigEclipseCaseData* eclipseCase, bool readFaultData, QString* errorMessages );
+    static bool openGridFileOpmCommon( const QString& fileName, RigEclipseCaseData* eclipseCase, bool readFaultData, QString* errorMessages );
 
     static bool exportGrid( const QString&         gridFileName,
                             RigEclipseCaseData*    eclipseCase,

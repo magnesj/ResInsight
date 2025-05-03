@@ -58,6 +58,21 @@
 #include "ert/ecl/ecl_grid.hpp"
 #include "ert/ecl/ecl_kw.h"
 
+#include "opm/common/utility/OpmInputError.hpp"
+#include "opm/input/eclipse/Deck/Deck.hpp"
+#include "opm/input/eclipse/EclipseState/Grid/EclipseGrid.hpp"
+#include "opm/input/eclipse/Parser/ErrorGuard.hpp"
+#include "opm/input/eclipse/Parser/InputErrorAction.hpp"
+#include "opm/input/eclipse/Parser/ParseContext.hpp"
+#include "opm/input/eclipse/Parser/Parser.hpp"
+
+/*
+#include "opm/input/eclipse/Deck/Deck.hpp"
+#include "opm/input/eclipse/Parser/Parser.hpp"
+*/
+
+#pragma optimize( "", off )
+
 QString includeKeyword( "INCLUDE" );
 QString faultsKeyword( "FAULTS" );
 QString editKeyword( "EDIT" );
@@ -83,6 +98,8 @@ RifEclipseInputFileTools::~RifEclipseInputFileTools()
 //--------------------------------------------------------------------------------------------------
 bool RifEclipseInputFileTools::openGridFile( const QString& fileName, RigEclipseCaseData* eclipseCase, bool readFaultData, QString* errorMessages )
 {
+    return openGridFileOpmCommon( fileName, eclipseCase, readFaultData, errorMessages );
+
     std::string filename = fileName.toStdString();
 
     auto objects = RifEclipseTextFileReader::readKeywordAndValues( filename );
@@ -213,6 +230,120 @@ bool RifEclipseInputFileTools::openGridFile( const QString& fileName, RigEclipse
     RiaLogging::error( txt );
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifEclipseInputFileTools::openGridFileOpmCommon( const QString&      fileName,
+                                                      RigEclipseCaseData* eclipseCase,
+                                                      bool                readFaultData,
+                                                      QString*            errorMessages )
+{
+    try
+    {
+        std::string stdFilename = fileName.toStdString();
+
+        Opm::ParseContext parseContext( Opm::InputErrorAction::WARN );
+
+        Opm::ErrorGuard errorGuard;
+
+        auto opmGrid = Opm::Parser::parseGrid( stdFilename, parseContext, errorGuard );
+        /*
+        Opm::Parser parser;
+        auto        deck = parser.parseFile( stdFilename, parseContext );
+
+        const int* actunumValues = nullptr;
+        if ( deck.hasKeyword( "ACTNUM" ) )
+        {
+            const std::vector<int>& deckActnum = deck["ACTNUM"].back().getIntData();
+            actunumValues                      = deckActnum.data();
+        }
+
+        Opm::EclipseGrid opmGrid( deck, actunumValues );
+*/
+        auto numActive = opmGrid.getNumActive();
+
+        auto mainGrid = eclipseCase->mainGrid();
+
+        auto nx = opmGrid.getNX();
+        auto ny = opmGrid.getNY();
+        auto nz = opmGrid.getNZ();
+
+        cvf::Vec3st gridPointDim( 0, 0, 0 );
+        gridPointDim.x() = nx + 1;
+        gridPointDim.y() = ny + 1;
+        gridPointDim.z() = nz + 1;
+        mainGrid->setGridPointDimensions( gridPointDim );
+
+        auto cellCount = nx * ny * nz;
+        mainGrid->nodes().resize( cellCount * 8 );
+
+        RigCell defaultCell;
+        defaultCell.setHostGrid( mainGrid );
+        mainGrid->reservoirCells().resize( cellCount, defaultCell );
+
+        std::vector<RigCell>& cells = mainGrid->reservoirCells();
+
+        std::array<double, 8> opmX{};
+        std::array<double, 8> opmY{};
+        std::array<double, 8> opmZ{};
+
+        // NB! taken from RoffFileTools
+        // Swap i and j to get correct faces
+        // const size_t cellMappingECLRi[8] = { 2, 3, 1, 0, 6, 7, 5, 4 };
+
+        // use same mapping as resdata
+        const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
+
+        RigActiveCellInfo* activeCellInfo = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        activeCellInfo->setGridCount( 1 );
+        activeCellInfo->setReservoirCellCount( cellCount );
+
+        size_t matrixActiveIndex = 0;
+
+        for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( cellCount ); opmCellIndex++ )
+        {
+            RigCell& cell = mainGrid->cell( opmCellIndex );
+
+            cell.setGridLocalCellIndex( opmCellIndex );
+            cell.setParentCellIndex( cvf::UNDEFINED_SIZE_T );
+
+            opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
+
+            if ( opmGrid.cellActive( opmCellIndex ) )
+            {
+                activeCellInfo->setCellResultIndex( opmCellIndex, matrixActiveIndex++ );
+            }
+
+            // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
+            auto riNodeStartIndex = opmCellIndex * 8;
+
+            for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
+            {
+                auto   riCornerIndex = cellMappingECLRi[opmNodeIndex];
+                size_t riNodeIndex   = riNodeStartIndex + riCornerIndex;
+
+                // The radial grid is specified with (0,0) as center, add grid center to get correct global coordinates
+                auto& riNode = mainGrid->nodes()[riNodeIndex];
+                riNode.x()   = opmX[opmNodeIndex];
+                riNode.y()   = opmY[opmNodeIndex];
+                riNode.z()   = -opmZ[opmNodeIndex];
+
+                cell.cornerIndices()[riCornerIndex] = riNodeIndex;
+            }
+        }
+
+        activeCellInfo->setGridActiveCellCounts( 0, matrixActiveIndex );
+        mainGrid->initAllSubGridsParentGridPointer();
+        activeCellInfo->computeDerivedData();
+    }
+    catch ( std::exception& e )
+    {
+        std::cout << "Exception: " << e.what() << std::endl;
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
