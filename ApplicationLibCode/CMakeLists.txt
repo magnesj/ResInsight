@@ -112,6 +112,7 @@ list(
   ProjectDataModel/GridCrossPlots/CellFilters/CMakeLists_files.cmake
   ProjectDataModel/Summary/CMakeLists_files.cmake
   ProjectDataModel/Summary/Sumo/CMakeLists_files.cmake
+  ProjectDataModel/Summary/Ensemble/CMakeLists_files.cmake
   ProjectDataModel/Flow/CMakeLists_files.cmake
   ProjectDataModel/Formations/CMakeLists_files.cmake
   ProjectDataModel/Annotations/CMakeLists_files.cmake

@@ -127,10 +127,11 @@ protected:
     bool isAutoNameChecked() const;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void initAfterRead() override;
+    void buildChildNodes();
 
 private:
     caf::PdmFieldHandle* userDescriptionField() override;
-    void                 initAfterRead() override;
     void                 defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
@@ -141,7 +142,6 @@ private:
 
     void onCaseNameChanged( const SignalEmitter* emitter );
 
-    void buildChildNodes();
     void clearChildNodes();
 
     QString ensembleDescription() const;
