@@ -18,6 +18,7 @@
 
 #include "RimSummaryEnsemble.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaFilePathTools.h"
@@ -30,6 +31,7 @@
 
 #include "RifSummaryReaderInterface.h"
 
+#include "EnsembleFileset/RimEnsembleFileset.h"
 #include "RimDeltaSummaryEnsemble.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimProject.h"
@@ -50,6 +52,11 @@
 #include <cmath>
 
 CAF_PDM_SOURCE_INIT( RimSummaryEnsemble, "SummaryCaseSubCollection" );
+
+namespace internal
+{
+const QString pathPatternPlaceholder = "*";
+}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -95,6 +102,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_ensembleDescription.registerGetMethod( this, &RimSummaryEnsemble::ensembleDescription );
     m_ensembleDescription.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_ensembleDescription.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
+    m_ensembleDescription.xmlCapability()->disableIO();
+
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFileSet, "EnsembleFileSet", "Ensemble File Set" );
 
     m_commonAddressCount = 0;
 }
@@ -133,6 +143,7 @@ void RimSummaryEnsemble::removeCase( RimSummaryCase* summaryCase, bool notifyCha
     }
 
     clearChildNodes();
+    populatePathPattern();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -167,6 +178,8 @@ void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase )
     updateReferringCurveSetsZoomAll();
 
     clearChildNodes();
+
+    populatePathPattern();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -204,10 +217,8 @@ void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summa
 
         // Do what is required to add the case, avoid updates until all cases are added
         summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
-        if ( m_cases.empty() )
-        {
-            summaryCase->setShowVectorItemsInProjectTree( true );
-        }
+        summaryCase->setShowVectorItemsInProjectTree( false );
+
         m_cases.push_back( summaryCase );
     }
 
@@ -231,6 +242,11 @@ void RimSummaryEnsemble::setNameTemplate( const QString& name )
 //--------------------------------------------------------------------------------------------------
 QString RimSummaryEnsemble::name() const
 {
+    if ( m_ensembleFileSet() )
+    {
+        return m_ensembleFileSet()->name();
+    }
+
     return m_name;
 }
 
@@ -890,6 +906,19 @@ void RimSummaryEnsemble::initAfterRead()
     {
         m_nameTemplateString = m_name;
     }
+
+    // Disable write access for the summary cases. This must be done here to make sure the cases for project files with summary cases are
+    // imported correctly. The function RiaProjectFileTools::fieldContentsByType() checks if the field is writable, and it is used to
+    // populate the summary path of summary cases in the project file.
+    m_cases.xmlCapability()->setIOWritable( false );
+
+    if ( m_ensembleFileSet() )
+    {
+        m_ensembleFileSet()->fileSetChanged.connect( this, &RimSummaryEnsemble::onFilterChanged );
+        createSummaryCasesFromEnsembleFileSet();
+    }
+
+    populatePathPattern();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -901,10 +930,31 @@ void RimSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
     {
         updateIcon();
     }
-    if ( changedField == &m_autoName || changedField == &m_nameTemplateString )
+    else if ( changedField == &m_autoName || changedField == &m_nameTemplateString )
     {
         RiaSummaryTools::updateSummaryEnsembleNames();
     }
+    else if ( changedField == &m_ensembleFileSet )
+    {
+        if ( m_ensembleFileSet() )
+        {
+            m_ensembleFileSet()->fileSetChanged.connect( this, &RimSummaryEnsemble::onFilterChanged );
+        }
+        createSummaryCasesFromEnsembleFileSet();
+        caseNameChanged.send();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimSummaryEnsemble::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    if ( fieldNeedingOptions == &m_ensembleFileSet )
+    {
+        return RimEnsembleFileset::ensembleFilSetOptions();
+    }
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -954,6 +1004,8 @@ bool RimSummaryEnsemble::isAutoNameChecked() const
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    uiOrdering.add( &m_ensembleFileSet );
+
     uiOrdering.add( &m_autoName );
 
     if ( !m_autoName() )
@@ -1041,6 +1093,67 @@ QString RimSummaryEnsemble::ensembleDescription() const
     }
 
     return txt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::populatePathPattern()
+{
+    QStringList filePaths;
+
+    for ( auto sumCase : allSummaryCases() )
+    {
+        const auto filePath = sumCase->summaryHeaderFilename();
+        if ( filePath.isEmpty() ) continue;
+
+        const auto fileName = RiaFilePathTools::toInternalSeparator( filePath );
+        filePaths.push_back( fileName );
+    }
+
+    //    m_pathPatternFileSet->findAndSetPathPatternAndRangeString( filePaths, internal::pathPatternPlaceholder );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::onFilterChanged( const caf::SignalEmitter* emitter )
+{
+    createSummaryCasesFromEnsembleFileSet();
+    buildChildNodes();
+    updateAllRequiredEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::createSummaryCasesFromEnsembleFileSet()
+{
+    m_cases.deleteChildrenAsync();
+
+    if ( m_ensembleFileSet() )
+    {
+        auto paths = m_ensembleFileSet()->createPaths( ".SMSPEC" );
+
+        RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
+
+        RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
+        auto [isOk, newCases] = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
+        if ( !isOk || newCases.empty() )
+        {
+            RiaLogging::warning( "No new cases are created." );
+            return;
+        }
+
+        replaceCases( newCases );
+
+        // Update name of cases and ensemble after all cases are added
+        for ( auto summaryCase : newCases )
+        {
+            summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
+            summaryCase->updateAutoShortName();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
