@@ -22,6 +22,7 @@
 #include "RimEnsembleFilesetCollection.h"
 #include "RimProject.h"
 
+#include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
@@ -137,6 +138,14 @@ void RimEnsembleFileset::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 void RimEnsembleFileset::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     fileSetChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileset::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    menuBuilder << "RicCreateEnsembleFromFilesetFeature";
 }
 
 //--------------------------------------------------------------------------------------------------
