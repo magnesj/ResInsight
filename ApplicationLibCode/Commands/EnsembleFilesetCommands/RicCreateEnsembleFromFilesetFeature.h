@@ -18,41 +18,17 @@
 
 #pragma once
 
-#include "RimSummaryEnsemble.h"
-#include "cafPdmPtrField.h"
-
-class RimEnsembleFileset;
+#include "cafCmdFeature.h"
 
 //==================================================================================================
-//
-//
-//
+///
 //==================================================================================================
-class RimPathPatternEnsemble : public RimSummaryEnsemble
+class RicCreateEnsembleFromFilesetFeature : public caf::CmdFeature
 {
-    CAF_PDM_HEADER_INIT;
-
-public:
-    RimPathPatternEnsemble();
-
-    void setEnsembleFileSet( RimEnsembleFileset* ensembleFileSet );
-
-private:
-    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
-
-    void populatePathPattern();
-    void onFilterChanged( const caf::SignalEmitter* emitter );
-
-    void createSummaryCasesFromEnsembleFileSet();
-
-    void initAfterRead() override;
+    CAF_CMD_HEADER_INIT;
 
 protected:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-
-    void onLoadDataAndUpdate() override;
-
-private:
-    caf::PdmPtrField<RimEnsembleFileset*> m_ensembleFileSet;
+    bool isCommandEnabled() const override;
+    void onActionTriggered( bool isChecked ) override;
+    void setupActionLook( QAction* actionToSetup ) override;
 };

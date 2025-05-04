@@ -49,6 +49,14 @@ RimPathPatternEnsemble::RimPathPatternEnsemble()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileset* ensembleFileSet )
+{
+    m_ensembleFileSet = ensembleFileSet;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimPathPatternEnsemble::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     if ( fieldNeedingOptions == &m_ensembleFileSet )
@@ -159,4 +167,14 @@ void RimPathPatternEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* change
         createSummaryCasesFromEnsembleFileSet();
         caseNameChanged.send();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPathPatternEnsemble::onLoadDataAndUpdate()
+{
+    if ( m_cases.empty() ) createSummaryCasesFromEnsembleFileSet();
+
+    RimSummaryEnsemble::onLoadDataAndUpdate();
 }
