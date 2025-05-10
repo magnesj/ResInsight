@@ -35,6 +35,7 @@ jobs:
           sudo apt-get update --option="APT::Acquire::Retries=3"
           sudo apt-get install --option="APT::Acquire::Retries=3" libxkbcommon-x11-0 libgl1-mesa-dev mesa-common-dev libglfw3-dev libglu1-mesa-dev libhdf5-dev
           sudo apt-get install clang-tidy-18 clang-format-18
+          pip install clang-tidy-cache
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
@@ -68,8 +69,9 @@ jobs:
         continue-on-error: true
         run: |
           cd build
-          run-clang-tidy-18 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
-          run-clang-tidy-18 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
+          export CLANG_TIDY_BINARY=clang-tidy-18
+          clang-tidy-cache -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
+          clang-tidy-cache -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
       - name: Run clang-format after clang-tidy
         continue-on-error: true
         run: |
