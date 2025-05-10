@@ -66,9 +66,9 @@ jobs:
           python ../scripts/fix_json_database.py compile_commands_original.json >> compile_commands.json
       - name: Run clang-tidy and apply fixes
         continue-on-error: true
-        # run-clang-tidy-18 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
         run: |
           cd build
+          run-clang-tidy-18 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
           run-clang-tidy-18 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
       - name: Run clang-format after clang-tidy
         continue-on-error: true
