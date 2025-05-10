@@ -62,3 +62,26 @@ jobs:
           cmake -DCMAKE_TOOLCHAIN_FILE=ThirdParty/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_C_COMPILER=clang-19 -DCMAKE_CXX_COMPILER=clang++-19 -DRESINSIGHT_USE_OPENMP=OFF -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ..
           mv compile_commands.json compile_commands_original.json
           python ../scripts/fix_json_database.py compile_commands_original.json >> compile_commands.json
+      - name: Run clang-tidy and apply fixes
+        continue-on-error: true
+        run: |
+          cd build
+          run-clang-tidy-19 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
+          run-clang-tidy-19 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
+      - name: Run clang-format after clang-tidy
+        continue-on-error: true
+        run: |
+          cd ApplicationLibCode
+          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-19 -i
+          cd ../GrpcInterface
+          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-19 -i
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Fixes by clang-tidy"
+          title: "Fixes by clang-tidy"
+          branch: clang-tidy-patches
+          branch-suffix: random
+          add-paths: |
+            ApplicationLibCode/*
+            GrpcInterface/*
