@@ -30,7 +30,7 @@ CAF_PDM_SOURCE_INIT( RimEnsembleFilesetCollection, "EnsembleFilesetCollection" )
 //--------------------------------------------------------------------------------------------------
 RimEnsembleFilesetCollection::RimEnsembleFilesetCollection()
 {
-    CAF_PDM_InitObject( "Ensemble Fileset Collection", ":/Cases16x16.png", "", "" );
+    CAF_PDM_InitObject( "Ensembles", ":/Cases16x16.png", "", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_filesets, "Filesets", "Filesets", "", "", "" );
     m_filesets.uiCapability()->setUiHidden( true );
