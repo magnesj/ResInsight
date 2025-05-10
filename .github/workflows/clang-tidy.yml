@@ -28,11 +28,14 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+     # clang++19 is required for the build configuration
+     # clang-tidy-19 and clang-format-18 is used for formatting
       - name: Install Linux dependencies
         run: |
           sudo apt-get update --option="APT::Acquire::Retries=3"
           sudo apt-get install --option="APT::Acquire::Retries=3" libxkbcommon-x11-0 libgl1-mesa-dev mesa-common-dev libglfw3-dev libglu1-mesa-dev libhdf5-dev
           sudo apt-get install clang-tidy-19 clang-format-19
+          sudo apt-get install clang-tidy-18 clang-format-18
 
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
@@ -66,15 +69,15 @@ jobs:
         continue-on-error: true
         run: |
           cd build
-          run-clang-tidy-19 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
-          run-clang-tidy-19 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
+          run-clang-tidy-18 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
+          run-clang-tidy-18 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
       - name: Run clang-format after clang-tidy
         continue-on-error: true
         run: |
           cd ApplicationLibCode
-          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-19 -i
+          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-18 -i
           cd ../GrpcInterface
-          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-19 -i
+          find -name '*.h' -o -name '*.cpp' -o -name '*.inl' | xargs clang-format-18 -i
       - uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
