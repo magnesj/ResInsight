@@ -308,21 +308,23 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
   # https://github.com/OPM/ResInsight/pull/7
   list(APPEND EXTERNAL_LINK_LIBRARIES rt)
 
-  find_library(STDCPP_LIBRARY NAMES stdc++
-      HINTS 
-    /opt/rh/gcc-toolset-13/root/usr/lib64
-    /opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13
-    /usr/lib/x86_64-linux-gnu
-    /usr/lib/gcc/x86_64-linux-gnu/13)
+  find_library(
+    STDCPP_LIBRARY
+    NAMES stdc++
+    HINTS /opt/rh/gcc-toolset-13/root/usr/lib64
+          /opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13
+          /usr/lib/x86_64-linux-gnu /usr/lib/gcc/x86_64-linux-gnu/13
+  )
 
-  find_library(STDCPP_EXP_LIBRARY NAMES stdc++exp
-    HINTS 
-    /opt/rh/gcc-toolset-13/root/usr/lib64
-    /opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13
-    /usr/lib/x86_64-linux-gnu
-    /usr/lib/gcc/x86_64-linux-gnu/13)
+  find_library(
+    STDCPP_EXP_LIBRARY
+    NAMES stdc++exp
+    HINTS /opt/rh/gcc-toolset-13/root/usr/lib64
+          /opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13
+          /usr/lib/x86_64-linux-gnu /usr/lib/gcc/x86_64-linux-gnu/13
+  )
 
-  if (STDCPP_EXP_LIBRARY)  
+  if(STDCPP_EXP_LIBRARY)
     message(STATUS "stdc++exp library found: ${STDCPP_EXP_LIBRARY}")
     # stdc++exp is required for std::stacktrace
     list(APPEND EXTERNAL_LINK_LIBRARIES ${STDCPP_EXP_LIBRARY})
