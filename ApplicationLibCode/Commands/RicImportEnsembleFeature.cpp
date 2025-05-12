@@ -27,10 +27,13 @@
 
 #include "RicImportSummaryCasesFeature.h"
 
+#include "EnsembleFileset/RimEnsembleFileset.h"
+#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
 #include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
+#include "Summary/Ensemble/RimPathPatternEnsemble.h"
 
 #include "RiuMainWindow.h"
 #include "RiuPlotMainWindowTools.h"
@@ -100,7 +103,7 @@ void RicImportEnsembleFeature::onActionTriggered( bool isChecked )
             for ( const auto& [groupName, fileNames] : grouping )
             {
                 bool useEnsembleNameDialog = false;
-                importSingleEnsemble( fileNames, useEnsembleNameDialog, ensembleGroupingMode, fileType, groupName );
+                importSingleEnsembleFileSet( fileNames, useEnsembleNameDialog, ensembleGroupingMode, fileType, groupName );
             }
 
             RiaSummaryTools::updateSummaryEnsembleNames();
@@ -148,6 +151,36 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsemble( const QStrin
     {
         RiuMainWindow::closeIfOpen();
     }
+
+    return ensemble;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const QStringList&               fileNames,
+                                                                           bool                             useEnsembleNameDialog,
+                                                                           RiaDefines::EnsembleGroupingMode groupingMode,
+                                                                           RiaDefines::FileType             fileType,
+                                                                           const QString&                   defaultEnsembleName )
+{
+    auto collection = RimProject::current()->ensembleFilesetCollection();
+
+    auto ensembleFileset = new RimEnsembleFileset();
+    ensembleFileset->setName( defaultEnsembleName );
+    ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
+
+    collection->addFileset( ensembleFileset );
+    collection->updateAllRequiredEditors();
+
+    auto ensemble = new RimPathPatternEnsemble();
+    ensemble->setEnsembleFileSet( ensembleFileset );
+    RiaSummaryTools::summaryCaseMainCollection()->addEnsemble( ensemble );
+    ensemble->loadDataAndUpdate();
+
+    RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );
+
+    RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
 
     return ensemble;
 }
