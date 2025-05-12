@@ -94,7 +94,7 @@ void RimEnsembleFileSet::findAndSetPathPatternAndRangeString( const QStringList&
 //--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimEnsembleFileSet::ensembleFilSetOptions()
 {
-    return RimProject::current()->ensembleFilesetCollection()->ensembleFileSetOptions();
+    return RimProject::current()->ensembleFileSetCollection()->ensembleFileSetOptions();
 }
 
 //--------------------------------------------------------------------------------------------------

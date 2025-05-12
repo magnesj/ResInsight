@@ -32,34 +32,34 @@ RimEnsembleFileSetCollection::RimEnsembleFileSetCollection()
 {
     CAF_PDM_InitObject( "Ensembles", ":/CreateGridCaseGroup16x16.png", "", "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_filesets, "Filesets", "Filesets", "", "", "" );
-    m_filesets.uiCapability()->setUiHidden( true );
+    CAF_PDM_InitFieldNoDefault( &m_fileSets, "FileSets", "Filesets", "", "", "" );
+    m_fileSets.uiCapability()->setUiHidden( true );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::addFileset( RimEnsembleFileset* fileset )
+void RimEnsembleFileSetCollection::addFileset( RimEnsembleFileSet* fileSet )
 {
-    if ( fileset )
+    if ( fileSet )
     {
-        m_filesets.push_back( fileset );
+        m_fileSets.push_back( fileSet );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::removeFileset( RimEnsembleFileset* fileset )
+void RimEnsembleFileSetCollection::removeFileset( RimEnsembleFileSet* fileSet )
 {
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimEnsembleFileset*> RimEnsembleFileSetCollection::filesets() const
+std::vector<RimEnsembleFileSet*> RimEnsembleFileSetCollection::fileSets() const
 {
-    return m_filesets.childrenByType();
+    return m_fileSets.childrenByType();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -67,7 +67,7 @@ std::vector<RimEnsembleFileset*> RimEnsembleFileSetCollection::filesets() const
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSetCollection::deleteAllFileSets()
 {
-    m_filesets.deleteChildren();
+    m_fileSets.deleteChildren();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ void RimEnsembleFileSetCollection::deleteAllFileSets()
 QList<caf::PdmOptionItemInfo> RimEnsembleFileSetCollection::ensembleFileSetOptions() const
 {
     QList<caf::PdmOptionItemInfo> options;
-    for ( const auto& fileset : m_filesets )
+    for ( const auto& fileset : m_fileSets )
     {
         options.push_back( caf::PdmOptionItemInfo( fileset->name(), fileset, false, fileset->uiIconProvider() ) );
     }
@@ -88,7 +88,7 @@ QList<caf::PdmOptionItemInfo> RimEnsembleFileSetCollection::ensembleFileSetOptio
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSetCollection::updateConnectedEditors()
 {
-    for ( const auto& fileset : m_filesets )
+    for ( const auto& fileset : m_fileSets )
     {
         fileset->updateConnectedEditors();
     }

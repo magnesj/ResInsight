@@ -49,7 +49,7 @@ RimPathPatternEnsemble::RimPathPatternEnsemble()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileset* ensembleFileSet )
+void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet )
 {
     m_ensembleFileSet = ensembleFileSet;
 }
@@ -61,7 +61,7 @@ QList<caf::PdmOptionItemInfo> RimPathPatternEnsemble::calculateValueOptions( con
 {
     if ( fieldNeedingOptions == &m_ensembleFileSet )
     {
-        return RimEnsembleFileset::ensembleFilSetOptions();
+        return RimEnsembleFileSet::ensembleFilSetOptions();
     }
     return {};
 }

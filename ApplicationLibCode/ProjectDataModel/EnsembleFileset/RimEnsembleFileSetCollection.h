@@ -22,7 +22,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
 
-class RimEnsembleFileset;
+class RimEnsembleFileSet;
 
 //==================================================================================================
 ///
@@ -36,9 +36,9 @@ class RimEnsembleFileSetCollection : public caf::PdmObject
 public:
     RimEnsembleFileSetCollection();
 
-    void                             addFileset( RimEnsembleFileset* fileset );
-    void                             removeFileset( RimEnsembleFileset* fileset );
-    std::vector<RimEnsembleFileset*> filesets() const;
+    void                             addFileset( RimEnsembleFileSet* fileSet );
+    void                             removeFileset( RimEnsembleFileSet* fileSet );
+    std::vector<RimEnsembleFileSet*> fileSets() const;
     void                             deleteAllFileSets();
 
     QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
@@ -52,5 +52,5 @@ private:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:
-    caf::PdmChildArrayField<RimEnsembleFileset*> m_filesets;
+    caf::PdmChildArrayField<RimEnsembleFileSet*> m_fileSets;
 };

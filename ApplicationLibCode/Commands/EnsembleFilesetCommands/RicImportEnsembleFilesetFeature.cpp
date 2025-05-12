@@ -51,12 +51,12 @@ void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
         return;
     }
 
-    auto collection = RimProject::current()->ensembleFilesetCollection();
+    auto collection = RimProject::current()->ensembleFileSetCollection();
 
     auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( result.files, result.groupingMode );
     for ( const auto& [groupName, fileNames] : grouping )
     {
-        auto ensembleFileset = new RimEnsembleFileset();
+        auto ensembleFileset = new RimEnsembleFileSet();
         ensembleFileset->setName( groupName );
         ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
 

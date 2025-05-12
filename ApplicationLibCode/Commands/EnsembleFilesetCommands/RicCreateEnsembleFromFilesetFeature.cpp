@@ -44,7 +44,7 @@ bool RicCreateEnsembleFromFilesetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicCreateEnsembleFromFilesetFeature::onActionTriggered( bool isChecked )
 {
-    for ( auto fileSet : caf::selectedObjectsByType<RimEnsembleFileset*>() )
+    for ( auto fileSet : caf::selectedObjectsByType<RimEnsembleFileSet*>() )
     {
         auto ensemble = new RimPathPatternEnsemble();
         ensemble->setEnsembleFileSet( fileSet );

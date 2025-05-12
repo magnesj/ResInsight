@@ -21,7 +21,7 @@
 #include "RimSummaryEnsemble.h"
 #include "cafPdmPtrField.h"
 
-class RimEnsembleFileset;
+class RimEnsembleFileSet;
 
 //==================================================================================================
 //
@@ -35,7 +35,7 @@ class RimPathPatternEnsemble : public RimSummaryEnsemble
 public:
     RimPathPatternEnsemble();
 
-    void setEnsembleFileSet( RimEnsembleFileset* ensembleFileSet );
+    void setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
 
 private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
@@ -54,5 +54,5 @@ protected:
     void onLoadDataAndUpdate() override;
 
 private:
-    caf::PdmPtrField<RimEnsembleFileset*> m_ensembleFileSet;
+    caf::PdmPtrField<RimEnsembleFileSet*> m_ensembleFileSet;
 };

@@ -99,14 +99,24 @@ void RicImportEnsembleFeature::onActionTriggered( bool isChecked )
         }
         else
         {
-            auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( fileNames, ensembleGroupingMode );
+            std::vector<RimSummaryEnsemble*> ensembles;
+            auto                             grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( fileNames, ensembleGroupingMode );
             for ( const auto& [groupName, fileNames] : grouping )
             {
                 bool useEnsembleNameDialog = false;
-                importSingleEnsembleFileSet( fileNames, useEnsembleNameDialog, ensembleGroupingMode, fileType, groupName );
+                if ( auto ensemble = importSingleEnsembleFileSet( fileNames, useEnsembleNameDialog, ensembleGroupingMode, fileType, groupName ) )
+                {
+                    ensembles.push_back( ensemble );
+                }
             }
 
             RiaSummaryTools::updateSummaryEnsembleNames();
+
+            for ( auto ensemble : ensembles )
+            {
+                RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );
+            }
+            RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
         }
     }
 }
@@ -177,10 +187,6 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
     ensemble->setEnsembleFileSet( ensembleFileset );
     RiaSummaryTools::summaryCaseMainCollection()->addEnsemble( ensemble );
     ensemble->loadDataAndUpdate();
-
-    RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );
-
-    RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
 
     return ensemble;
 }
