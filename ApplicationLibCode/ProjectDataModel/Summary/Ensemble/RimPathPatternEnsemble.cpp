@@ -21,7 +21,7 @@
 #include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaFilePathTools.h"
 
-#include "EnsembleFileset/RimEnsembleFileset.h"
+#include "EnsembleFileset/RimEnsembleFileSet.h"
 #include "RiaLogging.h"
 #include "RimSummaryCase.h"
 

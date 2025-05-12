@@ -36,7 +36,7 @@
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
-#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
+#include "EnsembleFileset/RimEnsembleFileSetCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
@@ -237,7 +237,7 @@ RimProject::RimProject()
     m_automationSettings = new RimAutomationSettings();
 
     CAF_PDM_InitFieldNoDefault( &m_ensembleFilesetCollection, "EnsembleFilesetCollection", "Ensemble Filesets" );
-    m_ensembleFilesetCollection = new RimEnsembleFilesetCollection();
+    m_ensembleFilesetCollection = new RimEnsembleFileSetCollection();
 
     // For now, create a default first oilfield that contains the rest of the project
     oilFields.push_back( new RimOilField );
@@ -384,7 +384,7 @@ RimAutomationSettings* RimProject::automationSettings() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEnsembleFilesetCollection* RimProject::ensembleFilesetCollection() const
+RimEnsembleFileSetCollection* RimProject::ensembleFileSetCollection() const
 {
     return m_ensembleFilesetCollection();
 }

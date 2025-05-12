@@ -18,8 +18,8 @@
 
 #include "RicImportEnsembleFilesetFeature.h"
 
-#include "EnsembleFileset/RimEnsembleFileset.h"
-#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
+#include "EnsembleFileset/RimEnsembleFileSet.h"
+#include "EnsembleFileset/RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 
 #include "RiaApplication.h"

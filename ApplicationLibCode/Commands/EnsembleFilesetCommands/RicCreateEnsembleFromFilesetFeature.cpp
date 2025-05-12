@@ -22,7 +22,7 @@
 #include "Summary/RiaSummaryTools.h"
 
 #include "Ensemble/RimPathPatternEnsemble.h"
-#include "EnsembleFileset/RimEnsembleFileset.h"
+#include "EnsembleFileset/RimEnsembleFileSet.h"
 #include "RimSummaryCaseMainCollection.h"
 
 #include "cafSelectionManagerTools.h"

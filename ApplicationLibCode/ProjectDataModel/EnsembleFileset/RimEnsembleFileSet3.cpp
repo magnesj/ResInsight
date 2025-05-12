@@ -16,17 +16,17 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RimEnsembleFileset.h"
+#include "RimEnsembleFileSet.h"
 
 #include "Ensemble/RiaEnsembleImportTools.h"
-#include "RimEnsembleFilesetCollection.h"
+#include "RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
-CAF_PDM_SOURCE_INIT( RimEnsembleFileset, "EnsembleFileset" );
+CAF_PDM_SOURCE_INIT( RimEnsembleFileSet, "EnsembleFileset" );
 
 namespace internal
 {
@@ -39,7 +39,7 @@ QString placeholderString()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEnsembleFileset::RimEnsembleFileset()
+RimEnsembleFileSet::RimEnsembleFileSet()
     : fileSetChanged( this )
 
 {
@@ -54,7 +54,7 @@ RimEnsembleFileset::RimEnsembleFileset()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RimEnsembleFileset::createPaths( const QString& extension ) const
+QStringList RimEnsembleFileSet::createPaths( const QString& extension ) const
 {
     // Append extension to the path pattern and return list of files matching the pattern
 
@@ -72,7 +72,7 @@ QStringList RimEnsembleFileset::createPaths( const QString& extension ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::findAndSetPathPatternAndRangeString( const QStringList& filePaths )
+void RimEnsembleFileSet::findAndSetPathPatternAndRangeString( const QStringList& filePaths )
 {
     const auto& [pattern, rangeString] = RiaEnsembleImportTools::findPathPattern( filePaths, internal::placeholderString() );
 
@@ -92,7 +92,7 @@ void RimEnsembleFileset::findAndSetPathPatternAndRangeString( const QStringList&
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QList<caf::PdmOptionItemInfo> RimEnsembleFileset::ensembleFilSetOptions()
+QList<caf::PdmOptionItemInfo> RimEnsembleFileSet::ensembleFilSetOptions()
 {
     return RimProject::current()->ensembleFilesetCollection()->ensembleFileSetOptions();
 }
@@ -100,7 +100,7 @@ QList<caf::PdmOptionItemInfo> RimEnsembleFileset::ensembleFilSetOptions()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+void RimEnsembleFileSet::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     if ( field == &m_pathPattern )
     {
@@ -123,7 +123,7 @@ void RimEnsembleFileset::defineEditorAttribute( const caf::PdmFieldHandle* field
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+void RimEnsembleFileSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_pathPattern );
@@ -135,7 +135,7 @@ void RimEnsembleFileset::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+void RimEnsembleFileSet::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     fileSetChanged.send();
 }
@@ -143,7 +143,7 @@ void RimEnsembleFileset::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+void RimEnsembleFileSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicCreateEnsembleFromFilesetFeature";
 }
@@ -151,7 +151,7 @@ void RimEnsembleFileset::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilde
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::setPathPattern( const QString& pathPattern )
+void RimEnsembleFileSet::setPathPattern( const QString& pathPattern )
 {
     m_pathPattern = pathPattern;
     fileSetChanged.send();
@@ -160,7 +160,7 @@ void RimEnsembleFileset::setPathPattern( const QString& pathPattern )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileset::setRangeString( const QString& rangeString )
+void RimEnsembleFileSet::setRangeString( const QString& rangeString )
 {
     m_realizationSubSet = rangeString;
     fileSetChanged.send();

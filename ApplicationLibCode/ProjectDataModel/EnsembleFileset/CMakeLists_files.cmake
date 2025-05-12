@@ -1,11 +1,11 @@
 set(SOURCE_GROUP_HEADER_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileset.h
-    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFilesetCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileSet.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileSetCollection.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileset.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFilesetCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileSet.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimEnsembleFileSetCollection.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

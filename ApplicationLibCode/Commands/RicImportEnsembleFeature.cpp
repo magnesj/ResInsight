@@ -27,8 +27,8 @@
 
 #include "RicImportSummaryCasesFeature.h"
 
-#include "EnsembleFileset/RimEnsembleFileset.h"
-#include "EnsembleFileset/RimEnsembleFilesetCollection.h"
+#include "EnsembleFileset/RimEnsembleFileSet.h"
+#include "EnsembleFileset/RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
@@ -164,9 +164,9 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
                                                                            RiaDefines::FileType             fileType,
                                                                            const QString&                   defaultEnsembleName )
 {
-    auto collection = RimProject::current()->ensembleFilesetCollection();
+    auto collection = RimProject::current()->ensembleFileSetCollection();
 
-    auto ensembleFileset = new RimEnsembleFileset();
+    auto ensembleFileset = new RimEnsembleFileSet();
     ensembleFileset->setName( defaultEnsembleName );
     ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
 

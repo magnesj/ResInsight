@@ -18,41 +18,39 @@
 
 #pragma once
 
-#include "RimNamedObject.h"
-
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
 
+class RimEnsembleFileset;
+
 //==================================================================================================
 ///
+/// Class to manage a collection of ensemble filesets
 ///
 //==================================================================================================
-class RimEnsembleFileset : public RimNamedObject
+class RimEnsembleFileSetCollection : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    caf::Signal<> fileSetChanged;
+    RimEnsembleFileSetCollection();
 
-public:
-    RimEnsembleFileset();
+    void                             addFileset( RimEnsembleFileset* fileset );
+    void                             removeFileset( RimEnsembleFileset* fileset );
+    std::vector<RimEnsembleFileset*> filesets() const;
+    void                             deleteAllFileSets();
 
-    QStringList createPaths( const QString& extension ) const;
-    void        findAndSetPathPatternAndRangeString( const QStringList& filePaths );
+    QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
 
-    static QList<caf::PdmOptionItemInfo> ensembleFilSetOptions();
+    void updateConnectedEditors();
 
 private:
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
-    void setPathPattern( const QString& pathPattern );
-    void setRangeString( const QString& rangeString );
-
 private:
-    caf::PdmField<QString> m_pathPattern;
-    caf::PdmField<QString> m_realizationSubSet;
+    caf::PdmChildArrayField<RimEnsembleFileset*> m_filesets;
 };
