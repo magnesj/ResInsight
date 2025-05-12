@@ -270,6 +270,7 @@ void RimProject::close()
         m_mainPlotCollection()->deleteAllContainedObjects();
     }
 
+    m_ensembleFilesetCollection()->deleteAllFileSets();
     oilFields.deleteChildren();
     oilFields.push_back( new RimOilField );
 
@@ -1468,7 +1469,6 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.DataSources" )
     {
-        uiTreeOrdering.add( &m_ensembleFilesetCollection );
         RimOilField* oilField = activeOilField();
         if ( oilField )
         {
@@ -1500,6 +1500,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.Cloud" )
     {
+        uiTreeOrdering.add( &m_ensembleFilesetCollection );
         if ( m_mainPlotCollection )
         {
             if ( activeOilField()->cloudDataCollection() )
@@ -1520,8 +1521,6 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     {
         // Use object instead of field to avoid duplicate entries in the tree view
         uiTreeOrdering.add( viewLinkerCollection() );
-
-        uiTreeOrdering.add( &m_ensembleFilesetCollection );
 
         RimOilField* oilField = activeOilField();
         if ( oilField )

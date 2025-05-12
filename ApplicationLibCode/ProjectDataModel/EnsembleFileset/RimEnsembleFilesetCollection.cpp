@@ -30,7 +30,7 @@ CAF_PDM_SOURCE_INIT( RimEnsembleFilesetCollection, "EnsembleFilesetCollection" )
 //--------------------------------------------------------------------------------------------------
 RimEnsembleFilesetCollection::RimEnsembleFilesetCollection()
 {
-    CAF_PDM_InitObject( "Ensembles", ":/Cases16x16.png", "", "" );
+    CAF_PDM_InitObject( "Ensembles", ":/CreateGridCaseGroup16x16.png", "", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_filesets, "Filesets", "Filesets", "", "", "" );
     m_filesets.uiCapability()->setUiHidden( true );
@@ -60,6 +60,14 @@ void RimEnsembleFilesetCollection::removeFileset( RimEnsembleFileset* fileset )
 std::vector<RimEnsembleFileset*> RimEnsembleFilesetCollection::filesets() const
 {
     return m_filesets.childrenByType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFilesetCollection::deleteAllFileSets()
+{
+    m_filesets.deleteChildren();
 }
 
 //--------------------------------------------------------------------------------------------------

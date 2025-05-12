@@ -39,6 +39,7 @@ public:
     void                             addFileset( RimEnsembleFileset* fileset );
     void                             removeFileset( RimEnsembleFileset* fileset );
     std::vector<RimEnsembleFileset*> filesets() const;
+    void                             deleteAllFileSets();
 
     QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
 
