@@ -107,8 +107,8 @@ void RimPathPatternEnsemble::createSummaryCasesFromEnsembleFileSet()
         RiaDefines::FileType fileType = RiaDefines::FileType::SMSPEC;
 
         RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
-        auto [isOk, newCases] = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
-        if ( !isOk || newCases.empty() )
+        auto                                 newCases = RiaEnsembleImportTools::createSummaryCasesFromFiles( paths, createConfig );
+        if ( newCases.empty() )
         {
             RiaLogging::warning( "No new cases are created." );
             return;
