@@ -117,6 +117,8 @@ public:
     void                      setMinMax( const RifEclipseSummaryAddress& address, double min, double max );
     std::pair<double, double> minMax( const RifEclipseSummaryAddress& address );
 
+    virtual void cleanupBeforeDelete();
+
 protected:
     virtual void onLoadDataAndUpdate();
 

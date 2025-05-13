@@ -38,6 +38,8 @@ public:
     void setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
     void updateName( const std::set<QString>& existingEnsembleNames ) override;
 
+    void cleanupBeforeDelete() override;
+
 private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;

@@ -23,6 +23,7 @@
 #include "RiaLogging.h"
 
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
+#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "RimSummaryCase.h"
 
 CAF_PDM_SOURCE_INIT( RimPathPatternEnsemble, "RimPathPatternEnsemble" );
@@ -66,6 +67,27 @@ void RimPathPatternEnsemble::updateName( const std::set<QString>& existingEnsemb
 
     m_name = candidateName;
     caseNameChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPathPatternEnsemble::cleanupBeforeDelete()
+{
+    if ( m_ensembleFileSet() )
+    {
+        m_ensembleFileSet()->fileSetChanged.disconnect( this );
+        m_ensembleFileSet()->nameChanged.disconnect( this );
+
+        auto fileSet      = m_ensembleFileSet();
+        m_ensembleFileSet = nullptr;
+
+        if ( auto coll = fileSet->firstAncestorOrThisOfType<RimEnsembleFileSetCollection>() )
+        {
+            coll->deleteFileSetIfPossible( fileSet );
+        }
+    }
+    RimSummaryEnsemble::cleanupBeforeDelete();
 }
 
 //--------------------------------------------------------------------------------------------------

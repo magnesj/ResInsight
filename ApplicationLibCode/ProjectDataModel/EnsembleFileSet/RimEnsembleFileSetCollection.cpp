@@ -50,13 +50,6 @@ void RimEnsembleFileSetCollection::addFileSet( RimEnsembleFileSet* fileSet )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::removeFileSet( RimEnsembleFileSet* fileSet )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::vector<RimEnsembleFileSet*> RimEnsembleFileSetCollection::fileSets() const
 {
     return m_fileSets.childrenByType();
@@ -68,6 +61,24 @@ std::vector<RimEnsembleFileSet*> RimEnsembleFileSetCollection::fileSets() const
 void RimEnsembleFileSetCollection::deleteAllFileSets()
 {
     m_fileSets.deleteChildren();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSetCollection::deleteFileSetIfPossible( RimEnsembleFileSet* fileSet )
+{
+    if ( fileSet )
+    {
+        auto connectedObjects = fileSet->objectsWithReferringPtrFields();
+        if ( connectedObjects.empty() )
+        {
+            m_fileSets.removeChild( fileSet );
+            delete fileSet;
+
+            updateConnectedEditors();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
