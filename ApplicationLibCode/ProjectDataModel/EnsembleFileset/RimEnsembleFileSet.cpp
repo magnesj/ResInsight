@@ -92,7 +92,13 @@ QStringList RimEnsembleFileSet::createPaths( const QString& extension ) const
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::findAndSetPathPatternAndRangeString( const QStringList& filePaths )
 {
-    const auto& [pattern, rangeString] = RiaEnsembleImportTools::findPathPattern( filePaths, internal::placeholderString() );
+    QStringList normalizedPaths;
+    for ( const auto& path : filePaths )
+    {
+        normalizedPaths.append( RiaFilePathTools::toInternalSeparator( path ) );
+    }
+
+    const auto& [pattern, rangeString] = RiaEnsembleImportTools::findPathPattern( normalizedPaths, internal::placeholderString() );
 
     // find the pattern without extension by finding . and remove rest of string
     auto noExtension = pattern;
