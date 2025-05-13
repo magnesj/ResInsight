@@ -427,19 +427,33 @@ void RimProject::setupBeforeSave()
 //--------------------------------------------------------------------------------------------------
 std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
 {
+    std::vector<QString> orderedKeywords;
+
+    orderedKeywords.push_back( fileNameHandle()->keyword() );
+    orderedKeywords.push_back( m_projectFileVersionString.keyword() );
+    orderedKeywords.push_back( m_globalPathList.keyword() );
+    orderedKeywords.push_back( m_ensembleFileSetCollection.keyword() );
+
     std::vector<caf::PdmFieldHandle*> ordered;
 
-    ordered.push_back( const_cast<caf::PdmFieldHandle*>( fileNameHandle() ) );
-    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_projectFileVersionString ) ) );
-    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_globalPathList ) ) );
-    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFileSetCollection ) ) );
+    auto fieldHandles = fields();
+    for ( auto kw : orderedKeywords )
+    {
+        auto it = std::find_if( fieldHandles.begin(),
+                                fieldHandles.end(),
+                                [&]( const caf::PdmFieldHandle* field ) { return field->keyword() == kw; } );
+        if ( it != fieldHandles.end() )
+        {
+            ordered.push_back( *it );
+        }
+    }
 
     // Append the rest of the fields
-    for ( auto handle : fields() )
+    for ( auto fieldHandle : fields() )
     {
-        if ( std::find( ordered.begin(), ordered.end(), handle ) == ordered.end() )
+        if ( std::find( ordered.begin(), ordered.end(), fieldHandle ) == ordered.end() )
         {
-            ordered.push_back( handle );
+            ordered.push_back( fieldHandle );
         }
     }
 
