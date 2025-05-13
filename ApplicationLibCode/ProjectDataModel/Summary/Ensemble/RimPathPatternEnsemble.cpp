@@ -20,9 +20,9 @@
 
 #include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaFilePathTools.h"
+#include "RiaLogging.h"
 
 #include "EnsembleFileset/RimEnsembleFileSet.h"
-#include "RiaLogging.h"
 #include "RimSummaryCase.h"
 
 CAF_PDM_SOURCE_INIT( RimPathPatternEnsemble, "RimPathPatternEnsemble" );
@@ -59,14 +59,12 @@ void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileSet* ensembleFil
 //--------------------------------------------------------------------------------------------------
 void RimPathPatternEnsemble::updateName( const std::set<QString>& existingEnsembleNames )
 {
-    if ( m_ensembleFileSet() )
-    {
-        m_name = m_ensembleFileSet()->name();
-    }
-    else
-    {
-        m_name = "Path Pattern Ensemble";
-    }
+    QString candidateName = m_ensembleFileSet() ? m_ensembleFileSet()->name() : "Path Pattern Ensemble";
+
+    if ( m_name == candidateName ) return;
+
+    m_name = candidateName;
+    caseNameChanged.send();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -84,28 +82,19 @@ QList<caf::PdmOptionItemInfo> RimPathPatternEnsemble::calculateValueOptions( con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPathPatternEnsemble::populatePathPattern()
+void RimPathPatternEnsemble::onFileSetChanged( const caf::SignalEmitter* emitter )
 {
-    QStringList filePaths;
-
-    for ( auto sumCase : allSummaryCases() )
-    {
-        const auto filePath = sumCase->summaryHeaderFilename();
-        if ( filePath.isEmpty() ) continue;
-
-        const auto fileName = RiaFilePathTools::toInternalSeparator( filePath );
-        filePaths.push_back( fileName );
-    }
+    createSummaryCasesFromEnsembleFileSet();
+    buildChildNodes();
+    updateAllRequiredEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPathPatternEnsemble::onFilterChanged( const caf::SignalEmitter* emitter )
+void RimPathPatternEnsemble::onFileSetNameChanged( const caf::SignalEmitter* emitter )
 {
-    createSummaryCasesFromEnsembleFileSet();
-    buildChildNodes();
-    updateAllRequiredEditors();
+    updateName( {} );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -147,13 +136,20 @@ void RimPathPatternEnsemble::initAfterRead()
 {
     RimSummaryEnsemble::initAfterRead();
 
+    connectSignals();
+    createSummaryCasesFromEnsembleFileSet();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPathPatternEnsemble::connectSignals()
+{
     if ( m_ensembleFileSet() )
     {
-        m_ensembleFileSet()->fileSetChanged.connect( this, &RimPathPatternEnsemble::onFilterChanged );
-        createSummaryCasesFromEnsembleFileSet();
+        m_ensembleFileSet()->fileSetChanged.connect( this, &RimPathPatternEnsemble::onFileSetChanged );
+        m_ensembleFileSet()->nameChanged.connect( this, &RimPathPatternEnsemble::onFileSetNameChanged );
     }
-
-    populatePathPattern();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -162,8 +158,12 @@ void RimPathPatternEnsemble::initAfterRead()
 void RimPathPatternEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_ensembleFileSet );
-    uiOrdering.add( &m_name );
-    m_name.uiCapability()->setUiReadOnly( true );
+
+    if ( m_ensembleFileSet() )
+    {
+        auto group = uiOrdering.addNewGroup( "Ensemble Definition" );
+        m_ensembleFileSet()->uiOrdering( uiConfigName, *group );
+    }
 
     uiOrdering.skipRemainingFields( true );
 }
@@ -177,10 +177,7 @@ void RimPathPatternEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* change
 
     if ( changedField == &m_ensembleFileSet )
     {
-        if ( m_ensembleFileSet() )
-        {
-            m_ensembleFileSet()->fileSetChanged.connect( this, &RimPathPatternEnsemble::onFilterChanged );
-        }
+        connectSignals();
         createSummaryCasesFromEnsembleFileSet();
         caseNameChanged.send();
     }

@@ -39,21 +39,23 @@ public:
 
     void updateName( const std::set<QString>& existingEnsembleNames ) override;
 
-private:
-    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
-
-    void populatePathPattern();
-    void onFilterChanged( const caf::SignalEmitter* emitter );
-
-    void createSummaryCasesFromEnsembleFileSet();
-
-    void initAfterRead() override;
-
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
     void onLoadDataAndUpdate() override;
+
+private:
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+
+    void onFileSetChanged( const caf::SignalEmitter* emitter );
+    void onFileSetNameChanged( const caf::SignalEmitter* emitter );
+
+    void createSummaryCasesFromEnsembleFileSet();
+
+    void initAfterRead() override;
+
+    void connectSignals();
 
 private:
     caf::PdmPtrField<RimEnsembleFileSet*> m_ensembleFileSet;

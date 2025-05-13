@@ -47,6 +47,7 @@ QString placeholderString()
 //--------------------------------------------------------------------------------------------------
 RimEnsembleFileSet::RimEnsembleFileSet()
     : fileSetChanged( this )
+    , nameChanged( this )
 
 {
     CAF_PDM_InitObject( "Ensemble", ":/CreateGridCaseGroup16x16.png", "", "" );
@@ -177,7 +178,7 @@ void RimEnsembleFileSet::updateName( const std::set<QString>& existingEnsembleNa
     if ( name() == candidateName ) return;
 
     setName( candidateName );
-    fileSetChanged.send();
+    nameChanged.send();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -250,16 +251,14 @@ void RimEnsembleFileSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_nameTemplateString )
+    if ( changedField == &m_nameTemplateString || changedField == &m_autoName )
     {
         RimProject::current()->ensembleFileSetCollection()->updateEnsembleNames();
     }
-    else if ( changedField == &m_autoName )
+    else
     {
-        RimProject::current()->ensembleFileSetCollection()->updateEnsembleNames();
+        fileSetChanged.send();
     }
-
-    fileSetChanged.send();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -36,6 +36,7 @@ class RimEnsembleFileSet : public RimNamedObject
 
 public:
     caf::Signal<> fileSetChanged;
+    caf::Signal<> nameChanged;
 
 public:
     RimEnsembleFileSet();
