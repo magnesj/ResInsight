@@ -36,7 +36,7 @@
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
-#include "EnsembleFileset/RimEnsembleFileSetCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
@@ -236,8 +236,8 @@ RimProject::RimProject()
     CAF_PDM_InitFieldNoDefault( &m_automationSettings, "AutomationSettings", "Automation Settings" );
     m_automationSettings = new RimAutomationSettings();
 
-    CAF_PDM_InitFieldNoDefault( &m_ensembleFilesetCollection, "EnsembleFilesetCollection", "Ensemble Filesets" );
-    m_ensembleFilesetCollection = new RimEnsembleFileSetCollection();
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFileSetCollection, "EnsembleFileSetCollection", "Ensemble File Sets" );
+    m_ensembleFileSetCollection = new RimEnsembleFileSetCollection();
 
     // For now, create a default first oilfield that contains the rest of the project
     oilFields.push_back( new RimOilField );
@@ -270,7 +270,7 @@ void RimProject::close()
         m_mainPlotCollection()->deleteAllContainedObjects();
     }
 
-    m_ensembleFilesetCollection()->deleteAllFileSets();
+    m_ensembleFileSetCollection()->deleteAllFileSets();
     oilFields.deleteChildren();
     oilFields.push_back( new RimOilField );
 
@@ -386,7 +386,7 @@ RimAutomationSettings* RimProject::automationSettings() const
 //--------------------------------------------------------------------------------------------------
 RimEnsembleFileSetCollection* RimProject::ensembleFileSetCollection() const
 {
-    return m_ensembleFilesetCollection();
+    return m_ensembleFileSetCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -432,7 +432,7 @@ std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( fileNameHandle() ) );
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_projectFileVersionString ) ) );
     ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_globalPathList ) ) );
-    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFilesetCollection ) ) );
+    ordered.push_back( const_cast<caf::PdmFieldHandle*>( dynamic_cast<const caf::PdmFieldHandle*>( &m_ensembleFileSetCollection ) ) );
 
     // Append the rest of the fields
     for ( auto handle : fields() )
@@ -1500,7 +1500,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.Cloud" )
     {
-        uiTreeOrdering.add( &m_ensembleFilesetCollection );
+        uiTreeOrdering.add( &m_ensembleFileSetCollection );
         if ( m_mainPlotCollection )
         {
             if ( activeOilField()->cloudDataCollection() )

@@ -213,7 +213,7 @@ private:
     caf::PdmChildField<RimMainPlotCollection*>        m_mainPlotCollection;
     caf::PdmChildField<RimQuickAccessCollection*>     m_pinnedFieldCollection;
     caf::PdmChildField<RimAutomationSettings*>        m_automationSettings;
-    caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFilesetCollection;
+    caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFileSetCollection;
 
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;

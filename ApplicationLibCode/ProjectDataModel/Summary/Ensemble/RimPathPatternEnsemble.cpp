@@ -22,7 +22,7 @@
 #include "RiaFilePathTools.h"
 #include "RiaLogging.h"
 
-#include "EnsembleFileset/RimEnsembleFileSet.h"
+#include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "RimSummaryCase.h"
 
 CAF_PDM_SOURCE_INIT( RimPathPatternEnsemble, "RimPathPatternEnsemble" );

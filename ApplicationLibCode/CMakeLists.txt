@@ -105,7 +105,7 @@ list(
   ProjectDataModel/CorrelationPlots/CMakeLists_files.cmake
   ProjectDataModel/ContourMap/CMakeLists_files.cmake
   ProjectDataModel/Cloud/CMakeLists_files.cmake
-  ProjectDataModel/EnsembleFileset/CMakeLists_files.cmake
+  ProjectDataModel/EnsembleFileSet/CMakeLists_files.cmake
   ProjectDataModel/Faults/CMakeLists_files.cmake
   ProjectDataModel/GeoMech/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CMakeLists_files.cmake

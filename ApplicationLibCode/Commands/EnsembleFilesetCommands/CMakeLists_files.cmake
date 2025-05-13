@@ -1,11 +1,11 @@
 set(SOURCE_GROUP_HEADER_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RicImportEnsembleFilesetFeature.h
-    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleFromFilesetFeature.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicImportEnsembleFileSetFeature.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleFromFileSetFeature.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
-    ${CMAKE_CURRENT_LIST_DIR}/RicImportEnsembleFilesetFeature.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleFromFilesetFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicImportEnsembleFileSetFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicCreateEnsembleFromFileSetFeature.cpp
 )
 
 list(APPEND COMMAND_CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

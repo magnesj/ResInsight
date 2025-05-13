@@ -23,7 +23,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
-CAF_PDM_SOURCE_INIT( RimEnsembleFileSetCollection, "EnsembleFilesetCollection" );
+CAF_PDM_SOURCE_INIT( RimEnsembleFileSetCollection, "EnsembleFileSetCollection" );
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -121,5 +121,5 @@ void RimEnsembleFileSetCollection::updateFileSetNames()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSetCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
-    menuBuilder << "RicImportEnsembleFilesetFeature";
+    menuBuilder << "RicImportEnsembleFileSetFeature";
 }

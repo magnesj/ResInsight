@@ -32,7 +32,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
-CAF_PDM_SOURCE_INIT( RimEnsembleFileSet, "EnsembleFileset" );
+CAF_PDM_SOURCE_INIT( RimEnsembleFileSet, "EnsembleFileSet" );
 
 namespace internal
 {

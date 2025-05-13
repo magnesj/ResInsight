@@ -23,7 +23,7 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RicImportEnsembleFilesetFeature : public caf::CmdFeature
+class RicImportEnsembleFileSetFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
 

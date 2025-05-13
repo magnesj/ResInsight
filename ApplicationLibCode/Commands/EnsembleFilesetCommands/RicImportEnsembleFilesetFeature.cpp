@@ -16,10 +16,10 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicImportEnsembleFilesetFeature.h"
+#include "RicImportEnsembleFileSetFeature.h"
 
-#include "EnsembleFileset/RimEnsembleFileSet.h"
-#include "EnsembleFileset/RimEnsembleFileSetCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSet.h"
+#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 
 #include "RiaApplication.h"
@@ -29,12 +29,12 @@
 
 #include <QAction>
 
-CAF_CMD_SOURCE_INIT( RicImportEnsembleFilesetFeature, "RicImportEnsembleFilesetFeature" );
+CAF_CMD_SOURCE_INIT( RicImportEnsembleFileSetFeature, "RicImportEnsembleFileSetFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicImportEnsembleFilesetFeature::isCommandEnabled() const
+bool RicImportEnsembleFileSetFeature::isCommandEnabled() const
 {
     return true;
 }
@@ -42,7 +42,7 @@ bool RicImportEnsembleFilesetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
+void RicImportEnsembleFileSetFeature::onActionTriggered( bool isChecked )
 {
     QString pathCacheName = "ENSEMBLE_FILES";
     auto    result = RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( "Import Ensemble", pathCacheName );
@@ -71,7 +71,7 @@ void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicImportEnsembleFilesetFeature::setupActionLook( QAction* actionToSetup )
+void RicImportEnsembleFileSetFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setIcon( QIcon( ":/Cases16x16.png" ) );
     actionToSetup->setText( "Import Ensemble File Set" );
