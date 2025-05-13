@@ -181,7 +181,7 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
     ensembleFileSet->setGroupingMode( groupingMode );
     ensembleFileSet->findAndSetPathPatternAndRangeString( fileNames );
 
-    collection->addFileset( ensembleFileSet );
+    collection->addFileSet( ensembleFileSet );
     collection->updateFileSetNames();
     collection->updateAllRequiredEditors();
 

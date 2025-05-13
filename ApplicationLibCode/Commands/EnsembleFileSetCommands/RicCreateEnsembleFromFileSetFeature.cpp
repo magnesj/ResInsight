@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicCreateEnsembleFromFilesetFeature.h"
+#include "RicCreateEnsembleFromFileSetFeature.h"
 
 #include "Summary/RiaSummaryPlotTools.h"
 #include "Summary/RiaSummaryTools.h"
@@ -29,12 +29,12 @@
 
 #include <QAction>
 
-CAF_CMD_SOURCE_INIT( RicCreateEnsembleFromFilesetFeature, "RicCreateEnsembleFromFilesetFeature" );
+CAF_CMD_SOURCE_INIT( RicCreateEnsembleFromFileSetFeature, "RicCreateEnsembleFromFileSetFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicCreateEnsembleFromFilesetFeature::isCommandEnabled() const
+bool RicCreateEnsembleFromFileSetFeature::isCommandEnabled() const
 {
     return true;
 }
@@ -42,7 +42,7 @@ bool RicCreateEnsembleFromFilesetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleFromFilesetFeature::onActionTriggered( bool isChecked )
+void RicCreateEnsembleFromFileSetFeature::onActionTriggered( bool isChecked )
 {
     for ( auto fileSet : caf::selectedObjectsByType<RimEnsembleFileSet*>() )
     {
@@ -61,7 +61,7 @@ void RicCreateEnsembleFromFilesetFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleFromFilesetFeature::setupActionLook( QAction* actionToSetup )
+void RicCreateEnsembleFromFileSetFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setIcon( QIcon( ":/Cases16x16.png" ) );
     actionToSetup->setText( "Create Summary Ensemble" );

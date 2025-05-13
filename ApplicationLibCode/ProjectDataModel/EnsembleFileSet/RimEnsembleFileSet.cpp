@@ -266,7 +266,7 @@ void RimEnsembleFileSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
-    menuBuilder << "RicCreateEnsembleFromFilesetFeature";
+    menuBuilder << "RicCreateEnsembleFromFileSetFeature";
 }
 
 //--------------------------------------------------------------------------------------------------

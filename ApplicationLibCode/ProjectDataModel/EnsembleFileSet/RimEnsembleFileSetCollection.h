@@ -36,8 +36,8 @@ class RimEnsembleFileSetCollection : public caf::PdmObject
 public:
     RimEnsembleFileSetCollection();
 
-    void                             addFileset( RimEnsembleFileSet* fileSet );
-    void                             removeFileset( RimEnsembleFileSet* fileSet );
+    void                             addFileSet( RimEnsembleFileSet* fileSet );
+    void                             removeFileSet( RimEnsembleFileSet* fileSet );
     std::vector<RimEnsembleFileSet*> fileSets() const;
     void                             deleteAllFileSets();
 

@@ -23,7 +23,7 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RicCreateEnsembleFromFilesetFeature : public caf::CmdFeature
+class RicCreateEnsembleFromFileSetFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
 

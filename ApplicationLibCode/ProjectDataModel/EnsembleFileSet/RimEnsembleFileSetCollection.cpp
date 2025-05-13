@@ -32,14 +32,14 @@ RimEnsembleFileSetCollection::RimEnsembleFileSetCollection()
 {
     CAF_PDM_InitObject( "Ensembles", ":/CreateGridCaseGroup16x16.png", "", "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_fileSets, "FileSets", "Filesets", "", "", "" );
+    CAF_PDM_InitFieldNoDefault( &m_fileSets, "FileSets", "File Sets", "", "", "" );
     m_fileSets.uiCapability()->setUiHidden( true );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::addFileset( RimEnsembleFileSet* fileSet )
+void RimEnsembleFileSetCollection::addFileSet( RimEnsembleFileSet* fileSet )
 {
     if ( fileSet )
     {
@@ -50,7 +50,7 @@ void RimEnsembleFileSetCollection::addFileset( RimEnsembleFileSet* fileSet )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::removeFileset( RimEnsembleFileSet* fileSet )
+void RimEnsembleFileSetCollection::removeFileSet( RimEnsembleFileSet* fileSet )
 {
 }
 

@@ -56,12 +56,12 @@ void RicImportEnsembleFileSetFeature::onActionTriggered( bool isChecked )
     auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( result.files, result.groupingMode );
     for ( const auto& [groupName, fileNames] : grouping )
     {
-        auto ensembleFileset = new RimEnsembleFileSet();
-        ensembleFileset->setName( groupName );
-        ensembleFileset->setGroupingMode( result.groupingMode );
-        ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
+        auto ensembleFileSet = new RimEnsembleFileSet();
+        ensembleFileSet->setName( groupName );
+        ensembleFileSet->setGroupingMode( result.groupingMode );
+        ensembleFileSet->findAndSetPathPatternAndRangeString( fileNames );
 
-        collection->addFileset( ensembleFileset );
+        collection->addFileSet( ensembleFileSet );
     }
 
     collection->updateFileSetNames();

@@ -52,6 +52,7 @@ RimPathPatternEnsemble::RimPathPatternEnsemble()
 void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet )
 {
     m_ensembleFileSet = ensembleFileSet;
+    connectSignals();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -123,6 +124,7 @@ void RimPathPatternEnsemble::createSummaryCasesFromEnsembleFileSet()
         // Update name of cases and ensemble after all cases are added
         for ( auto summaryCase : newCases )
         {
+            summaryCase->setShowVectorItemsInProjectTree( false );
             summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
             summaryCase->updateAutoShortName();
         }
