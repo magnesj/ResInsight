@@ -43,14 +43,9 @@ public:
 
     QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
 
-    void updateEnsembleNames();
-
-    void updateConnectedEditors();
+    void updateFileSetNames();
 
 private:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
 private:

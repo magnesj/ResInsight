@@ -253,7 +253,7 @@ void RimEnsembleFileSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 {
     if ( changedField == &m_nameTemplateString || changedField == &m_autoName )
     {
-        RimProject::current()->ensembleFileSetCollection()->updateEnsembleNames();
+        RimProject::current()->ensembleFileSetCollection()->updateFileSetNames();
     }
     else
     {

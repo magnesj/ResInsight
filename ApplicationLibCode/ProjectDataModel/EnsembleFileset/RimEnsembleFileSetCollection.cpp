@@ -86,7 +86,7 @@ QList<caf::PdmOptionItemInfo> RimEnsembleFileSetCollection::ensembleFileSetOptio
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::updateEnsembleNames()
+void RimEnsembleFileSetCollection::updateFileSetNames()
 {
     std::set<std::string> key1;
     std::set<std::string> key2;
@@ -114,38 +114,6 @@ void RimEnsembleFileSetCollection::updateEnsembleNames()
         fileSet->updateName( existingNames );
         existingNames.insert( fileSet->name() );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::updateConnectedEditors()
-{
-    for ( const auto& fileset : m_fileSets )
-    {
-        fileset->updateConnectedEditors();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleFileSetCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
-{
 }
 
 //--------------------------------------------------------------------------------------------------

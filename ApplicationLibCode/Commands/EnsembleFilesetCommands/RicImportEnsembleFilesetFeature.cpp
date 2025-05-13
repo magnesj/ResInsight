@@ -64,8 +64,7 @@ void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
         collection->addFileset( ensembleFileset );
     }
 
-    collection->updateEnsembleNames();
-
+    collection->updateFileSetNames();
     collection->updateAllRequiredEditors();
 }
 

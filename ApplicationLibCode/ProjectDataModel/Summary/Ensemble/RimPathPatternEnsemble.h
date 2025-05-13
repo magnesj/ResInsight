@@ -36,25 +36,19 @@ public:
     RimPathPatternEnsemble();
 
     void setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
-
     void updateName( const std::set<QString>& existingEnsembleNames ) override;
 
-protected:
+private:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-
-    void onLoadDataAndUpdate() override;
-
-private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void                          initAfterRead() override;
+    void                          onLoadDataAndUpdate() override;
 
     void onFileSetChanged( const caf::SignalEmitter* emitter );
     void onFileSetNameChanged( const caf::SignalEmitter* emitter );
 
     void createSummaryCasesFromEnsembleFileSet();
-
-    void initAfterRead() override;
-
     void connectSignals();
 
 private:

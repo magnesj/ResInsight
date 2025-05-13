@@ -182,7 +182,7 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
     ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
 
     collection->addFileset( ensembleFileset );
-    collection->updateEnsembleNames();
+    collection->updateFileSetNames();
     collection->updateAllRequiredEditors();
 
     auto ensemble = new RimPathPatternEnsemble();
