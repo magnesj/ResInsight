@@ -20,6 +20,8 @@
 
 #include "RimNamedObject.h"
 
+#include "Summary/RiaSummaryDefines.h"
+
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
@@ -41,6 +43,15 @@ public:
     QStringList createPaths( const QString& extension ) const;
     void        findAndSetPathPatternAndRangeString( const QStringList& filePaths );
 
+    void                                setNameTemplate( const QString& name );
+    void                                updateName( const std::set<QString>& existingEnsembleNames );
+    void                                setUsePathKey1( bool useKey1 );
+    void                                setUsePathKey2( bool useKey2 );
+    std::pair<std::string, std::string> nameKeys() const;
+    QString                             nameTemplateText() const;
+
+    void setGroupingMode( RiaDefines::EnsembleGroupingMode groupingMode );
+
     static QList<caf::PdmOptionItemInfo> ensembleFilSetOptions();
 
 private:
@@ -55,4 +66,11 @@ private:
 private:
     caf::PdmField<QString> m_pathPattern;
     caf::PdmField<QString> m_realizationSubSet;
+
+    caf::PdmField<QString> m_nameTemplateString;
+    caf::PdmField<bool>    m_autoName;
+    caf::PdmField<bool>    m_useKey1;
+    caf::PdmField<bool>    m_useKey2;
+
+    caf::PdmField<caf::AppEnum<RiaDefines::EnsembleGroupingMode>> m_groupingMode;
 };

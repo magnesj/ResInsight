@@ -58,10 +58,13 @@ void RicImportEnsembleFilesetFeature::onActionTriggered( bool isChecked )
     {
         auto ensembleFileset = new RimEnsembleFileSet();
         ensembleFileset->setName( groupName );
+        ensembleFileset->setGroupingMode( result.groupingMode );
         ensembleFileset->findAndSetPathPatternAndRangeString( fileNames );
 
         collection->addFileset( ensembleFileset );
     }
+
+    collection->updateEnsembleNames();
 
     collection->updateAllRequiredEditors();
 }

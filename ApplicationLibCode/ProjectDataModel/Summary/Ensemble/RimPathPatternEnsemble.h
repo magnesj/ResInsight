@@ -37,6 +37,8 @@ public:
 
     void setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
 
+    void updateName( const std::set<QString>& existingEnsembleNames ) override;
+
 private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 

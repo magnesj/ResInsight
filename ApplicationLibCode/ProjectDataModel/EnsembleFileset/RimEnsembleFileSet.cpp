@@ -19,10 +19,16 @@
 #include "RimEnsembleFileSet.h"
 
 #include "Ensemble/RiaEnsembleImportTools.h"
+#include "RiaEnsembleNameTools.h"
+#include "RiaFilePathTools.h"
+#include "RiaStdStringTools.h"
+#include "RiaTextStringTools.h"
+
 #include "RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 
@@ -47,6 +53,18 @@ RimEnsembleFileSet::RimEnsembleFileSet()
 
     CAF_PDM_InitField( &m_pathPattern, "PathPattern", QString(), "Path Pattern", "", "", "" );
     CAF_PDM_InitField( &m_realizationSubSet, "RealizationSubSet", QString(), "Realization SubSet", "", "", "" );
+
+    CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
+
+    CAF_PDM_InitScriptableField( &m_autoName, "CreateAutoName", true, "Auto Name" );
+    CAF_PDM_InitScriptableField( &m_useKey1, "UseKey1", false, "Use First Path Part" );
+    CAF_PDM_InitScriptableField( &m_useKey2, "UseKey2", false, "Use Second Path Part" );
+
+    QString defaultText = RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName();
+    QString tooltipText = QString( "Variables in template is supported, and will be replaced to create name. Example '%1'" ).arg( defaultText );
+    CAF_PDM_InitField( &m_nameTemplateString, "NameTemplateString", defaultText, "Name Template", "", tooltipText );
+
+    nameField()->uiCapability()->setUiReadOnly( true );
 
     setDeletable( true );
 }
@@ -92,6 +110,89 @@ void RimEnsembleFileSet::findAndSetPathPatternAndRangeString( const QStringList&
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::setNameTemplate( const QString& name )
+{
+    m_nameTemplateString = name;
+    fileSetChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::updateName( const std::set<QString>& existingEnsembleNames )
+{
+    const auto [key1, key2] = nameKeys();
+
+    QString templateText;
+    if ( m_autoName )
+    {
+        templateText = nameTemplateText();
+    }
+    else
+    {
+        templateText = m_nameTemplateString();
+    }
+
+    std::map<QString, QString> keyValues = {
+        { RiaDefines::key1VariableName(), QString::fromStdString( key1 ) },
+        { RiaDefines::key2VariableName(), QString::fromStdString( key2 ) },
+    };
+
+    auto candidateName = RiaTextStringTools::replaceTemplateTextWithValues( templateText, keyValues );
+
+    if ( m_autoName )
+    {
+        candidateName = candidateName.trimmed();
+
+        // When using auto name, remove leading and trailing commas that may occur if key1 or key2 is empty
+        if ( candidateName.startsWith( "," ) )
+        {
+            candidateName = candidateName.mid( 1 );
+        }
+        if ( candidateName.endsWith( "," ) )
+        {
+            candidateName = candidateName.left( candidateName.length() - 1 );
+        }
+
+        // Avoid identical ensemble names by appending a number
+        if ( existingEnsembleNames.contains( candidateName ) )
+        {
+            int     counter = 1;
+            QString uniqueName;
+            do
+            {
+                uniqueName = QString( "%1 (subset-%2)" ).arg( candidateName ).arg( counter++ );
+            } while ( existingEnsembleNames.contains( uniqueName ) );
+
+            candidateName = uniqueName;
+        }
+    }
+
+    if ( name() == candidateName ) return;
+
+    setName( candidateName );
+    fileSetChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::setUsePathKey1( bool useKey1 )
+{
+    m_useKey1 = useKey1;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::setUsePathKey2( bool useKey2 )
+{
+    m_useKey2 = useKey2;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimEnsembleFileSet::ensembleFilSetOptions()
 {
     return RimProject::current()->ensembleFileSetCollection()->ensembleFileSetOptions();
@@ -125,6 +226,12 @@ void RimEnsembleFileSet::defineEditorAttribute( const caf::PdmFieldHandle* field
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    uiOrdering.add( &m_autoName );
+    if ( !m_autoName() )
+    {
+        uiOrdering.add( &m_nameTemplateString );
+    }
+
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_pathPattern );
     uiOrdering.add( &m_realizationSubSet );
@@ -137,6 +244,15 @@ void RimEnsembleFileSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
+    if ( changedField == &m_nameTemplateString )
+    {
+        RimProject::current()->ensembleFileSetCollection()->updateEnsembleNames();
+    }
+    else if ( changedField == &m_autoName )
+    {
+        RimProject::current()->ensembleFileSetCollection()->updateEnsembleNames();
+    }
+
     fileSetChanged.send();
 }
 
@@ -164,4 +280,90 @@ void RimEnsembleFileSet::setRangeString( const QString& rangeString )
 {
     m_realizationSubSet = rangeString;
     fileSetChanged.send();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<std::string, std::string> RimEnsembleFileSet::nameKeys() const
+{
+    std::string key1 = "Undefined KEY1";
+    std::string key2 = "Undefined KEY2";
+
+    if ( m_groupingMode() == RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE )
+    {
+        auto pathPattern = m_pathPattern + ".SMSPEC";
+        auto paths       = RiaEnsembleImportTools::createPathsFromPattern( pathPattern, "0", internal::placeholderString() );
+        if ( !paths.empty() )
+        {
+            auto fileNames = RiaEnsembleNameTools::groupFilePathsFmu( { paths.front().toStdString() } );
+            if ( !fileNames.empty() )
+            {
+                key1 = fileNames.begin()->first.first;
+                key2 = fileNames.begin()->first.second;
+            }
+        }
+    }
+    else if ( m_groupingMode() == RiaDefines::EnsembleGroupingMode::EVEREST_FOLDER_STRUCTURE )
+    {
+        auto pathPattern = m_pathPattern + ".SMSPEC";
+        auto paths       = RiaEnsembleImportTools::createPathsFromPattern( pathPattern, "0-1", internal::placeholderString() );
+        if ( paths.size() > 1 )
+        {
+            auto name1 = RiaFilePathTools::toInternalSeparator( paths[0] ).toStdString();
+            auto name2 = RiaFilePathTools::toInternalSeparator( paths[1] ).toStdString();
+
+            auto parts1 = RiaStdStringTools::splitString( name1, '/' );
+            auto parts2 = RiaStdStringTools::splitString( name2, '/' );
+
+            size_t commonParts = 0;
+            for ( size_t i = 0; i < std::min( parts1.size(), parts2.size() ); i++ )
+            {
+                if ( parts1[i] == parts2[i] )
+                {
+                    commonParts++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            if ( commonParts == 1 )
+            {
+                key2 = parts1[commonParts - 1];
+            }
+            else if ( commonParts > 1 )
+            {
+                key1 = parts1[commonParts - 2];
+                key2 = parts1[commonParts - 1];
+            }
+        }
+    }
+
+    return { key1, key2 };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimEnsembleFileSet::nameTemplateText() const
+{
+    QString text;
+    if ( m_useKey1() ) text += RiaDefines::key1VariableName();
+    if ( m_useKey2() )
+    {
+        if ( !text.isEmpty() ) text += ", ";
+        text += RiaDefines::key2VariableName();
+    }
+
+    return text;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSet::setGroupingMode( RiaDefines::EnsembleGroupingMode groupingMode )
+{
+    m_groupingMode = groupingMode;
 }

@@ -43,6 +43,8 @@ public:
 
     QList<caf::PdmOptionItemInfo> ensembleFileSetOptions() const;
 
+    void updateEnsembleNames();
+
     void updateConnectedEditors();
 
 private:

@@ -49,6 +49,7 @@ void RicCreateEnsembleFromFilesetFeature::onActionTriggered( bool isChecked )
         auto ensemble = new RimPathPatternEnsemble();
         ensemble->setEnsembleFileSet( fileSet );
         RiaSummaryTools::summaryCaseMainCollection()->addEnsemble( ensemble );
+        RiaSummaryTools::summaryCaseMainCollection()->updateEnsembleNames();
         ensemble->loadDataAndUpdate();
 
         RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );

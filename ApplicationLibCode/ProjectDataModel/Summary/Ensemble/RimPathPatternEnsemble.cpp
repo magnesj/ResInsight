@@ -57,6 +57,21 @@ void RimPathPatternEnsemble::setEnsembleFileSet( RimEnsembleFileSet* ensembleFil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPathPatternEnsemble::updateName( const std::set<QString>& existingEnsembleNames )
+{
+    if ( m_ensembleFileSet() )
+    {
+        m_name = m_ensembleFileSet()->name();
+    }
+    else
+    {
+        m_name = "Path Pattern Ensemble";
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimPathPatternEnsemble::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     if ( fieldNeedingOptions == &m_ensembleFileSet )
@@ -147,8 +162,10 @@ void RimPathPatternEnsemble::initAfterRead()
 void RimPathPatternEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_ensembleFileSet );
+    uiOrdering.add( &m_name );
+    m_name.uiCapability()->setUiReadOnly( true );
 
-    RimSummaryEnsemble::defineUiOrdering( uiConfigName, uiOrdering );
+    uiOrdering.skipRemainingFields( true );
 }
 
 //--------------------------------------------------------------------------------------------------

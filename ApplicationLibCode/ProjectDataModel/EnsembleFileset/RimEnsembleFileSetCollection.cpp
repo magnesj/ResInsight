@@ -86,6 +86,39 @@ QList<caf::PdmOptionItemInfo> RimEnsembleFileSetCollection::ensembleFileSetOptio
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSetCollection::updateEnsembleNames()
+{
+    std::set<std::string> key1;
+    std::set<std::string> key2;
+
+    for ( const auto& fileSet : fileSets() )
+    {
+        const auto keys = fileSet->nameKeys();
+        key1.insert( keys.first );
+        key2.insert( keys.second );
+    }
+
+    bool useKey1 = key1.size() > 1;
+    bool useKey2 = key2.size() > 1;
+
+    if ( !useKey1 && !useKey2 )
+    {
+        useKey2 = true;
+    }
+
+    std::set<QString> existingNames;
+    for ( auto fileSet : fileSets() )
+    {
+        fileSet->setUsePathKey1( useKey1 );
+        fileSet->setUsePathKey2( useKey2 );
+        fileSet->updateName( existingNames );
+        existingNames.insert( fileSet->name() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSetCollection::updateConnectedEditors()
 {
     for ( const auto& fileset : m_fileSets )
