@@ -182,13 +182,15 @@ void RimPathPatternEnsemble::connectSignals()
 //--------------------------------------------------------------------------------------------------
 void RimPathPatternEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_ensembleFileSet );
-
     if ( m_ensembleFileSet() )
     {
         auto group = uiOrdering.addNewGroup( "Ensemble Definition" );
         m_ensembleFileSet()->uiOrdering( uiConfigName, *group );
     }
+
+    auto developersGroup = uiOrdering.addNewGroup( " -- Developers --" );
+    developersGroup->setCollapsedByDefault();
+    developersGroup->add( &m_ensembleFileSet );
 
     uiOrdering.skipRemainingFields( true );
 }
