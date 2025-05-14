@@ -34,7 +34,7 @@ namespace RimEnsembleFileSetTools
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummaryEnsemble*> RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( const std::vector<RimEnsembleFileSet*> fileSets )
+std::vector<RimSummaryEnsemble*> createSummaryEnsemblesFromFileSets( const std::vector<RimEnsembleFileSet*> fileSets )
 {
     std::vector<RimSummaryEnsemble*> ensembles;
     for ( auto fileSet : fileSets )
