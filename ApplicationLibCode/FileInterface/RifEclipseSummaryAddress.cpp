@@ -1039,6 +1039,13 @@ bool RifEclipseSummaryAddress::hasAccumulatedData() const
     {
         // Remove statistics text prefix
         quantityForInspection = quantityForInspection.mid( quantityForInspection.indexOf( ":" ) + 1 );
+
+        // Remove everything after ':', could be well name, group name, region number....
+        int index = quantityForInspection.indexOf( ":" );
+        if ( index != -1 )
+        {
+            quantityForInspection = quantityForInspection.left( index );
+        }
     }
 
     QString qBaseName = QString::fromStdString( baseVectorName( quantityForInspection.toStdString() ) );
