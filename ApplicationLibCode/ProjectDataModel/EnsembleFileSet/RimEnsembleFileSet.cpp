@@ -66,6 +66,7 @@ RimEnsembleFileSet::RimEnsembleFileSet()
     CAF_PDM_InitField( &m_nameTemplateString, "NameTemplateString", defaultText, "Name Template", "", tooltipText );
 
     nameField()->uiCapability()->setUiReadOnly( true );
+    nameField()->xmlCapability()->disableIO();
 
     setDeletable( true );
 }

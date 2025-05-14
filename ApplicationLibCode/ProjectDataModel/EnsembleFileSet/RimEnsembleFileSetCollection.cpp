@@ -132,3 +132,11 @@ void RimEnsembleFileSetCollection::appendMenuItems( caf::CmdFeatureMenuBuilder& 
 {
     menuBuilder << "RicImportEnsembleFileSetFeature";
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSetCollection::initAfterRead()
+{
+    updateFileSetNames();
+}

@@ -47,6 +47,7 @@ public:
 
 private:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    void initAfterRead() override;
 
 private:
     caf::PdmChildArrayField<RimEnsembleFileSet*> m_fileSets;
