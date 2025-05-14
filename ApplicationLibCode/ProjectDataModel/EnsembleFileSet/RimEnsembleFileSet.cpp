@@ -164,14 +164,7 @@ void RimEnsembleFileSet::updateName( const std::set<QString>& existingEnsembleNa
         // Avoid identical ensemble names by appending a number
         if ( existingEnsembleNames.contains( candidateName ) )
         {
-            int     counter = 1;
-            QString uniqueName;
-            do
-            {
-                uniqueName = QString( "%1 (subset-%2)" ).arg( candidateName ).arg( counter++ );
-            } while ( existingEnsembleNames.contains( uniqueName ) );
-
-            candidateName = uniqueName;
+            candidateName = internal::generateUniqueName(candidateName, existingEnsembleNames);
         }
     }
 
