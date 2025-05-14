@@ -24,6 +24,7 @@
 
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 #include "RimSummaryCase.h"
 
 CAF_PDM_SOURCE_INIT( RimPathPatternEnsemble, "RimPathPatternEnsemble" );
@@ -97,7 +98,7 @@ QList<caf::PdmOptionItemInfo> RimPathPatternEnsemble::calculateValueOptions( con
 {
     if ( fieldNeedingOptions == &m_ensembleFileSet )
     {
-        return RimEnsembleFileSet::ensembleFilSetOptions();
+        return RimEnsembleFileSetTools::ensembleFileSetOptions();
     }
     return {};
 }

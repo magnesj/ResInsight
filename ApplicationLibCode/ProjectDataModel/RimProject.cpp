@@ -437,7 +437,7 @@ std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
     std::vector<caf::PdmFieldHandle*> ordered;
 
     auto fieldHandles = fields();
-    for ( auto kw : orderedKeywords )
+    for ( const auto& kw : orderedKeywords )
     {
         auto it = std::find_if( fieldHandles.begin(),
                                 fieldHandles.end(),

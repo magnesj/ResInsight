@@ -20,6 +20,8 @@
 
 #include "Summary/RiaSummaryDefines.h"
 
+#include "cafPdmUiItem.h"
+
 #include <QStringList>
 
 #include <vector>
@@ -31,5 +33,7 @@ namespace RimEnsembleFileSetTools
 {
 std::vector<RimSummaryEnsemble*> createSummaryEnsemblesFromFileSets( const std::vector<RimEnsembleFileSet*> fileSets );
 std::vector<RimEnsembleFileSet*> createEnsembleFileSets( const QStringList& fileNames, RiaDefines::EnsembleGroupingMode groupingMode );
+
+QList<caf::PdmOptionItemInfo> ensembleFileSetOptions();
 
 }; // namespace RimEnsembleFileSetTools

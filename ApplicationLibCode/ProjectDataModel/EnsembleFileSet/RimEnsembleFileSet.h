@@ -53,8 +53,6 @@ public:
 
     void setGroupingMode( RiaDefines::EnsembleGroupingMode groupingMode );
 
-    static QList<caf::PdmOptionItemInfo> ensembleFilSetOptions();
-
 private:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;

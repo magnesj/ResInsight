@@ -39,14 +39,12 @@ bool RicImportEnsembleFileSetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicImportEnsembleFileSetFeature::onActionTriggered( bool isChecked )
 {
-    QString pathCacheName = "ENSEMBLE_FILES";
-    auto    result = RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( "Import Ensemble", pathCacheName );
-    if ( !result.ok )
+    const QString pathCacheName = "ENSEMBLE_FILES";
+    auto result = RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( "Import Ensemble", pathCacheName );
+    if ( result.ok )
     {
-        return;
+        RimEnsembleFileSetTools::createEnsembleFileSets( result.files, result.groupingMode );
     }
-
-    RimEnsembleFileSetTools::createEnsembleFileSets( result.files, result.groupingMode );
 }
 
 //--------------------------------------------------------------------------------------------------

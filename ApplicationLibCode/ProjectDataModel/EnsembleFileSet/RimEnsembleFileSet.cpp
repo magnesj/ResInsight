@@ -200,28 +200,18 @@ void RimEnsembleFileSet::setUsePathKey2( bool useKey2 )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QList<caf::PdmOptionItemInfo> RimEnsembleFileSet::ensembleFilSetOptions()
-{
-    return RimProject::current()->ensembleFileSetCollection()->ensembleFileSetOptions();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSet::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     if ( field == &m_pathPattern )
     {
-        auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( lineEdAttr )
+        if ( auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
         {
             lineEdAttr->placeholderText = "Enter path pattern...";
         }
     }
     else if ( field == &m_realizationSubSet )
     {
-        auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( lineEdAttr )
+        if ( auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
         {
             lineEdAttr->placeholderText = "E.g. 0,1,2-5,10-20";
         }

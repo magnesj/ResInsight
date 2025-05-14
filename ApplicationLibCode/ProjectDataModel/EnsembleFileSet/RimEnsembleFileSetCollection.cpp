@@ -41,10 +41,7 @@ RimEnsembleFileSetCollection::RimEnsembleFileSetCollection()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleFileSetCollection::addFileSet( RimEnsembleFileSet* fileSet )
 {
-    if ( fileSet )
-    {
-        m_fileSets.push_back( fileSet );
-    }
+    if ( fileSet ) m_fileSets.push_back( fileSet );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -70,6 +67,7 @@ void RimEnsembleFileSetCollection::deleteFileSetIfPossible( RimEnsembleFileSet* 
 {
     if ( fileSet )
     {
+        // Check if the file set is connected to any objects. If not, remove it from the collection and delete it
         auto connectedObjects = fileSet->objectsWithReferringPtrFields();
         if ( connectedObjects.empty() )
         {

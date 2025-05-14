@@ -177,9 +177,9 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
 {
     auto fileSets  = RimEnsembleFileSetTools::createEnsembleFileSets( fileNames, groupingMode );
     auto ensembles = RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
-    if ( ensembles.empty() ) return nullptr;
+    if ( !ensembles.empty() ) return ensembles.front();
 
-    return ensembles.front();
+    return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------

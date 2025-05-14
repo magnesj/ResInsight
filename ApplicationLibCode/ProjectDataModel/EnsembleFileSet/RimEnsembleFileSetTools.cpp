@@ -81,4 +81,12 @@ std::vector<RimEnsembleFileSet*> createEnsembleFileSets( const QStringList& file
     return fileSets;
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> ensembleFileSetOptions()
+{
+    return RimProject::current()->ensembleFileSetCollection()->ensembleFileSetOptions();
+}
+
 } // namespace RimEnsembleFileSetTools

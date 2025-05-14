@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RimSummaryEnsemble.h"
+
 #include "cafPdmPtrField.h"
 
 class RimEnsembleFileSet;
