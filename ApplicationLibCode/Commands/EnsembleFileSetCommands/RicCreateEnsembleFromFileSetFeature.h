@@ -27,8 +27,6 @@ class RicCreateEnsembleFromFileSetFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
 
-
-
 protected:
     bool isCommandEnabled() const override;
     void onActionTriggered( bool isChecked ) override;
