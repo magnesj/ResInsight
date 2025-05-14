@@ -18,12 +18,8 @@
 
 #include "RicCreateEnsembleFromFileSetFeature.h"
 
-#include "Summary/RiaSummaryPlotTools.h"
-#include "Summary/RiaSummaryTools.h"
-
-#include "Ensemble/RimPathPatternEnsemble.h"
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
-#include "RimSummaryCaseMainCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 
 #include "cafSelectionManagerTools.h"
 
@@ -44,18 +40,7 @@ bool RicCreateEnsembleFromFileSetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicCreateEnsembleFromFileSetFeature::onActionTriggered( bool isChecked )
 {
-    for ( auto fileSet : caf::selectedObjectsByType<RimEnsembleFileSet*>() )
-    {
-        auto ensemble = new RimPathPatternEnsemble();
-        ensemble->setEnsembleFileSet( fileSet );
-        RiaSummaryTools::summaryCaseMainCollection()->addEnsemble( ensemble );
-        RiaSummaryTools::summaryCaseMainCollection()->updateEnsembleNames();
-        ensemble->loadDataAndUpdate();
-
-        RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );
-    }
-
-    RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
+    RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( caf::selectedObjectsByType<RimEnsembleFileSet*>() );
 }
 
 //--------------------------------------------------------------------------------------------------

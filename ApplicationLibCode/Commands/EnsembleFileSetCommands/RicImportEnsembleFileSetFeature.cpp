@@ -18,14 +18,9 @@
 
 #include "RicImportEnsembleFileSetFeature.h"
 
-#include "EnsembleFileSet/RimEnsembleFileSet.h"
-#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
-#include "RimProject.h"
-
-#include "RiaApplication.h"
-#include "RiaEnsembleNameTools.h"
-
 #include "RicImportSummaryCasesFeature.h"
+
+#include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 
 #include <QAction>
 
@@ -51,21 +46,7 @@ void RicImportEnsembleFileSetFeature::onActionTriggered( bool isChecked )
         return;
     }
 
-    auto collection = RimProject::current()->ensembleFileSetCollection();
-
-    auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( result.files, result.groupingMode );
-    for ( const auto& [groupName, fileNames] : grouping )
-    {
-        auto ensembleFileSet = new RimEnsembleFileSet();
-        ensembleFileSet->setName( groupName );
-        ensembleFileSet->setGroupingMode( result.groupingMode );
-        ensembleFileSet->findAndSetPathPatternAndRangeString( fileNames );
-
-        collection->addFileSet( ensembleFileSet );
-    }
-
-    collection->updateFileSetNames();
-    collection->updateAllRequiredEditors();
+    RimEnsembleFileSetTools::createEnsembleFileSets( result.files, result.groupingMode );
 }
 
 //--------------------------------------------------------------------------------------------------

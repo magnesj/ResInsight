@@ -29,6 +29,7 @@
 
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 #include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
@@ -65,7 +66,7 @@ RimSummaryEnsemble* RicImportEnsembleFeature::createSummaryEnsemble( std::vector
     }
 
     bool useEnsembleNameDialog = false;
-    return importSingleEnsemble( fileNames, useEnsembleNameDialog, groupingMode, RiaDefines::FileType::SMSPEC, name );
+    return importSingleEnsembleFileSet( fileNames, useEnsembleNameDialog, groupingMode, RiaDefines::FileType::SMSPEC, name );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -174,23 +175,11 @@ RimSummaryEnsemble* RicImportEnsembleFeature::importSingleEnsembleFileSet( const
                                                                            RiaDefines::FileType             fileType,
                                                                            const QString&                   defaultEnsembleName )
 {
-    auto collection = RimProject::current()->ensembleFileSetCollection();
+    auto fileSets  = RimEnsembleFileSetTools::createEnsembleFileSets( fileNames, groupingMode );
+    auto ensembles = RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
+    if ( ensembles.empty() ) return nullptr;
 
-    auto ensembleFileSet = new RimEnsembleFileSet();
-    ensembleFileSet->setName( defaultEnsembleName );
-    ensembleFileSet->setGroupingMode( groupingMode );
-    ensembleFileSet->findAndSetPathPatternAndRangeString( fileNames );
-
-    collection->addFileSet( ensembleFileSet );
-    collection->updateFileSetNames();
-    collection->updateAllRequiredEditors();
-
-    auto ensemble = new RimPathPatternEnsemble();
-    ensemble->setEnsembleFileSet( ensembleFileSet );
-    RiaSummaryTools::summaryCaseMainCollection()->addEnsemble( ensemble );
-    ensemble->loadDataAndUpdate();
-
-    return ensemble;
+    return ensembles.front();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2025     Equinor ASA
+//  Copyright (C) 2025 Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,19 +18,18 @@
 
 #pragma once
 
-#include "cafCmdFeature.h"
+#include "Summary/RiaSummaryDefines.h"
 
-//==================================================================================================
-///
-//==================================================================================================
-class RicCreateEnsembleFromFileSetFeature : public caf::CmdFeature
+#include <QStringList>
+
+#include <vector>
+
+class RimSummaryEnsemble;
+class RimEnsembleFileSet;
+
+namespace RimEnsembleFileSetTools
 {
-    CAF_CMD_HEADER_INIT;
+std::vector<RimSummaryEnsemble*> createSummaryEnsemblesFromFileSets( const std::vector<RimEnsembleFileSet*> fileSets );
+std::vector<RimEnsembleFileSet*> createEnsembleFileSets( const QStringList& fileNames, RiaDefines::EnsembleGroupingMode groupingMode );
 
-
-
-protected:
-    bool isCommandEnabled() const override;
-    void onActionTriggered( bool isChecked ) override;
-    void setupActionLook( QAction* actionToSetup ) override;
-};
+}; // namespace RimEnsembleFileSetTools
