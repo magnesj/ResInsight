@@ -717,8 +717,10 @@ void RimEnsembleCurveSet::deleteEnsembleCurves()
     for ( size_t c = 0; c < m_curves.size(); c++ )
     {
         RimSummaryCurve* curve = m_curves[c];
-        if ( curve->summaryAddressY().isEnsembleStatistics() ) continue;
-        curvesIndexesToDelete.push_back( c );
+        if ( !curve->summaryAddressY().isEnsembleStatistics() )
+        {
+            curvesIndexesToDelete.push_back( c );
+        }
     }
 
     while ( !curvesIndexesToDelete.empty() )
@@ -739,8 +741,10 @@ void RimEnsembleCurveSet::deleteStatisticsCurves()
     for ( size_t c = 0; c < m_curves.size(); c++ )
     {
         RimSummaryCurve* curve = m_curves[c];
-        if ( !curve->summaryAddressY().isEnsembleStatistics() ) continue;
-        curvesIndexesToDelete.push_back( c );
+        if ( curve->summaryAddressY().isEnsembleStatistics() )
+        {
+            curvesIndexesToDelete.push_back( c );
+        }
     }
 
     while ( !curvesIndexesToDelete.empty() )
@@ -2676,20 +2680,17 @@ void RimEnsembleCurveSet::updateLegendMappingMode()
 //--------------------------------------------------------------------------------------------------
 RiuPlotCurveSymbol::PointSymbolEnum statisticsCurveSymbolFromAddress( const RifEclipseSummaryAddress& address )
 {
-    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P10 )
+    switch ( address.statisticsType() )
     {
-        return RiuPlotCurveSymbol::SYMBOL_DOWN_TRIANGLE;
+        case RifEclipseSummaryAddressDefines::StatisticsType::P10:
+            return RiuPlotCurveSymbol::SYMBOL_DOWN_TRIANGLE;
+        case RifEclipseSummaryAddressDefines::StatisticsType::P50:
+            return RiuPlotCurveSymbol::SYMBOL_DIAMOND;
+        case RifEclipseSummaryAddressDefines::StatisticsType::P90:
+            return RiuPlotCurveSymbol::SYMBOL_TRIANGLE;
+        default:
+            return RiuPlotCurveSymbol::SYMBOL_ELLIPSE;
     }
-    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P50 )
-    {
-        return RiuPlotCurveSymbol::SYMBOL_DIAMOND;
-    }
-    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P90 )
-    {
-        return RiuPlotCurveSymbol::SYMBOL_TRIANGLE;
-    }
-
-    return RiuPlotCurveSymbol::SYMBOL_ELLIPSE;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2697,10 +2698,16 @@ RiuPlotCurveSymbol::PointSymbolEnum statisticsCurveSymbolFromAddress( const RifE
 //--------------------------------------------------------------------------------------------------
 int statisticsCurveSymbolSize( RiuPlotCurveSymbol::PointSymbolEnum symbol )
 {
-    if ( symbol == RiuPlotCurveSymbol::SYMBOL_DIAMOND ) return 8;
-    if ( symbol == RiuPlotCurveSymbol::SYMBOL_TRIANGLE ) return 7;
-    if ( symbol == RiuPlotCurveSymbol::SYMBOL_DOWN_TRIANGLE ) return 7;
-    return 6;
+    switch ( symbol )
+    {
+        case RiuPlotCurveSymbol::SYMBOL_DIAMOND:
+            return 8;
+        case RiuPlotCurveSymbol::SYMBOL_TRIANGLE:
+        case RiuPlotCurveSymbol::SYMBOL_DOWN_TRIANGLE:
+            return 7;
+        default:
+            return 6;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

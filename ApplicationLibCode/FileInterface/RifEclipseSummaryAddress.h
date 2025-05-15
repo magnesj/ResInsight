@@ -91,7 +91,6 @@ public:
     static RifEclipseSummaryAddress
         blockLgrAddress( const std::string& vectorName, const std::string& lgrName, int i, int j, int k, int calculationId = -1 );
     static RifEclipseSummaryAddress importedAddress( const std::string& vectorName, int calculationId = -1 );
-    // static RifEclipseSummaryAddress ensembleStatisticsAddress( const std::string& vectorName, const std::string& datavectorName );
 
     // Special address when time is used as x-axis
     static RifEclipseSummaryAddress timeAddress();
@@ -106,6 +105,10 @@ public:
     SummaryCategory category() const;
     std::string     vectorName() const;
     bool            isHistoryVector() const;
+
+    bool           isEnsembleStatistics() const;
+    StatisticsType statisticsType() const;
+    void           setStatisticsType( StatisticsType type );
 
     int regionNumber() const;
     int regionNumber2() const;
@@ -161,10 +164,6 @@ public:
 
     std::string                formatUiTextRegionToRegion() const;
     static std::pair<int, int> regionToRegionPairFromUiText( const std::string& s );
-
-    bool           isEnsembleStatistics() const;
-    StatisticsType statisticsType() const;
-    void           setStatisticsType( StatisticsType type );
 
 private:
     static RifEclipseSummaryAddress fromTokens( const std::vector<std::string>& tokens );
