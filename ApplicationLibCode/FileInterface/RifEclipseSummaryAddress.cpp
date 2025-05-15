@@ -643,15 +643,6 @@ int RifEclipseSummaryAddress::id() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::string RifEclipseSummaryAddress::ensembleStatisticsVectorName() const
-{
-    // MSJTODO: Remove this function
-    return m_vectorName;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::uiText() const
 {
     std::string text;
@@ -664,6 +655,12 @@ std::string RifEclipseSummaryAddress::uiText() const
     if ( !itemText.empty() )
     {
         text += ":" + itemText;
+    }
+
+    if ( isEnsembleStatistics() )
+    {
+        auto statisticsText = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
+        text                = statisticsText + ":" + text;
     }
 
     return text;

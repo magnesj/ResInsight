@@ -39,6 +39,23 @@
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimEnsembleCrossPlotStatisticsCase::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( resultAddress.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P10 )
+    {
+        return { true, m_p10Data };
+    }
+    if ( resultAddress.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P50 )
+    {
+        return { true, m_p50Data };
+    }
+    if ( resultAddress.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P90 )
+    {
+        return { true, m_p90Data };
+    }
+    if ( resultAddress.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::MEAN )
+    {
+        return { true, m_meanData };
+    };
+
     if ( m_adrX.isValid() )
     {
         auto stringToTest = resultAddress.vectorName();
@@ -48,17 +65,6 @@ std::pair<bool, std::vector<double>> RimEnsembleCrossPlotStatisticsCase::values(
             return { true, m_binnedXValues };
         }
     }
-
-    auto quantityName = resultAddress.ensembleStatisticsVectorName();
-
-    if ( quantityName == RifEclipseSummaryAddressDefines::statisticsNameP10() )
-        return { true, m_p10Data };
-    else if ( quantityName == RifEclipseSummaryAddressDefines::statisticsNameP50() )
-        return { true, m_p50Data };
-    else if ( quantityName == RifEclipseSummaryAddressDefines::statisticsNameP90() )
-        return { true, m_p90Data };
-    else if ( quantityName == RifEclipseSummaryAddressDefines::statisticsNameMean() )
-        return { true, m_meanData };
 
     return { true, {} };
 }

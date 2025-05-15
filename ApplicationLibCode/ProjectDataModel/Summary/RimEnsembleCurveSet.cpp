@@ -2377,7 +2377,8 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
 
                 if ( m_statistics->showCurveLabels() )
                 {
-                    curve->setSymbolLabel( QString::fromStdString( address.summaryAddressY().ensembleStatisticsVectorName() ) );
+                    curve->setSymbolLabel( QString::fromStdString(
+                        RifEclipseSummaryAddressDefines::statisticsTypeToString( address.summaryAddressY().statisticsType() ) ) );
                 }
                 curve->setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
             }
@@ -2675,14 +2676,18 @@ void RimEnsembleCurveSet::updateLegendMappingMode()
 //--------------------------------------------------------------------------------------------------
 RiuPlotCurveSymbol::PointSymbolEnum statisticsCurveSymbolFromAddress( const RifEclipseSummaryAddress& address )
 {
-    auto qName = address.vectorName();
-
-    if ( qName.find( RifEclipseSummaryAddressDefines::statisticsNameP10() ) != std::string::npos )
+    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P10 )
+    {
         return RiuPlotCurveSymbol::SYMBOL_DOWN_TRIANGLE;
-    if ( qName.find( RifEclipseSummaryAddressDefines::statisticsNameP50() ) != std::string::npos )
+    }
+    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P50 )
+    {
         return RiuPlotCurveSymbol::SYMBOL_DIAMOND;
-    if ( qName.find( RifEclipseSummaryAddressDefines::statisticsNameP90() ) != std::string::npos )
+    }
+    if ( address.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::P90 )
+    {
         return RiuPlotCurveSymbol::SYMBOL_TRIANGLE;
+    }
 
     return RiuPlotCurveSymbol::SYMBOL_ELLIPSE;
 }
