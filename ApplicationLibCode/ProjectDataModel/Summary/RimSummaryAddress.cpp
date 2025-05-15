@@ -149,6 +149,7 @@ void RimSummaryAddress::setAddress( const RifEclipseSummaryAddress& addr )
 RifEclipseSummaryAddress RimSummaryAddress::address() const
 {
     return RifEclipseSummaryAddress( m_category(),
+                                     m_statistics(),
                                      m_vectorName().toStdString(),
                                      m_regionNumber(),
                                      m_regionNumber2(),
@@ -163,8 +164,7 @@ RifEclipseSummaryAddress RimSummaryAddress::address() const
                                      m_aquiferNumber,
                                      m_wellCompletionNumber(),
                                      m_isErrorResult,
-                                     m_calculationId,
-                                     m_statistics() );
+                                     m_calculationId );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -34,12 +34,12 @@
 //--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, std::map<SummaryIdentifierType, std::string>& identifiers )
     : m_category( category )
+    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
-    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
 {
     std::pair<int, int> reg2regPair;
     switch ( category )
@@ -102,6 +102,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
 ///
 //--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory                                 category,
+                                                    RifEclipseSummaryAddressDefines::StatisticsType statisticsType,
                                                     const std::string&                              vectorName,
                                                     int                                             regionNumber,
                                                     int                                             regionNumber2,
@@ -116,9 +117,9 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory             
                                                     int                                             aquiferNumber,
                                                     int                                             completionNumber,
                                                     bool                                            isErrorResult,
-                                                    int                                             id,
-                                                    RifEclipseSummaryAddressDefines::StatisticsType statisticsType )
+                                                    int                                             id )
     : m_category( category )
+    , m_statisticsType( statisticsType )
     , m_vectorName( vectorName )
     , m_lgrName( lgrName )
     , m_number0( -1 )
@@ -126,7 +127,6 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory             
     , m_number2( -1 )
     , m_isErrorResult( isErrorResult )
     , m_id( id )
-    , m_statisticsType( statisticsType )
 {
     switch ( category )
     {
@@ -182,12 +182,12 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory             
 //--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress::RifEclipseSummaryAddress()
     : m_category( RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_INVALID )
+    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
-    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
 {
 }
 
@@ -1321,6 +1321,30 @@ std::pair<int, int> RifEclipseSummaryAddress::regionToRegionPairFromUiText( cons
 
     return std::make_pair( RiaStdStringTools::toInt16( r2r[0].trimmed().toStdString() ),
                            RiaStdStringTools::toInt16( r2r[1].trimmed().toStdString() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifEclipseSummaryAddress::isEnsembleStatistics() const
+{
+    return m_statisticsType != RifEclipseSummaryAddressDefines::StatisticsType::NONE;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RifEclipseSummaryAddressDefines::StatisticsType RifEclipseSummaryAddress::statisticsType() const
+{
+    return m_statisticsType;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifEclipseSummaryAddress::setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type )
+{
+    m_statisticsType = type;
 }
 
 //--------------------------------------------------------------------------------------------------

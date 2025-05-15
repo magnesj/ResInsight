@@ -38,6 +38,7 @@ public:
     RifEclipseSummaryAddress();
 
     RifEclipseSummaryAddress( SummaryCategory    category,
+                              StatisticsType     statisticsType,
                               const std::string& vectorName,
                               int                regionNumber,
                               int                regionNumber2,
@@ -52,8 +53,7 @@ public:
                               int                aquiferNumber,
                               int                completionNumber,
                               bool               isErrorResult,
-                              int                id,
-                              StatisticsType     statisticsType = StatisticsType::NONE );
+                              int                id );
 
     RifEclipseSummaryAddress( SummaryCategory category, std::map<SummaryIdentifierType, std::string>& identifiers );
 
@@ -162,10 +162,9 @@ public:
     std::string                formatUiTextRegionToRegion() const;
     static std::pair<int, int> regionToRegionPairFromUiText( const std::string& s );
 
-    // Add accessors for new members
-    bool isEnsembleStatistics() const { return m_statisticsType != RifEclipseSummaryAddressDefines::StatisticsType::NONE; }
-    RifEclipseSummaryAddressDefines::StatisticsType statisticsType() const { return m_statisticsType; }
-    void setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type ) { m_statisticsType = type; }
+    bool                                            isEnsembleStatistics() const;
+    RifEclipseSummaryAddressDefines::StatisticsType statisticsType() const;
+    void                                            setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type );
 
 private:
     static RifEclipseSummaryAddress fromTokens( const std::vector<std::string>& tokens );
