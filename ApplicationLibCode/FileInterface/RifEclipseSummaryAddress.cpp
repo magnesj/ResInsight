@@ -1031,7 +1031,7 @@ bool RifEclipseSummaryAddress::hasAccumulatedData() const
 
     if ( qBaseName.endsWith( "WCT" ) || qBaseName.endsWith( "WCTH" ) )
     {
-        // https://github.com/OPM/ResInsight/issues/5808
+        //  https://github.com/OPM/ResInsight/issues/5808
         return false;
     }
 
