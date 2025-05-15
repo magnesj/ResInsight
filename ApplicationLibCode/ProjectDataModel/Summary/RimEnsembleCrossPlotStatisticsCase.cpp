@@ -39,6 +39,16 @@
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimEnsembleCrossPlotStatisticsCase::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( m_adrX.isValid() )
+    {
+        auto stringToTest = resultAddress.vectorName();
+        auto it           = stringToTest.find( m_adrX.vectorName() );
+        if ( it != std::string::npos )
+        {
+            return { true, m_binnedXValues };
+        }
+    }
+
     switch ( resultAddress.statisticsType() )
     {
         case RifEclipseSummaryAddressDefines::StatisticsType::P10:
@@ -51,16 +61,6 @@ std::pair<bool, std::vector<double>> RimEnsembleCrossPlotStatisticsCase::values(
             return { true, m_meanData };
         default:
             break;
-    }
-
-    if ( m_adrX.isValid() )
-    {
-        auto stringToTest = resultAddress.vectorName();
-        auto it           = stringToTest.find( m_adrX.vectorName() );
-        if ( it != std::string::npos )
-        {
-            return { true, m_binnedXValues };
-        }
     }
 
     return { true, {} };
