@@ -272,7 +272,7 @@ void RimSummaryRegressionAnalysisCurve::extractSourceCurveData()
             {
                 auto yAddr = curve->summaryAddressY();
 
-                if ( yAddr.category() == RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS )
+                if ( yAddr.isEnsembleStatistics() )
                 {
                     auto statisticsName = QString::fromStdString( yAddr.ensembleStatisticsVectorName() );
                     if ( statisticsName == statisticsCurveName )

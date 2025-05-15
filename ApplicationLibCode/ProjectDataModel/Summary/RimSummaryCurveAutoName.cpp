@@ -249,8 +249,9 @@ QString RimSummaryCurveAutoName::buildCurveName( const RifEclipseSummaryAddress&
             }
         }
 
-        if ( summaryAddress.category() == RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS )
+        if ( summaryAddress.isEnsembleStatistics() )
         {
+            // MSJTODO: Add prefix
             text = summaryAddress.vectorName();
         }
 

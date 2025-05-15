@@ -52,7 +52,8 @@ public:
                               int                aquiferNumber,
                               int                completionNumber,
                               bool               isErrorResult,
-                              int                id );
+                              int                id,
+                              StatisticsType     statisticsType = StatisticsType::NONE );
 
     RifEclipseSummaryAddress( SummaryCategory category, std::map<SummaryIdentifierType, std::string>& identifiers );
 
@@ -90,7 +91,7 @@ public:
     static RifEclipseSummaryAddress
         blockLgrAddress( const std::string& vectorName, const std::string& lgrName, int i, int j, int k, int calculationId = -1 );
     static RifEclipseSummaryAddress importedAddress( const std::string& vectorName, int calculationId = -1 );
-    static RifEclipseSummaryAddress ensembleStatisticsAddress( const std::string& vectorName, const std::string& datavectorName );
+    // static RifEclipseSummaryAddress ensembleStatisticsAddress( const std::string& vectorName, const std::string& datavectorName );
 
     // Special address when time is used as x-axis
     static RifEclipseSummaryAddress timeAddress();
@@ -163,6 +164,11 @@ public:
     std::string                formatUiTextRegionToRegion() const;
     static std::pair<int, int> regionToRegionPairFromUiText( const std::string& s );
 
+    // Add accessors for new members
+    bool isEnsembleStatistics() const { return m_statisticsType != RifEclipseSummaryAddressDefines::StatisticsType::NONE; }
+    RifEclipseSummaryAddressDefines::StatisticsType statisticsType() const { return m_statisticsType; }
+    void setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type ) { m_statisticsType = type; }
+
 private:
     static RifEclipseSummaryAddress fromTokens( const std::vector<std::string>& tokens );
 
@@ -175,15 +181,16 @@ private:
     // The ordering the variables are defined in defines how the objects get sorted. Members defined first will be
     // evaluated first. This concept is used by <=> operator.
 
-    SummaryCategory m_category;
-    std::string     m_vectorName;
-    std::string     m_name;
-    std::string     m_lgrName;
-    int             m_number0;
-    int             m_number1;
-    int             m_number2;
-    bool            m_isErrorResult;
-    int             m_id;
+    SummaryCategory                                 m_category;
+    RifEclipseSummaryAddressDefines::StatisticsType m_statisticsType;
+    std::string                                     m_vectorName;
+    std::string                                     m_name;
+    std::string                                     m_lgrName;
+    int                                             m_number0;
+    int                                             m_number1;
+    int                                             m_number2;
+    bool                                            m_isErrorResult;
+    int                                             m_id;
 };
 
 QTextStream& operator<<( QTextStream& str, const RifEclipseSummaryAddress& sobj );

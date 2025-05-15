@@ -39,6 +39,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
+    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
 {
     std::pair<int, int> reg2regPair;
     switch ( category )
@@ -100,22 +101,23 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
-                                                    const std::string& vectorName,
-                                                    int                regionNumber,
-                                                    int                regionNumber2,
-                                                    const std::string& groupName,
-                                                    const std::string& networkName,
-                                                    const std::string& wellName,
-                                                    int                wellSegmentNumber,
-                                                    const std::string& lgrName,
-                                                    int                cellI,
-                                                    int                cellJ,
-                                                    int                cellK,
-                                                    int                aquiferNumber,
-                                                    int                completionNumber,
-                                                    bool               isErrorResult,
-                                                    int                id )
+RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory                                 category,
+                                                    const std::string&                              vectorName,
+                                                    int                                             regionNumber,
+                                                    int                                             regionNumber2,
+                                                    const std::string&                              groupName,
+                                                    const std::string&                              networkName,
+                                                    const std::string&                              wellName,
+                                                    int                                             wellSegmentNumber,
+                                                    const std::string&                              lgrName,
+                                                    int                                             cellI,
+                                                    int                                             cellJ,
+                                                    int                                             cellK,
+                                                    int                                             aquiferNumber,
+                                                    int                                             completionNumber,
+                                                    bool                                            isErrorResult,
+                                                    int                                             id,
+                                                    RifEclipseSummaryAddressDefines::StatisticsType statisticsType )
     : m_category( category )
     , m_vectorName( vectorName )
     , m_lgrName( lgrName )
@@ -124,6 +126,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
     , m_number2( -1 )
     , m_isErrorResult( isErrorResult )
     , m_id( id )
+    , m_statisticsType( statisticsType )
 {
     switch ( category )
     {
@@ -184,6 +187,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress()
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
+    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
 {
 }
 
@@ -463,17 +467,6 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::importedAddress( const std::s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifEclipseSummaryAddress RifEclipseSummaryAddress::ensembleStatisticsAddress( const std::string& vectorName, const std::string& dataQuantityName )
-{
-    RifEclipseSummaryAddress addr;
-    addr.m_category   = SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS;
-    addr.m_vectorName = vectorName + ":" + dataQuantityName;
-    return addr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress RifEclipseSummaryAddress::timeAddress()
 {
     RifEclipseSummaryAddress addr;
@@ -652,8 +645,8 @@ int RifEclipseSummaryAddress::id() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::ensembleStatisticsVectorName() const
 {
-    QString qName = QString::fromStdString( m_vectorName );
-    return qName.split( ":" )[0].toStdString();
+    // MSJTODO: Remove this function
+    return m_vectorName;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1035,18 +1028,20 @@ bool RifEclipseSummaryAddress::hasAccumulatedData() const
     if ( !isValidEclipseCategory() ) return false;
 
     QString quantityForInspection = QString::fromStdString( vectorName() );
-    if ( category() == SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS )
-    {
-        // Remove statistics text prefix
-        quantityForInspection = quantityForInspection.mid( quantityForInspection.indexOf( ":" ) + 1 );
-
-        // Remove everything after ':', could be well name, group name, region number....
-        int index = quantityForInspection.indexOf( ":" );
-        if ( index != -1 )
+    /*
+        if ( category() == SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS )
         {
-            quantityForInspection = quantityForInspection.left( index );
+            // Remove statistics text prefix
+            quantityForInspection = quantityForInspection.mid( quantityForInspection.indexOf( ":" ) + 1 );
+
+            // Remove everything after ':', could be well name, group name, region number....
+            int index = quantityForInspection.indexOf( ":" );
+            if ( index != -1 )
+            {
+                quantityForInspection = quantityForInspection.left( index );
+            }
         }
-    }
+    */
 
     QString qBaseName = QString::fromStdString( baseVectorName( quantityForInspection.toStdString() ) );
 
@@ -1271,7 +1266,6 @@ bool RifEclipseSummaryAddress::isValidEclipseCategory() const
         case SummaryCategory::SUMMARY_WELL_SEGMENT:
         case SummaryCategory::SUMMARY_BLOCK:
         case SummaryCategory::SUMMARY_BLOCK_LGR:
-        case SummaryCategory::SUMMARY_ENSEMBLE_STATISTICS:
             return true;
     }
     return false;

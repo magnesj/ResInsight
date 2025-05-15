@@ -46,7 +46,6 @@ void caf::AppEnum<RifEclipseSummaryAddressDefines::SummaryCategory>::setUp()
     addItem( RifAdr::SUMMARY_BLOCK, "SUMMARY_BLOCK", RiaDefines::summaryBlock() );
     addItem( RifAdr::SUMMARY_BLOCK_LGR, "SUMMARY_BLOCK_LGR", RiaDefines::summaryLgrBlock() );
     addItem( RifAdr::SUMMARY_IMPORTED, "SUMMARY_IMPORTED", "Imported" );
-    addItem( RifAdr::SUMMARY_ENSEMBLE_STATISTICS, "SUMMARY_ENSEMBLE_STATISTICS", "Ensemble Statistics" );
     setDefault( RifAdr::SUMMARY_FIELD );
 }
 
