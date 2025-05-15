@@ -249,10 +249,10 @@ QString RimSummaryCurveAutoName::buildCurveName( const RifEclipseSummaryAddress&
             }
         }
 
-        if ( summaryAddress.isEnsembleStatistics() )
+        if ( summaryAddress.isStatistics() )
         {
-            // MSJTODO: Add prefix
-            text = summaryAddress.vectorName();
+            auto prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( summaryAddress.statisticsType() );
+            text        = prefix + ":" + summaryAddress.vectorName();
         }
 
         if ( m_unit && !unitText.empty() )

@@ -106,7 +106,7 @@ public:
     std::string     vectorName() const;
     bool            isHistoryVector() const;
 
-    bool           isEnsembleStatistics() const;
+    bool           isStatistics() const;
     StatisticsType statisticsType() const;
     void           setStatisticsType( StatisticsType type );
 

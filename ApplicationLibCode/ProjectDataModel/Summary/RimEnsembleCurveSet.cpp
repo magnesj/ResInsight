@@ -717,7 +717,7 @@ void RimEnsembleCurveSet::deleteEnsembleCurves()
     for ( size_t c = 0; c < m_curves.size(); c++ )
     {
         RimSummaryCurve* curve = m_curves[c];
-        if ( !curve->summaryAddressY().isEnsembleStatistics() ) curvesIndexesToDelete.push_back( c );
+        if ( !curve->summaryAddressY().isStatistics() ) curvesIndexesToDelete.push_back( c );
     }
 
     while ( !curvesIndexesToDelete.empty() )
@@ -738,7 +738,7 @@ void RimEnsembleCurveSet::deleteStatisticsCurves()
     for ( size_t c = 0; c < m_curves.size(); c++ )
     {
         RimSummaryCurve* curve = m_curves[c];
-        if ( curve->summaryAddressY().isEnsembleStatistics() ) curvesIndexesToDelete.push_back( c );
+        if ( curve->summaryAddressY().isStatistics() ) curvesIndexesToDelete.push_back( c );
     }
 
     while ( !curvesIndexesToDelete.empty() )
@@ -2075,7 +2075,7 @@ void RimEnsembleCurveSet::updateCurveColors()
     std::vector<RimSummaryCase*>  summaryCases;
     for ( auto& curve : m_curves )
     {
-        if ( curve->summaryAddressY().isEnsembleStatistics() ) continue;
+        if ( curve->summaryAddressY().isStatistics() ) continue;
 
         curvesToColor.push_back( curve );
         summaryCases.push_back( curve->summaryCaseY() );

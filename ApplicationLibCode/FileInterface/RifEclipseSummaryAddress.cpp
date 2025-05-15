@@ -657,10 +657,10 @@ std::string RifEclipseSummaryAddress::uiText() const
         text += ":" + itemText;
     }
 
-    if ( isEnsembleStatistics() )
+    if ( isStatistics() )
     {
-        auto statisticsText = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
-        text                = statisticsText + ":" + text;
+        auto prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
+        text        = prefix + ":" + text;
     }
 
     return text;
@@ -1326,7 +1326,7 @@ std::pair<int, int> RifEclipseSummaryAddress::regionToRegionPairFromUiText( cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifEclipseSummaryAddress::isEnsembleStatistics() const
+bool RifEclipseSummaryAddress::isStatistics() const
 {
     return m_statisticsType != StatisticsType::NONE;
 }

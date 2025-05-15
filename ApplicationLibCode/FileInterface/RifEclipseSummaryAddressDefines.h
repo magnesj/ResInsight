@@ -80,10 +80,6 @@ enum class CurveType
     RATE
 };
 
-std::string statisticsNameP10();
-std::string statisticsNameP50();
-std::string statisticsNameP90();
-std::string statisticsNameMean();
 std::string statisticsTypeToString( StatisticsType type );
 
 std::string differenceIdentifier();

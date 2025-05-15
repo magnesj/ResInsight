@@ -106,7 +106,7 @@ std::pair<std::string, std::string> RimSummaryEnsembleSumo::nameKeys() const
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& resultAddress )
 {
-    if ( resultAddress.isEnsembleStatistics() ) return;
+    if ( resultAddress.isStatistics() ) return;
 
     if ( !m_sumoDataSource() ) return;
 

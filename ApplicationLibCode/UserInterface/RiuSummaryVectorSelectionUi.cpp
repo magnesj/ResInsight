@@ -662,7 +662,7 @@ void RiuSummaryVectorSelectionUi::setSelectedCurveDefinitions( const std::vector
         RifEclipseSummaryAddress summaryAddress = curveDef.summaryAddressY();
 
         // Ignore ensemble statistics curves
-        if ( summaryAddress.isEnsembleStatistics() ) continue;
+        if ( summaryAddress.isStatistics() ) continue;
 
         // Select summary category if not already selected
         auto& selectedCategories = m_selectedSummaryCategories();
