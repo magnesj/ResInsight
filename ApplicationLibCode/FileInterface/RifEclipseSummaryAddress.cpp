@@ -34,7 +34,7 @@
 //--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, std::map<SummaryIdentifierType, std::string>& identifiers )
     : m_category( category )
-    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
+    , m_statisticsType( StatisticsType::NONE )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
@@ -101,23 +101,23 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory                                 category,
-                                                    RifEclipseSummaryAddressDefines::StatisticsType statisticsType,
-                                                    const std::string&                              vectorName,
-                                                    int                                             regionNumber,
-                                                    int                                             regionNumber2,
-                                                    const std::string&                              groupName,
-                                                    const std::string&                              networkName,
-                                                    const std::string&                              wellName,
-                                                    int                                             wellSegmentNumber,
-                                                    const std::string&                              lgrName,
-                                                    int                                             cellI,
-                                                    int                                             cellJ,
-                                                    int                                             cellK,
-                                                    int                                             aquiferNumber,
-                                                    int                                             completionNumber,
-                                                    bool                                            isErrorResult,
-                                                    int                                             id )
+RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
+                                                    StatisticsType     statisticsType,
+                                                    const std::string& vectorName,
+                                                    int                regionNumber,
+                                                    int                regionNumber2,
+                                                    const std::string& groupName,
+                                                    const std::string& networkName,
+                                                    const std::string& wellName,
+                                                    int                wellSegmentNumber,
+                                                    const std::string& lgrName,
+                                                    int                cellI,
+                                                    int                cellJ,
+                                                    int                cellK,
+                                                    int                aquiferNumber,
+                                                    int                completionNumber,
+                                                    bool               isErrorResult,
+                                                    int                id )
     : m_category( category )
     , m_statisticsType( statisticsType )
     , m_vectorName( vectorName )
@@ -181,8 +181,8 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory             
 ///
 //--------------------------------------------------------------------------------------------------
 RifEclipseSummaryAddress::RifEclipseSummaryAddress()
-    : m_category( RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_INVALID )
-    , m_statisticsType( RifEclipseSummaryAddressDefines::StatisticsType::NONE )
+    : m_category( SummaryCategory::SUMMARY_INVALID )
+    , m_statisticsType( StatisticsType::NONE )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
@@ -510,7 +510,7 @@ bool RifEclipseSummaryAddress::isDependentOnWellName( SummaryCategory category )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifEclipseSummaryAddressDefines::SummaryCategory RifEclipseSummaryAddress::category() const
+SummaryCategory RifEclipseSummaryAddress::category() const
 {
     return m_category;
 }
@@ -773,7 +773,7 @@ std::string RifEclipseSummaryAddress::toEclipseTextAddress() const
 //--------------------------------------------------------------------------------------------------
 /// Returns the stringified address component requested
 //--------------------------------------------------------------------------------------------------
-std::string RifEclipseSummaryAddress::addressComponentUiText( RifEclipseSummaryAddressDefines::SummaryIdentifierType identifierType ) const
+std::string RifEclipseSummaryAddress::addressComponentUiText( SummaryIdentifierType identifierType ) const
 {
     switch ( identifierType )
     {
@@ -1328,13 +1328,13 @@ std::pair<int, int> RifEclipseSummaryAddress::regionToRegionPairFromUiText( cons
 //--------------------------------------------------------------------------------------------------
 bool RifEclipseSummaryAddress::isEnsembleStatistics() const
 {
-    return m_statisticsType != RifEclipseSummaryAddressDefines::StatisticsType::NONE;
+    return m_statisticsType != StatisticsType::NONE;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifEclipseSummaryAddressDefines::StatisticsType RifEclipseSummaryAddress::statisticsType() const
+StatisticsType RifEclipseSummaryAddress::statisticsType() const
 {
     return m_statisticsType;
 }
@@ -1342,7 +1342,7 @@ RifEclipseSummaryAddressDefines::StatisticsType RifEclipseSummaryAddress::statis
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifEclipseSummaryAddress::setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type )
+void RifEclipseSummaryAddress::setStatisticsType( StatisticsType type )
 {
     m_statisticsType = type;
 }

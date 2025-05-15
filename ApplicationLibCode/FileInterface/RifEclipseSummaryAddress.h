@@ -99,7 +99,7 @@ public:
     static std::string generateStringFromAddresses( const std::vector<RifEclipseSummaryAddress>& addressVector,
                                                     const std::string                            jointString = "; " );
 
-    static bool isDependentOnWellName( RifEclipseSummaryAddressDefines::SummaryCategory category );
+    static bool isDependentOnWellName( SummaryCategory category );
 
     // Access methods
 
@@ -162,9 +162,9 @@ public:
     std::string                formatUiTextRegionToRegion() const;
     static std::pair<int, int> regionToRegionPairFromUiText( const std::string& s );
 
-    bool                                            isEnsembleStatistics() const;
-    RifEclipseSummaryAddressDefines::StatisticsType statisticsType() const;
-    void                                            setStatisticsType( RifEclipseSummaryAddressDefines::StatisticsType type );
+    bool           isEnsembleStatistics() const;
+    StatisticsType statisticsType() const;
+    void           setStatisticsType( StatisticsType type );
 
 private:
     static RifEclipseSummaryAddress fromTokens( const std::vector<std::string>& tokens );
@@ -178,16 +178,16 @@ private:
     // The ordering the variables are defined in defines how the objects get sorted. Members defined first will be
     // evaluated first. This concept is used by <=> operator.
 
-    SummaryCategory                                 m_category;
-    RifEclipseSummaryAddressDefines::StatisticsType m_statisticsType;
-    std::string                                     m_vectorName;
-    std::string                                     m_name;
-    std::string                                     m_lgrName;
-    int                                             m_number0;
-    int                                             m_number1;
-    int                                             m_number2;
-    bool                                            m_isErrorResult;
-    int                                             m_id;
+    SummaryCategory m_category;
+    StatisticsType  m_statisticsType;
+    std::string     m_vectorName;
+    std::string     m_name;
+    std::string     m_lgrName;
+    int             m_number0;
+    int             m_number1;
+    int             m_number2;
+    bool            m_isErrorResult;
+    int             m_id;
 };
 
 QTextStream& operator<<( QTextStream& str, const RifEclipseSummaryAddress& sobj );
