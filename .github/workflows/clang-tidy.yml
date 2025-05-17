@@ -66,7 +66,7 @@ jobs:
         continue-on-error: true
         run: |
           cd build
-          run-clang-tidy-19 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode/Commands/OsduCommands
+          run-clang-tidy-19 -config-file ../ApplicationLibCode/.clang-tidy -fix files ApplicationLibCode
           run-clang-tidy-19 -config-file ../GrpcInterface/.clang-tidy -fix files GrpcInterface
       - name: Run clang-format after clang-tidy
         continue-on-error: true
