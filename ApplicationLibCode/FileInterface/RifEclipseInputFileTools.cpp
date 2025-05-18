@@ -1279,9 +1279,8 @@ void RifEclipseInputFileTools::writeFaultLine( QTextStream&                     
     startK++;
     endK++;
 
-    stream << "'" << faultName << "'"
-           << "     " << i << "   " << i << "     " << j << "   " << j << "     " << startK << "   " << endK << "     "
-           << faultFaceText( faceType ) << "      / ";
+    stream << "'" << faultName << "'" << "     " << i << "   " << i << "     " << j << "   " << j << "     " << startK << "   " << endK
+           << "     " << faultFaceText( faceType ) << "      / ";
     stream << '\n';
 }
 
