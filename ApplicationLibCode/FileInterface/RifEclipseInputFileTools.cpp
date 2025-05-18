@@ -64,6 +64,8 @@ QString editKeyword( "EDIT" );
 QString gridKeyword( "GRID" );
 QString pathsKeyword( "PATHS" );
 
+#pragma optimize( "", off )
+
 //--------------------------------------------------------------------------------------------------
 /// Constructor
 //--------------------------------------------------------------------------------------------------
@@ -226,6 +228,8 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
                                            const cvf::Vec3st&     maxIn,
                                            const cvf::Vec3st&     refinement )
 {
+    return exportGridMsj( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
+
     if ( !eclipseCase )
     {
         return false;
@@ -374,6 +378,258 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
     ecl_grid_fprintf_grdecl2( mainEclGrid, filePtr, ecl_units );
     ecl_grid_free( mainEclGrid );
     fclose( filePtr );
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileName,
+                                              RigEclipseCaseData*    eclipseCase,
+                                              bool                   exportInLocalCoordinates,
+                                              const cvf::UByteArray* cellVisibilityOverrideForActnum /*= nullptr*/,
+                                              const cvf::Vec3st&     min /*= cvf::Vec3st::ZERO*/,
+                                              const cvf::Vec3st&     max /*= cvf::Vec3st::UNDEFINED*/,
+                                              const cvf::Vec3st&     refinement /*= cvf::Vec3st( 1, 1, 1 ) */ )
+{
+    if ( !eclipseCase )
+    {
+        return false;
+    }
+
+    const RigMainGrid* mainGrid = eclipseCase->mainGrid();
+
+    /*
+        std::vector<float*> ecl_corners;
+        ecl_corners.reserve( mainGrid->cellCount() * cellsPerOriginal );
+        std::vector<int*> ecl_coords;
+        ecl_coords.reserve( mainGrid->cellCount() * cellsPerOriginal );
+
+        std::array<float, 6> mapAxes      = mainGrid->mapAxesF();
+        cvf::Mat4d           mapAxisTrans = mainGrid->mapAxisTransform();
+        if ( exportInLocalCoordinates )
+        {
+            cvf::Vec3d minPoint3d( mainGrid->boundingBox().min() );
+            cvf::Vec2f minPoint2f( minPoint3d.x(), minPoint3d.y() );
+            cvf::Vec2f origin( mapAxes[2] - minPoint2f.x(), mapAxes[3] - minPoint2f.y() );
+            cvf::Vec2f xPoint = cvf::Vec2f( mapAxes[4], mapAxes[5] ) - minPoint2f;
+            cvf::Vec2f yPoint = cvf::Vec2f( mapAxes[0], mapAxes[1] ) - minPoint2f;
+            mapAxes           = { yPoint.x(), yPoint.y(), origin.x(), origin.y(), xPoint.x(), xPoint.y() };
+
+            mapAxisTrans.setTranslation( mapAxisTrans.translation() - minPoint3d );
+        }
+    */
+
+    const size_t* cellMappingECLRi = RifReaderEclipseOutput::eclipseCellIndexMapping();
+
+    int outputCellIndex = 0;
+
+    size_t kMin = min.z();
+    size_t kMax = max.z();
+    size_t nk   = kMax - kMin + 1;
+
+    size_t jMin = min.y();
+    size_t jMax = max.y();
+    size_t nj   = jMax - jMin + 1;
+
+    size_t iMin = min.x();
+    size_t iMax = max.x();
+    size_t ni   = iMax - iMin + 1;
+
+    std::vector<cvf::Vec3d> pillars( ( ni + 1 ) * ( nj + 1 ) * 2 );
+
+    // For each pillar position
+    for ( int j = 0; j <= nj; ++j )
+    {
+        for ( int i = 0; i <= ni; ++i )
+        {
+            int pillarIndex = int( j * ( ni + 1 ) + i );
+
+            // Find the top and bottom points for this pillar
+            cvf::Vec3d                top, bottom;
+            std::array<cvf::Vec3d, 8> corners;
+            size_t                    mainIndex = 0;
+
+            // If we're on an edge, we need to find cells adjacent to this pillar
+            if ( i < ni && j < nj )
+            {
+                // This pillar corresponds to corner 0 of cell (i,j,0)
+                // bottom = cells[i][j][0].corners[0];
+                // top    = cells[i][j][nk - 1].corners[4];
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j, min.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                bottom = corners[0];
+
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j, max.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                top = corners[4];
+            }
+            else if ( i == ni && j < nj )
+            {
+                // This pillar corresponds to corner 1 of cell (i-1,j,0)
+                // bottom = cells[i - 1][j][0].corners[1];
+                // top    = cells[i - 1][j][nk - 1].corners[5];
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i - 1, min.y() + j, min.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                bottom = corners[1];
+
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i - 1, min.y() + j, max.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                top = corners[5];
+            }
+            else if ( i < ni && j == nj )
+            {
+                // This pillar corresponds to corner 3 of cell (i,j-1,0)
+                // bottom = cells[i][j - 1][0].corners[3];
+                // top    = cells[i][j - 1][nk - 1].corners[7];
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j - 1, min.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                bottom = corners[3];
+
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j - 1, max.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                top = corners[7];
+            }
+            else if ( i == ni && j == nj )
+            {
+                // This pillar corresponds to corner 2 of cell (i-1,j-1,0)
+                // bottom = cells[i - 1][j - 1][0].corners[2];
+                // top    = cells[i - 1][j - 1][nk - 1].corners[6];
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i - 1, min.y() + j - 1, min.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                bottom = corners[2];
+
+                mainIndex = mainGrid->cellIndexFromIJK( min.x() + i - 1, min.y() + j - 1, max.z() );
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+                top = corners[6];
+            }
+
+            // Set the bottom point (x, y, z0) and top point (x, y, z1)
+            pillars[pillarIndex * 2]     = bottom;
+            pillars[pillarIndex * 2 + 1] = top;
+        }
+    }
+
+    std::vector<double> zcorn( 8 * ni * nj * nk );
+
+    // COORDS
+    int cellIndex = 0;
+    for ( int k = 0; k < nk; ++k )
+    {
+        for ( int j = 0; j < nj; ++j )
+        {
+            for ( int i = 0; i < ni; ++i )
+            {
+                size_t mainIndex = mainGrid->cellIndexFromIJK( i + iMin, j + jMin, k + kMin );
+
+                std::array<cvf::Vec3d, 8> corners;
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+
+                // Bottom face
+                {
+                    zcorn[cellIndex++] = corners[0].z();
+                    zcorn[cellIndex++] = corners[1].z();
+                    zcorn[cellIndex++] = corners[3].z();
+                    zcorn[cellIndex++] = corners[2].z();
+                }
+
+                // Top face
+                /*
+                                {
+                                    // Top of current cell (bottom of layer above)
+                                    int idx        = cellIndex * 8 + 4;
+                                    zcorn[idx + 0] = corners[4].z();
+                                    zcorn[idx + 1] = corners[5].z();
+                                    zcorn[idx + 2] = corners[7].z();
+                                    zcorn[idx + 3] = corners[6].z();
+                                }
+                */
+            }
+        }
+        for ( int j = 0; j < nj; ++j )
+        {
+            for ( int i = 0; i < ni; ++i )
+            {
+                size_t mainIndex = mainGrid->cellIndexFromIJK( i + iMin, j + jMin, k + kMin );
+
+                std::array<cvf::Vec3d, 8> corners;
+                mainGrid->cellCornerVertices( mainIndex, corners.data() );
+
+                // int cellIndex = int( ( k * nj * ni ) + ( j * ni ) + i );
+
+                // Bottom face
+                /*
+                                {
+                                    int idx = cellIndex * 8 + 0;
+
+                                    zcorn[idx + 0] = corners[0].z();
+                                    zcorn[idx + 1] = corners[1].z();
+                                    zcorn[idx + 2] = corners[3].z();
+                                    zcorn[idx + 3] = corners[2].z();
+                                }
+                */
+
+                // Top face
+                {
+                    // Top of current cell (bottom of layer above)
+                    int idx            = cellIndex * 8 + 4;
+                    zcorn[cellIndex++] = corners[4].z();
+                    zcorn[cellIndex++] = corners[5].z();
+                    zcorn[cellIndex++] = corners[7].z();
+                    zcorn[cellIndex++] = corners[6].z();
+                }
+            }
+        }
+    }
+
+    {
+        std::ofstream file( gridFileName.toStdString() );
+        if ( !file.is_open() )
+        {
+            return false;
+        }
+
+        // Write the header sections
+        file << "MAPUNITS\n 'METRES  '\n/\n\n";
+        file << "GRIDUNIT\n 'METRES  ' '        '\n/\n\n";
+
+        // Write SPECGRID section
+        file << "SPECGRID\n  " << ni << "  " << nj << "  " << nk << "  1  F /\n\n";
+
+        // Write COORD section
+        file << "COORD\n";
+        // std::vector<cvf::Vec3d> pillars = extractPillars();
+        for ( size_t i = 0; i < pillars.size(); i += 2 )
+        {
+            // Both top and bottom points of the pillar have the same (x,y)
+            file << std::scientific << std::setprecision( 6 ) << "   " << pillars[i].x() << "   " << pillars[i].y() << "   "
+                 << -pillars[i].z() << "   " << pillars[i + 1].x() << "   " << pillars[i + 1].y() << "   " << -pillars[i + 1].z();
+
+            if ( i < pillars.size() - 2 )
+            {
+                file << "\n";
+            }
+        }
+        file << "\n/\n\n";
+
+        // Write ZCORN section
+        file << "ZCORN\n";
+        // std::vector<double> zcorn         = generateZcorn();
+        int valuesPerLine = 4;
+        for ( size_t i = 0; i < zcorn.size(); ++i )
+        {
+            file << std::scientific << std::setprecision( 8 ) << "   " << -zcorn[i];
+
+            if ( ( i + 1 ) % valuesPerLine == 0 && i < zcorn.size() - 1 )
+            {
+                file << "\n";
+            }
+        }
+        file << "\n/\n\n";
+
+        return true;
+    }
 
     return true;
 }
@@ -1023,8 +1279,9 @@ void RifEclipseInputFileTools::writeFaultLine( QTextStream&                     
     startK++;
     endK++;
 
-    stream << "'" << faultName << "'" << "     " << i << "   " << i << "     " << j << "   " << j << "     " << startK << "   " << endK
-           << "     " << faultFaceText( faceType ) << "      / ";
+    stream << "'" << faultName << "'"
+           << "     " << i << "   " << i << "     " << j << "   " << j << "     " << startK << "   " << endK << "     "
+           << faultFaceText( faceType ) << "      / ";
     stream << '\n';
 }
 

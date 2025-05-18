@@ -67,6 +67,14 @@ public:
                             const cvf::Vec3st&     max                             = cvf::Vec3st::UNDEFINED,
                             const cvf::Vec3st&     refinement                      = cvf::Vec3st( 1, 1, 1 ) );
 
+    static bool exportGridMsj( const QString&         gridFileName,
+                               RigEclipseCaseData*    eclipseCase,
+                               bool                   exportInLocalCoordinates,
+                               const cvf::UByteArray* cellVisibilityOverrideForActnum = nullptr,
+                               const cvf::Vec3st&     min                             = cvf::Vec3st::ZERO,
+                               const cvf::Vec3st&     max                             = cvf::Vec3st::UNDEFINED,
+                               const cvf::Vec3st&     refinement                      = cvf::Vec3st( 1, 1, 1 ) );
+
     static bool exportKeywords( const QString&              resultFileName,
                                 RigEclipseCaseData*         eclipseCase,
                                 const std::vector<QString>& keywords,
