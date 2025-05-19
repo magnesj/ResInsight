@@ -33,6 +33,7 @@
 #include "RifEclipseTextFileReader.h"
 #include "RifReaderEclipseOutput.h"
 
+#include "RifGrdeclTools.h"
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
@@ -44,6 +45,7 @@
 #include "cafProgressInfo.h"
 
 #include <cmath>
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -228,7 +230,46 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
                                            const cvf::Vec3st&     maxIn,
                                            const cvf::Vec3st&     refinement )
 {
-    return exportGridMsj( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
+    std::optional<caf::VecIjk> optionalMax        = std::nullopt;
+    std::optional<caf::VecIjk> optionalMin        = std::nullopt;
+    std::optional<caf::VecIjk> optionalRefinement = std::nullopt;
+
+    if ( maxIn != cvf::Vec3st::UNDEFINED )
+    {
+        optionalMax = caf::VecIjk( maxIn.x(), maxIn.y(), maxIn.z() );
+    }
+    else
+    {
+        optionalMax = caf::VecIjk( eclipseCase->mainGrid()->cellCountI() - 1,
+                                   eclipseCase->mainGrid()->cellCountJ() - 1,
+                                   eclipseCase->mainGrid()->cellCountK() - 1 );
+    }
+
+    if ( min != cvf::Vec3st::UNDEFINED )
+    {
+        optionalMin = caf::VecIjk( min.x(), min.y(), min.z() );
+    }
+
+    if ( refinement != cvf::Vec3st::UNDEFINED )
+    {
+        optionalRefinement = caf::VecIjk( refinement.x(), refinement.y(), refinement.z() );
+    }
+
+    RifGrdeclTools tools( eclipseCase );
+
+    auto value = tools.exportCornerPointGrid( fileName,
+                                              exportInLocalCoordinates,
+                                              cellVisibilityOverrideForActnum,
+                                              optionalMin,
+                                              optionalMax,
+                                              optionalRefinement );
+
+    if ( !value.has_value() )
+    {
+        RiaLogging::error( "Failed to export grid to file: " + fileName + value.error() );
+        return false;
+    }
+    return true;
 
     if ( !eclipseCase )
     {
@@ -385,13 +426,14 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+/*
 bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileName,
                                               RigEclipseCaseData*    eclipseCase,
                                               bool                   exportInLocalCoordinates,
-                                              const cvf::UByteArray* cellVisibilityOverrideForActnum /*= nullptr*/,
-                                              const cvf::Vec3st&     min /*= cvf::Vec3st::ZERO*/,
-                                              const cvf::Vec3st&     max /*= cvf::Vec3st::UNDEFINED*/,
-                                              const cvf::Vec3st&     refinement /*= cvf::Vec3st( 1, 1, 1 ) */ )
+                                              const cvf::UByteArray* cellVisibilityOverrideForActnum / *= nullptr* /,
+                                              const cvf::Vec3st&     min / *= cvf::Vec3st::ZERO* /,
+                                              const cvf::Vec3st&     max / *= cvf::Vec3st::UNDEFINED* /,
+                                              const cvf::Vec3st&     refinement / *= cvf::Vec3st( 1, 1, 1 ) * / )
 {
     if ( !eclipseCase )
     {
@@ -399,31 +441,6 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
     }
 
     const RigMainGrid* mainGrid = eclipseCase->mainGrid();
-
-    /*
-        std::vector<float*> ecl_corners;
-        ecl_corners.reserve( mainGrid->cellCount() * cellsPerOriginal );
-        std::vector<int*> ecl_coords;
-        ecl_coords.reserve( mainGrid->cellCount() * cellsPerOriginal );
-
-        std::array<float, 6> mapAxes      = mainGrid->mapAxesF();
-        cvf::Mat4d           mapAxisTrans = mainGrid->mapAxisTransform();
-        if ( exportInLocalCoordinates )
-        {
-            cvf::Vec3d minPoint3d( mainGrid->boundingBox().min() );
-            cvf::Vec2f minPoint2f( minPoint3d.x(), minPoint3d.y() );
-            cvf::Vec2f origin( mapAxes[2] - minPoint2f.x(), mapAxes[3] - minPoint2f.y() );
-            cvf::Vec2f xPoint = cvf::Vec2f( mapAxes[4], mapAxes[5] ) - minPoint2f;
-            cvf::Vec2f yPoint = cvf::Vec2f( mapAxes[0], mapAxes[1] ) - minPoint2f;
-            mapAxes           = { yPoint.x(), yPoint.y(), origin.x(), origin.y(), xPoint.x(), xPoint.y() };
-
-            mapAxisTrans.setTranslation( mapAxisTrans.translation() - minPoint3d );
-        }
-    */
-
-    const size_t* cellMappingECLRi = RifReaderEclipseOutput::eclipseCellIndexMapping();
-
-    int outputCellIndex = 0;
 
     size_t kMin = min.z();
     size_t kMax = max.z();
@@ -535,7 +552,7 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
                 }
 
                 // Top face
-                /*
+                / *
                                 {
                                     // Top of current cell (bottom of layer above)
                                     int idx        = cellIndex * 8 + 4;
@@ -544,7 +561,7 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
                                     zcorn[idx + 2] = corners[7].z();
                                     zcorn[idx + 3] = corners[6].z();
                                 }
-                */
+                * /
             }
         }
         for ( int j = 0; j < nj; ++j )
@@ -559,7 +576,7 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
                 // int cellIndex = int( ( k * nj * ni ) + ( j * ni ) + i );
 
                 // Bottom face
-                /*
+                / *
                                 {
                                     int idx = cellIndex * 8 + 0;
 
@@ -568,7 +585,7 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
                                     zcorn[idx + 2] = corners[3].z();
                                     zcorn[idx + 3] = corners[2].z();
                                 }
-                */
+                * /
 
                 // Top face
                 {
@@ -633,6 +650,7 @@ bool RifEclipseInputFileTools::exportGridMsj( const QString&         gridFileNam
 
     return true;
 }
+*/
 
 //--------------------------------------------------------------------------------------------------
 ///
