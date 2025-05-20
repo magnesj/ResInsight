@@ -31,6 +31,7 @@
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
 
+#include "RifSurfio.h"
 #include <QFileInfo>
 #include <memory>
 
@@ -189,6 +190,13 @@ bool RimFileSurface::loadDataFromFile()
     {
         double resamplingDistance = RiaPreferences::current()->surfaceImportResamplingDistance();
         surface                   = RifSurfaceImporter::readOpenWorksXyzFile( filePath, resamplingDistance );
+    }
+    else if ( filePath.endsWith( "irap", Qt::CaseInsensitive ) )
+    {
+        auto surfaceData = RifSurfio::importSurface( filePath.toStdString() );
+    }
+    else if ( filePath.endsWith( "gri", Qt::CaseInsensitive ) )
+    {
     }
 
     m_vertices       = surface.first;
