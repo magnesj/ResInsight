@@ -18,7 +18,7 @@
 
 #include "RifSurfio.h"
 
-#include "RigTriangleMeshData.h"
+#include "Surface/RigTriangleMeshData.h"
 
 #include "irap_import.h"
 
