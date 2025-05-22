@@ -185,16 +185,6 @@ bool RimFileSurface::loadDataFromFile()
         auto   surface            = RifSurfaceImporter::readOpenWorksXyzFile( filePath, resamplingDistance );
         m_triangleMeshData->setGeometryData( surface.first, surface.second );
     }
-    else if ( filePath.endsWith( "irap", Qt::CaseInsensitive ) )
-    {
-        auto surfaceData = RifSurfio::importSurface( filePath.toStdString() );
-        if ( !surfaceData.has_value() ) return false;
-
-        m_triangleMeshData.reset( surfaceData.value().get() );
-    }
-    else if ( filePath.endsWith( "gri", Qt::CaseInsensitive ) )
-    {
-    }
 
     if ( !m_triangleMeshData ) m_triangleMeshData = std::make_unique<RigTriangleMeshData>();
 

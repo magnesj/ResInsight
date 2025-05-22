@@ -18,8 +18,6 @@
 
 #include "RifSurfio.h"
 
-#include "Surface/RigTriangleMeshData.h"
-
 #include "irap_import.h"
 
 #include <filesystem>
@@ -28,7 +26,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::expected<std::unique_ptr<RigTriangleMeshData>, std::string> RifSurfio::importSurface( const std::string& filename )
+std::expected<std::pair<RigRegularSurfaceData, std::vector<float>>, std::string> RifSurfio::importSurfaceData( const std::string& filename )
 {
     namespace fs = std::filesystem;
 
@@ -53,7 +51,52 @@ std::expected<std::unique_ptr<RigTriangleMeshData>, std::string> RifSurfio::impo
         return std::unexpected( "Could not open file: " + filename );
     }
 
-    auto fileData = surfio::irap::from_ascii_file( filename );
+    std::string extension = fs::path( filename ).extension().string();
+    std::transform( extension.begin(), extension.end(), extension.begin(), ::tolower );
+    if ( extension != ".irap" && extension != ".gri" )
+    {
+        return std::unexpected( "File is not a valid IRAP or GRI file: " + filename );
+    }
 
-    return std::make_unique<RigTriangleMeshData>();
+    auto convertToRegularSurface =
+        []( const surfio::irap::irap& fileData ) -> std::expected<std::pair<RigRegularSurfaceData, std::vector<float>>, std::string>
+    {
+        RigRegularSurfaceData surfaceData;
+        surfaceData.nx         = fileData.header.ncol;
+        surfaceData.ny         = fileData.header.nrow;
+        surfaceData.originX    = fileData.header.xori;
+        surfaceData.originY    = fileData.header.yori;
+        surfaceData.incrementX = fileData.header.xinc;
+        surfaceData.incrementY = fileData.header.yinc;
+        surfaceData.rotation   = fileData.header.rot;
+
+        // transpose the data to match the expected format
+        std::vector<float> transposedValues( fileData.values.size() );
+        for ( size_t row = 0; row < fileData.header.nrow; ++row )
+        {
+            for ( size_t col = 0; col < fileData.header.ncol; ++col )
+            {
+                transposedValues[row * fileData.header.ncol + col] = fileData.values[col * fileData.header.nrow + row];
+            }
+        }
+
+        return std::make_pair( surfaceData, transposedValues );
+    };
+
+    if ( extension == ".gri" )
+    {
+        auto fileData = surfio::irap::from_binary_file( filename );
+
+        return convertToRegularSurface( fileData );
+    }
+    else if ( extension == ".irap" )
+    {
+        auto fileData = surfio::irap::from_ascii_file( filename );
+
+        return convertToRegularSurface( fileData );
+    }
+    else
+    {
+        return std::unexpected( "File is not a valid IRAP or GRI file: " + filename );
+    }
 }

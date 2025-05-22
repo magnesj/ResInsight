@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2025-     Equinor ASA
+//  Copyright (C) 2025     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,26 +18,18 @@
 
 #pragma once
 
-#include <expected>
-#include <string>
-#include <vector>
+#include "RimRegularSurface.h"
 
-struct RigRegularSurfaceData
+class RimRegularFileSurface : public RimRegularSurface
 {
-    int    nx;
-    int    ny;
-    double originX;
-    double originY;
-    double incrementX;
-    double incrementY;
-    double rotation;
-};
+    CAF_PDM_HEADER_INIT;
 
-//==================================================================================================
-///
-//==================================================================================================
-class RifSurfio
-{
 public:
-    static std::expected<std::pair<RigRegularSurfaceData, std::vector<float>>, std::string> importSurfaceData( const std::string& filename );
+    RimRegularFileSurface();
+    void setFilePath( const QString& filePath );
+
+    bool onLoadData() override;
+
+private:
+    caf::PdmField<caf::FilePath> m_surfaceDefinitionFilePath;
 };
