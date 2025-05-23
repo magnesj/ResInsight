@@ -255,6 +255,9 @@ QString RimTools::relocatePathPattern( const QString& originalPattern, const QSt
 
     auto txt = originalPattern.toStdString();
 
+    RiaLogging::info( "txt" + QString::fromStdString( txt ) );
+    RiaLogging::info( "oldProjectPathStd" + QString::fromStdString( oldProjectPathStd ) );
+
     size_t equalIndex = 0;
     for ( size_t i = 0; i < std::min( oldProjectPathStd.size(), txt.size() ); ++i )
     {
@@ -264,6 +267,8 @@ QString RimTools::relocatePathPattern( const QString& originalPattern, const QSt
             break;
         }
     }
+
+    RiaLogging::info( "equalIndex" + QString::number( equalIndex ) );
 
     if ( equalIndex > 0 )
     {
