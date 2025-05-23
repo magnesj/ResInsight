@@ -189,13 +189,16 @@ void RiaCurveMerger<XValueType>::computeInterpolatedValues( bool includeValuesFr
                     interpolatedYValue( m_allXValues[valueIndex], m_originalValues[curveIdx].first, m_originalValues[curveIdx].second );
             }
 
+            curveValues[valueIndex] = interpolValue;
+        }
+
+        for ( int valueIndex = 0; valueIndex < static_cast<int>( dataValueCount ); valueIndex++ )
+        {
+            const auto& interpolValue = curveValues[valueIndex];
             if ( !RiaCurveDataTools::isValidValue( interpolValue, false ) )
             {
-#pragma omp critical
                 accumulatedValidValues[valueIndex] = HUGE_VAL;
             }
-
-            curveValues[valueIndex] = interpolValue;
         }
     }
 
