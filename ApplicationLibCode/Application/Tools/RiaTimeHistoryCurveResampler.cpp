@@ -251,22 +251,43 @@ void RiaTimeHistoryCurveResampler::clearData()
 //--------------------------------------------------------------------------------------------------
 void RiaTimeHistoryCurveResampler::computeResampledTimeSteps( RiaDefines::DateTimePeriod period )
 {
-    CVF_ASSERT( period != RiaDefines::DateTimePeriod::NONE && m_originalValues.second.size() > 0 );
+    if ( period == RiaDefines::DateTimePeriod::NONE ) return;
 
-    auto firstOriginalTimeStep = RiaQDateTimeTools::fromTime_t( m_originalValues.second.front() );
-    auto lastOriginalTimeStep  = RiaQDateTimeTools::fromTime_t( m_originalValues.second.back() );
-
-    clearData();
-    auto currTimeStep = firstResampledTimeStep( firstOriginalTimeStep, period );
-
-    while ( RiaQDateTimeTools::lessThan( currTimeStep, lastOriginalTimeStep ) )
+    const auto minimumSampleCount = 4;
+    if ( m_originalValues.second.size() < minimumSampleCount )
     {
-        m_timeSteps.push_back( currTimeStep.toSecsSinceEpoch() );
-        currTimeStep = RiaQDateTimeTools::addPeriod( currTimeStep, period );
+        return;
     }
 
-    // Add last time step
-    m_timeSteps.push_back( currTimeStep.toSecsSinceEpoch() );
+    clearData();
+
+    const auto startTime = m_originalValues.second.front();
+    const auto endTime   = m_originalValues.second.back();
+
+    auto computePeriodLength = []( time_t startTime, time_t endTime, RiaDefines::DateTimePeriod period ) -> std::pair<qint64, time_t>
+    {
+        auto firstOriginalTimeStep = RiaQDateTimeTools::fromTime_t( startTime );
+        auto firstAdjustedTimeStep = firstResampledTimeStep( firstOriginalTimeStep, period );
+        auto nextAdjustedTimeStep  = RiaQDateTimeTools::addPeriod( firstAdjustedTimeStep, period );
+
+        auto periodLength = nextAdjustedTimeStep.toSecsSinceEpoch() - firstOriginalTimeStep.toSecsSinceEpoch();
+
+        return std::make_pair( periodLength, firstAdjustedTimeStep.toSecsSinceEpoch() );
+    };
+
+    auto duration = endTime - startTime;
+
+    const auto& [periodLengthInSeconds, firstAdjustedTimeStep] = computePeriodLength( startTime, endTime, period );
+    auto numPeriods                                            = duration / periodLengthInSeconds;
+    m_timeSteps.reserve( numPeriods + 1 );
+
+    auto currentTime = firstAdjustedTimeStep;
+
+    while ( currentTime < endTime )
+    {
+        m_timeSteps.push_back( currentTime );
+        currentTime += periodLengthInSeconds;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
