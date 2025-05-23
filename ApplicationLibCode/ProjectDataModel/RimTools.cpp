@@ -243,6 +243,44 @@ QString RimTools::relocateFile( const QString&        originalFileName,
     return fileName;
 }
 
+#pragma optimize( "", off )
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimTools::relocatePathPattern( const QString& originalPattern, const QString& currentProjectPath, const QString& previousProjectPath )
+{
+    auto oldProjectPathStd = previousProjectPath.toStdString();
+    auto newProjectPathStd = currentProjectPath.toStdString();
+
+    auto txt = originalPattern.toStdString();
+
+    size_t equalIndex = 0;
+    for ( size_t i = 0; i < std::min( oldProjectPathStd.size(), txt.size() ); ++i )
+    {
+        if ( txt[i] != oldProjectPathStd[i] )
+        {
+            equalIndex = i;
+            break;
+        }
+    }
+
+    if ( equalIndex > 0 )
+    {
+        auto equalPart = txt.substr( 0, equalIndex );
+        auto theRest   = oldProjectPathStd.substr( equalIndex );
+
+        // remove theRest from the back of newProjectPath
+        auto newProjectPathWithoutTheRest = newProjectPathStd.substr( 0, newProjectPathStd.size() - theRest.size() );
+
+        auto newPattern = newProjectPathWithoutTheRest + txt.substr( equalIndex );
+
+        return QString::fromStdString( newPattern );
+    }
+
+    return originalPattern;
+}
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

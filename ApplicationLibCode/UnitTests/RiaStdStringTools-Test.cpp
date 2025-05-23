@@ -2,6 +2,7 @@
 
 #include "RiaStdStringTools.h"
 
+#include "RimTools.h"
 #include <QLocale>
 #include <charconv>
 
@@ -361,4 +362,21 @@ TEST( RiaStdStringToolsTest, TestToInt )
 
         EXPECT_EQ( resultValue, 12 );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RimToolsTest, ReplacePathPattern )
+{
+    QString previousProjectPath = "C:/path/to/projectFileFolder";
+
+    QString realization = "realization-*/MY_CASE-*";
+
+    QString originalPattern = "C:/path/to/" + realization;
+    QString newProjectPath  = "/mnt/new/path/to/projectFileFolder";
+    QString expectedPattern = "/mnt/new/path/to/" + realization;
+
+    QString result = RimTools::relocatePathPattern( originalPattern, newProjectPath, previousProjectPath );
+    EXPECT_EQ( result, expectedPattern );
 }
