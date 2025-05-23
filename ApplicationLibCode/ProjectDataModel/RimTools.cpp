@@ -20,6 +20,8 @@
 
 #include "RimTools.h"
 
+#include "RiaLogging.h"
+
 #include "RigFemPart.h"
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
@@ -266,12 +268,17 @@ QString RimTools::relocatePathPattern( const QString& originalPattern, const QSt
     if ( equalIndex > 0 )
     {
         auto equalPart = txt.substr( 0, equalIndex );
+        Rialogging::info("equalPart" + QString::fromStdString(equalPart));
+
         auto theRest   = oldProjectPathStd.substr( equalIndex );
+        Rialogging::info("theRest" + QString::fromStdString(theRest));
 
         // remove theRest from the back of newProjectPath
         auto newProjectPathWithoutTheRest = newProjectPathStd.substr( 0, newProjectPathStd.size() - theRest.size() );
+        Rialogging::info("newProjectPathWithoutTheRest" + QString::fromStdString(newProjectPathWithoutTheRest));
 
         auto newPattern = newProjectPathWithoutTheRest + txt.substr( equalIndex );
+        Rialogging::info("newPattern" + QString::fromStdString(newPattern));
 
         return QString::fromStdString( newPattern );
     }
