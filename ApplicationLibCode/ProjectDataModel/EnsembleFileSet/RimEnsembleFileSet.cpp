@@ -27,6 +27,7 @@
 #include "RimEnsembleFileSetCollection.h"
 #include "RimProject.h"
 
+#include "RiaLogging.h"
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmUiComboBoxEditor.h"

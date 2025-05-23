@@ -146,6 +146,8 @@ void RimSummaryFileSetEnsemble::onFileSetNameChanged( const caf::SignalEmitter* 
 //--------------------------------------------------------------------------------------------------
 void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet()
 {
+    RiaLogging::resetTimer( "RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet()" );
+
     m_cases.deleteChildrenAsync();
 
     if ( m_ensembleFileSet() )
@@ -174,6 +176,8 @@ void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet()
     }
 
     RiaSummaryTools::updateConnectedPlots( this );
+
+    RiaLogging::logTimeElapsed( "Completed RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet()" );
 }
 
 //--------------------------------------------------------------------------------------------------

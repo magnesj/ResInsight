@@ -237,6 +237,8 @@ QStringList createPathsFromPattern( const QString& basePath, const QString& numb
 //--------------------------------------------------------------------------------------------------
 QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const QString& placeholderString )
 {
+    RiaLogging::resetTimer( QString( "Starting search %1" ).arg( pathPattern ) );
+
     auto basePath = pathPattern;
 
     // Find based path up to "/realization"
@@ -290,6 +292,8 @@ QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const 
                    // Fallback to alphabetical if regex doesn't match
                    return a < b;
                } );
+
+    RiaLogging::logTimeElapsed( "" );
 
     return matchingFiles;
 }
