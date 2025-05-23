@@ -578,7 +578,7 @@ void RimProject::setProjectFileNameAndUpdateDependencies( const QString& project
         filePath->setPath( newFilePath );
     }
 
-    if ( ensembleFileSetCollection() ) ensembleFileSetCollection()->updateFilePathsFromProjectPath(newProjectPath, oldProjectPath );
+    if ( ensembleFileSetCollection() ) ensembleFileSetCollection()->updateFilePathsFromProjectPath( newProjectPath, oldProjectPath );
 
     auto* wellPathColl = RimTools::wellPathCollection();
     if ( wellPathColl )
