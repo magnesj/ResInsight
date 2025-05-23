@@ -82,6 +82,46 @@ void RimEnsembleFileSetCollection::deleteFileSetIfPossible( RimEnsembleFileSet* 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEnsembleFileSetCollection::updateFilePathsFromProjectPath( const QString& newProjectPath, const QString& oldProjectPath )
+{
+    auto oldProjectPathStd = oldProjectPath.toStdString();
+    auto newProjectPathStd = newProjectPath.toStdString();
+
+    for ( auto fileSet : fileSets() )
+    {
+        RiaLogging::info( "Updating file set path pattern from: " + fileSet->pathPattern() );
+
+        auto txt = fileSet->pathPattern().toStdString();
+
+        size_t equalIndex = 0;
+        for ( size_t i = 0; i < std::min( oldProjectPathStd.size(), txt.size() ); ++i )
+        {
+            if ( txt[i] == oldProjectPathStd[i] )
+            {
+                equalIndex = i;
+            }
+        }
+
+        if ( equalIndex > 0 )
+        {
+            auto equalPart = txt.substr( 0, equalIndex );
+            auto theRest   = oldProjectPathStd.substr( equalIndex );
+
+            // remove theRest from the back of newProjectPath
+            auto newProjectPathWithoutTheRest = newProjectPathStd.substr( 0, newProjectPathStd.size() - theRest.size() );
+
+            auto newPattern = newProjectPathWithoutTheRest + txt.substr( equalIndex );
+
+            fileSet->setPathPattern( QString::fromStdString( newPattern ) );
+
+            RiaLogging::info( "Updating file set path pattern to: " + QString::fromStdString( newPattern ) );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimEnsembleFileSetCollection::ensembleFileSetOptions() const
 {
     QList<caf::PdmOptionItemInfo> options;
