@@ -268,17 +268,17 @@ QString RimTools::relocatePathPattern( const QString& originalPattern, const QSt
     if ( equalIndex > 0 )
     {
         auto equalPart = txt.substr( 0, equalIndex );
-        Rialogging::info("equalPart" + QString::fromStdString(equalPart));
+        RiaLogging::info( "equalPart" + QString::fromStdString( equalPart ) );
 
-        auto theRest   = oldProjectPathStd.substr( equalIndex );
-        Rialogging::info("theRest" + QString::fromStdString(theRest));
+        auto theRest = oldProjectPathStd.substr( equalIndex );
+        RiaLogging::info( "theRest" + QString::fromStdString( theRest ) );
 
         // remove theRest from the back of newProjectPath
         auto newProjectPathWithoutTheRest = newProjectPathStd.substr( 0, newProjectPathStd.size() - theRest.size() );
-        Rialogging::info("newProjectPathWithoutTheRest" + QString::fromStdString(newProjectPathWithoutTheRest));
+        RiaLogging::info( "newProjectPathWithoutTheRest" + QString::fromStdString( newProjectPathWithoutTheRest ) );
 
         auto newPattern = newProjectPathWithoutTheRest + txt.substr( equalIndex );
-        Rialogging::info("newPattern" + QString::fromStdString(newPattern));
+        RiaLogging::info( "newPattern" + QString::fromStdString( newPattern ) );
 
         return QString::fromStdString( newPattern );
     }
