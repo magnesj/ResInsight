@@ -167,14 +167,12 @@ void RiaCurveMerger<XValueType>::computeInterpolatedValues( bool includeValuesFr
 
     m_interpolatedValuesForAllCurves.resize( curveCount );
 
-    std::vector<double> accumulatedValidValues( dataValueCount, 1.0 );
-
-    for ( size_t curveIdx = 0; curveIdx < curveCount; curveIdx++ )
+#pragma omp parallel for
+    for ( int curveIdx = 0; curveIdx < static_cast<int>( curveCount ); curveIdx++ )
     {
         std::vector<double>& curveValues = m_interpolatedValuesForAllCurves[curveIdx];
         curveValues.resize( dataValueCount );
 
-#pragma omp parallel for
         for ( int valueIndex = 0; valueIndex < static_cast<int>( dataValueCount ); valueIndex++ )
         {
             double interpolValue = 0.0;
@@ -193,10 +191,18 @@ void RiaCurveMerger<XValueType>::computeInterpolatedValues( bool includeValuesFr
 
             curveValues[valueIndex] = interpolValue;
         }
+    }
 
-        for ( int valueIndex = 0; valueIndex < static_cast<int>( dataValueCount ); valueIndex++ )
+    std::vector<double> accumulatedValidValues( dataValueCount, 1.0 );
+
+    // This loop can be parallelized, but it is not done here because it is not a performance bottleneck in the current implementation. Some
+    // testing indicate best performance with sequential execution.
+    for ( int valueIndex = 0; valueIndex < static_cast<int>( dataValueCount ); valueIndex++ )
+    {
+        for ( size_t curveIdx = 0; curveIdx < curveCount; curveIdx++ )
         {
-            const auto& interpolValue = curveValues[valueIndex];
+            std::vector<double>& curveValues   = m_interpolatedValuesForAllCurves[curveIdx];
+            const auto&          interpolValue = curveValues[valueIndex];
             if ( !RiaCurveDataTools::isValidValue( interpolValue, false ) )
             {
                 accumulatedValidValues[valueIndex] = HUGE_VAL;
