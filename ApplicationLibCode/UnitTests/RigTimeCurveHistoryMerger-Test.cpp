@@ -2,7 +2,9 @@
 
 #include "RiaCurveMerger.h"
 
+#include "RiaWeightedMeanCalculator.h"
 #include <cmath> // Needed for HUGE_VAL on Linux
+#include <random>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -11,27 +13,28 @@ TEST( RiaTimeHistoryCurveMergerTest, TestDateInterpolation )
 {
     std::vector<double> values{ 2.0, 3.5, 5.0, 6.0 };
     std::vector<time_t> timeSteps{ 1, 5, 10, 15 };
+    bool                isMonotonicallyIncreasing = true;
 
     {
-        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 1, timeSteps, values );
+        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 1, timeSteps, values, isMonotonicallyIncreasing );
 
         EXPECT_EQ( 2.0, val );
     }
 
     {
-        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 0, timeSteps, values );
+        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 0, timeSteps, values, isMonotonicallyIncreasing );
 
         EXPECT_EQ( HUGE_VAL, val );
     }
 
     {
-        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 20, timeSteps, values );
+        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 20, timeSteps, values, isMonotonicallyIncreasing );
 
         EXPECT_EQ( HUGE_VAL, val );
     }
 
     {
-        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 3, timeSteps, values );
+        double val = RiaTimeHistoryCurveMerger::interpolatedYValue( 3, timeSteps, values, isMonotonicallyIncreasing );
 
         EXPECT_EQ( 2.75, val );
     }
@@ -231,4 +234,52 @@ TEST( RiaTimeHistoryCurveMergerTest, SharedXValues )
 
     auto generatedYValuesB = interpolate.interpolatedYValuesForAllXValues( 1 );
     EXPECT_TRUE( std::equal( valuesB.begin(), valuesB.end(), generatedYValuesB.begin() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RiaTimeHistoryCurveMergerTest, PerformanceInterpolation )
+{
+    std::vector<double> valuesA;
+    std::vector<double> valuesB;
+    std::vector<time_t> timeStepsA;
+    std::vector<time_t> timeStepsB;
+
+    bool isMonotonicallyIncreasing = true;
+
+    const size_t maxTimeStep = 10000;
+    for ( size_t i = 0; i < maxTimeStep; i++ )
+    {
+        valuesA.push_back( static_cast<double>( i ) );
+        valuesB.push_back( static_cast<double>( i ) * 2.0 );
+        timeStepsA.push_back( static_cast<time_t>( i ) );
+        timeStepsB.push_back( static_cast<time_t>( i ) + 0.5 );
+    }
+
+    // create random time steps
+    std::vector<time_t> timeSteps;
+    for ( size_t i = 0; i < maxTimeStep; i++ )
+    {
+        timeSteps.push_back( static_cast<time_t>( i ) + 0.25 );
+    }
+
+    std::shuffle( timeSteps.begin(), timeSteps.end(), std::default_random_engine( 0 ) );
+
+    auto interpolationStart = std::chrono::high_resolution_clock::now();
+    {
+        const size_t N = 10000;
+        for ( size_t i = 0; i < N; i++ )
+        {
+            for ( auto timeStep : timeSteps )
+            {
+                double interpolatedA = RiaTimeHistoryCurveMerger::interpolatedYValue( timeStep, timeSteps, valuesA, isMonotonicallyIncreasing );
+                double interpolatedB = RiaTimeHistoryCurveMerger::interpolatedYValue( timeStep, timeSteps, valuesB, isMonotonicallyIncreasing );
+            }
+        }
+    }
+
+    auto                                      interpolationEnd      = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> interpolationDuration = interpolationEnd - interpolationStart;
+    std::cout << "Direct interpolation time for " << maxTimeStep << " values: " << interpolationDuration << " ms" << std::endl;
 }

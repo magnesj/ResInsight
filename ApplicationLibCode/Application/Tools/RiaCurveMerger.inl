@@ -185,8 +185,10 @@ void RiaCurveMerger<XValueType>::computeInterpolatedValues( bool includeValuesFr
             }
             else
             {
-                interpolValue =
-                    interpolatedYValue( m_allXValues[valueIndex], m_originalValues[curveIdx].first, m_originalValues[curveIdx].second );
+                interpolValue = interpolatedYValue( m_allXValues[valueIndex],
+                                                    m_originalValues[curveIdx].first,
+                                                    m_originalValues[curveIdx].second,
+                                                    m_isXValuesMonotonicallyIncreasing );
             }
 
             curveValues[valueIndex] = interpolValue;
@@ -275,14 +277,15 @@ void RiaCurveMerger<XValueType>::removeValuesForPartialCurves( std::set<XValueTy
 template <typename XValueType>
 double RiaCurveMerger<XValueType>::interpolatedYValue( const XValueType&              interpolationXValue,
                                                        const std::vector<XValueType>& xValues,
-                                                       const std::vector<double>&     yValues )
+                                                       const std::vector<double>&     yValues,
+                                                       bool                           isMonotonicallyIncreasing )
 {
     if ( xValues.empty() ) return HUGE_VAL;
     if ( yValues.size() != xValues.size() ) return HUGE_VAL;
 
     size_t startIndex = 0;
 
-    if ( isMonotonicallyIncreasing( xValues ) )
+    if ( isMonotonicallyIncreasing )
     {
         // Use lower_bound to find the first element that is not less than the interpolation value using a threshold that is larger than
         // the threshold used in XComparator::equals
