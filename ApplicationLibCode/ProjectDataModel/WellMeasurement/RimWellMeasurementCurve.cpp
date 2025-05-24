@@ -175,7 +175,7 @@ void RimWellMeasurementCurve::onLoadDataAndUpdate( bool updateParentPlot )
 
     if ( m_parentPlot )
     {
-        m_parentPlot->replot();
+        m_parentPlot->scheduleReplot();
     }
 }
 
@@ -207,7 +207,7 @@ void RimWellMeasurementCurve::fieldChangedByUi( const caf::PdmFieldHandle* chang
         loadDataAndUpdate( true );
     }
 
-    if ( m_parentPlot ) m_parentPlot->replot();
+    if ( m_parentPlot ) m_parentPlot->scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------

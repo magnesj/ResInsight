@@ -818,7 +818,7 @@ void RimWellLogRftCurve::onLoadDataAndUpdate( bool updateParentPlot )
 
         if ( m_parentPlot )
         {
-            m_parentPlot->replot();
+            m_parentPlot->scheduleReplot();
         }
     }
 }

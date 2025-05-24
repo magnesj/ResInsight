@@ -438,7 +438,7 @@ void RimSummaryEnsembleTools::highlightCurvesForSummaryCases( const std::vector<
                 plotWidget->highlightCurvesUpdateOrder( curvesForSameRealization );
             }
 
-            plotWidget->replot();
+            plotWidget->scheduleReplot();
         }
     }
 
@@ -467,7 +467,7 @@ void RimSummaryEnsembleTools::resetHighlightAllPlots()
             if ( auto plotWidget = dynamic_cast<RiuQwtPlotWidget*>( plot->plotWidget() ) )
             {
                 plotWidget->resetPlotItemHighlighting();
-                plotWidget->replot();
+                plotWidget->scheduleReplot();
             }
         }
     }

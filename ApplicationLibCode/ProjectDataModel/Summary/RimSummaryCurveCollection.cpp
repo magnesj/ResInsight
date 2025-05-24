@@ -120,7 +120,7 @@ void RimSummaryCurveCollection::setParentPlotAndReplot( RiuPlotWidget* plot )
 {
     setParentPlotNoReplot( plot );
 
-    if ( plot ) plot->replot();
+    if ( plot ) plot->scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------

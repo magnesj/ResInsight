@@ -159,7 +159,7 @@ void RimAsciiDataCurve::onLoadDataAndUpdate( bool updateParentPlot )
 
         updateZoomInParentPlot();
 
-        if ( m_parentPlot ) m_parentPlot->replot();
+        if ( m_parentPlot ) m_parentPlot->scheduleReplot();
     }
 
     updateQwtPlotAxis();

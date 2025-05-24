@@ -802,7 +802,7 @@ void RimPlotCurve::setTitle( const QString& title )
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurve::replotParentPlot()
 {
-    if ( m_parentPlot ) m_parentPlot->replot();
+    if ( m_parentPlot ) m_parentPlot->scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1159,7 +1159,7 @@ void RimPlotCurve::setParentPlotAndReplot( RiuPlotWidget* plotWidget )
     CAF_ASSERT( plotWidget );
 
     setParentPlotNoReplot( plotWidget );
-    plotWidget->replot();
+    plotWidget->scheduleReplot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1201,7 +1201,7 @@ void RimPlotCurve::reattach( bool updateParentPlot )
         setParentPlotNoReplot( m_parentPlot );
         if ( updateParentPlot )
         {
-            m_parentPlot->replot();
+            m_parentPlot->scheduleReplot();
         }
     }
 }
