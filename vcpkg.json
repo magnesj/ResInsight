@@ -9,7 +9,12 @@
         "type-lite",
         "fast-float",
         "spdlog",
-        "pugixml"
+        "pugixml",
+        "qtbase",
+        "qtnetworkauth",
+        "qtcharts",
+        "qtsvg"
+
     ],
     "overrides": [
         {
