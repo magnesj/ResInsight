@@ -47,7 +47,7 @@
 
 using namespace std::chrono;
 
-CAF_PDM_SOURCE_INIT( RimCornerPointCase, "RimCornerPointCase" );
+CAF_PDM_SOURCE_INIT( RimCornerPointCase, "CornerPointCase", "RimCornerPointCase" );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -103,7 +103,7 @@ std::expected<RimCornerPointCase*, QString> RimCornerPointCase::createFromCoordi
     auto cornerPointCase = new RimCornerPointCase;
 
     buildGrid( *cornerPointCase->eclipseCaseData(), nx, ny, nz, coord, zcorn, actnum );
-    cornerPointCase->ensureFaultDataIsComputed();
+    cornerPointCase->computeCachedData();
 
     return cornerPointCase;
 }

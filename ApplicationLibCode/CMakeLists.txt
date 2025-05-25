@@ -99,6 +99,7 @@ list(
   ReservoirDataModel/ResultAccessors/CMakeLists_files.cmake
   ReservoirDataModel/ResultCalculators/CMakeLists_files.cmake
   ReservoirDataModel/Well/CMakeLists_files.cmake
+  ReservoirDataModel/Surface/CMakeLists_files.cmake
   FileInterface/CMakeLists_files.cmake
   ProjectDataModel/CMakeLists_files.cmake
   ProjectDataModel/AnalysisPlots/CMakeLists_files.cmake
@@ -338,6 +339,7 @@ target_include_directories(
          ${CMAKE_CURRENT_SOURCE_DIR}/Application
          ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools
          ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools/WellPathTools
+         ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools/KeyValueStore
          ${CMAKE_CURRENT_SOURCE_DIR}/CommandFileInterface
          ${CMAKE_CURRENT_SOURCE_DIR}/CommandFileInterface/Core
          ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface
