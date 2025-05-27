@@ -406,4 +406,71 @@ void simplifyPolygon( std::vector<cvf::Vec3d>& vertices, double epsilon )
         vertices = { vertices.front(), vertices.back() };
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigPolygonTools::GeometryData computePolygonGeometryData( const std::vector<cvf::Vec3d>& vertices )
+{
+    GeometryData geometryData;
+
+    for ( size_t p = 1; p < vertices.size(); p++ )
+    {
+        const auto& p0 = vertices[p - 1];
+        const auto& p1 = vertices[p];
+
+        geometryData.lastSegmentLength = ( p1 - p0 ).length();
+
+        const auto& p1_horiz = cvf::Vec3d( p1.x(), p1.y(), p0.z() );
+
+        geometryData.lastSegmentHorisontalLength = ( p1_horiz - p0 ).length();
+
+        geometryData.totalLength += geometryData.lastSegmentLength;
+        geometryData.totalHorizontalLength += geometryData.lastSegmentHorisontalLength;
+    }
+
+    auto projectToZPlane = []( const std::vector<cvf::Vec3d>& vertices )
+    {
+        std::vector<cvf::Vec3d> pointsProjectedInZPlane;
+        for ( const auto& p : vertices )
+        {
+            auto pointInZ = p;
+            pointInZ.z()  = 0.0;
+            pointsProjectedInZPlane.push_back( pointInZ );
+        }
+        return pointsProjectedInZPlane;
+    };
+
+    cvf::Vec3d area             = cvf::GeometryTools::polygonAreaNormal3D( projectToZPlane( vertices ) );
+    geometryData.horizontalArea = cvf::Math::abs( area.z() );
+
+    return geometryData;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString geometryDataAsText( const std::vector<cvf::Vec3d>& vertices )
+{
+    auto geometryData = computePolygonGeometryData( vertices );
+
+    QString text;
+
+    if ( vertices.size() > 2 )
+    {
+        text = QString( "Segment Length: %1\nSegment Horizontal Length: %2\n" )
+                   .arg( geometryData.lastSegmentLength )
+                   .arg( geometryData.lastSegmentHorisontalLength );
+        text +=
+            QString( "Total Length: %1\nTotal Horizontal Length: %2\n" ).arg( geometryData.totalLength ).arg( geometryData.totalHorizontalLength );
+        text += QString( "\nHorizontal Area : %1" ).arg( geometryData.horizontalArea );
+    }
+    else
+    {
+        text = QString( "Length: %1\nHorizontal Length: %2\n" ).arg( geometryData.lastSegmentLength ).arg( geometryData.lastSegmentHorisontalLength );
+    }
+
+    return text;
+}
+
 } // namespace RigPolygonTools

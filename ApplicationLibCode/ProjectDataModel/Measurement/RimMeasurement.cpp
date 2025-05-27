@@ -20,15 +20,17 @@
 
 #include "RiaApplication.h"
 
+#include "RigPolygonTools.h"
+
 #include "Rim3dView.h"
 #include "RimGridView.h"
 
 #include "MeasurementCommands/RicMeasurementPickEventHandler.h"
 
+#include "RiuMainWindow.h"
 #include "RiuMeasurementEventFilter.h"
 #include "RiuViewerCommands.h"
 
-#include "RiuMainWindow.h"
 #include "cvfGeometryTools.h"
 
 CAF_PDM_SOURCE_INIT( RimMeasurement, "RimMeasurement" );
@@ -127,7 +129,7 @@ void RimMeasurement::removeAllPoints()
 //--------------------------------------------------------------------------------------------------
 QString RimMeasurement::label() const
 {
-    auto lengths = calculateLengths();
+    auto lengths = RigPolygonTools::computePolygonGeometryData( m_pointsInDomainCoords );
 
     QString text;
 
@@ -137,7 +139,7 @@ QString RimMeasurement::label() const
 
         text += QString( "Total Length: %1\nTotal Horizontal Length: %2\n" ).arg( lengths.totalLength ).arg( lengths.totalHorizontalLength );
 
-        text += QString( "\nHorizontal Area : %1" ).arg( lengths.area );
+        text += QString( "\nHorizontal Area : %1" ).arg( lengths.horizontalArea );
     }
     else
     {
@@ -145,45 +147,6 @@ QString RimMeasurement::label() const
     }
 
     return text;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimMeasurement::Lengths RimMeasurement::calculateLengths() const
-{
-    Lengths lengths;
-
-    for ( size_t p = 1; p < m_pointsInDomainCoords.size(); p++ )
-    {
-        const auto& p0 = m_pointsInDomainCoords[p - 1];
-        const auto& p1 = m_pointsInDomainCoords[p];
-
-        lengths.lastSegmentLength = ( p1 - p0 ).length();
-
-        const auto& p1_horiz = cvf::Vec3d( p1.x(), p1.y(), p0.z() );
-
-        lengths.lastSegmentHorisontalLength = ( p1_horiz - p0 ).length();
-
-        lengths.totalLength += lengths.lastSegmentLength;
-        lengths.totalHorizontalLength += lengths.lastSegmentHorisontalLength;
-    }
-
-    {
-        std::vector<Vec3d> pointsProjectedInZPlane;
-        for ( const auto& p : m_pointsInDomainCoords )
-        {
-            auto pointInZ = p;
-            pointInZ.z()  = 0.0;
-            pointsProjectedInZPlane.push_back( pointInZ );
-        }
-
-        Vec3d area = cvf::GeometryTools::polygonAreaNormal3D( pointsProjectedInZPlane );
-
-        lengths.area = cvf::Math::abs( area.z() );
-    }
-
-    return lengths;
 }
 
 //--------------------------------------------------------------------------------------------------
