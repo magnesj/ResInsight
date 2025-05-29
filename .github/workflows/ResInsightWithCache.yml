@@ -66,10 +66,6 @@ jobs:
       BUILD_TYPE: Release
       BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
       BUILDCACHE_ACCURACY: SLOPPY
-      USERNAME: magnesj
-      VCPKG_EXE: ${{ github.workspace }}/ThirdParty/vcpkg/vcpkg${{ matrix.config.os == 'windows-2022' && '.exe' || '' }}
-      FEED_URL: https://nuget.pkg.github.com/ceetronsolutions/index.json
-      VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/ceetronsolutions/index.json,readwrite"
 
     steps:
       - name: Checkout
@@ -181,35 +177,10 @@ jobs:
         run: |
           ThirdParty/vcpkg/${{ matrix.config.vcpkg-bootstrap }}
 
-      - name: Configure NuGet for binary caching (Linux)
-        if: runner.os == 'Linux'
-        run: |
-          mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-            sources add \
-            -Source "${{ env.FEED_URL }}" \
-            -StorePasswordInClearText \
-            -Name GitHubPackages \
-            -UserName "${{ env.USERNAME }}" \
-            -Password "${{ secrets.GH_PACKAGES_TOKEN }}"
-          mono `${{ env.VCPKG_EXE }} fetch nuget | tail -n 1` \
-            setapikey "${{ secrets.GH_PACKAGES_TOKEN }}" \
-            -Source "${{ env.FEED_URL }}"
-        
-      - name: Configure NuGet for binary caching (Windows)
-        if: runner.os == 'Windows'
-        shell: pwsh
-        run: |
-          .$(${{ env.VCPKG_EXE }} fetch nuget) `
-            sources add `
-            -Source "${{ env.FEED_URL }}" `
-            -StorePasswordInClearText `
-            -Name GitHubPackages `
-            -UserName "${{ env.USERNAME }}" `
-            -Password "${{ secrets.GH_PACKAGES_TOKEN }}"
-          .$(${{ env.VCPKG_EXE }} fetch nuget) `
-            setapikey "${{ secrets.GH_PACKAGES_TOKEN }}" `
-            -Source "${{ env.FEED_URL }}"
-
+      - name: Setup anew (or from cache) vcpkg (and does not build any package)
+        uses: lukka/run-vcpkg@v11 # Always specify the specific _version_ of the
+                                  # action you need, `v11` in this case to stay up
+                                  # to date with fixes on the v11 branch.
       - name: Configure
         shell: bash
         env:
