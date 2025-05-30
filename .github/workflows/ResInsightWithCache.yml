@@ -66,7 +66,6 @@ jobs:
       BUILD_TYPE: Release
       BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
       BUILDCACHE_ACCURACY: SLOPPY
-      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
     steps:
       - name: Checkout
@@ -179,10 +178,11 @@ jobs:
 
       - name: Restore vcpkg cache
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@v3
+        uses: magnesj/vcpkg-cache@msj-take-02
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          
+          prefix: vcpkg-cache-${{ matrix.config.os }}-${{ matrix.config.cxx }}
+        
       - name: Configure
         shell: bash
         env:
