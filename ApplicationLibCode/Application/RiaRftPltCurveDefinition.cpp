@@ -68,13 +68,21 @@ auto RiaRftPltCurveDefinition::operator<=>( const RiaRftPltCurveDefinition& othe
         return m_curveAddress.ensemble() <=> other.m_curveAddress.ensemble();
     }
 
-    if ( ( m_curveAddress <=> other.m_curveAddress ) == std::strong_ordering::equal )
+    if ( ( m_curveAddress != other.m_curveAddress ) )
     {
-        if ( m_wellName == other.m_wellName )
-        {
-            return m_timeStep.toMSecsSinceEpoch() <=> other.m_timeStep.toMSecsSinceEpoch();
-        }
+        return m_curveAddress <=> other.m_curveAddress;
+    }
+
+    if ( ( m_wellName.toStdString() != other.m_wellName.toStdString() ) )
+    {
         return m_wellName.toStdString() <=> other.m_wellName.toStdString();
     }
-    return m_curveAddress <=> other.m_curveAddress;
+
+    // If the curve addresses and well names are equal, compare the time steps
+    if ( m_timeStep.toMSecsSinceEpoch() != other.m_timeStep.toMSecsSinceEpoch() )
+    {
+        return m_timeStep.toMSecsSinceEpoch() <=> other.m_timeStep.toMSecsSinceEpoch();
+    }
+
+    return this <=> &other;
 }

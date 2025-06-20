@@ -165,68 +165,73 @@ auto RifDataSourceForRftPlt::operator<=>( const RifDataSourceForRftPlt& addr2 ) 
         return m_sourceType <=> addr2.m_sourceType;
     }
 
-    if ( m_sourceType == RifDataSourceForRftPlt::SourceType::NONE ) return std::strong_ordering::less;
-
     if ( m_sourceType == RifDataSourceForRftPlt::SourceType::OBSERVED_LAS_FILE )
     {
         if ( wellLogFile() && addr2.wellLogFile() )
         {
-            return wellLogFile()->fileName().toStdString() <=> addr2.wellLogFile()->fileName().toStdString();
+            if ( wellLogFile()->fileName() != addr2.wellLogFile()->fileName() )
+            {
+                return wellLogFile()->fileName().toStdString() <=> addr2.wellLogFile()->fileName().toStdString();
+            }
         }
-        return wellLogFile() <=> addr2.wellLogFile();
     }
     else if ( m_sourceType == RifDataSourceForRftPlt::SourceType::SUMMARY_RFT )
     {
         if ( summaryCase() && addr2.summaryCase() )
         {
-            if ( summaryCase()->displayCaseName() == addr2.summaryCase()->displayCaseName() )
+            if ( summaryCase()->displayCaseName().toStdString() != addr2.summaryCase()->displayCaseName().toStdString() )
             {
-                if ( ensemble() && addr2.ensemble() )
+                return summaryCase()->displayCaseName().toStdString() <=> addr2.summaryCase()->displayCaseName().toStdString();
+            }
+            if ( ensemble() && addr2.ensemble() )
+            {
+                if ( ensemble()->name().toStdString() != addr2.ensemble()->name().toStdString() )
                 {
                     return ensemble()->name().toStdString() <=> addr2.ensemble()->name().toStdString();
                 }
-                return ensemble() <=> addr2.ensemble();
             }
-            return summaryCase()->displayCaseName().toStdString() <=> addr2.summaryCase()->displayCaseName().toStdString();
         }
-        return summaryCase() <=> addr2.summaryCase();
     }
     else if ( m_sourceType == RifDataSourceForRftPlt::SourceType::ENSEMBLE_RFT )
     {
         if ( ensemble() && addr2.ensemble() )
         {
-            return ensemble()->name().toStdString() <=> addr2.ensemble()->name().toStdString();
+            if ( ensemble()->name().toStdString() != addr2.ensemble()->name().toStdString() )
+            {
+                return ensemble()->name().toStdString() <=> addr2.ensemble()->name().toStdString();
+            }
         }
-        return ensemble() <=> addr2.ensemble();
     }
     else if ( m_sourceType == RifDataSourceForRftPlt::SourceType::OBSERVED_FMU_RFT )
     {
-        if ( observedFmuRftData() || addr2.observedFmuRftData() )
+        if ( observedFmuRftData() && addr2.observedFmuRftData() )
         {
-            if ( observedFmuRftData() && addr2.observedFmuRftData() )
+            if ( observedFmuRftData()->name().toStdString() != addr2.observedFmuRftData()->name().toStdString() )
             {
                 return observedFmuRftData()->name().toStdString() <=> addr2.observedFmuRftData()->name().toStdString();
             }
-            return observedFmuRftData() <=> addr2.observedFmuRftData();
         }
-        if ( pressureDepthData() || addr2.pressureDepthData() )
+
+        if ( pressureDepthData() && addr2.pressureDepthData() )
         {
-            if ( pressureDepthData() && addr2.pressureDepthData() )
+            if ( pressureDepthData()->name().toStdString() != addr2.pressureDepthData()->name().toStdString() )
             {
-                return pressureDepthData()->name().toStdString() <=> addr2.pressureDepthData()->name().toStdString();
+                return ensemble()->name().toStdString() <=> addr2.ensemble()->name().toStdString();
             }
-            return pressureDepthData() <=> addr2.pressureDepthData();
         }
-        return std::strong_ordering::less;
     }
     else
     {
         if ( eclCase() && addr2.eclCase() )
         {
-            return eclCase()->caseId() <=> addr2.eclCase()->caseId();
+            if ( eclCase()->caseId() != addr2.eclCase()->caseId() )
+            {
+                return eclCase()->caseId() <=> addr2.eclCase()->caseId();
+            }
         }
-        return eclCase() <=> addr2.eclCase();
     }
+
+    return this <=> &addr2;
 }
 
 //--------------------------------------------------------------------------------------------------
