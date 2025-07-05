@@ -179,7 +179,7 @@ jobs:
 
       - name: Restore vcpkg cache
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@v3.3.1
+        uses: TAServers/vcpkg-cache@master
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: vcpkg-${{ matrix.config.cxx}}/
