@@ -184,6 +184,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: vcpkg-${{ matrix.config.cxx}}/
           
+      - name: Print CMake version
+        shell: bash
+        run: |
+          cmake --version
+
       - name: Configure
         shell: bash
         env:
