@@ -28,15 +28,20 @@
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests reading a well-formatted well measurement file with valid data. This test verifies
+/// that the RifWellMeasurementReader can correctly parse CSV format well measurement data
+/// including well names, measured depths, dates, measurement types, values, quality codes,
+/// and remarks. It validates both the parsing accuracy and proper data type conversions.
 //--------------------------------------------------------------------------------------------------
 TEST( RifWellMeasurementReaderTest, ReadCorrectInputFile )
 {
+    // Create a temporary file with well measurement data
     QTemporaryFile file;
     EXPECT_TRUE( file.open() );
 
     {
         QTextStream out( &file );
+        // Write test data: well name, depth, date, measurement type, value, quality, remark
         out << "NO 1234/5-6, 1234.56, 2019-11-13, XLOT, 99.9, 3, Good test\n"
             << "NO 4321/7-8, 4321.79, 2024-12-24, DP, 88.8, 1, Poor test\n";
     }
@@ -44,17 +49,22 @@ TEST( RifWellMeasurementReaderTest, ReadCorrectInputFile )
     QStringList filePaths;
     filePaths.append( file.fileName() );
 
+    // Read the well measurements from the file
     std::vector<RifWellMeasurement> wellMeasurements;
     RifWellMeasurementReader::readWellMeasurements( wellMeasurements, filePaths );
 
+    // Verify we got the expected number of measurements
     ASSERT_EQ( 2u, wellMeasurements.size() );
 
+    // Verify well names are parsed correctly
     ASSERT_EQ( "NO 1234/5-6", wellMeasurements[0].wellName.toStdString() );
     ASSERT_EQ( "NO 4321/7-8", wellMeasurements[1].wellName.toStdString() );
 
+    // Verify measured depths are parsed correctly
     ASSERT_DOUBLE_EQ( 1234.56, wellMeasurements[0].MD );
     ASSERT_DOUBLE_EQ( 4321.79, wellMeasurements[1].MD );
 
+    // Verify dates are parsed correctly (ISO 8601 format)
     QDate date0( 2019, 11, 13 );
     ASSERT_EQ( date0.year(), wellMeasurements[0].date.year() );
     ASSERT_EQ( date0.month(), wellMeasurements[0].date.month() );
@@ -65,32 +75,40 @@ TEST( RifWellMeasurementReaderTest, ReadCorrectInputFile )
     ASSERT_EQ( date1.month(), wellMeasurements[1].date.month() );
     ASSERT_EQ( date1.day(), wellMeasurements[1].date.day() );
 
+    // Verify measurement values are parsed correctly
     ASSERT_DOUBLE_EQ( 99.9, wellMeasurements[0].value );
     ASSERT_DOUBLE_EQ( 88.8, wellMeasurements[1].value );
 
+    // Verify measurement types (kinds) are parsed correctly
     ASSERT_EQ( "XLOT", wellMeasurements[0].kind.toStdString() );
     ASSERT_EQ( "DP", wellMeasurements[1].kind.toStdString() );
 
+    // Verify quality codes are parsed correctly
     ASSERT_EQ( 3, wellMeasurements[0].quality );
     ASSERT_EQ( 1, wellMeasurements[1].quality );
 
+    // Verify remarks are parsed correctly
     ASSERT_EQ( "Good test", wellMeasurements[0].remark.toStdString() );
     ASSERT_EQ( "Poor test", wellMeasurements[1].remark.toStdString() );
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests that measurement types (kinds) are automatically converted to uppercase for consistency.
+/// This ensures that regardless of how measurement types are specified in the input file 
+/// (LOT, lot, lOt), they are all standardized to uppercase (LOT) for uniform data handling.
 //--------------------------------------------------------------------------------------------------
 TEST( RifWellMeasurementReaderTest, KindsAreUppercased )
 {
+    // Create temporary file with measurement types in different cases
     QTemporaryFile file;
     EXPECT_TRUE( file.open() );
 
     {
         QTextStream out( &file );
-        out << "NO 1234/1-2, 1234.56, 2019-11-13, LOT, 99.9, 3, Good test\n"
-            << "NO 1234/3-4, 2345.67, 2024-12-24, lot, 88.8, 1, Poor test\n"
-            << "NO 1234/5-6, 3456.78, 2026-12-24, lOt, 77.7, 2, Poor test\n";
+        // Test data with measurement types in different cases: uppercase, lowercase, mixed case
+        out << "NO 1234/1-2, 1234.56, 2019-11-13, LOT, 99.9, 3, Good test\n"      // Already uppercase
+            << "NO 1234/3-4, 2345.67, 2024-12-24, lot, 88.8, 1, Poor test\n"      // Lowercase
+            << "NO 1234/5-6, 3456.78, 2026-12-24, lOt, 77.7, 2, Poor test\n";     // Mixed case
     }
 
     QStringList filePaths;
@@ -101,6 +119,7 @@ TEST( RifWellMeasurementReaderTest, KindsAreUppercased )
 
     ASSERT_EQ( 3u, wellMeasurements.size() );
 
+    // Verify all measurement types are converted to uppercase
     for ( unsigned int i = 0; i < wellMeasurements.size(); i++ )
     {
         ASSERT_EQ( "LOT", wellMeasurements[i].kind.toStdString() );
@@ -108,7 +127,10 @@ TEST( RifWellMeasurementReaderTest, KindsAreUppercased )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Helper to check exception messages when reading invalid files
+/// Helper function to test exception handling during file reading. This utility function
+/// attempts to read well measurements from the provided file paths and verifies that the
+/// expected exception is thrown with the correct error message. It also ensures that the
+/// wellMeasurements vector is properly cleaned up (empty) when an exception occurs.
 //--------------------------------------------------------------------------------------------------
 ::testing::AssertionResult readingThrowsException( const QStringList& filePaths, const QString& expectedMessage )
 {
@@ -116,65 +138,79 @@ TEST( RifWellMeasurementReaderTest, KindsAreUppercased )
     try
     {
         RifWellMeasurementReader::readWellMeasurements( wellMeasurements, filePaths );
-        // No exception thrown: fail!
+        // If we reach this point, no exception was thrown - this is a test failure
         return ::testing::AssertionFailure() << "readWellMeasurements did not throw exception";
     }
     catch ( FileParseException& error )
     {
-        // Should always have cleaned up the well measurements on failure
+        // Verify that well measurements vector was cleaned up on failure
         EXPECT_EQ( 0u, wellMeasurements.size() );
-        // Check that we get the expected message
+        // Verify that we received the expected error message
         EXPECT_EQ( expectedMessage.toStdString(), error.message.toStdString() );
         return ::testing::AssertionSuccess();
     }
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests error handling when attempting to read a non-existent file. This verifies that the
+/// reader properly detects and reports file access errors with appropriate error messages,
+/// ensuring robust error handling for invalid file paths.
 //--------------------------------------------------------------------------------------------------
 TEST( RifWellMeasurementReaderTest, ReadMissingFileThrows )
 {
     QStringList filePaths;
     QString     nonExistingFile( "this/is/a/file/which/does/not/exist.csv" );
     filePaths.append( nonExistingFile );
+    
+    // Verify that attempting to read a non-existent file throws the expected exception
     ASSERT_TRUE( readingThrowsException( filePaths, QString( "Unable to open file: %1" ).arg( nonExistingFile ) ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests error handling for malformed data with insufficient columns. This verifies that the
+/// reader properly detects and reports incomplete data lines that don't contain all required
+/// fields (well name, depth, date, kind, value, quality, remark), ensuring data integrity.
 //--------------------------------------------------------------------------------------------------
 TEST( RifWellMeasurementReaderTest, ReadShortLinesFileThrows )
 {
+    // Create file with incomplete data lines (missing required columns)
     QTemporaryFile file;
     EXPECT_TRUE( file.open() );
 
     {
         QTextStream out( &file );
-        out << "NO 1234/5-6, 1234.56\n"
-            << "NO 4321/7-8, 4321.79, 2024-12-24\n";
+        out << "NO 1234/5-6, 1234.56\n"                        // Missing date, kind, value, quality, remark
+            << "NO 4321/7-8, 4321.79, 2024-12-24\n";           // Missing kind, value, quality, remark
     }
 
     QStringList filePaths;
     filePaths.append( file.fileName() );
+    
+    // Verify that incomplete data on line 1 throws the expected exception
     ASSERT_TRUE( readingThrowsException( filePaths, QString( "Incomplete data on line 1: %1" ).arg( file.fileName() ) ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests error handling for empty well names. This verifies that the reader properly validates
+/// that well names are not empty or just whitespace, which is essential for proper well
+/// identification and data integrity in well measurement datasets.
 //--------------------------------------------------------------------------------------------------
 TEST( RifWellMeasurementReaderTest, ReadEmptyWellNameThrows )
 {
+    // Create file with valid first line and empty well name on second line
     QTemporaryFile file;
     EXPECT_TRUE( file.open() );
 
     {
         QTextStream out( &file );
-        out << "NO 1234/5-6, 1234.56, 2019-11-13, XLOT, 99.9, 3, Good test\n";
-        out << ", 1234.56, 2019-11-13, XLOT, 99.9, 3, Good test\n";
+        out << "NO 1234/5-6, 1234.56, 2019-11-13, XLOT, 99.9, 3, Good test\n";   // Valid line
+        out << ", 1234.56, 2019-11-13, XLOT, 99.9, 3, Good test\n";              // Empty well name
     }
 
     QStringList filePaths;
     filePaths.append( file.fileName() );
+    
+    // Verify that empty well name on line 2 throws the expected exception
     ASSERT_TRUE( readingThrowsException( filePaths, QString( "Unexpected empty 'Well Name' on line 2: %1" ).arg( file.fileName() ) ) );
 }
 
