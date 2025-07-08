@@ -193,7 +193,7 @@ jobs:
            EXEC_PATH=$(which cmake)
          fi
          echo "Executable path: $EXEC_PATH"
-         $EXEC_PATH --version    
+         "$EXEC_PATH" --version    
 
       - name: Configure
         shell: bash
