@@ -188,9 +188,9 @@ jobs:
         shell: bash
         run: |
          if [ "$RUNNER_OS" = "Windows" ]; then
-           EXEC_PATH=$(where node)
+           EXEC_PATH=$(where cmake)
          else
-           EXEC_PATH=$(which node)
+           EXEC_PATH=$(which cmake)
          fi
          echo "Executable path: $EXEC_PATH"
          $EXEC_PATH --version    
