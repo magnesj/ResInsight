@@ -188,7 +188,7 @@ jobs:
         shell: bash
         run: |
          if [ "$RUNNER_OS" = "Windows" ]; then
-           EXEC_PATH=$(where cmake)
+           EXEC_PATH=$(where.exe cmake | head -n 1)
          else
            EXEC_PATH=$(which cmake)
          fi
