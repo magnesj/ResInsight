@@ -187,7 +187,13 @@ jobs:
       - name: Print CMake version
         shell: bash
         run: |
-          cmake --version
+         if [ "$RUNNER_OS" = "Windows" ]; then
+           EXEC_PATH=$(where node)
+         else
+           EXEC_PATH=$(which node)
+         fi
+         echo "Executable path: $EXEC_PATH"
+         $EXEC_PATH --version    
 
       - name: Configure
         shell: bash
