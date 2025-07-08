@@ -8,19 +8,31 @@
 #define M_PI 3.14159265358979323846 // pi
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests the S-curve calculator with a basic configuration using 45-degree angles and small radius.
+/// This test validates the fundamental S-curve calculation between two points with specified
+/// inclinations and curvature radii. S-curves are used in well path planning to create smooth
+/// transitions between different well sections.
 //--------------------------------------------------------------------------------------------------
 TEST( RiaSCurveCalculator, Test1 )
 
 {
+    // Create S-curve from start point (100,100,0) to end point (100,150,-1000)
+    // Start: azimuth=0°, inclination=45°, radius=12
+    // End: azimuth=180°, inclination=45°, radius=12
     RiaSCurveCalculator sCurveCalc( { 100, 100, 0 }, 0, M_PI / 4, 12, { 100, 150, -1000 }, M_PI, M_PI / 4, 12 );
+    
+    // Verify that the calculation converged successfully
     EXPECT_TRUE( sCurveCalc.isOk() );
 
+    // Output calculation results for debugging/verification
     sCurveCalc.dump();
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Tests the S-curve calculator using pre-calculated radius estimates. This test uses radius
+/// values that were determined from previous calculations or engineering estimates, validating
+/// that the calculator can work with realistic input parameters derived from actual well
+/// planning scenarios.
 //--------------------------------------------------------------------------------------------------
 TEST( RiaSCurveCalculator, Test1AtEstimate )
 

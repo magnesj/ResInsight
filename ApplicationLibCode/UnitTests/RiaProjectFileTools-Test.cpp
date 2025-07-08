@@ -4,9 +4,16 @@
 
 #include <QStringList>
 
+//--------------------------------------------------------------------------------------------------
+/// Tests the decodeVersionString function which parses ResInsight project file version strings
+/// into their component parts (major, minor, patch, development ID). This is critical for
+/// ensuring proper version compatibility and migration handling when loading project files
+/// from different ResInsight versions.
+//--------------------------------------------------------------------------------------------------
 TEST( RiaProjectFileTools, DecodeProjectVersionString )
 {
     {
+        // Test case 1: Standard release version format (YYYY.MM.P)
         int majorVersion  = -1;
         int minorVersion  = -1;
         int patchNumber   = -1;
@@ -18,10 +25,11 @@ TEST( RiaProjectFileTools, DecodeProjectVersionString )
         EXPECT_EQ( 2017, majorVersion );
         EXPECT_EQ( 5, minorVersion );
         EXPECT_EQ( 1, patchNumber );
-        EXPECT_EQ( -1, developmentId );
+        EXPECT_EQ( -1, developmentId );  // No development ID for release versions
     }
 
     {
+        // Test case 2: Empty version string should return all -1 values
         int majorVersion  = -1;
         int minorVersion  = -1;
         int patchNumber   = -1;
@@ -37,6 +45,7 @@ TEST( RiaProjectFileTools, DecodeProjectVersionString )
     }
 
     {
+        // Test case 3: Development version format (YYYY.MM.P-dev.ID)
         int majorVersion  = -1;
         int minorVersion  = -1;
         int patchNumber   = -1;
@@ -52,6 +61,7 @@ TEST( RiaProjectFileTools, DecodeProjectVersionString )
     }
 
     {
+        // Test case 4: Complex development version with extra text (should extract ID from end)
         int majorVersion  = -1;
         int minorVersion  = -1;
         int patchNumber   = -1;
@@ -63,15 +73,23 @@ TEST( RiaProjectFileTools, DecodeProjectVersionString )
         EXPECT_EQ( 2017, majorVersion );
         EXPECT_EQ( 5, minorVersion );
         EXPECT_EQ( 2, patchNumber );
-        EXPECT_EQ( 23, developmentId );
+        EXPECT_EQ( 23, developmentId );  // Should extract the last numeric part
     }
 }
 
+//--------------------------------------------------------------------------------------------------
+/// Tests the version string ordering functionality with a comprehensive list of known ResInsight
+/// version strings from project history. This test verifies that version comparison logic correctly
+/// handles various version formats including release versions, development versions, release
+/// candidates, and special branch versions (flow, gm-beta, etc.). The ordering is critical for
+/// project file migration and compatibility decisions.
+//--------------------------------------------------------------------------------------------------
 TEST( RiaProjectFileTools, OrderKnownVersionStrings )
 {
     QStringList versionStrings;
     {
-        // The following list is taken from traversing history of ResInsightVersion.cmake
+        // Historical ResInsight version strings from ResInsightVersion.cmake - demonstrates various formats
+        // Including development versions, release candidates, special branches, etc.
 
         versionStrings << "2017.05.2-dev.15";
         versionStrings << "2017.05.2-dev.14";
