@@ -78,14 +78,15 @@ private:
     static std::unique_ptr<RifReaderOpmRft> createOpmRftReader( const QString& rftFileName, const QString& dataDeckFileName );
 
 private:
-    cvf::ref<RifSummaryReaderInterface>       m_fileSummaryReader;
-    cvf::ref<RifCalculatedSummaryCurveReader> m_calculatedSummaryReader;
-    cvf::ref<RifMultipleSummaryReaders>       m_multiSummaryReader;
+    std::unique_ptr<RifMultipleSummaryReaders> m_multiSummaryReader;
+    int                                        m_fileSummaryReaderId       = -1;
+    int                                        m_additionalSummaryReaderId = -1;
     std::unique_ptr<RifReaderOpmRft>          m_summaryEclipseRftReader;
-    caf::PdmField<bool>                       m_includeRestartFiles;
 
-    caf::PdmField<caf::FilePath>         m_additionalSummaryFilePath;
-    cvf::ref<RifOpmCommonEclipseSummary> m_additionalSummaryFileReader;
+    cvf::ref<RifReaderOpmRft> m_summaryEclipseRftReader;
+    caf::PdmField<bool>       m_includeRestartFiles;
+
+    caf::PdmField<caf::FilePath> m_additionalSummaryFilePath;
 
     caf::PdmChildField<RimRftCase*> m_rftCase;
 
