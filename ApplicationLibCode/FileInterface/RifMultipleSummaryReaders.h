@@ -20,8 +20,6 @@
 
 #include "RifSummaryReaderInterface.h"
 
-#include "cvfCollection.h"
-
 #include <memory>
 #include <vector>
 

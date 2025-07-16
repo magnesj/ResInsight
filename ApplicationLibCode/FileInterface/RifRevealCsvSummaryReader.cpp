@@ -36,9 +36,7 @@ RifRevealCsvSummaryReader::RifRevealCsvSummaryReader()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifRevealCsvSummaryReader::~RifRevealCsvSummaryReader()
-{
-}
+RifRevealCsvSummaryReader::~RifRevealCsvSummaryReader() = default;
 
 //--------------------------------------------------------------------------------------------------
 ///

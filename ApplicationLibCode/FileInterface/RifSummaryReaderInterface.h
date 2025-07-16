@@ -21,8 +21,6 @@
 #include "RiaDefines.h"
 #include "RifEclipseSummaryAddress.h"
 
-#include "cvfObject.h"
-
 #include <map>
 #include <set>
 #include <string>
