@@ -20,7 +20,6 @@
 #include "RimSummaryCase.h"
 
 #include "cafPdmField.h"
-#include "cvfObject.h"
 
 #include <memory>
 
@@ -80,10 +79,9 @@ private:
     std::unique_ptr<RifMultipleSummaryReaders> m_multiSummaryReader;
     int                                        m_fileSummaryReaderId       = -1;
     int                                        m_additionalSummaryReaderId = -1;
-    std::unique_ptr<RifReaderOpmRft>          m_summaryEclipseRftReader;
+    std::unique_ptr<RifReaderOpmRft>           m_summaryEclipseRftReader;
 
-    cvf::ref<RifReaderOpmRft> m_summaryEclipseRftReader;
-    caf::PdmField<bool>       m_includeRestartFiles;
+    caf::PdmField<bool> m_includeRestartFiles;
 
     caf::PdmField<caf::FilePath> m_additionalSummaryFilePath;
 
