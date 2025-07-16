@@ -30,6 +30,11 @@ RifMultipleSummaryReaders::RifMultipleSummaryReaders() = default;
 //--------------------------------------------------------------------------------------------------
 void RifMultipleSummaryReaders::addReader( std::unique_ptr<RifSummaryReaderInterface> reader )
 {
+    if ( findReader( reader->serialNumber() ) != nullptr )
+    {
+        // Do not add duplicate readers
+        return;
+    }
     m_readers.push_back( std::move( reader ) );
 
     buildMetaData();
