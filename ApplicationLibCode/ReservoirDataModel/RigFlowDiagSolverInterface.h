@@ -131,7 +131,7 @@ public:
 
 public:
     explicit RigFlowDiagSolverInterface( RimEclipseResultCase* eclipseCase );
-    ~RigFlowDiagSolverInterface();
+    virtual ~RigFlowDiagSolverInterface();
 
     RigFlowDiagTimeStepResult calculate( size_t                                   timeStepIdx,
                                          RigFlowDiagResultAddress::PhaseSelection phaseSelection,
