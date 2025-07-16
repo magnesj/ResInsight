@@ -481,7 +481,7 @@ RimSummaryCase* RimSummaryEnsembleTools::caseWithMostKeywords( const std::vector
     int maxAddrCount = 0;
     int maxAddrIndex = -1;
 
-    for ( int i = 0; i < (int)sourceCases.size(); i++ )
+    for ( int i = 0; i < static_cast<int>(sourceCases.size()); i++ )
     {
         RimSummaryCase* currCase = sourceCases[i];
         if ( !currCase ) continue;
