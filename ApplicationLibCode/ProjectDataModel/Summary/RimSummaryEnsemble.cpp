@@ -370,12 +370,17 @@ void RimSummaryEnsemble::setAsEnsemble( bool isEnsemble )
 //--------------------------------------------------------------------------------------------------
 std::set<RifEclipseSummaryAddress> RimSummaryEnsemble::ensembleSummaryAddresses() const
 {
+    // For performance reasons, we only return the addresses from the case with the most keywords.
+    // Calling buildMetaData() on all realizations is expensive
+
     if ( auto caseWithMostKeywords = RimSummaryEnsembleTools::caseWithMostKeywords( m_cases.childrenByType() ) )
     {
         if ( auto reader = caseWithMostKeywords->summaryReader() )
         {
             if ( reader->allResultAddresses().empty() )
             {
+                // If the reader has no addresses, we need to build the metadata to populate them
+                // This is typically the case for newly created cases or cases that have not been read yet
                 reader->buildMetaData();
             }
 
