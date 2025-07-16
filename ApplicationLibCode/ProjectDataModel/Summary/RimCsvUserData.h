@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "RifMultipleSummaryReaders.h"
 #include "RimObservedSummaryData.h"
 
 #include "cafPdmChildField.h"
@@ -29,6 +28,7 @@
 class RifSummaryReaderInterface;
 class RifCalculatedSummaryCurveReader;
 class RicPasteAsciiDataToSummaryPlotFeatureUi;
+class RifMultipleSummaryReaders;
 
 //==================================================================================================
 //
@@ -39,6 +39,7 @@ class RimCsvUserData : public RimObservedSummaryData
 
 public:
     RimCsvUserData();
+    ~RimCsvUserData() override;
 
     void createSummaryReaderInterface() override;
 
