@@ -124,7 +124,8 @@ void RifCaseRealizationParametersReader::parse()
 
         lineNo++;
 
-        auto [name, parameterValue] = RiaStdStringTools::splitAtWhitespace( RiaStdStringTools::trimString( line.toStdString() ) );
+        auto trimmedLine            = RiaStdStringTools::trimString( line.toStdString() );
+        auto [name, parameterValue] = RiaStdStringTools::splitAtWhitespace( trimmedLine );
 
         if ( name.empty() || parameterValue.empty() )
         {
