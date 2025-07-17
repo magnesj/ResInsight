@@ -239,7 +239,7 @@ std::pair<std::string_view, std::string_view> RiaStdStringTools::splitAtWhitespa
     const char* pos  = data;
 
     // Find separator, which is the first whitespace character
-    while ( pos < end && str.find_first_of( WHITESPACE, pos - data ) != static_cast<std::string_view::size_type>(pos - data ))
+    while ( pos < end && str.find_first_of( WHITESPACE, pos - data ) != static_cast<std::string_view::size_type>( pos - data ) )
         ++pos;
 
     if ( pos >= end ) return { str, {} };
@@ -248,7 +248,7 @@ std::pair<std::string_view, std::string_view> RiaStdStringTools::splitAtWhitespa
 
     // Skip all whitespace characters
     size_t offset = str.find_first_not_of( WHITESPACE, pos - data );
-    pos = (offset == std::string::npos) ? end : data + offset;
+    pos           = ( offset == std::string::npos ) ? end : data + offset;
 
     if ( pos >= end ) return { first, {} };
 
