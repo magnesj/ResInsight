@@ -116,7 +116,7 @@ void RifCaseRealizationParametersReader::parse()
     int         lineNo = 0;
     QStringList errors;
 
-    const auto decimalPoint = QLocale::c().decimalPoint().toLatin1()[0];
+    const auto decimalPoint = RiaStdStringTools::decimalPoint();
 
     while ( !dataStream.atEnd() )
     {

@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "string_view"
 #include <algorithm>
 #include <iterator>
 #include <numeric>
@@ -37,6 +36,7 @@ public:
     static std::string_view leftTrimString( std::string_view s );
     static std::string      removeWhitespace( const std::string& line );
 
+    static char decimalPoint();
     static bool isNumber( std::string_view s, char decimalPoint );
 
     static int16_t toInt16( std::string_view s );

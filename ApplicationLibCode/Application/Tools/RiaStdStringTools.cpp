@@ -68,6 +68,16 @@ std::string RiaStdStringTools::removeWhitespace( const std::string& line )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+char RiaStdStringTools::decimalPoint()
+{
+    std::locale loc;
+    char        decimalPoint = std::use_facet<std::numpunct<char>>( loc ).decimal_point();
+    return decimalPoint;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RiaStdStringTools::isNumber( std::string_view s, char decimalPoint )
 {
     if ( s.empty() ) return false;
