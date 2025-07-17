@@ -135,8 +135,14 @@ void RifCaseRealizationParametersReader::parse()
         if ( RiaStdStringTools::isNumber( parameterValue, decimalPoint ) )
         {
             double doubleValue = 0.0;
-            RiaStdStringTools::toDouble( parameterValue, doubleValue );
-            m_parameters->addParameter( QString::fromUtf8( name.data(), name.size() ), doubleValue );
+            if ( RiaStdStringTools::toDouble( parameterValue, doubleValue ) )
+            {
+                m_parameters->addParameter( QString::fromUtf8( name.data(), name.size() ), doubleValue );
+            }
+            else
+            {
+                errors << QString( "RifCaseRealizationParametersReader: Invalid number format in line %1" ).arg( lineNo );
+            }
         }
         else
         {
