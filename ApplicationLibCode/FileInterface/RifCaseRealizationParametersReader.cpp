@@ -124,13 +124,17 @@ void RifCaseRealizationParametersReader::parse()
 
         lineNo++;
 
-        auto [name, parameterValue] = RiaStdStringTools::splitAtWhitespace( RiaStdStringTools::trimString( line.toStdString() ) );
+        auto stdString = line.toStdString();
+        auto trimmedString = RiaStdStringTools::trimString( stdString ); 
+        auto [name, parameterValue] = RiaStdStringTools::splitAtWhitespace( trimmedString );
 
         if ( name.empty() || parameterValue.empty() )
         {
             errors << QString( "RifCaseRealizationParametersReader: Invalid file format in line %1" ).arg( lineNo );
             continue;
         }
+
+        std::cout << name << " = " << parameterValue << std::endl;
 
         if ( RiaStdStringTools::isNumber( parameterValue, decimalPoint ) )
         {
