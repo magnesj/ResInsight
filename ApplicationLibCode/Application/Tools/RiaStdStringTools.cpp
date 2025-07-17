@@ -291,7 +291,7 @@ std::pair<std::string_view, std::string_view> RiaStdStringTools::splitAtWhitespa
     while ( pos < end && !isWhitespace( static_cast<unsigned char>( *pos ) ) )
         ++pos;
 
-    if ( pos >= end ) return { std::string_view( firstStart, end - firstStart ), {} };
+    if ( pos >= end ) return {};
 
     std::string_view first( firstStart, pos - firstStart );
 

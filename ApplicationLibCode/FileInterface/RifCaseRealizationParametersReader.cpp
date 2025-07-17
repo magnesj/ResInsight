@@ -134,13 +134,12 @@ void RifCaseRealizationParametersReader::parse()
             continue;
         }
 
-        const auto parameterName = QString::fromUtf8( name.data(), static_cast<int>( name.size() ) );
         if ( RiaStdStringTools::isNumber( parameterValue, decimalPoint ) )
         {
             double doubleValue = 0.0;
             if ( RiaStdStringTools::toDouble( parameterValue, doubleValue ) )
             {
-                m_parameters->addParameter( parameterName, doubleValue );
+                m_parameters->addParameter( QString::fromStdString( std::string( name ) ), doubleValue );
             }
             else
             {
@@ -149,8 +148,7 @@ void RifCaseRealizationParametersReader::parse()
         }
         else
         {
-            const auto parameterString = QString::fromUtf8( parameterValue.data(), static_cast<int>( parameterValue.size() ) );
-            m_parameters->addParameter( parameterName, parameterString );
+            m_parameters->addParameter( QString::fromStdString( std::string( name ) ), QString::fromStdString( std::string( parameterValue ) ) );
         }
     }
 
