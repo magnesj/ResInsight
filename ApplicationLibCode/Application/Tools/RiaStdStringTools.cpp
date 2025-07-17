@@ -68,7 +68,7 @@ std::string RiaStdStringTools::removeWhitespace( const std::string& line )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RiaStdStringTools::isNumber( const std::string& s, char decimalPoint )
+bool RiaStdStringTools::isNumber( std::string_view s, char decimalPoint )
 {
     if ( s.empty() ) return false;
     if ( findCharMatchCount( s, decimalPoint ) > 1 ) return false;
@@ -222,7 +222,7 @@ std::string RiaStdStringTools::joinStrings( const std::vector<std::string>& s, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RiaStdStringTools::findCharMatchCount( const std::string& s, char c )
+size_t RiaStdStringTools::findCharMatchCount( std::string_view s, char c )
 {
     size_t count = 0;
     size_t pos   = 0;

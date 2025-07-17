@@ -30,6 +30,8 @@
 #include <functional>
 #include <memory>
 
+#pragma optimize( "", off )
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -116,39 +118,56 @@ void RifCaseRealizationParametersReader::parse()
     int         lineNo = 0;
     QStringList errors;
 
+    const char decimalPoint = '.';
+
     while ( !dataStream.atEnd() )
     {
         QString line = dataStream.readLine();
 
         lineNo++;
-        QStringList cols = RifFileParseTools::splitLineAndTrim( line, QRegularExpression( "[ \t]" ), true );
 
-        if ( cols.size() != 2 )
+        auto splitFast = []( std::string_view str ) -> std::pair<std::string_view, std::string_view>
         {
-            errors << QString( "RifEnsembleParametersReader: Invalid file format in line %1" ).arg( lineNo );
+            const char* data = str.data();
+            const char* end  = data + str.size();
+            const char* pos  = data;
 
+            // Find separator, which is the first space or tab character
+            while ( pos < end && *pos != ' ' && *pos != '\t' )
+                ++pos;
+
+            if ( pos >= end ) return { str, {} };
+
+            std::string_view first( data, pos - data );
+
+            // Skip all separators (multiple whitespace or tab characters)
+            while ( pos < end && ( *pos == ' ' || *pos == '\t' ) )
+                ++pos;
+
+            if ( pos >= end ) return { first, {} };
+
+            std::string_view second( pos, end - pos );
+
+            return { first, second };
+        };
+
+        auto [name, strValue] = splitFast( line.toStdString() );
+
+        if ( name.empty() || strValue.empty() )
+        {
+            errors << QString( "RifCaseRealizationParametersReader: Invalid file format in line %1" ).arg( lineNo );
             continue;
         }
 
-        QString& name     = cols[0];
-        QString& strValue = cols[1];
-
-        if ( RiaTextStringTools::isNumber( strValue, QLocale::c().decimalPoint() ) )
+        if ( RiaStdStringTools::isNumber( strValue, decimalPoint ) )
         {
-            bool   parseOk = true;
-            double value   = QLocale::c().toDouble( strValue, &parseOk );
-            if ( parseOk )
-            {
-                m_parameters->addParameter( name, value );
-            }
-            else
-            {
-                errors << QString( "RifEnsembleParametersReader: Invalid number format in line %1" ).arg( lineNo );
-            }
+            double value = 0.0;
+            RiaStdStringTools::toDouble( strValue, value );
+            m_parameters->addParameter( QString::fromUtf8( name.data(), name.size() ), value );
         }
         else
         {
-            m_parameters->addParameter( name, strValue );
+            m_parameters->addParameter( QString::fromUtf8( name.data(), name.size() ), QString::fromUtf8( strValue.data(), strValue.size() ) );
         }
     }
 

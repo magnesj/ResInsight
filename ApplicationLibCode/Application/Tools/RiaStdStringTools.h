@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "string_view"
 #include <algorithm>
 #include <iterator>
 #include <numeric>
@@ -36,7 +37,7 @@ public:
     static std::string_view leftTrimString( std::string_view s );
     static std::string      removeWhitespace( const std::string& line );
 
-    static bool isNumber( const std::string& s, char decimalPoint );
+    static bool isNumber( std::string_view s, char decimalPoint );
 
     static int16_t toInt16( std::string_view s );
     static int     toInt( std::string_view s );
@@ -75,7 +76,7 @@ public:
 private:
     template <class Container>
     static void   splitByDelimiter( const std::string& str, Container& cont, char delimiter = ' ' );
-    static size_t findCharMatchCount( const std::string& s, char c );
+    static size_t findCharMatchCount( std::string_view s, char c );
 };
 
 //==================================================================================================
