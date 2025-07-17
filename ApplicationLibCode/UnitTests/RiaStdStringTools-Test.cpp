@@ -95,6 +95,7 @@ TEST( RiaStdStringToolsTest, LeftTrimString )
         std::make_pair( "\tbla\v", "bla\v" ),
         std::make_pair( "bla", "bla" ),
         std::make_pair( "", "" ),
+        std::make_pair( "\t\t\t\t\t\t\t\t", "" ),
     };
 
     for ( auto [input, expectedText] : testData )
@@ -117,6 +118,7 @@ TEST( RiaStdStringToolsTest, RightTrimString )
         std::make_pair( "\tbla\v", "\tbla" ),
         std::make_pair( "bla", "bla" ),
         std::make_pair( "", "" ),
+        std::make_pair( "\t\t\t\t\t\t\t\t", "" ),
     };
 
     for ( auto [input, expectedText] : testData )
@@ -139,6 +141,8 @@ TEST( RiaStdStringToolsTest, RemoveWhitespace )
         std::make_pair( "\tbla\v", "bla" ),
         std::make_pair( "bla", "bla" ),
         std::make_pair( "", "" ),
+        std::make_pair( "\t\t\t\t\t\t\t\t", "" ),
+
     };
 
     for ( auto [input, expectedText] : testData )
@@ -159,6 +163,7 @@ TEST( RiaStdStringToolsTest, StringInTwoTokens )
         std::make_pair( "\tbla\tbla\t", std::make_pair( "bla", "bla" ) ),
         std::make_pair( "\tbla\v bla\v", std::make_pair( "bla", "bla" ) ),
         std::make_pair( "", std::make_pair( "", "" ) ),
+        std::make_pair( "\t\t\t\t\t\t\t\t", std::make_pair( "", "" ) ),
     };
 
     for ( auto [input, expectedText] : testData )
