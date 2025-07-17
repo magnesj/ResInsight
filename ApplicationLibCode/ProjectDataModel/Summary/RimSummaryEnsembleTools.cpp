@@ -481,7 +481,7 @@ RimSummaryCase* RimSummaryEnsembleTools::caseWithMostDataObjects( const std::vec
     size_t maxAddrCount = 0;
     size_t maxAddrIndex = sourceCases.size();
 
-    for ( int i = 0; i < sourceCases.size(); i++ )
+    for ( size_t i = 0; i < sourceCases.size(); i++ )
     {
         auto currCase = sourceCases[i];
         if ( !currCase ) continue;
