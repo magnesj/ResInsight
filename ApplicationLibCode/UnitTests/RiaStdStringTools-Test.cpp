@@ -168,7 +168,9 @@ TEST( RiaStdStringToolsTest, StringInTwoTokens )
 
     for ( auto [input, expectedText] : testData )
     {
-        EXPECT_EQ( RiaStdStringTools::splitAtWhitespace( input ), expectedText );
+        const auto& [first, second] = RiaStdStringTools::splitAtWhitespace( input );
+        EXPECT_EQ( first, expectedText.first );
+        EXPECT_EQ( second, expectedText.second );
     }
 }
 
