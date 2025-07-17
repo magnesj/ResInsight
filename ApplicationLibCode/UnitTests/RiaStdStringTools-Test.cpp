@@ -150,6 +150,26 @@ TEST( RiaStdStringToolsTest, RemoveWhitespace )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+TEST( RiaStdStringToolsTest, StringInTwoTokens )
+{
+    std::vector<std::pair<std::string, std::pair<std::string, std::string>>> testData = {
+        std::make_pair( "bla bla", std::make_pair( "bla", "bla" ) ),
+        std::make_pair( "bla  bla", std::make_pair( "bla", "bla" ) ),
+        std::make_pair( "  bla  bla  ", std::make_pair( "bla", "bla" ) ),
+        std::make_pair( "\tbla\tbla\t", std::make_pair( "bla", "bla" ) ),
+        std::make_pair( "\tbla\v bla\v", std::make_pair( "bla", "bla" ) ),
+        std::make_pair( "", std::make_pair( "", "" ) ),
+    };
+
+    for ( auto [input, expectedText] : testData )
+    {
+        EXPECT_EQ( RiaStdStringTools::splitAtWhitespace( input ), expectedText );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 TEST( RiaStdStringToolsTest, DISABLED_PerformanceConversion )
 {
     size_t      itemCount     = 1000000;

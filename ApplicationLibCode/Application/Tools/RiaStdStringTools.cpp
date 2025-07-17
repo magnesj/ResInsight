@@ -303,7 +303,7 @@ std::pair<std::string_view, std::string_view> RiaStdStringTools::splitAtWhitespa
 
     std::string_view second( pos, end - pos );
 
-    return { first, second };
+    return { first, rightTrimString( second ) };
 }
 
 //--------------------------------------------------------------------------------------------------
