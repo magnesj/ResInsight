@@ -50,6 +50,21 @@ std::vector<QString> parametersWithVariation( RimSummaryEnsemble* ensemble )
     return names;
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> sortedParameters( RimSummaryEnsemble* ensemble, RimCurveAppearanceDefines::ParameterSorting sorting )
+{
+    auto params = internal::parametersWithVariation( ensemble );
+
+    if ( sorting == RimCurveAppearanceDefines::ParameterSorting::ALPHABETICALLY )
+    {
+        std::sort( params.begin(), params.end() );
+    }
+
+    return params;
+}
+
 } // namespace internal
 
 //--------------------------------------------------------------------------------------------------
@@ -199,6 +214,16 @@ void RimCurveSetAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changed
         updateRealizationColor();
     }
 
+    if ( ( changedField == &m_colorMode ) && ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::BY_ENSEMBLE_PARAM ) &&
+         m_ensembleParameter().isEmpty() )
+    {
+        auto params = internal::sortedParameters( m_ensemble, m_ensembleParameterSorting() );
+        if ( !params.empty() )
+        {
+            m_ensembleParameter = params.front();
+        }
+    }
+
     if ( changedField == &m_colorMode || changedField == &m_ensembleParameter || changedField == &m_ensembleParameterSorting )
     {
         updateEnsembleParameterLegend( m_ensembleLegendConfig );
@@ -294,12 +319,15 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
 
     if ( fieldNeedingOptions == &m_ensembleParameter )
     {
-        auto params = internal::parametersWithVariation( m_ensemble );
+        /*
+                    auto params = internal::sortedPa parametersWithVariation( m_ensemble );
 
-        if ( m_ensembleParameterSorting() == RimCurveAppearanceDefines::ParameterSorting::ALPHABETICALLY )
-        {
-            std::sort( params.begin(), params.end() );
-        }
+                    if ( m_ensembleParameterSorting() == RimCurveAppearanceDefines::ParameterSorting::ALPHABETICALLY )
+                    {
+                        std::sort( params.begin(), params.end() );
+                    }
+        */
+        auto params = internal::sortedParameters( m_ensemble, m_ensembleParameterSorting() );
 
         for ( const auto& param : params )
         {
