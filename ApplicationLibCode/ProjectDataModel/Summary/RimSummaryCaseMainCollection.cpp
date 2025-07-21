@@ -362,12 +362,21 @@ std::vector<RimSummaryEnsemble*> RimSummaryCaseMainCollection::summaryEnsembles(
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::loadAllSummaryCaseData()
 {
-    std::vector<RimSummaryCase*> sumCases = allSummaryCases();
+    for ( auto e : summaryEnsembles() )
+    {
+        auto sumCases = e->allSummaryCases();
 
-    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases );
+        const bool extractStateFromFirstCase = true;
+        RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
+    }
+
+    std::vector<RimSummaryCase*> sumCases = topLevelSummaryCases();
+
+    const bool extractStateFromFirstCase = true;
+    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
 
     // Create addresses for all single summary cases (not part of an ensemble)
-    for ( auto sumCase : topLevelSummaryCases() )
+    for ( auto sumCase : sumCases )
     {
         if ( sumCase->summaryReader() )
         {
@@ -395,7 +404,7 @@ void RimSummaryCaseMainCollection::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSummaryCase*>& summaryCases )
+void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSummaryCase*>& summaryCases, bool extractStateFromFirstCase )
 {
     std::vector<RimFileSummaryCase*> fileSummaryCases;
     std::vector<RimSummaryCase*>     otherSummaryCases;
@@ -424,7 +433,7 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSum
 
     if ( !fileSummaryCases.empty() )
     {
-        loadFileSummaryCaseData( fileSummaryCases );
+        loadFileSummaryCaseData( fileSummaryCases, extractStateFromFirstCase );
     }
 
     if ( !otherSummaryCases.empty() )
@@ -451,7 +460,8 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSum
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<RimFileSummaryCase*>& fileSummaryCases )
+void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<RimFileSummaryCase*>& fileSummaryCases,
+                                                            bool                                    extractStateFromFirstCase )
 {
     RiaPreferencesSummary* prefs = RiaPreferencesSummary::current();
 
@@ -643,7 +653,8 @@ std::vector<RimSummaryCase*>
         QCoreApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
     }
 
-    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases );
+    const bool extractStateFromFirstCase = false;
+    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
 
     return sumCases;
 }

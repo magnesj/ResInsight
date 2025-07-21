@@ -81,8 +81,8 @@ public:
 private:
     void initAfterRead() override;
 
-    static void                loadSummaryCaseData( const std::vector<RimSummaryCase*>& summaryCases );
-    static void                loadFileSummaryCaseData( const std::vector<RimFileSummaryCase*>& fileSummaryCases );
+    static void loadSummaryCaseData( const std::vector<RimSummaryCase*>& summaryCases, bool extractStateFromFirstCase );
+    static void loadFileSummaryCaseData( const std::vector<RimFileSummaryCase*>& fileSummaryCases, bool extractStateFromFirstCase );
     static RimSummaryEnsemble* defaultAllocator();
 
     void onCaseNameChanged( const SignalEmitter* emitter );
