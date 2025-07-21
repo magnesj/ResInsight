@@ -86,9 +86,7 @@ private:
     void        populateTimeSteps();
     std::string keywordForAddress( const RifEclipseSummaryAddress& address ) const;
 
-    static void    increaseEsmryFileCount();
-    static QString enhancedSummaryFilename( const QString& fileName );
-    static QString smspecSummaryFilename( const QString& fileName );
+    static void increaseEsmryFileCount();
 
 private:
     std::unique_ptr<Opm::EclIO::ESmry>    m_standardReader;

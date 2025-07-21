@@ -33,6 +33,21 @@
 
 size_t RifOpmCommonEclipseSummary::sm_createdEsmryFileCount = 0;
 
+namespace internal
+{
+
+QString enhancedSummaryFilename( const QString& fileName )
+{
+    QString s( fileName );
+    return s.replace( ".SMSPEC", ".ESMRY" );
+}
+QString smspecSummaryFilename( const QString& fileName )
+{
+    QString s( fileName );
+    return s.replace( ".ESMRY", ".SMSPEC" );
+}
+} // namespace internal
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -93,10 +108,10 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     bool writeDataToEsmry = false;
 
-    auto candidateEsmryFileName = enhancedSummaryFilename( fileName );
+    auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
 
     // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
-    auto smspecFileName = smspecSummaryFilename( fileName );
+    auto smspecFileName = internal::smspecSummaryFilename( fileName );
 
     if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) && m_createEsmryFiles )
     {
@@ -281,13 +296,13 @@ void RifOpmCommonEclipseSummary::createAndSetAddresses()
 bool RifOpmCommonEclipseSummary::openFileReader( const QString& fileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger )
 {
     // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
-    auto smspecFileName = smspecSummaryFilename( fileName );
+    auto smspecFileName = internal::smspecSummaryFilename( fileName );
 
     if ( m_useEsmryFiles )
     {
         try
         {
-            auto candidateEsmryFileName = enhancedSummaryFilename( fileName );
+            auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
 
             if ( QFile::exists( candidateEsmryFileName ) )
             {
@@ -410,24 +425,6 @@ void RifOpmCommonEclipseSummary::increaseEsmryFileCount()
     // This function can be called from a parallel loop, make it thread safe
 #pragma omp critical
     sm_createdEsmryFileCount++;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RifOpmCommonEclipseSummary::enhancedSummaryFilename( const QString& fileName )
-{
-    QString s( fileName );
-    return s.replace( ".SMSPEC", ".ESMRY" );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RifOpmCommonEclipseSummary::smspecSummaryFilename( const QString& fileName )
-{
-    QString s( fileName );
-    return s.replace( ".ESMRY", ".SMSPEC" );
 }
 
 //--------------------------------------------------------------------------------------------------
