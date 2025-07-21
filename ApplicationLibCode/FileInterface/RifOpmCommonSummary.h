@@ -82,11 +82,14 @@ public:
 private:
     size_t      keywordCount() const override;
     void        createAndSetAddresses() override;
-    bool        openFileReader( const QString& fileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger );
+    bool        openFileReader( const QString&       fileName,
+                                bool                 includeRestartFiles,
+                                bool                 conversionIsRequired,
+                                bool                 hasCreatedEsmry,
+                                RiaThreadSafeLogger* threadSafeLogger );
     void        populateTimeSteps();
     std::string keywordForAddress( const RifEclipseSummaryAddress& address ) const;
 
-    static bool isEsmryConversionRequired( const QString& fileName );
     static bool writeEsmryFile( QString& smspecFileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger );
     static void increaseEsmryFileCount();
 
