@@ -494,7 +494,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
 
     {
         caf::ProgressInfo progInfo( fileSummaryCases.size(), "Loading Summary Cases" );
-
+        RiaLogging::info( "Loading Summary Cases" );
         RifOpmCommonEclipseSummary::resetEnhancedSummaryFileCount();
 
         RiaThreadSafeLogger threadSafeLogger;
@@ -518,6 +518,9 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename() );
                 RiaLogging::resetTimer( "" );
             }
+
+            
+            RiaLogging::info( "Completed " + fileSummaryCase->summaryHeaderFilename() );
 
             progInfo.setProgress( cIdx );
         }

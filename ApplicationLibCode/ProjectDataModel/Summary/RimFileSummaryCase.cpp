@@ -161,6 +161,7 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
 {
     if ( lookForRestartFiles )
     {
+        RiaLogging::resetTimer( "Searching for restart files for " + headerFileName );
         std::vector<QString> warnings;
         std::vector<QString> restartFileNames;
         if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
@@ -172,8 +173,12 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
             restartFileNames = RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
         }
 
+        RiaLogging::logTimeElapsed("");
+
         if ( !restartFileNames.empty() )
         {
+            RiaLogging::resetTimer( "Creating reader" );
+
             std::vector<std::string> summaryFileNames;
             summaryFileNames.push_back( headerFileName.toStdString() );
             for ( const auto& fileName : restartFileNames )
@@ -189,6 +194,9 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
             {
                 return nullptr;
             }
+
+            RiaLogging::logTimeElapsed("");
+
 
             return summaryReader;
         }

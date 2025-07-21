@@ -89,6 +89,8 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     //
     // NB! Always make sure the logic is consistent with the logic in RifHdf5SummaryExporter::ensureHdf5FileIsCreated
 
+    RiaLogging::resetTimer("RifOpmCommonEclipseSummary::open starting");
+
     bool writeDataToEsmry = false;
 
     auto candidateEsmryFileName = enhancedSummaryFilename( fileName );
@@ -129,6 +131,10 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
         writeDataToEsmry = true;
     }
 
+    RiaLogging::logTimeElapsed("after checking data SMSPEC and ESMRY");
+    RiaLogging::resetTimer("");
+
+
     if ( writeDataToEsmry )
     {
         try
@@ -155,10 +161,14 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     }
 
     if ( !openFileReader( fileName, includeRestartFiles, threadSafeLogger ) ) return false;
+    RiaLogging::logTimeElapsed("after openFileReader");
+    RiaLogging::resetTimer("");
 
     if ( !m_standardReader && !m_enhancedReader ) return false;
 
     populateTimeSteps();
+    RiaLogging::logTimeElapsed("after populateTimeSteps");
+    RiaLogging::resetTimer("");
 
     return true;
 }
