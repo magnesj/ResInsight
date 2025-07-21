@@ -216,7 +216,7 @@ auto RifDataSourceForRftPlt::operator<=>( const RifDataSourceForRftPlt& addr2 ) 
         {
             if ( pressureDepthData()->name().toStdString() != addr2.pressureDepthData()->name().toStdString() )
             {
-                return ensemble()->name().toStdString() <=> addr2.ensemble()->name().toStdString();
+                return pressureDepthData()->name().toStdString() <=> addr2.pressureDepthData()->name().toStdString();
             }
         }
     }
