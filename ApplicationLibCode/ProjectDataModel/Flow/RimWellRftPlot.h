@@ -169,5 +169,4 @@ private:
     bool                                                     m_isOnLoad;
 
     caf::PdmChildField<RimWellLogPlot*> m_wellLogPlot_OBSOLETE;
-    bool                                m_isInitialized = false;
 };
