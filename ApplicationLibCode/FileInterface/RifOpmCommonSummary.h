@@ -86,6 +86,8 @@ private:
     void        populateTimeSteps();
     std::string keywordForAddress( const RifEclipseSummaryAddress& address ) const;
 
+    static bool isEsmryConversionRequired( const QString& fileName );
+    static bool writeEsmryFile( QString& smspecFileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger );
     static void increaseEsmryFileCount();
 
 private:

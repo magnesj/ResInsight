@@ -97,6 +97,36 @@ size_t RifOpmCommonEclipseSummary::numberOfEnhancedSummaryFileCreated()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RifOpmCommonEclipseSummary::writeEsmryFile( QString& smspecFileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger )
+{
+    try
+    {
+        auto temporarySummaryFile = std::make_unique<Opm::EclIO::ESmry>( smspecFileName.toStdString(), includeRestartFiles );
+
+        if ( temporarySummaryFile->numberOfTimeSteps() > 0 )
+        {
+            temporarySummaryFile->make_esmry_file();
+        }
+
+        RifOpmCommonEclipseSummary::increaseEsmryFileCount();
+    }
+    catch ( std::exception& )
+    {
+        if ( threadSafeLogger )
+        {
+            QString txt = QString( "Warning, could not open summary file : %1" ).arg( smspecFileName );
+            threadSafeLogger->warning( txt );
+        }
+
+        return false;
+    }
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger )
 {
     // If an ESMRY file is present, and the SMSPEC file is newer than the ESMRY file, the ESMRY file will be recreated.
@@ -106,70 +136,20 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     RiaLogging::resetTimer( "RifOpmCommonEclipseSummary::open starting" );
 
-    bool writeDataToEsmry = false;
-
-    auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
-
-    // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
-    auto smspecFileName = internal::smspecSummaryFilename( fileName );
-
-    if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) && m_createEsmryFiles )
+    auto convertToEsmry = false;
+    if ( m_createEsmryFiles )
     {
-        writeDataToEsmry = true;
-    }
-
-    if ( RiaFilePathTools::isFirstOlderThanSecond( candidateEsmryFileName.toStdString(), smspecFileName.toStdString() ) )
-    {
-        QString root = QFileInfo( smspecFileName ).canonicalPath();
-
-        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
-        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
-
-        RiaLogging::debug(
-            QString( " %3 : %1 is older than %2, recreating %1." ).arg( esmryFileNameShort ).arg( smspecFileNameShort ).arg( root ) );
-
-        // Check if we have write permission in the folder
-        QFileInfo info( smspecFileName );
-
-        if ( !info.isWritable() )
-        {
-            QString txt =
-                QString( "ESMRY is older than SMSPEC, but export to file %1 failed due to missing write permissions. Aborting operation." )
-                    .arg( candidateEsmryFileName );
-            RiaLogging::error( txt );
-
-            return false;
-        }
-
-        std::filesystem::remove( candidateEsmryFileName.toStdString() );
-
-        writeDataToEsmry = true;
+        convertToEsmry = isEsmryConversionRequired( fileName );
     }
 
     RiaLogging::logTimeElapsed( "after checking data SMSPEC and ESMRY" );
     RiaLogging::resetTimer( "" );
 
-    if ( writeDataToEsmry )
+    if ( convertToEsmry )
     {
-        try
+        auto smspecFileName = internal::smspecSummaryFilename( fileName );
+        if ( !writeEsmryFile( smspecFileName, includeRestartFiles, threadSafeLogger ) )
         {
-            auto temporarySummaryFile = std::make_unique<Opm::EclIO::ESmry>( smspecFileName.toStdString(), includeRestartFiles );
-
-            if ( temporarySummaryFile->numberOfTimeSteps() > 0 )
-            {
-                temporarySummaryFile->make_esmry_file();
-            }
-
-            RifOpmCommonEclipseSummary::increaseEsmryFileCount();
-        }
-        catch ( std::exception& )
-        {
-            if ( threadSafeLogger )
-            {
-                QString txt = QString( "Warning, could not open summary file : %1" ).arg( smspecFileName );
-                threadSafeLogger->warning( txt );
-            }
-
             return false;
         }
     }
@@ -250,6 +230,52 @@ RiaDefines::EclipseUnitSystem RifOpmCommonEclipseSummary::unitSystem() const
 {
     // TODO: Not implemented
     return RiaDefines::EclipseUnitSystem::UNITS_UNKNOWN;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifOpmCommonEclipseSummary::isEsmryConversionRequired( const QString& fileName )
+{
+    auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
+
+    // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
+    auto smspecFileName = internal::smspecSummaryFilename( fileName );
+
+    if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) )
+    {
+        return true;
+    }
+
+    if ( RiaFilePathTools::isFirstOlderThanSecond( candidateEsmryFileName.toStdString(), smspecFileName.toStdString() ) )
+    {
+        QString root = QFileInfo( smspecFileName ).canonicalPath();
+
+        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
+        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
+
+        RiaLogging::debug(
+            QString( " %3 : %1 is older than %2, recreating %1." ).arg( esmryFileNameShort ).arg( smspecFileNameShort ).arg( root ) );
+
+        // Check if we have write permission in the folder
+        QFileInfo info( smspecFileName );
+
+        if ( !info.isWritable() )
+        {
+            QString txt = QString( "ESMRY is older than SMSPEC, but export to file %1 failed due to missing write permissions. "
+                                   "Aborting operation." )
+                              .arg( candidateEsmryFileName );
+            RiaLogging::error( txt );
+
+            return false;
+        }
+
+        std::filesystem::remove( candidateEsmryFileName.toStdString() );
+
+        return true;
+    }
+
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------
