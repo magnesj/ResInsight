@@ -173,7 +173,7 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
             restartFileNames = RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
         }
 
-        RiaLogging::logTimeElapsed("");
+        RiaLogging::logTimeElapsed( "" );
 
         if ( !restartFileNames.empty() )
         {
@@ -195,8 +195,7 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
                 return nullptr;
             }
 
-            RiaLogging::logTimeElapsed("");
-
+            RiaLogging::logTimeElapsed( "" );
 
             return summaryReader;
         }

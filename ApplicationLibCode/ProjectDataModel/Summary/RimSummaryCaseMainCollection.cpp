@@ -519,7 +519,6 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                 RiaLogging::resetTimer( "" );
             }
 
-            
             RiaLogging::info( "Completed " + fileSummaryCase->summaryHeaderFilename() );
 
             progInfo.setProgress( cIdx );
