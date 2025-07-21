@@ -504,14 +504,19 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         [[maybe_unused]] bool canUseMultipleTreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
+        // #pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
         {
             RimFileSummaryCase* fileSummaryCase = fileSummaryCases[cIdx];
             if ( fileSummaryCase )
             {
+                RiaLogging::logTimeElapsed( "Measure file case" );
                 fileSummaryCase->createSummaryReaderInterfaceThreadSafe( &threadSafeLogger );
+                RiaLogging::resetTimer( "" );
+
+                RiaLogging::logTimeElapsed( "Measure realization params" );
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename() );
+                RiaLogging::resetTimer( "" );
             }
 
             progInfo.setProgress( cIdx );
