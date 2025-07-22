@@ -540,7 +540,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
             RifOpmSummaryTools::RifEnsembleImportState state;
             state.setRestartPatterns( restartPatterns );
 
-            state.setShouldCreateEsmyFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName0 ) );
+            state.setShouldCreateEsmryFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName0 ) );
             state.setPathToParameterFile( RifCaseRealizationParametersFileLocator::locate( headerFileName0 ) );
 
             importState = state;

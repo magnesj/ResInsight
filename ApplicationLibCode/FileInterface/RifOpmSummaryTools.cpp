@@ -174,9 +174,7 @@ QString RifOpmSummaryTools::smspecSummaryFilename( const QString& fileName )
 bool RifOpmSummaryTools::isEsmryConversionRequired( const QString& fileName )
 {
     auto candidateEsmryFileName = enhancedSummaryFilename( fileName );
-
-    // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
-    auto smspecFileName = smspecSummaryFilename( fileName );
+    auto smspecFileName         = smspecSummaryFilename( fileName );
 
     if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) )
     {
@@ -236,39 +234,30 @@ std::expected<int, QString> RifOpmSummaryTools::extractRealizationNumber( const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifOpmSummaryTools::RifEnsembleImportState::shouldCreateEsmyFile() const
+bool RifOpmSummaryTools::RifEnsembleImportState::shouldCreateEsmryFile() const
 {
-    return m_shouldCreateEsmyFile;
+    return m_shouldCreateEsmryFile;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmSummaryTools::RifEnsembleImportState::setShouldCreateEsmyFile( bool val )
+void RifOpmSummaryTools::RifEnsembleImportState::setShouldCreateEsmryFile( bool shouldCreateEsmryFile )
 {
-    m_shouldCreateEsmyFile = val;
+    m_shouldCreateEsmryFile = shouldCreateEsmryFile;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmSummaryTools::RifEnsembleImportState::setFirstSummaryFilePath( const QString& filePath )
+std::vector<QString> RifOpmSummaryTools::RifEnsembleImportState::restartFilesForRealization( int realizationNumber ) const
 {
-    m_firstSummaryFilePath = filePath;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const std::vector<QString> RifOpmSummaryTools::RifEnsembleImportState::restartFilesForRealization( int realizationNumber ) const
-{
-    std::vector<QString> filePaths;
-
     QString numberString = QString::number( realizationNumber );
 
-    for ( auto s : m_restartFilePatterns )
+    std::vector<QString> filePaths;
+    for ( auto pattern : m_restartFileNamePatterns )
     {
-        filePaths.push_back( s.replace( placeholderText(), numberString ) );
+        filePaths.push_back( pattern.replace( placeholderText(), numberString ) );
     }
 
     return filePaths;
@@ -277,9 +266,9 @@ const std::vector<QString> RifOpmSummaryTools::RifEnsembleImportState::restartFi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmSummaryTools::RifEnsembleImportState::setRestartPatterns( const std::vector<QString>& filePatterns )
+void RifOpmSummaryTools::RifEnsembleImportState::setRestartPatterns( const std::vector<QString>& fileNamePatterns )
 {
-    m_restartFilePatterns = filePatterns;
+    m_restartFileNamePatterns = fileNamePatterns;
 }
 
 //--------------------------------------------------------------------------------------------------
