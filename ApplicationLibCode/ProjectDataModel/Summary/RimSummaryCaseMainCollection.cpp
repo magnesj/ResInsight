@@ -65,10 +65,12 @@ CAF_PDM_SOURCE_INIT( RimSummaryCaseMainCollection, "SummaryCaseCollection" );
 //--------------------------------------------------------------------------------------------------
 /// Internal function
 //--------------------------------------------------------------------------------------------------
-void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile )
+void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile, std::optional<QString> filePathCandicate )
 {
     std::shared_ptr<RigCaseRealizationParameters> parameters;
-    QString                                       parametersFile = RifCaseRealizationParametersFileLocator::locate( modelFolderOrFile );
+
+    QString parametersFile = filePathCandicate.has_value() ? filePathCandicate.value()
+                                                           : RifCaseRealizationParametersFileLocator::locate( modelFolderOrFile );
     if ( !parametersFile.isEmpty() )
     {
         auto reader = RifCaseRealizationReader::createReaderFromFileName( parametersFile );
@@ -450,7 +452,7 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSum
             {
                 sumCase->createSummaryReaderInterface();
                 sumCase->createRftReaderInterface();
-                addCaseRealizationParametersIfFound( *sumCase, sumCase->summaryHeaderFilename() );
+                addCaseRealizationParametersIfFound( *sumCase, sumCase->summaryHeaderFilename(), std::nullopt );
             }
 
             {
@@ -574,7 +576,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         [[maybe_unused]] bool canUseMultipleThreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-        canUseMultipleThreads = RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
+        canUseMultipleThreads |= RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
 
 #pragma omp parallel for schedule( dynamic ) if ( canUseMultipleThreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
@@ -587,7 +589,17 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                 RiaLogging::resetTimer( "" );
 
                 RiaLogging::logTimeElapsed( "Measure realization params" );
-                addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename() );
+                std::optional<QString> parameterFilePath;
+                if ( importState.has_value() )
+                {
+                    auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( fileSummaryCase->summaryHeaderFilename() );
+                    if ( realizationNumber.has_value() )
+                    {
+                        parameterFilePath = importState->pathToParameterFile( realizationNumber.value() );
+                    }
+                }
+
+                addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
                 RiaLogging::resetTimer( "" );
             }
 
