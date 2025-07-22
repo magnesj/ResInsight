@@ -225,7 +225,13 @@ std::expected<int, QString> RifOpmSummaryTools::extractRealizationNumber( const 
 
     if ( match.hasMatch() )
     {
-        return match.captured( 1 ).toInt();
+        bool ok;
+        int result = match.captured( 1 ).toInt( &ok );
+        if ( ok )
+        {
+            return result;
+        }
+        return std::unexpected( QString( "Invalid realization number format in path: %1" ).arg( path ) );
     }
 
     return std::unexpected( QString( "Could not extract realization number from path: %1" ).arg( path ) );
