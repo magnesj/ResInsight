@@ -27,6 +27,7 @@
 #include "RifCaseRealizationParametersReader.h"
 #include "RifEclipseSummaryTools.h"
 #include "RifOpmCommonSummary.h"
+#include "RifOpmSummaryTools.h"
 #include "RifSummaryCaseRestartSelector.h"
 #include "Sumo/RimSummaryCaseSumo.h"
 
@@ -372,7 +373,7 @@ void RimSummaryCaseMainCollection::loadAllSummaryCaseData()
 
     std::vector<RimSummaryCase*> sumCases = topLevelSummaryCases();
 
-    const bool extractStateFromFirstCase = true;
+    const bool extractStateFromFirstCase = false;
     RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
 
     // Create addresses for all single summary cases (not part of an ensemble)
@@ -498,6 +499,28 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
     }
 #endif
 
+    std::optional<RifOpmSummaryTools::RifEnsembleImportState> importState = std::nullopt;
+
+    if ( extractStateFromFirstCase )
+    {
+        // If we are extracting state from the first case, we need to make sure that the first case is loaded
+        // before we start loading the rest of the cases.
+        if ( !fileSummaryCases.empty() )
+        {
+            auto                 headerFileName = fileSummaryCases.front()->summaryHeaderFilename();
+            std::vector<QString> warnings;
+            std::vector<QString> restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+
+            RifOpmSummaryTools::RifEnsembleImportState state;
+            state.setRestartFiles( restartFileNames );
+
+            state.setShouldCreateEsmyFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName ) );
+            state.setPathToParameterFile( RifCaseRealizationParametersFileLocator::locate( headerFileName ) );
+
+            importState = state;
+        }
+    }
+
     // Use openMP when reading file summary case meta data. Avoid using the virtual interface of base class
     // RimSummaryCase, as it is difficult to make sure all variants of the leaf classes are thread safe.
     // Only open the summary file reader in parallel loop to reduce risk of multi threading issues
@@ -521,7 +544,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
             if ( fileSummaryCase )
             {
                 RiaLogging::logTimeElapsed( "Measure file case" );
-                fileSummaryCase->createSummaryReaderInterfaceThreadSafe( &threadSafeLogger );
+                fileSummaryCase->createSummaryReaderInterfaceThreadSafe( importState, &threadSafeLogger );
                 RiaLogging::resetTimer( "" );
 
                 RiaLogging::logTimeElapsed( "Measure realization params" );
@@ -588,6 +611,7 @@ void RimSummaryCaseMainCollection::onCaseNameChanged( const SignalEmitter* emitt
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCase*>
     RimSummaryCaseMainCollection::createSummaryCasesFromFileInfos( const std::vector<RifSummaryCaseFileResultInfo>& summaryHeaderFileInfos,
+                                                                   bool                                             readStateFromFirstFile,
                                                                    bool                                             showProgress )
 {
     RimProject* project = RimProject::current();
@@ -653,8 +677,7 @@ std::vector<RimSummaryCase*>
         QCoreApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
     }
 
-    const bool extractStateFromFirstCase = false;
-    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
+    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, readStateFromFirstFile );
 
     return sumCases;
 }

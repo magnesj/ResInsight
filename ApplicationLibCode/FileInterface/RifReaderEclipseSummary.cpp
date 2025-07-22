@@ -56,6 +56,14 @@ RifReaderEclipseSummary::~RifReaderEclipseSummary()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RifReaderEclipseSummary::setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState )
+{
+    m_ensembleImportState = ensembleImportState;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafeLogger* threadSafeLogger )
 {
     bool isValid = false;

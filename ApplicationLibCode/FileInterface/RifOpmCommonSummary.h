@@ -23,6 +23,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "RifOpmSummaryTools.h"
 #include <map>
 #include <memory>
 #include <set>
@@ -55,6 +56,8 @@ public:
     void useEnhancedSummaryFiles( bool enable );
     void createEnhancedSummaryFiles( bool enable );
 
+    void setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState );
+
     static void   resetEnhancedSummaryFileCount();
     static size_t numberOfEnhancedSummaryFileCreated();
 
@@ -86,4 +89,6 @@ private:
 
     bool m_useEsmryFiles;
     bool m_createEsmryFiles;
+
+    std::optional<RifOpmSummaryTools::RifEnsembleImportState> m_ensembleImportState;
 };

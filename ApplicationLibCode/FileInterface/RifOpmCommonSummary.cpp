@@ -66,6 +66,14 @@ void RifOpmCommonEclipseSummary::createEnhancedSummaryFiles( bool enable )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RifOpmCommonEclipseSummary::setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState )
+{
+    m_ensembleImportState = ensembleImportState;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RifOpmCommonEclipseSummary::resetEnhancedSummaryFileCount()
 {
     sm_createdEsmryFileCount = 0;
@@ -121,7 +129,16 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     RiaLogging::resetTimer( "RifOpmCommonEclipseSummary::open starting" );
 
-    bool conversionIsRequired = RifOpmSummaryTools::isEsmryConversionRequired( fileName );
+    bool conversionIsRequired = false;
+
+    if ( m_ensembleImportState )
+    {
+        conversionIsRequired = m_ensembleImportState->shouldCreateEsmyFile();
+    }
+    else
+    {
+        conversionIsRequired = RifOpmSummaryTools::isEsmryConversionRequired( fileName );
+    }
 
     RiaLogging::logTimeElapsed( "after checking data SMSPEC and ESMRY" );
     RiaLogging::resetTimer( "" );

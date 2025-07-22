@@ -20,6 +20,8 @@
 
 #include "RifEclipseSummaryAddress.h"
 
+#include <QString>
+
 #include <map>
 #include <set>
 #include <string>
@@ -37,6 +39,24 @@ namespace EclIO
 
 namespace RifOpmSummaryTools
 {
+class RifEnsembleImportState
+{
+public:
+    bool shouldCreateEsmyFile() const { return m_shouldCreateEsmyFile; }
+    void setShouldCreateEsmyFile( bool val ) { m_shouldCreateEsmyFile = val; }
+
+    const std::vector<QString> restartFiles( int realizationNumber ) const { return m_restartFiles; }
+    void                       setRestartFiles( const std::vector<QString>& restartFiles ) { m_restartFiles = restartFiles; }
+
+    QString pathToParameterFile() const { return m_pathToParameterFile; }
+    void    setPathToParameterFile( const QString& val ) { m_pathToParameterFile = val; }
+
+private:
+    bool                 m_shouldCreateEsmyFile = false;
+    std::vector<QString> m_restartFiles;
+    QString              m_pathToParameterFile;
+};
+
 std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>
     buildAddressesSmspecAndKeywordMap( const Opm::EclIO::ESmry* summaryFile );
 

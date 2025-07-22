@@ -89,7 +89,8 @@ QString RimFileSummaryCase::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLogger* threadSafeLogger )
+void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
+                                                                 RiaThreadSafeLogger* threadSafeLogger )
 {
     // RimFileSummaryCase::findRelatedFilesAndCreateReader is a performance bottleneck. The function
     // RifEclipseSummaryTools::getRestartFile() should be refactored to use opm-common instead of resdata.
@@ -101,7 +102,10 @@ void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLo
     m_fileSummaryReaderId       = -1;
     m_additionalSummaryReaderId = -1;
 
-    auto reader = RimFileSummaryCase::findRelatedFilesAndCreateReader( summaryHeaderFilename(), m_includeRestartFiles, threadSafeLogger );
+    auto reader = RimFileSummaryCase::findRelatedFilesAndCreateReader( summaryHeaderFilename(),
+                                                                       m_includeRestartFiles,
+                                                                       ensembleImportState,
+                                                                       threadSafeLogger );
     if ( !reader ) return;
 
     m_fileSummaryReaderId = reader->serialNumber();
@@ -119,7 +123,7 @@ void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLo
 void RimFileSummaryCase::createSummaryReaderInterface()
 {
     RiaThreadSafeLogger threadSafeLogger;
-    createSummaryReaderInterfaceThreadSafe( &threadSafeLogger );
+    createSummaryReaderInterfaceThreadSafe( std::nullopt, &threadSafeLogger );
 
     auto messages = threadSafeLogger.messages();
     for ( const auto& m : messages )
@@ -155,9 +159,11 @@ void RimFileSummaryCase::createRftReaderInterface()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&       headerFileName,
-                                                                                                bool                 lookForRestartFiles,
-                                                                                                RiaThreadSafeLogger* threadSafeLogger )
+std::unique_ptr<RifSummaryReaderInterface>
+    RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&                                            headerFileName,
+                                                         bool                                                      lookForRestartFiles,
+                                                         std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
+                                                         RiaThreadSafeLogger*                                      threadSafeLogger )
 {
     if ( lookForRestartFiles )
     {
@@ -166,7 +172,16 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
         std::vector<QString> restartFileNames;
         if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
         {
-            restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+            if ( ensembleImportState.has_value() )
+            {
+                const int realizationNumber = 1;
+                restartFileNames            = ensembleImportState->restartFiles( realizationNumber );
+            }
+            else
+            {
+                // If the restart file names are not provided, we search for them
+                restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+            }
         }
         else
         {
@@ -190,7 +205,7 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
             std::reverse( summaryFileNames.begin(), summaryFileNames.end() );
 
             auto summaryReader = std::make_unique<RifSummaryReaderAggregator>( summaryFileNames );
-            if ( !summaryReader->createReadersAndImportMetaData( threadSafeLogger ) )
+            if ( !summaryReader->createReadersAndImportMetaData( ensembleImportState, threadSafeLogger ) )
             {
                 return nullptr;
             }
