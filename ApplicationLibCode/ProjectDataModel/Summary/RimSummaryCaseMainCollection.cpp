@@ -55,6 +55,7 @@
 #include "cafPdmFieldReorderCapability.h"
 #include "cafProgressInfo.h"
 
+#include "RiaPreferencesSystem.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <memory>
@@ -502,6 +503,11 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
 
     std::optional<RifOpmSummaryTools::RifEnsembleImportState> importState = std::nullopt;
 
+    if ( extractStateFromFirstCase && !RiaPreferencesSystem::current()->useImprovedSummaryImport() )
+    {
+        extractStateFromFirstCase = false;
+    }
+
     if ( extractStateFromFirstCase )
     {
         // If we are extracting state from the first case, we need to make sure that the first case is loaded
@@ -557,7 +563,9 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         [[maybe_unused]] bool canUseMultipleTreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-        // #pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
+        canUseMultipleTreads = RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
+
+#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
         {
             RimFileSummaryCase* fileSummaryCase = fileSummaryCases[cIdx];

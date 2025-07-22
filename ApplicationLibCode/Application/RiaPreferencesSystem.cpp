@@ -79,6 +79,12 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_showPdfExportDialog, "showPdfExportDialog", true, "Show PDF Export Dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showPdfExportDialog );
 
+    CAF_PDM_InitField( &m_useImprovedSummaryImport, "useImprovedSummaryImport", false, "Use Improved Summary Import" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useImprovedSummaryImport );
+
+    CAF_PDM_InitField( &m_useMultiThreadingForSummary, "useMultiThreadingForSummary", false, "Use Multithreading for Summary Import" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useMultiThreadingForSummary );
+
     CAF_PDM_InitField( &m_gtestFilter, "gtestFilter", QString(), "Unit Test Filter (gtest)" );
     CAF_PDM_InitField( &m_exportScalingFactor, "exportScalingFactor", -1.0, "Export Scaling Factor (<0 disable)" );
 
@@ -218,6 +224,22 @@ bool RiaPreferencesSystem::showPdfExportDialog() const
 double RiaPreferencesSystem::exportPdfScalingFactor() const
 {
     return m_exportScalingFactor();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaPreferencesSystem::useImprovedSummaryImport() const
+{
+    return m_useImprovedSummaryImport();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaPreferencesSystem::useMultiThreadingForSummaryImport() const
+{
+    return m_useMultiThreadingForSummary();
 }
 
 //--------------------------------------------------------------------------------------------------
