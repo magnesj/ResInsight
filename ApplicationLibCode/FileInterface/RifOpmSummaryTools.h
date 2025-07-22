@@ -34,7 +34,6 @@ namespace Opm
 namespace EclIO
 {
     class ESmry;
-    class ExtESmry;
 } // namespace EclIO
 } // namespace Opm
 
@@ -46,18 +45,18 @@ public:
     bool shouldCreateEsmryFile() const;
     void setShouldCreateEsmryFile( bool val );
 
-    std::vector<QString> restartFilesForRealization( int realization ) const;
+    std::vector<QString> restartFilesForRealization( int realizationNumber ) const;
     void                 setRestartPatterns( const std::vector<QString>& filePatterns );
 
-    QString pathToParameterFile() const;
-    void    setPathToParameterFile( const QString& val );
+    QString pathToParameterFile( int realizationNumber ) const;
+    void    setParameterFilePathPattern( const QString& val );
 
     static QString placeholderText();
 
 private:
     bool                 m_shouldCreateEsmryFile = false;
     std::vector<QString> m_restartFileNamePatterns;
-    QString              m_pathToParameterFile;
+    QString              m_parameterFilePathPattern;
 };
 
 std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>

@@ -541,7 +541,18 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
             state.setRestartPatterns( restartPatterns );
 
             state.setShouldCreateEsmryFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName0 ) );
-            state.setPathToParameterFile( RifCaseRealizationParametersFileLocator::locate( headerFileName0 ) );
+
+            {
+                auto        path0 = RifCaseRealizationParametersFileLocator::locate( headerFileName0 );
+                auto        path1 = RifCaseRealizationParametersFileLocator::locate( headerFileName1 );
+                QStringList filePaths;
+                filePaths.push_back( path0 );
+                filePaths.push_back( path1 );
+                const auto [pattern, range] =
+                    RiaEnsembleImportTools::findPathPattern( filePaths, RifOpmSummaryTools::RifEnsembleImportState::placeholderText() );
+
+                state.setParameterFilePathPattern( pattern );
+            }
 
             importState = state;
         }

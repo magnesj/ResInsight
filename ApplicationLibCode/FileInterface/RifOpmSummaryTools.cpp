@@ -274,17 +274,21 @@ void RifOpmSummaryTools::RifEnsembleImportState::setRestartPatterns( const std::
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RifOpmSummaryTools::RifEnsembleImportState::pathToParameterFile() const
+QString RifOpmSummaryTools::RifEnsembleImportState::pathToParameterFile( int realizationNumber ) const
 {
-    return m_pathToParameterFile;
+    QString numberString = QString::number( realizationNumber );
+
+    auto parameterFilePath = m_parameterFilePathPattern;
+    parameterFilePath.replace( placeholderText(), numberString );
+    return parameterFilePath;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmSummaryTools::RifEnsembleImportState::setPathToParameterFile( const QString& val )
+void RifOpmSummaryTools::RifEnsembleImportState::setParameterFilePathPattern( const QString& val )
 {
-    m_pathToParameterFile = val;
+    m_parameterFilePathPattern = val;
 }
 
 //--------------------------------------------------------------------------------------------------
