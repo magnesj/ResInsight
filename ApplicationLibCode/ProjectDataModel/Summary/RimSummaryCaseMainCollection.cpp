@@ -560,12 +560,12 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         QCoreApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
 
         // The HDF5 reader requires a special configuration to be thread safe. Disable threading for HDF reader.
-        [[maybe_unused]] bool canUseMultipleTreads =
+        [[maybe_unused]] bool canUseMultipleThreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-        canUseMultipleTreads = RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
+        canUseMultipleThreads = RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
 
-#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
+#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleThreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
         {
             RimFileSummaryCase* fileSummaryCase = fileSummaryCases[cIdx];
