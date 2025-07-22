@@ -206,7 +206,10 @@ bool RifOpmSummaryTools::isEsmryConversionRequired( const QString& fileName )
             return false;
         }
 
-        std::filesystem::remove( candidateEsmryFileName.toStdString() );
+        if (!std::filesystem::remove( candidateEsmryFileName.toStdString() ))
+        {
+            RiaLogging::error( QString( "Failed to remove file: %1" ).arg( candidateEsmryFileName ) );
+        }
 
         return true;
     }
