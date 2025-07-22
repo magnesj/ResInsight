@@ -65,11 +65,11 @@ CAF_PDM_SOURCE_INIT( RimSummaryCaseMainCollection, "SummaryCaseCollection" );
 //--------------------------------------------------------------------------------------------------
 /// Internal function
 //--------------------------------------------------------------------------------------------------
-void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile, std::optional<QString> filePathCandicate )
+void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile, std::optional<QString> filePathCandidate )
 {
     std::shared_ptr<RigCaseRealizationParameters> parameters;
 
-    QString parametersFile = filePathCandicate.has_value() ? filePathCandicate.value()
+    QString parametersFile = filePathCandidate.has_value() ? filePathCandidate.value()
                                                            : RifCaseRealizationParametersFileLocator::locate( modelFolderOrFile );
     if ( !parametersFile.isEmpty() )
     {
