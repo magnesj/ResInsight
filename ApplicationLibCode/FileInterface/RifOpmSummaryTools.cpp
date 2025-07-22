@@ -227,7 +227,7 @@ std::expected<int, QString> RifOpmSummaryTools::extractRealizationNumber( const 
     if ( match.hasMatch() )
     {
         bool ok;
-        int result = match.captured( 1 ).toInt( &ok );
+        int  result = match.captured( 1 ).toInt( &ok );
         if ( ok )
         {
             return result;
