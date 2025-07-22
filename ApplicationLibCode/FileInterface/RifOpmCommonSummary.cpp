@@ -76,6 +76,8 @@ void RifOpmCommonEclipseSummary::setEnsembleImportState( RifOpmSummaryTools::Rif
 //--------------------------------------------------------------------------------------------------
 void RifOpmCommonEclipseSummary::resetEnhancedSummaryFileCount()
 {
+    // This function can be called from a parallel loop, make it thread safe
+#pragma omp critical
     sm_createdEsmryFileCount = 0;
 }
 
