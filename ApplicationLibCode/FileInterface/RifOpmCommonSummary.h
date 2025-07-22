@@ -18,12 +18,12 @@
 
 #pragma once
 
+#include "RifOpmSummaryTools.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <QString>
 #include <QStringList>
 
-#include "RifOpmSummaryTools.h"
 #include <map>
 #include <memory>
 #include <set>
