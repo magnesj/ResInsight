@@ -21,6 +21,7 @@
 #include "RiaFilePathTools.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
+#include "RifOpmSummaryTools.h"
 
 #ifdef _MSC_VER
 // Disable warning from external library to make sure treat warnings as error works
@@ -189,15 +190,36 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     if ( conversionIsRequired && m_createEsmryFiles )
     {
         auto smspecFileName = internal::smspecSummaryFilename( fileName );
-        if ( !writeEsmryFile( smspecFileName, includeRestartFiles, threadSafeLogger ) )
+        if ( writeEsmryFile( smspecFileName, includeRestartFiles, threadSafeLogger ) )
         {
-            return false;
+            hasCreatedEsmry = true;
         }
-
-        hasCreatedEsmry = true;
     }
 
-    if ( !openFileReader( fileName, includeRestartFiles, conversionIsRequired, hasCreatedEsmry, threadSafeLogger ) ) return false;
+    bool importEsmryFile = m_useEsmryFiles;
+
+    if ( conversionIsRequired && !hasCreatedEsmry )
+    {
+        // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
+        auto smspecFileName         = internal::smspecSummaryFilename( fileName );
+        auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
+
+        // If conversion is required, but we do not create ESMRY files, we cannot use the ESMRY file
+
+        importEsmryFile = false;
+
+        QString root = QFileInfo( smspecFileName ).canonicalPath();
+
+        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
+        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
+
+        RiaLogging::warning( QString( " %3 : %1 is older than %2, importing data from newest file %2." )
+                                 .arg( esmryFileNameShort )
+                                 .arg( smspecFileNameShort )
+                                 .arg( root ) );
+    }
+
+    if ( !openFileReader( fileName, includeRestartFiles, importEsmryFile, threadSafeLogger ) ) return false;
 
     RiaLogging::logTimeElapsed( "after openFileReader" );
     RiaLogging::resetTimer( "" );
@@ -309,7 +331,7 @@ void RifOpmCommonEclipseSummary::createAndSetAddresses()
         keywords = m_standardReader->keywordList();
     }
 
-    auto [addresses, addressMap] = RifOpmCommonSummaryTools::buildAddressesAndKeywordMap( keywords );
+    auto [addresses, addressMap] = RifOpmSummaryTools::buildAddressesAndKeywordMap( keywords );
     m_allResultAddresses         = addresses;
     m_summaryAddressToKeywordMap = addressMap;
 }
@@ -319,33 +341,14 @@ void RifOpmCommonEclipseSummary::createAndSetAddresses()
 //--------------------------------------------------------------------------------------------------
 bool RifOpmCommonEclipseSummary::openFileReader( const QString&       fileName,
                                                  bool                 includeRestartFiles,
-                                                 bool                 conversionIsRequired,
-                                                 bool                 hasCreatedEsmry,
+                                                 bool                 importEsmryFile,
                                                  RiaThreadSafeLogger* threadSafeLogger )
 {
     // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
     auto smspecFileName         = internal::smspecSummaryFilename( fileName );
     auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
 
-    bool tryToOpenEsmryFile = m_useEsmryFiles;
-
-    if ( conversionIsRequired && !m_createEsmryFiles )
-    {
-        // If conversion is required, but we do not create ESMRY files, we cannot use the ESMRY file
-        tryToOpenEsmryFile = false;
-
-        QString root = QFileInfo( smspecFileName ).canonicalPath();
-
-        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
-        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
-
-        RiaLogging::warning( QString( " %3 : %1 is older than %2, importing data from newest file %2." )
-                                 .arg( esmryFileNameShort )
-                                 .arg( smspecFileNameShort )
-                                 .arg( root ) );
-    }
-
-    if ( tryToOpenEsmryFile )
+    if ( importEsmryFile )
     {
         try
         {
@@ -438,122 +441,4 @@ void RifOpmCommonEclipseSummary::increaseEsmryFileCount()
     // This function can be called from a parallel loop, make it thread safe
 #pragma omp critical
     sm_createdEsmryFileCount++;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>
-    RifOpmCommonSummaryTools::buildAddressesSmspecAndKeywordMap( const Opm::EclIO::ESmry* summaryFile )
-{
-    std::set<RifEclipseSummaryAddress>              addresses;
-    std::map<RifEclipseSummaryAddress, size_t>      addressToSmspecIndexMap;
-    std::map<RifEclipseSummaryAddress, std::string> addressToKeywordMap;
-
-    if ( summaryFile )
-    {
-        auto keywords = summaryFile->keywordList();
-        for ( const auto& keyword : keywords )
-        {
-            auto eclAdr = RifEclipseSummaryAddress::fromEclipseTextAddress( keyword );
-            if ( !eclAdr.isValid() )
-            {
-                // If a category is not found, use the MISC category
-                eclAdr = RifEclipseSummaryAddress::miscAddress( keyword );
-            }
-
-            if ( eclAdr.isValid() )
-            {
-                addresses.insert( eclAdr );
-                size_t smspecIndex              = summaryFile->getSmspecIndexForKeyword( keyword );
-                addressToSmspecIndexMap[eclAdr] = smspecIndex;
-                addressToKeywordMap[eclAdr]     = keyword;
-            }
-        }
-    }
-
-    return { addresses, addressToSmspecIndexMap, addressToKeywordMap };
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::pair<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, std::string>>
-    RifOpmCommonSummaryTools::buildAddressesAndKeywordMap( const std::vector<std::string>& keywords )
-{
-    std::set<RifEclipseSummaryAddress>              addresses;
-    std::map<RifEclipseSummaryAddress, std::string> addressToKeywordMap;
-
-    std::vector<std::string> invalidKeywords;
-
-#pragma omp parallel
-    {
-        std::vector<RifEclipseSummaryAddress>                         threadAddresses;
-        std::vector<std::pair<RifEclipseSummaryAddress, std::string>> threadAddressToKeywordMap;
-        std::vector<std::string>                                      threadInvalidKeywords;
-
-#pragma omp for
-        for ( int index = 0; index < (int)keywords.size(); index++ )
-        {
-            auto keyword = keywords[index];
-
-            auto eclAdr = RifEclipseSummaryAddress::fromEclipseTextAddress( keyword );
-            if ( !eclAdr.isValid() )
-            {
-                threadInvalidKeywords.push_back( keyword );
-
-                // If a category is not found, use the MISC category
-                eclAdr = RifEclipseSummaryAddress::miscAddress( keyword );
-            }
-
-            if ( eclAdr.isValid() )
-            {
-                threadAddresses.emplace_back( eclAdr );
-                threadAddressToKeywordMap.emplace_back( std::make_pair( eclAdr, keyword ) );
-            }
-        }
-
-#pragma omp critical
-        {
-            addresses.insert( threadAddresses.begin(), threadAddresses.end() );
-            addressToKeywordMap.insert( threadAddressToKeywordMap.begin(), threadAddressToKeywordMap.end() );
-            invalidKeywords.insert( invalidKeywords.end(), threadInvalidKeywords.begin(), threadInvalidKeywords.end() );
-        }
-
-        // DEBUG code
-        // Used to print keywords not being categorized correctly
-        /*
-            for ( const auto& kw : invalidKeywords )
-            {
-                RiaLogging::warning( QString::fromStdString( kw ) );
-            }
-        */
-    }
-
-    return { addresses, addressToKeywordMap };
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-SummaryCategory RifOpmCommonSummaryTools::categoryFromKeyword( const std::string& keyword )
-{
-    auto opmCategory = Opm::EclIO::SummaryNode::category_from_keyword( keyword );
-    switch ( opmCategory )
-    {
-        case Opm::EclIO::SummaryNode::Category::Aquifer:
-            return SummaryCategory::SUMMARY_AQUIFER;
-        case Opm::EclIO::SummaryNode::Category::Block:
-            return SummaryCategory::SUMMARY_BLOCK;
-        case Opm::EclIO::SummaryNode::Category::Connection:
-            return SummaryCategory::SUMMARY_WELL_CONNECTION;
-        case Opm::EclIO::SummaryNode::Category::Completion:
-            return SummaryCategory::SUMMARY_WELL_COMPLETION;
-        case Opm::EclIO::SummaryNode::Category::Field:
-            return SummaryCategory::SUMMARY_FIELD;
-        case Opm::EclIO::SummaryNode::Category::Group:
-            return SummaryCategory::SUMMARY_GROUP;
-    }
-
-    return SummaryCategory::SUMMARY_INVALID;
 }

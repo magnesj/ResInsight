@@ -18,9 +18,6 @@
 
 #pragma once
 
-#include "RiaDefines.h"
-
-#include "RifEclipseSummaryAddress.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <QString>
@@ -43,18 +40,7 @@ namespace EclIO
 } // namespace Opm
 
 class RiaThreadSafeLogger;
-
-namespace RifOpmCommonSummaryTools
-{
-std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>
-    buildAddressesSmspecAndKeywordMap( const Opm::EclIO::ESmry* summaryFile );
-
-std::pair<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, std::string>>
-    buildAddressesAndKeywordMap( const std::vector<std::string>& keywords );
-
-SummaryCategory categoryFromKeyword( const std::string& keyword );
-
-}; // namespace RifOpmCommonSummaryTools
+class RifEclipseSummaryAddress;
 
 //==================================================================================================
 //
@@ -80,14 +66,10 @@ public:
     RiaDefines::EclipseUnitSystem        unitSystem() const override;
 
 private:
-    size_t      keywordCount() const override;
-    void        createAndSetAddresses() override;
-    bool        openFileReader( const QString&       fileName,
-                                bool                 includeRestartFiles,
-                                bool                 conversionIsRequired,
-                                bool                 hasCreatedEsmry,
-                                RiaThreadSafeLogger* threadSafeLogger );
-    void        populateTimeSteps();
+    size_t keywordCount() const override;
+    void   createAndSetAddresses() override;
+    bool   openFileReader( const QString& fileName, bool includeRestartFiles, bool importEsmryFile, RiaThreadSafeLogger* threadSafeLogger );
+    void   populateTimeSteps();
     std::string keywordForAddress( const RifEclipseSummaryAddress& address ) const;
 
     static bool writeEsmryFile( QString& smspecFileName, bool includeRestartFiles, RiaThreadSafeLogger* threadSafeLogger );
