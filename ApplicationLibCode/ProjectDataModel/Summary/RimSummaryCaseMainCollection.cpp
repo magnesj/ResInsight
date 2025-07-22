@@ -576,7 +576,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         [[maybe_unused]] bool canUseMultipleThreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-        canUseMultipleThreads |= RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
+        canUseMultipleThreads = canUseMultipleThreads && RiaPreferencesSystem::current()->useMultiThreadingForSummaryImport();
 
 #pragma omp parallel for schedule( dynamic ) if ( canUseMultipleThreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
