@@ -131,15 +131,14 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     RiaLogging::resetTimer( "RifOpmCommonEclipseSummary::open starting" );
 
-    bool isEsmryConversionRequired = m_ensembleImportState.has_value() 
-                                   ? m_ensembleImportState->shouldCreateEsmryFile()
-                                   : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
+    bool isEsmryConversionRequired = m_ensembleImportState.has_value() ? m_ensembleImportState->shouldCreateEsmryFile()
+                                                                       : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
 
     RiaLogging::logTimeElapsed( "after checking data SMSPEC and ESMRY" );
     RiaLogging::resetTimer( "" );
 
     bool hasCreatedEsmry = false;
-    if ( createEsmryFile && m_createEsmryFiles )
+    if ( isEsmryConversionRequired && m_createEsmryFiles )
     {
         auto smspecFileName = RifOpmSummaryTools::smspecSummaryFilename( fileName );
         if ( writeEsmryFile( smspecFileName, includeRestartFiles, threadSafeLogger ) )
@@ -150,7 +149,7 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     bool importEsmryFile = m_useEsmryFiles;
 
-    if ( createEsmryFile && !hasCreatedEsmry )
+    if ( isEsmryConversionRequired && !hasCreatedEsmry )
     {
         // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
         auto smspecFileName         = RifOpmSummaryTools::smspecSummaryFilename( fileName );
