@@ -18,12 +18,18 @@
 
 #include "RifOpmSummaryTools.h"
 
+#include "RiaFilePathTools.h"
+#include "RiaLogging.h"
+
 #ifdef _MSC_VER
 // Disable warning from external library to make sure treat warnings as error works
 #pragma warning( disable : 4267 )
 #endif
 #include "opm/io/eclipse/ESmry.hpp"
 #include "opm/io/eclipse/ExtESmry.hpp"
+
+#include <QFile>
+#include <QFileInfo>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -141,4 +147,68 @@ RifEclipseSummaryAddressDefines::SummaryCategory RifOpmSummaryTools::categoryFro
     }
 
     return SummaryCategory::SUMMARY_INVALID;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifOpmSummaryTools::enhancedSummaryFilename( const QString& fileName )
+{
+    QString s( fileName );
+    return s.replace( ".SMSPEC", ".ESMRY" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifOpmSummaryTools::smspecSummaryFilename( const QString& fileName )
+{
+    QString s( fileName );
+    return s.replace( ".ESMRY", ".SMSPEC" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifOpmSummaryTools::isEsmryConversionRequired( const QString& fileName )
+{
+    auto candidateEsmryFileName = enhancedSummaryFilename( fileName );
+
+    // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
+    auto smspecFileName = smspecSummaryFilename( fileName );
+
+    if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) )
+    {
+        return true;
+    }
+
+    if ( RiaFilePathTools::isFirstOlderThanSecond( candidateEsmryFileName.toStdString(), smspecFileName.toStdString() ) )
+    {
+        QString root = QFileInfo( smspecFileName ).canonicalPath();
+
+        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
+        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
+
+        RiaLogging::debug(
+            QString( " %3 : %1 is older than %2, recreating %1." ).arg( esmryFileNameShort ).arg( smspecFileNameShort ).arg( root ) );
+
+        // Check if we have write permission in the folder
+        QFileInfo info( smspecFileName );
+
+        if ( !info.isWritable() )
+        {
+            QString txt = QString( "ESMRY is older than SMSPEC, but export to file %1 failed due to missing write permissions. "
+                                   "Aborting operation." )
+                              .arg( candidateEsmryFileName );
+            RiaLogging::error( txt );
+
+            return false;
+        }
+
+        std::filesystem::remove( candidateEsmryFileName.toStdString() );
+
+        return true;
+    }
+
+    return false;
 }

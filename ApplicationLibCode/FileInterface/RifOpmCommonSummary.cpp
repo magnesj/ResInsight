@@ -18,7 +18,6 @@
 
 #include "RifOpmCommonSummary.h"
 
-#include "RiaFilePathTools.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
 #include "RifOpmSummaryTools.h"
@@ -33,65 +32,6 @@
 #include <QFileInfo>
 
 size_t RifOpmCommonEclipseSummary::sm_createdEsmryFileCount = 0;
-
-namespace internal
-{
-
-QString enhancedSummaryFilename( const QString& fileName )
-{
-    QString s( fileName );
-    return s.replace( ".SMSPEC", ".ESMRY" );
-}
-QString smspecSummaryFilename( const QString& fileName )
-{
-    QString s( fileName );
-    return s.replace( ".ESMRY", ".SMSPEC" );
-}
-
-bool isEsmryConversionRequired( const QString& fileName )
-{
-    auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
-
-    // Make sure to check the smspec file name, as it is supported to import ESMRY files without any SMSPEC data
-    auto smspecFileName = internal::smspecSummaryFilename( fileName );
-
-    if ( !QFile::exists( candidateEsmryFileName ) && QFile::exists( smspecFileName ) )
-    {
-        return true;
-    }
-
-    if ( RiaFilePathTools::isFirstOlderThanSecond( candidateEsmryFileName.toStdString(), smspecFileName.toStdString() ) )
-    {
-        QString root = QFileInfo( smspecFileName ).canonicalPath();
-
-        const QString smspecFileNameShort = QFileInfo( smspecFileName ).fileName();
-        const QString esmryFileNameShort  = QFileInfo( candidateEsmryFileName ).fileName();
-
-        RiaLogging::debug(
-            QString( " %3 : %1 is older than %2, recreating %1." ).arg( esmryFileNameShort ).arg( smspecFileNameShort ).arg( root ) );
-
-        // Check if we have write permission in the folder
-        QFileInfo info( smspecFileName );
-
-        if ( !info.isWritable() )
-        {
-            QString txt = QString( "ESMRY is older than SMSPEC, but export to file %1 failed due to missing write permissions. "
-                                   "Aborting operation." )
-                              .arg( candidateEsmryFileName );
-            RiaLogging::error( txt );
-
-            return false;
-        }
-
-        std::filesystem::remove( candidateEsmryFileName.toStdString() );
-
-        return true;
-    }
-
-    return false;
-}
-
-} // namespace internal
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -181,7 +121,7 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     RiaLogging::resetTimer( "RifOpmCommonEclipseSummary::open starting" );
 
-    bool conversionIsRequired = internal::isEsmryConversionRequired( fileName );
+    bool conversionIsRequired = RifOpmSummaryTools::isEsmryConversionRequired( fileName );
 
     RiaLogging::logTimeElapsed( "after checking data SMSPEC and ESMRY" );
     RiaLogging::resetTimer( "" );
@@ -189,7 +129,7 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     bool hasCreatedEsmry = false;
     if ( conversionIsRequired && m_createEsmryFiles )
     {
-        auto smspecFileName = internal::smspecSummaryFilename( fileName );
+        auto smspecFileName = RifOpmSummaryTools::smspecSummaryFilename( fileName );
         if ( writeEsmryFile( smspecFileName, includeRestartFiles, threadSafeLogger ) )
         {
             hasCreatedEsmry = true;
@@ -201,8 +141,8 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     if ( conversionIsRequired && !hasCreatedEsmry )
     {
         // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
-        auto smspecFileName         = internal::smspecSummaryFilename( fileName );
-        auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
+        auto smspecFileName         = RifOpmSummaryTools::smspecSummaryFilename( fileName );
+        auto candidateEsmryFileName = RifOpmSummaryTools::enhancedSummaryFilename( fileName );
 
         // If conversion is required, but we do not create ESMRY files, we cannot use the ESMRY file
 
@@ -345,8 +285,8 @@ bool RifOpmCommonEclipseSummary::openFileReader( const QString&       fileName,
                                                  RiaThreadSafeLogger* threadSafeLogger )
 {
     // Make sure to check the SMSPEC file name, as it is supported to import ESMRY files without any SMSPEC data.
-    auto smspecFileName         = internal::smspecSummaryFilename( fileName );
-    auto candidateEsmryFileName = internal::enhancedSummaryFilename( fileName );
+    auto smspecFileName         = RifOpmSummaryTools::smspecSummaryFilename( fileName );
+    auto candidateEsmryFileName = RifOpmSummaryTools::enhancedSummaryFilename( fileName );
 
     if ( importEsmryFile )
     {

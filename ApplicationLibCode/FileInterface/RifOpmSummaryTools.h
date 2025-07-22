@@ -45,4 +45,8 @@ std::pair<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress,
 
 SummaryCategory categoryFromKeyword( const std::string& keyword );
 
+QString enhancedSummaryFilename( const QString& fileName );
+QString smspecSummaryFilename( const QString& fileName );
+bool    isEsmryConversionRequired( const QString& fileName );
+
 }; // namespace RifOpmSummaryTools
