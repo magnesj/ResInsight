@@ -28,6 +28,7 @@
 #include "opm/io/eclipse/ESmry.hpp"
 #include "opm/io/eclipse/ExtESmry.hpp"
 
+#include "QRegularExpression"
 #include <QFile>
 #include <QFileInfo>
 
@@ -211,6 +212,22 @@ bool RifOpmSummaryTools::isEsmryConversionRequired( const QString& fileName )
     }
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<int, QString> RifOpmSummaryTools::extractRealizationNumber( const QString& path )
+{
+    QRegularExpression      pattern( "realization-(\\d+)", QRegularExpression::CaseInsensitiveOption );
+    QRegularExpressionMatch match = pattern.match( path );
+
+    if ( match.hasMatch() )
+    {
+        return match.captured( 1 ).toInt();
+    }
+
+    return std::unexpected( QString( "Could not extract realization number from path: %1" ).arg( path ) );
 }
 
 //--------------------------------------------------------------------------------------------------

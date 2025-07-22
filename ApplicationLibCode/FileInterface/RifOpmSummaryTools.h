@@ -22,6 +22,7 @@
 
 #include <QString>
 
+#include <expected>
 #include <map>
 #include <set>
 #include <string>
@@ -73,5 +74,7 @@ SummaryCategory categoryFromKeyword( const std::string& keyword );
 QString enhancedSummaryFilename( const QString& fileName );
 QString smspecSummaryFilename( const QString& fileName );
 bool    isEsmryConversionRequired( const QString& fileName );
+
+std::expected<int, QString> extractRealizationNumber( const QString& path );
 
 }; // namespace RifOpmSummaryTools

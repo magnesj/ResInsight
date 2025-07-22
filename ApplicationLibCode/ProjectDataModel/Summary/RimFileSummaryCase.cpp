@@ -25,6 +25,7 @@
 #include "RifEclipseSummaryTools.h"
 #include "RifMultipleSummaryReaders.h"
 #include "RifOpmCommonSummary.h"
+#include "RifOpmSummaryTools.h"
 #include "RifProjectSummaryDataWriter.h"
 #include "RifReaderEclipseSummary.h"
 #include "RifReaderOpmRft.h"
@@ -174,8 +175,14 @@ std::unique_ptr<RifSummaryReaderInterface>
         {
             if ( ensembleImportState.has_value() )
             {
-                const int realizationNumber = 1;
-                restartFileNames            = ensembleImportState->restartFilesForRealization( realizationNumber );
+                auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( headerFileName );
+                if ( !realizationNumber.has_value() )
+                {
+                    RiaLogging::error( realizationNumber.error() );
+                    return nullptr;
+                }
+
+                restartFileNames = ensembleImportState->restartFilesForRealization( realizationNumber.value() );
             }
             else
             {
