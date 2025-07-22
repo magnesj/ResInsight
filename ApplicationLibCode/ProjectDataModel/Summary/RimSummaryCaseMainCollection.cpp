@@ -18,6 +18,7 @@
 
 #include "RimSummaryCaseMainCollection.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaEclipseFileNameTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaLogging.h"
@@ -505,17 +506,36 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
     {
         // If we are extracting state from the first case, we need to make sure that the first case is loaded
         // before we start loading the rest of the cases.
-        if ( !fileSummaryCases.empty() )
+        if ( fileSummaryCases.size() > 1 )
         {
-            auto                 headerFileName = fileSummaryCases.front()->summaryHeaderFilename();
             std::vector<QString> warnings;
-            std::vector<QString> restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+
+            auto headerFileName0   = fileSummaryCases[0]->summaryHeaderFilename();
+            auto restartFileNames0 = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName0, warnings );
+
+            auto headerFileName1   = fileSummaryCases[1]->summaryHeaderFilename();
+            auto restartFileNames1 = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName1, warnings );
+
+            std::vector<QString> restartPatterns;
+
+            if ( !restartFileNames0.empty() && restartFileNames0.size() == restartFileNames1.size() )
+            {
+                for ( size_t i = 0; i < restartFileNames0.size(); i++ )
+                {
+                    QStringList filePaths;
+                    filePaths.push_back( restartFileNames0[i] );
+                    filePaths.push_back( restartFileNames1[i] );
+                    const auto [pattern, range] =
+                        RiaEnsembleImportTools::findPathPattern( filePaths, RifOpmSummaryTools::RifEnsembleImportState::placeholderText() );
+                    restartPatterns.push_back( pattern );
+                }
+            }
 
             RifOpmSummaryTools::RifEnsembleImportState state;
-            state.setRestartFiles( restartFileNames );
+            state.setRestartPatterns( restartPatterns );
 
-            state.setShouldCreateEsmyFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName ) );
-            state.setPathToParameterFile( RifCaseRealizationParametersFileLocator::locate( headerFileName ) );
+            state.setShouldCreateEsmyFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName0 ) );
+            state.setPathToParameterFile( RifCaseRealizationParametersFileLocator::locate( headerFileName0 ) );
 
             importState = state;
         }

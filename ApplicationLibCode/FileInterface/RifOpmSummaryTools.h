@@ -42,19 +42,24 @@ namespace RifOpmSummaryTools
 class RifEnsembleImportState
 {
 public:
-    bool shouldCreateEsmyFile() const { return m_shouldCreateEsmyFile; }
-    void setShouldCreateEsmyFile( bool val ) { m_shouldCreateEsmyFile = val; }
+    bool shouldCreateEsmyFile() const;
+    void setShouldCreateEsmyFile( bool val );
 
-    const std::vector<QString> restartFiles( int realizationNumber ) const { return m_restartFiles; }
-    void                       setRestartFiles( const std::vector<QString>& restartFiles ) { m_restartFiles = restartFiles; }
+    void setFirstSummaryFilePath( const QString& filePath );
 
-    QString pathToParameterFile() const { return m_pathToParameterFile; }
-    void    setPathToParameterFile( const QString& val ) { m_pathToParameterFile = val; }
+    const std::vector<QString> restartFilesForRealization( int realization ) const;
+    void                       setRestartPatterns( const std::vector<QString>& filePatterns );
+
+    QString pathToParameterFile() const;
+    void    setPathToParameterFile( const QString& val );
+
+    static QString placeholderText();
 
 private:
     bool                 m_shouldCreateEsmyFile = false;
-    std::vector<QString> m_restartFiles;
+    std::vector<QString> m_restartFilePatterns;
     QString              m_pathToParameterFile;
+    QString              m_firstSummaryFilePath;
 };
 
 std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>

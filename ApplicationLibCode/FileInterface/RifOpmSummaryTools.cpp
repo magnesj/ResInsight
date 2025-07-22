@@ -212,3 +212,76 @@ bool RifOpmSummaryTools::isEsmryConversionRequired( const QString& fileName )
 
     return false;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifOpmSummaryTools::RifEnsembleImportState::shouldCreateEsmyFile() const
+{
+    return m_shouldCreateEsmyFile;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifOpmSummaryTools::RifEnsembleImportState::setShouldCreateEsmyFile( bool val )
+{
+    m_shouldCreateEsmyFile = val;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifOpmSummaryTools::RifEnsembleImportState::setFirstSummaryFilePath( const QString& filePath )
+{
+    m_firstSummaryFilePath = filePath;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<QString> RifOpmSummaryTools::RifEnsembleImportState::restartFilesForRealization( int realizationNumber ) const
+{
+    std::vector<QString> filePaths;
+
+    QString numberString = QString::number( realizationNumber );
+
+    for ( auto s : m_restartFilePatterns )
+    {
+        filePaths.push_back( s.replace( placeholderText(), numberString ) );
+    }
+
+    return filePaths;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifOpmSummaryTools::RifEnsembleImportState::setRestartPatterns( const std::vector<QString>& filePatterns )
+{
+    m_restartFilePatterns = filePatterns;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifOpmSummaryTools::RifEnsembleImportState::pathToParameterFile() const
+{
+    return m_pathToParameterFile;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifOpmSummaryTools::RifEnsembleImportState::setPathToParameterFile( const QString& val )
+{
+    m_pathToParameterFile = val;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RifOpmSummaryTools::RifEnsembleImportState::placeholderText()
+{
+    return "$INDEX";
+}

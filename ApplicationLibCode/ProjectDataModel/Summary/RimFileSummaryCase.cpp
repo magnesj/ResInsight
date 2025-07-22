@@ -175,7 +175,7 @@ std::unique_ptr<RifSummaryReaderInterface>
             if ( ensembleImportState.has_value() )
             {
                 const int realizationNumber = 1;
-                restartFileNames            = ensembleImportState->restartFiles( realizationNumber );
+                restartFileNames            = ensembleImportState->restartFilesForRealization( realizationNumber );
             }
             else
             {
