@@ -89,7 +89,7 @@ private:
     caf::PdmField<double> m_exportScalingFactor;
 
     caf::PdmField<bool> m_useImprovedSummaryImport;
-    caf::PdmField<bool> m_useMultiThreadingForSummary;
+    caf::PdmField<bool> m_useMultiThreadingForSummary_TEMPORARY;
 
     caf::PdmField<bool>    m_showProgressBar;
     caf::PdmField<QString> m_gtestFilter;
