@@ -237,4 +237,3 @@ std::expected<int, QString> RifOpmSummaryTools::extractRealizationNumber( const 
 
     return std::unexpected( QString( "Could not extract realization number from path: %1" ).arg( path ) );
 }
-

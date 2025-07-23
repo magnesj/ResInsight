@@ -91,7 +91,7 @@ QString RimFileSummaryCase::caseName() const
 ///
 //--------------------------------------------------------------------------------------------------
 void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<RifEnsembleImportConfig> ensembleImportState,
-                                                                 RiaThreadSafeLogger* threadSafeLogger )
+                                                                 RiaThreadSafeLogger*                   threadSafeLogger )
 {
     // RimFileSummaryCase::findRelatedFilesAndCreateReader is a performance bottleneck. The function
     // RifEclipseSummaryTools::getRestartFile() should be refactored to use opm-common instead of resdata.
@@ -161,10 +161,10 @@ void RimFileSummaryCase::createRftReaderInterface()
 ///
 //--------------------------------------------------------------------------------------------------
 std::unique_ptr<RifSummaryReaderInterface>
-    RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&                                            headerFileName,
-                                                         bool                                                      lookForRestartFiles,
+    RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&                         headerFileName,
+                                                         bool                                   lookForRestartFiles,
                                                          std::optional<RifEnsembleImportConfig> ensembleImportState,
-                                                         RiaThreadSafeLogger*                                      threadSafeLogger )
+                                                         RiaThreadSafeLogger*                   threadSafeLogger )
 {
     if ( lookForRestartFiles )
     {
