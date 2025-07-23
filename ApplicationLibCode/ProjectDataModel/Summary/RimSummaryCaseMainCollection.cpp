@@ -562,9 +562,9 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                     }
                 }
 
-                RiaLogging::resetTimer();
+                auto startTime = RiaLogging::currentTime();
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
-                RiaLogging::logTimeElapsedAndResetTimer( "Setting of realization parameters" );
+                RiaLogging::logElapsedTime( "Setting of realization parameters", startTime );
             }
 
             RiaLogging::info( QString( "Completed %1" ).arg( fileSummaryCase->summaryHeaderFilename() ) );
