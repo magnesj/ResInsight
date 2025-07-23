@@ -86,17 +86,12 @@ void RifEnsembleImportConfig::computeRestartPatternsFromTwoRealizations( const s
 {
     m_restartFileNamePatterns.clear();
 
+    if ( restartFilesFirstCase.empty() ) return;
+
     if ( restartFilesFirstCase.size() != restartFilesSecondCase.size() )
     {
         RiaLogging::error( "RifEnsembleImportConfig::computeRestartPatternsFromTwoRealizations: "
                            "The number of restart files for the two realizations do not match." );
-        return;
-    }
-
-    if ( restartFilesFirstCase.size() < 2 )
-    {
-        RiaLogging::error( "RifEnsembleImportConfig::computeRestartPatternsFromTwoRealizations: "
-                           "At least two restart files are required to compute patterns." );
         return;
     }
 
