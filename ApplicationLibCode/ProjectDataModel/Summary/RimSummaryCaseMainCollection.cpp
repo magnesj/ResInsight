@@ -109,6 +109,7 @@ RimSummaryCaseMainCollection::RimSummaryCaseMainCollection()
     caf::PdmFieldReorderCapability::addToField( &m_cases );
 
     CAF_PDM_InitFieldNoDefault( &m_ensembles, "SummaryCaseCollections", "" );
+    caf::PdmFieldReorderCapability::addToField( &m_ensembles );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -219,12 +220,7 @@ void RimSummaryCaseMainCollection::removeCases( std::vector<RimSummaryCase*>& ca
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::moveCase( RimSummaryCase* summaryCase, int destinationIndex )
 {
-    auto currentIndex = m_cases.indexOf( summaryCase );
-    if ( currentIndex < m_cases.size() )
-    {
-        m_cases.erase( currentIndex );
-        m_cases.insertAt( std::min( destinationIndex, (int)m_cases.size() ), summaryCase );
-    }
+    m_cases.move( destinationIndex, summaryCase );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -262,6 +258,14 @@ RimSummaryEnsemble* RimSummaryCaseMainCollection::addEnsemble( const std::vector
     addEnsemble( ensemble );
 
     return ensemble;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCaseMainCollection::moveEnsemble( RimSummaryEnsemble* ensemble, int destinationIndex )
+{
+    m_ensembles.move( destinationIndex, ensemble );
 }
 
 //--------------------------------------------------------------------------------------------------
