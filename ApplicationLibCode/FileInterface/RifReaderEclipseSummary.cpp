@@ -56,7 +56,7 @@ RifReaderEclipseSummary::~RifReaderEclipseSummary()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifReaderEclipseSummary::setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState )
+void RifReaderEclipseSummary::setEnsembleImportState( RifEnsembleImportConfig ensembleImportState )
 {
     m_ensembleImportState = ensembleImportState;
 }

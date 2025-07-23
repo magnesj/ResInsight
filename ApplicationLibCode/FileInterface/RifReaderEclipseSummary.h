@@ -20,7 +20,7 @@
 
 #include "RiaDefines.h"
 
-#include "RifOpmSummaryTools.h"
+#include "RifEnsembleImportConfig.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <QString>
@@ -48,7 +48,7 @@ public:
     RifReaderEclipseSummary();
     ~RifReaderEclipseSummary() override;
 
-    void setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState );
+    void setEnsembleImportState( RifEnsembleImportConfig ensembleImportState );
 
     bool open( const QString& headerFileName, RiaThreadSafeLogger* threadSafeLogger );
 
@@ -67,7 +67,7 @@ private:
     std::unique_ptr<RifSummaryReaderInterface> m_summaryReader;
     std::set<RifEclipseSummaryAddress>         m_differenceAddresses;
 
-    std::optional<RifOpmSummaryTools::RifEnsembleImportState> m_ensembleImportState;
+    std::optional<RifEnsembleImportConfig> m_ensembleImportState;
 
 private:
     //==================================================================================================

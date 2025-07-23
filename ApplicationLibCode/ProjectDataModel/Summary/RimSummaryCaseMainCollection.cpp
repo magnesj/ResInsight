@@ -18,11 +18,11 @@
 
 #include "RimSummaryCaseMainCollection.h"
 
-#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaEclipseFileNameTools.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesSummary.h"
+#include "RiaPreferencesSystem.h"
 #include "Summary/RiaSummaryTools.h"
 
 #include "RifCaseRealizationParametersReader.h"
@@ -55,7 +55,6 @@
 #include "cafPdmFieldReorderCapability.h"
 #include "cafProgressInfo.h"
 
-#include "RiaPreferencesSystem.h"
 #include <QCoreApplication>
 #include <QDir>
 #include <memory>
@@ -503,7 +502,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
     }
 #endif
 
-    std::optional<RifOpmSummaryTools::RifEnsembleImportState> importState = std::nullopt;
+    std::optional<RifEnsembleImportConfig> importState = std::nullopt;
 
     if ( extractStateFromFirstCase && !RiaPreferencesSystem::current()->useImprovedSummaryImport() )
     {
@@ -518,43 +517,11 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
         {
             std::vector<QString> warnings;
 
-            auto headerFileName0   = fileSummaryCases[0]->summaryHeaderFilename();
-            auto restartFileNames0 = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName0, warnings );
+            auto headerFileName0 = fileSummaryCases[0]->summaryHeaderFilename();
+            auto headerFileName1 = fileSummaryCases[1]->summaryHeaderFilename();
 
-            auto headerFileName1   = fileSummaryCases[1]->summaryHeaderFilename();
-            auto restartFileNames1 = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName1, warnings );
-
-            std::vector<QString> restartPatterns;
-
-            if ( !restartFileNames0.empty() && restartFileNames0.size() == restartFileNames1.size() )
-            {
-                for ( size_t i = 0; i < restartFileNames0.size(); i++ )
-                {
-                    QStringList filePaths;
-                    filePaths.push_back( restartFileNames0[i] );
-                    filePaths.push_back( restartFileNames1[i] );
-                    const auto [pattern, range] =
-                        RiaEnsembleImportTools::findPathPattern( filePaths, RifOpmSummaryTools::RifEnsembleImportState::placeholderText() );
-                    restartPatterns.push_back( pattern );
-                }
-            }
-
-            RifOpmSummaryTools::RifEnsembleImportState state;
-            state.setRestartPatterns( restartPatterns );
-
-            state.setShouldCreateEsmryFile( RifOpmSummaryTools::isEsmryConversionRequired( headerFileName0 ) );
-
-            {
-                auto        path0 = RifCaseRealizationParametersFileLocator::locate( headerFileName0 );
-                auto        path1 = RifCaseRealizationParametersFileLocator::locate( headerFileName1 );
-                QStringList filePaths;
-                filePaths.push_back( path0 );
-                filePaths.push_back( path1 );
-                const auto [pattern, range] =
-                    RiaEnsembleImportTools::findPathPattern( filePaths, RifOpmSummaryTools::RifEnsembleImportState::placeholderText() );
-
-                state.setParameterFilePathPattern( pattern );
-            }
+            RifEnsembleImportConfig state;
+            state.computePatternsFromSummaryFilePaths( headerFileName0, headerFileName1 );
 
             importState = state;
         }

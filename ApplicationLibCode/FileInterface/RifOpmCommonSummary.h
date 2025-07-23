@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RifOpmSummaryTools.h"
+#include "RifEnsembleImportConfig.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <QString>
@@ -56,7 +56,7 @@ public:
     void useEnhancedSummaryFiles( bool enable );
     void createEnhancedSummaryFiles( bool enable );
 
-    void setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState );
+    void setEnsembleImportState( RifEnsembleImportConfig ensembleImportState );
 
     static void   resetEnhancedSummaryFileCount();
     static size_t numberOfEnhancedSummaryFileCreated();
@@ -90,5 +90,5 @@ private:
     bool m_useEsmryFiles;
     bool m_createEsmryFiles;
 
-    std::optional<RifOpmSummaryTools::RifEnsembleImportState> m_ensembleImportState;
+    std::optional<RifEnsembleImportConfig> m_ensembleImportState;
 };

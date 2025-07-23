@@ -66,7 +66,7 @@ void RifOpmCommonEclipseSummary::createEnhancedSummaryFiles( bool enable )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmCommonEclipseSummary::setEnsembleImportState( RifOpmSummaryTools::RifEnsembleImportState ensembleImportState )
+void RifOpmCommonEclipseSummary::setEnsembleImportState( RifEnsembleImportConfig ensembleImportState )
 {
     m_ensembleImportState = ensembleImportState;
 }

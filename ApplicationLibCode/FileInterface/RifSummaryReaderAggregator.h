@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RifOpmSummaryTools.h"
+#include "RifEnsembleImportConfig.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <memory>
@@ -38,8 +38,7 @@ class RifSummaryReaderAggregator : public RifSummaryReaderInterface
 public:
     RifSummaryReaderAggregator( const std::vector<std::string>& filesOrderedByStartOfHistory );
 
-    bool createReadersAndImportMetaData( std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
-                                         RiaThreadSafeLogger*                                      threadSafeLogger );
+    bool createReadersAndImportMetaData( std::optional<RifEnsembleImportConfig> ensembleImportState, RiaThreadSafeLogger* threadSafeLogger );
 
     std::vector<time_t>                  timeSteps( const RifEclipseSummaryAddress& resultAddress ) const override;
     std::pair<bool, std::vector<double>> values( const RifEclipseSummaryAddress& resultAddress ) const override;

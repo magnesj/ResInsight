@@ -90,7 +90,7 @@ QString RimFileSummaryCase::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
+void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<RifEnsembleImportConfig> ensembleImportState,
                                                                  RiaThreadSafeLogger* threadSafeLogger )
 {
     // RimFileSummaryCase::findRelatedFilesAndCreateReader is a performance bottleneck. The function
@@ -163,7 +163,7 @@ void RimFileSummaryCase::createRftReaderInterface()
 std::unique_ptr<RifSummaryReaderInterface>
     RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&                                            headerFileName,
                                                          bool                                                      lookForRestartFiles,
-                                                         std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
+                                                         std::optional<RifEnsembleImportConfig> ensembleImportState,
                                                          RiaThreadSafeLogger*                                      threadSafeLogger )
 {
     if ( lookForRestartFiles )

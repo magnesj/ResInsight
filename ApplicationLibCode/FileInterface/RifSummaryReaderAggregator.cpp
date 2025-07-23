@@ -142,7 +142,7 @@ size_t RifSummaryReaderAggregator::timeStepCount( RifSummaryReaderInterface* rea
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifSummaryReaderAggregator::createReadersAndImportMetaData( std::optional<RifOpmSummaryTools::RifEnsembleImportState> ensembleImportState,
+bool RifSummaryReaderAggregator::createReadersAndImportMetaData( std::optional<RifEnsembleImportConfig> ensembleImportState,
                                                                  RiaThreadSafeLogger* threadSafeLogger )
 {
     for ( const auto& fileName : m_fileNames )

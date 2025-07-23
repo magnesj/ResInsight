@@ -39,26 +39,6 @@ namespace EclIO
 
 namespace RifOpmSummaryTools
 {
-class RifEnsembleImportState
-{
-public:
-    bool shouldCreateEsmryFile() const;
-    void setShouldCreateEsmryFile( bool val );
-
-    std::vector<QString> restartFilesForRealization( int realizationNumber ) const;
-    void                 setRestartPatterns( const std::vector<QString>& filePatterns );
-
-    QString pathToParameterFile( int realizationNumber ) const;
-    void    setParameterFilePathPattern( const QString& val );
-
-    static QString placeholderText();
-
-private:
-    bool                 m_shouldCreateEsmryFile = false;
-    std::vector<QString> m_restartFileNamePatterns;
-    QString              m_parameterFilePathPattern;
-};
-
 std::tuple<std::set<RifEclipseSummaryAddress>, std::map<RifEclipseSummaryAddress, size_t>, std::map<RifEclipseSummaryAddress, std::string>>
     buildAddressesSmspecAndKeywordMap( const Opm::EclIO::ESmry* summaryFile );
 
