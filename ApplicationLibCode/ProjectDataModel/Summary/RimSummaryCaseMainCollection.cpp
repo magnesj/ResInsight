@@ -551,11 +551,8 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
             RimFileSummaryCase* fileSummaryCase = fileSummaryCases[cIdx];
             if ( fileSummaryCase )
             {
-                RiaLogging::logTimeElapsed( "Measure file case" );
                 fileSummaryCase->createSummaryReaderInterfaceThreadSafe( importState, &threadSafeLogger );
-                RiaLogging::resetTimer( "" );
 
-                RiaLogging::logTimeElapsed( "Measure realization params" );
                 std::optional<QString> parameterFilePath;
                 if ( importState.has_value() )
                 {
@@ -566,8 +563,9 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                     }
                 }
 
+                RiaLogging::resetTimer();
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
-                RiaLogging::resetTimer( "" );
+                RiaLogging::logTimeElapsedAndResetTimer( "Setting of realization paramaters" );
             }
 
             RiaLogging::info( QString( "Completed %1" ).arg( fileSummaryCase->summaryHeaderFilename() ) );

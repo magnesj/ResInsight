@@ -129,13 +129,12 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     //
     // NB! Always make sure the logic is consistent with the logic in RifHdf5SummaryExporter::ensureHdf5FileIsCreated
 
-    RiaLogging::resetTimer( "RifOpmCommonEclipseSummary::open starting" );
+    RiaLogging::resetTimer();
 
     bool isEsmryConversionRequired = m_ensembleImportState.has_value() ? m_ensembleImportState->shouldCreateEsmryFile()
                                                                        : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
 
-    RiaLogging::logTimeElapsed( "after checking data SMSPEC and ESMRY" );
-    RiaLogging::resetTimer( "" );
+    RiaLogging::logTimeElapsedAndResetTimer( "Check if conversion from SMSPEC to ESMRY is required" );
 
     bool hasCreatedEsmry = false;
     if ( isEsmryConversionRequired && m_createEsmryFiles )
@@ -172,14 +171,12 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     if ( !openFileReader( fileName, includeRestartFiles, importEsmryFile, threadSafeLogger ) ) return false;
 
-    RiaLogging::logTimeElapsed( "after openFileReader" );
-    RiaLogging::resetTimer( "" );
+    RiaLogging::logTimeElapsedAndResetTimer( "Completed openFileReader" );
 
     if ( !m_standardReader && !m_enhancedReader ) return false;
 
     populateTimeSteps();
-    RiaLogging::logTimeElapsed( "after populateTimeSteps" );
-    RiaLogging::resetTimer( "" );
+    RiaLogging::logTimeElapsedAndResetTimer( "Completed populateTimeSteps" );
 
     return true;
 }
