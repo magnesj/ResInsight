@@ -134,6 +134,7 @@ bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafe
             auto opmCommonReader = std::make_unique<RifOpmCommonEclipseSummary>();
             opmCommonReader->useEnhancedSummaryFiles( prefSummary->useEnhancedSummaryDataFiles() );
             opmCommonReader->createEnhancedSummaryFiles( prefSummary->createEnhancedSummaryDataFiles() );
+            if ( m_ensembleImportState.has_value() ) opmCommonReader->setEnsembleImportState( m_ensembleImportState.value() );
             isValid = opmCommonReader->open( headerFileName, false, threadSafeLogger );
 
             if ( isValid )
