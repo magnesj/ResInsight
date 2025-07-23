@@ -216,11 +216,24 @@ void RimSummaryCaseMainCollection::removeCases( std::vector<RimSummaryCase*>& ca
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Lambda function to move an object in a child array field
+//--------------------------------------------------------------------------------------------------
+auto moveObjectInChildArrayField = []( auto& childArrayField, auto* object, int destinationIndex )
+{
+    auto currentIndex = childArrayField.indexOf( object );
+    if ( currentIndex < childArrayField.size() )
+    {
+        childArrayField.erase( currentIndex );
+        childArrayField.insertAt( std::min( destinationIndex, static_cast<int>( childArrayField.size() ) ), object );
+    }
+};
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::moveCase( RimSummaryCase* summaryCase, int destinationIndex )
 {
-    m_cases.move( destinationIndex, summaryCase );
+    moveObjectInChildArrayField( m_cases, summaryCase, destinationIndex );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -265,7 +278,7 @@ RimSummaryEnsemble* RimSummaryCaseMainCollection::addEnsemble( const std::vector
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::moveEnsemble( RimSummaryEnsemble* ensemble, int destinationIndex )
 {
-    m_ensembles.move( destinationIndex, ensemble );
+    moveObjectInChildArrayField( m_ensembles, ensemble, destinationIndex );
 }
 
 //--------------------------------------------------------------------------------------------------
