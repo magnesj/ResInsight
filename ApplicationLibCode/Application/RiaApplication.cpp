@@ -467,8 +467,8 @@ QString RiaApplication::createAbsolutePathFromProjectRelativePath( QString proje
 //--------------------------------------------------------------------------------------------------
 bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAction loadAction, RiaProjectModifier* projectModifier )
 {
-    bool showDebugTiming = false;
-    if ( showDebugTiming )
+    bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "RiaApplication" );
+    if ( isLoggingEnabled )
     {
         RiaLogging::resetTimer();
     }
@@ -859,9 +859,9 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
         RiaLogging::info( QString( "Completed open of project file : '%1'" ).arg( projectFileName ) );
     }
 
-    if ( showDebugTiming )
+    if ( isLoggingEnabled )
     {
-        RiaLogging::logTimeElapsedAndResetTimer( "" );
+        RiaLogging::logTimeElapsedAndResetTimer( QString( "Project file '%1' loaded" ).arg( projectFileName ) );
     }
 
     return true;
