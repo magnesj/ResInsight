@@ -29,6 +29,7 @@
 #include "opm/io/eclipse/ESmry.hpp"
 #include "opm/io/eclipse/ExtESmry.hpp"
 
+#include "RiaPreferencesSystem.h"
 #include <QFileInfo>
 
 size_t RifOpmCommonEclipseSummary::sm_createdEsmryFileCount = 0;
@@ -134,7 +135,8 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     bool isEsmryConversionRequired = m_ensembleImportState.useConfigValues() ? m_ensembleImportState.shouldCreateEsmryFile()
                                                                              : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
 
-    RiaLogging::logElapsedTime( "Check if conversion from SMSPEC to ESMRY is required", startTime );
+    bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+    if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Check if conversion from SMSPEC to ESMRY is required", startTime );
 
     bool hasCreatedEsmry = false;
     if ( isEsmryConversionRequired && m_createEsmryFiles )
@@ -170,17 +172,14 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
     }
 
     auto timeBeforeReader = RiaLogging::currentTime();
-
     if ( !openFileReader( fileName, includeRestartFiles, importEsmryFile, threadSafeLogger ) ) return false;
-
-    RiaLogging::logElapsedTime( "Completed openFileReader", timeBeforeReader );
+    if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Completed openFileReader", timeBeforeReader );
 
     if ( !m_standardReader && !m_enhancedReader ) return false;
 
     auto timeBeforeTimeSteps = RiaLogging::currentTime();
-
     populateTimeSteps();
-    RiaLogging::logElapsedTime( "Completed populateTimeSteps", timeBeforeTimeSteps );
+    if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Completed populateTimeSteps", timeBeforeTimeSteps );
 
     return true;
 }

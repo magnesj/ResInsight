@@ -40,6 +40,7 @@
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 
+#include "RiaPreferencesSystem.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QUuid>
@@ -195,7 +196,8 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
             restartFileNames = RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
         }
 
-        RiaLogging::logElapsedTime( "Searched for restart files for " + headerFileName, startTime );
+        bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+        if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Searched for restart files for " + headerFileName, startTime );
 
         if ( !restartFileNames.empty() )
         {
@@ -217,7 +219,8 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
                 return nullptr;
             }
 
-            RiaLogging::logElapsedTime( "Created reader", startTime );
+            bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+            if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Created reader", startTime );
 
             return summaryReader;
         }

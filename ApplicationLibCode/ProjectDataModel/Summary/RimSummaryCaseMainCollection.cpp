@@ -564,7 +564,8 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
 
                 auto startTime = RiaLogging::currentTime();
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
-                RiaLogging::logElapsedTime( "Setting of realization parameters", startTime );
+                bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+                if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Setting of realization parameters", startTime );
             }
 
             RiaLogging::info( QString( "Completed %1" ).arg( fileSummaryCase->summaryHeaderFilename() ) );
