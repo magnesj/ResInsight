@@ -224,6 +224,10 @@ std::unique_ptr<RifSummaryReaderInterface>
     }
 
     auto summaryFileReader = std::make_unique<RifReaderEclipseSummary>();
+    if ( summaryFileReader && ensembleImportState.has_value() )
+    {
+        summaryFileReader->setEnsembleImportState( ensembleImportState.value() );
+    }
 
     // All restart data is taken care of by RifSummaryReaderAggregator, never read restart data from native file
     // readers
