@@ -131,8 +131,8 @@ bool RifOpmCommonEclipseSummary::open( const QString& fileName, bool includeRest
 
     RiaLogging::resetTimer();
 
-    bool isEsmryConversionRequired = m_ensembleImportState.has_value() ? m_ensembleImportState->shouldCreateEsmryFile()
-                                                                       : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
+    bool isEsmryConversionRequired = m_ensembleImportState.useConfigValues() ? m_ensembleImportState.shouldCreateEsmryFile()
+                                                                             : RifOpmSummaryTools::isEsmryConversionRequired( fileName );
 
     RiaLogging::logTimeElapsedAndResetTimer( "Check if conversion from SMSPEC to ESMRY is required" );
 

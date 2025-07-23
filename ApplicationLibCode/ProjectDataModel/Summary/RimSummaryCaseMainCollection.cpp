@@ -502,8 +502,7 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
     }
 #endif
 
-    std::optional<RifEnsembleImportConfig> importState = std::nullopt;
-
+    RifEnsembleImportConfig importState;
     if ( extractStateFromFirstCase && !RiaPreferencesSystem::current()->useImprovedSummaryImport() )
     {
         extractStateFromFirstCase = false;
@@ -554,18 +553,18 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<Ri
                 fileSummaryCase->createSummaryReaderInterfaceThreadSafe( importState, &threadSafeLogger );
 
                 std::optional<QString> parameterFilePath;
-                if ( importState.has_value() )
+                if ( importState.useConfigValues() )
                 {
                     auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( fileSummaryCase->summaryHeaderFilename() );
                     if ( realizationNumber.has_value() )
                     {
-                        parameterFilePath = importState->pathToParameterFile( realizationNumber.value() );
+                        parameterFilePath = importState.pathToParameterFile( realizationNumber.value() );
                     }
                 }
 
                 RiaLogging::resetTimer();
                 addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
-                RiaLogging::logTimeElapsedAndResetTimer( "Setting of realization paramaters" );
+                RiaLogging::logTimeElapsedAndResetTimer( "Setting of realization parameters" );
             }
 
             RiaLogging::info( QString( "Completed %1" ).arg( fileSummaryCase->summaryHeaderFilename() ) );

@@ -90,5 +90,5 @@ private:
     bool m_useEsmryFiles;
     bool m_createEsmryFiles;
 
-    std::optional<RifEnsembleImportConfig> m_ensembleImportState;
+    RifEnsembleImportConfig m_ensembleImportState;
 };

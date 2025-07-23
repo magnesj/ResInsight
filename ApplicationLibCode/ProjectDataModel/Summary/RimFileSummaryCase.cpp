@@ -90,8 +90,8 @@ QString RimFileSummaryCase::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<RifEnsembleImportConfig> ensembleImportState,
-                                                                 RiaThreadSafeLogger*                   threadSafeLogger )
+void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RifEnsembleImportConfig ensembleImportState,
+                                                                 RiaThreadSafeLogger*    threadSafeLogger )
 {
     // RimFileSummaryCase::findRelatedFilesAndCreateReader is a performance bottleneck. The function
     // RifEclipseSummaryTools::getRestartFile() should be refactored to use opm-common instead of resdata.
@@ -124,7 +124,7 @@ void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( std::optional<R
 void RimFileSummaryCase::createSummaryReaderInterface()
 {
     RiaThreadSafeLogger threadSafeLogger;
-    createSummaryReaderInterfaceThreadSafe( std::nullopt, &threadSafeLogger );
+    createSummaryReaderInterfaceThreadSafe( RifEnsembleImportConfig(), &threadSafeLogger );
 
     auto messages = threadSafeLogger.messages();
     for ( const auto& m : messages )
@@ -160,11 +160,10 @@ void RimFileSummaryCase::createRftReaderInterface()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RifSummaryReaderInterface>
-    RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&                         headerFileName,
-                                                         bool                                   lookForRestartFiles,
-                                                         std::optional<RifEnsembleImportConfig> ensembleImportState,
-                                                         RiaThreadSafeLogger*                   threadSafeLogger )
+std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&          headerFileName,
+                                                                                                bool                    lookForRestartFiles,
+                                                                                                RifEnsembleImportConfig ensembleImportState,
+                                                                                                RiaThreadSafeLogger*    threadSafeLogger )
 {
     if ( lookForRestartFiles )
     {
@@ -173,7 +172,7 @@ std::unique_ptr<RifSummaryReaderInterface>
         std::vector<QString> restartFileNames;
         if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
         {
-            if ( ensembleImportState.has_value() )
+            if ( ensembleImportState.useConfigValues() )
             {
                 auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( headerFileName );
                 if ( !realizationNumber.has_value() )
@@ -182,7 +181,7 @@ std::unique_ptr<RifSummaryReaderInterface>
                     return nullptr;
                 }
 
-                restartFileNames = ensembleImportState->restartFilesForRealization( realizationNumber.value() );
+                restartFileNames = ensembleImportState.restartFilesForRealization( realizationNumber.value() );
             }
             else
             {
@@ -224,10 +223,7 @@ std::unique_ptr<RifSummaryReaderInterface>
     }
 
     auto summaryFileReader = std::make_unique<RifReaderEclipseSummary>();
-    if ( summaryFileReader && ensembleImportState.has_value() )
-    {
-        summaryFileReader->setEnsembleImportState( ensembleImportState.value() );
-    }
+    summaryFileReader->setEnsembleImportState( ensembleImportState );
 
     // All restart data is taken care of by RifSummaryReaderAggregator, never read restart data from native file
     // readers

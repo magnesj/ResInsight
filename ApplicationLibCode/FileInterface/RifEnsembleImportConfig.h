@@ -30,6 +30,7 @@ public:
     std::vector<QString> restartFilesForRealization( int realizationNumber ) const;
     QString              pathToParameterFile( int realizationNumber ) const;
     bool                 shouldCreateEsmryFile() const;
+    bool                 useConfigValues() const;
 
 private:
     void computeRestartPatternsFromTwoRealizations( const std::vector<QString>& restartFilesFirstCase,
@@ -42,6 +43,7 @@ private:
     static QString placeholderText();
 
 private:
+    bool                 m_useConfigValues       = false;
     bool                 m_shouldCreateEsmryFile = false;
     std::vector<QString> m_restartFileNamePatterns;
     QString              m_parameterFilePathPattern;
