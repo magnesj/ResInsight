@@ -571,7 +571,7 @@ bool RiuQwtPlotWidget::eventFilter( QObject* watched, QEvent* event )
         }
 
         if ( ( mouseEvent->type() == QMouseEvent::MouseButtonPress ) &&
-             ( ( mouseEvent->button() == Qt::LeftButton ) || ( mouseEvent->button() == Qt::RightButton ) ) && m_plotDefinition )
+             ( mouseEvent->button() == Qt::LeftButton || mouseEvent->button() == Qt::RightButton ) && m_plotDefinition )
         {
             // Select the plot clicked at in the Project Tree for both left and right mouse button clicks
             RiuPlotMainWindowTools::selectAsCurrentItem( m_plotDefinition );
