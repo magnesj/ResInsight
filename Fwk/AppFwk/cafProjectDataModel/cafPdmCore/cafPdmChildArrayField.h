@@ -70,6 +70,7 @@ public:
     PdmObjectHandle* at( size_t index ) override;
     void             setValue( const std::vector<DataType*>& objects );
     size_t           indexOf( const PdmObjectHandle* obj ) const override;
+    void             move( int indexAfter, PdmObjectHandle* obj );
 
     virtual void deleteChildrenAsync();
 

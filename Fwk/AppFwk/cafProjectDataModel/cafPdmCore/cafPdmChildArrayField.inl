@@ -346,6 +346,20 @@ PdmObjectHandle* PdmChildArrayField<DataType*>::at( size_t index )
 ///
 //--------------------------------------------------------------------------------------------------
 template <typename DataType>
+void PdmChildArrayField<DataType*>::move( int indexAfter, PdmObjectHandle* obj )
+{
+    auto currentIndex = indexOf( obj );
+    if ( currentIndex < size() )
+    {
+        erase( currentIndex );
+        insertAt( std::min( indexAfter, (int)size() ), obj );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+template <typename DataType>
 void PdmChildArrayField<DataType*>::removeThisAsParentField()
 {
     typename std::vector<PdmPointer<DataType>>::iterator it;
