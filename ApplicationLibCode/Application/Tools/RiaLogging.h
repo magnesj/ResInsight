@@ -76,8 +76,7 @@ public:
 
     static std::chrono::time_point<std::chrono::high_resolution_clock> currentTime();
 
-    static void logElapsedTime( const QString&                                                     message,
-                                             const std::chrono::time_point<std::chrono::high_resolution_clock>& startTime );
+    static void logElapsedTime( const QString& message, const std::chrono::time_point<std::chrono::high_resolution_clock>& startTime );
 
 private:
     static void setLastMessage( const QString& message );
