@@ -470,8 +470,7 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
     bool showDebugTiming = false;
     if ( showDebugTiming )
     {
-        QString timingText = "RiaApplication::loadProject";
-        RiaLogging::resetTimer( timingText );
+        RiaLogging::resetTimer();
     }
 
     // First Close the current project
@@ -862,7 +861,7 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
 
     if ( showDebugTiming )
     {
-        RiaLogging::logTimeElapsed( "" );
+        RiaLogging::logTimeElapsedAndResetTimer( "" );
     }
 
     return true;

@@ -138,8 +138,7 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     bool showDebugTiming = false;
     if ( showDebugTiming )
     {
-        QString timingText = "RimEnsembleStatisticsCase::calculate" + QString::fromStdString( inputAddress.toEclipseTextAddress() );
-        RiaLogging::resetTimer( timingText );
+        RiaLogging::resetTimer();
     }
 
     m_hash = hash;
@@ -211,7 +210,8 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
 
     if ( showDebugTiming )
     {
-        RiaLogging::logTimeElapsed( "" );
+        QString timingText = "RimEnsembleStatisticsCase::calculate" + QString::fromStdString( inputAddress.toEclipseTextAddress() );
+        RiaLogging::logTimeElapsedAndResetTimer( timingText );
     }
 }
 

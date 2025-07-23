@@ -74,8 +74,8 @@ public:
 
     static void errorInMessageBox( QWidget* parent, const QString& title, const QString& text );
 
-    static void resetTimer( const QString& message );
-    static void logTimeElapsed( const QString& message );
+    static void resetTimer();
+    static void logTimeElapsedAndResetTimer( const QString& message );
 
 private:
     static void setLastMessage( const QString& message );

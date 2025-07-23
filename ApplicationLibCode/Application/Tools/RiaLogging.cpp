@@ -343,17 +343,15 @@ void RiaLogging::errorInMessageBox( QWidget* parent, const QString& title, const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::resetTimer( const QString& message )
+void RiaLogging::resetTimer()
 {
     sm_startTime = std::chrono::high_resolution_clock::now();
-
-    if ( !message.isEmpty() ) RiaLogging::debug( message );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::logTimeElapsed( const QString& message )
+void RiaLogging::logTimeElapsedAndResetTimer( const QString& message )
 {
     auto end = std::chrono::high_resolution_clock::now();
 
