@@ -142,15 +142,15 @@ size_t RifSummaryReaderAggregator::timeStepCount( RifSummaryReaderInterface* rea
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifSummaryReaderAggregator::createReadersAndImportMetaData( std::optional<RifEnsembleImportConfig> ensembleImportState,
-                                                                 RiaThreadSafeLogger*                   threadSafeLogger )
+bool RifSummaryReaderAggregator::createReadersAndImportMetaData( RifEnsembleImportConfig ensembleImportState,
+                                                                 RiaThreadSafeLogger*    threadSafeLogger )
 {
     for ( const auto& fileName : m_fileNames )
     {
         auto candidate = std::make_unique<RifReaderEclipseSummary>();
-        if ( ensembleImportState )
+        if ( ensembleImportState.useConfigValues() )
         {
-            candidate->setEnsembleImportState( ensembleImportState.value() );
+            candidate->setEnsembleImportState( ensembleImportState );
         }
 
         auto result = candidate->open( QString::fromStdString( fileName ), threadSafeLogger );
