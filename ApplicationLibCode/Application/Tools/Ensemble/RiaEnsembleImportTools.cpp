@@ -18,6 +18,7 @@
 
 #include "RiaEnsembleImportTools.h"
 
+#include "RiaFileSearchTools.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
@@ -29,7 +30,6 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 
-#include "RiaFileSearchTools.h"
 #include <QDirIterator>
 #include <QRegularExpression>
 
@@ -275,6 +275,9 @@ QStringList getMatchingFiles( const QString& basePath, const QString& regexPatte
 // regexPattern will be  "/myfolder/drogon-varying-grid-geometry/realization-(\\d+)/iter-0/eclipse/model/DROGON-(\\d+).EGRID"
 //
 // The basePath will be traversed recursively to find all files matching the regex pattern
+//
+//
+// MSJ 2025-07-24: !! This function is obsolete and should not be used. Replace with createPathsBySearchingFileSystem !!
 //
 //--------------------------------------------------------------------------------------------------
 QStringList
