@@ -319,16 +319,7 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
 
     if ( fieldNeedingOptions == &m_ensembleParameter )
     {
-        /*
-                    auto params = internal::sortedPa parametersWithVariation( m_ensemble );
-
-                    if ( m_ensembleParameterSorting() == RimCurveAppearanceDefines::ParameterSorting::ALPHABETICALLY )
-                    {
-                        std::sort( params.begin(), params.end() );
-                    }
-        */
         auto params = internal::sortedParameters( m_ensemble, m_ensembleParameterSorting() );
-
         for ( const auto& param : params )
         {
             options.push_back( caf::PdmOptionItemInfo( param, param ) );

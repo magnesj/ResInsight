@@ -1329,6 +1329,18 @@ void RimWellRftPlot::initAfterRead()
         m_wellLogPlot_OBSOLETE = nullptr;
     }
 
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2025.04.3" ) )
+    {
+        std::vector<cvf::Color3f> colorTable;
+        RiaColorTables::summaryCurveDefaultPaletteColors().color3fArray().toStdVector( &colorTable );
+
+        size_t colorIndex = 0;
+        for ( auto e : m_ensembleCurveSets )
+        {
+            e->setCurveColor( colorTable[colorIndex % colorTable.size()] );
+        }
+    }
+
     RimWellLogPlot::initAfterRead();
 }
 
