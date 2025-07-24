@@ -36,15 +36,15 @@ QStringList RiaFileSearchTools::findFilesInFolders( const QStringList&          
         QDir        qdir( folder );
         QStringList files = qdir.entryList( fileFilters, QDir::Files );
 
+        if ( callback && !callback( qdir.absolutePath() ) )
+        {
+            return allFiles;
+        }
+
         for ( const auto& file : files )
         {
             QString absFilePath = qdir.absoluteFilePath( file );
             allFiles.append( absFilePath );
-
-            if ( callback && !callback( qdir.absolutePath() ) )
-            {
-                return allFiles; // If the function returns false, stop searching
-            }
         }
     }
     return allFiles;
@@ -60,7 +60,7 @@ void RiaFileSearchTools::findMatchingFoldersRecursively( const QString&         
 {
     if ( callback && !callback( currentDir ) )
     {
-        return; // If the function returns false, stop searching
+        return;
     }
 
     QStringList pathFilterPartList = folderFilter.split( RiaFilePathTools::separator() );
@@ -93,6 +93,6 @@ void RiaFileSearchTools::findMatchingFoldersRecursively( const QString&         
             nextPathFilter = nextFilterList.join( RiaFilePathTools::separator() );
         }
 
-        findMatchingFoldersRecursively( fullPath, nextPathFilter, matchingFolders );
+        findMatchingFoldersRecursively( fullPath, nextPathFilter, matchingFolders, callback );
     }
 }

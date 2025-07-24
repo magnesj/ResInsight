@@ -346,8 +346,6 @@ QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const 
     QString basePath = pathPattern.left( slashIndex + 1 );
 
     QStringList folders;
-    folders.push_back( basePath );
-
     RiaFileSearchTools::findMatchingFoldersRecursively( basePath, pathFilter, folders );
 
     QStringList fileFilters;
