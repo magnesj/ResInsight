@@ -63,10 +63,14 @@ void RiaFileSearchTools::findMatchingFoldersRecursively( const QString&         
         return;
     }
 
-    QStringList pathFilterPartList = folderFilter.split( RiaFilePathTools::separator() );
-    if ( pathFilterPartList.isEmpty() )
+    QStringList pathFilterPartList;
+    if ( folderFilter.isEmpty() )
     {
         pathFilterPartList.push_back( "*" );
+    }
+    else
+    {
+        pathFilterPartList = folderFilter.split( RiaFilePathTools::separator() );
     }
 
     QDir        qdir( currentDir, pathFilterPartList[0], QDir::NoSort, QDir::Dirs | QDir::NoDotAndDotDot );
