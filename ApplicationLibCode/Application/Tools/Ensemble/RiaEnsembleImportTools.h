@@ -39,6 +39,7 @@ std::pair<QString, QString> findPathPattern( const QStringList& filePaths, const
 
 QStringList createPathsFromPattern( const QString& basePath, const QString& numberRange, const QString& placeholderString );
 QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const QString& placeholderString, const QString& enumerationString );
+QStringList createPathsBySearchingFileSystem_msj( const QString& pathPattern, const QString& extension, const QString& placeholderString );
 QStringList getMatchingFiles( const QString& basePath, const QString& regexPattern );
 
 } // namespace RiaEnsembleImportTools

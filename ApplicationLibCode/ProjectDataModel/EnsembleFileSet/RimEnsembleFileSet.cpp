@@ -105,9 +105,19 @@ QStringList RimEnsembleFileSet::createPaths( const QString& extension ) const
             }
             else
             {
-                paths = RiaEnsembleImportTools::createPathsBySearchingFileSystem( pathPatternWithExtension,
-                                                                                  internal::placeholderString(),
-                                                                                  "realization" );
+                bool useNew = true;
+                if ( useNew )
+                {
+                    paths = RiaEnsembleImportTools::createPathsBySearchingFileSystem_msj( m_pathPattern(),
+                                                                                          extension,
+                                                                                          internal::placeholderString() );
+                }
+                else
+                {
+                    paths = RiaEnsembleImportTools::createPathsBySearchingFileSystem( pathPatternWithExtension,
+                                                                                      internal::placeholderString(),
+                                                                                      "realization" );
+                }
             }
             const auto [pattern, range]       = RiaEnsembleImportTools::findPathPattern( paths, internal::placeholderString() );
             m_realizationNumbersReadFromFiles = range;

@@ -29,6 +29,7 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 
+#include "RiaFileSearchTools.h"
 #include <QDirIterator>
 #include <QRegularExpression>
 
@@ -314,6 +315,59 @@ QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const 
                } );
 
     return matchingFiles;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QStringList createPathsBySearchingFileSystem_msj( const QString& pathPattern, const QString& extension, const QString& placeholderString )
+{
+    // find the first index of the placeholder string
+    auto firstPlaceholderIndex = pathPattern.indexOf( placeholderString );
+    if ( firstPlaceholderIndex == -1 ) return {};
+
+    auto theRest = pathPattern.mid( firstPlaceholderIndex );
+
+    // In this string, find the index of the '/' before the placeholder string
+    auto slashIndex = pathPattern.lastIndexOf( '/', firstPlaceholderIndex );
+    if ( slashIndex == -1 ) return {};
+
+    QStringList folders;
+    {
+        // Extract the base path from the pathPattern
+        QString basePath = pathPattern.left( slashIndex + 1 );
+
+        QStringList dirs;
+        dirs.push_back( basePath );
+
+        QString pathFilter;
+
+        auto lastSlashIndex = theRest.lastIndexOf( '/' );
+        if ( lastSlashIndex != -1 )
+        {
+            // Extract the path filter from the rest of the string
+            pathFilter = theRest.left( lastSlashIndex + 1 );
+        }
+
+        pathFilter += "*";
+
+        RiaFileSearchTools::buildDirectoryListRecursiveSimple( basePath, pathFilter, &folders );
+    }
+
+    QStringList filters;
+    if ( extension.startsWith( '*' ) )
+    {
+        filters.push_back( extension );
+    }
+    else
+    {
+        // If the extension does not start with '*', we assume it is a file type like ".EGRID"
+        filters.push_back( "*" + extension );
+    }
+
+    auto candidateFiles = RiaFileSearchTools::findFilesInDirs( folders, filters );
+
+    return candidateFiles;
 }
 
 } // namespace RiaEnsembleImportTools
