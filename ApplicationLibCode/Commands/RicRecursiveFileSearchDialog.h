@@ -106,9 +106,7 @@ private:
 
     // File search methods
 
-    QStringList findMatchingFiles();
-    void buildDirectoryListRecursiveSimple_obsolete( const QString& currentDir, const QString& currentPathFilter, QStringList* accumulatedDirs );
-    QStringList    findFilesInDirs_obsolete( const QStringList& dirs );
+    QStringList    findMatchingFiles();
     QStringList    createFileNameFilterList();
     static QString replaceWithRealizationStar( const QString& text );
 

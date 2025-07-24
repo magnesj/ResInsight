@@ -25,11 +25,13 @@
 //==================================================================================================
 namespace RiaFileSearchTools
 {
-QStringList
-    findFilesInDirs( const QStringList& dirs, const QStringList& filters, const std::function<bool( const QString& )>& callback = nullptr );
-void buildDirectoryListRecursiveSimple( const QString&                               currentDir,
-                                        const QString&                               currentPathFilter,
-                                        QStringList&                                 accumulatedDirs,
-                                        const std::function<bool( const QString& )>& callback = nullptr );
+QStringList findFilesInFolders( const QStringList&                           folders,
+                                const QStringList&                           fileFilters,
+                                const std::function<bool( const QString& )>& callback = nullptr );
+
+void findMatchingFoldersRecursively( const QString&                               currentDir,
+                                     const QString&                               folderFilter,
+                                     QStringList&                                 matchingFolders,
+                                     const std::function<bool( const QString& )>& callback = nullptr );
 
 }; // namespace RiaFileSearchTools

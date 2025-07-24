@@ -25,16 +25,16 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RiaFileSearchTools::findFilesInDirs( const QStringList&                           dirs,
-                                                 const QStringList&                           filters,
-                                                 const std::function<bool( const QString& )>& callback )
+QStringList RiaFileSearchTools::findFilesInFolders( const QStringList&                           folders,
+                                                    const QStringList&                           fileFilters,
+                                                    const std::function<bool( const QString& )>& callback )
 {
     QStringList allFiles;
 
-    for ( const auto& dir : dirs )
+    for ( const auto& folder : folders )
     {
-        QDir        qdir( dir );
-        QStringList files = qdir.entryList( filters, QDir::Files );
+        QDir        qdir( folder );
+        QStringList files = qdir.entryList( fileFilters, QDir::Files );
 
         for ( const auto& file : files )
         {
@@ -53,17 +53,17 @@ QStringList RiaFileSearchTools::findFilesInDirs( const QStringList&             
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaFileSearchTools::buildDirectoryListRecursiveSimple( const QString&                               currentDir,
-                                                            const QString&                               currentPathFilter,
-                                                            QStringList&                                 accumulatedDirs,
-                                                            const std::function<bool( const QString& )>& callback )
+void RiaFileSearchTools::findMatchingFoldersRecursively( const QString&                               currentDir,
+                                                         const QString&                               folderFilter,
+                                                         QStringList&                                 matchingFolders,
+                                                         const std::function<bool( const QString& )>& callback )
 {
     if ( callback && !callback( currentDir ) )
     {
         return; // If the function returns false, stop searching
     }
 
-    QStringList pathFilterPartList = currentPathFilter.split( RiaFilePathTools::separator() );
+    QStringList pathFilterPartList = folderFilter.split( RiaFilePathTools::separator() );
     if ( pathFilterPartList.isEmpty() )
     {
         pathFilterPartList.push_back( "*" );
@@ -74,7 +74,7 @@ void RiaFileSearchTools::buildDirectoryListRecursiveSimple( const QString&      
 
     if ( pathFilterPartList.size() == 1 && pathFilterPartList[0] == "*" )
     {
-        accumulatedDirs.push_back( currentDir );
+        matchingFolders.push_back( currentDir );
     }
 
     for ( const QString& subDir : subDirs )
@@ -93,6 +93,6 @@ void RiaFileSearchTools::buildDirectoryListRecursiveSimple( const QString&      
             nextPathFilter = nextFilterList.join( RiaFilePathTools::separator() );
         }
 
-        buildDirectoryListRecursiveSimple( fullPath, nextPathFilter, accumulatedDirs );
+        findMatchingFoldersRecursively( fullPath, nextPathFilter, matchingFolders );
     }
 }

@@ -277,7 +277,8 @@ QStringList getMatchingFiles( const QString& basePath, const QString& regexPatte
 // The basePath will be traversed recursively to find all files matching the regex pattern
 //
 //--------------------------------------------------------------------------------------------------
-QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const QString& placeholderString, const QString& enumerationString )
+QStringList
+    createPathsBySearchingFileSystem_obsolete( const QString& pathPattern, const QString& placeholderString, const QString& enumerationString )
 {
     auto basePath = pathPattern;
 
@@ -320,54 +321,43 @@ QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList createPathsBySearchingFileSystem_msj( const QString& pathPattern, const QString& extension, const QString& placeholderString )
+QStringList createPathsBySearchingFileSystem( const QString& pathPattern, const QString& extension, const QString& placeholderString )
 {
-    // find the first index of the placeholder string
     auto firstPlaceholderIndex = pathPattern.indexOf( placeholderString );
     if ( firstPlaceholderIndex == -1 ) return {};
 
-    auto theRest = pathPattern.mid( firstPlaceholderIndex );
+    auto afterFirstPlaceholder = pathPattern.mid( firstPlaceholderIndex );
 
-    // In this string, find the index of the '/' before the placeholder string
     auto slashIndex = pathPattern.lastIndexOf( '/', firstPlaceholderIndex );
     if ( slashIndex == -1 ) return {};
 
-    QStringList folders;
+    QString pathFilter;
+    auto    lastSlashIndex = afterFirstPlaceholder.lastIndexOf( '/' );
+    if ( lastSlashIndex != -1 )
     {
-        // Extract the base path from the pathPattern
-        QString basePath = pathPattern.left( slashIndex + 1 );
-
-        QStringList dirs;
-        dirs.push_back( basePath );
-
-        QString pathFilter;
-
-        auto lastSlashIndex = theRest.lastIndexOf( '/' );
-        if ( lastSlashIndex != -1 )
-        {
-            // Extract the path filter from the rest of the string
-            pathFilter = theRest.left( lastSlashIndex + 1 );
-        }
-
-        pathFilter += "*";
-
-        RiaFileSearchTools::buildDirectoryListRecursiveSimple( basePath, pathFilter, folders );
+        pathFilter = afterFirstPlaceholder.left( lastSlashIndex + 1 );
     }
 
-    QStringList filters;
+    pathFilter += "*";
+
+    QString basePath = pathPattern.left( slashIndex + 1 );
+
+    QStringList folders;
+    folders.push_back( basePath );
+
+    RiaFileSearchTools::findMatchingFoldersRecursively( basePath, pathFilter, folders );
+
+    QStringList fileFilters;
     if ( extension.startsWith( '*' ) )
     {
-        filters.push_back( extension );
+        fileFilters.push_back( extension );
     }
     else
     {
-        // If the extension does not start with '*', we assume it is a file type like ".EGRID"
-        filters.push_back( "*" + extension );
+        fileFilters.push_back( "*" + extension );
     }
 
-    auto candidateFiles = RiaFileSearchTools::findFilesInDirs( folders, filters );
-
-    return candidateFiles;
+    return RiaFileSearchTools::findFilesInFolders( folders, fileFilters );
 }
 
 } // namespace RiaEnsembleImportTools
