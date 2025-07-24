@@ -20,6 +20,7 @@
 
 #include "RiaEnsembleNameTools.h"
 #include "RiaFilePathTools.h"
+#include "RiaFileSearchTools.h"
 #include "RiaGuiApplication.h"
 #include "RiaStdStringTools.h"
 #include "RiaStringListSerializer.h"
@@ -717,23 +718,46 @@ QStringList RicRecursiveFileSearchDialog::findMatchingFiles()
 {
     if ( cleanTextFromPathFilterField().isEmpty() ) return QStringList();
 
-    QStringList dirs;
+    auto updateDirStatus = [&]( const QString& text ) -> bool
+    {
+        if ( m_isCancelPressed ) return false;
+        updateStatus( SEARCHING_FOR_DIRS, text );
+        QApplication::processEvents();
+        return true;
+    };
 
-    QString pathFilter = pathFilterWithoutStartSeparator();
-    QString rootDir    = rootDirWithEndSeparator();
+    auto updateFileSearchStatus = [&]( const QString& text ) -> bool
+    {
+        if ( m_isCancelPressed ) return false;
+        updateStatus( SEARCHING_FOR_FILES, text );
+        QApplication::processEvents();
+        return true;
+    };
+
+    QStringList dirs;
+    QString     pathFilter = pathFilterWithoutStartSeparator();
+    QString     rootDir    = rootDirWithEndSeparator();
     if ( rootDir.size() > 1 && rootDir.endsWith( RiaFilePathTools::separator() ) ) rootDir.chop( 1 );
 
-    buildDirectoryListRecursiveSimple( rootDir, pathFilter, &dirs );
+    RiaFileSearchTools::buildDirectoryListRecursiveSimple( rootDir, pathFilter, dirs, updateDirStatus );
 
-    return findFilesInDirs( dirs );
+    if ( m_isCancelPressed ) return {};
+
+    QStringList filters = createFileNameFilterList();
+
+    auto files = RiaFileSearchTools::findFilesInDirs( dirs, filters, updateFileSearchStatus );
+
+    if ( m_isCancelPressed ) return {};
+
+    return files;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicRecursiveFileSearchDialog::buildDirectoryListRecursiveSimple( const QString& currentDirFullPathNoEndSeparator,
-                                                                      const QString& currentPathFilterNoEndSeparator,
-                                                                      QStringList*   accumulatedDirs )
+void RicRecursiveFileSearchDialog::buildDirectoryListRecursiveSimple_obsolete( const QString& currentDirFullPathNoEndSeparator,
+                                                                               const QString& currentPathFilterNoEndSeparator,
+                                                                               QStringList*   accumulatedDirs )
 {
     QString currDir    = currentDirFullPathNoEndSeparator;
     QString pathFilter = currentPathFilterNoEndSeparator;
@@ -778,14 +802,14 @@ void RicRecursiveFileSearchDialog::buildDirectoryListRecursiveSimple( const QStr
             nextPathFilter = pf.join( RiaFilePathTools::separator() );
         }
 
-        buildDirectoryListRecursiveSimple( fullPath, nextPathFilter, accumulatedDirs );
+        buildDirectoryListRecursiveSimple_obsolete( fullPath, nextPathFilter, accumulatedDirs );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QStringList RicRecursiveFileSearchDialog::findFilesInDirs( const QStringList& dirs )
+QStringList RicRecursiveFileSearchDialog::findFilesInDirs_obsolete( const QStringList& dirs )
 {
     QStringList allFiles;
     QStringList filters = createFileNameFilterList();

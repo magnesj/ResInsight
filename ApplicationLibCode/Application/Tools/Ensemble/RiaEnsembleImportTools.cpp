@@ -351,7 +351,7 @@ QStringList createPathsBySearchingFileSystem_msj( const QString& pathPattern, co
 
         pathFilter += "*";
 
-        RiaFileSearchTools::buildDirectoryListRecursiveSimple( basePath, pathFilter, &folders );
+        RiaFileSearchTools::buildDirectoryListRecursiveSimple( basePath, pathFilter, folders );
     }
 
     QStringList filters;
