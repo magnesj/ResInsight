@@ -73,7 +73,7 @@ std::vector<QString> sortedParameters( RimSummaryEnsemble* ensemble, RimCurveApp
 RimCurveSetAppearance::RimCurveSetAppearance()
     : appearanceChanged( this )
 {
-    CAF_PDM_InitObject( "Curve Set Apperance" );
+    CAF_PDM_InitObject( "Curve Set Appearance" );
 
     CAF_PDM_InitField( &m_colorMode, "ColorMode", caf::AppEnum<ColorMode>( ColorMode::SINGLE_COLOR_WITH_ALPHA ), "Coloring Mode" );
 
