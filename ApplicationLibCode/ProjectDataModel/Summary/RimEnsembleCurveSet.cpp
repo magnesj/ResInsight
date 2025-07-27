@@ -2246,7 +2246,7 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
                 {
                     newSummaryCurves = createCurves( sumCases, *addr );
 
-#pragma omp parallel for
+                    // #pragma omp parallel for
                     for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
                     {
                         newSummaryCurves[i]->valuesX();
@@ -2259,7 +2259,7 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
                     for ( auto c : realizationCurves() )
                     {
                         c->setCheckState( true );
-                        c->updateCurveVisibility();
+                        c->updateCurveVisibility( false );
                     }
                 }
 
@@ -2426,7 +2426,7 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
 
             curve->setShowInLegend( m_statistics->showStatisticsCurveLegends() );
 
-            curve->updateCurveVisibility();
+            curve->updateCurveVisibility( false );
             curve->loadDataAndUpdate( false );
             curve->updatePlotAxis();
         }
