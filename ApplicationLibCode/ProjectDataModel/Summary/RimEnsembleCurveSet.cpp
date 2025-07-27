@@ -116,6 +116,51 @@ void RimEnsembleCurveSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuild
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr )
+{
+    std::vector<RimSummaryCurve*> newSummaryCurves;
+
+    for ( auto& sumCase : sumCases )
+    {
+        auto curve = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
+        curve->setResampling( m_resampling() );
+
+        int lineThickness = 1;
+        if ( addr.address().isHistoryVector() )
+        {
+            lineThickness = 2;
+            curve->setCurveAppearanceFromCaseType();
+        }
+        curve->setLineThickness( lineThickness );
+
+        if ( m_useCustomAppearance() == RimCurveAppearanceDefines::AppearanceMode::CUSTOM )
+        {
+            curve->setLineStyle( m_lineStyle() );
+            curve->setSymbol( m_pointSymbol() );
+            curve->setSymbolSize( m_symbolSize() );
+        }
+
+        addRealizationCurve( curve );
+
+        curve->setLeftOrRightAxisY( axisY() );
+        if ( isXAxisSummaryVector() )
+        {
+            curve->setAxisTypeX( RiaDefines::HorizontalAxisType::SUMMARY_VECTOR );
+            curve->setSummaryCaseX( sumCase );
+            curve->setSummaryAddressX( m_xAddressSelector->summaryAddress() );
+            if ( m_xAddressSelector->plotAxisProperties() )
+                curve->setTopOrBottomAxisX( m_xAddressSelector->plotAxisProperties()->plotAxis() );
+        }
+
+        newSummaryCurves.push_back( curve );
+    }
+
+    return newSummaryCurves;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimEnsembleCurveSet::RimEnsembleCurveSet()
     : filterChanged( this )
     , m_hash( 0 )
@@ -2171,41 +2216,7 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
         if ( isCurvesVisible() )
         {
             std::vector<RimSummaryCurve*> newSummaryCurves;
-
-            for ( auto& sumCase : sumCases )
-            {
-                auto curve = RiaSummaryPlotTools::createCurve( sumCase, addr->address() );
-                curve->setResampling( m_resampling() );
-
-                int lineThickness = 1;
-                if ( addr->address().isHistoryVector() )
-                {
-                    lineThickness = 2;
-                    curve->setCurveAppearanceFromCaseType();
-                }
-                curve->setLineThickness( lineThickness );
-
-                if ( m_useCustomAppearance() == RimCurveAppearanceDefines::AppearanceMode::CUSTOM )
-                {
-                    curve->setLineStyle( m_lineStyle() );
-                    curve->setSymbol( m_pointSymbol() );
-                    curve->setSymbolSize( m_symbolSize() );
-                }
-
-                addRealizationCurve( curve );
-
-                curve->setLeftOrRightAxisY( axisY() );
-                if ( isXAxisSummaryVector() )
-                {
-                    curve->setAxisTypeX( RiaDefines::HorizontalAxisType::SUMMARY_VECTOR );
-                    curve->setSummaryCaseX( sumCase );
-                    curve->setSummaryAddressX( m_xAddressSelector->summaryAddress() );
-                    if ( m_xAddressSelector->plotAxisProperties() )
-                        curve->setTopOrBottomAxisX( m_xAddressSelector->plotAxisProperties()->plotAxis() );
-                }
-
-                newSummaryCurves.push_back( curve );
-            }
+            newSummaryCurves = createCurves( sumCases, *addr );
 
 #pragma omp parallel for
             for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
