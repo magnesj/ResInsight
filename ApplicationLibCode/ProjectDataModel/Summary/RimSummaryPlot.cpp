@@ -1463,7 +1463,7 @@ void RimSummaryPlot::deleteCurves( const std::vector<RimSummaryCurve*>& curves )
                 {
                     if ( c == curve )
                     {
-                        curveSet->deleteCurve( curve );
+                        curveSet->deleteRealizationCurve( curve );
                         if ( curveSet->curves().empty() )
                         {
                             if ( curveSet->colorMode() == RimEnsembleCurveSet::ColorMode::BY_ENSEMBLE_PARAM && plotWidget() &&

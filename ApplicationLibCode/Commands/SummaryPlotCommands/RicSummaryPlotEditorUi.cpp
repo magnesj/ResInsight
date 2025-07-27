@@ -659,7 +659,7 @@ void RicSummaryPlotEditorUi::copyEnsembleCurveAndAddToCurveSet( const RimSummary
         curveCopy->setCheckState( true );
     }
 
-    curveSet->addCurve( curveCopy );
+    curveSet->addRealizationCurve( curveCopy );
 
     // The curve creator is not a descendant of the project, and need to be set manually
     curveCopy->setSummaryCaseY( curve->summaryCaseY() );

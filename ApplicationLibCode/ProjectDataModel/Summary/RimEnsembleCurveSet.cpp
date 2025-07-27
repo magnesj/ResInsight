@@ -123,11 +123,17 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 {
     CAF_PDM_InitObject( "Ensemble Curve Set", ":/EnsembleCurveSet16x16.png" );
 
-    CAF_PDM_InitFieldNoDefault( &m_curves, "EnsembleCurveSet", "Ensemble Curve Set" );
-    m_curves.uiCapability()->setUiTreeChildrenHidden( false );
+    CAF_PDM_InitFieldNoDefault( &m_realizationCurves, "EnsembleCurveSet", "Ensemble Curve Set" );
+    m_realizationCurves.uiCapability()->setUiTreeChildrenHidden( false );
     // The summary curves are always recreated in loadDataAndUpdate(), so we can disable IO for curves. This will reduce the size of the
     // project files.
-    m_curves.xmlCapability()->disableIO();
+    m_realizationCurves.xmlCapability()->disableIO();
+
+    CAF_PDM_InitFieldNoDefault( &m_statisticsCurves, "StatisticsCurves", "Statistics Curves" );
+    m_statisticsCurves.uiCapability()->setUiTreeChildrenHidden( false );
+    // The summary curves are always recreated in loadDataAndUpdate(), so we can disable IO for curves. This will reduce the size of the
+    // project files.
+    m_statisticsCurves.xmlCapability()->disableIO();
 
     CAF_PDM_InitField( &m_showCurves, "IsActive", true, "Show Curves" );
     m_showCurves.uiCapability()->setUiHidden( true );
@@ -277,7 +283,8 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 //--------------------------------------------------------------------------------------------------
 RimEnsembleCurveSet::~RimEnsembleCurveSet()
 {
-    m_curves.deleteChildren();
+    m_realizationCurves.deleteChildren();
+    m_statisticsCurves.deleteChildren();
 
     auto parentPlot = firstAncestorOrThisOfType<RimSummaryPlot>();
     if ( parentPlot && parentPlot->plotWidget() )
@@ -368,7 +375,7 @@ void RimEnsembleCurveSet::loadDataAndUpdate( bool updateParentPlot )
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::setParentPlotNoReplot( RiuPlotWidget* plot )
 {
-    for ( RimSummaryCurve* curve : m_curves )
+    for ( RimSummaryCurve* curve : curves() )
     {
         curve->setParentPlotNoReplot( plot );
     }
@@ -379,7 +386,7 @@ void RimEnsembleCurveSet::setParentPlotNoReplot( RiuPlotWidget* plot )
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::deletePlotCurves()
 {
-    for ( RimSummaryCurve* curve : m_curves )
+    for ( RimSummaryCurve* curve : curves() )
     {
         curve->deletePlotCurve();
     }
@@ -396,15 +403,15 @@ void RimEnsembleCurveSet::deletePlotCurves()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::reattachPlotCurves()
 {
-    for ( RimSummaryCurve* curve : m_curves )
+    for ( RimSummaryCurve* curve : curves() )
     {
         bool updateParentPlot = false;
         curve->reattach( updateParentPlot );
     }
 
-    if ( !m_curves.empty() )
+    if ( !curves().empty() )
     {
-        auto firstCurve = m_curves[0];
+        auto firstCurve = curves()[0];
 
         firstCurve->replotParentPlot();
     }
@@ -413,7 +420,7 @@ void RimEnsembleCurveSet::reattachPlotCurves()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::addCurve( RimSummaryCurve* curve )
+void RimEnsembleCurveSet::addRealizationCurve( RimSummaryCurve* curve )
 {
     if ( curve )
     {
@@ -421,19 +428,7 @@ void RimEnsembleCurveSet::addCurve( RimSummaryCurve* curve )
         if ( plot && plot->plotWidget() ) curve->setParentPlotNoReplot( plot->plotWidget() );
 
         curve->setColor( m_colorForRealizations );
-        m_curves.push_back( curve );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::deleteCurve( RimSummaryCurve* curve )
-{
-    if ( curve )
-    {
-        m_curves.removeChild( curve );
-        delete curve;
+        m_realizationCurves.push_back( curve );
     }
 }
 
@@ -677,7 +672,10 @@ RiaSummaryCurveAddress RimEnsembleCurveSet::curveAddress() const
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCurve*> RimEnsembleCurveSet::curves() const
 {
-    return m_curves.childrenByType();
+    std::vector<RimSummaryCurve*> allCurves  = m_realizationCurves.childrenByType();
+    auto                          statCurves = m_statisticsCurves.childrenByType();
+    if ( !statCurves.empty() ) allCurves.insert( allCurves.end(), statCurves.begin(), statCurves.end() );
+    return allCurves;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -693,20 +691,7 @@ RimCustomObjectiveFunctionCollection* RimEnsembleCurveSet::customObjectiveFuncti
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::deleteEnsembleCurves()
 {
-    std::vector<size_t> curvesIndexesToDelete;
-    for ( size_t c = 0; c < m_curves.size(); c++ )
-    {
-        RimSummaryCurve* curve = m_curves[c];
-        if ( !curve->summaryAddressY().isStatistics() ) curvesIndexesToDelete.push_back( c );
-    }
-
-    while ( !curvesIndexesToDelete.empty() )
-    {
-        size_t currIndex = curvesIndexesToDelete.back();
-        delete m_curves[currIndex];
-        m_curves.erase( currIndex );
-        curvesIndexesToDelete.pop_back();
-    }
+    m_realizationCurves.deleteChildren();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -714,20 +699,7 @@ void RimEnsembleCurveSet::deleteEnsembleCurves()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::deleteStatisticsCurves()
 {
-    std::vector<size_t> curvesIndexesToDelete;
-    for ( size_t c = 0; c < m_curves.size(); c++ )
-    {
-        RimSummaryCurve* curve = m_curves[c];
-        if ( curve->summaryAddressY().isStatistics() ) curvesIndexesToDelete.push_back( c );
-    }
-
-    while ( !curvesIndexesToDelete.empty() )
-    {
-        size_t currIndex = curvesIndexesToDelete.back();
-        delete m_curves[currIndex];
-        m_curves.erase( currIndex );
-        curvesIndexesToDelete.pop_back();
-    }
+    m_statisticsCurves.deleteChildren();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1326,6 +1298,26 @@ void RimEnsembleCurveSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RimSummaryCurve*> RimEnsembleCurveSet::realizationCurves() const
+{
+    return m_realizationCurves.childrenByType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveSet::deleteRealizationCurve( RimSummaryCurve* curve )
+{
+    if ( curve )
+    {
+        m_realizationCurves.removeChild( curve );
+        delete curve;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::updateMaxMinAndDefaultValues()
 {
     auto [minTimeStep, maxTimeStep] = selectedTimeStepRange();
@@ -1780,7 +1772,7 @@ RiaSummaryCurveDefinitionAnalyser* RimEnsembleCurveSet::getOrCreateSelectedCurve
 std::vector<RiaSummaryCurveDefinition> RimEnsembleCurveSet::curveDefinitions() const
 {
     std::vector<RiaSummaryCurveDefinition> curveDefs;
-    for ( auto dataEntry : m_curves() )
+    for ( auto dataEntry : curves() )
     {
         curveDefs.push_back( dataEntry->curveDefinition() );
     }
@@ -2055,13 +2047,10 @@ void RimEnsembleCurveSet::updateCurveColors()
     updateLegendTitle();
 
     // Find the curves to color (skip the statistics)
-    std::vector<RimSummaryCurve*> curvesToColor;
+    std::vector<RimSummaryCurve*> curvesToColor = realizationCurves();
     std::vector<RimSummaryCase*>  summaryCases;
-    for ( auto& curve : m_curves )
+    for ( auto& curve : realizationCurves() )
     {
-        if ( curve->summaryAddressY().isStatistics() ) continue;
-
-        curvesToColor.push_back( curve );
         summaryCases.push_back( curve->summaryCaseY() );
     }
 
@@ -2203,7 +2192,7 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
                     curve->setSymbolSize( m_symbolSize() );
                 }
 
-                addCurve( curve );
+                addRealizationCurve( curve );
 
                 curve->setLeftOrRightAxisY( axisY() );
                 if ( isXAxisSummaryVector() )
@@ -2342,7 +2331,8 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
         {
             auto curve = RiaSummaryPlotTools::createCurve( summaryCase, address.summaryAddressY() );
             curve->setParentPlotNoReplot( plot->plotWidget() );
-            m_curves.push_back( curve );
+            m_statisticsCurves.push_back( curve );
+
             curve->setColor( m_statistics->color() );
             curve->setResampling( m_resampling() );
 
