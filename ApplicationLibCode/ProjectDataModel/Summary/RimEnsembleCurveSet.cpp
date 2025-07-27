@@ -173,6 +173,7 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     m_realizationCurves.uiCapability()->setUiTreeChildrenHidden( false );
     // The summary curves are always recreated in loadDataAndUpdate(), so we can disable IO for curves. This will reduce the size of the
     // project files.
+    //
     m_realizationCurves.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_statisticsCurves, "StatisticsCurves", "Statistics Curves" );
