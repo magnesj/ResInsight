@@ -66,6 +66,7 @@ class RiuPlotWidget;
 class RiuPlotCurve;
 class RimPlotAxisPropertiesInterface;
 class RimSummaryAddressSelector;
+class RimSummaryPlot;
 class RimTimeAxisAnnotation;
 
 class QwtPlot;
@@ -319,4 +320,5 @@ private:
 
 private:
     std::vector<RimSummaryCurve*> createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr );
+    void                          recreatePlotCurveForLegend( RimSummaryPlot* plot );
 };

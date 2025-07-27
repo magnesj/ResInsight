@@ -161,6 +161,35 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveSet::recreatePlotCurveForLegend( RimSummaryPlot* plot )
+{
+    if ( plot && plot->plotWidget() )
+    {
+        if ( plot->legendsVisible() ) plot->plotWidget()->updateLegend();
+        plot->scheduleReplotIfVisible();
+        plot->updateAxes();
+        plot->updatePlotInfoLabel();
+
+        // Always recreate the plot curve for the legend text to ensure the ordering is correct
+        // The ordering of legend items depends on the order the curves are added to the plot
+        //
+        // https://github.com/OPM/ResInsight/issues/12259
+        //
+        m_plotCurveForLegendText.reset( plot->plotWidget()->createPlotCurve( nullptr, "" ) );
+
+        int curveThickness = 3;
+        m_plotCurveForLegendText->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
+                                                 RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
+                                                 curveThickness,
+                                                 RiaColorTools::toQColor( m_mainEnsembleColor() ) );
+        m_plotCurveForLegendText->attachToPlot( plot->plotWidget() );
+        updateEnsembleLegendItem();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimEnsembleCurveSet::RimEnsembleCurveSet()
     : filterChanged( this )
     , m_hash( 0 )
@@ -2184,13 +2213,15 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
 {
     auto plot = firstAncestorOrThisOfTypeAsserted<RimSummaryPlot>();
 
-    auto newRealizationHash = RiaHashTools::hash( sumCases );
+    auto addressText        = m_yValuesSummaryAddress()->address().toEclipseTextAddress();
+    auto newRealizationHash = RiaHashTools::hash( sumCases, addressText );
     if ( newRealizationHash != m_realizationHash )
     {
         deleteEnsembleCurves();
     }
 
-    if ( m_statistics->hideEnsembleCurves() )
+    const bool hideCurves = m_statistics->hideEnsembleCurves() || !isCurvesVisible();
+    if ( hideCurves )
     {
         for ( auto c : realizationCurves() )
         {
@@ -2201,42 +2232,25 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
 
     deleteStatisticsCurves();
 
-    if ( plot && plot->plotWidget() )
-    {
-        if ( plot->legendsVisible() ) plot->plotWidget()->updateLegend();
-        plot->scheduleReplotIfVisible();
-        plot->updateAxes();
-        plot->updatePlotInfoLabel();
+    recreatePlotCurveForLegend( plot );
 
-        // Always recreate the plot curve for the legend text to ensure the ordering is correct
-        // The ordering of legend items depends on the order the curves are added to the plot
-        //
-        // https://github.com/OPM/ResInsight/issues/12259
-        //
-        m_plotCurveForLegendText.reset( plot->plotWidget()->createPlotCurve( nullptr, "" ) );
-
-        int curveThickness = 3;
-        m_plotCurveForLegendText->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
-                                                 RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
-                                                 curveThickness,
-                                                 RiaColorTools::toQColor( m_mainEnsembleColor() ) );
-        m_plotCurveForLegendText->attachToPlot( plot->plotWidget() );
-        updateEnsembleLegendItem();
-    }
-
-    if ( !m_statistics->hideEnsembleCurves() )
-
+    if ( !hideCurves )
     {
         RimSummaryAddress* addr = m_yValuesSummaryAddress();
         if ( plot && addr->address().category() != RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_INVALID )
         {
-            if ( isCurvesVisible() )
             {
                 std::vector<RimSummaryCurve*> newSummaryCurves;
 
                 if ( newRealizationHash != m_realizationHash )
                 {
                     newSummaryCurves = createCurves( sumCases, *addr );
+
+#pragma omp parallel for
+                    for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
+                    {
+                        newSummaryCurves[i]->valuesX();
+                    }
                 }
                 else
                 {
@@ -2249,12 +2263,6 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
                     }
                 }
 
-#pragma omp parallel for
-                for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
-                {
-                    newSummaryCurves[i]->valuesX();
-                }
-
                 for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
                 {
                     newSummaryCurves[i]->loadDataAndUpdate( false );
@@ -2264,9 +2272,10 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
             }
         }
         updateCurveColors();
-    }
 
-    m_realizationHash = newRealizationHash;
+        // Set hash when curves has been created or updated
+        m_realizationHash = newRealizationHash;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
