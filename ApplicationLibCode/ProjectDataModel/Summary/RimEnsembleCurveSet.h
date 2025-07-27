@@ -315,6 +315,7 @@ private:
 
     QList<caf::PdmOptionItemInfo> m_cachedAddressOptions;
     size_t                        m_hash;
+    size_t                        m_realizationHash;
 
 private:
     std::vector<RimSummaryCurve*> createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr );

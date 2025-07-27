@@ -164,6 +164,7 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
 RimEnsembleCurveSet::RimEnsembleCurveSet()
     : filterChanged( this )
     , m_hash( 0 )
+    , m_realizationHash( 0 )
 
 {
     CAF_PDM_InitObject( "Ensemble Curve Set", ":/EnsembleCurveSet16x16.png" );
@@ -2182,7 +2183,21 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
 {
     auto plot = firstAncestorOrThisOfTypeAsserted<RimSummaryPlot>();
 
-    deleteEnsembleCurves();
+    auto newRealizationHash = RiaHashTools::hash( sumCases );
+    if ( newRealizationHash != m_realizationHash )
+    {
+        deleteEnsembleCurves();
+    }
+
+    if ( m_statistics->hideEnsembleCurves() )
+    {
+        for ( auto c : realizationCurves() )
+        {
+            c->setCheckState( false );
+            c->updateCurveVisibility();
+        }
+    }
+
     deleteStatisticsCurves();
 
     if ( plot && plot->plotWidget() )
@@ -2208,31 +2223,49 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
         updateEnsembleLegendItem();
     }
 
-    if ( m_statistics->hideEnsembleCurves() ) return;
+    if ( !m_statistics->hideEnsembleCurves() )
 
-    RimSummaryAddress* addr = m_yValuesSummaryAddress();
-    if ( plot && addr->address().category() != RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_INVALID )
     {
-        if ( isCurvesVisible() )
+        RimSummaryAddress* addr = m_yValuesSummaryAddress();
+        if ( plot && addr->address().category() != RifEclipseSummaryAddressDefines::SummaryCategory::SUMMARY_INVALID )
         {
-            std::vector<RimSummaryCurve*> newSummaryCurves;
-            newSummaryCurves = createCurves( sumCases, *addr );
+            if ( isCurvesVisible() )
+            {
+                std::vector<RimSummaryCurve*> newSummaryCurves;
+
+                if ( newRealizationHash != m_realizationHash )
+                {
+                    newSummaryCurves = createCurves( sumCases, *addr );
+                }
+                else
+                {
+                    newSummaryCurves = realizationCurves();
+
+                    for ( auto c : realizationCurves() )
+                    {
+                        c->setCheckState( true );
+                        c->updateCurveVisibility();
+                    }
+                }
 
 #pragma omp parallel for
-            for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
-            {
-                newSummaryCurves[i]->valuesX();
-            }
+                for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
+                {
+                    newSummaryCurves[i]->valuesX();
+                }
 
-            for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
-            {
-                newSummaryCurves[i]->loadDataAndUpdate( false );
-                newSummaryCurves[i]->updatePlotAxis();
-                newSummaryCurves[i]->setShowInLegend( false );
+                for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
+                {
+                    newSummaryCurves[i]->loadDataAndUpdate( false );
+                    newSummaryCurves[i]->updatePlotAxis();
+                    newSummaryCurves[i]->setShowInLegend( false );
+                }
             }
         }
+        updateCurveColors();
     }
-    updateCurveColors();
+
+    m_realizationHash = newRealizationHash;
 }
 
 //--------------------------------------------------------------------------------------------------
