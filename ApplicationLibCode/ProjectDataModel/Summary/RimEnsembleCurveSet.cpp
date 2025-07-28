@@ -119,10 +119,19 @@ void RimEnsembleCurveSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuild
 std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr )
 {
     std::vector<RimSummaryCurve*> newSummaryCurves;
+    newSummaryCurves.resize( sumCases.size() );
 
-    for ( auto& sumCase : sumCases )
     {
-        auto curve = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
+        // Make sure static CAF data for the summary curve is initialized. This is required before we create curves in the multi-threaded
+        // loop below.
+        RimSummaryCurve dummy;
+    }
+
+#pragma omp parallel for
+    for ( int i = 0; i < sumCases.size(); i++ )
+    {
+        auto* sumCase = sumCases[i];
+        auto  curve   = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
         curve->setResampling( m_resampling() );
 
         int lineThickness = 1;
@@ -140,9 +149,6 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
             curve->setSymbolSize( m_symbolSize() );
         }
 
-        addRealizationCurve( curve );
-
-        curve->setLeftOrRightAxisY( axisY() );
         if ( isXAxisSummaryVector() )
         {
             curve->setAxisTypeX( RiaDefines::HorizontalAxisType::SUMMARY_VECTOR );
@@ -152,7 +158,21 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
                 curve->setTopOrBottomAxisX( m_xAddressSelector->plotAxisProperties()->plotAxis() );
         }
 
-        newSummaryCurves.push_back( curve );
+        curve->setColor( m_colorForRealizations );
+
+        newSummaryCurves[i] = curve;
+    }
+
+    auto plot       = firstAncestorOrThisOfType<RimSummaryPlot>();
+    auto plotWidget = plot ? plot->plotWidget() : nullptr;
+
+    // These operations are not thread safe
+    for ( auto* curve : newSummaryCurves )
+    {
+        curve->setParentPlotNoReplot( plot->plotWidget() );
+        m_realizationCurves.push_back( curve );
+
+        curve->setLeftOrRightAxisY( axisY() );
     }
 
     return newSummaryCurves;
@@ -2246,7 +2266,6 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
                 {
                     newSummaryCurves = createCurves( sumCases, *addr );
 
-                    // #pragma omp parallel for
                     for ( int i = 0; i < (int)newSummaryCurves.size(); ++i )
                     {
                         newSummaryCurves[i]->valuesX();
