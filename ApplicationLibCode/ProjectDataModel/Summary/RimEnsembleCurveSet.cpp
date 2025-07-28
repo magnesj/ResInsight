@@ -2028,10 +2028,9 @@ void RimEnsembleCurveSet::updateCurveColors()
 {
     updateLegendTitle();
 
-    // Find the curves to color (skip the statistics)
     std::vector<RimSummaryCurve*> curvesToColor = realizationCurves();
     std::vector<RimSummaryCase*>  summaryCases;
-    for ( auto& curve : realizationCurves() )
+    for ( auto& curve : curvesToColor )
     {
         summaryCases.push_back( curve->summaryCaseY() );
     }
