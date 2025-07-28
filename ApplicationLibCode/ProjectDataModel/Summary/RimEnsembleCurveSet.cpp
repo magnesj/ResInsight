@@ -128,7 +128,7 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
     }
 
 #pragma omp parallel for
-    for ( int i = 0; i < sumCases.size(); i++ )
+    for ( int i = 0; i < static_cast<int>( sumCases.size()); i++ )
     {
         auto* sumCase = sumCases[i];
         auto  curve   = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
@@ -169,7 +169,7 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
     // These operations are not thread safe
     for ( auto* curve : newSummaryCurves )
     {
-        curve->setParentPlotNoReplot( plot->plotWidget() );
+        curve->setParentPlotNoReplot( plotWidget );
         m_realizationCurves.push_back( curve );
 
         curve->setLeftOrRightAxisY( axisY() );
