@@ -97,119 +97,6 @@ CAF_PDM_SOURCE_INIT( RimEnsembleCurveSet, "RimEnsembleCurveSet" );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
-{
-    if ( isFiltered() )
-    {
-        menuBuilder << "RicCreateEnsembleFromFilteredCasesFeature";
-    }
-
-    menuBuilder << "RicNewSummaryEnsembleCurveSetFeature";
-    menuBuilder << "Separator";
-    menuBuilder << "RicSetSourceSteppingEnsembleCurveSetFeature";
-    menuBuilder << "RicClearSourceSteppingEnsembleCurveSetFeature";
-    menuBuilder << "Separator";
-    menuBuilder << "RicNewEnsembleCurveFilterFeature";
-    menuBuilder << "RicCreateRegressionAnalysisCurveFeature";
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr )
-{
-    std::vector<RimSummaryCurve*> newSummaryCurves;
-    newSummaryCurves.resize( sumCases.size() );
-
-    {
-        // Make sure static CAF data for the summary curve is initialized. This is required before we create curves in the multi-threaded
-        // loop below.
-        RimSummaryCurve dummy;
-    }
-
-#pragma omp parallel for
-    for ( int i = 0; i < static_cast<int>( sumCases.size()); i++ )
-    {
-        auto* sumCase = sumCases[i];
-        auto  curve   = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
-        curve->setResampling( m_resampling() );
-
-        int lineThickness = 1;
-        if ( addr.address().isHistoryVector() )
-        {
-            lineThickness = 2;
-            curve->setCurveAppearanceFromCaseType();
-        }
-        curve->setLineThickness( lineThickness );
-
-        if ( m_useCustomAppearance() == RimCurveAppearanceDefines::AppearanceMode::CUSTOM )
-        {
-            curve->setLineStyle( m_lineStyle() );
-            curve->setSymbol( m_pointSymbol() );
-            curve->setSymbolSize( m_symbolSize() );
-        }
-
-        if ( isXAxisSummaryVector() )
-        {
-            curve->setAxisTypeX( RiaDefines::HorizontalAxisType::SUMMARY_VECTOR );
-            curve->setSummaryCaseX( sumCase );
-            curve->setSummaryAddressX( m_xAddressSelector->summaryAddress() );
-            if ( m_xAddressSelector->plotAxisProperties() )
-                curve->setTopOrBottomAxisX( m_xAddressSelector->plotAxisProperties()->plotAxis() );
-        }
-
-        curve->setColor( m_colorForRealizations );
-
-        newSummaryCurves[i] = curve;
-    }
-
-    auto plot       = firstAncestorOrThisOfType<RimSummaryPlot>();
-    auto plotWidget = plot ? plot->plotWidget() : nullptr;
-
-    // These operations are not thread safe
-    for ( auto* curve : newSummaryCurves )
-    {
-        curve->setParentPlotNoReplot( plotWidget );
-        m_realizationCurves.push_back( curve );
-
-        curve->setLeftOrRightAxisY( axisY() );
-    }
-
-    return newSummaryCurves;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::recreatePlotCurveForLegend( RimSummaryPlot* plot )
-{
-    if ( plot && plot->plotWidget() )
-    {
-        if ( plot->legendsVisible() ) plot->plotWidget()->updateLegend();
-        plot->scheduleReplotIfVisible();
-        plot->updateAxes();
-        plot->updatePlotInfoLabel();
-
-        // Always recreate the plot curve for the legend text to ensure the ordering is correct
-        // The ordering of legend items depends on the order the curves are added to the plot
-        //
-        // https://github.com/OPM/ResInsight/issues/12259
-        //
-        m_plotCurveForLegendText.reset( plot->plotWidget()->createPlotCurve( nullptr, "" ) );
-
-        int curveThickness = 3;
-        m_plotCurveForLegendText->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
-                                                 RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
-                                                 curveThickness,
-                                                 RiaColorTools::toQColor( m_mainEnsembleColor() ) );
-        m_plotCurveForLegendText->attachToPlot( plot->plotWidget() );
-        updateEnsembleLegendItem();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimEnsembleCurveSet::RimEnsembleCurveSet()
     : filterChanged( this )
     , m_hash( 0 )
@@ -222,7 +109,6 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     m_realizationCurves.uiCapability()->setUiTreeChildrenHidden( false );
     // The summary curves are always recreated in loadDataAndUpdate(), so we can disable IO for curves. This will reduce the size of the
     // project files.
-    //
     m_realizationCurves.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_statisticsCurves, "StatisticsCurves", "Statistics Curves" );
@@ -2812,5 +2698,118 @@ void RimEnsembleCurveSet::initAfterRead()
         {
             m_yPlotAxisProperties = plot->axisPropertiesForPlotAxis( RiuPlotAxis( m_plotAxis_OBSOLETE() ) );
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveSet::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
+{
+    if ( isFiltered() )
+    {
+        menuBuilder << "RicCreateEnsembleFromFilteredCasesFeature";
+    }
+
+    menuBuilder << "RicNewSummaryEnsembleCurveSetFeature";
+    menuBuilder << "Separator";
+    menuBuilder << "RicSetSourceSteppingEnsembleCurveSetFeature";
+    menuBuilder << "RicClearSourceSteppingEnsembleCurveSetFeature";
+    menuBuilder << "Separator";
+    menuBuilder << "RicNewEnsembleCurveFilterFeature";
+    menuBuilder << "RicCreateRegressionAnalysisCurveFeature";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr )
+{
+    std::vector<RimSummaryCurve*> newSummaryCurves;
+    newSummaryCurves.resize( sumCases.size() );
+
+    {
+        // Make sure static CAF data for the summary curve is initialized. This is required before we create curves in the multi-threaded
+        // loop below.
+        RimSummaryCurve dummy;
+    }
+
+#pragma omp parallel for
+    for ( int i = 0; i < static_cast<int>( sumCases.size() ); i++ )
+    {
+        auto* sumCase = sumCases[i];
+        auto  curve   = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
+        curve->setResampling( m_resampling() );
+
+        int lineThickness = 1;
+        if ( addr.address().isHistoryVector() )
+        {
+            lineThickness = 2;
+            curve->setCurveAppearanceFromCaseType();
+        }
+        curve->setLineThickness( lineThickness );
+
+        if ( m_useCustomAppearance() == RimCurveAppearanceDefines::AppearanceMode::CUSTOM )
+        {
+            curve->setLineStyle( m_lineStyle() );
+            curve->setSymbol( m_pointSymbol() );
+            curve->setSymbolSize( m_symbolSize() );
+        }
+
+        if ( isXAxisSummaryVector() )
+        {
+            curve->setAxisTypeX( RiaDefines::HorizontalAxisType::SUMMARY_VECTOR );
+            curve->setSummaryCaseX( sumCase );
+            curve->setSummaryAddressX( m_xAddressSelector->summaryAddress() );
+            if ( m_xAddressSelector->plotAxisProperties() )
+                curve->setTopOrBottomAxisX( m_xAddressSelector->plotAxisProperties()->plotAxis() );
+        }
+
+        curve->setColor( m_colorForRealizations );
+
+        newSummaryCurves[i] = curve;
+    }
+
+    auto plot       = firstAncestorOrThisOfType<RimSummaryPlot>();
+    auto plotWidget = plot ? plot->plotWidget() : nullptr;
+
+    // These operations are not thread safe
+    for ( auto* curve : newSummaryCurves )
+    {
+        curve->setParentPlotNoReplot( plotWidget );
+        m_realizationCurves.push_back( curve );
+
+        curve->setLeftOrRightAxisY( axisY() );
+    }
+
+    return newSummaryCurves;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveSet::recreatePlotCurveForLegend( RimSummaryPlot* plot )
+{
+    if ( plot && plot->plotWidget() )
+    {
+        if ( plot->legendsVisible() ) plot->plotWidget()->updateLegend();
+        plot->scheduleReplotIfVisible();
+        plot->updateAxes();
+        plot->updatePlotInfoLabel();
+
+        // Always recreate the plot curve for the legend text to ensure the ordering is correct
+        // The ordering of legend items depends on the order the curves are added to the plot
+        //
+        // https://github.com/OPM/ResInsight/issues/12259
+        //
+        m_plotCurveForLegendText.reset( plot->plotWidget()->createPlotCurve( nullptr, "" ) );
+
+        int curveThickness = 3;
+        m_plotCurveForLegendText->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
+                                                 RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
+                                                 curveThickness,
+                                                 RiaColorTools::toQColor( m_mainEnsembleColor() ) );
+        m_plotCurveForLegendText->attachToPlot( plot->plotWidget() );
+        updateEnsembleLegendItem();
     }
 }
