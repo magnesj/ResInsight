@@ -128,7 +128,7 @@ std::vector<RimSummaryCurve*> RimEnsembleCurveSet::createCurves( const std::vect
     }
 
 #pragma omp parallel for
-    for ( int i = 0; i < static_cast<int>( sumCases.size()); i++ )
+    for ( int i = 0; i < static_cast<int>( sumCases.size() ); i++ )
     {
         auto* sumCase = sumCases[i];
         auto  curve   = RiaSummaryPlotTools::createCurve( sumCase, addr.address() );
