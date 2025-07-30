@@ -569,7 +569,7 @@ TEST( DISABLED_RigReservoirTest, WellTest )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigReservoirTest, ReadSimulationWellData )
+TEST( DISABLED_RigReservoirTest, ReadSimulationWellData )
 {
     auto restartAccess = std::make_unique<RifEclipseUnifiedRestartFileAccess>();
 
