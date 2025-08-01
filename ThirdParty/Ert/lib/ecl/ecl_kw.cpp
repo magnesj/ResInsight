@@ -39,7 +39,7 @@
 
 struct ecl_kw_struct {
   UTIL_TYPE_ID_DECLARATION;
-  offset_type       size;
+  long               size;
   ecl_data_type     data_type;
   char            * header8;              /* Header which is right padded with ' ' to become exactly 8 characters long. Should only be used internally.*/
   char            * header;               /* Header which is trimmed to no-space. */
@@ -297,9 +297,10 @@ static char * ecl_kw_alloc_output_buffer(const ecl_kw_type * ecl_kw) {
 
 
 static char * ecl_kw_alloc_input_buffer(const ecl_kw_type * ecl_kw) {
-    offset_type sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
-    offset_type kw_size = ecl_kw->size;
-    offset_type buffer_size = kw_size * sizeof_iotype;
+  //size_t buffer_size = ecl_kw->size * ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+    long long sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+    long long kw_size = ecl_kw->size;
+    long long buffer_size = kw_size * sizeof_iotype;
 
 
     // Add this check to catch suspicious values
@@ -1249,8 +1250,9 @@ bool ecl_kw_fread_data(ecl_kw_type *ecl_kw, fortio_type *fortio) {
       return true;
     } else {
       char * buffer = ecl_kw_alloc_input_buffer(ecl_kw);
-      const offset_type sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
-      const offset_type buffer_size = ecl_kw->size * sizeof_iotype;
+      const long sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+
+      const long buffer_size = ecl_kw->size * sizeof_iotype;
 
       bool read_ok = fortio_fread_buffer(fortio, buffer, buffer_size);
 
@@ -1507,9 +1509,9 @@ void ecl_kw_alloc_data(ecl_kw_type *ecl_kw) {
     util_abort("%s: trying to allocate data for ecl_kw object which has been declared with shared storage - aborting \n",__func__);
 
   {
-      offset_type type_size = ecl_type_get_sizeof_ctype(ecl_kw->data_type);
-      offset_type kw_size = ecl_kw->size;
-      offset_type byte_size = kw_size * type_size;
+      long long type_size = ecl_type_get_sizeof_ctype(ecl_kw->data_type);
+      long long kw_size = ecl_kw->size;
+      long long byte_size = kw_size * type_size;
 
       // Add this check to catch suspicious values
       if (byte_size < 0 || byte_size >(SIZE_MAX / 2)) {
