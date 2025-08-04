@@ -140,7 +140,6 @@ public:
 //==================================================================================================
 /// Partial specialization for PdmField<  caf::AppEnum<T> >
 //==================================================================================================
-
 template <typename T>
 class PdmUiFieldSpecialization<caf::AppEnum<T>>
 {
@@ -193,6 +192,9 @@ public:
     }
 };
 
+//==================================================================================================
+/// Partial specialization for PdmField<std::pair<T, U>>>
+//==================================================================================================
 template <typename T, typename U>
 class PdmUiFieldSpecialization<std::pair<T, U>>
 {
@@ -216,6 +218,44 @@ public:
 
     /// Methods to get a list of options for a field, specialized for AppEnum
     static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::pair<T, U>& )
+    {
+        QList<PdmOptionItemInfo> optionList;
+
+        return optionList;
+    }
+
+    /// Methods to retrieve the possible PdmObject pointed to by a field
+    static void childObjects( const PdmDataValueField<caf::AppEnum<T>>& field, std::vector<PdmObjectHandle*>* objects )
+    {
+    }
+};
+
+//==================================================================================================
+/// Partial specialization for PdmField<std::optional<T>>>
+//==================================================================================================
+template <typename T>
+class PdmUiFieldSpecialization<std::optional<T>>
+{
+public:
+    /// Convert the field value into a QVariant
+    static QVariant convert( const std::optional<T>& value )
+    {
+        return PdmValueFieldSpecialization<std::optional<T>>::convert( value );
+    }
+
+    /// Set the field value from a QVariant
+    static void setFromVariant( const QVariant& variantValue, std::optional<T>& value )
+    {
+        PdmValueFieldSpecialization<std::optional<T>>::setFromVariant( variantValue, value );
+    }
+
+    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
+    {
+        return variantValue == variantValue2;
+    }
+
+    /// Methods to get a list of options for a field, specialized for AppEnum
+    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::optional<T>& )
     {
         QList<PdmOptionItemInfo> optionList;
 

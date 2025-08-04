@@ -127,3 +127,46 @@ QTextStream& operator>>( QTextStream& str, std::pair<T, QString>& sobj )
 
     return str;
 }
+
+//==================================================================================================
+/// QTextStream Stream operator overloading for std::optional<T>
+//==================================================================================================
+
+template <typename T>
+QTextStream& operator<<( QTextStream& str, const std::optional<T>& sobj )
+{
+    std::pair<bool, T> pair;
+
+    if ( sobj.has_value() )
+    {
+        pair.first  = true;
+        pair.second = sobj.value();
+    }
+    else
+    {
+        pair.first  = false;
+        pair.second = T();
+    }
+
+    str << pair;
+
+    return str;
+}
+
+template <typename T>
+QTextStream& operator>>( QTextStream& str, std::optional<T>& sobj )
+{
+    std::pair<bool, T> pair;
+    str >> pair;
+
+    if ( pair.first )
+    {
+        sobj = pair.second;
+    }
+    else
+    {
+        sobj.reset();
+    }
+
+    return str;
+}
