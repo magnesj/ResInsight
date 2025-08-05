@@ -560,6 +560,7 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
         { QString::fromStdString( typeid( std::optional<double> ).name() ), "double" },
         { QString::fromStdString( typeid( std::optional<float> ).name() ), "float" },
         { QString::fromStdString( typeid( std::optional<int> ).name() ), "int" },
+        { QString::fromStdString( typeid( std::optional<bool> ).name() ), "bool" },
         { QString::fromStdString( typeid( std::optional<QString> ).name() ), "str" },
     };
 
