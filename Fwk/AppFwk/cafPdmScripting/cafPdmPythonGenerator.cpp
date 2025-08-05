@@ -508,6 +508,7 @@ QString PdmPythonGenerator::getDefaultValue( PdmFieldHandle* field )
             scriptability->readFromField( valueStream, true, true );
         }
 
+        valueString.remove( '"' );
         if ( valueString.isEmpty() )
         {
             valueString = defaultValue;
@@ -556,6 +557,10 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
         { QString::fromStdString( typeid( QString ).name() ), "str" },
         { QString::fromStdString( typeid( caf::FilePath ).name() ), "str" },
         { QString::fromStdString( typeid( std::vector<double> ).name() ), "List[float]" },
+        { QString::fromStdString( typeid( std::optional<double> ).name() ), "double" },
+        { QString::fromStdString( typeid( std::optional<float> ).name() ), "float" },
+        { QString::fromStdString( typeid( std::optional<int> ).name() ), "int" },
+        { QString::fromStdString( typeid( std::optional<QString> ).name() ), "str" },
     };
 
 #ifndef CAF_EXCLUDE_CVF
