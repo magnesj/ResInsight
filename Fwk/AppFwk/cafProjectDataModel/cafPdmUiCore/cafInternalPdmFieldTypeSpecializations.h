@@ -256,7 +256,7 @@ public:
         stringText.remove( '"' );
         if ( stringText.isEmpty() )
         {
-            value = std::nullopt;
+            value.reset();
             return;
         }
 
