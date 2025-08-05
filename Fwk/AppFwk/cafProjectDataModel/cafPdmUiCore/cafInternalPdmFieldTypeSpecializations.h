@@ -225,7 +225,7 @@ public:
     }
 
     /// Methods to retrieve the possible PdmObject pointed to by a field
-    static void childObjects( const PdmDataValueField<caf::AppEnum<T>>& field, std::vector<PdmObjectHandle*>* objects )
+    static void childObjects( const PdmDataValueField<std::pair<T, U>>& field, std::vector<PdmObjectHandle*>* objects )
     {
     }
 };
@@ -263,7 +263,7 @@ public:
     }
 
     /// Methods to retrieve the possible PdmObject pointed to by a field
-    static void childObjects( const PdmDataValueField<caf::AppEnum<T>>& field, std::vector<PdmObjectHandle*>* objects )
+    static void childObjects( const PdmDataValueField<std::optional<T>>& field, std::vector<PdmObjectHandle*>* objects )
     {
     }
 };

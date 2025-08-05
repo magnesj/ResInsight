@@ -57,7 +57,6 @@ public:
         CAF_PDM_InitField( &m_checkableString, "CheckableString", strPair, "label text" );
 
         CAF_PDM_InitFieldNoDefault( &m_optionalDouble, "OptionalDouble", "Optional Double" );
-        m_optionalDouble.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
     }
 
     ~AggregatedTypes() {}
