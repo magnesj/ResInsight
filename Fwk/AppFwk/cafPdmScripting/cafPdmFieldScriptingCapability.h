@@ -331,9 +331,17 @@ struct PdmFieldScriptingCapabilityIOHandler<std::optional<T>>
                                                                      inputStream,
                                                                      errorMessageContainer,
                                                                      stringsAreQuoted );
+        textValue.remove( '"' );
         if ( !textValue.isEmpty() )
         {
-            fieldValue = textValue;
+            QTextStream singleValueStream( &textValue );
+            T           singleValue;
+            bool        noStringQuotes = false;
+            PdmFieldScriptingCapabilityIOHandler<T>::writeToField( singleValue,
+                                                                   singleValueStream,
+                                                                   errorMessageContainer,
+                                                                   noStringQuotes );
+            fieldValue = singleValue;
         }
         else
         {
