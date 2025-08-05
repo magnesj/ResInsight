@@ -178,6 +178,7 @@ public:
 //==================================================================================================
 /// Partial specialization for std::optional
 //==================================================================================================
+/*
 template <typename T>
 class PdmValueFieldSpecialization<std::optional<T>>
 {
@@ -196,15 +197,16 @@ public:
     {
         // An empty QVariant means no value, and we should set the optional to std::nullopt
         auto stringText = variantValue.toString();
+        stringText.remove( '"' );
         if ( stringText.isEmpty() )
         {
             value = std::nullopt;
             return;
         }
 
-        T optionalValue;
-        PdmValueFieldSpecialization<T>::setFromVariant( variantValue, optionalValue );
-        value = optionalValue;
+        T valueOfType;
+        PdmValueFieldSpecialization<T>::setFromVariant( variantValue, valueOfType );
+        value = valueOfType;
     }
 
     static bool isEqual( const QVariant& variantValue, const QVariant& variantValue2 )
@@ -212,6 +214,7 @@ public:
         return variantValue == variantValue2;
     }
 };
+*/
 
 //==================================================================================================
 /// Partial specialization for caf::FilePath

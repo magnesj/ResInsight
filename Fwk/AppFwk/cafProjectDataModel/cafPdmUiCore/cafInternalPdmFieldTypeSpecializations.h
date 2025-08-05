@@ -240,13 +240,29 @@ public:
     /// Convert the field value into a QVariant
     static QVariant convert( const std::optional<T>& value )
     {
-        return PdmValueFieldSpecialization<std::optional<T>>::convert( value );
+        if ( value.has_value() )
+        {
+            return PdmValueFieldSpecialization<T>::convert( value.value() );
+        }
+
+        return QVariant();
     }
 
     /// Set the field value from a QVariant
     static void setFromVariant( const QVariant& variantValue, std::optional<T>& value )
     {
-        PdmValueFieldSpecialization<std::optional<T>>::setFromVariant( variantValue, value );
+        // An empty QVariant means no value, and we should set the optional to std::nullopt
+        auto stringText = variantValue.toString();
+        stringText.remove( '"' );
+        if ( stringText.isEmpty() )
+        {
+            value = std::nullopt;
+            return;
+        }
+
+        T valueOfType;
+        PdmValueFieldSpecialization<T>::setFromVariant( variantValue, valueOfType );
+        value = valueOfType;
     }
 
     static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
