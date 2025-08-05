@@ -135,20 +135,10 @@ QTextStream& operator>>( QTextStream& str, std::pair<T, QString>& sobj )
 template <typename T>
 QTextStream& operator<<( QTextStream& str, const std::optional<T>& sobj )
 {
-    std::pair<bool, T> pair;
-
     if ( sobj.has_value() )
     {
-        pair.first  = true;
-        pair.second = sobj.value();
+        str << sobj.value();
     }
-    else
-    {
-        pair.first  = false;
-        pair.second = T();
-    }
-
-    str << pair;
 
     return str;
 }
@@ -156,15 +146,22 @@ QTextStream& operator<<( QTextStream& str, const std::optional<T>& sobj )
 template <typename T>
 QTextStream& operator>>( QTextStream& str, std::optional<T>& sobj )
 {
-    std::pair<bool, T> pair;
-    str >> pair;
+    QString stringValue;
+    str >> stringValue;
 
-    if ( pair.first )
+    stringValue.remove( '"' );
+
+    if ( !stringValue.isEmpty() )
     {
-        sobj = pair.second;
+        // Use the QTextStream to parse the string value into the type T
+        QTextStream singleValueStream( &stringValue );
+        T           singleValue;
+        singleValueStream >> singleValue;
+        sobj = singleValue;
     }
     else
     {
+        // An empty string means no value, so reset the optional
         sobj.reset();
     }
 
