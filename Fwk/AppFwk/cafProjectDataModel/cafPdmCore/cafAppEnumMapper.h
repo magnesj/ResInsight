@@ -52,9 +52,6 @@ class AppEnum;
 
 //==================================================================================================
 /// A private class to handle the instance of the mapping vector for AppEnum.
-/// All access methods could have been placed directly in the AppEnum class,
-/// but AppEnum implementation gets nicer this way.
-/// The real core of this class is the vector map member and the static instance method
 //==================================================================================================
 template <class T>
 class AppEnumMapper
