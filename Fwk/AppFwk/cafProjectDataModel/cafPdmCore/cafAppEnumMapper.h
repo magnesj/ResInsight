@@ -220,8 +220,6 @@ private:
     {
     }
 
-    friend class AppEnum<T>;
-
     std::vector<EnumData> m_mapping;
     T                     m_defaultValue;
     bool                  m_defaultValueIsSet;
