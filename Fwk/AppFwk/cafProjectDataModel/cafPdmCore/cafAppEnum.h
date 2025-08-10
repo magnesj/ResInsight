@@ -167,7 +167,7 @@ public:
     static bool   isValid( size_t index ) { return index < AppEnumMapper<T>::instance()->size(); }
     static size_t size() { return AppEnumMapper<T>::instance()->size(); }
 
-    static QStringList uiTexts() { return AppEnumMapper::instance()->uiTexts(); }
+    static QStringList uiTexts() { return AppEnumMapper<T>::instance()->uiTexts(); }
     static T           fromIndex( size_t idx )
     {
         T val;
@@ -177,7 +177,7 @@ public:
     static T fromText( const QString& text )
     {
         T val;
-        AppEnumMapper::instance()->enumVal( val, text );
+        AppEnumMapper<T>::instance()->enumVal( val, text );
         return val;
     }
     static size_t  index( T enumValue ) { return AppEnumMapper<T>::instance()->index( enumValue ); }
