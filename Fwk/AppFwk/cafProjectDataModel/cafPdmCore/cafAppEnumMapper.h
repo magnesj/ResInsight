@@ -41,6 +41,7 @@
 #include <QString>
 #include <QStringList>
 
+#include <algorithm>
 #include <vector>
 
 namespace caf
@@ -68,7 +69,10 @@ private:
         {
         }
 
-        bool isMatching( const QString& text ) const { return ( text == m_text || m_aliases.contains( text ) ); }
+        bool isMatching( const QString& text ) const noexcept
+        {
+            return ( text == m_text || m_aliases.contains( text ) );
+        }
 
         T           m_enumVal;
         QString     m_text;
@@ -77,20 +81,47 @@ private:
     };
 
 public:
-    void addItem( T enumVal, const QString& text, QString uiText, const QStringList& aliases )
+    void addItem( T enumVal, const QString& text, const QString& uiText, const QStringList& aliases )
     {
+        // Pre-validate input to avoid partial state on failure
+        const QString trimmedText = text.trimmed();
+        if ( trimmedText.isEmpty() )
+        {
+            CAF_ASSERT( false && "Text cannot be empty" );
+            return;
+        }
+
+        // Check for duplicate main text
+        auto textExists = std::any_of( m_mapping.cbegin(),
+                                       m_mapping.cend(),
+                                       [&trimmedText]( const EnumData& enumData )
+                                       { return trimmedText == enumData.m_text; } );
+        CAF_ASSERT( !textExists && "Duplicate text found" );
+
         // Make sure the alias text is unique for enum
         for ( const auto& alias : aliases )
         {
-            for ( const auto& enumData : instance()->m_mapping )
-            {
-                CAF_ASSERT( !enumData.isMatching( alias ) );
-            }
+            auto aliasExists = std::any_of( m_mapping.cbegin(),
+                                            m_mapping.cend(),
+                                            [&alias]( const EnumData& enumData ) { return enumData.isMatching( alias ); } );
+            CAF_ASSERT( !aliasExists && "Duplicate alias found" );
+        }
+
+        // Check for duplicate enum value
+        auto enumExists = std::any_of( m_mapping.cbegin(),
+                                       m_mapping.cend(),
+                                       [enumVal]( const EnumData& enumData ) { return enumVal == enumData.m_enumVal; } );
+        CAF_ASSERT( !enumExists && "Duplicate enum value found" );
+
+        // Reserve space to avoid potential reallocation during emplace_back
+        if ( m_mapping.size() == m_mapping.capacity() )
+        {
+            m_mapping.reserve( m_mapping.size() * 2 + 1 );
         }
 
         // Make sure the text is trimmed, as this text is streamed to XML and will be trimmed when read back
         // from XML text https://github.com/OPM/ResInsight/issues/7829
-        instance()->m_mapping.push_back( EnumData( enumVal, text.trimmed(), uiText, aliases ) );
+        m_mapping.emplace_back( enumVal, trimmedText, uiText, aliases );
     }
 
     static AppEnumMapper* instance()
@@ -105,7 +136,7 @@ public:
         return &storedInstance;
     }
 
-    void setDefault( T defaultEnumValue )
+    void setDefault( T defaultEnumValue ) noexcept
     {
         m_defaultValue      = defaultEnumValue;
         m_defaultValueIsSet = true;
@@ -117,97 +148,99 @@ public:
         {
             return m_defaultValue;
         }
+        else if ( !m_mapping.empty() )
+        {
+            return m_mapping[0].m_enumVal;
+        }
         else
         {
-            // CAF_ASSERT(m_mapping.size());
-            return m_mapping[0].m_enumVal;
+            CAF_ASSERT( false && "No mapping available and no default set" );
+            return T();
         }
     }
 
     bool isValid( const QString& text ) const
     {
-        size_t idx;
-        for ( idx = 0; idx < m_mapping.size(); ++idx )
-        {
-            if ( text == m_mapping[idx].m_text ) return true;
-        }
-
-        return false;
+        auto it = std::find_if( m_mapping.cbegin(),
+                                m_mapping.cend(),
+                                [&text]( const EnumData& enumData ) { return text == enumData.m_text; } );
+        return it != m_mapping.cend();
     }
 
-    size_t size() const { return m_mapping.size(); }
+    size_t size() const noexcept { return m_mapping.size(); }
+    bool   empty() const noexcept { return m_mapping.empty(); }
 
     bool enumVal( T& value, const QString& text ) const
     {
-        value = defaultValue();
+        const QString trimmedText = text.trimmed();
 
-        QString trimmedText = text.trimmed();
+        auto it = std::find_if( m_mapping.cbegin(),
+                                m_mapping.cend(),
+                                [&trimmedText]( const EnumData& enumData ) { return enumData.isMatching( trimmedText ); } );
 
-        for ( size_t idx = 0; idx < m_mapping.size(); ++idx )
+        if ( it != m_mapping.cend() )
         {
-            // Make sure the text parsed from a text stream is trimmed
-            // https://github.com/OPM/ResInsight/issues/7829
-            if ( m_mapping[idx].isMatching( trimmedText ) )
-            {
-                value = m_mapping[idx].m_enumVal;
-                return true;
-            }
+            value = it->m_enumVal;
+            return true;
         }
-        return false;
+        else
+        {
+            value = defaultValue();
+            return false;
+        }
     }
 
     bool enumVal( T& value, size_t index ) const
     {
-        value = defaultValue();
         if ( index < m_mapping.size() )
         {
             value = m_mapping[index].m_enumVal;
             return true;
         }
         else
+        {
+            value = defaultValue();
             return false;
+        }
     }
 
     size_t index( T enumValue ) const
     {
-        size_t idx;
-        for ( idx = 0; idx < m_mapping.size(); ++idx )
-        {
-            if ( enumValue == m_mapping[idx].m_enumVal ) return idx;
-        }
+        auto it = std::find_if( m_mapping.cbegin(),
+                                m_mapping.cend(),
+                                [enumValue]( const EnumData& enumData ) { return enumValue == enumData.m_enumVal; } );
 
-        return idx;
+        return it != m_mapping.cend() ? static_cast<size_t>( std::distance( m_mapping.cbegin(), it ) ) : m_mapping.size();
     }
 
     QString uiText( T value ) const
     {
-        size_t idx;
-        for ( idx = 0; idx < m_mapping.size(); ++idx )
-        {
-            if ( value == m_mapping[idx].m_enumVal ) return m_mapping[idx].m_uiText;
-        }
-        return "";
+        auto it = std::find_if( m_mapping.cbegin(),
+                                m_mapping.cend(),
+                                [value]( const EnumData& enumData ) { return value == enumData.m_enumVal; } );
+
+        return it != m_mapping.cend() ? it->m_uiText : QString();
     }
 
     QStringList uiTexts() const
     {
         QStringList uiTextList;
-        size_t      idx;
-        for ( idx = 0; idx < m_mapping.size(); ++idx )
+        uiTextList.reserve( static_cast<int>( m_mapping.size() ) );
+
+        for ( const auto& enumData : m_mapping )
         {
-            uiTextList.append( m_mapping[idx].m_uiText );
+            uiTextList.append( enumData.m_uiText );
         }
         return uiTextList;
     }
 
     QString text( T value ) const
     {
-        size_t idx;
-        for ( idx = 0; idx < m_mapping.size(); ++idx )
-        {
-            if ( value == m_mapping[idx].m_enumVal ) return m_mapping[idx].m_text;
-        }
-        return "";
+        auto it = std::find_if( m_mapping.cbegin(),
+                                m_mapping.cend(),
+                                [value]( const EnumData& enumData ) { return value == enumData.m_enumVal; } );
+
+        return it != m_mapping.cend() ? it->m_text : QString();
     }
 
 private:
@@ -215,6 +248,8 @@ private:
         : m_defaultValue( T() )
         , m_defaultValueIsSet( false )
     {
+        // Reserve some initial capacity to reduce allocations
+        m_mapping.reserve( 8 );
     }
 
     std::vector<EnumData> m_mapping;
