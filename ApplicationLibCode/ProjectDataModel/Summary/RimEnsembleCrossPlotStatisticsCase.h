@@ -56,6 +56,8 @@ public:
 
 private:
     void clearData();
+    size_t keywordCount() const override;
+
 
 private:
     std::vector<double> m_p10Data;

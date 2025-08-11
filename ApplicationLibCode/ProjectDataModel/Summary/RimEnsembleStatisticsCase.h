@@ -55,6 +55,8 @@ public:
 
 private:
     void clearData();
+    size_t keywordCount() const override;
+
 
 private:
     std::vector<time_t> m_timeSteps;
