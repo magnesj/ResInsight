@@ -59,7 +59,6 @@ protected:
     void    createAndSetAddresses() override;
     size_t  keywordCount() const override;
 
-
 private:
     caf::PdmPointer<RimSummaryEnsembleSumo>                m_ensemble;
     QString                                                m_realizationName;
