@@ -102,9 +102,9 @@
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
+#include "RiuPlotMainWindow.h"
 #include "Tools/RiaVariableMapper.h"
 #include "Tools/RimValueMultiplexerCollection.h"
-#include "RiuPlotMainWindow.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmObjectScriptingCapability.h"

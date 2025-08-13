@@ -215,8 +215,8 @@ private:
     caf::PdmChildField<RimJobCollection*>             m_jobCollection;
 
     caf::PdmChildField<RimValueMultiplexerCollection*> m_valueMultiplexerCollection;
-    caf::PdmField<QString> m_globalPathList;
-    caf::PdmField<QString> m_projectFileVersionString;
+    caf::PdmField<QString>                             m_globalPathList;
+    caf::PdmField<QString>                             m_projectFileVersionString;
 
     caf::PdmChildField<RimDialogData*>             m_dialogData;
     caf::PdmChildField<RimPlotTemplateFolderItem*> m_plotTemplateTopFolder;
