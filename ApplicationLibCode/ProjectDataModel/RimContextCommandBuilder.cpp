@@ -1094,6 +1094,8 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
 
         menuBuilder << "RicFlyToObjectFeature";
 
+        menuBuilder << "RicCreateValueMultiplexerFeature";
+
         menuBuilder << "RicImportObservedDataFeature";
         menuBuilder << "RicImportObservedFmuDataFeature";
         menuBuilder << "RicImportPressureDepthDataFeature";

@@ -45,6 +45,7 @@
 #include "cafPdmUiValueRangeEditor.h"
 #include "cafSelectionManager.h"
 
+#include "VariableServer.h"
 #include <QAction>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -1171,6 +1172,8 @@ MainWindow* MainWindow::sm_mainWindowInstance = nullptr;
 //--------------------------------------------------------------------------------------------------
 MainWindow::MainWindow()
 {
+    sm_mainWindowInstance = this;
+
     caf::PdmUiItem::enableExtraDebugText( true );
 
     // Initialize command framework
@@ -1189,10 +1192,10 @@ MainWindow::MainWindow()
     createActions();
     createDockPanels();
     buildTestModel();
+    buildVariableModel();
 
     setPdmRoot( m_testRoot );
 
-    sm_mainWindowInstance = this;
     caf::SelectionManager::instance()->setPdmRootObject( m_testRoot );
 
 #ifdef TAP_USE_COMMAND_FRAMEWORK
@@ -1405,6 +1408,14 @@ void MainWindow::setPdmRoot( caf::PdmObjectHandle* pdmRoot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+VariableServer* MainWindow::variableServer() const
+{
+    return m_variableServer;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 MainWindow::~MainWindow()
 {
     m_pdmUiTreeView->setPdmItem( nullptr );
@@ -1431,6 +1442,26 @@ void MainWindow::releaseTestData()
         m_testRoot->objects.deleteChildren();
         delete m_testRoot;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void MainWindow::buildVariableModel()
+{
+    m_variableServer = new VariableServer();
+
+    m_testRoot->objects.push_back( m_variableServer );
+
+    auto firstObject = new VariableClient();
+    m_testRoot->objects.push_back( firstObject );
+
+    auto secondObject = new VariableClient();
+    m_testRoot->objects.push_back( secondObject );
+
+    // Add multiplexers
+    m_variableServer->setRoot( m_testRoot );
+    m_variableServer->addMultiplexer( firstObject, "DoubleValue", secondObject, "DoubleValue" );
 }
 
 //--------------------------------------------------------------------------------------------------
