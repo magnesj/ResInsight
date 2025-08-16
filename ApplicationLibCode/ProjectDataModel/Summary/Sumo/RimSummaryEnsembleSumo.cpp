@@ -112,31 +112,35 @@ void RimSummaryEnsembleSumo::loadSummaryData( const RifEclipseSummaryAddress& re
 
     auto resultText = QString::fromStdString( resultAddress.toEclipseTextAddress() );
 
-    auto sumoCaseId       = m_sumoDataSource->caseId();
-    auto sumoEnsembleName = m_sumoDataSource->ensembleName();
-
-    auto key = ParquetKey{ sumoCaseId, sumoEnsembleName, resultText, false };
-    if ( m_parquetTable.find( key ) == m_parquetTable.end() )
+    // No support for multi-threading when reading data from SUMO. This function can be called from multi-threaded loops
+#pragma omp critical( critical_section_loading_data_sumo )
     {
-        auto contents = loadParquetData( key );
-        RiaLogging::debug( QString( "Load Summary Data. Contents size: %1" ).arg( contents.size() ) );
+        auto sumoCaseId       = m_sumoDataSource->caseId();
+        auto sumoEnsembleName = m_sumoDataSource->ensembleName();
 
-        std::shared_ptr<arrow::Table> table = readParquetTable( contents, QString::fromStdString( resultAddress.uiText() ) );
-        m_parquetTable[key]                 = table;
+        auto key = ParquetKey{ sumoCaseId, sumoEnsembleName, resultText, false };
+        if ( m_parquetTable.find( key ) == m_parquetTable.end() )
+        {
+            auto contents = loadParquetData( key );
+            RiaLogging::debug( QString( "Load Summary Data. Contents size: %1" ).arg( contents.size() ) );
 
-        distributeDataToRealizations( resultAddress, table );
-    }
+            std::shared_ptr<arrow::Table> table = readParquetTable( contents, QString::fromStdString( resultAddress.uiText() ) );
+            m_parquetTable[key]                 = table;
 
-    auto parametersKey = ParquetKey{ sumoCaseId, sumoEnsembleName, "", true };
-    if ( m_parquetTable.find( parametersKey ) == m_parquetTable.end() )
-    {
-        auto contents = m_sumoConnector->requestParametersParquetDataBlocking( sumoCaseId, sumoEnsembleName );
-        RiaLogging::debug( QString( "Load ensemble parameter sensitivities. Contents size: %1" ).arg( contents.size() ) );
+            distributeDataToRealizations( resultAddress, table );
+        }
 
-        std::shared_ptr<arrow::Table> table = readParquetTable( contents, QString( "%1 parameter sensitivities" ).arg( sumoEnsembleName ) );
-        m_parquetTable[parametersKey]       = table;
+        auto parametersKey = ParquetKey{ sumoCaseId, sumoEnsembleName, "", true };
+        if ( m_parquetTable.find( parametersKey ) == m_parquetTable.end() )
+        {
+            auto contents = m_sumoConnector->requestParametersParquetDataBlocking( sumoCaseId, sumoEnsembleName );
+            RiaLogging::debug( QString( "Load ensemble parameter sensitivities. Contents size: %1" ).arg( contents.size() ) );
 
-        distributeParametersDataToRealizations( table );
+            std::shared_ptr<arrow::Table> table = readParquetTable( contents, QString( "%1 parameter sensitivities" ).arg( sumoEnsembleName ) );
+            m_parquetTable[parametersKey] = table;
+
+            distributeParametersDataToRealizations( table );
+        }
     }
 }
 
