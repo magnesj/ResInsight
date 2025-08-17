@@ -10,3 +10,15 @@ updates:
     schedule:
       # Check for updates to GitHub Actions every week
       interval: "weekly"
+    # Allow dependabot to update to latest versions
+    open-pull-requests-limit: 10
+    # Group updates to reduce noise
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    # Automatically merge minor and patch updates
+    # Reviewers can be added here if needed
+    labels:
+      - "dependencies"
+      - "github-actions"

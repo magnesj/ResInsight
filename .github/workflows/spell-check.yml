@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
-      - uses: sobolevn/misspell-fixer-action@master
+      - uses: sobolevn/misspell-fixer-action@0.1.0
         with:
           options: "-rsvnuR ApplicationLibCode/"
       - uses: peter-evans/create-pull-request@v7
