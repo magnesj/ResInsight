@@ -73,6 +73,7 @@ class RimQuickAccessCollection;
 class RimAutomationSettings;
 class RimJobCollection;
 class RimEnsembleFileSetCollection;
+class RimTemporaryObjectCollection;
 
 namespace caf
 {
@@ -196,6 +197,7 @@ public:
     RimAutomationSettings*        automationSettings() const;
     RimEnsembleFileSetCollection* ensembleFileSetCollection() const;
     RimJobCollection*             jobCollection() const;
+    RimTemporaryObjectCollection* temporaryObjectCollection() const;
 
 protected:
     void                              initAfterRead() override;
@@ -210,6 +212,7 @@ private:
     caf::PdmChildField<RimAutomationSettings*>        m_automationSettings;
     caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFileSetCollection;
     caf::PdmChildField<RimJobCollection*>             m_jobCollection;
+    caf::PdmChildField<RimTemporaryObjectCollection*> m_temporaryObjectCollection;
 
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;

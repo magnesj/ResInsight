@@ -99,6 +99,7 @@
 #include "RimWellPathCollection.h"
 #include "RimWellTargetMapping.h"
 #include "Tools/RimAutomationSettings.h"
+#include "Tools/RimTemporaryObjectCollection.h"
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
@@ -143,6 +144,10 @@ RimProject::RimProject()
     scriptCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_jobCollection, "JobCollection", "Jobs", ":/gear.png" );
+
+    CAF_PDM_InitFieldNoDefault( &m_temporaryObjectCollection, "TemporaryObjectCollection", "Jobs" );
+    m_temporaryObjectCollection = new RimTemporaryObjectCollection();
+    m_temporaryObjectCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
     CAF_PDM_InitFieldNoDefault( &m_pinnedFieldCollection, "PinnedFieldCollection", "PinnedFieldCollection" );
@@ -361,6 +366,14 @@ RimQuickAccessCollection* RimProject::pinnedFieldCollection() const
 RimJobCollection* RimProject::jobCollection() const
 {
     return m_jobCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimTemporaryObjectCollection* RimProject::temporaryObjectCollection() const
+{
+    return m_temporaryObjectCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
