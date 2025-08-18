@@ -22,6 +22,7 @@
 #include "RimCase.h"
 #include "RimCommandRouter.h"
 #include "RimProject.h"
+#include "Tools/RimTemporaryObjectCollection.h"
 
 #include "PdmObject.pb.h"
 
@@ -69,6 +70,11 @@ caf::PdmObject* RiaGrpcHelper::findCafObjectFromScriptNameAndAddress( const QStr
     std::vector<caf::PdmObject*> objectsOfCurrentClass;
 
     project->descendantsIncludingThisFromClassKeyword( classKeyword, objectsOfCurrentClass );
+    if ( objectsOfCurrentClass.empty() )
+    {
+        RimTemporaryObjectCollection::instance()->descendantsIncludingThisFromClassKeyword( classKeyword,
+                                                                                            objectsOfCurrentClass );
+    }
 
     caf::PdmObject* matchingObject = nullptr;
     for ( caf::PdmObject* testObject : objectsOfCurrentClass )

@@ -17,7 +17,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RimTemporaryObjectCollection.h"
-#include "RimProject.h"
 
 CAF_PDM_SOURCE_INIT( RimTemporaryObjectCollection, "RimTemporaryObjectCollection" );
 
@@ -37,7 +36,9 @@ RimTemporaryObjectCollection::RimTemporaryObjectCollection()
 //--------------------------------------------------------------------------------------------------
 RimTemporaryObjectCollection* RimTemporaryObjectCollection::instance()
 {
-    return RimProject::current()->temporaryObjectCollection();
+    static RimTemporaryObjectCollection staticInstance;
+
+    return &staticInstance;
 }
 
 //--------------------------------------------------------------------------------------------------
