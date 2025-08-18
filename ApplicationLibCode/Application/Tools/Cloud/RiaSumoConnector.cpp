@@ -319,10 +319,9 @@ void RiaSumoConnector::requestVectorNamesForEnsemble( const SumoCaseId& caseId, 
                 {"term": {"class": "table"}},
                 {"term": {"_sumo.parent_object.keyword": "%1"}},
                 {"term": {"fmu.iteration.name.keyword": "%2"}},
-                {"term": {"fmu.context.stage.keyword": "iteration"}},
-                {"term": {"fmu.aggregation.operation.keyword": "collection"}},
+                {"terms": {"fmu.context.stage.keyword": ["iteration", "realization"]}},
                 {"term": {"data.tagname.keyword": "summary"}},
-                {"term": {"data.content.keyword": "timeseries"}}
+                {"terms": {"data.content.keyword": ["timeseries", "simulationtimeseries"]}}
             ]}
         },
     "aggs": {
