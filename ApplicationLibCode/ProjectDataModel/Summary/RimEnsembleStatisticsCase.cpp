@@ -160,7 +160,12 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     for ( const auto& sumCase : summaryCases )
     {
         const auto& reader = sumCase->summaryReader();
-        if ( reader )
+        if ( !reader )
+        {
+            sumCase->setUiToolTip( "No data available for realization" );
+            sumCase->setUiReadOnly( true );
+        }
+        else
         {
             const std::vector<time_t>& timeSteps = reader->timeSteps( inputAddress );
             const auto [isOk, values]            = reader->values( inputAddress );

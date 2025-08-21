@@ -303,9 +303,11 @@ bool RifOpmCommonEclipseSummary::openFileReader( const QString&       fileName,
     {
         try
         {
-            m_enhancedReader = std::make_unique<Opm::EclIO::ExtESmry>( candidateEsmryFileName.toStdString(), includeRestartFiles );
-
-            return true;
+            if ( QFile::exists( candidateEsmryFileName ) )
+            {
+                m_enhancedReader = std::make_unique<Opm::EclIO::ExtESmry>( candidateEsmryFileName.toStdString(), includeRestartFiles );
+                if ( m_enhancedReader ) return true;
+            }
         }
         catch ( ... )
         {
