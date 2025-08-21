@@ -112,7 +112,20 @@ QStringList RimEnsembleFileSet::createPaths( const QString& extension ) const
             m_realizationNumbersReadFromFiles = range;
         }
 
-        realizationFilter = m_realizationNumbersReadFromFiles;
+        auto numbers = RiaStdStringTools::valuesFromRangeSelection( m_realizationNumbersReadFromFiles.toStdString() );
+        if ( !numbers.empty() )
+        {
+            auto minNumber = *std::min_element( numbers.begin(), numbers.end() );
+            auto maxNumber = *std::max_element( numbers.begin(), numbers.end() );
+
+            // Use the min and max numbers to create a realization filter, as this will the wildcard pattern. This makes it easy
+            // to see the realizations with missing or incomplete data
+            realizationFilter = QString( "%1-%2" ).arg( minNumber ).arg( maxNumber );
+        }
+        else
+        {
+            realizationFilter = m_realizationNumbersReadFromFiles;
+        }
     }
 
     return RiaEnsembleImportTools::createPathsFromPattern( pathPatternWithExtension, realizationFilter, internal::placeholderString() );
