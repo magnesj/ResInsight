@@ -344,15 +344,22 @@ double RiaCurveMerger<XValueType>::interpolatedYValue( const XValueType&        
                     return firstValue;
                 }
 
-                double firstDiff  = fabs( XComparator::diff( interpolationXValue, xValues.at( firstI ) ) );
-                double secondDiff = fabs( XComparator::diff( xValues.at( secondI ), interpolationXValue ) );
+                const double firstDiff  = fabs( XComparator::diff( interpolationXValue, xValues.at( firstI ) ) );
+                const double secondDiff = fabs( XComparator::diff( xValues.at( secondI ), interpolationXValue ) );
+                const double totalDiff  = firstDiff + secondDiff;
 
-                double firstWeight  = secondDiff / ( firstDiff + secondDiff );
-                double secondWeight = firstDiff / ( firstDiff + secondDiff );
-
-                double val = ( firstValue * firstWeight ) + ( secondValue * secondWeight );
-
-                CVF_ASSERT( RiaCurveDataTools::isValidValue( val, removeInterpolatedValues ) );
+                double val;
+                if ( totalDiff < std::numeric_limits<double>::epsilon() )
+                {
+                    // Points are essentially identical - use either value
+                    val = firstValue; // or secondValue, or average: (firstValue + secondValue) * 0.5
+                }
+                else
+                {
+                    const double firstWeight  = secondDiff / totalDiff;
+                    const double secondWeight = firstDiff / totalDiff;
+                    val                       = ( firstValue * firstWeight ) + ( secondValue * secondWeight );
+                }
 
                 return val;
             }
