@@ -46,6 +46,8 @@ set(PROJECT_FILES
     ApplicationEnum.cpp
     OptionalFields.h
     OptionalFields.cpp
+    RimFontSize.h
+    RimFontSize.cpp
 )
 
 qt_add_executable(
