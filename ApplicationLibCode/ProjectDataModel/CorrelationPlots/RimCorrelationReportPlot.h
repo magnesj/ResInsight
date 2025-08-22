@@ -75,7 +75,6 @@ private:
     void     childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
     void     doUpdateLayout() override;
 
-    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void onDataSelection( const caf::SignalEmitter* emitter, std::pair<QString, RiaSummaryCurveDefinition> parameterAndCurveDef );
 
 private:
@@ -84,10 +83,10 @@ private:
     caf::PdmChildField<RimCorrelationMatrixPlot*>    m_correlationMatrixPlot;
     caf::PdmChildField<RimCorrelationPlot*>          m_correlationPlot;
     caf::PdmChildField<RimParameterResultCrossPlot*> m_parameterResultCrossPlot;
-    RimFontSizeField  m_subTitleFontSize;
-    RimFontSizeField  m_labelFontSize;
-    RimFontSizeField  m_axisTitleFontSize;
-    RimFontSizeField  m_axisValueFontSize;
+    RimFontSizeField                                 m_subTitleFontSize;
+    RimFontSizeField                                 m_labelFontSize;
+    RimFontSizeField                                 m_axisTitleFontSize;
+    RimFontSizeField                                 m_axisValueFontSize;
 
     QPointer<RiuMultiPlotPage> m_viewer;
 };
