@@ -20,6 +20,7 @@
 
 #include "cafFontTools.h"
 #include "cafPdmField.h"
+#include "cafPdmFieldScriptingCapability.h"
 
 //==================================================================================================
 ///
@@ -36,3 +37,62 @@ public:
         return *this;
     }
 };
+
+namespace caf
+{
+template <>
+class PdmFieldScriptingCapability<RimFontSizeField> : public PdmAbstractFieldScriptingCapability
+{
+public:
+    PdmFieldScriptingCapability( RimFontSizeField* field, const QString& fieldName, bool giveOwnership )
+        : PdmAbstractFieldScriptingCapability( field, fieldName, giveOwnership )
+    {
+        m_field = field;
+    }
+
+    void writeToField( QTextStream&          inputStream,
+                       PdmObjectFactory*     objectFactory,
+                       PdmScriptIOMessages*  errorMessageContainer,
+                       bool                  stringsAreQuoted    = true,
+                       caf::PdmObjectHandle* existingObjectsRoot = nullptr ) override
+    {
+        if ( this->isIOWriteable() )
+        {
+            caf::FontTools::RelativeSizeEnum value;
+
+            PdmFieldScriptingCapabilityIOHandler<caf::FontTools::RelativeSizeEnum>::writeToField( value,
+                                                                                                  inputStream,
+                                                                                                  errorMessageContainer,
+                                                                                                  stringsAreQuoted );
+            m_field->setValue( value );
+        }
+    }
+
+    void readFromField( QTextStream& outputStream, bool quoteStrings = true, bool quoteNonBuiltins = false ) const override
+    {
+        PdmFieldScriptingCapabilityIOHandler<caf::FontTools::RelativeSizeEnum>::readFromField( m_field->value(),
+                                                                                               outputStream,
+                                                                                               quoteStrings,
+                                                                                               quoteNonBuiltins );
+    }
+
+    QStringList enumScriptTexts() const override
+    {
+        QStringList enumTexts;
+
+        for ( size_t i = 0; i < caf::FontTools::RelativeSizeEnum::size(); i++ )
+        {
+            auto enumText = caf::FontTools::RelativeSizeEnum::text( caf::FontTools::RelativeSizeEnum::fromIndex( i ) );
+            enumTexts.push_back( enumText );
+        }
+
+        return enumTexts;
+    }
+
+    QString dataType() const override { return "str"; }
+
+private:
+    RimFontSizeField* m_field;
+};
+
+}; // namespace caf
