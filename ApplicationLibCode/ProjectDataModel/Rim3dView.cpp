@@ -1515,10 +1515,6 @@ QList<caf::PdmOptionItemInfo> Rim3dView::calculateValueOptions( const caf::PdmFi
 
         options.push_front( caf::PdmOptionItemInfo( "None", nullptr ) );
     }
-    else if ( fieldNeedingOptions == &m_fontSize )
-    {
-        options = caf::FontTools::relativeSizeValueOptions( RiaPreferences::current()->defaultSceneFontSize() );
-    }
     else if ( fieldNeedingOptions == &m_scaleZ )
     {
         for ( auto scale : RiaDefines::viewScaleOptions() )
