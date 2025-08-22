@@ -139,8 +139,8 @@ private:
     caf::PdmField<double>                      m_smallContributionsThreshold;
 
     QPointer<RiuQwtPlotWidget>                      m_plotWidget;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisTitleFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisValueFontSize;
+    RimFontSizeField m_axisTitleFontSize;
+    RimFontSizeField m_axisValueFontSize;
 
     const int m_initialNumberOfTimeSteps = 10;
 };

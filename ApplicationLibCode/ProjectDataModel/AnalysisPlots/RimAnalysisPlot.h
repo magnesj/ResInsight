@@ -212,7 +212,7 @@ private:
     caf::PdmField<bool>                             m_useSummaryItemInBarText;
     caf::PdmField<bool>                             m_useTimeStepInBarText;
     caf::PdmField<bool>                             m_useVectorNameInBarText;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_barTextFontSize;
+    RimFontSizeField m_barTextFontSize;
 
     caf::PdmChildField<RimPlotAxisProperties*>       m_valueAxisProperties;
     caf::PdmChildField<RimPlotDataFilterCollection*> m_plotDataFilterCollection;

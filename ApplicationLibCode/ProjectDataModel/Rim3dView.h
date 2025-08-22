@@ -20,6 +20,7 @@
 
 #include "RiaDefines.h"
 
+#include "Appearance/RimFontSizeField.h"
 #include "RimNameConfig.h"
 #include "RimViewWindow.h"
 
@@ -346,7 +347,7 @@ private:
     caf::PdmField<caf::AppEnum<RivAnnotationTools::LabelPositionStrategy>> m_annotationStrategy;
     caf::PdmField<int>                                                     m_annotationCountHint;
 
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_fontSize;
+    RimFontSizeField m_fontSize;
 
     // 3D display model data
     cvf::ref<RivAnnotationsPartMgr> m_annotationsPartManager;

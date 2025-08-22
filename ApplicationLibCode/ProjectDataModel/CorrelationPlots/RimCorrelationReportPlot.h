@@ -84,10 +84,10 @@ private:
     caf::PdmChildField<RimCorrelationMatrixPlot*>    m_correlationMatrixPlot;
     caf::PdmChildField<RimCorrelationPlot*>          m_correlationPlot;
     caf::PdmChildField<RimParameterResultCrossPlot*> m_parameterResultCrossPlot;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>  m_subTitleFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>  m_labelFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>  m_axisTitleFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>  m_axisValueFontSize;
+    RimFontSizeField  m_subTitleFontSize;
+    RimFontSizeField  m_labelFontSize;
+    RimFontSizeField  m_axisTitleFontSize;
+    RimFontSizeField  m_axisValueFontSize;
 
     QPointer<RiuMultiPlotPage> m_viewer;
 };
