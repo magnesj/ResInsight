@@ -23,6 +23,81 @@
 #include <memory>
 
 /// Demo objects to show the usage of the Pdm system
+enum class MyEnum
+{
+    T1,
+    T2,
+    T3,
+    T4,
+    T5,
+    T6
+};
+
+class MyAppEnumField : public caf::PdmField<caf::AppEnum<MyEnum>>
+{
+public:
+    MyAppEnumField() {
+
+    };
+};
+
+namespace caf
+{
+template <>
+class PdmFieldScriptingCapability<MyAppEnumField> : public PdmAbstractFieldScriptingCapability
+{
+public:
+    PdmFieldScriptingCapability( MyAppEnumField* field, const QString& fieldName, bool giveOwnership )
+        : PdmAbstractFieldScriptingCapability( field, fieldName, giveOwnership )
+    {
+        m_field = field;
+    }
+
+    void writeToField( QTextStream&          inputStream,
+                       PdmObjectFactory*     objectFactory,
+                       PdmScriptIOMessages*  errorMessageContainer,
+                       bool                  stringsAreQuoted    = true,
+                       caf::PdmObjectHandle* existingObjectsRoot = nullptr ) override
+    {
+        if ( this->isIOWriteable() )
+        {
+            caf::AppEnum<MyEnum> value;
+
+            PdmFieldScriptingCapabilityIOHandler<caf::AppEnum<MyEnum>>::writeToField( value,
+                                                                                      inputStream,
+                                                                                      errorMessageContainer,
+                                                                                      stringsAreQuoted );
+            m_field->setValue( value );
+        }
+    }
+
+    void readFromField( QTextStream& outputStream, bool quoteStrings = true, bool quoteNonBuiltins = false ) const override
+    {
+        PdmFieldScriptingCapabilityIOHandler<caf::AppEnum<MyEnum>>::readFromField( m_field->value(),
+                                                                                   outputStream,
+                                                                                   quoteStrings,
+                                                                                   quoteNonBuiltins );
+    }
+
+    QStringList enumScriptTexts() const override
+    {
+        QStringList enumTexts;
+
+        for ( size_t i = 0; i < AppEnum<MyEnum>::size(); i++ )
+        {
+            auto enumText = AppEnum<MyEnum>::text( AppEnum<MyEnum>::fromIndex( i ) );
+            enumTexts.push_back( enumText );
+        }
+
+        return enumTexts;
+    }
+
+    QString dataType() const override { return "str"; }
+
+private:
+    PdmField<AppEnum<MyEnum>>* m_field;
+};
+}; // namespace caf
 
 class SimpleObj : public caf::PdmObject
 {
@@ -62,6 +137,7 @@ public:
     caf::PdmField<double>  m_doubleField;
     caf::PdmField<int>     m_intField;
     caf::PdmField<QString> m_textField;
+    MyAppEnumField         m_myAppEnum;
 
     caf::PdmChildField<SimpleObj*> m_simpleObjPtrField;
     caf::PdmChildField<SimpleObj*> m_simpleObjPtrField2;
