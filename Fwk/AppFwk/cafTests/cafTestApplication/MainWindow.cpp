@@ -46,6 +46,7 @@
 #include "cafPdmUiValueRangeEditor.h"
 #include "cafSelectionManager.h"
 
+#include "RimFontSize.h"
 #include <QAction>
 #include <QDockWidget>
 #include <QFileDialog>
@@ -173,9 +174,6 @@ public:
         m_colorTriplets.push_back( new ColorTriplet );
 
         CAF_PDM_InitFieldNoDefault( &m_valueLabelFontSize, "ValueLabelFontSize", "ValueLabelFontSize" );
-        m_valueLabelFontSize.uiCapability()->setValueOptionsGenerator(
-            []() -> QList<caf::PdmOptionItemInfo>
-            { return caf::FontTools::relativeSizeValueOptions( caf::FontTools::FontSize::FONT_SIZE_12 ); } );
     }
 
     caf::PdmField<double>  m_doubleField;
@@ -193,7 +191,7 @@ public:
 
     caf::PdmField<std::vector<QString>> m_multiSelectList;
 
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_valueLabelFontSize;
+    RimFontSize m_valueLabelFontSize;
 
     caf::PdmField<bool>  m_toggleField;
     caf::PdmFieldHandle* objectToggleField() override { return &m_toggleField; }
