@@ -339,7 +339,7 @@ private:
     caf::PdmPtrField<RimColorLegend*>                                  m_colorShadingLegend;
     caf::PdmField<int>                                                 m_colorShadingTransparency;
     caf::PdmField<bool>                                                m_showRegionLabels;
-    RimFontSizeField                    m_regionLabelFontSize;
+    RimFontSizeField                                                   m_regionLabelFontSize;
     caf::PdmField<caf::AppEnum<FormationSource>>                       m_formationSource;
     caf::PdmPtrField<RimCase*>                                         m_formationCase;
     caf::PdmField<caf::AppEnum<TrajectoryType>>                        m_formationTrajectoryType;
