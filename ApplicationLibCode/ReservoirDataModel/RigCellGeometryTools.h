@@ -27,6 +27,8 @@
 #include <list>
 #include <vector>
 
+class RigCell;
+
 class RigCellGeometryTools
 {
 public:
@@ -46,6 +48,14 @@ public:
                                   cvf::Vec3d&                      localZdirection );
 
     static double polygonLengthInLocalXdirWeightedByArea( const std::vector<cvf::Vec3d>& polygon2d );
+
+    static void convertGridToCornerPointArrays( const std::vector<RigCell>&    cells,
+                                                const std::vector<cvf::Vec3d>& nodes,
+                                                size_t                         nx,
+                                                size_t                         ny,
+                                                size_t                         nz,
+                                                std::vector<float>&            coordArray,
+                                                std::vector<float>&            zcornArray );
 
     static std::vector<std::vector<cvf::Vec3d>> intersectionWithPolygons( const std::vector<cvf::Vec3d>& polygon1,
                                                                           const std::vector<std::vector<cvf::Vec3d>>& polygonToIntersectWith );
