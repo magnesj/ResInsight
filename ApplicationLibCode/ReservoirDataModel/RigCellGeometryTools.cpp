@@ -913,7 +913,10 @@ bool RigCellGeometryTools::pointInsideCellNegK2D( const cvf::Vec3d& point, const
 /// COORD array: Contains pillar coordinates for grid corners (nx+1)*(ny+1)*6 floats
 ///               Each pillar has 6 values: x1,y1,z1,x2,y2,z2 (top and bottom 3D points of pillar)
 /// ZCORN array: Contains Z coordinates for cell corners (nx*ny*nz*8 floats)
-///              8 Z values per cell in standard Eclipse ordering
+///              8 Z values per cell
+///
+/// See Eclipse_Grid_Format.md for details
+///
 //--------------------------------------------------------------------------------------------------
 void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<RigCell>&    cells,
                                                            const std::vector<cvf::Vec3d>& nodes,
