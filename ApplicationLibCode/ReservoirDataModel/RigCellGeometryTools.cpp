@@ -1013,74 +1013,85 @@ void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<Rig
         }
     }
 
-    // Create ZCORN array - Z coordinates for each cell corner
-    // ZCORN format: layer by layer, with X cycling fastest
-    // For each layer: top face of layer, then bottom face of layer
-    // Each face: 4 corner points per cell (i,j), with i cycling fastest
-    size_t zcornIndex = 0;
+    // Create ZCORN array following Eclipse specification
+    // Following the pseudocode: organize by layer, then by j, then by face (not corner)
+
+    size_t zcornIdx = 0;
 
     for ( size_t k = 0; k < nz; ++k )
     {
-        // Top face of layer k
+        // Top layer interface
         for ( size_t j = 0; j < ny; ++j )
         {
+            // Export z values for face 1 (corners 0,3) for all cells in row j
             for ( size_t i = 0; i < nx; ++i )
             {
                 size_t cellIndex = k * nx * ny + j * nx + i;
-
                 if ( cellIndex < cells.size() )
                 {
-                    const RigCell& cell = cells[cellIndex];
-
-                    // Top corners: 0=(-I,-J), 1=(+I,-J), 2=(+I,+J), 3=(-I,+J)
-                    for ( int corner = 0; corner < 4; ++corner )
-                    {
-                        size_t nodeIndex = cell.cornerIndices()[corner];
-                        if ( nodeIndex < nodes.size() )
-                        {
-                            zcornArray[zcornIndex++] = static_cast<float>( -nodes[nodeIndex].z() );
-                        }
-                        else
-                        {
-                            zcornIndex++;
-                        }
-                    }
+                    const RigCell& cell       = cells[cellIndex];
+                    auto           topCorners = cell.faceCorners( cvf::StructGridInterface::NEG_K );
+                    zcornArray[zcornIdx++]    = static_cast<float>( -topCorners[0].z() ); // (-I,-J)
+                    zcornArray[zcornIdx++]    = static_cast<float>( -topCorners[3].z() ); // (+I,-J)
                 }
                 else
                 {
-                    zcornIndex += 4;
+                    zcornIdx += 2;
+                }
+            }
+
+            // Export z values for face 2 (corners 1,2) for all cells in row j
+            for ( size_t i = 0; i < nx; ++i )
+            {
+                size_t cellIndex = k * nx * ny + j * nx + i;
+                if ( cellIndex < cells.size() )
+                {
+                    const RigCell& cell       = cells[cellIndex];
+                    auto           topCorners = cell.faceCorners( cvf::StructGridInterface::NEG_K );
+                    zcornArray[zcornIdx++]    = static_cast<float>( -topCorners[1].z() ); // (-I,+J)
+                    zcornArray[zcornIdx++]    = static_cast<float>( -topCorners[2].z() ); // (+I,+J)
+                }
+                else
+                {
+                    zcornIdx += 2;
                 }
             }
         }
 
-        // Bottom face of layer k
+        // Bottom layer interface
         for ( size_t j = 0; j < ny; ++j )
         {
+            // Export z values for face 1 (corners 0,1) for all cells in row j
             for ( size_t i = 0; i < nx; ++i )
             {
                 size_t cellIndex = k * nx * ny + j * nx + i;
-
                 if ( cellIndex < cells.size() )
                 {
-                    const RigCell& cell = cells[cellIndex];
-
-                    // Bottom corners: 4=(-I,-J), 5=(+I,-J), 6=(+I,+J), 7=(-I,+J)
-                    for ( int corner = 4; corner < 8; ++corner )
-                    {
-                        size_t nodeIndex = cell.cornerIndices()[corner];
-                        if ( nodeIndex < nodes.size() )
-                        {
-                            zcornArray[zcornIndex++] = static_cast<float>( -nodes[nodeIndex].z() );
-                        }
-                        else
-                        {
-                            zcornIndex++;
-                        }
-                    }
+                    const RigCell& cell          = cells[cellIndex];
+                    auto           bottomCorners = cell.faceCorners( cvf::StructGridInterface::POS_K );
+                    zcornArray[zcornIdx++]       = static_cast<float>( -bottomCorners[0].z() ); // (-I,-J)
+                    zcornArray[zcornIdx++]       = static_cast<float>( -bottomCorners[1].z() ); // (+I,-J)
                 }
                 else
                 {
-                    zcornIndex += 4;
+                    zcornIdx += 2;
+                }
+            }
+
+            // Export z values for face 2 (corners 3,2) for all cells in row j
+            for ( size_t i = 0; i < nx; ++i )
+            {
+                size_t cellIndex = k * nx * ny + j * nx + i;
+                if ( cellIndex < cells.size() )
+                {
+                    const RigCell& cell          = cells[cellIndex];
+                    auto           bottomCorners = cell.faceCorners( cvf::StructGridInterface::POS_K );
+                    zcornArray[zcornIdx++]       = static_cast<float>( -bottomCorners[3].z() ); // (-I,+J)
+                    zcornArray[zcornIdx++]       = static_cast<float>( -bottomCorners[2].z() ); // (+I,+J)
+                }
+                else
+                {
+                    zcornIdx += 2;
                 }
             }
         }
