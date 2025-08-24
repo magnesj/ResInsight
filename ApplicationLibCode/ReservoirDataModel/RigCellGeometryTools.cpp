@@ -915,16 +915,18 @@ bool RigCellGeometryTools::pointInsideCellNegK2D( const cvf::Vec3d& point, const
 /// ZCORN array: Contains Z coordinates for cell corners (nx*ny*nz*8 floats)
 ///              8 Z values per cell in standard Eclipse ordering
 //--------------------------------------------------------------------------------------------------
-void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<RigCell>& cells,
-                                                            const std::vector<cvf::Vec3d>& nodes,
-                                                            size_t nx, size_t ny, size_t nz,
-                                                            std::vector<float>& coordArray,
-                                                            std::vector<float>& zcornArray )
+void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<RigCell>&    cells,
+                                                           const std::vector<cvf::Vec3d>& nodes,
+                                                           size_t                         nx,
+                                                           size_t                         ny,
+                                                           size_t                         nz,
+                                                           std::vector<float>&            coordArray,
+                                                           std::vector<float>&            zcornArray )
 {
     // Resize arrays to correct size
-    size_t coordSize = (nx + 1) * (ny + 1) * 6;
+    size_t coordSize = ( nx + 1 ) * ( ny + 1 ) * 6;
     size_t zcornSize = nx * ny * nz * 8;
-    
+
     coordArray.resize( coordSize, 0.0f );
     zcornArray.resize( zcornSize, 0.0f );
 
@@ -934,58 +936,61 @@ void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<Rig
     {
         for ( size_t i = 0; i <= nx; ++i )
         {
-            size_t pillarIndex = j * (nx + 1) + i;
-            size_t coordIndex = pillarIndex * 6;
-            
+            size_t pillarIndex = j * ( nx + 1 ) + i;
+            size_t coordIndex  = pillarIndex * 6;
+
             // Find top and bottom coordinates for this pillar
             // Use corner nodes from adjacent cells to define pillar
-            cvf::Vec3d topCoord(0.0, 0.0, 0.0);
-            cvf::Vec3d bottomCoord(0.0, 0.0, 0.0);
-            
+            cvf::Vec3d topCoord( 0.0, 0.0, 0.0 );
+            cvf::Vec3d bottomCoord( 0.0, 0.0, 0.0 );
+
             // Sample from available cells to get pillar coordinates
             bool foundCoords = false;
-            
+
             // Check all adjacent cells for this pillar position
             for ( int di = -1; di <= 0 && !foundCoords; ++di )
             {
                 for ( int dj = -1; dj <= 0 && !foundCoords; ++dj )
                 {
-                    int cellI = static_cast<int>(i) + di;
-                    int cellJ = static_cast<int>(j) + dj;
-                    
-                    if ( cellI >= 0 && cellI < static_cast<int>(nx) && 
-                         cellJ >= 0 && cellJ < static_cast<int>(ny) )
+                    int cellI = static_cast<int>( i ) + di;
+                    int cellJ = static_cast<int>( j ) + dj;
+
+                    if ( cellI >= 0 && cellI < static_cast<int>( nx ) && cellJ >= 0 && cellJ < static_cast<int>( ny ) )
                     {
                         // Find a cell at k=0 to get pillar coordinates
-                        size_t cellIndex = static_cast<size_t>(cellJ * nx + cellI);
-                        
+                        size_t cellIndex = static_cast<size_t>( cellJ * nx + cellI );
+
                         if ( cellIndex < cells.size() )
                         {
                             const RigCell& cell = cells[cellIndex];
-                            
+
                             // Determine which corner of this cell corresponds to our pillar
                             size_t cornerIdx = 0;
-                            if ( di == 0 && dj == 0 ) cornerIdx = 0;      // cell's (0,0) corner
-                            else if ( di == -1 && dj == 0 ) cornerIdx = 1;   // cell's (1,0) corner  
-                            else if ( di == 0 && dj == -1 ) cornerIdx = 3;   // cell's (0,1) corner
-                            else if ( di == -1 && dj == -1 ) cornerIdx = 2;  // cell's (1,1) corner
-                            
+                            if ( di == 0 && dj == 0 )
+                                cornerIdx = 0; // cell's (0,0) corner
+                            else if ( di == -1 && dj == 0 )
+                                cornerIdx = 1; // cell's (1,0) corner
+                            else if ( di == 0 && dj == -1 )
+                                cornerIdx = 3; // cell's (0,1) corner
+                            else if ( di == -1 && dj == -1 )
+                                cornerIdx = 2; // cell's (1,1) corner
+
                             size_t nodeIndex = cell.cornerIndices()[cornerIdx];
                             if ( nodeIndex < nodes.size() )
                             {
-                                topCoord = nodes[nodeIndex];
+                                topCoord    = nodes[nodeIndex];
                                 foundCoords = true;
-                                
+
                                 // Find bottom coordinate from deepest cell
                                 bottomCoord = topCoord;
                                 for ( size_t k = 0; k < nz; ++k )
                                 {
-                                    size_t deepCellIndex = k * nx * ny + static_cast<size_t>(cellJ * nx + cellI);
+                                    size_t deepCellIndex = k * nx * ny + static_cast<size_t>( cellJ * nx + cellI );
                                     if ( deepCellIndex < cells.size() )
                                     {
-                                        const RigCell& deepCell = cells[deepCellIndex];
-                                        size_t deepCornerIdx = cornerIdx + 4; // bottom corners are +4 from top
-                                        size_t deepNodeIndex = deepCell.cornerIndices()[deepCornerIdx];
+                                        const RigCell& deepCell      = cells[deepCellIndex];
+                                        size_t         deepCornerIdx = cornerIdx + 4; // bottom corners are +4 from top
+                                        size_t         deepNodeIndex = deepCell.cornerIndices()[deepCornerIdx];
                                         if ( deepNodeIndex < nodes.size() )
                                         {
                                             bottomCoord = nodes[deepNodeIndex];
@@ -997,42 +1002,85 @@ void RigCellGeometryTools::convertGridToCornerPointArrays( const std::vector<Rig
                     }
                 }
             }
-            
+
             // Store pillar coordinates in COORD array
             coordArray[coordIndex + 0] = static_cast<float>( topCoord.x() );
             coordArray[coordIndex + 1] = static_cast<float>( topCoord.y() );
-            coordArray[coordIndex + 2] = static_cast<float>( topCoord.z() );
+            coordArray[coordIndex + 2] = static_cast<float>( -topCoord.z() );
             coordArray[coordIndex + 3] = static_cast<float>( bottomCoord.x() );
             coordArray[coordIndex + 4] = static_cast<float>( bottomCoord.y() );
-            coordArray[coordIndex + 5] = static_cast<float>( bottomCoord.z() );
+            coordArray[coordIndex + 5] = static_cast<float>( -bottomCoord.z() );
         }
     }
 
     // Create ZCORN array - Z coordinates for each cell corner
+    // ZCORN format: layer by layer, with X cycling fastest
+    // For each layer: top face of layer, then bottom face of layer
+    // Each face: 4 corner points per cell (i,j), with i cycling fastest
+    size_t zcornIndex = 0;
+
     for ( size_t k = 0; k < nz; ++k )
     {
+        // Top face of layer k
         for ( size_t j = 0; j < ny; ++j )
         {
             for ( size_t i = 0; i < nx; ++i )
             {
                 size_t cellIndex = k * nx * ny + j * nx + i;
-                
+
                 if ( cellIndex < cells.size() )
                 {
                     const RigCell& cell = cells[cellIndex];
-                    size_t zcornIndex = cellIndex * 8;
-                    
-                    // Eclipse ZCORN ordering: 8 corners per cell
-                    // Top corners (k): 0=(-,-), 1=(+,-), 2=(+,+), 3=(-,+)  
-                    // Bottom corners (k+1): 4=(-,-), 5=(+,-), 6=(+,+), 7=(-,+)
-                    for ( int corner = 0; corner < 8; ++corner )
+
+                    // Top corners: 0=(-I,-J), 1=(+I,-J), 2=(+I,+J), 3=(-I,+J)
+                    for ( int corner = 0; corner < 4; ++corner )
                     {
                         size_t nodeIndex = cell.cornerIndices()[corner];
                         if ( nodeIndex < nodes.size() )
                         {
-                            zcornArray[zcornIndex + corner] = static_cast<float>( nodes[nodeIndex].z() );
+                            zcornArray[zcornIndex++] = static_cast<float>( -nodes[nodeIndex].z() );
+                        }
+                        else
+                        {
+                            zcornIndex++;
                         }
                     }
+                }
+                else
+                {
+                    zcornIndex += 4;
+                }
+            }
+        }
+
+        // Bottom face of layer k
+        for ( size_t j = 0; j < ny; ++j )
+        {
+            for ( size_t i = 0; i < nx; ++i )
+            {
+                size_t cellIndex = k * nx * ny + j * nx + i;
+
+                if ( cellIndex < cells.size() )
+                {
+                    const RigCell& cell = cells[cellIndex];
+
+                    // Bottom corners: 4=(-I,-J), 5=(+I,-J), 6=(+I,+J), 7=(-I,+J)
+                    for ( int corner = 4; corner < 8; ++corner )
+                    {
+                        size_t nodeIndex = cell.cornerIndices()[corner];
+                        if ( nodeIndex < nodes.size() )
+                        {
+                            zcornArray[zcornIndex++] = static_cast<float>( -nodes[nodeIndex].z() );
+                        }
+                        else
+                        {
+                            zcornIndex++;
+                        }
+                    }
+                }
+                else
+                {
+                    zcornIndex += 4;
                 }
             }
         }

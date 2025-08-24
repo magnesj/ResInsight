@@ -455,7 +455,8 @@ bool RifEclipseInputFileTools::exportGrid_msj( const QString&         resultFile
             coordArrayDouble.push_back( v );
         }
 
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble );
+        int valuesPerRow = 4;
+        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble, valuesPerRow );
     }
 
     {
@@ -468,7 +469,8 @@ bool RifEclipseInputFileTools::exportGrid_msj( const QString&         resultFile
             coordArrayDouble.push_back( v );
         }
 
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble );
+        int valuesPerRow = 4;
+        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble, valuesPerRow );
     }
 
     return true;
@@ -577,7 +579,8 @@ bool RifEclipseInputFileTools::exportKeywords( const QString&              resul
 
         // Multiple keywords can be exported to same file, so write ECHO keywords outside the loop
         bool writeEchoKeywordsInExporterObject = false;
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, filteredResults );
+        int  valuePerRow                       = 5;
+        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, filteredResults, valuePerRow );
 
         progress.incrementProgress();
     }
