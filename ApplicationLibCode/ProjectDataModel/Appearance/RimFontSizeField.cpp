@@ -36,3 +36,12 @@ void RimFontSizeField::configureCapabilities()
         uiFieldHandle->setValueOptionsGenerator( callback );
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimFontSizeField& RimFontSizeField::operator=( const caf::FontTools::RelativeSize& value )
+{
+    setValue( value );
+    return *this;
+}

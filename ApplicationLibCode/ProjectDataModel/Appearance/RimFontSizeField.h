@@ -22,8 +22,6 @@
 #include "cafPdmField.h"
 #include "cafPdmFieldScriptingCapability.h"
 
-#include <memory>
-
 //==================================================================================================
 ///
 ///
@@ -33,11 +31,7 @@ class RimFontSizeField : public caf::PdmField<caf::FontTools::RelativeSizeEnum>
 public:
     void configureCapabilities() override;
 
-    RimFontSizeField& operator=( const caf::FontTools::RelativeSize& value )
-    {
-        setValue( value );
-        return *this;
-    }
+    RimFontSizeField& operator=( const caf::FontTools::RelativeSize& value );
 };
 
 namespace caf
