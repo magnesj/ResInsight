@@ -29,6 +29,8 @@
 #include "ExportCommands/RicEclipseCellResultToFileImpl.h"
 
 #include "RifEclipseInputPropertyLoader.h"
+
+#include "RigEclipseGridConverter.h"
 #include "RifEclipseKeywordContent.h"
 #include "RifEclipseTextFileReader.h"
 #include "RifReaderEclipseOutput.h"
@@ -227,7 +229,7 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
                                            const cvf::Vec3st&     maxIn,
                                            const cvf::Vec3st&     refinement )
 {
-    return exportGrid_msj( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
+    return RigEclipseGridConverter::exportGrid( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
 
     if ( !eclipseCase )
     {
@@ -384,93 +386,6 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifEclipseInputFileTools::exportGrid_msj( const QString&         resultFileName,
-                                               RigEclipseCaseData*    eclipseCase,
-                                               bool                   exportInLocalCoordinates,
-                                               const cvf::UByteArray* cellVisibilityOverrideForActnum /*= nullptr*/,
-                                               const cvf::Vec3st&     min /*= cvf::Vec3st::ZERO*/,
-                                               const cvf::Vec3st&     max /*= cvf::Vec3st::UNDEFINED*/,
-                                               const cvf::Vec3st&     refinement /*= cvf::Vec3st( 1, 1, 1 ) */ )
-{
-    if ( !eclipseCase )
-    {
-        return false;
-    }
-
-    const RigActiveCellInfo* activeCellInfo = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-
-    CVF_ASSERT( activeCellInfo );
-
-    const RigMainGrid* mainGrid = eclipseCase->mainGrid();
-
-    std::vector<float> coordArray;
-    std::vector<float> zcornArray;
-
-    auto nodes = mainGrid->nodes();
-
-    std::vector<RigCell> cells;
-
-    for ( size_t k = 0; k <= max.z() - min.z(); ++k )
-    {
-        for ( size_t j = 0; j <= max.y() - min.y(); ++j )
-        {
-            for ( size_t i = 0; i <= max.x() - min.x(); ++i )
-            {
-                size_t mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j, min.z() + k );
-
-                cells.push_back( mainGrid->cell( mainIndex ) );
-            }
-        }
-    }
-
-    size_t ni = ( max.x() - min.x() + 1 ) * refinement.x();
-    size_t nj = ( max.y() - min.y() + 1 ) * refinement.y();
-    size_t nk = ( max.z() - min.z() + 1 ) * refinement.z();
-
-    RigCellGeometryTools::convertGridToCornerPointArrays( cells, nodes, ni, nj, nk, coordArray, zcornArray );
-
-    QFile exportFile( resultFileName );
-    if ( !exportFile.open( QIODevice::WriteOnly | QIODevice::Text ) )
-    {
-        return false;
-    }
-
-    {
-        QTextStream out( &exportFile );
-        out << "SPECGRID\n";
-        out << "  " << ni << "  " << nj << "  " << nk << "  1  F /\n";
-    }
-
-    {
-        bool                writeEchoKeywordsInExporterObject = true;
-        QString             keyword                           = "COORD";
-        std::vector<double> coordArrayDouble;
-        // convert from float to double
-        for ( const auto& v : coordArray )
-        {
-            coordArrayDouble.push_back( v );
-        }
-
-        int valuesPerRow = 4;
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble, valuesPerRow );
-    }
-
-    {
-        bool                writeEchoKeywordsInExporterObject = true;
-        QString             keyword                           = "ZCORN";
-        std::vector<double> coordArrayDouble;
-        // convert from float to double
-        for ( const auto& v : zcornArray )
-        {
-            coordArrayDouble.push_back( v );
-        }
-
-        int valuesPerRow = 4;
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, coordArrayDouble, valuesPerRow );
-    }
-
-    return true;
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
