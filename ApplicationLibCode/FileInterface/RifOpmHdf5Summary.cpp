@@ -94,7 +94,7 @@ bool RifOpmHdf5Summary::open( const QString& headerFileName, bool includeRestart
                 m_timeSteps.push_back( timeAsTimeT );
             }
         }
-        
+
         // Create and set addresses after successful initialization
         createAndSetAddresses();
     }
