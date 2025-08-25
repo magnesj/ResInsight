@@ -67,7 +67,6 @@ public:
                             const cvf::Vec3st&     max                             = cvf::Vec3st::UNDEFINED,
                             const cvf::Vec3st&     refinement                      = cvf::Vec3st( 1, 1, 1 ) );
 
-
     static bool exportKeywords( const QString&              resultFileName,
                                 RigEclipseCaseData*         eclipseCase,
                                 const std::vector<QString>& keywords,

@@ -30,10 +30,10 @@
 
 #include "RifEclipseInputPropertyLoader.h"
 
-#include "RigResdataGridConverter.h"
 #include "RifEclipseKeywordContent.h"
 #include "RifEclipseTextFileReader.h"
 #include "RifReaderEclipseOutput.h"
+#include "RigResdataGridConverter.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"

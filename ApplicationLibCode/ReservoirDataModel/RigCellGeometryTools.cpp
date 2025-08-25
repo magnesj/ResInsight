@@ -907,4 +907,3 @@ bool RigCellGeometryTools::pointInsideCellNegK2D( const cvf::Vec3d& point, const
 
     return RigCellGeometryTools::pointInsidePolygon2D( point, polygon );
 }
-
