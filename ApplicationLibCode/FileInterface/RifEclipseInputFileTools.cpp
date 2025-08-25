@@ -30,7 +30,7 @@
 
 #include "RifEclipseInputPropertyLoader.h"
 
-#include "RigEclipseGridConverter.h"
+#include "RigResdataGridConverter.h"
 #include "RifEclipseKeywordContent.h"
 #include "RifEclipseTextFileReader.h"
 #include "RifReaderEclipseOutput.h"
@@ -229,7 +229,7 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
                                            const cvf::Vec3st&     maxIn,
                                            const cvf::Vec3st&     refinement )
 {
-    return RigEclipseGridConverter::exportGrid( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
+    return RigResdataGridConverter::exportGrid( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
 
     if ( !eclipseCase )
     {

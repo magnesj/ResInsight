@@ -32,7 +32,7 @@ class RigCell;
 // Utility class for converting Eclipse grids to various formats
 //
 //==================================================================================================
-class RigEclipseGridConverter
+class RigResdataGridConverter
 {
 public:
     static bool exportGrid( const QString&         gridFileName,
@@ -52,5 +52,5 @@ public:
                                                 std::vector<float>&            zcornArray );
 
 private:
-    RigEclipseGridConverter() = delete;
+    RigResdataGridConverter() = delete;
 };

@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseGridConverter.h"
+#include "RigResdataGridConverter.h"
 
 #include "ExportCommands/RicEclipseCellResultToFileImpl.h"
 
@@ -40,7 +40,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigEclipseGridConverter::exportGrid( const QString&         resultFileName,
+bool RigResdataGridConverter::exportGrid( const QString&         resultFileName,
                                           RigEclipseCaseData*    eclipseCase,
                                           bool                   exportInLocalCoordinates,
                                           const cvf::UByteArray* cellVisibilityOverrideForActnum /*= nullptr*/,
@@ -138,7 +138,7 @@ bool RigEclipseGridConverter::exportGrid( const QString&         resultFileName,
 /// See Eclipse_Grid_Format.md for details
 ///
 //--------------------------------------------------------------------------------------------------
-void RigEclipseGridConverter::convertGridToCornerPointArrays( const std::vector<RigCell>&    cells,
+void RigResdataGridConverter::convertGridToCornerPointArrays( const std::vector<RigCell>&    cells,
                                                               const std::vector<cvf::Vec3d>& nodes,
                                                               size_t                         nx,
                                                               size_t                         ny,
