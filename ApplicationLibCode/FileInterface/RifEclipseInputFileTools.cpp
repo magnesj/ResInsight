@@ -408,10 +408,6 @@ bool RifEclipseInputFileTools::exportGrid_msj( const QString&         resultFile
 
     auto nodes = mainGrid->nodes();
 
-    auto nI = mainGrid->cellCountI();
-    auto nJ = mainGrid->cellCountJ();
-    auto nK = mainGrid->cellCountK();
-
     std::vector<RigCell> cells;
 
     for ( size_t k = 0; k <= max.z() - min.z(); ++k )
