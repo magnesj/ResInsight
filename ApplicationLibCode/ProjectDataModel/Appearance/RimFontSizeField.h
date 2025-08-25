@@ -43,38 +43,15 @@ public:
 namespace caf
 {
 template <>
-class PdmFieldScriptingCapability<RimFontSizeField> : public PdmAbstractFieldScriptingCapability
+class PdmFieldScriptingCapability<RimFontSizeField> : public PdmFieldScriptingCapability<PdmField<caf::FontTools::RelativeSizeEnum>>
 {
 public:
     PdmFieldScriptingCapability( RimFontSizeField* field, const QString& fieldName, bool giveOwnership )
-        : PdmAbstractFieldScriptingCapability( field, fieldName, giveOwnership )
-        , m_baseCapability(
-              std::make_unique<PdmFieldScriptingCapability<
-                  caf::PdmField<caf::FontTools::RelativeSizeEnum>>>( static_cast<caf::PdmField<caf::FontTools::RelativeSizeEnum>*>( field ),
-                                                                     fieldName,
-                                                                     false ) )
+        : PdmFieldScriptingCapability<PdmField<caf::FontTools::RelativeSizeEnum>>( field, fieldName, giveOwnership )
     {
     }
 
-    void writeToField( QTextStream&          inputStream,
-                       PdmObjectFactory*     objectFactory,
-                       PdmScriptIOMessages*  errorMessageContainer,
-                       bool                  stringsAreQuoted    = true,
-                       caf::PdmObjectHandle* existingObjectsRoot = nullptr ) override
-    {
-        m_baseCapability->writeToField( inputStream, objectFactory, errorMessageContainer, stringsAreQuoted, existingObjectsRoot );
-    }
-
-    void readFromField( QTextStream& outputStream, bool quoteStrings = true, bool quoteNonBuiltins = false ) const override
-    {
-        m_baseCapability->readFromField( outputStream, quoteStrings, quoteNonBuiltins );
-    }
-
-    QStringList enumScriptTexts() const override { return m_baseCapability->enumScriptTexts(); }
-    QString     dataType() const override { return "str"; }
-
-private:
-    std::unique_ptr<PdmFieldScriptingCapability<caf::PdmField<caf::FontTools::RelativeSizeEnum>>> m_baseCapability;
+    QString dataType() const override { return "str"; }
 };
 
 }; // namespace caf

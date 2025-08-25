@@ -33,69 +33,31 @@ enum class MyEnum
     T6
 };
 
+// This is a specialized class that can be used to implement custom behavior in configureCapabilities
+// It is required to have a specialization of PdmFieldScriptingCapability for this class, as the new class
+// MyAppEnumField is not known to the template
 class MyAppEnumField : public caf::PdmField<caf::AppEnum<MyEnum>>
 {
 public:
     MyAppEnumField() {
 
     };
+
+    void configureCapabilities() override {};
 };
 
 namespace caf
 {
 template <>
-class PdmFieldScriptingCapability<MyAppEnumField> : public PdmAbstractFieldScriptingCapability
+class PdmFieldScriptingCapability<MyAppEnumField> : public PdmFieldScriptingCapability<caf::PdmField<caf::AppEnum<MyEnum>>>
 {
 public:
     PdmFieldScriptingCapability( MyAppEnumField* field, const QString& fieldName, bool giveOwnership )
-        : PdmAbstractFieldScriptingCapability( field, fieldName, giveOwnership )
+        : PdmFieldScriptingCapability<caf::PdmField<caf::AppEnum<MyEnum>>>( field, fieldName, giveOwnership )
     {
-        m_field = field;
-    }
-
-    void writeToField( QTextStream&          inputStream,
-                       PdmObjectFactory*     objectFactory,
-                       PdmScriptIOMessages*  errorMessageContainer,
-                       bool                  stringsAreQuoted    = true,
-                       caf::PdmObjectHandle* existingObjectsRoot = nullptr ) override
-    {
-        if ( this->isIOWriteable() )
-        {
-            caf::AppEnum<MyEnum> value;
-
-            PdmFieldScriptingCapabilityIOHandler<caf::AppEnum<MyEnum>>::writeToField( value,
-                                                                                      inputStream,
-                                                                                      errorMessageContainer,
-                                                                                      stringsAreQuoted );
-            m_field->setValue( value );
-        }
-    }
-
-    void readFromField( QTextStream& outputStream, bool quoteStrings = true, bool quoteNonBuiltins = false ) const override
-    {
-        PdmFieldScriptingCapabilityIOHandler<caf::AppEnum<MyEnum>>::readFromField( m_field->value(),
-                                                                                   outputStream,
-                                                                                   quoteStrings,
-                                                                                   quoteNonBuiltins );
-    }
-
-    QStringList enumScriptTexts() const override
-    {
-        QStringList enumTexts;
-
-        for ( size_t i = 0; i < AppEnum<MyEnum>::size(); i++ )
-        {
-            auto enumText = AppEnum<MyEnum>::text( AppEnum<MyEnum>::fromIndex( i ) );
-            enumTexts.push_back( enumText );
-        }
-
-        return enumTexts;
     }
 
     QString dataType() const override { return "str"; }
-
-private:
-    PdmField<AppEnum<MyEnum>>* m_field;
 };
 }; // namespace caf
 
