@@ -105,6 +105,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseMultiPropertyStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleFractureStatisticsCalculator.cpp

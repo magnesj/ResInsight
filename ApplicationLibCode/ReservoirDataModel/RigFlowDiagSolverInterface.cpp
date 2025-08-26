@@ -21,6 +21,7 @@
 #include <memory>
 
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RifEclipseOutputFileTools.h"
 #include "RifReaderEclipseOutput.h"

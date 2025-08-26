@@ -23,6 +23,7 @@
 #include "RiaDefines.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaGuiApplication.h"
+#include "RiaResultNames.h"
 
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"

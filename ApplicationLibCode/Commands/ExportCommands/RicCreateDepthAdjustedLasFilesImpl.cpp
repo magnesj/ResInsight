@@ -20,6 +20,7 @@
 #include "RicCreateDepthAdjustedLasFilesImpl.h"
 
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RicCreateDepthAdjustedLasFilesUi.h"
 

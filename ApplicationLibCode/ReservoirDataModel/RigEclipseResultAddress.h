@@ -18,117 +18,51 @@
 #pragma once
 
 #include "RiaDefines.h"
-#include "RiaResultNames.h"
 
 #include <QString>
 
 class RigEclipseResultAddress
 {
 public:
-    RigEclipseResultAddress()
-        : m_resultCatType( RiaDefines::ResultCatType::UNDEFINED )
-        , m_resultDataType( RiaDefines::ResultDataType::UNKNOWN )
-        , m_timeLapseBaseFrameIdx( NO_TIME_LAPSE )
-        , m_differenceCaseId( NO_CASE_DIFF )
-        , m_divideByCellFaceArea( false )
-    {
-    }
-
-    explicit RigEclipseResultAddress( const QString& resultName )
-        : m_resultCatType( RiaDefines::ResultCatType::UNDEFINED )
-        , m_resultDataType( RiaDefines::ResultDataType::UNKNOWN )
-        , m_resultName( resultName )
-        , m_timeLapseBaseFrameIdx( NO_TIME_LAPSE )
-        , m_differenceCaseId( NO_CASE_DIFF )
-        , m_divideByCellFaceArea( false )
-    {
-    }
-
+    RigEclipseResultAddress();
+    explicit RigEclipseResultAddress( const QString& resultName );
     explicit RigEclipseResultAddress( RiaDefines::ResultCatType type,
                                       const QString&            resultName,
                                       int                       timeLapseBaseTimeStep = NO_TIME_LAPSE,
                                       int                       differenceCaseId      = NO_CASE_DIFF,
-                                      bool                      divideByCellFaceArea  = false )
-        : m_resultCatType( type )
-        , m_resultDataType( RiaDefines::ResultDataType::UNKNOWN )
-        , m_resultName( resultName )
-        , m_timeLapseBaseFrameIdx( timeLapseBaseTimeStep )
-        , m_differenceCaseId( differenceCaseId )
-        , m_divideByCellFaceArea( divideByCellFaceArea )
-    {
-    }
+                                      bool                      divideByCellFaceArea  = false );
+    explicit RigEclipseResultAddress( RiaDefines::ResultCatType type, RiaDefines::ResultDataType dataType, const QString& resultName );
 
-    explicit RigEclipseResultAddress( RiaDefines::ResultCatType type, RiaDefines::ResultDataType dataType, const QString& resultName )
-        : m_resultCatType( type )
-        , m_resultDataType( dataType )
-        , m_resultName( resultName )
-        , m_timeLapseBaseFrameIdx( NO_TIME_LAPSE )
-        , m_differenceCaseId( NO_CASE_DIFF )
-        , m_divideByCellFaceArea( false )
-    {
-    }
-
-    bool isValid() const { return !( m_resultName.isEmpty() || m_resultName == RiaResultNames::undefinedResultName() ); }
+    bool isValid() const;
 
     void                       setDataType( RiaDefines::ResultDataType dataType ) { m_resultDataType = dataType; }
     RiaDefines::ResultDataType dataType() const { return m_resultDataType; }
 
     // Delta Time Step
-    bool                 isDeltaTimeStepActive() const { return m_timeLapseBaseFrameIdx > NO_TIME_LAPSE; }
-    void                 setDeltaTimeStepIndex( int timeStepIndex ) { m_timeLapseBaseFrameIdx = timeStepIndex; }
-    int                  deltaTimeStepIndex() const { return m_timeLapseBaseFrameIdx; }
-    bool                 representsAllTimeLapses() const { return m_timeLapseBaseFrameIdx == ALL_TIME_LAPSES; }
+    bool                 isDeltaTimeStepActive() const;
+    void                 setDeltaTimeStepIndex( int timeStepIndex );
+    int                  deltaTimeStepIndex() const;
+    bool                 representsAllTimeLapses() const;
     static constexpr int allTimeLapsesValue() { return ALL_TIME_LAPSES; }
     static constexpr int noTimeLapseValue() { return NO_TIME_LAPSE; }
-
     // Delta Grid Case
-    bool                 isDeltaCaseActive() const { return m_differenceCaseId > NO_CASE_DIFF; }
-    void                 setDeltaCaseId( int caseId ) { m_differenceCaseId = caseId; }
-    int                  deltaCaseId() const { return m_differenceCaseId; }
+    bool                 isDeltaCaseActive() const;
+    void                 setDeltaCaseId( int caseId );
+    int                  deltaCaseId() const;
     static constexpr int noCaseDiffValue() { return NO_CASE_DIFF; }
 
     // Divide by Cell Face Area
-    void enableDivideByCellFaceArea( bool enable ) { m_divideByCellFaceArea = enable; }
+    void enableDivideByCellFaceArea( bool enable );
+    bool isDivideByCellFaceAreaActive() const;
 
-    bool isDivideByCellFaceAreaActive() const { return m_divideByCellFaceArea; }
+    bool operator<( const RigEclipseResultAddress& other ) const;
+    bool operator==( const RigEclipseResultAddress& other ) const;
 
-    bool operator<( const RigEclipseResultAddress& other ) const
-    {
-        if ( m_divideByCellFaceArea != other.m_divideByCellFaceArea )
-        {
-            return ( m_divideByCellFaceArea < other.m_divideByCellFaceArea );
-        }
+    const QString& resultName() const;
+    void           setResultName( QString name );
 
-        if ( m_differenceCaseId != other.m_differenceCaseId )
-        {
-            return ( m_differenceCaseId < other.m_differenceCaseId );
-        }
-
-        if ( m_timeLapseBaseFrameIdx != other.m_timeLapseBaseFrameIdx )
-        {
-            return ( m_timeLapseBaseFrameIdx < other.m_timeLapseBaseFrameIdx );
-        }
-
-        if ( m_resultCatType != other.m_resultCatType )
-        {
-            return ( m_resultCatType < other.m_resultCatType );
-        }
-
-        return ( m_resultName < other.m_resultName );
-    }
-
-    bool operator==( const RigEclipseResultAddress& other ) const
-    {
-        return m_resultCatType == other.m_resultCatType && m_resultName == other.m_resultName &&
-               m_timeLapseBaseFrameIdx == other.m_timeLapseBaseFrameIdx && m_differenceCaseId == other.m_differenceCaseId &&
-               m_divideByCellFaceArea == other.m_divideByCellFaceArea;
-    }
-
-    const QString& resultName() const { return m_resultName; }
-    void           setResultName( QString name ) { m_resultName = name; }
-
-    RiaDefines::ResultCatType resultCatType() const { return m_resultCatType; }
-    void                      setResultCatType( RiaDefines::ResultCatType catType ) { m_resultCatType = catType; }
+    RiaDefines::ResultCatType resultCatType() const;
+    void                      setResultCatType( RiaDefines::ResultCatType catType );
 
 private:
     RiaDefines::ResultCatType  m_resultCatType;
