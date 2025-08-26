@@ -78,6 +78,7 @@ public:
     void                                setFillStyle( Qt::BrushStyle brushStyle );
     void                                setFillColor( const cvf::Color3f& fillColor );
     void                                setFillColorTransparency( float fillColorTransparency );
+    void                                setCurveColorTransparency( float curveColorTransparency );
 
     bool isChecked() const;
     void setCheckState( bool isChecked );

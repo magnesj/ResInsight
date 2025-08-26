@@ -155,8 +155,10 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitField( &m_colorForRealizations, "Color", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
-    CAF_PDM_InitField( &m_colorBlending, "ColorTransparency", 0.3, "Blending [0..1]" );
+    CAF_PDM_InitField( &m_colorBlending, "ColorTransparency", 0.1, "Blending [0..1]" );
     m_colorBlending.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    CAF_PDM_InitField( &m_transparencyForRealizations, "TransparencyForRealizations", 0.9, "Transparency [0..1]" );
+    m_transparencyForRealizations.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString( "" ), "Parameter" );
     m_ensembleParameter.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -925,7 +927,8 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
     {
         updateAllCurves();
     }
-    else if ( changedField == &m_colorForRealizations || changedField == &m_mainEnsembleColor || changedField == &m_colorBlending )
+    else if ( changedField == &m_colorForRealizations || changedField == &m_mainEnsembleColor || changedField == &m_colorBlending ||
+              changedField == &m_transparencyForRealizations )
     {
         setBlendedCurveColor();
 
@@ -1415,6 +1418,7 @@ void RimEnsembleCurveSet::appendColorGroup( caf::PdmUiOrdering& uiOrdering )
     caf::PdmUiGroup* colorsGroup = uiOrdering.addNewGroup( "Appearance" );
     m_colorMode.uiCapability()->setUiReadOnly( !m_yValuesSummaryEnsemble() );
     colorsGroup->add( &m_colorMode );
+    colorsGroup->add( &m_transparencyForRealizations );
 
     if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR )
     {
@@ -1544,6 +1548,15 @@ void RimEnsembleCurveSet::defineEditorAttribute( const caf::PdmFieldHandle* fiel
         if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
             myAttr->m_minimum  = 0.001;
+            myAttr->m_maximum  = 1.0;
+            myAttr->m_decimals = 2;
+        }
+    }
+    if ( field == &m_transparencyForRealizations )
+    {
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
+        {
+            myAttr->m_minimum  = 0.0;
             myAttr->m_maximum  = 1.0;
             myAttr->m_decimals = 2;
         }
@@ -2044,6 +2057,7 @@ void RimEnsembleCurveSet::updateCurveColors()
     for ( size_t i = 0; i < curvesToColor.size(); i++ )
     {
         curvesToColor[i]->setColor( caseColors[i] );
+        curvesToColor[i]->setCurveColorTransparency( m_transparencyForRealizations );
         curvesToColor[i]->updateCurveAppearance();
     }
 

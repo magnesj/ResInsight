@@ -735,6 +735,14 @@ void RimPlotCurve::setFillColorTransparency( float fillColorTransparency )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurve::setCurveColorTransparency( float curveColorTransparency )
+{
+    m_curveAppearance->setCurveColorTransparency( curveColorTransparency );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimPlotCurve::showInLegend() const
 {
     return m_showLegend;
