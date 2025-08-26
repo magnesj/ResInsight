@@ -19,6 +19,8 @@
 
 #include "RigResultAccessorFactory.h"
 
+#include "RiaResultNames.h"
+
 #include "RigActiveCellInfo.h"
 #include "RigActiveCellsResultAccessor.h"
 #include "RigAllGridCellsResultAccessor.h"

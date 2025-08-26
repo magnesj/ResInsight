@@ -23,6 +23,7 @@
 #include "RiaApplication.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RicImportSummaryCasesFeature.h"
 

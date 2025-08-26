@@ -23,6 +23,7 @@
 #include "Histogram/RimGridStatisticsHistogramDataSource.h"
 #include "RiaLogging.h"
 #include "RiaQDateTimeTools.h"
+#include "RiaResultNames.h"
 
 #include "RicfCommandObject.h"
 

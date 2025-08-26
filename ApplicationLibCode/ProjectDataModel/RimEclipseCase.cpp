@@ -27,6 +27,7 @@
 #include "RiaLogging.h"
 #include "RiaPreferencesGrid.h"
 #include "RiaQDateTimeTools.h"
+#include "RiaResultNames.h"
 
 #include "CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
 
