@@ -86,6 +86,9 @@ public:
     void         setFillColor( const cvf::Color3f& fillColor );
     cvf::Color3f fillColor() const;
 
+    void  setCurveColorTransparency( float curveColorTransparency );
+    float curveColorTransparency() const;
+
     void  setFillColorTransparency( float fillColorTransparency );
     float fillColorTransparency() const;
 
@@ -114,6 +117,7 @@ protected:
     caf::PdmField<int>     m_symbolSize;
 
     caf::PdmField<cvf::Color3f> m_curveColor;
+    caf::PdmField<float>        m_curveColorTransparency;
     caf::PdmField<int>          m_curveThickness;
     caf::PdmField<float>        m_symbolSkipPixelDistance;
 

@@ -88,6 +88,8 @@ RimPlotCurveAppearance::RimPlotCurveAppearance()
     CAF_PDM_InitObject( "Curve Apperance" );
 
     CAF_PDM_InitField( &m_curveColor, "Color", RiaColorTools::textColor3f(), "Color" );
+    CAF_PDM_InitField( &m_curveColorTransparency, "CurveColorTransparency", 1.0f, "Transparency" );
+    m_curveColorTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_fillColor, "FillColor", cvf::Color3f( -1.0, -1.0, -1.0 ), "Fill Color" );
     CAF_PDM_InitField( &m_fillColorTransparency, "FillColorTransparency", 1.0f, "Fill Color Transparency" );
     m_fillColorTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -151,7 +153,7 @@ void RimPlotCurveAppearance::fieldChangedByUi( const caf::PdmFieldHandle* change
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurveAppearance ::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_fillColorTransparency )
+    if ( field == &m_curveColorTransparency || field == &m_fillColorTransparency )
     {
         caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
         if ( myAttr )
@@ -205,7 +207,9 @@ void RimPlotCurveAppearance::setColorWithFieldChanged( const QColor& color )
 void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_curveColor );
+    uiOrdering.add( &m_curveColorTransparency );
     m_curveColor.uiCapability()->setUiHidden( !m_colorVisible );
+    m_curveColorTransparency.uiCapability()->setUiHidden( !m_colorVisible );
 
     uiOrdering.add( &m_pointSymbol );
     if ( RiuPlotCurveSymbol::isFilledSymbol( m_pointSymbol() ) )
@@ -502,4 +506,20 @@ void RimPlotCurveAppearance::setFillOptionsVisible( bool isVisible )
 void RimPlotCurveAppearance::setCurveFittingToleranceVisible( bool isVisible )
 {
     m_curveFittingToleranceVisible = isVisible;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setCurveColorTransparency( float curveColorTransparency )
+{
+    m_curveColorTransparency = curveColorTransparency;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+float RimPlotCurveAppearance::curveColorTransparency() const
+{
+    return m_curveColorTransparency;
 }

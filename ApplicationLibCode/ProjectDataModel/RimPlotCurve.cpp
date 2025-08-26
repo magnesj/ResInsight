@@ -969,7 +969,7 @@ void RimPlotCurve::setZOrder( double z )
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurve::updateCurveAppearance()
 {
-    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color() );
+    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color(), m_curveAppearance->curveColorTransparency() );
 
     if ( !m_plotCurve ) return;
 
