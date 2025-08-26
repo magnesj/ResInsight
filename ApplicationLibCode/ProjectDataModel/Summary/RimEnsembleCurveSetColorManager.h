@@ -45,7 +45,7 @@ public:
     enum class ColorMode
     {
         SINGLE_COLOR,
-        SINGLE_COLOR_WITH_ALPHA,
+        SINGLE_COLOR_BLENDED,
         BY_ENSEMBLE_PARAM,
         BY_OBJECTIVE_FUNCTION,
         BY_CUSTOM_OBJECTIVE_FUNCTION

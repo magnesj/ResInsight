@@ -151,12 +151,12 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     m_xAddressSelector->setShowResampling( false );
     m_xAddressSelector.uiCapability()->setUiTreeChildrenHidden( true );
 
-    CAF_PDM_InitField( &m_colorMode, "ColorMode", caf::AppEnum<ColorMode>( ColorMode::SINGLE_COLOR_WITH_ALPHA ), "Coloring Mode" );
+    CAF_PDM_InitField( &m_colorMode, "ColorMode", caf::AppEnum<ColorMode>( ColorMode::SINGLE_COLOR_BLENDED ), "Coloring Mode" );
 
     CAF_PDM_InitField( &m_colorForRealizations, "Color", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
-    CAF_PDM_InitField( &m_colorTransparency, "ColorTransparency", 0.3, "Transparency" );
-    m_colorTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    CAF_PDM_InitField( &m_colorBlending, "ColorTransparency", 0.3, "Blending [0..1]" );
+    m_colorBlending.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString( "" ), "Parameter" );
     m_ensembleParameter.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -310,7 +310,7 @@ void RimEnsembleCurveSet::setColor( cvf::Color3f color )
 {
     m_mainEnsembleColor = color;
 
-    setTransparentCurveColor();
+    setBlendedCurveColor();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -925,9 +925,9 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
     {
         updateAllCurves();
     }
-    else if ( changedField == &m_colorForRealizations || changedField == &m_mainEnsembleColor || changedField == &m_colorTransparency )
+    else if ( changedField == &m_colorForRealizations || changedField == &m_mainEnsembleColor || changedField == &m_colorBlending )
     {
-        setTransparentCurveColor();
+        setBlendedCurveColor();
 
         updateCurveColors();
 
@@ -984,7 +984,7 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
             }
         }
 
-        setTransparentCurveColor();
+        setBlendedCurveColor();
         updateCurveColors();
         updateTimeAnnotations();
         updateObjectiveFunctionLegend();
@@ -1340,15 +1340,15 @@ void RimEnsembleCurveSet::onCustomObjectiveFunctionChanged( const caf::SignalEmi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::setTransparentCurveColor()
+void RimEnsembleCurveSet::setBlendedCurveColor()
 {
-    if ( m_colorMode() == RimEnsembleCurveSet::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    if ( m_colorMode() == RimEnsembleCurveSet::ColorMode::SINGLE_COLOR_BLENDED )
     {
         auto backgroundColor = RiuGuiTheme::getColorByVariableName( "backgroundColor1" );
 
         auto sourceColor      = RiaColorTools::toQColor( m_mainEnsembleColor );
         auto sourceWeight     = 100;
-        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 10 * m_colorTransparency ) );
+        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 10 * m_colorBlending ) );
         auto blendedColor     = RiaColorTools::blendQColors( backgroundColor, sourceColor, backgroundWeight, sourceWeight );
 
         m_colorForRealizations = RiaColorTools::fromQColorTo3f( blendedColor );
@@ -1362,7 +1362,7 @@ void RimEnsembleCurveSet::setTransparentCurveColor()
 //--------------------------------------------------------------------------------------------------
 QColor RimEnsembleCurveSet::mainEnsembleColor() const
 {
-    if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED )
     {
         return RiaColorTools::toQColor( m_mainEnsembleColor );
     }
@@ -1420,10 +1420,10 @@ void RimEnsembleCurveSet::appendColorGroup( caf::PdmUiOrdering& uiOrdering )
     {
         colorsGroup->add( &m_colorForRealizations );
     }
-    else if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    else if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED )
     {
         colorsGroup->add( &m_mainEnsembleColor );
-        colorsGroup->add( &m_colorTransparency );
+        colorsGroup->add( &m_colorBlending );
     }
     else if ( m_colorMode == ColorMode::BY_ENSEMBLE_PARAM )
     {
@@ -1539,7 +1539,7 @@ void RimEnsembleCurveSet::defineEditorAttribute( const caf::PdmFieldHandle* fiel
             myAttr->m_showSpinBox = false;
         }
     }
-    if ( field == &m_colorTransparency )
+    if ( field == &m_colorBlending )
     {
         if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
@@ -1581,13 +1581,13 @@ QList<caf::PdmOptionItemInfo> RimEnsembleCurveSet::calculateValueOptions( const 
     else if ( fieldNeedingOptions == &m_colorMode )
     {
         auto singleColorOption          = ColorModeEnum( ColorMode::SINGLE_COLOR );
-        auto singleColorWithAlphaOption = ColorModeEnum( ColorMode::SINGLE_COLOR_WITH_ALPHA );
+        auto singleColorWithAlphaOption = ColorModeEnum( ColorMode::SINGLE_COLOR_BLENDED );
         auto byEnsParamOption           = ColorModeEnum( ColorMode::BY_ENSEMBLE_PARAM );
         auto byObjFuncOption            = ColorModeEnum( ColorMode::BY_OBJECTIVE_FUNCTION );
         auto byCustomObjFuncOption      = ColorModeEnum( ColorMode::BY_CUSTOM_OBJECTIVE_FUNCTION );
 
         options.push_back( caf::PdmOptionItemInfo( singleColorOption.uiText(), ColorMode::SINGLE_COLOR ) );
-        options.push_back( caf::PdmOptionItemInfo( singleColorWithAlphaOption.uiText(), ColorMode::SINGLE_COLOR_WITH_ALPHA ) );
+        options.push_back( caf::PdmOptionItemInfo( singleColorWithAlphaOption.uiText(), ColorMode::SINGLE_COLOR_BLENDED ) );
 
         RimSummaryEnsemble* group = m_yValuesSummaryEnsemble();
         if ( group && group->hasEnsembleParameters() )

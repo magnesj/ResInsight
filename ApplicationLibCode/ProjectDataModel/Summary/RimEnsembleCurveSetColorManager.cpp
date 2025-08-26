@@ -39,7 +39,10 @@ template <>
 void AppEnum<RimEnsembleCurveSetColorManager::ColorMode>::setUp()
 {
     addItem( RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR, "SINGLE_COLOR", "Single Color" );
-    addItem( RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA, "SINGLE_COLOR_WITH_ALPHA", "Single Color with Blending" );
+    addItem( RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED,
+             "SINGLE_COLOR_BLENDED",
+             "Single Color with Blending",
+             { "SINGLE_COLOR_WITH_ALPHA" } );
     addItem( RimEnsembleCurveSetColorManager::ColorMode::BY_ENSEMBLE_PARAM, "BY_ENSEMBLE_PARAM", "By Ensemble Parameter" );
     addItem( RimEnsembleCurveSetColorManager::ColorMode::BY_OBJECTIVE_FUNCTION, "BY_OBJECTIVE_FUNCTION", "By Objective Function" );
     addItem( RimEnsembleCurveSetColorManager::ColorMode::BY_CUSTOM_OBJECTIVE_FUNCTION,
@@ -238,5 +241,5 @@ cvf::Color3f RimEnsembleCurveSetColorManager::caseColor( const RimRegularLegendC
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleCurveSetColorManager::hasSameColorForAllRealizationCurves( ColorMode colorMode )
 {
-    return ( colorMode == ColorMode::SINGLE_COLOR || colorMode == ColorMode::SINGLE_COLOR_WITH_ALPHA );
+    return ( colorMode == ColorMode::SINGLE_COLOR || colorMode == ColorMode::SINGLE_COLOR_BLENDED );
 }

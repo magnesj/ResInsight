@@ -75,12 +75,12 @@ RimCurveSetAppearance::RimCurveSetAppearance()
 {
     CAF_PDM_InitObject( "Curve Set Appearance" );
 
-    CAF_PDM_InitField( &m_colorMode, "ColorMode", caf::AppEnum<ColorMode>( ColorMode::SINGLE_COLOR_WITH_ALPHA ), "Coloring Mode" );
+    CAF_PDM_InitField( &m_colorMode, "ColorMode", caf::AppEnum<ColorMode>( ColorMode::SINGLE_COLOR_BLENDED ), "Coloring Mode" );
 
     CAF_PDM_InitField( &m_colorForRealizations, "Color", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
-    CAF_PDM_InitField( &m_colorTransparency, "ColorTransparency", 0.3, "Transparency" );
-    m_colorTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    CAF_PDM_InitField( &m_blendingValue, "ColorTransparency", 0.3, "Transparency" );
+    m_blendingValue.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString( "" ), "Parameter" );
     m_ensembleParameter.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -154,7 +154,7 @@ void RimCurveSetAppearance::setEnsembleParameter( const QString& ensembleParamet
 RimRegularLegendConfig* RimCurveSetAppearance::legendConfig() const
 {
     if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR ||
-         m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+         m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED )
     {
         return nullptr;
     }
@@ -209,7 +209,7 @@ void RimCurveSetAppearance::updateEnsembleParameterLegend( RimRegularLegendConfi
 //--------------------------------------------------------------------------------------------------
 void RimCurveSetAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_colorMode || changedField == &m_colorTransparency || changedField == &m_mainEnsembleColor )
+    if ( changedField == &m_colorMode || changedField == &m_blendingValue || changedField == &m_mainEnsembleColor )
     {
         updateRealizationColor();
     }
@@ -237,13 +237,13 @@ void RimCurveSetAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changed
 //--------------------------------------------------------------------------------------------------
 void RimCurveSetAppearance::updateRealizationColor()
 {
-    if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED )
     {
         auto backgroundColor = RiuGuiTheme::getColorByVariableName( "backgroundColor1" );
 
         auto sourceColor      = RiaColorTools::toQColor( m_mainEnsembleColor );
         auto sourceWeight     = 100;
-        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 10 * m_colorTransparency ) );
+        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 10 * m_blendingValue ) );
         auto blendedColor     = RiaColorTools::blendQColors( backgroundColor, sourceColor, backgroundWeight, sourceWeight );
 
         m_colorForRealizations = RiaColorTools::fromQColorTo3f( blendedColor );
@@ -265,10 +265,10 @@ void RimCurveSetAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     {
         uiOrdering.add( &m_mainEnsembleColor );
     }
-    else if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    else if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_BLENDED )
     {
         uiOrdering.add( &m_mainEnsembleColor );
-        uiOrdering.add( &m_colorTransparency );
+        uiOrdering.add( &m_blendingValue );
     }
     else if ( m_colorMode == ColorMode::BY_ENSEMBLE_PARAM )
     {
@@ -328,11 +328,11 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
     else if ( fieldNeedingOptions == &m_colorMode )
     {
         auto singleColorOption          = ColorModeEnum( ColorMode::SINGLE_COLOR );
-        auto singleColorWithAlphaOption = ColorModeEnum( ColorMode::SINGLE_COLOR_WITH_ALPHA );
+        auto singleColorWithAlphaOption = ColorModeEnum( ColorMode::SINGLE_COLOR_BLENDED );
         auto byEnsParamOption           = ColorModeEnum( ColorMode::BY_ENSEMBLE_PARAM );
 
         options.push_back( caf::PdmOptionItemInfo( singleColorOption.uiText(), ColorMode::SINGLE_COLOR ) );
-        options.push_back( caf::PdmOptionItemInfo( singleColorWithAlphaOption.uiText(), ColorMode::SINGLE_COLOR_WITH_ALPHA ) );
+        options.push_back( caf::PdmOptionItemInfo( singleColorWithAlphaOption.uiText(), ColorMode::SINGLE_COLOR_BLENDED ) );
         options.push_back( caf::PdmOptionItemInfo( byEnsParamOption.uiText(), ColorMode::BY_ENSEMBLE_PARAM ) );
     }
 
