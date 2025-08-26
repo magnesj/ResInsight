@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RicFaciesPropertiesImportTools.h"
 
