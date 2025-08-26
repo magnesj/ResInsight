@@ -420,6 +420,14 @@ void RimDeltaSummaryCase::createSummaryReaderInterface()
 //--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RimDeltaSummaryCase::summaryReader()
 {
+    if ( m_allResultAddresses.empty() )
+    {
+        // Other Rim classes implementing the summaryReader() function always calls createSummaryReaderInterface() if not present. Here the
+        // logic must be slightly different, we check if no addresses are present. Calling createSummaryReaderInterface() always will give a
+        // large performance penalty.
+        createSummaryReaderInterface();
+    }
+
     return this;
 }
 
