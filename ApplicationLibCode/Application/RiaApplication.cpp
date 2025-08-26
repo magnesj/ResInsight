@@ -508,6 +508,10 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
 
     bool logTiming = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "RiaApplication" );
 
+    // Keep track of fields that fail to resolve references. This can happen for references to objects that are created as part of
+    // initAfterRead(). A second pass to resolve references is done later in this function.
+    std::vector<caf::PdmFieldHandle*> fieldsWithFailingResolve;
+
     {
         QString taskName = QString( "Reading Project Structure from File" );
         auto    task     = progress.task( taskName, 10 );
@@ -566,7 +570,9 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
 
         // At this point, all the file paths variables are replaced and all file paths updated to the new location. This will enable use of
         // file paths in initAfterRead().
-        m_project->resolveReferencesRecursively();
+        // If objects are created in initAfterRead(), references to these objects will added to fieldsWithFailingResolve (example is
+        // realization objects in for ensemble file set)
+        m_project->resolveReferencesRecursively( &fieldsWithFailingResolve );
         m_project->initAfterReadRecursively();
 
         if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.09.2" ) )
@@ -881,6 +887,16 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
             {
                 for ( auto stimPlan : well->stimPlanModelCollection()->allStimPlanModels() )
                     stimPlan->resetAnchorPositionAndThicknessDirection();
+            }
+        }
+
+        // Second pass to resolveReferences() that may have failed in first pass. This is happening for references to realization objects
+        // being created in ensemble->loadDataAndUpdate();
+        for ( auto field : fieldsWithFailingResolve )
+        {
+            if ( field && field->xmlCapability() )
+            {
+                field->xmlCapability()->resolveReferences();
             }
         }
 
