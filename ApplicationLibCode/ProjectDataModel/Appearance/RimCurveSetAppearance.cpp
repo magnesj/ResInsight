@@ -79,7 +79,7 @@ RimCurveSetAppearance::RimCurveSetAppearance()
 
     CAF_PDM_InitField( &m_colorForRealizations, "Color", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
-    CAF_PDM_InitField( &m_blendingValue, "ColorTransparency", 0.3, "Transparency" );
+    CAF_PDM_InitField( &m_blendingValue, "ColorTransparency", 0.3, "Blending Value [0..1]" );
     m_blendingValue.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString( "" ), "Parameter" );

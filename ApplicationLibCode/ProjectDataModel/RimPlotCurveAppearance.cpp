@@ -155,11 +155,11 @@ void RimPlotCurveAppearance ::defineEditorAttribute( const caf::PdmFieldHandle* 
 {
     if ( field == &m_curveColorTransparency || field == &m_fillColorTransparency )
     {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
+        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
-            myAttr->m_minimum = 0.0;
-            myAttr->m_maximum = 1.0;
+            myAttr->m_minimum  = 0.0;
+            myAttr->m_maximum  = 1.0;
+            myAttr->m_decimals = 2;
         }
     }
 }
