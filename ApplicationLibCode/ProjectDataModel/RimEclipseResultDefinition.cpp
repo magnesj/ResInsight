@@ -1425,6 +1425,8 @@ bool RimEclipseResultDefinition::isCompletionTypeSelected() const
 //--------------------------------------------------------------------------------------------------
 bool RimEclipseResultDefinition::hasCategoryResult() const
 {
+    if ( m_resultVariable().startsWith( RiaResultNames::convergence() ) ) return false;
+
     if ( RiaResultNames::isCategoryResult( m_resultVariable() ) ) return true;
 
     if ( auto* gridCellResults = currentGridCellResults() )
