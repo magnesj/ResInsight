@@ -231,7 +231,7 @@ private:
     void onObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
     void onCustomObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
 
-    void setBlendedCurveColor();
+    void computeAndSetRealizationColor();
     void onColorTagClicked( const SignalEmitter* emitter, size_t index );
 
     void setSummaryAddressX( RifEclipseSummaryAddress address );

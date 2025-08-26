@@ -312,7 +312,7 @@ void RimEnsembleCurveSet::setColor( cvf::Color3f color )
 {
     m_mainEnsembleColor = color;
 
-    setBlendedCurveColor();
+    computeAndSetRealizationColor();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -930,7 +930,7 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
     else if ( changedField == &m_colorForRealizations || changedField == &m_mainEnsembleColor || changedField == &m_colorBlending ||
               changedField == &m_transparencyForRealizations )
     {
-        setBlendedCurveColor();
+        computeAndSetRealizationColor();
 
         updateCurveColors();
 
@@ -987,7 +987,7 @@ void RimEnsembleCurveSet::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
             }
         }
 
-        setBlendedCurveColor();
+        computeAndSetRealizationColor();
         updateCurveColors();
         updateTimeAnnotations();
         updateObjectiveFunctionLegend();
@@ -1343,7 +1343,7 @@ void RimEnsembleCurveSet::onCustomObjectiveFunctionChanged( const caf::SignalEmi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::setBlendedCurveColor()
+void RimEnsembleCurveSet::computeAndSetRealizationColor()
 {
     if ( m_colorMode() == RimEnsembleCurveSet::ColorMode::SINGLE_COLOR_BLENDED )
     {
