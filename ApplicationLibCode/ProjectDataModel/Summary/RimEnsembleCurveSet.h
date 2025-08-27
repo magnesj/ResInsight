@@ -231,7 +231,7 @@ private:
     void onObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
     void onCustomObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
 
-    void setTransparentCurveColor();
+    void computeRealizationColor();
     void onColorTagClicked( const SignalEmitter* emitter, size_t index );
 
     void setSummaryAddressX( RifEclipseSummaryAddress address );
@@ -262,7 +262,7 @@ private:
 
     caf::PdmField<ColorModeEnum>                                             m_colorMode;
     caf::PdmField<cvf::Color3f>                                              m_mainEnsembleColor;
-    caf::PdmField<cvf::Color3f>                                              m_colorForRealizations;
+    cvf::Color3f                                                             m_colorForRealizations;
     caf::PdmField<double>                                                    m_colorTransparency;
     caf::PdmField<QString>                                                   m_ensembleParameter;
     caf::PdmField<caf::AppEnum<RimCurveAppearanceDefines::ParameterSorting>> m_ensembleParameterSorting;
