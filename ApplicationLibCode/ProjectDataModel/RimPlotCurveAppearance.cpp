@@ -89,7 +89,7 @@ RimPlotCurveAppearance::RimPlotCurveAppearance()
 
     CAF_PDM_InitField( &m_curveColor, "Color", RiaColorTools::textColor3f(), "Color" );
 
-    CAF_PDM_InitField( &m_curveColorOpacity, "CurveColorOpacity", 1.0f, "Opacity", );
+    CAF_PDM_InitField( &m_curveColorOpacity, "CurveColorOpacity", 1.0f, "Opacity" );
     m_curveColorOpacity.registerKeywordAlias( "CurveColorTransparency" );
     m_curveColorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
