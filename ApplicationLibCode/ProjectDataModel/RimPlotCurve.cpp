@@ -735,6 +735,14 @@ void RimPlotCurve::setFillColorTransparency( float fillColorTransparency )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurve::setCurveColorTransparency( float curveColorTransparency )
+{
+    m_curveAppearance->setCurveColorTransparency( curveColorTransparency );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimPlotCurve::showInLegend() const
 {
     return m_showLegend;
@@ -969,7 +977,7 @@ void RimPlotCurve::setZOrder( double z )
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurve::updateCurveAppearance()
 {
-    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color() );
+    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color(), m_curveAppearance->curveColorTransparency() );
 
     if ( !m_plotCurve ) return;
 
