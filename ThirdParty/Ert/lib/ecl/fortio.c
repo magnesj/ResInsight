@@ -451,9 +451,9 @@ bool fortio_is_fortio_file(fortio_type * fortio) {
   it will return -1.
 */
 
-int fortio_init_read(fortio_type *fortio) {
-  int elm_read;
-  int record_size;
+long fortio_init_read(fortio_type *fortio) {
+  long elm_read;
+  long record_size;
 
   elm_read = fread(&record_size , sizeof(record_size) , 1 , fortio->stream);
   if (elm_read == 1) {
@@ -469,7 +469,7 @@ int fortio_init_read(fortio_type *fortio) {
 bool fortio_data_fskip(fortio_type* fortio, const int element_size, const int element_count, const int block_count) {
   int headers = block_count * 4;
   int trailers = block_count * 4;
-  int bytes_to_skip = headers + trailers + (element_size * element_count);
+  size_t bytes_to_skip = headers + trailers + (element_size * element_count);
 
   return fortio_fseek(fortio, bytes_to_skip, SEEK_CUR);
 }
@@ -547,12 +547,12 @@ static int fortio_fread_record(fortio_type *fortio , char *buffer) {
    transparent, low-level way.
 */
 
-bool fortio_fread_buffer(fortio_type * fortio, char * buffer , int buffer_size) {
-  int total_bytes_read = 0;
+bool fortio_fread_buffer(fortio_type * fortio, char * buffer , long long buffer_size) {
+    long long total_bytes_read = 0;
 
   while (true) {
     char * buffer_ptr = &buffer[total_bytes_read];
-    int bytes_read = fortio_fread_record(fortio , buffer_ptr);
+    long long bytes_read = fortio_fread_record(fortio , buffer_ptr);
 
     if (bytes_read < 0)
       break;

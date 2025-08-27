@@ -106,14 +106,14 @@ extern "C" {
   void           ecl_kw_get_memcpy_int_data(const ecl_kw_type *ecl_kw , int *target);
   void           ecl_kw_set_memcpy_data(ecl_kw_type * , const void *);
   bool           ecl_kw_fwrite(const ecl_kw_type *,  fortio_type *);
-  void           ecl_kw_iget(const ecl_kw_type *, int , void *);
-  void           ecl_kw_iset(ecl_kw_type *ecl_kw , int i , const void *iptr);
-  void           ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , int index, const char * s);
-  void           ecl_kw_iset_string8(ecl_kw_type * ecl_kw , int index , const char *s8);
-  void           ecl_kw_iset_string_ptr(ecl_kw_type*, int, const char*);
+  void           ecl_kw_iget(const ecl_kw_type *, offset_type, void *);
+  void           ecl_kw_iset(ecl_kw_type *ecl_kw , offset_type i , const void *iptr);
+  void           ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , offset_type index, const char * s);
+  void           ecl_kw_iset_string8(ecl_kw_type * ecl_kw , offset_type index , const char *s8);
+  void           ecl_kw_iset_string_ptr(ecl_kw_type*, offset_type, const char*);
   const char *   ecl_kw_iget_string_ptr(const ecl_kw_type *, int);
-  const char  *  ecl_kw_iget_char_ptr( const ecl_kw_type * ecl_kw , int i);
-  void        *  ecl_kw_iget_ptr(const ecl_kw_type *, int);
+  const char  *  ecl_kw_iget_char_ptr( const ecl_kw_type * ecl_kw , offset_type i);
+  void        *  ecl_kw_iget_ptr(const ecl_kw_type *, offset_type);
   int            ecl_kw_get_size(const ecl_kw_type *);
   bool           ecl_kw_ichar_eq(const ecl_kw_type *, int , const char *);
   ecl_kw_type *  ecl_kw_alloc( const char * header , int size , ecl_data_type );
@@ -124,8 +124,8 @@ extern "C" {
   void           ecl_kw_fwrite_param_fortio(fortio_type *, const char * ,  ecl_data_type , int , void * );
   void           ecl_kw_summarize(const ecl_kw_type * ecl_kw);
   void           ecl_kw_fread_double_param(const char * , bool , double *);
-  float          ecl_kw_iget_as_float(const ecl_kw_type * ecl_kw , int i);
-  double         ecl_kw_iget_as_double(const ecl_kw_type * ecl_kw , int i);
+  float          ecl_kw_iget_as_float(const ecl_kw_type* ecl_kw, offset_type i);
+  double         ecl_kw_iget_as_double(const ecl_kw_type * ecl_kw , offset_type i);
   void           ecl_kw_get_data_as_double(const ecl_kw_type *, double *);
   void           ecl_kw_get_data_as_float(const ecl_kw_type * ecl_kw , float * float_data);
   bool           ecl_kw_name_equal( const ecl_kw_type * ecl_kw , const char * name);
@@ -214,20 +214,20 @@ extern "C" {
   void ecl_kw_shift_float_or_double( ecl_kw_type * ecl_kw , double shift_value );
 
 
-#define ECL_KW_IGET_TYPED_HEADER(type) type ecl_kw_iget_ ## type(const ecl_kw_type * , int)
+#define ECL_KW_IGET_TYPED_HEADER(type) type ecl_kw_iget_ ## type(const ecl_kw_type * , offset_type)
   ECL_KW_IGET_TYPED_HEADER(double);
   ECL_KW_IGET_TYPED_HEADER(float);
   ECL_KW_IGET_TYPED_HEADER(int);
 #undef ECL_KW_IGET_TYPED_HEADER
-  bool  ecl_kw_iget_bool( const ecl_kw_type * ecl_kw , int i );
+  bool  ecl_kw_iget_bool( const ecl_kw_type * ecl_kw , offset_type i );
 
 
-#define ECL_KW_ISET_TYPED_HEADER(type) void ecl_kw_iset_ ## type(ecl_kw_type * , int , type )
+#define ECL_KW_ISET_TYPED_HEADER(type) void ecl_kw_iset_ ## type(ecl_kw_type * , offset_type , type )
   ECL_KW_ISET_TYPED_HEADER(double);
   ECL_KW_ISET_TYPED_HEADER(float);
   ECL_KW_ISET_TYPED_HEADER(int);
 #undef ECL_KW_ISET_TYPED_HEADER
-  void ecl_kw_iset_bool( ecl_kw_type * ecl_kw , int i , bool bool_value);
+  void ecl_kw_iset_bool( ecl_kw_type * ecl_kw , offset_type i , bool bool_value);
 
 
 #define ECL_KW_GET_TYPED_PTR_HEADER(type) type * ecl_kw_get_ ## type ## _ptr(const ecl_kw_type *)

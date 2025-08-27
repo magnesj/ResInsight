@@ -37,6 +37,7 @@
 #include <QDebug>
 #include <QDir>
 
+#include "RifReaderEclipseWell.h"
 #include <memory>
 
 using namespace RiaDefines;
@@ -563,4 +564,36 @@ TEST( DISABLED_RigReservoirTest, WellTest )
     EXPECT_TRUE( result );
 
     readerInterfaceEcl->setHdf5FileName( sourSim );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( DISABLED_RigReservoirTest, ReadSimulationWellData )
+{
+    auto restartAccess = std::make_unique<RifEclipseUnifiedRestartFileAccess>();
+
+    QString restartFilename;
+    // restartFilename = "c:/gitroot/resinsight-tutorials/model-data/drogon/DROGON-0.UNRST";
+    restartFilename = "f:/Models/equinor_azure/EGRID_Crash_Jun25/SM_TEMP_JFUN_DYN_FMU-0.UNRST";
+
+    restartAccess->setRestartFiles( QStringList( restartFilename ) );
+    restartAccess->open();
+
+    std::vector<QDateTime> filteredTimeSteps;
+    /*
+        for ( auto& a : filteredTimeStepInfos )
+        {
+            filteredTimeSteps.push_back( a.m_date );
+        }
+    */
+
+    RigEclipseCaseData eclipseCaseData( nullptr );
+
+    std::vector<std::string> gridNames;
+
+    bool importCompleteMswData = true;
+    RifReaderEclipseWell::readWellCells( restartAccess.get(), &eclipseCaseData, filteredTimeSteps, gridNames, importCompleteMswData );
+
+    restartAccess->close();
 }

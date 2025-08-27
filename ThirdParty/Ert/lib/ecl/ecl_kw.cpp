@@ -37,11 +37,9 @@
 
 
 
-
-
 struct ecl_kw_struct {
   UTIL_TYPE_ID_DECLARATION;
-  int               size;
+  long               size;
   ecl_data_type     data_type;
   char            * header8;              /* Header which is right padded with ' ' to become exactly 8 characters long. Should only be used internally.*/
   char            * header;               /* Header which is trimmed to no-space. */
@@ -251,7 +249,7 @@ static int get_columns(const ecl_data_type data_type) {
 
 /******************************************************************/
 
-static void ecl_kw_assert_index(const ecl_kw_type *ecl_kw , int index, const char *caller) {
+static void ecl_kw_assert_index(const ecl_kw_type *ecl_kw , offset_type index, const char *caller) {
   if (index < 0 || index >= ecl_kw->size)
     util_abort("%s: Invalid index lookup. kw:%s input_index:%d   size:%d \n",caller , ecl_kw->header , index , ecl_kw->size);
 }
@@ -299,7 +297,17 @@ static char * ecl_kw_alloc_output_buffer(const ecl_kw_type * ecl_kw) {
 
 
 static char * ecl_kw_alloc_input_buffer(const ecl_kw_type * ecl_kw) {
-  size_t buffer_size = ecl_kw->size * ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+  //size_t buffer_size = ecl_kw->size * ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+    long long sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+    long long kw_size = ecl_kw->size;
+    long long buffer_size = kw_size * sizeof_iotype;
+
+
+    // Add this check to catch suspicious values
+    if (buffer_size < 0 || buffer_size > (SIZE_MAX / 2)) {
+        util_abort("%s: suspicious new_size value %zu - possible overflow\n", __func__, buffer_size);
+    }
+
   char * buffer = (char*)util_malloc( buffer_size );
 
   return buffer;
@@ -431,7 +439,7 @@ static bool ecl_kw_string_eq(const char *s1 , const char *s2) {
 
 
 
-bool ecl_kw_ichar_eq(const ecl_kw_type *ecl_kw , int i , const char *value) {
+bool ecl_kw_ichar_eq(const ecl_kw_type *ecl_kw , offset_type i , const char *value) {
   char s1[ECL_STRING8_LENGTH + 1];
   ecl_kw_iget(ecl_kw , i , s1);
   return ecl_kw_string_eq(s1 , value);
@@ -794,25 +802,25 @@ const void * ecl_kw_copyc__(const void * void_kw) {
   return ecl_kw_alloc_copy((const ecl_kw_type *) void_kw);
 }
 
-static void * ecl_kw_iget_ptr_static(const ecl_kw_type *ecl_kw , int i) {
+static void * ecl_kw_iget_ptr_static(const ecl_kw_type *ecl_kw , offset_type i) {
   ecl_kw_assert_index(ecl_kw , i , __func__);
   return &ecl_kw->data[i * ecl_type_get_sizeof_ctype(ecl_kw->data_type)];
 }
 
 
-static void ecl_kw_iget_static(const ecl_kw_type *ecl_kw , int i , void *iptr) {
+static void ecl_kw_iget_static(const ecl_kw_type *ecl_kw , offset_type i , void *iptr) {
   memcpy(iptr , ecl_kw_iget_ptr_static(ecl_kw , i) , ecl_type_get_sizeof_ctype(ecl_kw->data_type));
 }
 
 
-static void ecl_kw_iset_static(ecl_kw_type *ecl_kw , int i , const void *iptr) {
+static void ecl_kw_iset_static(ecl_kw_type *ecl_kw , offset_type i , const void *iptr) {
   size_t sizeof_ctype = ecl_type_get_sizeof_ctype(ecl_kw->data_type);
   ecl_kw_assert_index(ecl_kw , i , __func__);
   memcpy(&ecl_kw->data[i * sizeof_ctype] , iptr, sizeof_ctype);
 }
 
 
-void ecl_kw_iget(const ecl_kw_type *ecl_kw , int i , void *iptr) {
+void ecl_kw_iget(const ecl_kw_type *ecl_kw , offset_type i , void *iptr) {
   ecl_kw_iget_static(ecl_kw , i , iptr);
 }
 
@@ -821,7 +829,7 @@ void ecl_kw_iget(const ecl_kw_type *ecl_kw , int i , void *iptr) {
    Will return a double value for underlying data types of double,
    float and int.
 */
-double ecl_kw_iget_as_double(const ecl_kw_type * ecl_kw , int index) {
+double ecl_kw_iget_as_double(const ecl_kw_type * ecl_kw , offset_type index) {
   if (ecl_type_is_float(ecl_kw->data_type))
     return ecl_kw_iget_float( ecl_kw , index); /* Here the compiler will silently insert a float -> double conversion. */
   else if (ecl_type_is_double(ecl_kw->data_type))
@@ -838,7 +846,7 @@ double ecl_kw_iget_as_double(const ecl_kw_type * ecl_kw , int index) {
    Will return a float value for underlying data types of double and float.
 */
 
-float ecl_kw_iget_as_float(const ecl_kw_type * ecl_kw , int i) {
+float ecl_kw_iget_as_float(const ecl_kw_type * ecl_kw , offset_type i) {
   if (ecl_type_is_float(ecl_kw->data_type))
     return ecl_kw_iget_float( ecl_kw , i);
   else if (ecl_type_is_double(ecl_kw->data_type))
@@ -851,7 +859,7 @@ float ecl_kw_iget_as_float(const ecl_kw_type * ecl_kw , int i) {
 
 
 #define ECL_KW_IGET_TYPED(ctype , ECL_TYPE)                                                                 \
-ctype ecl_kw_iget_ ## ctype(const ecl_kw_type * ecl_kw, int i) {                                            \
+ctype ecl_kw_iget_ ## ctype(const ecl_kw_type * ecl_kw, offset_type i) {                                            \
   ctype value;                                                                                              \
   if (ecl_kw_get_type(ecl_kw) != ECL_TYPE)                                                                  \
     util_abort("%s: Keyword: %s is wrong type - aborting \n",__func__ , ecl_kw_get_header8(ecl_kw));        \
@@ -866,13 +874,13 @@ ECL_KW_IGET_TYPED(bool   , ECL_BOOL_TYPE);
 #undef ECL_KW_IGET_TYPED
 
 
-const char * ecl_kw_iget_char_ptr( const ecl_kw_type * ecl_kw , int i) {
+const char* ecl_kw_iget_char_ptr(const ecl_kw_type* ecl_kw, offset_type i) {
   if (ecl_kw_get_type(ecl_kw) != ECL_CHAR_TYPE)
     util_abort("%s: Keyword: %s is wrong type - aborting \n",__func__ , ecl_kw_get_header8(ecl_kw));
   return (const char *)ecl_kw_iget_ptr( ecl_kw , i );
 }
 
-const char * ecl_kw_iget_string_ptr( const ecl_kw_type * ecl_kw, int i) {
+const char * ecl_kw_iget_string_ptr( const ecl_kw_type * ecl_kw, offset_type i) {
   if (ecl_kw_get_type(ecl_kw) != ECL_STRING_TYPE)
     util_abort("%s: Keyword: %s is wrong type - aborting \n",__func__ , ecl_kw_get_header8(ecl_kw));
   return (const char *)ecl_kw_iget_ptr( ecl_kw , i );
@@ -885,7 +893,7 @@ const char * ecl_kw_iget_string_ptr( const ecl_kw_type * ecl_kw, int i) {
    be padded, if s8 is longer than 8 characters the characters from 9
    and out will be ignored.
 */
-void ecl_kw_iset_string8(ecl_kw_type * ecl_kw , int index , const char *s8) {
+void ecl_kw_iset_string8(ecl_kw_type * ecl_kw , offset_type index , const char *s8) {
   char * ecl_string = (char *) ecl_kw_iget_ptr( ecl_kw , index );
   if (strlen( s8 ) >= ECL_STRING8_LENGTH) {
     /* The whole string goes in - possibly loosing content at the end. */
@@ -919,7 +927,7 @@ void ecl_kw_iset_string8(ecl_kw_type * ecl_kw , int index , const char *s8) {
    length greater than 8 - maybe the overwriting of consecutive
    elements is not what you want?
 */
-void ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , int index, const char * s) {
+void ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , offset_type index, const char * s) {
   int strings = strlen( s ) / ECL_STRING8_LENGTH;
   if ((strlen( s ) %  ECL_STRING8_LENGTH) != 0)
     strings++;
@@ -937,7 +945,7 @@ void ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , int index, const char * s) {
  @index. If the input string is shorter than the type length the
  string will be padded with trailing spaces.
  */
-void ecl_kw_iset_string_ptr( ecl_kw_type * ecl_kw, int index, const char * s) {
+void ecl_kw_iset_string_ptr( ecl_kw_type * ecl_kw, offset_type index, const char * s) {
   if(!ecl_type_is_alpha(ecl_kw_get_data_type(ecl_kw))) {
     char * type_name = ecl_type_alloc_name(ecl_kw_get_data_type(ecl_kw));
     util_abort("%s: Expected alphabetic data type (CHAR, CXXX or MESS), was %s\n", __func__, type_name);
@@ -985,7 +993,7 @@ bool ecl_kw_icmp_string( const ecl_kw_type * ecl_kw , int index, const char * ot
 
 
 #define ECL_KW_ISET_TYPED(ctype , ECL_TYPE)                                                                 \
-void ecl_kw_iset_ ## ctype(ecl_kw_type * ecl_kw, int i, ctype value) {                                      \
+void ecl_kw_iset_ ## ctype(ecl_kw_type * ecl_kw, offset_type i, ctype value) {                                      \
   if (ecl_kw_get_type(ecl_kw) != ECL_TYPE)                                                                  \
     util_abort("%s: Keyword: %s is wrong type - aborting \n",__func__ , ecl_kw_get_header8(ecl_kw));        \
   ecl_kw_iset_static(ecl_kw , i , &value);                                                                  \
@@ -1083,14 +1091,14 @@ void * ecl_kw_get_void_ptr(const ecl_kw_type * ecl_kw) {
 /*****************************************************************/
 
 
-void * ecl_kw_iget_ptr(const ecl_kw_type *ecl_kw , int i) {
+void * ecl_kw_iget_ptr(const ecl_kw_type *ecl_kw , offset_type i) {
   return ecl_kw_iget_ptr_static(ecl_kw , i);
 }
 
 
 
 
-void ecl_kw_iset(ecl_kw_type *ecl_kw , int i , const void *iptr) {
+void ecl_kw_iset(ecl_kw_type *ecl_kw , offset_type i , const void *iptr) {
   ecl_kw_iset_static(ecl_kw , i , iptr);
 }
 
@@ -1242,8 +1250,11 @@ bool ecl_kw_fread_data(ecl_kw_type *ecl_kw, fortio_type *fortio) {
       return true;
     } else {
       char * buffer = ecl_kw_alloc_input_buffer(ecl_kw);
-      const int sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
-      bool read_ok = fortio_fread_buffer(fortio, buffer, ecl_kw->size * sizeof_iotype);
+      const long sizeof_iotype = ecl_type_get_sizeof_iotype(ecl_kw->data_type);
+
+      const long buffer_size = ecl_kw->size * sizeof_iotype;
+
+      bool read_ok = fortio_fread_buffer(fortio, buffer, buffer_size);
 
       if (read_ok)
         ecl_kw_load_from_input_buffer(ecl_kw, buffer);
@@ -1498,7 +1509,15 @@ void ecl_kw_alloc_data(ecl_kw_type *ecl_kw) {
     util_abort("%s: trying to allocate data for ecl_kw object which has been declared with shared storage - aborting \n",__func__);
 
   {
-    size_t byte_size = ecl_kw->size * ecl_type_get_sizeof_ctype(ecl_kw->data_type);
+      long long type_size = ecl_type_get_sizeof_ctype(ecl_kw->data_type);
+      long long kw_size = ecl_kw->size;
+      long long byte_size = kw_size * type_size;
+
+      // Add this check to catch suspicious values
+      if (byte_size < 0 || byte_size >(SIZE_MAX / 2)) {
+          util_abort("%s: suspicious new_size value %zu - possible overflow\n", __func__, byte_size);
+      }
+
     ecl_kw->data = (char*)util_realloc(ecl_kw->data , byte_size );
     memset(ecl_kw->data , 0 , byte_size);
   }
