@@ -2040,7 +2040,7 @@ void RimEnsembleCurveSet::updateCurveColors()
     for ( size_t i = 0; i < curvesToColor.size(); i++ )
     {
         curvesToColor[i]->setColor( caseColors[i] );
-        curvesToColor[i]->setCurveColorTransparency( m_colorOpacity() );
+        curvesToColor[i]->setCurveColorOpacity( m_colorOpacity() );
         curvesToColor[i]->updateCurveAppearance();
     }
 
