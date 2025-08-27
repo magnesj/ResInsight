@@ -19,6 +19,8 @@
 
 #include "RigEclipseNativeVisibleCellsStatCalc.h"
 
+#include "RiaResultNames.h"
+
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigStatisticsMath.h"

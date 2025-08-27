@@ -145,8 +145,8 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
 
                 if ( *caseTimeSteps.rbegin() < timeThreshold )
                 {
-                    QString txt = "Summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
-                                  " has different time steps in the source ensembles, no values are calculated for this vector.";
+                    QString txt = "Delta for summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
+                                  ": One or both source realizations are incomplete, no values are calculated.";
 
                     RiaLogging::warning( txt );
 
@@ -420,6 +420,13 @@ void RimDeltaSummaryCase::createSummaryReaderInterface()
 //--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RimDeltaSummaryCase::summaryReader()
 {
+    if ( m_allResultAddresses.empty() )
+    {
+        // Other Rim classes implementing the summaryReader() function always calls createSummaryReaderInterface() if not present. Here the
+        // logic must be slightly different, we check if no addresses are present.
+        createSummaryReaderInterface();
+    }
+
     return this;
 }
 

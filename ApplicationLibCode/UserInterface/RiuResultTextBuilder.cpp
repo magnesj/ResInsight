@@ -19,6 +19,8 @@
 
 #include "RiuResultTextBuilder.h"
 
+#include "RiaResultNames.h"
+
 #include "RigAllanDiagramData.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"

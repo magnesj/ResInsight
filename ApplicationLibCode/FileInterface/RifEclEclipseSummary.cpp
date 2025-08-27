@@ -280,6 +280,13 @@ std::pair<bool, std::vector<double>> RifEclEclipseSummary::values( const RifEcli
         int variableIndex = indexFromAddress( resultAddress );
         if ( variableIndex < 0 ) return { false, {} };
 
+        // Validate index is within bounds to prevent segfault
+        int nodeCount = ecl_smspec_num_nodes( m_ecl_SmSpec );
+        if ( variableIndex >= nodeCount )
+        {
+            return { false, {} }; // Invalid index - beyond available nodes
+        }
+
         const ecl::smspec_node& ertSumVarNode = ecl_smspec_iget_node_w_node_index( m_ecl_SmSpec, variableIndex );
         int                     paramsIndex   = ertSumVarNode.get_params_index();
 

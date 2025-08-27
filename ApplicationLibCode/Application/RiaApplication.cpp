@@ -566,6 +566,8 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
 
         // At this point, all the file paths variables are replaced and all file paths updated to the new location. This will enable use of
         // file paths in initAfterRead().
+        // If Rim-objects are created in initAfterRead(), they will be resolved in the second pass
+        // Example: Realization objects in ensemble file set
         m_project->resolveReferencesRecursively();
         m_project->initAfterReadRecursively();
 
@@ -883,6 +885,10 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
                     stimPlan->resetAnchorPositionAndThicknessDirection();
             }
         }
+
+        // Second pass: a full recursive resolution to robustly handle both previously failing references and any newly created ones from
+        // initAfterRead.
+        m_project->resolveReferencesRecursively();
 
         // Some procedures in onProjectOpened() may rely on the display model having been created
         // So we need to force the completion of the display model here.
