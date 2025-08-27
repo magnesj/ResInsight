@@ -2719,7 +2719,10 @@ void RimEnsembleCurveSet::initAfterRead()
         }
     }
 
-    if ( m_colorMode == ColorMode::SINGLE_COLOR_WITH_ALPHA ) m_colorMode = ColorMode::SINGLE_COLOR;
+    if ( m_colorMode == ColorMode::SINGLE_COLOR_WITH_ALPHA )
+    {
+        m_colorMode = ColorMode::SINGLE_COLOR;
+    }
 
     computeRealizationColor();
 }
