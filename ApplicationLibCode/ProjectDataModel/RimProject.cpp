@@ -102,11 +102,14 @@
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
+#include "Tools/RiaVariableMapper.h"
+#include "Tools/RimValueMultiplexerCollection.h"
 #include "RiuPlotMainWindow.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cvfBoundingBox.h"
 
 #include <QDir>
 #include <QFile>
@@ -146,6 +149,7 @@ RimProject::RimProject()
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
     CAF_PDM_InitFieldNoDefault( &m_pinnedFieldCollection, "PinnedFieldCollection", "PinnedFieldCollection" );
+    CAF_PDM_InitFieldNoDefault( &m_valueMultiplexerCollection, "ValueMultiplexerCollection", "Value Multiplexer Collection" );
 
     CAF_PDM_InitFieldNoDefault( &viewLinkerCollection, "LinkedViews", "Linked Views", ":/LinkView.svg" );
     viewLinkerCollection = new RimViewLinkerCollection;
@@ -209,6 +213,10 @@ RimProject::RimProject()
     m_mainPlotCollection    = new RimMainPlotCollection();
     m_pinnedFieldCollection = new RimQuickAccessCollection();
     m_jobCollection         = new RimJobCollection();
+
+    auto multiplexerCollection = new RimValueMultiplexerCollection();
+    caf::PdmUiCommandSystemProxy::instance()->setFieldChangedMultiplexer( multiplexerCollection );
+    m_valueMultiplexerCollection = multiplexerCollection;
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -1544,7 +1552,157 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
         }
 
         uiTreeOrdering.add( colorLegendCollection() );
+        uiTreeOrdering.add( valueMultiplexerCollection() );
     }
 
     uiTreeOrdering.skipRemainingChildren( true );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimProject::transferPathsToGlobalPathList()
+{
+    RiaVariableMapper variableMapper( m_globalPathList() );
+
+    for ( caf::FilePath* filePath : allFilePaths() )
+    {
+        QString path = filePath->path();
+        if ( !path.isEmpty() )
+        {
+            QString pathId = variableMapper.addPathAndGetId( path );
+            filePath->setPath( pathId );
+        }
+    }
+
+    for ( auto summaryCase : allSummaryCases() )
+    {
+        if ( summaryCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
+        {
+            // At this point, after the replace of variables into caf::FilePath objects, the variable name is
+            // stored in the summary case object. Read out the variable name and append "_name" for custom
+            // summary variables.
+
+            QString variableName = summaryCase->summaryHeaderFilename();
+            variableName         = variableName.remove( RiaVariableMapper::variableToken() );
+
+            variableName = RiaVariableMapper::variableToken() + variableName + RiaVariableMapper::postfixName() +
+                           RiaVariableMapper::variableToken();
+
+            QString variableValue = summaryCase->displayCaseName();
+            variableMapper.addVariable( variableName, variableValue );
+
+            summaryCase->setCustomCaseName( variableName );
+        }
+    }
+
+    for ( auto gridCase : allGridCases() )
+    {
+        if ( gridCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
+        {
+            // At this point, after the replace of variables into caf::FilePath objects, the variable name is
+            // stored in the summary case object. Read out the variable name and append "_name" for custom
+            // summary variables.
+
+            QString variableName = gridCase->gridFileName();
+            variableName         = variableName.remove( RiaVariableMapper::variableToken() );
+
+            variableName = RiaVariableMapper::variableToken() + variableName + RiaVariableMapper::postfixName() +
+                           RiaVariableMapper::variableToken();
+
+            QString variableValue = gridCase->caseUserDescription();
+            variableMapper.addVariable( variableName, variableValue );
+
+            gridCase->setCustomCaseName( variableName );
+        }
+    }
+
+    variableMapper.replaceVariablesInValues();
+
+    m_globalPathList = variableMapper.variableTableAsText();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapper* pathListMapper /*=nullptr*/ ) const
+{
+    std::unique_ptr<RiaVariableMapper> internalMapper;
+
+    if ( pathListMapper == nullptr )
+    {
+        internalMapper = std::make_unique<RiaVariableMapper>( m_globalPathList );
+        pathListMapper = internalMapper.get();
+    }
+
+    QString     returnValue      = filePath;
+    QString     pathIdCandidate  = filePath.trimmed();
+    QStringList pathIdComponents = pathIdCandidate.split( RiaVariableMapper::variableToken() );
+
+    if ( pathIdComponents.size() == 3 && pathIdComponents[0].size() == 0 && pathIdComponents[1].size() > 0 && pathIdComponents[2].size() == 0 )
+    {
+        bool    isFound = false;
+        QString path    = pathListMapper->valueForVariable( pathIdCandidate, &isFound );
+        if ( isFound )
+        {
+            returnValue = path;
+        }
+    }
+
+    return returnValue;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimProject::distributePathsFromGlobalPathList()
+{
+    RiaVariableMapper pathListMapper( m_globalPathList() );
+
+    for ( caf::FilePath* filePath : allFilePaths() )
+    {
+        filePath->setPath( updatedFilePathFromPathId( filePath->path(), &pathListMapper ) );
+    }
+
+    for ( auto summaryCase : allSummaryCases() )
+    {
+        if ( summaryCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
+        {
+            auto variableName = summaryCase->displayCaseName();
+
+            bool    isFound       = false;
+            QString variableValue = pathListMapper.valueForVariable( variableName, &isFound );
+            if ( isFound )
+            {
+                summaryCase->setCustomCaseName( variableValue );
+            }
+            else if ( variableName.contains( RiaVariableMapper::postfixName() + RiaVariableMapper::variableToken() ) )
+            {
+                // The variable name is not found in the variable list, but the name indicates a variable. Reset
+                // to full case name.
+                summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::FULL_CASE_NAME );
+            }
+        }
+    }
+
+    for ( auto gridCase : allGridCases() )
+    {
+        if ( gridCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
+        {
+            auto variableName = gridCase->caseUserDescription();
+
+            bool    isFound       = false;
+            QString variableValue = pathListMapper.valueForVariable( variableName, &isFound );
+            if ( isFound )
+            {
+                gridCase->setCustomCaseName( variableValue );
+            }
+            else if ( variableName.contains( RiaVariableMapper::postfixName() + RiaVariableMapper::variableToken() ) )
+            {
+                // The variable name is not found in the variable list, but the name indicates a variable. Reset
+                // to full case name.
+                gridCase->setDisplayNameType( RimCaseDisplayNameTools::DisplayName::FULL_CASE_NAME );
+            }
+        }
+    }
 }

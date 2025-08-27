@@ -64,7 +64,8 @@ PdmUiCommandSystemProxy* PdmUiCommandSystemProxy::instance()
 //--------------------------------------------------------------------------------------------------
 PdmUiCommandSystemProxy::PdmUiCommandSystemProxy()
 {
-    m_commandInterface = nullptr;
+    m_commandInterface        = nullptr;
+    m_fieldChangedMultiplexer = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -73,6 +74,22 @@ PdmUiCommandSystemProxy::PdmUiCommandSystemProxy()
 void PdmUiCommandSystemProxy::setCommandInterface( PdmUiCommandSystemInterface* commandInterface )
 {
     m_commandInterface = commandInterface;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiCommandSystemProxy::setFieldChangedMultiplexer( PdmFieldChangedMultiplexerInterface* fieldChangedMultiplexer )
+{
+    m_fieldChangedMultiplexer = fieldChangedMultiplexer;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldChangedMultiplexerInterface* PdmUiCommandSystemProxy::fieldChangedMultiplexer() const
+{
+    return m_fieldChangedMultiplexer;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -102,7 +119,20 @@ void PdmUiCommandSystemProxy::setUiValueToField( PdmUiFieldHandle* uiFieldHandle
             }
         }
 
-        if ( m_commandInterface && !fieldsToUpdate.empty() )
+        std::vector<caf::PdmFieldHandle*> connectedFields;
+        if ( m_fieldChangedMultiplexer )
+        {
+            connectedFields = m_fieldChangedMultiplexer->connectedFields( editorField );
+            for ( auto connectedField : connectedFields )
+            {
+                if ( std::find( fieldsToUpdate.begin(), fieldsToUpdate.end(), connectedField ) == fieldsToUpdate.end() )
+                {
+                    fieldsToUpdate.push_back( connectedField );
+                }
+            }
+        }
+
+        if ( m_commandInterface && !fieldsToUpdate.empty() && connectedFields.empty() )
         {
             auto firstField = fieldsToUpdate.front();
             if ( m_commandInterface->isFieldWritable( firstField ) )
