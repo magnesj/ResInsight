@@ -80,7 +80,7 @@ RimCurveSetAppearance::RimCurveSetAppearance()
     CAF_PDM_InitField( &m_colorForRealizations, "Color", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
 
-    CAF_PDM_InitField( &m_colorOpacity, "ColorOpacity", 0.3, "Opacity" );
+    CAF_PDM_InitField( &m_colorOpacity, "ColorOpacity", 0.7, "Opacity" );
     m_colorOpacity.registerKeywordAlias( "ColorTransparency" );
     m_colorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
@@ -245,7 +245,7 @@ void RimCurveSetAppearance::updateRealizationColor()
 
         auto sourceColor      = RiaColorTools::toQColor( m_mainEnsembleColor );
         auto sourceWeight     = 100;
-        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 10 * m_colorOpacity ) );
+        int  backgroundWeight = std::max( 1, static_cast<int>( sourceWeight * 5 * ( 1.0 - m_colorOpacity ) ) );
         auto blendedColor     = RiaColorTools::blendQColors( backgroundColor, sourceColor, backgroundWeight, sourceWeight );
 
         m_colorForRealizations = RiaColorTools::fromQColorTo3f( blendedColor );
@@ -339,4 +339,20 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
     }
 
     return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCurveSetAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_colorOpacity )
+    {
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
+        {
+            myAttr->m_minimum  = 0.001;
+            myAttr->m_maximum  = 1.0;
+            myAttr->m_decimals = 2;
+        }
+    }
 }
