@@ -30,6 +30,7 @@
 #include "RimCase.h"
 #include "RimColorLegend.h"
 #include "RimColorLegendCollection.h"
+#include "RimCompletionTemplateCollection.h"
 #include "RimEclipseCase.h"
 #include "RimFaultInView.h"
 #include "RimFaultInViewCollection.h"
@@ -40,6 +41,8 @@
 #include "RimSeismicDataCollection.h"
 #include "RimSeismicDifferenceData.h"
 #include "RimSurfaceCollection.h"
+#include "RimValveTemplateCollection.h"
+#include "RimViewWindow.h"
 #include "RimWellLogLasFile.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
@@ -83,14 +86,8 @@ QString RimTools::getCacheRootDirectoryPathFromProject()
 ///  such that the common start of oldProjectPath and m_gridFileName is removed from m_gridFileName
 ///  and replaced with the start of newProjectPath up to where newProjectPath starts to be equal to oldProjectPath
 //--------------------------------------------------------------------------------------------------
-QString RimTools::relocateFile( const QString&        originalFileName,
-                                const QString&        currentProjectPath,
-                                const QString&        previousProjectPath,
-                                bool*                 foundFile,
-                                std::vector<QString>* searchedPaths )
+QString RimTools::relocateFile( const QString& originalFileName, const QString& currentProjectPath, const QString& previousProjectPath )
 {
-    if ( foundFile ) *foundFile = true;
-
     // Make sure we have a Qt formatted path ( using "/" not "\")
     QString fileName       = QDir::fromNativeSeparators( originalFileName );
     QString newProjectPath = QDir::fromNativeSeparators( currentProjectPath );
@@ -115,7 +112,6 @@ QString RimTools::relocateFile( const QString&        originalFileName,
         fileName.replace( QString( "\\" ), QString( "/" ) );
     }
 
-    if ( searchedPaths ) searchedPaths->push_back( fileName );
     if ( caf::Utils::fileExists( fileName ) )
     {
         return fileName;
@@ -125,7 +121,6 @@ QString RimTools::relocateFile( const QString&        originalFileName,
     {
         QString fileNameWithoutPath = QFileInfo( fileName ).fileName();
         QString candidate           = QDir::fromNativeSeparators( newProjectPath + QDir::separator() + fileNameWithoutPath );
-        if ( searchedPaths ) searchedPaths->push_back( candidate );
 
         if ( caf::Utils::fileExists( candidate ) )
         {
@@ -223,8 +218,6 @@ QString RimTools::relocateFile( const QString&        originalFileName,
 
             QString relocatedFileName = relocationPath + fileNameWithoutPath;
 
-            if ( searchedPaths ) searchedPaths->push_back( relocatedFileName );
-
             if ( caf::Utils::fileExists( relocatedFileName ) )
             {
                 return relocatedFileName;
@@ -237,10 +230,41 @@ QString RimTools::relocateFile( const QString&        originalFileName,
         }
     }
 
-    // return the unchanged filename, if we could not find a valid relocation file
-    if ( foundFile ) *foundFile = false;
-
     return fileName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimTools::relocatePathPattern( const QString& originalPattern, const QString& currentProjectPath, const QString& previousProjectPath )
+{
+    auto previousProjectPathStd = previousProjectPath.toStdString();
+    auto currentProjectPathStd  = currentProjectPath.toStdString();
+
+    auto originalPatternStd = originalPattern.toStdString();
+
+    size_t equalIndex = 0;
+    for ( size_t i = 0; i < std::min( previousProjectPathStd.size(), originalPatternStd.size() ); ++i )
+    {
+        if ( originalPatternStd[i] != previousProjectPathStd[i] )
+        {
+            equalIndex = i;
+            break;
+        }
+    }
+
+    if ( equalIndex > 0 )
+    {
+        auto theRest = previousProjectPathStd.substr( equalIndex );
+
+        // remove theRest from the back of newProjectPath
+        auto newProjectPathWithoutTheRest = currentProjectPathStd.substr( 0, currentProjectPathStd.size() - theRest.size() );
+        auto newPattern                   = newProjectPathWithoutTheRest + originalPatternStd.substr( equalIndex );
+
+        return QString::fromStdString( newPattern );
+    }
+
+    return originalPattern;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -552,6 +576,20 @@ RimWellPath* RimTools::firstWellPath()
 
     return nullptr;
 }
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimValveTemplateCollection* RimTools::valveTemplateCollection()
+{
+    auto proj = RimProject::current();
+    if ( !proj ) return nullptr;
+
+    auto oilField = proj->activeOilField();
+    if ( !oilField ) return nullptr;
+
+    auto compColl = oilField->completionTemplateCollection();
+    return compColl ? compColl->valveTemplateCollection() : nullptr;
+}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -559,6 +597,14 @@ RimWellPath* RimTools::firstWellPath()
 RimSurfaceCollection* RimTools::surfaceCollection()
 {
     return RimProject::current()->activeOilField()->surfaceCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimJobCollection* RimTools::jobCollection()
+{
+    return RimProject::current()->jobCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -606,6 +652,28 @@ void RimTools::optionItemsForSpecifiedWellPaths( const std::vector<RimWellPath*>
     for ( auto wellPath : wellPaths )
     {
         options->push_back( caf::PdmOptionItemInfo( wellPath->name(), wellPath, false, wellIcon ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// This function is intended to be called when multiple views are toggled or displayed. Can be called from a plot collection in
+/// onChildrenUpdated()
+//--------------------------------------------------------------------------------------------------
+void RimTools::updateViewWindowContent( std::vector<caf::PdmObjectHandle*>& objects )
+{
+    for ( auto& obj : objects )
+    {
+        if ( auto viewWindow = dynamic_cast<RimViewWindow*>( obj ) )
+        {
+            if ( viewWindow->showWindow() )
+            {
+                viewWindow->loadDataAndUpdate();
+            }
+            else
+            {
+                viewWindow->updateMdiWindowVisibility();
+            }
+        }
     }
 }
 

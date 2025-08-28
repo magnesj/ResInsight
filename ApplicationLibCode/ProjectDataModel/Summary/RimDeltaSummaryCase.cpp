@@ -145,8 +145,8 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
 
                 if ( *caseTimeSteps.rbegin() < timeThreshold )
                 {
-                    QString txt = "Summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
-                                  " has different time steps in the source ensembles, no values are calculated for this vector.";
+                    QString txt = "Delta for summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
+                                  ": One or both source realizations are incomplete, no values are calculated.";
 
                     RiaLogging::warning( txt );
 
@@ -322,17 +322,26 @@ std::pair<std::vector<time_t>, std::vector<double>> RimDeltaSummaryCase::calcula
     merger.addCurveData( reader1->timeSteps( address ), values1 );
     merger.addCurveData( reader2->timeSteps( address ), values2 );
     merger.computeInterpolatedValues( includeIncompleteCurves );
-
-    const std::vector<double>& allValues1 = merger.interpolatedYValuesForAllXValues( 0 );
-    const std::vector<double>& allValues2 = merger.interpolatedYValuesForAllXValues( 1 );
+    if ( merger.curveCount() < 2 )
+    {
+        // If we have less than two curves, we cannot calculate a delta
+        return ResultPair();
+    }
 
     size_t sampleCount = merger.allXValues().size();
+    if ( sampleCount == 0 )
+    {
+        return ResultPair();
+    }
 
     std::vector<double> calculatedValues;
     calculatedValues.reserve( sampleCount );
 
     int clampedIndexCase1 = std::min( fixedTimeStepCase1, static_cast<int>( values1.size() ) );
     int clampedIndexCase2 = std::min( fixedTimeStepCase2, static_cast<int>( values2.size() ) );
+
+    const std::vector<double>& allValues1 = merger.interpolatedYValuesForAllXValues( 0 );
+    const std::vector<double>& allValues2 = merger.interpolatedYValuesForAllXValues( 1 );
 
     for ( size_t i = 0; i < sampleCount; i++ )
     {
@@ -362,6 +371,14 @@ QString RimDeltaSummaryCase::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+size_t RimDeltaSummaryCase::keywordCount() const
+{
+    return m_allResultAddresses.size();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimDeltaSummaryCase::createSummaryReaderInterface()
 {
     m_allResultAddresses.clear();
@@ -375,6 +392,8 @@ void RimDeltaSummaryCase::createSummaryReaderInterface()
 
         if ( m_summaryCase1->summaryReader() )
         {
+            m_summaryCase1->summaryReader()->createAddressesIfRequired();
+
             auto adr = m_summaryCase1->summaryReader()->allResultAddresses();
             m_allResultAddresses.insert( adr.begin(), adr.end() );
         }
@@ -388,6 +407,8 @@ void RimDeltaSummaryCase::createSummaryReaderInterface()
 
         if ( m_summaryCase2->summaryReader() )
         {
+            m_summaryCase2->summaryReader()->createAddressesIfRequired();
+
             auto adr = m_summaryCase2->summaryReader()->allResultAddresses();
             m_allResultAddresses.insert( adr.begin(), adr.end() );
         }
@@ -399,6 +420,13 @@ void RimDeltaSummaryCase::createSummaryReaderInterface()
 //--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RimDeltaSummaryCase::summaryReader()
 {
+    if ( m_allResultAddresses.empty() )
+    {
+        // Other Rim classes implementing the summaryReader() function always calls createSummaryReaderInterface() if not present. Here the
+        // logic must be slightly different, we check if no addresses are present.
+        createSummaryReaderInterface();
+    }
+
     return this;
 }
 

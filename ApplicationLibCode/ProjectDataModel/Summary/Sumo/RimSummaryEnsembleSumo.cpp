@@ -441,7 +441,10 @@ void RimSummaryEnsembleSumo::buildMetaData()
 {
     for ( auto summaryCase : allSummaryCases() )
     {
-        summaryCase->summaryReader()->buildMetaData();
+        if ( auto reader = summaryCase->summaryReader() )
+        {
+            reader->createAndSetAddresses();
+        }
     }
 
     RimSummaryEnsemble::buildMetaData();

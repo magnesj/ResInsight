@@ -20,6 +20,7 @@
 
 #include "RiaDefines.h"
 
+#include "RifEnsembleImportConfig.h"
 #include "RifSummaryReaderInterface.h"
 
 #include <QString>
@@ -47,6 +48,8 @@ public:
     RifReaderEclipseSummary();
     ~RifReaderEclipseSummary() override;
 
+    void setEnsembleImportState( RifEnsembleImportConfig ensembleImportState );
+
     bool open( const QString& headerFileName, RiaThreadSafeLogger* threadSafeLogger );
 
     std::vector<time_t> timeSteps( const RifEclipseSummaryAddress& resultAddress ) const override;
@@ -54,14 +57,17 @@ public:
     std::pair<bool, std::vector<double>> values( const RifEclipseSummaryAddress& resultAddress ) const override;
     std::string                          unitName( const RifEclipseSummaryAddress& resultAddress ) const override;
     RiaDefines::EclipseUnitSystem        unitSystem() const override;
-    void                                 buildMetaData() override;
+    void                                 createAndSetAddresses() override;
 
 private:
+    size_t                     keywordCount() const override;
     RifSummaryReaderInterface* currentSummaryReader() const;
 
 private:
     std::unique_ptr<RifSummaryReaderInterface> m_summaryReader;
     std::set<RifEclipseSummaryAddress>         m_differenceAddresses;
+
+    RifEnsembleImportConfig m_ensembleImportState;
 
 private:
     //==================================================================================================

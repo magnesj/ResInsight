@@ -27,11 +27,13 @@
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesGrid.h"
+#include "RiaResultNames.h"
 #include "RiaViewRedrawScheduler.h"
 
 #include "RifEclipseSummaryTools.h"
 #include "RifReaderSettings.h"
 #include "RifSummaryCaseRestartSelector.h"
+#include "RifSummaryReaderInterface.h"
 
 #include "RigGridManager.h"
 
@@ -121,11 +123,18 @@ bool RiaImportEclipseCaseTools::openEclipseCasesFromFile( const QStringList& fil
                                                                               : nullptr;
         if ( sumCaseColl )
         {
-            std::vector<RimSummaryCase*> candidateCases = sumCaseColl->createSummaryCasesFromFileInfos( summaryFileInfos );
+            const bool                   readStateFromFirstFile = false;
+            std::vector<RimSummaryCase*> candidateCases =
+                sumCaseColl->createSummaryCasesFromFileInfos( summaryFileInfos, readStateFromFirstFile );
             std::vector<RimSummaryCase*> duplicatedCases;
 
             for ( RimSummaryCase* newSumCase : candidateCases )
             {
+                if ( auto reader = newSumCase->summaryReader() )
+                {
+                    reader->createAddressesIfRequired();
+                }
+
                 RimSummaryEnsemble* existingCollection = nullptr;
                 auto existingSummaryCase = sumCaseColl->findTopLevelSummaryCaseFromFileName( newSumCase->summaryHeaderFilename() );
                 if ( existingSummaryCase )

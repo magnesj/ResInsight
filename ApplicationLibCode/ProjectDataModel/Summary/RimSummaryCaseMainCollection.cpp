@@ -22,11 +22,13 @@
 #include "RiaEnsembleNameTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesSummary.h"
+#include "RiaPreferencesSystem.h"
 #include "Summary/RiaSummaryTools.h"
 
 #include "RifCaseRealizationParametersReader.h"
 #include "RifEclipseSummaryTools.h"
 #include "RifOpmCommonSummary.h"
+#include "RifOpmSummaryTools.h"
 #include "RifSummaryCaseRestartSelector.h"
 #include "Sumo/RimSummaryCaseSumo.h"
 
@@ -62,10 +64,12 @@ CAF_PDM_SOURCE_INIT( RimSummaryCaseMainCollection, "SummaryCaseCollection" );
 //--------------------------------------------------------------------------------------------------
 /// Internal function
 //--------------------------------------------------------------------------------------------------
-void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile )
+void addCaseRealizationParametersIfFound( RimSummaryCase& sumCase, const QString modelFolderOrFile, const QString& filePathCandidate )
 {
     std::shared_ptr<RigCaseRealizationParameters> parameters;
-    QString                                       parametersFile = RifCaseRealizationParametersFileLocator::locate( modelFolderOrFile );
+
+    QString parametersFile = filePathCandidate.isEmpty() ? RifCaseRealizationParametersFileLocator::locate( modelFolderOrFile )
+                                                         : filePathCandidate;
     if ( !parametersFile.isEmpty() )
     {
         auto reader = RifCaseRealizationReader::createReaderFromFileName( parametersFile );
@@ -109,6 +113,7 @@ RimSummaryCaseMainCollection::RimSummaryCaseMainCollection()
     caf::PdmFieldReorderCapability::addToField( &m_cases );
 
     CAF_PDM_InitFieldNoDefault( &m_ensembles, "SummaryCaseCollections", "" );
+    caf::PdmFieldReorderCapability::addToField( &m_ensembles );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -215,16 +220,24 @@ void RimSummaryCaseMainCollection::removeCases( std::vector<RimSummaryCase*>& ca
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Lambda function to move an object in a child array field
+//--------------------------------------------------------------------------------------------------
+auto moveObjectInChildArrayField = []( auto& childArrayField, auto* object, int destinationIndex )
+{
+    auto currentIndex = childArrayField.indexOf( object );
+    if ( currentIndex < childArrayField.size() )
+    {
+        childArrayField.erase( currentIndex );
+        childArrayField.insertAt( std::min( destinationIndex, static_cast<int>( childArrayField.size() ) ), object );
+    }
+};
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::moveCase( RimSummaryCase* summaryCase, int destinationIndex )
 {
-    auto currentIndex = m_cases.indexOf( summaryCase );
-    if ( currentIndex < m_cases.size() )
-    {
-        m_cases.erase( currentIndex );
-        m_cases.insertAt( std::min( destinationIndex, (int)m_cases.size() ), summaryCase );
-    }
+    moveObjectInChildArrayField( m_cases, summaryCase, destinationIndex );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -237,12 +250,6 @@ RimSummaryEnsemble* RimSummaryCaseMainCollection::addEnsemble( const std::vector
 {
     RimSummaryEnsemble* ensemble = allocator();
     if ( !collectionName.isEmpty() ) ensemble->setNameTemplate( collectionName );
-
-    if ( ensemble->ensembleId() == -1 )
-    {
-        RimProject* project = RimProject::current();
-        project->assignIdToEnsemble( ensemble );
-    }
 
     for ( RimSummaryCase* summaryCase : summaryCases )
     {
@@ -265,12 +272,17 @@ RimSummaryEnsemble* RimSummaryCaseMainCollection::addEnsemble( const std::vector
 
     ensemble->setAsEnsemble( isEnsemble );
 
-    ensemble->caseNameChanged.connect( this, &RimSummaryCaseMainCollection::onCaseNameChanged );
-    m_ensembles.push_back( ensemble );
-
-    dataSourceHasChanged.send();
+    addEnsemble( ensemble );
 
     return ensemble;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryCaseMainCollection::moveEnsemble( RimSummaryEnsemble* ensemble, int destinationIndex )
+{
+    moveObjectInChildArrayField( m_ensembles, ensemble, destinationIndex );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -299,6 +311,8 @@ void RimSummaryCaseMainCollection::addEnsemble( RimSummaryEnsemble* ensemble )
         RimProject* project = RimProject::current();
         project->assignIdToEnsemble( ensemble );
     }
+
+    ensemble->caseNameChanged.connect( this, &RimSummaryCaseMainCollection::onCaseNameChanged );
 
     dataSourceHasChanged.send();
 }
@@ -369,9 +383,27 @@ std::vector<RimSummaryEnsemble*> RimSummaryCaseMainCollection::summaryEnsembles(
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCaseMainCollection::loadAllSummaryCaseData()
 {
-    std::vector<RimSummaryCase*> sumCases = allSummaryCases();
+    for ( auto ensemble : summaryEnsembles() )
+    {
+        auto sumCases = ensemble->allSummaryCases();
 
-    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases );
+        const bool extractStateFromFirstCase = true;
+        RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
+    }
+
+    std::vector<RimSummaryCase*> sumCases = topLevelSummaryCases();
+
+    const bool extractStateFromFirstCase = false;
+    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, extractStateFromFirstCase );
+
+    // Create addresses for all single summary cases (not part of an ensemble)
+    for ( auto sumCase : sumCases )
+    {
+        if ( sumCase->summaryReader() )
+        {
+            sumCase->summaryReader()->createAddressesIfRequired();
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -393,7 +425,7 @@ void RimSummaryCaseMainCollection::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCaseMainCollection::loadSummaryCaseData( std::vector<RimSummaryCase*> summaryCases )
+void RimSummaryCaseMainCollection::loadSummaryCaseData( const std::vector<RimSummaryCase*>& summaryCases, bool extractStateFromFirstCase )
 {
     std::vector<RimFileSummaryCase*> fileSummaryCases;
     std::vector<RimSummaryCase*>     otherSummaryCases;
@@ -422,7 +454,7 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( std::vector<RimSummaryCa
 
     if ( !fileSummaryCases.empty() )
     {
-        loadFileSummaryCaseData( fileSummaryCases );
+        loadFileSummaryCaseData( fileSummaryCases, extractStateFromFirstCase );
     }
 
     if ( !otherSummaryCases.empty() )
@@ -436,7 +468,7 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( std::vector<RimSummaryCa
             {
                 sumCase->createSummaryReaderInterface();
                 sumCase->createRftReaderInterface();
-                addCaseRealizationParametersIfFound( *sumCase, sumCase->summaryHeaderFilename() );
+                addCaseRealizationParametersIfFound( *sumCase, sumCase->summaryHeaderFilename(), {} );
             }
 
             {
@@ -449,7 +481,8 @@ void RimSummaryCaseMainCollection::loadSummaryCaseData( std::vector<RimSummaryCa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCaseMainCollection::loadFileSummaryCaseData( std::vector<RimFileSummaryCase*> fileSummaryCases )
+void RimSummaryCaseMainCollection::loadFileSummaryCaseData( const std::vector<RimFileSummaryCase*>& fileSummaryCases,
+                                                            bool                                    extractStateFromFirstCase )
 {
     RiaPreferencesSummary* prefs = RiaPreferencesSummary::current();
 
@@ -486,30 +519,71 @@ void RimSummaryCaseMainCollection::loadFileSummaryCaseData( std::vector<RimFileS
     }
 #endif
 
+    RifEnsembleImportConfig importState;
+    if ( !RiaPreferencesSummary::current()->useImprovedSummaryImport() )
+    {
+        extractStateFromFirstCase = false;
+    }
+
+    if ( extractStateFromFirstCase )
+    {
+        // If we are extracting state from the first case, we need to make sure that the first case is loaded
+        // before we start loading the rest of the cases.
+        if ( fileSummaryCases.size() > 1 )
+        {
+            std::vector<QString> warnings;
+
+            auto headerFileName0 = fileSummaryCases[0]->summaryHeaderFilename();
+            auto headerFileName1 = fileSummaryCases[1]->summaryHeaderFilename();
+
+            RifEnsembleImportConfig state;
+            state.computePatternsFromSummaryFilePaths( headerFileName0, headerFileName1 );
+
+            importState = state;
+        }
+    }
+
     // Use openMP when reading file summary case meta data. Avoid using the virtual interface of base class
     // RimSummaryCase, as it is difficult to make sure all variants of the leaf classes are thread safe.
     // Only open the summary file reader in parallel loop to reduce risk of multi threading issues
 
     {
         caf::ProgressInfo progInfo( fileSummaryCases.size(), "Loading Summary Cases" );
-
         RifOpmCommonEclipseSummary::resetEnhancedSummaryFileCount();
 
         RiaThreadSafeLogger threadSafeLogger;
         QCoreApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
 
         // The HDF5 reader requires a special configuration to be thread safe. Disable threading for HDF reader.
-        [[maybe_unused]] bool canUseMultipleTreads =
+        [[maybe_unused]] bool canUseMultipleThreads =
             ( prefs->summaryDataReader() != RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON );
 
-#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleTreads )
+#pragma omp parallel for schedule( dynamic ) if ( canUseMultipleThreads )
         for ( int cIdx = 0; cIdx < static_cast<int>( fileSummaryCases.size() ); ++cIdx )
         {
             RimFileSummaryCase* fileSummaryCase = fileSummaryCases[cIdx];
             if ( fileSummaryCase )
             {
-                fileSummaryCase->createSummaryReaderInterfaceThreadSafe( &threadSafeLogger );
-                addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename() );
+                fileSummaryCase->createSummaryReaderInterfaceThreadSafe( importState, &threadSafeLogger );
+
+                QString parameterFilePath;
+                if ( importState.useConfigValues() )
+                {
+                    auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( fileSummaryCase->summaryHeaderFilename() );
+                    if ( realizationNumber.has_value() )
+                    {
+                        parameterFilePath = importState.pathToParameterFile( realizationNumber.value() );
+                    }
+                }
+
+                auto startTime = RiaLogging::currentTime();
+                addCaseRealizationParametersIfFound( *fileSummaryCase, fileSummaryCase->summaryHeaderFilename(), parameterFilePath );
+                bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+                if ( isLoggingEnabled )
+                {
+                    RiaLogging::logElapsedTime( "Setting of realization parameters", startTime );
+                    RiaLogging::info( QString( "Completed %1" ).arg( fileSummaryCase->summaryHeaderFilename() ) );
+                }
             }
 
             progInfo.setProgress( cIdx );
@@ -569,6 +643,7 @@ void RimSummaryCaseMainCollection::onCaseNameChanged( const SignalEmitter* emitt
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCase*>
     RimSummaryCaseMainCollection::createSummaryCasesFromFileInfos( const std::vector<RifSummaryCaseFileResultInfo>& summaryHeaderFileInfos,
+                                                                   bool                                             readStateFromFirstFile,
                                                                    bool                                             showProgress )
 {
     RimProject* project = RimProject::current();
@@ -634,7 +709,7 @@ std::vector<RimSummaryCase*>
         QCoreApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
     }
 
-    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases );
+    RimSummaryCaseMainCollection::loadSummaryCaseData( sumCases, readStateFromFirstFile );
 
     return sumCases;
 }

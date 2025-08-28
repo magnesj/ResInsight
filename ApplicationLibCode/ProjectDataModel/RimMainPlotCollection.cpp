@@ -23,6 +23,7 @@
 #include "Summary/RiaSummaryDefines.h"
 #include "Summary/RiaSummaryPlotTools.h"
 
+#include "Histogram/RimHistogramMultiPlotCollection.h"
 #include "RimAbstractPlotCollection.h"
 #include "RimAnalysisPlotCollection.h"
 #include "RimCorrelationPlotCollection.h"
@@ -57,13 +58,6 @@
 #include "RimWellPltPlot.h"
 #include "RimWellRftPlot.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
-
-#ifdef USE_QTCHARTS
-#include "RimEnsembleFractureStatisticsPlot.h"
-#include "RimEnsembleFractureStatisticsPlotCollection.h"
-#include "RimGridStatisticsPlot.h"
-#include "RimGridStatisticsPlotCollection.h"
-#endif
 
 #include "RiuMainWindow.h"
 #include "RiuProjectPropertyView.h"
@@ -109,11 +103,8 @@ RimMainPlotCollection::RimMainPlotCollection()
     CAF_PDM_InitFieldNoDefault( &m_stimPlanModelPlotCollection, "StimPlanModelPlotCollection", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_vfpPlotCollection, "VfpPlotCollection", "" );
-#ifdef USE_QTCHARTS
-    CAF_PDM_InitFieldNoDefault( &m_gridStatisticsPlotCollection, "GridStatisticsPlotCollection", "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_ensembleFractureStatisticsPlotCollection, "EnsembleFractureStatisticsPlotCollection", "" );
-#endif
+    CAF_PDM_InitFieldNoDefault( &m_histogramMultiPlotCollection, "HistogramMultiPlotCollection", "" );
 
     m_wellLogPlotCollection               = new RimWellLogPlotCollection();
     m_rftPlotCollection                   = new RimRftPlotCollection();
@@ -129,10 +120,7 @@ RimMainPlotCollection::RimMainPlotCollection()
     m_correlationPlotCollection           = new RimCorrelationPlotCollection;
     m_stimPlanModelPlotCollection         = new RimStimPlanModelPlotCollection;
     m_vfpPlotCollection                   = new RimVfpPlotCollection();
-#ifdef USE_QTCHARTS
-    m_gridStatisticsPlotCollection             = new RimGridStatisticsPlotCollection;
-    m_ensembleFractureStatisticsPlotCollection = new RimEnsembleFractureStatisticsPlotCollection;
-#endif
+    m_histogramMultiPlotCollection        = new RimHistogramMultiPlotCollection();
 
     CAF_PDM_InitFieldNoDefault( &m_summaryPlotCollection_OBSOLETE, "SummaryPlotCollection", "Summary Plots" );
     m_summaryPlotCollection_OBSOLETE.xmlCapability()->setIOWritable( false );
@@ -325,23 +313,13 @@ RimStimPlanModelPlotCollection* RimMainPlotCollection::stimPlanModelPlotCollecti
     return m_stimPlanModelPlotCollection();
 }
 
-#ifdef USE_QTCHARTS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimGridStatisticsPlotCollection* RimMainPlotCollection::gridStatisticsPlotCollection() const
+RimHistogramMultiPlotCollection* RimMainPlotCollection::histogramMultiPlotCollection() const
 {
-    return m_gridStatisticsPlotCollection();
+    return m_histogramMultiPlotCollection();
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEnsembleFractureStatisticsPlotCollection* RimMainPlotCollection::ensembleFractureStatisticsPlotCollection() const
-{
-    return m_ensembleFractureStatisticsPlotCollection();
-}
-#endif
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -494,11 +472,7 @@ std::vector<RimPlotCollection*> RimMainPlotCollection::allPlotCollections() cons
     plotCollections.push_back( correlationPlotCollection() );
     plotCollections.push_back( saturationPressurePlotCollection() );
     plotCollections.push_back( multiPlotCollection() );
-
-#ifdef USE_QTCHARTS
-    plotCollections.push_back( gridStatisticsPlotCollection() );
-    plotCollections.push_back( ensembleFractureStatisticsPlotCollection() );
-#endif
+    plotCollections.push_back( histogramMultiPlotCollection() );
 
     return plotCollections;
 }
@@ -516,11 +490,6 @@ std::vector<RimPlotCollection*> RimMainPlotCollection::plotCollectionsWithFormat
     plotCollections.push_back( gridCrossPlotCollection() );
     plotCollections.push_back( multiPlotCollection() );
     plotCollections.push_back( stimPlanModelPlotCollection() );
-
-#ifdef USE_QTCHARTS
-    plotCollections.push_back( gridStatisticsPlotCollection() );
-    plotCollections.push_back( ensembleFractureStatisticsPlotCollection() );
-#endif
 
     return plotCollections;
 }

@@ -35,10 +35,12 @@ set(COMMAND_REFERENCED_CMAKE_FILES
     CrossSectionCommands/CMakeLists_files.cmake
     EclipseCommands/CMakeLists_files.cmake
     EclipseCommands/EclipseWell/CMakeLists_files.cmake
+    EnsembleFileSetCommands/CMakeLists_files.cmake
     ExportCommands/CMakeLists_files.cmake
     FlowCommands/CMakeLists_files.cmake
     GridCrossPlotCommands/CMakeLists_files.cmake
     GeoMechCommands/CMakeLists_files.cmake
+    JobCommands/CMakeLists_files.cmake
     HoloLensCommands/CMakeLists_files.cmake
     IntersectionBoxCommands/CMakeLists_files.cmake
     IntersectionViewCommands/CMakeLists_files.cmake
@@ -61,6 +63,7 @@ set(COMMAND_REFERENCED_CMAKE_FILES
     Sumo/CMakeLists_files.cmake
     ToolCommands/CMakeLists_files.cmake
     3dView/CMakeLists_files.cmake
+    Histogram/CMakeLists_files.cmake
 )
 
 # Include source file lists from *.cmake files
@@ -75,6 +78,10 @@ add_library(
   ${COMMAND_CODE_SOURCE_FILES} ${COMMAND_CODE_HEADER_FILES}
   ${COMMAND_MOC_SOURCE_FILES}
 )
+
+if(RESINSIGHT_ENABLE_OPENVDS)
+  add_definitions(-DUSE_OPENVDS)
+endif()
 
 if(RESINSIGHT_ENABLE_PRECOMPILED_HEADERS)
   message("Precompiled Headers is enabled on : ${PROJECT_NAME}")
@@ -105,14 +112,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
   target_compile_options(Commands PRIVATE -Wno-deprecated-declarations)
 endif()
 
-if(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS)
-  if(MSVC)
-    target_compile_options(Commands PRIVATE /WX)
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_compile_options(Commands PRIVATE -Werror)
-  endif()
-endif()
-
 if(MSVC)
   # The following warnings are supposed to be used in ResInsight, but
   # temporarily disabled to avoid too much noise warning C4245: 'return':
@@ -136,6 +135,7 @@ if(MSVC)
 
 endif()
 
-set(LINK_LIBRARIES ApplicationLibCode ResultStatisticsCache)
-
-target_link_libraries(${PROJECT_NAME} PRIVATE ${LINK_LIBRARIES})
+set(LINK_LIBRARIES ApplicationLibCode ResultStatisticsCache
+                   ResInsightCommonSettings
+)
+target_link_libraries(Commands PRIVATE ${LINK_LIBRARIES})

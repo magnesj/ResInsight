@@ -19,6 +19,7 @@
 
 #include "RiaDefines.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 #include "RiaStimPlanModelDefines.h"
 
 #include "RigEclipseCaseData.h"

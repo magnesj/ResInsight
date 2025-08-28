@@ -29,14 +29,15 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimIdenticalGridCaseGroup, RimcIdenticalGridC
 ///
 //--------------------------------------------------------------------------------------------------
 RimcIdenticalGridCaseGroup_createStatisticsCase::RimcIdenticalGridCaseGroup_createStatisticsCase( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
+
 {
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcIdenticalGridCaseGroup_createStatisticsCase::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcIdenticalGridCaseGroup_createStatisticsCase::execute()
 {
     auto gridCaseGroup = self<RimIdenticalGridCaseGroup>();
     auto statCase      = gridCaseGroup->createAndAppendEmptyStatisticsCase();
@@ -49,15 +50,7 @@ caf::PdmObjectHandle* RimcIdenticalGridCaseGroup_createStatisticsCase::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcIdenticalGridCaseGroup_createStatisticsCase::resultIsPersistent() const
+QString RimcIdenticalGridCaseGroup_createStatisticsCase::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcIdenticalGridCaseGroup_createStatisticsCase::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimEclipseStatisticsCase );
+    return RimEclipseStatisticsCase::classKeywordStatic();
 }

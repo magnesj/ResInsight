@@ -19,6 +19,7 @@
 
 #include "RicReplaceCaseFeature.h"
 
+#include "RiaDefines.h"
 #include "RiaEclipseFileNameTools.h"
 #include "RiaGuiApplication.h"
 #include "Summary/RiaSummaryTools.h"
@@ -51,17 +52,8 @@ CAF_CMD_SOURCE_INIT( RicReplaceCaseFeature, "RicReplaceCaseFeature" );
 //--------------------------------------------------------------------------------------------------
 bool RicReplaceCaseFeature::isCommandEnabled() const
 {
-    std::vector<caf::PdmObject*> selectedFormationNamesCollObjs;
-    caf::SelectionManager::instance()->objectsByType( &selectedFormationNamesCollObjs );
-    for ( caf::PdmObject* pdmObject : selectedFormationNamesCollObjs )
-    {
-        if ( dynamic_cast<RimEclipseResultCase*>( pdmObject ) )
-        {
-            return true;
-        }
-    }
-
-    return false;
+    const auto objects = caf::SelectionManager::instance()->objectsByType<RimEclipseResultCase>();
+    return !objects.empty();
 }
 
 //--------------------------------------------------------------------------------------------------

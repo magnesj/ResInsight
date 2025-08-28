@@ -150,7 +150,7 @@ RimStatisticsContourMap::RimStatisticsContourMap()
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    if ( ( eclipseCase() == nullptr ) && ( ensemble()->cases().size() > 0 ) )
+    if ( ( eclipseCase() == nullptr ) && ( !ensemble()->cases().empty() ) )
     {
         auto selCase = ensemble()->cases().front();
         setEclipseCase( selCase );
@@ -524,7 +524,7 @@ void RimStatisticsContourMap::computeStatistics()
 
     caf::ProgressInfo progInfo( nCases, QString( "Reading Eclipse Ensemble" ) );
 
-    auto readerSettings                = RiaPreferencesGrid::current()->gridOnlyReaderSettings();
+    auto readerSettings                = RiaPreferencesGrid::gridOnlyReaderSettings();
     readerSettings.onlyLoadActiveCells = true;
     auto casesInViews                  = ensemble->casesInViews();
     auto oldReaderType                 = RiaPreferencesGrid::current()->gridModelReaderOverride();
@@ -551,7 +551,7 @@ void RimStatisticsContourMap::computeStatistics()
             auto          formationNames = selectedFormations();
 
             bool formationNamesOk = true;
-            if ( formationNames.size() > 0 )
+            if ( !formationNames.empty() )
             {
                 if ( auto names = eCase->activeFormationNames() )
                 {

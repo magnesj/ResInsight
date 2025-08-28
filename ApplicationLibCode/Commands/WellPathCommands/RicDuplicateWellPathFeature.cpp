@@ -23,16 +23,13 @@
 #include "Well/RigWellPath.h"
 
 #include "RimModeledWellPath.h"
-#include "RimOilField.h"
 #include "RimProject.h"
 #include "RimTools.h"
 #include "RimWellPathCollection.h"
 #include "RimWellPathGeometryDef.h"
-#include "RimWellPathTarget.h"
 
 #include "Riu3DMainWindowTools.h"
 
-#include "cafSelectionManager.h"
 #include "cafSelectionManagerTools.h"
 
 #include <QAction>
@@ -54,45 +51,7 @@ bool RicDuplicateWellPathFeature::isCommandEnabled() const
 void RicDuplicateWellPathFeature::onActionTriggered( bool isChecked )
 {
     auto sourceWellPath = caf::firstAncestorOfTypeFromSelectedObject<RimModeledWellPath>();
-    if ( !sourceWellPath ) return;
-
-    RimProject* project = RimProject::current();
-    if ( project && RimProject::current()->activeOilField() )
-    {
-        RimWellPathCollection* wellPathCollection = RimTools::wellPathCollection();
-        if ( wellPathCollection )
-        {
-            auto newModeledWellPath = new RimModeledWellPath();
-
-            newModeledWellPath->setUnitSystem( project->commonUnitSystemForAllCases() );
-
-            size_t modelledWellpathCount = wellPathCollection->modelledWellPathCount();
-
-            newModeledWellPath->setName( "Well-" + QString::number( modelledWellpathCount + 1 ) );
-            newModeledWellPath->setWellPathColor( RiaColorTables::editableWellPathsPaletteColors().cycledColor3f( modelledWellpathCount ) );
-
-            wellPathCollection->addWellPaths( { newModeledWellPath } );
-            wellPathCollection->uiCapability()->updateConnectedEditors();
-
-            if ( sourceWellPath->wellPathGeometry() && sourceWellPath->wellPathGeometry()->measuredDepths().size() > 2 )
-            {
-                auto destinationGeometryDef = newModeledWellPath->geometryDefinition();
-
-                std::vector<cvf::Vec3d> targetCoordinates;
-
-                for ( auto target : sourceWellPath->geometryDefinition()->activeWellTargets( false ) )
-                {
-                    targetCoordinates.push_back( target->targetPointXYZ() );
-                }
-                destinationGeometryDef->createAndInsertTargets( targetCoordinates );
-                newModeledWellPath->createWellPathGeometry();
-            }
-
-            project->scheduleCreateDisplayModelAndRedrawAllViews();
-
-            Riu3DMainWindowTools::selectAsCurrentItem( newModeledWellPath->geometryDefinition() );
-        }
-    }
+    duplicateWellPath( sourceWellPath );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -102,4 +61,35 @@ void RicDuplicateWellPathFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setText( "Duplicate Well Path" );
     actionToSetup->setIcon( QIcon( ":/caf/duplicate.svg" ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellPath* RicDuplicateWellPathFeature::duplicateWellPath( RimWellPath* wellPath )
+{
+    if ( wellPath == nullptr ) return nullptr;
+
+    RimProject*            project            = RimProject::current();
+    RimWellPathCollection* wellPathCollection = RimTools::wellPathCollection();
+    if ( project && wellPathCollection )
+    {
+        auto newModeledWellPath = wellPath->copyObject<RimModeledWellPath>();
+        if ( newModeledWellPath == nullptr ) return nullptr;
+
+        size_t modelledWellpathCount = wellPathCollection->modelledWellPathCount();
+        newModeledWellPath->setName( "Well-" + QString::number( modelledWellpathCount + 1 ) );
+        newModeledWellPath->setWellPathColor( RiaColorTables::editableWellPathsPaletteColors().cycledColor3f( modelledWellpathCount ) );
+
+        wellPathCollection->addWellPaths( { newModeledWellPath } );
+        newModeledWellPath->createWellPathGeometry();
+
+        project->scheduleCreateDisplayModelAndRedrawAllViews();
+
+        Riu3DMainWindowTools::selectAsCurrentItem( newModeledWellPath->geometryDefinition() );
+
+        return newModeledWellPath;
+    }
+
+    return nullptr;
 }

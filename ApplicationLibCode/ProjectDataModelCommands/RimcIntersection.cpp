@@ -179,16 +179,17 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimExtrudedCurveIntersection, RimcExtrudedCur
 ///
 //--------------------------------------------------------------------------------------------------
 RimcExtrudedCurveIntersection_geometry::RimcExtrudedCurveIntersection_geometry( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_INVALID, PdmObjectMethod::ResultType::PERSISTENT_FALSE )
 {
     CAF_PDM_InitObject( "Intersection Geometry" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_geometryType, "GeometryType", "Geometry Type" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcExtrudedCurveIntersection_geometry::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcExtrudedCurveIntersection_geometry::execute()
 {
     auto intersection = self<RimExtrudedCurveIntersection>();
 
@@ -232,23 +233,15 @@ caf::PdmObjectHandle* RimcExtrudedCurveIntersection_geometry::execute()
         return triangleGeometry;
     }
 
-    return new RimcTriangleGeometry;
+    return std::unexpected( "No intersection geometry found." );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcExtrudedCurveIntersection_geometry::resultIsPersistent() const
+QString RimcExtrudedCurveIntersection_geometry::classKeywordReturnedType() const
 {
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcExtrudedCurveIntersection_geometry::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimcTriangleGeometry );
+    return RimcTriangleGeometry::classKeywordStatic();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -288,16 +281,17 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimExtrudedCurveIntersection, RimcExtrudedCur
 ///
 //--------------------------------------------------------------------------------------------------
 RimcExtrudedCurveIntersection_geometryResult::RimcExtrudedCurveIntersection_geometryResult( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_INVALID, PdmObjectMethod::ResultType::PERSISTENT_FALSE )
 {
     CAF_PDM_InitObject( "Geometry Result" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_geometryType, "GeometryType", "Geometry Type" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcExtrudedCurveIntersection_geometryResult::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcExtrudedCurveIntersection_geometryResult::execute()
 {
     auto intersection = self<RimExtrudedCurveIntersection>();
 
@@ -307,9 +301,7 @@ caf::PdmObjectHandle* RimcExtrudedCurveIntersection_geometryResult::execute()
         auto eclView = intersection->firstAncestorOfType<RimEclipseView>();
         if ( !eclView )
         {
-            RiaLogging::error( "No Eclipse view found. Extraction of intersection result is only supported for "
-                               "Eclipse view." );
-            return nullptr;
+            return std::unexpected( "No Eclipse view found. Extraction of intersection result is only supported for Eclipse view." );
         }
 
         RimEclipseResultDefinition* eclResultDef = nullptr;
@@ -337,21 +329,13 @@ caf::PdmObjectHandle* RimcExtrudedCurveIntersection_geometryResult::execute()
         return RimcDataContainerDouble::create( values );
     }
 
-    return new RimcDataContainerDouble();
+    return std::unexpected( "No intersection geometry result found." );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcExtrudedCurveIntersection_geometryResult::resultIsPersistent() const
+QString RimcExtrudedCurveIntersection_geometryResult::classKeywordReturnedType() const
 {
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcExtrudedCurveIntersection_geometryResult::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimcDataContainerDouble );
+    return RimcDataContainerDouble::classKeywordStatic();
 }

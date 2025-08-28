@@ -244,6 +244,11 @@ std::set<RifEclipseSummaryAddress> RimAnalysisPlot::unfilteredAddresses() const
 
     for ( RimSummaryCase* sumCase : analyserOfSelectedCurveDefs->m_singleSummaryCases )
     {
+        if ( !sumCase || !sumCase->summaryReader() )
+        {
+            continue;
+        }
+
         const std::set<RifEclipseSummaryAddress>& caseAddrs = sumCase->summaryReader()->allResultAddresses();
         addresses.insert( caseAddrs.begin(), caseAddrs.end() );
     }
@@ -680,10 +685,6 @@ QList<caf::PdmOptionItemInfo> RimAnalysisPlot::calculateValueOptions( const caf:
 
             options.push_back( { displayName, sumCase } );
         }
-    }
-    else if ( fieldNeedingOptions == &m_barTextFontSize )
-    {
-        options = caf::FontTools::relativeSizeValueOptions( RiaPreferences::current()->defaultPlotFontSize() );
     }
 
     return options;

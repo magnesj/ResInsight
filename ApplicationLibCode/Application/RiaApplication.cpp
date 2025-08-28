@@ -21,6 +21,8 @@
 #include "Cloud/RiaOsduConnector.h"
 #include "Cloud/RiaSumoConnector.h"
 #include "Cloud/RiaSumoDefines.h"
+#include "KeyValueStore/RiaKeyValueStore.h"
+#include "RiaDefines.h"
 #include "RiaOsduDefines.h"
 
 #include "RiaBaseDefs.h"
@@ -28,6 +30,7 @@
 #include "RiaFontCache.h"
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
+#include "RiaOpenMPTools.h"
 #include "RiaPlotWindowRedrawScheduler.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesOsdu.h"
@@ -115,6 +118,7 @@
 #include "cafPdmCodeGenerator.h"
 #include "cafPdmDataValueField.h"
 #include "cafPdmDefaultObjectFactory.h"
+#include "cafPdmDeprecation.h"
 #include "cafPdmMarkdownBuilder.h"
 #include "cafPdmMarkdownGenerator.h"
 #include "cafPdmScriptIOMessages.h"
@@ -178,6 +182,8 @@ RiaApplication::RiaApplication()
     m_commandRouter = std::make_unique<RimCommandRouter>();
     m_osduConnector = nullptr;
     m_sumoConnector = nullptr;
+
+    m_keyValueStore = std::make_unique<RiaKeyValueStore<char>>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -360,6 +366,37 @@ RimCommandRouter* RiaApplication::commandRouter()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaApplication::setThreadCount() const
+{
+    std::optional<int> threadCount = std::nullopt;
+    QString            source;
+
+    if ( m_threadCountFromCommandLine.has_value() )
+    {
+        threadCount = m_threadCountFromCommandLine.value();
+        source      = "Command Line";
+    }
+    else
+    {
+        auto threadCountPrefs = RiaPreferencesSystem::current()->threadCount();
+        if ( threadCountPrefs.has_value() )
+        {
+            threadCount = threadCountPrefs.value();
+            source      = "Preferences";
+        }
+    }
+
+    if ( threadCount.has_value() )
+    {
+        RiaLogging::info( QString( "Setting number of threads to %1 from %2" ).arg( threadCount.value() ).arg( source ) );
+
+        RiaOpenMPTools::setMaxThreads( threadCount.value() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RiaApplication::openFile( const QString& fileName )
 {
     if ( !caf::Utils::fileExists( fileName ) ) return false;
@@ -374,12 +411,12 @@ bool RiaApplication::openFile( const QString& fileName )
     {
         loadingSucceded = loadProject( fileName );
     }
-    else if ( int( fileType ) & int( RiaDefines::ImportFileType::ANY_GEOMECH_FILE ) )
+    else if ( RiaDefines::isGeoMechFileType( fileType ) )
     {
         loadingSucceded   = openOdbCaseFromFile( fileName );
         lastUsedDialogTag = "GEOMECH_MODEL";
     }
-    else if ( int( fileType ) & int( RiaDefines::ImportFileType::ANY_ECLIPSE_FILE ) )
+    else if ( RiaDefines::isEclipseFileType( fileType ) )
     {
         bool createView   = true;
         bool createPlot   = true;
@@ -463,374 +500,435 @@ QString RiaApplication::createAbsolutePathFromProjectRelativePath( QString proje
 //--------------------------------------------------------------------------------------------------
 bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAction loadAction, RiaProjectModifier* projectModifier )
 {
+    auto startTime = RiaLogging::currentTime();
+
     // First Close the current project
 
-    caf::ProgressInfo progress( 7, "Loading Project File" );
-    progress.setProgressDescription( "Reading Project Structure from File" );
+    caf::ProgressInfo progress( 100, "Loading Project File" );
 
-    closeProject();
+    bool logTiming = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "RiaApplication" );
 
-    onProjectBeingOpened();
-
-    RiaLogging::info( QString( "Starting to open project file : '%1'" ).arg( projectFileName ) );
-
-    // Create a absolute path file name, as this is required for update of file references in the project modifier object
-    QString fullPathProjectFileName = caf::Utils::absoluteFileName( projectFileName );
-    if ( !caf::Utils::fileExists( fullPathProjectFileName ) )
     {
-        RiaLogging::info( QString( "File does not exist : '%1'" ).arg( fullPathProjectFileName ) );
-        return false;
-    }
+        QString taskName = QString( "Reading Project Structure from File" );
+        auto    task     = progress.task( taskName, 10 );
 
-    m_project->setFileName( fullPathProjectFileName );
-    m_project->readFile();
-    m_project->updatesAfterProjectFileIsRead();
-
-    // Apply any modifications to the loaded project before we go ahead and load actual data
-    if ( projectModifier )
-    {
-        projectModifier->applyModificationsToProject( m_project.get() );
-    }
-
-    // Propagate possible new location of project
-
-    m_project->setProjectFileNameAndUpdateDependencies( fullPathProjectFileName );
-
-    // On error, delete everything, and bail out.
-
-    if ( m_project->projectFileVersionString().isEmpty() )
-    {
         closeProject();
 
-        QString errMsg =
-            QString( "Unknown project file version detected in file \n%1\n\nCould not open project." ).arg( fullPathProjectFileName );
+        onProjectBeingOpened();
 
-        onProjectOpeningError( errMsg );
+        RiaLogging::info( QString( "Starting to open project file : '%1'" ).arg( projectFileName ) );
 
-        // Delete all object possibly generated by readFile()
-        m_project = std::make_unique<RimProject>();
-
-        onProjectOpened();
-
-        return true;
-    }
-
-    // At this point, all the file paths variables are replaced and all file paths updated to the new location. This will enable use of file
-    // paths in initAfterRead().
-    m_project->resolveReferencesRecursively();
-    m_project->initAfterReadRecursively();
-
-    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.09.2" ) )
-    {
-        // Traverse objects recursively and add quick access fields for old projects
-        RimQuickAccessCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
-    }
-
-    // Migrate all RimGridCases to RimFileSummaryCase
-    RimGridSummaryCase_obsolete::convertGridCasesToSummaryFileCases( m_project.get() );
-
-    ///////
-    // Load the external data, and initialize stuff that needs specific ordering
-
-    // VL check regarding specific order mentioned in comment above...
-
-    m_preferences->lastUsedProjectFileName = fullPathProjectFileName;
-    if ( m_preferencesFileName.isEmpty() )
-    {
-        m_preferences->writePreferencesToApplicationStore();
-    }
-
-    progress.incrementProgress();
-    progress.setProgressDescription( "Loading Grid Data" );
-
-    for ( size_t oilFieldIdx = 0; oilFieldIdx < m_project->oilFields().size(); oilFieldIdx++ )
-    {
-        RimOilField*              oilField       = m_project->oilFields[oilFieldIdx];
-        RimEclipseCaseCollection* analysisModels = oilField ? oilField->analysisModels() : nullptr;
-        if ( analysisModels == nullptr ) continue;
-
-        for ( size_t cgIdx = 0; cgIdx < analysisModels->caseGroups.size(); ++cgIdx )
+        // Create a absolute path file name, as this is required for update of file references in the project modifier object
+        QString fullPathProjectFileName = caf::Utils::absoluteFileName( projectFileName );
+        if ( !caf::Utils::fileExists( fullPathProjectFileName ) )
         {
-            // Load the Main case of each IdenticalGridCaseGroup
-            RimIdenticalGridCaseGroup* igcg = analysisModels->caseGroups[cgIdx];
-            igcg->loadMainCaseAndActiveCellInfo(); // VL is this supposed to be done for each RimOilField?
-        }
-    }
-
-    // Load the formation names
-
-    for ( RimOilField* oilField : m_project->oilFields )
-    {
-        if ( oilField == nullptr ) continue;
-        if ( oilField->formationNamesCollection() != nullptr )
-        {
-            oilField->formationNamesCollection()->readAllFormationNames();
-        }
-    }
-
-    for ( size_t oilFieldIdx = 0; oilFieldIdx < m_project->oilFields().size(); oilFieldIdx++ )
-    {
-        RimOilField* oilField = m_project->oilFields[oilFieldIdx];
-        if ( oilField == nullptr ) continue;
-        if ( oilField->wellPathCollection == nullptr )
-        {
-            oilField->wellPathCollection = std::make_unique<RimWellPathCollection>();
+            RiaLogging::info( QString( "File does not exist : '%1'" ).arg( fullPathProjectFileName ) );
+            return false;
         }
 
-        // Initialize well paths
-        if ( !oilField->wellPathCollection->loadDataAndUpdate() )
+        m_project->setFileName( fullPathProjectFileName );
+        std::vector<QString> deprecationMessages = m_project->readFile( defaultDeprecations() );
+        for ( const QString& deprecationMessage : deprecationMessages )
         {
-            // Opening well path was cancelled or failed: close project.
+            RiaLogging::info( deprecationMessage );
+        }
+
+        m_project->updatesAfterProjectFileIsRead();
+
+        // Apply any modifications to the loaded project before we go ahead and load actual data
+        if ( projectModifier )
+        {
+            projectModifier->applyModificationsToProject( m_project.get() );
+        }
+
+        // Propagate possible new location of project
+
+        m_project->setProjectFileNameAndUpdateDependencies( fullPathProjectFileName );
+
+        // On error, delete everything, and bail out.
+
+        if ( m_project->projectFileVersionString().isEmpty() )
+        {
             closeProject();
+
+            QString errMsg =
+                QString( "Unknown project file version detected in file \n%1\n\nCould not open project." ).arg( fullPathProjectFileName );
+
+            onProjectOpeningError( errMsg );
+
+            // Delete all object possibly generated by readFile()
             m_project = std::make_unique<RimProject>();
+
             onProjectOpened();
+
             return true;
         }
 
-        oilField->ensembleWellLogsCollection->loadDataAndUpdate();
-        oilField->vfpDataCollection->loadDataAndUpdate();
+        // At this point, all the file paths variables are replaced and all file paths updated to the new location. This will enable use of
+        // file paths in initAfterRead().
+        // If Rim-objects are created in initAfterRead(), they will be resolved in the second pass
+        // Example: Realization objects in ensemble file set
+        m_project->resolveReferencesRecursively();
+        m_project->initAfterReadRecursively();
 
-        // Initialize seismic data
-        auto& seisDataColl = oilField->seismicDataCollection();
-        for ( auto seismicData : seisDataColl->seismicData() )
+        if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2024.09.2" ) )
         {
-            seismicData->ensureFileReaderIsInitialized();
+            // Traverse objects recursively and add quick access fields for old projects
+            RimQuickAccessCollection::instance()->addQuickAccessFieldsRecursively( m_project.get() );
         }
 
-        oilField->polygonCollection()->loadData();
+        // Migrate all RimGridCases to RimFileSummaryCase
+        RimGridSummaryCase_obsolete::convertGridCasesToSummaryFileCases( m_project.get() );
+
+        ///////
+        // Load the external data, and initialize stuff that needs specific ordering
+
+        // VL check regarding specific order mentioned in comment above...
+
+        m_preferences->lastUsedProjectFileName = fullPathProjectFileName;
+        if ( m_preferencesFileName.isEmpty() )
+        {
+            m_preferences->writePreferencesToApplicationStore();
+        }
+
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
     }
 
-    progress.incrementProgress();
-    progress.setProgressDescription( "Loading 2D Plot Data" );
-
     {
-        RimMainPlotCollection* mainPlotColl = RimMainPlotCollection::current();
-        mainPlotColl->ensureDefaultFlowPlotsAreCreated();
+        QString taskName = QString( "Loading Grid Data" );
+        auto    task     = progress.task( taskName, 10 );
 
-        // RimVfpTable are not presisted in the project file, and are created in vfpDataCollection->loadDataAndUpdate(). Existing VFP
-        // plots will have references to RimVfpTables. Call resolveReferencesRecursively() to update the references to RimVfpTable objects.
-        mainPlotColl->vfpPlotCollection()->resolveReferencesRecursively();
-    }
-
-    for ( RimOilField* oilField : m_project->oilFields )
-    {
-        if ( oilField == nullptr ) continue;
-        // Temporary
-        if ( !oilField->summaryCaseMainCollection() )
-        {
-            oilField->summaryCaseMainCollection = std::make_unique<RimSummaryCaseMainCollection>();
-        }
-        oilField->summaryCaseMainCollection()->loadAllSummaryCaseData();
-
-        m_project->calculationCollection()->rebuildCaseMetaData();
-
-        if ( !oilField->observedDataCollection() )
-        {
-            oilField->observedDataCollection = std::make_unique<RimObservedDataCollection>();
-        }
-        for ( RimObservedSummaryData* observedData : oilField->observedDataCollection()->allObservedSummaryData() )
-        {
-            observedData->createSummaryReaderInterface();
-            observedData->createRftReaderInterface();
-            observedData->updateMetaData();
-        }
-        for ( RimObservedFmuRftData* observedFmuData : oilField->observedDataCollection()->allObservedFmuRftData() )
-        {
-            observedFmuData->createRftReaderInterface();
-        }
-
-        oilField->completionTemplateCollection()->loadAndUpdateData();
-        oilField->fractureDefinitionCollection()->createAndAssignTemplateCopyForNonMatchingUnit();
-
-        {
-            std::vector<RimWellPathFracture*> wellPathFractures =
-                oilField->wellPathCollection->descendantsIncludingThisOfType<RimWellPathFracture>();
-
-            for ( auto fracture : wellPathFractures )
-            {
-                fracture->loadDataAndUpdate();
-            }
-        }
-
-        oilField->surfaceCollection()->loadData();
-    }
-
-    progress.incrementProgress();
-    progress.setProgressDescription( "Calculation Grid Statistics" );
-
-    // If load action is specified to recalculate statistics, do it now.
-    // Apparently this needs to be done before the views are loaded, lest the number of time steps for statistics will
-    // be clamped
-    if ( loadAction == ProjectLoadAction::PLA_CALCULATE_STATISTICS )
-    {
         for ( size_t oilFieldIdx = 0; oilFieldIdx < m_project->oilFields().size(); oilFieldIdx++ )
         {
             RimOilField*              oilField       = m_project->oilFields[oilFieldIdx];
             RimEclipseCaseCollection* analysisModels = oilField ? oilField->analysisModels() : nullptr;
-            if ( analysisModels )
+            if ( analysisModels == nullptr ) continue;
+
+            for ( size_t cgIdx = 0; cgIdx < analysisModels->caseGroups.size(); ++cgIdx )
             {
-                analysisModels->recomputeStatisticsForAllCaseGroups();
+                // Load the Main case of each IdenticalGridCaseGroup
+                RimIdenticalGridCaseGroup* igcg = analysisModels->caseGroups[cgIdx];
+                igcg->loadMainCaseAndActiveCellInfo(); // VL is this supposed to be done for each RimOilField?
             }
         }
+
+        // Load the formation names
+
+        for ( RimOilField* oilField : m_project->oilFields )
+        {
+            if ( oilField == nullptr ) continue;
+            if ( oilField->formationNamesCollection() != nullptr )
+            {
+                oilField->formationNamesCollection()->readAllFormationNames();
+            }
+        }
+
+        for ( size_t oilFieldIdx = 0; oilFieldIdx < m_project->oilFields().size(); oilFieldIdx++ )
+        {
+            RimOilField* oilField = m_project->oilFields[oilFieldIdx];
+            if ( oilField == nullptr ) continue;
+            if ( oilField->wellPathCollection == nullptr )
+            {
+                oilField->wellPathCollection = std::make_unique<RimWellPathCollection>();
+            }
+
+            // Initialize well paths
+            if ( !oilField->wellPathCollection->loadDataAndUpdate() )
+            {
+                // Opening well path was cancelled or failed: close project.
+                closeProject();
+                m_project = std::make_unique<RimProject>();
+                onProjectOpened();
+                return true;
+            }
+
+            oilField->ensembleWellLogsCollection->loadDataAndUpdate();
+            oilField->vfpDataCollection->loadDataAndUpdate();
+
+            // Initialize seismic data
+            auto& seisDataColl = oilField->seismicDataCollection();
+            for ( auto seismicData : seisDataColl->seismicData() )
+            {
+                seismicData->ensureFileReaderIsInitialized();
+            }
+
+            oilField->polygonCollection()->loadData();
+        }
+
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
     }
 
-    progress.incrementProgress();
-    progress.setProgressDescription( "Create 3D Views" );
-
-    // Now load the ReservoirViews for the cases
-    // Add all "native" cases in the project
-    std::vector<RimCase*> casesToLoad = m_project->allGridCases();
     {
-        caf::ProgressInfo caseProgress( casesToLoad.size(), "Reading Cases" );
+        QString taskName = QString( "Loading Data for 2D Plots" );
+        auto    task     = progress.task( taskName, 10 );
 
-        for ( size_t cIdx = 0; cIdx < casesToLoad.size(); ++cIdx )
         {
-            RimCase* cas = casesToLoad[cIdx];
-            CVF_ASSERT( cas );
+            RimMainPlotCollection* mainPlotColl = RimMainPlotCollection::current();
+            mainPlotColl->ensureDefaultFlowPlotsAreCreated();
 
-            // Make sure case name is updated. It can be out-of-sync if the
-            // user has updated the project file manually.
-            cas->updateAutoShortName();
+            // RimVfpTable are not presisted in the project file, and are created in vfpDataCollection->loadDataAndUpdate(). Existing VFP
+            // plots will have references to RimVfpTables. Call resolveReferencesRecursively() to update the references to RimVfpTable objects.
+            mainPlotColl->vfpPlotCollection()->resolveReferencesRecursively();
+        }
 
-            caseProgress.setProgressDescription( cas->caseUserDescription() );
-            std::vector<Rim3dView*> views = cas->views();
-            { // To delete the view progress before incrementing the caseProgress
-                caf::ProgressInfo viewProgress( views.size(), "Creating Views" );
+        for ( RimOilField* oilField : m_project->oilFields )
+        {
+            if ( oilField == nullptr ) continue;
+            // Temporary
+            if ( !oilField->summaryCaseMainCollection() )
+            {
+                oilField->summaryCaseMainCollection = std::make_unique<RimSummaryCaseMainCollection>();
+            }
+            oilField->summaryCaseMainCollection()->loadAllSummaryCaseData();
 
-                size_t j;
-                for ( j = 0; j < views.size(); j++ )
+            m_project->calculationCollection()->rebuildCaseMetaData();
+
+            if ( !oilField->observedDataCollection() )
+            {
+                oilField->observedDataCollection = std::make_unique<RimObservedDataCollection>();
+            }
+            for ( RimObservedSummaryData* observedData : oilField->observedDataCollection()->allObservedSummaryData() )
+            {
+                observedData->createSummaryReaderInterface();
+                observedData->createRftReaderInterface();
+                observedData->updateMetaData();
+            }
+            for ( RimObservedFmuRftData* observedFmuData : oilField->observedDataCollection()->allObservedFmuRftData() )
+            {
+                observedFmuData->createRftReaderInterface();
+            }
+
+            oilField->completionTemplateCollection()->loadAndUpdateData();
+            oilField->fractureDefinitionCollection()->createAndAssignTemplateCopyForNonMatchingUnit();
+
+            {
+                std::vector<RimWellPathFracture*> wellPathFractures =
+                    oilField->wellPathCollection->descendantsIncludingThisOfType<RimWellPathFracture>();
+
+                for ( auto fracture : wellPathFractures )
                 {
-                    Rim3dView* riv = views[j];
-                    CVF_ASSERT( riv );
-
-                    viewProgress.setProgressDescription( riv->name() );
-
-                    if ( m_project->isProjectFileVersionEqualOrOlderThan( "2018.1.0.103" ) )
-                    {
-                        std::vector<RimStimPlanColors*> stimPlanColors = riv->descendantsIncludingThisOfType<RimStimPlanColors>();
-                        if ( stimPlanColors.size() == 1 )
-                        {
-                            stimPlanColors[0]->updateConductivityResultName();
-                        }
-                    }
-
-                    riv->loadDataAndUpdate();
-
-                    if ( m_project->isProjectFileVersionEqualOrOlderThan( "2018.1.1.110" ) )
-                    {
-                        auto* geoView = dynamic_cast<RimGeoMechView*>( riv );
-                        if ( geoView )
-                        {
-                            geoView->convertCameraPositionFromOldProjectFiles();
-                        }
-                    }
-
-                    if ( riv->showWindow() )
-                    {
-                        setActiveReservoirView( riv );
-                    }
-
-                    RimGridView* rigv = dynamic_cast<RimGridView*>( riv );
-                    if ( rigv ) rigv->cellFilterCollection()->updateIconState();
-
-                    viewProgress.incrementProgress();
+                    fracture->loadDataAndUpdate();
                 }
             }
-            caseProgress.incrementProgress();
+
+            oilField->surfaceCollection()->loadData();
         }
+
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
     }
 
-    // Load all grid ensemble views
     {
-        auto gridCaseEnsembles = m_project->activeOilField()->analysisModels()->caseEnsembles.childrenByType();
+        QString taskName = QString( "Calculation Statistics for Grid Case Groups" );
+        auto    task     = progress.task( taskName, 10 );
 
-        for ( auto gridCaseEnsemble : gridCaseEnsembles )
+        // If load action is specified to recalculate statistics, do it now.
+        // Apparently this needs to be done before the views are loaded, lest the number of time steps for statistics will
+        // be clamped
+        if ( loadAction == ProjectLoadAction::PLA_CALCULATE_STATISTICS )
         {
-            auto views = gridCaseEnsemble->viewCollection()->views();
-            for ( auto view : views )
+            for ( size_t oilFieldIdx = 0; oilFieldIdx < m_project->oilFields().size(); oilFieldIdx++ )
             {
-                view->loadDataAndUpdate();
+                RimOilField*              oilField       = m_project->oilFields[oilFieldIdx];
+                RimEclipseCaseCollection* analysisModels = oilField ? oilField->analysisModels() : nullptr;
+                if ( analysisModels )
+                {
+                    analysisModels->recomputeStatisticsForAllCaseGroups();
+                }
             }
         }
-    }
 
-    if ( m_project->viewLinkerCollection() && m_project->viewLinkerCollection()->viewLinker() )
-    {
-        m_project->viewLinkerCollection()->viewLinker()->updateOverrides();
-    }
-
-    // Intersection Views: Sync from intersections in the case.
-
-    for ( RimCase* cas : casesToLoad )
-    {
-        cas->intersectionViewCollection()->syncFromExistingIntersections( false );
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
     }
 
     {
-        for ( auto view : m_project->allViews() )
+        QString taskName = QString( "Loading 3D Views" );
+        auto    task     = progress.task( taskName, 10 );
+
+        // Now load the ReservoirViews for the cases
+        // Add all "native" cases in the project
+        std::vector<RimCase*> casesToLoad = m_project->allGridCases();
         {
-            if ( auto eclipseView = dynamic_cast<RimEclipseView*>( view ) )
+            caf::ProgressInfo caseProgress( casesToLoad.size(), "Reading Cases" );
+
+            for ( size_t cIdx = 0; cIdx < casesToLoad.size(); ++cIdx )
             {
-                eclipseView->faultReactivationModelCollection()->loadDataAndUpdate();
+                RimCase* cas = casesToLoad[cIdx];
+                CVF_ASSERT( cas );
+
+                // Make sure case name is updated. It can be out-of-sync if the
+                // user has updated the project file manually.
+                cas->updateAutoShortName();
+
+                caseProgress.setProgressDescription( cas->caseUserDescription() );
+                std::vector<Rim3dView*> views = cas->views();
+                { // To delete the view progress before incrementing the caseProgress
+                    caf::ProgressInfo viewProgress( views.size(), "Creating Views" );
+
+                    size_t j;
+                    for ( j = 0; j < views.size(); j++ )
+                    {
+                        Rim3dView* riv = views[j];
+                        CVF_ASSERT( riv );
+
+                        viewProgress.setProgressDescription( riv->name() );
+
+                        if ( m_project->isProjectFileVersionEqualOrOlderThan( "2018.1.0.103" ) )
+                        {
+                            std::vector<RimStimPlanColors*> stimPlanColors = riv->descendantsIncludingThisOfType<RimStimPlanColors>();
+                            if ( stimPlanColors.size() == 1 )
+                            {
+                                stimPlanColors[0]->updateConductivityResultName();
+                            }
+                        }
+
+                        riv->loadDataAndUpdate();
+
+                        if ( m_project->isProjectFileVersionEqualOrOlderThan( "2018.1.1.110" ) )
+                        {
+                            auto* geoView = dynamic_cast<RimGeoMechView*>( riv );
+                            if ( geoView )
+                            {
+                                geoView->convertCameraPositionFromOldProjectFiles();
+                            }
+                        }
+
+                        if ( riv->showWindow() )
+                        {
+                            setActiveReservoirView( riv );
+                        }
+
+                        RimGridView* rigv = dynamic_cast<RimGridView*>( riv );
+                        if ( rigv ) rigv->cellFilterCollection()->updateIconState();
+
+                        viewProgress.incrementProgress();
+                    }
+                }
+                caseProgress.incrementProgress();
             }
         }
-    }
 
-    for ( RimOilField* oilField : m_project->oilFields )
-    {
-        for ( auto seisView : oilField->seismicViewCollection()->views() )
+        // Load all grid ensemble views
         {
-            seisView->loadDataAndUpdate();
+            auto gridCaseEnsembles = m_project->activeOilField()->analysisModels()->caseEnsembles.childrenByType();
+
+            for ( auto gridCaseEnsemble : gridCaseEnsembles )
+            {
+                auto views = gridCaseEnsemble->viewCollection()->views();
+                for ( auto view : views )
+                {
+                    view->loadDataAndUpdate();
+                }
+            }
         }
-    }
 
-    progress.incrementProgress();
-    progress.setProgressDescription( "Load Summary Data" );
-
-    // Init summary case groups
-    for ( RimOilField* oilField : m_project->oilFields )
-    {
-        auto sumMainCollection = oilField->summaryCaseMainCollection();
-        if ( !sumMainCollection ) continue;
-
-        sumMainCollection->updateAutoShortName();
-        for ( auto ensemble : sumMainCollection->summaryEnsembles() )
+        if ( m_project->viewLinkerCollection() && m_project->viewLinkerCollection()->viewLinker() )
         {
-            ensemble->loadDataAndUpdate();
+            m_project->viewLinkerCollection()->viewLinker()->updateOverrides();
         }
-        sumMainCollection->updateEnsembleNames();
 
-        for ( auto well : oilField->wellPathCollection()->allWellPaths() )
+        // Intersection Views: Sync from intersections in the case.
+
+        for ( RimCase* cas : casesToLoad )
         {
-            for ( auto stimPlan : well->stimPlanModelCollection()->allStimPlanModels() )
-                stimPlan->resetAnchorPositionAndThicknessDirection();
+            cas->intersectionViewCollection()->syncFromExistingIntersections( false );
         }
+
+        {
+            for ( auto view : m_project->allViews() )
+            {
+                if ( auto eclipseView = dynamic_cast<RimEclipseView*>( view ) )
+                {
+                    eclipseView->faultReactivationModelCollection()->loadDataAndUpdate();
+                }
+            }
+        }
+
+        for ( RimOilField* oilField : m_project->oilFields )
+        {
+            for ( auto seisView : oilField->seismicViewCollection()->views() )
+            {
+                seisView->loadDataAndUpdate();
+            }
+        }
+
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
     }
 
-    // Some procedures in onProjectOpened() may rely on the display model having been created
-    // So we need to force the completion of the display model here.
-    RiaViewRedrawScheduler::instance()->updateAndRedrawScheduledViews();
-
-    // NB! This function must be called before executing command objects,
-    // because the tree view state is restored from project file and sets
-    // current active view ( see restoreTreeViewState() )
-    // Default behavior for scripts is to use current active view for data read/write
-    onProjectOpened();
-
-    progress.incrementProgress();
-    progress.setProgressDescription( "Performing Grid Calculations" );
-
-    // Recalculate the results from grid property calculations.
-    // Has to be done late since the results are filtered by view cell visibility
-    for ( auto gridCalculation : m_project->gridCalculationCollection()->sortedGridCalculations() )
     {
-        gridCalculation->calculate();
-        gridCalculation->updateDependentObjects();
+        const int taskSteps = 30;
+
+        // Init summary case groups
+        for ( RimOilField* oilField : m_project->oilFields )
+        {
+            auto sumMainCollection = oilField->summaryCaseMainCollection();
+            if ( !sumMainCollection ) continue;
+
+            sumMainCollection->updateAutoShortName();
+
+            int stepSize = 1;
+            if ( !sumMainCollection->summaryEnsembles().empty() )
+            {
+                stepSize = std::max( 1, int( taskSteps / sumMainCollection->summaryEnsembles().size() ) );
+            }
+
+            for ( auto ensemble : sumMainCollection->summaryEnsembles() )
+            {
+                auto ensembleTask = progress.task( QString( "Loading Summary Ensemble '%1'" ).arg( ensemble->name() ), stepSize );
+                ensemble->loadDataAndUpdate();
+                RiaLogging::info( QString( "Loaded ensemble : '%1'" ).arg( ensemble->name() ) );
+            }
+            sumMainCollection->updateEnsembleNames();
+
+            for ( auto well : oilField->wellPathCollection()->allWellPaths() )
+            {
+                for ( auto stimPlan : well->stimPlanModelCollection()->allStimPlanModels() )
+                    stimPlan->resetAnchorPositionAndThicknessDirection();
+            }
+        }
+
+        // Second pass: a full recursive resolution to robustly handle both previously failing references and any newly created ones from
+        // initAfterRead.
+        m_project->resolveReferencesRecursively();
+
+        // Some procedures in onProjectOpened() may rely on the display model having been created
+        // So we need to force the completion of the display model here.
+        RiaViewRedrawScheduler::instance()->updateAndRedrawScheduledViews();
+
+        // NB! This function must be called before executing command objects,
+        // because the tree view state is restored from project file and sets
+        // current active view ( see restoreTreeViewState() )
+        // Default behavior for scripts is to use current active view for data read/write
+        onProjectOpened();
+
+        if ( logTiming ) RiaLogging::logElapsedTime( "Load Summary Data", startTime );
     }
 
-    RiaPlotWindowRedrawScheduler::instance()->performScheduledUpdates();
+    {
+        QString taskName = QString( "Grid Cells Calculations" );
+        auto    task     = progress.task( taskName, 10 );
 
-    RiaLogging::info( QString( "Completed open of project file : '%1'" ).arg( projectFileName ) );
+        // Recalculate the results from grid property calculations.
+        // Has to be done late since the results are filtered by view cell visibility
+        for ( auto gridCalculation : m_project->gridCalculationCollection()->sortedGridCalculations() )
+        {
+            gridCalculation->calculate();
+            gridCalculation->updateDependentObjects();
+        }
+
+        RiaPlotWindowRedrawScheduler::instance()->performScheduledUpdates();
+
+        if ( logTiming ) RiaLogging::logElapsedTime( taskName, startTime );
+    }
+
+    auto logText = QString( "Project file '%1' loaded successfully." ).arg( projectFileName );
+    if ( logTiming )
+    {
+        RiaLogging::logElapsedTime( logText, startTime );
+    }
+    else
+    {
+        RiaLogging::info( logText );
+    }
 
     return true;
 }
@@ -1778,4 +1876,22 @@ void RiaApplication::initializeDataLoadController()
                                             std::make_unique<RimWellLogFileDataLoader>() );
     dataLoadController->registerDataLoader( RimWellLogFile::classKeywordStatic(), wellLogKeyword, std::make_unique<RimWellLogFileDataLoader>() );
     dataLoadController->registerDataLoader( RimOsduWellLog::classKeywordStatic(), wellLogKeyword, std::make_unique<RimOsduWellLogDataLoader>() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaKeyValueStore<char>* RiaApplication::keyValueStore() const
+{
+    return m_keyValueStore.get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmDeprecation> RiaApplication::defaultDeprecations()
+{
+    // Deprecations can be used for adding info messages when pdm fields have been removed.
+    // To extend the concept to pdm objects more work is needed.
+    return {};
 }

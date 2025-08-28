@@ -128,15 +128,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
       COMPILE_FLAGS
       "-Wall -Wno-unused-parameter -Wno-reorder -Wno-parentheses -Wno-switch"
   )
-  # Treat warnings as errors if asked to do so
-  if(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS)
-    set_target_properties(
-      ResInsight
-      PROPERTIES
-        COMPILE_FLAGS
-        "-Wall -Wno-unused-parameter -Wno-reorder -Wno-parentheses -Wno-switch -Werror"
-    )
-  endif()
 
   if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set_target_properties(
@@ -233,6 +224,10 @@ endif()
 if(RESINSIGHT_USE_ODB_API)
   add_definitions(-DUSE_ODB_API)
   list(APPEND LINK_LIBRARIES RifOdbReader)
+endif()
+
+if(RESINSIGHT_ENABLE_OPENVDS)
+  add_definitions(-DUSE_OPENVDS)
 endif()
 
 target_link_libraries(ResInsight PRIVATE ${LINK_LIBRARIES})
@@ -383,7 +378,12 @@ if(RESINSIGHT_PRIVATE_INSTALL)
 
   endif()
 
-  install(TARGETS ResInsight DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
+  install(
+    TARGETS ResInsight
+    BUNDLE DESTINATION ${RESINSIGHT_INSTALL_FOLDER} COMPONENT Runtime
+    RUNTIME DESTINATION ${RESINSIGHT_INSTALL_FOLDER} COMPONENT Runtime
+  )
+
   install(FILES ${RESINSIGHT_FILES} DESTINATION ${RESINSIGHT_INSTALL_FOLDER})
 
   if(WIN32 AND WINDEPLOYQT_EXECUTABLE)

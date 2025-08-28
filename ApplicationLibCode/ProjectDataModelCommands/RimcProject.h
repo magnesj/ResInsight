@@ -29,17 +29,15 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RimProject_importSummaryCase : public caf::PdmObjectMethod
+class RimProject_importSummaryCase : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimProject_importSummaryCase( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
-    bool                             isNullptrValidResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<QString> m_fileName;
@@ -55,10 +53,8 @@ class RimProject_summaryCase : public caf::PdmObjectMethod
 public:
     RimProject_summaryCase( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
-    bool                             isNullptrValidResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<int> m_caseId;
@@ -67,18 +63,67 @@ private:
 //==================================================================================================
 ///
 //==================================================================================================
-class RimProject_surfaceFolder : public caf::PdmObjectMethod
+class RimProject_surfaceFolder : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimProject_surfaceFolder( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
-    bool                             isNullptrValidResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<QString> m_folderName;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimProject_createGridFromKeyValues : public caf::PdmObjectCreationMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimProject_createGridFromKeyValues( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+
+private:
+    caf::PdmField<QString> m_name;
+    caf::PdmField<int>     m_nx;
+    caf::PdmField<int>     m_ny;
+    caf::PdmField<int>     m_nz;
+    caf::PdmField<QString> m_coordKey;
+    caf::PdmField<QString> m_zcornKey;
+    caf::PdmField<QString> m_actnumKey;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimProject_wellPathCollection : public caf::PdmObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimProject_wellPathCollection( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimProject_valveTemplates : public caf::PdmObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimProject_valveTemplates( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 };

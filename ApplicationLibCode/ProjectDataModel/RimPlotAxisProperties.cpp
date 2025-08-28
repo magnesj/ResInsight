@@ -56,6 +56,7 @@ RimPlotAxisProperties::RimPlotAxisProperties()
     : logarithmicChanged( this )
     , axisPositionChanged( this )
     , m_enableTitleTextSettings( true )
+    , m_enableTitleLayoutSettings( true )
     , m_isRangeSettingsEnabled( true )
     , m_isAlwaysRequired( false )
 {
@@ -124,6 +125,20 @@ void RimPlotAxisProperties::configureForBasicUse()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotAxisProperties::configureForHistogramUse()
+{
+    setEnableTitleTextSettings( false );
+    setEnableTitleLayoutSettings( false );
+
+    m_isLogarithmicScaleEnabled.uiCapability()->setUiHidden( true );
+    m_isAxisInverted.uiCapability()->setUiHidden( true );
+    m_showNumbers.uiCapability()->setUiHidden( true );
+    m_plotAxis.uiCapability()->setUiHidden( true );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimPlotAxisProperties::setAlwaysRequired( bool enable )
 {
     m_isAlwaysRequired = enable;
@@ -143,6 +158,14 @@ bool RimPlotAxisProperties::isDeletable() const
 void RimPlotAxisProperties::setEnableTitleTextSettings( bool enable )
 {
     m_enableTitleTextSettings = enable;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotAxisProperties::setEnableTitleLayoutSettings( bool enable )
+{
+    m_enableTitleLayoutSettings = enable;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -188,10 +211,6 @@ QList<caf::PdmOptionItemInfo> RimPlotAxisProperties::calculateValueOptions( cons
             options.push_back( caf::PdmOptionItemInfo( uiText, value ) );
         }
     }
-    else if ( fieldNeedingOptions == &m_titleFontSize || fieldNeedingOptions == &m_valuesFontSize )
-    {
-        options = caf::FontTools::relativeSizeValueOptions( RiaPreferences::current()->defaultPlotFontSize() );
-    }
 
     return options;
 }
@@ -222,6 +241,7 @@ void RimPlotAxisProperties::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         }
     }
 
+    if ( m_enableTitleLayoutSettings )
     {
         caf::PdmUiGroup* titleGroup = uiOrdering.addNewGroup( "Title Layout" );
         titleGroup->add( &m_titlePositionEnum );

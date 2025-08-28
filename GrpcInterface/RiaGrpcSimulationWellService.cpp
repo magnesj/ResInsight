@@ -22,7 +22,10 @@
 
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
+#include "RigMainGrid.h"
+#include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigSimWellData.h"
+#include "Well/RigWellPath.h"
 #include "Well/RigWellResultFrame.h"
 #include "Well/RigWellResultPoint.h"
 
@@ -150,6 +153,66 @@ grpc::Status RiaGrpcSimulationWellService::GetSimulationWellCells( grpc::ServerC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+grpc::Status RiaGrpcSimulationWellService::GetPerfLength( grpc::ServerContext*               context,
+                                                          const rips::SimulationWellRequest* request,
+                                                          rips::SimulationWellPerfLength*    reply )
+{
+    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( RiaGrpcHelper::findCase( request->case_id() ) );
+    if ( !eclipseCase || !eclipseCase->eclipseCaseData() )
+    {
+        return grpc::Status( grpc::NOT_FOUND, "Case not found or invalid." );
+    }
+
+    cvf::ref<RigSimWellData> currentWellResult = findWellResult( eclipseCase, request->well_name() );
+    if ( currentWellResult.isNull() )
+    {
+        return grpc::Status( grpc::NOT_FOUND, "Well not found" );
+    }
+
+    // check that the well is open and has valid cells for the requested timestep
+    size_t tsIdx = static_cast<size_t>( request->timestep() );
+    if ( !currentWellResult->hasWellResult( tsIdx ) || !currentWellResult->isOpen( tsIdx ) ||
+         !currentWellResult->hasAnyValidCells( tsIdx ) )
+    {
+        reply->set_accumulated_length( 0.0 );
+        return grpc::Status::OK;
+    }
+
+    auto wellPaths = eclipseCase->eclipseCaseData()->simulationWellBranches( QString::fromStdString( request->well_name() ),
+                                                                             true /*incl cell centers*/,
+                                                                             true /*auto detect branches*/ );
+    auto   mainGrid   = eclipseCase->mainGrid();
+    double perfLength = 0.0;
+
+    for ( auto wellPath : wellPaths )
+    {
+        auto extractor =
+            std::make_unique<RigEclipseWellLogExtractor>( eclipseCase->eclipseCaseData(), wellPath, request->well_name() );
+
+        for ( const auto& info : extractor->cellIntersectionInfosAlongWellPath() )
+        {
+            size_t localCellIndex = 0;
+
+            auto   localGrid = mainGrid->gridAndGridLocalIdxFromGlobalCellIdx( info.globCellIndex, &localCellIndex );
+            size_t gridIndex = localGrid->gridId();
+
+            auto wResCell =
+                currentWellResult->wellResultFrame( tsIdx )->findResultCellWellHeadExcluded( gridIndex, localCellIndex );
+
+            if ( wResCell.isValid() && wResCell.isOpen() )
+            {
+                perfLength += info.endMD - info.startMD;
+            }
+        }
+    }
+
+    reply->set_accumulated_length( perfLength );
+    return grpc::Status::OK;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 cvf::ref<RigSimWellData> RiaGrpcSimulationWellService::findWellResult( const RimEclipseCase* eclipseCase,
                                                                        const std::string&    wellName )
 {
@@ -170,16 +233,17 @@ cvf::ref<RigSimWellData> RiaGrpcSimulationWellService::findWellResult( const Rim
 //--------------------------------------------------------------------------------------------------
 std::vector<RiaGrpcCallbackInterface*> RiaGrpcSimulationWellService::createCallbacks()
 {
-    typedef RiaGrpcSimulationWellService Self;
+    using Self = RiaGrpcSimulationWellService;
 
-    return {
-        new RiaGrpcUnaryCallback<Self, SimulationWellRequest, SimulationWellStatus>( this,
-                                                                                     &Self::GetSimulationWellStatus,
-                                                                                     &Self::RequestGetSimulationWellStatus ),
-        new RiaGrpcUnaryCallback<Self, SimulationWellRequest, SimulationWellCellInfoArray>( this,
-                                                                                            &Self::GetSimulationWellCells,
-                                                                                            &Self::RequestGetSimulationWellCells ),
-    };
+    return { new RiaGrpcUnaryCallback<Self, SimulationWellRequest, SimulationWellStatus>( this,
+                                                                                          &Self::GetSimulationWellStatus,
+                                                                                          &Self::RequestGetSimulationWellStatus ),
+             new RiaGrpcUnaryCallback<Self, SimulationWellRequest, SimulationWellCellInfoArray>( this,
+                                                                                                 &Self::GetSimulationWellCells,
+                                                                                                 &Self::RequestGetSimulationWellCells ),
+             new RiaGrpcUnaryCallback<Self, SimulationWellRequest, SimulationWellPerfLength>( this,
+                                                                                              &Self::GetPerfLength,
+                                                                                              &Self::RequestGetPerfLength ) };
 }
 
 static bool RiaGrpcSimulationWellService_init =

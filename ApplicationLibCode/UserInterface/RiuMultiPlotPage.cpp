@@ -40,9 +40,6 @@
 #include "RiuQwtPlotLegend.h"
 #include "RiuQwtPlotTools.h"
 #include "RiuQwtPlotWidget.h"
-#ifdef USE_QTCHARTS
-#include "RiuQtChartsPlotWidget.h"
-#endif
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafSelectionManager.h"
@@ -200,15 +197,6 @@ void RiuMultiPlotPage::insertPlot( RiuPlotWidget* plotWidget, size_t index )
                              SIGNAL( legendDataChanged( const QVariant&, const QList<QwtLegendData>& ) ),
                              SLOT( updateLegend( const QVariant&, const QList<QwtLegendData>& ) ) );
             qwtPlotWidget->connect( legend, SIGNAL( clicked( const QVariant&, int ) ), SLOT( onLegendClicked( const QVariant&, int ) ) );
-        }
-        else
-        {
-#ifdef USE_QTCHARTS
-            auto qtchartPlotWidget = dynamic_cast<RiuQtChartsPlotWidget*>( plotWidget );
-            legend->connect( qtchartPlotWidget,
-                             SIGNAL( legendDataChanged( const QList<QwtLegendData>& ) ),
-                             SLOT( updateLegend( const QList<QwtLegendData>& ) ) );
-#endif
         }
 
         QObject::connect( legend, SIGNAL( legendUpdated() ), this, SLOT( onLegendUpdated() ) );
@@ -574,7 +562,7 @@ void RiuMultiPlotPage::performUpdate( RiaDefines::MultiPlotPageUpdateType whatTo
     auto multiPlot = dynamic_cast<RimMultiPlot*>( m_plotDefinition.p() );
     if ( multiPlot && !multiPlot->isValid() ) return;
 
-    if ( whatToUpdate == RiaDefines::MultiPlotPageUpdateType::ALL )
+    if ( RiaDefines::isFullUpdate( whatToUpdate ) )
     {
         applyLook();
         updateTitleFont();
@@ -587,14 +575,14 @@ void RiuMultiPlotPage::performUpdate( RiaDefines::MultiPlotPageUpdateType whatTo
         return;
     }
 
-    if ( ( whatToUpdate & RiaDefines::MultiPlotPageUpdateType::LEGEND ) == RiaDefines::MultiPlotPageUpdateType::LEGEND )
+    if ( RiaDefines::isLegendUpdate( whatToUpdate ) )
     {
         refreshLegends();
         alignCanvasTops();
         if ( m_autoAlignAxes ) alignAxes();
     }
 
-    if ( ( whatToUpdate & RiaDefines::MultiPlotPageUpdateType::TITLE ) == RiaDefines::MultiPlotPageUpdateType::TITLE )
+    if ( RiaDefines::isTitleUpdate( whatToUpdate ) )
     {
         updateTitleFont();
         updateSubTitles();

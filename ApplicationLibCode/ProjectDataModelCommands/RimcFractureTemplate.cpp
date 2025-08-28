@@ -30,9 +30,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimFractureTemplate, RimcFractureTemplate_set
 ///
 //--------------------------------------------------------------------------------------------------
 RimcFractureTemplate_setScaleFactors::RimcFractureTemplate_setScaleFactors( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmVoidObjectMethod( self )
 {
     CAF_PDM_InitObject( "Set Fracture Template Scale Factors", "", "", "Set Fracture Template Scale Factors." );
+
     CAF_PDM_InitScriptableField( &m_halfLength, "HalfLength", 1.0, "Half Length" );
     CAF_PDM_InitScriptableField( &m_height, "Height", 1.0, "Height" );
     CAF_PDM_InitScriptableField( &m_dFactor, "DFactor", 1.0, "D Factor" );
@@ -42,12 +43,11 @@ RimcFractureTemplate_setScaleFactors::RimcFractureTemplate_setScaleFactors( caf:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcFractureTemplate_setScaleFactors::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcFractureTemplate_setScaleFactors::execute()
 {
     if ( m_halfLength() <= 0.0 || m_height() <= 0.0 || m_dFactor() <= 0.0 || m_conductivity() <= 0.0 )
     {
-        RiaLogging::error( "Invalid scale factors." );
-        return nullptr;
+        return std::unexpected( "Invalid scale factors." );
     }
 
     RimFractureTemplate* fractureTemplate = self<RimFractureTemplate>();
@@ -58,28 +58,4 @@ caf::PdmObjectHandle* RimcFractureTemplate_setScaleFactors::execute()
     }
 
     return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFractureTemplate_setScaleFactors::resultIsPersistent() const
-{
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcFractureTemplate_setScaleFactors::defaultResult() const
-{
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFractureTemplate_setScaleFactors::isNullptrValidResult() const
-{
-    return true;
 }

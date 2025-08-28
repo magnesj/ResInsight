@@ -19,6 +19,7 @@
 #include "RigNumberOfFloodedPoreVolumesCalculator.h"
 
 #include "RiaPorosityModel.h"
+#include "RiaResultNames.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -32,7 +33,9 @@
 #include "RimReservoirCellResultsStorage.h"
 
 #include "cafProgressInfo.h"
+
 #include <QString>
+
 #include <vector>
 
 //--------------------------------------------------------------------------------------------------

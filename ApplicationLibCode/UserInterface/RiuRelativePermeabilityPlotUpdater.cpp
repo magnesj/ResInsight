@@ -20,6 +20,8 @@
 #include "Riu3dSelectionManager.h"
 #include "RiuRelativePermeabilityPlotPanel.h"
 
+#include "RiaResultNames.h"
+
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"

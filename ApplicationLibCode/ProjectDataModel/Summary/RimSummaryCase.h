@@ -54,7 +54,6 @@ public:
 
 public:
     RimSummaryCase();
-    ~RimSummaryCase() override;
 
     virtual QString                      summaryHeaderFilename() const;
     QString                              displayCaseName() const;
@@ -97,6 +96,7 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     caf::PdmFieldHandle* userDescriptionField() override;
+    void                 defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     void updateTreeItemName();
 

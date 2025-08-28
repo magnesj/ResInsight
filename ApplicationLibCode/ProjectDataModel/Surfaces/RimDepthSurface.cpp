@@ -18,7 +18,7 @@
 
 #include "RimDepthSurface.h"
 
-#include "RigSurface.h"
+#include "Surface/RigSurface.h"
 
 #include "RimSurfaceCollection.h"
 
@@ -28,7 +28,7 @@
 
 #include "cvfVector3.h"
 
-CAF_PDM_SOURCE_INIT( RimDepthSurface, "RimDepthSurface" );
+CAF_PDM_SOURCE_INIT( RimDepthSurface, "DepthSurface", "RimDepthSurface" );
 
 //--------------------------------------------------------------------------------------------------
 ///

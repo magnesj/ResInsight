@@ -25,6 +25,7 @@
 #include "RiaFieldHandleTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaResultNames.h"
 
 #include "HoloLensCommands/RicExportToSharingServerScheduler.h"
 
@@ -42,6 +43,7 @@
 #include "Well/RigWellResultFrame.h"
 #include "Well/RigWellResultPoint.h"
 
+#include "Histogram/RimGridStatisticsHistogramDataSource.h"
 #include "Polygons/RimPolygonInViewCollection.h"
 #include "Rim2dIntersectionView.h"
 #include "Rim3dOverlayInfoConfig.h"
@@ -93,10 +95,6 @@
 #include "RimWellMeasurementInView.h"
 #include "RimWellMeasurementInViewCollection.h"
 #include "RimWellPathCollection.h"
-
-#ifdef USE_QTCHARTS
-#include "RimGridStatisticsPlot.h"
-#endif
 
 #include "Riu3dSelectionManager.h"
 #include "RiuMainWindow.h"
@@ -840,8 +838,7 @@ void RimEclipseView::onCreateDisplayModel()
             //   PdmUiTreeViewEditor::updateSelectionManager(),
             //   PdmUiTreeViewEditor::enableSelectionManagerUpdating
 
-            std::vector<caf::PdmUiItem*> selectedItems;
-            caf::SelectionManager::instance()->selectedItems( selectedItems );
+            const auto selectedItems = caf::SelectionManager::instance()->selectedItems();
 
             curveSet->cellFilterViewUpdated();
 
@@ -851,16 +848,15 @@ void RimEclipseView::onCreateDisplayModel()
         }
     }
 
-#ifdef USE_QTCHARTS
-    std::vector<RimGridStatisticsPlot*> gridStatisticsPlots = objectsWithReferringPtrFieldsOfType<RimGridStatisticsPlot>();
-    for ( auto gridStatisticsPlot : gridStatisticsPlots )
+    std::vector<RimGridStatisticsHistogramDataSource*> gridStatisticsHistogramDataSources =
+        objectsWithReferringPtrFieldsOfType<RimGridStatisticsHistogramDataSource>();
+    for ( auto gridStatisticsPlot : gridStatisticsHistogramDataSources )
     {
         if ( gridStatisticsPlot != nullptr )
         {
             gridStatisticsPlot->cellFilterViewUpdated();
         }
     }
-#endif
 
     RicExportToSharingServerScheduler::instance()->scheduleUpdateSession();
 }

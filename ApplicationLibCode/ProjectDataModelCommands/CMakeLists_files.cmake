@@ -19,6 +19,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathGeometryDef.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcModeledWellPath.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcWellPath.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathCollection.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcFractureTemplateCollection.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcFractureTemplate.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcThermalFractureTemplate.h
@@ -28,6 +29,11 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimcIdenticalGridCaseGroup.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcPressureTable.h
     ${CMAKE_CURRENT_LIST_DIR}/RimcFishbonesCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcPolygonCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcRegularSurface.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcPerforationInterval.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcValveTemplateCollection.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathCompletionSettings.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -51,6 +57,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathGeometryDef.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcModeledWellPath.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcWellPath.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcFractureTemplateCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcFractureTemplate.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcThermalFractureTemplate.cpp
@@ -60,6 +67,11 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimcIdenticalGridCaseGroup.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcPressureTable.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimcFishbonesCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcPolygonCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcRegularSurface.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcPerforationInterval.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcValveTemplateCollection.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimcWellPathCompletionSettings.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

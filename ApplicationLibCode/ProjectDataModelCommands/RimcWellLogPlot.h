@@ -32,16 +32,15 @@ class RimWellLogTrack;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcWellLogPlot_newWellLogTrack : public caf::PdmObjectMethod
+class RimcWellLogPlot_newWellLogTrack : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcWellLogPlot_newWellLogTrack( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
     static RimWellLogTrack*
         createWellLogTrack( RimWellLogPlot* wellLogPlot, RimEclipseCase* eclipseCase, RimWellPath* wellPath, const QString& title );

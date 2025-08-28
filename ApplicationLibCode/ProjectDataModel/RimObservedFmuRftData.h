@@ -19,11 +19,14 @@
 #pragma once
 
 #include "RifReaderFmuRft.h"
+
 #include "RimNamedObject.h"
 
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
+
+#include <memory>
 
 class RimObservedFmuRftData : public RimNamedObject
 {
@@ -40,9 +43,13 @@ public:
     std::vector<QString> wells() const;
     std::vector<QString> labels( const RifEclipseRftAddress& rftAddress );
 
-private:
-    cvf::ref<RifReaderFmuRft> m_fmuRftReader;
+protected:
+    void initAfterRead() override;
 
-    caf::PdmField<QString>                        m_directoryPath;
+private:
+    std::unique_ptr<RifReaderFmuRft> m_fmuRftReader;
+
+    caf::PdmField<caf::FilePath>                  m_directoryPath;
+    caf::PdmField<QString>                        m_directoryPath_OBSOLETE;
     caf::PdmProxyValueField<std::vector<QString>> m_wells;
 };

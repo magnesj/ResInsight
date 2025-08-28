@@ -19,8 +19,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "KeyValueStore/RiaKeyValueStore.h"
 #include "RiaDefines.h"
 
+#include "cafPdmDeprecation.h"
 #include "cafPdmPointer.h"
 #include "cvfObject.h"
 
@@ -119,6 +121,8 @@ public:
     RimProject*       project();
     RimCommandRouter* commandRouter();
 
+    void setThreadCount() const;
+
     void createMockModel();
     void createResultsMockModel();
     void createLargeResultsMockModel();
@@ -199,6 +203,8 @@ public:
     RiaOsduConnector* makeOsduConnector();
     RiaSumoConnector* makeSumoConnector();
 
+    RiaKeyValueStore<char>* keyValueStore() const;
+
 protected:
     // Protected implementation specific overrides
     virtual void invokeProcessEvents( QEventLoop::ProcessEventsFlags flags = QEventLoop::AllEvents ) = 0;
@@ -222,6 +228,8 @@ protected:
 
     bool generateCode( const QString& outputPath, gsl::not_null<QString*> errMsg );
 
+    static std::vector<caf::PdmDeprecation> defaultDeprecations();
+
 protected:
     void initializeDataLoadController();
 
@@ -236,6 +244,8 @@ protected:
 
     QPointer<RiaSocketServer>       m_socketServer;
     std::unique_ptr<caf::UiProcess> m_workerProcess;
+
+    std::unique_ptr<RiaKeyValueStore<char>> m_keyValueStore;
 
     // Execute for all settings
     std::list<int>                  m_scriptCaseIds;
@@ -252,6 +262,8 @@ protected:
     QString m_preferencesFileName;
 
     bool m_runningWorkerProcess;
+
+    std::optional<int> m_threadCountFromCommandLine;
 
 private:
     static RiaApplication*     s_riaApplication;

@@ -68,10 +68,6 @@
 #include "RiuQwtPlotWidget.h"
 #include "RiuSummaryQwtPlot.h"
 
-#ifdef USE_QTCHARTS
-#include "RiuSummaryQtChartsPlot.h"
-#endif
-
 #include "cvfColor3.h"
 
 #include "cafPdmFieldScriptingCapability.h"
@@ -130,11 +126,7 @@ RimSummaryPlot::RimSummaryPlot()
     CAF_PDM_InitScriptableField( &m_useAutoPlotTitle, "IsUsingAutoName", true, "Auto Title" );
     CAF_PDM_InitScriptableField( &m_description, "PlotDescription", QString( "Summary Plot" ), "Name" );
     CAF_PDM_InitScriptableField( &m_normalizeCurveYValues, "normalizeCurveYValues", false, "Normalize all curves" );
-#ifdef USE_QTCHARTS
-    bool useQtChart = RiaPreferences::current()->useQtChartsAsDefaultPlotType();
-    CAF_PDM_InitScriptableField( &m_useQtChartsPlot, "useQtChartsPlot", useQtChart, "Use Qt Charts" );
-    m_useQtChartsPlot.uiCapability()->setUiHidden( true );
-#endif
+
     CAF_PDM_InitFieldNoDefault( &m_summaryCurveCollection, "SummaryCurveCollection", "" );
     m_summaryCurveCollection = new RimSummaryCurveCollection;
     m_summaryCurveCollection->curvesChanged.connect( this, &RimSummaryPlot::onCurveCollectionChanged );
@@ -1103,15 +1095,12 @@ bool RimSummaryPlot::isOnlyWaterCutCurvesVisible( RiuPlotAxis plotAxis )
     auto curves = visibleSummaryCurvesForAxis( plotAxis );
     if ( curves.empty() ) return false;
 
-    size_t waterCutCurveCount = 0;
-    for ( auto c : curves )
+    for ( const auto& c : curves )
     {
         auto quantityName = c->summaryAddressY().vectorName();
-
-        if ( RiaStdStringTools::endsWith( quantityName, "WCT" ) ) waterCutCurveCount++;
+        if ( !RiaStdStringTools::endsWith( quantityName, "WCT" ) ) return false;
     }
-
-    return ( waterCutCurveCount == curves.size() );
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1439,14 +1428,6 @@ void RimSummaryPlot::removeCurve( RimSummaryCurve* curve )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryPlot::deleteCurve( RimSummaryCurve* curve )
-{
-    deleteCurves( { curve } );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimSummaryPlot::deleteCurves( const std::vector<RimSummaryCurve*>& curves )
 {
     for ( const auto curve : curves )
@@ -1471,7 +1452,7 @@ void RimSummaryPlot::deleteCurves( const std::vector<RimSummaryCurve*>& curves )
                 {
                     if ( c == curve )
                     {
-                        curveSet->deleteCurve( curve );
+                        curveSet->deleteRealizationCurve( curve );
                         if ( curveSet->curves().empty() )
                         {
                             if ( curveSet->colorMode() == RimEnsembleCurveSet::ColorMode::BY_ENSEMBLE_PARAM && plotWidget() &&
@@ -1612,29 +1593,6 @@ void RimSummaryPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
     }
 
     if ( changedField == &m_showPlotLegends ) updateLegend();
-
-#ifdef USE_QTCHARTS
-    if ( changedField == &m_useQtChartsPlot )
-    {
-        // Hide window
-        setShowWindow( false );
-
-        // Detach and destroy plot curves
-        for ( auto c : summaryCurves() )
-        {
-            c->detach( true );
-        }
-
-        for ( auto& curveSet : ensembleCurveSetCollection()->curveSets() )
-        {
-            curveSet->deletePlotCurves();
-        }
-
-        // Destroy viewer
-        removeMdiWindowFromMdiArea();
-        deletePlotCurvesAndPlotWidget();
-    }
-#endif
 
     if ( changedField == &m_normalizeCurveYValues )
     {
@@ -1916,6 +1874,8 @@ void RimSummaryPlot::updateAxisRangesFromPlotWidget()
     {
         if ( !axisProperties ) continue;
 
+        if ( !plotWidget()->axisEnabled( axisProperties->plotAxis() ) ) continue;
+
         auto [axisMin, axisMax] = plotWidget()->axisRange( axisProperties->plotAxis() );
         if ( axisProperties->isAxisInverted() ) std::swap( axisMin, axisMax );
 
@@ -1938,17 +1898,12 @@ void RimSummaryPlot::deletePlotCurvesAndPlotWidget()
     if ( isDeletable() )
     {
         detachAllPlotItems();
-
-        if ( plotWidget() )
-        {
-            plotWidget()->setParent( nullptr );
-        }
-
         deleteAllPlotCurves();
 
         if ( m_summaryPlot )
         {
-            m_summaryPlot.reset();
+            // The RiuPlotWidget is owned by Qt, and will be deleted when its parent is destructed.
+            m_summaryPlot.clear();
         }
     }
 }
@@ -2613,9 +2568,6 @@ void RimSummaryPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     }
 
     caf::PdmUiGroup* mainOptions = uiOrdering.addNewGroup( "General Plot Options" );
-#ifdef USE_QTCHARTS
-    mainOptions->add( &m_useQtChartsPlot );
-#endif
     if ( isMdiWindow() )
     {
         mainOptions->add( &m_showPlotTitle );
@@ -2647,36 +2599,10 @@ void RimSummaryPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 //--------------------------------------------------------------------------------------------------
 RiuPlotWidget* RimSummaryPlot::doCreatePlotViewWidget( QWidget* mainWindowParent )
 {
+    CAF_ASSERT( mainWindowParent );
     if ( !plotWidget() )
     {
-#ifdef USE_QTCHARTS
-        bool useQtCharts = m_useQtChartsPlot;
-
-        auto regTestRunner = RiaRegressionTestRunner::instance();
-        if ( regTestRunner->isRunningRegressionTests() )
-        {
-            if ( regTestRunner->overridePlotEngine() == RiaRegressionTest::PlotEngine::USE_QWT )
-                useQtCharts = false;
-            else if ( regTestRunner->overridePlotEngine() == RiaRegressionTest::PlotEngine::USER_QTCHARTS )
-                useQtCharts = true;
-        }
-
-        // Disable all use of QtCharts for now. If a plot was created using QtCharts during the period this flag was
-        // active, the use of QtCharts was stored in the project file or template file. Set flag to false to force use
-        // of Qwt
-        useQtCharts = false;
-
-        if ( useQtCharts )
-        {
-            m_summaryPlot = std::make_unique<RiuSummaryQtChartsPlot>( this, mainWindowParent );
-        }
-        else
-        {
-            m_summaryPlot = std::make_unique<RiuSummaryQwtPlot>( this, mainWindowParent );
-        }
-#else
-        m_summaryPlot = std::make_unique<RiuSummaryQwtPlot>( this, mainWindowParent );
-#endif
+        m_summaryPlot = new RiuSummaryQwtPlot( this, mainWindowParent );
 
         QObject::connect( plotWidget(), SIGNAL( curveOrderNeedsUpdate() ), this, SLOT( onUpdateCurveOrder() ) );
 
@@ -2709,8 +2635,6 @@ RiuPlotWidget* RimSummaryPlot::doCreatePlotViewWidget( QWidget* mainWindowParent
 
         updatePlotTitle();
     }
-
-    plotWidget()->setParent( mainWindowParent );
 
     return plotWidget();
 }

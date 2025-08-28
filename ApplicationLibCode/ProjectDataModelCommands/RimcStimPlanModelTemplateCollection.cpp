@@ -39,9 +39,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimStimPlanModelTemplateCollection,
 //--------------------------------------------------------------------------------------------------
 RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate(
     caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Create StimPlan Model Template", "", "", "Create a new StimPlan Model Template" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_eclipseCase, "EclipseCase", "", "", "", "Eclipse Case" );
     CAF_PDM_InitScriptableField( &m_timeStep, "TimeStep", 0, "", "", "", "Time Step" );
 
@@ -52,7 +53,7 @@ RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::RimcStimPlanMod
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::execute()
 {
     if ( !m_eclipseCase ) return nullptr;
 
@@ -76,15 +77,7 @@ caf::PdmObjectHandle* RimcStimPlanModelTemplateCollection_appendStimPlanModelTem
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::resultIsPersistent() const
+QString RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimStimPlanModelTemplate );
+    return RimStimPlanModelTemplate::classKeywordStatic();
 }

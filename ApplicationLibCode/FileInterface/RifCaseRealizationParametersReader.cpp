@@ -17,11 +17,13 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RifCaseRealizationParametersReader.h"
-#include "RifFileParseTools.h"
 
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
 #include "RiaTextStringTools.h"
+
+#include "RifFileParseTools.h"
+#include "RifOpmSummaryTools.h"
 
 #include <QDir>
 #include <QString>
@@ -63,11 +65,11 @@ std::shared_ptr<RifCaseRealizationReader> RifCaseRealizationReader::createReader
 
     if ( fileName.endsWith( parametersFileName() ) )
     {
-        reader.reset( new RifCaseRealizationParametersReader( fileName ) );
+        reader = std::make_shared<RifCaseRealizationParametersReader>( fileName );
     }
     else if ( fileName.endsWith( runSpecificationFileName() ) )
     {
-        reader.reset( new RifCaseRealizationRunspecificationReader( fileName ) );
+        reader = std::make_shared<RifCaseRealizationRunspecificationReader>( fileName );
     }
     return reader;
 }
@@ -116,39 +118,39 @@ void RifCaseRealizationParametersReader::parse()
     int         lineNo = 0;
     QStringList errors;
 
+    const auto decimalPoint = RiaStdStringTools::decimalPoint();
+
     while ( !dataStream.atEnd() )
     {
         QString line = dataStream.readLine();
 
         lineNo++;
-        QStringList cols = RifFileParseTools::splitLineAndTrim( line, QRegularExpression( "[ \t]" ), true );
 
-        if ( cols.size() != 2 )
+        const auto stdLine                = line.toStdString();
+        const auto trimmedLine            = RiaStdStringTools::trimString( stdLine );
+        const auto [name, parameterValue] = RiaStdStringTools::splitAtWhitespace( trimmedLine );
+
+        if ( name.empty() || parameterValue.empty() )
         {
-            errors << QString( "RifEnsembleParametersReader: Invalid file format in line %1" ).arg( lineNo );
-
+            errors << QString( "RifCaseRealizationParametersReader: Invalid file format in line %1" ).arg( lineNo );
             continue;
         }
 
-        QString& name     = cols[0];
-        QString& strValue = cols[1];
-
-        if ( RiaTextStringTools::isNumber( strValue, QLocale::c().decimalPoint() ) )
+        if ( RiaStdStringTools::isNumber( parameterValue, decimalPoint ) )
         {
-            bool   parseOk = true;
-            double value   = QLocale::c().toDouble( strValue, &parseOk );
-            if ( parseOk )
+            double doubleValue = 0.0;
+            if ( RiaStdStringTools::toDouble( parameterValue, doubleValue ) )
             {
-                m_parameters->addParameter( name, value );
+                m_parameters->addParameter( QString::fromStdString( std::string( name ) ), doubleValue );
             }
             else
             {
-                errors << QString( "RifEnsembleParametersReader: Invalid number format in line %1" ).arg( lineNo );
+                errors << QString( "RifCaseRealizationParametersReader: Invalid number format in line %1" ).arg( lineNo );
             }
         }
         else
         {
-            m_parameters->addParameter( name, strValue );
+            m_parameters->addParameter( QString::fromStdString( std::string( name ) ), QString::fromStdString( std::string( parameterValue ) ) );
         }
     }
 
@@ -287,23 +289,11 @@ int RifCaseRealizationParametersFileLocator::realizationNumber( const QString& m
     QDir    dir( modelPath );
     QString absolutePath = dir.absolutePath();
 
-    return realizationNumberFromFullPath( absolutePath );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RifCaseRealizationParametersFileLocator::realizationNumberFromFullPath( const QString& path )
-{
-    int resultIndex = -1;
-
-    QRegularExpression      pattern( "realization-(\\d+)", QRegularExpression::CaseInsensitiveOption );
-    QRegularExpressionMatch match = pattern.match( path );
-
-    if ( match.hasMatch() )
+    auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( absolutePath );
+    if ( realizationNumber.has_value() )
     {
-        resultIndex = match.captured( 1 ).toInt();
+        return realizationNumber.value();
     }
 
-    return resultIndex;
+    return -1;
 }

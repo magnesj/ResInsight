@@ -26,7 +26,7 @@
 #include "RimSurfaceCollection.h"
 
 #include "RigStatisticsMath.h"
-#include "RigSurface.h"
+#include "Surface/RigSurface.h"
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
@@ -362,4 +362,20 @@ void RimSurface::updateMinMaxValues( RimRegularLegendConfig* legend, const QStri
 bool RimSurface::isMeshLinesEnabledDefault() const
 {
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::BoundingBox RimSurface::boundingBoxInDomainCoords() const
+{
+    cvf::BoundingBox boundingBox;
+
+    if ( m_surfaceData.notNull() )
+    {
+        for ( const auto& vertex : m_surfaceData->vertices() )
+            boundingBox.add( vertex );
+    }
+
+    return boundingBox;
 }

@@ -140,7 +140,12 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
                         auto pdmChildArrayField = dynamic_cast<const PdmChildArrayFieldHandle*>( field );
                         if ( pdmValueField )
                         {
-                            QString dataType = PdmPythonGenerator::dataTypeString( field, false );
+                            QString dataType = scriptability->dataType();
+                            if ( dataType.isEmpty() )
+                            {
+                                dataType = PdmPythonGenerator::dataTypeString( field, false );
+                            }
+
                             if ( field->xmlCapability()->isVectorField() )
                             {
                                 dataType = QString( "List[%1]" ).arg( dataType );
@@ -192,15 +197,28 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
                             }
                             else
                             {
-                                QString valueString = getDefaultValue( field );
+                                QString defaultValue = getDefaultValue( field );
 
-                                if ( valueString == "None" )
+                                if ( dataType.toLower().contains( "optional" ) )
                                 {
+                                    auto strippedValue = defaultValue;
+                                    strippedValue.remove( "\"" );
+
+                                    if ( strippedValue.isEmpty() )
+                                    {
+                                        // An empty string as default value for an optional field is set to the None
+                                        defaultValue = "None";
+                                    }
+                                }
+                                else if ( defaultValue == "None" )
+                                {
+                                    // TODO: Consider using PdmField<std::optional<T>> for optional fields instead of
+                                    // using the default value to manipulate the type
                                     dataType = QString( "Optional[%1]" ).arg( dataType );
                                 }
 
                                 QString fieldCode =
-                                    QString( "        self.%1: %2 = %3\n" ).arg( snake_field_name ).arg( dataType ).arg( valueString );
+                                    QString( "        self.%1: %2 = %3\n" ).arg( snake_field_name ).arg( dataType ).arg( defaultValue );
 
                                 QString fullComment;
                                 {
@@ -287,11 +305,12 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
 
                 QString returnDataType = "None";
                 QString returnComment;
-                if ( method->defaultResult() )
+                if ( !method->classKeywordReturnedType().isEmpty() )
                 {
-                    QString classKeyword = method->defaultResult()->xmlCapability()->classKeyword();
-                    returnComment        = classKeyword;
-                    returnDataType = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( classKeyword );
+                    QString classKeywordReturnedType = method->classKeywordReturnedType();
+                    returnComment                    = classKeywordReturnedType;
+                    returnDataType =
+                        PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( classKeywordReturnedType );
 
                     outputArgumentStrings.push_back( QString( "%1" ).arg( returnDataType ) );
 
@@ -313,6 +332,9 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
                     QString defaultValue = getDefaultValue( field );
                     if ( defaultValue == "None" )
                     {
+                        // TODO: Consider using PdmField<std::optional<T>> for optional fields instead of using
+                        // the default value to manipulate the type
+
                         dataType = QString( "Optional[%1]" ).arg( dataType );
                     }
 
@@ -555,6 +577,11 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
         { QString::fromStdString( typeid( QString ).name() ), "str" },
         { QString::fromStdString( typeid( caf::FilePath ).name() ), "str" },
         { QString::fromStdString( typeid( std::vector<double> ).name() ), "List[float]" },
+        { QString::fromStdString( typeid( std::optional<double> ).name() ), "Optional[float]" },
+        { QString::fromStdString( typeid( std::optional<float> ).name() ), "Optional[float]" },
+        { QString::fromStdString( typeid( std::optional<int> ).name() ), "Optional[int]" },
+        { QString::fromStdString( typeid( std::optional<bool> ).name() ), "Optional[bool]" },
+        { QString::fromStdString( typeid( std::optional<QString> ).name() ), "Optional[str]" },
     };
 
 #ifndef CAF_EXCLUDE_CVF

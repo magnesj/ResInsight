@@ -18,6 +18,8 @@
 
 #include "RimElementVectorResult.h"
 
+#include "RiaResultNames.h"
+
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"

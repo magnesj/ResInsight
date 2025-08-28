@@ -23,6 +23,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTestRunner.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaExtractionTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaFilePathTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RiaFileSearchTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveMerger.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveMerger.inl
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveDataTools.h
@@ -37,6 +38,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedHarmonicMeanCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaOptionItemFactory.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaGitDiff.h
+    ${CMAKE_CURRENT_LIST_DIR}/RiaWslTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaCellDividingTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaFieldHandleTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaBoundingBoxTools.h
@@ -81,6 +83,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaRegressionTestRunner.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaExtractionTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaFilePathTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaFileSearchTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveMerger.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaCurveDataTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellLogCurveMerger.cpp
@@ -90,6 +93,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaWeightedHarmonicMeanCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaOptionItemFactory.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaGitDiff.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaWslTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaCellDividingTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaFieldHandleTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaBoundingBoxTools.cpp

@@ -30,7 +30,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimElasticProperties, RimcElasticProperties_a
 ///
 //--------------------------------------------------------------------------------------------------
 RimcElasticProperties_addPropertyScaling::RimcElasticProperties_addPropertyScaling( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Add Elastic Propery Scaling", "", "", "Add Elastic Property Scaling" );
 
@@ -43,12 +43,12 @@ RimcElasticProperties_addPropertyScaling::RimcElasticProperties_addPropertyScali
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcElasticProperties_addPropertyScaling::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcElasticProperties_addPropertyScaling::execute()
 {
     RimElasticProperties* elasticProperties = self<RimElasticProperties>();
 
     RimElasticPropertyScalingCollection* scalingColl = elasticProperties->scalingCollection();
-    if ( !scalingColl ) return nullptr;
+    if ( !scalingColl ) return std::unexpected( "No scaling collection found" );
 
     RimElasticPropertyScaling* propertyScaling = new RimElasticPropertyScaling;
     propertyScaling->setFormation( m_formation() );
@@ -68,15 +68,7 @@ caf::PdmObjectHandle* RimcElasticProperties_addPropertyScaling::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcElasticProperties_addPropertyScaling::resultIsPersistent() const
+QString RimcElasticProperties_addPropertyScaling::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcElasticProperties_addPropertyScaling::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimElasticPropertyScaling );
+    return RimElasticPropertyScaling::classKeywordStatic();
 }

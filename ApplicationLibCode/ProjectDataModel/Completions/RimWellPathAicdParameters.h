@@ -61,14 +61,15 @@ public:
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+    void migrateFieldContent( QString& fieldContent, caf::PdmFieldHandle* fieldHandle ) override;
 
 private:
-    std::set<const caf::PdmField<QString>*> stringFieldsWithNoValidDefault() const;
-    void                                    setUnitLabels();
-    bool                                    isMetric() const;
+    std::set<const caf::PdmField<std::optional<double>>*> optionalFieldsWithNoValidDefault() const;
+    void                                                  setUnitLabels();
+    bool                                                  isMetric() const;
 
 private:
     caf::PdmField<bool> m_deviceOpen;
 
-    std::array<caf::PdmField<QString>, AICD_NUM_PARAMS> m_aicdParameterFields;
+    std::array<caf::PdmField<std::optional<double>>, AICD_NUM_PARAMS> m_aicdParameterFields;
 };

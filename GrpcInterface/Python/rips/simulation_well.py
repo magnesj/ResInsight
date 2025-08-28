@@ -7,15 +7,13 @@ import grpc
 import SimulationWell_pb2
 import SimulationWell_pb2_grpc
 
-import Properties_pb2
-import Properties_pb2_grpc
 import PdmObject_pb2
 
 from .resinsight_classes import SimulationWell
 
 from .case import Case
 from .view import View
-from .pdmobject import PdmObjectBase, add_method
+from .pdmobject import add_method
 
 from typing import List, Optional
 
@@ -77,6 +75,23 @@ def cells(
         case_id=self.case().id, well_name=self.name, timestep=timestep
     )
     return self.__simulation_well_stub.GetSimulationWellCells(sim_well_request).data
+
+
+@add_method(SimulationWell)
+def accumulated_perforation_length(self: SimulationWell, timestep: int) -> float:
+    """Get accumulated perforation lenght for the given timestep.
+       If a well is closed the length will be 0.
+
+    Arguments:
+        timestep(int): Time step index
+
+    """
+    sim_well_request = SimulationWell_pb2.SimulationWellRequest(
+        case_id=self.case().id, well_name=self.name, timestep=timestep
+    )
+    return self.__simulation_well_stub.GetPerfLength(
+        sim_well_request
+    ).accumulated_length
 
 
 @add_method(SimulationWell)

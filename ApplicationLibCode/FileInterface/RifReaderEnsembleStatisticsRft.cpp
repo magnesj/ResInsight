@@ -86,19 +86,14 @@ void RifReaderEnsembleStatisticsRft::values( const RifEclipseRftAddress& rftAddr
 {
     if ( !m_summaryCaseCollection ) return;
 
-    CAF_ASSERT( rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::MD ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::TVD ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_MEAN ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_P10 ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_P50 ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_P90 ||
-                rftAddress.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_ERROR );
-
     auto it = m_cachedValues.find( rftAddress );
     if ( it == m_cachedValues.end() )
     {
         calculateStatistics( rftAddress.wellName(), rftAddress.timeStep() );
     }
+
+    // The function calculateStatistics will store values in the value cache if the processing is successful. If the processing fails, the
+    // assignment will create an entry in the cache with an empty vector
     *values = m_cachedValues[rftAddress];
 }
 
@@ -302,8 +297,13 @@ void RifReaderEnsembleStatisticsRft::extractStatisticsFromCurveMerger( const QSt
     {
         // Make sure we end up with approximately the same amount of points as originally
         // Since allDepths contain *valid* values, it can potentially be smaller than the mean.
-        // Thus we need to ensure sizeMultiplier is at least 1.
-        size_t sizeMultiplier = std::max( (size_t)1, allDepths.size() / dataSetSizeCalc.weightedMean() );
+        // Ensure robust calculation by checking for valid weighted mean and avoiding division by zero
+        size_t sizeMultiplier = 1;
+        if ( dataSetSizeCalc.validAggregatedWeight() && dataSetSizeCalc.weightedMean() > 0 )
+        {
+            sizeMultiplier = std::max( static_cast<size_t>( 1 ), allDepths.size() / static_cast<size_t>( dataSetSizeCalc.weightedMean() ) );
+        }
+
         for ( size_t depthIdx = 0; depthIdx < allDepths.size(); depthIdx += sizeMultiplier )
         {
             std::vector<double> pressuresAtDepth;

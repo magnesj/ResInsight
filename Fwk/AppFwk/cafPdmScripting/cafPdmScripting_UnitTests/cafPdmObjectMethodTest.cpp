@@ -16,10 +16,8 @@ class InheritedDemoObj_appendValves : public caf::PdmObjectMethod
 public:
     InheritedDemoObj_appendValves( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    bool                             isNullptrValidResult() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<std::vector<double>> m_valveLocations;
@@ -31,7 +29,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( InheritedDemoObj, InheritedDemoObj_appendValv
 ///
 //--------------------------------------------------------------------------------------------------
 InheritedDemoObj_appendValves::InheritedDemoObj_appendValves( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_VALID, PdmObjectMethod::ResultType::PERSISTENT_TRUE )
 {
     CAF_PDM_InitObject( "Append Valves", "", "", "Append Valves" );
 
@@ -41,7 +39,7 @@ InheritedDemoObj_appendValves::InheritedDemoObj_appendValves( caf::PdmObjectHand
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* InheritedDemoObj_appendValves::execute()
+std::expected<caf::PdmObjectHandle*, QString> InheritedDemoObj_appendValves::execute()
 {
     auto obj = self<InheritedDemoObj>();
 
@@ -54,25 +52,9 @@ caf::PdmObjectHandle* InheritedDemoObj_appendValves::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool InheritedDemoObj_appendValves::resultIsPersistent() const
+QString InheritedDemoObj_appendValves::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool InheritedDemoObj_appendValves::isNullptrValidResult() const
-{
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> InheritedDemoObj_appendValves::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new InheritedDemoObj );
+    return InheritedDemoObj::classKeywordStatic();
 }
 
 //--------------------------------------------------------------------------------------------------

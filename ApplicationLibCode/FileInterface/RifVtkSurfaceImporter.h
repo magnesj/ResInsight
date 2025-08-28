@@ -19,12 +19,7 @@
 #pragma once
 
 #include <filesystem>
-#include <map>
 #include <memory>
-#include <string>
-#include <vector>
-
-#include "cvfVector3.h"
 
 #include "pugixml.hpp"
 
@@ -36,19 +31,8 @@ class RigTriangleMeshData;
 class RifVtkSurfaceImporter
 {
 public:
-    struct PvdDataset
-    {
-        double                timestep;
-        std::filesystem::path filepath;
-    };
-
     static std::unique_ptr<RigTriangleMeshData> importFromFile( const std::filesystem::path& filepath );
 
-    static std::vector<PvdDataset> parsePvdDatasets( const std::filesystem::path& filepath );
-
 private:
-    static std::unique_ptr<RigTriangleMeshData>      importFromXmlDoc( const pugi::xml_document& doc );
-    static std::vector<cvf::Vec3d>                   readPoints( const pugi::xml_node& piece );
-    static std::vector<unsigned>                     readConnectivity( const pugi::xml_node& piece );
-    static std::map<std::string, std::vector<float>> readProperties( const pugi::xml_node& piece );
+    static std::unique_ptr<RigTriangleMeshData> importFromXmlDoc( const pugi::xml_document& doc );
 };

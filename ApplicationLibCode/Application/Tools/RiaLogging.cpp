@@ -18,6 +18,7 @@
 
 #include "RiaLogging.h"
 #include "RiaGuiApplication.h"
+#include "RiaPreferencesSystem.h"
 #include "RiaRegressionTestRunner.h"
 
 #include <iostream>
@@ -206,7 +207,6 @@ bool RiaLogging::isSameMessage( const QString& message )
 //==================================================================================================
 
 std::vector<std::unique_ptr<RiaLogger>>                     RiaLogging::sm_logger;
-std::chrono::time_point<std::chrono::high_resolution_clock> RiaLogging::sm_startTime;
 QString                                                     RiaLogging::sm_lastMessage;
 std::chrono::time_point<std::chrono::high_resolution_clock> RiaLogging::sm_lastMessageTime;
 
@@ -245,8 +245,10 @@ RILogLevel RiaLogging::logLevelBasedOnPreferences()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::error( const QString& message )
+void RiaLogging::error( const QString& message, const QString logKeyword )
 {
+    if ( !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
+
     if ( isSameMessage( message ) ) return;
 
     for ( const auto& logger : sm_logger )
@@ -264,8 +266,10 @@ void RiaLogging::error( const QString& message )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::warning( const QString& message )
+void RiaLogging::warning( const QString& message, const QString logKeyword )
 {
+    if ( !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
+
     if ( isSameMessage( message ) ) return;
 
     for ( const auto& logger : sm_logger )
@@ -283,8 +287,10 @@ void RiaLogging::warning( const QString& message )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::info( const QString& message )
+void RiaLogging::info( const QString& message, const QString logKeyword )
 {
+    if ( !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
+
     if ( isSameMessage( message ) ) return;
 
     for ( const auto& logger : sm_logger )
@@ -302,8 +308,10 @@ void RiaLogging::info( const QString& message )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::debug( const QString& message )
+void RiaLogging::debug( const QString& message, const QString logKeyword )
 {
+    if ( !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
+
     if ( isSameMessage( message ) ) return;
 
     for ( const auto& logger : sm_logger )
@@ -334,22 +342,37 @@ void RiaLogging::errorInMessageBox( QWidget* parent, const QString& title, const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::resetTimer( const QString& message )
+std::chrono::time_point<std::chrono::high_resolution_clock> RiaLogging::currentTime()
 {
-    sm_startTime = std::chrono::high_resolution_clock::now();
-
-    if ( !message.isEmpty() ) RiaLogging::debug( message );
+    return std::chrono::high_resolution_clock::now();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaLogging::logTimeElapsed( const QString& message )
+void RiaLogging::logElapsedTime( const QString& message, const std::chrono::time_point<std::chrono::high_resolution_clock>& startTime )
 {
-    auto end = std::chrono::high_resolution_clock::now();
+    auto end      = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( end - startTime );
 
-    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>( end - sm_startTime );
-    auto text     = message + QString( " (duration : %1 milliseconds)" ).arg( duration.count() );
+    QString text;
+    auto    totalMs = duration.count();
+
+    if ( totalMs < 1000 )
+    {
+        text = message + QString( " (duration: %1 milliseconds)" ).arg( totalMs );
+    }
+    else if ( totalMs < 60000 )
+    {
+        double seconds = totalMs / 1000.0;
+        text           = message + QString( " (duration: %1 seconds)" ).arg( seconds, 0, 'f', 1 );
+    }
+    else
+    {
+        auto minutes          = totalMs / 60000;
+        auto remainingSeconds = ( totalMs % 60000 ) / 1000.0;
+        text                  = message + QString( " (duration: %1 minutes %2 seconds)" ).arg( minutes ).arg( remainingSeconds, 0, 'f', 1 );
+    }
 
     RiaLogging::debug( text );
 }

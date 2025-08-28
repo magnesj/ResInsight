@@ -37,9 +37,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimStimPlanModelCollection, RimcStimPlanModel
 ///
 //--------------------------------------------------------------------------------------------------
 RimcStimPlanModelCollection_appendStimPlanModel::RimcStimPlanModelCollection_appendStimPlanModel( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Create StimPlan Model", "", "", "Create a new StimPlan Model" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_wellPath, "WellPath", "", "", "", "Well Path" );
     CAF_PDM_InitScriptableField( &m_md, "MeasuredDepth", 0.0, "Measured Depth" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_stimPlanModelTemplate, "StimPlanModelTemplate", "", "", "", "StimPlan Model Template" );
@@ -48,7 +49,7 @@ RimcStimPlanModelCollection_appendStimPlanModel::RimcStimPlanModelCollection_app
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcStimPlanModelCollection_appendStimPlanModel::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcStimPlanModelCollection_appendStimPlanModel::execute()
 {
     RimStimPlanModel*           stimPlanModel           = nullptr;
     RimStimPlanModelCollection* stimPlanModelCollection = self<RimStimPlanModelCollection>();
@@ -64,23 +65,18 @@ caf::PdmObjectHandle* RimcStimPlanModelCollection_appendStimPlanModel::execute()
         stimPlanModel->setMD( m_md() );
         stimPlanModel->setStimPlanModelTemplate( m_stimPlanModelTemplate() );
         stimPlanModelCollection->updateAllRequiredEditors();
+        return stimPlanModel;
     }
-
-    return stimPlanModel;
+    else
+    {
+        return std::unexpected( "Unable to add StimPlan model." );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcStimPlanModelCollection_appendStimPlanModel::resultIsPersistent() const
+QString RimcStimPlanModelCollection_appendStimPlanModel::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcStimPlanModelCollection_appendStimPlanModel::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimStimPlanModel );
+    return RimStimPlanModel::classKeywordStatic();
 }

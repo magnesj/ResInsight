@@ -24,8 +24,8 @@
 #include "RifCsvUserData.h"
 #include "RifKeywordVectorUserData.h"
 #include "RifMultipleSummaryReaders.h"
+#include "RifSummaryReaderAggregator.h"
 #include "RifSummaryReaderInterface.h"
-#include "RifSummaryReaderMultipleFiles.h"
 
 #include "SummaryPlotCommands/RicPasteAsciiDataToSummaryPlotFeatureUi.h"
 
@@ -53,9 +53,7 @@ RimCsvUserData::RimCsvUserData()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimCsvUserData::~RimCsvUserData()
-{
-}
+RimCsvUserData::~RimCsvUserData() = default;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -66,17 +64,13 @@ void RimCsvUserData::createSummaryReaderInterface()
 
     if ( caf::Utils::fileExists( summaryHeaderFilename() ) )
     {
-        RifCsvUserData* csvUserData = new RifCsvUserData();
+        auto csvUserData = std::make_unique<RifCsvUserData>();
         if ( csvUserData->parse( summaryHeaderFilename(), m_parseOptions->parseOptions(), &m_errorText ) )
         {
-            m_summaryReader = csvUserData;
-
-            m_multiSummaryReader = new RifMultipleSummaryReaders;
-            m_multiSummaryReader->addReader( m_summaryReader.p() );
-
-            m_calculatedSummaryReader = new RifCalculatedSummaryCurveReader( this );
-
-            m_multiSummaryReader->addReader( m_calculatedSummaryReader.p() );
+            m_multiSummaryReader = std::make_unique<RifMultipleSummaryReaders>();
+            m_multiSummaryReader->addReader( std::move( csvUserData ) );
+            m_multiSummaryReader->addReader( std::make_unique<RifCalculatedSummaryCurveReader>( this ) );
+            m_multiSummaryReader->createAndSetAddresses();
         }
     }
 }
@@ -86,11 +80,11 @@ void RimCsvUserData::createSummaryReaderInterface()
 //--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RimCsvUserData::summaryReader()
 {
-    if ( m_multiSummaryReader.isNull() )
+    if ( !m_multiSummaryReader )
     {
         createSummaryReaderInterface();
     }
-    return m_multiSummaryReader.p();
+    return m_multiSummaryReader.get();
 }
 
 //--------------------------------------------------------------------------------------------------

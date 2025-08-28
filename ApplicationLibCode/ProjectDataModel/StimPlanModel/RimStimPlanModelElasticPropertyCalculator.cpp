@@ -20,6 +20,7 @@
 #include "RiaDefines.h"
 #include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 #include "RiaStimPlanModelDefines.h"
 
 #include "RigEclipseCaseData.h"

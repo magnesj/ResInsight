@@ -20,6 +20,7 @@
 
 #include "RiaColorTables.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"

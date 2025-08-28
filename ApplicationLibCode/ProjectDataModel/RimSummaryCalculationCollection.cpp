@@ -50,6 +50,8 @@ RimSummaryCalculation* RimSummaryCalculationCollection::createCalculation() cons
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationCollection::updateDataDependingOnCalculations()
 {
+    if ( calculations().empty() ) return;
+
     // Refresh data sources tree
     // Refresh meta data for all summary cases and rebuild AddressNodes in the summary tree
     RimSummaryCaseMainCollection* summaryCaseCollection = RiaSummaryTools::summaryCaseMainCollection();
@@ -58,14 +60,13 @@ void RimSummaryCalculationCollection::updateDataDependingOnCalculations()
     {
         if ( !summaryCase ) continue;
 
-        if ( auto reader = summaryCase->summaryReader() )
+        if ( summaryCase->showVectorItemsInProjectTree() )
         {
-            reader->buildMetaData();
-
-            if ( summaryCase->showVectorItemsInProjectTree() )
+            if ( auto reader = summaryCase->summaryReader() )
             {
-                summaryCase->onCalculationUpdated();
+                reader->createAndSetAddresses();
             }
+            summaryCase->onCalculationUpdated();
         }
     }
 
@@ -77,7 +78,7 @@ void RimSummaryCalculationCollection::updateDataDependingOnCalculations()
 
         if ( auto reader = obs->summaryReader() )
         {
-            reader->buildMetaData();
+            reader->createAndSetAddresses();
             obs->onCalculationUpdated();
         }
     }

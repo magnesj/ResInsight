@@ -72,13 +72,13 @@ public:
 
     // RimPlot implementations
     RiuPlotWidget* plotWidget() override;
-    void           setAutoScaleXEnabled( bool enabled ) override{};
-    void           setAutoScaleYEnabled( bool enabled ) override{};
-    void           updateAxes() override{};
-    void           updateLegend() override{};
+    void           setAutoScaleXEnabled( bool enabled ) override {};
+    void           setAutoScaleYEnabled( bool enabled ) override {};
+    void           updateAxes() override {};
+    void           updateLegend() override {};
     QString        asciiDataForPlotExport() const override;
-    void           reattachAllCurves() override{};
-    void           detachAllCurves() override{};
+    void           reattachAllCurves() override {};
+    void           detachAllCurves() override {};
 
     // RimPlotWindow implementations
     QString description() const override;
@@ -86,7 +86,7 @@ public:
     // RimViewWindow implementations
     QWidget* viewWidget() override;
     QImage   snapshotWindowContent() override;
-    void     zoomAll() override{};
+    void     zoomAll() override {};
 
 private:
     // RimPlot implementations
@@ -138,9 +138,9 @@ private:
     caf::PdmField<bool>                        m_groupSmallContributions;
     caf::PdmField<double>                      m_smallContributionsThreshold;
 
-    QPointer<RiuQwtPlotWidget>                      m_plotWidget;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisTitleFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisValueFontSize;
+    QPointer<RiuQwtPlotWidget> m_plotWidget;
+    RimFontSizeField           m_axisTitleFontSize;
+    RimFontSizeField           m_axisValueFontSize;
 
     const int m_initialNumberOfTimeSteps = 10;
 };

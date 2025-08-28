@@ -28,6 +28,7 @@
 #include "RifEclipseOutputFileTools.h"
 #include "RifEclipseReportKeywords.h"
 #include "RifEclipseUnifiedRestartFileAccess.h"
+#include "RifEdfmTools.h"
 #include "RifOpmRadialGridTools.h"
 #include "RifReaderEclipseWell.h"
 
@@ -90,6 +91,12 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
             RiaLogging::error( "Failed to open grid file " + fileName );
 
             return false;
+        }
+
+        auto iLimitFromEdfm = RifEdfmTools::checkForEdfmLimitI( fileName );
+        if ( iLimitFromEdfm > 0 )
+        {
+            eclipseCaseData->mainGrid()->invalidateCellsAboveI( iLimitFromEdfm - 1 /* zero based index */ );
         }
 
         if ( isFaultImportEnabled() )
@@ -745,14 +752,13 @@ void RifReaderOpmCommon::setupInitAndRestartAccess()
     {
         try
         {
-            const bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "RifReaderOpmCommon" );
-
-            if ( isLoggingEnabled )
-                RiaLogging::resetTimer( "Starting import of meta data from " + QString::fromStdString( m_restartFileName ) );
+            auto startTime = RiaLogging::currentTime();
 
             m_restartFile = std::make_unique<EclIO::ERst>( m_restartFileName );
 
-            if ( isLoggingEnabled ) RiaLogging::logTimeElapsed( "Completed import of meta data" );
+            const bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "RifReaderOpmCommon" );
+            if ( isLoggingEnabled )
+                RiaLogging::logElapsedTime( "Import of meta data from " + QString::fromStdString( m_restartFileName ), startTime );
         }
         catch ( ... )
         {
@@ -772,7 +778,7 @@ std::vector<RigEclipseTimeStepInfo> RifReaderOpmCommon::createFilteredTimeStepIn
 
     auto timeStepsOnFile = readTimeSteps();
 
-    if ( timeStepsOnFile.size() == 0 ) return timeStepInfos;
+    if ( timeStepsOnFile.empty() ) return timeStepInfos;
 
     auto  startDayOffset = timeStepsOnFile[0].simulationTimeFromStart;
     QDate startDate( timeStepsOnFile[0].year, timeStepsOnFile[0].month, timeStepsOnFile[0].day );
@@ -933,7 +939,7 @@ void RifReaderOpmCommon::buildMetaData( RigEclipseCaseData* eclipseCaseData, caf
     auto task = progress.task( "Handling well information", 10 );
     if ( loadWellDataEnabled() && !m_restartFileName.empty() )
     {
-        RiaLogging::resetTimer( "Start import of simulation well data" );
+        auto startTime = RiaLogging::currentTime();
 
         auto restartAccess = std::make_unique<RifEclipseUnifiedRestartFileAccess>();
         restartAccess->setRestartFiles( QStringList( QString::fromStdString( m_restartFileName ) ) );
@@ -953,7 +959,7 @@ void RifReaderOpmCommon::buildMetaData( RigEclipseCaseData* eclipseCaseData, caf
 
         restartAccess->close();
 
-        RiaLogging::logTimeElapsed( "Completed import of simulation well data" );
+        RiaLogging::logElapsedTime( "Import of simulation well data", startTime );
     }
     else
     {
@@ -1026,7 +1032,7 @@ std::vector<QDateTime> RifReaderOpmCommon::timeStepsOnFile( QString gridFileName
     if ( m_restartFile == nullptr ) return {};
 
     auto timeStepsOnFile = readTimeSteps();
-    if ( timeStepsOnFile.size() == 0 ) return {};
+    if ( timeStepsOnFile.empty() ) return {};
 
     auto  startDayOffset = timeStepsOnFile[0].simulationTimeFromStart;
     QDate startDate( timeStepsOnFile[0].year, timeStepsOnFile[0].month, timeStepsOnFile[0].day );

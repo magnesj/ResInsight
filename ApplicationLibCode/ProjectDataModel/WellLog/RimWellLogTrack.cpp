@@ -25,6 +25,7 @@
 #include "RiaLogging.h"
 #include "RiaPlotDefines.h"
 #include "RiaPreferences.h"
+#include "RiaResultNames.h"
 #include "RiaSimWellBranchTools.h"
 #include "RiaWellLogCurveMerger.h"
 

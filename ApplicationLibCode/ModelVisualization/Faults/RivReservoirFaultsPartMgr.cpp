@@ -19,6 +19,8 @@
 
 #include "RivReservoirFaultsPartMgr.h"
 
+#include "RiaResultNames.h"
+
 #include "RigEclipseResultAddress.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"

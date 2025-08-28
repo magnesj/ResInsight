@@ -113,6 +113,9 @@ public:
     bool isDualPorosity() const;
     void setDualPorosity( bool enable );
 
+    // invalidate all cells with I > iLimit (0 based index)
+    void invalidateCellsAboveI( size_t iLimit );
+
 protected: // only for use by file readers and internal services. TODO: replace with a better API
     friend class RigGridBase;
     friend class RigReservoirBuilder;
@@ -123,6 +126,7 @@ protected: // only for use by file readers and internal services. TODO: replace 
     friend class RiaGrpcCaseService;
     friend class RiaActiveCellInfoStateHandler;
     friend class RicCreateTemporaryLgrFeature;
+    friend class RimCornerPointCase;
     std::vector<RigCell>&       reservoirCells();
     const std::vector<RigCell>& reservoirCells() const;
 

@@ -18,14 +18,19 @@
 
 #include "RicReplaceSummaryEnsembleFeature.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaLogging.h"
 #include "Summary/RiaSummaryTools.h"
 
 #include "RicImportSummaryCasesFeature.h"
 
+#include "EnsembleFileSet/RimEnsembleFileSet.h"
+#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
+#include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
+#include "Summary/Ensemble/RimSummaryFileSetEnsemble.h"
 
 #include "cafPdmObject.h"
 #include "cafSelectionManager.h"
@@ -61,9 +66,33 @@ void RicReplaceSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     if ( fileNames.isEmpty() ) return;
     if ( fileType != RiaDefines::FileType::SMSPEC ) return;
 
-    RicImportSummaryCasesFeature::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = false };
-    auto [isOk, newCases] = RicImportSummaryCasesFeature::createSummaryCasesFromFiles( fileNames, createConfig );
-    if ( !isOk || newCases.empty() )
+    if ( auto fileSetEnsemble = dynamic_cast<RimSummaryFileSetEnsemble*>( summaryEnsemble ) )
+    {
+        if ( auto fileSet = fileSetEnsemble->ensembleFileSet() )
+        {
+            auto collection = RimProject::current()->ensembleFileSetCollection();
+
+            fileSet->findAndSetPathPatternAndRangeString( fileNames );
+
+            collection->updateFileSetNames();
+            collection->updateAllRequiredEditors();
+
+            RiaLogging::info( QString( "Completed replace ensemble, new name is '" ) + summaryEnsemble->name() + "'" );
+
+            return;
+        }
+
+        RiaLogging::error( "Failed to get ensemble file set from summary ensemble." );
+        return;
+    }
+
+    RiaEnsembleImportTools::CreateConfig createConfig{ .fileType              = fileType,
+                                                       .ensembleOrGroup       = false,
+                                                       .allowDialogs          = false,
+                                                       .buildSummaryAddresses = false };
+
+    auto newCases = RiaEnsembleImportTools::createSummaryCasesFromFiles( fileNames, createConfig );
+    if ( newCases.empty() )
     {
         RiaLogging::warning( "No new cases are created." );
         return;

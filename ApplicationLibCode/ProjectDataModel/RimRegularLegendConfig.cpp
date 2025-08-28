@@ -25,6 +25,7 @@
 #include "RiaNumberFormat.h"
 #include "RiaNumericalTools.h"
 #include "RiaPreferences.h"
+#include "RiaResultNames.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimColorLegend.h"
@@ -1219,6 +1220,13 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
     else if ( resultName != RiaResultNames::undefinedResultName() )
     {
         colorRangeType = RimRegularLegendConfig::ColorRangesType::NORMAL;
+    }
+
+    if ( resultName.startsWith( RiaResultNames::convergence() ) )
+    {
+        mappingType  = MappingType::LINEAR_DISCRETE;
+        rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
+        numberFormat = RiaNumberFormat::NumberFormatType::FIXED;
     }
 
     resetUserDefinedValues();

@@ -27,16 +27,15 @@
 #include "RiaPreferences.h"
 #include "RiaProjectBackupTools.h"
 #include "RiaProjectFileTools.h"
-#include "RiaTextStringTools.h"
 #include "RiaVersionInfo.h"
 
-#include "RicfCommandObject.h"
 #include "RigEclipseCaseData.h"
-#include "RigGridBase.h"
 
 #include "Cloud/RimCloudDataSourceCollection.h"
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
+#include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "Formations/RimFormationNamesCollection.h"
+#include "Jobs/RimJobCollection.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Polygons/RimPolygonCollection.h"
 #include "QuickAccess/RimQuickAccessCollection.h"
@@ -44,7 +43,6 @@
 #include "RimAnalysisPlotCollection.h"
 #include "RimAnnotationCollection.h"
 #include "RimAnnotationInViewCollection.h"
-#include "RimCalcScript.h"
 #include "RimCase.h"
 #include "RimCaseCollection.h"
 #include "RimColorLegendCollection.h"
@@ -84,21 +82,18 @@
 #include "RimSeismicView.h"
 #include "RimSeismicViewCollection.h"
 #include "RimStimPlanModelPlotCollection.h"
-#include "RimSummaryCalculation.h"
 #include "RimSummaryCalculationCollection.h"
+#include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
 #include "RimSummaryMultiPlotCollection.h"
 #include "RimSummaryTableCollection.h"
 #include "RimSurfaceCollection.h"
 #include "RimTools.h"
-#include "RimUserDefinedPolylinesAnnotation.h"
 #include "RimValveTemplate.h"
 #include "RimValveTemplateCollection.h"
 #include "RimViewLinker.h"
 #include "RimViewLinkerCollection.h"
-#include "RimViewWindow.h"
-#include "RimWellLogLasFile.h"
 #include "RimWellLogPlotCollection.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
@@ -107,32 +102,16 @@
 #include "VerticalFlowPerformance/RimVfpDataCollection.h"
 #include "VerticalFlowPerformance/RimVfpPlotCollection.h"
 
-#include "Tools/RiaVariableMapper.h"
-
-#ifdef USE_QTCHARTS
-#include "RimEnsembleFractureStatisticsPlot.h"
-#include "RimEnsembleFractureStatisticsPlotCollection.h"
-#include "RimGridStatisticsPlot.h"
-#include "RimGridStatisticsPlotCollection.h"
-#endif
-
-#include "RiuMainWindow.h"
 #include "RiuPlotMainWindow.h"
 
-#include "OctaveScriptCommands/RicExecuteScriptForCasesFeature.h"
-
-#include "cafCmdFeature.h"
-#include "cafCmdFeatureManager.h"
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiTreeOrdering.h"
-#include "cvfBoundingBox.h"
 
-#include <QDebug>
 #include <QDir>
-#include <QMenu>
+#include <QFile>
 
 #include <algorithm>
-#include <memory>
 
 CAF_PDM_SOURCE_INIT( RimProject, "ResInsightProject" );
 //--------------------------------------------------------------------------------------------------
@@ -162,6 +141,8 @@ RimProject::RimProject()
 
     CAF_PDM_InitFieldNoDefault( &scriptCollection, "ScriptCollection", "Octave Scripts", ":/octave.png" );
     scriptCollection.xmlCapability()->disableIO();
+
+    CAF_PDM_InitFieldNoDefault( &m_jobCollection, "JobCollection", "Jobs", ":/gear.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_mainPlotCollection, "MainPlotCollection", "Plots" );
     CAF_PDM_InitFieldNoDefault( &m_pinnedFieldCollection, "PinnedFieldCollection", "PinnedFieldCollection" );
@@ -227,6 +208,7 @@ RimProject::RimProject()
 
     m_mainPlotCollection    = new RimMainPlotCollection();
     m_pinnedFieldCollection = new RimQuickAccessCollection();
+    m_jobCollection         = new RimJobCollection();
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateTopFolder, "PlotTemplateCollection", "Plot Templates" );
     m_plotTemplateTopFolder = new RimPlotTemplateFolderItem();
@@ -234,6 +216,9 @@ RimProject::RimProject()
 
     CAF_PDM_InitFieldNoDefault( &m_automationSettings, "AutomationSettings", "Automation Settings" );
     m_automationSettings = new RimAutomationSettings();
+
+    CAF_PDM_InitFieldNoDefault( &m_ensembleFileSetCollection, "EnsembleFileSetCollection", "Ensemble File Sets" );
+    m_ensembleFileSetCollection = new RimEnsembleFileSetCollection();
 
     // For now, create a default first oilfield that contains the rest of the project
     oilFields.push_back( new RimOilField );
@@ -266,6 +251,8 @@ void RimProject::close()
         m_mainPlotCollection()->deleteAllContainedObjects();
     }
 
+    m_jobCollection->deleteAllJobs();
+    m_ensembleFileSetCollection()->deleteAllFileSets();
     oilFields.deleteChildren();
     oilFields.push_back( new RimOilField );
 
@@ -305,7 +292,7 @@ void RimProject::close()
 //--------------------------------------------------------------------------------------------------
 void RimProject::updatesAfterProjectFileIsRead()
 {
-    distributePathsFromGlobalPathList();
+    RiaProjectFileTools::distributePathsFromGlobalPathList( this, m_globalPathList() );
 
     // Create an empty oil field in case the project did not contain one
     if ( oilFields.empty() )
@@ -371,9 +358,25 @@ RimQuickAccessCollection* RimProject::pinnedFieldCollection() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimJobCollection* RimProject::jobCollection() const
+{
+    return m_jobCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimAutomationSettings* RimProject::automationSettings() const
 {
     return m_automationSettings();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimEnsembleFileSetCollection* RimProject::ensembleFileSetCollection() const
+{
+    return m_ensembleFileSetCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -412,6 +415,44 @@ void RimProject::setupBeforeSave()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<caf::PdmFieldHandle*> RimProject::fieldsForExport() const
+{
+    std::vector<QString> orderedKeywords;
+
+    orderedKeywords.push_back( fileNameHandle()->keyword() );
+    orderedKeywords.push_back( m_projectFileVersionString.keyword() );
+    orderedKeywords.push_back( m_globalPathList.keyword() );
+    orderedKeywords.push_back( m_ensembleFileSetCollection.keyword() );
+
+    std::vector<caf::PdmFieldHandle*> ordered;
+
+    auto fieldHandles = fields();
+    for ( const auto& kw : orderedKeywords )
+    {
+        auto it = std::find_if( fieldHandles.begin(),
+                                fieldHandles.end(),
+                                [&]( const caf::PdmFieldHandle* field ) { return field->keyword() == kw; } );
+        if ( it != fieldHandles.end() )
+        {
+            ordered.push_back( *it );
+        }
+    }
+
+    // Append the rest of the fields
+    for ( auto fieldHandle : fields() )
+    {
+        if ( std::find( ordered.begin(), ordered.end(), fieldHandle ) == ordered.end() )
+        {
+            ordered.push_back( fieldHandle );
+        }
+    }
+
+    return ordered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimMainPlotCollection* RimProject::mainPlotCollection() const
 {
     return m_mainPlotCollection();
@@ -422,7 +463,7 @@ RimMainPlotCollection* RimProject::mainPlotCollection() const
 //--------------------------------------------------------------------------------------------------
 bool RimProject::writeProjectFile()
 {
-    transferPathsToGlobalPathList();
+    m_globalPathList = RiaProjectFileTools::transferPathsToGlobalPathList( this );
 
     QFile xmlFile( fileName() );
     if ( !xmlFile.open( QIODevice::WriteOnly | QIODevice::Text ) ) return false;
@@ -437,7 +478,7 @@ bool RimProject::writeProjectFile()
         RiaProjectBackupTools::appendTextToDatabase( backupFilename, maximumRecordCount, content );
     }
 
-    distributePathsFromGlobalPathList();
+    RiaProjectFileTools::distributePathsFromGlobalPathList( this, m_globalPathList() );
 
     return true;
 }
@@ -515,17 +556,17 @@ void RimProject::setProjectFileNameAndUpdateDependencies( const QString& project
     QFileInfo fileInfoOld( oldProjectFileName );
     QString   oldProjectPath = fileInfoOld.path();
 
-    std::vector<caf::FilePath*> filePaths = allFilePaths();
-    for ( caf::FilePath* filePath : filePaths )
-    {
-        bool                 foundFile = false;
-        std::vector<QString> searchedPaths;
+    if ( newProjectPath == oldProjectPath ) return;
 
+    for ( caf::FilePath* filePath : allFilePaths() )
+    {
         QString filePathCandidate = filePath->path();
 
-        QString newFilePath = RimTools::relocateFile( filePathCandidate, newProjectPath, oldProjectPath, &foundFile, &searchedPaths );
+        QString newFilePath = RimTools::relocateFile( filePathCandidate, newProjectPath, oldProjectPath );
         filePath->setPath( newFilePath );
     }
+
+    if ( ensembleFileSetCollection() ) ensembleFileSetCollection()->updateFilePathsFromProjectPath( newProjectPath, oldProjectPath );
 
     auto* wellPathColl = RimTools::wellPathCollection();
     if ( wellPathColl )
@@ -563,9 +604,9 @@ void RimProject::assignIdToEnsemble( RimSummaryEnsemble* summaryCaseCollection )
 {
     if ( summaryCaseCollection )
     {
-        for ( RimSummaryEnsemble* s : RimProject::summaryGroups() )
+        for ( RimSummaryEnsemble* ensemble : summaryEnsembles() )
         {
-            m_nextValidEnsembleId = std::max( m_nextValidEnsembleId, s->ensembleId() + 1 );
+            m_nextValidEnsembleId = std::max( m_nextValidEnsembleId, ensemble->ensembleId() + 1 );
         }
 
         summaryCaseCollection->setEnsembleId( m_nextValidEnsembleId );
@@ -751,7 +792,7 @@ std::vector<RimSummaryCase*> RimProject::allSummaryCases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummaryEnsemble*> RimProject::summaryGroups() const
+std::vector<RimSummaryEnsemble*> RimProject::summaryEnsembles() const
 {
     std::vector<RimSummaryEnsemble*> ensembles;
 
@@ -1325,8 +1366,7 @@ RimPlotTemplateFolderItem* RimProject::rootPlotTemplateItem() const
 //--------------------------------------------------------------------------------------------------
 std::vector<caf::FilePath*> RimProject::allFilePaths() const
 {
-    std::vector<caf::FilePath*> filePaths;
-    RiaProjectFileTools::fieldContentsByType( this, filePaths );
+    std::vector<caf::FilePath*> filePaths = RiaProjectFileTools::writableFieldContent<caf::FilePath>( this );
 
     return filePaths;
 }
@@ -1417,17 +1457,12 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
             {
                 uiTreeOrdering.add( m_mainPlotCollection->vfpPlotCollection() );
             }
-#ifdef USE_QTCHARTS
-            if ( m_mainPlotCollection->gridStatisticsPlotCollection() || m_mainPlotCollection->ensembleFractureStatisticsPlotCollection() )
-            {
-                auto statisticsItemCollection = uiTreeOrdering.add( "Statistics Plots", ":/Folder.png" );
-                if ( m_mainPlotCollection->gridStatisticsPlotCollection() )
-                    statisticsItemCollection->add( m_mainPlotCollection->gridStatisticsPlotCollection() );
 
-                if ( m_mainPlotCollection->ensembleFractureStatisticsPlotCollection() )
-                    statisticsItemCollection->add( m_mainPlotCollection->ensembleFractureStatisticsPlotCollection() );
+            if ( m_mainPlotCollection->histogramMultiPlotCollection() )
+            {
+                uiTreeOrdering.add( m_mainPlotCollection->histogramMultiPlotCollection() );
             }
-#endif
+
             uiTreeOrdering.add( automationSettings() );
         }
     }
@@ -1457,6 +1492,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     else if ( uiConfigName == "PlotWindow.Scripts" || uiConfigName == "MainWindow.Scripts" )
     {
         uiTreeOrdering.add( scriptCollection() );
+        uiTreeOrdering.add( jobCollection() );
     }
     else if ( uiConfigName == "PlotWindow.Templates" )
     {
@@ -1464,6 +1500,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
     else if ( uiConfigName == "PlotWindow.Cloud" )
     {
+        uiTreeOrdering.add( &m_ensembleFileSetCollection );
         if ( m_mainPlotCollection )
         {
             if ( activeOilField()->cloudDataCollection() )
@@ -1510,153 +1547,4 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
     }
 
     uiTreeOrdering.skipRemainingChildren( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimProject::transferPathsToGlobalPathList()
-{
-    RiaVariableMapper variableMapper( m_globalPathList() );
-
-    for ( caf::FilePath* filePath : allFilePaths() )
-    {
-        QString path = filePath->path();
-        if ( !path.isEmpty() )
-        {
-            QString pathId = variableMapper.addPathAndGetId( path );
-            filePath->setPath( pathId );
-        }
-    }
-
-    for ( auto summaryCase : allSummaryCases() )
-    {
-        if ( summaryCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
-        {
-            // At this point, after the replace of variables into caf::FilePath objects, the variable name is
-            // stored in the summary case object. Read out the variable name and append "_name" for custom
-            // summary variables.
-
-            QString variableName = summaryCase->summaryHeaderFilename();
-            variableName         = variableName.remove( RiaVariableMapper::variableToken() );
-
-            variableName = RiaVariableMapper::variableToken() + variableName + RiaVariableMapper::postfixName() +
-                           RiaVariableMapper::variableToken();
-
-            QString variableValue = summaryCase->displayCaseName();
-            variableMapper.addVariable( variableName, variableValue );
-
-            summaryCase->setCustomCaseName( variableName );
-        }
-    }
-
-    for ( auto gridCase : allGridCases() )
-    {
-        if ( gridCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
-        {
-            // At this point, after the replace of variables into caf::FilePath objects, the variable name is
-            // stored in the summary case object. Read out the variable name and append "_name" for custom
-            // summary variables.
-
-            QString variableName = gridCase->gridFileName();
-            variableName         = variableName.remove( RiaVariableMapper::variableToken() );
-
-            variableName = RiaVariableMapper::variableToken() + variableName + RiaVariableMapper::postfixName() +
-                           RiaVariableMapper::variableToken();
-
-            QString variableValue = gridCase->caseUserDescription();
-            variableMapper.addVariable( variableName, variableValue );
-
-            gridCase->setCustomCaseName( variableName );
-        }
-    }
-
-    variableMapper.replaceVariablesInValues();
-
-    m_globalPathList = variableMapper.variableTableAsText();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimProject::updatedFilePathFromPathId( QString filePath, RiaVariableMapper* pathListMapper /*=nullptr*/ ) const
-{
-    std::unique_ptr<RiaVariableMapper> internalMapper;
-
-    if ( pathListMapper == nullptr )
-    {
-        internalMapper = std::make_unique<RiaVariableMapper>( m_globalPathList );
-        pathListMapper = internalMapper.get();
-    }
-
-    QString     returnValue      = filePath;
-    QString     pathIdCandidate  = filePath.trimmed();
-    QStringList pathIdComponents = pathIdCandidate.split( RiaVariableMapper::variableToken() );
-
-    if ( pathIdComponents.size() == 3 && pathIdComponents[0].size() == 0 && pathIdComponents[1].size() > 0 && pathIdComponents[2].size() == 0 )
-    {
-        bool    isFound = false;
-        QString path    = pathListMapper->valueForVariable( pathIdCandidate, &isFound );
-        if ( isFound )
-        {
-            returnValue = path;
-        }
-    }
-
-    return returnValue;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimProject::distributePathsFromGlobalPathList()
-{
-    RiaVariableMapper pathListMapper( m_globalPathList() );
-
-    for ( caf::FilePath* filePath : allFilePaths() )
-    {
-        filePath->setPath( updatedFilePathFromPathId( filePath->path(), &pathListMapper ) );
-    }
-
-    for ( auto summaryCase : allSummaryCases() )
-    {
-        if ( summaryCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
-        {
-            auto variableName = summaryCase->displayCaseName();
-
-            bool    isFound       = false;
-            QString variableValue = pathListMapper.valueForVariable( variableName, &isFound );
-            if ( isFound )
-            {
-                summaryCase->setCustomCaseName( variableValue );
-            }
-            else if ( variableName.contains( RiaVariableMapper::postfixName() + RiaVariableMapper::variableToken() ) )
-            {
-                // The variable name is not found in the variable list, but the name indicates a variable. Reset
-                // to full case name.
-                summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::FULL_CASE_NAME );
-            }
-        }
-    }
-
-    for ( auto gridCase : allGridCases() )
-    {
-        if ( gridCase->displayNameType() == RimCaseDisplayNameTools::DisplayName::CUSTOM )
-        {
-            auto variableName = gridCase->caseUserDescription();
-
-            bool    isFound       = false;
-            QString variableValue = pathListMapper.valueForVariable( variableName, &isFound );
-            if ( isFound )
-            {
-                gridCase->setCustomCaseName( variableValue );
-            }
-            else if ( variableName.contains( RiaVariableMapper::postfixName() + RiaVariableMapper::variableToken() ) )
-            {
-                // The variable name is not found in the variable list, but the name indicates a variable. Reset
-                // to full case name.
-                gridCase->setDisplayNameType( RimCaseDisplayNameTools::DisplayName::FULL_CASE_NAME );
-            }
-        }
-    }
 }

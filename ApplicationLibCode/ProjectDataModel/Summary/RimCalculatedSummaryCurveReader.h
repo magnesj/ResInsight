@@ -37,12 +37,13 @@ public:
     std::pair<bool, std::vector<double>> values( const RifEclipseSummaryAddress& resultAddress ) const override;
     std::string                          unitName( const RifEclipseSummaryAddress& resultAddress ) const override;
 
-    void buildMetaData() override;
+    void createAndSetAddresses() override;
 
     RiaDefines::EclipseUnitSystem unitSystem() const override;
 
 private:
     RimSummaryCalculation* findCalculationByName( const RifEclipseSummaryAddress& resultAddress ) const;
+    size_t                 keywordCount() const override;
 
 private:
     RimSummaryCalculationCollection* m_calculationCollection;

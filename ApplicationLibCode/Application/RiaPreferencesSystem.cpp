@@ -21,6 +21,7 @@
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 
+#include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 
@@ -70,6 +71,9 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_showProjectChangedDialog, "showProjectChangedDialog", true, "Show 'Project has changed' dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showProjectChangedDialog );
 
+    CAF_PDM_InitField( &m_logToFile, "logToFile", true, "Write Log Files in Home Folder" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_logToFile );
+
     CAF_PDM_InitField( &m_showProgressBar, "showProgressBar", true, "Show Progress Bar" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showProgressBar );
 
@@ -84,7 +88,13 @@ RiaPreferencesSystem::RiaPreferencesSystem()
                        EclipseTextFileReaderModeType( RiaPreferencesSystem::EclipseTextFileReaderMode::FILE ),
                        "Eclipse Text File Import mode (GRDECL)" );
 
-    CAF_PDM_InitField( &m_keywordsForLogging, "KeywordsForLogging", QString(), "Keywords to enable debug logging, separated by semicolon" );
+    CAF_PDM_InitField( &m_keywordsForLogging,
+                       "KeywordsForLogging",
+                       QString(),
+                       "Keywords to enable debug logging, separated by semicolon.\nType 'enable-all' to enable logging for all objects." );
+
+    CAF_PDM_InitField( &m_maximumNumberOfThreads, "maximumNumberOfThreads", std::make_pair( false, QString( "4" ) ), "Maximum Number of Threads" );
+    m_maximumNumberOfThreads.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -220,6 +230,29 @@ double RiaPreferencesSystem::exportPdfScalingFactor() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::optional<int> RiaPreferencesSystem::threadCount() const
+{
+    const auto& [enabled, text] = m_maximumNumberOfThreads();
+
+    if ( !enabled || text.isEmpty() )
+    {
+        return std::nullopt; // No limit set
+    }
+
+    return text.toInt();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaPreferencesSystem::logToFile() const
+{
+    return m_logToFile();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiaPreferencesSystem::EclipseTextFileReaderMode RiaPreferencesSystem::eclipseTextFileReaderMode() const
 {
     return m_eclipseReaderMode();
@@ -230,6 +263,8 @@ RiaPreferencesSystem::EclipseTextFileReaderMode RiaPreferencesSystem::eclipseTex
 //--------------------------------------------------------------------------------------------------
 bool RiaPreferencesSystem::isLoggingActivatedForKeyword( const QString& keyword ) const
 {
+    if ( keyword.isEmpty() ) return true;
+
     QStringList keywords = m_keywordsForLogging().split( ";" );
 
     if ( keywords.contains( "enable-all" ) ) return true;
@@ -255,6 +290,7 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         group->add( &m_showHud );
     }
 
+    uiOrdering.add( &m_logToFile );
     uiOrdering.add( &m_showProjectChangedDialog );
     uiOrdering.add( &m_showTestToolbar );
     uiOrdering.add( &m_includeFractureDebugInfoFile );
@@ -270,6 +306,8 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         group->add( &m_keywordsForLogging );
         group->add( &m_gtestFilter );
     }
+
+    uiOrdering.add( &m_maximumNumberOfThreads );
 }
 
 //--------------------------------------------------------------------------------------------------

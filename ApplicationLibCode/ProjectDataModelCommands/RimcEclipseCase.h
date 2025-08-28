@@ -29,18 +29,38 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcEclipseCase_importProperties : public caf::PdmObjectMethod
+class RimcEclipseCase_importProperties : public caf::PdmVoidObjectMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcEclipseCase_importProperties( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
-    bool                             isNullptrValidResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
 
 private:
     caf::PdmField<std::vector<QString>> m_fileNames;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcEclipseCase_exportValuesInternal : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcEclipseCase_exportValuesInternal( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmField<QString> m_coordinateX;
+    caf::PdmField<QString> m_coordinateY;
+    caf::PdmField<QString> m_coordinateZ;
+    caf::PdmField<QString> m_propertyType;
+    caf::PdmField<QString> m_propertyName;
+    caf::PdmField<int>     m_timeStep;
+    caf::PdmField<QString> m_porosityModel;
+    caf::PdmField<QString> m_resultKey;
 };

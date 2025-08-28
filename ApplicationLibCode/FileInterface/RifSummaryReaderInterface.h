@@ -21,8 +21,6 @@
 #include "RiaDefines.h"
 #include "RifEclipseSummaryAddress.h"
 
-#include "cvfObject.h"
-
 #include <map>
 #include <set>
 #include <string>
@@ -34,10 +32,11 @@ class QDateTime;
 //
 //
 //==================================================================================================
-class RifSummaryReaderInterface : public cvf::Object
+class RifSummaryReaderInterface
 {
 public:
     RifSummaryReaderInterface();
+    virtual ~RifSummaryReaderInterface() = default;
 
     bool hasAddress( const RifEclipseSummaryAddress& resultAddress ) const;
 
@@ -53,9 +52,17 @@ public:
     virtual std::string                   unitName( const RifEclipseSummaryAddress& resultAddress ) const = 0;
     virtual RiaDefines::EclipseUnitSystem unitSystem() const                                              = 0;
 
-    virtual void buildMetaData();
+    virtual void createAndSetAddresses();
+    void         createAddressesIfRequired();
 
     int serialNumber() const;
+
+    // Returns the number of result addresses. If no addresses are present, keywordCount() is returned.
+    size_t dataObjectCount() const;
+
+    // The keywordCount is considered a internal method, not to be used by clients. Having it as a protected method will not work well, as
+    // this class is also used as a contained object in addition to deriving from this interface.
+    virtual size_t keywordCount() const = 0;
 
 protected:
     void increaseSerialNumber();

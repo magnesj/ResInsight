@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RifMultipleSummaryReaders.h"
+
 #include "RimCalculatedSummaryCurveReader.h"
 
 //--------------------------------------------------------------------------------------------------
@@ -27,25 +28,43 @@ RifMultipleSummaryReaders::RifMultipleSummaryReaders() = default;
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifMultipleSummaryReaders::addReader( RifSummaryReaderInterface* reader )
+void RifMultipleSummaryReaders::addReader( std::unique_ptr<RifSummaryReaderInterface> reader )
 {
-    for ( auto existingReader : m_readers )
-    {
-        if ( existingReader.p() == reader ) return;
-    }
+    if ( findReader( reader->serialNumber() ) != nullptr ) return;
 
-    m_readers.push_back( reader );
-
-    buildMetaData();
+    m_readers.push_back( std::move( reader ) );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifMultipleSummaryReaders::removeReader( RifSummaryReaderInterface* reader )
+RifSummaryReaderInterface* RifMultipleSummaryReaders::findReader( int serialNumber ) const
 {
-    m_readers.erase( reader );
-    buildMetaData();
+    auto reader = std::find_if( m_readers.begin(),
+                                m_readers.end(),
+                                [serialNumber]( const std::unique_ptr<RifSummaryReaderInterface>& r )
+                                { return r->serialNumber() == serialNumber; } );
+    if ( reader != m_readers.end() )
+    {
+        return reader->get();
+    }
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifMultipleSummaryReaders::removeReader( int serialNumber )
+{
+    auto reader = std::find_if( m_readers.begin(),
+                                m_readers.end(),
+                                [serialNumber]( const std::unique_ptr<RifSummaryReaderInterface>& r )
+                                { return r->serialNumber() == serialNumber; } );
+
+    if ( reader != m_readers.end() )
+    {
+        m_readers.erase( reader );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -55,7 +74,8 @@ std::vector<time_t> RifMultipleSummaryReaders::timeSteps( const RifEclipseSummar
 {
     for ( const auto& r : m_readers )
     {
-        if ( r->hasAddress( resultAddress ) ) return r->timeSteps( resultAddress );
+        const auto& timeSteps = r->timeSteps( resultAddress );
+        if ( !timeSteps.empty() ) return timeSteps;
     }
 
     return {};
@@ -68,7 +88,8 @@ std::pair<bool, std::vector<double>> RifMultipleSummaryReaders::values( const Ri
 {
     for ( const auto& r : m_readers )
     {
-        if ( r->hasAddress( resultAddress ) ) return r->values( resultAddress );
+        const auto& okAndValues = r->values( resultAddress );
+        if ( okAndValues.first && !okAndValues.second.empty() ) return okAndValues;
     }
 
     return { false, {} };
@@ -81,7 +102,8 @@ std::string RifMultipleSummaryReaders::unitName( const RifEclipseSummaryAddress&
 {
     for ( const auto& r : m_readers )
     {
-        if ( r->hasAddress( resultAddress ) ) return r->unitName( resultAddress );
+        auto name = r->unitName( resultAddress );
+        if ( !name.empty() ) return name;
     }
 
     return {};
@@ -100,25 +122,32 @@ RiaDefines::EclipseUnitSystem RifMultipleSummaryReaders::unitSystem() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifMultipleSummaryReaders::buildMetaData()
+void RifMultipleSummaryReaders::createAndSetAddresses()
 {
     m_allErrorAddresses.clear();
     m_allResultAddresses.clear();
 
     for ( auto& reader : m_readers )
     {
-        // TODO: hack. Find a better way to rebuild calculated summary meta data.
-        auto calcReader = dynamic_cast<RifCalculatedSummaryCurveReader*>( reader.p() );
-        if ( calcReader ) calcReader->buildMetaData();
+        reader->createAndSetAddresses();
 
-        {
-            auto resultAddresses = reader->allResultAddresses();
-            m_allResultAddresses.insert( resultAddresses.begin(), resultAddresses.end() );
-        }
+        auto resultAddresses = reader->allResultAddresses();
+        m_allResultAddresses.insert( resultAddresses.begin(), resultAddresses.end() );
 
-        {
-            auto errorResultAddresses = reader->allErrorAddresses();
-            m_allErrorAddresses.insert( errorResultAddresses.begin(), errorResultAddresses.end() );
-        }
+        auto errorResultAddresses = reader->allErrorAddresses();
+        m_allErrorAddresses.insert( errorResultAddresses.begin(), errorResultAddresses.end() );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RifMultipleSummaryReaders::keywordCount() const
+{
+    for ( const auto& r : m_readers )
+    {
+        if ( r->keywordCount() > 0 ) return r->keywordCount();
+    }
+
+    return 0;
 }

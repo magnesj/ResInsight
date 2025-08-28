@@ -65,7 +65,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifParameterXmlReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmCommonSummary.h
     ${CMAKE_CURRENT_LIST_DIR}/RifEnsembleFractureStatisticsExporter.h
-    ${CMAKE_CURRENT_LIST_DIR}/RifSummaryReaderMultipleFiles.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifSummaryReaderAggregator.h
     ${CMAKE_CURRENT_LIST_DIR}/RifEclEclipseSummary.h
     ${CMAKE_CURRENT_LIST_DIR}/RifWellIAFileWriter.h
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseTextFileReader.h
@@ -78,8 +78,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderPressureDepthData.h
     ${CMAKE_CURRENT_LIST_DIR}/RifSeismicReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifSeismicZGYReader.h
-    ${CMAKE_CURRENT_LIST_DIR}/RifOpenVDSReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmRadialGridTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile.h
     ${CMAKE_CURRENT_LIST_DIR}/RifCsvSummaryReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifRevealSummaryCsvReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifRevealCsvSectionSummaryReader.h
@@ -88,6 +88,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderOpmCommonActive.h
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseReportKeywords.h
     ${CMAKE_CURRENT_LIST_DIR}/RifInpExportTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifEdfmTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RifFaultReactivationModelExporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RifThermalToStimPlanFractureXmlOutput.h
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseSummaryAddressDefines.h
@@ -104,6 +105,12 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifArrowTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderRegularGridModel.h
     ${CMAKE_CURRENT_LIST_DIR}/RifVtkSurfaceImporter.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifSurfio.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifFileTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifVtkImportUtil.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifRmsWellPathReader.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmSummaryTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifEnsembleImportConfig.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -168,8 +175,9 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifSurfaceExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifParameterXmlReader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmCommonSummary.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEnsembleFractureStatisticsExporter.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RifSummaryReaderMultipleFiles.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifSummaryReaderAggregator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclEclipseSummary.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifWellIAFileWriter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseTextFileReader.cpp
@@ -181,7 +189,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderPressureDepthData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifSeismicReader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifSeismicZGYReader.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RifOpenVDSReader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmRadialGridTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifCsvSummaryReader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifRevealCsvSummaryReader.cpp
@@ -191,6 +198,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderOpmCommon.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderOpmCommonActive.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifInpExportTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifEdfmTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifFaultReactivationModelExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifThermalToStimPlanFractureXmlOutput.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseSummaryAddressDefines.cpp
@@ -205,6 +213,12 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifArrowTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderRegularGridModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifVtkSurfaceImporter.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifSurfio.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifFileTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifVtkImportUtil.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifRmsWellPathReader.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmSummaryTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifEnsembleImportConfig.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

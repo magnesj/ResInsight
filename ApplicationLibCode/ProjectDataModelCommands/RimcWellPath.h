@@ -34,16 +34,15 @@ class RimEclipseCase;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcWellPath_addFracture : public caf::PdmObjectMethod
+class RimcWellPath_addFracture : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcWellPath_addFracture( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<double>                          m_md;
@@ -55,16 +54,15 @@ private:
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcWellPath_addThermalFracture : public caf::PdmObjectMethod
+class RimcWellPath_addThermalFracture : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcWellPath_addThermalFracture( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmPtrField<RimThermalFractureTemplate*> m_fractureTemplate;
@@ -75,16 +73,15 @@ private:
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcWellPath_appendPerforationInterval : public caf::PdmObjectMethod
+class RimcWellPath_appendPerforationInterval : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcWellPath_appendPerforationInterval( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<double> m_startMD;
@@ -103,10 +100,8 @@ class RimcWellPath_multiSegmentWellSettings : public caf::PdmObjectMethod
 public:
     RimcWellPath_multiSegmentWellSettings( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    bool                             isNullptrValidResult() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 };
 
 //==================================================================================================
@@ -119,12 +114,33 @@ class RimcWellPath_appendFishbones : public caf::PdmObjectMethod
 public:
     RimcWellPath_appendFishbones( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    bool                             isNullptrValidResult() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<std::vector<double>>                             m_subLocations;
     caf::PdmField<caf::AppEnum<RimFishbonesDefines::DrillingType>> m_drillingType;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcWellPath_extractWellPathPropertiesInternal : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcWellPath_extractWellPathPropertiesInternal( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmField<double>  m_resamplingInterval;
+    caf::PdmField<QString> m_coordinateX;
+    caf::PdmField<QString> m_coordinateY;
+    caf::PdmField<QString> m_coordinateZ;
+    caf::PdmField<QString> m_measuredDepth;
+    caf::PdmField<QString> m_inclination;
+    caf::PdmField<QString> m_azimuth;
+    caf::PdmField<QString> m_dogleg;
 };

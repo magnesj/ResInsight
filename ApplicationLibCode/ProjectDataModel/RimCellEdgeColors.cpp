@@ -20,6 +20,9 @@
 
 #include "RimCellEdgeColors.h"
 
+#include "RiaLogging.h"
+#include "RiaResultNames.h"
+
 #include "RicCreateEnsembleWellLogUi.h"
 
 #include "RigCaseCellResultsData.h"
@@ -36,7 +39,6 @@
 
 #include "cvfMath.h"
 
-#include "RiaLogging.h"
 #include <array>
 
 namespace caf
