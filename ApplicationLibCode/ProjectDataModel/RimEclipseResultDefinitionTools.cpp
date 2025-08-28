@@ -21,6 +21,7 @@
 #include "RiaColorTables.h"
 #include "RiaColorTools.h"
 #include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RigAllanDiagramData.h"
 #include "RigCaseCellResultsData.h"

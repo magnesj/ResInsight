@@ -32,17 +32,20 @@ class QDateTime;
 namespace caf
 {
 class PdmOptionItemInfo;
-}
+class PdmObjectHandle;
+} // namespace caf
 
 class RimGeoMechCase;
 class RimEclipseCase;
 class RimWellPathCollection;
+class RimValveTemplateCollection;
 class RimCase;
 class RimWellPath;
 class RimSurfaceCollection;
 class RimFaultInViewCollection;
 class RimPolygonCollection;
 class RimAutomationSettings;
+class RimJobCollection;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -52,11 +55,8 @@ class RimTools
 public:
     static QString getCacheRootDirectoryPathFromProject();
 
-    static QString relocateFile( const QString&        originalFileName,
-                                 const QString&        currentProjectPath,
-                                 const QString&        previousProjectPath,
-                                 bool*                 foundFile,
-                                 std::vector<QString>* searchedPaths );
+    static QString relocateFile( const QString& originalFileName, const QString& currentProjectPath, const QString& previousProjectPath );
+    static QString relocatePathPattern( const QString& originalPattern, const QString& currentProjectPath, const QString& previousProjectPath );
 
     static void wellPathOptionItemsSubset( const std::vector<RimWellPath*>& wellPathsToExclude, QList<caf::PdmOptionItemInfo>* options );
     static void wellPathOptionItems( QList<caf::PdmOptionItemInfo>* options );
@@ -78,11 +78,16 @@ public:
     static RimWellPathCollection* wellPathCollection();
     static RimWellPath*           firstWellPath();
 
+    static RimValveTemplateCollection* valveTemplateCollection();
+
     static RimSurfaceCollection*  surfaceCollection();
     static RimPolygonCollection*  polygonCollection();
     static RimAutomationSettings* automationSettings();
+    static RimJobCollection*      jobCollection();
 
     static void timeStepsForCase( RimCase* gridCase, QList<caf::PdmOptionItemInfo>* options );
 
     static void optionItemsForSpecifiedWellPaths( const std::vector<RimWellPath*>& wellPaths, QList<caf::PdmOptionItemInfo>* options );
+
+    static void updateViewWindowContent( std::vector<caf::PdmObjectHandle*>& objects );
 };

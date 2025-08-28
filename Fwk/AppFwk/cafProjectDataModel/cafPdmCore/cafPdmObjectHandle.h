@@ -101,12 +101,14 @@ public:
     virtual void onChildDeleted( PdmChildArrayFieldHandle*           childArray,
                                  std::vector<caf::PdmObjectHandle*>& referringObjects );
 
-    virtual void onChildAdded( caf::PdmFieldHandle* containerForNewObject ){};
+    virtual void onChildAdded( caf::PdmFieldHandle* containerForNewObject ) {};
     virtual void onChildrenUpdated( PdmChildArrayFieldHandle*           childArray,
-                                    std::vector<caf::PdmObjectHandle*>& updatedObjects ){};
+                                    std::vector<caf::PdmObjectHandle*>& updatedObjects ) {};
 
     virtual void
-        handleDroppedMimeData( const QMimeData* data, Qt::DropAction action, caf::PdmFieldHandle* destinationField ){};
+        handleDroppedMimeData( const QMimeData* data, Qt::DropAction action, caf::PdmFieldHandle* destinationField ) {};
+
+    virtual void migrateFieldContent( QString& fieldContent, PdmFieldHandle* fieldHandle ) {};
 
 protected:
     void addField( PdmFieldHandle* field, const QString& keyword );
@@ -118,7 +120,8 @@ private:
     PDM_DISABLE_COPY_AND_ASSIGN( PdmObjectHandle );
 
     // Fields
-    std::vector<PdmFieldHandle*> m_fields;
+    std::vector<PdmFieldHandle*>       m_fields;
+    std::map<QString, PdmFieldHandle*> m_fieldKeywords;
 
     // Capabilities
     std::vector<std::pair<PdmObjectCapability*, bool>> m_capabilities;

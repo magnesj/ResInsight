@@ -296,7 +296,7 @@ void RimPlotCurve::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurve::updateCurvePresentation( bool updatePlotLegendAndTitle )
 {
-    updateCurveVisibility();
+    updateCurveVisibility( updatePlotLegendAndTitle );
 
     if ( updatePlotLegendAndTitle )
     {
@@ -727,6 +727,22 @@ void RimPlotCurve::setFillColor( const cvf::Color3f& fillColor )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurve::setFillColorOpacity( float opacity )
+{
+    m_curveAppearance->setFillColorOpacity( opacity );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurve::setCurveColorOpacity( float opacity )
+{
+    m_curveAppearance->setCurveColorOpacity( opacity );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimPlotCurve::showInLegend() const
 {
     return m_showLegend;
@@ -961,7 +977,7 @@ void RimPlotCurve::setZOrder( double z )
 //--------------------------------------------------------------------------------------------------
 void RimPlotCurve::updateCurveAppearance()
 {
-    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color() );
+    QColor curveColor = RiaColorTools::toQColor( m_curveAppearance->color(), m_curveAppearance->curveColorOpacity() );
 
     if ( !m_plotCurve ) return;
 
@@ -1007,6 +1023,8 @@ void RimPlotCurve::updateCurveAppearance()
     QColor fillColor = RiaColorTools::toQColor( m_curveAppearance->fillColor() );
 
     fillColor = RiaColorTools::blendQColors( fillColor, QColor( Qt::white ), 3, 1 );
+    fillColor.setAlphaF( m_curveAppearance->fillColorOpacity() );
+
     QBrush fillBrush( fillColor, fillStyle() );
     m_plotCurve->setAppearance( m_curveAppearance->lineStyle(),
                                 m_curveAppearance->interpolation(),
@@ -1068,15 +1086,15 @@ void RimPlotCurve::updateUiIconFromPlotSymbol()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPlotCurve::updateCurveVisibility()
+void RimPlotCurve::updateCurveVisibility( bool updateParentPlot )
 {
     if ( canCurveBeAttached() )
     {
-        reattach();
+        reattach( updateParentPlot );
     }
     else
     {
-        detach();
+        detach( updateParentPlot );
     }
 }
 

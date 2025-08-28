@@ -1,8 +1,8 @@
 import sys
 import os
+import math
 
 sys.path.insert(1, os.path.join(sys.path[0], "../../"))
-import rips
 
 import dataroot
 
@@ -13,6 +13,8 @@ def test_10k(rips_instance, initialize_test):
     case.create_view()
     assert len(case.grids()) == 2
     cell_count_info = case.cell_count()
+    assert cell_count_info.active_cell_count == 11125
+    assert cell_count_info.reservoir_cell_count == 316224
 
     sim_wells = case.simulation_wells()
     assert len(sim_wells) == 3
@@ -56,3 +58,19 @@ def test_10k(rips_instance, initialize_test):
                     + str(len(cells))
                 )
                 assert len(cells) == expected_cell_count[sim_well.name]
+
+
+def test_10k_acclength(rips_instance, initialize_test):
+    case_path = dataroot.PATH + "/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID"
+    case = rips_instance.project.load_case(path=case_path)
+    case.create_view()
+    sim_wells = case.simulation_wells()
+
+    expected_length = {}
+    expected_length["GP1"] = 4708.0
+    expected_length["GI1"] = 2132.8
+    expected_length["GP2"] = 49.0
+
+    for sim_well in sim_wells:
+        length = sim_well.accumulated_perforation_length(1)
+        assert math.fabs(length - expected_length[sim_well.name]) < 0.1

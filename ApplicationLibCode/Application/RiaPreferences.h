@@ -46,6 +46,7 @@ class RiaPreferencesSystem;
 class RiaPreferencesOsdu;
 class RiaPreferencesGrid;
 class RiaPreferencesSumo;
+class RiaPreferencesOpm;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -85,7 +86,6 @@ public:
     QString     lastUsedPlotTemplateAbsolutePath() const;
     void        setLastUsedPlotTemplatePath( const QString& templatePath );
     bool        openExportedPdfInViewer() const;
-    bool        useQtChartsAsDefaultPlotType() const;
     bool        writeEchoInGrdeclFiles() const;
 
     RiaDefines::ThemeEnum guiTheme() const;
@@ -120,10 +120,7 @@ public:
     bool    octaveShowHeaderInfoWhenExecutingScripts() const;
     QString octavePortNumber() const;
 
-    QString loggerFilename() const;
-    int     loggerFlushInterval() const;
-    bool    loggerTrapSignalAndFlush() const;
-    bool    storeBackupOfProjectFiles() const;
+    bool storeBackupOfProjectFiles() const;
 
     RiaPreferencesGeoMech* geoMechPreferences() const;
     RiaPreferencesSummary* summaryPreferences() const;
@@ -131,6 +128,7 @@ public:
     RiaPreferencesOsdu*    osduPreferences() const;
     RiaPreferencesSumo*    sumoPreferences() const;
     RiaPreferencesGrid*    gridPreferences() const;
+    RiaPreferencesOpm*     opmPreferences() const;
 
     void importPreferenceValuesFromFile( const QString& fileName );
     void exportPreferenceValuesToFile( const QString& fileName );
@@ -199,7 +197,6 @@ private:
     caf::PdmField<QString>       m_plotTemplateFolders;
     caf::PdmField<int>           m_maxPlotTemplateFoldersDepth;
     caf::PdmField<caf::FilePath> m_lastUsedPlotTemplate;
-    caf::PdmField<bool>          m_useQtChartsPlotByDefault;
 
     caf::PdmField<caf::FilePath> m_gridCalculationExpressionFolder;
     caf::PdmField<caf::FilePath> m_summaryCalculationExpressionFolder;
@@ -211,11 +208,6 @@ private:
 
     // Python
     caf::PdmField<QString> m_pythonExecutable;
-
-    // Logging
-    caf::PdmField<std::pair<bool, QString>> m_loggerFilename;
-    caf::PdmField<int>                      m_loggerFlushInterval;
-    caf::PdmField<bool>                     m_loggerTrapSignalAndFlush;
 
     caf::PdmField<bool> m_storeBackupOfProjectFile;
 
@@ -230,6 +222,9 @@ private:
 
     // GeoMech things
     caf::PdmChildField<RiaPreferencesGeoMech*> m_geoMechPreferences;
+
+    // OPM settings
+    caf::PdmChildField<RiaPreferencesOpm*> m_opmPreferences;
 
     // Summary data
     caf::PdmChildField<RiaPreferencesSummary*> m_summaryPreferences;

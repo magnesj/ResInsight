@@ -19,8 +19,11 @@
 
 #include "RimSummaryCase.h"
 
+#include "RifEnsembleImportConfig.h"
+
 #include "cafPdmField.h"
-#include "cvfObject.h"
+
+#include <memory>
 
 class RifReaderRftInterface;
 class RifReaderOpmRft;
@@ -43,14 +46,13 @@ class RimFileSummaryCase : public RimSummaryCase
 
 public:
     RimFileSummaryCase();
-    ~RimFileSummaryCase() override;
 
     QString summaryHeaderFilename() const override;
     QString caseName() const override;
 
-    void                       createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLogger* threadSafeLogger );
-    void                       createSummaryReaderInterface() override;
-    void                       createRftReaderInterface() override;
+    void createSummaryReaderInterfaceThreadSafe( RifEnsembleImportConfig ensembleImportState, RiaThreadSafeLogger* threadSafeLogger );
+    void createSummaryReaderInterface() override;
+    void createRftReaderInterface() override;
     RifSummaryReaderInterface* summaryReader() override;
     RifReaderRftInterface*     rftReader() override;
     void                       searchForWseglinkAndRecreateRftReader();
@@ -60,8 +62,10 @@ public:
     void setSummaryData( const std::string& keyword, const std::string& unit, const std::vector<float>& values );
     void onProjectBeingSaved();
 
-    static RifSummaryReaderInterface*
-        findRelatedFilesAndCreateReader( const QString& headerFileName, bool lookForRestartFiles, RiaThreadSafeLogger* threadSafeLogger );
+    static std::unique_ptr<RifSummaryReaderInterface> findRelatedFilesAndCreateReader( const QString&          headerFileName,
+                                                                                       bool                    lookForRestartFiles,
+                                                                                       RifEnsembleImportConfig ensembleImportState,
+                                                                                       RiaThreadSafeLogger*    threadSafeLogger );
 
 protected:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
@@ -73,17 +77,17 @@ private:
     QString        additionalSummaryDataFilePath() const;
     static QString createAdditionalSummaryFileName();
 
-    static RifReaderOpmRft* createOpmRftReader( const QString& rftFileName, const QString& dataDeckFileName );
+    static std::unique_ptr<RifReaderOpmRft> createOpmRftReader( const QString& rftFileName, const QString& dataDeckFileName );
 
 private:
-    cvf::ref<RifSummaryReaderInterface>       m_fileSummaryReader;
-    cvf::ref<RifCalculatedSummaryCurveReader> m_calculatedSummaryReader;
-    cvf::ref<RifMultipleSummaryReaders>       m_multiSummaryReader;
-    cvf::ref<RifReaderOpmRft>                 m_summaryEclipseRftReader;
-    caf::PdmField<bool>                       m_includeRestartFiles;
+    std::unique_ptr<RifMultipleSummaryReaders> m_multiSummaryReader;
+    int                                        m_fileSummaryReaderId       = -1;
+    int                                        m_additionalSummaryReaderId = -1;
+    std::unique_ptr<RifReaderOpmRft>           m_summaryEclipseRftReader;
 
-    caf::PdmField<caf::FilePath>         m_additionalSummaryFilePath;
-    cvf::ref<RifOpmCommonEclipseSummary> m_additionalSummaryFileReader;
+    caf::PdmField<bool> m_includeRestartFiles;
+
+    caf::PdmField<caf::FilePath> m_additionalSummaryFilePath;
 
     caf::PdmChildField<RimRftCase*> m_rftCase;
 

@@ -30,8 +30,6 @@
 
 #include <vector>
 
-class RiaVariableMapper;
-
 class RigEclipseCaseData;
 class RigGridManager;
 class RigMainGrid;
@@ -73,6 +71,8 @@ class RimPlotTemplateFolderItem;
 class RimGridCalculationCollection;
 class RimQuickAccessCollection;
 class RimAutomationSettings;
+class RimJobCollection;
+class RimEnsembleFileSetCollection;
 
 namespace caf
 {
@@ -133,7 +133,7 @@ public:
     [[nodiscard]] std::vector<RimCase*> allGridCases() const;
 
     std::vector<RimSummaryCase*>     allSummaryCases() const;
-    std::vector<RimSummaryEnsemble*> summaryGroups() const;
+    std::vector<RimSummaryEnsemble*> summaryEnsembles() const;
     RimSummaryCaseMainCollection*    firstSummaryCaseMainCollection() const;
 
     [[nodiscard]] std::vector<Rim3dView*>   allViews() const;
@@ -192,24 +192,24 @@ public:
 
     void updatesAfterProjectFileIsRead();
 
-    RimQuickAccessCollection* pinnedFieldCollection() const;
-    RimAutomationSettings*    automationSettings() const;
+    RimQuickAccessCollection*     pinnedFieldCollection() const;
+    RimAutomationSettings*        automationSettings() const;
+    RimEnsembleFileSetCollection* ensembleFileSetCollection() const;
+    RimJobCollection*             jobCollection() const;
 
 protected:
-    void initAfterRead() override;
-    void setupBeforeSave() override;
+    void                              initAfterRead() override;
+    void                              setupBeforeSave() override;
+    std::vector<caf::PdmFieldHandle*> fieldsForExport() const override;
 
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
 private:
-    void    transferPathsToGlobalPathList();
-    void    distributePathsFromGlobalPathList();
-    QString updatedFilePathFromPathId( QString filePath, RiaVariableMapper* pathListMapper = nullptr ) const;
-
-private:
-    caf::PdmChildField<RimMainPlotCollection*>    m_mainPlotCollection;
-    caf::PdmChildField<RimQuickAccessCollection*> m_pinnedFieldCollection;
-    caf::PdmChildField<RimAutomationSettings*>    m_automationSettings;
+    caf::PdmChildField<RimMainPlotCollection*>        m_mainPlotCollection;
+    caf::PdmChildField<RimQuickAccessCollection*>     m_pinnedFieldCollection;
+    caf::PdmChildField<RimAutomationSettings*>        m_automationSettings;
+    caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFileSetCollection;
+    caf::PdmChildField<RimJobCollection*>             m_jobCollection;
 
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;

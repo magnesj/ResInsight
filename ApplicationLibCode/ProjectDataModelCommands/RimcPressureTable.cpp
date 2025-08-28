@@ -29,7 +29,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimPressureTable, RimcPressureTable_addPressu
 ///
 //--------------------------------------------------------------------------------------------------
 RimcPressureTable_addPressure::RimcPressureTable_addPressure( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Add pressure data", "", "", "Add pressure data to pressure table." );
 
@@ -41,7 +41,7 @@ RimcPressureTable_addPressure::RimcPressureTable_addPressure( caf::PdmObjectHand
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcPressureTable_addPressure::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcPressureTable_addPressure::execute()
 {
     RimPressureTableItem* pressureTableItem = new RimPressureTableItem;
     pressureTableItem->setValues( m_depth, m_initialPressure, m_pressure );
@@ -56,15 +56,7 @@ caf::PdmObjectHandle* RimcPressureTable_addPressure::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcPressureTable_addPressure::resultIsPersistent() const
+QString RimcPressureTable_addPressure::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcPressureTable_addPressure::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimPressureTableItem );
+    return RimPressureTableItem::classKeywordStatic();
 }

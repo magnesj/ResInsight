@@ -297,11 +297,6 @@ QList<caf::PdmOptionItemInfo> RimAbstractCorrelationPlot::calculateValueOptions(
             }
         }
     }
-    else if ( fieldNeedingOptions == &m_labelFontSize || fieldNeedingOptions == &m_axisTitleFontSize ||
-              fieldNeedingOptions == &m_axisValueFontSize )
-    {
-        options = caf::FontTools::relativeSizeValueOptions( RiaPreferences::current()->defaultPlotFontSize() );
-    }
     else if ( fieldNeedingOptions == &m_curveSetForFiltering )
     {
         RimSummaryEnsemble* ensemble = nullptr;
@@ -513,7 +508,7 @@ std::set<RigEnsembleParameter> RimAbstractCorrelationPlot::variationSortedEnsemb
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigEnsembleParameter RimAbstractCorrelationPlot::ensembleParameter( const QString& ensembleParameterName ) const
+RigEnsembleParameter RimAbstractCorrelationPlot::ensembleParameterByName( const QString& ensembleParameterName ) const
 {
     std::set<RigEnsembleParameter> ensembleParms = ensembleParameters();
     for ( const RigEnsembleParameter& eParam : ensembleParms )
@@ -574,7 +569,10 @@ RiuPlotWidget* RimAbstractCorrelationPlot::doCreatePlotViewWidget( QWidget* main
         m_plotWidget = new RiuQwtPlotWidget( this, mainWindowParent );
         updatePlotTitle();
 
-        new RiuContextMenuLauncher( m_plotWidget, { "RicShowPlotDataFeature" } );
+        new RiuContextMenuLauncher( m_plotWidget,
+                                    { "RicShowPlotDataFeature",
+                                      "RicCreateHistogramForEnsembleParameterFeature",
+                                      "RicCreateHistogramForSummaryVectorFeature" } );
     }
 
     return m_plotWidget;

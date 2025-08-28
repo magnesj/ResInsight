@@ -23,6 +23,7 @@
 #include "RimWellPathGeometryDef.h"
 #include "RimWellPathTarget.h"
 
+#include "WellPathCommands/RicDuplicateWellPathFeature.h"
 #include "WellPathCommands/RicNewWellPathLateralAtDepthFeature.h"
 
 #include "cafPdmAbstractFieldScriptingCapability.h"
@@ -34,9 +35,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimModeledWellPath, RimcModeledWellPath_appen
 ///
 //--------------------------------------------------------------------------------------------------
 RimcModeledWellPath_appendLateral::RimcModeledWellPath_appendLateral( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Append Well Path Lateral", "", "", "Append Well Path Lateral" );
+
     CAF_PDM_InitScriptableField( &m_tieInDepth, "TieInDepth", 0.0, "", "", "", "Measured Depth on the Parent Well Path" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_lateralName, "LateralName", "", "", "", "Lateral Name" );
 }
@@ -44,7 +46,7 @@ RimcModeledWellPath_appendLateral::RimcModeledWellPath_appendLateral( caf::PdmOb
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcModeledWellPath_appendLateral::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcModeledWellPath_appendLateral::execute()
 {
     auto parentWellPath = self<RimModeledWellPath>();
 
@@ -61,15 +63,36 @@ caf::PdmObjectHandle* RimcModeledWellPath_appendLateral::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcModeledWellPath_appendLateral::resultIsPersistent() const
+QString RimcModeledWellPath_appendLateral::classKeywordReturnedType() const
 {
-    return true;
+    return RimModeledWellPath::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimModeledWellPath, RimcModeledWellPath_duplicate, "Duplicate" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimcModeledWellPath_duplicate::RimcModeledWellPath_duplicate( caf::PdmObjectHandle* self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_VALID, PdmObjectMethod::ResultType::PERSISTENT_TRUE )
+{
+    CAF_PDM_InitObject( "Duplicate", "", "", "Duplicate" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcModeledWellPath_appendLateral::defaultResult() const
+std::expected<caf::PdmObjectHandle*, QString> RimcModeledWellPath_duplicate::execute()
 {
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimModeledWellPath );
+    auto wellPath = self<RimWellPath>();
+
+    return RicDuplicateWellPathFeature::duplicateWellPath( wellPath );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimcModeledWellPath_duplicate::classKeywordReturnedType() const
+{
+    return RimModeledWellPath::classKeywordStatic();
 }

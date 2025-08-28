@@ -33,16 +33,15 @@ class RimEclipseCase;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate : public caf::PdmObjectMethod
+class RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcStimPlanModelTemplateCollection_appendStimPlanModelTemplate( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmPtrField<RimEclipseCase*> m_eclipseCase;

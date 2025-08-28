@@ -30,8 +30,13 @@ CAF_PDM_SOURCE_INIT( RimObservedFmuRftData, "ObservedFmuRftData" );
 RimObservedFmuRftData::RimObservedFmuRftData()
 {
     CAF_PDM_InitObject( "Observed FMU Data", ":/ObservedRFTDataFile16x16.png" );
-    CAF_PDM_InitFieldNoDefault( &m_directoryPath, "Directory", "Directory" );
+
+    CAF_PDM_InitFieldNoDefault( &m_directoryPath, "ObservedFolder", "Directory" );
     m_directoryPath.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitFieldNoDefault( &m_directoryPath_OBSOLETE, "Directory", "Directory" );
+    m_directoryPath_OBSOLETE.uiCapability()->setUiReadOnly( true );
+    m_directoryPath_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitFieldNoDefault( &m_wells, "Wells", "Wells" );
     m_wells.xmlCapability()->disableIO();
@@ -52,7 +57,7 @@ void RimObservedFmuRftData::setDirectoryPath( const QString& path )
 //--------------------------------------------------------------------------------------------------
 void RimObservedFmuRftData::createRftReaderInterface()
 {
-    m_fmuRftReader = new RifReaderFmuRft( m_directoryPath );
+    m_fmuRftReader = std::make_unique<RifReaderFmuRft>( m_directoryPath().path() );
     m_fmuRftReader->importData();
 }
 
@@ -61,12 +66,12 @@ void RimObservedFmuRftData::createRftReaderInterface()
 //--------------------------------------------------------------------------------------------------
 RifReaderRftInterface* RimObservedFmuRftData::rftReader()
 {
-    if ( m_fmuRftReader.isNull() )
+    if ( !m_fmuRftReader )
     {
         createRftReaderInterface();
     }
 
-    return m_fmuRftReader.p();
+    return m_fmuRftReader.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -90,9 +95,9 @@ bool RimObservedFmuRftData::hasWell( const QString& wellPathName ) const
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RimObservedFmuRftData::wells() const
 {
-    if ( m_fmuRftReader.p() )
+    if ( m_fmuRftReader )
     {
-        std::set<QString> wellNames = const_cast<RifReaderFmuRft*>( m_fmuRftReader.p() )->wellNames();
+        std::set<QString> wellNames = m_fmuRftReader->wellNames();
         return std::vector<QString>( wellNames.begin(), wellNames.end() );
     }
     return std::vector<QString>();
@@ -103,9 +108,20 @@ std::vector<QString> RimObservedFmuRftData::wells() const
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RimObservedFmuRftData::labels( const RifEclipseRftAddress& rftAddress )
 {
-    if ( m_fmuRftReader.p() )
+    if ( m_fmuRftReader )
     {
-        return const_cast<RifReaderFmuRft*>( m_fmuRftReader.p() )->labels( rftAddress );
+        return m_fmuRftReader->labels( rftAddress );
     }
     return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimObservedFmuRftData::initAfterRead()
+{
+    if ( m_directoryPath().path().isEmpty() )
+    {
+        m_directoryPath = m_directoryPath_OBSOLETE();
+    }
 }

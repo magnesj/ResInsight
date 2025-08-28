@@ -27,16 +27,15 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcPressureTable_addPressure : public caf::PdmObjectMethod
+class RimcPressureTable_addPressure : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcPressureTable_addPressure( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<double> m_depth;

@@ -95,8 +95,7 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     m_ensembleDescription.registerGetMethod( this, &RimSummaryEnsemble::ensembleDescription );
     m_ensembleDescription.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_ensembleDescription.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
-
-    m_commonAddressCount = 0;
+    m_ensembleDescription.xmlCapability()->disableIO();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -138,7 +137,7 @@ void RimSummaryEnsemble::removeCase( RimSummaryCase* summaryCase, bool notifyCha
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase )
+void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase, bool notifyChange )
 {
     summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
 
@@ -155,7 +154,7 @@ void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase )
         if ( !derivedEnsemble ) continue;
 
         derivedEnsemble->createDerivedEnsembleCases();
-        derivedEnsemble->updateReferringCurveSetsZoomAll();
+        if ( notifyChange ) derivedEnsemble->updateReferringCurveSetsZoomAll();
     }
 
     if ( m_isEnsemble )
@@ -164,7 +163,7 @@ void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase )
         calculateEnsembleParametersIntersectionHash();
     }
 
-    updateReferringCurveSetsZoomAll();
+    if ( notifyChange ) updateReferringCurveSetsZoomAll();
 
     clearChildNodes();
 }
@@ -190,7 +189,7 @@ RimSummaryCase* RimSummaryEnsemble::firstSummaryCase() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summaryCases )
+void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summaryCases, bool notifyChange )
 {
     m_cases.deleteChildrenAsync();
 
@@ -214,7 +213,20 @@ void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summa
     if ( lastCase )
     {
         // Add the last case, and update connected plots
-        addCase( lastCase );
+        addCase( lastCase, notifyChange );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::reloadCases()
+{
+    for ( auto summaryCase : allSummaryCases() )
+    {
+        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
+
+        RiaLogging::info( QString( "Reloaded data for %1" ).arg( summaryCase->summaryHeaderFilename() ) );
     }
 }
 
@@ -357,33 +369,21 @@ void RimSummaryEnsemble::setAsEnsemble( bool isEnsemble )
 //--------------------------------------------------------------------------------------------------
 std::set<RifEclipseSummaryAddress> RimSummaryEnsemble::ensembleSummaryAddresses() const
 {
-    std::set<RifEclipseSummaryAddress> addresses;
-    size_t                             maxAddrCount = 0;
-    int                                maxAddrIndex = -1;
-
-    for ( int i = 0; i < (int)m_cases.size(); i++ )
+    // For performance reasons, we only return the addresses from the case with the most keywords.
+    // Calling buildMetaData() on all realizations is expensive
+    if ( auto caseWithMostKeywords = RimSummaryEnsembleTools::caseWithMostDataObjects( m_cases.childrenByType() ) )
     {
-        RimSummaryCase* currCase = m_cases[i];
-        if ( !currCase ) continue;
-
-        RifSummaryReaderInterface* reader = currCase->summaryReader();
-        if ( !reader ) continue;
-
-        size_t addrCount = reader->allResultAddresses().size();
-        if ( addrCount > maxAddrCount )
+        if ( auto reader = caseWithMostKeywords->summaryReader() )
         {
-            maxAddrCount = addrCount;
-            maxAddrIndex = (int)i;
+            // If the reader has no addresses, we need to build the metadata to populate them
+            // This is typically the case for newly created cases or cases that have not been read yet
+            reader->createAddressesIfRequired();
+
+            return reader->allResultAddresses();
         }
     }
 
-    if ( maxAddrIndex >= 0 && m_cases[maxAddrIndex]->summaryReader() )
-    {
-        const std::set<RifEclipseSummaryAddress>& addrs = m_cases[maxAddrIndex]->summaryReader()->allResultAddresses();
-        addresses.insert( addrs.begin(), addrs.end() );
-    }
-
-    return addresses;
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -508,7 +508,8 @@ std::vector<std::pair<RigEnsembleParameter, double>>
     {
         parameters.erase( std::remove_if( parameters.begin(),
                                           parameters.end(),
-                                          [&selectedParameters]( const RigEnsembleParameter& parameter ) {
+                                          [&selectedParameters]( const RigEnsembleParameter& parameter )
+                                          {
                                               return std::find( selectedParameters.begin(), selectedParameters.end(), parameter.name ) ==
                                                      selectedParameters.end();
                                           } ),
@@ -627,7 +628,7 @@ RigEnsembleParameter RimSummaryEnsemble::ensembleParameter( const QString& param
 //--------------------------------------------------------------------------------------------------
 void RimSummaryEnsemble::calculateEnsembleParametersIntersectionHash()
 {
-    m_commonAddressCount = RimSummaryEnsembleTools::calculateEnsembleParametersIntersectionHash( allSummaryCases() );
+    RimSummaryEnsembleTools::calculateEnsembleParametersIntersectionHash( allSummaryCases() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -805,15 +806,16 @@ void RimSummaryEnsemble::computeMinMax( const RifEclipseSummaryAddress& address 
 
     for ( const auto& s : m_cases() )
     {
-        if ( !s->summaryReader() ) continue;
+        if ( auto reader = s->summaryReader() )
+        {
+            auto [isOk, values] = reader->values( address );
+            if ( values.empty() ) continue;
 
-        auto [isOk, values] = s->summaryReader()->values( address );
-        if ( values.empty() ) continue;
+            const auto [min, max] = std::minmax_element( values.begin(), values.end() );
 
-        const auto [min, max] = std::minmax_element( values.begin(), values.end() );
-
-        minimumValue = std::min( *min, minimumValue );
-        maximumValue = std::max( *max, maximumValue );
+            minimumValue = std::min( *min, minimumValue );
+            maximumValue = std::max( *max, maximumValue );
+        }
     }
 
     if ( minimumValue != std::numeric_limits<double>::infinity() && maximumValue != -std::numeric_limits<double>::infinity() )
@@ -838,6 +840,13 @@ std::pair<double, double> RimSummaryEnsemble::minMax( const RifEclipseSummaryAdd
     computeMinMax( address );
 
     return m_minMaxValues[address];
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::cleanupBeforeDelete()
+{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1039,6 +1048,10 @@ QString RimSummaryEnsemble::ensembleDescription() const
     {
         txt += "The ensemble is grouped by the FMU file folder structure.\n";
     }
+    else if ( m_groupingMode() == RiaDefines::EnsembleGroupingMode::RESINSIGHT_OPMFLOW_STRUCTURE )
+    {
+        txt += "The ensemble is grouped by the ResInsight Opm Flow file folder structure.\n";
+    }
 
     return txt;
 }
@@ -1094,6 +1107,18 @@ std::pair<std::string, std::string> RimSummaryEnsemble::nameKeys() const
             {
                 key1 = parts1[commonParts - 2];
                 key2 = parts1[commonParts - 1];
+            }
+        }
+    }
+    else if ( m_groupingMode() == RiaDefines::EnsembleGroupingMode::RESINSIGHT_OPMFLOW_STRUCTURE )
+    {
+        if ( !m_cases.empty() )
+        {
+            auto fileNames = RiaEnsembleNameTools::groupFilePathsOpm( { m_cases[0]->summaryHeaderFilename().toStdString() } );
+            if ( !fileNames.empty() )
+            {
+                key1 = fileNames.begin()->first.first;
+                key2 = fileNames.begin()->first.second;
             }
         }
     }

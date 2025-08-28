@@ -26,7 +26,7 @@ def test_10k(rips_instance, initialize_test):
 
 
 def test_add_well_path_completions(rips_instance, initialize_test):
-    well_path_coll = rips_instance.project.descendants(rips.WellPathCollection)[0]
+    well_path_coll = rips_instance.project.well_path_collection()
 
     well_path = well_path_coll.add_new_object(rips.ModeledWellPath)
     well_path.name = "test"
@@ -50,7 +50,7 @@ def test_add_well_path_completions(rips_instance, initialize_test):
     completions_settings.update()  # Commit updates back to ResInsight
 
     completions_settings_updated = well_path.completion_settings()
-    assert completions_settings_updated.allow_well_cross_flow == True
+    assert completions_settings_updated.allow_well_cross_flow
     assert completions_settings_updated.auto_well_shut_in == "STOP"
     assert completions_settings_updated.drainage_radius_for_pi == "1.56"
     assert completions_settings_updated.fluid_in_place_region == 99
@@ -76,8 +76,8 @@ def test_add_well_path_completions(rips_instance, initialize_test):
     msw_settings.update()
 
     msw_settings_updated = well_path.msw_settings()
-    assert msw_settings_updated.custom_values_for_lateral == True
-    assert msw_settings_updated.enforce_max_segment_length == True
+    assert msw_settings_updated.custom_values_for_lateral
+    assert msw_settings_updated.enforce_max_segment_length
     assert msw_settings_updated.liner_diameter == 20.0
     assert msw_settings_updated.max_segment_length == 123.05
     assert msw_settings_updated.pressure_drop == "HFA"
@@ -87,7 +87,6 @@ def test_add_well_path_completions(rips_instance, initialize_test):
 
 
 def test_add_well_path_fracture_template(rips_instance, initialize_test):
-
     # Add test for all properties
     # Some properties depend on availablility of other data and is not tested, these tests are commented out
 
@@ -138,14 +137,14 @@ def test_add_well_path_fracture_template(rips_instance, initialize_test):
     assert fracture_template_updated.relative_gas_density == 0.1
     assert fracture_template_updated.relative_permeability == 0.2
     assert fracture_template_updated.user_defined_d_factor == 14
-    assert fracture_template_updated.user_defined_perforation_length == True
+    assert fracture_template_updated.user_defined_perforation_length
     assert fracture_template_updated.user_description == "my frac name"
     assert fracture_template_updated.width_scale_factor == 7
 
 
 # test fishbone interface
 def test_fishbone_interface(rips_instance, initialize_test):
-    well_path_coll = rips_instance.project.descendants(rips.WellPathCollection)[0]
+    well_path_coll = rips_instance.project.well_path_collection()
 
     well_path = well_path_coll.add_new_object(rips.ModeledWellPath)
     well_path.name = "fishbone_well"
@@ -191,3 +190,49 @@ def test_fishbone_interface(rips_instance, initialize_test):
     assert fishbones_updated.lateral_tubing_diameter == 0.1
     assert fishbones_updated.lateral_tubing_roghness_factor == 0.1
     assert fishbones_updated.subs_orientation_mode == "FIXED"
+
+
+# test perforations and perforations settings
+def test_perforation_settings(rips_instance, initialize_test):
+    well_path_coll = rips_instance.project.well_path_collection()
+
+    well_path = well_path_coll.add_new_object(rips.ModeledWellPath)
+    well_path.name = "perforated_well"
+    well_path.update()
+
+    perforation_coll = well_path.completions().perforations()
+    non_darcy_parameters = perforation_coll.non_darcy_parameters()
+    non_darcy_parameters.non_darcy_flow_type = "UserDefined"
+    non_darcy_parameters.user_defined_d_factor = 1.2345
+    non_darcy_parameters.update()
+
+    non_darcy_parameters_updated = perforation_coll.non_darcy_parameters()
+    assert non_darcy_parameters_updated.non_darcy_flow_type == "UserDefined"
+    assert non_darcy_parameters_updated.user_defined_d_factor == 1.2345
+
+    non_darcy_parameters = perforation_coll.non_darcy_parameters()
+    non_darcy_parameters.non_darcy_flow_type = "None"
+    non_darcy_parameters.update()
+    non_darcy_parameters_updated = perforation_coll.non_darcy_parameters()
+    assert non_darcy_parameters_updated.non_darcy_flow_type == "None"
+
+    non_darcy_parameters = perforation_coll.non_darcy_parameters()
+    non_darcy_parameters.non_darcy_flow_type = "Computed"
+    non_darcy_parameters.gas_viscosity = 1.2
+    non_darcy_parameters.grid_permeability_scaling_factor = 20
+    non_darcy_parameters.inertial_coefficient = 1.1
+    non_darcy_parameters.permeability_scaling_factor = 0.14
+    non_darcy_parameters.porosity_scaling_factor = 0.59
+    non_darcy_parameters.relative_gas_density = 0.23
+    non_darcy_parameters.well_radius = 12.12
+
+    non_darcy_parameters.update()
+    non_darcy_parameters_updated = perforation_coll.non_darcy_parameters()
+    assert non_darcy_parameters_updated.non_darcy_flow_type == "Computed"
+    assert non_darcy_parameters_updated.gas_viscosity == 1.2
+    assert non_darcy_parameters_updated.grid_permeability_scaling_factor == 20
+    assert non_darcy_parameters_updated.inertial_coefficient == 1.1
+    assert non_darcy_parameters_updated.permeability_scaling_factor == 0.14
+    assert non_darcy_parameters_updated.porosity_scaling_factor == 0.59
+    assert non_darcy_parameters_updated.relative_gas_density == 0.23
+    assert non_darcy_parameters_updated.well_radius == 12.12

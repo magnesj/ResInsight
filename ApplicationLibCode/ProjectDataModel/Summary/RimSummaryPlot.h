@@ -104,7 +104,6 @@ public:
 
     void removeCurve( RimSummaryCurve* curve );
 
-    void deleteCurve( RimSummaryCurve* curve );
     void deleteCurves( const std::vector<RimSummaryCurve*>& curves );
 
     void deleteCurvesAssosiatedWithCase( RimSummaryCase* summaryCase );
@@ -319,9 +318,6 @@ private:
     static RiuPlotAxis plotAxisForTime();
 
 private:
-#ifdef USE_QTCHARTS
-    caf::PdmField<bool> m_useQtChartsPlot;
-#endif
     caf::PdmField<bool> m_normalizeCurveYValues;
 
     caf::PdmField<bool>    m_useAutoPlotTitle;
@@ -342,7 +338,7 @@ private:
 
     caf::PdmChildArrayField<RimPlotAxisPropertiesInterface*> m_axisPropertiesArray;
 
-    std::unique_ptr<RiuSummaryPlot>   m_summaryPlot;
+    QPointer<RiuSummaryPlot>          m_summaryPlot;
     std::unique_ptr<QwtPlotTextLabel> m_plotInfoLabel;
 
     std::unique_ptr<RimSummaryPlotNameHelper>         m_nameHelperAllCurves;

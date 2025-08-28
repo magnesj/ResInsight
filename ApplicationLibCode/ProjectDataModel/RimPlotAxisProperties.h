@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "Appearance/RimFontSizeField.h"
 #include "RimPlotAxisPropertiesInterface.h"
 
 #include "RiuPlotAxis.h"
@@ -64,10 +65,12 @@ public:
     RimPlotAxisProperties();
 
     void configureForBasicUse();
+    void configureForHistogramUse();
 
     void setAlwaysRequired( bool enable );
 
     void setEnableTitleTextSettings( bool enable );
+    void setEnableTitleLayoutSettings( bool enable );
     void enableRangeSettings( bool enable );
     void setNameForUnusedAxis();
     void setNameAndAxis( const QString& objectName, const QString& axistTitle, RiaDefines::PlotAxis axis, int axisIndex = 0 );
@@ -180,11 +183,12 @@ private:
     caf::PdmField<bool> m_isLogarithmicScaleEnabled;
 
     bool m_enableTitleTextSettings;
+    bool m_enableTitleLayoutSettings;
     bool m_isRangeSettingsEnabled;
     bool m_isAlwaysRequired;
 
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>    m_titleFontSize;
+    RimFontSizeField                                   m_titleFontSize;
     caf::PdmField<caf::AppEnum<AxisTitlePositionType>> m_titlePositionEnum;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum>    m_valuesFontSize;
+    RimFontSizeField                                   m_valuesFontSize;
     caf::PdmChildArrayField<RimPlotAxisAnnotation*>    m_annotations;
 };

@@ -22,7 +22,7 @@
 #include "RiaStdStringTools.h"
 
 #include "RifHdf5SummaryReader.h"
-#include "RifOpmCommonSummary.h"
+#include "RifOpmSummaryTools.h"
 
 #ifdef _MSC_VER
 // Disable warning from external library to make sure treat warnings as error works
@@ -75,7 +75,26 @@ bool RifOpmHdf5Summary::open( const QString& headerFileName, bool includeRestart
 
     if ( !m_eSmry || !m_hdf5Reader ) return false;
 
-    buildMetaData();
+    m_timeSteps.clear();
+    if ( m_eSmry )
+    {
+        // Get time step data from HDF
+        if ( m_hdf5Reader )
+        {
+            m_timeSteps = m_hdf5Reader->timeSteps();
+        }
+        else
+        {
+            // Fallback to using opm-reader for time step data
+            auto timePoints = m_eSmry->dates();
+
+            for ( const auto& d : timePoints )
+            {
+                auto timeAsTimeT = std::chrono::system_clock::to_time_t( d );
+                m_timeSteps.push_back( timeAsTimeT );
+            }
+        }
+    }
 
     return true;
 }
@@ -144,33 +163,14 @@ RiaDefines::EclipseUnitSystem RifOpmHdf5Summary::unitSystem() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmHdf5Summary::buildMetaData()
+void RifOpmHdf5Summary::createAndSetAddresses()
 {
     if ( m_eSmry )
     {
-        // Get time step data from HDF
-        if ( m_hdf5Reader )
-        {
-            m_timeSteps = m_hdf5Reader->timeSteps();
-        }
-        else
-        {
-            // Fallback to using opm-reader for time step data
-            auto timePoints = m_eSmry->dates();
-
-            for ( const auto& d : timePoints )
-            {
-                auto timeAsTimeT = std::chrono::system_clock::to_time_t( d );
-                m_timeSteps.push_back( timeAsTimeT );
-            }
-        }
-
-        {
-            auto [addresses, smspecIndices, addressToKeywordMap] = RifOpmCommonSummaryTools::buildAddressesSmspecAndKeywordMap( m_eSmry.get() );
-            m_allResultAddresses         = addresses;
-            m_adrToSmspecIndices         = smspecIndices;
-            m_summaryAddressToKeywordMap = addressToKeywordMap;
-        }
+        auto [addresses, smspecIndices, addressToKeywordMap] = RifOpmSummaryTools::buildAddressesSmspecAndKeywordMap( m_eSmry.get() );
+        m_allResultAddresses                                 = addresses;
+        m_adrToSmspecIndices                                 = smspecIndices;
+        m_summaryAddressToKeywordMap                         = addressToKeywordMap;
     }
 }
 
@@ -193,4 +193,16 @@ bool RifOpmHdf5Summary::openESmryFile( const QString& headerFileName, bool inclu
     }
 
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RifOpmHdf5Summary::keywordCount() const
+{
+    if ( m_eSmry )
+    {
+        return m_eSmry->keywordList().size();
+    }
+    return 0;
 }

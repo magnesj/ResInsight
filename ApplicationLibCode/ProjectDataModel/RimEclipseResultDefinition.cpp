@@ -20,8 +20,10 @@
 
 #include "RimEclipseResultDefinition.h"
 
+#include "Histogram/RimGridStatisticsHistogramDataSource.h"
 #include "RiaLogging.h"
 #include "RiaQDateTimeTools.h"
+#include "RiaResultNames.h"
 
 #include "RicfCommandObject.h"
 
@@ -36,6 +38,7 @@
 #include "ContourMap/RimContourMapProjection.h"
 #include "ContourMap/RimEclipseContourMapProjection.h"
 #include "ContourMap/RimEclipseContourMapView.h"
+#include "Histogram/RimGridStatisticsHistogramDataSource.h"
 #include "Rim3dView.h"
 #include "Rim3dWellLogCurve.h"
 #include "RimCellEdgeColors.h"
@@ -60,10 +63,6 @@
 #include "RimViewLinker.h"
 #include "RimWellLogExtractionCurve.h"
 #include "RimWellLogTrack.h"
-
-#ifdef USE_QTCHARTS
-#include "RimGridStatisticsPlot.h"
-#endif
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmUiToolButtonEditor.h"
@@ -598,13 +597,12 @@ void RimEclipseResultDefinition::loadDataAndUpdate()
         rim3dWellLogCurve->updateCurveIn3dView();
     }
 
-#ifdef USE_QTCHARTS
-    RimGridStatisticsPlot* gridStatisticsPlot = firstAncestorOrThisOfType<RimGridStatisticsPlot>();
-    if ( gridStatisticsPlot )
+    RimGridStatisticsHistogramDataSource* gridStatisticsHistogramDataSource =
+        firstAncestorOrThisOfType<RimGridStatisticsHistogramDataSource>();
+    if ( gridStatisticsHistogramDataSource )
     {
-        gridStatisticsPlot->loadDataAndUpdate();
+        gridStatisticsHistogramDataSource->loadDataAndUpdate();
     }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1428,6 +1426,8 @@ bool RimEclipseResultDefinition::isCompletionTypeSelected() const
 //--------------------------------------------------------------------------------------------------
 bool RimEclipseResultDefinition::hasCategoryResult() const
 {
+    if ( m_resultVariable().startsWith( RiaResultNames::convergence() ) ) return false;
+
     if ( RiaResultNames::isCategoryResult( m_resultVariable() ) ) return true;
 
     if ( auto* gridCellResults = currentGridCellResults() )

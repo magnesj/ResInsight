@@ -86,6 +86,12 @@ public:
     void         setFillColor( const cvf::Color3f& fillColor );
     cvf::Color3f fillColor() const;
 
+    void  setCurveColorOpacity( float opacity );
+    float curveColorOpacity() const;
+
+    void  setFillColorOpacity( float opacity );
+    float fillColorOpacity() const;
+
     float curveFittingTolerance() const;
 
     void                                           setInterpolation( RiuQwtPlotCurveDefines::CurveInterpolationEnum );
@@ -94,6 +100,7 @@ public:
     void setInterpolationVisible( bool isVisible );
     void setColorVisible( bool isVisible );
     void setFillOptionsVisible( bool isVisible );
+    void setCurveFittingToleranceVisible( bool isVisible );
 
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
@@ -101,13 +108,16 @@ protected:
     // Overridden PDM methods
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
-    void                          initAfterRead() override;
+    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+
+    void initAfterRead() override;
 
 protected:
     caf::PdmField<QString> m_symbolLabel;
     caf::PdmField<int>     m_symbolSize;
 
     caf::PdmField<cvf::Color3f> m_curveColor;
+    caf::PdmField<float>        m_curveColorOpacity;
     caf::PdmField<int>          m_curveThickness;
     caf::PdmField<float>        m_symbolSkipPixelDistance;
 
@@ -117,6 +127,7 @@ protected:
     caf::PdmField<LineStyle>          m_lineStyle;
     caf::PdmField<FillStyle>          m_fillStyle;
     caf::PdmField<cvf::Color3f>       m_fillColor;
+    caf::PdmField<float>              m_fillColorOpacity;
     caf::PdmField<CurveInterpolation> m_curveInterpolation;
     caf::PdmField<LabelPosition>      m_symbolLabelPosition;
     caf::PdmField<cvf::Color3f>       m_symbolEdgeColor;
@@ -124,4 +135,5 @@ protected:
     bool m_colorVisible;
     bool m_interpolationVisible;
     bool m_fillOptionsVisible;
+    bool m_curveFittingToleranceVisible;
 };

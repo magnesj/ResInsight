@@ -29,16 +29,15 @@
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcRimWellPathGeometryDef_appendNewWellTarget : public caf::PdmObjectMethod
+class RimcRimWellPathGeometryDef_appendNewWellTarget : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcRimWellPathGeometryDef_appendNewWellTarget( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<cvf::Vec3d> m_coordinate;

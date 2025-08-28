@@ -29,17 +29,14 @@ class RimFractureTemplate;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcFractureTemplate_setScaleFactors : public caf::PdmObjectMethod
+class RimcFractureTemplate_setScaleFactors : public caf::PdmVoidObjectMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcFractureTemplate_setScaleFactors( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
-    bool                             isNullptrValidResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
 
 private:
     caf::PdmField<double> m_halfLength;

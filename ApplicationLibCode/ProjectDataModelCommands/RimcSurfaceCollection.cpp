@@ -22,6 +22,7 @@
 #include "RimCase.h"
 #include "RimFileSurface.h"
 #include "RimGridCaseSurface.h"
+#include "RimRegularSurface.h"
 #include "RimSurface.h"
 #include "RimSurfaceCollection.h"
 
@@ -33,21 +34,24 @@
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSurfaceCollection, RimcSurfaceCollection_importSurface, "ImportSurface" );
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSurfaceCollection, RimcSurfaceCollection_addFolder, "AddFolder" );
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSurfaceCollection, RimcSurfaceCollection_newSurface, "NewSurface" );
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimSurfaceCollection, RimcSurfaceCollection_newRegularSurface, "NewRegularSurface" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RimcSurfaceCollection_importSurface::RimcSurfaceCollection_importSurface( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
+
 {
     CAF_PDM_InitObject( "Import Surface", "", "", "Import a new surface from file" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_fileName, "FileName", "", "", "", "Filename to import surface from" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcSurfaceCollection_importSurface::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcSurfaceCollection_importSurface::execute()
 {
     RimSurfaceCollection* coll = self<RimSurfaceCollection>();
     if ( coll )
@@ -62,41 +66,26 @@ caf::PdmObjectHandle* RimcSurfaceCollection_importSurface::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_importSurface::resultIsPersistent() const
+QString RimcSurfaceCollection_importSurface::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcSurfaceCollection_importSurface::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimFileSurface );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_importSurface::isNullptrValidResult() const
-{
-    return true;
+    return RimFileSurface::classKeywordStatic();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RimcSurfaceCollection_addFolder::RimcSurfaceCollection_addFolder( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Add Folder", "", "", "Add a new surface folder" );
+
     CAF_PDM_InitScriptableField( &m_folderName, "FolderName", QString( "Surfaces" ), "", "", "", "New surface folder name" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcSurfaceCollection_addFolder::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcSurfaceCollection_addFolder::execute()
 {
     RimSurfaceCollection* coll = self<RimSurfaceCollection>();
     if ( coll )
@@ -113,34 +102,19 @@ caf::PdmObjectHandle* RimcSurfaceCollection_addFolder::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_addFolder::resultIsPersistent() const
+QString RimcSurfaceCollection_addFolder::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcSurfaceCollection_addFolder::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimSurfaceCollection );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_addFolder::isNullptrValidResult() const
-{
-    return true;
+    return RimSurfaceCollection::classKeywordStatic();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RimcSurfaceCollection_newSurface::RimcSurfaceCollection_newSurface( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "New Surface", "", "", "Create a new surface" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_case, "Case", "" );
     CAF_PDM_InitScriptableField( &m_kIndex, "KIndex", 0, "" );
 }
@@ -148,7 +122,7 @@ RimcSurfaceCollection_newSurface::RimcSurfaceCollection_newSurface( caf::PdmObje
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcSurfaceCollection_newSurface::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcSurfaceCollection_newSurface::execute()
 {
     RimSurfaceCollection* coll = self<RimSurfaceCollection>();
     if ( coll && m_case )
@@ -162,23 +136,73 @@ caf::PdmObjectHandle* RimcSurfaceCollection_newSurface::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_newSurface::resultIsPersistent() const
+QString RimcSurfaceCollection_newSurface::classKeywordReturnedType() const
 {
-    return true;
+    return RimGridCaseSurface::classKeywordStatic();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcSurfaceCollection_newSurface::defaultResult() const
+RimcSurfaceCollection_newRegularSurface::RimcSurfaceCollection_newRegularSurface( caf::PdmObjectHandle* self )
+    : PdmObjectCreationMethod( self )
 {
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimGridCaseSurface );
+    CAF_PDM_InitObject( "New Regular Surface", "", "", "Create a new regular surface" );
+
+    CAF_PDM_InitScriptableField( &m_name, "Name", QString( "" ), "Name" );
+
+    CAF_PDM_InitScriptableField( &m_originX, "OriginX", 0.0, "Origin X" );
+    CAF_PDM_InitScriptableField( &m_originY, "OriginY", 0.0, "Origin Y" );
+    CAF_PDM_InitScriptableField( &m_depth, "Depth", 0.0, "Depth" );
+
+    CAF_PDM_InitScriptableField( &m_nx, "Nx", 10, "Nx" );
+    CAF_PDM_InitScriptableField( &m_ny, "Ny", 10, "Ny" );
+    CAF_PDM_InitScriptableField( &m_incrementX, "IncrementX", 20.0, "Increment X" );
+    CAF_PDM_InitScriptableField( &m_incrementY, "IncrementY", 20.0, "Increment Y" );
+
+    CAF_PDM_InitScriptableField( &m_rotation, "Rotation", 0.0, "Rotation" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcSurfaceCollection_newSurface::isNullptrValidResult() const
+std::expected<caf::PdmObjectHandle*, QString> RimcSurfaceCollection_newRegularSurface::execute()
 {
-    return true;
+    RimSurfaceCollection* coll = self<RimSurfaceCollection>();
+    if ( !coll ) return std::unexpected( "No surface collection found" );
+
+    if ( m_nx() <= 0 ) return std::unexpected( "Invalid nx. Must be positive." );
+    if ( m_ny() <= 0 ) return std::unexpected( "Invalid ny. Must be positive." );
+    if ( m_incrementX() <= 0.0 ) return std::unexpected( "Invalid increment X. Must be positive." );
+    if ( m_incrementY() <= 0.0 ) return std::unexpected( "Invalid increment Y. Must be positive." );
+    if ( m_rotation() < 0.0 || m_rotation() > 360.0 ) return std::unexpected( "Invalid rotation. Valid range: [0.0-360.0]" );
+
+    RimRegularSurface* surface = new RimRegularSurface;
+    surface->setUserDescription( m_name() );
+
+    surface->setNx( m_nx() );
+    surface->setNy( m_ny() );
+    surface->setOriginX( m_originX() );
+    surface->setOriginY( m_originY() );
+    surface->setDepth( m_depth() );
+    surface->setIncrementX( m_incrementX() );
+    surface->setIncrementY( m_incrementY() );
+    surface->setRotation( m_rotation() );
+
+    surface->setColor( cvf::Color3f::BLUE );
+    surface->setOpacity( true, 0.6f );
+
+    coll->addSurface( surface );
+    coll->updateViews();
+    coll->updateConnectedEditors();
+
+    return surface;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimcSurfaceCollection_newRegularSurface::classKeywordReturnedType() const
+{
+    return RimRegularSurface::classKeywordStatic();
 }

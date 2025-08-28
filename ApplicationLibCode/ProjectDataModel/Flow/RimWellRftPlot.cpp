@@ -21,6 +21,7 @@
 #include "RiaColorTables.h"
 #include "RiaColorTools.h"
 #include "RiaPlotDefines.h"
+#include "RiaQDateTimeTools.h"
 #include "RiaSimWellBranchTools.h"
 #include "Summary/RiaSummaryTools.h"
 
@@ -29,6 +30,7 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 
+#include "RimDataSourceForRftPlt.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseResultCase.h"
 #include "RimEnsembleCurveSetColorManager.h"
@@ -56,6 +58,7 @@
 
 #include "RiuAbstractLegendFrame.h"
 #include "RiuDraggableOverlayFrame.h"
+#include "RiuPlotCurve.h"
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotWidget.h"
 
@@ -108,9 +111,10 @@ RimWellRftPlot::RimWellRftPlot()
     m_selectedSources.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_selectedSources.uiCapability()->setAutoAddingOptionFromValue( false );
 
+    CAF_PDM_InitFieldNoDefault( &m_selectedSourcesForIo, "SourcesForIo", "SourcesForIo" );
+
     CAF_PDM_InitFieldNoDefault( &m_selectedTimeSteps, "TimeSteps", "Time Steps" );
     m_selectedTimeSteps.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
-    m_selectedTimeSteps.xmlCapability()->disableIO();
     m_selectedTimeSteps.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_selectedTimeSteps.uiCapability()->setAutoAddingOptionFromValue( false );
 
@@ -233,7 +237,7 @@ QString RimWellRftPlot::associatedSimWellName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellRftPlot::applyInitialSelections( std::variant<RimSummaryCase*, RimSummaryEnsemble*> dataSource )
+void RimWellRftPlot::setOrInitializeDataSources( const std::vector<RifDataSourceForRftPlt>& sourcesToSelect )
 {
     std::map<QString, QStringList> wellSources = findWellSources();
     if ( m_wellPathNameOrSimWellName() == "None" && !wellSources.empty() )
@@ -241,49 +245,37 @@ void RimWellRftPlot::applyInitialSelections( std::variant<RimSummaryCase*, RimSu
         m_wellPathNameOrSimWellName = wellSources.begin()->first;
     }
 
-    RimSummaryEnsemble* ensemble    = nullptr;
-    RimSummaryCase*     summaryCase = nullptr;
-
-    if ( auto summaryCollection = std::get_if<RimSummaryEnsemble*>( &dataSource ) )
-    {
-        ensemble = *summaryCollection;
-    }
-    else if ( auto sumCase = std::get_if<RimSummaryCase*>( &dataSource ) )
-    {
-        summaryCase = *sumCase;
-    }
-
-    bool summaryOrEnsembleSelected = ( summaryCase || ensemble );
-
-    std::vector<RifDataSourceForRftPlt> sourcesToSelect;
+    std::vector<RifDataSourceForRftPlt> dataSources;
     const QString                       simWellName = associatedSimWellName();
 
-    if ( !summaryOrEnsembleSelected )
+    if ( !sourcesToSelect.empty() )
     {
+        // If the selection is provided, use it directly
+        dataSources = sourcesToSelect;
+    }
+    else
+    {
+        // If no selection is provided, build the selection based on available data sources
+
         for ( RimEclipseResultCase* const rftCase : RimWellPlotTools::rftCasesForWell( simWellName ) )
         {
-            sourcesToSelect.push_back( RifDataSourceForRftPlt( RifDataSourceForRftPlt::SourceType::RFT_SIM_WELL_DATA, rftCase ) );
+            dataSources.push_back( RifDataSourceForRftPlt( RifDataSourceForRftPlt::SourceType::RFT_SIM_WELL_DATA, rftCase ) );
         }
 
         for ( RimEclipseResultCase* const gridCase : RimWellPlotTools::gridCasesForWell( simWellName ) )
         {
-            sourcesToSelect.push_back( RifDataSourceForRftPlt( RifDataSourceForRftPlt::SourceType::GRID_MODEL_CELL_DATA, gridCase ) );
+            dataSources.push_back( RifDataSourceForRftPlt( RifDataSourceForRftPlt::SourceType::GRID_MODEL_CELL_DATA, gridCase ) );
         }
 
         for ( RimSummaryEnsemble* const ensemble : RimWellPlotTools::rftEnsemblesForWell( simWellName ) )
         {
-            sourcesToSelect.push_back( RifDataSourceForRftPlt( ensemble ) );
+            dataSources.push_back( RifDataSourceForRftPlt( ensemble ) );
         }
 
         for ( auto singleCase : RiaSummaryTools::singleTopLevelSummaryCases() )
         {
-            sourcesToSelect.push_back( RifDataSourceForRftPlt( singleCase, nullptr, nullptr ) );
+            dataSources.push_back( RifDataSourceForRftPlt( singleCase, nullptr, nullptr ) );
         }
-    }
-    else
-    {
-        if ( summaryCase ) sourcesToSelect.push_back( RifDataSourceForRftPlt( summaryCase, nullptr, nullptr ) );
-        if ( ensemble ) sourcesToSelect.push_back( RifDataSourceForRftPlt( ensemble ) );
     }
 
     std::vector<RimWellLogFile*> wellLogFiles = RimWellPlotTools::wellLogFilesContainingPressure( m_wellPathNameOrSimWellName );
@@ -293,17 +285,17 @@ void RimWellRftPlot::applyInitialSelections( std::variant<RimSummaryCase*, RimSu
         {
             if ( auto wellLogLasFile = dynamic_cast<RimWellLogLasFile*>( wellLogFile ) )
             {
-                sourcesToSelect.push_back( RifDataSourceForRftPlt( wellLogLasFile ) );
+                dataSources.push_back( RifDataSourceForRftPlt( wellLogLasFile ) );
             }
         }
     }
 
     for ( RimObservedFmuRftData* const observedFmuRftData : RimWellPlotTools::observedFmuRftDataForWell( m_wellPathNameOrSimWellName ) )
     {
-        sourcesToSelect.push_back( RifDataSourceForRftPlt( observedFmuRftData ) );
+        dataSources.push_back( RifDataSourceForRftPlt( observedFmuRftData ) );
     }
 
-    m_selectedSources = sourcesToSelect;
+    m_selectedSources = dataSources;
 
     {
         std::set<RifEclipseRftAddress::RftWellLogChannelType> channelTypesToUse = RifEclipseRftAddress::rftPlotChannelTypes();
@@ -336,6 +328,8 @@ void RimWellRftPlot::applyInitialSelections( std::variant<RimSummaryCase*, RimSu
 
     createEnsembleCurveSets();
     syncCurvesFromUiSelection();
+
+    m_isInitialized = true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -386,31 +380,45 @@ void RimWellRftPlot::updateEditorsFromPreviousSelection()
 //--------------------------------------------------------------------------------------------------
 void RimWellRftPlot::setSelectedSourcesFromCurves()
 {
-    std::set<RifDataSourceForRftPlt>                      selectedSources;
-    std::set<QDateTime>                                   selectedTimeSteps;
-    std::map<QDateTime, std::set<RifDataSourceForRftPlt>> selectedTimeStepsMap;
-
-    for ( const RiaRftPltCurveDefinition& curveDef : curveDefsFromCurves() )
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2025.04.3" ) )
     {
-        if ( curveDef.address().sourceType() == RifDataSourceForRftPlt::SourceType::OBSERVED_LAS_FILE )
-        {
-            selectedSources.insert( RifDataSourceForRftPlt( curveDef.address().wellLogFile() ) );
-        }
-        else if ( ( curveDef.address().sourceType() == RifDataSourceForRftPlt::SourceType::SUMMARY_RFT ) && curveDef.address().ensemble() )
-        {
-            selectedSources.insert( RifDataSourceForRftPlt( curveDef.address().ensemble() ) );
-        }
-        else
-            selectedSources.insert( curveDef.address() );
+        std::set<RifDataSourceForRftPlt>                      selectedSources;
+        std::set<QDateTime>                                   selectedTimeSteps;
+        std::map<QDateTime, std::set<RifDataSourceForRftPlt>> selectedTimeStepsMap;
 
-        auto newTimeStepMap = std::map<QDateTime, std::set<RifDataSourceForRftPlt>>{
-            { curveDef.timeStep(), std::set<RifDataSourceForRftPlt>{ curveDef.address() } } };
-        RimWellPlotTools::addTimeStepsToMap( selectedTimeStepsMap, newTimeStepMap );
-        selectedTimeSteps.insert( curveDef.timeStep() );
+        for ( const RiaRftPltCurveDefinition& curveDef : curveDefsFromCurves() )
+        {
+            if ( curveDef.address().sourceType() == RifDataSourceForRftPlt::SourceType::OBSERVED_LAS_FILE )
+            {
+                selectedSources.insert( RifDataSourceForRftPlt( curveDef.address().wellLogFile() ) );
+            }
+            else if ( ( curveDef.address().sourceType() == RifDataSourceForRftPlt::SourceType::SUMMARY_RFT ) && curveDef.address().ensemble() )
+            {
+                selectedSources.insert( RifDataSourceForRftPlt( curveDef.address().ensemble() ) );
+            }
+            else
+                selectedSources.insert( curveDef.address() );
+
+            auto newTimeStepMap = std::map<QDateTime, std::set<RifDataSourceForRftPlt>>{
+                { curveDef.timeStep(), std::set<RifDataSourceForRftPlt>{ curveDef.address() } } };
+            RimWellPlotTools::addTimeStepsToMap( selectedTimeStepsMap, newTimeStepMap );
+            selectedTimeSteps.insert( curveDef.timeStep() );
+        }
+
+        // Storage of time steps to the project file was changed in 2025.04.3
+        m_selectedSources   = std::vector<RifDataSourceForRftPlt>( selectedSources.begin(), selectedSources.end() );
+        m_selectedTimeSteps = std::vector<QDateTime>( selectedTimeSteps.begin(), selectedTimeSteps.end() );
+
+        return;
     }
 
-    m_selectedSources   = std::vector<RifDataSourceForRftPlt>( selectedSources.begin(), selectedSources.end() );
-    m_selectedTimeSteps = std::vector<QDateTime>( selectedTimeSteps.begin(), selectedTimeSteps.end() );
+    std::vector<RifDataSourceForRftPlt> selectedSources;
+    for ( RimDataSourceForRftPlt* addr : m_selectedSourcesForIo )
+    {
+        selectedSources.push_back( addr->address() );
+    }
+
+    m_selectedSources = selectedSources;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -504,12 +512,17 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
     RimWellLogTrack* const plotTrack = dynamic_cast<RimWellLogTrack*>( plotByIndex( 0 ) );
     if ( !plotTrack ) return;
 
+    if ( plotTrack->plotWidget() )
+    {
+        detachAndDeleteLegendCurves();
+    }
+
     // Delete curves
     plotTrack->deleteAllCurves();
 
     defineCurveColorsAndSymbols( allCurveDefs );
 
-    std::set<RimSummaryEnsemble*> ensemblesWithSummaryCurves;
+    std::set<std::pair<RimWellRftEnsembleCurveSet*, QDateTime>> curveSetsForLegend;
 
     // Add new curves
     for ( const RiaRftPltCurveDefinition& curveDefToAdd : allCurveDefs )
@@ -573,7 +586,12 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
             if ( curveDefToAdd.address().ensemble() )
             {
                 auto curveSet = findEnsembleCurveSet( curveDefToAdd.address().ensemble() );
-                if ( curveSet ) eclipeCase = curveSet->eclipseCase();
+                if ( curveSet )
+                {
+                    eclipeCase = curveSet->eclipseCase();
+
+                    curveSetsForLegend.insert( { curveSet, curveDefToAdd.timeStep() } );
+                }
             }
             curve->setEclipseCase( eclipeCase );
 
@@ -588,9 +606,7 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
 
             if ( curveDefToAdd.address().ensemble() )
             {
-                bool isFirstSummaryCurveInEnsemble = ensemblesWithSummaryCurves.count( curveDefToAdd.address().ensemble() ) == 0u;
-                curve->setShowInLegend( isFirstSummaryCurveInEnsemble );
-                ensemblesWithSummaryCurves.insert( curveDefToAdd.address().ensemble() );
+                curve->setShowInLegend( false );
             }
         }
         else if ( m_showStatisticsCurves && curveDefToAdd.address().sourceType() == RifDataSourceForRftPlt::SourceType::ENSEMBLE_RFT )
@@ -622,18 +638,16 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
                         curve->setObservedFmuRftData( findObservedFmuData( m_wellPathNameOrSimWellName, curveDefToAdd.timeStep() ) );
                         curve->setZOrder( RiuQwtPlotCurveDefines::zDepthForIndex( RiuQwtPlotCurveDefines::ZIndex::Z_ENSEMBLE_STAT_CURVE ) );
                         applyCurveAppearance( curve );
-                        auto                              symbol   = statisticsCurveSymbolFromAddress( rftAddress );
-                        RiuPlotCurveSymbol::LabelPosition labelPos = statisticsLabelPosFromAddress( rftAddress );
+
+                        auto symbol = m_timeStepSymbols[curveDefToAdd.timeStep()];
                         curve->setSymbol( symbol );
-                        curve->setSymbolLabelPosition( labelPos );
-                        curve->setSymbolSize( curve->symbolSize() + 3 );
-                        curve->setSymbolSkipDistance( 150 );
+                        auto size = curve->symbolSize();
+                        curve->setSymbolSize( size + 2 );
                         curve->setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
-                        QString uiText = caf::AppEnum<RifEclipseRftAddress::RftWellLogChannelType>::uiText( rftAddress.wellLogChannel() );
-                        QString label  = uiText.replace( ": Pressure", "" );
-                        curve->setSymbolLabel( label );
                         curve->setLineThickness( 3 );
-                        curve->setShowInLegend( !m_showEnsembleCurves );
+                        curve->setShowInLegend( false );
+
+                        curveSetsForLegend.insert( { curveSet, curveDefToAdd.timeStep() } );
                     }
                 }
             }
@@ -693,6 +707,43 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
 
                 applyCurveAppearance( curve );
             }
+        }
+    }
+
+    if ( auto widget = plotTrack->plotWidget() )
+    {
+        // Create curves with no content to display in the curve legend section. Ensures a consistent legend for both ensemble and
+        // statistics curves.
+
+        auto formatString = RiaQDateTimeTools::createTimeFormatStringFromDates( m_selectedTimeSteps() );
+        for ( const auto& [curveSet, dateTime] : curveSetsForLegend )
+        {
+            auto riuCurve = widget->createPlotCurve( nullptr, "" );
+            riuCurve->attachToPlot( plotTrack->plotWidget() );
+            riuCurve->setVisibleInLegend( true );
+
+            QStringList titleItems;
+            titleItems.push_back( curveSet->ensembleName() );
+            titleItems.push_back( dateTime.toString( formatString ) );
+            titleItems.push_back( m_wellPathNameOrSimWellName );
+            QString title = titleItems.join( ", " );
+            riuCurve->setTitle( title );
+
+            auto color          = RiaColorTools::toQColor( curveSet->curveColor( nullptr, nullptr ) );
+            int  curveThickness = 3;
+            riuCurve->setAppearance( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID,
+                                     RiuQwtPlotCurveDefines::CurveInterpolationEnum::INTERPOLATION_POINT_TO_POINT,
+                                     curveThickness,
+                                     color );
+
+            auto symbolType = m_timeStepSymbols[dateTime];
+            auto symbol     = riuCurve->createSymbol( symbolType );
+            symbol->setSize( 8, 8 );
+            symbol->setColor( color );
+
+            riuCurve->setSymbol( symbol );
+
+            m_legendPlotCurves.push_back( riuCurve );
         }
     }
 
@@ -1194,6 +1245,20 @@ std::map<QString, QStringList> RimWellRftPlot::findWellSources()
 //--------------------------------------------------------------------------------------------------
 void RimWellRftPlot::onLoadDataAndUpdate()
 {
+    if ( !m_isInitialized )
+    {
+        // TODO: m_selectedSources and m_selectedTimeSteps are not stored in the project file, so we need to set them here
+        // to ensure that the plot is initialized with the correct sources and time steps. Refactor m_selectedSources and
+        // m_selectedTimeSteps to be stored in the project file, and disable storing of curves to the project file. This is a temporary
+        // solution to ensure that the plot is initialized correctly setSelectedSourcesFromCurves();
+        //
+        // This function call was previously in initAfterRead, and triggered opening of the grid model. Moved here to allow 3D views to
+        // trigger open of grid model
+
+        setSelectedSourcesFromCurves();
+        m_isInitialized = true;
+    }
+
     if ( m_isOnLoad )
     {
         if ( plotCount() > 0 )
@@ -1236,6 +1301,14 @@ void RimWellRftPlot::onLoadDataAndUpdate()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::setupBeforeSave()
+{
+    syncSourcesIoFieldFromGuiField();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellRftPlot::initAfterRead()
 {
     if ( m_wellLogPlot_OBSOLETE )
@@ -1246,11 +1319,17 @@ void RimWellRftPlot::initAfterRead()
         m_wellLogPlot_OBSOLETE = nullptr;
     }
 
-    // TODO: m_selectedSources and m_selectedTimeSteps are not stored in the project file, so we need to set them here
-    // to ensure that the plot is initialized with the correct sources and time steps. Refactor m_selectedSources and m_selectedTimeSteps to
-    // be stored in the project file, and disable storing of curves to the project file. This is a temporary solution to ensure that the
-    // plot is initialized correctly
-    setSelectedSourcesFromCurves();
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2025.04.3" ) )
+    {
+        std::vector<cvf::Color3f> colorTable;
+        RiaColorTables::summaryCurveDefaultPaletteColors().color3fArray().toStdVector( &colorTable );
+
+        size_t colorIndex = 0;
+        for ( auto e : m_ensembleCurveSets )
+        {
+            e->setCurveColor( colorTable[colorIndex % colorTable.size()] );
+        }
+    }
 
     RimWellLogPlot::initAfterRead();
 }
@@ -1285,6 +1364,17 @@ bool RimWellRftPlot::useUndoRedoForFieldChanged()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::deleteViewWidget()
+{
+    // Required to detach curves before view widget is deleted. The Qwt plot curves are implicitly deleted when the view widget is deleted.
+    detachAndDeleteLegendCurves();
+
+    RimDepthTrackPlot::deleteViewWidget();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellRftPlot::assignWellPathToExtractionCurves()
 {
     RimProject*  proj     = RimProject::current();
@@ -1305,6 +1395,19 @@ void RimWellRftPlot::assignWellPathToExtractionCurves()
                 }
             }
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::syncSourcesIoFieldFromGuiField()
+{
+    m_selectedSourcesForIo.deleteChildren();
+
+    for ( const RifDataSourceForRftPlt& addr : m_selectedSources() )
+    {
+        m_selectedSourcesForIo.push_back( new RimDataSourceForRftPlt( addr ) );
     }
 }
 
@@ -1353,45 +1456,12 @@ cvf::Color3f RimWellRftPlot::findCurveColor( RimWellLogCurve* curve )
 {
     RiaRftPltCurveDefinition curveDef = RimWellPlotTools::curveDefFromCurve( curve );
 
-    cvf::Color3f curveColor;
-    if ( curveDef.address().sourceType() == RifDataSourceForRftPlt::SourceType::SUMMARY_RFT )
+    if ( RimWellRftEnsembleCurveSet* ensembleCurveSet = findEnsembleCurveSet( curveDef.address().ensemble() ) )
     {
-        RimWellRftEnsembleCurveSet* ensembleCurveSet = findEnsembleCurveSet( curveDef.address().ensemble() );
-        if ( ensembleCurveSet && ensembleCurveSet->colorMode() == ColorMode::BY_ENSEMBLE_PARAM )
-        {
-            curveColor = ensembleCurveSet->caseColor( curveDef.address().summaryCase() );
-        }
-        else
-        {
-            if ( curveDef.address().ensemble() )
-            {
-                // If we have an ensemble, we need to use the ensemble address to find one single color for all curves in the ensemble. If
-                // we also include the summary case, each curve will be assigned a separate color.
-
-                RifDataSourceForRftPlt dataSource( curveDef.address().ensemble() );
-                curveColor = m_dataSourceColors[dataSource];
-            }
-            else
-            {
-                curveColor = m_dataSourceColors[curveDef.address()];
-            }
-        }
-
-        if ( m_showStatisticsCurves )
-        {
-            if ( plotByIndex( 0 ) && plotByIndex( 0 )->plotWidget() )
-            {
-                cvf::Color3f backgroundColor = RiaColorTools::fromQColorTo3f( plotByIndex( 0 )->plotWidget()->backgroundColor() );
-                curveColor                   = RiaColorTools::blendCvfColors( backgroundColor, curveColor, 1, 2 );
-            }
-        }
-    }
-    else
-    {
-        curveColor = m_dataSourceColors[curveDef.address()];
+        return ensembleCurveSet->curveColor( curveDef.address().ensemble(), curveDef.address().summaryCase() );
     }
 
-    return curveColor;
+    return m_dataSourceColors[curveDef.address()];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1422,10 +1492,7 @@ void RimWellRftPlot::defineCurveColorsAndSymbols( const std::set<RiaRftPltCurveD
                                          [&curveSet]( const RimSummaryEnsemble* ensemble ) { return curveSet->ensemble() == ensemble; } );
         if ( ensemble_it != ensembles.end() )
         {
-            curveSet->initializeLegend();
-
-            if ( viewer && curveSet->legendConfig()->showLegend() && curveSet->colorMode() == ColorMode::BY_ENSEMBLE_PARAM &&
-                 !curveSet->currentEnsembleParameter().isEmpty() )
+            if ( viewer && curveSet->legendConfig() )
             {
                 if ( !m_ensembleLegendFrames[curveSet] )
                 {
@@ -1518,6 +1585,9 @@ void RimWellRftPlot::createEnsembleCurveSets()
         delete curveSet;
     }
 
+    std::vector<cvf::Color3f> colorTable;
+    RiaColorTables::summaryCurveDefaultPaletteColors().color3fArray().toStdVector( &colorTable );
+
     // Then add curve set for any ensembles we haven't already added
     for ( RimSummaryEnsemble* ensemble : rftEnsembles )
     {
@@ -1528,9 +1598,26 @@ void RimWellRftPlot::createEnsembleCurveSets()
         {
             RimWellRftEnsembleCurveSet* curveSet = new RimWellRftEnsembleCurveSet;
             curveSet->setEnsemble( ensemble );
+            auto index = m_ensembleCurveSets.size();
+            auto color = colorTable.at( index % colorTable.size() );
+            curveSet->setCurveColor( color );
             m_ensembleCurveSets.push_back( curveSet );
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::detachAndDeleteLegendCurves()
+{
+    for ( auto c : m_legendPlotCurves )
+    {
+        c->detach();
+        delete c;
+    }
+
+    m_legendPlotCurves.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1561,6 +1648,29 @@ void RimWellRftPlot::rebuildCurves()
     createEnsembleCurveSets();
     updateFormationsOnPlot();
     syncCurvesFromUiSelection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::initializeDataSources( RimWellRftPlot* source )
+{
+    for ( auto curveSet : m_ensembleCurveSets )
+    {
+        // Clear the ensemble statistics before applying initial selections
+        // This is necessary to ensure that the statistics are recalculated based on the initial selections
+        curveSet->clearEnsembleStatistics();
+    }
+
+    if ( source )
+    {
+        setOrInitializeDataSources( source->m_selectedSources );
+    }
+    else
+    {
+        // If no source is provided, initialize with empty sources
+        setOrInitializeDataSources( {} );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

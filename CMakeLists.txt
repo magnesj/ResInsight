@@ -1,10 +1,45 @@
 # The way boost is configured and used in Boost 1.86 requires CMake 3.26
 cmake_minimum_required(VERSION 3.26)
 
+cmake_policy(SET CMP0020 NEW)
+if(POLICY CMP0077)
+  cmake_policy(SET CMP0077 NEW)
+endif()
+if(POLICY CMP0135)
+  cmake_policy(SET CMP0135 OLD)
+endif()
+if(POLICY CMP0167)
+  cmake_policy(SET CMP0167 OLD)
+endif()
+if(POLICY CMP0169)
+  cmake_policy(SET CMP0169 OLD)
+endif()
+
 include(CheckCSourceCompiles)
 include(FetchContent)
 
 project(ResInsight)
+
+# Include common settings
+include(cmake/ResInsightCommonSettings.cmake)
+
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13.0)
+    message(
+      FATAL_ERROR
+        "Minimum GCC version is 13, detected version: ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  endif()
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  if(CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0)
+    message(
+      FATAL_ERROR
+        "Minimum supported version is Clang 19, detected version: ${CMAKE_CXX_COMPILER_VERSION}"
+    )
+  endif()
+endif()
 
 # Ensure all binary files ensd up in the same folder as the executable
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
@@ -14,14 +49,6 @@ set(VIZ_MODULES_FOLDER_NAME Fwk/VizFwk)
 message(STATUS "Set CEE_USE_QT6 to ON")
 set(CEE_USE_QT5 OFF)
 set(CEE_USE_QT6 ON)
-
-cmake_policy(SET CMP0020 NEW)
-if(POLICY CMP0077)
-  cmake_policy(SET CMP0077 NEW)
-endif()
-if(POLICY CMP0135)
-  cmake_policy(SET CMP0135 OLD)
-endif()
 
 if(UNIX)
   option(
@@ -46,7 +73,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 option(RESINSIGHT_BUNDLE_TESTMODELS "Copy TestModels into the installation" OFF)
 mark_as_advanced(RESINSIGHT_BUNDLE_TESTMODELS)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -395,38 +422,52 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
   endif()
 endif()
 
+if(UNIX)
+  execute_process(
+    COMMAND date "+%Y-%m-%d %H:%M:%S"
+    OUTPUT_VARIABLE RESINSIGHT_BUILD_DATE
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+  )
+else()
+  string(TIMESTAMP RESINSIGHT_BUILD_DATE "%Y-%m-%d %H:%M:%S")
+endif()
+
 # ##############################################################################
 # OpenVDS seismic file access
 # ##############################################################################
 
-message(STATUS "Starting download of external library OpenVDS ...")
+option(RESINSIGHT_ENABLE_OPENVDS "Add support for OpenVDS seismic files" ON)
 
-if(MSVC)
-  FetchContent_Declare(
-    openvds
-    URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.5-win.zip
-  )
-else()
-  FetchContent_Declare(
-    openvds
-    URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.5-manylinux_2014.tar.gz
-  )
-endif()
+if(RESINSIGHT_ENABLE_OPENVDS)
+  message(STATUS "Starting download of external library OpenVDS ...")
 
-FetchContent_MakeAvailable(openvds)
-message(STATUS "... completed download of external library OpenVDS")
+  if(MSVC)
+    FetchContent_Declare(
+      openvds
+      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.6-win.zip
+    )
+  else()
+    FetchContent_Declare(
+      openvds
+      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.6-manylinux_2014.tar.gz
+    )
+  endif()
 
-set(RESINSIGHT_OPENVDS_API_DIR ${openvds_SOURCE_DIR})
-message(STATUS "Using OpenVDS api from : ${RESINSIGHT_OPENVDS_API_DIR}")
+  FetchContent_MakeAvailable(openvds)
+  message(STATUS "... completed download of external library OpenVDS")
 
-if(MSVC)
-  list(APPEND EXTERNAL_LINK_LIBRARIES
-       ${RESINSIGHT_OPENVDS_API_DIR}/lib/msvc_141/openvds.lib
-  )
-else()
-  list(APPEND EXTERNAL_LINK_LIBRARIES
-       ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so
-  )
+  set(RESINSIGHT_OPENVDS_API_DIR ${openvds_SOURCE_DIR})
+  message(STATUS "Using OpenVDS API from : ${RESINSIGHT_OPENVDS_API_DIR}")
+
+  if(MSVC)
+    list(APPEND EXTERNAL_LINK_LIBRARIES
+         ${RESINSIGHT_OPENVDS_API_DIR}/lib/msvc_141/openvds.lib
+    )
+  else()
+    list(APPEND EXTERNAL_LINK_LIBRARIES
+         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so
+    )
+  endif()
 endif()
 
 # ##############################################################################
@@ -488,49 +529,18 @@ endif() # MSVC
 add_subdirectory(ThirdParty/custom-opm-flowdiagnostics)
 add_subdirectory(ThirdParty/custom-opm-flowdiag-app)
 
-# Option used to build opm-common from source or use precompiled binaries
-option(RESINSIGHT_BUILD_LIBS_FROM_SOURCE "Build opm-common from source" ON)
-mark_as_advanced(RESINSIGHT_BUILD_LIBS_FROM_SOURCE)
+# CREATE_OPM_COMMON_KEYWORDS is used to create c++-code for the keywords in
+# opm-common JSON files See description in
+# ThirdParty/custom-opm-common/CMakeLists.txt When changing this flag, it is
+# required to reopen the Visual Studio project
+set(CREATE_OPM_COMMON_KEYWORDS OFF)
 
-if((NOT RESINSIGHT_BUILD_LIBS_FROM_SOURCE) AND MSVC)
+add_subdirectory(ThirdParty/custom-opm-common)
 
-  message(STATUS "Starting download of external library opm-common ...")
-
-  # See description of URL here
-  # https://docs.github.com/en/repositories/releasing-projects-on-github/linking-to-releases
-  FetchContent_Declare(
-    ri-dependencies
-    URL https://github.com/CeetronSolutions/resinsight-dependencies/releases/download/2025.01/custom-opm-common.zip
-  )
-  FetchContent_MakeAvailable(ri-dependencies)
-
-  add_library(custom-opm-common STATIC IMPORTED)
-  set_target_properties(
-    custom-opm-common
-    PROPERTIES IMPORTED_CONFIGURATIONS "Debug;Release"
-               IMPORTED_LOCATION_DEBUG
-               "${ri-dependencies_SOURCE_DIR}/custom-opm-common_debug.lib"
-               IMPORTED_LOCATION_RELEASE
-               "${ri-dependencies_SOURCE_DIR}/custom-opm-common.lib"
-  )
-
-  list(APPEND EXTERNAL_LINK_LIBRARIES custom-opm-common)
-
-  message(STATUS "... completed download of external library opm-common ")
-else()
-  # CREATE_OPM_COMMON_KEYWORDS is used to create c++-code for the keywords in
-  # opm-common JSON files See description in
-  # ThirdParty/custom-opm-common/CMakeLists.txt When changing this flag, it is
-  # required to reopen the Visual Studio project
-  set(CREATE_OPM_COMMON_KEYWORDS OFF)
-
-  add_subdirectory(ThirdParty/custom-opm-common)
-
-  if(NOT CREATE_OPM_COMMON_KEYWORDS)
-    add_subdirectory(ThirdParty/custom-opm-common/custom-opm-parser-tests)
-    list(APPEND OPM_LIBRARIES custom-opm-common)
-    set_property(TARGET opm-parser-tests PROPERTY FOLDER "Thirdparty/OPM")
-  endif()
+if(NOT CREATE_OPM_COMMON_KEYWORDS)
+  add_subdirectory(ThirdParty/custom-opm-common/custom-opm-parser-tests)
+  list(APPEND OPM_LIBRARIES custom-opm-common)
+  set_property(TARGET opm-parser-tests PROPERTY FOLDER "Thirdparty/OPM")
 endif()
 
 list(APPEND OPM_LIBRARIES custom-opm-flowdiagnostics custom-opm-flowdiag-app)
@@ -564,17 +574,9 @@ endif()
 find_package(
   Qt6
   COMPONENTS
-  REQUIRED
-  Core
-  Gui
-  OpenGL
-  Network
-  Widgets
-  Charts
+  REQUIRED Core Gui OpenGL Network Widgets
 )
-set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets
-                 Qt6::Charts
-)
+set(QT_LIBRARIES Qt6::Core Qt6::Gui Qt6::OpenGL Qt6::Network Qt6::Widgets)
 qt_standard_project_setup()
 
 # Disable use of foreach
@@ -582,12 +584,6 @@ add_definitions(-DQT_NO_FOREACH)
 
 # Open GL
 find_package(OpenGL)
-
-# ##############################################################################
-# QtCharts
-# ##############################################################################
-set(RESINSIGHT_USE_QT_CHARTS ON)
-add_definitions(-DUSE_QTCHARTS)
 
 # ##############################################################################
 # Qwt
@@ -684,6 +680,13 @@ set_property(
 )
 
 # ##############################################################################
+# surfio
+# ##############################################################################
+
+add_subdirectory(ThirdParty/custom-surfio)
+list(APPEND THIRD_PARTY_LIBRARIES surfio_lib)
+
+# ##############################################################################
 # toml++
 # ##############################################################################
 
@@ -764,15 +767,17 @@ if(MSVC)
   endif()
 
   # OpenVDS Dlls
-  set(OPENVDS_DLL_NAMES openvds segyutils)
-  foreach(OPENVDS_DLL_NAME ${OPENVDS_DLL_NAMES})
+  if(RESINSIGHT_ENABLE_OPENVDS)
+    set(OPENVDS_DLL_NAMES openvds segyutils)
+    foreach(OPENVDS_DLL_NAME ${OPENVDS_DLL_NAMES})
+      list(APPEND RI_FILENAMES
+           ${RESINSIGHT_OPENVDS_API_DIR}/bin/msvc_141/${OPENVDS_DLL_NAME}.dll
+      )
+    endforeach(OPENVDS_DLL_NAME)
     list(APPEND RI_FILENAMES
-         ${RESINSIGHT_OPENVDS_API_DIR}/bin/msvc_141/${OPENVDS_DLL_NAME}.dll
+         ${RESINSIGHT_OPENVDS_API_DIR}/bin/msvc_141/SEGYImport.exe
     )
-  endforeach(OPENVDS_DLL_NAME)
-  list(APPEND RI_FILENAMES
-       ${RESINSIGHT_OPENVDS_API_DIR}/bin/msvc_141/SEGYImport.exe
-  )
+  endif()
 
   # HDF5 Dlls
   if(RESINSIGHT_FOUND_HDF5)
@@ -784,24 +789,25 @@ if(MSVC)
 
 else()
   # Linux
+  if(RESINSIGHT_ENABLE_OPENVDS)
+    # OpenVDS lib files
+    list(APPEND RI_FILENAMES ${RESINSIGHT_OPENVDS_API_DIR}/bin/SEGYImport)
 
-  # OpenVDS lib files
-  list(APPEND RI_FILENAMES ${RESINSIGHT_OPENVDS_API_DIR}/bin/SEGYImport)
-
-  set(OPENVDS_LIB_NAMES
-      libopenvds.so
-      libopenvds.so.3
-      libopenvds.so.3.4.5
-      libopenvds-85fcb584.so.3.4.5
-      libsegyutils.so
-      libsegyutils.so.3
-      libsegyutils.so.3.4.5
-  )
-  foreach(OPENVDS_LIB_NAME ${OPENVDS_LIB_NAMES})
-    list(APPEND RI_FILENAMES
-         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/${OPENVDS_LIB_NAME}
+    set(OPENVDS_LIB_NAMES
+        libopenvds.so
+        libopenvds.so.3
+        libopenvds.so.3.4.6
+        libopenvds-e6a44892.so.3.4.6
+        libsegyutils.so
+        libsegyutils.so.3
+        libsegyutils.so.3.4.6
     )
-  endforeach(OPENVDS_LIB_NAME)
+    foreach(OPENVDS_LIB_NAME ${OPENVDS_LIB_NAMES})
+      list(APPEND RI_FILENAMES
+           ${RESINSIGHT_OPENVDS_API_DIR}/lib64/${OPENVDS_LIB_NAME}
+      )
+    endforeach(OPENVDS_LIB_NAME)
+  endif()
 endif(MSVC)
 
 # ##############################################################################
@@ -973,7 +979,11 @@ endif()
 
 # Set the install folder to be the bin folder. TODO: Move Python scripts to a
 # separate folder
-set(RESINSIGHT_INSTALL_FOLDER "bin")
+if(APPLE)
+  set(RESINSIGHT_INSTALL_FOLDER ".")
+else()
+  set(RESINSIGHT_INSTALL_FOLDER "bin")
+endif()
 
 # override system install prefix if private installation chosen
 option(RESINSIGHT_PRIVATE_INSTALL
@@ -1008,7 +1018,8 @@ if(RESINSIGHT_PRIVATE_INSTALL)
     )
     install(
       FILES ${ERT_SHARED_LIB_FILES}
-      DESTINATION ${RESINSIGHT_INSTALL_FOLDER}/ResInsight.app/Contents/MacOS
+      DESTINATION
+        ${RESINSIGHT_INSTALL_FOLDER}/ResInsight.app/Contents/Frameworks
     )
   endif()
 
@@ -1036,23 +1047,25 @@ if(RESINSIGHT_BUNDLE_TESTMODELS)
   )
 endif()
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-  set(OPENVDS_SHARED_LIB_FILES
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3.4.5
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds-85fcb584.so.3.4.5
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3
-      ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3.4.5
-  )
-  install(FILES ${OPENVDS_SHARED_LIB_FILES}
-          DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
-  )
+if(RESINSIGHT_ENABLE_OPENVDS)
+  if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(OPENVDS_SHARED_LIB_FILES
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3.4.6
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds-e6a44892.so.3.4.6
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3.4.6
+    )
+    install(FILES ${OPENVDS_SHARED_LIB_FILES}
+            DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    )
 
-  install(PROGRAMS ${RESINSIGHT_OPENVDS_API_DIR}/bin/SEGYImport
-          DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
-  )
+    install(PROGRAMS ${RESINSIGHT_OPENVDS_API_DIR}/bin/SEGYImport
+            DESTINATION ${RESINSIGHT_INSTALL_FOLDER}
+    )
+  endif()
 endif()
 
 # ##############################################################################

@@ -8,6 +8,7 @@
 #include "LineEditAndPushButtons.h"
 #include "ManyGroups.h"
 #include "MenuItemProducer.h"
+#include "OptionalFields.h"
 #include "TamComboBox.h"
 #include "WidgetLayoutTest.h"
 
@@ -749,6 +750,14 @@ public:
 
     caf::PdmFieldHandle* objectToggleField() override { return &m_toggleField; }
 
+    void migrateFieldContent( QString& fieldContent, caf::PdmFieldHandle* fieldHandle ) override
+    {
+        if ( fieldHandle == &m_textField )
+        {
+            fieldContent = "Migrated Text Field Content";
+        }
+    }
+
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override
     {
         if ( changedField == &m_toggleField )
@@ -1310,6 +1319,7 @@ void MainWindow::buildTestModel()
     m_testRoot->objects.push_back( singleEditorObj );
 
     m_testRoot->objects.push_back( new LineEditAndPushButtons );
+    m_testRoot->objects.push_back( new OptionalFields );
 
     auto tamComboBox = new TamComboBox;
     m_testRoot->objects.push_back( tamComboBox );

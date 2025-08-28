@@ -22,7 +22,7 @@
 
 #include "cafPdmObjectScriptingCapability.h"
 
-CAF_PDM_SOURCE_INIT( RimSummaryCaseSumo, "RimSummaryCaseSumo" );
+CAF_PDM_SOURCE_INIT( RimSummaryCaseSumo, "SummaryCaseSumo", "RimSummaryCaseSumo" );
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -171,11 +171,19 @@ QString RimSummaryCaseSumo::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCaseSumo::buildMetaData()
+void RimSummaryCaseSumo::createAndSetAddresses()
 {
     if ( m_ensemble )
     {
         auto addresses       = m_ensemble->allResultAddresses();
         m_allResultAddresses = addresses;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RimSummaryCaseSumo::keywordCount() const
+{
+    return m_allResultAddresses.size();
 }

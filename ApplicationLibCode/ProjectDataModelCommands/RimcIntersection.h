@@ -86,9 +86,8 @@ class RimcExtrudedCurveIntersection_geometry : public caf::PdmObjectMethod
 public:
     RimcExtrudedCurveIntersection_geometry( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
     static std::unique_ptr<RivIntersectionGeometryGeneratorInterface>
         createGeometryGenerator( RimExtrudedCurveIntersection* intersection, RimcTriangleGeometry::GeometryType geometryType );
@@ -107,9 +106,8 @@ class RimcExtrudedCurveIntersection_geometryResult : public caf::PdmObjectMethod
 public:
     RimcExtrudedCurveIntersection_geometryResult( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<caf::AppEnum<RimcTriangleGeometry::GeometryType>> m_geometryType;

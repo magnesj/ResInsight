@@ -239,7 +239,8 @@ auto createOptionsForSummaryCase = []() -> QList<caf::PdmOptionItemInfo>
     RimProject*                  proj  = RimProject::current();
     std::vector<RimSummaryCase*> cases = proj->allSummaryCases();
 
-    auto options = RiaSummaryTools::optionsForSummaryCases( cases );
+    bool includeEnsembleName = false;
+    auto options             = RiaSummaryTools::optionsForSummaryCases( cases, includeEnsembleName );
     if ( !options.empty() )
     {
         options.push_front( caf::PdmOptionItemInfo( "None", nullptr ) );
@@ -255,12 +256,12 @@ auto createOptionsForEnsemble = []() -> QList<caf::PdmOptionItemInfo>
 {
     QList<caf::PdmOptionItemInfo> options;
 
-    RimProject*                      proj   = RimProject::current();
-    std::vector<RimSummaryEnsemble*> groups = proj->summaryGroups();
+    RimProject*                      proj      = RimProject::current();
+    std::vector<RimSummaryEnsemble*> ensembles = proj->summaryEnsembles();
 
-    for ( RimSummaryEnsemble* group : groups )
+    for ( RimSummaryEnsemble* ensemble : ensembles )
     {
-        if ( group->isEnsemble() ) options.push_back( caf::PdmOptionItemInfo( group->name(), group ) );
+        if ( ensemble->isEnsemble() ) options.push_back( caf::PdmOptionItemInfo( ensemble->name(), ensemble ) );
     }
 
     options.push_front( caf::PdmOptionItemInfo( "None", nullptr ) );

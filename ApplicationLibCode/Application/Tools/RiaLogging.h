@@ -23,7 +23,8 @@
 #include <string>
 #include <vector>
 
-class QString;
+#include <QString>
+
 class QWidget;
 
 enum class RILogLevel
@@ -66,15 +67,15 @@ public:
 
     static RILogLevel logLevelBasedOnPreferences();
 
-    static void error( const QString& message );
-    static void warning( const QString& message );
-    static void info( const QString& message );
-    static void debug( const QString& message );
+    static void error( const QString& message, const QString logKeyword = "" );
+    static void warning( const QString& message, const QString logKeyword = "" );
+    static void info( const QString& message, const QString logKeyword = "" );
+    static void debug( const QString& message, const QString logKeyword = "" );
 
     static void errorInMessageBox( QWidget* parent, const QString& title, const QString& text );
 
-    static void resetTimer( const QString& message );
-    static void logTimeElapsed( const QString& message );
+    static std::chrono::time_point<std::chrono::high_resolution_clock> currentTime();
+    static void logElapsedTime( const QString& message, const std::chrono::time_point<std::chrono::high_resolution_clock>& startTime );
 
 private:
     static void setLastMessage( const QString& message );
@@ -82,7 +83,6 @@ private:
 
 private:
     static std::vector<std::unique_ptr<RiaLogger>>                     sm_logger;
-    static std::chrono::time_point<std::chrono::high_resolution_clock> sm_startTime;
     static QString                                                     sm_lastMessage;
     static std::chrono::time_point<std::chrono::high_resolution_clock> sm_lastMessageTime;
 };

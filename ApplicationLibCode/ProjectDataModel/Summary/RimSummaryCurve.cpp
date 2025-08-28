@@ -493,7 +493,8 @@ QList<caf::PdmOptionItemInfo> RimSummaryCurve::calculateValueOptions( const caf:
         RimProject*                  proj  = RimProject::current();
         std::vector<RimSummaryCase*> cases = proj->allSummaryCases();
 
-        options = RiaSummaryTools::optionsForSummaryCases( cases );
+        bool includeEnsembleName = false;
+        options                  = RiaSummaryTools::optionsForSummaryCases( cases, includeEnsembleName );
 
         if ( !options.empty() )
         {
@@ -791,7 +792,7 @@ void RimSummaryCurve::initAfterRead()
 {
     RimStackablePlotCurve::initAfterRead();
 
-    if ( m_yPlotAxisProperties.value() == nullptr )
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2021" ) && m_yPlotAxisProperties.value() == nullptr )
     {
         auto plot = firstAncestorOrThisOfType<RimSummaryPlot>();
         if ( plot ) m_yPlotAxisProperties = plot->axisPropertiesForPlotAxis( RiuPlotAxis( m_plotAxis_OBSOLETE() ) );

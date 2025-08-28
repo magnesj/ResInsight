@@ -15,7 +15,7 @@ if(MSVC)
   add_definitions(-D_WIN32_WINNT=0x600)
 endif()
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 23)
 
 
 add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
@@ -33,6 +33,7 @@ set(SOURCE_GROUP_HEADER_FILES
     RiaGrpcCommandService.h
     RiaGrpcAppService.h
     RiaGrpcPropertiesService.h
+    RiaGrpcKeyValueStoreService.h
     RiaGrpcNNCPropertiesService.h
     RiaGrpcPdmObjectService.h
     RiaGrpcApplicationInterface.h
@@ -49,6 +50,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     RiaGrpcCommandService.cpp
     RiaGrpcAppService.cpp
     RiaGrpcPropertiesService.cpp
+    RiaGrpcKeyValueStoreService.cpp
     RiaGrpcNNCPropertiesService.cpp
     RiaGrpcPdmObjectService.cpp
     RiaGrpcApplicationInterface.cpp)

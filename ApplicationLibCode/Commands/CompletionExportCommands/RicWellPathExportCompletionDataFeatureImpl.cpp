@@ -23,6 +23,7 @@
 #include "RiaFractureDefines.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesSystem.h"
+#include "RiaStatisticsTools.h"
 #include "RiaWeightedMeanCalculator.h"
 
 #include "ExportCommands/RicExportLgrFeature.h"
@@ -489,9 +490,22 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
     RiaWeightedMeanCalculator<double> diameterCalculator;
     RiaWeightedMeanCalculator<double> skinFactorCalculator;
 
+    auto isValidTransmissibility = []( double transmissibility )
+    { return RiaStatisticsTools::isValidNumber<double>( transmissibility ) && transmissibility >= 0.0; };
+
     for ( const RigCompletionData& completion : completions )
     {
         double transmissibility = completion.transmissibility();
+
+        if ( !isValidTransmissibility( transmissibility ) )
+        {
+            QString errorMessage = QString( "Invalid or negative transmissibility value (%1) in cell %3" )
+                                       .arg( transmissibility )
+                                       .arg( cellIndexIJK.oneBasedLocalCellIndexString() );
+            RiaLogging::error( errorMessage );
+            resultCompletion.addMetadata( "ERROR", errorMessage );
+            continue;
+        }
 
         diameterCalculator.addValueAndWeight( completion.diameter(), transmissibility );
         skinFactorCalculator.addValueAndWeight( completion.skinFactor(), transmissibility );
@@ -515,6 +529,9 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
 
         for ( const RigCompletionData& completion : completions )
         {
+            // Error is reported in the loop above, so we can skip this completion
+            if ( !isValidTransmissibility( completion.transmissibility() ) ) continue;
+
             resultCompletion.m_metadata.reserve( resultCompletion.m_metadata.size() + completion.m_metadata.size() );
             resultCompletion.m_metadata.insert( resultCompletion.m_metadata.end(), completion.m_metadata.begin(), completion.m_metadata.end() );
 

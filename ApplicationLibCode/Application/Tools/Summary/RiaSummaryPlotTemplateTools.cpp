@@ -95,14 +95,17 @@ RimSummaryMultiPlot* RicSummaryPlotTemplateTools::create( const QString& fileNam
         {
             auto firstCase = sumCases.front();
 
-            analyzer.appendAddresses( firstCase->summaryReader()->allResultAddresses() );
+            if ( auto reader = firstCase->summaryReader() )
+            {
+                analyzer.appendAddresses( reader->allResultAddresses() );
+            }
         }
         else if ( !sumEnsembles.empty() )
         {
             auto caseCollection = sumEnsembles.front();
 
             auto firstCase = caseCollection->firstSummaryCase();
-            if ( firstCase != nullptr )
+            if ( firstCase && firstCase->summaryReader() )
             {
                 analyzer.appendAddresses( firstCase->summaryReader()->allResultAddresses() );
             }
@@ -181,14 +184,17 @@ RimSummaryMultiPlot* RicSummaryPlotTemplateTools::create( const QString&        
     {
         auto firstCase = sumCases.front();
 
-        analyzer.appendAddresses( firstCase->summaryReader()->allResultAddresses() );
+        if ( auto reader = firstCase->summaryReader() )
+        {
+            analyzer.appendAddresses( reader->allResultAddresses() );
+        }
     }
     else if ( !ensembles.empty() )
     {
         auto caseCollection = ensembles.front();
 
         auto firstCase = caseCollection->firstSummaryCase();
-        if ( firstCase != nullptr )
+        if ( firstCase && firstCase->summaryReader() )
         {
             analyzer.appendAddresses( firstCase->summaryReader()->allResultAddresses() );
         }
@@ -440,7 +446,7 @@ QString RicSummaryPlotTemplateTools::selectPlotTemplatePath()
     RicSelectPlotTemplateUi ui;
 
     caf::PdmUiPropertyViewDialog propertyDialog( plotwindow, &ui, "Select Plot Template", "" );
-    propertyDialog.resize( QSize( 400, 600 ) );
+    propertyDialog.resize( QSize( 600, 800 ) );
 
     if ( propertyDialog.exec() == QDialog::Accepted && !ui.selectedPlotTemplates().empty() )
     {
@@ -486,10 +492,7 @@ std::vector<QString> RicSummaryPlotTemplateTools::selectDefaultPlotTemplates( st
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCase*> RicSummaryPlotTemplateTools::selectedSummaryCases()
 {
-    std::vector<RimSummaryCase*> objects;
-    caf::SelectionManager::instance()->objectsByType( &objects );
-
-    return objects;
+    return caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -497,10 +500,7 @@ std::vector<RimSummaryCase*> RicSummaryPlotTemplateTools::selectedSummaryCases()
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryEnsemble*> RicSummaryPlotTemplateTools::selectedSummaryEnsembles()
 {
-    std::vector<RimSummaryEnsemble*> objects;
-    caf::SelectionManager::instance()->objectsByType( &objects );
-
-    return objects;
+    return caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -508,10 +508,7 @@ std::vector<RimSummaryEnsemble*> RicSummaryPlotTemplateTools::selectedSummaryEns
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryAddressCollection*> RicSummaryPlotTemplateTools::selectedSummaryAddressCollections()
 {
-    std::vector<RimSummaryAddressCollection*> objects;
-    caf::SelectionManager::instance()->objectsByType( &objects );
-
-    return objects;
+    return caf::SelectionManager::instance()->objectsByType<RimSummaryAddressCollection>();
 }
 
 //--------------------------------------------------------------------------------------------------

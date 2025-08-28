@@ -27,6 +27,7 @@
 #include "RiaLogging.h"
 #include "RiaPreferencesGeoMech.h"
 #include "RiaPreferencesGrid.h"
+#include "RiaPreferencesOpm.h"
 #include "RiaPreferencesOsdu.h"
 #include "RiaPreferencesSummary.h"
 #include "RiaPreferencesSumo.h"
@@ -145,12 +146,6 @@ RiaPreferences::RiaPreferences()
     }
     defaultFilename += "/ResInsight.log";
 
-    CAF_PDM_InitField( &m_loggerFilename, "loggerFilename", std::make_pair( false, defaultFilename ), "Logging To File" );
-    m_loggerFilename.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
-
-    CAF_PDM_InitField( &m_loggerFlushInterval, "loggerFlushInterval", 500, "Logging Flush Interval [ms]" );
-    CAF_PDM_InitField( &m_loggerTrapSignalAndFlush, "loggerTrapSignalAndFlush", false, "Trap SIGNAL and Flush File Logs" );
-
     CAF_PDM_InitField( &m_storeBackupOfProjectFile, "storeBackupOfProjectFile", true, "Store Backup of Project Files" );
 
     CAF_PDM_InitFieldNoDefault( &m_defaultMeshModeType, "defaultMeshModeType", "Show Grid Lines" );
@@ -237,9 +232,6 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitField( &m_writeEchoInGrdeclFiles, "writeEchoInGrdeclFiles", false, "Write NOECHO and ECHO in GRDECL files" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_writeEchoInGrdeclFiles );
 
-    CAF_PDM_InitField( &m_useQtChartsPlotByDefault, "useQtChartsPlotByDefault", false, "Use QtChart as Default Plot Type" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useQtChartsPlotByDefault );
-
     CAF_PDM_InitFieldNoDefault( &m_gridCalculationExpressionFolder, "gridCalculationExpressionFolder", "Grid Calculation Expression Folder" );
     CAF_PDM_InitFieldNoDefault( &m_summaryCalculationExpressionFolder,
                                 "summaryCalculationExpressionFolder",
@@ -273,6 +265,9 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &m_geoMechPreferences, "geoMechPreferences", "geoMechPreferences" );
     m_geoMechPreferences = new RiaPreferencesGeoMech;
+
+    CAF_PDM_InitFieldNoDefault( &m_opmPreferences, "opmPreferences", "opmPreferences" );
+    m_opmPreferences = new RiaPreferencesOpm();
 
     CAF_PDM_InitFieldNoDefault( &m_systemPreferences, "systemPreferences", "systemPreferences" );
     m_systemPreferences = new RiaPreferencesSystem;
@@ -415,11 +410,6 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
         caf::PdmUiGroup* loggingGroup = uiOrdering.addNewGroup( "Logging and Backup" );
         loggingGroup->add( &m_storeBackupOfProjectFile );
-        loggingGroup->add( &m_loggerFilename );
-        loggingGroup->add( &m_loggerFlushInterval );
-        loggingGroup->add( &m_loggerTrapSignalAndFlush );
-        m_loggerTrapSignalAndFlush.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
-        m_loggerFlushInterval.uiCapability()->setUiReadOnly( !m_loggerFilename().first );
 
         caf::PdmUiGroup* otherGroup = uiOrdering.addNewGroup( "Other" );
         otherGroup->setCollapsedByDefault();
@@ -468,9 +458,6 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         pageSetup->add( &m_pageTopMargin );
         pageSetup->appendToRow( &m_pageBottomMargin );
 
-        generalGrp->add( &m_useQtChartsPlotByDefault );
-        m_useQtChartsPlotByDefault.uiCapability()->setUiHidden( true );
-
         QString unitLabel = " [mm]";
         if ( QPageSize( m_pageSize() ).definitionUnits() == QPageSize::Inch )
         {
@@ -500,6 +487,8 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         scriptGroup->add( &scriptDirectories );
         scriptGroup->add( &m_maxScriptFoldersDepth );
         scriptGroup->add( &scriptEditorExecutable );
+
+        m_opmPreferences()->appendItems( uiOrdering );
     }
 #ifdef USE_ODB_API
     else if ( uiConfigName == RiaPreferences::tabNameGeomech() )
@@ -844,14 +833,6 @@ bool RiaPreferences::openExportedPdfInViewer() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RiaPreferences::useQtChartsAsDefaultPlotType() const
-{
-    return m_useQtChartsPlotByDefault;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RiaPreferences::writeEchoInGrdeclFiles() const
 {
     return m_writeEchoInGrdeclFiles;
@@ -1033,35 +1014,6 @@ QString RiaPreferences::octavePortNumber() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiaPreferences::loggerFilename() const
-{
-    if ( m_loggerFilename().first )
-    {
-        return m_loggerFilename().second;
-    }
-
-    return {};
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RiaPreferences::loggerFlushInterval() const
-{
-    return m_loggerFlushInterval();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaPreferences::loggerTrapSignalAndFlush() const
-{
-    return m_loggerTrapSignalAndFlush();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RiaPreferences::storeBackupOfProjectFiles() const
 {
     return m_storeBackupOfProjectFile();
@@ -1089,6 +1041,14 @@ RiaPreferencesSystem* RiaPreferences::systemPreferences() const
 RiaPreferencesGeoMech* RiaPreferences::geoMechPreferences() const
 {
     return m_geoMechPreferences();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesOpm* RiaPreferences::opmPreferences() const
+{
+    return m_opmPreferences();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -67,15 +67,23 @@ bool RifEclEclipseSummary::open( const QString& headerFileName, RiaThreadSafeLog
     assert( m_ecl_sum == nullptr );
 
     m_ecl_sum = RifEclipseSummaryTools::openEclSum( headerFileName, false );
-    if ( m_ecl_sum )
+
+    if ( !m_ecl_sum )
     {
-        m_timeSteps.clear();
-        m_ecl_SmSpec = ecl_sum_get_smspec( m_ecl_sum );
-        m_timeSteps  = RifEclipseSummaryTools::getTimeSteps( m_ecl_sum );
-        m_unitSystem = RifEclipseSummaryTools::readUnitSystem( m_ecl_sum );
+        if ( threadSafeLogger )
+        {
+            QString msg = "Not able to create resdata file reader for " + headerFileName;
+            threadSafeLogger->error( msg );
+        }
+        return false;
     }
 
-    buildMetaData();
+    m_timeSteps.clear();
+    m_ecl_SmSpec = ecl_sum_get_smspec( m_ecl_sum );
+    m_timeSteps  = RifEclipseSummaryTools::getTimeSteps( m_ecl_sum );
+    m_unitSystem = RifEclipseSummaryTools::readUnitSystem( m_ecl_sum );
+
+    createAndSetAddresses();
 
     return true;
 }
@@ -272,6 +280,13 @@ std::pair<bool, std::vector<double>> RifEclEclipseSummary::values( const RifEcli
         int variableIndex = indexFromAddress( resultAddress );
         if ( variableIndex < 0 ) return { false, {} };
 
+        // Validate index is within bounds to prevent segfault
+        int nodeCount = ecl_smspec_num_nodes( m_ecl_SmSpec );
+        if ( variableIndex >= nodeCount )
+        {
+            return { false, {} }; // Invalid index - beyond available nodes
+        }
+
         const ecl::smspec_node& ertSumVarNode = ecl_smspec_iget_node_w_node_index( m_ecl_SmSpec, variableIndex );
         int                     paramsIndex   = ertSumVarNode.get_params_index();
 
@@ -314,7 +329,7 @@ int RifEclEclipseSummary::indexFromAddress( const RifEclipseSummaryAddress& resu
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifEclEclipseSummary::buildMetaData()
+void RifEclEclipseSummary::createAndSetAddresses()
 {
     m_allResultAddresses.clear();
     m_resultAddressToErtNodeIdx.clear();
@@ -363,6 +378,19 @@ void RifEclEclipseSummary::buildMetaData()
             m_resultAddressToErtNodeIdx[addr] = i;
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RifEclEclipseSummary::keywordCount() const
+{
+    if ( m_ecl_SmSpec )
+    {
+        return static_cast<size_t>( ecl_smspec_num_nodes( m_ecl_SmSpec ) );
+    }
+
+    return 0;
 }
 
 //--------------------------------------------------------------------------------------------------

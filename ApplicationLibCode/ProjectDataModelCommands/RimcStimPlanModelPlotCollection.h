@@ -30,16 +30,15 @@ class RimStimPlanModel;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcStimPlanModelPlotCollection_appendStimPlanModelPlot : public caf::PdmObjectMethod
+class RimcStimPlanModelPlotCollection_appendStimPlanModelPlot : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcStimPlanModelPlotCollection_appendStimPlanModelPlot( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmPtrField<RimStimPlanModel*> m_stimPlanModel;

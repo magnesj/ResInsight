@@ -30,6 +30,7 @@
 #include "opm/input/eclipse/Parser/InputErrorAction.hpp"
 #include "opm/input/eclipse/Parser/ParseContext.hpp"
 #include "opm/input/eclipse/Parser/Parser.hpp"
+#include "opm/input/eclipse/Parser/ParserKeywords/E.hpp"
 #include "opm/input/eclipse/Parser/ParserKeywords/G.hpp"
 #include "opm/input/eclipse/Parser/ParserKeywords/I.hpp"
 #include "opm/input/eclipse/Parser/ParserKeywords/P.hpp"
@@ -48,7 +49,7 @@ namespace RiaOpmParserTools
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-Opm::VFPInjTable createInjectionTable( const Opm::DeckKeyword& keyword )
+std::pair<Opm::UnitSystem, Opm::VFPInjTable> createInjectionTable( const Opm::DeckKeyword& keyword )
 {
     Opm::UnitSystem unitSystem;
     {
@@ -62,13 +63,13 @@ Opm::VFPInjTable createInjectionTable( const Opm::DeckKeyword& keyword )
         }
     }
 
-    return { keyword, unitSystem };
+    return { unitSystem, { keyword, unitSystem } };
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-Opm::VFPProdTable createProductionTable( const Opm::DeckKeyword& keyword )
+std::pair<Opm::UnitSystem, Opm::VFPProdTable> createProductionTable( const Opm::DeckKeyword& keyword )
 {
     Opm::UnitSystem unitSystem;
     {
@@ -84,33 +85,40 @@ Opm::VFPProdTable createProductionTable( const Opm::DeckKeyword& keyword )
 
     bool gaslift_opt_active = false;
 
-    return { keyword, gaslift_opt_active, unitSystem };
+    return { unitSystem, { keyword, gaslift_opt_active, unitSystem } };
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>> extractVfpTablesFromDataFile( const std::string& dataDeckFilename )
+std::tuple<Opm::UnitSystem, std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>>
+    extractVfpTablesFromDataFile( const std::string& dataDeckFilename )
 {
-    if ( !std::filesystem::exists( dataDeckFilename ) ) return {};
+    if ( !std::filesystem::exists( dataDeckFilename ) )
+        return std::tuple<Opm::UnitSystem, std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>>{};
 
     std::vector<Opm::VFPProdTable> prodTables;
     std::vector<Opm::VFPInjTable>  injTables;
 
+    std::optional<Opm::UnitSystem> unitSystemFromTables;
+
     try
     {
+        // The parser is not robust when looking for a small number of keywords. Several keywords is added as parsing error occurs.
         Opm::Parser parser( false );
 
         // Required to include the some keywords not related or required for VFP data to avoid paring errors causing data to be skipped.
         // TUNING caused error in a Norne model
         // GRUPTREE, WELSPECS caused error in an unknown models
+        // ECHO caused error in a Verdande model
         std::vector<Opm::ParserKeyword> parserKeywords = { Opm::ParserKeywords::VFPPROD(),
                                                            Opm::ParserKeywords::VFPINJ(),
                                                            Opm::ParserKeywords::INCLUDE(),
                                                            Opm::ParserKeywords::TUNING(),
                                                            Opm::ParserKeywords::GRUPTREE(),
                                                            Opm::ParserKeywords::WELSPECS(),
-                                                           Opm::ParserKeywords::SLAVES() };
+                                                           Opm::ParserKeywords::SLAVES(),
+                                                           Opm::ParserKeywords::ECHO() };
         for ( const auto& kw : parserKeywords )
         {
             parser.addParserKeyword( kw );
@@ -122,9 +130,15 @@ std::pair<std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>> extract
         {
             std::string prodKeyword = "VFPPROD";
             auto        keywordList = deck.getKeywordList( prodKeyword );
+
             for ( auto kw : keywordList )
             {
-                auto table = createProductionTable( *kw );
+                const auto& [tableUnitSystem, table] = createProductionTable( *kw );
+
+                if ( !unitSystemFromTables )
+                {
+                    unitSystemFromTables = tableUnitSystem;
+                }
                 prodTables.push_back( table );
             }
         }
@@ -133,7 +147,12 @@ std::pair<std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>> extract
             auto        keywordList = deck.getKeywordList( injKeyword );
             for ( auto kw : keywordList )
             {
-                auto table = createInjectionTable( *kw );
+                const auto& [tableUnitSystem, table] = createInjectionTable( *kw );
+
+                if ( !unitSystemFromTables )
+                {
+                    unitSystemFromTables = tableUnitSystem;
+                }
                 injTables.push_back( table );
             }
         }
@@ -154,7 +173,13 @@ std::pair<std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>> extract
         RiaLogging::warning( text );
     }
 
-    return { prodTables, injTables };
+    Opm::UnitSystem unitSystemValue;
+    if ( unitSystemFromTables )
+    {
+        unitSystemValue = *unitSystemFromTables;
+    }
+
+    return std::tuple<Opm::UnitSystem, std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>>{ unitSystemValue, prodTables, injTables };
 }
 
 //--------------------------------------------------------------------------------------------------
