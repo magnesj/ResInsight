@@ -240,7 +240,12 @@ double RigContourMapCalculator::calculateSum( const RigContourMapProjection&    
     double sum = 0.0;
     for ( auto [cellIdx, weight] : matchingCells )
     {
-        double cellValue = gridCellValues[contourMapProjection.gridResultIndex( cellIdx )];
+        const auto valueIndex = contourMapProjection.gridResultIndex( cellIdx );
+
+        // Safety check, should not happen
+        if ( valueIndex >= gridCellValues.size() ) continue;
+
+        const double cellValue = gridCellValues[valueIndex];
         if ( std::abs( cellValue ) != std::numeric_limits<double>::infinity() )
         {
             sum += cellValue * weight;
@@ -422,6 +427,8 @@ std::vector<RigContourMapCalculator::CellIndexAndResult>
     auto cellGridIdxVisibility = contourMapProjection.getCellVisibility();
     for ( size_t globalCellIdx : allCellIndices )
     {
+        if ( !contourMapProjection.isCellActive( globalCellIdx ) ) continue;
+
         if ( cellGridIdxVisibility.isNull() || ( *cellGridIdxVisibility )[globalCellIdx] )
         {
             auto k = contourMapProjection.kLayer( globalCellIdx );
