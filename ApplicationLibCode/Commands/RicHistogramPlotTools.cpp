@@ -29,6 +29,7 @@
 #include "Histogram/RimHistogramPlot.h"
 #include "RimMainPlotCollection.h"
 #include "RimProject.h"
+#include "RimSummaryEnsemble.h"
 
 #include "RiaColorTables.h"
 #include "RiaGuiApplication.h"
@@ -101,15 +102,7 @@ void RicHistogramPlotTools::createHistogramCurve( RimHistogramPlot* plot, RimHis
     newCurve->setColor( curveColor );
     newCurve->setFillColor( curveColor );
 
-    plot->addCurveNoUpdate( newCurve );
-
-    plot->loadDataAndUpdate();
-    plot->updateConnectedEditors();
-
-    RiuPlotMainWindow* mainPlotWindow = app->mainPlotWindow();
-    mainPlotWindow->updateMultiPlotToolBar();
-
-    RiuPlotMainWindowTools::onObjectAppended( newCurve, plot );
+    RicHistogramPlotTools::addHistogramCurveToPlot( plot, newCurve );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -153,4 +146,104 @@ RimHistogramPlot* RicHistogramPlotTools::addNewHistogramPlot( RimHistogramMultiP
     RiuPlotMainWindowTools::onObjectAppended( plot, histogramMultiPlot );
 
     return plot;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimHistogramDataSource*> RicHistogramPlotTools::existingDataSources( RimHistogramPlot* plot )
+{
+    std::vector<RimHistogramDataSource*> sources;
+
+    for ( auto curve : plot->histogramCurves() )
+    {
+        sources.push_back( curve->dataSource() );
+    }
+
+    return sources;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicHistogramPlotTools::appendEnsembleParameterHistogramCurve( RimHistogramPlot* plot, RimEnsembleParameterHistogramDataSource* dataSource )
+{
+    for ( auto source : existingDataSources( plot ) )
+    {
+        if ( auto histSource = dynamic_cast<RimEnsembleParameterHistogramDataSource*>( source ) )
+        {
+            // check for duplicate
+            if ( ( histSource->ensemble() == dataSource->ensemble() ) && ( histSource->ensembleParameter() == dataSource->ensembleParameter() ) )
+            {
+                return;
+            }
+        }
+    }
+
+    createHistogramCurve( plot, dataSource );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicHistogramPlotTools::addHistogramCurveToPlot( RimHistogramPlot* plot, RimHistogramCurve* curve, bool resolveRefs )
+{
+    RiaGuiApplication* app     = RiaGuiApplication::instance();
+    RimProject*        project = app->project();
+    if ( project == nullptr ) return;
+
+    plot->addCurveNoUpdate( curve );
+
+    if ( resolveRefs ) curve->resolveReferencesRecursively();
+
+    plot->loadDataAndUpdate();
+    plot->updateConnectedEditors();
+
+    RiuPlotMainWindow* mainPlotWindow = app->mainPlotWindow();
+    mainPlotWindow->updateMultiPlotToolBar();
+
+    RiuPlotMainWindowTools::onObjectAppended( curve, plot );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<QString> RicHistogramPlotTools::existingEnsembleParameters( RimHistogramPlot* plot )
+{
+    std::set<QString> foundParameters;
+
+    for ( auto source : existingDataSources( plot ) )
+    {
+        if ( auto histSource = dynamic_cast<RimEnsembleParameterHistogramDataSource*>( source ) )
+        {
+            foundParameters.insert( histSource->ensembleParameter() );
+        }
+    }
+
+    return foundParameters;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicHistogramPlotTools::appendEnsembleToHistogram( RimHistogramPlot* plot, RimSummaryEnsemble* ensemble )
+{
+    auto currentParameters = existingEnsembleParameters( plot );
+
+    if ( currentParameters.empty() )
+    {
+        auto newDataSource = new RimEnsembleParameterHistogramDataSource();
+        newDataSource->setDefaults();
+        newDataSource->setEnsemble( ensemble );
+        appendEnsembleParameterHistogramCurve( plot, newDataSource );
+        return;
+    }
+
+    for ( auto& parameter : currentParameters )
+    {
+        auto newDataSource = new RimEnsembleParameterHistogramDataSource();
+        newDataSource->setEnsemble( ensemble );
+        newDataSource->setEnsembleParameter( parameter );
+        appendEnsembleParameterHistogramCurve( plot, newDataSource );
+    }
 }

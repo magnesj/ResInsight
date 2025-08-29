@@ -20,11 +20,19 @@
 
 #include "RiaLogging.h"
 #include "RiaPlotDefines.h"
+#include "Summary/RiaSummaryTools.h"
 
+#include "RicHistogramPlotTools.h"
+
+#include "Histogram/RimEnsembleParameterHistogramDataSource.h"
+#include "Histogram/RimEnsembleSummaryVectorHistogramDataSource.h"
 #include "RimHistogramCurve.h"
 #include "RimHistogramCurveCollection.h"
 #include "RimMultiPlot.h"
 #include "RimPlotAxisLogRangeCalculator.h"
+#include "Summary/Ensemble/RimSummaryEnsembleParameter.h"
+#include "Summary/Ensemble/RimSummaryFileSetEnsemble.h"
+#include "Summary/RimSummaryAddress.h"
 #include "Tools/RimPlotAxisTools.h"
 
 #include "RiuPlotAxis.h"
@@ -126,6 +134,26 @@ RimHistogramPlot::~RimHistogramPlot()
     removeMdiWindowFromMdiArea();
 
     deletePlotCurvesAndPlotWidget();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimHistogramPlot::initAfterRead()
+{
+    for ( auto curve : histogramCurves() )
+    {
+        connectCurveSignals( curve );
+    }
+
+    for ( const auto& axisProperties : m_axisPropertiesArray )
+    {
+        auto plotAxisProperties = dynamic_cast<RimPlotAxisProperties*>( axisProperties.p() );
+        if ( plotAxisProperties )
+        {
+            connectAxisSignals( plotAxisProperties );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1276,4 +1304,46 @@ RimHistogramPlot::FrequencyType RimHistogramPlot::frequencyType() const
 RimHistogramPlot::GraphType RimHistogramPlot::graphType() const
 {
     return m_graphType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimHistogramPlot::handleDroppedObjects( const std::vector<caf::PdmObjectHandle*>& objects )
+{
+    for ( auto obj : objects )
+    {
+        if ( auto fileSet = dynamic_cast<RimSummaryFileSetEnsemble*>( obj ) )
+        {
+            RicHistogramPlotTools::appendEnsembleToHistogram( this, fileSet );
+        }
+        else if ( auto parameter = dynamic_cast<RimSummaryEnsembleParameter*>( obj ) )
+        {
+            auto ensemble = RiaSummaryTools::ensembleById( parameter->ensembleId() );
+            if ( ensemble == nullptr ) continue;
+
+            auto newDataSource = new RimEnsembleParameterHistogramDataSource();
+            newDataSource->setEnsemble( ensemble );
+            newDataSource->setEnsembleParameter( parameter->name() );
+
+            RicHistogramPlotTools::appendEnsembleParameterHistogramCurve( this, newDataSource );
+        }
+        else if ( auto address = dynamic_cast<RimSummaryAddress*>( obj ) )
+        {
+            if ( !address->isEnsemble() ) continue;
+
+            auto ensemble = RiaSummaryTools::ensembleById( address->ensembleId() );
+            if ( ensemble == nullptr ) continue;
+
+            auto newDataSource = new RimEnsembleSummaryVectorHistogramDataSource();
+            newDataSource->setDefaults(); // get default timestep
+            auto fileAddress = address->address();
+            newDataSource->setSummaryAddress( fileAddress );
+            newDataSource->setEnsemble( ensemble );
+
+            RicHistogramPlotTools::createHistogramCurve( this, newDataSource );
+        }
+    }
+
+    scheduleReplotIfVisible();
 }
