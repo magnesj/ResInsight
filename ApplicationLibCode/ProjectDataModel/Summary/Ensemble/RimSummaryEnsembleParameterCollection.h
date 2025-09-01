@@ -15,38 +15,40 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
-
 #pragma once
 
-#include "RimWellPath.h"
+#include "RimNamedObject.h"
 
-#include "cafPdmField.h"
-#include "cafPdmFieldCvfVec3d.h"
+#include "cafPdmChildArrayField.h"
 
-#include "cvfVector3.h"
-
+#include <QString>
+#include <string>
 #include <vector>
 
-//==================================================================================================
-///
-//==================================================================================================
-class RimFixedTrajectoryWellPath : public RimWellPath
+class RimSummaryEnsembleParameter;
+
+class RimSummaryEnsembleParameterCollection : public RimNamedObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimFixedTrajectoryWellPath();
-    ~RimFixedTrajectoryWellPath() override;
+    RimSummaryEnsembleParameterCollection();
+    ~RimSummaryEnsembleParameterCollection() override;
 
-    void                    setTrajectoryPoints( const std::vector<cvf::Vec3d>& wellTargets );
-    std::vector<cvf::Vec3d> trajectoryPoints() const;
+    void addParameter( QString name, bool checkDuplicates = true );
+    bool hasParameter( const QString name ) const;
 
-    void createWellPathGeometry();
+    void setEnsembleId( int ensembleId );
+    int  ensembleId() const;
+
+    void deleteChildren();
+
+    bool isEmpty() const;
+
+    void updateUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering ) const;
 
 private:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void initAfterRead() override;
+    caf::PdmChildArrayField<RimSummaryEnsembleParameter*> m_parameters;
 
-private:
-    caf::PdmField<std::vector<cvf::Vec3d>> m_trajectoryPoints;
+    caf::PdmField<int> m_ensembleId;
 };

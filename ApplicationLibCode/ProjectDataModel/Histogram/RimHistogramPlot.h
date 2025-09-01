@@ -146,6 +146,8 @@ public:
 
     void scheduleReplotIfVisible();
 
+    std::vector<RimHistogramCurve*> histogramCurves() const;
+
 public:
     // RimViewWindow overrides
     void deleteViewWidget() override;
@@ -177,7 +179,11 @@ protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void onLoadDataAndUpdate() override;
 
+    void handleDroppedObjects( const std::vector<caf::PdmObjectHandle*>& objects ) override;
+
     QImage snapshotWindowContent() override;
+
+    void initAfterRead() override;
 
 private slots:
     void onPlotZoomed();
@@ -209,7 +215,6 @@ private:
 
     std::vector<RimPlotAxisPropertiesInterface*> allPlotAxes() const;
 
-    std::vector<RimHistogramCurve*> histogramCurves() const;
     std::vector<RimHistogramCurve*> visibleHistogramCurvesForAxis( RiuPlotAxis plotAxis ) const;
 
     void assignPlotAxis( RimHistogramCurve* curve );

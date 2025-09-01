@@ -18,12 +18,18 @@
 
 #pragma once
 
+#include <set>
 #include <vector>
+
+#include <QString>
 
 class RimHistogramDataSource;
 class RimHistogramPlot;
 class RimHistogramMultiPlot;
 class RimHistogramMultiPlotCollection;
+class RimEnsembleParameterHistogramDataSource;
+class RimHistogramCurve;
+class RimSummaryEnsemble;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -43,8 +49,17 @@ public:
 
     static void createDefaultHistogramCurve( RimHistogramPlot* plot, DataSourceType dataSourceType );
     static void createHistogramCurve( RimHistogramPlot* plot, RimHistogramDataSource* dataSource );
+    static void appendEnsembleParameterHistogramCurve( RimHistogramPlot* plot, RimEnsembleParameterHistogramDataSource* dataSource );
+    static void addHistogramCurveToPlot( RimHistogramPlot* plot, RimHistogramCurve* curve, bool resolveRefs = false );
 
     static RimHistogramMultiPlot* addNewHistogramMultiplot();
     static RimHistogramMultiPlot* addNewHistogramMultiplot( RimHistogramMultiPlotCollection* collection );
     static RimHistogramPlot*      addNewHistogramPlot( RimHistogramMultiPlot* histogramMultiPlot );
+
+    static void appendEnsembleToHistogram( RimHistogramPlot* plot, RimSummaryEnsemble* ensemble );
+
+    static std::set<QString> existingEnsembleParameters( RimHistogramPlot* plot );
+
+private:
+    static std::vector<RimHistogramDataSource*> existingDataSources( RimHistogramPlot* plot );
 };
