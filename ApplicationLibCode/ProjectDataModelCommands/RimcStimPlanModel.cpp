@@ -30,44 +30,22 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimStimPlanModel, RimcStimPlanModel_exportToF
 ///
 //--------------------------------------------------------------------------------------------------
 RimcStimPlanModel_exportToFile::RimcStimPlanModel_exportToFile( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmVoidObjectMethod( self )
 {
     CAF_PDM_InitObject( "Export StimPlan Model Plot", "", "", "Export StimPlan Model Plot to File" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_directoryPath, "DirectoryPath", "", "", "", "Directory Path" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcStimPlanModel_exportToFile::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcStimPlanModel_exportToFile::execute()
 {
     RimStimPlanModel* stimPlanModel = self<RimStimPlanModel>();
 
-    RifStimPlanModelExporter::writeToDirectory( stimPlanModel, stimPlanModel->useDetailedFluidLoss(), m_directoryPath() );
-
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcStimPlanModel_exportToFile::resultIsPersistent() const
-{
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcStimPlanModel_exportToFile::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimStimPlanModel );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcStimPlanModel_exportToFile::isNullptrValidResult() const
-{
-    return true;
+    if ( RifStimPlanModelExporter::writeToDirectory( stimPlanModel, stimPlanModel->useDetailedFluidLoss(), m_directoryPath() ) )
+        return nullptr;
+    else
+        return std::unexpected( "Unable to write model to directory" );
 }

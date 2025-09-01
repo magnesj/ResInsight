@@ -248,61 +248,75 @@ std::vector<RimWellPath*> RimWellPathCollection::addWellPaths( QStringList fileP
 
     for ( const QString& filePath : filePaths )
     {
-        // Check if this file is already open
-        bool alreadyOpen = false;
-        for ( const auto& wellPath : m_wellPaths )
+        std::expected<std::vector<RimFileWellPath*>, QString> result = addWellPathsForFile( filePath );
+        if ( result )
         {
-            auto* fWPath = dynamic_cast<RimFileWellPath*>( wellPath.p() );
-            if ( !fWPath ) continue;
-
-            QFile f1;
-            f1.setFileName( filePath );
-            QString s1 = f1.fileName();
-            QFile   f2;
-            f2.setFileName( fWPath->filePath() );
-            QString s2 = f2.fileName();
-            if ( s1 == s2 )
-            {
-                // printf("Attempting to open well path JSON file that is already open:\n  %s\n", (const char*)
-                // filePath.toLocal8Bit());
-                alreadyOpen = true;
-                errorMessages->push_back( QString( "%1 is already loaded" ).arg( filePath ) );
-                break;
-            }
+            wellPathArray.insert( wellPathArray.end(), result.value().begin(), result.value().end() );
         }
-
-        if ( !alreadyOpen )
+        else if ( errorMessages )
         {
-            QFileInfo fi( filePath );
-
-            if ( fi.suffix().compare( "json" ) == 0 )
-            {
-                auto* wellPath = new RimFileWellPath();
-                wellPath->setFilepath( filePath );
-                wellPathArray.push_back( wellPath );
-            }
-            else
-            {
-                // Create Well path objects for all the paths in the assumed ascii file
-                size_t wellPathCount = m_wellPathImporter->wellDataCount( filePath );
-                for ( size_t i = 0; i < wellPathCount; ++i )
-                {
-                    auto* wellPath = new RimFileWellPath();
-                    wellPath->setFilepath( filePath );
-                    wellPath->setWellPathIndexInFile( static_cast<int>( i ) );
-                    wellPathArray.push_back( wellPath );
-                }
-            }
+            errorMessages->append( result.error() );
         }
     }
 
-    readAndAddWellPaths( wellPathArray );
+    std::vector<RimWellPath*> addedWellPaths = readAndAddWellPaths( wellPathArray );
     CAF_ASSERT( wellPathArray.empty() );
 
     scheduleRedrawAffectedViews();
     updateAllRequiredEditors();
 
-    return allWellPaths();
+    return addedWellPaths;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<std::vector<RimFileWellPath*>, QString> RimWellPathCollection::addWellPathsForFile( const QString& filePath )
+{
+    auto isAlreadyLoaded = []( const QString& filePath, const std::vector<RimWellPath*>& wellPaths ) -> bool
+    {
+        for ( const auto& wellPath : wellPaths )
+        {
+            if ( auto* fWPath = dynamic_cast<RimFileWellPath*>( wellPath ) )
+            {
+                QFile f1;
+                f1.setFileName( filePath );
+                QFile f2;
+                f2.setFileName( fWPath->filePath() );
+                if ( f1.fileName() == f2.fileName() ) return true;
+            }
+        }
+        return false;
+    };
+
+    // Check if this file is already open
+    bool isJsonFile = filePath.endsWith( "json", Qt::CaseInsensitive );
+    if ( isJsonFile && isAlreadyLoaded( filePath, m_wellPaths.childrenByType() ) )
+    {
+        return std::unexpected( QString( "%1 is already loaded" ).arg( filePath ) );
+    }
+
+    std::vector<RimFileWellPath*> wellPaths;
+    if ( isJsonFile )
+    {
+        auto* wellPath = new RimFileWellPath();
+        wellPath->setFilepath( filePath );
+        wellPaths.push_back( wellPath );
+    }
+    else
+    {
+        // Create Well path objects for all the paths in the assumed ascii file
+        size_t wellPathCount = m_wellPathImporter->wellDataCount( filePath );
+        for ( size_t i = 0; i < wellPathCount; ++i )
+        {
+            auto* wellPath = new RimFileWellPath();
+            wellPath->setFilepath( filePath );
+            wellPath->setWellPathIndexInFile( static_cast<int>( i ) );
+            wellPaths.push_back( wellPath );
+        }
+    }
+
+    return wellPaths;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -328,10 +342,12 @@ std::vector<RimWellPath*> RimWellPathCollection::allWellPaths() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellPathCollection::readAndAddWellPaths( std::vector<RimFileWellPath*>& wellPathArray )
+std::vector<RimWellPath*> RimWellPathCollection::readAndAddWellPaths( std::vector<RimFileWellPath*>& wellPathArray )
 {
     caf::ProgressInfo progress( wellPathArray.size(), "Reading well paths from file" );
 
+    // Keep track of the well paths that were actually added.
+    std::vector<RimWellPath*> addedWellPaths;
     for ( RimFileWellPath* wellPath : wellPathArray )
     {
         wellPath->readWellPathFile( nullptr, m_wellPathImporter.get(), true );
@@ -343,7 +359,7 @@ void RimWellPathCollection::readAndAddWellPaths( std::vector<RimFileWellPath*>& 
         // NB! Do not use tryFindMatchingWellPath(), as this function will remove the prefix and will return an false
         // match in many cases.
         auto* existingWellPath = dynamic_cast<RimFileWellPath*>( wellPathByName( wellPath->name() ) );
-        if ( existingWellPath )
+        if ( existingWellPath && !existingWellPath->filePath().endsWith( ".dev" ) )
         {
             existingWellPath->setFilepath( wellPath->filePath() );
             existingWellPath->setWellPathIndexInFile( wellPath->wellPathIndexInFile() );
@@ -360,6 +376,7 @@ void RimWellPathCollection::readAndAddWellPaths( std::vector<RimFileWellPath*>& 
             wellPath->setWellPathColor( RiaColorTables::wellPathsPaletteColors().cycledColor3f( m_wellPaths.size() ) );
             wellPath->setUnitSystem( findUnitSystemForWellPath( wellPath ) );
             addWellPath( wellPath );
+            addedWellPaths.push_back( wellPath );
         }
 
         progress.incrementProgress();
@@ -369,6 +386,8 @@ void RimWellPathCollection::readAndAddWellPaths( std::vector<RimFileWellPath*>& 
     groupWellPaths( allWellPaths() );
     sortWellsByName();
     rebuildWellPathNodes();
+
+    return addedWellPaths;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -710,8 +729,6 @@ RimWellPath* RimWellPathCollection::mostRecentlyUpdatedWellPath()
 //--------------------------------------------------------------------------------------------------
 void RimWellPathCollection::readWellPathFormationFiles()
 {
-    caf::ProgressInfo progress( m_wellPaths.size(), "Reading well picks from file" );
-
     for ( const auto& wellPath : m_wellPaths )
     {
         QString errorMessage;
@@ -719,9 +736,6 @@ void RimWellPathCollection::readWellPathFormationFiles()
         {
             RiaLogging::errorInMessageBox( Riu3DMainWindowTools::mainWindowWidget(), "File open error", errorMessage );
         }
-
-        progress.setProgressDescription( QString( "Reading formation file for %1" ).arg( wellPath->name() ) );
-        progress.incrementProgress();
     }
 }
 

@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include "cafPdmDeprecation.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
@@ -57,18 +58,19 @@ public:
     QString fileName() const;
     void    setFileName( const QString& fileName );
 
-    void readFile();
-    bool writeFile();
+    std::vector<QString> readFile( const std::vector<PdmDeprecation>& deprecations = {} );
+    bool                 writeFile();
 
     static void updateUiIconStateRecursively( PdmObjectHandle* root );
 
 protected:
-    QString documentAsString();
+    QString               documentAsString();
+    const PdmFieldHandle* fileNameHandle() const;
 
 private:
-    void writeDocumentToXmlStream( QXmlStreamWriter& xmlStream );
-    void readFile( QIODevice* device );
-    void writeFile( QIODevice* device );
+    void                 writeDocumentToXmlStream( QXmlStreamWriter& xmlStream );
+    std::vector<QString> readFile( QIODevice* device, const std::vector<PdmDeprecation>& deprecations );
+    void                 writeFile( QIODevice* device );
 
 private:
     PdmField<QString> m_fileName;

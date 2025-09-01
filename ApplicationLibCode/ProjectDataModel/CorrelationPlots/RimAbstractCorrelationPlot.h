@@ -79,6 +79,8 @@ public:
     void             setAxisValueFontSize( caf::FontTools::RelativeSize fontSize );
     std::set<time_t> allAvailableTimeSteps();
 
+    std::set<RifEclipseSummaryAddress> addresses() const;
+
 protected:
     // Overridden PDM methods
 
@@ -88,10 +90,9 @@ protected:
     caf::PdmFieldHandle*          userDescriptionField() override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
-    std::set<RifEclipseSummaryAddress> addresses() const;
-    std::set<RigEnsembleParameter>     ensembleParameters() const;
-    std::set<RigEnsembleParameter>     variationSortedEnsembleParameters();
-    RigEnsembleParameter               ensembleParameter( const QString& ensembleParameterName ) const;
+    std::set<RigEnsembleParameter> ensembleParameters() const;
+    std::set<RigEnsembleParameter> variationSortedEnsembleParameters();
+    RigEnsembleParameter           ensembleParameterByName( const QString& ensembleParameterName ) const;
 
     // RimViewWindow overrides
     QWidget* viewWidget() override;
@@ -147,9 +148,9 @@ protected:
     caf::PdmField<bool>    m_useAutoPlotTitle;
     caf::PdmField<QString> m_description;
 
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_labelFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisTitleFontSize;
-    caf::PdmField<caf::FontTools::RelativeSizeEnum> m_axisValueFontSize;
+    RimFontSizeField m_labelFontSize;
+    RimFontSizeField m_axisTitleFontSize;
+    RimFontSizeField m_axisValueFontSize;
 
 private:
     caf::PdmChildArrayField<RimAnalysisPlotDataEntry*> m_dataSources;

@@ -33,7 +33,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimFishbonesCollection, RimcFishbonesCollecti
 ///
 //--------------------------------------------------------------------------------------------------
 RimcFishbonesCollection_appendFishbones::RimcFishbonesCollection_appendFishbones( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Append Fishbones", "", "", "Append Fishbones" );
 
@@ -44,16 +44,15 @@ RimcFishbonesCollection_appendFishbones::RimcFishbonesCollection_appendFishbones
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcFishbonesCollection_appendFishbones::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcFishbonesCollection_appendFishbones::execute()
 {
     auto fishbonesCollection = self<RimFishbonesCollection>();
-    if ( !fishbonesCollection ) return nullptr;
+    if ( !fishbonesCollection ) return std::unexpected( "No fishbones collection found" );
 
     if ( m_subLocations().empty() )
     {
-        RiaLogging::error(
+        return std::unexpected(
             "Sub locations are empty, expected list of float values defining measured depths. Cannot create fishbones object." );
-        return nullptr;
     }
 
     auto* fishbonesObject = fishbonesCollection->appendFishbonesSubsAtLocations( m_subLocations(), m_drillingType() );
@@ -69,17 +68,9 @@ caf::PdmObjectHandle* RimcFishbonesCollection_appendFishbones::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcFishbonesCollection_appendFishbones::resultIsPersistent() const
+QString RimcFishbonesCollection_appendFishbones::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcFishbonesCollection_appendFishbones::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimFishbones );
+    return RimFishbones::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimFishbonesCollection, RimcFishbonesCollection_setFixedStartLocation, "SetFixedStartLocation" );
@@ -88,7 +79,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimFishbonesCollection, RimcFishbonesCollecti
 ///
 //--------------------------------------------------------------------------------------------------
 RimcFishbonesCollection_setFixedStartLocation::RimcFishbonesCollection_setFixedStartLocation( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmVoidObjectMethod( self )
 {
     CAF_PDM_InitObject( "Set Fixed Start Location", "", "", "" );
 
@@ -98,7 +89,7 @@ RimcFishbonesCollection_setFixedStartLocation::RimcFishbonesCollection_setFixedS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcFishbonesCollection_setFixedStartLocation::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcFishbonesCollection_setFixedStartLocation::execute()
 {
     auto fishbonesCollection = self<RimFishbonesCollection>();
     if ( fishbonesCollection )
@@ -109,37 +100,13 @@ caf::PdmObjectHandle* RimcFishbonesCollection_setFixedStartLocation::execute()
     return nullptr;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFishbonesCollection_setFixedStartLocation::resultIsPersistent() const
-{
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcFishbonesCollection_setFixedStartLocation::defaultResult() const
-{
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFishbonesCollection_setFixedStartLocation::isNullptrValidResult() const
-{
-    return true;
-}
-
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimFishbonesCollection, RimcFishbonesCollection_setFixedEndLocation, "SetFixedEndLocation" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RimcFishbonesCollection_setFixedEndLocation::RimcFishbonesCollection_setFixedEndLocation( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmVoidObjectMethod( self )
 {
     CAF_PDM_InitObject( "Set Fixed End Location", "", "", "" );
 
@@ -149,7 +116,7 @@ RimcFishbonesCollection_setFixedEndLocation::RimcFishbonesCollection_setFixedEnd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcFishbonesCollection_setFixedEndLocation::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcFishbonesCollection_setFixedEndLocation::execute()
 {
     auto fishbonesCollection = self<RimFishbonesCollection>();
     if ( fishbonesCollection )
@@ -158,28 +125,4 @@ caf::PdmObjectHandle* RimcFishbonesCollection_setFixedEndLocation::execute()
     }
 
     return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFishbonesCollection_setFixedEndLocation::resultIsPersistent() const
-{
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcFishbonesCollection_setFixedEndLocation::defaultResult() const
-{
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcFishbonesCollection_setFixedEndLocation::isNullptrValidResult() const
-{
-    return true;
 }

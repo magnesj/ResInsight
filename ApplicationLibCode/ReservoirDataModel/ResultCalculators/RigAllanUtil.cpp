@@ -18,6 +18,8 @@
 
 #include "RigAllanUtil.h"
 
+#include "RiaResultNames.h"
+
 #include "RigAllanDiagramData.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultAddress.h"

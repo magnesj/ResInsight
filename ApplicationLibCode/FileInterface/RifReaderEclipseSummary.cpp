@@ -56,6 +56,14 @@ RifReaderEclipseSummary::~RifReaderEclipseSummary()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RifReaderEclipseSummary::setEnsembleImportState( RifEnsembleImportConfig ensembleImportState )
+{
+    m_ensembleImportState = ensembleImportState;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafeLogger* threadSafeLogger )
 {
     bool isValid = false;
@@ -106,17 +114,20 @@ bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafe
                 QString txt = QString( "Created %1 " ).arg( h5FileName );
                 if ( threadSafeLogger ) threadSafeLogger->info( txt );
             }
-            h5FileFound = QFile::exists( h5FileName );
+#endif
+        }
 
-            if ( h5FileFound )
+        h5FileFound = QFile::exists( h5FileName );
+
+        if ( h5FileFound && ( prefSummary->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::HDF5_OPM_COMMON ) )
+        {
+#ifdef USE_HDF5
+            auto hdfReader = std::make_unique<RifOpmHdf5Summary>();
+
+            isValid = hdfReader->open( headerFileName, false, threadSafeLogger );
+            if ( isValid )
             {
-                auto hdfReader = std::make_unique<RifOpmHdf5Summary>();
-
-                isValid = hdfReader->open( headerFileName, false, threadSafeLogger );
-                if ( isValid )
-                {
-                    m_summaryReader = std::move( hdfReader );
-                }
+                m_summaryReader = std::move( hdfReader );
             }
 #endif
         }
@@ -124,9 +135,9 @@ bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafe
         if ( !isValid && prefSummary->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
         {
             auto opmCommonReader = std::make_unique<RifOpmCommonEclipseSummary>();
-
             opmCommonReader->useEnhancedSummaryFiles( prefSummary->useEnhancedSummaryDataFiles() );
             opmCommonReader->createEnhancedSummaryFiles( prefSummary->createEnhancedSummaryDataFiles() );
+            if ( m_ensembleImportState.useConfigValues() ) opmCommonReader->setEnsembleImportState( m_ensembleImportState );
             isValid = opmCommonReader->open( headerFileName, false, threadSafeLogger );
 
             if ( isValid )
@@ -146,11 +157,6 @@ bool RifReaderEclipseSummary::open( const QString& headerFileName, RiaThreadSafe
         {
             m_summaryReader = std::move( libeclReader );
         }
-    }
-
-    if ( isValid )
-    {
-        buildMetaData();
     }
 
     return isValid;
@@ -229,15 +235,15 @@ std::vector<time_t> RifReaderEclipseSummary::timeSteps( const RifEclipseSummaryA
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifReaderEclipseSummary::buildMetaData()
+void RifReaderEclipseSummary::createAndSetAddresses()
 {
     m_allResultAddresses.clear();
     m_allErrorAddresses.clear();
 
-    auto reader = currentSummaryReader();
-
-    if ( reader )
+    if ( auto reader = currentSummaryReader() )
     {
+        reader->createAndSetAddresses();
+
         m_allResultAddresses = reader->allResultAddresses();
         m_allErrorAddresses  = reader->allErrorAddresses();
     }
@@ -281,11 +287,19 @@ void RifReaderEclipseSummary::buildMetaData()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+size_t RifReaderEclipseSummary::keywordCount() const
+{
+    if ( m_summaryReader ) return m_summaryReader->keywordCount();
+
+    return 0;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RifReaderEclipseSummary::currentSummaryReader() const
 {
-    if ( m_summaryReader ) return m_summaryReader.get();
-
-    return nullptr;
+    return m_summaryReader.get();
 }
 
 //--------------------------------------------------------------------------------------------------

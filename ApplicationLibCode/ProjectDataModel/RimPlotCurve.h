@@ -77,6 +77,8 @@ public:
     virtual Qt::BrushStyle              fillStyle() const;
     void                                setFillStyle( Qt::BrushStyle brushStyle );
     void                                setFillColor( const cvf::Color3f& fillColor );
+    void                                setFillColorOpacity( float opacity );
+    void                                setCurveColorOpacity( float opacity );
 
     bool isChecked() const;
     void setCheckState( bool isChecked );
@@ -100,7 +102,7 @@ public:
     void setCustomName( const QString& customName );
     void setLegendEntryText( const QString& legendEntryText );
 
-    virtual void updateCurveVisibility();
+    void         updateCurveVisibility( bool updateParentPlot = true );
     void         updateLegendEntryVisibilityAndPlotLegend();
     virtual void updateLegendEntryVisibilityNoPlotUpdate();
     virtual void replotParentPlot();

@@ -19,10 +19,6 @@ endif()
 # Open GL
 find_package(OpenGL)
 
-option(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS
-       "Treat warnings as errors (stops build)" OFF
-)
-
 find_package(
   Qt6
   COMPONENTS Core
@@ -36,7 +32,6 @@ find_package(
              PrintSupport
              Svg
              Sql
-  OPTIONAL_COMPONENTS Charts
 )
 set(QT_LIBRARIES
     Qt6::Core
@@ -50,7 +45,6 @@ set(QT_LIBRARIES
     Qt6::PrintSupport
     Qt6::Svg
     Qt6::Sql
-    Qt6::Charts
 )
 qt_standard_project_setup()
 
@@ -90,6 +84,8 @@ list(
   Application/Tools/WellPathTools/CMakeLists_files.cmake
   Application/Tools/Cloud/CMakeLists_files.cmake
   Application/Tools/Summary/CMakeLists_files.cmake
+  Application/Tools/KeyValueStore/CMakeLists_files.cmake
+  Application/Tools/Ensemble/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_files.cmake
   ReservoirDataModel/CMakeLists_filesNotToUnitTest.cmake
   ReservoirDataModel/Completions/CMakeLists_files.cmake
@@ -97,18 +93,23 @@ list(
   ReservoirDataModel/ResultAccessors/CMakeLists_files.cmake
   ReservoirDataModel/ResultCalculators/CMakeLists_files.cmake
   ReservoirDataModel/Well/CMakeLists_files.cmake
+  ReservoirDataModel/Surface/CMakeLists_files.cmake
   FileInterface/CMakeLists_files.cmake
   ProjectDataModel/CMakeLists_files.cmake
   ProjectDataModel/AnalysisPlots/CMakeLists_files.cmake
+  ProjectDataModel/Appearance/CMakeLists_files.cmake
   ProjectDataModel/CorrelationPlots/CMakeLists_files.cmake
   ProjectDataModel/ContourMap/CMakeLists_files.cmake
   ProjectDataModel/Cloud/CMakeLists_files.cmake
+  ProjectDataModel/EnsembleFileSet/CMakeLists_files.cmake
   ProjectDataModel/Faults/CMakeLists_files.cmake
   ProjectDataModel/GeoMech/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CMakeLists_files.cmake
   ProjectDataModel/GridCrossPlots/CellFilters/CMakeLists_files.cmake
+  ProjectDataModel/Jobs/CMakeLists_files.cmake
   ProjectDataModel/Summary/CMakeLists_files.cmake
   ProjectDataModel/Summary/Sumo/CMakeLists_files.cmake
+  ProjectDataModel/Summary/Ensemble/CMakeLists_files.cmake
   ProjectDataModel/Flow/CMakeLists_files.cmake
   ProjectDataModel/Formations/CMakeLists_files.cmake
   ProjectDataModel/Annotations/CMakeLists_files.cmake
@@ -132,6 +133,7 @@ list(
   ProjectDataModelCommands/CommandRouter/CMakeLists_files.cmake
   ProjectDataModel/VerticalFlowPerformance/CMakeLists_files.cmake
   ProjectDataModel/QuickAccess/CMakeLists_files.cmake
+  ProjectDataModel/Histogram/CMakeLists_files.cmake
   GeoMech/GeoMechVisualization/CMakeLists_files.cmake
   ModelVisualization/CMakeLists_files.cmake
   ModelVisualization/Faults/CMakeLists_files.cmake
@@ -169,21 +171,15 @@ endif()
 #
 # OpenVDS
 #
-list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
+if(RESINSIGHT_ENABLE_OPENVDS)
+  message(STATUS "OpenVDS support enabled")
+  add_definitions(-DUSE_OPENVDS)
+  list(APPEND RI_PRIVATE_INCLUDES ${RESINSIGHT_OPENVDS_API_DIR}/include)
 
-#
-# Configure include directories if opm-common.lib is downloaded and linked
-# without building from source
-#
-if(NOT RESINSIGHT_BUILD_LIBS_FROM_SOURCE)
-  list(APPEND RI_PUBLIC_INCLUDES
-       ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/custom-opm-common/opm-common
+  list(APPEND CPP_SOURCES FileInterface/RifOpenVDSReader.cpp
+       FileInterface/RifOpenVDSReader.h
   )
-  list(
-    APPEND
-    RI_PRIVATE_INCLUDES
-    ${CMAKE_CURRENT_SOURCE_DIR}/../ThirdParty/custom-opm-common/generated-opm-common/include
-  )
+
 endif()
 
 #
@@ -265,14 +261,6 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   )
 endif()
 
-if(RESINSIGHT_TREAT_WARNINGS_AS_ERRORS)
-  if(MSVC)
-    target_compile_options(ApplicationLibCode PRIVATE /WX)
-  elseif(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    target_compile_options(ApplicationLibCode PRIVATE -Werror)
-  endif()
-endif()
-
 if(MSVC)
   # The following warnings are supposed to be used in ResInsight, but
   # temporarily disabled to avoid too much noise warning C4245: 'return':
@@ -314,15 +302,42 @@ set(LINK_LIBRARIES
     ${RI_LIBRARIES}
 )
 
-# According to ivarun this is needed on OpenSuse, and Fedora. See:
-# https://github.com/OPM/ResInsight/pull/7
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+  # According to ivarun rt is needed on OpenSuse, and Fedora. See:
+  # https://github.com/OPM/ResInsight/pull/7
   list(APPEND EXTERNAL_LINK_LIBRARIES rt)
+
+  # std::stacktrace requires stdc++exp. If a custom build of GCC stdc++exp is
+  # reqiured, define the search path here.
+  set(RESINSIGHT_GCC_STDCPP_EXP_PATH
+      ""
+      CACHE PATH "Path to search for stdc++exp"
+  )
+
+  if(RESINSIGHT_GCC_STDCPP_EXP_PATH)
+    find_library(
+      STDCPP_EXP_LIBRARY
+      NAMES stdc++exp
+      HINTS ${RESINSIGHT_GCC_STDCPP_EXP_PATH}
+    )
+    if(STDCPP_EXP_LIBRARY)
+      message(
+        STATUS
+          "stdc++exp library found at custom location: ${STDCPP_EXP_LIBRARY}"
+      )
+      list(APPEND EXTERNAL_LINK_LIBRARIES ${STDCPP_EXP_LIBRARY})
+    endif()
+  else()
+    # stdc++exp is required for std::stacktrace
+    message(STATUS "stdc++exp library found at default location")
+    list(APPEND EXTERNAL_LINK_LIBRARIES stdc++exp)
+  endif()
 endif()
 
 target_link_libraries(
-  ${PROJECT_NAME} PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES}
+  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES}
 )
+target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
 
 target_include_directories(
   ${PROJECT_NAME}
@@ -335,6 +350,7 @@ target_include_directories(
          ${CMAKE_CURRENT_SOURCE_DIR}/Application
          ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools
          ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools/WellPathTools
+         ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools/KeyValueStore
          ${CMAKE_CURRENT_SOURCE_DIR}/CommandFileInterface
          ${CMAKE_CURRENT_SOURCE_DIR}/CommandFileInterface/Core
          ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface

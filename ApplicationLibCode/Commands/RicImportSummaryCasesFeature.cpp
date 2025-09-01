@@ -22,6 +22,7 @@
 #include "Summary/RiaSummaryPlotTools.h"
 #include "SummaryPlotCommands/RicNewSummaryCurveFeature.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaGuiApplication.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
@@ -74,9 +75,9 @@ void RicImportSummaryCasesFeature::onActionTriggered( bool isChecked )
 
     if ( fileNames.isEmpty() ) return;
 
-    CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = true };
-    auto [isOk, cases] = createSummaryCasesFromFiles( fileNames, createConfig );
-    if ( !isOk ) return;
+    RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = fileType, .ensembleOrGroup = false, .allowDialogs = true };
+    auto                                 cases = createSummaryCasesFromFiles( fileNames, createConfig );
+    if ( cases.empty() ) return;
 
     addSummaryCases( cases );
     if ( !cases.empty() )
@@ -86,8 +87,6 @@ void RicImportSummaryCasesFeature::onActionTriggered( bool isChecked )
             RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( { sumcase }, {} );
         }
     }
-
-    addCasesToGroupIfRelevant( cases );
 
     for ( const auto& rimCase : cases )
         app->addToRecentFiles( rimCase->summaryHeaderFilename() );
@@ -123,9 +122,9 @@ std::pair<bool, std::vector<RimSummaryCase*>> RicImportSummaryCasesFeature::crea
 {
     RiaGuiApplication* app = RiaGuiApplication::instance();
 
-    CreateConfig createConfig{ .fileType = RiaDefines::FileType::SMSPEC, .ensembleOrGroup = false, .allowDialogs = true };
-    auto [isOk, cases] = createSummaryCasesFromFiles( fileNames, createConfig );
-    if ( isOk )
+    RiaEnsembleImportTools::CreateConfig createConfig{ .fileType = RiaDefines::FileType::SMSPEC, .ensembleOrGroup = false, .allowDialogs = true };
+    auto cases = RiaEnsembleImportTools::createSummaryCasesFromFiles( fileNames, createConfig );
+    if ( !cases.empty() )
     {
         addSummaryCases( cases );
         if ( !cases.empty() && doCreateDefaultPlot )
@@ -163,60 +162,6 @@ std::pair<bool, std::vector<RimSummaryCase*>> RicImportSummaryCasesFeature::crea
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<bool, std::vector<RimSummaryCase*>> RicImportSummaryCasesFeature::createSummaryCasesFromFiles( const QStringList& fileNames,
-                                                                                                         CreateConfig       createConfig )
-{
-    RiaApplication* app  = RiaApplication::instance();
-    RimProject*     proj = app->project();
-
-    RimSummaryCaseMainCollection* sumCaseColl = proj->activeOilField() ? proj->activeOilField()->summaryCaseMainCollection() : nullptr;
-
-    std::vector<RimSummaryCase*> newCases;
-
-    if ( !sumCaseColl ) return std::make_pair( false, newCases );
-
-    std::vector<RifSummaryCaseFileResultInfo> importFileInfos;
-    if ( createConfig.fileType == RiaDefines::FileType::SMSPEC )
-    {
-        RifSummaryCaseRestartSelector fileSelector;
-
-        if ( !RiaGuiApplication::isRunning() || !createConfig.allowDialogs )
-        {
-            fileSelector.showDialog( false );
-        }
-
-        fileSelector.setEnsembleOrGroupMode( createConfig.ensembleOrGroup );
-        fileSelector.determineFilesToImportFromSummaryFiles( fileNames );
-
-        importFileInfos = fileSelector.summaryFileInfos();
-
-        if ( fileSelector.foundErrors() )
-        {
-            QString errorMessage = fileSelector.createCombinedErrorMessage();
-            RiaLogging::error( errorMessage );
-        }
-    }
-    else
-    {
-        // No restart files for these file types: just copy to result info
-        for ( auto f : fileNames )
-        {
-            importFileInfos.push_back( RifSummaryCaseFileResultInfo( f, false, createConfig.fileType ) );
-        }
-    }
-
-    if ( !importFileInfos.empty() )
-    {
-        std::vector<RimSummaryCase*> sumCases = sumCaseColl->createSummaryCasesFromFileInfos( importFileInfos, true );
-        newCases.insert( newCases.end(), sumCases.begin(), sumCases.end() );
-    }
-
-    return std::make_pair( true, newCases );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RicImportSummaryCasesFeature::addSummaryCases( const std::vector<RimSummaryCase*>& cases )
 {
     RiaApplication*               app         = RiaApplication::instance();
@@ -238,37 +183,16 @@ void RicImportSummaryCasesFeature::addSummaryCases( const std::vector<RimSummary
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicImportSummaryCasesFeature::addCasesToGroupIfRelevant( const std::vector<RimSummaryCase*>& cases )
-{
-    std::vector<RimSummaryEnsemble*> selectedColl = caf::selectedObjectsByTypeStrict<RimSummaryEnsemble*>();
-
-    if ( selectedColl.size() == 1 )
-    {
-        RimSummaryEnsemble*           coll     = selectedColl.front();
-        RimSummaryCaseMainCollection* mainColl = coll->firstAncestorOrThisOfType<RimSummaryCaseMainCollection>();
-
-        if ( mainColl )
-        {
-            for ( const auto sumCase : cases )
-            {
-                mainColl->removeCase( sumCase );
-                selectedColl.front()->addCase( sumCase );
-            }
-            mainColl->updateConnectedEditors();
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RicRecursiveFileSearchDialogResult
     RicImportSummaryCasesFeature::runRecursiveSummaryCaseFileSearchDialogWithGrouping( const QString& dialogTitle, const QString& pathCacheName )
 {
     RiaApplication* app        = RiaApplication::instance();
     QString         defaultDir = app->lastUsedDialogDirectory( pathCacheName );
 
+    // Make it possible to select ESMRY in this dialog, but this is a GUI only feature. Always use SMSPEC as the main file type as defined
+    // in RiaDefines::FileType
     auto fileTypes = { RicRecursiveFileSearchDialog::FileType::SMSPEC,
+                       RicRecursiveFileSearchDialog::FileType::ESMRY,
                        RicRecursiveFileSearchDialog::FileType::REVEAL_SUMMARY,
                        RicRecursiveFileSearchDialog::FileType::STIMPLAN_SUMMARY };
 

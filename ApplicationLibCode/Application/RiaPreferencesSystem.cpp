@@ -21,6 +21,7 @@
 #include "RiaPreferences.h"
 #include "RiaPreferencesSystem.h"
 
+#include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 
@@ -84,7 +85,13 @@ RiaPreferencesSystem::RiaPreferencesSystem()
                        EclipseTextFileReaderModeType( RiaPreferencesSystem::EclipseTextFileReaderMode::FILE ),
                        "Eclipse Text File Import mode (GRDECL)" );
 
-    CAF_PDM_InitField( &m_keywordsForLogging, "KeywordsForLogging", QString(), "Keywords to enable debug logging, separated by semicolon" );
+    CAF_PDM_InitField( &m_keywordsForLogging,
+                       "KeywordsForLogging",
+                       QString(),
+                       "Keywords to enable debug logging, separated by semicolon.\nType 'enable-all' to enable logging for all objects." );
+
+    CAF_PDM_InitField( &m_maximumNumberOfThreads, "maximumNumberOfThreads", std::make_pair( false, QString( "4" ) ), "Maximum Number of Threads" );
+    m_maximumNumberOfThreads.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -220,6 +227,21 @@ double RiaPreferencesSystem::exportPdfScalingFactor() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::optional<int> RiaPreferencesSystem::threadCount() const
+{
+    const auto& [enabled, text] = m_maximumNumberOfThreads();
+
+    if ( !enabled || text.isEmpty() )
+    {
+        return std::nullopt; // No limit set
+    }
+
+    return text.toInt();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiaPreferencesSystem::EclipseTextFileReaderMode RiaPreferencesSystem::eclipseTextFileReaderMode() const
 {
     return m_eclipseReaderMode();
@@ -230,6 +252,8 @@ RiaPreferencesSystem::EclipseTextFileReaderMode RiaPreferencesSystem::eclipseTex
 //--------------------------------------------------------------------------------------------------
 bool RiaPreferencesSystem::isLoggingActivatedForKeyword( const QString& keyword ) const
 {
+    if ( keyword.isEmpty() ) return true;
+
     QStringList keywords = m_keywordsForLogging().split( ";" );
 
     if ( keywords.contains( "enable-all" ) ) return true;
@@ -270,6 +294,8 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         group->add( &m_keywordsForLogging );
         group->add( &m_gtestFilter );
     }
+
+    uiOrdering.add( &m_maximumNumberOfThreads );
 }
 
 //--------------------------------------------------------------------------------------------------

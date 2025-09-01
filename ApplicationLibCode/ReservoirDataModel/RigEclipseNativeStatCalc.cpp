@@ -19,6 +19,8 @@
 
 #include "RigEclipseNativeStatCalc.h"
 
+#include "RiaResultNames.h"
+
 #include "RigCaseCellResultsData.h"
 #include "RigStatisticsMath.h"
 #include "RigWeightedMeanCalc.h"

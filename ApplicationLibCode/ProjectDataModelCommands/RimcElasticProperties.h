@@ -34,16 +34,15 @@ class RimWellPath;
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcElasticProperties_addPropertyScaling : public caf::PdmObjectMethod
+class RimcElasticProperties_addPropertyScaling : public caf::PdmObjectCreationMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
     RimcElasticProperties_addPropertyScaling( caf::PdmObjectHandle* self );
 
-    caf::PdmObjectHandle*            execute() override;
-    bool                             resultIsPersistent() const override;
-    std::unique_ptr<PdmObjectHandle> defaultResult() const override;
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
 
 private:
     caf::PdmField<QString> m_formation;

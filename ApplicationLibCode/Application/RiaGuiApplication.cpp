@@ -435,15 +435,14 @@ void RiaGuiApplication::initialize()
         logger->setLevel( int( RiaLogging::logLevelBasedOnPreferences() ) );
 
         RiaLogging::appendLoggerInstance( std::move( logger ) );
+    }
 
-        auto filename = RiaPreferences::current()->loggerFilename();
-        if ( !filename.isEmpty() )
-        {
-            auto fileLogger = std::make_unique<RiaFileLogger>( filename.toStdString() );
-            fileLogger->setLevel( int( RiaLogging::logLevelBasedOnPreferences() ) );
+    {
+        auto logFolder  = QDir::homePath() + "/.resinsight/logs";
+        auto fileLogger = std::make_unique<RiaFileLogger>( logFolder.toStdString() );
+        fileLogger->setLevel( int( RiaLogging::logLevelBasedOnPreferences() ) );
 
-            RiaLogging::appendLoggerInstance( std::move( fileLogger ) );
-        }
+        RiaLogging::appendLoggerInstance( std::move( fileLogger ) );
     }
     m_socketServer = new RiaSocketServer( this );
 
@@ -476,6 +475,23 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( gsl::not_n
         showFormattedTextInMessageBoxOrConsole( text );
 
         return RiaApplication::ApplicationStatus::EXIT_COMPLETED;
+    }
+
+    if ( cvf::Option o = progOpt->option( "threadcount" ) )
+    {
+        if ( o.valueCount() == 1 )
+        {
+            auto value = o.value( 0 ).toInt();
+            if ( value > 0 )
+            {
+                m_threadCountFromCommandLine = value;
+            }
+            else
+            {
+                RiaLogging::error( "Error: Invalid value for --threadcount. Must be a positive integer." );
+                return RiaApplication::ApplicationStatus::EXIT_WITH_ERROR;
+            }
+        }
     }
 
     // Code generation
@@ -1173,14 +1189,14 @@ void RiaGuiApplication::invokeProcessEvents( QEventLoop::ProcessEventsFlags flag
 //--------------------------------------------------------------------------------------------------
 void RiaGuiApplication::onFileSuccessfullyLoaded( const QString& fileName, RiaDefines::ImportFileType fileType )
 {
-    if ( uint( fileType ) & uint( RiaDefines::ImportFileType::ANY_ECLIPSE_FILE ) )
+    if ( RiaDefines::isEclipseFileType( fileType ) )
     {
         if ( fileType == RiaDefines::ImportFileType::ECLIPSE_SUMMARY_FILE )
         {
             auto plotWindow = getOrCreateAndShowMainPlotWindow();
             plotWindow->raise();
         }
-        else if ( fileType != RiaDefines::ImportFileType::RESINSIGHT_PROJECT_FILE )
+        else
         {
             auto mainWindow = getOrCreateAndShowMainWindow();
             mainWindow->raise();
@@ -1520,10 +1536,7 @@ void RiaGuiApplication::applyGuiPreferences( const RiaPreferences*              
             }
         }
 
-        std::vector<caf::PdmUiItem*> uiEditorsToUpdate;
-        caf::SelectionManager::instance()->selectedItems( uiEditorsToUpdate );
-
-        for ( caf::PdmUiItem* uiItem : uiEditorsToUpdate )
+        for ( caf::PdmUiItem* uiItem : caf::SelectionManager::instance()->selectedItems() )
         {
             uiItem->updateConnectedEditors();
         }

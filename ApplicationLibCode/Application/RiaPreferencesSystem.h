@@ -57,6 +57,8 @@ public:
     bool    showPdfExportDialog() const;
     double  exportPdfScalingFactor() const;
 
+    std::optional<int> threadCount() const;
+
     EclipseTextFileReaderMode eclipseTextFileReaderMode() const;
 
     bool isLoggingActivatedForKeyword( const QString& keyword ) const;
@@ -88,4 +90,6 @@ private:
     caf::PdmField<EclipseTextFileReaderModeType> m_eclipseReaderMode;
 
     caf::PdmField<QString> m_keywordsForLogging;
+
+    caf::PdmField<std::pair<bool, QString>> m_maximumNumberOfThreads;
 };

@@ -23,6 +23,7 @@
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesGrid.h"
+#include "RiaPreferencesSummary.h"
 
 #include "RicImportSummaryCasesFeature.h"
 
@@ -74,24 +75,24 @@ RicImportGeneralDataFeature::OpenCaseResults RicImportGeneralDataFeature::openEc
 
     for ( const QString& fileName : fileNames )
     {
-        int fileTypeAsInt = int( obtainFileTypeFromFileName( fileName ) );
-        if ( fileTypeAsInt & ( int( ImportFileType::ECLIPSE_GRID_FILE ) | int( ImportFileType::ECLIPSE_EGRID_FILE ) ) )
+        RiaDefines::ImportFileType fileType = obtainFileTypeFromFileName( fileName );
+        if ( RiaDefines::isEclipseResultFileType( fileType ) )
         {
             eclipseCaseFiles.push_back( fileName );
         }
-        else if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_INPUT_FILE ) )
+        else if ( fileType == ImportFileType::ECLIPSE_INPUT_FILE )
         {
             eclipseInputFiles.push_back( fileName );
         }
-        else if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_SUMMARY_FILE ) )
+        else if ( fileType == ImportFileType::ECLIPSE_SUMMARY_FILE )
         {
             eclipseSummaryFiles.push_back( fileName );
         }
-        else if ( fileTypeAsInt & int( ImportFileType::ROFF_FILE ) )
+        else if ( fileType == ImportFileType::ROFF_FILE )
         {
             roffFiles.push_back( fileName );
         }
-        else if ( fileTypeAsInt & int( ImportFileType::EM_H5GRID ) )
+        else if ( fileType == ImportFileType::EM_H5GRID )
         {
             emFiles.push_back( fileName );
         }
@@ -218,6 +219,7 @@ QString RicImportGeneralDataFeature::getFilePattern( RiaDefines::ImportFileType 
     QString eclipseEGridFilePattern( "*.EGRID" );
     QString eclipseInputFilePattern( "*.GRDECL" );
     QString eclipseSummaryFilePattern( "*.SMSPEC" );
+    QString esmrySummaryFilePattern( "*.ESMRY" );
     QString roffFilePattern( "*.ROFF *.ROFFASC" );
 
     if ( fileType == ImportFileType::ANY_ECLIPSE_FILE )
@@ -246,7 +248,21 @@ QString RicImportGeneralDataFeature::getFilePattern( RiaDefines::ImportFileType 
 
     if ( fileType == ImportFileType::ECLIPSE_SUMMARY_FILE )
     {
-        return QString( "Eclipse Summary File (%1)" ).arg( eclipseSummaryFilePattern );
+        QStringList filterTexts;
+        if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
+        {
+            filterTexts += QString( "ESMRY Summary Files (%1)" ).arg( esmrySummaryFilePattern );
+            filterTexts += QString( "Eclipse Summary Files (%1)" ).arg( eclipseSummaryFilePattern );
+        }
+        else
+        {
+            filterTexts += QString( "Eclipse Summary Files (%1)" ).arg( eclipseSummaryFilePattern );
+            filterTexts += QString( "ESMRY Summary Files (%1)" ).arg( esmrySummaryFilePattern );
+        }
+
+        filterTexts += QString( "All Summary Files (%1 %2)" ).arg( eclipseSummaryFilePattern ).arg( esmrySummaryFilePattern );
+
+        return filterTexts.join( ";;" );
     }
 
     if ( fileType == ImportFileType::ROFF_FILE )
@@ -268,24 +284,23 @@ QStringList RicImportGeneralDataFeature::getEclipseFileNamesWithDialog( RiaDefin
         filePatternTexts += getFilePattern( ImportFileType::ANY_ECLIPSE_FILE );
     }
 
-    int fileTypeAsInt = int( fileType );
-    if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_EGRID_FILE ) )
+    if ( fileType == ImportFileType::ECLIPSE_EGRID_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ECLIPSE_EGRID_FILE );
     }
-    if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_GRID_FILE ) )
+    if ( fileType == ImportFileType::ECLIPSE_GRID_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ECLIPSE_GRID_FILE );
     }
-    if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_INPUT_FILE ) )
+    if ( fileType == ImportFileType::ECLIPSE_INPUT_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ECLIPSE_INPUT_FILE );
     }
-    if ( fileTypeAsInt & int( ImportFileType::ECLIPSE_SUMMARY_FILE ) )
+    if ( fileType == ImportFileType::ECLIPSE_SUMMARY_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ECLIPSE_SUMMARY_FILE );
     }
-    if ( fileTypeAsInt & int( ImportFileType::ROFF_FILE ) )
+    if ( fileType == ImportFileType::ROFF_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ROFF_FILE );
     }
@@ -355,7 +370,6 @@ bool RicImportGeneralDataFeature::openSummaryCaseFromFileNames( const QStringLis
     auto [isOk, newCases] = RicImportSummaryCasesFeature::createAndAddSummaryCasesFromFiles( fileNames, doCreateDefaultPlot );
     if ( isOk )
     {
-        RicImportSummaryCasesFeature::addCasesToGroupIfRelevant( newCases );
         for ( const RimSummaryCase* newCase : newCases )
         {
             RiaApplication::instance()->addToRecentFiles( newCase->summaryHeaderFilename() );

@@ -25,10 +25,11 @@
 #include "RifEclipseSummaryTools.h"
 #include "RifMultipleSummaryReaders.h"
 #include "RifOpmCommonSummary.h"
+#include "RifOpmSummaryTools.h"
 #include "RifProjectSummaryDataWriter.h"
 #include "RifReaderEclipseSummary.h"
 #include "RifReaderOpmRft.h"
-#include "RifSummaryReaderMultipleFiles.h"
+#include "RifSummaryReaderAggregator.h"
 
 #include "RimCalculatedSummaryCurveReader.h"
 #include "RimProject.h"
@@ -39,6 +40,7 @@
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 
+#include "RiaPreferencesSystem.h"
 #include <QDir>
 #include <QFileInfo>
 #include <QUuid>
@@ -71,13 +73,6 @@ RimFileSummaryCase::RimFileSummaryCase()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimFileSummaryCase::~RimFileSummaryCase()
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RimFileSummaryCase::summaryHeaderFilename() const
 {
     return m_summaryHeaderFilename().path();
@@ -96,7 +91,8 @@ QString RimFileSummaryCase::caseName() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLogger* threadSafeLogger )
+void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RifEnsembleImportConfig ensembleImportState,
+                                                                 RiaThreadSafeLogger*    threadSafeLogger )
 {
     // RimFileSummaryCase::findRelatedFilesAndCreateReader is a performance bottleneck. The function
     // RifEclipseSummaryTools::getRestartFile() should be refactored to use opm-common instead of resdata.
@@ -104,17 +100,24 @@ void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLo
     //
     // https://github.com/OPM/ResInsight/issues/11342
 
-    m_fileSummaryReader =
-        RimFileSummaryCase::findRelatedFilesAndCreateReader( summaryHeaderFilename(), m_includeRestartFiles, threadSafeLogger );
+    auto multiReader            = std::make_unique<RifMultipleSummaryReaders>();
+    m_fileSummaryReaderId       = -1;
+    m_additionalSummaryReaderId = -1;
 
-    m_multiSummaryReader = new RifMultipleSummaryReaders;
-    m_multiSummaryReader->addReader( m_fileSummaryReader.p() );
+    auto reader = RimFileSummaryCase::findRelatedFilesAndCreateReader( summaryHeaderFilename(),
+                                                                       m_includeRestartFiles,
+                                                                       ensembleImportState,
+                                                                       threadSafeLogger );
+    if ( !reader ) return;
+
+    m_fileSummaryReaderId = reader->serialNumber();
+
+    m_multiSummaryReader = std::move( multiReader );
+    m_multiSummaryReader->addReader( std::move( reader ) );
 
     openAndAttachAdditionalReader();
 
-    m_calculatedSummaryReader = new RifCalculatedSummaryCurveReader( this );
-
-    m_multiSummaryReader->addReader( m_calculatedSummaryReader.p() );
+    m_multiSummaryReader->addReader( std::make_unique<RifCalculatedSummaryCurveReader>( this ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -123,7 +126,7 @@ void RimFileSummaryCase::createSummaryReaderInterfaceThreadSafe( RiaThreadSafeLo
 void RimFileSummaryCase::createSummaryReaderInterface()
 {
     RiaThreadSafeLogger threadSafeLogger;
-    createSummaryReaderInterfaceThreadSafe( &threadSafeLogger );
+    createSummaryReaderInterfaceThreadSafe( RifEnsembleImportConfig(), &threadSafeLogger );
 
     auto messages = threadSafeLogger.messages();
     for ( const auto& m : messages )
@@ -159,25 +162,48 @@ void RimFileSummaryCase::createRftReaderInterface()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifSummaryReaderInterface* RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&       headerFileName,
-                                                                                bool                 lookForRestartFiles,
-                                                                                RiaThreadSafeLogger* threadSafeLogger )
+std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesAndCreateReader( const QString&          headerFileName,
+                                                                                                bool                    lookForRestartFiles,
+                                                                                                RifEnsembleImportConfig ensembleImportState,
+                                                                                                RiaThreadSafeLogger*    threadSafeLogger )
 {
     if ( lookForRestartFiles )
     {
+        auto startTime = RiaLogging::currentTime();
+
         std::vector<QString> warnings;
         std::vector<QString> restartFileNames;
         if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
         {
-            restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+            if ( ensembleImportState.useConfigValues() )
+            {
+                auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( headerFileName );
+                if ( !realizationNumber.has_value() )
+                {
+                    RiaLogging::error( realizationNumber.error() );
+                    return nullptr;
+                }
+
+                restartFileNames = ensembleImportState.restartFilesForRealization( realizationNumber.value() );
+            }
+            else
+            {
+                // If the restart file names are not provided, we search for them
+                restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
+            }
         }
         else
         {
             restartFileNames = RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
         }
 
+        bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+        if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Searched for restart files for " + headerFileName, startTime );
+
         if ( !restartFileNames.empty() )
         {
+            auto startTime = RiaLogging::currentTime();
+
             std::vector<std::string> summaryFileNames;
             summaryFileNames.push_back( headerFileName.toStdString() );
             for ( const auto& fileName : restartFileNames )
@@ -188,24 +214,26 @@ RifSummaryReaderInterface* RimFileSummaryCase::findRelatedFilesAndCreateReader( 
             // The ordering in intended to be start of history first, so we reverse the ordering
             std::reverse( summaryFileNames.begin(), summaryFileNames.end() );
 
-            auto summaryReader = new RifSummaryReaderMultipleFiles( summaryFileNames );
-            if ( !summaryReader->createReadersAndImportMetaData( threadSafeLogger ) )
+            auto summaryReader = std::make_unique<RifSummaryReaderAggregator>( summaryFileNames );
+            if ( !summaryReader->createReadersAndImportMetaData( ensembleImportState, threadSafeLogger ) )
             {
-                delete summaryReader;
                 return nullptr;
             }
+
+            bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );
+            if ( isLoggingEnabled ) RiaLogging::logElapsedTime( "Created reader", startTime );
 
             return summaryReader;
         }
     }
 
-    RifReaderEclipseSummary* summaryFileReader = new RifReaderEclipseSummary;
+    auto summaryFileReader = std::make_unique<RifReaderEclipseSummary>();
+    summaryFileReader->setEnsembleImportState( ensembleImportState );
 
-    // All restart data is taken care of by RifSummaryReaderMultipleFiles, never read restart data from native file
+    // All restart data is taken care of by RifSummaryReaderAggregator, never read restart data from native file
     // readers
     if ( !summaryFileReader->open( headerFileName, threadSafeLogger ) )
     {
-        delete summaryFileReader;
         return nullptr;
     }
 
@@ -215,13 +243,13 @@ RifSummaryReaderInterface* RimFileSummaryCase::findRelatedFilesAndCreateReader( 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifReaderOpmRft* RimFileSummaryCase::createOpmRftReader( const QString& rftFileName, const QString& dataDeckFileName )
+std::unique_ptr<RifReaderOpmRft> RimFileSummaryCase::createOpmRftReader( const QString& rftFileName, const QString& dataDeckFileName )
 {
     QFileInfo fi( rftFileName );
 
     if ( fi.exists() )
     {
-        return new RifReaderOpmRft( rftFileName, dataDeckFileName );
+        return std::make_unique<RifReaderOpmRft>( rftFileName, dataDeckFileName );
     }
 
     return nullptr;
@@ -264,15 +292,15 @@ void RimFileSummaryCase::openAndAttachAdditionalReader()
     QString additionalSummaryFilePath = m_additionalSummaryFilePath().path();
     if ( additionalSummaryFilePath.isEmpty() ) return;
 
-    cvf::ref<RifOpmCommonEclipseSummary> opmCommonReader = new RifOpmCommonEclipseSummary;
+    auto opmCommonReader = std::make_unique<RifOpmCommonEclipseSummary>();
     opmCommonReader->useEnhancedSummaryFiles( true );
 
     bool includeRestartFiles = false;
     auto isValid             = opmCommonReader->open( additionalSummaryFilePath, includeRestartFiles, nullptr );
     if ( isValid )
     {
-        m_multiSummaryReader->addReader( opmCommonReader.p() );
-        m_additionalSummaryFileReader = opmCommonReader;
+        m_additionalSummaryReaderId = opmCommonReader->serialNumber();
+        m_multiSummaryReader->addReader( std::move( opmCommonReader ) );
     }
 }
 
@@ -281,11 +309,11 @@ void RimFileSummaryCase::openAndAttachAdditionalReader()
 //--------------------------------------------------------------------------------------------------
 RifSummaryReaderInterface* RimFileSummaryCase::summaryReader()
 {
-    if ( m_multiSummaryReader.isNull() )
+    if ( !m_multiSummaryReader )
     {
         createSummaryReaderInterface();
     }
-    return m_multiSummaryReader.p();
+    return m_multiSummaryReader.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -293,11 +321,11 @@ RifSummaryReaderInterface* RimFileSummaryCase::summaryReader()
 //--------------------------------------------------------------------------------------------------
 RifReaderRftInterface* RimFileSummaryCase::rftReader()
 {
-    if ( m_summaryEclipseRftReader.isNull() )
+    if ( !m_summaryEclipseRftReader )
     {
         createRftReaderInterface();
     }
-    return m_summaryEclipseRftReader.p();
+    return m_summaryEclipseRftReader.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -313,7 +341,7 @@ void RimFileSummaryCase::setIncludeRestartFiles( bool includeRestartFiles )
 //--------------------------------------------------------------------------------------------------
 void RimFileSummaryCase::setSummaryData( const std::string& keyword, const std::string& unit, const std::vector<float>& values )
 {
-    size_t mainSummaryFileValueCount = m_fileSummaryReader->timeSteps( RifEclipseSummaryAddress() ).size();
+    size_t mainSummaryFileValueCount = m_multiSummaryReader->timeSteps( RifEclipseSummaryAddress() ).size();
     if ( values.size() != mainSummaryFileValueCount )
     {
         QString txt = QString( "Wrong size of summary data for keyword %1. Expected %2 values, received %3 values" )
@@ -325,9 +353,7 @@ void RimFileSummaryCase::setSummaryData( const std::string& keyword, const std::
         return;
     }
 
-    // Remove existing reader to be able to write to the summary file
-    m_multiSummaryReader->removeReader( m_additionalSummaryFileReader.p() );
-    m_additionalSummaryFileReader = nullptr;
+    m_multiSummaryReader->removeReader( m_additionalSummaryReaderId );
 
     RifProjectSummaryDataWriter projectSummaryDataWriter;
 
@@ -339,12 +365,16 @@ void RimFileSummaryCase::setSummaryData( const std::string& keyword, const std::
     }
     else
     {
-        projectSummaryDataWriter.importFromSourceSummaryReader( m_fileSummaryReader.p() );
+        auto fileReader = m_multiSummaryReader->findReader( m_fileSummaryReaderId );
+        if ( fileReader )
+        {
+            projectSummaryDataWriter.importFromSourceSummaryReader( fileReader );
 
-        auto tempFilePath = additionalSummaryDataFilePath();
+            auto tempFilePath = additionalSummaryDataFilePath();
 
-        m_additionalSummaryFilePath  = tempFilePath;
-        tmpAdditionalSummaryFilePath = tempFilePath;
+            m_additionalSummaryFilePath  = tempFilePath;
+            tmpAdditionalSummaryFilePath = tempFilePath;
+        }
     }
 
     projectSummaryDataWriter.setData( { keyword }, { unit }, { values } );
@@ -359,6 +389,7 @@ void RimFileSummaryCase::setSummaryData( const std::string& keyword, const std::
     projectSummaryDataWriter.clearErrorMessages();
 
     openAndAttachAdditionalReader();
+    m_multiSummaryReader->createAndSetAddresses();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -22,8 +22,7 @@
 
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiCommandSystemProxy.h"
-
-#include "cvfAssert.h"
+#include "cafPdmUiDoubleSliderEditor.h"
 
 CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimPlotCurveAppearance, "PlotCurveAppearance" );
 
@@ -84,11 +83,21 @@ RimPlotCurveAppearance::RimPlotCurveAppearance()
     , m_colorVisible( true )
     , m_interpolationVisible( true )
     , m_fillOptionsVisible( true )
+    , m_curveFittingToleranceVisible( true )
 {
     CAF_PDM_InitObject( "Curve Apperance" );
 
     CAF_PDM_InitField( &m_curveColor, "Color", RiaColorTools::textColor3f(), "Color" );
+
+    CAF_PDM_InitField( &m_curveColorOpacity, "CurveColorOpacity", 1.0f, "Opacity" );
+    m_curveColorOpacity.registerKeywordAlias( "CurveColorTransparency" );
+    m_curveColorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+
     CAF_PDM_InitField( &m_fillColor, "FillColor", cvf::Color3f( -1.0, -1.0, -1.0 ), "Fill Color" );
+
+    CAF_PDM_InitField( &m_fillColorOpacity, "FillColorOpacity", 1.0f, "Fill Color Opacity" );
+    m_fillColorOpacity.registerKeywordAlias( "FillColorTransparency" );
+    m_fillColorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_curveThickness, "Thickness", 1, "Line Thickness" );
     m_curveThickness.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
@@ -147,6 +156,22 @@ void RimPlotCurveAppearance::fieldChangedByUi( const caf::PdmFieldHandle* change
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance ::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_curveColorOpacity || field == &m_fillColorOpacity )
+    {
+        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
+        {
+            myAttr->m_minimum  = 0.0;
+            myAttr->m_maximum  = 1.0;
+            myAttr->m_decimals = 2;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimPlotCurveAppearance::initAfterRead()
 {
     m_symbolSize.uiCapability()->setUiReadOnly( m_pointSymbol() == RiuPlotCurveSymbol::SYMBOL_NONE );
@@ -187,7 +212,9 @@ void RimPlotCurveAppearance::setColorWithFieldChanged( const QColor& color )
 void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_curveColor );
+    uiOrdering.add( &m_curveColorOpacity );
     m_curveColor.uiCapability()->setUiHidden( !m_colorVisible );
+    m_curveColorOpacity.uiCapability()->setUiHidden( !m_colorVisible );
 
     uiOrdering.add( &m_pointSymbol );
     if ( RiuPlotCurveSymbol::isFilledSymbol( m_pointSymbol() ) )
@@ -199,16 +226,22 @@ void RimPlotCurveAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     uiOrdering.add( &m_lineStyle );
     uiOrdering.add( &m_curveThickness );
 
-    uiOrdering.add( &m_curveFittingTolerance );
-    m_curveFittingTolerance.uiCapability()->setUiReadOnly( m_lineStyle() == RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
+    if ( m_curveFittingToleranceVisible )
+    {
+        uiOrdering.add( &m_curveFittingTolerance );
+        m_curveFittingTolerance.uiCapability()->setUiReadOnly( m_lineStyle() == RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
+    }
+
     uiOrdering.add( &m_fillStyle );
     m_fillStyle.uiCapability()->setUiHidden( !m_fillOptionsVisible );
 
     if ( m_fillStyle != Qt::BrushStyle::NoBrush )
     {
         uiOrdering.add( &m_fillColor );
+        uiOrdering.add( &m_fillColorOpacity );
     }
     m_fillColor.uiCapability()->setUiHidden( !m_fillOptionsVisible );
+    m_fillColorOpacity.uiCapability()->setUiHidden( !m_fillOptionsVisible );
 
     uiOrdering.add( &m_curveInterpolation );
     m_curveInterpolation.uiCapability()->setUiHidden( !m_interpolationVisible );
@@ -419,6 +452,22 @@ void RimPlotCurveAppearance::setFillColor( const cvf::Color3f& fillColor )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setFillColorOpacity( float opacity )
+{
+    m_fillColorOpacity = opacity;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+float RimPlotCurveAppearance::fillColorOpacity() const
+{
+    return m_fillColorOpacity;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 cvf::Color3f RimPlotCurveAppearance::fillColor() const
 {
     return m_fillColor;
@@ -454,4 +503,28 @@ void RimPlotCurveAppearance::setInterpolationVisible( bool isVisible )
 void RimPlotCurveAppearance::setFillOptionsVisible( bool isVisible )
 {
     m_fillOptionsVisible = isVisible;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setCurveFittingToleranceVisible( bool isVisible )
+{
+    m_curveFittingToleranceVisible = isVisible;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimPlotCurveAppearance::setCurveColorOpacity( float opacity )
+{
+    m_curveColorOpacity = opacity;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+float RimPlotCurveAppearance::curveColorOpacity() const
+{
+    return m_curveColorOpacity;
 }

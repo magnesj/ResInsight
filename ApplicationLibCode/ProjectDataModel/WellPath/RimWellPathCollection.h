@@ -38,6 +38,7 @@
 
 #include <gsl/gsl>
 
+#include <expected>
 #include <memory>
 
 class RiaOsduConnector;
@@ -150,8 +151,10 @@ private:
 
     caf::PdmFieldHandle* objectToggleField() override;
 
-    void readAndAddWellPaths( std::vector<RimFileWellPath*>& wellPathArray );
-    void sortWellsByName();
+    std::vector<RimWellPath*> readAndAddWellPaths( std::vector<RimFileWellPath*>& wellPathArray );
+    void                      sortWellsByName();
+
+    std::expected<std::vector<RimFileWellPath*>, QString> addWellPathsForFile( const QString& filePath );
 
     caf::AppEnum<RiaDefines::EclipseUnitSystem> findUnitSystemForWellPath( const RimWellPath* wellPath );
 

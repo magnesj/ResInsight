@@ -20,6 +20,7 @@
 
 #include "RiaEnsembleNameTools.h"
 #include "RiaFilePathTools.h"
+#include "RiaFileSearchTools.h"
 #include "RiaGuiApplication.h"
 #include "RiaStdStringTools.h"
 #include "RiaStringListSerializer.h"
@@ -717,96 +718,35 @@ QStringList RicRecursiveFileSearchDialog::findMatchingFiles()
 {
     if ( cleanTextFromPathFilterField().isEmpty() ) return QStringList();
 
-    QStringList dirs;
+    auto updateDirSearchStatus = [&]( const QString& text ) -> bool
+    {
+        if ( m_isCancelPressed ) return false;
+        updateStatus( SEARCHING_FOR_DIRS, text );
+        QApplication::processEvents();
+        return true;
+    };
+
+    auto updateFileSearchStatus = [&]( const QString& text ) -> bool
+    {
+        if ( m_isCancelPressed ) return false;
+        updateStatus( SEARCHING_FOR_FILES, text );
+        QApplication::processEvents();
+        return true;
+    };
 
     QString pathFilter = pathFilterWithoutStartSeparator();
     QString rootDir    = rootDirWithEndSeparator();
     if ( rootDir.size() > 1 && rootDir.endsWith( RiaFilePathTools::separator() ) ) rootDir.chop( 1 );
 
-    buildDirectoryListRecursiveSimple( rootDir, pathFilter, &dirs );
+    QStringList matchingFolders;
+    RiaFileSearchTools::findMatchingFoldersRecursively( rootDir, pathFilter, matchingFolders, updateDirSearchStatus );
+    if ( m_isCancelPressed ) return {};
 
-    return findFilesInDirs( dirs );
-}
+    QStringList fileNameFilters = createFileNameFilterList();
+    auto        files           = RiaFileSearchTools::findFilesInFolders( matchingFolders, fileNameFilters, updateFileSearchStatus );
+    if ( m_isCancelPressed ) return {};
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicRecursiveFileSearchDialog::buildDirectoryListRecursiveSimple( const QString& currentDirFullPathNoEndSeparator,
-                                                                      const QString& currentPathFilterNoEndSeparator,
-                                                                      QStringList*   accumulatedDirs )
-{
-    QString currDir    = currentDirFullPathNoEndSeparator;
-    QString pathFilter = currentPathFilterNoEndSeparator;
-
-    if ( m_isCancelPressed )
-    {
-        accumulatedDirs->clear();
-        return;
-    }
-
-    updateStatus( SEARCHING_FOR_DIRS, currDir );
-    QApplication::processEvents();
-
-    if ( pathFilter.isEmpty() )
-    {
-        accumulatedDirs->push_back( currentDirFullPathNoEndSeparator );
-        return;
-    }
-
-    QStringList pathFilterPartList = pathFilter.split( RiaFilePathTools::separator() );
-    QDir        qdir( currDir, pathFilterPartList[0], QDir::NoSort, QDir::Dirs | QDir::NoDotAndDotDot );
-    QStringList subDirs = qdir.entryList();
-
-    if ( pathFilterPartList.size() == 1 && pathFilterPartList[0] == "*" )
-    {
-        accumulatedDirs->push_back( currDir );
-    }
-
-    for ( const QString& subDir : subDirs )
-    {
-        QString fullPath = qdir.absoluteFilePath( subDir );
-        QString nextPathFilter;
-
-        if ( pathFilterPartList.size() == 1 && pathFilterPartList[0] == "*" )
-        {
-            nextPathFilter = "*";
-        }
-        else
-        {
-            auto pf = pathFilterPartList;
-            pf.removeFirst();
-            nextPathFilter = pf.join( RiaFilePathTools::separator() );
-        }
-
-        buildDirectoryListRecursiveSimple( fullPath, nextPathFilter, accumulatedDirs );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QStringList RicRecursiveFileSearchDialog::findFilesInDirs( const QStringList& dirs )
-{
-    QStringList allFiles;
-    QStringList filters = createFileNameFilterList();
-
-    for ( const auto& dir : dirs )
-    {
-        QDir        qdir( dir );
-        QStringList files = qdir.entryList( filters, QDir::Files );
-
-        if ( m_isCancelPressed ) return QStringList();
-
-        updateStatus( SEARCHING_FOR_FILES, qdir.absolutePath() );
-        QApplication::processEvents();
-
-        for ( QString file : files )
-        {
-            QString absFilePath = qdir.absoluteFilePath( file );
-            allFiles.append( absFilePath );
-        }
-    }
-    return allFiles;
+    return files;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1222,6 +1162,7 @@ RiaDefines::EnsembleGroupingMode RicRecursiveFileSearchDialog::ensembleGroupingM
     if ( m_ensembleGroupingMode->currentIndex() == 0 ) return RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
     if ( m_ensembleGroupingMode->currentIndex() == 1 ) return RiaDefines::EnsembleGroupingMode::EVEREST_FOLDER_STRUCTURE;
     if ( m_ensembleGroupingMode->currentIndex() == 2 ) return RiaDefines::EnsembleGroupingMode::NONE;
+    if ( m_ensembleGroupingMode->currentIndex() == 3 ) return RiaDefines::EnsembleGroupingMode::RESINSIGHT_OPMFLOW_STRUCTURE;
 
     return RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
 }
@@ -1254,6 +1195,8 @@ QString RicRecursiveFileSearchDialog::fileExtensionForType( FileType fileType )
             return "GRID";
         case FileType::SMSPEC:
             return "SMSPEC";
+        case FileType::ESMRY:
+            return "ESMRY";
         case FileType::STIMPLAN_FRACTURE:
             return "XML";
         case FileType::LAS:
@@ -1284,6 +1227,8 @@ QString RicRecursiveFileSearchDialog::fileNameForType( FileType fileType )
             return "Eclipse Grid File";
         case FileType::SMSPEC:
             return "Eclipse Summary File";
+        case FileType::ESMRY:
+            return "ESMRY Summary File";
         case FileType::STIMPLAN_FRACTURE:
             return "StimPlan Fracture";
         case FileType::LAS:
@@ -1307,6 +1252,7 @@ RiaDefines::FileType RicRecursiveFileSearchDialog::mapSummaryFileType( RicRecurs
     switch ( fileType )
     {
         case RicRecursiveFileSearchDialog::FileType::SMSPEC:
+        case RicRecursiveFileSearchDialog::FileType::ESMRY:
             return RiaDefines::FileType::SMSPEC;
         case RicRecursiveFileSearchDialog::FileType::REVEAL_SUMMARY:
             return RiaDefines::FileType::REVEAL_SUMMARY;

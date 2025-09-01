@@ -18,10 +18,7 @@
 
 #pragma once
 
-#include "RimEnsembleCurveSetColorManager.h"
-#include "RimViewWindow.h"
 #include "RimWellLogPlot.h"
-#include "RimWellRftEnsembleCurveSet.h"
 
 #include "RifDataSourceForRftPltQMetaType.h"
 
@@ -30,10 +27,7 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPtrField.h"
-#include "cvfCollection.h"
 
-#include <QDate>
-#include <QMetaType>
 #include <QPointer>
 
 #include <map>
@@ -54,6 +48,9 @@ class RiaRftPltCurveDefinition;
 class RifDataSourceForRftPlt;
 class RifEclipseRftAddress;
 class RiuDraggableOverlayFrame;
+class RimDataSourceForRftPlt;
+class RiuPlotCurve;
+class RimWellRftEnsembleCurveSet;
 
 namespace cvf
 {
@@ -86,7 +83,6 @@ public:
     int branchIndex() const;
 
     std::variant<RimSummaryCase*, RimSummaryEnsemble*> dataSource() const;
-    void applyInitialSelections( std::variant<RimSummaryCase*, RimSummaryEnsemble*> dataSource );
 
     static const char* plotNameFormatString();
 
@@ -99,7 +95,9 @@ public:
 
     void rebuildCurves();
 
-protected:
+    void initializeDataSources( RimWellRftPlot* source );
+
+private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;
 
@@ -108,20 +106,24 @@ protected:
 
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void onLoadDataAndUpdate() override;
+    void setupBeforeSave() override;
     void initAfterRead() override;
     bool useUndoRedoForFieldChanged() override;
+    void deleteViewWidget() override;
 
-private:
     std::map<QString, QStringList> findWellSources();
     void                           updateEditorsFromPreviousSelection();
     void                           setSelectedSourcesFromCurves();
     void                           syncCurvesFromUiSelection();
     void                           assignWellPathToExtractionCurves();
+    void                           syncSourcesIoFieldFromGuiField();
 
     RimObservedFmuRftData* findObservedFmuData( const QString& wellPathName, const QDateTime& timeStep ) const;
 
     std::set<RiaRftPltCurveDefinition> selectedCurveDefs() const;
     std::set<RiaRftPltCurveDefinition> curveDefsFromCurves() const;
+
+    void setOrInitializeDataSources( const std::vector<RifDataSourceForRftPlt>& sourcesToSelect );
 
     void updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition>& allCurveDefs,
                              const std::set<RiaRftPltCurveDefinition>& curveDefsToAdd,
@@ -146,6 +148,8 @@ private:
     std::vector<RimSummaryEnsemble*> selectedEnsembles() const;
     void                             createEnsembleCurveSets();
 
+    void detachAndDeleteLegendCurves();
+
 private:
     friend class RimWellRftEnsembleCurveSet;
 
@@ -157,6 +161,7 @@ private:
     caf::PdmField<bool>    m_showErrorInObservedData;
 
     caf::PdmField<std::vector<RifDataSourceForRftPlt>> m_selectedSources;
+    caf::PdmChildArrayField<RimDataSourceForRftPlt*>   m_selectedSourcesForIo;
     caf::PdmField<std::vector<QDateTime>>              m_selectedTimeSteps;
 
     caf::PdmChildArrayField<RimWellRftEnsembleCurveSet*> m_ensembleCurveSets;
@@ -168,5 +173,8 @@ private:
     std::map<QDateTime, RiuPlotCurveSymbol::PointSymbolEnum> m_timeStepSymbols;
     bool                                                     m_isOnLoad;
 
+    std::vector<RiuPlotCurve*> m_legendPlotCurves;
+
     caf::PdmChildField<RimWellLogPlot*> m_wellLogPlot_OBSOLETE;
+    bool                                m_isInitialized = false;
 };

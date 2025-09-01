@@ -483,7 +483,7 @@ std::string RifEclipseSummaryAddress::generateStringFromAddresses( const std::ve
     std::string addrString;
     for ( const RifEclipseSummaryAddress& address : addressVector )
     {
-        if ( addrString.length() > 0 )
+        if ( !addrString.empty() )
         {
             addrString += jointString;
         }

@@ -18,6 +18,7 @@
 
 #include "RicSummaryPlotFeatureImpl.h"
 
+#include "Ensemble/RiaEnsembleImportTools.h"
 #include "RiaApplication.h"
 #include "RiaColorTables.h"
 #include "RiaDefines.h"
@@ -85,7 +86,7 @@ RimSummaryCurve* RicSummaryPlotFeatureImpl::createHistoryCurve( const RifEclipse
 {
     RifEclipseSummaryAddress historyAddr = addr;
     historyAddr.setVectorName( historyAddr.vectorName() + "H" );
-    if ( summaryCasesToUse->summaryReader()->allResultAddresses().count( historyAddr ) )
+    if ( summaryCasesToUse->summaryReader() && summaryCasesToUse->summaryReader()->allResultAddresses().count( historyAddr ) )
     {
         return RiaSummaryPlotTools::createCurve( summaryCasesToUse, historyAddr );
     }
@@ -284,11 +285,11 @@ void RicSummaryPlotFeatureImpl::createSummaryPlotsFromArgumentLine( const QStrin
 
     bool isEnsembleMode = ensembleColoringStyle != EnsembleColoringType::NONE;
 
-    RicImportSummaryCasesFeature::CreateConfig createConfig{ .fileType        = RiaDefines::FileType::SMSPEC,
-                                                             .ensembleOrGroup = isEnsembleMode,
-                                                             .allowDialogs    = true };
-    auto [isOk, summaryCasesToUse] = RicImportSummaryCasesFeature::createSummaryCasesFromFiles( summaryFileNames, createConfig );
-    if ( !isOk || summaryCasesToUse.empty() )
+    RiaEnsembleImportTools::CreateConfig createConfig{ .fileType        = RiaDefines::FileType::SMSPEC,
+                                                       .ensembleOrGroup = isEnsembleMode,
+                                                       .allowDialogs    = true };
+    auto summaryCasesToUse = RiaEnsembleImportTools::createSummaryCasesFromFiles( summaryFileNames, createConfig );
+    if ( summaryCasesToUse.empty() )
     {
         RiaLogging::error( "Needs at least one summary case to create a plot." );
         return;
@@ -621,6 +622,11 @@ std::vector<RimSummaryPlot*> RicSummaryPlotFeatureImpl::createMultipleSummaryPlo
         {
             for ( RimSummaryCase* sumCase : summaryCasesToUse )
             {
+                if ( !sumCase || !sumCase->summaryReader() )
+                {
+                    continue;
+                }
+
                 const std::set<RifEclipseSummaryAddress>& allAddrsInCase = sumCase->summaryReader()->allResultAddresses();
                 if ( allAddrsInCase.count( addr ) )
                 {
@@ -668,6 +674,11 @@ std::set<RifEclipseSummaryAddress>
     std::set<RifEclipseSummaryAddress> filteredAdressesFromCases;
     for ( RimSummaryCase* sumCase : summaryCasesToUse )
     {
+        if ( !sumCase || !sumCase->summaryReader() )
+        {
+            continue;
+        }
+
         const std::set<RifEclipseSummaryAddress>& addrs = sumCase->summaryReader()->allResultAddresses();
         std::vector<bool>                         usedFilters;
 

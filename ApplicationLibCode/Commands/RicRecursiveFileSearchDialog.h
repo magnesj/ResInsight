@@ -55,12 +55,15 @@ public:
         NO_FILES_FOUND
     };
 
+    // ESMRY is available as option in the dialog to be able to search for ESMRY files. Note that the use of ESMRY files in this dialog use
+    // RiaDefines::FileType::SMSPEC, as ESMRY files can be created from SMSPEC files.
     enum class FileType
     {
         GRDECL,
         EGRID,
         GRID,
         SMSPEC,
+        ESMRY,
         STIMPLAN_FRACTURE,
         LAS,
         SURFACE,
@@ -106,9 +109,7 @@ private:
 
     // File search methods
 
-    QStringList findMatchingFiles();
-    void buildDirectoryListRecursiveSimple( const QString& currentDir, const QString& currentPathFilter, QStringList* accumulatedDirs );
-    QStringList    findFilesInDirs( const QStringList& dirs );
+    QStringList    findMatchingFiles();
     QStringList    createFileNameFilterList();
     static QString replaceWithRealizationStar( const QString& text );
 

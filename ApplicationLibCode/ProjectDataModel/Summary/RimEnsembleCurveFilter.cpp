@@ -303,7 +303,7 @@ QList<caf::PdmOptionItemInfo> RimEnsembleCurveFilter::calculateValueOptions( con
         auto curveSet = parentCurveSet();
         if ( curveSet )
         {
-            auto params = curveSet->ensembleParameters( RimEnsembleCurveSet::ParameterSorting::ABSOLUTE_VALUE );
+            auto params = curveSet->ensembleParameters( RimCurveAppearanceDefines::ParameterSorting::ABSOLUTE_VALUE );
             for ( const auto& [param, corr] : params )
             {
                 options.push_back( caf::PdmOptionItemInfo( QString( "%1 (Avg. correlation: %2)" ).arg( param.name ).arg( corr ), param.name ) );
@@ -500,6 +500,11 @@ void RimEnsembleCurveFilter::initAfterRead()
     {
         m_valueRange = std::pair<double, double>( m_minValue_OBSOLETE, m_maxValue_OBSOLETE );
     };
+
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2020.04.0" ) )
+    {
+        m_filterMode = FilterMode::ENSEMBLE_PARAMETER;
+    };
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -675,25 +680,28 @@ std::vector<RimSummaryCase*> RimEnsembleCurveFilter::applyFilter( const std::vec
         }
         else if ( m_filterMode() == FilterMode::SUMMARY_VALUE )
         {
-            const auto [isValid, values] = sumCase->summaryReader()->values( m_addressSelector->summaryAddress() );
-
-            bool isInsideFilter = isValid;
-
-            if ( isValid && !values.empty() )
+            if ( auto reader = sumCase->summaryReader() )
             {
-                auto timeConfig = curveSet->objectiveFunctionTimeConfig();
-                auto timeSteps  = sumCase->summaryReader()->timeSteps( m_addressSelector->summaryAddress() );
+                const auto [isValid, values] = reader->values( m_addressSelector->summaryAddress() );
 
-                for ( size_t i = 0; i < std::min( timeSteps.size(), values.size() ); i++ )
+                bool isInsideFilter = isValid;
+
+                if ( isValid && !values.empty() )
                 {
-                    if ( timeSteps[i] < timeConfig.m_startTimeStep || timeSteps[i] > timeConfig.m_endTimeStep ) continue;
+                    auto timeConfig = curveSet->objectiveFunctionTimeConfig();
+                    auto timeSteps  = reader->timeSteps( m_addressSelector->summaryAddress() );
 
-                    isInsideFilter = RiaNumericalTools::isValueInRange( values[i], m_valueRange() );
+                    for ( size_t i = 0; i < std::min( timeSteps.size(), values.size() ); i++ )
+                    {
+                        if ( timeSteps[i] < timeConfig.m_startTimeStep || timeSteps[i] > timeConfig.m_endTimeStep ) continue;
+
+                        isInsideFilter = RiaNumericalTools::isValueInRange( values[i], m_valueRange() );
+                    }
                 }
-            }
-            if ( !isInsideFilter )
-            {
-                casesToRemove.insert( sumCase );
+                if ( !isInsideFilter )
+                {
+                    casesToRemove.insert( sumCase );
+                }
             }
         }
     }
@@ -789,7 +797,7 @@ void RimEnsembleCurveFilter::updateMaxMinAndDefaultValues( bool forceDefault )
     {
         if ( !selectedEnsembleParameter().isValid() )
         {
-            auto ensParams = parentCurveSet()->ensembleParameters( RimEnsembleCurveSet::ParameterSorting::ABSOLUTE_VALUE );
+            auto ensParams = parentCurveSet()->ensembleParameters( RimCurveAppearanceDefines::ParameterSorting::ABSOLUTE_VALUE );
             if ( !ensParams.empty() )
             {
                 m_ensembleParameterName = ensParams.front().first.name;

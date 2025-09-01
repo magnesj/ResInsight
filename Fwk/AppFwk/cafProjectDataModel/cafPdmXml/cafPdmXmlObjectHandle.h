@@ -1,5 +1,6 @@
 #pragma once
 
+#include "cafPdmDeprecation.h"
 #include "cafPdmObjectCapability.h"
 
 #include <QString>
@@ -45,8 +46,11 @@ public:
 
     // Main XML serialization methods that is used internally by the document serialization system
     // Not supposed to be used directly.
-    void readFields( QXmlStreamReader& inputStream, PdmObjectFactory* objectFactory, bool isCopyOperation );
-    void writeFields( QXmlStreamWriter& outputStream ) const;
+    std::vector<QString> readFields( QXmlStreamReader&                  inputStream,
+                                     PdmObjectFactory*                  objectFactory,
+                                     bool                               isCopyOperation,
+                                     const std::vector<PdmDeprecation>& deprecations = {} );
+    void                 writeFields( QXmlStreamWriter& outputStream ) const;
 
     /// Check if a string is a valid Xml element name
     static bool isValidXmlElementName( const QString& name );
@@ -65,10 +69,13 @@ public:
 protected: // Virtual
     /// Method gets called from PdmDocument after all objects are read.
     /// Re-implement to set up internal pointers etc. in your data structure
-    virtual void initAfterRead(){};
+    virtual void initAfterRead() {};
     /// Method gets called from PdmDocument before saving document.
     /// Re-implement to make sure your fields have correct data before saving
-    virtual void setupBeforeSave(){};
+    virtual void setupBeforeSave() {};
+
+    /// Override this method if you need to exclude or reorder fields for export to XML
+    [[nodiscard]] virtual std::vector<PdmFieldHandle*> fieldsForExport() const;
 
     /// This method is intended to be used in macros to make compile time errors
     // if user uses them on wrong type of objects

@@ -25,6 +25,7 @@
 #include "Summary/RiaSummaryCurveAddress.h"
 #include "Summary/RiaSummaryDefines.h"
 
+#include "Appearance/RimCurveAppearanceDefines.h"
 #include "RimEnsembleCrossPlotStatisticsCase.h"
 #include "RimEnsembleCurveSetColorManager.h"
 #include "RimEnsembleCurveSetInterface.h"
@@ -65,6 +66,7 @@ class RiuPlotWidget;
 class RiuPlotCurve;
 class RimPlotAxisPropertiesInterface;
 class RimSummaryAddressSelector;
+class RimSummaryPlot;
 class RimTimeAxisAnnotation;
 
 class QwtPlot;
@@ -86,18 +88,6 @@ public:
     using LineStyle          = caf::AppEnum<RiuQwtPlotCurveDefines::LineStyleEnum>;
     using PointSymbol        = caf::AppEnum<RiuPlotCurveSymbol::PointSymbolEnum>;
 
-    enum class ParameterSorting
-    {
-        ABSOLUTE_VALUE,
-        ALPHABETICALLY
-    };
-
-    enum class AppearanceMode
-    {
-        DEFAULT,
-        CUSTOM
-    };
-
 public:
     RimEnsembleCurveSet();
     ~RimEnsembleCurveSet() override;
@@ -117,8 +107,8 @@ public:
     void deletePlotCurves();
     void reattachPlotCurves();
 
-    void addCurve( RimSummaryCurve* curve );
-    void deleteCurve( RimSummaryCurve* curve );
+    void addRealizationCurve( RimSummaryCurve* curve );
+    void deleteRealizationCurve( RimSummaryCurve* curve );
 
     void                          setSummaryAddressY( RifEclipseSummaryAddress address );
     void                          setCurveAddress( RiaSummaryCurveAddress address );
@@ -160,7 +150,7 @@ public:
     void                              updateAllTextInPlot();
     std::vector<RigEnsembleParameter> variationSortedEnsembleParameters() const;
 
-    std::vector<std::pair<RigEnsembleParameter, double>> ensembleParameters( ParameterSorting sortingMode ) const;
+    std::vector<std::pair<RigEnsembleParameter, double>> ensembleParameters( RimCurveAppearanceDefines::ParameterSorting sortingMode ) const;
 
     std::vector<RimSummaryCase*> filterEnsembleCases( const std::vector<RimSummaryCase*>& sumCases );
     void                         disableStatisticCurves();
@@ -218,6 +208,8 @@ private:
     std::vector<RiaSummaryCurveDefinition> curveDefinitions() const;
     void                                   defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
+    std::vector<RimSummaryCurve*> realizationCurves() const;
+
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -239,7 +231,7 @@ private:
     void onObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
     void onCustomObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
 
-    void setTransparentCurveColor();
+    void computeRealizationColor();
     void onColorTagClicked( const SignalEmitter* emitter, size_t index );
 
     void setSummaryAddressX( RifEclipseSummaryAddress address );
@@ -249,9 +241,13 @@ private:
 
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
 
+    void createCurves( const std::vector<RimSummaryCase*>& sumCases, const RimSummaryAddress& addr );
+    void recreatePlotCurveForLegend( RimSummaryPlot* plot );
+
 private:
     caf::PdmField<bool>                       m_showCurves;
-    caf::PdmChildArrayField<RimSummaryCurve*> m_curves;
+    caf::PdmChildArrayField<RimSummaryCurve*> m_realizationCurves;
+    caf::PdmChildArrayField<RimSummaryCurve*> m_statisticsCurves;
 
     caf::PdmPointer<RimSummaryCurve> m_currentSummaryCurve;
 
@@ -264,22 +260,22 @@ private:
     caf::PdmField<caf::AppEnum<RiaDefines::HorizontalAxisType>> m_xAxisType;
     caf::PdmChildField<RimSummaryAddressSelector*>              m_xAddressSelector;
 
-    caf::PdmField<ColorModeEnum>                                       m_colorMode;
-    caf::PdmField<cvf::Color3f>                                        m_mainEnsembleColor;
-    caf::PdmField<cvf::Color3f>                                        m_colorForRealizations;
-    caf::PdmField<double>                                              m_colorTransparency;
-    caf::PdmField<QString>                                             m_ensembleParameter;
-    caf::PdmField<caf::AppEnum<RimEnsembleCurveSet::ParameterSorting>> m_ensembleParameterSorting;
+    caf::PdmField<ColorModeEnum>                                             m_colorMode;
+    caf::PdmField<cvf::Color3f>                                              m_mainEnsembleColor;
+    cvf::Color3f                                                             m_colorForRealizations;
+    caf::PdmField<double>                                                    m_colorOpacity;
+    caf::PdmField<QString>                                                   m_ensembleParameter;
+    caf::PdmField<caf::AppEnum<RimCurveAppearanceDefines::ParameterSorting>> m_ensembleParameterSorting;
 
-    caf::PdmField<caf::AppEnum<AppearanceMode>> m_useCustomAppearance;
-    caf::PdmField<LineStyle>                    m_lineStyle;
-    caf::PdmField<PointSymbol>                  m_pointSymbol;
-    caf::PdmField<int>                          m_symbolSize;
+    caf::PdmField<caf::AppEnum<RimCurveAppearanceDefines::AppearanceMode>> m_useCustomAppearance;
+    caf::PdmField<LineStyle>                                               m_lineStyle;
+    caf::PdmField<PointSymbol>                                             m_pointSymbol;
+    caf::PdmField<int>                                                     m_symbolSize;
 
-    caf::PdmField<caf::AppEnum<AppearanceMode>> m_statisticsUseCustomAppearance;
-    caf::PdmField<LineStyle>                    m_statisticsLineStyle;
-    caf::PdmField<PointSymbol>                  m_statisticsPointSymbol;
-    caf::PdmField<int>                          m_statisticsSymbolSize;
+    caf::PdmField<caf::AppEnum<RimCurveAppearanceDefines::AppearanceMode>> m_statisticsUseCustomAppearance;
+    caf::PdmField<LineStyle>                                               m_statisticsLineStyle;
+    caf::PdmField<PointSymbol>                                             m_statisticsPointSymbol;
+    caf::PdmField<int>                                                     m_statisticsSymbolSize;
 
     caf::PdmChildArrayField<RimSummaryAddress*>   m_objectiveValuesSummaryAddresses;
     caf::PdmField<QString>                        m_objectiveValuesSummaryAddressesUiField;
@@ -323,4 +319,7 @@ private:
 
     QList<caf::PdmOptionItemInfo> m_cachedAddressOptions;
     size_t                        m_hash;
+    size_t                        m_realizationHash;
+
+    caf::PdmField<cvf::Color3f> m_colorForRealizations_OBSOLETE;
 };

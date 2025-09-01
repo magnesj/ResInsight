@@ -264,7 +264,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         caf::ProgressInfo progInfo( 50, "Reading Eclipse Grid File", false /*do not delay*/ );
         progInfo.setNextProgressIncrement( 49 );
 
-        m_flowDagSolverInterface = new RigFlowDiagSolverInterface( this );
+        m_flowDagSolverInterface = std::make_unique<RigFlowDiagSolverInterface>( this );
 
         CVF_ASSERT( eclipseCaseData() );
         CVF_ASSERT( readerInterface.notNull() );
@@ -425,11 +425,11 @@ void RimEclipseResultCase::ensureRftDataIsImported()
     {
         if ( m_useOpmRftReader )
         {
-            m_readerOpmRft = new RifReaderOpmRft( rftFileInfo.filePath() );
+            m_readerOpmRft = std::make_unique<RifReaderOpmRft>( rftFileInfo.filePath() );
         }
         else
         {
-            m_readerEclipseRft = new RifReaderEclipseRft( rftFileInfo.filePath() );
+            m_readerEclipseRft = std::make_unique<RifReaderEclipseRft>( rftFileInfo.filePath() );
         }
     }
 
@@ -602,7 +602,7 @@ std::vector<RimFlowDiagSolution*> RimEclipseResultCase::flowDiagSolutions()
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagSolverInterface* RimEclipseResultCase::flowDiagSolverInterface()
 {
-    return m_flowDagSolverInterface.p();
+    return m_flowDagSolverInterface.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -612,9 +612,9 @@ RifReaderRftInterface* RimEclipseResultCase::rftReader()
 {
     ensureRftDataIsImported();
 
-    if ( m_useOpmRftReader ) return m_readerOpmRft.p();
+    if ( m_useOpmRftReader ) return m_readerOpmRft.get();
 
-    return m_readerEclipseRft.p();
+    return m_readerEclipseRft.get();
 }
 
 //--------------------------------------------------------------------------------------------------

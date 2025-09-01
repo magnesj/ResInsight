@@ -45,6 +45,7 @@
 #include "RimWellLogCurve.h"
 #include "RimWellLogPlot.h"
 #include "RimWellLogTrack.h"
+#include "Summary/Ensemble/RimSummaryEnsembleParameter.h"
 
 #include "RiuMainWindow.h"
 
@@ -155,7 +156,7 @@ private:
         std::vector<T*> typedAncestorsVec;
         for ( size_t i = 0; i < m_objects.size(); i++ )
         {
-            auto typedAncestor = m_objects[i]->firstAncestorOfType<T>();
+            auto typedAncestor = m_objects[i]->template firstAncestorOfType<T>();
             if ( typedAncestor )
             {
                 typedAncestorsVec.push_back( typedAncestor );
@@ -246,9 +247,9 @@ Qt::ItemFlags RiuDragDrop::flags( const QModelIndex& index ) const
             if ( wellAllocationPlot ) return itemflags;
         }
 
-        if ( dynamic_cast<RimEclipseCase*>( uiItem ) || dynamic_cast<RimWellLogCurve*>( uiItem ) ||
-             dynamic_cast<RimWellLogChannel*>( uiItem ) || dynamic_cast<RimPlot*>( uiItem ) || dynamic_cast<RimSummaryCase*>( uiItem ) ||
-             dynamic_cast<RimSummaryEnsemble*>( uiItem ) || dynamic_cast<RimSurface*>( uiItem ) )
+        if ( dynamic_cast<RimEclipseCase*>( uiItem ) || dynamic_cast<RimWellLogCurve*>( uiItem ) || dynamic_cast<RimWellLogChannel*>( uiItem ) ||
+             dynamic_cast<RimPlot*>( uiItem ) || dynamic_cast<RimSummaryCase*>( uiItem ) || dynamic_cast<RimSummaryEnsemble*>( uiItem ) ||
+             dynamic_cast<RimSurface*>( uiItem ) || dynamic_cast<RimSummaryEnsembleParameter*>( uiItem ) )
         {
             itemflags |= Qt::ItemIsDragEnabled;
         }
@@ -325,7 +326,8 @@ Qt::ItemFlags RiuDragDrop::flags( const QModelIndex& index ) const
             }
             else if ( dynamic_cast<RimSummaryCaseMainCollection*>( uiItem ) )
             {
-                if ( RiuTypedPdmObjects<RimSummaryCase>::containsTypedObjects( m_dragItems ) )
+                if ( RiuTypedPdmObjects<RimSummaryCase>::containsTypedObjects( m_dragItems ) ||
+                     RiuTypedPdmObjects<RimSummaryEnsemble>::containsTypedObjects( m_dragItems ) )
                 {
                     itemflags |= Qt::ItemIsDropEnabled;
                 }
@@ -610,9 +612,9 @@ bool RiuDragDrop::handleSummaryCaseMainCollectionDrop( Qt::DropAction           
                                                        RimSummaryCaseMainCollection* summaryCaseDropTarget,
                                                        int                           insertAtPosition )
 {
-    std::vector<RimSummaryCase*> summaryCases = RiuTypedPdmObjects<RimSummaryCase>::typedObjectsFromGroup( draggedObjects );
+    if ( action != Qt::MoveAction ) return false;
 
-    if ( action != Qt::MoveAction || summaryCases.empty() ) return false;
+    std::vector<RimSummaryCase*> summaryCases = RiuTypedPdmObjects<RimSummaryCase>::typedObjectsFromGroup( draggedObjects );
 
     for ( RimSummaryCase* summaryCase : summaryCases )
     {
@@ -637,6 +639,13 @@ bool RiuDragDrop::handleSummaryCaseMainCollectionDrop( Qt::DropAction           
         {
             parentContainer->moveCase( summaryCase, insertAtPosition );
         }
+    }
+
+    auto ensembles = RiuTypedPdmObjects<RimSummaryEnsemble>::typedObjectsFromGroup( draggedObjects );
+    if ( ensembles.size() == 1 )
+    {
+        auto ensemble = ensembles.front();
+        summaryCaseDropTarget->moveEnsemble( ensemble, insertAtPosition );
     }
 
     return true;
@@ -667,8 +676,7 @@ void RiuDragDrop::objectGroupFromModelIndexes( caf::PdmUiTreeView* uiTreeView, c
 //--------------------------------------------------------------------------------------------------
 std::vector<caf::PdmPointer<caf::PdmObjectHandle>> RiuDragDrop::objectHandlesFromSelection()
 {
-    std::vector<caf::PdmObjectHandle*> selection;
-    caf::SelectionManager::instance()->objectsByType( &selection );
+    const auto selection = caf::SelectionManager::instance()->objectsByType<caf::PdmObjectHandle>();
 
     std::vector<caf::PdmPointer<caf::PdmObjectHandle>> objectHandles;
 

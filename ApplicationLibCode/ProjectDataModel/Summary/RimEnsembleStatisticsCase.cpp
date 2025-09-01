@@ -73,6 +73,8 @@ bool RimEnsembleStatisticsCase::hasMeanData() const
 //--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
+    if ( resultAddress.isErrorResult() ) return { true, {} };
+
     switch ( resultAddress.statisticsType() )
     {
         case RifEclipseSummaryAddressDefines::StatisticsType::P10:
@@ -135,12 +137,7 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     auto hash = RiaHashTools::hash( summaryCases, inputAddress.toEclipseTextAddress(), includeIncompleteCurves );
     if ( hash == m_hash ) return;
 
-    bool showDebugTiming = false;
-    if ( showDebugTiming )
-    {
-        QString timingText = "RimEnsembleStatisticsCase::calculate" + QString::fromStdString( inputAddress.toEclipseTextAddress() );
-        RiaLogging::resetTimer( timingText );
-    }
+    auto startTime = RiaLogging::currentTime();
 
     m_hash = hash;
 
@@ -163,14 +160,31 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     for ( const auto& sumCase : summaryCases )
     {
         const auto& reader = sumCase->summaryReader();
-        if ( reader )
+        if ( !reader )
+        {
+            sumCase->setUiToolTip( "No data available for realization" );
+            sumCase->setUiReadOnly( true );
+        }
+        else
         {
             const std::vector<time_t>& timeSteps = reader->timeSteps( inputAddress );
             const auto [isOk, values]            = reader->values( inputAddress );
 
-            if ( values.empty() || timeSteps.empty() ) continue;
+            if ( values.empty() || timeSteps.empty() )
+            {
+                sumCase->setUiToolTip( "No data available for realization" );
+                sumCase->setUiReadOnly( true );
 
-            if ( !includeIncompleteCurves && ( timeSteps.back() < timeThreshold ) ) continue;
+                continue;
+            }
+
+            if ( !includeIncompleteCurves && ( timeSteps.back() < timeThreshold ) )
+            {
+                sumCase->setUiToolTip( "Incomplete realization" );
+                continue;
+            }
+            sumCase->setUiToolTip( "" );
+            sumCase->setUiReadOnly( false );
 
             curveMerger.addCurveData( timeSteps, values );
         }
@@ -209,9 +223,11 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
         m_meanData.push_back( mean );
     }
 
+    bool showDebugTiming = false;
     if ( showDebugTiming )
     {
-        RiaLogging::logTimeElapsed( "" );
+        QString timingText = "RimEnsembleStatisticsCase::calculate" + QString::fromStdString( inputAddress.toEclipseTextAddress() );
+        RiaLogging::logElapsedTime( timingText, startTime );
     }
 }
 
@@ -239,6 +255,21 @@ void RimEnsembleStatisticsCase::clearData()
     m_p90Data.clear();
     m_meanData.clear();
     m_firstSummaryCase = nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RimEnsembleStatisticsCase::keywordCount() const
+{
+    if ( m_firstSummaryCase && m_firstSummaryCase->summaryReader() )
+    {
+        m_firstSummaryCase->summaryReader()->createAddressesIfRequired();
+
+        return m_firstSummaryCase->summaryReader()->keywordCount();
+    }
+
+    return 0;
 }
 
 //--------------------------------------------------------------------------------------------------

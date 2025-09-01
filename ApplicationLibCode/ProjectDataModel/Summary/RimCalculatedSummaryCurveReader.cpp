@@ -82,7 +82,7 @@ std::string RifCalculatedSummaryCurveReader::unitName( const RifEclipseSummaryAd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifCalculatedSummaryCurveReader::buildMetaData()
+void RifCalculatedSummaryCurveReader::createAndSetAddresses()
 {
     m_allResultAddresses.clear();
 
@@ -112,6 +112,14 @@ RimSummaryCalculation* RifCalculatedSummaryCurveReader::findCalculationByName( c
     if ( !m_calculationCollection || !resultAddress.isCalculated() ) return nullptr;
 
     return dynamic_cast<RimSummaryCalculation*>( m_calculationCollection->findCalculationById( resultAddress.id() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RifCalculatedSummaryCurveReader::keywordCount() const
+{
+    return 0;
 }
 
 //--------------------------------------------------------------------------------------------------

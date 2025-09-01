@@ -18,7 +18,11 @@
 
 #include "RimcWellPath.h"
 
+#include "FractureCommands/RicNewWellPathFractureFeature.h"
 #include "FractureCommands/RicPlaceThermalFractureUsingTemplateDataFeature.h"
+
+#include "RiaApplication.h"
+#include "RiaKeyValueStoreUtil.h"
 #include "RiaLogging.h"
 
 #include "RimEclipseCase.h"
@@ -38,12 +42,17 @@
 #include "RimWellPathCompletionSettings.h"
 #include "RimWellPathFracture.h"
 
+#include "RigDoglegTools.h"
 #include "RigStimPlanModelTools.h"
-
-#include "FractureCommands/RicNewWellPathFractureFeature.h"
+#include "Well/RigWellPathGeometryExporter.h"
+#include "Well/RigWellPathGeometryTools.h"
 
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmFieldScriptingCapability.h"
+#include "cvfMath.h"
+#include "cvfVector3.h"
+
+#include <numbers>
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_addFracture, "AddFracture" );
 
@@ -51,7 +60,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_addFracture, "AddFr
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellPath_addFracture::RimcWellPath_addFracture( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Add StimPlan Fracture", "", "", "Add StimPlan Fracture" );
 
@@ -64,7 +73,7 @@ RimcWellPath_addFracture::RimcWellPath_addFracture( caf::PdmObjectHandle* self )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellPath_addFracture::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_addFracture::execute()
 {
     auto wellPath = self<RimWellPath>();
 
@@ -110,17 +119,9 @@ caf::PdmObjectHandle* RimcWellPath_addFracture::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_addFracture::resultIsPersistent() const
+QString RimcWellPath_addFracture::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellPath_addFracture::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimWellPathFracture );
+    return RimWellPathFracture::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_addThermalFracture, "AddThermalFracture" );
@@ -129,7 +130,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_addThermalFracture,
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellPath_addThermalFracture::RimcWellPath_addThermalFracture( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Add Thermal Fracture", "", "", "Add Thermal Fracture" );
 
@@ -141,7 +142,7 @@ RimcWellPath_addThermalFracture::RimcWellPath_addThermalFracture( caf::PdmObject
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellPath_addThermalFracture::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_addThermalFracture::execute()
 {
     auto wellPath = self<RimWellPath>();
 
@@ -163,17 +164,9 @@ caf::PdmObjectHandle* RimcWellPath_addThermalFracture::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_addThermalFracture::resultIsPersistent() const
+QString RimcWellPath_addThermalFracture::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellPath_addThermalFracture::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimWellPathFracture );
+    return RimWellPathFracture::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendPerforationInterval, "AppendPerforationInterval" );
@@ -182,9 +175,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendPerforationIn
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellPath_appendPerforationInterval::RimcWellPath_appendPerforationInterval( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Append Perforation Interval", "", "", "Append Perforation Interval" );
+
     CAF_PDM_InitScriptableField( &m_startMD, "StartMd", 0.0, "", "", "", "Start Measured Depth" );
     CAF_PDM_InitScriptableField( &m_endMD, "EndMd", 0.0, "", "", "", "End Measured Depth" );
     CAF_PDM_InitScriptableField( &m_diameter, "Diameter", 0.0, "", "", "", "Diameter" );
@@ -194,7 +188,7 @@ RimcWellPath_appendPerforationInterval::RimcWellPath_appendPerforationInterval( 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellPath_appendPerforationInterval::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendPerforationInterval::execute()
 {
     auto wellPath = self<RimWellPath>();
 
@@ -216,17 +210,9 @@ caf::PdmObjectHandle* RimcWellPath_appendPerforationInterval::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_appendPerforationInterval::resultIsPersistent() const
+QString RimcWellPath_appendPerforationInterval::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellPath_appendPerforationInterval::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimPerforationInterval );
+    return RimPerforationInterval::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_multiSegmentWellSettings, "MswSettings" );
@@ -235,7 +221,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_multiSegmentWellSet
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellPath_multiSegmentWellSettings::RimcWellPath_multiSegmentWellSettings( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_VALID, PdmObjectMethod::ResultType::PERSISTENT_TRUE )
 {
     CAF_PDM_InitObject( "MSW Settings", "", "", "Multi Segment Well Settings" );
 }
@@ -243,7 +229,7 @@ RimcWellPath_multiSegmentWellSettings::RimcWellPath_multiSegmentWellSettings( ca
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellPath_multiSegmentWellSettings::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_multiSegmentWellSettings::execute()
 {
     auto wellPath = self<RimWellPath>();
 
@@ -264,25 +250,9 @@ caf::PdmObjectHandle* RimcWellPath_multiSegmentWellSettings::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_multiSegmentWellSettings::resultIsPersistent() const
+QString RimcWellPath_multiSegmentWellSettings::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimcWellPath_multiSegmentWellSettings::isNullptrValidResult() const
-{
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellPath_multiSegmentWellSettings::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimMswCompletionParameters );
+    return RimMswCompletionParameters::classKeywordStatic();
 }
 
 CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendFishbones, "AppendFishbones" );
@@ -291,7 +261,7 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendFishbones, "A
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellPath_appendFishbones::RimcWellPath_appendFishbones( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : PdmObjectMethod( self, PdmObjectMethod::NullPointerType::NULL_IS_VALID, PdmObjectMethod::ResultType::PERSISTENT_TRUE )
 {
     CAF_PDM_InitObject( "Append Fishbones", "", "", "Append Fishbones" );
 
@@ -303,7 +273,7 @@ RimcWellPath_appendFishbones::RimcWellPath_appendFishbones( caf::PdmObjectHandle
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellPath_appendFishbones::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendFishbones::execute()
 {
     auto wellPath = self<RimWellPath>();
 
@@ -331,23 +301,93 @@ caf::PdmObjectHandle* RimcWellPath_appendFishbones::execute()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_appendFishbones::resultIsPersistent() const
+QString RimcWellPath_appendFishbones::classKeywordReturnedType() const
 {
-    return true;
+    return RimFishbones::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_extractWellPathPropertiesInternal, "ExtractWellPathPropertiesInternal" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimcWellPath_extractWellPathPropertiesInternal::RimcWellPath_extractWellPathPropertiesInternal( caf::PdmObjectHandle* self )
+    : caf::PdmVoidObjectMethod( self )
+{
+    CAF_PDM_InitObject( "Extract Well Path Properties", "", "", "Extract Well Path Properties" );
+
+    CAF_PDM_InitScriptableField( &m_resamplingInterval, "ResamplingInterval", 10.0, "ResamplingInterval" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_coordinateX, "CoordinateX", "CoordinateX" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_coordinateY, "CoordinateY", "CoordinateY" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_coordinateZ, "CoordinateZ", "CoordinateZ" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_measuredDepth, "MeasuredDepth", "MeasuredDepth" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_azimuth, "Azimuth", "Azimuth" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_inclination, "Inclination", "Inclination" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_dogleg, "Dogleg", "Dogleg" );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellPath_appendFishbones::isNullptrValidResult() const
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_extractWellPathPropertiesInternal::execute()
 {
-    return true;
-}
+    auto wellPath = self<RimWellPath>();
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellPath_appendFishbones::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimFishbones );
+    std::vector<double> xValues;
+    std::vector<double> yValues;
+    std::vector<double> tvdValues;
+    std::vector<double> mdValues;
+
+    auto wellPathGeom = wellPath->wellPathGeometry();
+
+    double mdStepSize = m_resamplingInterval();
+    CAF_ASSERT( mdStepSize > 0.0 );
+    double rkbOffset = 0.0;
+    RigWellPathGeometryExporter::computeWellPathDataForExport( *wellPathGeom, mdStepSize, rkbOffset, xValues, yValues, tvdValues, mdValues );
+
+    auto convertToCharViaFloat = []( const std::vector<double>& doubles ) -> std::vector<char>
+    {
+        std::vector<float> f;
+        for ( const double& v : doubles )
+            f.push_back( static_cast<float>( v ) );
+        return RiaKeyValueStoreUtil::convertToByteVector( f );
+    };
+
+    RiaApplication::instance()->keyValueStore()->set( m_coordinateX().toStdString(), convertToCharViaFloat( xValues ) );
+    RiaApplication::instance()->keyValueStore()->set( m_coordinateY().toStdString(), convertToCharViaFloat( yValues ) );
+    RiaApplication::instance()->keyValueStore()->set( m_coordinateZ().toStdString(), convertToCharViaFloat( tvdValues ) );
+    RiaApplication::instance()->keyValueStore()->set( m_measuredDepth().toStdString(), convertToCharViaFloat( mdValues ) );
+
+    std::vector<double> azimuthValues;
+    std::vector<double> inclinationValues;
+    for ( const double& md : mdValues )
+    {
+        auto [azimuth, inclination] = RigWellPathGeometryTools::calculateAzimuthAndInclinationAtMd( md, wellPathGeom );
+
+        if ( azimuth < 0.0 )
+        {
+            // Straight atan2 gives angle from -PI to PI yielding angles from -180 to 180
+            // where the negative angles are counter clockwise.
+            // To get all positive clockwise angles, we add 360 degrees to negative angles.
+            azimuth = azimuth + std::numbers::pi * 2.0;
+        }
+
+        azimuthValues.push_back( cvf::Math::toDegrees( azimuth ) );
+        inclinationValues.push_back( cvf::Math::toDegrees( inclination ) );
+    }
+
+    RiaApplication::instance()->keyValueStore()->set( m_azimuth().toStdString(), convertToCharViaFloat( azimuthValues ) );
+    RiaApplication::instance()->keyValueStore()->set( m_inclination().toStdString(), convertToCharViaFloat( inclinationValues ) );
+
+    std::vector<RigDoglegTools::WellSurveyPoint> surveyPoints;
+    for ( size_t i = 0; i < xValues.size(); i++ )
+    {
+        surveyPoints.push_back( { .inclination = inclinationValues[i], .azimuth = azimuthValues[i], .measuredDepth = mdValues[i] } );
+    }
+
+    // TODO: normalization length is meter. Maybe make it settable?
+    std::vector<double> doglegs = RigDoglegTools::calculateTrajectoryDogleg( surveyPoints, 30 );
+    RiaApplication::instance()->keyValueStore()->set( m_dogleg().toStdString(), convertToCharViaFloat( doglegs ) );
+
+    return nullptr;
 }

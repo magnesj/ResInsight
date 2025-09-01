@@ -40,6 +40,7 @@
 class RimSummaryCase;
 class RimSummaryAddressCollection;
 class RiaSummaryAddressAnalyzer;
+class RimSummaryEnsembleParameterCollection;
 
 //==================================================================================================
 ///
@@ -57,8 +58,10 @@ public:
     ~RimSummaryEnsemble() override;
 
     void removeCase( RimSummaryCase* summaryCase, bool notifyChange = true );
-    void addCase( RimSummaryCase* summaryCase );
-    void replaceCases( const std::vector<RimSummaryCase*>& summaryCases );
+    void addCase( RimSummaryCase* summaryCase, bool notifyChange = true );
+    void replaceCases( const std::vector<RimSummaryCase*>& summaryCases, bool notifyChange = true );
+
+    virtual void reloadCases();
 
     virtual std::vector<RimSummaryCase*> allSummaryCases() const;
     RimSummaryCase*                      firstSummaryCase() const;
@@ -66,7 +69,7 @@ public:
     QString name() const;
 
     void                                        setNameTemplate( const QString& name );
-    void                                        updateName( const std::set<QString>& existingEnsembleNames );
+    virtual void                                updateName( const std::set<QString>& existingEnsembleNames );
     void                                        setUsePathKey1( bool useKey1 );
     void                                        setUsePathKey2( bool useKey2 );
     virtual std::pair<std::string, std::string> nameKeys() const;
@@ -117,6 +120,8 @@ public:
     void                      setMinMax( const RifEclipseSummaryAddress& address, double min, double max );
     std::pair<double, double> minMax( const RifEclipseSummaryAddress& address );
 
+    virtual void cleanupBeforeDelete();
+
 protected:
     virtual void onLoadDataAndUpdate();
 
@@ -127,10 +132,11 @@ protected:
     bool isAutoNameChecked() const;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void initAfterRead() override;
+    void buildChildNodes();
 
 private:
     caf::PdmFieldHandle* userDescriptionField() override;
-    void                 initAfterRead() override;
     void                 defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
@@ -141,7 +147,6 @@ private:
 
     void onCaseNameChanged( const SignalEmitter* emitter );
 
-    void buildChildNodes();
     void clearChildNodes();
 
     QString ensembleDescription() const;
@@ -163,9 +168,9 @@ private:
     caf::PdmField<bool>                              m_isEnsemble;
     caf::PdmChildField<RimSummaryAddressCollection*> m_dataVectorFolders;
 
-    caf::PdmField<int> m_ensembleId;
+    caf::PdmChildField<RimSummaryEnsembleParameterCollection*> m_ensembleParameters;
 
-    size_t m_commonAddressCount; // if different address count among cases, set to 0
+    caf::PdmField<int> m_ensembleId;
 
     mutable std::vector<RigEnsembleParameter>  m_cachedSortedEnsembleParameters;
     std::unique_ptr<RiaSummaryAddressAnalyzer> m_analyzer;

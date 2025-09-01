@@ -1,8 +1,9 @@
+#include "RifVtkImportUtil.h"
 #include "RifVtkSurfaceImporter.h"
 
 #include "RiaTestDataDirectory.h"
 
-#include "RigTriangleMeshData.h"
+#include "Surface/RigTriangleMeshData.h"
 
 #include <gtest/gtest.h>
 
@@ -42,6 +43,13 @@ TEST( RifVtkSurfaceImporterTest, ImportFromFile )
                                   [expectedProperty]( const QString& name ) { return name == expectedProperty; } ) );
         EXPECT_EQ( triangleMeshData->propertyValues( expectedProperty ).size(), expectedVertexCount );
     }
+
+    // Check that we handled NaN values
+    auto values = triangleMeshData->propertyValues( "ReservoirPerm" );
+    for ( size_t i = 24; i < 30; i++ )
+    {
+        ASSERT_TRUE( std::isnan( triangleMeshData->propertyValues( "ReservoirPerm" )[i] ) );
+    }
 }
 
 // Test parsing a PVD file
@@ -52,7 +60,7 @@ TEST( RifVtkSurfaceImporterTest, ParsePvdDatasets )
     std::filesystem::path pvdFilePath = testDataDir / "dataset.pvd";
 
     // Exercise
-    auto datasets = RifVtkSurfaceImporter::parsePvdDatasets( pvdFilePath );
+    auto datasets = RifVtkImportUtil::parsePvdDatasets( pvdFilePath );
 
     // Verify
     ASSERT_EQ( datasets.size(), 2 ) << "Expected 2 datasets in the PVD file";
@@ -78,7 +86,7 @@ TEST( RifVtkSurfaceImporterTest, ImportMultipleTimesteps )
     std::filesystem::path pvdFilePath = testDataDir / "dataset.pvd";
 
     // Exercise
-    auto datasets = RifVtkSurfaceImporter::parsePvdDatasets( pvdFilePath );
+    auto datasets = RifVtkImportUtil::parsePvdDatasets( pvdFilePath );
     ASSERT_FALSE( datasets.empty() ) << "Failed to parse PVD datasets";
 
     // Import each VTU file
@@ -118,7 +126,7 @@ TEST( RifVtkSurfaceImporterTest, HandleInvalidFiles )
 
     // Test with invalid PVD file
     std::filesystem::path invalidPvdFile = testDataDir / "invalid.pvd";
-    auto                  datasets       = RifVtkSurfaceImporter::parsePvdDatasets( invalidPvdFile );
+    auto                  datasets       = RifVtkImportUtil::parsePvdDatasets( invalidPvdFile );
     EXPECT_TRUE( datasets.empty() ) << "Expected empty dataset list for invalid PVD file";
 }
 
@@ -130,7 +138,7 @@ TEST( RifVtkSurfaceImporterTest, PvdPathResolution )
     std::filesystem::path pvdFilePath = testDataDir / "dataset.pvd";
 
     // Exercise
-    auto datasets = RifVtkSurfaceImporter::parsePvdDatasets( pvdFilePath );
+    auto datasets = RifVtkImportUtil::parsePvdDatasets( pvdFilePath );
     ASSERT_FALSE( datasets.empty() ) << "Failed to parse PVD datasets";
 
     // Verify

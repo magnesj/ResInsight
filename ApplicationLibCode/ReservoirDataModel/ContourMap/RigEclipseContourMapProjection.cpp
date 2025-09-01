@@ -18,6 +18,8 @@
 
 #include "RigEclipseContourMapProjection.h"
 
+#include "RiaResultNames.h"
+
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigCell.h"
@@ -321,6 +323,19 @@ size_t RigEclipseContourMapProjection::gridResultIndex( size_t globalCellIdx ) c
     if ( m_useActiveCellInfo ) return m_activeCellInfo->cellResultIndex( globalCellIdx );
 
     return globalCellIdx;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RigEclipseContourMapProjection::isCellActive( size_t globalCellIdx ) const
+{
+    if ( m_useActiveCellInfo && m_activeCellInfo.notNull() )
+    {
+        return m_activeCellInfo->isActive( globalCellIdx );
+    }
+
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------

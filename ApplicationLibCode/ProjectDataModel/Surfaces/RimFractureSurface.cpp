@@ -21,18 +21,19 @@
 #include "RiaLogging.h"
 
 #include "RigStatisticsMath.h"
-#include "RigSurface.h"
-#include "RigTriangleMeshData.h"
+#include "Surface/RigSurface.h"
+#include "Surface/RigTriangleMeshData.h"
 
 #include "RimRegularLegendConfig.h"
 #include "RimSurfaceCollection.h"
 
 #include "RifSurfaceImporter.h"
+#include "RifVtkImportUtil.h"
 #include "RifVtkSurfaceImporter.h"
 
 #include "cafPdmObjectScriptingCapability.h"
 
-CAF_PDM_SOURCE_INIT( RimFractureSurface, "RimFractureSurface" );
+CAF_PDM_SOURCE_INIT( RimFractureSurface, "FractureSurface", "RimFractureSurface" );
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -199,7 +200,7 @@ void RimFractureSurface::clearCachedNativeData()
 bool RimFractureSurface::loadDataFromFile()
 {
     std::filesystem::path filepath    = m_surfaceDefinitionFilePath().path().toLocal8Bit().constData();
-    auto                  surfaceInfo = RifVtkSurfaceImporter::parsePvdDatasets( filepath );
+    auto                  surfaceInfo = RifVtkImportUtil::parsePvdDatasets( filepath );
 
     for ( const auto& s : surfaceInfo )
     {

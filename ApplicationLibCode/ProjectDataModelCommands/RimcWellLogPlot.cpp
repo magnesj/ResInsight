@@ -39,9 +39,10 @@ CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellLogPlot, RimcWellLogPlot_newWellLogTra
 ///
 //--------------------------------------------------------------------------------------------------
 RimcWellLogPlot_newWellLogTrack::RimcWellLogPlot_newWellLogTrack( caf::PdmObjectHandle* self )
-    : caf::PdmObjectMethod( self )
+    : caf::PdmObjectCreationMethod( self )
 {
     CAF_PDM_InitObject( "Create Well Log Track", "", "", "Create a new well log track" );
+
     CAF_PDM_InitScriptableFieldNoDefault( &m_title, "Title", "", "", "", "Title" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_case, "Case", "", "", "", "Case" );
     CAF_PDM_InitScriptableFieldNoDefault( &m_wellPath, "WellPath", "", "", "", "Well Path" );
@@ -50,11 +51,11 @@ RimcWellLogPlot_newWellLogTrack::RimcWellLogPlot_newWellLogTrack( caf::PdmObject
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmObjectHandle* RimcWellLogPlot_newWellLogTrack::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellLogPlot_newWellLogTrack::execute()
 {
     RimWellLogPlot* wellLogPlot = self<RimWellLogPlot>();
 
-    if ( !wellLogPlot ) return nullptr;
+    if ( !wellLogPlot ) return std::unexpected( "No well log plot found" );
 
     return createWellLogTrack( wellLogPlot, m_case(), m_wellPath(), m_title() );
 }
@@ -90,15 +91,7 @@ RimWellLogTrack* RimcWellLogPlot_newWellLogTrack::createWellLogTrack( RimWellLog
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimcWellLogPlot_newWellLogTrack::resultIsPersistent() const
+QString RimcWellLogPlot_newWellLogTrack::classKeywordReturnedType() const
 {
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<caf::PdmObjectHandle> RimcWellLogPlot_newWellLogTrack::defaultResult() const
-{
-    return std::unique_ptr<caf::PdmObjectHandle>( new RimWellLogTrack );
+    return RimWellLogTrack::classKeywordStatic();
 }

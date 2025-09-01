@@ -54,10 +54,7 @@ CAF_CMD_SOURCE_INIT( RicPlotProductionRateFeature, "RicPlotProductionRateFeature
 //--------------------------------------------------------------------------------------------------
 bool RicPlotProductionRateFeature::isCommandEnabled() const
 {
-    std::vector<RimSimWellInView*> collection;
-    caf::SelectionManager::instance()->objectsByType( &collection );
-
-    for ( RimSimWellInView* well : collection )
+    for ( RimSimWellInView* well : caf::SelectionManager::instance()->objectsByType<RimSimWellInView>() )
     {
         auto summaryCase = RimSimWellInViewTools::summaryCaseForWell( well );
         if ( summaryCase )
@@ -80,12 +77,9 @@ void RicPlotProductionRateFeature::onActionTriggered( bool isChecked )
     RimSummaryCaseMainCollection* sumCaseColl = project->activeOilField() ? project->activeOilField()->summaryCaseMainCollection() : nullptr;
     if ( !sumCaseColl ) return;
 
-    std::vector<RimSimWellInView*> collection;
-    caf::SelectionManager::instance()->objectsByType( &collection );
-
     RimSummaryPlot* summaryPlotToSelect = nullptr;
 
-    for ( RimSimWellInView* well : collection )
+    for ( RimSimWellInView* well : caf::SelectionManager::instance()->objectsByType<RimSimWellInView>() )
     {
         auto summaryCase = RimSimWellInViewTools::summaryCaseForWell( well );
         if ( !summaryCase ) continue;
@@ -248,9 +242,11 @@ RimSummaryCurve* RicPlotProductionRateFeature::addSummaryCurve( RimSummaryPlot* 
     CVF_ASSERT( summaryCase );
     CVF_ASSERT( well );
 
-    RifEclipseSummaryAddress addr = RifEclipseSummaryAddress::wellAddress( vectorName.toStdString(), well->name().toStdString(), -1 );
+    auto reader = summaryCase->summaryReader();
+    if ( !reader ) return nullptr;
 
-    if ( !summaryCase->summaryReader()->hasAddress( addr ) )
+    RifEclipseSummaryAddress addr = RifEclipseSummaryAddress::wellAddress( vectorName.toStdString(), well->name().toStdString(), -1 );
+    if ( !reader->hasAddress( addr ) )
     {
         return nullptr;
     }

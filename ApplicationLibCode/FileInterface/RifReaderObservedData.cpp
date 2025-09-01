@@ -56,36 +56,11 @@ bool RifReaderObservedData::open( const QString&                                
 
     QString     data;
     QTextStream out( &data );
-    out << "Date"
-        << "\t"
-        << "Oil"
-        << "\t"
-        << "PW"
-        << "\n";
-    out << "1993-02-23"
-        << "\t"
-        << "10"
-        << "\t"
-        << "1"
-        << "\n";
-    out << "1993-06-15"
-        << "\t"
-        << "20"
-        << "\t"
-        << "2"
-        << "\n";
-    out << "1994-02-26"
-        << "\t"
-        << "30"
-        << "\t"
-        << "3"
-        << "\n";
-    out << "1994-05-23"
-        << "\t"
-        << "40"
-        << "\t"
-        << "4"
-        << "\n";
+    out << "Date" << "\t" << "Oil" << "\t" << "PW" << "\n";
+    out << "1993-02-23" << "\t" << "10" << "\t" << "1" << "\n";
+    out << "1993-06-15" << "\t" << "20" << "\t" << "2" << "\n";
+    out << "1994-02-26" << "\t" << "30" << "\t" << "3" << "\n";
+    out << "1994-05-23" << "\t" << "40" << "\t" << "4" << "\n";
 
     m_asciiParser = std::unique_ptr<RifCsvUserDataParser>( new RifCsvUserDataPastedTextParser( data ) );
 
@@ -207,6 +182,14 @@ RifEclipseSummaryAddress RifReaderObservedData::address( const QString&         
                                      wellCompletionNumber,
                                      isErrorResult,
                                      id );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RifReaderObservedData::keywordCount() const
+{
+    return m_allResultAddresses.size();
 }
 
 //--------------------------------------------------------------------------------------------------

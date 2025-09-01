@@ -23,7 +23,6 @@
 #include "enum_bitmask.hpp"
 
 #include <QString>
-#include <set>
 #include <vector>
 
 namespace RiaDefines
@@ -123,23 +122,28 @@ enum class PhaseType
     PHASE_NOT_APPLICABLE
 };
 
-enum class ImportFileType
+enum class ImportFileType : uint32_t
 {
-    NOT_A_VALID_IMPORT_FILE = 0x00,
-    ECLIPSE_GRID_FILE       = 0x01,
-    ECLIPSE_EGRID_FILE      = 0x02,
-    ECLIPSE_INPUT_FILE      = 0x04,
-    ECLIPSE_SUMMARY_FILE    = 0x08,
-    GEOMECH_ODB_FILE        = 0x10,
-    RESINSIGHT_PROJECT_FILE = 0x20,
-    GEOMECH_INP_FILE        = 0x40,
-    EM_H5GRID               = 0x80,
-    ROFF_FILE               = 0x100,
+    NOT_A_VALID_IMPORT_FILE = 1 << 0,
+    ECLIPSE_GRID_FILE       = 1 << 1,
+    ECLIPSE_EGRID_FILE      = 1 << 2,
+    ECLIPSE_INPUT_FILE      = 1 << 3,
+    ECLIPSE_SUMMARY_FILE    = 1 << 4,
+    GEOMECH_ODB_FILE        = 1 << 5,
+    RESINSIGHT_PROJECT_FILE = 1 << 6,
+    GEOMECH_INP_FILE        = 1 << 7,
+    EM_H5GRID               = 1 << 8,
+    ROFF_FILE               = 1 << 9,
+    GEOMECH_VTK_FILE        = 1 << 10,
     ECLIPSE_RESULT_GRID     = ECLIPSE_GRID_FILE | ECLIPSE_EGRID_FILE,
     ANY_ECLIPSE_FILE        = ECLIPSE_RESULT_GRID | ECLIPSE_INPUT_FILE | ECLIPSE_SUMMARY_FILE | ROFF_FILE | EM_H5GRID,
-    ANY_GEOMECH_FILE        = GEOMECH_ODB_FILE | GEOMECH_INP_FILE,
-    ANY_IMPORT_FILE         = 0xFF
+    ANY_GEOMECH_FILE        = GEOMECH_ODB_FILE | GEOMECH_INP_FILE | GEOMECH_VTK_FILE,
+    ANY_IMPORT_FILE         = ANY_ECLIPSE_FILE | ANY_GEOMECH_FILE | RESINSIGHT_PROJECT_FILE
 };
+
+bool isGeoMechFileType( ImportFileType fileType );
+bool isEclipseResultFileType( ImportFileType fileType );
+bool isEclipseFileType( ImportFileType fileType );
 
 ImportFileType obtainFileTypeFromFileName( const QString& fileName );
 QString        defaultDirectoryLabel( ImportFileType fileTypes );
@@ -231,6 +235,11 @@ enum class MultiPlotPageUpdateType : uint32_t
     ALL    = 0b00000111
 };
 
+bool isFullUpdate( MultiPlotPageUpdateType updateType );
+bool isLegendUpdate( MultiPlotPageUpdateType updateType );
+bool isTitleUpdate( MultiPlotPageUpdateType updateType );
+bool isPlotUpdate( MultiPlotPageUpdateType updateType );
+
 std::vector<double> viewScaleOptions();
 
 enum class View3dContent
@@ -253,10 +262,10 @@ enum class ItemIn3dView
 };
 
 QString betaFeaturePostfix();
-
 }; // namespace RiaDefines
 
 // Activate bit mask operators at global scope
 ENABLE_BITMASK_OPERATORS( RiaDefines::MultiPlotPageUpdateType )
 ENABLE_BITMASK_OPERATORS( RiaDefines::View3dContent )
 ENABLE_BITMASK_OPERATORS( RiaDefines::ItemIn3dView )
+ENABLE_BITMASK_OPERATORS( RiaDefines::ImportFileType )

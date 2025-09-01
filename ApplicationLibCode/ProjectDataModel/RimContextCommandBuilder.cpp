@@ -25,6 +25,9 @@
 #include "ContourMap/RimEclipseContourMapViewCollection.h"
 #include "Formations/RimFormationNames.h"
 #include "Formations/RimFormationNamesCollection.h"
+#include "Histogram/RimHistogramCurve.h"
+#include "Histogram/RimHistogramMultiPlot.h"
+#include "Histogram/RimHistogramPlot.h"
 #include "PlotTemplates/RimPlotTemplateFileItem.h"
 #include "PlotTemplates/RimPlotTemplateFolderItem.h"
 #include "Rim3dOverlayInfoConfig.h"
@@ -158,14 +161,10 @@
 #include "RimWellPltPlot.h"
 #include "RimWellRftPlot.h"
 
-#ifdef USE_QTCHARTS
-#include "RimEnsembleFractureStatisticsPlotCollection.h"
-#include "RimGridStatisticsPlotCollection.h"
-#endif
-
 #include "RiuMainWindow.h"
 
 #include "OctaveScriptCommands/RicExecuteScriptForCasesFeature.h"
+#include "RicHistogramPlotTools.h"
 #include "ToggleCommands/RicToggleItemsFeatureImpl.h"
 
 #include "cafCmdFeature.h"
@@ -190,8 +189,7 @@
 //--------------------------------------------------------------------------------------------------
 caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
 {
-    std::vector<caf::PdmUiItem*> uiItems;
-    caf::SelectionManager::instance()->selectedItems( uiItems );
+    const auto uiItems = caf::SelectionManager::instance()->selectedItems();
 
     caf::PdmUiItem* firstUiItem = nullptr;
     {
@@ -656,16 +654,6 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         {
             menuBuilder << "RicCreateSaturationPressurePlotsFeature";
         }
-#ifdef USE_QTCHARTS
-        else if ( dynamic_cast<RimGridStatisticsPlotCollection*>( firstUiItem ) )
-        {
-            menuBuilder << "RicCreateGridStatisticsPlotFeature";
-        }
-        else if ( dynamic_cast<RimEnsembleFractureStatisticsPlotCollection*>( firstUiItem ) )
-        {
-            menuBuilder << "RicCreateEnsembleFractureStatisticsPlotFeature";
-        }
-#endif
         else if ( dynamic_cast<RimGridCrossPlot*>( firstUiItem ) )
         {
             menuBuilder << "RicPasteGridCrossPlotDataSetFeature";
@@ -870,9 +858,7 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         }
         else if ( dynamic_cast<Rim3dOverlayInfoConfig*>( firstUiItem ) )
         {
-#ifdef USE_QTCHARTS
             menuBuilder << "RicCreateGridStatisticsPlotFeature";
-#endif
             menuBuilder << "RicShowGridStatisticsFeature";
         }
         else if ( dynamic_cast<RimValveTemplateCollection*>( firstUiItem ) )
@@ -992,6 +978,35 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
             menuBuilder << "RicSnapshotViewToPdfFeature";
             menuBuilder << "RicSaveMultiPlotTemplateFeature";
             menuBuilder << "RicPasteSummaryMultiPlotFeature";
+        }
+        else if ( dynamic_cast<RimHistogramMultiPlot*>( firstUiItem ) )
+        {
+            menuBuilder.subMenuStart( "New Histogram Plot" );
+
+            for ( RicHistogramPlotTools::DataSourceType dataSourceType : RicHistogramPlotTools::allDataSourceTypes() )
+            {
+                caf::AppEnum<RicHistogramPlotTools::DataSourceType> dstEnum( dataSourceType );
+                menuBuilder.addCmdFeatureWithUserData( "RicNewDefaultHistogramPlotFeature", dstEnum.uiText(), QVariant( dstEnum.text() ) );
+            }
+
+            menuBuilder.subMenuEnd();
+        }
+        else if ( dynamic_cast<RimHistogramPlot*>( firstUiItem ) )
+        {
+            menuBuilder << "RicPasteHistogramCurveFeature";
+            menuBuilder.subMenuStart( "New Histogram Curve" );
+
+            for ( RicHistogramPlotTools::DataSourceType dataSourceType : RicHistogramPlotTools::allDataSourceTypes() )
+            {
+                caf::AppEnum<RicHistogramPlotTools::DataSourceType> dstEnum( dataSourceType );
+                menuBuilder.addCmdFeatureWithUserData( "RicNewHistogramCurveFeature", dstEnum.uiText(), QVariant( dstEnum.text() ) );
+            }
+
+            menuBuilder.subMenuEnd();
+        }
+        else if ( dynamic_cast<RimHistogramCurve*>( firstUiItem ) )
+        {
+            menuBuilder << "RicPasteHistogramCurveFeature";
         }
         else if ( dynamic_cast<RimMultiPlot*>( firstUiItem ) )
         {
@@ -1145,6 +1160,7 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
             {
                 menuBuilder << "RicCloseSourSimDataFeature";
             }
+            menuBuilder << "RicNewOpmFlowJobFeature";
         }
         else if ( dynamic_cast<RimSummaryPlot*>( firstUiItem ) )
         {
