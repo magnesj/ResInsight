@@ -36,9 +36,9 @@
 
 #pragma once
 
+#include "cvfArray.h"
 #include "cvfObject.h"
 #include "cvfStructGrid.h"
-#include "cvfArray.h"
 
 namespace cvf
 {
@@ -60,13 +60,13 @@ public:
     explicit GeometryGeneratorInterface( const StructGridInterface* grid, bool useOpenMP );
     ~GeometryGeneratorInterface() override = default;
 
-    // Setup methods  
-    virtual void setCellVisibility( const UByteArray* cellVisibility ) = 0;
+    // Setup methods
+    virtual void setCellVisibility( const UByteArray* cellVisibility )                           = 0;
     virtual void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter ) = 0;
 
     // Core geometry generation
-    virtual ref<DrawableGeo> generateSurface() = 0;
-    virtual ref<DrawableGeo> createMeshDrawable() = 0;
+    virtual ref<DrawableGeo> generateSurface()                               = 0;
+    virtual ref<DrawableGeo> createMeshDrawable()                            = 0;
     virtual ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) = 0;
 
     // Geometry type identification
@@ -77,11 +77,11 @@ public:
 
     // Texture coordinate support
     virtual void textureCoordinates( Vec2fArray*                       textureCoords,
-                                   const StructGridScalarDataAccess* resultAccessor,
-                                   const ScalarMapper*               mapper ) const = 0;
+                                     const StructGridScalarDataAccess* resultAccessor,
+                                     const ScalarMapper*               mapper ) const = 0;
 
     // Mapping support (may not be applicable to all geometry types)
-    virtual const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const = 0;
+    virtual const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const     = 0;
     virtual const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const = 0;
 
 protected:

@@ -36,8 +36,8 @@
 
 #pragma once
 
-#include "cvfGeometryGeneratorInterface.h"
 #include "cvfArray.h"
+#include "cvfGeometryGeneratorInterface.h"
 
 namespace cvf
 {
@@ -65,8 +65,8 @@ public:
     GridGeometryType geometryType() const override { return GridGeometryType::CYLINDRICAL; }
 
     void textureCoordinates( Vec2fArray*                       textureCoords,
-                           const StructGridScalarDataAccess* resultAccessor,
-                           const ScalarMapper*               mapper ) const override;
+                             const StructGridScalarDataAccess* resultAccessor,
+                             const ScalarMapper*               mapper ) const override;
 
     const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const override;
     const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const override;
@@ -79,9 +79,9 @@ public:
 private:
     struct CylindricalCell
     {
-        double innerRadius, outerRadius;
-        double startAngle, endAngle;
-        double topZ, bottomZ;
+        double     innerRadius, outerRadius;
+        double     startAngle, endAngle;
+        double     topZ, bottomZ;
         cvf::Vec3d centerPoint;
     };
 

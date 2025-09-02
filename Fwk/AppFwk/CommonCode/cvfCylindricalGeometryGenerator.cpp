@@ -35,15 +35,15 @@
 //##################################################################################################
 
 #include "cvfCylindricalGeometryGenerator.h"
-#include "cvfStructGridGeometryGenerator.h"
-#include "cvfStructGridScalarDataAccess.h"
-#include "cvfScalarMapper.h"
-#include "cvfGeometryBuilderDrawableGeo.h"
-#include "cvfPrimitiveSetIndexedUInt.h"
-#include "cvfOutlineEdgeExtractor.h"
 #include "cvfArray.h"
 #include "cvfBase.h"
 #include "cvfDrawableGeo.h"
+#include "cvfGeometryBuilderDrawableGeo.h"
+#include "cvfOutlineEdgeExtractor.h"
+#include "cvfPrimitiveSetIndexedUInt.h"
+#include "cvfScalarMapper.h"
+#include "cvfStructGridGeometryGenerator.h"
+#include "cvfStructGridScalarDataAccess.h"
 #include <cmath>
 
 namespace cvf
@@ -55,7 +55,7 @@ namespace cvf
 CylindricalGeometryGenerator::CylindricalGeometryGenerator( const StructGridInterface* grid, bool useOpenMP )
     : GeometryGeneratorInterface( grid, useOpenMP )
 {
-    m_quadMapper = new StructGridQuadToCellFaceMapper;
+    m_quadMapper     = new StructGridQuadToCellFaceMapper;
     m_triangleMapper = new StuctGridTriangleToCellFaceMapper( m_quadMapper.p() );
 }
 
@@ -109,7 +109,7 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawable()
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( m_vertices.p() );
 
-    ref<UIntArray> indices = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( m_vertices.p() );
+    ref<UIntArray> indices            = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( m_vertices.p() );
     ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
     prim->setIndices( indices.p() );
 
@@ -149,8 +149,8 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createOutlineMeshDrawable( double
 ///
 //--------------------------------------------------------------------------------------------------
 void CylindricalGeometryGenerator::textureCoordinates( Vec2fArray*                       textureCoords,
-                                                      const StructGridScalarDataAccess* resultAccessor,
-                                                      const ScalarMapper*               mapper ) const
+                                                       const StructGridScalarDataAccess* resultAccessor,
+                                                       const ScalarMapper*               mapper ) const
 {
     if ( !resultAccessor ) return;
 
@@ -199,7 +199,8 @@ const StuctGridTriangleToCellFaceMapper* CylindricalGeometryGenerator::triangleT
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid, size_t cellIndex )
+ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
+                                                                                 size_t                     cellIndex )
 {
     return createMeshDrawableFromSingleCell( grid, cellIndex, grid->displayModelOffset() );
 }
@@ -209,7 +210,7 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
 //--------------------------------------------------------------------------------------------------
 ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
                                                                                  size_t                     cellIndex,
-                                                                                 const cvf::Vec3d&          displayModelOffset )
+                                                                                 const cvf::Vec3d& displayModelOffset )
 {
     // For now, fall back to standard hexahedral representation for single cells
     return StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
@@ -281,7 +282,9 @@ void CylindricalGeometryGenerator::computeArrays()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::generateCylindricalQuads( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices )
+void CylindricalGeometryGenerator::generateCylindricalQuads( const CylindricalCell& cell,
+                                                             size_t                 cellIndex,
+                                                             std::vector<Vec3f>&    vertices )
 {
     addRadialFaces( cell, cellIndex, vertices );
     addCircumferentialFaces( cell, cellIndex, vertices );
@@ -327,7 +330,9 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices )
+void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCell& cell,
+                                                            size_t                 cellIndex,
+                                                            std::vector<Vec3f>&    vertices )
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
@@ -346,8 +351,8 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
     m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
 
     // End angle face (POS_I in radial grid terms)
-    cvf::Vec3d endInner = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d endOuter = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d endInner    = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d endOuter    = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d endInnerTop = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
     cvf::Vec3d endOuterTop = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
 
@@ -363,15 +368,19 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices )
+void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cell,
+                                                      size_t                 cellIndex,
+                                                      std::vector<Vec3f>&    vertices )
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
     // Bottom face (NEG_K)
-    cvf::Vec3d bottomInnerStart = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomInnerEnd   = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomOuterStart = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomOuterEnd   = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d bottomInnerStart =
+        cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d bottomInnerEnd = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d bottomOuterStart =
+        cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
+    cvf::Vec3d bottomOuterEnd = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
 
     vertices.push_back( cvf::Vec3f( bottomInnerStart - offset ) );
     vertices.push_back( cvf::Vec3f( bottomOuterStart - offset ) );
@@ -420,11 +429,16 @@ bool CylindricalGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t
 bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex, CylindricalCell& cell ) const
 {
     // Try to get cylindrical coordinates from the grid interface
-    if ( m_grid->getCylindricalCoords( cellIndex, cell.innerRadius, cell.outerRadius, 
-                                     cell.startAngle, cell.endAngle, cell.topZ, cell.bottomZ ) )
+    if ( m_grid->getCylindricalCoords( cellIndex,
+                                       cell.innerRadius,
+                                       cell.outerRadius,
+                                       cell.startAngle,
+                                       cell.endAngle,
+                                       cell.topZ,
+                                       cell.bottomZ ) )
     {
         // Get center point from grid
-        cell.centerPoint = m_grid->cellCentroid( cellIndex );
+        cell.centerPoint     = m_grid->cellCentroid( cellIndex );
         cell.centerPoint.z() = ( cell.topZ + cell.bottomZ ) * 0.5;
         return true;
     }
@@ -436,33 +450,33 @@ bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex,
     // For radial grids, approximate center from bottom face center
     cvf::Vec3d bottomCenter = ( cornerVerts[0] + cornerVerts[1] + cornerVerts[2] + cornerVerts[3] ) * 0.25;
     cvf::Vec3d topCenter    = ( cornerVerts[4] + cornerVerts[5] + cornerVerts[6] + cornerVerts[7] ) * 0.25;
-    
+
     cell.centerPoint = ( bottomCenter + topCenter ) * 0.5;
-    cell.bottomZ = bottomCenter.z();
-    cell.topZ = topCenter.z();
+    cell.bottomZ     = bottomCenter.z();
+    cell.topZ        = topCenter.z();
 
     // Approximate radial extents
     double minRadius = HUGE_VAL;
     double maxRadius = 0.0;
-    double minAngle = HUGE_VAL;
-    double maxAngle = -HUGE_VAL;
+    double minAngle  = HUGE_VAL;
+    double maxAngle  = -HUGE_VAL;
 
     for ( int idx = 0; idx < 8; idx++ )
     {
         cvf::Vec3d relative = cornerVerts[idx] - cell.centerPoint;
-        double radius = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
-        double angle = std::atan2( relative.y(), relative.x() );
+        double     radius   = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
+        double     angle    = std::atan2( relative.y(), relative.x() );
 
         minRadius = std::min( minRadius, radius );
         maxRadius = std::max( maxRadius, radius );
-        minAngle = std::min( minAngle, angle );
-        maxAngle = std::max( maxAngle, angle );
+        minAngle  = std::min( minAngle, angle );
+        maxAngle  = std::max( maxAngle, angle );
     }
 
     cell.innerRadius = minRadius;
     cell.outerRadius = maxRadius;
-    cell.startAngle = minAngle;
-    cell.endAngle = maxAngle;
+    cell.startAngle  = minAngle;
+    cell.endAngle    = maxAngle;
 
     return true;
 }
@@ -470,7 +484,8 @@ bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z, const cvf::Vec3d& center ) const
+cvf::Vec3d
+    CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z, const cvf::Vec3d& center ) const
 {
     double x = center.x() + radius * std::cos( angle );
     double y = center.y() + radius * std::sin( angle );

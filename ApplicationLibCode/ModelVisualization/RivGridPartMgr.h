@@ -84,8 +84,8 @@ private:
     // Surface visualization
     std::unique_ptr<cvf::GeometryGeneratorInterface> m_surfaceGenerator;
     RigGridCellFaceVisibilityFilter                  m_surfaceFaceFilter;
-    cvf::ref<cvf::Part>              m_surfaceFaces;
-    cvf::ref<cvf::Vec2fArray>        m_surfaceFacesTextureCoords;
+    cvf::ref<cvf::Part>                              m_surfaceFaces;
+    cvf::ref<cvf::Vec2fArray>                        m_surfaceFacesTextureCoords;
 
     cvf::ref<cvf::Part> m_surfaceGridLines;
 
