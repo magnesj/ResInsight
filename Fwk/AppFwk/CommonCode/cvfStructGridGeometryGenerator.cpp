@@ -178,8 +178,7 @@ bool CellRangeFilter::hasIncludeRanges() const
 ///
 //--------------------------------------------------------------------------------------------------
 StructGridGeometryGenerator::StructGridGeometryGenerator( const StructGridInterface* grid, bool useOpenMP )
-    : m_grid( grid )
-    , m_useOpenMP( useOpenMP )
+    : GeometryGeneratorInterface( grid, useOpenMP )
 {
     CVF_ASSERT( grid );
     m_quadMapper     = new StructGridQuadToCellFaceMapper;

@@ -69,6 +69,14 @@ public:
     std::string gridName() const;
     void        setGridName( const std::string& gridName );
 
+    // Cylindrical grid support
+    void setGridGeometryType( cvf::GridGeometryType geometryType ) { m_gridGeometryType = geometryType; }
+    cvf::GridGeometryType gridGeometryType() const override { return m_gridGeometryType; }
+    bool getCylindricalCoords( size_t cellIndex,
+                             double& innerRadius, double& outerRadius,
+                             double& startAngle, double& endAngle,
+                             double& topZ, double& bottomZ ) const override;
+
     bool         isMainGrid() const;
     RigMainGrid* mainGrid() const { return m_mainGrid; }
 
@@ -119,13 +127,14 @@ protected:
     size_t m_cellCountIJ;
 
 private:
-    std::string      m_gridName;
-    cvf::Vec3st      m_gridPointDimensions;
-    cvf::Vec3st      m_cellCount;
-    size_t           m_gridIndex; ///< The LGR index of this grid. Starts with 1. Main grid has index 0.
-    int              m_gridId; ///< The LGR id of this grid. Main grid has id 0.
-    RigMainGrid*     m_mainGrid;
-    cvf::BoundingBox m_boundingBox;
+    std::string             m_gridName;
+    cvf::Vec3st             m_gridPointDimensions;
+    cvf::Vec3st             m_cellCount;
+    size_t                  m_gridIndex; ///< The LGR index of this grid. Starts with 1. Main grid has index 0.
+    int                     m_gridId; ///< The LGR id of this grid. Main grid has id 0.
+    RigMainGrid*            m_mainGrid;
+    cvf::BoundingBox        m_boundingBox;
+    cvf::GridGeometryType   m_gridGeometryType;
 
     std::vector<std::array<size_t, 6>> m_coarseningBoxInfo;
 };

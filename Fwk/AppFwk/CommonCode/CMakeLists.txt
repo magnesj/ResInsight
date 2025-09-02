@@ -42,6 +42,12 @@ add_library(
   cafContourLines.h
   cvfStructGridGeometryGenerator.cpp
   cvfStructGridGeometryGenerator.h
+  cvfGeometryGeneratorInterface.cpp
+  cvfGeometryGeneratorInterface.h
+  cvfCylindricalGeometryGenerator.cpp
+  cvfCylindricalGeometryGenerator.h
+  cvfGeometryGeneratorFactory.cpp
+  cvfGeometryGeneratorFactory.h
   cvfStructGridScalarDataAccess.h
   cafVecIjk.cpp
   cafVecIjk.h
