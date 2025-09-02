@@ -52,11 +52,6 @@ class GeometryGeneratorFactory
 {
 public:
     static std::unique_ptr<GeometryGeneratorInterface> create( const StructGridInterface* grid, bool useOpenMP );
-
-    // Convenience method that returns the traditional StructGridGeometryGenerator
-    // for backward compatibility
-    static ref<class StructGridGeometryGenerator> createStructGridGenerator( const StructGridInterface* grid,
-                                                                             bool                       useOpenMP );
 };
 
 } // namespace cvf

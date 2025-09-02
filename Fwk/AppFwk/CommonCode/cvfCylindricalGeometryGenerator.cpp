@@ -46,6 +46,10 @@
 #include "cvfStructGridScalarDataAccess.h"
 #include <cmath>
 
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
+
 namespace cvf
 {
 
@@ -57,13 +61,6 @@ CylindricalGeometryGenerator::CylindricalGeometryGenerator( const StructGridInte
 {
     m_quadMapper     = new StructGridQuadToCellFaceMapper;
     m_triangleMapper = new StuctGridTriangleToCellFaceMapper( m_quadMapper.p() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-CylindricalGeometryGenerator::~CylindricalGeometryGenerator()
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -298,7 +295,7 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Inner radial face (NEG_J in radial grid terms)
+    // Inner radial face (NEG_I in radial grid: smaller radius)
     cvf::Vec3d innerStart = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d innerEnd   = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d innerStartTop = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
@@ -310,9 +307,9 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
     vertices.push_back( cvf::Vec3f( innerStartTop - offset ) );
 
     m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_J );
+    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
 
-    // Outer radial face (POS_J in radial grid terms)
+    // Outer radial face (POS_I in radial grid: larger radius)
     cvf::Vec3d outerStart = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d outerEnd   = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d outerStartTop = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
@@ -324,7 +321,7 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
     vertices.push_back( cvf::Vec3f( outerEndTop - offset ) );
 
     m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_J );
+    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_I );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -336,7 +333,7 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Start angle face (NEG_I in radial grid terms)
+    // Start angle face (NEG_J in radial grid: smaller theta)
     cvf::Vec3d startInner = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d startOuter = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d startInnerTop = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
@@ -348,9 +345,9 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
     vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
 
     m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
+    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_J );
 
-    // End angle face (POS_I in radial grid terms)
+    // End angle face (POS_J in radial grid: larger theta)
     cvf::Vec3d endInner    = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d endOuter    = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
     cvf::Vec3d endInnerTop = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
@@ -362,7 +359,7 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
     vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
 
     m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_I );
+    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_J );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -487,8 +484,10 @@ bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex,
 cvf::Vec3d
     CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z, const cvf::Vec3d& center ) const
 {
-    double x = center.x() + radius * std::cos( angle );
-    double y = center.y() + radius * std::sin( angle );
+    // Convert angle from degrees to radians for trigonometric functions
+    double angleRadians = angle * M_PI / 180.0;
+    double x            = center.x() + radius * std::cos( angleRadians );
+    double y            = center.y() + radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
 }
 

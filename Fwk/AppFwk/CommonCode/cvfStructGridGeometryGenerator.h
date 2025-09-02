@@ -171,7 +171,6 @@ class StructGridGeometryGenerator : public GeometryGeneratorInterface
 {
 public:
     explicit StructGridGeometryGenerator( const StructGridInterface* grid, bool useOpenMP );
-    ~StructGridGeometryGenerator() override;
 
     // Setup methods
     void setCellVisibility( const UByteArray* cellVisibility ) override;
