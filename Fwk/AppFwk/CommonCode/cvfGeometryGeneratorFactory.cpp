@@ -59,5 +59,4 @@ std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( co
     }
 }
 
-
 } // namespace cvf

@@ -599,7 +599,7 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
 
     // For radial grids, use IJK structure directly:
     // I-direction (i, i+1) represents radius range (innerRadius, outerRadius)
-    // J-direction (j, j+1) represents angular range in degrees (startAngle, endAngle)  
+    // J-direction (j, j+1) represents angular range in degrees (startAngle, endAngle)
     // K-direction (k, k+1) represents vertical range (bottomZ, topZ)
 
     // Calculate radial and angular extents from corner vertices relative to grid center
@@ -622,8 +622,8 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
 
     innerRadius = minRadius;
     outerRadius = maxRadius;
-    startAngle  = minAngle;  // degrees
-    endAngle    = maxAngle;  // degrees
+    startAngle  = minAngle; // degrees
+    endAngle    = maxAngle; // degrees
 
     return true;
 }
