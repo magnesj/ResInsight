@@ -611,7 +611,7 @@ TEST( RigCellGeometryTools, ClipperEdgeTracking )
 
     // Convert to clipper2 format
     Clipper2Lib::Paths64 subject, clip;
-    
+
     Clipper2Lib::Path64 polygon1path;
     for ( const cvf::Vec3d& v : polygon1 )
     {

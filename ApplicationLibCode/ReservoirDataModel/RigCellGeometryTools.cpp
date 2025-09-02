@@ -385,7 +385,7 @@ std::vector<std::vector<cvf::Vec3d>>
 
     // Convert to clipper2 format
     Clipper2Lib::Paths64 subject, clip;
-    
+
     {
         Clipper2Lib::Path64 polygon1path;
         for ( const cvf::Vec3d& v : polygon1 )
@@ -527,7 +527,7 @@ std::vector<std::vector<cvf::Vec3d>> RigCellGeometryTools::clipPolylineByPolygon
 
     // Convert to clipper2 format
     Clipper2Lib::Paths64 subject, clip;
-    
+
     Clipper2Lib::Path64 polyLinePath;
     for ( const cvf::Vec3d& v : polyLine )
     {
@@ -544,7 +544,7 @@ std::vector<std::vector<cvf::Vec3d>> RigCellGeometryTools::clipPolylineByPolygon
 
     // Note: Clipper2 doesn't have ZFillFunction, so Z interpolation needs to be handled manually
     Clipper2Lib::Paths64 solution = Clipper2Lib::Intersect( subject, clip, Clipper2Lib::FillRule::EvenOdd );
-    
+
     // TODO: Implement Z interpolation manually for interpolType
     Clipper2Lib::Paths64 solutionPaths = solution;
 
