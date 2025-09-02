@@ -54,11 +54,10 @@ class CellFaceVisibilityFilter;
 // Base interface for grid geometry generators
 //
 //==================================================================================================
-class GeometryGeneratorInterface : public Object
+class GeometryGeneratorInterface
 {
 public:
     explicit GeometryGeneratorInterface( const StructGridInterface* grid, bool useOpenMP );
-    ~GeometryGeneratorInterface() override = default;
 
     // Setup methods
     virtual void setCellVisibility( const UByteArray* cellVisibility )                           = 0;

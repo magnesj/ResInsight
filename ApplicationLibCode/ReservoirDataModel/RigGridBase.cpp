@@ -579,7 +579,7 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
         return false;
     }
 
-    // For radial grids, extract cylindrical parameters from IJK indices
+    // For radial grids: I=radius, J=theta(degrees), K=z
     size_t i, j, k;
     if ( !ijkFromCellIndex( cellIndex, &i, &j, &k ) )
     {
@@ -597,7 +597,12 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
     topZ    = topCenter.z();
     bottomZ = bottomCenter.z();
 
-    // Calculate radial and angular extents from corner vertices
+    // For radial grids, use IJK structure directly:
+    // I-direction (i, i+1) represents radius range (innerRadius, outerRadius)
+    // J-direction (j, j+1) represents angular range in degrees (startAngle, endAngle)  
+    // K-direction (k, k+1) represents vertical range (bottomZ, topZ)
+
+    // Calculate radial and angular extents from corner vertices relative to grid center
     double minRadius = HUGE_VAL;
     double maxRadius = 0.0;
     double minAngle  = HUGE_VAL;
@@ -607,7 +612,7 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
     {
         cvf::Vec3d relative = cornerVerts[idx] - bottomCenter;
         double     radius   = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
-        double     angle    = std::atan2( relative.y(), relative.x() );
+        double     angle    = std::atan2( relative.y(), relative.x() ) * 180.0 / M_PI; // Convert to degrees
 
         minRadius = std::min( minRadius, radius );
         maxRadius = std::max( maxRadius, radius );
@@ -617,8 +622,8 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
 
     innerRadius = minRadius;
     outerRadius = maxRadius;
-    startAngle  = minAngle;
-    endAngle    = maxAngle;
+    startAngle  = minAngle;  // degrees
+    endAngle    = maxAngle;  // degrees
 
     return true;
 }

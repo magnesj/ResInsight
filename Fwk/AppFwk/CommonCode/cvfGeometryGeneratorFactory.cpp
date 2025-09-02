@@ -59,13 +59,5 @@ std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( co
     }
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-ref<StructGridGeometryGenerator> GeometryGeneratorFactory::createStructGridGenerator( const StructGridInterface* grid,
-                                                                                      bool useOpenMP )
-{
-    return new StructGridGeometryGenerator( grid, useOpenMP );
-}
 
 } // namespace cvf

@@ -52,7 +52,6 @@ class CylindricalGeometryGenerator : public GeometryGeneratorInterface
 {
 public:
     explicit CylindricalGeometryGenerator( const StructGridInterface* grid, bool useOpenMP );
-    ~CylindricalGeometryGenerator() override;
 
     // Setup methods
     void setCellVisibility( const UByteArray* cellVisibility );
