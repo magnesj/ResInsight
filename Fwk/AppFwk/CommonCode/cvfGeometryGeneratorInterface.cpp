@@ -35,8 +35,8 @@
 //##################################################################################################
 
 #include "cvfGeometryGeneratorInterface.h"
-#include "cvfStructGrid.h"
 #include "cvfBase.h"
+#include "cvfStructGrid.h"
 
 namespace cvf
 {

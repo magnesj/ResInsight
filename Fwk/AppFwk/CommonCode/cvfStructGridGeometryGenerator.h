@@ -38,9 +38,9 @@
 
 #include "cvfArray.h"
 #include "cvfCollection.h"
+#include "cvfGeometryGeneratorInterface.h"
 #include "cvfObject.h"
 #include "cvfStructGrid.h"
-#include "cvfGeometryGeneratorInterface.h"
 
 namespace cvf
 {

@@ -35,9 +35,9 @@
 //##################################################################################################
 
 #include "cvfGeometryGeneratorFactory.h"
-#include "cvfStructGridGeometryGenerator.h"
 #include "cvfCylindricalGeometryGenerator.h"
 #include "cvfStructGrid.h"
+#include "cvfStructGridGeometryGenerator.h"
 
 namespace cvf
 {
@@ -45,7 +45,8 @@ namespace cvf
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( const StructGridInterface* grid, bool useOpenMP )
+std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( const StructGridInterface* grid,
+                                                                              bool                       useOpenMP )
 {
     switch ( grid->gridGeometryType() )
     {
@@ -61,7 +62,8 @@ std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ref<StructGridGeometryGenerator> GeometryGeneratorFactory::createStructGridGenerator( const StructGridInterface* grid, bool useOpenMP )
+ref<StructGridGeometryGenerator> GeometryGeneratorFactory::createStructGridGenerator( const StructGridInterface* grid,
+                                                                                      bool useOpenMP )
 {
     return new StructGridGeometryGenerator( grid, useOpenMP );
 }

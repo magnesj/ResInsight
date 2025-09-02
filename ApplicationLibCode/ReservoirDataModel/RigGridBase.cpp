@@ -566,10 +566,13 @@ bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                     
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigGridBase::getCylindricalCoords( size_t cellIndex,
-                                       double& innerRadius, double& outerRadius,
-                                       double& startAngle, double& endAngle,
-                                       double& topZ, double& bottomZ ) const
+bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
+                                        double& innerRadius,
+                                        double& outerRadius,
+                                        double& startAngle,
+                                        double& endAngle,
+                                        double& topZ,
+                                        double& bottomZ ) const
 {
     if ( m_gridGeometryType != cvf::GridGeometryType::CYLINDRICAL )
     {
@@ -590,32 +593,32 @@ bool RigGridBase::getCylindricalCoords( size_t cellIndex,
     // Find center point from bottom face
     cvf::Vec3d bottomCenter = ( cornerVerts[0] + cornerVerts[1] + cornerVerts[2] + cornerVerts[3] ) * 0.25;
     cvf::Vec3d topCenter    = ( cornerVerts[4] + cornerVerts[5] + cornerVerts[6] + cornerVerts[7] ) * 0.25;
-    
-    topZ = topCenter.z();
+
+    topZ    = topCenter.z();
     bottomZ = bottomCenter.z();
 
     // Calculate radial and angular extents from corner vertices
     double minRadius = HUGE_VAL;
     double maxRadius = 0.0;
-    double minAngle = HUGE_VAL;
-    double maxAngle = -HUGE_VAL;
+    double minAngle  = HUGE_VAL;
+    double maxAngle  = -HUGE_VAL;
 
     for ( int idx = 0; idx < 8; idx++ )
     {
         cvf::Vec3d relative = cornerVerts[idx] - bottomCenter;
-        double radius = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
-        double angle = std::atan2( relative.y(), relative.x() );
+        double     radius   = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
+        double     angle    = std::atan2( relative.y(), relative.x() );
 
         minRadius = std::min( minRadius, radius );
         maxRadius = std::max( maxRadius, radius );
-        minAngle = std::min( minAngle, angle );
-        maxAngle = std::max( maxAngle, angle );
+        minAngle  = std::min( minAngle, angle );
+        maxAngle  = std::max( maxAngle, angle );
     }
 
     innerRadius = minRadius;
     outerRadius = maxRadius;
-    startAngle = minAngle;
-    endAngle = maxAngle;
+    startAngle  = minAngle;
+    endAngle    = maxAngle;
 
     return true;
 }

@@ -110,7 +110,7 @@ RivGridPartMgr::RivGridPartMgr( RivCellSetEnum cellSetType, RimEclipseCase* ecli
     CVF_ASSERT( grid );
     m_cellVisibility            = new cvf::UByteArray;
     m_surfaceFacesTextureCoords = new cvf::Vec2fArray;
-    
+
     m_surfaceGenerator = cvf::GeometryGeneratorFactory::create( grid, RiaRegressionTestRunner::instance()->useOpenMPForGeometryCreation() );
 }
 
