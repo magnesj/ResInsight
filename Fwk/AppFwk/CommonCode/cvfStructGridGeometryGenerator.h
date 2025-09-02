@@ -40,6 +40,7 @@
 #include "cvfCollection.h"
 #include "cvfObject.h"
 #include "cvfStructGrid.h"
+#include "cvfGeometryGeneratorInterface.h"
 
 namespace cvf
 {
@@ -166,34 +167,28 @@ private:
 //
 //
 //==================================================================================================
-class StructGridGeometryGenerator : public Object
+class StructGridGeometryGenerator : public GeometryGeneratorInterface
 {
 public:
     explicit StructGridGeometryGenerator( const StructGridInterface* grid, bool useOpenMP );
     ~StructGridGeometryGenerator() override;
 
     // Setup methods
+    void setCellVisibility( const UByteArray* cellVisibility ) override;
+    void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter ) override;
 
-    void setCellVisibility( const UByteArray* cellVisibility );
-    void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter );
-
-    // Access, valid after generation is done
-
-    const StructGridInterface* activeGrid() { return m_grid.p(); }
+    // GeometryGeneratorInterface implementation
+    ref<DrawableGeo> generateSurface() override;
+    ref<DrawableGeo> createMeshDrawable() override;
+    ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) override;
+    GridGeometryType geometryType() const override { return GridGeometryType::HEXAHEDRAL; }
 
     void textureCoordinates( Vec2fArray*                       textureCoords,
                              const StructGridScalarDataAccess* resultAccessor,
-                             const ScalarMapper*               mapper ) const;
+                             const ScalarMapper*               mapper ) const override;
 
-    // Mapping between cells and geometry
-
-    const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() { return m_quadMapper.p(); }
-    const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() { return m_triangleMapper.p(); }
-
-    // Generated geometry
-    ref<DrawableGeo> generateSurface();
-    ref<DrawableGeo> createMeshDrawable();
-    ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle );
+    const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const override { return m_quadMapper.p(); }
+    const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const override { return m_triangleMapper.p(); }
 
     static ref<DrawableGeo> createMeshDrawableFromSingleCell( const StructGridInterface* grid, size_t cellIndex );
 
@@ -209,7 +204,6 @@ private:
 
 private:
     // Input
-    cref<StructGridInterface>                    m_grid; // The grid being processed
     std::vector<const CellFaceVisibilityFilter*> m_cellVisibilityFilters;
     cref<UByteArray>                             m_cellVisibility;
 
@@ -219,11 +213,6 @@ private:
     // Mappings
     ref<StructGridQuadToCellFaceMapper>    m_quadMapper;
     ref<StuctGridTriangleToCellFaceMapper> m_triangleMapper;
-
-    // Multiple treads can be used when building geometry data structures.
-    // This causes visual artifacts due to transparency algorithm, and a stable visual image
-    // can be produced if OpenMP is disabled. Currently used by regression test comparing images
-    bool m_useOpenMP;
 };
 
 } // namespace cvf

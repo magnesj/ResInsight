@@ -28,7 +28,8 @@
 
 #include "cvfObject.h"
 
-#include "cvfStructGridGeometryGenerator.h"
+#include "cvfGeometryGeneratorInterface.h"
+#include <memory>
 
 namespace cvf
 {
@@ -70,7 +71,7 @@ public:
     void appendPartsToModel( cvf::ModelBasicList* model );
 
 private:
-    void generatePartGeometry( cvf::StructGridGeometryGenerator& geoBuilder );
+    void generatePartGeometry( cvf::GeometryGeneratorInterface& geoBuilder );
 
 private:
     size_t                 m_gridIdx;
@@ -81,8 +82,8 @@ private:
     cvf::Color3f             m_defaultColor;
 
     // Surface visualization
-    cvf::StructGridGeometryGenerator m_surfaceGenerator;
-    RigGridCellFaceVisibilityFilter  m_surfaceFaceFilter;
+    std::unique_ptr<cvf::GeometryGeneratorInterface> m_surfaceGenerator;
+    RigGridCellFaceVisibilityFilter                  m_surfaceFaceFilter;
     cvf::ref<cvf::Part>              m_surfaceFaces;
     cvf::ref<cvf::Vec2fArray>        m_surfaceFacesTextureCoords;
 
