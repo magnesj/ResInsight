@@ -588,25 +588,25 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
 
     // In cylindrical grids, IJK coordinates directly represent r, theta, z values
     // I-direction represents radius range
-    // J-direction represents angular range 
+    // J-direction represents angular range
     // K-direction represents vertical range
-    
+
     // Get corner vertices to extract the Z range
     cvf::Vec3d cornerVerts[8];
     cellCornerVertices( cellIndex, cornerVerts );
-    
+
     // Extract Z range from corner vertices
     double minZ = HUGE_VAL;
     double maxZ = -HUGE_VAL;
-    
+
     for ( int idx = 0; idx < 8; idx++ )
     {
         minZ = std::min( minZ, cornerVerts[idx].z() );
         maxZ = std::max( maxZ, cornerVerts[idx].z() );
     }
-    
+
     bottomZ = minZ;
-    topZ = maxZ;
+    topZ    = maxZ;
 
     // Extract radius and angle values directly from IJK coordinates
     // These are the actual r, theta values stored in the file

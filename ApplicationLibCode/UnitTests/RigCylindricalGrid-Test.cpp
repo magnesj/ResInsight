@@ -171,7 +171,7 @@ TEST( RigCylindricalGrid, HexahedralGridCompatibility )
         {
             for ( size_t i = 0; i < 3; ++i )
             {
-                size_t nodeIdx           = i + j * 3 + k * 9;
+                size_t nodeIdx            = i + j * 3 + k * 9;
                 hexGrid->nodes()[nodeIdx] = cvf::Vec3d( i * 10.0, j * 10.0, k * 10.0 );
             }
         }
