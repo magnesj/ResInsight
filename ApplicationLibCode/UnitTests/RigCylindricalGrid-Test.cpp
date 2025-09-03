@@ -126,9 +126,9 @@ TEST( RigCylindricalGrid, CylindricalCoordinateExtraction )
 //--------------------------------------------------------------------------------------------------
 TEST( RigCylindricalGrid, FactoryPatternSelection )
 {
-    MockCylindricalGrid grid;
+    cvf::ref<MockCylindricalGrid> grid = new MockCylindricalGrid();
 
-    auto generator = cvf::GeometryGeneratorFactory::create( &grid, false );
+    auto generator = cvf::GeometryGeneratorFactory::create( grid.p(), false );
 
     EXPECT_NE( nullptr, generator.get() );
     // Note: Skip geometry type check to avoid initialization issues
@@ -139,13 +139,13 @@ TEST( RigCylindricalGrid, FactoryPatternSelection )
 //--------------------------------------------------------------------------------------------------
 TEST( RigCylindricalGrid, CylindricalGeometryGeneration )
 {
-    MockCylindricalGrid grid;
+    cvf::ref<MockCylindricalGrid> grid = new MockCylindricalGrid();
 
-    cvf::CylindricalGeometryGenerator generator( &grid, false );
+    cvf::CylindricalGeometryGenerator generator( grid.p(), false );
 
     // Set up cell visibility - all cells visible
     ref<UByteArray> cellVisibility = new UByteArray;
-    cellVisibility->resize( grid.cellCount() );
+    cellVisibility->resize( grid->cellCount() );
     cellVisibility->setAll( 1 );
 
     generator.setCellVisibility( cellVisibility.p() );
@@ -160,11 +160,11 @@ TEST( RigCylindricalGrid, CylindricalGeometryGeneration )
 TEST( RigCylindricalGrid, HexahedralGridCompatibility )
 {
     // Test that regular grids still work with the factory pattern
-    RigMainGrid hexGrid;
-    hexGrid.setGridPointDimensions( cvf::Vec3st( 3, 3, 3 ) );
+    cvf::ref<RigMainGrid> hexGrid = new RigMainGrid();
+    hexGrid->setGridPointDimensions( cvf::Vec3st( 3, 3, 3 ) );
 
     // Set up a simple rectangular grid
-    hexGrid.nodes().resize( 3 * 3 * 3 );
+    hexGrid->nodes().resize( 3 * 3 * 3 );
     for ( size_t k = 0; k < 3; ++k )
     {
         for ( size_t j = 0; j < 3; ++j )
@@ -172,14 +172,14 @@ TEST( RigCylindricalGrid, HexahedralGridCompatibility )
             for ( size_t i = 0; i < 3; ++i )
             {
                 size_t nodeIdx           = i + j * 3 + k * 9;
-                hexGrid.nodes()[nodeIdx] = cvf::Vec3d( i * 10.0, j * 10.0, k * 10.0 );
+                hexGrid->nodes()[nodeIdx] = cvf::Vec3d( i * 10.0, j * 10.0, k * 10.0 );
             }
         }
     }
 
-    EXPECT_EQ( cvf::GridGeometryType::HEXAHEDRAL, hexGrid.gridGeometryType() );
+    EXPECT_EQ( cvf::GridGeometryType::HEXAHEDRAL, hexGrid->gridGeometryType() );
 
-    auto generator = cvf::GeometryGeneratorFactory::create( &hexGrid, false );
+    auto generator = cvf::GeometryGeneratorFactory::create( hexGrid.p(), false );
     EXPECT_NE( nullptr, generator.get() );
     EXPECT_EQ( cvf::GridGeometryType::HEXAHEDRAL, generator->geometryType() );
 }
