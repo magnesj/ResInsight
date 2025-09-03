@@ -586,44 +586,34 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
         return false;
     }
 
-    // Get corner vertices to extract cylindrical parameters
+    // In cylindrical grids, IJK coordinates directly represent r, theta, z values
+    // I-direction represents radius range
+    // J-direction represents angular range 
+    // K-direction represents vertical range
+    
+    // Get corner vertices to extract the Z range
     cvf::Vec3d cornerVerts[8];
     cellCornerVertices( cellIndex, cornerVerts );
-
-    // Find center point from bottom face
-    cvf::Vec3d bottomCenter = ( cornerVerts[0] + cornerVerts[1] + cornerVerts[2] + cornerVerts[3] ) * 0.25;
-    cvf::Vec3d topCenter    = ( cornerVerts[4] + cornerVerts[5] + cornerVerts[6] + cornerVerts[7] ) * 0.25;
-
-    topZ    = topCenter.z();
-    bottomZ = bottomCenter.z();
-
-    // For radial grids, use IJK structure directly:
-    // I-direction (i, i+1) represents radius range (innerRadius, outerRadius)
-    // J-direction (j, j+1) represents angular range in degrees (startAngle, endAngle)
-    // K-direction (k, k+1) represents vertical range (bottomZ, topZ)
-
-    // Calculate radial and angular extents from corner vertices relative to grid center
-    double minRadius = HUGE_VAL;
-    double maxRadius = 0.0;
-    double minAngle  = HUGE_VAL;
-    double maxAngle  = -HUGE_VAL;
-
+    
+    // Extract Z range from corner vertices
+    double minZ = HUGE_VAL;
+    double maxZ = -HUGE_VAL;
+    
     for ( int idx = 0; idx < 8; idx++ )
     {
-        cvf::Vec3d relative = cornerVerts[idx] - bottomCenter;
-        double     radius   = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
-        double     angle    = std::atan2( relative.y(), relative.x() ) * 180.0 / M_PI; // Convert to degrees
-
-        minRadius = std::min( minRadius, radius );
-        maxRadius = std::max( maxRadius, radius );
-        minAngle  = std::min( minAngle, angle );
-        maxAngle  = std::max( maxAngle, angle );
+        minZ = std::min( minZ, cornerVerts[idx].z() );
+        maxZ = std::max( maxZ, cornerVerts[idx].z() );
     }
+    
+    bottomZ = minZ;
+    topZ = maxZ;
 
-    innerRadius = minRadius;
-    outerRadius = maxRadius;
-    startAngle  = minAngle; // degrees
-    endAngle    = maxAngle; // degrees
+    // Extract radius and angle values directly from IJK coordinates
+    // These are the actual r, theta values stored in the file
+    innerRadius = cornerVerts[0].x(); // Inner radius at I index
+    outerRadius = cornerVerts[1].x(); // Outer radius at I+1 index
+    startAngle  = cornerVerts[0].y(); // Start angle at J index
+    endAngle    = cornerVerts[3].y(); // End angle at J+1 index
 
     return true;
 }

@@ -58,6 +58,7 @@ namespace cvf
 //--------------------------------------------------------------------------------------------------
 CylindricalGeometryGenerator::CylindricalGeometryGenerator( const StructGridInterface* grid, bool useOpenMP )
     : GeometryGeneratorInterface( grid, useOpenMP )
+    , m_curveSubdivisions( 10 )
 {
     m_quadMapper     = new StructGridQuadToCellFaceMapper;
     m_triangleMapper = new StuctGridTriangleToCellFaceMapper( m_quadMapper.p() );
@@ -295,33 +296,51 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Inner radial face (NEG_I in radial grid: smaller radius)
-    cvf::Vec3d innerStart = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d innerEnd   = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d innerStartTop = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d innerEndTop   = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
+    // Create N subdivisions along the angular range for smooth curved surfaces
+    double angleRange = cell.endAngle - cell.startAngle;
+    double angleStep  = angleRange / m_curveSubdivisions;
 
-    vertices.push_back( cvf::Vec3f( innerStart - offset ) );
-    vertices.push_back( cvf::Vec3f( innerEnd - offset ) );
-    vertices.push_back( cvf::Vec3f( innerEndTop - offset ) );
-    vertices.push_back( cvf::Vec3f( innerStartTop - offset ) );
+    // Inner radial face (NEG_I in radial grid: smaller radius) - curved surface
+    for ( int i = 0; i < m_curveSubdivisions; ++i )
+    {
+        double angle1 = cell.startAngle + i * angleStep;
+        double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
+        // Create quad for this subdivision
+        cvf::Vec3d innerBot1 = cylindricalToCartesian( cell.innerRadius, angle1, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d innerBot2 = cylindricalToCartesian( cell.innerRadius, angle2, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d innerTop1 = cylindricalToCartesian( cell.innerRadius, angle1, cell.topZ, cell.centerPoint );
+        cvf::Vec3d innerTop2 = cylindricalToCartesian( cell.innerRadius, angle2, cell.topZ, cell.centerPoint );
 
-    // Outer radial face (POS_I in radial grid: larger radius)
-    cvf::Vec3d outerStart = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d outerEnd   = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d outerStartTop = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d outerEndTop   = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
+        vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerTop2 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerTop1 - offset ) );
 
-    vertices.push_back( cvf::Vec3f( outerEnd - offset ) );
-    vertices.push_back( cvf::Vec3f( outerStart - offset ) );
-    vertices.push_back( cvf::Vec3f( outerStartTop - offset ) );
-    vertices.push_back( cvf::Vec3f( outerEndTop - offset ) );
+        m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+        m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
+    }
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_I );
+    // Outer radial face (POS_I in radial grid: larger radius) - curved surface
+    for ( int i = 0; i < m_curveSubdivisions; ++i )
+    {
+        double angle1 = cell.startAngle + i * angleStep;
+        double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
+
+        // Create quad for this subdivision (reverse winding for outward face)
+        cvf::Vec3d outerBot1 = cylindricalToCartesian( cell.outerRadius, angle1, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d outerBot2 = cylindricalToCartesian( cell.outerRadius, angle2, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d outerTop1 = cylindricalToCartesian( cell.outerRadius, angle1, cell.topZ, cell.centerPoint );
+        cvf::Vec3d outerTop2 = cylindricalToCartesian( cell.outerRadius, angle2, cell.topZ, cell.centerPoint );
+
+        vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerTop1 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerTop2 - offset ) );
+
+        m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+        m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_I );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -333,33 +352,51 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Start angle face (NEG_J in radial grid: smaller theta)
-    cvf::Vec3d startInner = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d startOuter = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d startInnerTop = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d startOuterTop = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
+    // Create N subdivisions along the radial range for smooth curved surfaces
+    double radiusRange = cell.outerRadius - cell.innerRadius;
+    double radiusStep  = radiusRange / m_curveSubdivisions;
 
-    vertices.push_back( cvf::Vec3f( startInner - offset ) );
-    vertices.push_back( cvf::Vec3f( startOuter - offset ) );
-    vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
-    vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
+    // Start angle face (NEG_J in radial grid: smaller theta) - curved surface
+    for ( int i = 0; i < m_curveSubdivisions; ++i )
+    {
+        double radius1 = cell.innerRadius + i * radiusStep;
+        double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_J );
+        // Create quad for this subdivision
+        cvf::Vec3d startInner    = cylindricalToCartesian( radius1, cell.startAngle, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d startOuter    = cylindricalToCartesian( radius2, cell.startAngle, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d startInnerTop = cylindricalToCartesian( radius1, cell.startAngle, cell.topZ, cell.centerPoint );
+        cvf::Vec3d startOuterTop = cylindricalToCartesian( radius2, cell.startAngle, cell.topZ, cell.centerPoint );
 
-    // End angle face (POS_J in radial grid: larger theta)
-    cvf::Vec3d endInner    = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d endOuter    = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d endInnerTop = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d endOuterTop = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
+        vertices.push_back( cvf::Vec3f( startInner - offset ) );
+        vertices.push_back( cvf::Vec3f( startOuter - offset ) );
+        vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
+        vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
 
-    vertices.push_back( cvf::Vec3f( endOuter - offset ) );
-    vertices.push_back( cvf::Vec3f( endInner - offset ) );
-    vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
-    vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
+        m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+        m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_J );
+    }
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_J );
+    // End angle face (POS_J in radial grid: larger theta) - curved surface
+    for ( int i = 0; i < m_curveSubdivisions; ++i )
+    {
+        double radius1 = cell.innerRadius + i * radiusStep;
+        double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
+
+        // Create quad for this subdivision (reverse winding for outward face)
+        cvf::Vec3d endInner    = cylindricalToCartesian( radius1, cell.endAngle, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d endOuter    = cylindricalToCartesian( radius2, cell.endAngle, cell.bottomZ, cell.centerPoint );
+        cvf::Vec3d endInnerTop = cylindricalToCartesian( radius1, cell.endAngle, cell.topZ, cell.centerPoint );
+        cvf::Vec3d endOuterTop = cylindricalToCartesian( radius2, cell.endAngle, cell.topZ, cell.centerPoint );
+
+        vertices.push_back( cvf::Vec3f( endOuter - offset ) );
+        vertices.push_back( cvf::Vec3f( endInner - offset ) );
+        vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
+        vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
+
+        m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+        m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_J );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -371,35 +408,63 @@ void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cel
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Bottom face (NEG_K)
-    cvf::Vec3d bottomInnerStart =
-        cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomInnerEnd = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomOuterStart =
-        cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.bottomZ, cell.centerPoint );
-    cvf::Vec3d bottomOuterEnd = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.bottomZ, cell.centerPoint );
+    // Create N x N subdivisions for smooth curved surfaces on top/bottom faces
+    double radiusRange = cell.outerRadius - cell.innerRadius;
+    double angleRange  = cell.endAngle - cell.startAngle;
+    double radiusStep  = radiusRange / m_curveSubdivisions;
+    double angleStep   = angleRange / m_curveSubdivisions;
 
-    vertices.push_back( cvf::Vec3f( bottomInnerStart - offset ) );
-    vertices.push_back( cvf::Vec3f( bottomOuterStart - offset ) );
-    vertices.push_back( cvf::Vec3f( bottomOuterEnd - offset ) );
-    vertices.push_back( cvf::Vec3f( bottomInnerEnd - offset ) );
+    // Bottom face (NEG_K) - subdivided curved surface
+    for ( int j = 0; j < m_curveSubdivisions; ++j )
+    {
+        for ( int i = 0; i < m_curveSubdivisions; ++i )
+        {
+            double radius1 = cell.innerRadius + i * radiusStep;
+            double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
+            double angle1  = cell.startAngle + j * angleStep;
+            double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_K );
+            // Create quad for this subdivision
+            cvf::Vec3d bottomInnerStart = cylindricalToCartesian( radius1, angle1, cell.bottomZ, cell.centerPoint );
+            cvf::Vec3d bottomOuterStart = cylindricalToCartesian( radius2, angle1, cell.bottomZ, cell.centerPoint );
+            cvf::Vec3d bottomInnerEnd   = cylindricalToCartesian( radius1, angle2, cell.bottomZ, cell.centerPoint );
+            cvf::Vec3d bottomOuterEnd   = cylindricalToCartesian( radius2, angle2, cell.bottomZ, cell.centerPoint );
 
-    // Top face (POS_K)
-    cvf::Vec3d topInnerStart = cylindricalToCartesian( cell.innerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d topInnerEnd   = cylindricalToCartesian( cell.innerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d topOuterStart = cylindricalToCartesian( cell.outerRadius, cell.startAngle, cell.topZ, cell.centerPoint );
-    cvf::Vec3d topOuterEnd   = cylindricalToCartesian( cell.outerRadius, cell.endAngle, cell.topZ, cell.centerPoint );
+            vertices.push_back( cvf::Vec3f( bottomInnerStart - offset ) );
+            vertices.push_back( cvf::Vec3f( bottomOuterStart - offset ) );
+            vertices.push_back( cvf::Vec3f( bottomOuterEnd - offset ) );
+            vertices.push_back( cvf::Vec3f( bottomInnerEnd - offset ) );
 
-    vertices.push_back( cvf::Vec3f( topInnerEnd - offset ) );
-    vertices.push_back( cvf::Vec3f( topOuterEnd - offset ) );
-    vertices.push_back( cvf::Vec3f( topOuterStart - offset ) );
-    vertices.push_back( cvf::Vec3f( topInnerStart - offset ) );
+            m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+            m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_K );
+        }
+    }
 
-    m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
-    m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_K );
+    // Top face (POS_K) - subdivided curved surface
+    for ( int j = 0; j < m_curveSubdivisions; ++j )
+    {
+        for ( int i = 0; i < m_curveSubdivisions; ++i )
+        {
+            double radius1 = cell.innerRadius + i * radiusStep;
+            double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
+            double angle1  = cell.startAngle + j * angleStep;
+            double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
+
+            // Create quad for this subdivision (reverse winding for upward face)
+            cvf::Vec3d topInnerStart = cylindricalToCartesian( radius1, angle1, cell.topZ, cell.centerPoint );
+            cvf::Vec3d topOuterStart = cylindricalToCartesian( radius2, angle1, cell.topZ, cell.centerPoint );
+            cvf::Vec3d topInnerEnd   = cylindricalToCartesian( radius1, angle2, cell.topZ, cell.centerPoint );
+            cvf::Vec3d topOuterEnd   = cylindricalToCartesian( radius2, angle2, cell.topZ, cell.centerPoint );
+
+            vertices.push_back( cvf::Vec3f( topInnerEnd - offset ) );
+            vertices.push_back( cvf::Vec3f( topOuterEnd - offset ) );
+            vertices.push_back( cvf::Vec3f( topOuterStart - offset ) );
+            vertices.push_back( cvf::Vec3f( topInnerStart - offset ) );
+
+            m_quadMapper->quadToCellIndexMap().push_back( cellIndex );
+            m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::POS_K );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

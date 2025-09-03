@@ -56,6 +56,7 @@ public:
     // Setup methods
     void setCellVisibility( const UByteArray* cellVisibility );
     void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter );
+    void setCurveSubdivisions( int subdivisions ) { m_curveSubdivisions = subdivisions; }
 
     // GeometryGeneratorInterface implementation
     ref<DrawableGeo> generateSurface() override;
@@ -99,6 +100,7 @@ private:
     // Input
     std::vector<const CellFaceVisibilityFilter*> m_cellVisibilityFilters;
     cref<UByteArray>                             m_cellVisibility;
+    int                                          m_curveSubdivisions;
 
     // Created arrays
     cvf::ref<cvf::Vec3fArray> m_vertices;
