@@ -105,6 +105,7 @@ private:
 
     // Created arrays
     cvf::ref<cvf::Vec3fArray> m_vertices;
+    cvf::ref<cvf::UIntArray>  m_meshLineIndices;
 
     // Mappings
     ref<StructGridQuadToCellFaceMapper>    m_quadMapper;

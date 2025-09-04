@@ -107,10 +107,14 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawable()
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( m_vertices.p() );
 
-    // Create custom line indices that filter out horizontal subdivisions on top/bottom faces
-    ref<UIntArray> indices = createCylindricalMeshLineIndices();
+    // Use cached mesh line indices if available, otherwise compute them
+    if ( m_meshLineIndices.isNull() )
+    {
+        m_meshLineIndices = createCylindricalMeshLineIndices();
+    }
+
     ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( indices.p() );
+    prim->setIndices( m_meshLineIndices.p() );
 
     geo->addPrimitiveSet( prim.p() );
     return geo;
@@ -421,6 +425,9 @@ void CylindricalGeometryGenerator::computeArrays()
 
     m_vertices = new cvf::Vec3fArray;
     m_vertices->assign( vertices );
+    
+    // Invalidate cached mesh line indices when vertices change
+    m_meshLineIndices = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
