@@ -210,8 +210,141 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
                                                                                  size_t                     cellIndex,
                                                                                  const cvf::Vec3d& displayModelOffset )
 {
-    // For now, fall back to standard hexahedral representation for single cells
-    return StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
+    if ( grid->gridGeometryType() != cvf::GridGeometryType::CYLINDRICAL )
+    {
+        return StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
+    }
+
+    CylindricalCell cylCell;
+    bool success = grid->getCylindricalCoords( cellIndex,
+                                               cylCell.innerRadius,
+                                               cylCell.outerRadius,
+                                               cylCell.startAngle,
+                                               cylCell.endAngle,
+                                               cylCell.topZ,
+                                               cylCell.bottomZ );
+    if ( !success )
+    {
+        return StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
+    }
+
+
+    std::vector<Vec3f> vertices;
+    
+    cvf::Vec3d offset = displayModelOffset;
+    int curveSubdivisions = 10;
+
+    // Create angular subdivisions for smooth curved surfaces
+    double angleRange = cylCell.endAngle - cylCell.startAngle;
+    double angleStep  = angleRange / curveSubdivisions;
+
+    // Inner radial face - curved surface with angular subdivisions
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
+        cvf::Vec3d innerBot1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.bottomZ );
+        cvf::Vec3d innerBot2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.bottomZ );
+        cvf::Vec3d innerTop1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.topZ );
+        cvf::Vec3d innerTop2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.topZ );
+
+        vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerTop2 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerTop1 - offset ) );
+    }
+
+    // Outer radial face - curved surface with angular subdivisions
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
+        cvf::Vec3d outerBot1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.bottomZ );
+        cvf::Vec3d outerBot2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.bottomZ );
+        cvf::Vec3d outerTop1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.topZ );
+        cvf::Vec3d outerTop2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.topZ );
+
+        vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerTop1 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerTop2 - offset ) );
+    }
+
+    // Start angle face - straight radial face (no subdivision needed)
+    cvf::Vec3d startInner    = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.startAngle, cylCell.bottomZ );
+    cvf::Vec3d startOuter    = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.startAngle, cylCell.bottomZ );
+    cvf::Vec3d startInnerTop = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.startAngle, cylCell.topZ );
+    cvf::Vec3d startOuterTop = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.startAngle, cylCell.topZ );
+
+    vertices.push_back( cvf::Vec3f( startInner - offset ) );
+    vertices.push_back( cvf::Vec3f( startOuter - offset ) );
+    vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
+    vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
+
+    // End angle face - straight radial face (no subdivision needed)
+    cvf::Vec3d endInner    = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endOuter    = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endInnerTop = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.endAngle, cylCell.topZ );
+    cvf::Vec3d endOuterTop = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.endAngle, cylCell.topZ );
+
+    vertices.push_back( cvf::Vec3f( endOuter - offset ) );
+    vertices.push_back( cvf::Vec3f( endInner - offset ) );
+    vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
+    vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
+
+    // Bottom face - curved surface with angular subdivisions
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
+        cvf::Vec3d bottomInner1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.bottomZ );
+        cvf::Vec3d bottomOuter1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.bottomZ );
+        cvf::Vec3d bottomInner2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.bottomZ );
+        cvf::Vec3d bottomOuter2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.bottomZ );
+
+        vertices.push_back( cvf::Vec3f( bottomInner1 - offset ) );
+        vertices.push_back( cvf::Vec3f( bottomOuter1 - offset ) );
+        vertices.push_back( cvf::Vec3f( bottomOuter2 - offset ) );
+        vertices.push_back( cvf::Vec3f( bottomInner2 - offset ) );
+    }
+
+    // Top face - curved surface with angular subdivisions
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
+        cvf::Vec3d topInner1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.topZ );
+        cvf::Vec3d topOuter1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.topZ );
+        cvf::Vec3d topInner2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.topZ );
+        cvf::Vec3d topOuter2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.topZ );
+
+        vertices.push_back( cvf::Vec3f( topInner2 - offset ) );
+        vertices.push_back( cvf::Vec3f( topOuter2 - offset ) );
+        vertices.push_back( cvf::Vec3f( topOuter1 - offset ) );
+        vertices.push_back( cvf::Vec3f( topInner1 - offset ) );
+    }
+
+    if ( vertices.empty() )
+    {
+        return nullptr;
+    }
+
+    cvf::ref<cvf::Vec3fArray> cvfVertices = new cvf::Vec3fArray;
+    cvfVertices->assign( vertices );
+
+    ref<DrawableGeo> geo = new DrawableGeo;
+    geo->setVertexArray( cvfVertices.p() );
+
+    ref<UIntArray> indices = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( cvfVertices.p() );
+    ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
+    prim->setIndices( indices.p() );
+
+    geo->addPrimitiveSet( prim.p() );
+    return geo;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -307,10 +440,10 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
         double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
 
         // Create quad for this subdivision
-        cvf::Vec3d innerBot1 = cylindricalToCartesian( cell.innerRadius, angle1, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d innerBot2 = cylindricalToCartesian( cell.innerRadius, angle2, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d innerTop1 = cylindricalToCartesian( cell.innerRadius, angle1, cell.topZ, cell.centerPoint );
-        cvf::Vec3d innerTop2 = cylindricalToCartesian( cell.innerRadius, angle2, cell.topZ, cell.centerPoint );
+        cvf::Vec3d innerBot1 = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.bottomZ );
+        cvf::Vec3d innerBot2 = cylindricalToCartesianStatic( cell.innerRadius, angle2, cell.bottomZ );
+        cvf::Vec3d innerTop1 = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.topZ );
+        cvf::Vec3d innerTop2 = cylindricalToCartesianStatic( cell.innerRadius, angle2, cell.topZ );
 
         vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
         vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
@@ -328,10 +461,10 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
         double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
 
         // Create quad for this subdivision (reverse winding for outward face)
-        cvf::Vec3d outerBot1 = cylindricalToCartesian( cell.outerRadius, angle1, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d outerBot2 = cylindricalToCartesian( cell.outerRadius, angle2, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d outerTop1 = cylindricalToCartesian( cell.outerRadius, angle1, cell.topZ, cell.centerPoint );
-        cvf::Vec3d outerTop2 = cylindricalToCartesian( cell.outerRadius, angle2, cell.topZ, cell.centerPoint );
+        cvf::Vec3d outerBot1 = cylindricalToCartesianStatic( cell.outerRadius, angle1, cell.bottomZ );
+        cvf::Vec3d outerBot2 = cylindricalToCartesianStatic( cell.outerRadius, angle2, cell.bottomZ );
+        cvf::Vec3d outerTop1 = cylindricalToCartesianStatic( cell.outerRadius, angle1, cell.topZ );
+        cvf::Vec3d outerTop2 = cylindricalToCartesianStatic( cell.outerRadius, angle2, cell.topZ );
 
         vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
         vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
@@ -363,10 +496,10 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
         double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
 
         // Create quad for this subdivision
-        cvf::Vec3d startInner    = cylindricalToCartesian( radius1, cell.startAngle, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d startOuter    = cylindricalToCartesian( radius2, cell.startAngle, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d startInnerTop = cylindricalToCartesian( radius1, cell.startAngle, cell.topZ, cell.centerPoint );
-        cvf::Vec3d startOuterTop = cylindricalToCartesian( radius2, cell.startAngle, cell.topZ, cell.centerPoint );
+        cvf::Vec3d startInner    = cylindricalToCartesianStatic( radius1, cell.startAngle, cell.bottomZ );
+        cvf::Vec3d startOuter    = cylindricalToCartesianStatic( radius2, cell.startAngle, cell.bottomZ );
+        cvf::Vec3d startInnerTop = cylindricalToCartesianStatic( radius1, cell.startAngle, cell.topZ );
+        cvf::Vec3d startOuterTop = cylindricalToCartesianStatic( radius2, cell.startAngle, cell.topZ );
 
         vertices.push_back( cvf::Vec3f( startInner - offset ) );
         vertices.push_back( cvf::Vec3f( startOuter - offset ) );
@@ -384,10 +517,10 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
         double radius2 = cell.innerRadius + ( i + 1 ) * radiusStep;
 
         // Create quad for this subdivision (reverse winding for outward face)
-        cvf::Vec3d endInner    = cylindricalToCartesian( radius1, cell.endAngle, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d endOuter    = cylindricalToCartesian( radius2, cell.endAngle, cell.bottomZ, cell.centerPoint );
-        cvf::Vec3d endInnerTop = cylindricalToCartesian( radius1, cell.endAngle, cell.topZ, cell.centerPoint );
-        cvf::Vec3d endOuterTop = cylindricalToCartesian( radius2, cell.endAngle, cell.topZ, cell.centerPoint );
+        cvf::Vec3d endInner    = cylindricalToCartesianStatic( radius1, cell.endAngle, cell.bottomZ );
+        cvf::Vec3d endOuter    = cylindricalToCartesianStatic( radius2, cell.endAngle, cell.bottomZ );
+        cvf::Vec3d endInnerTop = cylindricalToCartesianStatic( radius1, cell.endAngle, cell.topZ );
+        cvf::Vec3d endOuterTop = cylindricalToCartesianStatic( radius2, cell.endAngle, cell.topZ );
 
         vertices.push_back( cvf::Vec3f( endOuter - offset ) );
         vertices.push_back( cvf::Vec3f( endInner - offset ) );
@@ -425,10 +558,10 @@ void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cel
             double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
 
             // Create quad for this subdivision
-            cvf::Vec3d bottomInnerStart = cylindricalToCartesian( radius1, angle1, cell.bottomZ, cell.centerPoint );
-            cvf::Vec3d bottomOuterStart = cylindricalToCartesian( radius2, angle1, cell.bottomZ, cell.centerPoint );
-            cvf::Vec3d bottomInnerEnd   = cylindricalToCartesian( radius1, angle2, cell.bottomZ, cell.centerPoint );
-            cvf::Vec3d bottomOuterEnd   = cylindricalToCartesian( radius2, angle2, cell.bottomZ, cell.centerPoint );
+            cvf::Vec3d bottomInnerStart = cylindricalToCartesianStatic( radius1, angle1, cell.bottomZ );
+            cvf::Vec3d bottomOuterStart = cylindricalToCartesianStatic( radius2, angle1, cell.bottomZ );
+            cvf::Vec3d bottomInnerEnd   = cylindricalToCartesianStatic( radius1, angle2, cell.bottomZ );
+            cvf::Vec3d bottomOuterEnd   = cylindricalToCartesianStatic( radius2, angle2, cell.bottomZ );
 
             vertices.push_back( cvf::Vec3f( bottomInnerStart - offset ) );
             vertices.push_back( cvf::Vec3f( bottomOuterStart - offset ) );
@@ -451,10 +584,10 @@ void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cel
             double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
 
             // Create quad for this subdivision (reverse winding for upward face)
-            cvf::Vec3d topInnerStart = cylindricalToCartesian( radius1, angle1, cell.topZ, cell.centerPoint );
-            cvf::Vec3d topOuterStart = cylindricalToCartesian( radius2, angle1, cell.topZ, cell.centerPoint );
-            cvf::Vec3d topInnerEnd   = cylindricalToCartesian( radius1, angle2, cell.topZ, cell.centerPoint );
-            cvf::Vec3d topOuterEnd   = cylindricalToCartesian( radius2, angle2, cell.topZ, cell.centerPoint );
+            cvf::Vec3d topInnerStart = cylindricalToCartesianStatic( radius1, angle1, cell.topZ );
+            cvf::Vec3d topOuterStart = cylindricalToCartesianStatic( radius2, angle1, cell.topZ );
+            cvf::Vec3d topInnerEnd   = cylindricalToCartesianStatic( radius1, angle2, cell.topZ );
+            cvf::Vec3d topOuterEnd   = cylindricalToCartesianStatic( radius2, angle2, cell.topZ );
 
             vertices.push_back( cvf::Vec3f( topInnerEnd - offset ) );
             vertices.push_back( cvf::Vec3f( topOuterEnd - offset ) );
@@ -502,13 +635,24 @@ bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3d
-    CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z, const cvf::Vec3d& center ) const
+cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z ) const
 {
     // Convert angle from degrees to radians for trigonometric functions
     double angleRadians = angle * M_PI / 180.0;
-    double x            = center.x() + radius * std::cos( angleRadians );
-    double y            = center.y() + radius * std::sin( angleRadians );
+    double x = radius * std::cos( angleRadians );
+    double y = radius * std::sin( angleRadians );
+    return cvf::Vec3d( x, y, z );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesianStatic( double radius, double angle, double z )
+{
+    // Convert angle from degrees to radians for trigonometric functions
+    double angleRadians = angle * M_PI / 180.0;
+    double x = radius * std::cos( angleRadians );
+    double y = radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
 }
 

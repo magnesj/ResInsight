@@ -79,10 +79,9 @@ public:
 private:
     struct CylindricalCell
     {
-        double     innerRadius, outerRadius;
-        double     startAngle, endAngle;
-        double     topZ, bottomZ;
-        cvf::Vec3d centerPoint;
+        double innerRadius, outerRadius;
+        double startAngle, endAngle;
+        double topZ, bottomZ;
     };
 
     void computeArrays();
@@ -94,7 +93,8 @@ private:
     bool isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const;
     bool extractCylindricalCellData( size_t cellIndex, CylindricalCell& cell ) const;
 
-    cvf::Vec3d cylindricalToCartesian( double radius, double angle, double z, const cvf::Vec3d& center ) const;
+    cvf::Vec3d cylindricalToCartesian( double radius, double angle, double z ) const;
+    static cvf::Vec3d cylindricalToCartesianStatic( double radius, double angle, double z );
 
 private:
     // Input

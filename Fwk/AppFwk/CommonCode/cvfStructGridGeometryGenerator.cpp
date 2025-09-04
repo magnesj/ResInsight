@@ -39,6 +39,7 @@
 #include "cvfStructGrid.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"
+#include "cvfCylindricalGeometryGenerator.h"
 
 #include "cvfDebugTimer.h"
 #include "cvfGeometryBuilderDrawableGeo.h"
@@ -258,6 +259,12 @@ ref<DrawableGeo> StructGridGeometryGenerator::createOutlineMeshDrawable( double 
 ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
                                                                                 size_t                     cellIndex )
 {
+    // Check if this is a cylindrical grid and delegate to appropriate generator
+    if ( grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL )
+    {
+        return CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex );
+    }
+    
     return createMeshDrawableFromSingleCell( grid, cellIndex, grid->displayModelOffset() );
 }
 
@@ -268,6 +275,12 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
                                                                                 size_t                     cellIndex,
                                                                                 const cvf::Vec3d& displayModelOffset )
 {
+    // Check if this is a cylindrical grid and delegate to appropriate generator
+    if ( grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL )
+    {
+        return CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
+    }
+
     std::array<cvf::Vec3d, 8> cornerVerts = grid->cellCornerVertices( cellIndex );
 
     std::vector<Vec3f> vertices;
