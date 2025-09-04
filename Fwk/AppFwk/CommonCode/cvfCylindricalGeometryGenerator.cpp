@@ -523,14 +523,14 @@ void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cel
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
     // Create angular subdivisions only for smooth curved surfaces on top/bottom faces
-    double angleRange  = cell.endAngle - cell.startAngle;
-    double angleStep   = angleRange / m_curveSubdivisions;
+    double angleRange = cell.endAngle - cell.startAngle;
+    double angleStep  = angleRange / m_curveSubdivisions;
 
     // Bottom face (NEG_K) - angular subdivision only
     for ( int j = 0; j < m_curveSubdivisions; ++j )
     {
-        double angle1  = cell.startAngle + j * angleStep;
-        double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
+        double angle1 = cell.startAngle + j * angleStep;
+        double angle2 = cell.startAngle + ( j + 1 ) * angleStep;
 
         // Create quad using only inner and outer radius
         cvf::Vec3d bottomInnerStart = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.bottomZ );
@@ -550,8 +550,8 @@ void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cel
     // Top face (POS_K) - angular subdivision only
     for ( int j = 0; j < m_curveSubdivisions; ++j )
     {
-        double angle1  = cell.startAngle + j * angleStep;
-        double angle2  = cell.startAngle + ( j + 1 ) * angleStep;
+        double angle1 = cell.startAngle + j * angleStep;
+        double angle2 = cell.startAngle + ( j + 1 ) * angleStep;
 
         // Create quad using only inner and outer radius (reverse winding for upward face)
         cvf::Vec3d topInnerStart = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.topZ );
