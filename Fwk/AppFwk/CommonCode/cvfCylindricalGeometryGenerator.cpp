@@ -216,7 +216,7 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
     }
 
     CylindricalCell cylCell;
-    bool success = grid->getCylindricalCoords( cellIndex,
+    bool            success = grid->getCylindricalCoords( cellIndex,
                                                cylCell.innerRadius,
                                                cylCell.outerRadius,
                                                cylCell.startAngle,
@@ -228,11 +228,10 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
         return StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
     }
 
-
     std::vector<Vec3f> vertices;
-    
-    cvf::Vec3d offset = displayModelOffset;
-    int curveSubdivisions = 10;
+
+    cvf::Vec3d offset            = displayModelOffset;
+    int        curveSubdivisions = 10;
 
     // Create angular subdivisions for smooth curved surfaces
     double angleRange = cylCell.endAngle - cylCell.startAngle;
@@ -339,7 +338,7 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( cvfVertices.p() );
 
-    ref<UIntArray> indices = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( cvfVertices.p() );
+    ref<UIntArray> indices            = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( cvfVertices.p() );
     ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
     prim->setIndices( indices.p() );
 
@@ -609,8 +608,8 @@ cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesian( double radius, 
 {
     // Convert angle from degrees to radians for trigonometric functions
     double angleRadians = angle * M_PI / 180.0;
-    double x = radius * std::cos( angleRadians );
-    double y = radius * std::sin( angleRadians );
+    double x            = radius * std::cos( angleRadians );
+    double y            = radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
 }
 
@@ -621,8 +620,8 @@ cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesianStatic( double ra
 {
     // Convert angle from degrees to radians for trigonometric functions
     double angleRadians = angle * M_PI / 180.0;
-    double x = radius * std::cos( angleRadians );
-    double y = radius * std::sin( angleRadians );
+    double x            = radius * std::cos( angleRadians );
+    double y            = radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
 }
 

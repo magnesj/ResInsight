@@ -36,10 +36,10 @@
 
 #include "cvfBase.h"
 
+#include "cvfCylindricalGeometryGenerator.h"
 #include "cvfStructGrid.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"
-#include "cvfCylindricalGeometryGenerator.h"
 
 #include "cvfDebugTimer.h"
 #include "cvfGeometryBuilderDrawableGeo.h"
@@ -264,7 +264,7 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
     {
         return CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex );
     }
-    
+
     return createMeshDrawableFromSingleCell( grid, cellIndex, grid->displayModelOffset() );
 }
 
