@@ -48,6 +48,7 @@
 
 #include "RigDoglegTools.h"
 #include "RigStimPlanModelTools.h"
+#include "Well/RigWellPath.h"
 #include "Well/RigWellPathGeometryExporter.h"
 #include "Well/RigWellPathGeometryTools.h"
 
@@ -613,4 +614,50 @@ std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_addWellLogInternal::e
 QString RimcWellPath_addWellLogInternal::classKeywordReturnedType() const
 {
     return RimImportedWellLog::classKeywordStatic();
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendLateral, "AppendLateral" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimcWellPath_appendLateral::RimcWellPath_appendLateral( caf::PdmObjectHandle* self )
+    : caf::PdmVoidObjectMethod( self )
+{
+    CAF_PDM_InitObject( "Append Well Path Lateral" );
+
+    CAF_PDM_InitScriptableFieldNoDefault( &m_lateral, "WellPathLateral", "", "", "", "Well Path Lateral" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendLateral::execute()
+{
+    auto wellPath = self<RimWellPath>();
+
+    if ( !m_lateral )
+    {
+        QString txt = "No lateral specified. Cannot append lateral to well path.";
+        return std::unexpected( txt );
+    }
+
+    const auto wellPathGeometry = wellPath->wellPathGeometry();
+    if ( wellPathGeometry )
+    {
+        const double sharedWellPathLength = m_lateral->wellPathGeometry()->identicalTubeLength( *wellPathGeometry );
+
+        const double epsilon = 1.0e-8;
+        if ( sharedWellPathLength > epsilon )
+        {
+            wellPath->connectWellPaths( m_lateral, sharedWellPathLength );
+        }
+        else
+        {
+            QString txt = "No shared geometry between main well path and lateral. Cannot append lateral to well path.";
+            return std::unexpected( txt );
+        }
+    }
+
+    return nullptr;
 }

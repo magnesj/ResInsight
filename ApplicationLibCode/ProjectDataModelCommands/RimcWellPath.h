@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RimFishbonesDefines.h"
+#include "RimWellPath.h"
 
 #include "cafPdmField.h"
 #include "cafPdmObjectHandle.h"
@@ -164,4 +165,20 @@ private:
     caf::PdmField<QString> m_channelKeysCsv;
     caf::PdmField<QString> m_tvdMslKey;
     caf::PdmField<QString> m_tvdRkbKey;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcWellPath_appendLateral : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcWellPath_appendLateral( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmPtrField<RimWellPath*> m_lateral;
 };
