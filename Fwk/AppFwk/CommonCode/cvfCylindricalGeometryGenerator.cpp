@@ -237,7 +237,7 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
     double angleRange = cylCell.endAngle - cylCell.startAngle;
     double angleStep  = angleRange / curveSubdivisions;
 
-    // Inner radial face - curved surface with angular subdivisions
+    // Inner radial curve - bottom edge only
     for ( int i = 0; i < curveSubdivisions; ++i )
     {
         double angle1 = cylCell.startAngle + i * angleStep;
@@ -245,16 +245,27 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
 
         cvf::Vec3d innerBot1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.bottomZ );
         cvf::Vec3d innerBot2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.bottomZ );
+
+        // Create line segment for curve (not quad)
+        vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
+    }
+
+    // Inner radial curve - top edge only
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
         cvf::Vec3d innerTop1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.topZ );
         cvf::Vec3d innerTop2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.topZ );
 
-        vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
-        vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
-        vertices.push_back( cvf::Vec3f( innerTop2 - offset ) );
+        // Create line segment for curve (not quad)
         vertices.push_back( cvf::Vec3f( innerTop1 - offset ) );
+        vertices.push_back( cvf::Vec3f( innerTop2 - offset ) );
     }
 
-    // Outer radial face - curved surface with angular subdivisions
+    // Outer radial curve - bottom edge only
     for ( int i = 0; i < curveSubdivisions; ++i )
     {
         double angle1 = cylCell.startAngle + i * angleStep;
@@ -262,70 +273,65 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
 
         cvf::Vec3d outerBot1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.bottomZ );
         cvf::Vec3d outerBot2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.bottomZ );
+
+        // Create line segment for curve (not quad)
+        vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
+        vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
+    }
+
+    // Outer radial curve - top edge only
+    for ( int i = 0; i < curveSubdivisions; ++i )
+    {
+        double angle1 = cylCell.startAngle + i * angleStep;
+        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+
         cvf::Vec3d outerTop1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.topZ );
         cvf::Vec3d outerTop2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.topZ );
 
-        vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
-        vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
+        // Create line segment for curve (not quad)
         vertices.push_back( cvf::Vec3f( outerTop1 - offset ) );
         vertices.push_back( cvf::Vec3f( outerTop2 - offset ) );
     }
 
-    // Start angle face - straight radial face (no subdivision needed)
-    cvf::Vec3d startInner    = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.startAngle, cylCell.bottomZ );
-    cvf::Vec3d startOuter    = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.startAngle, cylCell.bottomZ );
+    // Add radial lines from inner to outer radius at start and end angles
+    cvf::Vec3d startInnerBot = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.startAngle, cylCell.bottomZ );
+    cvf::Vec3d startOuterBot = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.startAngle, cylCell.bottomZ );
     cvf::Vec3d startInnerTop = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.startAngle, cylCell.topZ );
     cvf::Vec3d startOuterTop = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.startAngle, cylCell.topZ );
 
-    vertices.push_back( cvf::Vec3f( startInner - offset ) );
-    vertices.push_back( cvf::Vec3f( startOuter - offset ) );
-    vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
-    vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
-
-    // End angle face - straight radial face (no subdivision needed)
-    cvf::Vec3d endInner    = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.endAngle, cylCell.bottomZ );
-    cvf::Vec3d endOuter    = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endInnerBot = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endOuterBot = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.endAngle, cylCell.bottomZ );
     cvf::Vec3d endInnerTop = cylindricalToCartesianStatic( cylCell.innerRadius, cylCell.endAngle, cylCell.topZ );
     cvf::Vec3d endOuterTop = cylindricalToCartesianStatic( cylCell.outerRadius, cylCell.endAngle, cylCell.topZ );
 
-    vertices.push_back( cvf::Vec3f( endOuter - offset ) );
-    vertices.push_back( cvf::Vec3f( endInner - offset ) );
-    vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
+    // Start angle radial lines
+    vertices.push_back( cvf::Vec3f( startInnerBot - offset ) );
+    vertices.push_back( cvf::Vec3f( startOuterBot - offset ) );
+    vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
+    vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
+
+    // End angle radial lines
+    vertices.push_back( cvf::Vec3f( endInnerBot - offset ) );
+    vertices.push_back( cvf::Vec3f( endOuterBot - offset ) );
     vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
+    vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
 
-    // Bottom face - curved surface with angular subdivisions
-    for ( int i = 0; i < curveSubdivisions; ++i )
-    {
-        double angle1 = cylCell.startAngle + i * angleStep;
-        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
+    // Add vertical corner lines connecting top and bottom
+    // Corner 1: Inner radius, start angle
+    vertices.push_back( cvf::Vec3f( startInnerBot - offset ) );
+    vertices.push_back( cvf::Vec3f( startInnerTop - offset ) );
 
-        cvf::Vec3d bottomInner1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.bottomZ );
-        cvf::Vec3d bottomOuter1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.bottomZ );
-        cvf::Vec3d bottomInner2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.bottomZ );
-        cvf::Vec3d bottomOuter2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.bottomZ );
+    // Corner 2: Outer radius, start angle  
+    vertices.push_back( cvf::Vec3f( startOuterBot - offset ) );
+    vertices.push_back( cvf::Vec3f( startOuterTop - offset ) );
 
-        vertices.push_back( cvf::Vec3f( bottomInner1 - offset ) );
-        vertices.push_back( cvf::Vec3f( bottomOuter1 - offset ) );
-        vertices.push_back( cvf::Vec3f( bottomOuter2 - offset ) );
-        vertices.push_back( cvf::Vec3f( bottomInner2 - offset ) );
-    }
+    // Corner 3: Inner radius, end angle
+    vertices.push_back( cvf::Vec3f( endInnerBot - offset ) );
+    vertices.push_back( cvf::Vec3f( endInnerTop - offset ) );
 
-    // Top face - curved surface with angular subdivisions
-    for ( int i = 0; i < curveSubdivisions; ++i )
-    {
-        double angle1 = cylCell.startAngle + i * angleStep;
-        double angle2 = cylCell.startAngle + ( i + 1 ) * angleStep;
-
-        cvf::Vec3d topInner1 = cylindricalToCartesianStatic( cylCell.innerRadius, angle1, cylCell.topZ );
-        cvf::Vec3d topOuter1 = cylindricalToCartesianStatic( cylCell.outerRadius, angle1, cylCell.topZ );
-        cvf::Vec3d topInner2 = cylindricalToCartesianStatic( cylCell.innerRadius, angle2, cylCell.topZ );
-        cvf::Vec3d topOuter2 = cylindricalToCartesianStatic( cylCell.outerRadius, angle2, cylCell.topZ );
-
-        vertices.push_back( cvf::Vec3f( topInner2 - offset ) );
-        vertices.push_back( cvf::Vec3f( topOuter2 - offset ) );
-        vertices.push_back( cvf::Vec3f( topOuter1 - offset ) );
-        vertices.push_back( cvf::Vec3f( topInner1 - offset ) );
-    }
+    // Corner 4: Outer radius, end angle
+    vertices.push_back( cvf::Vec3f( endOuterBot - offset ) );
+    vertices.push_back( cvf::Vec3f( endOuterTop - offset ) );
 
     if ( vertices.empty() )
     {
@@ -338,9 +344,16 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawableFromSingleCell(
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( cvfVertices.p() );
 
-    ref<UIntArray> indices            = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( cvfVertices.p() );
+    // Create line indices for direct line rendering (pairs of vertices)
+    ref<UIntArray> lineIndices = new UIntArray;
+    lineIndices->resize( vertices.size() );
+    for ( size_t i = 0; i < vertices.size(); ++i )
+    {
+        lineIndices->set( i, static_cast<uint>( i ) );
+    }
+
     ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( indices.p() );
+    prim->setIndices( lineIndices.p() );
 
     geo->addPrimitiveSet( prim.p() );
     return geo;
