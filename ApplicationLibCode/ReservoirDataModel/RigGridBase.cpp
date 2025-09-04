@@ -592,8 +592,7 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
     // K-direction represents vertical range
 
     // Get corner vertices to extract the Z range
-    cvf::Vec3d cornerVerts[8];
-    cellCornerVertices( cellIndex, cornerVerts );
+    std::array<cvf::Vec3d, 8> cornerVerts = cellCornerVertices( cellIndex );
 
     // Extract Z range from corner vertices
     double minZ = HUGE_VAL;

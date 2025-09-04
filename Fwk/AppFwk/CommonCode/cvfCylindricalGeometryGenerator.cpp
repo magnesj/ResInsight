@@ -506,8 +506,7 @@ bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex,
     }
 
     // Fallback: extract from corner vertices and approximate cylindrical parameters
-    cvf::Vec3d cornerVerts[8];
-    m_grid->cellCornerVertices( cellIndex, cornerVerts );
+    std::array<cvf::Vec3d, 8> cornerVerts = m_grid->cellCornerVertices( cellIndex );
 
     // For radial grids, approximate center from bottom face center
     cvf::Vec3d bottomCenter = ( cornerVerts[0] + cornerVerts[1] + cornerVerts[2] + cornerVerts[3] ) * 0.25;
