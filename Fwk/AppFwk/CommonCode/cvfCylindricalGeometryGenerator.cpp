@@ -490,56 +490,13 @@ bool CylindricalGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t
 //--------------------------------------------------------------------------------------------------
 bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex, CylindricalCell& cell ) const
 {
-    // Try to get cylindrical coordinates from the grid interface
-    if ( m_grid->getCylindricalCoords( cellIndex,
-                                       cell.innerRadius,
-                                       cell.outerRadius,
-                                       cell.startAngle,
-                                       cell.endAngle,
-                                       cell.topZ,
-                                       cell.bottomZ ) )
-    {
-        // Get center point from grid
-        cell.centerPoint     = m_grid->cellCentroid( cellIndex );
-        cell.centerPoint.z() = ( cell.topZ + cell.bottomZ ) * 0.5;
-        return true;
-    }
-
-    // Fallback: extract from corner vertices and approximate cylindrical parameters
-    std::array<cvf::Vec3d, 8> cornerVerts = m_grid->cellCornerVertices( cellIndex );
-
-    // For radial grids, approximate center from bottom face center
-    cvf::Vec3d bottomCenter = ( cornerVerts[0] + cornerVerts[1] + cornerVerts[2] + cornerVerts[3] ) * 0.25;
-    cvf::Vec3d topCenter    = ( cornerVerts[4] + cornerVerts[5] + cornerVerts[6] + cornerVerts[7] ) * 0.25;
-
-    cell.centerPoint = ( bottomCenter + topCenter ) * 0.5;
-    cell.bottomZ     = bottomCenter.z();
-    cell.topZ        = topCenter.z();
-
-    // Approximate radial extents
-    double minRadius = HUGE_VAL;
-    double maxRadius = 0.0;
-    double minAngle  = HUGE_VAL;
-    double maxAngle  = -HUGE_VAL;
-
-    for ( int idx = 0; idx < 8; idx++ )
-    {
-        cvf::Vec3d relative = cornerVerts[idx] - cell.centerPoint;
-        double     radius   = std::sqrt( relative.x() * relative.x() + relative.y() * relative.y() );
-        double     angle    = std::atan2( relative.y(), relative.x() );
-
-        minRadius = std::min( minRadius, radius );
-        maxRadius = std::max( maxRadius, radius );
-        minAngle  = std::min( minAngle, angle );
-        maxAngle  = std::max( maxAngle, angle );
-    }
-
-    cell.innerRadius = minRadius;
-    cell.outerRadius = maxRadius;
-    cell.startAngle  = minAngle;
-    cell.endAngle    = maxAngle;
-
-    return true;
+    return m_grid->getCylindricalCoords( cellIndex,
+                                         cell.innerRadius,
+                                         cell.outerRadius,
+                                         cell.startAngle,
+                                         cell.endAngle,
+                                         cell.topZ,
+                                         cell.bottomZ );
 }
 
 //--------------------------------------------------------------------------------------------------
