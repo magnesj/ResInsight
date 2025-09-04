@@ -107,7 +107,8 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawable()
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( m_vertices.p() );
 
-    ref<UIntArray> indices            = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( m_vertices.p() );
+    // Create custom line indices that filter out horizontal subdivisions on top/bottom faces
+    ref<UIntArray> indices = createCylindricalMeshLineIndices();
     ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
     prim->setIndices( indices.p() );
 
@@ -441,22 +442,22 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
-    // Create N subdivisions along the angular range for smooth curved surfaces
+    // Create angular subdivisions for smooth curved surfaces
     double angleRange = cell.endAngle - cell.startAngle;
     double angleStep  = angleRange / m_curveSubdivisions;
 
-    // Inner radial face (NEG_I in radial grid: smaller radius) - curved surface
+    // Inner radial face (NEG_I) - angular subdivision only
     for ( int i = 0; i < m_curveSubdivisions; ++i )
     {
         double angle1 = cell.startAngle + i * angleStep;
         double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
 
-        // Create quad for this subdivision
         cvf::Vec3d innerBot1 = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.bottomZ );
         cvf::Vec3d innerBot2 = cylindricalToCartesianStatic( cell.innerRadius, angle2, cell.bottomZ );
         cvf::Vec3d innerTop1 = cylindricalToCartesianStatic( cell.innerRadius, angle1, cell.topZ );
         cvf::Vec3d innerTop2 = cylindricalToCartesianStatic( cell.innerRadius, angle2, cell.topZ );
 
+        // Create quad for curved surface
         vertices.push_back( cvf::Vec3f( innerBot1 - offset ) );
         vertices.push_back( cvf::Vec3f( innerBot2 - offset ) );
         vertices.push_back( cvf::Vec3f( innerTop2 - offset ) );
@@ -466,18 +467,18 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
         m_quadMapper->quadToCellFaceMap().push_back( StructGridInterface::NEG_I );
     }
 
-    // Outer radial face (POS_I in radial grid: larger radius) - curved surface
+    // Outer radial face (POS_I) - angular subdivision only  
     for ( int i = 0; i < m_curveSubdivisions; ++i )
     {
         double angle1 = cell.startAngle + i * angleStep;
         double angle2 = cell.startAngle + ( i + 1 ) * angleStep;
 
-        // Create quad for this subdivision (reverse winding for outward face)
         cvf::Vec3d outerBot1 = cylindricalToCartesianStatic( cell.outerRadius, angle1, cell.bottomZ );
         cvf::Vec3d outerBot2 = cylindricalToCartesianStatic( cell.outerRadius, angle2, cell.bottomZ );
         cvf::Vec3d outerTop1 = cylindricalToCartesianStatic( cell.outerRadius, angle1, cell.topZ );
         cvf::Vec3d outerTop2 = cylindricalToCartesianStatic( cell.outerRadius, angle2, cell.topZ );
 
+        // Create quad for curved surface (reverse winding for outward face)
         vertices.push_back( cvf::Vec3f( outerBot2 - offset ) );
         vertices.push_back( cvf::Vec3f( outerBot1 - offset ) );
         vertices.push_back( cvf::Vec3f( outerTop1 - offset ) );
@@ -624,6 +625,58 @@ cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesianStatic( double ra
     double x            = radius * std::cos( angleRadians );
     double y            = radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+ref<UIntArray> CylindricalGeometryGenerator::createCylindricalMeshLineIndices()
+{
+    CVF_ASSERT( m_vertices.notNull() );
+    
+    size_t numVertices = m_vertices->size();
+    int    numQuads    = static_cast<int>( numVertices / 4 );
+    CVF_ASSERT( numVertices % 4 == 0 );
+
+    std::vector<uint> filteredIndices;
+    filteredIndices.reserve( numQuads * 8 );
+
+    for ( int i = 0; i < numQuads; i++ )
+    {
+        // Get the face type for this quad
+        StructGridInterface::FaceType faceType = m_quadMapper->cellFace( i );
+        
+        // For top/bottom faces (NEG_K, POS_K), skip all internal subdivision lines
+        if ( faceType == StructGridInterface::NEG_K || faceType == StructGridInterface::POS_K )
+        {
+            // Skip internal mesh lines on top/bottom faces - only perimeter will be visible
+            // from circumferential faces
+        }
+        else if ( faceType == StructGridInterface::NEG_I || faceType == StructGridInterface::POS_I )
+        {
+            // For radial faces, only add the curved (horizontal) lines, skip vertical subdivisions
+            filteredIndices.push_back( i * 4 + 0 );
+            filteredIndices.push_back( i * 4 + 1 );
+            filteredIndices.push_back( i * 4 + 2 );
+            filteredIndices.push_back( i * 4 + 3 );
+        }
+        else
+        {
+            // For circumferential faces, add all edge lines (these are the corner lines)
+            filteredIndices.push_back( i * 4 + 0 );
+            filteredIndices.push_back( i * 4 + 1 );
+            filteredIndices.push_back( i * 4 + 1 );
+            filteredIndices.push_back( i * 4 + 2 );
+            filteredIndices.push_back( i * 4 + 2 );
+            filteredIndices.push_back( i * 4 + 3 );
+            filteredIndices.push_back( i * 4 + 3 );
+            filteredIndices.push_back( i * 4 + 0 );
+        }
+    }
+
+    ref<UIntArray> indices = new UIntArray;
+    indices->assign( filteredIndices );
+    return indices;
 }
 
 } // namespace cvf
