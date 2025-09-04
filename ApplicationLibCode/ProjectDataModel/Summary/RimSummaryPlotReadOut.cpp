@@ -43,7 +43,7 @@ RimSummaryPlotReadOut::RimSummaryPlotReadOut()
     CAF_PDM_InitObject( "Summary Plot Read Out", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_readOutType, "ReadOutType", "Readout Mode" );
-    m_readOutType = ReadOutType::SNAP_TO_POINT;
+    m_readOutType = ReadOutType::TIME_VALUE_TRACKING;
 
     CAF_PDM_InitFieldNoDefault( &m_lineAppearance, "LineAppearance", "" );
     m_lineAppearance = new RimAnnotationLineAppearance;
