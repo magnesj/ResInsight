@@ -665,8 +665,8 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxSlow()
         {
             // For cylindrical grids, find Z-range and largest radius from active cells
             double maxRadius = 0.0;
-            double minZ = HUGE_VAL;
-            double maxZ = -HUGE_VAL;
+            double minZ      = HUGE_VAL;
+            double maxZ      = -HUGE_VAL;
 
             for ( size_t i = 0; i < m_mainGrid->cellCount(); i++ )
             {
@@ -677,12 +677,12 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxSlow()
                     if ( m_mainGrid->getCylindricalCoords( i, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ ) )
                     {
                         maxRadius = std::max( maxRadius, outerRadius );
-                        minZ = std::min( minZ, bottomZ );
-                        maxZ = std::max( maxZ, topZ );
+                        minZ      = std::min( minZ, bottomZ );
+                        maxZ      = std::max( maxZ, topZ );
                     }
                 }
             }
-            
+
             // Create bounding box: XY extends from -maxRadius to +maxRadius
             bb.add( cvf::Vec3d( -maxRadius, -maxRadius, minZ ) );
             bb.add( cvf::Vec3d( maxRadius, maxRadius, maxZ ) );
@@ -744,10 +744,10 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxOptimized()
         {
             // For cylindrical grids, find Z-range and largest radius from active cells
             auto [minBB, maxBB] = activeInfos[acIdx]->ijkBoundingBox();
-            
+
             double maxRadius = 0.0;
-            double minZ = HUGE_VAL;
-            double maxZ = -HUGE_VAL;
+            double minZ      = HUGE_VAL;
+            double maxZ      = -HUGE_VAL;
 
             for ( size_t k = minBB.z(); k <= maxBB.z(); k++ )
             {
@@ -758,20 +758,20 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxOptimized()
                         if ( m_mainGrid->isCellValid( i, j, k ) )
                         {
                             size_t cellIndex = m_mainGrid->cellIndexFromIJK( i, j, k );
-                            
+
                             // Get r,theta,z coordinates from active cells
                             double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
                             if ( m_mainGrid->getCylindricalCoords( cellIndex, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ ) )
                             {
                                 maxRadius = std::max( maxRadius, outerRadius );
-                                minZ = std::min( minZ, bottomZ );
-                                maxZ = std::max( maxZ, topZ );
+                                minZ      = std::min( minZ, bottomZ );
+                                maxZ      = std::max( maxZ, topZ );
                             }
                         }
                     }
                 }
             }
-            
+
             // Create bounding box: XY extends from -maxRadius to +maxRadius
             bb.add( cvf::Vec3d( -maxRadius, -maxRadius, minZ ) );
             bb.add( cvf::Vec3d( maxRadius, maxRadius, maxZ ) );
