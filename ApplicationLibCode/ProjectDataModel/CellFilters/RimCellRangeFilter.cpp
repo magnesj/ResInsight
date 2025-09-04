@@ -92,8 +92,8 @@ RimCellRangeFilter::~RimCellRangeFilter()
 //--------------------------------------------------------------------------------------------------
 QString RimCellRangeFilter::fullName() const
 {
-    const cvf::StructGridInterface* grid = selectedGrid();
-    bool isCylindricalGrid = ( grid && grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL );
+    const cvf::StructGridInterface* grid              = selectedGrid();
+    bool                            isCylindricalGrid = ( grid && grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL );
 
     QString postfix;
     if ( ( cellCountI == 1 ) && ( cellCountJ > 1 ) && ( cellCountK > 1 ) )
@@ -118,14 +118,14 @@ QString RimCellRangeFilter::fullName() const
             QString irange = QString( "R=%1-%2" ).arg( QString::number( startIndexI ), QString::number( startIndexI + cellCountI - 1 ) );
             QString jrange = QString( "θ=%1-%2" ).arg( QString::number( startIndexJ ), QString::number( startIndexJ + cellCountJ - 1 ) );
             QString krange = QString( "Z=%1-%2" ).arg( QString::number( startIndexK ), QString::number( startIndexK + cellCountK - 1 ) );
-            postfix = QString( "%1 %2 %3" ).arg( irange, jrange, krange );
+            postfix        = QString( "%1 %2 %3" ).arg( irange, jrange, krange );
         }
         else
         {
             QString irange = QString( "I=%1-%2" ).arg( QString::number( startIndexI ), QString::number( startIndexI + cellCountI - 1 ) );
             QString jrange = QString( "J=%1-%2" ).arg( QString::number( startIndexJ ), QString::number( startIndexJ + cellCountJ - 1 ) );
             QString krange = QString( "K=%1-%2" ).arg( QString::number( startIndexK ), QString::number( startIndexK + cellCountK - 1 ) );
-            postfix = QString( "%1 %2 %3" ).arg( irange, jrange, krange );
+            postfix        = QString( "%1 %2 %3" ).arg( irange, jrange, krange );
         }
     }
 
