@@ -649,19 +649,19 @@ std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendLateral::execut
         return std::unexpected( txt );
     }
 
-    const double sharedWellPathLength = m_lateral->wellPathGeometry()->identicalTubeLength( *mainWellPathGeometry );
-    const double epsilon              = 1.0e-8;
-    if ( sharedWellPathLength > epsilon )
-    {
-        m_lateral->connectWellPaths( wellPath, sharedWellPathLength );
-        return nullptr;
-    }
-
     auto lateralGeometry = m_lateral->wellPathGeometry();
     if ( !lateralGeometry )
     {
         QString txt = "No geometry available for lateral. Cannot append lateral to main well path.";
         return std::unexpected( txt );
+    }
+
+    const double sharedWellPathLength = lateralGeometry->identicalTubeLength( *mainWellPathGeometry );
+    const double epsilon              = 1.0e-8;
+    if ( sharedWellPathLength > epsilon )
+    {
+        m_lateral->connectWellPaths( wellPath, sharedWellPathLength );
+        return nullptr;
     }
 
     if ( lateralGeometry->wellPathPoints().empty() )
