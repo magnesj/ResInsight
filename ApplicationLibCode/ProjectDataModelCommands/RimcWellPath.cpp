@@ -636,28 +636,49 @@ std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendLateral::execut
 {
     auto wellPath = self<RimWellPath>();
 
+    const auto mainWellPathGeometry = wellPath->wellPathGeometry();
+    if ( !mainWellPathGeometry )
+    {
+        QString txt = "No geometry available for main well path. Cannot append lateral to main well path.";
+        return std::unexpected( txt );
+    }
+
     if ( !m_lateral )
     {
         QString txt = "No lateral specified. Cannot append lateral to well path.";
         return std::unexpected( txt );
     }
 
-    const auto wellPathGeometry = wellPath->wellPathGeometry();
-    if ( wellPathGeometry )
+    const double sharedWellPathLength = m_lateral->wellPathGeometry()->identicalTubeLength( *mainWellPathGeometry );
+    const double epsilon              = 1.0e-8;
+    if ( sharedWellPathLength > epsilon )
     {
-        const double sharedWellPathLength = m_lateral->wellPathGeometry()->identicalTubeLength( *wellPathGeometry );
-
-        const double epsilon = 1.0e-8;
-        if ( sharedWellPathLength > epsilon )
-        {
-            wellPath->connectWellPaths( m_lateral, sharedWellPathLength );
-        }
-        else
-        {
-            QString txt = "No shared geometry between main well path and lateral. Cannot append lateral to well path.";
-            return std::unexpected( txt );
-        }
+        m_lateral->connectWellPaths( wellPath, sharedWellPathLength );
+        return nullptr;
     }
+
+    auto lateralGeometry = m_lateral->wellPathGeometry();
+    if ( !lateralGeometry )
+    {
+        QString txt = "No geometry available for lateral. Cannot append lateral to main well path.";
+        return std::unexpected( txt );
+    }
+
+    if ( lateralGeometry->wellPathPoints().empty() )
+    {
+        QString txt = "No points available for lateral. Cannot append lateral to main well path.";
+        return std::unexpected( txt );
+    }
+
+    auto lateralStartPoint   = lateralGeometry->wellPathPoints().front();
+    auto closestMdOnMainWell = mainWellPathGeometry->closestMeasuredDepth( lateralStartPoint );
+    if ( closestMdOnMainWell < 0.0 )
+    {
+        QString txt = "Failed to find closest point on main well path. Cannot append lateral to main well path.";
+        return std::unexpected( txt );
+    }
+
+    m_lateral->connectWellPaths( wellPath, closestMdOnMainWell );
 
     return nullptr;
 }
