@@ -26,9 +26,9 @@
 
 #include "cafPdmPointer.h"
 
+#include "cvfGeometryGeneratorInterface.h"
 #include "cvfObject.h"
 
-#include "cvfGeometryGeneratorInterface.h"
 #include <memory>
 
 namespace cvf

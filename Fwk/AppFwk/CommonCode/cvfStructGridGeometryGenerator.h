@@ -172,6 +172,8 @@ class StructGridGeometryGenerator : public GeometryGeneratorInterface
 public:
     explicit StructGridGeometryGenerator( const StructGridInterface* grid, bool useOpenMP );
 
+    GridGeometryType geometryType() const override;
+
     // Setup methods
     void setCellVisibility( const UByteArray* cellVisibility ) override;
     void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter ) override;
@@ -180,14 +182,13 @@ public:
     ref<DrawableGeo> generateSurface() override;
     ref<DrawableGeo> createMeshDrawable() override;
     ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) override;
-    GridGeometryType geometryType() const override { return GridGeometryType::HEXAHEDRAL; }
 
     void textureCoordinates( Vec2fArray*                       textureCoords,
                              const StructGridScalarDataAccess* resultAccessor,
                              const ScalarMapper*               mapper ) const override;
 
-    const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const override { return m_quadMapper.p(); }
-    const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const override { return m_triangleMapper.p(); }
+    const StructGridQuadToCellFaceMapper*    quadToCellFaceMapper() const override;
+    const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const override;
 
     static ref<DrawableGeo> createMeshDrawableFromSingleCell( const StructGridInterface* grid, size_t cellIndex );
 

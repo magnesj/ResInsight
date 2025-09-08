@@ -53,7 +53,6 @@ std::unique_ptr<GeometryGeneratorInterface> GeometryGeneratorFactory::create( co
         case GridGeometryType::CYLINDRICAL:
             return std::unique_ptr<GeometryGeneratorInterface>( new CylindricalGeometryGenerator( grid, useOpenMP ) );
         case GridGeometryType::HEXAHEDRAL:
-        case GridGeometryType::HYBRID:
         default:
             return std::unique_ptr<GeometryGeneratorInterface>( new StructGridGeometryGenerator( grid, useOpenMP ) );
     }

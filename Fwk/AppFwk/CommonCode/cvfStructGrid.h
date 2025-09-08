@@ -46,17 +46,17 @@
 
 namespace cvf
 {
-enum class GridGeometryType
-{
-    HEXAHEDRAL, // Standard rectangular cells
-    CYLINDRICAL, // Cylindrical/radial cells
-    HYBRID // Mixed geometry types
-};
 }
 
 namespace cvf
 {
 class CellFilterBase;
+
+enum class GridGeometryType
+{
+    HEXAHEDRAL, // Standard rectangular cells
+    CYLINDRICAL, // Cylindrical/radial cells
+};
 
 // Navneforslag
 //    StructGridGeometryGeneratorInterface
@@ -119,17 +119,14 @@ public:
     virtual cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const   = 0;
 
     // Cylindrical coordinate support
-    virtual GridGeometryType gridGeometryType() const { return GridGeometryType::HEXAHEDRAL; }
+    virtual GridGeometryType gridGeometryType() const;
     virtual bool             getCylindricalCoords( size_t  cellIndex,
                                                    double& innerRadius,
                                                    double& outerRadius,
                                                    double& startAngle,
                                                    double& endAngle,
                                                    double& topZ,
-                                                   double& bottomZ ) const
-    {
-        return false;
-    }
+                                                   double& bottomZ ) const;
 
 public:
     static void     cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] );

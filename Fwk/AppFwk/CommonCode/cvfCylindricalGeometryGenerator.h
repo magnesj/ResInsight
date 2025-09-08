@@ -95,7 +95,7 @@ private:
 
     ref<UIntArray> createCylindricalMeshLineIndices();
 
-    static cvf::Vec3d cylindricalToCartesianStatic( double radius, double angle, double z );
+    static cvf::Vec3d cylindricalToCartesian( double radius, double angle, double z );
 
 private:
     // Input
