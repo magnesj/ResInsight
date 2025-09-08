@@ -63,6 +63,7 @@ jobs:
           cmakebuild/install/bin/cafPdmXml_UnitTests
           cmakebuild/install/bin/cafProjectDataModel_UnitTests
           cmakebuild/install/bin/cafPdmScripting_UnitTests
+          cmakebuild/install/bin/CommonCode_UnitTests
 
       - name: Run Unit Tests Windows Qt6 (does not work on Linux)
         if: (contains( matrix.os, 'windows') && (matrix.qtver == '6.5.3'))
