@@ -73,6 +73,7 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
 
         if ( opmMainGrid.is_radial() )
         {
+            riMainGrid->setGridGeometryType( cvf::GridGeometryType::CYLINDRICAL );
             transferCoordinatesRadial( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
         }
 
@@ -88,6 +89,7 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                     auto riLgrGrid = riMainGrid->gridByIndex( i );
                     if ( riLgrGrid->gridName() == lgrName )
                     {
+                        riLgrGrid->setGridGeometryType( cvf::GridGeometryType::CYLINDRICAL );
                         transferCoordinatesRadial( opmMainGrid, opmLgrGrid, riMainGrid, riLgrGrid );
                     }
                 }
@@ -159,11 +161,12 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
 
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( cellCount ); opmCellIndex++ )
     {
-        opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
+        bool convert_to_radial_coords = false;
+        auto ijkCell                  = opmGrid.ijk_from_global_index( opmCellIndex );
+        opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convert_to_radial_coords );
 
         // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
         auto riNodeStartIndex = riGrid->reservoirCellIndex( opmCellIndex ) * 8;
-        auto ijkCell          = opmGrid.ijk_from_global_index( opmCellIndex );
 
         double xCenterCoordOpm = 0.0;
         double yCenterCoordOpm = 0.0;
@@ -174,6 +177,10 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
             xCenterCoordOpm                = xCenter;
             yCenterCoordOpm                = yCenter;
         }
+
+        //// TODO: Fixme: For now we do not lock to pillars
+        const bool lockToPillars = false;
+        if ( !lockToPillars ) return;
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
