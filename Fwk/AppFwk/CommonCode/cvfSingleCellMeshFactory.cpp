@@ -116,18 +116,13 @@ ref<DrawableGeo> SingleCellMeshFactory::createCylindricalMesh( const StructGridI
                                                                size_t                     cellIndex,
                                                                const cvf::Vec3d&          displayModelOffset )
 {
-    CylindricalCell cylCell;
-    bool            success = grid->getCylindricalCoords( cellIndex,
-                                               cylCell.innerRadius,
-                                               cylCell.outerRadius,
-                                               cylCell.startAngle,
-                                               cylCell.endAngle,
-                                               cylCell.topZ,
-                                               cylCell.bottomZ );
-    if ( !success )
+    auto result = grid->getCylindricalCoords( cellIndex );
+    if ( !result.has_value() )
     {
         return createHexahedralMesh( grid, cellIndex, displayModelOffset );
     }
+    
+    const cvf::CylindricalCell& cylCell = result.value();
 
     std::vector<Vec3f> vertices;
 

@@ -25,8 +25,10 @@
 #include "RigResultAccessorFactory.h"
 
 #include "cvfAssert.h"
+#include "cvfCylindricalGeometryGenerator.h"
 
 #include <cstdlib>
+#include <expected>
 
 RigGridBase::RigGridBase( RigMainGrid* mainGrid )
     : m_gridPointDimensions( 0, 0, 0 )
@@ -582,24 +584,18 @@ cvf::GridGeometryType RigGridBase::gridGeometryType() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
-                                        double& innerRadius,
-                                        double& outerRadius,
-                                        double& startAngle,
-                                        double& endAngle,
-                                        double& topZ,
-                                        double& bottomZ ) const
+std::expected<cvf::CylindricalCell, std::string> RigGridBase::getCylindricalCoords( size_t cellIndex ) const
 {
     if ( m_gridGeometryType != cvf::GridGeometryType::CYLINDRICAL )
     {
-        return false;
+        return std::unexpected( "Grid is not of cylindrical type" );
     }
 
     // For radial grids: I=radius, J=theta(degrees), K=z
     size_t i, j, k;
     if ( !ijkFromCellIndex( cellIndex, &i, &j, &k ) )
     {
-        return false;
+        return std::unexpected( "Invalid cell index" );
     }
 
     // In cylindrical grids, IJK coordinates directly represent r, theta, z values
@@ -620,15 +616,14 @@ bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
         maxZ = std::max( maxZ, cornerVerts[idx].z() );
     }
 
-    bottomZ = minZ;
-    topZ    = maxZ;
+    // Create and return cylindrical cell structure
+    cvf::CylindricalCell cell;
+    cell.innerRadius = cornerVerts[0].x(); // Inner radius at I index
+    cell.outerRadius = cornerVerts[1].x(); // Outer radius at I+1 index
+    cell.startAngle  = cornerVerts[0].y(); // Start angle at J index
+    cell.endAngle    = cornerVerts[3].y(); // End angle at J+1 index
+    cell.bottomZ     = minZ;
+    cell.topZ        = maxZ;
 
-    // Extract radius and angle values directly from IJK coordinates
-    // These are the actual r, theta values stored in the file
-    innerRadius = cornerVerts[0].x(); // Inner radius at I index
-    outerRadius = cornerVerts[1].x(); // Outer radius at I+1 index
-    startAngle  = cornerVerts[0].y(); // Start angle at J index
-    endAngle    = cornerVerts[3].y(); // End angle at J+1 index
-
-    return true;
+    return cell;
 }

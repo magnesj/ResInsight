@@ -212,17 +212,12 @@ void CylindricalGeometryGenerator::computeArrays()
                     continue;
                 }
 
-                CylindricalCell cylCell;
-                if ( !m_grid->getCylindricalCoords( cellIndex,
-                                                    cylCell.innerRadius,
-                                                    cylCell.outerRadius,
-                                                    cylCell.startAngle,
-                                                    cylCell.endAngle,
-                                                    cylCell.topZ,
-                                                    cylCell.bottomZ ) )
+                auto cylResult = m_grid->getCylindricalCoords( cellIndex );
+                if ( !cylResult.has_value() )
                 {
                     continue;
                 }
+                const cvf::CylindricalCell& cylCell = cylResult.value();
 
                 std::vector<StructGridInterface::FaceType> visibleFaces;
                 visibleFaces.reserve( 6 );
@@ -261,7 +256,7 @@ void CylindricalGeometryGenerator::computeArrays()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::generateCylindricalQuads( const CylindricalCell& cell,
+void CylindricalGeometryGenerator::generateCylindricalQuads( const cvf::CylindricalCell& cell,
                                                              size_t                 cellIndex,
                                                              std::vector<Vec3f>&    vertices )
 {
@@ -273,7 +268,7 @@ void CylindricalGeometryGenerator::generateCylindricalQuads( const CylindricalCe
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices )
+void CylindricalGeometryGenerator::addRadialFaces( const cvf::CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices )
 {
     cvf::Vec3d offset = m_grid->displayModelOffset();
 
@@ -327,7 +322,7 @@ void CylindricalGeometryGenerator::addRadialFaces( const CylindricalCell& cell, 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCell& cell,
+void CylindricalGeometryGenerator::addCircumferentialFaces( const cvf::CylindricalCell& cell,
                                                             size_t                 cellIndex,
                                                             std::vector<Vec3f>&    vertices )
 {
@@ -365,7 +360,7 @@ void CylindricalGeometryGenerator::addCircumferentialFaces( const CylindricalCel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void CylindricalGeometryGenerator::addTopBottomFaces( const CylindricalCell& cell,
+void CylindricalGeometryGenerator::addTopBottomFaces( const cvf::CylindricalCell& cell,
                                                       size_t                 cellIndex,
                                                       std::vector<Vec3f>&    vertices )
 {

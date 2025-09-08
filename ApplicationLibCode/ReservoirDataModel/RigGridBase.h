@@ -30,6 +30,7 @@
 #include "cvfVector3.h"
 #include <array>
 
+#include <expected>
 #include <optional>
 #include <string>
 #include <vector>
@@ -73,13 +74,7 @@ public:
     // Cylindrical grid support
     void                  setGridGeometryType( cvf::GridGeometryType geometryType );
     cvf::GridGeometryType gridGeometryType() const override;
-    bool                  getCylindricalCoords( size_t  cellIndex,
-                                                double& innerRadius,
-                                                double& outerRadius,
-                                                double& startAngle,
-                                                double& endAngle,
-                                                double& topZ,
-                                                double& bottomZ ) const override;
+    std::expected<cvf::CylindricalCell, std::string> getCylindricalCoords( size_t cellIndex ) const override;
 
     bool         isMainGrid() const;
     RigMainGrid* mainGrid() const { return m_mainGrid; }

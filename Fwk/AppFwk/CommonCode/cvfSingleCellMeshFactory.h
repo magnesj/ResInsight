@@ -57,13 +57,6 @@ public:
         createMeshDrawable( const StructGridInterface* grid, size_t cellIndex, const cvf::Vec3d& displayModelOffset );
 
 private:
-    struct CylindricalCell
-    {
-        double innerRadius, outerRadius;
-        double startAngle, endAngle;
-        double topZ, bottomZ;
-    };
-
     static ref<DrawableGeo>
         createHexahedralMesh( const StructGridInterface* grid, size_t cellIndex, const cvf::Vec3d& displayModelOffset );
 

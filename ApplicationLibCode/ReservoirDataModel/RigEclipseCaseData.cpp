@@ -673,12 +673,13 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxSlow()
                 if ( activeInfos[acIdx]->isActive( i ) )
                 {
                     // Get r,theta,z coordinates from active cells
-                    double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
-                    if ( m_mainGrid->getCylindricalCoords( i, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ ) )
+                    auto result = m_mainGrid->getCylindricalCoords( i );
+                    if ( result.has_value() )
                     {
-                        maxRadius = std::max( maxRadius, outerRadius );
-                        minZ      = std::min( minZ, bottomZ );
-                        maxZ      = std::max( maxZ, topZ );
+                        const auto& cylCell = result.value();
+                        maxRadius = std::max( maxRadius, cylCell.outerRadius );
+                        minZ      = std::min( minZ, cylCell.bottomZ );
+                        maxZ      = std::max( maxZ, cylCell.topZ );
                     }
                 }
             }
@@ -760,12 +761,13 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxOptimized()
                             size_t cellIndex = m_mainGrid->cellIndexFromIJK( i, j, k );
 
                             // Get r,theta,z coordinates from active cells
-                            double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
-                            if ( m_mainGrid->getCylindricalCoords( cellIndex, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ ) )
+                            auto result = m_mainGrid->getCylindricalCoords( cellIndex );
+                            if ( result.has_value() )
                             {
-                                maxRadius = std::max( maxRadius, outerRadius );
-                                minZ      = std::min( minZ, bottomZ );
-                                maxZ      = std::max( maxZ, topZ );
+                                const auto& cylCell = result.value();
+                                maxRadius = std::max( maxRadius, cylCell.outerRadius );
+                                minZ      = std::min( minZ, cylCell.bottomZ );
+                                maxZ      = std::max( maxZ, cylCell.topZ );
                             }
                         }
                     }

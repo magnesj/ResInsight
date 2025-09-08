@@ -43,9 +43,17 @@
 
 #include <array>
 #include <cstddef>
+#include <expected>
+#include <string>
 
 namespace cvf
 {
+struct CylindricalCell
+{
+    double innerRadius, outerRadius;
+    double startAngle, endAngle;
+    double topZ, bottomZ;
+};
 }
 
 namespace cvf
@@ -119,14 +127,8 @@ public:
     virtual cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const   = 0;
 
     // Cylindrical coordinate support
-    virtual GridGeometryType gridGeometryType() const;
-    virtual bool             getCylindricalCoords( size_t  cellIndex,
-                                                   double& innerRadius,
-                                                   double& outerRadius,
-                                                   double& startAngle,
-                                                   double& endAngle,
-                                                   double& topZ,
-                                                   double& bottomZ ) const;
+    virtual GridGeometryType                           gridGeometryType() const;
+    virtual std::expected<CylindricalCell, std::string> getCylindricalCoords( size_t cellIndex ) const;
 
 public:
     static void     cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] );
