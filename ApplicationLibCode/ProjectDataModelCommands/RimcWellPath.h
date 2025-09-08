@@ -19,7 +19,6 @@
 #pragma once
 
 #include "RimFishbonesDefines.h"
-#include "RimWellPath.h"
 
 #include "cafPdmField.h"
 #include "cafPdmObjectHandle.h"
@@ -31,6 +30,7 @@
 class RimStimPlanFractureTemplate;
 class RimThermalFractureTemplate;
 class RimEclipseCase;
+class RimWellPath;
 
 //==================================================================================================
 ///
