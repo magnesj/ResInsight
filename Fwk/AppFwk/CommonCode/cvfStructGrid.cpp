@@ -71,6 +71,28 @@ StructGridInterface::StructGridInterface()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+cvf::GridGeometryType StructGridInterface::gridGeometryType() const
+{
+    return GridGeometryType::HEXAHEDRAL;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool StructGridInterface::getCylindricalCoords( size_t  cellIndex,
+                                                double& innerRadius,
+                                                double& outerRadius,
+                                                double& startAngle,
+                                                double& endAngle,
+                                                double& topZ,
+                                                double& bottomZ ) const
+{
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void StructGridInterface::cellFaceVertexIndices( FaceType face, cvf::ubyte vertexIndices[4] )
 {
     //

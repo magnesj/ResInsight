@@ -34,6 +34,7 @@ RigGridBase::RigGridBase( RigMainGrid* mainGrid )
     , m_mainGrid( mainGrid )
     , m_cellCountIJK( 0 )
     , m_cellCountIJ( 0 )
+    , m_gridGeometryType( cvf::GridGeometryType::HEXAHEDRAL )
 {
     if ( mainGrid == nullptr )
     {
@@ -72,6 +73,14 @@ void RigGridBase::setGridPointDimensions( const cvf::Vec3st& gridDimensions )
 void RigGridBase::setGridName( const std::string& gridName )
 {
     m_gridName = gridName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigGridBase::setGridGeometryType( cvf::GridGeometryType geometryType )
+{
+    m_gridGeometryType = geometryType;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -560,4 +569,66 @@ bool RigGridCellFaceVisibilityFilter::isFaceVisible( size_t                     
     }
 
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::GridGeometryType RigGridBase::gridGeometryType() const
+{
+    return m_gridGeometryType;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RigGridBase::getCylindricalCoords( size_t  cellIndex,
+                                        double& innerRadius,
+                                        double& outerRadius,
+                                        double& startAngle,
+                                        double& endAngle,
+                                        double& topZ,
+                                        double& bottomZ ) const
+{
+    if ( m_gridGeometryType != cvf::GridGeometryType::CYLINDRICAL )
+    {
+        return false;
+    }
+
+    // For radial grids: I=radius, J=theta(degrees), K=z
+    size_t i, j, k;
+    if ( !ijkFromCellIndex( cellIndex, &i, &j, &k ) )
+    {
+        return false;
+    }
+
+    // In cylindrical grids, IJK coordinates directly represent r, theta, z values
+    // I-direction represents radius range
+    // J-direction represents angular range
+    // K-direction represents vertical range
+
+    // Get corner vertices to extract the Z range
+    std::array<cvf::Vec3d, 8> cornerVerts = cellCornerVertices( cellIndex );
+
+    // Extract Z range from corner vertices
+    double minZ = HUGE_VAL;
+    double maxZ = -HUGE_VAL;
+
+    for ( int idx = 0; idx < 8; idx++ )
+    {
+        minZ = std::min( minZ, cornerVerts[idx].z() );
+        maxZ = std::max( maxZ, cornerVerts[idx].z() );
+    }
+
+    bottomZ = minZ;
+    topZ    = maxZ;
+
+    // Extract radius and angle values directly from IJK coordinates
+    // These are the actual r, theta values stored in the file
+    innerRadius = cornerVerts[0].x(); // Inner radius at I index
+    outerRadius = cornerVerts[1].x(); // Outer radius at I+1 index
+    startAngle  = cornerVerts[0].y(); // Start angle at J index
+    endAngle    = cornerVerts[3].y(); // End angle at J+1 index
+
+    return true;
 }

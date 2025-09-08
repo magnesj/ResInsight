@@ -36,9 +36,11 @@
 
 #include "cvfBase.h"
 
+#include "cvfCylindricalGeometryGenerator.h"
 #include "cvfStructGrid.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"
+#include "cvfStructGridTools.h"
 
 #include "cvfDebugTimer.h"
 #include "cvfGeometryBuilderDrawableGeo.h"
@@ -180,19 +182,11 @@ bool CellRangeFilter::hasIncludeRanges() const
 ///
 //--------------------------------------------------------------------------------------------------
 StructGridGeometryGenerator::StructGridGeometryGenerator( const StructGridInterface* grid, bool useOpenMP )
-    : m_grid( grid )
-    , m_useOpenMP( useOpenMP )
+    : GeometryGeneratorInterface( grid, useOpenMP )
 {
     CVF_ASSERT( grid );
     m_quadMapper     = new StructGridQuadToCellFaceMapper;
     m_triangleMapper = new StuctGridTriangleToCellFaceMapper( m_quadMapper.p() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-StructGridGeometryGenerator::~StructGridGeometryGenerator()
-{
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -224,7 +218,7 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawable()
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( m_vertices.p() );
 
-    ref<UIntArray>               indices = lineIndicesFromQuadVertexArray( m_vertices.p() );
+    ref<UIntArray>               indices = StructGridTools::lineIndicesFromQuadVertexArray( m_vertices.p() );
     ref<PrimitiveSetIndexedUInt> prim    = new PrimitiveSetIndexedUInt( PT_LINES );
     prim->setIndices( indices.p() );
 
@@ -235,113 +229,9 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawable()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createOutlineMeshDrawable( double creaseAngle )
+cvf::GridGeometryType StructGridGeometryGenerator::geometryType() const
 {
-    if ( !( m_vertices.notNull() && m_vertices->size() != 0 ) ) return nullptr;
-
-    cvf::OutlineEdgeExtractor ee( creaseAngle, *m_vertices );
-
-    ref<UIntArray> indices = lineIndicesFromQuadVertexArray( m_vertices.p() );
-    ee.addPrimitives( 4, *indices );
-
-    ref<cvf::UIntArray> lineIndices = ee.lineIndices();
-    if ( lineIndices->size() == 0 )
-    {
-        return nullptr;
-    }
-
-    ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( lineIndices.p() );
-
-    ref<DrawableGeo> geo = new DrawableGeo;
-    geo->setVertexArray( m_vertices.p() );
-    geo->addPrimitiveSet( prim.p() );
-
-    return geo;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
-                                                                                size_t                     cellIndex )
-{
-    return createMeshDrawableFromSingleCell( grid, cellIndex, grid->displayModelOffset() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
-                                                                                size_t                     cellIndex,
-                                                                                const cvf::Vec3d& displayModelOffset )
-{
-    std::array<cvf::Vec3d, 8> cornerVerts = grid->cellCornerVertices( cellIndex );
-
-    std::vector<Vec3f> vertices;
-
-    for ( int enumInt = cvf::StructGridInterface::POS_I; enumInt < cvf::StructGridInterface::NO_FACE; enumInt++ )
-    {
-        cvf::StructGridInterface::FaceType face = static_cast<cvf::StructGridInterface::FaceType>( enumInt );
-
-        ubyte faceConn[4];
-        grid->cellFaceVertexIndices( face, faceConn );
-
-        int n;
-        for ( n = 0; n < 4; n++ )
-        {
-            vertices.push_back( cvf::Vec3f( cornerVerts[faceConn[n]] - displayModelOffset ) );
-        }
-    }
-
-    cvf::ref<cvf::Vec3fArray> cvfVertices = new cvf::Vec3fArray;
-    cvfVertices->assign( vertices );
-
-    if ( !( cvfVertices.notNull() && cvfVertices->size() != 0 ) ) return nullptr;
-
-    ref<DrawableGeo> geo = new DrawableGeo;
-    geo->setVertexArray( cvfVertices.p() );
-
-    ref<UIntArray>               indices = lineIndicesFromQuadVertexArray( cvfVertices.p() );
-    ref<PrimitiveSetIndexedUInt> prim    = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( indices.p() );
-
-    geo->addPrimitiveSet( prim.p() );
-    return geo;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-///
-///
-///
-//--------------------------------------------------------------------------------------------------
-ref<UIntArray> StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( const Vec3fArray* vertexArray )
-{
-    CVF_ASSERT( vertexArray );
-
-    size_t numVertices = vertexArray->size();
-    int    numQuads    = static_cast<int>( numVertices / 4 );
-    CVF_ASSERT( numVertices % 4 == 0 );
-
-    ref<UIntArray> indices = new UIntArray;
-    indices->resize( (size_t)numQuads * 8 );
-
-#pragma omp parallel for
-    for ( int i = 0; i < numQuads; i++ )
-    {
-        size_t idx = (size_t)i * 8;
-        indices->set( idx + 0, i * 4 + 0 );
-        indices->set( idx + 1, i * 4 + 1 );
-        indices->set( idx + 2, i * 4 + 1 );
-        indices->set( idx + 3, i * 4 + 2 );
-        indices->set( idx + 4, i * 4 + 2 );
-        indices->set( idx + 5, i * 4 + 3 );
-        indices->set( idx + 6, i * 4 + 3 );
-        indices->set( idx + 7, i * 4 + 0 );
-    }
-
-    return indices;
+    return GridGeometryType::HEXAHEDRAL;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -483,43 +373,21 @@ void StructGridGeometryGenerator::textureCoordinates( Vec2fArray*               
     }
 }
 
-#if 0
 //--------------------------------------------------------------------------------------------------
-/// 
-/// 
+///
 //--------------------------------------------------------------------------------------------------
-void StructGridGeometryGenerator::textureCoordinatesFromSingleFaceValues(Vec2fArray* textureCoords, const ScalarMapper* mapper, const CellFaceValueCalculator* resultAccessor) const
+const cvf::StructGridQuadToCellFaceMapper* StructGridGeometryGenerator::quadToCellFaceMapper() const
 {
-    if (!resultAccessor) return;
-
-    textureCoords->resize(m_quadMapper->quadCount()*4);
-
-    cvf::Vec2f* rawPtr = textureCoords->ptr();
-
-    double cellFaceValue;
-    cvf::Vec2f texCoord;
-    int quadCount = static_cast<int>(m_quadMapper->quadCount());
-
-#pragma omp parallel for private( texCoord, cellFaceValue )
-    for (int qIdx = 0; qIdx < quadCount; qIdx++)
-    {
-        cellFaceValue = resultAccessor->cellFaceScalar(m_quadMapper->cellIndex(qIdx), m_quadMapper->faceType(qIdx));
-        
-        texCoord = mapper->mapToTextureCoord(cellFaceValue);
-
-        if (cellFaceValue == HUGE_VAL || cellFaceValue != cellFaceValue) // a != a is true for NAN's
-        {
-            texCoord[1] = 1.0f;
-        }
-
-        size_t j;
-        for (j = 0; j < 4; j++)
-        {   
-            rawPtr[qIdx*4 + j] = texCoord;
-        }
-    }
+    return m_quadMapper.p();
 }
-#endif
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const cvf::StuctGridTriangleToCellFaceMapper* StructGridGeometryGenerator::triangleToCellFaceMapper() const
+{
+    return m_triangleMapper.p();
+}
 
 //--------------------------------------------------------------------------------------------------
 ///
