@@ -64,9 +64,8 @@ public:
     virtual void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter ) = 0;
 
     // Core geometry generation
-    virtual ref<DrawableGeo> generateSurface()                               = 0;
-    virtual ref<DrawableGeo> createMeshDrawable()                            = 0;
-    virtual ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) = 0;
+    virtual ref<DrawableGeo> generateSurface()    = 0;
+    virtual ref<DrawableGeo> createMeshDrawable() = 0;
 
     // Geometry type identification
     virtual GridGeometryType geometryType() const = 0;

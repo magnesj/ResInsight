@@ -21,6 +21,7 @@
 #include "RigCell.h"
 #include "RigGridBase.h"
 #include "RigMainGrid.h"
+
 #include "cvfCylindricalGeometryGenerator.h"
 #include "cvfDrawableGeo.h"
 #include "cvfGeometryGeneratorFactory.h"

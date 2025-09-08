@@ -228,34 +228,6 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawable()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createOutlineMeshDrawable( double creaseAngle )
-{
-    if ( !( m_vertices.notNull() && m_vertices->size() != 0 ) ) return nullptr;
-
-    cvf::OutlineEdgeExtractor ee( creaseAngle, *m_vertices );
-
-    ref<UIntArray> indices = lineIndicesFromQuadVertexArray( m_vertices.p() );
-    ee.addPrimitives( 4, *indices );
-
-    ref<cvf::UIntArray> lineIndices = ee.lineIndices();
-    if ( lineIndices->size() == 0 )
-    {
-        return nullptr;
-    }
-
-    ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( lineIndices.p() );
-
-    ref<DrawableGeo> geo = new DrawableGeo;
-    geo->setVertexArray( m_vertices.p() );
-    geo->addPrimitiveSet( prim.p() );
-
-    return geo;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 cvf::GridGeometryType StructGridGeometryGenerator::geometryType() const
 {
     return GridGeometryType::HEXAHEDRAL;

@@ -56,13 +56,13 @@ public:
     // Setup methods
     void setCellVisibility( const UByteArray* cellVisibility );
     void addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter );
-    void setCurveSubdivisions( int subdivisions ) { m_curveSubdivisions = subdivisions; }
+    void setCurveSubdivisions( int subdivisions );
 
     // GeometryGeneratorInterface implementation
     ref<DrawableGeo> generateSurface() override;
     ref<DrawableGeo> createMeshDrawable() override;
-    ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) override;
-    GridGeometryType geometryType() const override { return GridGeometryType::CYLINDRICAL; }
+
+    GridGeometryType geometryType() const override;
 
     void textureCoordinates( Vec2fArray*                       textureCoords,
                              const StructGridScalarDataAccess* resultAccessor,

@@ -181,7 +181,6 @@ public:
     // GeometryGeneratorInterface implementation
     ref<DrawableGeo> generateSurface() override;
     ref<DrawableGeo> createMeshDrawable() override;
-    ref<DrawableGeo> createOutlineMeshDrawable( double creaseAngle ) override;
 
     void textureCoordinates( Vec2fArray*                       textureCoords,
                              const StructGridScalarDataAccess* resultAccessor,

@@ -44,11 +44,9 @@
 #include "cvfScalarMapper.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"
-#include <cmath>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
+#include <cmath>
+#include <numbers>
 
 namespace cvf
 {
@@ -78,6 +76,14 @@ void CylindricalGeometryGenerator::setCellVisibility( const UByteArray* cellVisi
 void CylindricalGeometryGenerator::addFaceVisibilityFilter( const CellFaceVisibilityFilter* cellVisibilityFilter )
 {
     m_cellVisibilityFilters.push_back( cellVisibilityFilter );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void CylindricalGeometryGenerator::setCurveSubdivisions( int subdivisions )
+{
+    m_curveSubdivisions = subdivisions;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -123,29 +129,9 @@ ref<DrawableGeo> CylindricalGeometryGenerator::createMeshDrawable()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> CylindricalGeometryGenerator::createOutlineMeshDrawable( double creaseAngle )
+cvf::GridGeometryType CylindricalGeometryGenerator::geometryType() const
 {
-    if ( !( m_vertices.notNull() && m_vertices->size() != 0 ) ) return nullptr;
-
-    cvf::OutlineEdgeExtractor ee( creaseAngle, *m_vertices );
-
-    ref<UIntArray> indices = StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( m_vertices.p() );
-    ee.addPrimitives( 4, *indices );
-
-    ref<cvf::UIntArray> lineIndices = ee.lineIndices();
-    if ( lineIndices->size() == 0 )
-    {
-        return nullptr;
-    }
-
-    ref<PrimitiveSetIndexedUInt> prim = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( lineIndices.p() );
-
-    ref<DrawableGeo> geo = new DrawableGeo;
-    geo->setVertexArray( m_vertices.p() );
-    geo->addPrimitiveSet( prim.p() );
-
-    return geo;
+    return GridGeometryType::CYLINDRICAL;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -620,7 +606,7 @@ bool CylindricalGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t
 cvf::Vec3d CylindricalGeometryGenerator::cylindricalToCartesian( double radius, double angle, double z )
 {
     // Convert angle from degrees to radians for trigonometric functions
-    double angleRadians = angle * M_PI / 180.0;
+    double angleRadians = angle * std::numbers::pi / 180.0;
     double x            = radius * std::cos( angleRadians );
     double y            = radius * std::sin( angleRadians );
     return cvf::Vec3d( x, y, z );
