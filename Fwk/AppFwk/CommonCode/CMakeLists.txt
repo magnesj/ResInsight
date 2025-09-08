@@ -46,6 +46,10 @@ add_library(
   cvfGeometryGeneratorInterface.h
   cvfCylindricalGeometryGenerator.cpp
   cvfCylindricalGeometryGenerator.h
+  cvfSingleCellMeshFactory.cpp
+  cvfSingleCellMeshFactory.h
+  cvfStructGridTools.cpp
+  cvfStructGridTools.h
   cvfGeometryGeneratorFactory.cpp
   cvfGeometryGeneratorFactory.h
   cvfStructGridScalarDataAccess.h

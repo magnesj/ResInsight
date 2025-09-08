@@ -40,6 +40,7 @@
 #include "cvfStructGrid.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"
+#include "cvfStructGridTools.h"
 
 #include "cvfDebugTimer.h"
 #include "cvfGeometryBuilderDrawableGeo.h"
@@ -217,7 +218,7 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawable()
     ref<DrawableGeo> geo = new DrawableGeo;
     geo->setVertexArray( m_vertices.p() );
 
-    ref<UIntArray>               indices = lineIndicesFromQuadVertexArray( m_vertices.p() );
+    ref<UIntArray>               indices = StructGridTools::lineIndicesFromQuadVertexArray( m_vertices.p() );
     ref<PrimitiveSetIndexedUInt> prim    = new PrimitiveSetIndexedUInt( PT_LINES );
     prim->setIndices( indices.p() );
 
@@ -233,101 +234,7 @@ cvf::GridGeometryType StructGridGeometryGenerator::geometryType() const
     return GridGeometryType::HEXAHEDRAL;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
-                                                                                size_t                     cellIndex )
-{
-    // Check if this is a cylindrical grid and delegate to appropriate generator
-    if ( grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL )
-    {
-        return CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex );
-    }
 
-    return createMeshDrawableFromSingleCell( grid, cellIndex, grid->displayModelOffset() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( const StructGridInterface* grid,
-                                                                                size_t                     cellIndex,
-                                                                                const cvf::Vec3d& displayModelOffset )
-{
-    // Check if this is a cylindrical grid and delegate to appropriate generator
-    if ( grid->gridGeometryType() == cvf::GridGeometryType::CYLINDRICAL )
-    {
-        return CylindricalGeometryGenerator::createMeshDrawableFromSingleCell( grid, cellIndex, displayModelOffset );
-    }
-
-    std::array<cvf::Vec3d, 8> cornerVerts = grid->cellCornerVertices( cellIndex );
-
-    std::vector<Vec3f> vertices;
-
-    for ( int enumInt = cvf::StructGridInterface::POS_I; enumInt < cvf::StructGridInterface::NO_FACE; enumInt++ )
-    {
-        cvf::StructGridInterface::FaceType face = static_cast<cvf::StructGridInterface::FaceType>( enumInt );
-
-        ubyte faceConn[4];
-        grid->cellFaceVertexIndices( face, faceConn );
-
-        int n;
-        for ( n = 0; n < 4; n++ )
-        {
-            vertices.push_back( cvf::Vec3f( cornerVerts[faceConn[n]] - displayModelOffset ) );
-        }
-    }
-
-    cvf::ref<cvf::Vec3fArray> cvfVertices = new cvf::Vec3fArray;
-    cvfVertices->assign( vertices );
-
-    if ( !( cvfVertices.notNull() && cvfVertices->size() != 0 ) ) return nullptr;
-
-    ref<DrawableGeo> geo = new DrawableGeo;
-    geo->setVertexArray( cvfVertices.p() );
-
-    ref<UIntArray>               indices = lineIndicesFromQuadVertexArray( cvfVertices.p() );
-    ref<PrimitiveSetIndexedUInt> prim    = new PrimitiveSetIndexedUInt( PT_LINES );
-    prim->setIndices( indices.p() );
-
-    geo->addPrimitiveSet( prim.p() );
-    return geo;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-///
-///
-///
-//--------------------------------------------------------------------------------------------------
-ref<UIntArray> StructGridGeometryGenerator::lineIndicesFromQuadVertexArray( const Vec3fArray* vertexArray )
-{
-    CVF_ASSERT( vertexArray );
-
-    size_t numVertices = vertexArray->size();
-    int    numQuads    = static_cast<int>( numVertices / 4 );
-    CVF_ASSERT( numVertices % 4 == 0 );
-
-    ref<UIntArray> indices = new UIntArray;
-    indices->resize( (size_t)numQuads * 8 );
-
-#pragma omp parallel for
-    for ( int i = 0; i < numQuads; i++ )
-    {
-        size_t idx = (size_t)i * 8;
-        indices->set( idx + 0, i * 4 + 0 );
-        indices->set( idx + 1, i * 4 + 1 );
-        indices->set( idx + 2, i * 4 + 1 );
-        indices->set( idx + 3, i * 4 + 2 );
-        indices->set( idx + 4, i * 4 + 2 );
-        indices->set( idx + 5, i * 4 + 3 );
-        indices->set( idx + 6, i * 4 + 3 );
-        indices->set( idx + 7, i * 4 + 0 );
-    }
-
-    return indices;
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
