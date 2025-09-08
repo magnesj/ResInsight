@@ -190,13 +190,19 @@ ref<DrawableGeo> SingleCellMeshFactory::createCylindricalMesh( const StructGridI
     }
 
     // Add radial lines from inner to outer radius at start and end angles
-    cvf::Vec3d startInnerBot = StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.startAngle, cylCell.bottomZ );
-    cvf::Vec3d startOuterBot = StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.startAngle, cylCell.bottomZ );
-    cvf::Vec3d startInnerTop = StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.startAngle, cylCell.topZ );
-    cvf::Vec3d startOuterTop = StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.startAngle, cylCell.topZ );
+    cvf::Vec3d startInnerBot =
+        StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.startAngle, cylCell.bottomZ );
+    cvf::Vec3d startOuterBot =
+        StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.startAngle, cylCell.bottomZ );
+    cvf::Vec3d startInnerTop =
+        StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.startAngle, cylCell.topZ );
+    cvf::Vec3d startOuterTop =
+        StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.startAngle, cylCell.topZ );
 
-    cvf::Vec3d endInnerBot = StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.endAngle, cylCell.bottomZ );
-    cvf::Vec3d endOuterBot = StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endInnerBot =
+        StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.endAngle, cylCell.bottomZ );
+    cvf::Vec3d endOuterBot =
+        StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.endAngle, cylCell.bottomZ );
     cvf::Vec3d endInnerTop = StructGridTools::cylindricalToCartesian( cylCell.innerRadius, cylCell.endAngle, cylCell.topZ );
     cvf::Vec3d endOuterTop = StructGridTools::cylindricalToCartesian( cylCell.outerRadius, cylCell.endAngle, cylCell.topZ );
 
@@ -249,4 +255,3 @@ ref<DrawableGeo> SingleCellMeshFactory::createCylindricalMesh( const StructGridI
     geo->addPrimitiveSet( prim.p() );
     return geo;
 }
-

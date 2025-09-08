@@ -53,9 +53,8 @@ class SingleCellMeshFactory
 {
 public:
     static ref<DrawableGeo> createMeshDrawable( const StructGridInterface* grid, size_t cellIndex );
-    static ref<DrawableGeo> createMeshDrawable( const StructGridInterface* grid,
-                                                size_t                     cellIndex,
-                                                const cvf::Vec3d&          displayModelOffset );
+    static ref<DrawableGeo>
+        createMeshDrawable( const StructGridInterface* grid, size_t cellIndex, const cvf::Vec3d& displayModelOffset );
 
 private:
     struct CylindricalCell
@@ -65,13 +64,11 @@ private:
         double topZ, bottomZ;
     };
 
-    static ref<DrawableGeo> createHexahedralMesh( const StructGridInterface* grid,
-                                                  size_t                     cellIndex,
-                                                  const cvf::Vec3d&          displayModelOffset );
-    
-    static ref<DrawableGeo> createCylindricalMesh( const StructGridInterface* grid,
-                                                   size_t                     cellIndex,
-                                                   const cvf::Vec3d&          displayModelOffset );
+    static ref<DrawableGeo>
+        createHexahedralMesh( const StructGridInterface* grid, size_t cellIndex, const cvf::Vec3d& displayModelOffset );
+
+    static ref<DrawableGeo>
+        createCylindricalMesh( const StructGridInterface* grid, size_t cellIndex, const cvf::Vec3d& displayModelOffset );
 };
 
 } // namespace cvf

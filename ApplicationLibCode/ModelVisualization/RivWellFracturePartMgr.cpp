@@ -1075,8 +1075,8 @@ cvf::ref<cvf::DrawableGeo> RivWellFracturePartMgr::createStimPlanMeshDrawable( R
 
     cvf::ref<cvf::DrawableGeo> stimPlanMeshGeo = new cvf::DrawableGeo;
     stimPlanMeshGeo->setVertexArray( stimPlanMeshVertexList );
-    cvf::ref<cvf::UIntArray> indices = cvf::StructGridTools::lineIndicesFromQuadVertexArray( stimPlanMeshVertexList );
-    cvf::ref<cvf::PrimitiveSetIndexedUInt> prim = new cvf::PrimitiveSetIndexedUInt( cvf::PT_LINES );
+    cvf::ref<cvf::UIntArray>               indices = cvf::StructGridTools::lineIndicesFromQuadVertexArray( stimPlanMeshVertexList );
+    cvf::ref<cvf::PrimitiveSetIndexedUInt> prim    = new cvf::PrimitiveSetIndexedUInt( cvf::PT_LINES );
     prim->setIndices( indices.p() );
 
     stimPlanMeshGeo->addPrimitiveSet( prim.p() );
