@@ -391,7 +391,13 @@ void CylindricalGeometryGenerator::computeArrays()
                 }
 
                 CylindricalCell cylCell;
-                if ( !extractCylindricalCellData( cellIndex, cylCell ) )
+                if ( !m_grid->getCylindricalCoords( cellIndex,
+                                                    cylCell.innerRadius,
+                                                    cylCell.outerRadius,
+                                                    cylCell.startAngle,
+                                                    cylCell.endAngle,
+                                                    cylCell.topZ,
+                                                    cylCell.bottomZ ) )
                 {
                     continue;
                 }
@@ -606,20 +612,6 @@ bool CylindricalGeometryGenerator::isCellFaceVisible( size_t i, size_t j, size_t
     }
 
     return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool CylindricalGeometryGenerator::extractCylindricalCellData( size_t cellIndex, CylindricalCell& cell ) const
-{
-    return m_grid->getCylindricalCoords( cellIndex,
-                                         cell.innerRadius,
-                                         cell.outerRadius,
-                                         cell.startAngle,
-                                         cell.endAngle,
-                                         cell.topZ,
-                                         cell.bottomZ );
 }
 
 //--------------------------------------------------------------------------------------------------

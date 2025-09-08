@@ -71,8 +71,8 @@ public:
     void        setGridName( const std::string& gridName );
 
     // Cylindrical grid support
-    void                  setGridGeometryType( cvf::GridGeometryType geometryType ) { m_gridGeometryType = geometryType; }
-    cvf::GridGeometryType gridGeometryType() const override { return m_gridGeometryType; }
+    void                  setGridGeometryType( cvf::GridGeometryType geometryType );
+    cvf::GridGeometryType gridGeometryType() const override;
     bool                  getCylindricalCoords( size_t  cellIndex,
                                                 double& innerRadius,
                                                 double& outerRadius,

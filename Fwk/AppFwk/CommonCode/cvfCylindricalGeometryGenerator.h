@@ -91,7 +91,6 @@ private:
     void addTopBottomFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
 
     bool isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const;
-    bool extractCylindricalCellData( size_t cellIndex, CylindricalCell& cell ) const;
 
     ref<UIntArray> createCylindricalMeshLineIndices();
 
