@@ -15,11 +15,8 @@ set(VIZ_MODULES_FOLDER_NAME ../../../../Fwk/VizFwk)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} # required for gtest-all.cpp
 )
 
-set(PROJECT_FILES cafAngleUtilsTest.cpp
-                  cafVecIjkTest.cpp
-                  cvfCellRangeTest.cpp
-                  cvfStructGridTest.cpp
-                  CommonCode_UnitTests_main.cpp
+set(PROJECT_FILES cafAngleUtilsTest.cpp cafVecIjkTest.cpp cvfCellRangeTest.cpp
+                  cvfStructGridTest.cpp CommonCode_UnitTests_main.cpp
 )
 
 # add the executable
