@@ -677,9 +677,9 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxSlow()
                     if ( result.has_value() )
                     {
                         const auto& cylCell = result.value();
-                        maxRadius = std::max( maxRadius, cylCell.outerRadius );
-                        minZ      = std::min( minZ, cylCell.bottomZ );
-                        maxZ      = std::max( maxZ, cylCell.topZ );
+                        maxRadius           = std::max( maxRadius, cylCell.outerRadius );
+                        minZ                = std::min( minZ, cylCell.bottomZ );
+                        maxZ                = std::max( maxZ, cylCell.topZ );
                     }
                 }
             }
@@ -765,9 +765,9 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxOptimized()
                             if ( result.has_value() )
                             {
                                 const auto& cylCell = result.value();
-                                maxRadius = std::max( maxRadius, cylCell.outerRadius );
-                                minZ      = std::min( minZ, cylCell.bottomZ );
-                                maxZ      = std::max( maxZ, cylCell.topZ );
+                                maxRadius           = std::max( maxRadius, cylCell.outerRadius );
+                                minZ                = std::min( minZ, cylCell.bottomZ );
+                                maxZ                = std::max( maxZ, cylCell.topZ );
                             }
                         }
                     }
