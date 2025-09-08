@@ -72,18 +72,11 @@ public:
     const StuctGridTriangleToCellFaceMapper* triangleToCellFaceMapper() const override;
 
 private:
-    struct CylindricalCell
-    {
-        double innerRadius, outerRadius;
-        double startAngle, endAngle;
-        double topZ, bottomZ;
-    };
-
     void computeArrays();
-    void generateCylindricalQuads( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
-    void addRadialFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
-    void addCircumferentialFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
-    void addTopBottomFaces( const CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
+    void generateCylindricalQuads( const cvf::CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
+    void addRadialFaces( const cvf::CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
+    void addCircumferentialFaces( const cvf::CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
+    void addTopBottomFaces( const cvf::CylindricalCell& cell, size_t cellIndex, std::vector<Vec3f>& vertices );
 
     bool isCellFaceVisible( size_t i, size_t j, size_t k, StructGridInterface::FaceType face ) const;
 

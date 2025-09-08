@@ -112,14 +112,17 @@ TEST( RigCylindricalGrid, CylindricalCoordinateExtraction )
     // Test first cell (0,0,0)
     size_t cellIndex = grid.cellIndexFromIJK( 0, 0, 0 );
 
-    double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
-    bool   success = grid.getCylindricalCoords( cellIndex, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ );
-
-    EXPECT_TRUE( success );
-    EXPECT_GT( outerRadius, innerRadius );
-    EXPECT_GT( endAngle, startAngle );
-    EXPECT_GT( topZ, bottomZ );
-    EXPECT_GE( innerRadius, 0.0 );
+    auto result = grid.getCylindricalCoords( cellIndex );
+    
+    EXPECT_TRUE( result.has_value() );
+    if ( result.has_value() )
+    {
+        const auto& cylCell = result.value();
+        EXPECT_GT( cylCell.outerRadius, cylCell.innerRadius );
+        EXPECT_GT( cylCell.endAngle, cylCell.startAngle );
+        EXPECT_GT( cylCell.topZ, cylCell.bottomZ );
+        EXPECT_GE( cylCell.innerRadius, 0.0 );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -193,10 +196,9 @@ TEST( RigCylindricalGrid, InvalidCellIndexHandling )
     MockCylindricalGrid grid;
 
     // Test with valid cell index first
-    double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
     size_t validCellIndex = 0;
-    bool   success        = grid.getCylindricalCoords( validCellIndex, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ );
-    EXPECT_TRUE( success );
+    auto   result = grid.getCylindricalCoords( validCellIndex );
+    EXPECT_TRUE( result.has_value() );
 
     // Test with out-of-bounds IJK (should return false from ijkFromCellIndex)
     size_t i = 999, j = 999, k = 999;
@@ -214,17 +216,17 @@ TEST( RigCylindricalGrid, AngleRangeValidation )
     // Test multiple cells to ensure angle ranges are consistent
     for ( size_t cellIdx = 0; cellIdx < grid.cellCount(); ++cellIdx )
     {
-        double innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ;
-        bool   success = grid.getCylindricalCoords( cellIdx, innerRadius, outerRadius, startAngle, endAngle, topZ, bottomZ );
+        auto result = grid.getCylindricalCoords( cellIdx );
 
-        if ( success )
+        if ( result.has_value() )
         {
-            EXPECT_GE( endAngle, startAngle );
-            EXPECT_GE( startAngle, -180.0 ); // degrees
-            EXPECT_LE( endAngle, 360.0 ); // degrees
-            EXPECT_GT( outerRadius, 0.0 );
-            EXPECT_GE( innerRadius, 0.0 );
-            EXPECT_GE( outerRadius, innerRadius );
+            const auto& cylCell = result.value();
+            EXPECT_GE( cylCell.endAngle, cylCell.startAngle );
+            EXPECT_GE( cylCell.startAngle, -180.0 ); // degrees
+            EXPECT_LE( cylCell.endAngle, 360.0 ); // degrees
+            EXPECT_GT( cylCell.outerRadius, 0.0 );
+            EXPECT_GE( cylCell.innerRadius, 0.0 );
+            EXPECT_GE( cylCell.outerRadius, cylCell.innerRadius );
         }
     }
 }

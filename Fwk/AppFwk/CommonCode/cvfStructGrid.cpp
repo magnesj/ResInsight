@@ -37,9 +37,11 @@
 #include "cvfStructGrid.h"
 #include "cvfBase.h"
 #include "cvfBoundingBox.h"
+#include "cvfCylindricalGeometryGenerator.h"
 
 #include <algorithm>
 #include <array>
+#include <expected>
 
 namespace caf
 {
@@ -79,15 +81,9 @@ cvf::GridGeometryType StructGridInterface::gridGeometryType() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool StructGridInterface::getCylindricalCoords( size_t  cellIndex,
-                                                double& innerRadius,
-                                                double& outerRadius,
-                                                double& startAngle,
-                                                double& endAngle,
-                                                double& topZ,
-                                                double& bottomZ ) const
+std::expected<CylindricalCell, std::string> StructGridInterface::getCylindricalCoords( size_t cellIndex ) const
 {
-    return false;
+    return std::unexpected( "Grid does not support cylindrical coordinates" );
 }
 
 //--------------------------------------------------------------------------------------------------
