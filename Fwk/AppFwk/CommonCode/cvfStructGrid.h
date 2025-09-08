@@ -54,7 +54,7 @@ struct CylindricalCell
     double startAngle, endAngle;
     double topZ, bottomZ;
 };
-}
+} //namespace cvf
 
 namespace cvf
 {
@@ -127,7 +127,7 @@ public:
     virtual cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const   = 0;
 
     // Cylindrical coordinate support
-    virtual GridGeometryType                           gridGeometryType() const;
+    virtual GridGeometryType                            gridGeometryType() const;
     virtual std::expected<CylindricalCell, std::string> getCylindricalCoords( size_t cellIndex ) const;
 
 public:

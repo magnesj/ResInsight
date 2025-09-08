@@ -121,7 +121,7 @@ ref<DrawableGeo> SingleCellMeshFactory::createCylindricalMesh( const StructGridI
     {
         return createHexahedralMesh( grid, cellIndex, displayModelOffset );
     }
-    
+
     const cvf::CylindricalCell& cylCell = result.value();
 
     std::vector<Vec3f> vertices;

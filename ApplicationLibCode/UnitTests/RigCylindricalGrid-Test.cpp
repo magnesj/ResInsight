@@ -113,7 +113,7 @@ TEST( RigCylindricalGrid, CylindricalCoordinateExtraction )
     size_t cellIndex = grid.cellIndexFromIJK( 0, 0, 0 );
 
     auto result = grid.getCylindricalCoords( cellIndex );
-    
+
     EXPECT_TRUE( result.has_value() );
     if ( result.has_value() )
     {
@@ -197,7 +197,7 @@ TEST( RigCylindricalGrid, InvalidCellIndexHandling )
 
     // Test with valid cell index first
     size_t validCellIndex = 0;
-    auto   result = grid.getCylindricalCoords( validCellIndex );
+    auto   result         = grid.getCylindricalCoords( validCellIndex );
     EXPECT_TRUE( result.has_value() );
 
     // Test with out-of-bounds IJK (should return false from ijkFromCellIndex)
