@@ -197,8 +197,7 @@ StructGridInterface::FaceType StructGridInterface::oppositeFace( FaceType face )
             opposite = NEG_K;
             break;
         default:
-            opposite = POS_I;
-            CVF_ASSERT( false );
+            opposite = NO_FACE;
     }
 
     return opposite;

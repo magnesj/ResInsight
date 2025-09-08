@@ -20,6 +20,9 @@ qt_standard_project_setup()
 
 add_library(
   ${PROJECT_NAME}
+  cafAngleUtils.cpp
+  cafAngleUtils.h
+  cafAngleUtils.inl
   cafEffectCache.cpp
   cafEffectCache.h
   cafEffectGenerator.cpp
