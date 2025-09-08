@@ -34,84 +34,85 @@
 //
 //##################################################################################################
 
-#include <type_traits>
 #include <cmath>
+#include <type_traits>
 
-namespace caf {
+namespace caf
+{
 
 //==================================================================================================
 // Degrees normalization
 //==================================================================================================
-template<typename T>
+template <typename T>
 inline Degrees<T> Degrees<T>::normalized() const
 {
-    T normalized = cvf::Math::fmod(m_value, T(360));
-    if (normalized < T(0)) 
+    T normalized = cvf::Math::fmod( m_value, T( 360 ) );
+    if ( normalized < T( 0 ) )
     {
-        normalized += T(360);
+        normalized += T( 360 );
     }
-    return Degrees<T>(normalized);
+    return Degrees<T>( normalized );
 }
 
 //==================================================================================================
-// Radians normalization  
+// Radians normalization
 //==================================================================================================
-template<typename T>
+template <typename T>
 inline Radians<T> Radians<T>::normalized() const
 {
-    T twoPi = T(2) * (std::is_same_v<T, float> ? cvf::PI_F : cvf::PI_D);
-    T normalized = cvf::Math::fmod(m_value, twoPi);
-    if (normalized < T(0)) 
+    T twoPi      = T( 2 ) * ( std::is_same_v<T, float> ? cvf::PI_F : cvf::PI_D );
+    T normalized = cvf::Math::fmod( m_value, twoPi );
+    if ( normalized < T( 0 ) )
     {
         normalized += twoPi;
     }
-    return Radians<T>(normalized);
+    return Radians<T>( normalized );
 }
 
 //==================================================================================================
 // Coordinate conversion implementations
 //==================================================================================================
 
-template<typename T>
-inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian(T radius, const Radians<T>& angle, T height)
+template <typename T>
+inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian( T radius, const Radians<T>& angle, T height )
 {
-    T x = radius * cvf::Math::cos(angle.value());
-    T y = radius * cvf::Math::sin(angle.value());
-    return cvf::Vector3<T>(x, y, height);
+    T x = radius * cvf::Math::cos( angle.value() );
+    T y = radius * cvf::Math::sin( angle.value() );
+    return cvf::Vector3<T>( x, y, height );
 }
 
-template<typename T>
-inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian(T radius, const Degrees<T>& angle, T height)
+template <typename T>
+inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian( T radius, const Degrees<T>& angle, T height )
 {
-    T angleRad = cvf::Math::toRadians(angle.value());
-    T x = radius * cvf::Math::cos(angleRad);
-    T y = radius * cvf::Math::sin(angleRad);
-    return cvf::Vector3<T>(x, y, height);
+    T angleRad = cvf::Math::toRadians( angle.value() );
+    T x        = radius * cvf::Math::cos( angleRad );
+    T y        = radius * cvf::Math::sin( angleRad );
+    return cvf::Vector3<T>( x, y, height );
 }
 
-template<typename T>
-inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian(const CylindricalCoordinate& coord)
+template <typename T>
+inline cvf::Vector3<T> CoordinateConverter::cylindricalToCartesian( const CylindricalCoordinate& coord )
 {
-    T x = static_cast<T>(coord.radius * cvf::Math::cos(coord.angle));
-    T y = static_cast<T>(coord.radius * cvf::Math::sin(coord.angle));
-    T z = static_cast<T>(coord.height);
-    return cvf::Vector3<T>(x, y, z);
+    T x = static_cast<T>( coord.radius * cvf::Math::cos( coord.angle ) );
+    T y = static_cast<T>( coord.radius * cvf::Math::sin( coord.angle ) );
+    T z = static_cast<T>( coord.height );
+    return cvf::Vector3<T>( x, y, z );
 }
 
-template<typename T>
-inline CylindricalCoordinate CoordinateConverter::cartesianToCylindrical(const cvf::Vector3<T>& cartesian)
+template <typename T>
+inline CylindricalCoordinate CoordinateConverter::cartesianToCylindrical( const cvf::Vector3<T>& cartesian )
 {
-    return cartesianToCylindrical(cartesian.x(), cartesian.y(), cartesian.z());
+    return cartesianToCylindrical( cartesian.x(), cartesian.y(), cartesian.z() );
 }
 
-template<typename T>
-inline CylindricalCoordinate CoordinateConverter::cartesianToCylindrical(T x, T y, T z)
+template <typename T>
+inline CylindricalCoordinate CoordinateConverter::cartesianToCylindrical( T x, T y, T z )
 {
-    double radius = cvf::Math::sqrt(static_cast<double>(x * x + y * y));
-    double angle = std::atan2(static_cast<double>(y), static_cast<double>(x));
-    double height = static_cast<double>(z);
-    
-    return CylindricalCoordinate(radius, Radiansd(angle), height);
+    double radius = cvf::Math::sqrt( static_cast<double>( x * x + y * y ) );
+    double angle  = std::atan2( static_cast<double>( y ), static_cast<double>( x ) );
+    double height = static_cast<double>( z );
+
+    return CylindricalCoordinate( radius, Radiansd( angle ), height );
 }
 
 } // namespace caf
