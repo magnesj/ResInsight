@@ -20,6 +20,8 @@
 
 #include "RivGridPartMgr.h"
 
+#include "cvfGeometryGeneratorFactory.h"
+
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaRegressionTestRunner.h"
@@ -97,8 +99,7 @@ void caf::AppEnum<RivCellSetEnum>::setUp()
 ///
 //--------------------------------------------------------------------------------------------------
 RivGridPartMgr::RivGridPartMgr( RivCellSetEnum cellSetType, RimEclipseCase* eclipseCase, const RigGridBase* grid, size_t gridIdx )
-    : m_surfaceGenerator( grid, RiaRegressionTestRunner::instance()->useOpenMPForGeometryCreation() )
-    , m_gridIdx( gridIdx )
+    : m_gridIdx( gridIdx )
     , m_grid( grid )
     , m_surfaceFaceFilter( grid )
     , m_opacityLevel( 1.0f )
@@ -109,6 +110,8 @@ RivGridPartMgr::RivGridPartMgr( RivCellSetEnum cellSetType, RimEclipseCase* ecli
     CVF_ASSERT( grid );
     m_cellVisibility            = new cvf::UByteArray;
     m_surfaceFacesTextureCoords = new cvf::Vec2fArray;
+
+    m_surfaceGenerator = cvf::GeometryGeneratorFactory::create( grid, RiaRegressionTestRunner::instance()->useOpenMPForGeometryCreation() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -129,16 +132,16 @@ void RivGridPartMgr::setCellVisibility( cvf::UByteArray* cellVisibilities )
 
     m_cellVisibility = cellVisibilities;
 
-    m_surfaceGenerator.setCellVisibility( cellVisibilities );
-    m_surfaceGenerator.addFaceVisibilityFilter( &m_surfaceFaceFilter );
+    m_surfaceGenerator->setCellVisibility( cellVisibilities );
+    m_surfaceGenerator->addFaceVisibilityFilter( &m_surfaceFaceFilter );
 
-    generatePartGeometry( m_surfaceGenerator );
+    generatePartGeometry( *m_surfaceGenerator );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RivGridPartMgr::generatePartGeometry( cvf::StructGridGeometryGenerator& geoBuilder )
+void RivGridPartMgr::generatePartGeometry( cvf::GeometryGeneratorInterface& geoBuilder )
 {
     bool useBufferObjects = true;
 
@@ -289,7 +292,7 @@ void RivGridPartMgr::updateCellResultColor( size_t timeStepIndex, RimEclipseCell
                                                      cellResultColors->reservoirView()->wellCollection(),
                                                      timeStepIndex,
                                                      m_grid->gridIndex(),
-                                                     m_surfaceGenerator.quadToCellFaceMapper() );
+                                                     m_surfaceGenerator->quadToCellFaceMapper() );
 
             texturer.createTextureCoords( m_surfaceFacesTextureCoords.p() );
 
@@ -303,7 +306,7 @@ void RivGridPartMgr::updateCellResultColor( size_t timeStepIndex, RimEclipseCell
         }
         else
         {
-            RivTextureCoordsCreator texturer( cellResultColors, timeStepIndex, m_grid->gridIndex(), m_surfaceGenerator.quadToCellFaceMapper() );
+            RivTextureCoordsCreator texturer( cellResultColors, timeStepIndex, m_grid->gridIndex(), m_surfaceGenerator->quadToCellFaceMapper() );
             if ( !texturer.isValid() )
             {
                 return;
@@ -350,7 +353,7 @@ void RivGridPartMgr::updateCellEdgeResultColor( size_t                timeStepIn
         if ( dg )
         {
             cvf::ref<cvf::Effect> eff = RivScalarMapperUtils::createCellEdgeEffect( dg,
-                                                                                    m_surfaceGenerator.quadToCellFaceMapper(),
+                                                                                    m_surfaceGenerator->quadToCellFaceMapper(),
                                                                                     m_grid->gridIndex(),
                                                                                     timeStepIndex,
                                                                                     cellResultColors,
