@@ -96,6 +96,12 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
             }
         }
     }
+    catch ( const std::exception& e )
+    {
+        RiaLogging::warning(
+            QString( "Failed to open grid case for import of radial coordinates : %1" ).arg( QString::fromStdString( gridFilePath ) ) );
+        RiaLogging::error( QString::fromStdString( e.what() ) );
+    }
     catch ( ... )
     {
         RiaLogging::warning(
