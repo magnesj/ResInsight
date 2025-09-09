@@ -270,6 +270,11 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
     auto radialGridCenterTopLayerOpm = isRadialGrid ? RifOpmRadialGridTools::computeXyCenterForTopOfCells( opmMainGrid, opmGrid, localGrid )
                                                     : std::map<int, std::pair<double, double>>();
 
+    if ( isRadialGrid )
+    {
+        activeGrid->setGridGeometryType( cvf::GridGeometryType::CYLINDRICAL );
+    }
+
     // use same mapping as resdata
     const size_t cellMappingECLRi[8] = { 0, 1, 3, 2, 4, 5, 7, 6 };
 
@@ -322,7 +327,8 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
         std::array<double, 8> opmX{};
         std::array<double, 8> opmY{};
         std::array<double, 8> opmZ{};
-        opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
+        bool                  convertToRadialCoords = false;
+        opmGrid.getCellCorners( opmIJK, opmX, opmY, opmZ, convertToRadialCoords );
 
         // Each cell has 8 nodes, use active cell index and multiply to find first node index for cell
         auto localNodeIndex   = activeCellMap[opmCellIndex] * 8;
