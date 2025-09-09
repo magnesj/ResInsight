@@ -56,6 +56,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectBackupTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaQuantityInfoTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaHashTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils.h
+    ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils.inl
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -108,6 +110,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaFileLogger.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectBackupTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaQuantityInfoTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils.cpp
 )
 
 list(APPEND CODE_SOURCE_FILES ${SOURCE_GROUP_SOURCE_FILES})
