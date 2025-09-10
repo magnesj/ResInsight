@@ -192,6 +192,7 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
             yCenterCoordOpm                = yCenter;
         }
 
+        // Adjustment of center of cylindrical model is not supported
         if ( RiaPreferencesGrid::current()->useCylindricalVisualization() ) return;
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
@@ -205,8 +206,7 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
             riNode.z()   = -opmZ[opmNodeIndex];
 
             // First grid dimension is radius, check if cell has are at the outer-most slice
-            if ( !RiaPreferencesGrid::current()->useCylindricalVisualization() && !hostCellGlobalIndices.empty() &&
-                 ( gridDimension[0] - 1 == ijkCell[0] ) )
+            if ( !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == ijkCell[0] ) )
             {
                 auto hostCellIndex = hostCellGlobalIndices[opmCellIndex];
 
