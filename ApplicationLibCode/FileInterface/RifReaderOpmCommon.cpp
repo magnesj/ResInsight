@@ -20,6 +20,7 @@
 
 #include "RiaEclipseFileNameTools.h"
 #include "RiaLogging.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaResultNames.h"
@@ -443,7 +444,7 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
     auto radialGridCenterTopLayerOpm = isRadialGrid ? RifOpmRadialGridTools::computeXyCenterForTopOfCells( opmMainGrid, opmGrid, localGrid )
                                                     : std::map<int, std::pair<double, double>>();
 
-    if ( isRadialGrid )
+    if ( isRadialGrid && RiaPreferencesGrid::current()->useCylindricalVisualization() )
     {
         mainGrid->setGridGeometryType( cvf::GridGeometryType::CYLINDRICAL );
     }
@@ -484,9 +485,10 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
         std::array<double, 8> opmX{};
         std::array<double, 8> opmY{};
         std::array<double, 8> opmZ{};
-        bool                  convertToRadialCoords = false;
-        auto                  ijkCell               = opmGrid.ijk_from_global_index( opmCellIndex );
-        opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convertToRadialCoords );
+
+        bool convertCylindricalCoords = isRadialGrid && !RiaPreferencesGrid::current()->useCylindricalVisualization();
+        auto ijkCell                  = opmGrid.ijk_from_global_index( opmCellIndex );
+        opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convertCylindricalCoords );
 
         // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
         auto riNodeStartIndex = nodeStartIndex + riReservoirIndex * 8;
@@ -504,22 +506,21 @@ void RifReaderOpmCommon::transferGeometry( Opm::EclIO::EGrid&  opmMainGrid,
             cell.cornerIndices()[riCornerIndex] = riNodeIndex;
 
             // First grid dimension is radius, check if cell are at the outer-most slice
-            /*
-                        if ( isRadialGrid && !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == opmIJK[0] ) )
-                        {
-                            auto hostCellIndex = hostCellGlobalIndices[opmCellIndex];
+            if ( !RiaPreferencesGrid::current()->useCylindricalVisualization() && isRadialGrid && !hostCellGlobalIndices.empty() &&
+                 ( gridDimension[0] - 1 == opmIJK[0] ) )
+            {
+                auto hostCellIndex = hostCellGlobalIndices[opmCellIndex];
 
-                            RifOpmRadialGridTools::lockToHostPillars( riNode,
-                                                                      opmMainGrid,
-                                                                      opmGrid,
-                                                                      opmIJK,
-                                                                      hostCellIndex,
-                                                                      opmCellIndex,
-                                                                      opmNodeIndex,
-                                                                      xCenterCoordOpm,
-                                                                      yCenterCoordOpm );
-                        }
-            */
+                RifOpmRadialGridTools::lockToHostPillars( riNode,
+                                                          opmMainGrid,
+                                                          opmGrid,
+                                                          opmIJK,
+                                                          hostCellIndex,
+                                                          opmCellIndex,
+                                                          opmNodeIndex,
+                                                          xCenterCoordOpm,
+                                                          yCenterCoordOpm );
+            }
         }
         if ( invalidateLongPyramidCells )
         {
