@@ -48,16 +48,6 @@
 
 namespace cvf
 {
-struct CylindricalCell
-{
-    double innerRadius, outerRadius;
-    double startAngle, endAngle;
-    double topZ, bottomZ;
-};
-} //namespace cvf
-
-namespace cvf
-{
 class CellFilterBase;
 
 enum class GridGeometryType
@@ -66,8 +56,12 @@ enum class GridGeometryType
     CYLINDRICAL, // Cylindrical/radial cells
 };
 
-// Navneforslag
-//    StructGridGeometryGeneratorInterface
+struct CylindricalCell
+{
+    double innerRadius, outerRadius;
+    double startAngle, endAngle;
+    double topZ, bottomZ;
+};
 
 // Main purpose of this class is to define the interface to be used by geometry generators
 class StructGridInterface : public Object
