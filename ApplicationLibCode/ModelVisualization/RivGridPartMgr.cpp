@@ -20,8 +20,6 @@
 
 #include "RivGridPartMgr.h"
 
-#include "cvfGeometryGeneratorFactory.h"
-
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaRegressionTestRunner.h"
@@ -56,6 +54,7 @@
 #include "cafProgressInfo.h"
 
 #include "cvfDrawableGeo.h"
+#include "cvfGeometryGeneratorFactory.h"
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"
 #include "cvfRenderStateBlending.h"

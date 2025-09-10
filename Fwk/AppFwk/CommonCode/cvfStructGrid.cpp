@@ -37,7 +37,6 @@
 #include "cvfStructGrid.h"
 #include "cvfBase.h"
 #include "cvfBoundingBox.h"
-#include "cvfCylindricalGeometryGenerator.h"
 
 #include <algorithm>
 #include <array>

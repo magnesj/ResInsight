@@ -36,7 +36,6 @@
 
 #include "cvfBase.h"
 
-#include "cvfCylindricalGeometryGenerator.h"
 #include "cvfStructGrid.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfStructGridScalarDataAccess.h"

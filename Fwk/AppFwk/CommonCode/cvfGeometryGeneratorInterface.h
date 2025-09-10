@@ -70,9 +70,6 @@ public:
     // Geometry type identification
     virtual GridGeometryType geometryType() const = 0;
 
-    // Access to underlying grid
-    const StructGridInterface* activeGrid() const { return m_grid.p(); }
-
     // Texture coordinate support
     virtual void textureCoordinates( Vec2fArray*                       textureCoords,
                                      const StructGridScalarDataAccess* resultAccessor,

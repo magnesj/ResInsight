@@ -37,6 +37,7 @@
 #pragma once
 
 #include "cvfGeometryGeneratorInterface.h"
+
 #include <memory>
 
 namespace cvf

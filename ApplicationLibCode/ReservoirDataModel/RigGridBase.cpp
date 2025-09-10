@@ -25,7 +25,6 @@
 #include "RigResultAccessorFactory.h"
 
 #include "cvfAssert.h"
-#include "cvfCylindricalGeometryGenerator.h"
 
 #include <cstdlib>
 #include <expected>
