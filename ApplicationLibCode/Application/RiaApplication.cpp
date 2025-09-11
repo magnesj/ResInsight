@@ -31,6 +31,7 @@
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 #include "RiaOpenMPTools.h"
+#include "RiaToCafLogging.h"
 #include "RiaPlotWindowRedrawScheduler.h"
 #include "RiaPreferences.h"
 #include "RiaPreferencesOsdu.h"
@@ -192,6 +193,9 @@ RiaApplication::RiaApplication()
 RiaApplication::~RiaApplication()
 {
     RiaFontCache::clear();
+
+    // Shutdown CAF logging bridge
+    RiaCafLoggingManager::shutdownCafLogging();
 
     caf::SelectionManager::instance()->setPdmRootObject( nullptr );
 
@@ -1632,6 +1636,9 @@ void RiaApplication::initialize()
     m_project->setPlotTemplateFolders( m_preferences->plotTemplateFolders() );
 
     caf::SelectionManager::instance()->setPdmRootObject( project() );
+
+    // Initialize CAF logging bridge to forward CAF framework messages to ResInsight logging
+    RiaCafLoggingManager::initializeCafLogging();
 
     initializeDataLoadController();
 }
