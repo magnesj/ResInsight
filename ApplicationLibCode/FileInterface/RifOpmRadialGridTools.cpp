@@ -74,6 +74,16 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
         if ( opmMainGrid.is_radial() )
         {
             transferCoordinatesRadial( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
+
+            if ( opmMainGrid.is_radial() && opmMainGrid.dimension().at( 1 ) < 4 )
+            {
+                RiaLogging::warning( QString( "Radial grid with less than 4 cells in J direction is not supported : %1" )
+                                         .arg( QString::fromStdString( gridFilePath ) ) );
+
+                // Create temporary LGR with 4 cells in J direction to be able to compute coordinates
+
+
+            }
         }
 
         auto lgrNames = opmMainGrid.list_of_lgrs();

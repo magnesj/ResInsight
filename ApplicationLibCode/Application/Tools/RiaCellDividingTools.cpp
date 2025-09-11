@@ -131,6 +131,80 @@ std::vector<cvf::Vec3d> RiaCellDividingTools::createHexCornerCoords( std::array<
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<cvf::Vec3d> RiaCellDividingTools::createHexCornerCoordsFromCylindricalCell( std::array<cvf::Vec3d, 8> cellCornersCylindricalCoords,
+                                                                                        size_t nRadial,
+                                                                                        size_t nTheta,
+                                                                                        size_t nz )
+{
+    if ( nRadial == 0 || nTheta == 0 || nz == 0 ) return {};
+
+    // Extract radial, angular and z bounds from the 8 corners
+    // Assuming corners are ordered similar to hex cells:
+    // 0-3: bottom face (z=z_min), 4-7: top face (z=z_max)
+    // Within each face: different r,theta combinations
+    
+    double rMin = std::numeric_limits<double>::max();
+    double rMax = std::numeric_limits<double>::lowest();
+    double thetaMin = std::numeric_limits<double>::max();
+    double thetaMax = std::numeric_limits<double>::lowest();
+    double zMin = std::numeric_limits<double>::max();
+    double zMax = std::numeric_limits<double>::lowest();
+
+    // Find the bounds in cylindrical coordinates
+    for ( const auto& corner : cellCornersCylindricalCoords )
+    {
+        double r = corner.x();
+        double theta = corner.y();
+        double z = corner.z();
+
+        rMin = std::min( rMin, r );
+        rMax = std::max( rMax, r );
+        thetaMin = std::min( thetaMin, theta );
+        thetaMax = std::max( thetaMax, theta );
+        zMin = std::min( zMin, z );
+        zMax = std::max( zMax, z );
+    }
+
+    std::vector<cvf::Vec3d> subCellCorners;
+    subCellCorners.reserve( nRadial * nTheta * nz * 8 );
+
+    // Generate subdivided cells in cylindrical coordinates
+    for ( size_t iz = 0; iz < nz; iz++ )
+    {
+        for ( size_t it = 0; it < nTheta; it++ )
+        {
+            for ( size_t ir = 0; ir < nRadial; ir++ )
+            {
+                // Calculate the cylindrical bounds for this sub-cell
+                double r0 = rMin + ( rMax - rMin ) * ir / nRadial;
+                double r1 = rMin + ( rMax - rMin ) * ( ir + 1 ) / nRadial;
+                double theta0 = thetaMin + ( thetaMax - thetaMin ) * it / nTheta;
+                double theta1 = thetaMin + ( thetaMax - thetaMin ) * ( it + 1 ) / nTheta;
+                double z0 = zMin + ( zMax - zMin ) * iz / nz;
+                double z1 = zMin + ( zMax - zMin ) * ( iz + 1 ) / nz;
+
+                // Generate 8 corners for this sub-cell in cylindrical coordinates
+                // Bottom face (4 corners)
+                subCellCorners.emplace_back( r0, theta0, z0 );  // corner 0
+                subCellCorners.emplace_back( r1, theta0, z0 );  // corner 1
+                subCellCorners.emplace_back( r1, theta1, z0 );  // corner 2
+                subCellCorners.emplace_back( r0, theta1, z0 );  // corner 3
+
+                // Top face (4 corners)
+                subCellCorners.emplace_back( r0, theta0, z1 );  // corner 4
+                subCellCorners.emplace_back( r1, theta0, z1 );  // corner 5
+                subCellCorners.emplace_back( r1, theta1, z1 );  // corner 6
+                subCellCorners.emplace_back( r0, theta1, z1 );  // corner 7
+            }
+        }
+    }
+
+    return subCellCorners;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 double RiaCellDividingTools::computeFlowDistance( const std::array<cvf::Vec3d, 8>& cellVertices, const cvf::Vec3d& areaCenter )
 {
     auto subCellCorners = createHexCornerCoords( cellVertices, 2, 2, 2 );
