@@ -131,39 +131,67 @@ std::vector<cvf::Vec3d> RiaCellDividingTools::createHexCornerCoords( std::array<
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<cvf::Vec3d> RiaCellDividingTools::createHexCornerCoordsFromCylindricalCell( std::array<cvf::Vec3d, 8> cellCornersCylindricalCoords,
-                                                                                        size_t nRadial,
-                                                                                        size_t nTheta,
-                                                                                        size_t nz )
+std::vector<cvf::Vec3d> RiaCellDividingTools::subdivideCylindricalCell( std::array<cvf::Vec3d, 8> cellCornersCylindricalCoords,
+                                                                        size_t                    nRadial,
+                                                                        size_t                    nTheta,
+                                                                        size_t                    nz )
 {
     if ( nRadial == 0 || nTheta == 0 || nz == 0 ) return {};
 
-    // Extract radial, angular and z bounds from the 8 corners
-    // Assuming corners are ordered similar to hex cells:
-    // 0-3: bottom face (z=z_min), 4-7: top face (z=z_max)
-    // Within each face: different r,theta combinations
-    
-    double rMin = std::numeric_limits<double>::max();
-    double rMax = std::numeric_limits<double>::lowest();
+    // Extract radial and angular bounds from the 8 corners
+    double rMin     = std::numeric_limits<double>::max();
+    double rMax     = std::numeric_limits<double>::lowest();
     double thetaMin = std::numeric_limits<double>::max();
     double thetaMax = std::numeric_limits<double>::lowest();
-    double zMin = std::numeric_limits<double>::max();
-    double zMax = std::numeric_limits<double>::lowest();
 
     // Find the bounds in cylindrical coordinates
     for ( const auto& corner : cellCornersCylindricalCoords )
     {
-        double r = corner.x();
+        double r     = corner.x();
         double theta = corner.y();
-        double z = corner.z();
 
-        rMin = std::min( rMin, r );
-        rMax = std::max( rMax, r );
+        rMin     = std::min( rMin, r );
+        rMax     = std::max( rMax, r );
         thetaMin = std::min( thetaMin, theta );
         thetaMax = std::max( thetaMax, theta );
-        zMin = std::min( zMin, z );
-        zMax = std::max( zMax, z );
     }
+
+    // Helper function to interpolate z values from the original 8 corners
+    auto interpolateZ = [&]( double r, double theta, double zFraction ) -> double
+    {
+        // Bilinear interpolation in r-theta space, then linear interpolation in z
+        double rFraction     = ( r - rMin ) / ( rMax - rMin );
+        double thetaFraction = ( theta - thetaMin ) / ( thetaMax - thetaMin );
+
+        // Clamp fractions to [0,1]
+        rFraction     = std::max( 0.0, std::min( 1.0, rFraction ) );
+        thetaFraction = std::max( 0.0, std::min( 1.0, thetaFraction ) );
+
+        // Get z values from bottom face (corners 0-3) and top face (corners 4-7)
+        // Assuming hex corner ordering: 0,1,2,3 are bottom, 4,5,6,7 are top
+        // and within each face they form a quad in r-theta space
+
+        // Bottom face interpolation
+        double z_bottom_00 = cellCornersCylindricalCoords[0].z(); // rMin, thetaMin
+        double z_bottom_10 = cellCornersCylindricalCoords[1].z(); // rMax, thetaMin
+        double z_bottom_11 = cellCornersCylindricalCoords[2].z(); // rMax, thetaMax
+        double z_bottom_01 = cellCornersCylindricalCoords[3].z(); // rMin, thetaMax
+
+        double z_bottom = ( 1.0 - rFraction ) * ( 1.0 - thetaFraction ) * z_bottom_00 + rFraction * ( 1.0 - thetaFraction ) * z_bottom_10 +
+                          rFraction * thetaFraction * z_bottom_11 + ( 1.0 - rFraction ) * thetaFraction * z_bottom_01;
+
+        // Top face interpolation
+        double z_top_00 = cellCornersCylindricalCoords[4].z(); // rMin, thetaMin
+        double z_top_10 = cellCornersCylindricalCoords[5].z(); // rMax, thetaMin
+        double z_top_11 = cellCornersCylindricalCoords[6].z(); // rMax, thetaMax
+        double z_top_01 = cellCornersCylindricalCoords[7].z(); // rMin, thetaMax
+
+        double z_top = ( 1.0 - rFraction ) * ( 1.0 - thetaFraction ) * z_top_00 + rFraction * ( 1.0 - thetaFraction ) * z_top_10 +
+                       rFraction * thetaFraction * z_top_11 + ( 1.0 - rFraction ) * thetaFraction * z_top_01;
+
+        // Linear interpolation between bottom and top
+        return ( 1.0 - zFraction ) * z_bottom + zFraction * z_top;
+    };
 
     std::vector<cvf::Vec3d> subCellCorners;
     subCellCorners.reserve( nRadial * nTheta * nz * 8 );
@@ -176,25 +204,37 @@ std::vector<cvf::Vec3d> RiaCellDividingTools::createHexCornerCoordsFromCylindric
             for ( size_t ir = 0; ir < nRadial; ir++ )
             {
                 // Calculate the cylindrical bounds for this sub-cell
-                double r0 = rMin + ( rMax - rMin ) * ir / nRadial;
-                double r1 = rMin + ( rMax - rMin ) * ( ir + 1 ) / nRadial;
+                double r0     = rMin + ( rMax - rMin ) * ir / nRadial;
+                double r1     = rMin + ( rMax - rMin ) * ( ir + 1 ) / nRadial;
                 double theta0 = thetaMin + ( thetaMax - thetaMin ) * it / nTheta;
                 double theta1 = thetaMin + ( thetaMax - thetaMin ) * ( it + 1 ) / nTheta;
-                double z0 = zMin + ( zMax - zMin ) * iz / nz;
-                double z1 = zMin + ( zMax - zMin ) * ( iz + 1 ) / nz;
+
+                double zFraction0 = static_cast<double>( iz ) / nz;
+                double zFraction1 = static_cast<double>( iz + 1 ) / nz;
+
+                // Interpolate z values for each corner of the subcell
+                double z00_bottom = interpolateZ( r0, theta0, zFraction0 );
+                double z10_bottom = interpolateZ( r1, theta0, zFraction0 );
+                double z11_bottom = interpolateZ( r1, theta1, zFraction0 );
+                double z01_bottom = interpolateZ( r0, theta1, zFraction0 );
+
+                double z00_top = interpolateZ( r0, theta0, zFraction1 );
+                double z10_top = interpolateZ( r1, theta0, zFraction1 );
+                double z11_top = interpolateZ( r1, theta1, zFraction1 );
+                double z01_top = interpolateZ( r0, theta1, zFraction1 );
 
                 // Generate 8 corners for this sub-cell in cylindrical coordinates
                 // Bottom face (4 corners)
-                subCellCorners.emplace_back( r0, theta0, z0 );  // corner 0
-                subCellCorners.emplace_back( r1, theta0, z0 );  // corner 1
-                subCellCorners.emplace_back( r1, theta1, z0 );  // corner 2
-                subCellCorners.emplace_back( r0, theta1, z0 );  // corner 3
+                subCellCorners.emplace_back( r0, theta0, z00_bottom ); // corner 0
+                subCellCorners.emplace_back( r1, theta0, z10_bottom ); // corner 1
+                subCellCorners.emplace_back( r1, theta1, z11_bottom ); // corner 2
+                subCellCorners.emplace_back( r0, theta1, z01_bottom ); // corner 3
 
                 // Top face (4 corners)
-                subCellCorners.emplace_back( r0, theta0, z1 );  // corner 4
-                subCellCorners.emplace_back( r1, theta0, z1 );  // corner 5
-                subCellCorners.emplace_back( r1, theta1, z1 );  // corner 6
-                subCellCorners.emplace_back( r0, theta1, z1 );  // corner 7
+                subCellCorners.emplace_back( r0, theta0, z00_top ); // corner 4
+                subCellCorners.emplace_back( r1, theta0, z10_top ); // corner 5
+                subCellCorners.emplace_back( r1, theta1, z11_top ); // corner 6
+                subCellCorners.emplace_back( r0, theta1, z01_top ); // corner 7
             }
         }
     }
