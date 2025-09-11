@@ -70,6 +70,7 @@
 #include <QFile>
 #include <QFileInfo>
 
+#include "RifOpmRadialGridTools.h"
 #include <fstream>
 #include <string>
 
@@ -297,6 +298,12 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
     }
+
+    RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData() );
+    eclipseCaseData()->clearWellCellsInGridCache();
+
+    computeCachedData();
+
     return true;
 }
 

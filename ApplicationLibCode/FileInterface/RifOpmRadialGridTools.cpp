@@ -85,10 +85,12 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                 RiaLogging::warning( QString( "Radial grid with less than 4 cells in J direction is not supported : %1" )
                                          .arg( QString::fromStdString( gridFilePath ) ) );
 
-                const int nRadial = 1;
-                const int nTheta  = 20;
-                const int nK      = 1;
                 const int id      = 100;
+                const int nRadial = 1;
+                const int nK      = 1;
+
+                auto multiplier   = static_cast<size_t>( std::round( 20.0 / static_cast<double>( opmMainGrid.dimension().at( 1 ) ) ) ) + 1;
+                const auto nTheta = riMainGrid->cellCountJ() * multiplier;
 
                 const caf::VecIjk mainGridStart( 0, 0, 0 );
                 const caf::VecIjk mainGridEnd( riMainGrid->cellCountI(), riMainGrid->cellCountJ(), riMainGrid->cellCountK() );
