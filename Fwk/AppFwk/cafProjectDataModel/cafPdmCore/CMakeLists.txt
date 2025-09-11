@@ -61,6 +61,8 @@ set(PROJECT_FILES
     cafAsyncWorkerManager.cpp
     cafPdmObjectHandleTools.h
     cafPdmDeprecation.h
+    cafPdmLogging.h
+    cafPdmLogging.cpp
 )
 
 add_library(${PROJECT_NAME} ${PROJECT_FILES})

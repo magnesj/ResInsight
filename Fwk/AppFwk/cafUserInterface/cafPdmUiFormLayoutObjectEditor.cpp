@@ -36,6 +36,7 @@
 
 #include "cafPdmUiFormLayoutObjectEditor.h"
 
+#include "cafPdmLogging.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUiFieldEditorHelper.h"
@@ -67,6 +68,12 @@ caf::PdmUiFormLayoutObjectEditor::~PdmUiFormLayoutObjectEditor()
 {
     // If there are field editor present, the usage of this editor has not cleared correctly
     // The intended usage is to call the method setPdmObject(NULL) before closing the dialog
+    if ( !m_fieldViews.empty() )
+    {
+        CAF_PDM_LOG_WARNING( QString( "UI Form Layout Editor: Destructor called with %1 field views still present. "
+                                      "Call setPdmObject(nullptr) before destruction." )
+                                 .arg( m_fieldViews.size() ) );
+    }
     CAF_ASSERT( m_fieldViews.empty() );
 }
 
@@ -354,6 +361,9 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
             // Suggested approach: Make sure that all objects and groups in PdmUiOrdering have unique names.
 
             auto message = "Detected duplicate group box with keyword: " + groupBoxKey;
+            CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: %1. This may cause layout issues. Ensure unique group "
+                                        "names in PdmUiOrdering." )
+                                   .arg( message ) );
             CAF_ASSERT( false && message.toStdString().data() );
         }
 
@@ -397,6 +407,9 @@ caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateField
                                                                                         PdmUiFieldHandle* field,
                                                                                         const QString&    uiConfigName )
 {
+    // If object is hidden in the ui tree, it should not be shown in the form either
+    if ( field->isUiTreeHidden( uiConfigName ) ) return nullptr;
+
     caf::PdmUiFieldEditorHandle* fieldEditor = nullptr;
 
     std::map<PdmFieldHandle*, PdmUiFieldEditorHandle*>::iterator it = m_fieldViews.find( field->fieldHandle() );
@@ -414,16 +427,21 @@ caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateField
         }
         else
         {
-            // This assert happens if no editor is available for a given field
+            // This happens if no editor is available for a given field
             // If the macro for registering the editor is put as the single statement
             // in a cpp file, a dummy static class must be used to make sure the compile unit
             // is included
             //
             // See cafPdmUiCoreColor3f and cafPdmUiCoreVec3d
+            //
+            // Default editors are registered in cafPdmUiDefaultObjectEditor.cpp
 
-            // This assert will trigger for PdmChildArrayField and PdmChildField
-            // Consider to exclude assert or add editors for these types if the assert is reintroduced
-            // CAF_ASSERT(false);
+            QString fieldTypeName = field ? field->fieldHandle()->keyword() : "unknown";
+            CAF_PDM_LOG_ERROR(
+                QString( "UI Form Layout Editor: No field editor available for field type '%1' in config '%2'. "
+                         "Check that the field editor is properly registered." )
+                    .arg( fieldTypeName )
+                    .arg( uiConfigName.isEmpty() ? "default" : uiConfigName ) );
         }
     }
     else
