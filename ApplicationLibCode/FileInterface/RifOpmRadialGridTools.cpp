@@ -21,6 +21,9 @@
 #include "RiaLogging.h"
 #include "RiaWeightedMeanCalculator.h"
 
+#include "ExportCommands/RicExportLgrFeature.h"
+#include "RicCreateTemporaryLgrFeature.h"
+
 #include "RifReaderEclipseOutput.h"
 
 #include "RigActiveCellInfo.h"
@@ -37,8 +40,9 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigMainGrid* riMainGrid )
+void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData )
 {
+    auto riMainGrid = caseData->mainGrid();
     CAF_ASSERT( riMainGrid );
 
     try
@@ -80,9 +84,31 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                 RiaLogging::warning( QString( "Radial grid with less than 4 cells in J direction is not supported : %1" )
                                          .arg( QString::fromStdString( gridFilePath ) ) );
 
+                const int nRadial = 1;
+                const int nTheta  = 4;
+                const int nK      = 1;
+                const int id      = 100;
+
+                const caf::VecIjk mainGridStart( 0, 0, 0 );
+                const caf::VecIjk mainGridEnd( riMainGrid->cellCountI(), riMainGrid->cellCountJ(), riMainGrid->cellCountK() );
+                const caf::VecIjk lgrSize( riMainGrid->cellCountI() * nRadial, riMainGrid->cellCountJ() * nTheta, riMainGrid->cellCountK() * nK );
+
+                LgrInfo lgrInfo{ id, "Radial LGR", "", lgrSize, mainGridStart, mainGridEnd };
+
+                bool useRadial = true;
+                RicCreateTemporaryLgrFeature::createLgr( lgrInfo, riMainGrid, useRadial );
+
+                RigActiveCellInfo* activeCellInfo         = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+                RigActiveCellInfo* fractureActiveCellInfo = caseData->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
+
+                auto lgrCellCount = lgrSize.i() * lgrSize.j() * lgrSize.k();
+                activeCellInfo->addLgr( lgrCellCount );
+                if ( fractureActiveCellInfo->reservoirActiveCellCount() > 0 )
+                {
+                    fractureActiveCellInfo->addLgr( lgrCellCount );
+                }
+
                 // Create temporary LGR with 4 cells in J direction to be able to compute coordinates
-
-
             }
         }
 
