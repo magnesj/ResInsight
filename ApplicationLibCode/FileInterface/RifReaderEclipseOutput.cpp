@@ -409,7 +409,7 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         auto task = progress.task( "Transferring grid geometry", 10 );
         if ( !transferGeometry( mainEclGrid, eclipseCaseData, invalidateLongThinCells() ) ) return false;
 
-        RifOpmRadialGridTools::importCoordinatesForRadialGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
+        RifOpmRadialGridTools::importCoordinatesForRadialGrid( fileName.toStdString(), eclipseCaseData );
     }
 
     auto iLimitFromEdfm = RifEdfmTools::checkForEdfmLimitI( fileName );
