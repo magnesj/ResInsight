@@ -30,10 +30,8 @@ class RiaCellDividingTools
 {
 public:
     static std::vector<cvf::Vec3d> createHexCornerCoords( std::array<cvf::Vec3d, 8> mainCellCorners, size_t nx, size_t ny, size_t nz );
-    static std::vector<cvf::Vec3d> subdivideCylindricalCell( std::array<cvf::Vec3d, 8> cellCornersCylindricalCoords,
-                                                             size_t                    nRadial,
-                                                             size_t                    nTheta,
-                                                             size_t                    nz );
+    static std::vector<cvf::Vec3d>
+        subdivideCylindricalCell( std::array<cvf::Vec3d, 8> cellCornersCylindricalCoords, size_t nRadial, size_t nTheta, size_t nz );
 
     static double computeFlowDistance( const std::array<cvf::Vec3d, 8>& cellVertices, const cvf::Vec3d& areaCenter );
 };
