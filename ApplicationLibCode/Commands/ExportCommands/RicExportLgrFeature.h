@@ -26,6 +26,7 @@
 #include "cafCmdFeature.h"
 #include "cafVecIjk.h"
 
+#include <algorithm>
 #include <limits>
 #include <memory>
 
@@ -52,13 +53,13 @@ public:
     LgrInfo( int                id,
              const QString&     name,
              const QString&     associatedWellPathName,
-             const caf::VecIjk& sizes,
+             const caf::VecIjk& lgrGridSize,
              const caf::VecIjk& mainGridStartCell,
              const caf::VecIjk& mainGridEndCell )
         : id( id )
         , name( name )
         , associatedWellPathName( associatedWellPathName )
-        , sizes( sizes )
+        , lgrGridSize( lgrGridSize )
         , mainGridStartCell( mainGridStartCell )
         , mainGridEndCell( mainGridEndCell )
     {
@@ -66,17 +67,23 @@ public:
 
     caf::VecIjk sizesPerMainGridCell() const
     {
-        return caf::VecIjk( sizes.i() / ( mainGridEndCell.i() - mainGridStartCell.i() + 1 ),
-                            sizes.j() / ( mainGridEndCell.j() - mainGridStartCell.j() + 1 ),
-                            sizes.k() / ( mainGridEndCell.k() - mainGridStartCell.k() + 1 ) );
+        auto iSize = lgrGridSize.i() / ( mainGridEndCell.i() - mainGridStartCell.i() + 1 );
+        auto jSize = lgrGridSize.j() / ( mainGridEndCell.j() - mainGridStartCell.j() + 1 );
+        auto kSize = lgrGridSize.k() / ( mainGridEndCell.k() - mainGridStartCell.k() + 1 );
+
+        iSize = std::max( iSize, size_t( 1 ) );
+        jSize = std::max( jSize, size_t( 1 ) );
+        kSize = std::max( kSize, size_t( 1 ) );
+
+        return caf::VecIjk( iSize, jSize, kSize );
     }
 
-    size_t cellCount() const { return sizes.i() * sizes.j() * sizes.k(); }
+    size_t cellCount() const { return lgrGridSize.i() * lgrGridSize.j() * lgrGridSize.k(); }
 
     int         id;
     QString     name;
     QString     associatedWellPathName;
-    caf::VecIjk sizes;
+    caf::VecIjk lgrGridSize;
 
     caf::VecIjk mainGridStartCell;
     caf::VecIjk mainGridEndCell;
