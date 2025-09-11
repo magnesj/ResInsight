@@ -76,6 +76,10 @@ CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR( PdmUiTreeSelectionEditor, std::vector<
 
 CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR( PdmUiFilePathEditor, FilePath );
 
+CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR( PdmUiLineEditor, std::optional<QString> );
+CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR( PdmUiLineEditor, std::optional<int> );
+CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR( PdmUiLineEditor, std::optional<double> );
+
 // As the macro CAF_PDM_UI_REGISTER_DEFAULT_FIELD_EDITOR() is not working correctly for std::pair<> the
 // registration of this type in the factory has to be written directly
 static bool myPdmUiCheckBoxAndTextEditor =
