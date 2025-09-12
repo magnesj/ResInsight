@@ -204,6 +204,9 @@ bool RifEclipseInputFileTools::openGridFile( const QString& fileName, RigEclipse
         // Import additional keywords as input properties
         RifEclipseInputPropertyLoader::createInputPropertiesFromKeywords( eclipseCase, objects, &errorMessages );
 
+        std::string aabbTreeInfo;
+        eclipseCase->mainGrid()->computeCachedData( &aabbTreeInfo );
+
         if ( !errorMessages.isEmpty() ) RiaLogging::error( errorMessages );
 
         return true;
