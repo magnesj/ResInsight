@@ -64,3 +64,22 @@ private:
     caf::PdmField<QString> m_porosityModel;
     caf::PdmField<QString> m_resultKey;
 };
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcEclipseCase_createLocalGridRefinement : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcEclipseCase_createLocalGridRefinement( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmField<int>  m_nI;
+    caf::PdmField<int>  m_nJ;
+    caf::PdmField<int>  m_nK;
+    caf::PdmField<bool> m_convertFromRadialToCartesian;
+};

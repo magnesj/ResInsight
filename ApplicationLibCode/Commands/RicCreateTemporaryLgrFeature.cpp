@@ -188,7 +188,7 @@ void RicCreateTemporaryLgrFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 /// Todo: Guarding, caching LGR corner nodes calculations
 //--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid )
+RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid )
 {
     int    lgrId          = lgrInfo.id;
     size_t totalCellCount = mainGrid->totalCellCount();
@@ -265,6 +265,56 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
     }
 
     localGrid->setParentGrid( mainGrid );
+
+    return localGrid;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigEclipseCaseData* caseData )
+{
+    auto mainGrid = caseData->mainGrid();
+
+    auto gridCount = mainGrid->gridCount();
+
+    auto localGrid = createLgr( lgrInfo, mainGrid );
+
+    if ( auto activeInfo = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ) )
+    {
+        auto currentReservoirCellCount = activeInfo->reservoirCellCount();
+
+        activeInfo->setGridCount( gridCount + 1 );
+        activeInfo->setReservoirCellCount( currentReservoirCellCount + localGrid->cellCount() );
+
+        size_t activeCellCount = 0;
+
+        for ( size_t k = 0; k < localGrid->cellCountK(); k++ )
+        {
+            for ( size_t j = 0; j < localGrid->cellCountJ(); j++ )
+            {
+                for ( size_t i = 0; i < localGrid->cellCountI(); i++ )
+                {
+                    size_t cellIndex = localGrid->cellIndexFromIJK( i, j, k );
+                    auto   gridCell  = localGrid->cell( cellIndex );
+                    if ( gridCell.parentCellIndex() != cvf::UNDEFINED_SIZE_T )
+                    {
+                        auto resultIndex = activeInfo->cellResultIndex( gridCell.parentCellIndex() );
+                        if ( resultIndex != cvf::UNDEFINED_SIZE_T )
+                        {
+                            activeInfo->setCellResultIndex( cellIndex + mainGrid->totalCellCount(), resultIndex );
+                            activeCellCount++;
+                        }
+                    }
+                }
+            }
+        }
+
+        activeInfo->setGridActiveCellCounts( gridCount, activeCellCount );
+        activeInfo->computeDerivedData();
+    }
+
+    return localGrid;
 }
 
 //--------------------------------------------------------------------------------------------------

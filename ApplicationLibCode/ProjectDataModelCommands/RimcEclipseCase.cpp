@@ -22,6 +22,9 @@
 #include "RiaGuiApplication.h"
 #include "RiaKeyValueStoreUtil.h"
 
+#include "ExportCommands/RicExportLgrFeature.h"
+#include "RicCreateTemporaryLgrFeature.h"
+
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
@@ -30,6 +33,8 @@
 #include "RigResultAccessorFactory.h"
 
 #include "RimEclipseCase.h"
+#include "RimEclipseView.h"
+#include "RimGridCollection.h"
 #include "RimProject.h"
 
 #include "cafPdmFieldScriptingCapability.h"
@@ -178,6 +183,67 @@ std::expected<caf::PdmObjectHandle*, QString> RimcEclipseCase_exportValuesIntern
     }
 
     keyValueStore->set( m_resultKey().toStdString(), RiaKeyValueStoreUtil::convertToByteVector( values ) );
+
+    return nullptr;
+}
+
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimEclipseCase, RimcEclipseCase_createLocalGridRefinement, "create_lgr" );
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimcEclipseCase_createLocalGridRefinement::RimcEclipseCase_createLocalGridRefinement( caf::PdmObjectHandle* self )
+    : caf::PdmVoidObjectMethod( self )
+{
+    CAF_PDM_InitObject( "Export Values Internal", "", "", "Export Values Internal" );
+
+    CAF_PDM_InitScriptableFieldNoDefault( &m_nI, "RefinementI", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_nJ, "RefinementJ", "" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_nK, "RefinementK", "" );
+
+    CAF_PDM_InitScriptableField( &m_convertFromRadialToCartesian, "ConvertToCartesian", false, "Convert To Cartesian" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<caf::PdmObjectHandle*, QString> RimcEclipseCase_createLocalGridRefinement::execute()
+{
+    auto eclipseCase = self<RimEclipseCase>();
+
+    const int nRadial = 1;
+    const int nTheta  = 20;
+    const int nK      = 1;
+    const int id      = 100;
+
+    auto mainGrid = eclipseCase->mainGrid();
+
+    const caf::VecIjk mainGridStart( 0, 0, 0 );
+    const caf::VecIjk mainGridEnd( mainGrid->cellCountI(), mainGrid->cellCountJ(), mainGrid->cellCountK() );
+    const caf::VecIjk lgrSize( mainGrid->cellCountI() * m_nI, mainGrid->cellCountJ() * m_nJ, mainGrid->cellCountK() * m_nK );
+
+    LgrInfo lgrInfo{ id, "Radial LGR", "", lgrSize, mainGridStart, mainGridEnd };
+    RicCreateTemporaryLgrFeature::createLgr( lgrInfo, eclipseCase->eclipseCaseData() );
+
+    auto eclipseCaseData = eclipseCase->eclipseCaseData();
+    eclipseCaseData->clearWellCellsInGridCache();
+
+    eclipseCaseData->mainGrid()->computeCachedData();
+    eclipseCaseData->setVirtualPerforationTransmissibilities( nullptr );
+
+    eclipseCase->computeActiveCellsBoundingBox();
+
+    for ( auto view : eclipseCase->reservoirViews() )
+    {
+        if ( view && view->gridCollection() )
+        {
+            view->gridCollection()->syncFromMainEclipseGrid();
+        }
+    }
+
+    eclipseCase->createDisplayModelAndUpdateAllViews();
+
+    // eclipseCase->updateAllRequiredEditors();
 
     return nullptr;
 }
