@@ -219,7 +219,7 @@ std::expected<caf::PdmObjectHandle*, QString> RimcEclipseCase_createLocalGridRef
     auto mainGrid = eclipseCase->mainGrid();
 
     const caf::VecIjk mainGridStart( 0, 0, 0 );
-    const caf::VecIjk mainGridEnd( mainGrid->cellCountI(), mainGrid->cellCountJ(), mainGrid->cellCountK() );
+    const caf::VecIjk mainGridEnd( mainGrid->cellCountI() - 1, mainGrid->cellCountJ() - 1, mainGrid->cellCountK() - 1 );
     const caf::VecIjk lgrSize( mainGrid->cellCountI() * m_nI, mainGrid->cellCountJ() * m_nJ, mainGrid->cellCountK() * m_nK );
 
     LgrInfo lgrInfo{ id, "Radial LGR", "", lgrSize, mainGridStart, mainGridEnd };

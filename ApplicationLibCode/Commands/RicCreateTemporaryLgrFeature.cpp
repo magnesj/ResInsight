@@ -276,7 +276,8 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
 {
     auto mainGrid = caseData->mainGrid();
 
-    auto gridCount = mainGrid->gridCount();
+    auto gridCount         = mainGrid->gridCount();
+    auto mainGridCellCount = mainGrid->totalCellCount();
 
     auto localGrid = createLgr( lgrInfo, mainGrid );
 
@@ -302,7 +303,7 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
                         auto resultIndex = activeInfo->cellResultIndex( gridCell.parentCellIndex() );
                         if ( resultIndex != cvf::UNDEFINED_SIZE_T )
                         {
-                            activeInfo->setCellResultIndex( cellIndex + mainGrid->totalCellCount(), resultIndex );
+                            activeInfo->setCellResultIndex( cellIndex + mainGridCellCount, resultIndex );
                             activeCellCount++;
                         }
                     }
