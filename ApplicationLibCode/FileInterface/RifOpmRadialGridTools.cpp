@@ -93,7 +93,7 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                 const auto nTheta = riMainGrid->cellCountJ() * multiplier;
 
                 const caf::VecIjk mainGridStart( 0, 0, 0 );
-                const caf::VecIjk mainGridEnd( riMainGrid->cellCountI(), riMainGrid->cellCountJ(), riMainGrid->cellCountK() );
+                const caf::VecIjk mainGridEnd( riMainGrid->cellCountI() - 1, riMainGrid->cellCountJ() - 1, riMainGrid->cellCountK() - 1 );
                 const caf::VecIjk lgrSize( riMainGrid->cellCountI() * nRadial, riMainGrid->cellCountJ() * nTheta, riMainGrid->cellCountK() * nK );
 
                 LgrInfo lgrInfo{ id, "Radial LGR", "", lgrSize, mainGridStart, mainGridEnd };
