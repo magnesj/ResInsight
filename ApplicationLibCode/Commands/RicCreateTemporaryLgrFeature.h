@@ -37,6 +37,8 @@ class RimWellPath;
 class RicExportLgrUi;
 class QFile;
 class QTextStream;
+class RigGridBase;
+class RigEclipseCaseData;
 
 //==================================================================================================
 ///
@@ -56,7 +58,8 @@ public:
 
     void updateViews( RimEclipseCase* eclipseCase );
 
-    static void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid);
+    static RigGridBase* createLgr( const LgrInfo& lgrInfo, RigEclipseCaseData* caseData );
+    static RigGridBase* createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
 
 protected:
     bool isCommandEnabled() const override;
