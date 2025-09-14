@@ -62,13 +62,13 @@ RicExportLgrUi::RicExportLgrUi()
     CAF_PDM_InitField( &m_includeFractures, "IncludeFractures", true, "Fractures" );
     CAF_PDM_InitField( &m_includeFishbones, "IncludeFishbones", true, "Fishbones" );
 
-    QString ijkLabel = "Cell Count I, J, K";
-    CAF_PDM_InitField( &m_cellCountI, "CellCountI", 2, ijkLabel );
-    CAF_PDM_InitField( &m_cellCountJ, "CellCountJ", 2, "" );
-    CAF_PDM_InitField( &m_cellCountK, "CellCountK", 2, "" );
+    QString ijkLabel = "Refinement I, J, K";
+    CAF_PDM_InitField( &m_refinementI, "CellCountI", 2, ijkLabel );
+    CAF_PDM_InitField( &m_refinementJ, "CellCountJ", 2, "" );
+    CAF_PDM_InitField( &m_refinementK, "CellCountK", 2, "" );
 
-    m_cellCountJ.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_cellCountK.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_refinementJ.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_refinementK.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
 
     CAF_PDM_InitField( &m_splitType, "SplitType", Lgr::SplitTypeEnum(), "Split Type" );
 }
@@ -104,9 +104,9 @@ void RicExportLgrUi::setTimeStep( int timeStep )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::VecIjk RicExportLgrUi::lgrCellCount() const
+caf::VecIjk RicExportLgrUi::refinement() const
 {
-    return caf::VecIjk( m_cellCountI, m_cellCountJ, m_cellCountK );
+    return caf::VecIjk( m_refinementI, m_refinementJ, m_refinementK );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -180,9 +180,9 @@ void RicExportLgrUi::setDefaultValuesFromCase()
         m_exportFolder     = caseFolder;
     }
 
-    m_cellCountI = 2;
-    m_cellCountJ = 2;
-    m_cellCountK = 2;
+    m_refinementI = 2;
+    m_refinementJ = 2;
+    m_refinementK = 2;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -230,9 +230,9 @@ void RicExportLgrUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     uiOrdering.add( &m_splitType, { .newRow = true, .totalColumnSpan = 6, .leftLabelColumnSpan = 1 } );
 
     caf::PdmUiGroup* gridRefinement = uiOrdering.addNewGroup( "Grid Refinement" );
-    gridRefinement->add( &m_cellCountI, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
-    gridRefinement->appendToRow( &m_cellCountJ );
-    gridRefinement->appendToRow( &m_cellCountK );
+    gridRefinement->add( &m_refinementI, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
+    gridRefinement->appendToRow( &m_refinementJ );
+    gridRefinement->appendToRow( &m_refinementK );
 
     //    uiOrdering.add(&m_wellPathsInfo);
     uiOrdering.skipRemainingFields( true );
