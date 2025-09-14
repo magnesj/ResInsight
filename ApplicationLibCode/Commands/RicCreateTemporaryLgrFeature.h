@@ -49,7 +49,7 @@ public:
     void createLgrsForWellPaths( std::vector<RimWellPath*>                          wellPaths,
                                  RimEclipseCase*                                    eclipseCase,
                                  size_t                                             timeStep,
-                                 caf::VecIjk                                        lgrCellCounts,
+                                 caf::VecIjk                                        refinement,
                                  Lgr::SplitType                                     splitType,
                                  const std::set<RigCompletionData::CompletionType>& completionTypes,
                                  QStringList*                                       wellsIntersectingOtherLgrs );
