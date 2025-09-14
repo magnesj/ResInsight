@@ -18,6 +18,7 @@
 
 #include "RifOpmRadialGridTools.h"
 
+#include "RiaAngleUtils.h"
 #include "RiaLogging.h"
 #include "RiaWeightedMeanCalculator.h"
 
@@ -34,14 +35,13 @@
 
 #include "opm/io/eclipse/EGrid.hpp"
 
-#include "RiaAngleUtils.h"
 #include <algorithm>
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData )
+bool RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData )
 {
     auto riMainGrid = caseData->mainGrid();
     CAF_ASSERT( riMainGrid );
@@ -72,7 +72,9 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
             }
         }
 
-        if ( !isRadialGridPresent ) return;
+        if ( !isRadialGridPresent ) return false;
+
+        bool lgrIsCreated = false;
 
         Opm::EclIO::EGrid opmMainGrid( gridFilePath );
 
@@ -99,7 +101,7 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
 
                 LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
 
-                auto lgrGrid = RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
+                RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
 
                 // Convert the radial grid to a Cartesian grid
                 std::vector<cvf::Vec3d>& nodes = riMainGrid->nodes();
@@ -111,6 +113,8 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                     node.x()       = cartesian.x();
                     node.y()       = cartesian.y();
                 }
+
+                lgrIsCreated = true;
             }
         }
 
@@ -131,12 +135,15 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                 }
             }
         }
+        return lgrIsCreated;
     }
     catch ( ... )
     {
         RiaLogging::warning(
             QString( "Failed to open grid case for import of radial coordinates : %1" ).arg( QString::fromStdString( gridFilePath ) ) );
     }
+
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------

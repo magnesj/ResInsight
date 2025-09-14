@@ -43,16 +43,10 @@ class RifOpmRadialGridTools
 {
 public:
     // If the grid is radial, the coordinates are imported and adjusted to fit the host cells
-    static void importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData );
-
-    static void
-        transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
+    static bool importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData );
 
     static std::map<int, std::pair<double, double>>
         computeXyCenterForTopOfCells( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigGridBase* riGrid );
-
-    static std::vector<std::vector<cvf::Vec3d>>
-        computeSnapToCoordinates( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, int mainGridCellIndex, int lgrCellIndex );
 
     static void lockToHostPillars( cvf::Vec3d&         riNode,
                                    Opm::EclIO::EGrid&  opmMainGrid,
@@ -63,4 +57,11 @@ public:
                                    size_t              opmNodeIndex,
                                    double              xCenterCoordOpm,
                                    double              yCenterCoordOpm );
+
+private:
+    static void
+        transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
+
+    static std::vector<std::vector<cvf::Vec3d>>
+        computeSnapToCoordinates( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, int mainGridCellIndex, int lgrCellIndex );
 };
