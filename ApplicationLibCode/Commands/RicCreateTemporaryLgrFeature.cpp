@@ -58,7 +58,7 @@ CAF_CMD_SOURCE_INIT( RicCreateTemporaryLgrFeature, "RicCreateTemporaryLgrFeature
 void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPath*>                          wellPaths,
                                                            RimEclipseCase*                                    eclipseCase,
                                                            size_t                                             timeStep,
-                                                           caf::VecIjk                                        lgrCellCounts,
+                                                           caf::VecIjk                                        refinement,
                                                            Lgr::SplitType                                     splitType,
                                                            const std::set<RigCompletionData::CompletionType>& completionTypes,
                                                            QStringList*                                       wellsIntersectingOtherLgrs )
@@ -67,19 +67,14 @@ void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPa
     RigActiveCellInfo* activeCellInfo         = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
     RigActiveCellInfo* fractureActiveCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
 
-    auto lgrs = RicExportLgrFeature::buildLgrsForWellPaths( wellPaths,
-                                                            eclipseCase,
-                                                            timeStep,
-                                                            lgrCellCounts,
-                                                            splitType,
-                                                            completionTypes,
-                                                            wellsIntersectingOtherLgrs );
+    auto lgrs =
+        RicExportLgrFeature::buildLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, wellsIntersectingOtherLgrs );
 
     for ( const auto& lgr : lgrs )
     {
         createLgr( lgr, eclipseCase->eclipseCaseData()->mainGrid() );
 
-        size_t lgrCellCount = lgr.cellCount();
+        size_t lgrCellCount = lgr.lgrCellCount();
 
         activeCellInfo->addLgr( lgrCellCount );
         if ( fractureActiveCellInfo->reservoirActiveCellCount() > 0 )
@@ -153,7 +148,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
     if ( dialogData )
     {
         auto       eclipseCase     = dialogData->caseToApply();
-        auto       lgrCellCounts   = dialogData->lgrCellCount();
+        auto       refinement      = dialogData->refinement();
         size_t     timeStep        = dialogData->timeStep();
         auto       splitType       = dialogData->splitType();
         const auto completionTypes = dialogData->completionTypes();
@@ -162,7 +157,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
 
         QStringList wellsIntersectingOtherLgrs;
 
-        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, lgrCellCounts, splitType, completionTypes, &wellsIntersectingOtherLgrs );
+        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, &wellsIntersectingOtherLgrs );
 
         updateViews( eclipseCase );
 
@@ -192,7 +187,7 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
 {
     int    lgrId          = lgrInfo.id;
     size_t totalCellCount = mainGrid->totalCellCount();
-    size_t lgrCellCount   = lgrInfo.cellCount();
+    size_t lgrCellCount   = lgrInfo.lgrCellCount();
 
     // Create local grid and set properties
     RigLocalGrid* localGrid = new RigLocalGrid( mainGrid );
@@ -201,7 +196,7 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
     localGrid->setGridId( lgrId );
     localGrid->setIndexToStartOfCells( totalCellCount );
     localGrid->setGridName( lgrInfo.name.toStdString() );
-    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.sizes.i(), lgrInfo.sizes.j(), lgrInfo.sizes.k() ) );
+    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.lgrCellCounts().i(), lgrInfo.lgrCellCounts().j(), lgrInfo.lgrCellCounts().k() ) );
     mainGrid->addLocalGrid( localGrid );
 
     size_t cellStartIndex = mainGrid->totalCellCount();
@@ -215,21 +210,21 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
         mainGrid->nodes().resize( nodeStartIndex + lgrCellCount * 8, cvf::Vec3d( 0, 0, 0 ) );
     }
 
-    auto   lgrSizePerMainCell = lgrInfo.sizesPerMainGridCell();
+    auto   refinement         = lgrInfo.refinement;
     size_t gridLocalCellIndex = 0;
 
     // Loop through all new LGR cells
-    for ( size_t lgrK = 0; lgrK < lgrInfo.sizes.k(); lgrK++ )
+    for ( size_t lgrK = 0; lgrK < lgrInfo.lgrCellCounts().k(); lgrK++ )
     {
-        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / lgrSizePerMainCell.k();
+        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / refinement.k();
 
-        for ( size_t lgrJ = 0; lgrJ < lgrInfo.sizes.j(); lgrJ++ )
+        for ( size_t lgrJ = 0; lgrJ < lgrInfo.lgrCellCounts().j(); lgrJ++ )
         {
-            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / lgrSizePerMainCell.j();
+            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / refinement.j();
 
-            for ( size_t lgrI = 0; lgrI < lgrInfo.sizes.i(); lgrI++, gridLocalCellIndex++ )
+            for ( size_t lgrI = 0; lgrI < lgrInfo.lgrCellCounts().i(); lgrI++, gridLocalCellIndex++ )
             {
-                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / lgrSizePerMainCell.i();
+                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / refinement.i();
 
                 size_t mainCellIndex = mainGrid->cellIndexFromIJK( mainI, mainJ, mainK );
                 auto&  mainGridCell  = mainGrid->cell( mainCellIndex );
@@ -244,14 +239,14 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
                     size_t                    cIdx;
                     std::array<cvf::Vec3d, 8> vertices = mainGrid->cellCornerVertices( mainCellIndex );
 
-                    auto cellCounts = lgrInfo.sizesPerMainGridCell();
-                    auto lgrCoords = RiaCellDividingTools::createHexCornerCoords( vertices, cellCounts.i(), cellCounts.j(), cellCounts.k() );
+                    std::vector<cvf::Vec3d> lgrCoords =
+                        RiaCellDividingTools::createHexCornerCoords( vertices, refinement.i(), refinement.j(), refinement.k() );
 
-                    size_t subI = lgrI % lgrSizePerMainCell.i();
-                    size_t subJ = lgrJ % lgrSizePerMainCell.j();
-                    size_t subK = lgrK % lgrSizePerMainCell.k();
+                    size_t subI = lgrI % refinement.i();
+                    size_t subJ = lgrJ % refinement.j();
+                    size_t subK = lgrK % refinement.k();
 
-                    size_t subIndex = subI + subJ * lgrSizePerMainCell.i() + subK * lgrSizePerMainCell.i() * lgrSizePerMainCell.j();
+                    size_t subIndex = subI + subJ * refinement.i() + subK * refinement.i() * refinement.j();
 
                     for ( cIdx = 0; cIdx < 8; ++cIdx )
                     {

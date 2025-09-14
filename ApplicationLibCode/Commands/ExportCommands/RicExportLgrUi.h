@@ -53,7 +53,7 @@ public:
     void setCase( RimEclipseCase* rimCase );
     void setTimeStep( int timeStep );
 
-    caf::VecIjk                                 lgrCellCount() const;
+    caf::VecIjk                                 refinement() const;
     QString                                     exportFolder() const;
     RimEclipseCase*                             caseToApply() const;
     int                                         timeStep() const;
@@ -79,9 +79,9 @@ private:
     caf::PdmField<bool>               m_includeFractures;
     caf::PdmField<bool>               m_includeFishbones;
 
-    caf::PdmField<int> m_cellCountI;
-    caf::PdmField<int> m_cellCountJ;
-    caf::PdmField<int> m_cellCountK;
+    caf::PdmField<int> m_refinementI;
+    caf::PdmField<int> m_refinementJ;
+    caf::PdmField<int> m_refinementK;
 
     caf::PdmField<Lgr::SplitTypeEnum> m_splitType;
 };
