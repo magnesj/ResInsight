@@ -247,11 +247,14 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
                     auto cellCounts = lgrInfo.sizesPerMainGridCell();
 
                     std::vector<cvf::Vec3d> lgrCoords;
-                    if ( useRadial )
-                    {
-                        lgrCoords = RiaCellDividingTools::subdivideCylindricalCell( vertices, cellCounts.i(), cellCounts.j(), cellCounts.k() );
-                    }
-                    else
+                    /*
+                                        if ( useRadial )
+                                        {
+                                            lgrCoords = RiaCellDividingTools::subdivideCylindricalCell( vertices, cellCounts.i(),
+                       cellCounts.j(), cellCounts.k() );
+                                        }
+                                        else
+                    */
                     {
                         lgrCoords = RiaCellDividingTools::createHexCornerCoords( vertices, cellCounts.i(), cellCounts.j(), cellCounts.k() );
                     }
