@@ -79,7 +79,7 @@ void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPa
     {
         createLgr( lgr, eclipseCase->eclipseCaseData()->mainGrid() );
 
-        size_t lgrCellCount = lgr.cellCount();
+        size_t lgrCellCount = lgr.lgrCellCount();
 
         activeCellInfo->addLgr( lgrCellCount );
         if ( fractureActiveCellInfo->reservoirActiveCellCount() > 0 )
@@ -192,7 +192,7 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
 {
     int    lgrId          = lgrInfo.id;
     size_t totalCellCount = mainGrid->totalCellCount();
-    size_t lgrCellCount   = lgrInfo.cellCount();
+    size_t lgrCellCount   = lgrInfo.lgrCellCount();
 
     // Create local grid and set properties
     RigLocalGrid* localGrid = new RigLocalGrid( mainGrid );
@@ -215,21 +215,21 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
         mainGrid->nodes().resize( nodeStartIndex + lgrCellCount * 8, cvf::Vec3d( 0, 0, 0 ) );
     }
 
-    auto   lgrSizePerMainCell = lgrInfo.sizesPerMainGridCell();
+    auto   refinement         = lgrInfo.refinement;
     size_t gridLocalCellIndex = 0;
 
     // Loop through all new LGR cells
-    for ( size_t lgrK = 0; lgrK < lgrInfo.sizes.k(); lgrK++ )
+    for ( size_t lgrK = 0; lgrK < lgrInfo.lgrGridSize().k(); lgrK++ )
     {
-        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / lgrSizePerMainCell.k();
+        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / refinement.k();
 
-        for ( size_t lgrJ = 0; lgrJ < lgrInfo.sizes.j(); lgrJ++ )
+        for ( size_t lgrJ = 0; lgrJ < lgrInfo.lgrGridSize().j(); lgrJ++ )
         {
-            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / lgrSizePerMainCell.j();
+            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / refinement.j();
 
-            for ( size_t lgrI = 0; lgrI < lgrInfo.sizes.i(); lgrI++, gridLocalCellIndex++ )
+            for ( size_t lgrI = 0; lgrI < lgrInfo.lgrGridSize().i(); lgrI++, gridLocalCellIndex++ )
             {
-                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / lgrSizePerMainCell.i();
+                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / refinement.i();
 
                 size_t mainCellIndex = mainGrid->cellIndexFromIJK( mainI, mainJ, mainK );
                 auto&  mainGridCell  = mainGrid->cell( mainCellIndex );
@@ -244,14 +244,14 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
                     size_t                    cIdx;
                     std::array<cvf::Vec3d, 8> vertices = mainGrid->cellCornerVertices( mainCellIndex );
 
-                    auto cellCounts = lgrInfo.sizesPerMainGridCell();
-                    auto lgrCoords = RiaCellDividingTools::createHexCornerCoords( vertices, cellCounts.i(), cellCounts.j(), cellCounts.k() );
+                    std::vector<cvf::Vec3d> lgrCoords =
+                        RiaCellDividingTools::createHexCornerCoords( vertices, refinement.i(), refinement.j(), refinement.k() );
 
-                    size_t subI = lgrI % lgrSizePerMainCell.i();
-                    size_t subJ = lgrJ % lgrSizePerMainCell.j();
-                    size_t subK = lgrK % lgrSizePerMainCell.k();
+                    size_t subI = lgrI % refinement.i();
+                    size_t subJ = lgrJ % refinement.j();
+                    size_t subK = lgrK % refinement.k();
 
-                    size_t subIndex = subI + subJ * lgrSizePerMainCell.i() + subK * lgrSizePerMainCell.i() * lgrSizePerMainCell.j();
+                    size_t subIndex = subI + subJ * refinement.i() + subK * refinement.i() * refinement.j();
 
                     for ( cIdx = 0; cIdx < 8; ++cIdx )
                     {

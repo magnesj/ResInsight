@@ -52,31 +52,42 @@ public:
     LgrInfo( int                id,
              const QString&     name,
              const QString&     associatedWellPathName,
-             const caf::VecIjk& sizes,
+             const caf::VecIjk& refinement,
              const caf::VecIjk& mainGridStartCell,
              const caf::VecIjk& mainGridEndCell )
         : id( id )
         , name( name )
         , associatedWellPathName( associatedWellPathName )
-        , sizes( sizes )
+        , refinement( refinement )
         , mainGridStartCell( mainGridStartCell )
         , mainGridEndCell( mainGridEndCell )
     {
     }
 
-    caf::VecIjk sizesPerMainGridCell() const
+    caf::VecIjk lgrGridSize() const
     {
-        return caf::VecIjk( sizes.i() / ( mainGridEndCell.i() - mainGridStartCell.i() + 1 ),
-                            sizes.j() / ( mainGridEndCell.j() - mainGridStartCell.j() + 1 ),
-                            sizes.k() / ( mainGridEndCell.k() - mainGridStartCell.k() + 1 ) );
+        auto lgrI = ( mainGridEndCell.i() - mainGridStartCell.i() + 1 ) * refinement.i();
+        auto lgrJ = ( mainGridEndCell.j() - mainGridStartCell.j() + 1 ) * refinement.j();
+        auto lgrK = ( mainGridEndCell.k() - mainGridStartCell.k() + 1 ) * refinement.k();
+
+        lgrI = lgrI > 0 ? lgrI : 1;
+        lgrJ = lgrJ > 0 ? lgrJ : 1;
+        lgrK = lgrK > 0 ? lgrK : 1;
+
+        return { lgrI, lgrJ, lgrK };
     }
 
-    size_t cellCount() const { return sizes.i() * sizes.j() * sizes.k(); }
+    size_t lgrCellCount() const
+    {
+        auto size = lgrGridSize();
+        return size.i() * size.j() * size.k();
+    }
 
-    int         id;
-    QString     name;
-    QString     associatedWellPathName;
-    caf::VecIjk sizes;
+    int     id;
+    QString name;
+    QString associatedWellPathName;
+
+    caf::VecIjk refinement;
 
     caf::VecIjk mainGridStartCell;
     caf::VecIjk mainGridEndCell;

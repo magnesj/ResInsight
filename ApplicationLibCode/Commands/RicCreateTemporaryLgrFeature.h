@@ -56,13 +56,14 @@ public:
 
     void updateViews( RimEclipseCase* eclipseCase );
 
+    static void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid);
+
 protected:
     bool isCommandEnabled() const override;
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
     void computeCachedData( RimEclipseCase* eclipseCase );
     void deleteAllCachedData( RimEclipseCase* eclipseCase );
 };
