@@ -58,7 +58,7 @@ CAF_CMD_SOURCE_INIT( RicCreateTemporaryLgrFeature, "RicCreateTemporaryLgrFeature
 void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPath*>                          wellPaths,
                                                            RimEclipseCase*                                    eclipseCase,
                                                            size_t                                             timeStep,
-                                                           caf::VecIjk                                        lgrCellCounts,
+                                                           caf::VecIjk                                        refinement,
                                                            Lgr::SplitType                                     splitType,
                                                            const std::set<RigCompletionData::CompletionType>& completionTypes,
                                                            QStringList*                                       wellsIntersectingOtherLgrs )
@@ -67,13 +67,8 @@ void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPa
     RigActiveCellInfo* activeCellInfo         = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
     RigActiveCellInfo* fractureActiveCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
 
-    auto lgrs = RicExportLgrFeature::buildLgrsForWellPaths( wellPaths,
-                                                            eclipseCase,
-                                                            timeStep,
-                                                            lgrCellCounts,
-                                                            splitType,
-                                                            completionTypes,
-                                                            wellsIntersectingOtherLgrs );
+    auto lgrs =
+        RicExportLgrFeature::buildLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, wellsIntersectingOtherLgrs );
 
     for ( const auto& lgr : lgrs )
     {
@@ -153,7 +148,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
     if ( dialogData )
     {
         auto       eclipseCase     = dialogData->caseToApply();
-        auto       lgrCellCounts   = dialogData->lgrCellCount();
+        auto       refinement      = dialogData->refinement();
         size_t     timeStep        = dialogData->timeStep();
         auto       splitType       = dialogData->splitType();
         const auto completionTypes = dialogData->completionTypes();
@@ -162,7 +157,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
 
         QStringList wellsIntersectingOtherLgrs;
 
-        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, lgrCellCounts, splitType, completionTypes, &wellsIntersectingOtherLgrs );
+        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, &wellsIntersectingOtherLgrs );
 
         updateViews( eclipseCase );
 
