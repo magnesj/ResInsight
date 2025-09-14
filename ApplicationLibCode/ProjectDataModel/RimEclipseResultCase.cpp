@@ -32,6 +32,7 @@
 #include "RifEclipseOutputFileTools.h"
 #include "RifEclipseRestartDataAccess.h"
 #include "RifInputPropertyLoader.h"
+#include "RifOpmRadialGridTools.h"
 #include "RifReaderEclipseOutput.h"
 #include "RifReaderEclipseRft.h"
 #include "RifReaderMockModel.h"
@@ -297,6 +298,14 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
     }
+
+    // Check if radial grid data is available. Create LGR if radial section count is below specified limit. Rebuild cached data if required.
+    if ( RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData() ) )
+    {
+        eclipseCaseData()->clearWellCellsInGridCache();
+        computeCachedData();
+    }
+
     return true;
 }
 
