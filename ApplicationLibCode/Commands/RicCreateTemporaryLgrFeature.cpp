@@ -196,7 +196,7 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
     localGrid->setGridId( lgrId );
     localGrid->setIndexToStartOfCells( totalCellCount );
     localGrid->setGridName( lgrInfo.name.toStdString() );
-    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.sizes.i(), lgrInfo.sizes.j(), lgrInfo.sizes.k() ) );
+    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.lgrGridSize().i(), lgrInfo.lgrGridSize().j(), lgrInfo.lgrGridSize().k() ) );
     mainGrid->addLocalGrid( localGrid );
 
     size_t cellStartIndex = mainGrid->totalCellCount();
