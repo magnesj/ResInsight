@@ -369,6 +369,11 @@ cvf::ref<RigResultAccessor> RigResultAccessorFactory::createNativeFromResultAddr
     }
 
     bool useGlobalActiveIndex = eclipseCase->results( porosityModel )->isUsingGlobalActiveIndex( resultAddress );
+    if ( eclipseCase->mainGrid()->gridCount() > 1 )
+    {
+        // Always use active cell indexing for multi-grid cases.
+        useGlobalActiveIndex = true;
+    }
     if ( useGlobalActiveIndex )
     {
         cvf::ref<RigResultAccessor> object =
