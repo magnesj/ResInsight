@@ -196,7 +196,7 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
     localGrid->setGridId( lgrId );
     localGrid->setIndexToStartOfCells( totalCellCount );
     localGrid->setGridName( lgrInfo.name.toStdString() );
-    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.lgrGridSize().i(), lgrInfo.lgrGridSize().j(), lgrInfo.lgrGridSize().k() ) );
+    localGrid->setCellCounts( cvf::Vec3st( lgrInfo.lgrCellCounts().i(), lgrInfo.lgrCellCounts().j(), lgrInfo.lgrCellCounts().k() ) );
     mainGrid->addLocalGrid( localGrid );
 
     size_t cellStartIndex = mainGrid->totalCellCount();
@@ -214,15 +214,15 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
     size_t gridLocalCellIndex = 0;
 
     // Loop through all new LGR cells
-    for ( size_t lgrK = 0; lgrK < lgrInfo.lgrGridSize().k(); lgrK++ )
+    for ( size_t lgrK = 0; lgrK < lgrInfo.lgrCellCounts().k(); lgrK++ )
     {
         size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / refinement.k();
 
-        for ( size_t lgrJ = 0; lgrJ < lgrInfo.lgrGridSize().j(); lgrJ++ )
+        for ( size_t lgrJ = 0; lgrJ < lgrInfo.lgrCellCounts().j(); lgrJ++ )
         {
             size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / refinement.j();
 
-            for ( size_t lgrI = 0; lgrI < lgrInfo.lgrGridSize().i(); lgrI++, gridLocalCellIndex++ )
+            for ( size_t lgrI = 0; lgrI < lgrInfo.lgrCellCounts().i(); lgrI++, gridLocalCellIndex++ )
             {
                 size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / refinement.i();
 
