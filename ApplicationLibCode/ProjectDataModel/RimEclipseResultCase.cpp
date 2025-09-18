@@ -300,12 +300,24 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
     }
 
     // Check if radial grid data is available. Create LGR if radial section count is below specified limit. Rebuild cached data if required.
-    if ( RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData() ) )
+    bool isLgrCreated = RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData() );
+    if ( !isLgrCreated )
+    {
+        // Check if min J coordinate is close to 0.0 and max is close to 360
+        auto         bb      = mainGrid()->boundingBox();
+        const double epsilon = 1.0; // degrees
+
+        if ( mainGrid()->cellCountJ() < 4 && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+        {
+            isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData() );
+        }
+    }
+
+    if ( isLgrCreated )
     {
         eclipseCaseData()->clearWellCellsInGridCache();
         computeCachedData();
     }
-
     return true;
 }
 
@@ -554,8 +566,8 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
 //--------------------------------------------------------------------------------------------------
 RimEclipseResultCase::~RimEclipseResultCase()
 {
-    // Disconnect all comparison views. In debug build on Windows, a crash occurs. The comparison view is also set to zero in the destructor
-    // of Rim3dView()
+    // Disconnect all comparison views. In debug build on Windows, a crash occurs. The comparison view is also set to zero in the
+    // destructor of Rim3dView()
     for ( auto v : reservoirViews() )
     {
         if ( v ) v->setComparisonView( nullptr );
