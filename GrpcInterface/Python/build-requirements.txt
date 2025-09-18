@@ -1,6 +1,6 @@
 grpcio
-grpcio-tools<1.64 # to make sure we use libprotoc 26.1, to display version info use 'python -m grpc_tools.protoc --version'
-protobuf>=5.26.1,<5.27 # use same requirements as ortools https://github.com/google/or-tools/blob/stable/ortools/python/setup.py.in
+grpcio-tools
+protobuf
 wheel
 typing-extensions
 pytest
