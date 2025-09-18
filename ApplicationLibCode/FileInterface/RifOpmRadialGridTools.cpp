@@ -172,7 +172,6 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
 
     const auto    hostCellGlobalIndices = opmGrid.hostCellsGlobalIndex();
     const size_t* cellMappingECLRi      = RifReaderEclipseOutput::eclipseCellIndexMapping();
-    const auto    gridDimension         = opmGrid.dimension();
     auto&         riNodes               = riMainGrid->nodes();
 
     std::vector<cvf::Vec3d> snapToCoordinatesFromMainGrid;
