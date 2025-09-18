@@ -58,6 +58,9 @@ public:
                                    double              xCenterCoordOpm,
                                    double              yCenterCoordOpm );
 
+    static bool createRadialGridRefinement( RigEclipseCaseData* caseData );
+    static void convertNodesToCartesian( std::vector<cvf::Vec3d>& nodes );
+
 private:
     static void
         transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );

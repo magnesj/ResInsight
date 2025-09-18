@@ -84,35 +84,10 @@ bool RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
 
             if ( opmMainGrid.is_radial() && opmMainGrid.dimension().at( 1 ) < 20 )
             {
-                RiaLogging::warning( QString( "Radial grid with less than 4 cells in J direction is not supported : %1" )
-                                         .arg( QString::fromStdString( gridFilePath ) ) );
+                RiaLogging::info( QString( "Radial grid with less than 4 cells in J direction detected, creating refinement : %1" )
+                                      .arg( QString::fromStdString( gridFilePath ) ) );
 
-                const int id      = 100;
-                const int nRadial = 1;
-                const int nK      = 1;
-
-                auto multiplier   = static_cast<size_t>( std::round( 20.0 / static_cast<double>( opmMainGrid.dimension().at( 1 ) ) ) ) + 1;
-                const auto nTheta = riMainGrid->cellCountJ() * multiplier;
-
-                const caf::VecIjk mainGridStart( 0, 0, 0 );
-                const caf::VecIjk mainGridEnd( riMainGrid->cellCountI() - 1, riMainGrid->cellCountJ() - 1, riMainGrid->cellCountK() - 1 );
-                const caf::VecIjk lgrSize( riMainGrid->cellCountI() * nRadial, riMainGrid->cellCountJ() * nTheta, riMainGrid->cellCountK() * nK );
-                const caf::VecIjk refinement( nRadial, nTheta, nK );
-
-                LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
-
-                RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
-
-                // Convert the radial grid to a Cartesian grid
-                std::vector<cvf::Vec3d>& nodes = riMainGrid->nodes();
-                for ( size_t i = 0; i < nodes.size(); i++ )
-                {
-                    auto& node = nodes[i];
-
-                    auto cartesian = Ria::CoordinateConverter::cylindricalToCartesian( node.x(), Ria::Degreesd( node.y() ), node.z() );
-                    node.x()       = cartesian.x();
-                    node.y()       = cartesian.y();
-                }
+                createRadialGridRefinement( caseData );
 
                 lgrIsCreated = true;
             }
@@ -328,6 +303,51 @@ void RifOpmRadialGridTools::lockToHostPillars( cvf::Vec3d&         riNode,
             riNode.y() = closestPillarCoord.y();
             riNode.z() = -closestPillarCoord.z();
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifOpmRadialGridTools::createRadialGridRefinement( RigEclipseCaseData* caseData )
+{
+    auto riMainGrid = caseData->mainGrid();
+
+    const int id      = 100;
+    const int nRadial = 1;
+    const int nK      = 1;
+
+    auto       multiplier = static_cast<size_t>( std::round( 20.0 / static_cast<double>( riMainGrid->cellCountJ() ) ) ) + 1;
+    const auto nTheta     = riMainGrid->cellCountJ() * multiplier;
+
+    const caf::VecIjk mainGridStart( 0, 0, 0 );
+    const caf::VecIjk mainGridEnd( riMainGrid->cellCountI() - 1, riMainGrid->cellCountJ() - 1, riMainGrid->cellCountK() - 1 );
+    const caf::VecIjk lgrSize( riMainGrid->cellCountI() * nRadial, riMainGrid->cellCountJ() * nTheta, riMainGrid->cellCountK() * nK );
+    const caf::VecIjk refinement( nRadial, nTheta, nK );
+
+    LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
+
+    RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
+
+    // Convert the radial grid to a Cartesian grid
+    std::vector<cvf::Vec3d>& nodes = riMainGrid->nodes();
+    convertNodesToCartesian( nodes );
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifOpmRadialGridTools::convertNodesToCartesian( std::vector<cvf::Vec3d>& nodes )
+{
+    for ( size_t i = 0; i < nodes.size(); i++ )
+    {
+        auto& node = nodes[i];
+
+        auto cartesian = Ria::CoordinateConverter::cylindricalToCartesian( node.x(), Ria::Degreesd( node.y() ), node.z() );
+        node.x()       = cartesian.x();
+        node.y()       = cartesian.y();
     }
 }
 
