@@ -871,9 +871,9 @@ std::map<QString, std::vector<LgrInfo>> RicExportLgrFeature::createLgrInfoListFo
         auto mainGridCellCountJ = mainGridBoundingBox.second.j() - mainGridBoundingBox.first.j() + 1;
         auto mainGridCellCountK = mainGridBoundingBox.second.k() - mainGridBoundingBox.first.k() + 1;
 
-        auto refinementI = mainGridCellCountI > 0 ? std::max(1UL, grid->cellCountI() / mainGridCellCountI) : 1;
-        auto refinementJ = mainGridCellCountJ > 0 ? std::max(1UL, grid->cellCountJ() / mainGridCellCountJ) : 1;
-        auto refinementK = mainGridCellCountK > 0 ? std::max(1UL, grid->cellCountK() / mainGridCellCountK) : 1;
+        auto refinementI = mainGridCellCountI > 0 ? std::max( 1UL, grid->cellCountI() / mainGridCellCountI ) : 1;
+        auto refinementJ = mainGridCellCountJ > 0 ? std::max( 1UL, grid->cellCountJ() / mainGridCellCountJ ) : 1;
+        auto refinementK = mainGridCellCountK > 0 ? std::max( 1UL, grid->cellCountK() / mainGridCellCountK ) : 1;
 
         caf::VecIjk refinement( refinementI, refinementJ, refinementK );
 

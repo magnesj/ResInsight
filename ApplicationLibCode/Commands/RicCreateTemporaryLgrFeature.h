@@ -56,7 +56,7 @@ public:
 
     void updateViews( RimEclipseCase* eclipseCase );
 
-    static void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid);
+    static void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
 
 protected:
     bool isCommandEnabled() const override;
