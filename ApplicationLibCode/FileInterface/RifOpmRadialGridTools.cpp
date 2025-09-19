@@ -21,6 +21,9 @@
 #include "RiaLogging.h"
 #include "RiaWeightedMeanCalculator.h"
 
+#include "ExportCommands/RicExportLgrFeature.h"
+#include "RicCreateTemporaryLgrFeature.h"
+
 #include "RifReaderEclipseOutput.h"
 
 #include "RigActiveCellInfo.h"
@@ -31,14 +34,16 @@
 
 #include "opm/io/eclipse/EGrid.hpp"
 
+#include "RiaAngleUtils.h"
 #include <algorithm>
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigMainGrid* riMainGrid )
+void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData )
 {
+    auto riMainGrid = caseData->mainGrid();
     CAF_ASSERT( riMainGrid );
 
     try
@@ -74,6 +79,39 @@ void RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
         if ( opmMainGrid.is_radial() )
         {
             transferCoordinatesRadial( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
+
+            if ( opmMainGrid.is_radial() && opmMainGrid.dimension().at( 1 ) < 20 )
+            {
+                RiaLogging::warning( QString( "Radial grid with less than 4 cells in J direction is not supported : %1" )
+                                         .arg( QString::fromStdString( gridFilePath ) ) );
+
+                const int id      = 100;
+                const int nRadial = 1;
+                const int nK      = 1;
+
+                auto multiplier   = static_cast<size_t>( std::round( 20.0 / static_cast<double>( opmMainGrid.dimension().at( 1 ) ) ) ) + 1;
+                const auto nTheta = riMainGrid->cellCountJ() * multiplier;
+
+                const caf::VecIjk mainGridStart( 0, 0, 0 );
+                const caf::VecIjk mainGridEnd( riMainGrid->cellCountI() - 1, riMainGrid->cellCountJ() - 1, riMainGrid->cellCountK() - 1 );
+                const caf::VecIjk lgrSize( riMainGrid->cellCountI() * nRadial, riMainGrid->cellCountJ() * nTheta, riMainGrid->cellCountK() * nK );
+                const caf::VecIjk refinement( nRadial, nTheta, nK );
+
+                LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
+
+                auto lgrGrid = RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
+
+                // Convert the radial grid to a Cartesian grid
+                std::vector<cvf::Vec3d>& nodes = riMainGrid->nodes();
+                for ( size_t i = 0; i < nodes.size(); i++ )
+                {
+                    auto& node = nodes[i];
+
+                    auto cartesian = Ria::CoordinateConverter::cylindricalToCartesian( node.x(), Ria::Degreesd( node.y() ), node.z() );
+                    node.x()       = cartesian.x();
+                    node.y()       = cartesian.y();
+                }
+            }
         }
 
         auto lgrNames = opmMainGrid.list_of_lgrs();
@@ -156,24 +194,27 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
     auto&         riNodes               = riMainGrid->nodes();
 
     std::vector<cvf::Vec3d> snapToCoordinatesFromMainGrid;
+    bool                    convertCylindricalCoords = false;
 
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( cellCount ); opmCellIndex++ )
     {
-        opmGrid.getCellCorners( opmCellIndex, opmX, opmY, opmZ );
+        auto ijkCell = opmGrid.ijk_from_global_index( opmCellIndex );
+        opmGrid.getCellCorners( ijkCell, opmX, opmY, opmZ, convertCylindricalCoords );
 
         // Each cell has 8 nodes, use reservoir cell index and multiply to find first node index for cell
         auto riNodeStartIndex = riGrid->reservoirCellIndex( opmCellIndex ) * 8;
-        auto ijkCell          = opmGrid.ijk_from_global_index( opmCellIndex );
 
         double xCenterCoordOpm = 0.0;
         double yCenterCoordOpm = 0.0;
 
-        if ( radialGridCenterTopLayerOpm.count( ijkCell[2] ) > 0 )
-        {
-            const auto& [xCenter, yCenter] = radialGridCenterTopLayerOpm[ijkCell[2]];
-            xCenterCoordOpm                = xCenter;
-            yCenterCoordOpm                = yCenter;
-        }
+        /*
+                if ( radialGridCenterTopLayerOpm.count( ijkCell[2] ) > 0 )
+                {
+                    const auto& [xCenter, yCenter] = radialGridCenterTopLayerOpm[ijkCell[2]];
+                    xCenterCoordOpm                = xCenter;
+                    yCenterCoordOpm                = yCenter;
+                }
+        */
 
         for ( size_t opmNodeIndex = 0; opmNodeIndex < 8; opmNodeIndex++ )
         {
@@ -186,12 +227,15 @@ void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMai
             riNode.z()   = -opmZ[opmNodeIndex];
 
             // First grid dimension is radius, check if cell has are at the outer-most slice
-            if ( !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == ijkCell[0] ) )
-            {
-                auto hostCellIndex = hostCellGlobalIndices[opmCellIndex];
+            /*
+                        if ( !hostCellGlobalIndices.empty() && ( gridDimension[0] - 1 == ijkCell[0] ) )
+                        {
+                            auto hostCellIndex = hostCellGlobalIndices[opmCellIndex];
 
-                lockToHostPillars( riNode, opmMainGrid, opmGrid, ijkCell, hostCellIndex, opmCellIndex, opmNodeIndex, xCenterCoordOpm, yCenterCoordOpm );
-            }
+                            lockToHostPillars( riNode, opmMainGrid, opmGrid, ijkCell, hostCellIndex, opmCellIndex, opmNodeIndex,
+               xCenterCoordOpm, yCenterCoordOpm );
+                        }
+            */
         }
     }
 }
