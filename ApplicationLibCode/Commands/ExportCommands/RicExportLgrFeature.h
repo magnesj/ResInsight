@@ -64,7 +64,7 @@ public:
     {
     }
 
-    caf::VecIjk lgrGridSize() const
+    caf::VecIjk lgrCellCounts() const
     {
         auto lgrI = ( mainGridEndCell.i() - mainGridStartCell.i() + 1 ) * refinement.i();
         auto lgrJ = ( mainGridEndCell.j() - mainGridStartCell.j() + 1 ) * refinement.j();
@@ -79,7 +79,7 @@ public:
 
     size_t lgrCellCount() const
     {
-        auto size = lgrGridSize();
+        auto size = lgrCellCounts();
         return size.i() * size.j() * size.k();
     }
 
