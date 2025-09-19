@@ -98,23 +98,6 @@ bool RifOpmRadialGridTools::importCylindricalCoordinates( const std::string& gri
             }
         }
 
-        auto lgrNames = opmMainGrid.list_of_lgrs();
-        for ( const auto& lgrName : lgrNames )
-        {
-            Opm::EclIO::EGrid opmLgrGrid( gridFilePath, lgrName );
-
-            if ( opmLgrGrid.is_radial() )
-            {
-                for ( size_t i = 0; i < riMainGrid->gridCount(); i++ )
-                {
-                    auto riLgrGrid = riMainGrid->gridByIndex( i );
-                    if ( riLgrGrid->gridName() == lgrName )
-                    {
-                        transferCylindricalCoords( opmMainGrid, opmLgrGrid, riMainGrid, riLgrGrid );
-                    }
-                }
-            }
-        }
         return lgrIsCreated;
     }
     catch ( ... )
