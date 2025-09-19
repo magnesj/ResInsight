@@ -56,7 +56,7 @@ public:
                                  const std::set<RigCompletionData::CompletionType>& completionTypes,
                                  QStringList*                                       wellsIntersectingOtherLgrs );
 
-    void updateViews( RimEclipseCase* eclipseCase );
+    static void updateViews( RimEclipseCase* eclipseCase );
 
     static RigGridBase* createLgr( const LgrInfo& lgrInfo, RigEclipseCaseData* caseData );
     static RigGridBase* createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
@@ -67,6 +67,6 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    void computeCachedData( RimEclipseCase* eclipseCase );
-    void deleteAllCachedData( RimEclipseCase* eclipseCase );
+    static void computeCachedData( RimEclipseCase* eclipseCase );
+    static void deleteAllCachedData( RimEclipseCase* eclipseCase );
 };

@@ -72,6 +72,7 @@
 #include <QFile>
 #include <QFileInfo>
 
+#include "RicCreateTemporaryLgrFeature.h"
 #include <fstream>
 #include <string>
 
@@ -332,8 +333,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
 
     if ( buildCacheData )
     {
-        eclipseCaseData()->clearWellCellsInGridCache();
-        computeCachedData();
+        RicCreateTemporaryLgrFeature::updateViews( this );
     }
 
     return true;
