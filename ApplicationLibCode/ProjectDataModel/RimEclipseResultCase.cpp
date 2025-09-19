@@ -45,6 +45,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagSolverInterface.h"
 #include "RigMainGrid.h"
+#include "RigReservoirGridTools.h"
 
 #include "Formations/RimFormationNames.h"
 #include "Formations/RimFormationTools.h"
@@ -72,7 +73,6 @@
 #include <QFile>
 #include <QFileInfo>
 
-#include "RicCreateTemporaryLgrFeature.h"
 #include <fstream>
 #include <string>
 
@@ -313,14 +313,15 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
             auto         bb      = mainGrid()->boundingBox();
             const double epsilon = 1.0; // degrees
 
-            auto minimumRadialRefinement = RiaPreferencesSystem::current()->minimumRadialRefinement();
-
-            if ( mainGrid()->cellCountJ() < minimumRadialRefinement && ( std::abs( bb.min().y() ) < epsilon ) &&
-                 ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+            if ( ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
             {
-                auto radialRefinement = ( minimumRadialRefinement / mainGrid()->cellCountJ() ) + 1;
+                size_t minimumRadialRefinement = static_cast<size_t>( RiaPreferencesSystem::current()->minimumRadialRefinement() );
+                if ( mainGrid()->cellCountJ() < minimumRadialRefinement )
+                {
+                    auto radialRefinement = ( minimumRadialRefinement / mainGrid()->cellCountJ() ) + 1;
 
-                isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData(), radialRefinement );
+                    isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData(), radialRefinement );
+                }
             }
         }
 
@@ -333,7 +334,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
 
     if ( buildCacheData )
     {
-        RicCreateTemporaryLgrFeature::updateViews( this );
+        RigReservoirGridTools::updateViews( this );
     }
 
     return true;

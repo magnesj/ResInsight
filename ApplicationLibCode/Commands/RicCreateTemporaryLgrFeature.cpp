@@ -31,6 +31,7 @@
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigMainGrid.h"
+#include "RigReservoirGridTools.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
@@ -87,36 +88,6 @@ void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::updateViews( RimEclipseCase* eclipseCase )
-{
-    RiaGuiApplication* guiApp = nullptr;
-    if ( RiaGuiApplication::isRunning() )
-    {
-        guiApp = RiaGuiApplication::instance();
-    }
-
-    if ( guiApp ) RiaGuiApplication::clearAllSelections();
-
-    deleteAllCachedData( eclipseCase );
-    RimMainPlotCollection::current()->deleteAllCachedData();
-    computeCachedData( eclipseCase );
-
-    for ( auto view : eclipseCase->reservoirViews() )
-    {
-        if ( view && view->gridCollection() )
-        {
-            view->gridCollection()->syncFromMainEclipseGrid();
-        }
-    }
-
-    RimMainPlotCollection::current()->wellLogPlotCollection()->loadDataAndUpdateAllPlots();
-
-    if ( guiApp ) eclipseCase->createDisplayModelAndUpdateAllViews();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RicCreateTemporaryLgrFeature::isCommandEnabled() const
 {
     std::vector<RimWellPathCompletions*> completions = caf::selectedObjectsByTypeStrict<RimWellPathCompletions*>();
@@ -159,7 +130,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
 
         createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, &wellsIntersectingOtherLgrs );
 
-        updateViews( eclipseCase );
+        RigReservoirGridTools::updateViews( eclipseCase );
 
         if ( !wellsIntersectingOtherLgrs.empty() )
         {
@@ -311,64 +282,4 @@ RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, Ri
     }
 
     return localGrid;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::deleteAllCachedData( RimEclipseCase* eclipseCase )
-{
-    if ( eclipseCase )
-    {
-        std::vector<RiaDefines::ResultCatType> categoriesToExclude = { RiaDefines::ResultCatType::GENERATED };
-
-        RigCaseCellResultsData* cellResultsDataMatrix = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        if ( cellResultsDataMatrix )
-        {
-            cellResultsDataMatrix->freeAllocatedResultsData( categoriesToExclude, std::nullopt );
-        }
-
-        RigCaseCellResultsData* cellResultsDataFracture = eclipseCase->results( RiaDefines::PorosityModelType::FRACTURE_MODEL );
-        if ( cellResultsDataFracture )
-        {
-            cellResultsDataFracture->freeAllocatedResultsData( categoriesToExclude, std::nullopt );
-        }
-
-        RigEclipseCaseData* eclipseCaseData = eclipseCase->eclipseCaseData();
-        if ( eclipseCaseData )
-        {
-            eclipseCaseData->clearWellCellsInGridCache();
-            eclipseCaseData->setVirtualPerforationTransmissibilities( nullptr );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::computeCachedData( RimEclipseCase* eclipseCase )
-{
-    if ( eclipseCase )
-    {
-        RigCaseCellResultsData* cellResultsDataMatrix   = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        RigCaseCellResultsData* cellResultsDataFracture = eclipseCase->results( RiaDefines::PorosityModelType::FRACTURE_MODEL );
-
-        RigEclipseCaseData* eclipseCaseData = eclipseCase->eclipseCaseData();
-        if ( eclipseCaseData )
-        {
-            eclipseCaseData->mainGrid()->computeCachedData();
-            eclipseCase->computeActiveCellsBoundingBox();
-        }
-
-        if ( cellResultsDataMatrix )
-        {
-            cellResultsDataMatrix->computeDepthRelatedResults();
-            cellResultsDataMatrix->computeCellVolumes();
-        }
-
-        if ( cellResultsDataFracture )
-        {
-            cellResultsDataFracture->computeDepthRelatedResults();
-        }
-    }
 }
