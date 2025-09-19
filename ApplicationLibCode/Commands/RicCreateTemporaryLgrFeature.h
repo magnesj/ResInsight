@@ -30,13 +30,8 @@
 
 class LgrInfo;
 class RigMainGrid;
-class RigCell;
 class RimEclipseCase;
-class RimSimWellInView;
 class RimWellPath;
-class RicExportLgrUi;
-class QFile;
-class QTextStream;
 class RigGridBase;
 class RigEclipseCaseData;
 
