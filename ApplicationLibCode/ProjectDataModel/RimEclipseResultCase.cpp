@@ -24,6 +24,7 @@
 #include "RiaFieldHandleTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesGrid.h"
+#include "RiaPreferencesSystem.h"
 #include "RiaRegressionTestRunner.h"
 #include "RiaResultNames.h"
 
@@ -299,25 +300,42 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
     }
 
-    // Check if radial grid data is available. Create LGR if radial section count is below specified limit. Rebuild cached data if required.
-    bool isLgrCreated = RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData() );
-    if ( !isLgrCreated )
+    bool buildCacheData = false;
+    if ( RiaPreferencesSystem::current()->useCylindricalCoordinateConversion() )
     {
-        // Check if min J coordinate is close to 0.0 and max is close to 360
-        auto         bb      = mainGrid()->boundingBox();
-        const double epsilon = 1.0; // degrees
-
-        if ( mainGrid()->cellCountJ() < 4 && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+        // Check if radial grid data is available. Create LGR if radial section count is below specified limit. Rebuild cached data if
+        // required.
+        bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( gridFileName().toStdString(), eclipseCaseData() );
+        if ( !isLgrCreated )
         {
-            isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData() );
+            // Check if min J coordinate is close to 0.0 and max is close to 360
+            auto         bb      = mainGrid()->boundingBox();
+            const double epsilon = 1.0; // degrees
+
+            auto minimumRadialRefinement = RiaPreferencesSystem::current()->minimumRadialRefinement();
+
+            if ( mainGrid()->cellCountJ() < minimumRadialRefinement && ( std::abs( bb.min().y() ) < epsilon ) &&
+                 ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+            {
+                auto radialRefinement = ( minimumRadialRefinement / mainGrid()->cellCountJ() ) + 1;
+
+                isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData(), radialRefinement );
+            }
         }
+
+        buildCacheData = isLgrCreated;
+    }
+    else
+    {
+        buildCacheData = RifOpmRadialGridTools::importCoordinatesForRadialGrid( gridFileName().toStdString(), eclipseCaseData()->mainGrid() );
     }
 
-    if ( isLgrCreated )
+    if ( buildCacheData )
     {
         eclipseCaseData()->clearWellCellsInGridCache();
         computeCachedData();
     }
+
     return true;
 }
 

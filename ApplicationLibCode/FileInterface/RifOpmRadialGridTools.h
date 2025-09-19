@@ -43,7 +43,9 @@ class RifOpmRadialGridTools
 {
 public:
     // If the grid is radial, the coordinates are imported and adjusted to fit the host cells
-    static bool importCoordinatesForRadialGrid( const std::string& gridFilePath, RigEclipseCaseData* caseData );
+    static bool importCoordinatesForRadialGrid( const std::string& gridFilePath, RigMainGrid* mainGrid );
+
+    static bool importCylindricalCoordinates( const std::string& gridFilePath, RigEclipseCaseData* caseData );
 
     static std::map<int, std::pair<double, double>>
         computeXyCenterForTopOfCells( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigGridBase* riGrid );
@@ -58,10 +60,13 @@ public:
                                    double              xCenterCoordOpm,
                                    double              yCenterCoordOpm );
 
-    static bool createRadialGridRefinement( RigEclipseCaseData* caseData );
+    static bool createRadialGridRefinement( RigEclipseCaseData* caseData, size_t radialRefinement );
     static void convertNodesToCartesian( std::vector<cvf::Vec3d>& nodes );
 
 private:
+    static void
+        transferCylindricalCoords( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
+
     static void
         transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
 
