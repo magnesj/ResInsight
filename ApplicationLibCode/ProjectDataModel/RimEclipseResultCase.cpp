@@ -309,18 +309,18 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( gridFileName().toStdString(), eclipseCaseData() );
         if ( !isLgrCreated )
         {
-            // Check if min J coordinate is close to 0.0 and max is close to 360
+            // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
+            // has an invalid header and is not possible to import using opm-common
             auto         bb      = mainGrid()->boundingBox();
-            const double epsilon = 1.0; // degrees
-
+            const double epsilon = 1.0;
             if ( ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
             {
-                size_t minimumRadialRefinement = static_cast<size_t>( RiaPreferencesSystem::current()->minimumRadialRefinement() );
-                if ( mainGrid()->cellCountJ() < minimumRadialRefinement )
+                size_t minimumAngularCellCount = static_cast<size_t>( RiaPreferencesSystem::current()->minimumAngularCellCount() );
+                if ( mainGrid()->cellCountJ() < minimumAngularCellCount )
                 {
-                    auto radialRefinement = ( minimumRadialRefinement / mainGrid()->cellCountJ() ) + 1;
+                    auto angularRefinement = ( minimumAngularCellCount / mainGrid()->cellCountJ() ) + 1;
 
-                    isLgrCreated = RifOpmRadialGridTools::createRadialGridRefinement( eclipseCaseData(), radialRefinement );
+                    isLgrCreated = RifOpmRadialGridTools::createAngularGridRefinement( eclipseCaseData(), angularRefinement );
                 }
             }
         }

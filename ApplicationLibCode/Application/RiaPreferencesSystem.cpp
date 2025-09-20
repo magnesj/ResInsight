@@ -80,7 +80,7 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_useCylindricalCoordinateConversion, "useCylindricalCoordinateConversion", true, "Use Cylindrical Coords" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useCylindricalCoordinateConversion );
 
-    CAF_PDM_InitField( &m_mimimumRadialRefinement, "mimimumRadialRefinement", 20, "Minimum Radial Refinement" );
+    CAF_PDM_InitField( &m_mimimumAngularCellCount, "mimimumAngularCellCount", 40, "Minimum Angular Cell Count" );
 
     CAF_PDM_InitField( &m_gtestFilter, "gtestFilter", QString(), "Unit Test Filter (gtest)" );
     CAF_PDM_InitField( &m_exportScalingFactor, "exportScalingFactor", -1.0, "Export Scaling Factor (<0 disable)" );
@@ -255,9 +255,9 @@ bool RiaPreferencesSystem::useCylindricalCoordinateConversion() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiaPreferencesSystem::minimumRadialRefinement() const
+int RiaPreferencesSystem::minimumAngularCellCount() const
 {
-    return m_mimimumRadialRefinement();
+    return m_mimimumAngularCellCount();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Radial Grid" );
         group->add( &m_useCylindricalCoordinateConversion );
-        group->add( &m_mimimumRadialRefinement );
+        group->add( &m_mimimumAngularCellCount );
     }
 
     {

@@ -60,7 +60,7 @@ public:
     std::optional<int> threadCount() const;
 
     bool useCylindricalCoordinateConversion() const;
-    int  minimumRadialRefinement() const;
+    int  minimumAngularCellCount() const;
 
     EclipseTextFileReaderMode eclipseTextFileReaderMode() const;
 
@@ -90,7 +90,7 @@ private:
     caf::PdmField<bool> m_showProgressBar;
 
     caf::PdmField<bool> m_useCylindricalCoordinateConversion;
-    caf::PdmField<int>  m_mimimumRadialRefinement;
+    caf::PdmField<int>  m_mimimumAngularCellCount;
 
     caf::PdmField<QString> m_gtestFilter;
 

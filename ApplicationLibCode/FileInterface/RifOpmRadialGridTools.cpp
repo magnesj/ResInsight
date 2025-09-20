@@ -83,16 +83,16 @@ bool RifOpmRadialGridTools::importCylindricalCoordinates( const std::string& gri
         {
             transferCylindricalCoords( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
 
-            auto minimumRadialRefinement = RiaPreferencesSystem::current()->minimumRadialRefinement();
+            auto minimumAngularCellCount = RiaPreferencesSystem::current()->minimumAngularCellCount();
 
-            if ( opmMainGrid.is_radial() && opmMainGrid.dimension().at( 1 ) < minimumRadialRefinement )
+            if ( opmMainGrid.is_radial() && opmMainGrid.dimension().at( 1 ) < minimumAngularCellCount )
             {
                 RiaLogging::info( QString( "Radial grid with less than 4 cells in J direction detected, creating refinement : %1" )
                                       .arg( QString::fromStdString( gridFilePath ) ) );
 
-                int radialRefinement = ( minimumRadialRefinement / opmMainGrid.dimension().at( 1 ) ) + 1;
+                int radialRefinement = ( minimumAngularCellCount / opmMainGrid.dimension().at( 1 ) ) + 1;
 
-                createRadialGridRefinement( caseData, radialRefinement );
+                createAngularGridRefinement( caseData, radialRefinement );
 
                 lgrIsCreated = true;
             }
@@ -401,18 +401,19 @@ void RifOpmRadialGridTools::lockToHostPillars( cvf::Vec3d&         riNode,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifOpmRadialGridTools::createRadialGridRefinement( RigEclipseCaseData* caseData, size_t radialRefinement )
+bool RifOpmRadialGridTools::createAngularGridRefinement( RigEclipseCaseData* caseData, size_t angularRefinement )
 {
+    if ( !caseData || !caseData->mainGrid() ) return false;
+
     auto riMainGrid = caseData->mainGrid();
 
-    const int  id      = 100;
-    const int  nRadial = 1;
-    const auto nTheta  = radialRefinement;
-    const int  nK      = 1;
+    const int id      = 100;
+    const int nRadial = 1;
+    const int nK      = 1;
 
     const caf::VecIjk mainGridStart( 0, 0, 0 );
     const caf::VecIjk mainGridEnd( riMainGrid->cellCountI() - 1, riMainGrid->cellCountJ() - 1, riMainGrid->cellCountK() - 1 );
-    const caf::VecIjk refinement( nRadial, nTheta, nK );
+    const caf::VecIjk refinement( nRadial, angularRefinement, nK );
 
     LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
 
