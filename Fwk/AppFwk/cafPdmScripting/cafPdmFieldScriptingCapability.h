@@ -209,12 +209,24 @@ struct PdmFieldScriptingCapabilityIOHandler
                               bool                 stringsAreQuoted = true )
     {
         inputStream >> fieldValue;
-        if ( inputStream.status() == QTextStream::ReadCorruptData )
+        if ( inputStream.status() != QTextStream::Ok )
         {
-            errorMessageContainer->addError( "Argument value is unreadable in the argument: \"" +
-                                             errorMessageContainer->currentArgument + "\" in the command: \"" +
-                                             errorMessageContainer->currentCommand + "\"" );
+            QString errorMessage;
+            if ( inputStream.status() == QTextStream::ReadPastEnd )
+            {
+                errorMessage = "Read past end of argument";
+            }
+            else if ( inputStream.status() == QTextStream::ReadCorruptData )
+            {
+                errorMessage = "Argument value is unreadable";
+            }
+            else
+            {
+                errorMessage = "Unknown read error";
+            }
 
+            errorMessageContainer->addError( errorMessage + ": \"" + errorMessageContainer->currentArgument +
+                                             "\" in the command: \"" + errorMessageContainer->currentCommand + "\"" );
             inputStream.setStatus( QTextStream::Ok );
         }
     }
@@ -325,23 +337,17 @@ struct PdmFieldScriptingCapabilityIOHandler<std::optional<T>>
                               PdmScriptIOMessages* errorMessageContainer,
                               bool                 stringsAreQuoted = true )
     {
-        QString textValue;
+        T realValue;
 
-        PdmFieldScriptingCapabilityIOHandler<QString>::writeToField( textValue,
-                                                                     inputStream,
-                                                                     errorMessageContainer,
-                                                                     stringsAreQuoted );
-        textValue.remove( '"' );
-        if ( !textValue.isEmpty() )
+        // Use error count to detect if error messages were added during the read operation
+        // If so, we do not set the field value
+        auto incomingErrorCount = errorMessageContainer->m_messages.size();
+
+        PdmFieldScriptingCapabilityIOHandler<T>::writeToField( realValue, inputStream, errorMessageContainer, stringsAreQuoted );
+
+        if ( errorMessageContainer->m_messages.size() == incomingErrorCount )
         {
-            QTextStream singleValueStream( &textValue );
-            T           singleValue;
-            bool        noStringQuotes = false;
-            PdmFieldScriptingCapabilityIOHandler<T>::writeToField( singleValue,
-                                                                   singleValueStream,
-                                                                   errorMessageContainer,
-                                                                   noStringQuotes );
-            fieldValue = singleValue;
+            fieldValue = realValue;
         }
         else
         {
@@ -354,19 +360,11 @@ struct PdmFieldScriptingCapabilityIOHandler<std::optional<T>>
                                bool                    quoteStrings     = true,
                                bool                    quoteNonBuiltins = false )
     {
-        QString textValue;
-
         if ( fieldValue.has_value() )
         {
-            QTextStream singleValueStream( &textValue );
-            singleValueStream << fieldValue.value();
+            auto realValue = fieldValue.value();
+            PdmFieldScriptingCapabilityIOHandler<T>::readFromField( realValue, outputStream, quoteStrings, quoteNonBuiltins );
         }
-        else
-        {
-            textValue = "";
-        }
-
-        PdmFieldScriptingCapabilityIOHandler<QString>::readFromField( textValue, outputStream, quoteStrings, quoteNonBuiltins );
     }
 };
 

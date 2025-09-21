@@ -131,6 +131,9 @@ TEST( PdmFieldSerialization, ValueList )
 //--------------------------------------------------------------------------------------------------
 TEST( PdmFieldSerialization, OptionalValues )
 {
+    // See currently supported types in PdmPythonGenerator::dataTypeString
+
+    // Optional string
     {
         std::optional<QString> optionalString = std::nullopt;
         QString                text;
@@ -144,7 +147,7 @@ TEST( PdmFieldSerialization, OptionalValues )
                                                                                           &messages,
                                                                                           stringsAreQuoted );
 
-        const QString expected = "\"\"";
+        const QString expected = "";
         EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
 
         std::optional<QString> result;
@@ -181,5 +184,101 @@ TEST( PdmFieldSerialization, OptionalValues )
                                                                                          stringsAreQuoted );
 
         EXPECT_STREQ( sourceText.toStdString().c_str(), result.value().toStdString().c_str() );
+    }
+
+    // Optional float
+    {
+        float                sourceValue    = 23.45;
+        std::optional<float> optionalString = sourceValue;
+
+        QString     text;
+        QTextStream stream( &text );
+
+        caf::PdmScriptIOMessages messages;
+
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<float>>::readFromField( optionalString, stream, &messages );
+
+        const QString expected = "23.45";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<float> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<float>>::writeToField( result, stream, &messages );
+
+        EXPECT_TRUE( result.has_value() );
+        EXPECT_DOUBLE_EQ( sourceValue, result.value() );
+    }
+
+    // Optional double
+    {
+        double                sourceValue    = 23.45;
+        std::optional<double> optionalString = sourceValue;
+
+        QString     text;
+        QTextStream stream( &text );
+
+        caf::PdmScriptIOMessages messages;
+
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<double>>::readFromField( optionalString, stream, &messages );
+
+        const QString expected = "2.345000000000000e+01";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<double> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<double>>::writeToField( result, stream, &messages );
+
+        EXPECT_TRUE( result.has_value() );
+        EXPECT_DOUBLE_EQ( sourceValue, result.value() );
+    }
+
+    // Optional bool
+    {
+        bool                     sourceValue    = true;
+        std::optional<bool>      optionalString = sourceValue;
+        QString                  text;
+        QTextStream              stream( &text );
+        caf::PdmScriptIOMessages messages;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<bool>>::readFromField( optionalString, stream, &messages );
+
+        const QString expected = "true";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<bool> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<bool>>::writeToField( result, stream, &messages );
+        EXPECT_TRUE( result.has_value() );
+        EXPECT_EQ( sourceValue, result.value() );
+    }
+
+    // Optional int
+    {
+        int                      sourceValue    = 2345;
+        std::optional<int>       optionalString = sourceValue;
+        QString                  text;
+        QTextStream              stream( &text );
+        caf::PdmScriptIOMessages messages;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<int>>::readFromField( optionalString, stream, &messages );
+
+        const QString expected = "2345";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<int> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<int>>::writeToField( result, stream, &messages );
+        EXPECT_TRUE( result.has_value() );
+        EXPECT_EQ( sourceValue, result.value() );
+    }
+
+    // Optional int with no value
+    {
+        std::optional<int>       optionalInt;
+        QString                  text;
+        QTextStream              stream( &text );
+        caf::PdmScriptIOMessages messages;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<int>>::readFromField( optionalInt, stream, &messages );
+
+        const QString expected = "";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<int> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<int>>::writeToField( result, stream, &messages );
+        EXPECT_FALSE( result.has_value() );
     }
 }
