@@ -366,7 +366,7 @@ struct PdmFieldScriptingCapabilityIOHandler<std::optional<T>>
             textValue = "";
         }
 
-        PdmFieldScriptingCapabilityIOHandler<QString>::readFromField( textValue, outputStream, quoteStrings, quoteNonBuiltins );
+        outputStream << textValue;
     }
 };
 
