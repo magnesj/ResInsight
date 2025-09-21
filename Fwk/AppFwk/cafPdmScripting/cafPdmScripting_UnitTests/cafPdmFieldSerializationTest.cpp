@@ -228,4 +228,57 @@ TEST( PdmFieldSerialization, OptionalValues )
         caf::PdmFieldScriptingCapabilityIOHandler<std::optional<int>>::writeToField( result, stream, &messages );
         EXPECT_FALSE( result.has_value() );
     }
+
+    // Optional string
+    {
+        std::optional<QString> optionalString = std::nullopt;
+        QString                text;
+        QTextStream            stream( &text );
+
+        caf::PdmScriptIOMessages messages;
+        bool                     stringsAreQuoted = true;
+
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<QString>>::readFromField( optionalString,
+                                                                                          stream,
+                                                                                          &messages,
+                                                                                          stringsAreQuoted );
+
+        const QString expected = "";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<QString> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<QString>>::writeToField( result,
+                                                                                         stream,
+                                                                                         &messages,
+                                                                                         stringsAreQuoted );
+
+        EXPECT_FALSE( result.has_value() );
+    }
+
+    {
+        QString                sourceText     = "Test string with spaces";
+        std::optional<QString> optionalString = sourceText;
+
+        QString     text;
+        QTextStream stream( &text );
+
+        caf::PdmScriptIOMessages messages;
+        bool                     stringsAreQuoted = true;
+
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<QString>>::readFromField( optionalString,
+                                                                                          stream,
+                                                                                          &messages,
+                                                                                          stringsAreQuoted );
+
+        const QString expected = "\"Test string with spaces\"";
+        EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
+
+        std::optional<QString> result;
+        caf::PdmFieldScriptingCapabilityIOHandler<std::optional<QString>>::writeToField( result,
+                                                                                         stream,
+                                                                                         &messages,
+                                                                                         stringsAreQuoted );
+
+        EXPECT_STREQ( sourceText.toStdString().c_str(), result.value().toStdString().c_str() );
+    }
 }
