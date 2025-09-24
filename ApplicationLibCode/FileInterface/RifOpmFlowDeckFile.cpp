@@ -37,8 +37,6 @@ namespace internal
 //--------------------------------------------------------------------------------------------------
 static std::optional<Opm::FileDeck::Index> locateTimeStep( std::unique_ptr<Opm::FileDeck>& fileDeck, int timeStep )
 {
-    Opm::ErrorGuard errors{};
-
     int currentStep = 1;
 
     // locate dates keyword for the selected step
@@ -61,8 +59,6 @@ static std::optional<Opm::FileDeck::Index> locateTimeStep( std::unique_ptr<Opm::
 //--------------------------------------------------------------------------------------------------
 static std::optional<Opm::FileDeck::Index> locateKeywordAtTimeStep( std::unique_ptr<Opm::FileDeck>& fileDeck, int timeStep, std::string keyword )
 {
-    Opm::ErrorGuard errors{};
-
     auto startPos = internal::locateTimeStep( fileDeck, timeStep );
     if ( startPos.has_value() )
     {
@@ -88,6 +84,18 @@ static std::optional<Opm::FileDeck::Index> locateKeywordAtTimeStep( std::unique_
     }
     return std::nullopt;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+static std::optional<Opm::FileDeck::Index> positionToIndex( int deckPosition, std::unique_ptr<Opm::FileDeck>& fileDeck )
+{
+    auto it = fileDeck->start();
+    it      = it + deckPosition;
+    if ( it != fileDeck->stop() ) return it;
+    return std::nullopt;
+}
+
 } // namespace internal
 
 //--------------------------------------------------------------------------------------------------
@@ -164,7 +172,7 @@ Opm::DeckItem RifOpmFlowDeckFile::defaultItem( std::string name, int cols )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifOpmFlowDeckFile::mergeWellDeck( int timeStep, std::string filename )
+bool RifOpmFlowDeckFile::mergeWellDeck( int timeStep, std::string filename, int fallbackPosition )
 {
     Opm::ErrorGuard errors{};
 
@@ -178,6 +186,9 @@ bool RifOpmFlowDeckFile::mergeWellDeck( int timeStep, std::string filename )
     const auto compdatIndexes = deckToMerge.index( "COMPDAT" );
     if ( compdatIndexes.empty() ) return false;
     auto& mergeCompdatKw = deckToMerge[compdatIndexes[0]];
+
+    auto additionalConnections = mergeCompdatKw.size();
+    auto welldims              = this->welldims();
 
     auto datePos = internal::locateTimeStep( m_fileDeck, timeStep );
     if ( datePos.has_value() )
@@ -243,23 +254,44 @@ bool RifOpmFlowDeckFile::mergeWellDeck( int timeStep, std::string filename )
         // Insert new well data into main COMPDAT
         {
             const auto foundCompdat = m_fileDeck->find( "COMPDAT" );
-            if ( !foundCompdat.has_value() ) return false;
-            auto& existing_pos = foundCompdat.value();
-            auto& compdat_kw   = m_fileDeck->operator[]( existing_pos );
-
-            Opm::DeckKeyword newCompdatKw( compdat_kw );
-
-            for ( size_t i = 0; i < mergeCompdatKw.size(); i++ )
+            if ( foundCompdat.has_value() )
             {
-                Opm::DeckRecord newRecToAdd( mergeCompdatKw.getRecord( i ) );
-                newCompdatKw.addRecord( std::move( newRecToAdd ) );
-            }
+                auto& existing_pos = foundCompdat.value();
+                auto& compdat_kw   = m_fileDeck->operator[]( existing_pos );
 
-            m_fileDeck->erase( existing_pos );
-            m_fileDeck->insert( existing_pos, newCompdatKw );
+                Opm::DeckKeyword newCompdatKw( compdat_kw );
+
+                for ( size_t i = 0; i < mergeCompdatKw.size(); i++ )
+                {
+                    Opm::DeckRecord newRecToAdd( mergeCompdatKw.getRecord( i ) );
+                    newCompdatKw.addRecord( std::move( newRecToAdd ) );
+                }
+
+                m_fileDeck->erase( existing_pos );
+                m_fileDeck->insert( existing_pos, newCompdatKw );
+            }
+            else if ( fallbackPosition >= 0 )
+            {
+                // existing kw not found, insert a new one at fallback position
+                auto position = internal::positionToIndex( fallbackPosition, m_fileDeck );
+                if ( position.has_value() )
+                {
+                    m_fileDeck->insert( position.value(), mergeCompdatKw );
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
+            }
         }
     }
-    return true;
+
+    // increase wells and connections in welldims to make sure they are big enough
+    return setWelldims( (int)welldims[0] + 1, (int)( welldims[1] + additionalConnections ), (int)welldims[2], (int)welldims[3] );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -305,20 +337,14 @@ bool RifOpmFlowDeckFile::openWellAtDeckPosition( int deckPosition, std::string o
 {
     Opm::ErrorGuard errors{};
 
-    // locate position in file deck
-    int currentPosition = 0;
-    for ( auto it = m_fileDeck->start(); it != m_fileDeck->stop(); it++ )
+    auto position = internal::positionToIndex( deckPosition, m_fileDeck );
+    if ( position.has_value() )
     {
-        if ( currentPosition == deckPosition )
-        {
-            auto             deck = Opm::Parser{}.parseString( openText, defaultParseContext(), errors );
-            Opm::DeckKeyword newKw( *deck.begin() );
-
-            m_fileDeck->insert( it, newKw );
-
-            return true;
-        }
-        currentPosition++;
+        // position found, insert before
+        auto             deck = Opm::Parser{}.parseString( openText, defaultParseContext(), errors );
+        Opm::DeckKeyword newKw( *deck.begin() );
+        m_fileDeck->insert( position.value(), newKw );
+        return true;
     }
     return false;
 }
@@ -361,6 +387,55 @@ bool RifOpmFlowDeckFile::hasDatesKeyword()
     if ( m_fileDeck.get() == nullptr ) return false;
     auto pos = m_fileDeck->find( "DATES" );
     return pos.has_value();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RifOpmFlowDeckFile::welldims()
+{
+    if ( m_fileDeck.get() == nullptr ) return {};
+    auto pos = m_fileDeck->find( "WELLDIMS" );
+    if ( pos.has_value() )
+    {
+        std::vector<int> dims;
+
+        auto&       kw  = m_fileDeck->operator[]( pos.value() );
+        const auto& rec = kw.getRecord( 0 );
+        dims.push_back( rec.getItem( "MAXWELLS" ).get<int>( 0 ) );
+        dims.push_back( rec.getItem( "MAXCONN" ).get<int>( 0 ) );
+        dims.push_back( rec.getItem( "MAXGROUPS" ).get<int>( 0 ) );
+        dims.push_back( rec.getItem( "MAX_GROUPSIZE" ).get<int>( 0 ) );
+
+        return dims;
+    }
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifOpmFlowDeckFile::setWelldims( int maxWells, int maxConnections, int maxGroups, int maxWellsInGroup )
+{
+    if ( m_fileDeck.get() == nullptr ) return false;
+    auto pos = m_fileDeck->find( "WELLDIMS" );
+    if ( pos.has_value() )
+    {
+        std::vector<int> dims;
+
+        auto& oldkw = m_fileDeck->operator[]( pos.value() );
+
+        Opm::DeckKeyword newKw( Opm::ParserKeyword( oldkw.name() ) );
+        newKw.addRecord( Opm::DeckRecord{ { item( "MAXWELLS", maxWells ),
+                                            item( "MAXCONN", maxConnections ),
+                                            item( "MAXGROUPS", maxGroups ),
+                                            item( "MAX_GROUPSIZE", maxWellsInGroup ) } } );
+
+        m_fileDeck->erase( pos.value() );
+        m_fileDeck->insert( pos.value(), newKw );
+        return true;
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -54,6 +54,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
+#include "cafProgressInfo.h"
 
 #include <QFile>
 #include <QFileInfo>
@@ -192,7 +193,14 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
     genGrp->add( nameField() );
     genGrp->add( &m_deckFileName );
     genGrp->add( &m_workDir );
-    genGrp->add( &m_addNewWell );
+    if ( m_eclipseCase() == nullptr )
+    {
+        m_addNewWell = false;
+    }
+    else
+    {
+        genGrp->add( &m_addNewWell );
+    }
 
     if ( m_addNewWell() )
     {
@@ -600,8 +608,10 @@ bool RimOpmFlowJob::onPrepare()
                 return false;
             }
 
+            int fallbackPosition = ( m_fileDeckHasDates && m_wellOpenType == WellOpenType::OPEN_AT_DATE ) ? -1 : m_openWellDeckPosition() - 1;
+
             // merge new well settings from resinsight into DATA deck
-            if ( !m_deckFile->mergeWellDeck( m_openTimeStep(), wellTempFile().toStdString() ) )
+            if ( !m_deckFile->mergeWellDeck( m_openTimeStep(), wellTempFile().toStdString(), fallbackPosition ) )
             {
                 RiaLogging::error( "Unable to merge new well data into DATA file. Are there WELSPECS and COMPDAT keywords?" );
                 return false;
@@ -645,10 +655,20 @@ bool RimOpmFlowJob::onPrepare()
         }
     }
 
+    caf::ProgressInfo saveProgress( 1, "Saving updated information to DATA file.", false );
+
     // save DATA file to working folder
     bool saveOk = m_deckFile->saveDeck( workingDirectory().toStdString(), deckName().toStdString() + deckExtension().toStdString() );
     m_deckFile.reset();
 
+    return saveOk;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimOpmFlowJob::onRun()
+{
     if ( m_pauseBeforeRun() )
     {
         QString infoText = "Input parameter files can now be found in the working folder:";
@@ -659,8 +679,7 @@ bool RimOpmFlowJob::onPrepare()
 
         if ( reply != QMessageBox::Ok ) return false;
     }
-
-    return saveOk;
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -738,6 +757,11 @@ void RimOpmFlowJob::onCompleted( bool success )
                 {
                     newCase->setCustomCaseName( name() );
                     newCase->updateConnectedEditors();
+                    if ( m_eclipseCase() == nullptr )
+                    {
+                        m_eclipseCase = newCase;
+                    }
+
                     Riu3DMainWindowTools::selectAsCurrentItem( newCase );
                     Riu3DMainWindowTools::setExpanded( newCase, true );
                 }

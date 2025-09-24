@@ -42,7 +42,7 @@ public:
     bool loadDeck( std::string filename );
     bool saveDeck( std::string folder, std::string filename );
 
-    bool mergeWellDeck( int timeStep, std::string filename );
+    bool mergeWellDeck( int timeStep, std::string filename, int fallbackPosition );
     bool mergeMswData( std::vector<std::string>& mswFileData );
 
     bool openWellAtTimeStep( int timeStep, std::string openText );
@@ -52,6 +52,8 @@ public:
 
     std::vector<std::string> keywords();
     bool                     hasDatesKeyword();
+    std::vector<int>         welldims();
+    bool                     setWelldims( int maxWells, int maxConnections, int maxGroups, int maxWellsInGroup );
 
 private:
     Opm::DeckItem            item( std::string name, std::string value );
