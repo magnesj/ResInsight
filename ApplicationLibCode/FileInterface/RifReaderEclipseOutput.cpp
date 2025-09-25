@@ -31,6 +31,7 @@
 #include "RifEclipseRestartDataAccess.h"
 #include "RifEdfmTools.h"
 #include "RifHdf5ReaderInterface.h"
+#include "RifOpmRadialGridTools.h"
 #include "RifReaderEclipseWell.h"
 
 #ifdef USE_HDF5
@@ -425,6 +426,27 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
     {
         auto task = progress.task( "Reading Results Meta data", 25 );
         buildMetaData( mainEclGrid );
+    }
+
+    if ( readerSettings().useCylindricalCoordinates )
+    {
+        // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
+        // has an invalid header and is not possible to import using opm-common
+        RigMainGrid* mainGrid = eclipseCaseData->mainGrid();
+
+        mainGrid->computeBoundingBox();
+        auto         bb      = mainGrid->boundingBox();
+        const double epsilon = 1.0;
+        if ( ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+        {
+            size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
+            if ( mainGrid->cellCountJ() < minimumAngularCellCount )
+            {
+                auto angularRefinement = ( minimumAngularCellCount / mainGrid->cellCountJ() ) + 1;
+
+                RifOpmRadialGridTools::createAngularGridRefinement( eclipseCaseData, angularRefinement );
+            }
+        }
     }
 
     {

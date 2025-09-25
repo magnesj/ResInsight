@@ -158,6 +158,8 @@ bool RimEclipseResultCase::showTimeStepFilterGUI()
 //--------------------------------------------------------------------------------------------------
 void RimEclipseResultCase::checkAndImportRadialGrid()
 {
+    return;
+
     bool refreshEclipseCaseData = false;
     if ( RiaPreferencesSystem::current()->useCylindricalCoordinates() )
     {

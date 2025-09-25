@@ -199,3 +199,11 @@ void RifReaderInterface::importFaults( const QStringList& fileSet, cvf::Collecti
         }
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RifReaderSettings RifReaderInterface::readerSettings() const
+{
+    return m_readerSettings;
+}
