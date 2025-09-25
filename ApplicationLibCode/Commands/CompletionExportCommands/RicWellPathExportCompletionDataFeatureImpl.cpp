@@ -53,6 +53,7 @@
 #include "Well/RigWellPath.h"
 #include "Well/RigWellPathIntersectionTools.h"
 
+#include "RimEclipseCase.h"
 #include "RimFileWellPath.h"
 #include "RimFishbones.h"
 #include "RimFishbonesCollection.h"
@@ -83,6 +84,7 @@
 #include <QDir>
 
 #include <map>
+#include <optional>
 #include <set>
 
 //--------------------------------------------------------------------------------------------------
@@ -493,8 +495,35 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
     auto isValidTransmissibility = []( double transmissibility )
     { return RiaStatisticsTools::isValidNumber<double>( transmissibility ) && transmissibility >= 0.0; };
 
+    auto startMD = completions[0].startMD();
+    auto endMD   = completions[0].endMD();
+
     for ( const RigCompletionData& completion : completions )
     {
+        if ( !startMD.has_value() )
+        {
+            startMD = completion.startMD();
+        }
+        else
+        {
+            if ( completion.startMD().has_value() && ( completion.startMD().value() < startMD.value() ) )
+            {
+                startMD = completion.startMD();
+            }
+        }
+
+        if ( !endMD.has_value() )
+        {
+            endMD = completion.endMD();
+        }
+        else
+        {
+            if ( completion.endMD().has_value() && ( completion.endMD().value() > endMD.value() ) )
+            {
+                endMD = completion.endMD();
+            }
+        }
+
         double transmissibility = completion.transmissibility();
 
         if ( !isValidTransmissibility( transmissibility ) )
@@ -515,6 +544,11 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
             largestTransmissibilityValue = transmissibility;
             cellDirection                = completion.direction();
         }
+    }
+
+    if ( startMD.has_value() && endMD.has_value() )
+    {
+        resultCompletion.setDepthRange( startMD.value(), endMD.value() );
     }
 
     double combinedDiameter   = diameterCalculator.weightedMean();
@@ -1219,6 +1253,8 @@ std::vector<RigCompletionData>
                                                                             dFactor,
                                                                             kh,
                                                                             direction );
+                completion.setDepthRange( cell.startMD, cell.endMD );
+
                 completion.addMetadata( "Perforation Completion",
                                         QString( "MD In: %1 - MD Out: %2" ).arg( cell.startMD ).arg( cell.endMD ) +
                                             QString( " Transmissibility: " ) + QString::number( transmissibility ) );
@@ -1675,4 +1711,101 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCarfinForTemporaryLgrs( c
     {
         RicExportLgrFeature::exportLgrs( folder, lgrInfoForWell.first, lgrInfoForWell.second );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigCompletionData> RicWellPathExportCompletionDataFeatureImpl::completionDataForWellPath( RimWellPath*    wellPath,
+                                                                                                      RimEclipseCase* eCase )
+{
+    if ( eCase == nullptr ) return {};
+
+    // Ensure that the case is open. This will enable export without any open views.
+    eCase->ensureReservoirCaseIsOpen();
+    if ( eCase->eclipseCaseData() == nullptr )
+    {
+        RiaLogging::error( "Export Completions Data: No data available for Eclipse Case" );
+        return {};
+    }
+
+    RicExportCompletionDataSettingsUi exportSettings;
+    exportSettings.caseToApply = eCase;
+    exportSettings.includeMsw  = false;
+    exportSettings.setExportDataSourceAsComment( true );
+    exportSettings.includePerforations = true;
+    exportSettings.includeFishbones    = true;
+    exportSettings.includeFractures    = true;
+
+    std::vector<RigCompletionData> completions;
+
+    std::vector<RimWellPath*> allWellPathLaterals;
+    if ( wellPath->unitSystem() == eCase->eclipseCaseData()->unitsType() )
+    {
+        allWellPathLaterals = wellPath->allWellPathLaterals();
+    }
+    else
+    {
+        return {};
+    }
+
+    std::map<size_t, std::vector<RigCompletionData>> completionsPerEclipseCellAllCompletionTypes;
+
+    for ( auto wellPathLateral : allWellPathLaterals )
+    {
+        // Skip well paths that are not enabled, no export of WELSEGS or COMPDAT
+        // https://github.com/OPM/ResInsight/issues/10754
+        //
+        if ( !wellPathLateral->isEnabled() ) continue;
+
+        // Generate completion data
+
+        if ( exportSettings.includePerforations )
+        {
+            std::vector<RigCompletionData> perforationCompletionData =
+                generatePerforationsCompdatValues( wellPathLateral,
+                                                   wellPathLateral->perforationIntervalCollection()->perforations(),
+                                                   exportSettings );
+
+            appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, perforationCompletionData );
+        }
+
+        if ( exportSettings.includeFishbones )
+        {
+            // Make sure the start and end location is computed if needed
+            wellPathLateral->fishbonesCollection()->computeStartAndEndLocation();
+
+            std::vector<RigCompletionData> fishbonesCompletionData =
+                RicFishbonesTransmissibilityCalculationFeatureImp::generateFishboneCompdatValuesUsingAdjustedCellVolume( wellPathLateral,
+                                                                                                                         exportSettings );
+
+            appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, fishbonesCompletionData );
+        }
+
+        if ( exportSettings.includeFractures() )
+        {
+            // If no report is wanted, set reportItems = nullptr
+            std::vector<RicWellPathFractureReportItem>* reportItems = nullptr;
+
+            std::vector<RigCompletionData> fractureCompletionData = RicExportFractureCompletionsImpl::
+                generateCompdatValuesForWellPath( wellPathLateral,
+                                                  exportSettings.caseToApply(),
+                                                  reportItems,
+                                                  nullptr,
+                                                  RicExportFractureCompletionsImpl::
+                                                      PressureDepletionParameters( exportSettings.performTransScaling(),
+                                                                                   exportSettings.transScalingTimeStep(),
+                                                                                   exportSettings.transScalingWBHPSource(),
+                                                                                   exportSettings.transScalingWBHP() ) );
+
+            appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, fractureCompletionData );
+        }
+    }
+
+    for ( auto& data : completionsPerEclipseCellAllCompletionTypes )
+    {
+        completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
+    }
+
+    return completions;
 }

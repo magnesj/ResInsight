@@ -21,8 +21,11 @@
 #include "cafPdmField.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmObjectMethod.h"
+#include "cafPdmPtrField.h"
 
 #include <QString>
+
+class RimEclipseResultCase;
 
 //==================================================================================================
 ///

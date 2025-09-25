@@ -25,6 +25,7 @@
 #include <cafPdmObject.h>
 #include <cafPdmPointer.h>
 
+#include <optional>
 #include <vector>
 
 //==================================================================================================
@@ -84,6 +85,7 @@ public:
     void setSecondOrderingValue( double orderingValue );
     void setDiameter( double diameter );
     void setTransmissibility( double transmissibility );
+    void setDepthRange( double startMD, double endMD );
 
     void setTransAndWPImultBackgroundDataFromFishbone( double        transmissibility,
                                                        double        skinFactor,
@@ -133,10 +135,14 @@ public:
     double                                    skinFactor() const;
     double                                    dFactor() const;
     CellDirection                             direction() const;
-    size_t                                    count() const;
     double                                    wpimult() const;
     CompletionType                            completionType() const;
     bool                                      isMainBore() const;
+    std::optional<double>                     startMD() const;
+    std::optional<double>                     endMD() const;
+    QString                                   directionStringIJK() const;
+    QString                                   directionStringXYZ() const;
+    QString                                   metaDataString() const;
 
     double firstOrderingValue() const;
     double secondOrderingValue() const;
@@ -149,17 +155,19 @@ public:
 private:
     QString                   m_wellName;
     RigCompletionDataGridCell m_cellIndex;
-    double                    m_saturation; // TODO: remove, always use default in Eclipse?
+    double                    m_saturation;
     double                    m_transmissibility;
     double                    m_diameter;
-    double                    m_kh; // TODO: Remove, always use default in Eclipse?
+    double                    m_kh;
     double                    m_skinFactor;
-    double                    m_dFactor; // TODO: Remove, always use default in Eclipse?
+    double                    m_dFactor;
     CellDirection             m_direction;
+
+    std::optional<double> m_startMD; // start MD in completion cell
+    std::optional<double> m_endMD; // end MD in completion cell
 
     bool m_isMainBore; // to use mainbore for Eclipse calculation
 
-    size_t m_count; // TODO: Remove, usage replaced by WPImult
     double m_wpimult;
 
     CompletionType m_completionType;
