@@ -434,11 +434,17 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         // has an invalid header and is not possible to import using opm-common
         RigMainGrid* mainGrid = eclipseCaseData->mainGrid();
 
-        mainGrid->computeBoundingBox();
+        if ( !mainGrid->boundingBox().isValid() )
+        {
+            mainGrid->computeBoundingBox();
+        }
+
         auto         bb      = mainGrid->boundingBox();
         const double epsilon = 1.0;
-        if ( ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+        if ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
         {
+            m_isRadialGrid = true;
+
             size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
             if ( mainGrid->cellCountJ() < minimumAngularCellCount )
             {
@@ -1140,6 +1146,14 @@ void RifReaderEclipseOutput::updateFromGridCount( size_t gridCount )
     {
         m_dynamicResultsAccess->updateFromGridCount( gridCount );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RifReaderEclipseOutput::isRadialGridDetected() const
+{
+    return m_isRadialGrid;
 }
 
 //--------------------------------------------------------------------------------------------------
