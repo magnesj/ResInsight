@@ -123,4 +123,5 @@ private:
     std::string                        m_restartFileName;
     std::unique_ptr<Opm::EclIO::ERst>  m_restartFile;
     std::unique_ptr<Opm::EclIO::EInit> m_initFile;
+    bool                               m_radialGridDetected = false;
 };
