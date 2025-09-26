@@ -180,7 +180,7 @@ RifReaderSettings RiaPreferencesGrid::readerSettings()
                           .includeFileAbsolutePathPrefix       = m_includeFileAbsolutePathPrefix,
                           .onlyLoadActiveCells                 = m_onlyLoadActiveCells,
                           .invalidateLongThinCells             = m_invalidateLongThinCells,
-                          .useCylindricalCoordinates           = RiaPreferencesSystem::current()->useCylindricalCoordinates(),
+                          .useCylindricalCoordinates           = m_radialGridMode == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL,
                           .minimumAngularCellCount             = RiaPreferencesSystem::current()->minimumAngularCellCount()
 
     };

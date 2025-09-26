@@ -19,6 +19,8 @@
 
 #include "RivSingleCellPartGenerator.h"
 
+#include "RiaPreferencesGrid.h"
+
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigFemPartCollection.h"
@@ -109,32 +111,31 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawable()
 {
     if ( m_rigCaseData && m_cellIndex != cvf::UNDEFINED_SIZE_T )
     {
-        if ( m_showLgrMeshLines )
+        auto grid = m_rigCaseData->grid( m_gridIndex );
+        if ( !grid ) return nullptr;
+
+        if ( grid->isMainGrid() || m_showLgrMeshLines )
         {
-            return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->grid( m_gridIndex ),
-                                                                                       m_cellIndex,
-                                                                                       m_displayModelOffset );
+            return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, m_cellIndex, m_displayModelOffset );
         }
         else
         {
             auto ownerCase = m_rigCaseData->ownerCase();
-            if ( RigReservoirGridTools::isRadialGrid( ownerCase ) )
+            if ( RigReservoirGridTools::isRadialGrid( ownerCase ) &&
+                 RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
             {
                 return createMeshDrawableFromLgrGridCells();
             }
             else
             {
-                if ( auto currentGrid = m_rigCaseData->grid( m_gridIndex ) )
-                {
-                    auto currentCell         = currentGrid->cell( m_cellIndex );
-                    auto cellIndexInMainGrid = currentCell.parentCellIndex();
+                auto currentCell         = grid->cell( m_cellIndex );
+                auto cellIndexInMainGrid = currentCell.parentCellIndex();
 
-                    if ( cellIndexInMainGrid != cvf::UNDEFINED_SIZE_T )
-                    {
-                        return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->mainGrid(),
-                                                                                                   cellIndexInMainGrid,
-                                                                                                   m_displayModelOffset );
-                    }
+                if ( cellIndexInMainGrid != cvf::UNDEFINED_SIZE_T )
+                {
+                    return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->mainGrid(),
+                                                                                               cellIndexInMainGrid,
+                                                                                               m_displayModelOffset );
                 }
             }
         }

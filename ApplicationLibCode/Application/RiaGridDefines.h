@@ -23,7 +23,6 @@ namespace RiaGridDefines
 
 enum class RadialGridMode
 {
-    AUTO_DETECT,
     USE_CYLINDRICAL,
     USE_CARTESIAN
 };
