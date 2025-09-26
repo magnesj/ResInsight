@@ -1063,7 +1063,7 @@ std::vector<QDateTime> RifReaderOpmCommon::timeStepsOnFile( QString gridFileName
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifReaderOpmCommon::isRadialGridDetected() const
+bool RifReaderOpmCommon::isRadialGrid() const
 {
     return m_radialGridDetected;
 }

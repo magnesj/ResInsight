@@ -1151,7 +1151,7 @@ void RifReaderEclipseOutput::updateFromGridCount( size_t gridCount )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifReaderEclipseOutput::isRadialGridDetected() const
+bool RifReaderEclipseOutput::isRadialGrid() const
 {
     return m_isRadialGrid;
 }

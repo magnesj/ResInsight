@@ -79,7 +79,7 @@ public:
 
     virtual void updateFromGridCount( size_t gridCount ) {};
 
-    virtual bool isRadialGridDetected() const;
+    virtual bool isRadialGrid() const;
 
 protected:
     bool              isTimeStepIncludedByFilter( size_t timeStepIndex ) const;

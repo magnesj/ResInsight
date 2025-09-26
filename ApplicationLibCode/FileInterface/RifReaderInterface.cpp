@@ -116,7 +116,7 @@ std::set<RiaDefines::PhaseType> RifReaderInterface::availablePhases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifReaderInterface::isRadialGridDetected() const
+bool RifReaderInterface::isRadialGrid() const
 {
     return false;
 }

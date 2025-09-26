@@ -88,7 +88,7 @@ public:
 
     void updateFromGridCount( size_t gridCount ) override;
 
-    bool isRadialGridDetected() const override;
+    bool isRadialGrid() const override;
 
 private:
     bool readActiveCellInfo();
