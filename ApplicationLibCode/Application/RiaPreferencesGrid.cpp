@@ -97,6 +97,8 @@ RiaPreferencesGrid::RiaPreferencesGrid()
 
     CAF_PDM_InitField( &m_invalidateLongThinCells, "invalidateLongThinCells", false, "Skip Long, Thin Cells" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_invalidateLongThinCells );
+
+    CAF_PDM_InitFieldNoDefault( &m_radialGridMode, "radialGridMode", "Radial Grid Display Mode" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -145,6 +147,8 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
     {
         egridGrp->add( &m_useResultIndexFile );
     }
+
+    egridGrp->add( &m_radialGridMode );
 
     const bool setFaultImportSettingsReadOnly = !importFaults();
 
@@ -326,4 +330,11 @@ void RiaPreferencesGrid::setGridModelReaderOverride( const RiaDefines::GridModel
 RiaDefines::GridModelReader RiaPreferencesGrid::gridModelReaderOverride() const
 {
     return m_gridModelReaderOverride;
+}
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaGridDefines::RadialGridMode RiaPreferencesGrid::radialGridMode() const
+{
+    return m_radialGridMode();
 }

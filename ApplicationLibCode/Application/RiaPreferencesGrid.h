@@ -23,6 +23,7 @@
 #include "cafPdmObject.h"
 
 #include "RiaDefines.h"
+#include "RiaGridDefines.h"
 
 #include <QString>
 
@@ -63,6 +64,8 @@ public:
     void                        setGridModelReaderOverride( const RiaDefines::GridModelReader readerType );
     RiaDefines::GridModelReader gridModelReaderOverride() const;
 
+    RiaGridDefines::RadialGridMode radialGridMode() const;
+
     void appendItems( caf::PdmUiOrdering& uiOrdering );
 
 private:
@@ -80,4 +83,6 @@ private:
     caf::PdmField<bool>    m_loadAndShowSoil;
     caf::PdmField<bool>    m_onlyLoadActiveCells;
     caf::PdmField<bool>    m_invalidateLongThinCells;
+
+    caf::PdmField<caf::AppEnum<RiaGridDefines::RadialGridMode>> m_radialGridMode;
 };
