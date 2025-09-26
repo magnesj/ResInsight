@@ -120,7 +120,7 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
 
         if ( m_radialGridDetected )
         {
-            if ( readerSettings().useCylindricalCoordinates && m_radialGridDetected )
+            if ( readerSettings().useCylindricalCoordinates )
             {
                 auto task         = progress.task( "Check for Radial Grid", 25 );
                 bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( fileName.toStdString(), m_eclipseCaseData );
