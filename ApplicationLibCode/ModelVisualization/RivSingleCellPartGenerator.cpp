@@ -24,7 +24,9 @@
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
 #include "RigGridBase.h"
+#include "RigReservoirGridTools.h"
 
+#include "RimEclipseCase.h"
 #include "RimGeoMechCase.h"
 
 #include "RivFemPartGeometryGenerator.h"
@@ -109,12 +111,33 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawable()
     {
         if ( m_showLgrMeshLines )
         {
-            return createMeshDrawableFromLgrGridCells();
+            return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->grid( m_gridIndex ),
+                                                                                       m_cellIndex,
+                                                                                       m_displayModelOffset );
         }
+        else
+        {
+            auto ownerCase = m_rigCaseData->ownerCase();
+            if ( RigReservoirGridTools::isRadialGrid( ownerCase ) )
+            {
+                return createMeshDrawableFromLgrGridCells();
+            }
+            else
+            {
+                if ( auto currentGrid = m_rigCaseData->grid( m_gridIndex ) )
+                {
+                    auto currentCell         = currentGrid->cell( m_cellIndex );
+                    auto cellIndexInMainGrid = currentCell.parentCellIndex();
 
-        return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->grid( m_gridIndex ),
-                                                                                   m_cellIndex,
-                                                                                   m_displayModelOffset );
+                    if ( cellIndexInMainGrid != cvf::UNDEFINED_SIZE_T )
+                    {
+                        return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->mainGrid(),
+                                                                                                   cellIndexInMainGrid,
+                                                                                                   m_displayModelOffset );
+                    }
+                }
+            }
+        }
     }
     else if ( m_geoMechCase && m_cellIndex != cvf::UNDEFINED_SIZE_T )
     {

@@ -43,7 +43,7 @@ class RifOpmRadialGridTools
 {
 public:
     // If the grid is radial, the coordinates are imported and adjusted to fit the host cells
-    static bool importCoordinatesForRadialGrid( const std::string& gridFilePath, RigMainGrid* mainGrid );
+    static bool tryConvertRadialGridToCartesianGrid( const std::string& gridFilePath, RigMainGrid* mainGrid );
 
     static bool importCylindricalCoordinates( const std::string& gridFilePath, RigEclipseCaseData* caseData );
 
@@ -67,8 +67,10 @@ private:
     static void
         transferCylindricalCoords( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
 
-    static void
-        transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, RigMainGrid* riMainGrid, RigGridBase* riGrid );
+    static void convertRadialGridToCartesianGrid( Opm::EclIO::EGrid& opmMainGrid,
+                                                  Opm::EclIO::EGrid& opmGrid,
+                                                  RigMainGrid*       riMainGrid,
+                                                  RigGridBase*       riGrid );
 
     static std::vector<std::vector<cvf::Vec3d>>
         computeSnapToCoordinates( Opm::EclIO::EGrid& opmMainGrid, Opm::EclIO::EGrid& opmGrid, int mainGridCellIndex, int lgrCellIndex );

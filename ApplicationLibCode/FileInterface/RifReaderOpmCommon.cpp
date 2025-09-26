@@ -118,13 +118,20 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
             buildMetaData( eclipseCaseData, progress );
         }
 
-        if ( readerSettings().useCylindricalCoordinates && m_radialGridDetected )
+        if ( m_radialGridDetected )
         {
-            auto task         = progress.task( "Check for Radial Grid", 25 );
-            bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( fileName.toStdString(), m_eclipseCaseData );
-            if ( isLgrCreated )
+            if ( readerSettings().useCylindricalCoordinates && m_radialGridDetected )
             {
-                m_eclipseCaseData->clearWellCellsInGridCache();
+                auto task         = progress.task( "Check for Radial Grid", 25 );
+                bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( fileName.toStdString(), m_eclipseCaseData );
+                if ( isLgrCreated )
+                {
+                    m_eclipseCaseData->clearWellCellsInGridCache();
+                }
+            }
+            else
+            {
+                RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
             }
         }
 

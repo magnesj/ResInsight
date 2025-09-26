@@ -112,7 +112,7 @@ bool RifOpmRadialGridTools::importCylindricalCoordinates( const std::string& gri
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& gridFilePath, RigMainGrid* riMainGrid )
+bool RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( const std::string& gridFilePath, RigMainGrid* riMainGrid )
 {
     try
     {
@@ -146,7 +146,7 @@ bool RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
 
         if ( opmMainGrid.is_radial() )
         {
-            transferCoordinatesRadial( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
+            convertRadialGridToCartesianGrid( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
         }
 
         auto lgrNames = opmMainGrid.list_of_lgrs();
@@ -161,7 +161,7 @@ bool RifOpmRadialGridTools::importCoordinatesForRadialGrid( const std::string& g
                     auto riLgrGrid = riMainGrid->gridByIndex( i );
                     if ( riLgrGrid->gridName() == lgrName )
                     {
-                        transferCoordinatesRadial( opmMainGrid, opmLgrGrid, riMainGrid, riLgrGrid );
+                        convertRadialGridToCartesianGrid( opmMainGrid, opmLgrGrid, riMainGrid, riLgrGrid );
                     }
                 }
             }
@@ -252,10 +252,10 @@ void RifOpmRadialGridTools::transferCylindricalCoords( Opm::EclIO::EGrid& opmMai
 // 2. Find the closest point on the pillars of the host cell
 // 3. Find the closest point on this pillar, and use this point as the adjusted coordinate for the node
 //--------------------------------------------------------------------------------------------------
-void RifOpmRadialGridTools::transferCoordinatesRadial( Opm::EclIO::EGrid& opmMainGrid,
-                                                       Opm::EclIO::EGrid& opmGrid,
-                                                       RigMainGrid*       riMainGrid,
-                                                       RigGridBase*       riGrid )
+void RifOpmRadialGridTools::convertRadialGridToCartesianGrid( Opm::EclIO::EGrid& opmMainGrid,
+                                                              Opm::EclIO::EGrid& opmGrid,
+                                                              RigMainGrid*       riMainGrid,
+                                                              RigGridBase*       riGrid )
 {
     size_t cellCount = opmGrid.totalNumberOfCells();
     if ( cellCount != riGrid->cellCount() ) return;

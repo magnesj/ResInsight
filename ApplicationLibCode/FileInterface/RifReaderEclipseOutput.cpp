@@ -454,6 +454,10 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
             }
         }
     }
+    else
+    {
+        m_isRadialGrid = RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
+    }
 
     {
         auto task = progress.task( "Handling NCC data", 20 );

@@ -43,6 +43,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagSolverInterface.h"
 #include "RigMainGrid.h"
+#include "RigReservoirGridTools.h"
 
 #include "Formations/RimFormationNames.h"
 #include "Formations/RimFormationTools.h"
@@ -296,6 +297,12 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         }
 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
+    }
+
+    if ( RigReservoirGridTools::isRadialGrid( this ) )
+    {
+        // This is required to make the generated LGR for radial grids work when loading a project file
+        RigReservoirGridTools::refreshEclipseCaseDataAndViews( this );
     }
 
     return true;
