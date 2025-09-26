@@ -20,6 +20,8 @@
 
 #include "RiaGuiApplication.h"
 
+#include "RifReaderInterface.h"
+
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
@@ -123,7 +125,7 @@ bool RigReservoirGridTools::isRadialGrid( RimCase* rimCase )
     auto readerInterface = results->readerInterface();
     if ( !readerInterface ) return false;
 
-    return readerInterface->isRadialGridDetected();
+    return readerInterface->isRadialGrid();
 }
 
 //--------------------------------------------------------------------------------------------------
