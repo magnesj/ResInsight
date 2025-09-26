@@ -21,6 +21,9 @@
 #include "RiaApplication.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaPreferencesSystem.h"
+
+#include "RifReaderSettings.h"
 
 #include "cafPdmUiCheckBoxEditor.h"
 
@@ -155,20 +158,8 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
 //--------------------------------------------------------------------------------------------------
 RifReaderSettings RiaPreferencesGrid::gridOnlyReaderSettings()
 {
-    RifReaderSettings rs{
-        // Disable as much as possible
-        false, // import faults
-        false, // import NNCs
-        false, // includeInactiveCellsInFaultGeometry
-        false, // importAdvancedMswData
-        false, // useResultIndexFile
-        true, // skipWellData
-        false, // import summary data
-        "", // include prefix,
-        false, // only active cells
-        true // ignore long thin cells
-    };
-    return rs;
+    // Use the default settings, as they disable most options
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -176,16 +167,19 @@ RifReaderSettings RiaPreferencesGrid::gridOnlyReaderSettings()
 //--------------------------------------------------------------------------------------------------
 RifReaderSettings RiaPreferencesGrid::readerSettings()
 {
-    RifReaderSettings rs{ m_importFaults,
-                          m_importNNCs,
-                          m_includeInactiveCellsInFaultGeometry,
-                          m_importAdvancedMswData,
-                          m_useResultIndexFile,
-                          m_skipWellData,
-                          true, // import summary data
-                          m_includeFileAbsolutePathPrefix,
-                          onlyLoadActiveCells(),
-                          m_invalidateLongThinCells };
+    RifReaderSettings rs{ .importFaults                        = m_importFaults,
+                          .importNNCs                          = m_importNNCs,
+                          .includeInactiveCellsInFaultGeometry = m_includeInactiveCellsInFaultGeometry,
+                          .importAdvancedMswData               = m_importAdvancedMswData,
+                          .skipWellData                        = m_skipWellData,
+                          .importSummaryData                   = true,
+                          .includeFileAbsolutePathPrefix       = m_includeFileAbsolutePathPrefix,
+                          .onlyLoadActiveCells                 = m_onlyLoadActiveCells,
+                          .invalidateLongThinCells             = m_invalidateLongThinCells,
+                          .useCylindricalCoordinates           = RiaPreferencesSystem::current()->useCylindricalCoordinates(),
+                          .minimumAngularCellCount             = RiaPreferencesSystem::current()->minimumAngularCellCount()
+
+    };
     return rs;
 }
 
