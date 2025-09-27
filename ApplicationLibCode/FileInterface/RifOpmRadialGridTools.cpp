@@ -81,6 +81,7 @@ bool RifOpmRadialGridTools::importCylindricalCoordinates( const std::string& gri
 
         if ( opmMainGrid.is_radial() )
         {
+            riMainGrid->setIsRadial( true );
             transferCylindricalCoords( opmMainGrid, opmMainGrid, riMainGrid, riMainGrid );
 
             auto minimumAngularCellCount = RiaPreferencesSystem::current()->minimumAngularCellCount();
@@ -417,7 +418,8 @@ bool RifOpmRadialGridTools::createAngularGridRefinement( RigEclipseCaseData* cas
 
     LgrInfo lgrInfo{ id, "Radial LGR", "", refinement, mainGridStart, mainGridEnd };
 
-    RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
+    auto grid = RicCreateTemporaryLgrFeature::createLgr( lgrInfo, caseData );
+    grid->setIsRadial( true );
 
     // Convert the radial grid to a Cartesian grid
     std::vector<cvf::Vec3d>& nodes = riMainGrid->nodes();

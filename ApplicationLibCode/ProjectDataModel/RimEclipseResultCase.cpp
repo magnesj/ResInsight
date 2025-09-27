@@ -299,7 +299,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
     }
 
-    if ( RigReservoirGridTools::isRadialGrid( this ) )
+    if ( mainGrid() && mainGrid()->isRadial() )
     {
         // This is required to make the generated LGR for radial grids work when loading a project file
         RigReservoirGridTools::refreshEclipseCaseDataAndViews( this );

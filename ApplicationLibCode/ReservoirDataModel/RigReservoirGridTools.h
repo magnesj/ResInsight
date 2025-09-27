@@ -47,7 +47,6 @@ public:
     static const cvf::StructGridInterface* mainGrid( RimCase* rimCase );
     static const cvf::StructGridInterface* gridByIndex( RimCase* rimCase, int gridIndex );
     static QString                         gridName( RimCase* rimCase, int gridIndex );
-    static bool                            isRadialGrid( RimCase* rimCase );
 
     static const RigActiveCellInfo* activeCellInfo( Rim3dView* rimView );
 

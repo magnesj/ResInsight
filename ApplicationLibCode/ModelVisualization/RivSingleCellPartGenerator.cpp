@@ -228,9 +228,7 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawable()
         }
         else
         {
-            auto ownerCase = m_rigCaseData->ownerCase();
-            if ( RigReservoirGridTools::isRadialGrid( ownerCase ) &&
-                 RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
+            if ( grid->isRadial() && RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
             {
                 return createMeshDrawableFromLgrGridCells();
             }

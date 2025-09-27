@@ -181,9 +181,13 @@ void RimCellRangeFilter::computeAndSetValidValues()
 //--------------------------------------------------------------------------------------------------
 bool RimCellRangeFilter::isMainGridRadial() const
 {
-    auto rimCase = firstAncestorOrThisOfTypeAsserted<Rim3dView>()->ownerCase();
+    auto rigGrid = dynamic_cast<const RigGridBase*>( selectedGrid() );
+    if ( !rigGrid ) return false;
 
-    return RigReservoirGridTools::isRadialGrid( rimCase );
+    auto mainGrid = rigGrid->mainGrid();
+    if ( !mainGrid ) return false;
+
+    return mainGrid->isRadial();
 }
 
 //--------------------------------------------------------------------------------------------------
