@@ -1070,14 +1070,6 @@ std::vector<QDateTime> RifReaderOpmCommon::timeStepsOnFile( QString gridFileName
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifReaderOpmCommon::isRadialGrid() const
-{
-    return m_radialGridDetected;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RifReaderOpmCommon::verifyActiveCellInfo( int activeSizeMat, int activeSizeFrac )
 {
     if ( m_initFile == nullptr ) return true;

@@ -61,8 +61,6 @@ public:
 
     std::vector<QDateTime> timeStepsOnFile( QString gridFileName );
 
-    bool isRadialGrid() const override;
-
 protected:
     virtual bool importGrid( RigMainGrid* mainGrid, RigEclipseCaseData* caseData );
 

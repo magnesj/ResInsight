@@ -444,7 +444,6 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
             const double epsilon = 1.0;
             if ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
             {
-                m_isRadialGrid = true;
                 mainGrid->setIsRadial( true );
 
                 size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
@@ -459,7 +458,6 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         else
         {
             auto isRadial = RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
-            m_isRadialGrid = isRadial;
             mainGrid->setIsRadial( isRadial );
         }
     }
@@ -1155,14 +1153,6 @@ void RifReaderEclipseOutput::updateFromGridCount( size_t gridCount )
     {
         m_dynamicResultsAccess->updateFromGridCount( gridCount );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RifReaderEclipseOutput::isRadialGrid() const
-{
-    return m_isRadialGrid;
 }
 
 //--------------------------------------------------------------------------------------------------
