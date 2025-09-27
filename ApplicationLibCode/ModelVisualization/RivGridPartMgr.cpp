@@ -182,16 +182,16 @@ void RivGridPartMgr::generatePartGeometry( cvf::StructGridGeometryGenerator& geo
         if ( RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL && m_grid->isRadial() &&
              m_grid->isTempGrid() )
         {
-            std::vector<size_t> cellIndices;
+            std::vector<size_t> localGridCellIndices;
             for ( size_t i = 0; i < m_grid->cellCount(); i++ )
             {
-                // Check if cell is visible
-                cellIndices.push_back( i );
+                if ( !( *m_cellVisibility )[i] ) continue;
+                localGridCellIndices.push_back( i );
             }
 
-            auto displayOffset = m_eclipseCase->displayModelOffset();
-
-            geoMesh = RivSingleCellPartGenerator::createMeshLinesOfParentGridCells( m_grid.p(), cellIndices, displayOffset );
+            geoMesh = RivSingleCellPartGenerator::createMeshLinesOfParentGridCells( m_grid.p(),
+                                                                                    localGridCellIndices,
+                                                                                    m_eclipseCase->displayModelOffset() );
         }
         else
         {
