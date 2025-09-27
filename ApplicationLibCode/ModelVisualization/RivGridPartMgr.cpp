@@ -25,49 +25,28 @@
 #include "RiaPreferencesGrid.h"
 #include "RiaRegressionTestRunner.h"
 
-#include "RigCaseCellResultsData.h"
-#include "RigEclipseCaseData.h"
-#include "RigResultAccessorFactory.h"
-
 #include "RimCellEdgeColors.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipseView.h"
 #include "RimRegularLegendConfig.h"
-#include "RimReservoirCellResultsStorage.h"
-#include "RimSimWellInViewCollection.h"
 #include "RimTernaryLegendConfig.h"
 
-#include "RivCellEdgeEffectGenerator.h"
 #include "RivCompletionTypeResultToTextureMapper.h"
 #include "RivMeshLinesSourceInfo.h"
 #include "RivPartPriority.h"
-#include "RivResultToTextureMapper.h"
 #include "RivScalarMapperUtils.h"
 #include "RivSingleCellPartGenerator.h"
 #include "RivSourceInfo.h"
-#include "RivTernaryScalarMapperEffectGenerator.h"
 #include "RivTernaryTextureCoordsCreator.h"
 #include "RivTextureCoordsCreator.h"
 
 #include "cafEffectGenerator.h"
-#include "cafPdmFieldCvfColor.h"
-#include "cafPdmFieldCvfMat4d.h"
-#include "cafProgressInfo.h"
 
 #include "cvfDrawableGeo.h"
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"
-#include "cvfRenderStateBlending.h"
-#include "cvfRenderStatePolygonOffset.h"
-#include "cvfRenderState_FF.h"
-#include "cvfShaderProgram.h"
-#include "cvfShaderProgramGenerator.h"
-#include "cvfShaderSourceProvider.h"
-#include "cvfShaderSourceRepository.h"
-#include "cvfStructGrid.h"
 #include "cvfTransform.h"
-#include "cvfUniform.h"
 
 namespace caf
 {
@@ -201,7 +180,7 @@ void RivGridPartMgr::generatePartGeometry( cvf::StructGridGeometryGenerator& geo
         cvf::ref<cvf::DrawableGeo> geoMesh;
 
         if ( RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL && m_grid->isRadial() &&
-             !m_grid->isMainGrid() )
+             m_grid->isTempGrid() )
         {
             std::vector<size_t> cellIndices;
             for ( size_t i = 0; i < m_grid->cellCount(); i++ )
