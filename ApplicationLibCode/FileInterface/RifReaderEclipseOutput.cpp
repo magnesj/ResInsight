@@ -23,8 +23,8 @@
 #include "RiaCellDividingTools.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaLogging.h"
-
 #include "RiaStringEncodingTools.h"
+
 #include "RifActiveCellsReader.h"
 #include "RifEclipseInputFileTools.h"
 #include "RifEclipseOutputFileTools.h"
@@ -431,7 +431,7 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
     {
         RigMainGrid* mainGrid = eclipseCaseData->mainGrid();
 
-        if ( readerSettings().useCylindricalCoordinates )
+        auto isAngularRangeCylindrical = [&]()
         {
             // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
             // has an invalid header and is not possible to import using opm-common
@@ -443,6 +443,24 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
             auto         bb      = mainGrid->boundingBox();
             const double epsilon = 1.0;
             if ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+            {
+                return true;
+            }
+
+            return false;
+        };
+
+        bool isDetectedAsRadial = isAngularRangeCylindrical();
+        if ( isDetectedAsRadial )
+        {
+            if ( !readerSettings().useCylindricalCoordinates )
+            {
+                QString msg = QString( "The grid appears to be a radial grid. To import this grid, open Preferences, and set Radial "
+                                       "import mode to 'Show Cells as Cylinder Segments'." );
+                RiaLogging::errorInMessageBox( nullptr, "Potential Radial Grid", msg );
+            }
+
+            if ( readerSettings().useCylindricalCoordinates )
             {
                 mainGrid->setIsRadial( true );
 
