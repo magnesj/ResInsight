@@ -22,50 +22,31 @@
 
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaRegressionTestRunner.h"
-
-#include "RigCaseCellResultsData.h"
-#include "RigEclipseCaseData.h"
-#include "RigResultAccessorFactory.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipseView.h"
 #include "RimRegularLegendConfig.h"
-#include "RimReservoirCellResultsStorage.h"
-#include "RimSimWellInViewCollection.h"
 #include "RimTernaryLegendConfig.h"
 
-#include "RivCellEdgeEffectGenerator.h"
 #include "RivCompletionTypeResultToTextureMapper.h"
 #include "RivMeshLinesSourceInfo.h"
 #include "RivPartPriority.h"
-#include "RivResultToTextureMapper.h"
 #include "RivScalarMapperUtils.h"
+#include "RivSingleCellPartGenerator.h"
 #include "RivSourceInfo.h"
-#include "RivTernaryScalarMapperEffectGenerator.h"
 #include "RivTernaryTextureCoordsCreator.h"
 #include "RivTextureCoordsCreator.h"
 
 #include "cafEffectGenerator.h"
-#include "cafPdmFieldCvfColor.h"
-#include "cafPdmFieldCvfMat4d.h"
-#include "cafProgressInfo.h"
 
 #include "cvfDrawableGeo.h"
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"
-#include "cvfRenderStateBlending.h"
-#include "cvfRenderStatePolygonOffset.h"
-#include "cvfRenderState_FF.h"
-#include "cvfShaderProgram.h"
-#include "cvfShaderProgramGenerator.h"
-#include "cvfShaderSourceProvider.h"
-#include "cvfShaderSourceRepository.h"
-#include "cvfStructGrid.h"
 #include "cvfTransform.h"
-#include "cvfUniform.h"
 
 namespace caf
 {
@@ -196,7 +177,27 @@ void RivGridPartMgr::generatePartGeometry( cvf::StructGridGeometryGenerator& geo
 
     // Mesh geometry
     {
-        cvf::ref<cvf::DrawableGeo> geoMesh = geoBuilder.createMeshDrawable();
+        cvf::ref<cvf::DrawableGeo> geoMesh;
+
+        if ( RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL && m_grid->isRadial() &&
+             m_grid->isTempGrid() )
+        {
+            std::vector<size_t> localGridCellIndices;
+            for ( size_t i = 0; i < m_grid->cellCount(); i++ )
+            {
+                if ( !( *m_cellVisibility )[i] ) continue;
+                localGridCellIndices.push_back( i );
+            }
+
+            geoMesh = RivSingleCellPartGenerator::createMeshLinesOfParentGridCells( m_grid.p(),
+                                                                                    localGridCellIndices,
+                                                                                    m_eclipseCase->displayModelOffset() );
+        }
+        else
+        {
+            geoMesh = geoBuilder.createMeshDrawable();
+        }
+
         if ( geoMesh.notNull() )
         {
             if ( useBufferObjects )
