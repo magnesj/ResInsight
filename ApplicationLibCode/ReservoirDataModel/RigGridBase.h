@@ -51,6 +51,9 @@ public:
     cvf::Vec3st    cellCounts() const { return m_cellCounts; }
     virtual size_t cellCount() const { return m_cellCountIJK; }
 
+    bool isRadial() const;
+    void setIsRadial( bool isRadial );
+
     virtual RigCell&       cell( size_t gridLocalCellIndex );
     virtual const RigCell& cell( size_t gridLocalCellIndex ) const;
 
@@ -128,6 +131,7 @@ private:
     int              m_gridId; ///< The LGR id of this grid. Main grid has id 0.
     RigMainGrid*     m_mainGrid;
     cvf::BoundingBox m_boundingBox;
+    bool             m_isRadial = false;
 
     std::vector<std::array<size_t, 6>> m_coarseningBoxInfo;
 };

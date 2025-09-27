@@ -428,30 +428,37 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         buildMetaData( mainEclGrid );
     }
 
-    if ( readerSettings().useCylindricalCoordinates )
     {
-        // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
-        // has an invalid header and is not possible to import using opm-common
         RigMainGrid* mainGrid = eclipseCaseData->mainGrid();
 
-        if ( !mainGrid->boundingBox().isValid() )
+        if ( readerSettings().useCylindricalCoordinates )
         {
-            mainGrid->computeBoundingBox();
-        }
-
-        auto         bb      = mainGrid->boundingBox();
-        const double epsilon = 1.0;
-        if ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
-        {
-            m_isRadialGrid = true;
-
-            size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
-            if ( mainGrid->cellCountJ() < minimumAngularCellCount )
+            // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
+            // has an invalid header and is not possible to import using opm-common
+            if ( !mainGrid->boundingBox().isValid() )
             {
-                auto angularRefinement = ( minimumAngularCellCount / mainGrid->cellCountJ() ) + 1;
-
-                RifOpmRadialGridTools::createAngularGridRefinement( eclipseCaseData, angularRefinement );
+                mainGrid->computeBoundingBox();
             }
+
+            auto         bb      = mainGrid->boundingBox();
+            const double epsilon = 1.0;
+            if ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) )
+            {
+                mainGrid->setIsRadial( true );
+
+                size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
+                if ( mainGrid->cellCountJ() < minimumAngularCellCount )
+                {
+                    auto angularRefinement = ( minimumAngularCellCount / mainGrid->cellCountJ() ) + 1;
+
+                    RifOpmRadialGridTools::createAngularGridRefinement( eclipseCaseData, angularRefinement );
+                }
+            }
+        }
+        else
+        {
+            auto isRadial = RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
+            mainGrid->setIsRadial( isRadial );
         }
     }
 
@@ -1146,14 +1153,6 @@ void RifReaderEclipseOutput::updateFromGridCount( size_t gridCount )
     {
         m_dynamicResultsAccess->updateFromGridCount( gridCount );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RifReaderEclipseOutput::isRadialGrid() const
-{
-    return m_isRadialGrid;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -111,26 +111,6 @@ QString RigReservoirGridTools::gridName( RimCase* rimCase, int gridIndex )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigReservoirGridTools::isRadialGrid( RimCase* rimCase )
-{
-    RimEclipseResultCase* eclipseResultCase = dynamic_cast<RimEclipseResultCase*>( rimCase );
-    if ( !eclipseResultCase ) return false;
-
-    auto eclipseCaseData = eclipseResultCase->eclipseCaseData();
-    if ( !eclipseCaseData ) return false;
-
-    auto results = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    if ( !results ) return false;
-
-    auto readerInterface = results->readerInterface();
-    if ( !readerInterface ) return false;
-
-    return readerInterface->isRadialGrid();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 const RigActiveCellInfo* RigReservoirGridTools::activeCellInfo( Rim3dView* rimView )
 {
     RimEclipseView* eclipseView = dynamic_cast<RimEclipseView*>( rimView );

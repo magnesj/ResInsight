@@ -116,14 +116,6 @@ std::set<RiaDefines::PhaseType> RifReaderInterface::availablePhases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RifReaderInterface::isRadialGrid() const
-{
-    return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RifReaderInterface::isTimeStepIncludedByFilter( size_t timeStepIndex ) const
 {
     if ( m_fileTimeStepIndices.empty() ) return true;
