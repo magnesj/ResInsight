@@ -22,6 +22,7 @@
 
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaPreferencesGrid.h"
 #include "RiaRegressionTestRunner.h"
 
 #include "RigCaseCellResultsData.h"
@@ -43,6 +44,7 @@
 #include "RivPartPriority.h"
 #include "RivResultToTextureMapper.h"
 #include "RivScalarMapperUtils.h"
+#include "RivSingleCellPartGenerator.h"
 #include "RivSourceInfo.h"
 #include "RivTernaryScalarMapperEffectGenerator.h"
 #include "RivTernaryTextureCoordsCreator.h"
@@ -196,7 +198,29 @@ void RivGridPartMgr::generatePartGeometry( cvf::StructGridGeometryGenerator& geo
 
     // Mesh geometry
     {
-        cvf::ref<cvf::DrawableGeo> geoMesh = geoBuilder.createMeshDrawable();
+        cvf::ref<cvf::DrawableGeo> geoMesh;
+
+        if ( RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
+        {
+            if ( !m_grid->isMainGrid() )
+            {
+                std::vector<size_t> cellIndices;
+                for ( size_t i = 0; i < m_grid->cellCount(); i++ )
+                {
+                    // Check if cell is visible
+                    cellIndices.push_back( i );
+                }
+
+                auto displayOffset = m_eclipseCase->displayModelOffset();
+
+                geoMesh = RivSingleCellPartGenerator::createMeshLinesOfParentGridCells( m_grid.p(), cellIndices, displayOffset );
+            }
+        }
+        else
+        {
+            geoMesh = geoBuilder.createMeshDrawable();
+        }
+
         if ( geoMesh.notNull() )
         {
             if ( useBufferObjects )
