@@ -59,8 +59,7 @@ public:
 
     std::optional<int> threadCount() const;
 
-    bool useCylindricalCoordinates() const;
-    int  minimumAngularCellCount() const;
+    int minimumAngularCellCount() const;
 
     EclipseTextFileReaderMode eclipseTextFileReaderMode() const;
 
@@ -89,8 +88,7 @@ private:
 
     caf::PdmField<bool> m_showProgressBar;
 
-    caf::PdmField<bool> m_useCylindricalCoordinates;
-    caf::PdmField<int>  m_mimimumAngularCellCount;
+    caf::PdmField<int> m_mimimumAngularCellCount;
 
     caf::PdmField<QString> m_gtestFilter;
 
