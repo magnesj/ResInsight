@@ -55,15 +55,15 @@ CAF_PDM_UI_FIELD_EDITOR_SOURCE_INIT( PdmUiCheckBoxAndComboBoxEditor );
 //--------------------------------------------------------------------------------------------------
 void PdmUiCheckBoxAndComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
-    CAF_ASSERT( !m_lineEdit.isNull() );
+    CAF_ASSERT( !m_comboBox.isNull() );
     CAF_ASSERT( !m_label.isNull() );
 
     PdmUiFieldEditorHandle::updateLabelFromField( m_label, uiConfigName );
 
-    m_lineEdit->setToolTip( uiField()->uiToolTip( uiConfigName ) );
+    m_comboBox->setToolTip( uiField()->uiToolTip( uiConfigName ) );
 
-    bool    isChecked = false;
-    QString textString;
+    bool isChecked = false;
+    int  value     = 0;
 
     // A pair is converted into a list of QVariant in PdmValueFieldSpecialization<std::pair<T, U>>
     auto variantValue = uiField()->uiValue();
@@ -72,23 +72,35 @@ void PdmUiCheckBoxAndComboBoxEditor::configureAndUpdateUi( const QString& uiConf
         QList<QVariant> lst = variantValue.toList();
         if ( lst.size() == 2 )
         {
-            isChecked  = lst[0].toBool();
-            textString = lst[1].toString();
+            isChecked = lst[0].toBool();
+            value     = lst[1].toInt();
         }
     }
 
-    m_lineEdit->blockSignals( true );
+    m_comboBox->blockSignals( true );
     m_checkBox->blockSignals( true );
+    {
+        QList<PdmOptionItemInfo> options = uiField()->valueOptions();
+        for ( const auto& option : options )
+        {
+            auto icon = option.icon();
+            if ( icon )
+                m_comboBox->addItem( *icon, option.optionUiText() );
+            else
+                m_comboBox->addItem( option.optionUiText() );
+        }
 
-    m_lineEdit->setText( QString( "%1" ).arg( textString ) );
-    m_checkBox->setChecked( isChecked );
+        m_comboBox->setCurrentIndex( value );
+        m_checkBox->setChecked( isChecked );
+    }
 
-    m_lineEdit->blockSignals( false );
+    m_comboBox->blockSignals( false );
     m_checkBox->blockSignals( false );
 
     bool isReadOnly = uiField()->isUiReadOnly( uiConfigName );
     if ( !isChecked ) isReadOnly = true;
-    m_lineEdit->setDisabled( isReadOnly );
+    isReadOnly = false;
+    m_comboBox->setDisabled( isReadOnly );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -98,16 +110,17 @@ QWidget* PdmUiCheckBoxAndComboBoxEditor::createEditorWidget( QWidget* parent )
 {
     auto* containerWidget = new QWidget( parent );
 
-    m_lineEdit = new PdmUiLineEdit( containerWidget, true );
-    connect( m_lineEdit, SIGNAL( editingFinished() ), this, SLOT( slotSetValueToField() ) );
+    m_comboBox = new QComboBox( containerWidget );
+    connect( m_comboBox, SIGNAL( editingFinished() ), this, SLOT( slotSetValueToField() ) );
+    connect( m_comboBox, SIGNAL( activated( int ) ), this, SLOT( slotSetValueToField() ) );
 
     m_checkBox = new QCheckBox( "", containerWidget );
-    connect( m_checkBox, SIGNAL( clicked() ), this, SLOT( slotSetValueToField() ) );
+    connect( m_checkBox, SIGNAL( index() ), this, SLOT( slotSetValueToField() ) );
 
     auto* layout = new QHBoxLayout;
 
     layout->addWidget( m_checkBox );
-    layout->addWidget( m_lineEdit );
+    layout->addWidget( m_comboBox );
     layout->setContentsMargins( 0, 0, 0, 0 );
 
     containerWidget->setLayout( layout );
@@ -122,10 +135,13 @@ void PdmUiCheckBoxAndComboBoxEditor::slotSetValueToField()
 {
     bool isChecked = m_checkBox->checkState() == Qt::CheckState::Checked;
 
-    auto text      = m_lineEdit->text();
-    auto pairValue = std::make_pair( isChecked, text );
+    QVariant v;
+    v = m_comboBox->currentIndex();
+    QVariant uintValue( v.toUInt() );
 
-    QVariant v = caf::PdmValueFieldSpecialization<std::pair<bool, QString>>::convert( pairValue );
+    QList<QVariant> list;
+    list.append( QVariant( isChecked ) );
+    list.append( uintValue );
 
     this->setValueToField( v );
 }

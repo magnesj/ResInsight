@@ -276,6 +276,14 @@ public:
             text = "Fourth";
             options.push_back( caf::PdmOptionItemInfo( text, text ) );
         }
+        else if ( fieldNeedingOptions == &m_booleanAndSelectionInList )
+        {
+            for ( int i = 3; i < 9; i++ )
+            {
+                auto text = QString( "Option %1" ).arg( i );
+                options.push_back( caf::PdmOptionItemInfo( text, i ) );
+            }
+        }
 
         return options;
     }

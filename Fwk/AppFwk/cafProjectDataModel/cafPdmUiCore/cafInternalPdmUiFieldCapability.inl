@@ -48,30 +48,60 @@ void PdmFieldUiCap<FieldType>::setValueFromUiEditor( const QVariant& uiValue, bo
             }
             else
             {
-                if ( selectedIndexes.front().metaType().id() == QMetaType::UInt )
+                bool isProcessed = false;
+
+                auto variantList = uiValue.toList();
+                if ( variantList.size() == 2 )
                 {
-                    for ( int i = 0; i < selectedIndexes.size(); ++i )
+                    auto first  = variantList.front();
+                    auto second = variantList.at( 1 );
+
+                    if ( ( first.typeId() == QMetaType::Bool ) && ( second.canConvert<uint>() ) )
                     {
-                        unsigned int opIdx = selectedIndexes[i].toUInt();
+                        QList<QVariant> valuesForPair;
+                        valuesForPair.push_back( first );
+
+                        unsigned int opIdx = second.toUInt();
                         if ( opIdx < static_cast<unsigned int>( m_optionEntryCache.size() ) )
                         {
-                            valuesToSetInField.push_back( m_optionEntryCache[opIdx].value() );
+                            valuesForPair.push_back( m_optionEntryCache[opIdx].value() );
                         }
+
+                        typename FieldType::FieldDataType value;
+                        PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( valuesForPair, value );
+                        m_field->setValue( value );
+                        isProcessed = true;
                     }
-                    typename FieldType::FieldDataType value;
-                    PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( valuesToSetInField, value );
-                    m_field->setValue( value );
                 }
-                else
+
+                if ( !isProcessed )
                 {
-                    // We are not getting indexes as expected from the UI. For now assert, to catch this condition
-                    // but it should possibly be handled as setting the values explicitly. The code for that is below
-                    // the assert
-                    CAF_ASSERT( false );
-                    typename FieldType::FieldDataType value;
-                    PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( uiValue, value );
-                    m_field->setValue( value );
-                    m_optionEntryCache.clear();
+                    if ( selectedIndexes.front().metaType().id() == QMetaType::UInt )
+                    {
+                        for ( int i = 0; i < selectedIndexes.size(); ++i )
+                        {
+                            unsigned int opIdx = selectedIndexes[i].toUInt();
+                            if ( opIdx < static_cast<unsigned int>( m_optionEntryCache.size() ) )
+                            {
+                                valuesToSetInField.push_back( m_optionEntryCache[opIdx].value() );
+                            }
+                        }
+                        typename FieldType::FieldDataType value;
+                        PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( valuesToSetInField,
+                                                                                                     value );
+                        m_field->setValue( value );
+                    }
+                    else
+                    {
+                        // We are not getting indexes as expected from the UI. For now assert, to catch this condition
+                        // but it should possibly be handled as setting the values explicitly. The code for that is
+                        // below the assert
+                        CAF_ASSERT( false );
+                        typename FieldType::FieldDataType value;
+                        PdmUiFieldSpecialization<typename FieldType::FieldDataType>::setFromVariant( uiValue, value );
+                        m_field->setValue( value );
+                        m_optionEntryCache.clear();
+                    }
                 }
             }
         }

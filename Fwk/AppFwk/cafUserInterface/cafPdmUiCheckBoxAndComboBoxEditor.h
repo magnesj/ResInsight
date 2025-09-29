@@ -39,8 +39,8 @@
 #include "cafPdmUiFieldLabelEditorHandle.h"
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QLabel>
-#include <QLineEdit>
 #include <QPointer>
 #include <QString>
 #include <QWidget>
@@ -67,8 +67,8 @@ protected slots:
     void slotSetValueToField();
 
 private:
-    QPointer<QLineEdit> m_lineEdit;
     QPointer<QCheckBox> m_checkBox;
+    QPointer<QComboBox> m_comboBox;
 };
 
 } // end namespace caf
