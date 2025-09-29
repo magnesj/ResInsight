@@ -67,6 +67,8 @@ set(PROJECT_FILES
     cafPdmUiLabelEditor.cpp
     cafPdmUiCheckBoxAndTextEditor.h
     cafPdmUiCheckBoxAndTextEditor.cpp
+    cafPdmUiCheckBoxAndComboBoxEditor.h
+    cafPdmUiCheckBoxAndComboBoxEditor.cpp
     cafPdmUiValueRangeEditor.h
     cafPdmUiValueRangeEditor.cpp
     # object editors

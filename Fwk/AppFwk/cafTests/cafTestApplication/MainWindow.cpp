@@ -28,6 +28,7 @@
 #include "cafPdmProxyValueField.h"
 #include "cafPdmPtrField.h"
 #include "cafPdmReferenceHelper.h"
+#include "cafPdmUiCheckBoxAndComboBoxEditor.h"
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiColorEditor.h"
@@ -141,6 +142,10 @@ public:
         CAF_PDM_InitFieldNoDefault( &m_booleanAndTextField, "BooleanAndTextField", "Checkable text" );
         m_booleanAndTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
 
+        CAF_PDM_InitFieldNoDefault( &m_booleanAndSelectionInList, "BooleanAndSelectionInList", "Checkable selection in list" );
+        m_booleanAndSelectionInList.uiCapability()->setUiEditorTypeName(
+            caf::PdmUiCheckBoxAndComboBoxEditor::uiEditorTypeName() );
+
         m_proxyDoubleField.registerSetMethod( this, &SmallDemoPdmObject::setDoubleMember );
         m_proxyDoubleField.registerGetMethod( this, &SmallDemoPdmObject::doubleMember );
         CAF_PDM_InitFieldNoDefault( &m_proxyDoubleField, "ProxyDouble", "Proxy Double" );
@@ -178,6 +183,7 @@ public:
 
     caf::PdmField<std::pair<bool, double>>  m_booleanAndDoubleField;
     caf::PdmField<std::pair<bool, QString>> m_booleanAndTextField;
+    caf::PdmField<std::pair<bool, int>>     m_booleanAndSelectionInList;
 
     caf::PdmChildArrayField<ColorTriplet*> m_colorTriplets;
 
@@ -294,6 +300,7 @@ protected:
     {
         uiOrdering.add( &m_booleanAndDoubleField );
         uiOrdering.add( &m_booleanAndTextField );
+        uiOrdering.add( &m_booleanAndSelectionInList );
 
         uiOrdering.add( &m_doubleField );
         uiOrdering.add( &m_intField );
