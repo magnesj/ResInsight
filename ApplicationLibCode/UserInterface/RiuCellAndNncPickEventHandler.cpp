@@ -360,21 +360,59 @@ bool RiuCellAndNncPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& eve
                 }
             }
 
-            selItem = new RiuEclipseSelectionItem( associatedGridView,
-                                                   eclResDef,
-                                                   timestepIndex,
-                                                   gridIndex,
-                                                   gridLocalCellIndex,
-                                                   nncIndex,
-                                                   curveColor,
-                                                   face,
-                                                   localIntersectionPoint );
+            // The SHIFT button is used to toggle between showing mesh lines for LGR cells or main grid cells.
+            //
+            // The logic for clicking on a cell in a radial grid is as follows:
+            // - If SHIFT is not pressed, show mesh lines for the main grid cell
+            // - If SHIFT is pressed, show mesh lines for the LGR cells
+            //
+            // For non-radial grids, the logic is reversed:
+            // - If SHIFT is pressed, show mesh lines for the main grid cell
+            // - If SHIFT is not pressed, show mesh lines for the LGR cells
+            //
+            const bool isShiftPressed = ( keyboardModifiers & Qt::ShiftModifier ) != 0;
 
-            // Check if Shift button is pressed
-            if ( keyboardModifiers & Qt::ShiftModifier )
+            bool showLgrMeshLines = false;
+            auto eclipseView      = dynamic_cast<RimEclipseView*>( mainOrComparisonView );
+            auto mainGrid         = eclipseView->eclipseCase()->eclipseCaseData()->mainGrid();
+            auto currentGrid      = mainGrid->gridByIndex( gridIndex );
+            if ( mainGrid && !currentGrid->isMainGrid() )
             {
-                static_cast<RiuEclipseSelectionItem*>( selItem )->setShowLgrMeshLines( true );
+                bool selectMainGridCell = false;
+                if ( currentGrid->isRadial() )
+                {
+                    selectMainGridCell = !isShiftPressed;
+                    showLgrMeshLines   = !isShiftPressed;
+                }
+                else
+                {
+                    selectMainGridCell = isShiftPressed;
+                }
+
+                if ( selectMainGridCell )
+                {
+                    auto       currentGrid         = mainGrid->gridByIndex( gridIndex );
+                    const auto cellIndexInMainGrid = currentGrid->cell( gridLocalCellIndex ).parentCellIndex();
+
+                    // Change selection to main grid cell
+                    gridIndex          = mainGrid->gridIndex();
+                    gridLocalCellIndex = cellIndexInMainGrid;
+                }
             }
+
+            auto eclSelectionItem = new RiuEclipseSelectionItem( associatedGridView,
+                                                                 eclResDef,
+                                                                 timestepIndex,
+                                                                 gridIndex,
+                                                                 gridLocalCellIndex,
+                                                                 nncIndex,
+                                                                 curveColor,
+                                                                 face,
+                                                                 localIntersectionPoint );
+
+            eclSelectionItem->setShowLgrMeshLines( showLgrMeshLines );
+
+            selItem = eclSelectionItem;
         }
 
         if ( geomResDef )

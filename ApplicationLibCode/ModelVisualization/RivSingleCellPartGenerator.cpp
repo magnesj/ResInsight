@@ -222,28 +222,13 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawable()
         auto grid = m_rigCaseData->grid( m_gridIndex );
         if ( !grid ) return nullptr;
 
-        if ( grid->isMainGrid() || m_showLgrMeshLines )
+        if ( m_showLgrMeshLines && RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
         {
-            return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, m_cellIndex, m_displayModelOffset );
+            return createMeshDrawableFromLgrGridCells();
         }
         else
         {
-            if ( grid->isRadial() && RiaPreferencesGrid::current()->radialGridMode() == RiaGridDefines::RadialGridMode::USE_CYLINDRICAL )
-            {
-                return createMeshDrawableFromLgrGridCells();
-            }
-            else
-            {
-                auto currentCell         = grid->cell( m_cellIndex );
-                auto cellIndexInMainGrid = currentCell.parentCellIndex();
-
-                if ( cellIndexInMainGrid != cvf::UNDEFINED_SIZE_T )
-                {
-                    return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( m_rigCaseData->mainGrid(),
-                                                                                               cellIndexInMainGrid,
-                                                                                               m_displayModelOffset );
-                }
-            }
+            return cvf::StructGridGeometryGenerator::createMeshDrawableFromSingleCell( grid, m_cellIndex, m_displayModelOffset );
         }
     }
     else if ( m_geoMechCase && m_cellIndex != cvf::UNDEFINED_SIZE_T )
@@ -268,24 +253,25 @@ cvf::ref<cvf::DrawableGeo> RivSingleCellPartGenerator::createMeshDrawableFromLgr
     if ( !m_rigCaseData ) return nullptr;
     if ( m_cellIndex == cvf::UNDEFINED_SIZE_T ) return nullptr;
 
-    auto currentGrid = m_rigCaseData->grid( m_gridIndex );
-    if ( !currentGrid ) return nullptr;
+    auto mainGrid = m_rigCaseData->mainGrid();
+    if ( !mainGrid ) return nullptr;
 
-    auto currentCell         = currentGrid->cell( m_cellIndex );
-    auto cellIndexInMainGrid = currentCell.parentCellIndex();
+    if ( mainGrid->gridCount() < 2 ) return nullptr;
+
+    auto lgrGrid = m_rigCaseData->grid( 1 );
+    if ( !lgrGrid ) return nullptr;
 
     std::vector<size_t> lgrCellIndices;
-
-    for ( size_t i = 0; i < currentGrid->cellCount(); i++ )
+    for ( size_t i = 0; i < lgrGrid->cellCount(); i++ )
     {
-        const auto cell            = currentGrid->cell( i );
+        const auto cell            = lgrGrid->cell( i );
         auto       parentCellIndex = cell.parentCellIndex();
 
-        if ( parentCellIndex == cellIndexInMainGrid )
+        if ( parentCellIndex == m_cellIndex )
         {
             lgrCellIndices.push_back( i );
         }
     }
 
-    return createMeshLinesOfParentGridCells( currentGrid, lgrCellIndices, m_displayModelOffset );
+    return createMeshLinesOfParentGridCells( lgrGrid, lgrCellIndices, m_displayModelOffset );
 }
