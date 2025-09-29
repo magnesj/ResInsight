@@ -27,6 +27,7 @@ class Part;
 }
 
 class RigEclipseCaseData;
+class RigGridBase;
 class RimGeoMechCase;
 
 //==================================================================================================
@@ -41,7 +42,10 @@ public:
 
     void setShowLgrMeshLines( bool enable );
 
-    cvf::ref<cvf::Part> createPart( const cvf::Color3f color );
+    cvf::ref<cvf::Part>               createPart( const cvf::Color3f color );
+    static cvf::ref<cvf::DrawableGeo> createMeshLinesOfParentGridCells( RigGridBase const*   grid,
+                                                                        std::vector<size_t>& localGridCellIndices,
+                                                                        const cvf::Vec3d&    displayModelOffset );
 
 private:
     cvf::ref<cvf::DrawableGeo> createMeshDrawable();

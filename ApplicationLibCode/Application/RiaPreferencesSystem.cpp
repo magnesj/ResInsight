@@ -77,9 +77,6 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_showPdfExportDialog, "showPdfExportDialog", true, "Show PDF Export Dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showPdfExportDialog );
 
-    CAF_PDM_InitField( &m_useCylindricalCoordinates, "useCylindricalCoordinates", true, "Use Cylindrical Coords" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useCylindricalCoordinates );
-
     CAF_PDM_InitField( &m_mimimumAngularCellCount, "mimimumAngularCellCount", 40, "Minimum Angular Cell Count" );
 
     CAF_PDM_InitField( &m_gtestFilter, "gtestFilter", QString(), "Unit Test Filter (gtest)" );
@@ -247,14 +244,6 @@ std::optional<int> RiaPreferencesSystem::threadCount() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RiaPreferencesSystem::useCylindricalCoordinates() const
-{
-    return m_useCylindricalCoordinates();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 int RiaPreferencesSystem::minimumAngularCellCount() const
 {
     return m_mimimumAngularCellCount();
@@ -312,7 +301,6 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Radial Grid" );
-        group->add( &m_useCylindricalCoordinates );
         group->add( &m_mimimumAngularCellCount );
     }
 

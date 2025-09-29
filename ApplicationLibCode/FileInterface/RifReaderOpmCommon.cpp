@@ -118,13 +118,20 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
             buildMetaData( eclipseCaseData, progress );
         }
 
-        if ( readerSettings().useCylindricalCoordinates && m_radialGridDetected )
+        if ( m_radialGridDetected )
         {
-            auto task         = progress.task( "Check for Radial Grid", 25 );
-            bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( fileName.toStdString(), m_eclipseCaseData );
-            if ( isLgrCreated )
+            if ( readerSettings().useCylindricalCoordinates )
             {
-                m_eclipseCaseData->clearWellCellsInGridCache();
+                auto task         = progress.task( "Check for Radial Grid", 25 );
+                bool isLgrCreated = RifOpmRadialGridTools::importCylindricalCoordinates( fileName.toStdString(), m_eclipseCaseData );
+                if ( isLgrCreated )
+                {
+                    m_eclipseCaseData->clearWellCellsInGridCache();
+                }
+            }
+            else
+            {
+                RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
             }
         }
 
@@ -152,8 +159,12 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
     }
     catch ( std::exception& e )
     {
-        auto description = e.what();
-        RiaLogging::error( description );
+        RiaLogging::debug( e.what() );
+
+        QString errorMsg = "Unable to read cell data from grid. Change grid reader to resdata and try again.";
+        RiaLogging::error( errorMsg );
+
+        return false;
     }
 
     return true;
@@ -1058,14 +1069,6 @@ std::vector<QDateTime> RifReaderOpmCommon::timeStepsOnFile( QString gridFileName
     }
 
     return dateTimes;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RifReaderOpmCommon::isRadialGrid() const
-{
-    return m_radialGridDetected;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -97,6 +97,8 @@ RiaPreferencesGrid::RiaPreferencesGrid()
 
     CAF_PDM_InitField( &m_invalidateLongThinCells, "invalidateLongThinCells", false, "Skip Long, Thin Cells" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_invalidateLongThinCells );
+
+    CAF_PDM_InitFieldNoDefault( &m_radialGridMode, "radialGridMode", "Radial Grid Display Mode" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -146,6 +148,8 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
         egridGrp->add( &m_useResultIndexFile );
     }
 
+    egridGrp->add( &m_radialGridMode );
+
     const bool setFaultImportSettingsReadOnly = !importFaults();
 
     m_includeInactiveCellsInFaultGeometry.uiCapability()->setUiReadOnly( setFaultImportSettingsReadOnly );
@@ -176,7 +180,7 @@ RifReaderSettings RiaPreferencesGrid::readerSettings()
                           .includeFileAbsolutePathPrefix       = m_includeFileAbsolutePathPrefix,
                           .onlyLoadActiveCells                 = m_onlyLoadActiveCells,
                           .invalidateLongThinCells             = m_invalidateLongThinCells,
-                          .useCylindricalCoordinates           = RiaPreferencesSystem::current()->useCylindricalCoordinates(),
+                          .useCylindricalCoordinates           = m_radialGridMode == RiaGridDefines::RadialGridMode::CYLINDRICAL,
                           .minimumAngularCellCount             = RiaPreferencesSystem::current()->minimumAngularCellCount()
 
     };
@@ -326,4 +330,11 @@ void RiaPreferencesGrid::setGridModelReaderOverride( const RiaDefines::GridModel
 RiaDefines::GridModelReader RiaPreferencesGrid::gridModelReaderOverride() const
 {
     return m_gridModelReaderOverride;
+}
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaGridDefines::RadialGridMode RiaPreferencesGrid::radialGridMode() const
+{
+    return m_radialGridMode();
 }
