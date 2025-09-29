@@ -80,6 +80,7 @@ void caf::AppEnum<RimOpmFlowJob::WellOpenType>::setUp()
 //--------------------------------------------------------------------------------------------------
 RimOpmFlowJob::RimOpmFlowJob()
     : m_fileDeckHasDates( false )
+    , m_fileDeckIsRestart( false )
 {
     CAF_PDM_InitObject( "Opm Flow Simulation", ":/opm.png" );
 
@@ -95,16 +96,10 @@ RimOpmFlowJob::RimOpmFlowJob()
     CAF_PDM_InitField( &m_pauseBeforeRun, "PauseBeforeRun", false, "Pause before running OPM Flow" );
     CAF_PDM_InitField( &m_addNewWell, "AddNewWell", true, "Add New Well" );
     CAF_PDM_InitField( &m_openWellDeckPosition, "OpenWellDeckPosition", -1, "Open Well at Keyword Index" );
-    CAF_PDM_InitField( &m_includeMSWData, "IncludeMswData", false, "Add MSW Data" );
+    CAF_PDM_InitField( &m_includeMSWData, "IncludeMswData", false, "Include MSW Data (experimental)" );
     CAF_PDM_InitField( &m_addToEnsemble, "AddToEnsemble", false, "Add Runs to Ensemble" );
     CAF_PDM_InitField( &m_useRestart, "UseRestart", false, "Restart Simulation at Well Open Date" );
     CAF_PDM_InitField( &m_currentRunId, "CurrentRunID", 0, "Current Run ID" );
-
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_addToEnsemble );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_pauseBeforeRun );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useRestart );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_includeMSWData );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_addNewWell );
 
     CAF_PDM_InitField( &m_wellOpenType, "WellOpenType", caf::AppEnum<WellOpenType>( WellOpenType::OPEN_AT_DATE ), "Open Well" );
     CAF_PDM_InitField( &m_wellOpenKeyword, "WellOpenKeyword", QString( "WCONPROD" ), "Open Well Keyword" );
@@ -114,6 +109,8 @@ RimOpmFlowJob::RimOpmFlowJob()
     CAF_PDM_InitField( &m_wellOpenText, "WellOpenText", QString( "'GRUP' 5000 4* 100 20 5" ), "Open Well Parameters" );
 
     CAF_PDM_InitField( &m_openTimeStep, "OpenTimeStep", 0, " " );
+    CAF_PDM_InitField( &m_endTimeStep, "EndTimeStep", 0, " " );
+    CAF_PDM_InitField( &m_endTimeStepEnabled, "EndTimeStepEnabled", false, "Stop Simulation at Date" );
 
     CAF_PDM_InitField( &m_runButton, "runButton", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_runButton );
@@ -126,6 +123,13 @@ RimOpmFlowJob::RimOpmFlowJob()
     CAF_PDM_InitField( &m_openSelectButton, "openSelectButton", false, " " );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_openSelectButton );
     m_openSelectButton.xmlCapability()->disableIO();
+
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_addToEnsemble );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_pauseBeforeRun );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useRestart );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_includeMSWData );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_addNewWell );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_endTimeStepEnabled );
 
     setDeletable( true );
 }
@@ -217,15 +221,15 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
             if ( m_wellOpenType() == WellOpenType::OPEN_AT_DATE )
             {
                 wellGrp->add( &m_openTimeStep );
-                wellGrp->add( &m_useRestart );
-                if ( !m_useRestart() )
+                if ( !m_fileDeckIsRestart )
                 {
-                    wellGrp->add( &m_includeMSWData );
+                    wellGrp->add( &m_useRestart );
                 }
                 else
                 {
-                    m_includeMSWData = false;
+                    m_useRestart = false;
                 }
+                if ( m_eclipseCase() ) wellGrp->add( &m_includeMSWData );
             }
             else if ( m_wellOpenType == WellOpenType::OPEN_BY_POSITION )
             {
@@ -241,6 +245,14 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
     auto opmGrp = uiOrdering.addNewGroup( "Opm Flow" );
     opmGrp->add( &m_runButton );
     opmGrp->add( &m_pauseBeforeRun );
+    if ( m_fileDeckHasDates )
+    {
+        opmGrp->add( &m_endTimeStepEnabled );
+        if ( m_endTimeStepEnabled() )
+        {
+            opmGrp->add( &m_endTimeStep );
+        }
+    }
     opmGrp->add( &m_addToEnsemble );
     if ( m_addToEnsemble() )
     {
@@ -263,11 +275,16 @@ QList<caf::PdmOptionItemInfo> RimOpmFlowJob::calculateValueOptions( const caf::P
     {
         RimTools::wellPathOptionItems( &options );
     }
-    else if ( fieldNeedingOptions == &m_openTimeStep )
+    else if ( ( fieldNeedingOptions == &m_openTimeStep ) || ( fieldNeedingOptions == &m_endTimeStep ) )
     {
-        if ( auto ec = m_eclipseCase() )
+        openDeckFile();
+        if ( m_deckFile != nullptr )
         {
-            RimTools::timeStepsForCase( ec, &options );
+            auto timeStepNames = m_deckFile->dateStrings();
+            for ( int i = 0; i < static_cast<int>( timeStepNames.size() - 1 ); ++i )
+            {
+                options.push_back( caf::PdmOptionItemInfo( QString::fromStdString( timeStepNames[i] ), QVariant::fromValue( i ) ) );
+            }
         }
     }
     else if ( fieldNeedingOptions == &m_wellOpenKeyword )
@@ -381,11 +398,13 @@ bool RimOpmFlowJob::openDeckFile()
 
         if ( deckLoadOk )
         {
-            m_fileDeckHasDates = m_deckFile->hasDatesKeyword();
+            m_fileDeckHasDates  = m_deckFile->hasDatesKeyword();
+            m_fileDeckIsRestart = m_deckFile->isRestartFile();
         }
         else
         {
-            m_fileDeckHasDates = false;
+            m_fileDeckHasDates  = false;
+            m_fileDeckIsRestart = false;
             m_deckFile.reset();
         }
     }
@@ -504,14 +523,6 @@ QString RimOpmFlowJob::wellTempFile( int timeStep, bool includeMSW, bool include
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimOpmFlowJob::openWellTempFile() const
-{
-    return workingDirectory() + "/ri_open_well" + deckExtension();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QStringList RimOpmFlowJob::command()
 {
     QStringList cmd;
@@ -549,6 +560,19 @@ QStringList RimOpmFlowJob::command()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::map<QString, QString> RimOpmFlowJob::environment()
+{
+    auto opmPref = RiaPreferencesOpm::current();
+    if ( opmPref->useWsl() )
+    {
+        return RiaWslTools::wslEnvironmentVariables();
+    }
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimOpmFlowJob::onPrepare()
 {
     // reload file deck to make sure we start with the original
@@ -580,22 +604,21 @@ bool RimOpmFlowJob::onPrepare()
             return false;
         }
 
-        if ( m_includeMSWData && m_wellOpenType == WellOpenType::OPEN_AT_DATE )
-        {
-            if ( m_eclipseCase() )
-            {
-                std::vector<std::string> mswData;
-                int                      i = 0;
-                for ( auto& date : m_eclipseCase->timeStepDates() )
-                {
-                    mswData.push_back( exportMswWellSettings( date, i++ ) );
-                }
+        int mergePosition = m_openWellDeckPosition();
 
-                if ( !m_deckFile->mergeMswData( mswData ) )
-                {
-                    RiaLogging::error( "Failed to merge MSW data into file deck." );
-                    return false;
-                }
+        if ( ( m_includeMSWData ) && ( m_wellOpenType == WellOpenType::OPEN_AT_DATE ) )
+        {
+            std::vector<std::string> mswData;
+            int                      nDates = (int)m_eclipseCase()->timeStepDates().size();
+            for ( int timeStep = 0; timeStep < nDates; timeStep++ )
+            {
+                mswData.push_back( exportMswWellSettings( timeStep ) );
+            }
+
+            if ( !m_deckFile->mergeMswData( mswData ) )
+            {
+                RiaLogging::error( "Failed to merge MSW data into file deck." );
+                return false;
             }
         }
         else
@@ -608,13 +631,22 @@ bool RimOpmFlowJob::onPrepare()
                 return false;
             }
 
-            int fallbackPosition = ( m_fileDeckHasDates && m_wellOpenType == WellOpenType::OPEN_AT_DATE ) ? -1 : m_openWellDeckPosition() - 1;
-
-            // merge new well settings from resinsight into DATA deck
-            if ( !m_deckFile->mergeWellDeck( m_openTimeStep(), wellTempFile().toStdString(), fallbackPosition ) )
+            if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
             {
-                RiaLogging::error( "Unable to merge new well data into DATA file. Are there WELSPECS and COMPDAT keywords?" );
-                return false;
+                if ( !m_deckFile->mergeWellDeckAtTimeStep( m_openTimeStep(), wellTempFile().toStdString() ) )
+                {
+                    RiaLogging::error( "Unable to merge new well data into DATA file at selected time step due to parse errors." );
+                    return false;
+                }
+            }
+            else
+            {
+                mergePosition = m_deckFile->mergeWellDeckAtPosition( mergePosition, wellTempFile().toStdString() );
+                if ( mergePosition < m_openWellDeckPosition() )
+                {
+                    RiaLogging::error( "Unable to merge new well data into DATA file due to parse errors." );
+                    return false;
+                }
             }
             QFile::remove( wellTempFile() );
         }
@@ -622,36 +654,45 @@ bool RimOpmFlowJob::onPrepare()
         QString openWellText = generateBasicOpenWellText();
 
         // open new well at selected timestep
-        if ( m_fileDeckHasDates && m_wellOpenType == WellOpenType::OPEN_AT_DATE )
+        if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
         {
             if ( !m_deckFile->openWellAtTimeStep( m_openTimeStep(), openWellText.toStdString() ) )
             {
-                RiaLogging::error( "Unable to open new well in DATA file." );
+                RiaLogging::error( "Unable to open new well at selected timestep in DATA file." );
                 return false;
-            }
-
-            if ( m_useRestart() )
-            {
-                if ( !copyUnrstFileToWorkDir() )
-                {
-                    RiaLogging::error( "Unable to locate UNRST file from input case." );
-                    return false;
-                }
-
-                if ( !m_deckFile->restartAtTimeStep( std::max( m_openTimeStep() - 1, 0 ), restartDeckName().toStdString() ) )
-                {
-                    RiaLogging::error( "Unable to insert restart keywords in DATA file." );
-                    return false;
-                }
             }
         }
         else
         {
-            if ( !m_deckFile->openWellAtDeckPosition( m_openWellDeckPosition, openWellText.toStdString() ) )
+            if ( !m_deckFile->openWellAtDeckPosition( mergePosition, openWellText.toStdString() ) )
             {
                 RiaLogging::error( "Unable to open new well at selected position in DATA file." );
                 return false;
             }
+        }
+    }
+
+    if ( m_useRestart() )
+    {
+        if ( !copyUnrstFileToWorkDir() )
+        {
+            RiaLogging::error( "Unable to locate UNRST file from input case." );
+            return false;
+        }
+
+        if ( !m_deckFile->restartAtTimeStep( m_openTimeStep(), restartDeckName().toStdString() ) )
+        {
+            RiaLogging::error( "Unable to insert restart keywords in DATA file." );
+            return false;
+        }
+    }
+
+    if ( m_endTimeStepEnabled() )
+    {
+        if ( !m_deckFile->stopAtTimeStep( m_endTimeStep() ) )
+        {
+            RiaLogging::error( "Unable to insert END keyword in DATA file." );
+            return false;
         }
     }
 
@@ -835,7 +876,7 @@ void RimOpmFlowJob::exportBasicWellSettings()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::string RimOpmFlowJob::exportMswWellSettings( QDateTime date, int timeStep )
+std::string RimOpmFlowJob::exportMswWellSettings( int timeStep )
 {
     RicExportCompletionDataSettingsUi exportSettings;
 
@@ -945,4 +986,22 @@ QString RimOpmFlowJob::readFileContent( QString filename )
         return fileContent;
     }
     return "";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QDateTime> RimOpmFlowJob::datesInFileDeck()
+{
+    std::vector<QDateTime> dates;
+
+    if ( openDeckFile() )
+    {
+        for ( auto tt : m_deckFile->dates() )
+        {
+            dates.push_back( QDateTime::fromSecsSinceEpoch( tt ) );
+        }
+    }
+
+    return dates;
 }

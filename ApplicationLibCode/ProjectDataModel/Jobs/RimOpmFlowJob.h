@@ -62,12 +62,13 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          initAfterRead() override;
 
-    QString     title() override;
-    QStringList command() override;
-    QString     workingDirectory() const override;
-    bool        onPrepare() override;
-    bool        onRun() override;
-    void        onCompleted( bool success ) override;
+    QString                    title() override;
+    QStringList                command() override;
+    std::map<QString, QString> environment() override;
+    QString                    workingDirectory() const override;
+    bool                       onPrepare() override;
+    bool                       onRun() override;
+    void                       onCompleted( bool success ) override;
 
     bool openDeckFile();
     bool copyUnrstFileToWorkDir();
@@ -76,14 +77,15 @@ private:
     RimEclipseCase* findExistingCase( QString filename );
     QString         deckExtension() const;
     QString         wellTempFile( int timeStep = -1, bool includeMSW = false, bool includeLGR = false ) const;
-    QString         openWellTempFile() const;
     QString         baseDeckName() const;
     QString         restartDeckName() const;
+
+    std::vector<QDateTime> datesInFileDeck();
 
     static QString readFileContent( QString filename );
 
     void        exportBasicWellSettings();
-    std::string exportMswWellSettings( QDateTime date, int timeStep );
+    std::string exportMswWellSettings( int timeStep );
     QString     generateBasicOpenWellText();
     void        selectOpenWellPosition();
 
@@ -105,6 +107,8 @@ private:
     caf::PdmPtrField<RimEclipseCaseEnsemble*> m_gridEnsemble;
     caf::PdmPtrField<RimSummaryEnsemble*>     m_summaryEnsemble;
     caf::PdmField<int>                        m_openTimeStep;
+    caf::PdmField<bool>                       m_endTimeStepEnabled;
+    caf::PdmField<int>                        m_endTimeStep;
     caf::PdmField<bool>                       m_addNewWell;
     caf::PdmField<caf::AppEnum<WellOpenType>> m_wellOpenType;
     caf::PdmField<bool>                       m_includeMSWData;
@@ -115,4 +119,5 @@ private:
     QString                             m_deckName;
     std::unique_ptr<RifOpmFlowDeckFile> m_deckFile;
     bool                                m_fileDeckHasDates;
+    bool                                m_fileDeckIsRestart;
 };
