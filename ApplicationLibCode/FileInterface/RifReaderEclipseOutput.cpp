@@ -450,8 +450,8 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         {
             if ( !readerSettings().useCylindricalCoordinates )
             {
-                QString msg = QString( "The grid appears to be a radial grid. To import this grid, open Preferences, and set Radial "
-                                       "import mode to 'Show Cells as Cylinder Segments'." );
+                QString msg = QString( "The grid appears to be a radial grid.\nTo import this grid, open Preferences, and set 'Radial "
+                                       "Grid Display Mode' to 'Show Cells as Cylinder Segments'." );
                 RiaLogging::errorInMessageBox( nullptr, "Potential Radial Grid", msg );
             }
 

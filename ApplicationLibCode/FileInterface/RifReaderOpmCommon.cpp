@@ -161,7 +161,8 @@ bool RifReaderOpmCommon::open( const QString& fileName, RigEclipseCaseData* ecli
     {
         RiaLogging::debug( e.what() );
 
-        QString errorMsg = "Unable to read cell data from grid. Change grid reader to resdata and try again.";
+        QString errorMsg = "Unable to read cell data from grid.\nOpen Preferences->Grid->EGRID settings, and set 'Model Reader' to "
+                           "'resdata' and try again.";
         RiaLogging::error( errorMsg );
 
         return false;
