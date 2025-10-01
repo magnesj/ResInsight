@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RiaDefines.h"
+
 #include "RigFlowDiagSolverInterface.h"
 
 #include <QPointer>
@@ -66,17 +67,6 @@ private:
         RIGHT_YAXIS
     };
 
-    class ValueRange
-    {
-    public:
-        ValueRange();
-        void add( const ValueRange& range );
-
-    public:
-        double min;
-        double max;
-    };
-
     void        plotUiSelectedCurves();
     static void setPlotDefaults( QwtPlot* plot );
     static void plotCurvesInQwt( RiaDefines::EclipseUnitSystem                                unitSystem,
@@ -110,8 +100,6 @@ private:
                                                            std::vector<QwtPlotMarker*>*                    myPlotMarkers,
                                                            std::vector<QPointF>*                           points,
                                                            std::vector<WhichYAxis>*                        axes );
-
-    static double interpolatedCurveYValue( const std::vector<double>& xVals, const std::vector<double>& yVals, double x );
 
     static void
         addTransparentCurve( QwtPlot* plot, const std::vector<QPointF>& points, const std::vector<WhichYAxis>& axes, bool logScaleLeftAxis );
