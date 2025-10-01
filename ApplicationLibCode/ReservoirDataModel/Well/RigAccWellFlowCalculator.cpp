@@ -117,13 +117,13 @@ RigAccWellFlowCalculator::RigAccWellFlowCalculator( const std::vector<std::vecto
 
     if ( !m_useTotalWellPhaseRateOnly )
     {
-        m_tracerNames.push_back( RIG_FLOW_OIL_NAME );
-        m_tracerNames.push_back( RIG_FLOW_GAS_NAME );
-        m_tracerNames.push_back( RIG_FLOW_WATER_NAME );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowOilName() );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowGasName() );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowWaterName() );
     }
     else
     {
-        m_tracerNames.push_back( RIG_FLOW_TOTAL_NAME );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowTotalName() );
     }
 
     initializePipeBranchesMeasuredDepths();
@@ -156,13 +156,13 @@ RigAccWellFlowCalculator::RigAccWellFlowCalculator( const std::vector<cvf::Vec3d
 
     if ( !m_useTotalWellPhaseRateOnly )
     {
-        m_tracerNames.push_back( RIG_FLOW_OIL_NAME );
-        m_tracerNames.push_back( RIG_FLOW_GAS_NAME );
-        m_tracerNames.push_back( RIG_FLOW_WATER_NAME );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowOilName() );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowGasName() );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowWaterName() );
     }
     else
     {
-        m_tracerNames.push_back( RIG_FLOW_TOTAL_NAME );
+        m_tracerNames.push_back( RigFlowDiagDefines::flowTotalName() );
     }
 
     initializePipeBranchesMeasuredDepths();
@@ -939,7 +939,7 @@ void RigAccWellFlowCalculator::groupSmallContributions()
     }
 
     m_tracerNames.swap( filteredTracernames );
-    m_tracerNames.push_back( RIG_TINY_TRACER_GROUP_NAME );
+    m_tracerNames.push_back( RigFlowDiagDefines::tinyTracerGroupName() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -969,5 +969,5 @@ void RigAccWellFlowCalculator::groupSmallTracers( std::map<QString, std::vector<
         branchFlowSet->erase( it );
     }
 
-    ( *branchFlowSet )[RIG_TINY_TRACER_GROUP_NAME] = groupedAccFlowValues;
+    ( *branchFlowSet )[RigFlowDiagDefines::tinyTracerGroupName()] = groupedAccFlowValues;
 }

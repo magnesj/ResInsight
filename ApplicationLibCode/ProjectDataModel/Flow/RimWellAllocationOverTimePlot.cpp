@@ -747,9 +747,9 @@ QList<caf::PdmOptionItemInfo> RimWellAllocationOverTimePlot::calculateValueOptio
 //--------------------------------------------------------------------------------------------------
 cvf::Color3f RimWellAllocationOverTimePlot::getTracerColor( const QString& tracerName )
 {
-    if ( tracerName == RIG_FLOW_OIL_NAME ) return cvf::Color3f::DARK_GREEN;
-    if ( tracerName == RIG_FLOW_GAS_NAME ) return cvf::Color3f::DARK_RED;
-    if ( tracerName == RIG_FLOW_WATER_NAME ) return cvf::Color3f::BLUE;
+    if ( tracerName == RigFlowDiagDefines::flowOilName() ) return cvf::Color3f::DARK_GREEN;
+    if ( tracerName == RigFlowDiagDefines::flowGasName() ) return cvf::Color3f::DARK_RED;
+    if ( tracerName == RigFlowDiagDefines::flowWaterName() ) return cvf::Color3f::BLUE;
     return cvf::Color3f::DARK_GRAY;
 }
 
