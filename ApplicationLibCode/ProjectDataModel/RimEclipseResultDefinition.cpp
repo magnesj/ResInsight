@@ -389,8 +389,8 @@ void RimEclipseResultDefinition::fieldChangedByUi( const caf::PdmFieldHandle* ch
         if ( m_phaseSelection() != RigFlowDiagResultAddress::PHASE_ALL )
         {
             m_resultType            = m_resultTypeUiField;
-            m_resultVariable        = RIG_FLD_TOF_RESNAME;
-            m_resultVariableUiField = RIG_FLD_TOF_RESNAME;
+            m_resultVariable        = RigFlowDiagDefines::tofResultName();
+            m_resultVariableUiField = RigFlowDiagDefines::tofResultName();
         }
         loadDataAndUpdate();
     }
@@ -697,15 +697,15 @@ QList<caf::PdmOptionItemInfo> RimEclipseResultDefinition::calculateValueOptions(
             options.push_back( caf::PdmOptionItemInfo( RimEclipseResultDefinitionTools::timeOfFlightString( injectorSelectionState(),
                                                                                                             producerSelectionState(),
                                                                                                             false ),
-                                                       RIG_FLD_TOF_RESNAME ) );
+                                                       RigFlowDiagDefines::tofResultName() ) );
             if ( m_phaseSelection() == RigFlowDiagResultAddress::PHASE_ALL )
             {
-                options.push_back( caf::PdmOptionItemInfo( "Tracer Cell Fraction (Sum)", RIG_FLD_CELL_FRACTION_RESNAME ) );
+                options.push_back( caf::PdmOptionItemInfo( "Tracer Cell Fraction (Sum)", RigFlowDiagDefines::cellFractionResultName() ) );
                 options.push_back( caf::PdmOptionItemInfo( RimEclipseResultDefinitionTools::maxFractionTracerString( injectorSelectionState(),
                                                                                                                      producerSelectionState(),
                                                                                                                      false ),
-                                                           RIG_FLD_MAX_FRACTION_TRACER_RESNAME ) );
-                options.push_back( caf::PdmOptionItemInfo( "Injector Producer Communication", RIG_FLD_COMMUNICATION_RESNAME ) );
+                                                           RigFlowDiagDefines::maxFractionTracerResultName() ) );
+                options.push_back( caf::PdmOptionItemInfo( "Injector Producer Communication", RigFlowDiagDefines::communicationResultName() ) );
             }
         }
         else if ( fieldNeedingOptions == &m_flowSolutionUiField )
@@ -752,7 +752,7 @@ QList<caf::PdmOptionItemInfo> RimEclipseResultDefinition::calculateValueOptions(
         }
         else if ( fieldNeedingOptions == &m_resultVariableUiField )
         {
-            options.push_back( caf::PdmOptionItemInfo( RIG_NUM_FLOODED_PV, RIG_NUM_FLOODED_PV ) );
+            options.push_back( caf::PdmOptionItemInfo( RigFlowDiagDefines::numFloodedPv(), RigFlowDiagDefines::numFloodedPv() ) );
         }
     }
     else
@@ -1450,7 +1450,8 @@ bool RimEclipseResultDefinition::hasCategoryResult() const
     if ( m_resultType() == RiaDefines::ResultCatType::DYNAMIC_NATIVE && resultVariable() == RiaResultNames::completionTypeResultName() )
         return true;
 
-    if ( m_resultType() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS && m_resultVariable() == RIG_FLD_MAX_FRACTION_TRACER_RESNAME )
+    if ( m_resultType() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS &&
+         m_resultVariable() == RigFlowDiagDefines::maxFractionTracerResultName() )
         return true;
 
     if ( resultVariable() == RiaResultNames::formationAllanResultName() || resultVariable() == RiaResultNames::formationBinaryAllanResultName() )
@@ -1546,7 +1547,7 @@ void RimEclipseResultDefinition::defineUiOrdering( QString uiConfigName, caf::Pd
         }
 
         if ( m_resultTypeUiField() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS &&
-             m_resultVariableUiField() == RIG_FLD_MAX_FRACTION_TRACER_RESNAME )
+             m_resultVariableUiField() == RigFlowDiagDefines::maxFractionTracerResultName() )
         {
             showOnlyVisibleCategoriesOption = true;
         }
@@ -1629,11 +1630,11 @@ bool RimEclipseResultDefinition::hasDualPorFractureResult()
 QString RimEclipseResultDefinition::flowDiagResUiText( bool shortLabel, int maxTracerStringLength ) const
 {
     QString uiText = QString::fromStdString( flowDiagResAddress().variableName );
-    if ( flowDiagResAddress().variableName == RIG_FLD_TOF_RESNAME )
+    if ( uiText == RigFlowDiagDefines::tofResultName() )
     {
         uiText = RimEclipseResultDefinitionTools::timeOfFlightString( injectorSelectionState(), producerSelectionState(), shortLabel );
     }
-    else if ( flowDiagResAddress().variableName == RIG_FLD_MAX_FRACTION_TRACER_RESNAME )
+    else if ( uiText == RigFlowDiagDefines::maxFractionTracerResultName() )
     {
         uiText = RimEclipseResultDefinitionTools::maxFractionTracerString( injectorSelectionState(), producerSelectionState(), shortLabel );
     }

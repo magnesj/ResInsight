@@ -176,13 +176,13 @@ void RiuPvtPlotWidget::setPlotDefaults( QwtPlot* plot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                            unitSystem,
-                                   const std::vector<RigFlowDiagSolverInterface::PvtCurve>& curveArr,
-                                   double                                                   pressure,
-                                   double                                                   pointMarkerYValue,
-                                   const QString&                                           pointMarkerLabel,
-                                   const QString&                                           plotTitle,
-                                   const QString&                                           yAxisTitle )
+void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                    unitSystem,
+                                   const std::vector<RigFlowDiagDefines::PvtCurve>& curveArr,
+                                   double                                           pressure,
+                                   double                                           pointMarkerYValue,
+                                   const QString&                                   pointMarkerLabel,
+                                   const QString&                                   plotTitle,
+                                   const QString&                                   yAxisTitle )
 {
     m_qwtPlot->detachItems( QwtPlotItem::Rtti_PlotCurve );
     m_qwtPlot->detachItems( QwtPlotItem::Rtti_PlotMarker );
@@ -198,8 +198,8 @@ void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                
         std::vector<double> yVals;
         for ( size_t i = 0; i < curveArr.size(); i++ )
         {
-            const RigFlowDiagSolverInterface::PvtCurve& curve = curveArr[i];
-            if ( curve.phase == RigFlowDiagSolverInterface::PvtCurve::OIL && !curve.pressureVals.empty() && !curve.yVals.empty() )
+            const RigFlowDiagDefines::PvtCurve& curve = curveArr[i];
+            if ( curve.phase == RigFlowDiagDefines::PvtCurve::OIL && !curve.pressureVals.empty() && !curve.yVals.empty() )
             {
                 xVals.push_back( curve.pressureVals[0] );
                 yVals.push_back( curve.yVals[0] );
@@ -222,20 +222,20 @@ void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                
     // Add the primary curves
     for ( size_t i = 0; i < curveArr.size(); i++ )
     {
-        const RigFlowDiagSolverInterface::PvtCurve& curve       = curveArr[i];
-        QwtPlotCurve*                               qwtCurve    = new QwtPlotCurve();
-        QwtSymbol*                                  curveSymbol = new QwtSymbol( QwtSymbol::Ellipse );
+        const RigFlowDiagDefines::PvtCurve& curve       = curveArr[i];
+        QwtPlotCurve*                       qwtCurve    = new QwtPlotCurve();
+        QwtSymbol*                          curveSymbol = new QwtSymbol( QwtSymbol::Ellipse );
 
         CVF_ASSERT( curve.pressureVals.size() == curve.yVals.size() );
         qwtCurve->setSamples( curve.pressureVals.data(), curve.yVals.data(), static_cast<int>( curve.pressureVals.size() ) );
 
         qwtCurve->setStyle( QwtPlotCurve::Lines );
 
-        if ( curve.phase == RigFlowDiagSolverInterface::PvtCurve::GAS )
+        if ( curve.phase == RigFlowDiagDefines::PvtCurve::GAS )
         {
             qwtCurve->setTitle( "Gas" );
         }
-        else if ( curve.phase == RigFlowDiagSolverInterface::PvtCurve::OIL )
+        else if ( curve.phase == RigFlowDiagDefines::PvtCurve::OIL )
         {
             qwtCurve->setTitle( "Oil" );
         }
@@ -346,13 +346,13 @@ void RiuPvtPlotWidget::updateTrackerPlotMarkerAndLabelFromPicker()
             size_t curveIdx = indexOfQwtCurve( closestQwtCurve );
             if ( curveIdx < m_pvtCurveArr.size() )
             {
-                const RigFlowDiagSolverInterface::PvtCurve& pvtCurve = m_pvtCurveArr[curveIdx];
+                const RigFlowDiagDefines::PvtCurve& pvtCurve = m_pvtCurveArr[curveIdx];
                 if ( static_cast<size_t>( pointSampleIdx ) < pvtCurve.mixRatVals.size() )
                 {
                     mixRat = pvtCurve.mixRatVals[pointSampleIdx];
 
                     // The text is Rs or Rv depending on phase
-                    mixRatioText = ( pvtCurve.phase == RigFlowDiagSolverInterface::PvtCurve::GAS ) ? "Rv" : "Rs";
+                    mixRatioText = ( pvtCurve.phase == RigFlowDiagDefines::PvtCurve::GAS ) ? "Rv" : "Rs";
                 }
             }
         }

@@ -17,6 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "RigFlowDiagDefines.h"
 #include "RigFlowDiagResultAddress.h"
 
 #include "cafPdmPointer.h"
@@ -65,71 +66,6 @@ class RigOpmFlowDiagStaticData;
 class RigFlowDiagSolverInterface
 {
 public:
-    struct FlowCharacteristicsResultFrame
-    {
-        FlowCharacteristicsResultFrame();
-
-        using Curve = std::pair<std::vector<double>, std::vector<double>>;
-
-        Curve  m_storageCapFlowCapCurve;
-        Curve  m_dimensionlessTimeSweepEfficiencyCurve;
-        double m_lorenzCoefficient;
-    };
-
-    struct RelPermCurve
-    {
-        enum Ident
-        {
-            KRW,
-            KRG,
-            KROW,
-            KROG,
-            PCOW,
-            PCOG
-        };
-        enum EpsMode
-        {
-            EPS_ON,
-            EPS_OFF
-        };
-
-        Ident               ident;
-        std::string         name;
-        EpsMode             epsMode;
-        std::vector<double> saturationVals;
-        std::vector<double> yVals;
-    };
-
-    enum PvtCurveType
-    {
-        PVT_CT_FVF,
-        PVT_CT_VISCOSITY
-    };
-
-    struct PvtCurve
-    {
-        enum Phase
-        {
-            OIL,
-            GAS
-        };
-        enum Ident
-        {
-            Unknown,
-            Bo,
-            Bg,
-            Visc_o,
-            Visc_g
-        };
-
-        Ident               ident;
-        Phase               phase;
-        std::vector<double> pressureVals;
-        std::vector<double> yVals;
-        std::vector<double> mixRatVals;
-    };
-
-public:
     explicit RigFlowDiagSolverInterface( RimEclipseResultCase* eclipseCase );
     virtual ~RigFlowDiagSolverInterface();
 
@@ -138,15 +74,15 @@ public:
                                          std::map<std::string, std::vector<int>>  injectorTracers,
                                          std::map<std::string, std::vector<int>>  producerTracers );
 
-    FlowCharacteristicsResultFrame calculateFlowCharacteristics( const std::vector<double>* injector_tof,
-                                                                 const std::vector<double>* producer_tof,
-                                                                 const std::vector<size_t>& selected_cell_indices,
-                                                                 double                     max_pv_fraction );
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame calculateFlowCharacteristics( const std::vector<double>* injector_tof,
+                                                                                     const std::vector<double>* producer_tof,
+                                                                                     const std::vector<size_t>& selected_cell_indices,
+                                                                                     double                     max_pv_fraction );
 
-    std::vector<RelPermCurve> calculateRelPermCurves( size_t activeCellIndex );
+    std::vector<RigFlowDiagDefines::RelPermCurve> calculateRelPermCurves( size_t activeCellIndex );
 
-    std::vector<PvtCurve> calculatePvtCurves( PvtCurveType pvtCurveType, int pvtNum );
-    bool                  calculatePvtDynamicPropertiesFvf( int pvtNum, double pressure, double rs, double rv, double* bo, double* bg );
+    std::vector<RigFlowDiagDefines::PvtCurve> calculatePvtCurves( RigFlowDiagDefines::PvtCurveType pvtCurveType, int pvtNum );
+    bool calculatePvtDynamicPropertiesFvf( int pvtNum, double pressure, double rs, double rv, double* bo, double* bg );
     bool calculatePvtDynamicPropertiesViscosity( int pvtNum, double pressure, double rs, double rv, double* mu_o, double* mu_g );
 
 private:

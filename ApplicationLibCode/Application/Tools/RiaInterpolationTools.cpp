@@ -78,8 +78,8 @@ double RiaInterpolationTools::linear( const std::vector<double>& x, const std::v
     }
 
     // Calculate indices
-    int upperIndex = it - x.begin();
-    int lowerIndex = upperIndex - 1;
+    auto upperIndex = it - x.begin();
+    auto lowerIndex = upperIndex - 1;
 
     double lowerX = x[lowerIndex];
     double lowerY = y[lowerIndex];

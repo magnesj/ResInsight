@@ -222,7 +222,7 @@ bool RicNewGridTimeHistoryCurveFeature::isCommandEnabled() const
         if ( eclSelectionItem && eclSelectionItem->m_resultDefinition )
         {
             if ( eclSelectionItem->m_resultDefinition->isFlowDiagOrInjectionFlooding() &&
-                 eclSelectionItem->m_resultDefinition->resultVariable() != RIG_NUM_FLOODED_PV )
+                 eclSelectionItem->m_resultDefinition->resultVariable() != RigFlowDiagDefines::numFloodedPv() )
             {
                 return false;
             }
