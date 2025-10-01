@@ -19,7 +19,8 @@
 #pragma once
 
 #include "RiaDefines.h"
-#include "RigFlowDiagSolverInterface.h"
+
+#include "RigFlowDiagDefines.h"
 
 #include <QPointer>
 #include <QWidget>
@@ -57,13 +58,13 @@ class RiuPvtPlotWidget : public QWidget, public RiuPvtTrackerTextProvider
 public:
     RiuPvtPlotWidget( RiuPvtPlotPanel* parent );
 
-    void plotCurves( RiaDefines::EclipseUnitSystem                            unitSystem,
+    void plotCurves( RiaDefines::EclipseUnitSystem                    unitSystem,
                      const std::vector<RigFlowDiagDefines::PvtCurve>& curveArr,
-                     double                                                   pressure,
-                     double                                                   pointMarkerYValue,
-                     const QString&                                           pointMarkerLabel,
-                     const QString&                                           plotTitle,
-                     const QString&                                           yAxisTitle );
+                     double                                           pressure,
+                     double                                           pointMarkerYValue,
+                     const QString&                                   pointMarkerLabel,
+                     const QString&                                   plotTitle,
+                     const QString&                                   yAxisTitle );
     void applyFontSizes( bool replot );
 
 private:
@@ -81,7 +82,7 @@ private:
     QPointer<RiuDockedQwtPlot> m_qwtPlot;
 
     std::vector<RigFlowDiagDefines::PvtCurve> m_pvtCurveArr; // Array of source Pvt curves currently being plotted
-    std::vector<const QwtPlotCurve*>                  m_qwtCurveArr; // Array of corresponding qwt curves used for mapping to Pvt curve
+    std::vector<const QwtPlotCurve*>          m_qwtCurveArr; // Array of corresponding qwt curves used for mapping to Pvt curve
                                                     // when doing tracking
 
     QPointer<RiuPvtQwtPicker> m_qwtPicker;

@@ -20,7 +20,7 @@
 
 #include "RiaDefines.h"
 
-#include "RigFlowDiagSolverInterface.h"
+#include "RigFlowDiagDefines.h"
 
 #include <QPointer>
 #include <QWidget>
