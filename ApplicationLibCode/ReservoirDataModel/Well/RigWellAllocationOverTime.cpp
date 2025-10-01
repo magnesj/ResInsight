@@ -300,15 +300,15 @@ void RigWellAllocationOverTime::groupAccumulatedFlowVolumes( std::map<QString, s
     }
     for ( const auto& well : groupedWells )
     {
-        if ( groupedWellValuesMap.count( RIG_TINY_TRACER_GROUP_NAME ) == 0 )
+        if ( groupedWellValuesMap.count( RigFlowDiagDefines::tinyTracerGroupName() ) == 0 )
         {
-            groupedWellValuesMap[RIG_TINY_TRACER_GROUP_NAME] = rWellValuesMap[well];
+            groupedWellValuesMap[RigFlowDiagDefines::tinyTracerGroupName()] = rWellValuesMap[well];
         }
         else
         {
             for ( const auto& [date, value] : rWellValuesMap[well] )
             {
-                groupedWellValuesMap[RIG_TINY_TRACER_GROUP_NAME][date] += value;
+                groupedWellValuesMap[RigFlowDiagDefines::tinyTracerGroupName()][date] += value;
             }
         }
     }
@@ -357,15 +357,15 @@ void RigWellAllocationOverTime::groupAccumulatedFlowVolumeFractionsOrPercentages
     }
     for ( const auto& well : groupedWells )
     {
-        if ( groupedWellValuesMap.count( RIG_TINY_TRACER_GROUP_NAME ) == 0 )
+        if ( groupedWellValuesMap.count( RigFlowDiagDefines::tinyTracerGroupName() ) == 0 )
         {
-            groupedWellValuesMap[RIG_TINY_TRACER_GROUP_NAME] = rWellValuesMap[well];
+            groupedWellValuesMap[RigFlowDiagDefines::tinyTracerGroupName()] = rWellValuesMap[well];
         }
         else
         {
             for ( const auto& [date, value] : rWellValuesMap[well] )
             {
-                groupedWellValuesMap[RIG_TINY_TRACER_GROUP_NAME][date] += value;
+                groupedWellValuesMap[RigFlowDiagDefines::tinyTracerGroupName()][date] += value;
             }
         }
     }

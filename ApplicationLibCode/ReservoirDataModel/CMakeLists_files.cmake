@@ -119,6 +119,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModelGenerator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.cpp

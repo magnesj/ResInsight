@@ -84,4 +84,18 @@ struct FlowCharacteristicsResultFrame
     double m_lorenzCoefficient = HUGE_VAL;
 };
 
+const char* tofResultName();
+const char* cellFractionResultName();
+const char* maxFractionTracerResultName();
+const char* communicationResultName();
+const char* numFloodedPv();
+
+const char* flowTotalName();
+const char* flowOilName();
+const char* flowGasName();
+const char* flowWaterName();
+
+const char* reservoirTracerName();
+const char* tinyTracerGroupName();
+
 } // namespace RigFlowDiagDefines
