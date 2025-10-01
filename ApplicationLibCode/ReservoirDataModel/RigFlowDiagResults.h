@@ -147,8 +147,8 @@ private:
 
     std::vector<std::map<RigFlowDiagResultAddress::PhaseSelection, bool>> m_hasAtemptedNativeResults;
 
-    std::map<RigFlowDiagResultAddress, cvf::ref<RigFlowDiagResultFrames>> m_resultSets;
-    std::map<RigFlowDiagResultAddress, cvf::ref<RigStatisticsDataCache>>  m_resultStatistics;
+    std::map<RigFlowDiagResultAddress, std::unique_ptr<RigFlowDiagResultFrames>> m_resultSets;
+    std::map<RigFlowDiagResultAddress, std::unique_ptr<RigStatisticsDataCache>>  m_resultStatistics;
 
     using InjectorProducerCommunicationMap = std::map<std::pair<std::string, std::string>, std::pair<double, double>>;
     std::vector<std::map<RigFlowDiagResultAddress::PhaseSelection, InjectorProducerCommunicationMap>> m_injProdPairFluxCommunicationTimesteps;

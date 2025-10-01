@@ -20,6 +20,7 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
+#include "RigFlowDiagSolverInterface.h"
 #include "RigFlowDiagStatCalc.h"
 #include "RigMainGrid.h"
 
@@ -30,7 +31,6 @@
 #include "RimEclipseResultCase.h"
 #include "RimFlowDiagSolution.h"
 
-#include "RigFlowDiagSolverInterface.h"
 #include <cmath> // Needed for HUGE_VAL on Linux
 
 namespace caf
@@ -171,10 +171,9 @@ RigFlowDiagSolverInterface* RigFlowDiagResults::solverInterface()
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagResultFrames* RigFlowDiagResults::createScalarResult( const RigFlowDiagResultAddress& resVarAddr )
 {
-    cvf::ref<RigFlowDiagResultFrames> newFrameSet = new RigFlowDiagResultFrames( m_timeStepCount );
-    m_resultSets[resVarAddr]                      = newFrameSet;
+    m_resultSets[resVarAddr] = std::make_unique<RigFlowDiagResultFrames>( m_timeStepCount );
 
-    return newFrameSet.p();
+    return m_resultSets[resVarAddr].get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -182,11 +181,11 @@ RigFlowDiagResultFrames* RigFlowDiagResults::createScalarResult( const RigFlowDi
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagResultFrames* RigFlowDiagResults::findScalarResult( const RigFlowDiagResultAddress& resVarAddr )
 {
-    decltype( m_resultSets )::iterator it = m_resultSets.find( resVarAddr );
+    auto it = m_resultSets.find( resVarAddr );
 
     if ( it == m_resultSets.end() ) return nullptr;
 
-    return it->second.p();
+    return it->second.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -516,15 +515,12 @@ std::vector<std::pair<std::string, const std::vector<double>*>>
 //--------------------------------------------------------------------------------------------------
 RigStatisticsDataCache* RigFlowDiagResults::statistics( const RigFlowDiagResultAddress& resVarAddr )
 {
-    RigStatisticsDataCache* statCache = m_resultStatistics[resVarAddr].p();
-    if ( !statCache )
-    {
-        RigFlowDiagStatCalc* calculator = new RigFlowDiagStatCalc( this, resVarAddr );
-        statCache                       = new RigStatisticsDataCache( calculator );
-        m_resultStatistics[resVarAddr]  = statCache;
-    }
+    auto it = m_resultStatistics.find( resVarAddr );
+    if ( it != m_resultStatistics.end() ) return it->second.get();
 
-    return statCache;
+    RigFlowDiagStatCalc* calculator = new RigFlowDiagStatCalc( this, resVarAddr );
+    m_resultStatistics[resVarAddr]  = std::make_unique<RigStatisticsDataCache>( calculator );
+    return m_resultStatistics[resVarAddr].get();
 }
 
 //--------------------------------------------------------------------------------------------------
