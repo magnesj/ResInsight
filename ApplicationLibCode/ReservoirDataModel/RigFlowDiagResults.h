@@ -19,7 +19,7 @@
 
 #include "RigFlowDiagResultAddress.h"
 
-#include "RigFlowDiagSolverInterface.h"
+#include "RigFlowDiagDefines.h"
 
 #include "RimFlowDiagSolution.h"
 
@@ -36,6 +36,7 @@
 class RigFlowDiagResultFrames;
 class RigStatisticsDataCache;
 class RigActiveCellInfo;
+class RigFlowDiagSolverInterface;
 
 class RigFlowDiagResults : public cvf::Object
 {
@@ -85,14 +86,14 @@ public:
 
     std::vector<int> calculatedTimeSteps( RigFlowDiagResultAddress::PhaseSelection phaseSelection );
 
-    RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame flowCharacteristicsResults( int                         timeStepIndex,
-                                                                                           CellFilter                  cellSelection,
-                                                                                           const std::vector<QString>& tracerNames,
-                                                                                           double                      max_pv_fraction,
-                                                                                           double                      minCommunication,
-                                                                                           int                         maxTof );
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame flowCharacteristicsResults( int                         timeStepIndex,
+                                                                                   CellFilter                  cellSelection,
+                                                                                   const std::vector<QString>& tracerNames,
+                                                                                   double                      max_pv_fraction,
+                                                                                   double                      minCommunication,
+                                                                                   int                         maxTof );
 
-    RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame
         flowCharacteristicsResults( int timeStepIndex, const std::vector<char>& visibleActiveCells, double max_pv_fraction );
 
     RimFlowDiagSolution* flowDiagSolution();

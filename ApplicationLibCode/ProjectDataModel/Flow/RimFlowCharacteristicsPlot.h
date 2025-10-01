@@ -119,8 +119,8 @@ private:
     caf::PdmField<double> m_minCommunication;
     caf::PdmField<int>    m_maxTof;
 
-    std::vector<int>                                                          m_currentlyPlottedTimeSteps;
-    std::map<int, RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame> m_timeStepToFlowResultMap;
+    std::vector<int>                                                  m_currentlyPlottedTimeSteps;
+    std::map<int, RigFlowDiagDefines::FlowCharacteristicsResultFrame> m_timeStepToFlowResultMap;
 
     QPointer<RiuFlowCharacteristicsPlot> m_flowCharPlotWidget;
 };

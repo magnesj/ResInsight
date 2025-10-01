@@ -612,14 +612,14 @@ void RigFlowDiagSolverInterface::reportPvtCurveError( const QString& message )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame
+RigFlowDiagDefines::FlowCharacteristicsResultFrame
     RigFlowDiagSolverInterface::calculateFlowCharacteristics( const std::vector<double>* injector_tof,
                                                               const std::vector<double>* producer_tof,
                                                               const std::vector<size_t>& selected_cell_indices,
                                                               double                     max_pv_fraction )
 {
     using namespace Opm::FlowDiagnostics;
-    RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame result;
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame result;
 
     if ( injector_tof == nullptr || producer_tof == nullptr )
     {
@@ -1015,12 +1015,4 @@ std::wstring RigFlowDiagSolverInterface::getInitFileName() const
     QString initFileName = RifEclipseOutputFileTools::firstFileNameOfType( m_filesWithSameBaseName, ECL_INIT_FILE );
 
     return initFileName.toStdWString();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame::FlowCharacteristicsResultFrame()
-    : m_lorenzCoefficient( HUGE_VAL )
-{
 }

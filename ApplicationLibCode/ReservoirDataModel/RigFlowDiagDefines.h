@@ -75,4 +75,13 @@ struct PvtCurve
     std::vector<double> mixRatVals;
 };
 
+struct FlowCharacteristicsResultFrame
+{
+    using Curve = std::pair<std::vector<double>, std::vector<double>>;
+
+    Curve  m_storageCapFlowCapCurve;
+    Curve  m_dimensionlessTimeSweepEfficiencyCurve;
+    double m_lorenzCoefficient = HUGE_VAL;
+};
+
 } // namespace RigFlowDiagDefines

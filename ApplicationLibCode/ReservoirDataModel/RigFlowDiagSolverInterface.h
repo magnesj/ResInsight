@@ -66,18 +66,6 @@ class RigOpmFlowDiagStaticData;
 class RigFlowDiagSolverInterface
 {
 public:
-    struct FlowCharacteristicsResultFrame
-    {
-        FlowCharacteristicsResultFrame();
-
-        using Curve = std::pair<std::vector<double>, std::vector<double>>;
-
-        Curve  m_storageCapFlowCapCurve;
-        Curve  m_dimensionlessTimeSweepEfficiencyCurve;
-        double m_lorenzCoefficient;
-    };
-
-public:
     explicit RigFlowDiagSolverInterface( RimEclipseResultCase* eclipseCase );
     virtual ~RigFlowDiagSolverInterface();
 
@@ -86,10 +74,10 @@ public:
                                          std::map<std::string, std::vector<int>>  injectorTracers,
                                          std::map<std::string, std::vector<int>>  producerTracers );
 
-    FlowCharacteristicsResultFrame calculateFlowCharacteristics( const std::vector<double>* injector_tof,
-                                                                 const std::vector<double>* producer_tof,
-                                                                 const std::vector<size_t>& selected_cell_indices,
-                                                                 double                     max_pv_fraction );
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame calculateFlowCharacteristics( const std::vector<double>* injector_tof,
+                                                                                     const std::vector<double>* producer_tof,
+                                                                                     const std::vector<size_t>& selected_cell_indices,
+                                                                                     double                     max_pv_fraction );
 
     std::vector<RigFlowDiagDefines::RelPermCurve> calculateRelPermCurves( size_t activeCellIndex );
 

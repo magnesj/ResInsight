@@ -660,7 +660,7 @@ void RimFlowCharacteristicsPlot::onLoadDataAndUpdate()
             }
         }
 
-        std::map<int, RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame> timeStepToFlowResultMap;
+        std::map<int, RigFlowDiagDefines::FlowCharacteristicsResultFrame> timeStepToFlowResultMap;
 
         for ( int timeStepIdx : m_currentlyPlottedTimeSteps )
         {

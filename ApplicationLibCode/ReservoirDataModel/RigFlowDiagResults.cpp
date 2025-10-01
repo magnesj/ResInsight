@@ -20,7 +20,6 @@
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
-#include "RigFlowDiagSolverInterface.h"
 #include "RigFlowDiagStatCalc.h"
 #include "RigMainGrid.h"
 
@@ -31,6 +30,7 @@
 #include "RimEclipseResultCase.h"
 #include "RimFlowDiagSolution.h"
 
+#include "RigFlowDiagSolverInterface.h"
 #include <cmath> // Needed for HUGE_VAL on Linux
 
 namespace caf
@@ -734,12 +734,12 @@ std::vector<int> RigFlowDiagResults::calculatedTimeSteps( RigFlowDiagResultAddre
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame RigFlowDiagResults::flowCharacteristicsResults( int        timeStepIndex,
-                                                                                                           CellFilter cellSelection,
-                                                                                                           const std::vector<QString>& tracerNames,
-                                                                                                           double max_pv_fraction,
-                                                                                                           double minCommunication,
-                                                                                                           int    maxTof )
+RigFlowDiagDefines::FlowCharacteristicsResultFrame RigFlowDiagResults::flowCharacteristicsResults( int        timeStepIndex,
+                                                                                                   CellFilter cellSelection,
+                                                                                                   const std::vector<QString>& tracerNames,
+                                                                                                   double max_pv_fraction,
+                                                                                                   double minCommunication,
+                                                                                                   int    maxTof )
 {
     std::set<std::string> injectorNames;
     std::set<std::string> producerNames;
@@ -847,7 +847,7 @@ RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame RigFlowDiagResults::f
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame
+RigFlowDiagDefines::FlowCharacteristicsResultFrame
     RigFlowDiagResults::flowCharacteristicsResults( int timeStepIndex, const std::vector<char>& visibleActiveCells, double max_pv_fraction )
 {
     std::vector<QString> tracerNames = m_flowDiagSolution->tracerNames();
