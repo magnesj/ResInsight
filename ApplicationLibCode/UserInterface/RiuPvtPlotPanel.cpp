@@ -96,13 +96,13 @@ RiuPvtPlotPanel::~RiuPvtPlotPanel()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuPvtPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                            unitSystem,
+void RiuPvtPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                    unitSystem,
                                    const std::vector<RigFlowDiagDefines::PvtCurve>& fvfCurveArr,
                                    const std::vector<RigFlowDiagDefines::PvtCurve>& viscosityCurveArr,
-                                   const FvfDynProps&                                       fvfDynProps,
-                                   const ViscosityDynProps&                                 viscosityDynProps,
-                                   const CellValues&                                        cellValues,
-                                   const QString&                                           cellReferenceText )
+                                   const FvfDynProps&                               fvfDynProps,
+                                   const ViscosityDynProps&                         viscosityDynProps,
+                                   const CellValues&                                cellValues,
+                                   const QString&                                   cellReferenceText )
 {
     // cvf::Trace::show("RiuPvtPlotPanel::setPlotData()");
 
@@ -163,7 +163,7 @@ void RiuPvtPlotPanel::applyFontSizes( bool replot )
 void RiuPvtPlotPanel::plotUiSelectedCurves()
 {
     // Determine which curves (phase) to actually plot based on selection in GUI
-    const int                                         currComboIdx = m_phaseComboBox->currentIndex();
+    const int                                 currComboIdx = m_phaseComboBox->currentIndex();
     const RigFlowDiagDefines::PvtCurve::Phase phaseToPlot =
         static_cast<RigFlowDiagDefines::PvtCurve::Phase>( m_phaseComboBox->itemData( currComboIdx ).toInt() );
 
@@ -180,8 +180,8 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
     // FVF plot
     {
         RigFlowDiagDefines::PvtCurve::Ident curveIdentToPlot    = RigFlowDiagDefines::PvtCurve::Unknown;
-        double                                      pointMarkerFvfValue = HUGE_VAL;
-        QString                                     pointMarkerLabel    = "";
+        double                              pointMarkerFvfValue = HUGE_VAL;
+        QString                             pointMarkerLabel    = "";
 
         if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::GAS )
         {
@@ -222,8 +222,8 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
     // Viscosity plot
     {
         RigFlowDiagDefines::PvtCurve::Ident curveIdentToPlot          = RigFlowDiagDefines::PvtCurve::Unknown;
-        double                                      pointMarkerViscosityValue = HUGE_VAL;
-        QString                                     pointMarkerLabel          = "";
+        double                              pointMarkerViscosityValue = HUGE_VAL;
+        QString                             pointMarkerLabel          = "";
 
         if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::GAS )
         {
@@ -280,8 +280,7 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
 //--------------------------------------------------------------------------------------------------
 /// Static helper to get unit labels
 //--------------------------------------------------------------------------------------------------
-QString RiuPvtPlotPanel::unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem               unitSystem,
-                                                  RigFlowDiagDefines::PvtCurve::Ident curveIdent )
+QString RiuPvtPlotPanel::unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem unitSystem, RigFlowDiagDefines::PvtCurve::Ident curveIdent )
 {
     if ( curveIdent == RigFlowDiagDefines::PvtCurve::Bo )
     {
