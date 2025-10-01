@@ -176,13 +176,13 @@ void RiuPvtPlotWidget::setPlotDefaults( QwtPlot* plot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                            unitSystem,
+void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                    unitSystem,
                                    const std::vector<RigFlowDiagDefines::PvtCurve>& curveArr,
-                                   double                                                   pressure,
-                                   double                                                   pointMarkerYValue,
-                                   const QString&                                           pointMarkerLabel,
-                                   const QString&                                           plotTitle,
-                                   const QString&                                           yAxisTitle )
+                                   double                                           pressure,
+                                   double                                           pointMarkerYValue,
+                                   const QString&                                   pointMarkerLabel,
+                                   const QString&                                   plotTitle,
+                                   const QString&                                   yAxisTitle )
 {
     m_qwtPlot->detachItems( QwtPlotItem::Rtti_PlotCurve );
     m_qwtPlot->detachItems( QwtPlotItem::Rtti_PlotMarker );
@@ -223,8 +223,8 @@ void RiuPvtPlotWidget::plotCurves( RiaDefines::EclipseUnitSystem                
     for ( size_t i = 0; i < curveArr.size(); i++ )
     {
         const RigFlowDiagDefines::PvtCurve& curve       = curveArr[i];
-        QwtPlotCurve*                               qwtCurve    = new QwtPlotCurve();
-        QwtSymbol*                                  curveSymbol = new QwtSymbol( QwtSymbol::Ellipse );
+        QwtPlotCurve*                       qwtCurve    = new QwtPlotCurve();
+        QwtSymbol*                          curveSymbol = new QwtSymbol( QwtSymbol::Ellipse );
 
         CVF_ASSERT( curve.pressureVals.size() == curve.yVals.size() );
         qwtCurve->setSamples( curve.pressureVals.data(), curve.yVals.data(), static_cast<int>( curve.pressureVals.size() ) );

@@ -203,12 +203,12 @@ void RiuRelativePermeabilityPlotPanel::setPlotDefaults( QwtPlot* plot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                                unitSystem,
+void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                        unitSystem,
                                                     const std::vector<RigFlowDiagDefines::RelPermCurve>& relPermCurves,
-                                                    double                                                       swat,
-                                                    double                                                       sgas,
-                                                    const QString&                                               caseName,
-                                                    const QString&                                               cellReferenceText )
+                                                    double                                               swat,
+                                                    double                                               sgas,
+                                                    const QString&                                       caseName,
+                                                    const QString&                                       cellReferenceText )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -334,18 +334,18 @@ void RiuRelativePermeabilityPlotPanel::addTransparentCurve( QwtPlot*            
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitSystem                                unitSystem,
+void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitSystem                        unitSystem,
                                                         const std::vector<RigFlowDiagDefines::RelPermCurve>& curveArr,
-                                                        double                                                       swat,
-                                                        double                                                       sgas,
-                                                        QString                                                      cellReferenceText,
-                                                        bool                                                         logScaleLeftAxis,
-                                                        bool                                                         fixedXAxis,
-                                                        bool                                                         fixedLeftYAxis,
-                                                        QwtPlot*                                                     plot,
-                                                        std::vector<QwtPlotMarker*>*                                 myPlotMarkers,
-                                                        bool                                                         showScaled,
-                                                        bool                                                         showUnscaled )
+                                                        double                                               swat,
+                                                        double                                               sgas,
+                                                        QString                                              cellReferenceText,
+                                                        bool                                                 logScaleLeftAxis,
+                                                        bool                                                 fixedXAxis,
+                                                        bool                                                 fixedLeftYAxis,
+                                                        QwtPlot*                                             plot,
+                                                        std::vector<QwtPlotMarker*>*                         myPlotMarkers,
+                                                        bool                                                 showScaled,
+                                                        bool                                                 showUnscaled )
 {
     bool skipUnscaledLegends = showScaled && showUnscaled;
 
@@ -653,13 +653,13 @@ void RiuRelativePermeabilityPlotPanel::addVerticalSaturationMarkerLine( double  
 /// Add a marker at the intersection of the passed curve and the constant saturation value
 //--------------------------------------------------------------------------------------------------
 void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker( const RigFlowDiagDefines::RelPermCurve& curve,
-                                                                                  double                       saturationValue,
-                                                                                  QColor                       markerColor,
-                                                                                  WhichYAxis                   whichYAxis,
-                                                                                  QwtPlot*                     plot,
-                                                                                  std::vector<QwtPlotMarker*>* myPlotMarkers,
-                                                                                  std::vector<QPointF>*        points,
-                                                                                  std::vector<WhichYAxis>*     axes )
+                                                                                  double                                  saturationValue,
+                                                                                  QColor                                  markerColor,
+                                                                                  WhichYAxis                              whichYAxis,
+                                                                                  QwtPlot*                                plot,
+                                                                                  std::vector<QwtPlotMarker*>*            myPlotMarkers,
+                                                                                  std::vector<QPointF>*                   points,
+                                                                                  std::vector<WhichYAxis>*                axes )
 {
     const double yVal = RiaInterpolationTools::linear( curve.saturationVals, curve.yVals, saturationValue );
     if ( yVal != HUGE_VAL )

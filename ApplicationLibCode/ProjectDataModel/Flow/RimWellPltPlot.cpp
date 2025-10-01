@@ -537,7 +537,8 @@ void RimWellPltPlot::syncCurvesFromUiSelection()
 
                     QString curveUnitText = RimWellPlotTools::flowUnitText( RimWellLogLasFile::WELL_FLOW_COND_RESERVOIR, unitSet );
 
-                    const std::vector<double> accFlow = wfTotalAccumulator.accumulatedTracerFlowPrPseudoLength( RigFlowDiagDefines::flowTotalName(), 0 );
+                    const std::vector<double> accFlow =
+                        wfTotalAccumulator.accumulatedTracerFlowPrPseudoLength( RigFlowDiagDefines::flowTotalName(), 0 );
                     addStackedCurve( curveName + ", " + RigFlowDiagDefines::flowTotalName() + " " + curveUnitText,
                                      depthValues,
                                      accFlow,
@@ -562,11 +563,14 @@ void RimWellPltPlot::syncCurvesFromUiSelection()
                         auto color = tracerName == RigFlowDiagDefines::flowOilName()     ? cvf::Color3f::DARK_GREEN
                                      : tracerName == RigFlowDiagDefines::flowGasName()   ? cvf::Color3f::DARK_RED
                                      : tracerName == RigFlowDiagDefines::flowWaterName() ? cvf::Color3f::BLUE
-                                                                         : cvf::Color3f::DARK_GRAY;
+                                                                                         : cvf::Color3f::DARK_GRAY;
 
-                        if ( ( tracerName == RigFlowDiagDefines::flowOilName() && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_OIL ) ) ||
-                             ( tracerName == RigFlowDiagDefines::flowGasName() && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS ) ) ||
-                             ( tracerName == RigFlowDiagDefines::flowWaterName() && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER ) ) )
+                        if ( ( tracerName == RigFlowDiagDefines::flowOilName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_OIL ) ) ||
+                             ( tracerName == RigFlowDiagDefines::flowGasName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS ) ) ||
+                             ( tracerName == RigFlowDiagDefines::flowWaterName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER ) ) )
                         {
                             RimWellPlotTools::FlowPhase flowPhase = RimWellPlotTools::FlowPhase::FLOW_PHASE_NONE;
                             if ( tracerName == RigFlowDiagDefines::flowOilName() )
