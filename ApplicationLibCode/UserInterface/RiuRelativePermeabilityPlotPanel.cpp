@@ -18,12 +18,14 @@
 
 #include "RiuRelativePermeabilityPlotPanel.h"
 
-#include "RigFlowDiagSolverInterface.h"
-
 #include "RiaCurveDataTools.h"
 #include "RiaEclipseUnitTools.h"
+#include "RiaInterpolationTools.h"
 #include "RiaPlotDefines.h"
 #include "RiaResultNames.h"
+
+#include "RigFlowDiagSolverInterface.h"
+
 #include "RiuDockedQwtPlot.h"
 #include "RiuGuiTheme.h"
 #include "RiuPlotCurveSymbol.h"
@@ -552,6 +554,9 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
     plot->replot();
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QwtPlotCurve* RiuRelativePermeabilityPlotPanel::getLegendCurve( QString title, bool scaled )
 {
     QwtPlotCurve* curve = new QwtPlotCurve( title );
@@ -656,7 +661,7 @@ void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker
                                                                                   std::vector<QPointF>*        points,
                                                                                   std::vector<WhichYAxis>*     axes )
 {
-    const double yVal = interpolatedCurveYValue( curve.saturationVals, curve.yVals, saturationValue );
+    const double yVal = RiaInterpolationTools::linear( curve.saturationVals, curve.yVals, saturationValue );
     if ( yVal != HUGE_VAL )
     {
         QwtPlotMarker* pointMarker = new QwtPlotMarker;
@@ -678,46 +683,6 @@ void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker
         axes->push_back( whichYAxis );
         points->push_back( QPointF( saturationValue, yVal ) );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Assumes that all the x-values are ordered in increasing order
-//--------------------------------------------------------------------------------------------------
-double RiuRelativePermeabilityPlotPanel::interpolatedCurveYValue( const std::vector<double>& xVals, const std::vector<double>& yVals, double x )
-{
-    if ( xVals.empty() ) return HUGE_VAL;
-    if ( x < xVals.front() ) return HUGE_VAL;
-    if ( x > xVals.back() ) return HUGE_VAL;
-
-    // Find first element greater or equal to the passed x-value
-    std::vector<double>::const_iterator it = std::upper_bound( xVals.begin(), xVals.end(), x );
-
-    // Due to checks above, we should never come up empty, but to safeguard against NaNs etc
-    if ( it == xVals.end() )
-    {
-        return HUGE_VAL;
-    }
-
-    // Corner case - exact match on first element
-    if ( it == xVals.begin() )
-    {
-        return yVals.front();
-    }
-
-    const size_t idx1 = it - xVals.begin();
-    CVF_ASSERT( idx1 > 0 );
-    const size_t idx0 = idx1 - 1;
-
-    const double x0 = xVals[idx0];
-    const double y0 = yVals[idx0];
-    const double x1 = xVals[idx1];
-    const double y1 = yVals[idx1];
-    CVF_ASSERT( x1 > x0 );
-
-    const double t = ( x1 - x0 ) > 0 ? ( x - x0 ) / ( x1 - x0 ) : 0;
-    const double y = y0 * ( 1.0 - t ) + y1 * t;
-
-    return y;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -878,37 +843,4 @@ void RiuRelativePermeabilityPlotPanel::showEvent( QShowEvent* event )
 {
     if ( m_plotUpdater != nullptr ) m_plotUpdater->doDelayedUpdate();
     QWidget::showEvent( event );
-}
-
-//==================================================================================================
-//
-//
-//
-//==================================================================================================
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RiuRelativePermeabilityPlotPanel::ValueRange::ValueRange()
-    : min( HUGE_VAL )
-    , max( -HUGE_VAL )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::ValueRange::add( const ValueRange& range )
-{
-    if ( range.max >= range.min )
-    {
-        if ( range.max > max )
-        {
-            max = range.max;
-        }
-        if ( range.min < min )
-        {
-            min = range.min;
-        }
-    }
 }
