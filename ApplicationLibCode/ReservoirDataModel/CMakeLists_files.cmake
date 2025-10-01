@@ -38,6 +38,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureGrid.h
@@ -118,12 +119,14 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModelGenerator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureGrid.cpp

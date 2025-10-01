@@ -545,11 +545,11 @@ void RimFlowCharacteristicsPlot::fieldChangedByUi( const caf::PdmFieldHandle* ch
 
                     if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION )
                     {
-                        view->cellResult()->setResultVariable( RIG_FLD_COMMUNICATION_RESNAME );
+                        view->cellResult()->setResultVariable( RigFlowDiagDefines::communicationResultName() );
                     }
                     else
                     {
-                        view->cellResult()->setResultVariable( RIG_FLD_TOF_RESNAME );
+                        view->cellResult()->setResultVariable( RigFlowDiagDefines::tofResultName() );
                     }
 
                     int timeStep = 0;
@@ -660,7 +660,7 @@ void RimFlowCharacteristicsPlot::onLoadDataAndUpdate()
             }
         }
 
-        std::map<int, RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame> timeStepToFlowResultMap;
+        std::map<int, RigFlowDiagDefines::FlowCharacteristicsResultFrame> timeStepToFlowResultMap;
 
         for ( int timeStepIdx : m_currentlyPlottedTimeSteps )
         {

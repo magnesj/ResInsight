@@ -130,10 +130,10 @@ QStringList RimEclipseResultDefinitionTools::getResultNamesForResultType( RiaDef
     }
 
     QStringList flowVars;
-    flowVars.push_back( RIG_FLD_TOF_RESNAME );
-    flowVars.push_back( RIG_FLD_CELL_FRACTION_RESNAME );
-    flowVars.push_back( RIG_FLD_MAX_FRACTION_TRACER_RESNAME );
-    flowVars.push_back( RIG_FLD_COMMUNICATION_RESNAME );
+    flowVars.push_back( RigFlowDiagDefines::tofResultName() );
+    flowVars.push_back( RigFlowDiagDefines::cellFractionResultName() );
+    flowVars.push_back( RigFlowDiagDefines::maxFractionTracerResultName() );
+    flowVars.push_back( RigFlowDiagDefines::communicationResultName() );
     return flowVars;
 }
 

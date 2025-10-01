@@ -17,24 +17,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "RigFlowDiagDefines.h"
+
 #include "cafAppEnum.h"
 
 #include <set>
 #include <string>
-
-#define RIG_FLD_TOF_RESNAME "TOF"
-#define RIG_FLD_CELL_FRACTION_RESNAME "Fraction"
-#define RIG_FLD_MAX_FRACTION_TRACER_RESNAME "MaxFractionTracer"
-#define RIG_FLD_COMMUNICATION_RESNAME "Communication"
-#define RIG_NUM_FLOODED_PV "Water Flooded PV"
-
-#define RIG_FLOW_TOTAL_NAME "Total"
-#define RIG_FLOW_OIL_NAME "Oil"
-#define RIG_FLOW_GAS_NAME "Gas"
-#define RIG_FLOW_WATER_NAME "Water"
-
-#define RIG_RESERVOIR_TRACER_NAME "Reservoir"
-#define RIG_TINY_TRACER_GROUP_NAME "Other"
 
 class RigFlowDiagResultAddress
 {

@@ -326,9 +326,9 @@ cvf::Color3f RimFlowDiagSolution::tracerColor( const QString& tracerName ) const
 {
     QString wellName = removeCrossFlowEnding( tracerName );
 
-    if ( wellName == RIG_FLOW_TOTAL_NAME ) return cvf::Color3f::LIGHT_GRAY;
-    if ( wellName == RIG_RESERVOIR_TRACER_NAME ) return cvf::Color3f::LIGHT_GRAY;
-    if ( wellName == RIG_TINY_TRACER_GROUP_NAME ) return cvf::Color3f::DARK_GRAY;
+    if ( wellName == RigFlowDiagDefines::flowTotalName() ) return cvf::Color3f::LIGHT_GRAY;
+    if ( wellName == RigFlowDiagDefines::reservoirTracerName() ) return cvf::Color3f::LIGHT_GRAY;
+    if ( wellName == RigFlowDiagDefines::tinyTracerGroupName() ) return cvf::Color3f::DARK_GRAY;
 
     auto eclCase = firstAncestorOrThisOfType<RimEclipseResultCase>();
     if ( eclCase )

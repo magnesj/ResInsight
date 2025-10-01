@@ -65,7 +65,7 @@ void RigFlowDiagTimeStepResult::setTracerTOF( const std::string&                
     std::set<std::string> tracers;
     tracers.insert( tracerName );
 
-    RigFlowDiagResultAddress resAddr( RIG_FLD_TOF_RESNAME, phaseSelection, tracers );
+    RigFlowDiagResultAddress resAddr( RigFlowDiagDefines::tofResultName().toStdString(), phaseSelection, tracers );
 
     addResult( resAddr, cellValues );
 
@@ -86,7 +86,7 @@ void RigFlowDiagTimeStepResult::setTracerFraction( const std::string&           
     std::set<std::string> tracers;
     tracers.insert( tracerName );
 
-    addResult( RigFlowDiagResultAddress( RIG_FLD_CELL_FRACTION_RESNAME, phaseSelection, tracers ), cellValues );
+    addResult( RigFlowDiagResultAddress( RigFlowDiagDefines::cellFractionResultName().toStdString(), phaseSelection, tracers ), cellValues );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -612,14 +612,14 @@ void RigFlowDiagSolverInterface::reportPvtCurveError( const QString& message )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame
+RigFlowDiagDefines::FlowCharacteristicsResultFrame
     RigFlowDiagSolverInterface::calculateFlowCharacteristics( const std::vector<double>* injector_tof,
                                                               const std::vector<double>* producer_tof,
                                                               const std::vector<size_t>& selected_cell_indices,
                                                               double                     max_pv_fraction )
 {
     using namespace Opm::FlowDiagnostics;
-    RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame result;
+    RigFlowDiagDefines::FlowCharacteristicsResultFrame result;
 
     if ( injector_tof == nullptr || producer_tof == nullptr )
     {
@@ -656,9 +656,9 @@ RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface::calculateRelPermCurves( size_t activeCellIndex )
+std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calculateRelPermCurves( size_t activeCellIndex )
 {
-    std::vector<RelPermCurve> retCurveArr;
+    std::vector<RigFlowDiagDefines::RelPermCurve> retCurveArr;
 
     if ( !ensureStaticDataObjectInstanceCreated() )
     {
@@ -692,29 +692,30 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface
                                                  Opm::ECLPhaseIndex::Aqua }; // oil/water capillary pressure (Po-Pw) in
                                                                              // O/W system
 
-    std::vector<std::pair<RelPermCurve::Ident, std::string>> curveIdentNameArr;
-    std::vector<Opm::ECLSaturationFunc::RawCurve>            satFuncRequests;
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::KRW, "KRW" ) );
+    std::vector<std::pair<RigFlowDiagDefines::RelPermCurve::Ident, std::string>> curveIdentNameArr;
+    std::vector<Opm::ECLSaturationFunc::RawCurve>                                satFuncRequests;
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::KRW, "KRW" ) );
     satFuncRequests.push_back( krw );
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::KRG, "KRG" ) );
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::KRG, "KRG" ) );
     satFuncRequests.push_back( krg );
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::KROW, "KROW" ) );
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::KROW, "KROW" ) );
     satFuncRequests.push_back( krow );
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::KROG, "KROG" ) );
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::KROG, "KROG" ) );
     satFuncRequests.push_back( krog );
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::PCOG, "PCOG" ) );
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::PCOG, "PCOG" ) );
     satFuncRequests.push_back( pcgo );
-    curveIdentNameArr.push_back( std::make_pair( RelPermCurve::PCOW, "PCOW" ) );
+    curveIdentNameArr.push_back( std::make_pair( RigFlowDiagDefines::RelPermCurve::PCOW, "PCOW" ) );
     satFuncRequests.push_back( pcow );
 
     try
     {
         // Calculate and return curves both with and without endpoint scaling and tag them accordingly
         // Must use two calls to achieve this
-        const std::array<RelPermCurve::EpsMode, 2> epsModeArr = { { RelPermCurve::EPS_ON, RelPermCurve::EPS_OFF } };
-        for ( RelPermCurve::EpsMode epsMode : epsModeArr )
+        const std::array<RigFlowDiagDefines::RelPermCurve::EpsMode, 2> epsModeArr = {
+            { RigFlowDiagDefines::RelPermCurve::EPS_ON, RigFlowDiagDefines::RelPermCurve::EPS_OFF } };
+        for ( RigFlowDiagDefines::RelPermCurve::EpsMode epsMode : epsModeArr )
         {
-            const bool useEps = epsMode == RelPermCurve::EPS_ON;
+            const bool useEps = epsMode == RigFlowDiagDefines::RelPermCurve::EPS_ON;
 
             Opm::ECLSaturationFunc::SatFuncScaling scaling;
             if ( !useEps )
@@ -725,9 +726,9 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface
                 m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( satFuncRequests, static_cast<int>( activeCellIndex ), scaling );
             for ( size_t i = 0; i < graphArr.size(); i++ )
             {
-                const RelPermCurve::Ident          curveIdent = curveIdentNameArr[i].first;
-                const std::string                  curveName  = curveIdentNameArr[i].second;
-                const Opm::FlowDiagnostics::Graph& srcGraph   = graphArr[i];
+                const RigFlowDiagDefines::RelPermCurve::Ident curveIdent = curveIdentNameArr[i].first;
+                const std::string                             curveName  = curveIdentNameArr[i].second;
+                const Opm::FlowDiagnostics::Graph&            srcGraph   = graphArr[i];
                 if ( !srcGraph.first.empty() )
                 {
                     const std::vector<double>& xVals = srcGraph.first;
@@ -748,9 +749,9 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface
     // https://github.com/OPM/ResInsight/issues/11396
 
     bool hasKRG = false;
-    for ( const RelPermCurve& curve : retCurveArr )
+    for ( const RigFlowDiagDefines::RelPermCurve& curve : retCurveArr )
     {
-        if ( curve.ident == RelPermCurve::KRG )
+        if ( curve.ident == RigFlowDiagDefines::RelPermCurve::KRG )
         {
             hasKRG = true;
             break;
@@ -761,7 +762,8 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface
     {
         retCurveArr.erase( std::remove_if( retCurveArr.begin(),
                                            retCurveArr.end(),
-                                           []( const RelPermCurve& curve ) { return curve.ident == RelPermCurve::KROG; } ),
+                                           []( const RigFlowDiagDefines::RelPermCurve& curve )
+                                           { return curve.ident == RigFlowDiagDefines::RelPermCurve::KROG; } ),
                            retCurveArr.end() );
     }
 
@@ -771,9 +773,10 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RigFlowDiagSolverInterface
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::calculatePvtCurves( PvtCurveType pvtCurveType, int pvtNum )
+std::vector<RigFlowDiagDefines::PvtCurve> RigFlowDiagSolverInterface::calculatePvtCurves( RigFlowDiagDefines::PvtCurveType pvtCurveType,
+                                                                                          int                              pvtNum )
 {
-    std::vector<PvtCurve> retCurveArr;
+    std::vector<RigFlowDiagDefines::PvtCurve> retCurveArr;
 
     try
     {
@@ -789,7 +792,7 @@ std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::ca
         }
 
         // Requesting FVF or Viscosity
-        if ( pvtCurveType == PvtCurveType::PVT_CT_FVF )
+        if ( pvtCurveType == RigFlowDiagDefines::PvtCurveType::PVT_CT_FVF )
         {
             // Bo
             {
@@ -801,7 +804,8 @@ std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::ca
                 {
                     if ( !srcGraph.press.empty() )
                     {
-                        retCurveArr.push_back( { PvtCurve::Bo, PvtCurve::OIL, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
+                        retCurveArr.push_back(
+                            { RigFlowDiagDefines::PvtCurve::Bo, RigFlowDiagDefines::PvtCurve::OIL, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
                     }
                 }
             }
@@ -816,13 +820,14 @@ std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::ca
                 {
                     if ( !srcGraph.press.empty() )
                     {
-                        retCurveArr.push_back( { PvtCurve::Bg, PvtCurve::GAS, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
+                        retCurveArr.push_back(
+                            { RigFlowDiagDefines::PvtCurve::Bg, RigFlowDiagDefines::PvtCurve::GAS, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
                     }
                 }
             }
         }
 
-        else if ( pvtCurveType == PvtCurveType::PVT_CT_VISCOSITY )
+        else if ( pvtCurveType == RigFlowDiagDefines::PvtCurveType::PVT_CT_VISCOSITY )
         {
             // Visc_o / mu_o
             {
@@ -834,7 +839,11 @@ std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::ca
                 {
                     if ( !srcGraph.press.empty() )
                     {
-                        retCurveArr.push_back( { PvtCurve::Visc_o, PvtCurve::OIL, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
+                        retCurveArr.push_back( { RigFlowDiagDefines::PvtCurve::Visc_o,
+                                                 RigFlowDiagDefines::PvtCurve::OIL,
+                                                 srcGraph.press,
+                                                 srcGraph.value,
+                                                 srcGraph.mixRat } );
                     }
                 }
             }
@@ -849,7 +858,11 @@ std::vector<RigFlowDiagSolverInterface::PvtCurve> RigFlowDiagSolverInterface::ca
                 {
                     if ( !srcGraph.press.empty() )
                     {
-                        retCurveArr.push_back( { PvtCurve::Visc_g, PvtCurve::GAS, srcGraph.press, srcGraph.value, srcGraph.mixRat } );
+                        retCurveArr.push_back( { RigFlowDiagDefines::PvtCurve::Visc_g,
+                                                 RigFlowDiagDefines::PvtCurve::GAS,
+                                                 srcGraph.press,
+                                                 srcGraph.value,
+                                                 srcGraph.mixRat } );
                     }
                 }
             }
@@ -1002,12 +1015,4 @@ std::wstring RigFlowDiagSolverInterface::getInitFileName() const
     QString initFileName = RifEclipseOutputFileTools::firstFileNameOfType( m_filesWithSameBaseName, ECL_INIT_FILE );
 
     return initFileName.toStdWString();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::FlowCharacteristicsResultFrame::FlowCharacteristicsResultFrame()
-    : m_lorenzCoefficient( HUGE_VAL )
-{
 }
