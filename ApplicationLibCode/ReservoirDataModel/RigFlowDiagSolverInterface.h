@@ -21,9 +21,9 @@
 #include "RigFlowDiagResultAddress.h"
 
 #include "cafPdmPointer.h"
-#include "cvfObject.h"
 
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -92,8 +92,8 @@ private:
     void         reportRelPermCurveError( const QString& message );
     void         reportPvtCurveError( const QString& message );
 
-    RimEclipseResultCase*              m_eclipseCase;
-    cvf::ref<RigOpmFlowDiagStaticData> m_opmFlowDiagStaticData;
+    RimEclipseResultCase*                     m_eclipseCase;
+    std::unique_ptr<RigOpmFlowDiagStaticData> m_opmFlowDiagStaticData;
 
     int m_pvtCurveErrorCount;
     int m_relpermCurveErrorCount;

@@ -18,8 +18,6 @@
 
 #include "RigFlowDiagSolverInterface.h"
 
-#include <memory>
-
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 
@@ -116,7 +114,7 @@ void RigFlowDiagTimeStepResult::addResult( const RigFlowDiagResultAddress& resAd
     }
 }
 
-class RigOpmFlowDiagStaticData : public cvf::Object
+class RigOpmFlowDiagStaticData
 {
 public:
     RigOpmFlowDiagStaticData( const ecl_grid_type* mainGrid, const std::wstring& init, RiaDefines::EclipseUnitSystem caseUnitSystem )
@@ -247,7 +245,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
         progressInfo.incrementProgress();
         progressInfo.setProgressDescription( "Calculating Connectivities" );
 
-        CVF_ASSERT( m_opmFlowDiagStaticData.notNull() );
+        CVF_ASSERT( m_opmFlowDiagStaticData != nullptr );
         const Opm::FlowDiagnostics::ConnectivityGraph connGraph =
             Opm::FlowDiagnostics::ConnectivityGraph{ static_cast<int>( m_opmFlowDiagStaticData->m_eclGraph->numCells() ),
                                                      m_opmFlowDiagStaticData->m_eclGraph->neighbours() };
@@ -504,7 +502,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
 //--------------------------------------------------------------------------------------------------
 bool RigFlowDiagSolverInterface::ensureStaticDataObjectInstanceCreated()
 {
-    if ( m_opmFlowDiagStaticData.isNull() )
+    if ( m_opmFlowDiagStaticData != nullptr )
     {
         // Get set of files
         std::wstring initFileName = getInitFileName();
@@ -524,14 +522,14 @@ bool RigFlowDiagSolverInterface::ensureStaticDataObjectInstanceCreated()
                 }
 
                 RiaDefines::EclipseUnitSystem caseUnitSystem = eclipseCaseData->unitsType();
-                m_opmFlowDiagStaticData                      = new RigOpmFlowDiagStaticData( mainGrid, initFileName, caseUnitSystem );
+                m_opmFlowDiagStaticData = std::make_unique<RigOpmFlowDiagStaticData>( mainGrid, initFileName, caseUnitSystem );
 
                 ecl_grid_free( mainGrid );
             }
         }
     }
 
-    return m_opmFlowDiagStaticData.notNull();
+    return m_opmFlowDiagStaticData != nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -626,7 +624,7 @@ RigFlowDiagDefines::FlowCharacteristicsResultFrame
         return result;
     }
 
-    if ( m_opmFlowDiagStaticData.isNull() )
+    if ( m_opmFlowDiagStaticData == nullptr )
     {
         return result;
     }
@@ -665,7 +663,7 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
         return retCurveArr;
     }
 
-    CVF_ASSERT( m_opmFlowDiagStaticData.notNull() );
+    CVF_ASSERT( m_opmFlowDiagStaticData != nullptr );
     if ( !m_opmFlowDiagStaticData->m_eclSaturationFunc )
     {
         return retCurveArr;
@@ -785,7 +783,7 @@ std::vector<RigFlowDiagDefines::PvtCurve> RigFlowDiagSolverInterface::calculateP
             return retCurveArr;
         }
 
-        CVF_ASSERT( m_opmFlowDiagStaticData.notNull() );
+        CVF_ASSERT( m_opmFlowDiagStaticData != nullptr );
         if ( !m_opmFlowDiagStaticData->m_eclPvtCurveCollection )
         {
             return retCurveArr;
@@ -890,7 +888,7 @@ bool RigFlowDiagSolverInterface::calculatePvtDynamicPropertiesFvf( int pvtNum, d
         return false;
     }
 
-    CVF_ASSERT( m_opmFlowDiagStaticData.notNull() );
+    CVF_ASSERT( m_opmFlowDiagStaticData != nullptr );
     if ( !m_opmFlowDiagStaticData->m_eclPvtCurveCollection )
     {
         return false;
@@ -952,7 +950,7 @@ bool RigFlowDiagSolverInterface::calculatePvtDynamicPropertiesViscosity( int pvt
         return false;
     }
 
-    CVF_ASSERT( m_opmFlowDiagStaticData.notNull() );
+    CVF_ASSERT( m_opmFlowDiagStaticData != nullptr );
     if ( !m_opmFlowDiagStaticData->m_eclPvtCurveCollection )
     {
         return false;
