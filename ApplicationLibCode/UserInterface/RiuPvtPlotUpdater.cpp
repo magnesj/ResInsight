@@ -127,10 +127,10 @@ bool RiuPvtPlotUpdater::queryDataAndUpdatePlot( const RimEclipseResultDefinition
 
         const int cellPvtNum = ( cellPvtNumDouble != HUGE_VAL ) ? static_cast<int>( cellPvtNumDouble ) : std::numeric_limits<int>::max();
 
-        std::vector<RigFlowDiagSolverInterface::PvtCurve> fvfCurveArr =
-            eclipseResultCase->flowDiagSolverInterface()->calculatePvtCurves( RigFlowDiagSolverInterface::PVT_CT_FVF, cellPvtNum );
-        std::vector<RigFlowDiagSolverInterface::PvtCurve> viscosityCurveArr =
-            eclipseResultCase->flowDiagSolverInterface()->calculatePvtCurves( RigFlowDiagSolverInterface::PVT_CT_VISCOSITY, cellPvtNum );
+        std::vector<RigFlowDiagDefines::PvtCurve> fvfCurveArr =
+            eclipseResultCase->flowDiagSolverInterface()->calculatePvtCurves( RigFlowDiagDefines::PVT_CT_FVF, cellPvtNum );
+        std::vector<RigFlowDiagDefines::PvtCurve> viscosityCurveArr =
+            eclipseResultCase->flowDiagSolverInterface()->calculatePvtCurves( RigFlowDiagDefines::PVT_CT_VISCOSITY, cellPvtNum );
 
         RiuPvtPlotPanel::FvfDynProps fvfDynProps;
         eclipseResultCase->flowDiagSolverInterface()->calculatePvtDynamicPropertiesFvf( cellPvtNum,

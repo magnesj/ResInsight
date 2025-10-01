@@ -105,7 +105,7 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
         {
             // cvf::Trace::show("Updating RelPerm plot for active cell index: %d", static_cast<int>(activeCellIndex));
 
-            std::vector<RigFlowDiagSolverInterface::RelPermCurve> relPermCurveArr =
+            std::vector<RigFlowDiagDefines::RelPermCurve> relPermCurveArr =
                 eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( activeCellIndex );
 
             // Make sure we load the results that we'll query below

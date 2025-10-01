@@ -58,7 +58,7 @@ public:
     RiuPvtPlotWidget( RiuPvtPlotPanel* parent );
 
     void plotCurves( RiaDefines::EclipseUnitSystem                            unitSystem,
-                     const std::vector<RigFlowDiagSolverInterface::PvtCurve>& curveArr,
+                     const std::vector<RigFlowDiagDefines::PvtCurve>& curveArr,
                      double                                                   pressure,
                      double                                                   pointMarkerYValue,
                      const QString&                                           pointMarkerLabel,
@@ -80,7 +80,7 @@ private slots:
 private:
     QPointer<RiuDockedQwtPlot> m_qwtPlot;
 
-    std::vector<RigFlowDiagSolverInterface::PvtCurve> m_pvtCurveArr; // Array of source Pvt curves currently being plotted
+    std::vector<RigFlowDiagDefines::PvtCurve> m_pvtCurveArr; // Array of source Pvt curves currently being plotted
     std::vector<const QwtPlotCurve*>                  m_qwtCurveArr; // Array of corresponding qwt curves used for mapping to Pvt curve
                                                     // when doing tracking
 

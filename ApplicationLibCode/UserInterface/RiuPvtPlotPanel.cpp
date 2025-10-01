@@ -49,8 +49,8 @@ RiuPvtPlotPanel::RiuPvtPlotPanel( QWidget* parent )
 {
     m_phaseComboBox = new QComboBox( this );
     m_phaseComboBox->setEditable( false );
-    m_phaseComboBox->addItem( "Oil", QVariant( RigFlowDiagSolverInterface::PvtCurve::OIL ) );
-    m_phaseComboBox->addItem( "Gas", QVariant( RigFlowDiagSolverInterface::PvtCurve::GAS ) );
+    m_phaseComboBox->addItem( "Oil", QVariant( RigFlowDiagDefines::PvtCurve::OIL ) );
+    m_phaseComboBox->addItem( "Gas", QVariant( RigFlowDiagDefines::PvtCurve::GAS ) );
 
     m_titleLabel = new QLabel( "", this );
     m_titleLabel->setAlignment( Qt::AlignHCenter );
@@ -97,8 +97,8 @@ RiuPvtPlotPanel::~RiuPvtPlotPanel()
 ///
 //--------------------------------------------------------------------------------------------------
 void RiuPvtPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                            unitSystem,
-                                   const std::vector<RigFlowDiagSolverInterface::PvtCurve>& fvfCurveArr,
-                                   const std::vector<RigFlowDiagSolverInterface::PvtCurve>& viscosityCurveArr,
+                                   const std::vector<RigFlowDiagDefines::PvtCurve>& fvfCurveArr,
+                                   const std::vector<RigFlowDiagDefines::PvtCurve>& viscosityCurveArr,
                                    const FvfDynProps&                                       fvfDynProps,
                                    const ViscosityDynProps&                                 viscosityDynProps,
                                    const CellValues&                                        cellValues,
@@ -164,28 +164,28 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
 {
     // Determine which curves (phase) to actually plot based on selection in GUI
     const int                                         currComboIdx = m_phaseComboBox->currentIndex();
-    const RigFlowDiagSolverInterface::PvtCurve::Phase phaseToPlot =
-        static_cast<RigFlowDiagSolverInterface::PvtCurve::Phase>( m_phaseComboBox->itemData( currComboIdx ).toInt() );
+    const RigFlowDiagDefines::PvtCurve::Phase phaseToPlot =
+        static_cast<RigFlowDiagDefines::PvtCurve::Phase>( m_phaseComboBox->itemData( currComboIdx ).toInt() );
 
     QString phaseString = "";
-    if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::GAS )
+    if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::GAS )
     {
         phaseString = "Gas ";
     }
-    else if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::OIL )
+    else if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::OIL )
     {
         phaseString = "Oil ";
     }
 
     // FVF plot
     {
-        RigFlowDiagSolverInterface::PvtCurve::Ident curveIdentToPlot    = RigFlowDiagSolverInterface::PvtCurve::Unknown;
+        RigFlowDiagDefines::PvtCurve::Ident curveIdentToPlot    = RigFlowDiagDefines::PvtCurve::Unknown;
         double                                      pointMarkerFvfValue = HUGE_VAL;
         QString                                     pointMarkerLabel    = "";
 
-        if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::GAS )
+        if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::GAS )
         {
-            curveIdentToPlot    = RigFlowDiagSolverInterface::PvtCurve::Bg;
+            curveIdentToPlot    = RigFlowDiagDefines::PvtCurve::Bg;
             pointMarkerFvfValue = m_fvfDynProps.bg;
             pointMarkerLabel    = QString( "%1 (%2)" ).arg( pointMarkerFvfValue ).arg( m_cellValues.pressure );
             if ( m_cellValues.rv != HUGE_VAL )
@@ -193,9 +193,9 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
                 pointMarkerLabel += QString( "\nRv = %1" ).arg( m_cellValues.rv );
             }
         }
-        else if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::OIL )
+        else if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::OIL )
         {
-            curveIdentToPlot    = RigFlowDiagSolverInterface::PvtCurve::Bo;
+            curveIdentToPlot    = RigFlowDiagDefines::PvtCurve::Bo;
             pointMarkerFvfValue = m_fvfDynProps.bo;
             pointMarkerLabel    = QString( "%1 (%2)" ).arg( pointMarkerFvfValue ).arg( m_cellValues.pressure );
             if ( m_cellValues.rs != HUGE_VAL )
@@ -204,8 +204,8 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
             }
         }
 
-        std::vector<RigFlowDiagSolverInterface::PvtCurve> selectedFvfCurves;
-        for ( RigFlowDiagSolverInterface::PvtCurve curve : m_allFvfCurvesArr )
+        std::vector<RigFlowDiagDefines::PvtCurve> selectedFvfCurves;
+        for ( RigFlowDiagDefines::PvtCurve curve : m_allFvfCurvesArr )
         {
             if ( curve.ident == curveIdentToPlot )
             {
@@ -221,13 +221,13 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
 
     // Viscosity plot
     {
-        RigFlowDiagSolverInterface::PvtCurve::Ident curveIdentToPlot          = RigFlowDiagSolverInterface::PvtCurve::Unknown;
+        RigFlowDiagDefines::PvtCurve::Ident curveIdentToPlot          = RigFlowDiagDefines::PvtCurve::Unknown;
         double                                      pointMarkerViscosityValue = HUGE_VAL;
         QString                                     pointMarkerLabel          = "";
 
-        if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::GAS )
+        if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::GAS )
         {
-            curveIdentToPlot          = RigFlowDiagSolverInterface::PvtCurve::Visc_g;
+            curveIdentToPlot          = RigFlowDiagDefines::PvtCurve::Visc_g;
             pointMarkerViscosityValue = m_viscosityDynProps.mu_g;
             pointMarkerLabel          = QString( "%1 (%2)" ).arg( pointMarkerViscosityValue ).arg( m_cellValues.pressure );
             if ( m_cellValues.rv != HUGE_VAL )
@@ -235,9 +235,9 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
                 pointMarkerLabel += QString( "\nRv = %1" ).arg( m_cellValues.rv );
             }
         }
-        else if ( phaseToPlot == RigFlowDiagSolverInterface::PvtCurve::OIL )
+        else if ( phaseToPlot == RigFlowDiagDefines::PvtCurve::OIL )
         {
-            curveIdentToPlot          = RigFlowDiagSolverInterface::PvtCurve::Visc_o;
+            curveIdentToPlot          = RigFlowDiagDefines::PvtCurve::Visc_o;
             pointMarkerViscosityValue = m_viscosityDynProps.mu_o;
             pointMarkerLabel          = QString( "%1 (%2)" ).arg( pointMarkerViscosityValue ).arg( m_cellValues.pressure );
             if ( m_cellValues.rs != HUGE_VAL )
@@ -246,8 +246,8 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
             }
         }
 
-        std::vector<RigFlowDiagSolverInterface::PvtCurve> selectedViscosityCurves;
-        for ( RigFlowDiagSolverInterface::PvtCurve curve : m_allViscosityCurvesArr )
+        std::vector<RigFlowDiagDefines::PvtCurve> selectedViscosityCurves;
+        for ( RigFlowDiagDefines::PvtCurve curve : m_allViscosityCurvesArr )
         {
             if ( curve.ident == curveIdentToPlot )
             {
@@ -281,9 +281,9 @@ void RiuPvtPlotPanel::plotUiSelectedCurves()
 /// Static helper to get unit labels
 //--------------------------------------------------------------------------------------------------
 QString RiuPvtPlotPanel::unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem               unitSystem,
-                                                  RigFlowDiagSolverInterface::PvtCurve::Ident curveIdent )
+                                                  RigFlowDiagDefines::PvtCurve::Ident curveIdent )
 {
-    if ( curveIdent == RigFlowDiagSolverInterface::PvtCurve::Bo )
+    if ( curveIdent == RigFlowDiagDefines::PvtCurve::Bo )
     {
         switch ( unitSystem )
         {
@@ -297,7 +297,7 @@ QString RiuPvtPlotPanel::unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem 
                 return "";
         }
     }
-    else if ( curveIdent == RigFlowDiagSolverInterface::PvtCurve::Bg )
+    else if ( curveIdent == RigFlowDiagDefines::PvtCurve::Bg )
     {
         switch ( unitSystem )
         {
@@ -311,7 +311,7 @@ QString RiuPvtPlotPanel::unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem 
                 return "";
         }
     }
-    else if ( curveIdent == RigFlowDiagSolverInterface::PvtCurve::Visc_o || curveIdent == RigFlowDiagSolverInterface::PvtCurve::Visc_g )
+    else if ( curveIdent == RigFlowDiagDefines::PvtCurve::Visc_o || curveIdent == RigFlowDiagDefines::PvtCurve::Visc_g )
     {
         switch ( unitSystem )
         {
