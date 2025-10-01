@@ -65,7 +65,7 @@ void RigFlowDiagTimeStepResult::setTracerTOF( const std::string&                
     std::set<std::string> tracers;
     tracers.insert( tracerName );
 
-    RigFlowDiagResultAddress resAddr( RigFlowDiagDefines::tofResultName(), phaseSelection, tracers );
+    RigFlowDiagResultAddress resAddr( RigFlowDiagDefines::tofResultName().toStdString(), phaseSelection, tracers );
 
     addResult( resAddr, cellValues );
 
@@ -86,7 +86,7 @@ void RigFlowDiagTimeStepResult::setTracerFraction( const std::string&           
     std::set<std::string> tracers;
     tracers.insert( tracerName );
 
-    addResult( RigFlowDiagResultAddress( RigFlowDiagDefines::cellFractionResultName(), phaseSelection, tracers ), cellValues );
+    addResult( RigFlowDiagResultAddress( RigFlowDiagDefines::cellFractionResultName().toStdString(), phaseSelection, tracers ), cellValues );
 }
 
 //--------------------------------------------------------------------------------------------------
