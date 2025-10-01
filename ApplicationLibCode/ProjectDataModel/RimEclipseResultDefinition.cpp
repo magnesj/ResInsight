@@ -1450,7 +1450,8 @@ bool RimEclipseResultDefinition::hasCategoryResult() const
     if ( m_resultType() == RiaDefines::ResultCatType::DYNAMIC_NATIVE && resultVariable() == RiaResultNames::completionTypeResultName() )
         return true;
 
-    if ( m_resultType() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS && m_resultVariable() == RigFlowDiagDefines::maxFractionTracerResultName() )
+    if ( m_resultType() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS &&
+         m_resultVariable() == RigFlowDiagDefines::maxFractionTracerResultName() )
         return true;
 
     if ( resultVariable() == RiaResultNames::formationAllanResultName() || resultVariable() == RiaResultNames::formationBinaryAllanResultName() )
@@ -1629,11 +1630,11 @@ bool RimEclipseResultDefinition::hasDualPorFractureResult()
 QString RimEclipseResultDefinition::flowDiagResUiText( bool shortLabel, int maxTracerStringLength ) const
 {
     QString uiText = QString::fromStdString( flowDiagResAddress().variableName );
-    if ( flowDiagResAddress().variableName == RigFlowDiagDefines::tofResultName() )
+    if ( uiText == RigFlowDiagDefines::tofResultName() )
     {
         uiText = RimEclipseResultDefinitionTools::timeOfFlightString( injectorSelectionState(), producerSelectionState(), shortLabel );
     }
-    else if ( flowDiagResAddress().variableName == RigFlowDiagDefines::maxFractionTracerResultName() )
+    else if ( uiText == RigFlowDiagDefines::maxFractionTracerResultName() )
     {
         uiText = RimEclipseResultDefinitionTools::maxFractionTracerString( injectorSelectionState(), producerSelectionState(), shortLabel );
     }

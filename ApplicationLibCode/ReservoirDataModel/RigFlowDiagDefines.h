@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <QString>
+
 namespace RigFlowDiagDefines
 {
 struct RelPermCurve
@@ -84,18 +86,18 @@ struct FlowCharacteristicsResultFrame
     double m_lorenzCoefficient = HUGE_VAL;
 };
 
-const char* tofResultName();
-const char* cellFractionResultName();
-const char* maxFractionTracerResultName();
-const char* communicationResultName();
-const char* numFloodedPv();
+QString tofResultName();
+QString cellFractionResultName();
+QString maxFractionTracerResultName();
+QString communicationResultName();
+QString numFloodedPv();
 
-const char* flowTotalName();
-const char* flowOilName();
-const char* flowGasName();
-const char* flowWaterName();
+QString flowTotalName();
+QString flowOilName();
+QString flowGasName();
+QString flowWaterName();
 
-const char* reservoirTracerName();
-const char* tinyTracerGroupName();
+QString reservoirTracerName();
+QString tinyTracerGroupName();
 
 } // namespace RigFlowDiagDefines

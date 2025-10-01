@@ -65,7 +65,9 @@ std::map<QString, const std::vector<double>*>
         {
             if ( flowDiagSolution->tracerStatusInTimeStep( tracerName, timeStepIndex ) == requestedTracerType )
             {
-                RigFlowDiagResultAddress resAddr( RigFlowDiagDefines::cellFractionResultName(), phaseSelection, tracerName.toStdString() );
+                RigFlowDiagResultAddress resAddr( RigFlowDiagDefines::cellFractionResultName().toStdString(),
+                                                  phaseSelection,
+                                                  tracerName.toStdString() );
                 const std::vector<double>* tracerCellFractions = flowDiagSolution->flowDiagResults()->resultValues( resAddr, timeStepIndex );
                 if ( tracerCellFractions )
                 {
