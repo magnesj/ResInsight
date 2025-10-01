@@ -61,13 +61,6 @@ RigFlowDiagResults::RigFlowDiagResults( RimFlowDiagSolution* flowSolution, size_
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagResults::~RigFlowDiagResults()
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 const std::vector<double>* RigFlowDiagResults::resultValues( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex )
 {
     CVF_ASSERT( m_timeStepCount != cvf::UNDEFINED_SIZE_T ); // Forgotten to call init

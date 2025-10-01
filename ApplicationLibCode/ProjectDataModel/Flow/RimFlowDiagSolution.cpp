@@ -95,7 +95,7 @@ QString RimFlowDiagSolution::userDescription() const
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 {
-    if ( m_flowDiagResults.isNull() )
+    if ( !m_flowDiagResults )
     {
         size_t timeStepCount;
         {
@@ -108,10 +108,10 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
             timeStepCount = eclCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount();
         }
 
-        m_flowDiagResults = new RigFlowDiagResults( this, timeStepCount );
+        m_flowDiagResults = std::make_unique<RigFlowDiagResults>( this, timeStepCount );
     }
 
-    return m_flowDiagResults.p();
+    return m_flowDiagResults.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 //--------------------------------------------------------------------------------------------------
 const RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults() const
 {
-    return m_flowDiagResults.p();
+    return m_flowDiagResults.get();
 }
 
 //--------------------------------------------------------------------------------------------------

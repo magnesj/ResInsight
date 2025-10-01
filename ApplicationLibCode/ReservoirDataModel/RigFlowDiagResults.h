@@ -20,14 +20,12 @@
 #include "RigFlowDiagResultAddress.h"
 
 #include "RigFlowDiagDefines.h"
+#include "RigFlowDiagResultFrames.h"
 
 #include "RimFlowDiagSolution.h"
 
 #include "cafAppEnum.h"
 #include "cafPdmPointer.h"
-
-#include "cvfArray.h"
-#include "cvfObject.h"
 
 #include <map>
 #include <string>
@@ -38,7 +36,7 @@ class RigStatisticsDataCache;
 class RigActiveCellInfo;
 class RigFlowDiagSolverInterface;
 
-class RigFlowDiagResults : public cvf::Object
+class RigFlowDiagResults
 {
 public:
     enum CellFilter
@@ -54,7 +52,6 @@ public:
 
 public:
     RigFlowDiagResults( RimFlowDiagSolution* flowSolution, size_t timeStepCount );
-    ~RigFlowDiagResults() override;
 
     const std::vector<double>* resultValues( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex );
     size_t                     timeStepCount() { return m_timeStepCount; }
