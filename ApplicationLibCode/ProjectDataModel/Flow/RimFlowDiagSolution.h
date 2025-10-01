@@ -69,5 +69,5 @@ private:
     caf::PdmFieldHandle*   userDescriptionField() override;
     caf::PdmField<QString> m_userDescription;
 
-    cvf::ref<RigFlowDiagResults> m_flowDiagResults;
+    std::unique_ptr<RigFlowDiagResults> m_flowDiagResults;
 };
