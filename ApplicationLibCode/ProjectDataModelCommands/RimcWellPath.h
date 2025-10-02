@@ -170,12 +170,12 @@ private:
 //==================================================================================================
 ///
 //==================================================================================================
-class RimcWellPath_appendLateral : public caf::PdmVoidObjectMethod
+class RimcWellPath_appendLateralFromGeometry : public caf::PdmVoidObjectMethod
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimcWellPath_appendLateral( caf::PdmObjectHandle* self );
+    RimcWellPath_appendLateralFromGeometry( caf::PdmObjectHandle* self );
 
     std::expected<caf::PdmObjectHandle*, QString> execute() override;
 

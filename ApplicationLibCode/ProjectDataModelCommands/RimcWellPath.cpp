@@ -616,12 +616,12 @@ QString RimcWellPath_addWellLogInternal::classKeywordReturnedType() const
     return RimImportedWellLog::classKeywordStatic();
 }
 
-CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendLateral, "AppendLateral" );
+CAF_PDM_OBJECT_METHOD_SOURCE_INIT( RimWellPath, RimcWellPath_appendLateralFromGeometry, "AppendLateralFromGeometry" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimcWellPath_appendLateral::RimcWellPath_appendLateral( caf::PdmObjectHandle* self )
+RimcWellPath_appendLateralFromGeometry::RimcWellPath_appendLateralFromGeometry( caf::PdmObjectHandle* self )
     : caf::PdmVoidObjectMethod( self )
 {
     CAF_PDM_InitObject( "Append Well Path Lateral" );
@@ -632,7 +632,7 @@ RimcWellPath_appendLateral::RimcWellPath_appendLateral( caf::PdmObjectHandle* se
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendLateral::execute()
+std::expected<caf::PdmObjectHandle*, QString> RimcWellPath_appendLateralFromGeometry::execute()
 {
     auto wellPath = self<RimWellPath>();
 
