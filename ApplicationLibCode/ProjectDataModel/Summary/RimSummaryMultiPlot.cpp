@@ -1774,6 +1774,8 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
 
     for ( auto plot : summaryPlots() )
     {
+        if ( !plot ) continue;
+
         if ( m_readOutSettings->enableVerticalLine() && plot->timeAxisProperties() )
         {
             plot->timeAxisProperties()->removeAllAnnotations();
