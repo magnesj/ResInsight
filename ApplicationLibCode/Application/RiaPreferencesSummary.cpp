@@ -129,6 +129,8 @@ RiaPreferencesSummary::RiaPreferencesSummary()
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
 
+    CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::TIME_VALUE_TRACKING, "Default Readout Mode" );
+
     CAF_PDM_InitField( &m_createEnhancedSummaryDataFile,
                        "createEnhancedSummaryDataFile_v01",
                        false,
@@ -319,6 +321,7 @@ void RiaPreferencesSummary::appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOr
 
     uiOrdering.add( &m_curveColorByPhase );
     uiOrdering.add( &m_showSummaryTimeAsLongString );
+    uiOrdering.add( &m_summaryReadoutMode );
 
     auto multiGroup = uiOrdering.addNewGroup( "Multi Plot Defaults" );
 
@@ -582,6 +585,14 @@ RiaDefines::ColumnCount RiaPreferencesSummary::defaultMultiPlotColumnCount() con
 RiaDefines::RowCount RiaPreferencesSummary::defaultMultiPlotRowCount() const
 {
     return m_defaultRowsPerPage();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaDefines::ReadOutType RiaPreferencesSummary::defaultSummaryReadoutMode() const
+{
+    return m_summaryReadoutMode();
 }
 
 //--------------------------------------------------------------------------------------------------
