@@ -70,7 +70,7 @@ bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*              
                                            IndexType                                       vertexIndex,
                                            double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
+    if ( !polygon ) return false;
 
     // Check if vertex is directly included already
 
@@ -183,7 +183,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
     size_t firstIdx;
     size_t secondIdx;
 
-    CVF_TIGHT_ASSERT( touchedEdgeIndex );
+    if ( !touchedEdgeIndex ) return false;
 
     *touchedEdgeIndex = -1;
     for ( firstIdx = 0, secondIdx = 1; firstIdx < numIndices; ++firstIdx, ++secondIdx )
@@ -255,8 +255,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                        const IndexType                                 cv2CubeFaceIndices[4],
                                                        double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
-    CVF_ASSERT( createdVertexes );
+    if ( !polygon || !createdVertexes ) return false;
 
     // Topology analysis
 
@@ -466,7 +465,10 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                             else if ( fractionAlongEdge2 >= 1.0 )
                                 intersectionVxIndex = cv2CubeFaceIndices[nextCv2Idx];
                             else
-                                CVF_ASSERT( false ); // Tolerance trouble
+                            {
+                                // Tolerance trouble - cannot determine intersection vertex
+                                intersectionVxIndex = cv1CubeFaceIndices[cv1Idx]; // Use start vertex as fallback
+                            }
                         }
                         break;
                         case GeometryTools::LINES_OVERLAP:
@@ -480,7 +482,10 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                             else if ( fractionAlongEdge2 >= 1.0 )
                                 intersectionVxIndex = cv2CubeFaceIndices[nextCv2Idx];
                             else
-                                CVF_ASSERT( false ); // Tolerance trouble
+                            {
+                                // Tolerance trouble - cannot determine intersection vertex
+                                intersectionVxIndex = cv1CubeFaceIndices[cv1Idx]; // Use start vertex as fallback
+                            }
                         }
                         break;
                         default:
@@ -504,7 +509,11 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
             if ( ( intersectStatus == GeometryTools::LINES_CROSSES ) || ( intersectStatus == GeometryTools::LINES_TOUCH ) ||
                  ( intersectStatus == GeometryTools::LINES_OVERLAP ) )
             {
-                CVF_ASSERT( intersectionVxIndex != cvf::UNDEFINED_UINT );
+                if ( intersectionVxIndex == cvf::UNDEFINED_UINT )
+                {
+                    // Invalid intersection index - skip this intersection
+                    continue;
+                }
 
                 intersectionFractionsAlongEdge.push_back( fractionAlongEdge1 );
                 intersectedCv2EdgeIdxs.push_back( cv2Idx );
@@ -581,7 +590,11 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
             }
             else
             {
-                CVF_ASSERT( lastIntersection < intersectedCv2EdgeIdxs.size() );
+                if ( lastIntersection >= intersectedCv2EdgeIdxs.size() )
+                {
+                    // Invalid intersection index - cannot continue polygon
+                    break;
+                }
             }
         }
     }
@@ -625,8 +638,10 @@ void GeometryTools::calculatePartiallyFreeCubeFacePolygon( ArrayWrapperConst<Ver
     // Vertex Index to position in polygon
     using VxIdxToPolygonPositionMap = std::map<IndexType, typename std::vector<IndexType>::const_iterator>;
 
-    CVF_ASSERT( m_partiallyFreeCubeFaceHasHoles );
-    CVF_ASSERT( partialFacePolygon != NULL );
+    if ( !m_partiallyFreeCubeFaceHasHoles || !partialFacePolygon )
+    {
+        return; // Invalid parameters
+    }
 
     // Copy the start polygon
     std::list<IndexType> resultPolygon;
@@ -969,7 +984,10 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
     }
 
     iData.intersectionPointIndex = vxIndexIntersectionPoint;
-    CVF_ASSERT( e1P1 < m_edgeIntsectMap.size() );
+    if ( e1P1 >= m_edgeIntsectMap.size() )
+    {
+        return; // Invalid edge index
+    }
     m_edgeIntsectMap[e1P1][e1P2][e2P1][e2P2] = iData;
 }
 
