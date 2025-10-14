@@ -23,7 +23,7 @@
 #include "RiaFractureDefines.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesSystem.h"
-#include "RiaStatisticsTools.h"
+#include "RigStatisticsTools.h"
 #include "RiaWeightedMeanCalculator.h"
 
 #include "ExportCommands/RicExportLgrFeature.h"
@@ -493,7 +493,7 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
     RiaWeightedMeanCalculator<double> skinFactorCalculator;
 
     auto isValidTransmissibility = []( double transmissibility )
-    { return RiaStatisticsTools::isValidNumber<double>( transmissibility ) && transmissibility >= 0.0; };
+    { return RigStatisticsTools::isValidNumber<double>( transmissibility ) && transmissibility >= 0.0; };
 
     auto startMD = completions[0].startMD();
     auto endMD   = completions[0].endMD();

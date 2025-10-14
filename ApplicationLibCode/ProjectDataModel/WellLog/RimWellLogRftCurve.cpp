@@ -27,7 +27,7 @@
 #include "RiaResultNames.h"
 #include "RiaRftDefines.h"
 #include "RiaSimWellBranchTools.h"
-#include "RiaStatisticsTools.h"
+#include "RigStatisticsTools.h"
 #include "RiaTextStringTools.h"
 #include "Summary/RiaSummaryTools.h"
 
@@ -670,7 +670,7 @@ void RimWellLogRftCurve::onLoadDataAndUpdate( bool updateParentPlot )
         {
             for ( const auto& v : values )
             {
-                if ( RiaStatisticsTools::isValidNumber<double>( v ) ) return true;
+                if ( RigStatisticsTools::isValidNumber<double>( v ) ) return true;
             }
             return false;
         };
