@@ -41,12 +41,12 @@ RimSummaryMultiPlotCollection::RimSummaryMultiPlotCollection()
     CAF_PDM_InitFieldNoDefault( &m_summaryMultiPlots, "MultiSummaryPlots", "Summary Plots" );
     caf::PdmFieldReorderCapability::addToField( &m_summaryMultiPlots );
 
-    CAF_PDM_InitField( &m_applyReadoutSettingsToAll, "ApplyReadoutSettingsToAll", false, "Apply Readout Settings to All" );
-    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_applyReadoutSettingsToAll );
+    CAF_PDM_InitField( &m_useGlobalReadoutSettings, "UseGlobalReadoutSettings", false, "Use Global Readout Settings" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useGlobalReadoutSettings );
 
-    CAF_PDM_InitFieldNoDefault( &m_readOutSettings, "ReadOutSettings", "Read Out Settings" );
-    m_readOutSettings = new RimSummaryPlotReadOut;
-    m_readOutSettings.uiCapability()->setUiTreeChildrenHidden( true );
+    CAF_PDM_InitFieldNoDefault( &m_readoutSettings, "ReadOutSettings", "Read Out Settings" );
+    m_readoutSettings = new RimSummaryPlotReadOut;
+    m_readoutSettings.uiCapability()->setUiTreeChildrenHidden( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -191,13 +191,12 @@ void RimSummaryMultiPlotCollection::onChildrenUpdated( caf::PdmChildArrayFieldHa
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlotCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_applyReadoutSettingsToAll );
+    uiOrdering.add( &m_useGlobalReadoutSettings );
 
-    if ( m_applyReadoutSettingsToAll() )
-    {
-        auto readOutGroup = uiOrdering.addNewGroup( "Mouse Cursor Readout" );
-        m_readOutSettings->uiOrdering( uiConfigName, *readOutGroup );
-    }
+    auto readOutGroup = uiOrdering.addNewGroup( "Mouse Cursor Readout" );
+    readOutGroup->setCollapsed( !m_useGlobalReadoutSettings() );
+    m_readoutSettings->uiOrdering( uiConfigName, *readOutGroup );
+
     uiOrdering.skipRemainingFields();
 }
 
@@ -262,9 +261,9 @@ void RimSummaryMultiPlotCollection::updateSummaryNameHasChanged()
 //--------------------------------------------------------------------------------------------------
 std::optional<RimSummaryPlotReadOut*> RimSummaryMultiPlotCollection::activeReadOutSettings() const
 {
-    if ( m_applyReadoutSettingsToAll() )
+    if ( m_useGlobalReadoutSettings() )
     {
-        return m_readOutSettings();
+        return m_readoutSettings();
     }
     return std::nullopt;
 }

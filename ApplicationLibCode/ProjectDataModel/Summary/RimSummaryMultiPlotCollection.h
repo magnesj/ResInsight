@@ -69,6 +69,6 @@ private:
 
 private:
     caf::PdmChildArrayField<RimSummaryMultiPlot*> m_summaryMultiPlots;
-    caf::PdmField<bool>                           m_applyReadoutSettingsToAll;
-    caf::PdmChildField<RimSummaryPlotReadOut*>    m_readOutSettings;
+    caf::PdmField<bool>                           m_useGlobalReadoutSettings;
+    caf::PdmChildField<RimSummaryPlotReadOut*>    m_readoutSettings;
 };

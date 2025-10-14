@@ -155,6 +155,10 @@ RimSummaryMultiPlot::RimSummaryMultiPlot()
     m_readOutSettings = new RimSummaryPlotReadOut;
     m_readOutSettings.uiCapability()->setUiTreeChildrenHidden( true );
 
+    CAF_PDM_InitField( &m_editGlobalSettings, "EditGlobalSettings", false, "Edit Global Settings" );
+    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_editGlobalSettings );
+    m_editGlobalSettings.xmlCapability()->disableIO();
+
     CAF_PDM_InitFieldNoDefault( &m_axisRangeAggregation, "AxisRangeAggregation", "Y Axis Range" );
 
     CAF_PDM_InitField( &m_hidePlotsWithValuesBelow, "HidePlotsWithValuesBelow", false, "" );
@@ -397,7 +401,14 @@ void RimSummaryMultiPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     axesGroup->add( &m_autoAdjustAppearance );
 
     auto readOutGroup = uiOrdering.addNewGroup( "Mouse Cursor Readout" );
-    m_readOutSettings->uiOrdering( uiConfigName, *readOutGroup );
+    if ( m_readOutSettings == activeReadoutSettings() )
+    {
+        m_readOutSettings->uiOrdering( uiConfigName, *readOutGroup );
+    }
+    else
+    {
+        readOutGroup->add( &m_editGlobalSettings );
+    }
 
     auto plotVisibilityFilterGroup = uiOrdering.addNewGroup( "Plot Visibility Filter" );
     plotVisibilityFilterGroup->add( &m_plotFilterYAxisThreshold );
@@ -517,6 +528,15 @@ void RimSummaryMultiPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
 
         m_autoPlotTitle = false;
     }
+    else if ( changedField == &m_editGlobalSettings )
+    {
+        m_editGlobalSettings = false;
+
+        if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )
+        {
+            RiuPlotMainWindowTools::selectAsCurrentItem( plotCollection );
+        }
+    }
 
     RimMultiPlot::fieldChangedByUi( changedField, oldValue, newValue );
 }
@@ -539,10 +559,16 @@ void RimSummaryMultiPlot::defineEditorAttribute( const caf::PdmFieldHandle* fiel
 {
     if ( &m_hidePlotsWithValuesBelow == field )
     {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
+        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
         {
             attrib->m_buttonText = "Apply Filter";
+        }
+    }
+    else if ( field == &m_editGlobalSettings )
+    {
+        if ( auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
+        {
+            pbAttribute->m_buttonText = "Edit";
         }
     }
 }
