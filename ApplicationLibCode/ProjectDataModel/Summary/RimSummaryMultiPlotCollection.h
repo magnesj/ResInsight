@@ -51,7 +51,7 @@ public:
 
     void updateSummaryNameHasChanged();
 
-    std::optional<RimSummaryPlotReadOut*> activeReadOutSettings() const;
+    std::optional<RimSummaryPlotReadOut*> globalReadOutSettings() const;
 
 private:
     void initAfterRead() override;
@@ -65,7 +65,7 @@ private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
 
-    void onUpdateReadOutSettings();
+    void updateReadOutSettingsInSubPlots();
 
 private:
     caf::PdmChildArrayField<RimSummaryMultiPlot*> m_summaryMultiPlots;

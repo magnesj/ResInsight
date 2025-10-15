@@ -1575,9 +1575,9 @@ RimSummaryPlotReadOut* RimSummaryMultiPlot::activeReadoutSettings() const
 {
     if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )
     {
-        if ( plotCollection->activeReadOutSettings().has_value() )
+        if ( plotCollection->globalReadOutSettings().has_value() )
         {
-            return plotCollection->activeReadOutSettings().value();
+            return plotCollection->globalReadOutSettings().value();
         }
     }
 

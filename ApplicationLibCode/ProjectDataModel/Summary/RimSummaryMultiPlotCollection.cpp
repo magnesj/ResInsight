@@ -140,7 +140,10 @@ void RimSummaryMultiPlotCollection::onRefreshTree( const caf::SignalEmitter* emi
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlotCollection::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    onUpdateReadOutSettings();
+    if ( changedField == &m_useGlobalReadoutSettings )
+    {
+        updateReadOutSettingsInSubPlots();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -148,13 +151,16 @@ void RimSummaryMultiPlotCollection::fieldChangedByUi( const caf::PdmFieldHandle*
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlotCollection::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField )
 {
-    onUpdateReadOutSettings();
+    if ( changedChildField == &m_readoutSettings )
+    {
+        updateReadOutSettingsInSubPlots();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryMultiPlotCollection::onUpdateReadOutSettings()
+void RimSummaryMultiPlotCollection::updateReadOutSettingsInSubPlots()
 {
     for ( auto plot : m_summaryMultiPlots )
     {
@@ -257,7 +263,7 @@ void RimSummaryMultiPlotCollection::updateSummaryNameHasChanged()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<RimSummaryPlotReadOut*> RimSummaryMultiPlotCollection::activeReadOutSettings() const
+std::optional<RimSummaryPlotReadOut*> RimSummaryMultiPlotCollection::globalReadOutSettings() const
 {
     if ( m_useGlobalReadoutSettings() )
     {
