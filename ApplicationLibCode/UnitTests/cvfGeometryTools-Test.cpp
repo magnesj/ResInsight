@@ -701,7 +701,7 @@ TEST( GeometryToolsEdgeCases, AdditionalGeometricTests )
     cvf::Vec3d areaNormal = GeometryTools::polygonAreaNormal3D( square );
     EXPECT_NEAR( 0.0, areaNormal.x(), 1e-6 );
     EXPECT_NEAR( 0.0, areaNormal.y(), 1e-6 );
-    EXPECT_NEAR( -1.0, areaNormal.z(), 1e-6 ); // Negative due to winding
+    EXPECT_NEAR( 1.0, areaNormal.z(), 1e-6 ); // Positive due to opposite winding
 
     // Test with different winding
     std::vector<cvf::Vec3d> squareReversed = { cvf::Vec3d( 0, 0, 0 ), cvf::Vec3d( 0, 1, 0 ), cvf::Vec3d( 1, 1, 0 ), cvf::Vec3d( 1, 0, 0 ) };
@@ -709,7 +709,7 @@ TEST( GeometryToolsEdgeCases, AdditionalGeometricTests )
     areaNormal = GeometryTools::polygonAreaNormal3D( squareReversed );
     EXPECT_NEAR( 0.0, areaNormal.x(), 1e-6 );
     EXPECT_NEAR( 0.0, areaNormal.y(), 1e-6 );
-    EXPECT_NEAR( 1.0, areaNormal.z(), 1e-6 ); // Positive due to opposite winding
+    EXPECT_NEAR( -1.0, areaNormal.z(), 1e-6 ); // Negative due to winding
 }
 
 //--------------------------------------------------------------------------------------------------

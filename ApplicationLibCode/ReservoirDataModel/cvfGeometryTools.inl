@@ -27,8 +27,12 @@ namespace cvf
 template <typename Vec3Type>
 Vec3Type GeometryTools::computePolygonCenter( const std::vector<Vec3Type>& polygon )
 {
-    Vec3Type s;
+    if ( polygon.empty() )
+    {
+        return Vec3Type::ZERO;
+    }
 
+    Vec3Type s;
     for ( size_t i = 0; i < polygon.size(); i++ )
     {
         s += polygon[i];
@@ -964,6 +968,13 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
                                                        double                            fractionAlongEdge1,
                                                        double                            fractionAlongEdge2 )
 {
+    // Check bounds before canonization
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() )
+    {
+        return; // Invalid edge index
+    }
+
     static bool flipE1;
     static bool flipE2;
     static bool flipE1E2;
@@ -983,11 +994,7 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
         iData.fractionAlongEdge2 = temp;
     }
 
-    iData.intersectionPointIndex = vxIndexIntersectionPoint;
-    if ( e1P1 >= m_edgeIntsectMap.size() )
-    {
-        return; // Invalid edge index
-    }
+    iData.intersectionPointIndex             = vxIndexIntersectionPoint;
     m_edgeIntsectMap[e1P1][e1P2][e2P1][e2P2] = iData;
 }
 
@@ -1004,6 +1011,13 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
                                                         double*                            fractionAlongEdge1,
                                                         double*                            fractionAlongEdge2 )
 {
+    // Check bounds before canonization
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() )
+    {
+        return false; // Invalid edge index
+    }
+
     static bool flipE1;
     static bool flipE2;
     static bool flipE1E2;
