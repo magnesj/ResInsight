@@ -277,25 +277,7 @@ void RigMainGrid::computeCachedData( std::string* aabbTreeInfo )
     initAllSubCellsMainGridCellIndex();
 
     m_cellSearchTree = nullptr;
-
-    const double maxNumberOfLeafNodes = 4000000;
-    const double factor               = std::ceil( cellCount() / maxNumberOfLeafNodes );
-    const size_t cellsPerBoundingBox  = std::max( size_t( 1 ), static_cast<size_t>( factor ) );
-
-    if ( cellsPerBoundingBox > 1 )
-    {
-        buildCellSearchTreeOptimized( cellsPerBoundingBox );
-    }
-    else
-    {
-        buildCellSearchTree();
-    }
-
-    if ( aabbTreeInfo )
-    {
-        *aabbTreeInfo += "Cells per bounding box : " + std::to_string( cellsPerBoundingBox ) + "\n";
-        *aabbTreeInfo += m_cellSearchTree->info();
-    }
+    doBuildCellSearchTree( aabbTreeInfo );
 
     computeBoundingBox();
 }
@@ -836,6 +818,11 @@ const RigFault* RigMainGrid::findFaultFromCellIndexAndCellFace( size_t reservoir
 //--------------------------------------------------------------------------------------------------
 std::vector<size_t> RigMainGrid::findIntersectingCells( const cvf::BoundingBox& inputBB ) const
 {
+    if ( m_cellSearchTree.isNull() )
+    {
+        doBuildCellSearchTree();
+    }
+
     std::vector<size_t> cellIndices;
     if ( m_cellSearchTree.notNull() )
     {
@@ -847,7 +834,32 @@ std::vector<size_t> RigMainGrid::findIntersectingCells( const cvf::BoundingBox& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMainGrid::buildCellSearchTree()
+void RigMainGrid::doBuildCellSearchTree( std::string* aabbTreeInfo ) const
+{
+    const double maxNumberOfLeafNodes = 4000000;
+    const double factor               = std::ceil( cellCount() / maxNumberOfLeafNodes );
+    const size_t cellsPerBoundingBox  = std::max( size_t( 1 ), static_cast<size_t>( factor ) );
+
+    if ( cellsPerBoundingBox > 1 )
+    {
+        buildCellSearchTreeOptimized( cellsPerBoundingBox );
+    }
+    else
+    {
+        buildCellSearchTree();
+    }
+
+    if ( aabbTreeInfo )
+    {
+        *aabbTreeInfo += "Cells per bounding box : " + std::to_string( cellsPerBoundingBox ) + "\n";
+        *aabbTreeInfo += m_cellSearchTree->info();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMainGrid::buildCellSearchTree() const
 {
     if ( m_cellSearchTree.isNull() )
     {
@@ -910,7 +922,7 @@ void RigMainGrid::buildCellSearchTree()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMainGrid::buildCellSearchTreeOptimized( size_t cellsPerBoundingBox )
+void RigMainGrid::buildCellSearchTreeOptimized( size_t cellsPerBoundingBox ) const
 {
     int threadCount = RiaOpenMPTools::availableThreadCount();
 

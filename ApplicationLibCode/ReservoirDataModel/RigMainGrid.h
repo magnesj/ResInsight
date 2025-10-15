@@ -130,16 +130,18 @@ protected: // only for use by file readers and internal services. TODO: replace 
     std::vector<RigCell>&       reservoirCells();
     const std::vector<RigCell>& reservoirCells() const;
 
-protected:
+private:
     void initAllSubCellsMainGridCellIndex();
-    void buildCellSearchTree();
-    void buildCellSearchTreeOptimized( size_t cellsPerBoundingBox );
     bool hasFaultWithName( const QString& name ) const;
     void computeBoundingBox();
 
     static std::array<double, 6> defaultMapAxes();
 
-protected:
+    void doBuildCellSearchTree( std::string* aabbTreeInfo = nullptr ) const;
+    void buildCellSearchTree() const;
+    void buildCellSearchTreeOptimized( size_t cellsPerBoundingBox ) const;
+
+private:
     std::vector<cvf::Vec3d>       m_nodes; ///< Global vertex table
     std::vector<RigCell>          m_cells; ///< Global array of all cells in the reservoir (including the ones in LGR's)
     cvf::Collection<RigLocalGrid> m_localGrids; ///< List of all the LGR's in this reservoir
@@ -149,9 +151,8 @@ protected:
     cvf::ref<RigNNCData>                 m_nncData;
     cvf::ref<RigFaultsPrCellAccumulator> m_faultsPrCellAcc;
 
-    cvf::Vec3d                     m_displayModelOffset;
-    cvf::ref<cvf::BoundingBoxTree> m_cellSearchTree;
-    cvf::BoundingBox               m_boundingBox;
+    cvf::Vec3d       m_displayModelOffset;
+    cvf::BoundingBox m_boundingBox;
 
     bool m_flipXAxis;
     bool m_flipYAxis;
@@ -161,6 +162,7 @@ protected:
 
     bool m_dualPorosity;
 
-    mutable bool m_isFaceNormalsOutwards;
-    mutable bool m_isFaceNormalsOutwardsComputed;
+    mutable bool                           m_isFaceNormalsOutwards;
+    mutable bool                           m_isFaceNormalsOutwardsComputed;
+    mutable cvf::ref<cvf::BoundingBoxTree> m_cellSearchTree;
 };
