@@ -312,6 +312,7 @@ void RiaPreferencesSummary::appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOr
     }
 
     uiOrdering.add( &m_crossPlotAddressCombinations );
+    uiOrdering.add( &m_summaryReadoutMode );
 
     auto historyCurveGroup = uiOrdering.addNewGroup( "History Vectors" );
 
@@ -321,7 +322,6 @@ void RiaPreferencesSummary::appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOr
 
     uiOrdering.add( &m_curveColorByPhase );
     uiOrdering.add( &m_showSummaryTimeAsLongString );
-    uiOrdering.add( &m_summaryReadoutMode );
 
     auto multiGroup = uiOrdering.addNewGroup( "Multi Plot Defaults" );
 

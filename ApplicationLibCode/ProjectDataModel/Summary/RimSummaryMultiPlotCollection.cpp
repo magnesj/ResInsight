@@ -194,10 +194,8 @@ void RimSummaryMultiPlotCollection::defineUiOrdering( QString uiConfigName, caf:
     uiOrdering.add( &m_useGlobalReadoutSettings );
 
     auto readOutGroup = uiOrdering.addNewGroup( "Mouse Cursor Readout" );
-    readOutGroup->setCollapsed( !m_useGlobalReadoutSettings() );
+    readOutGroup->setCollapsedByDefault();
     m_readoutSettings->uiOrdering( uiConfigName, *readOutGroup );
-
-    uiOrdering.skipRemainingFields();
 }
 
 //--------------------------------------------------------------------------------------------------
