@@ -73,6 +73,7 @@ class RimQuickAccessCollection;
 class RimAutomationSettings;
 class RimJobCollection;
 class RimEnsembleFileSetCollection;
+class RimValueMultiplexerCollection;
 
 namespace caf
 {
@@ -196,6 +197,8 @@ public:
     RimEnsembleFileSetCollection* ensembleFileSetCollection() const;
     RimJobCollection*             jobCollection() const;
 
+    RimValueMultiplexerCollection* valueMultiplexerCollection() const;
+
 protected:
     void                              initAfterRead() override;
     void                              setupBeforeSave() override;
@@ -210,6 +213,7 @@ private:
     caf::PdmChildField<RimEnsembleFileSetCollection*> m_ensembleFileSetCollection;
     caf::PdmChildField<RimJobCollection*>             m_jobCollection;
 
+    caf::PdmChildField<RimValueMultiplexerCollection*> m_valueMultiplexerCollection;
     caf::PdmField<QString> m_globalPathList;
     caf::PdmField<QString> m_projectFileVersionString;
 
