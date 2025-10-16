@@ -42,6 +42,7 @@
 #include <QPointer>
 #include <QString>
 #include <QWidget>
+#include <functional>
 
 class QGridLayout;
 
@@ -60,8 +61,10 @@ public:
     }
 
 public:
-    bool m_useWordWrap;
-    bool m_useSingleWidgetInsteadOfLabelAndEditorWidget;
+    bool                                  m_useWordWrap;
+    bool                                  m_useSingleWidgetInsteadOfLabelAndEditorWidget;
+    QString                               m_linkText;
+    std::function<void( const QString& )> m_linkActivatedCallback;
 };
 
 //==================================================================================================
@@ -75,11 +78,6 @@ class PdmUiLabelEditor : public PdmUiFieldEditorHandle
 public:
     PdmUiLabelEditor();
     ~PdmUiLabelEditor() override;
-
-    void setText( const QString& text );
-
-signals:
-    void linkActivated( const QString& link );
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

@@ -62,22 +62,36 @@ PdmUiLabelEditor::~PdmUiLabelEditor()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiLabelEditor::setText( const QString& text )
-{
-    if ( m_label )
-    {
-        m_label->setText( text );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
     CAF_ASSERT( !m_label.isNull() );
 
-    PdmUiFieldEditorHandle::updateLabelFromField( m_label, uiConfigName );
+    PdmUiLabelEditorAttribute attributes;
+    caf::PdmUiObjectHandle*   uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
+    if ( uiObject )
+    {
+        uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
+    }
+
+    if ( !attributes.m_linkText.isEmpty() )
+    {
+        // Configure rich text and hyper link support
+        m_label->setTextFormat( Qt::RichText );
+        m_label->setTextInteractionFlags( Qt::TextBrowserInteraction );
+
+        caf::setLabelText( m_label, attributes.m_linkText );
+    }
+    else
+    {
+        PdmUiFieldEditorHandle::updateLabelFromField( m_label, uiConfigName );
+    }
+
+    if ( attributes.m_linkActivatedCallback )
+    {
+        connect( m_label,
+                 &QLabel::linkActivated,
+                 [attributes]( const QString& link ) { attributes.m_linkActivatedCallback( link ); } );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -133,11 +147,6 @@ QWidget* PdmUiLabelEditor::createLabelWidget( QWidget* parent )
         {
             m_label = new QShortenedLabel( parent );
         }
-
-        // Configure rich text and hyperlink support
-        m_label->setTextFormat( Qt::RichText );
-        m_label->setTextInteractionFlags( Qt::TextBrowserInteraction );
-        connect( m_label, &QLabel::linkActivated, this, &PdmUiLabelEditor::linkActivated );
     }
 
     return m_label;

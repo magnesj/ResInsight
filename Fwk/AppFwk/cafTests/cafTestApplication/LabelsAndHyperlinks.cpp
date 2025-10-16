@@ -19,45 +19,38 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
 
     CAF_PDM_InitFieldNoDefault( &m_labelTextField, "LabelTextField", "Label Text", "", "", "" );
     m_labelTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
-    m_labelTextField = "This is a regular label with <b>bold</b> and <i>italic</i> text.";
 
-    CAF_PDM_InitFieldNoDefault( &m_hyperlinkTextField,
-                                "HyperlinkTextField",
-                                "Click <a href=\"link1\">this link</a> or <a href=\"link2\">another link</a> to test "
-                                "hyperlinks.",
-                                "",
-                                "",
-                                "" );
+    CAF_PDM_InitFieldNoDefault( &m_hyperlinkTextField, "HyperlinkTextField", "" );
     m_hyperlinkTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
-    m_hyperlinkTextField =
-        "Click <a href=\"link1\">this link</a> or <a href=\"link2\">another link</a> to test hyperlinks.";
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void LabelsAndHyperlinks::onEditorWidgetsCreated()
+void LabelsAndHyperlinks::defineEditorAttribute( const caf::PdmFieldHandle* field,
+                                                 QString                    uiConfigName,
+                                                 caf::PdmUiEditorAttribute* attribute )
 {
-    for ( auto editor : m_hyperlinkTextField.uiCapability()->connectedEditors() )
+    caf::PdmUiLabelEditorAttribute* labelEditorAttribute = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute );
+    if ( labelEditorAttribute )
     {
-        caf::PdmUiLabelEditor* labelEditor = dynamic_cast<caf::PdmUiLabelEditor*>( editor );
-        if ( labelEditor )
+        if ( field == &m_hyperlinkTextField )
         {
-            auto txt = "Click  <a href=\"link2\">another link</a> to test";
-            m_hyperlinkTextField.uiCapability()->setUiName( txt );
+            labelEditorAttribute->m_linkText =
+                "Click <a href=\"dummy\">link</a> to select the <b>Optional Field</b> object.";
 
-            QObject::connect( labelEditor,
-                              &caf::PdmUiLabelEditor::linkActivated,
-                              [this]( const QString& link )
-                              {
-                                  auto mainWin = MainWindow::instance();
-                                  auto root    = mainWin->root();
-                                  auto obj     = root->descendantsIncludingThisOfType<OptionalFields>();
-                                  if ( !obj.empty() )
-                                  {
-                                      mainWin->selectInTreeView( obj.front() );
-                                  }
-                              } );
+            labelEditorAttribute->m_linkActivatedCallback = [this]( const QString& link )
+            {
+                auto mainWin = MainWindow::instance();
+                if ( auto root = mainWin->root() )
+                {
+                    auto obj = root->descendantsIncludingThisOfType<OptionalFields>();
+                    if ( !obj.empty() )
+                    {
+                        mainWin->selectInTreeView( obj.front() );
+                    }
+                }
+            };
         }
     }
 }
