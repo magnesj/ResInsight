@@ -1,9 +1,9 @@
 #include "LabelsAndHyperlinks.h"
 
-#include "cafPdmUiLabelEditor.h"
-
 #include "MainWindow.h"
 #include "OptionalFields.h"
+
+#include "cafPdmUiLabelEditor.h"
 
 CAF_PDM_SOURCE_INIT( LabelsAndHyperlinks, "LabelsAndHyperlinks" );
 
