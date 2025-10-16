@@ -1415,15 +1415,11 @@ void MainWindow::setPdmRoot( caf::PdmObjectHandle* pdmRoot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void MainWindow::selectInTreeView( caf::PdmObjectHandle* obj )
+void MainWindow::setTreeViewSelection( caf::PdmObjectHandle* obj )
 {
-    if ( obj )
+    if ( auto uiObj = caf::uiObj( obj ) )
     {
-        caf::PdmUiObjectHandle* uiObj = caf::uiObj( obj );
-        if ( uiObj )
-        {
-            m_pdmUiTreeView->selectAsCurrentItem( uiObj );
-        }
+        m_pdmUiTreeView->selectAsCurrentItem( uiObj );
     }
 }
 

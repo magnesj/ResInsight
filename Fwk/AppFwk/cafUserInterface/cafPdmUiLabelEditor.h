@@ -42,6 +42,7 @@
 #include <QPointer>
 #include <QString>
 #include <QWidget>
+
 #include <functional>
 
 class QGridLayout;

@@ -32,7 +32,7 @@ public:
     static MainWindow* instance();
     void               setPdmRoot( caf::PdmObjectHandle* pdmRoot );
 
-    void selectInTreeView( caf::PdmObjectHandle* obj );
+    void setTreeViewSelection( caf::PdmObjectHandle* obj );
 
     caf::PdmObjectHandle* root() const;
 

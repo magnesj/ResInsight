@@ -5,9 +5,6 @@
 #include "MainWindow.h"
 #include "OptionalFields.h"
 
-#include <QDebug>
-#include <QObject>
-
 CAF_PDM_SOURCE_INIT( LabelsAndHyperlinks, "LabelsAndHyperlinks" );
 
 //--------------------------------------------------------------------------------------------------
@@ -17,7 +14,7 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
 {
     CAF_PDM_InitObject( "Labels And Hyperlinks", "", "", "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_labelTextField, "LabelTextField", "Label Text", "", "", "" );
+    CAF_PDM_InitFieldNoDefault( &m_labelTextField, "LabelTextField", "Label Text this text can be very long", "", "", "" );
     m_labelTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_hyperlinkTextField, "HyperlinkTextField", "" );
@@ -31,10 +28,9 @@ void LabelsAndHyperlinks::defineEditorAttribute( const caf::PdmFieldHandle* fiel
                                                  QString                    uiConfigName,
                                                  caf::PdmUiEditorAttribute* attribute )
 {
-    caf::PdmUiLabelEditorAttribute* labelEditorAttribute = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute );
-    if ( labelEditorAttribute )
+    if ( field == &m_hyperlinkTextField )
     {
-        if ( field == &m_hyperlinkTextField )
+        if ( auto labelEditorAttribute = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute ) )
         {
             labelEditorAttribute->m_linkText =
                 "Click <a href=\"dummy\">link</a> to select the <b>Optional Field</b> object.";
@@ -47,7 +43,7 @@ void LabelsAndHyperlinks::defineEditorAttribute( const caf::PdmFieldHandle* fiel
                     auto obj = root->descendantsIncludingThisOfType<OptionalFields>();
                     if ( !obj.empty() )
                     {
-                        mainWin->selectInTreeView( obj.front() );
+                        mainWin->setTreeViewSelection( obj.front() );
                     }
                 }
             };
