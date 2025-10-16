@@ -67,8 +67,7 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
     CAF_ASSERT( !m_label.isNull() );
 
     PdmUiLabelEditorAttribute attributes;
-    caf::PdmUiObjectHandle*   uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-    if ( uiObject )
+    if ( auto uiObject = uiObj( uiField()->fieldHandle()->ownerObject() ) )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
     }
@@ -99,8 +98,7 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
 //--------------------------------------------------------------------------------------------------
 QWidget* PdmUiLabelEditor::createCombinedWidget( QWidget* parent )
 {
-    caf::PdmUiObjectHandle* uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-    if ( uiObject )
+    if ( auto uiObject = uiObj( uiField()->fieldHandle()->ownerObject() ) )
     {
         const QString             uiConfigName;
         PdmUiLabelEditorAttribute attributes;
@@ -131,8 +129,7 @@ QWidget* PdmUiLabelEditor::createLabelWidget( QWidget* parent )
     if ( m_label.isNull() )
     {
         PdmUiLabelEditorAttribute attributes;
-        caf::PdmUiObjectHandle*   uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-        if ( uiObject )
+        if ( auto uiObject = uiObj( uiField()->fieldHandle()->ownerObject() ) )
         {
             const QString uiConfigName;
             uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
