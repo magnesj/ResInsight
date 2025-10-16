@@ -62,6 +62,17 @@ PdmUiLabelEditor::~PdmUiLabelEditor()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void PdmUiLabelEditor::setText( const QString& text )
+{
+    if ( m_label )
+    {
+        m_label->setText( text );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
     CAF_ASSERT( !m_label.isNull() );
@@ -122,6 +133,11 @@ QWidget* PdmUiLabelEditor::createLabelWidget( QWidget* parent )
         {
             m_label = new QShortenedLabel( parent );
         }
+
+        // Configure rich text and hyperlink support
+        m_label->setTextFormat( Qt::RichText );
+        m_label->setTextInteractionFlags( Qt::TextBrowserInteraction );
+        connect( m_label, &QLabel::linkActivated, this, &PdmUiLabelEditor::linkActivated );
     }
 
     return m_label;

@@ -10,14 +10,8 @@ class LabelsAndHyperlinks : public caf::PdmObject
 public:
     LabelsAndHyperlinks();
 
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-
-private:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-
-    void defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                QString                    uiConfigName,
-                                caf::PdmUiEditorAttribute* attribute ) override;
+protected:
+    void onEditorWidgetsCreated() override;
 
 private:
     caf::PdmField<QString> m_labelTextField;

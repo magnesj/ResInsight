@@ -76,6 +76,11 @@ public:
     PdmUiLabelEditor();
     ~PdmUiLabelEditor() override;
 
+    void setText( const QString& text );
+
+signals:
+    void linkActivated( const QString& link );
+
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;
     QWidget* createLabelWidget( QWidget* parent ) override;
