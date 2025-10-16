@@ -129,7 +129,7 @@ RiaPreferencesSummary::RiaPreferencesSummary()
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
 
-    CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::TIME_VALUE_TRACKING, "Default Readout Mode" );
+    CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::SNAP_TO_POINT, "Default Readout Mode" );
 
     CAF_PDM_InitField( &m_createEnhancedSummaryDataFile,
                        "createEnhancedSummaryDataFile_v01",
