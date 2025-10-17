@@ -39,6 +39,7 @@
 #include "cafPdmObjectHandle.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLabel.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiObjectHandle.h"
 
 namespace caf
@@ -58,6 +59,12 @@ PdmUiOrdering::~PdmUiOrdering()
     {
         delete createdLabel;
         createdLabel = nullptr;
+    }
+
+    for ( auto& createdButton : m_createdButtons )
+    {
+        delete createdButton;
+        createdButton = nullptr;
     }
 }
 
@@ -86,6 +93,32 @@ PdmUiLabel* PdmUiOrdering::addNewLabel( const QString& labelText, LayoutOptions 
     m_ordering.emplace_back( label, layout );
 
     return label;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, LayoutOptions layout )
+{
+    auto* button = new PdmUiButton( buttonText );
+
+    m_createdButtons.push_back( button );
+    m_ordering.emplace_back( button, layout );
+
+    return button;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, const std::function<void()>& callback, LayoutOptions layout )
+{
+    auto* button = new PdmUiButton( buttonText, callback );
+
+    m_createdButtons.push_back( button );
+    m_ordering.emplace_back( button, layout );
+
+    return button;
 }
 
 //--------------------------------------------------------------------------------------------------

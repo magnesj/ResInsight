@@ -44,6 +44,7 @@
 #include "cafPdmUiFieldEditorHelper.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLabel.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiOrdering.h"
@@ -57,6 +58,7 @@
 #include <QFrame>
 #include <QGridLayout>
 #include <QLabel>
+#include <QPushButton>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -180,6 +182,15 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
                 if ( qLabel )
                 {
                     parentLayout->addWidget( qLabel, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
+                    currentColumn += itemColumnSpan;
+                }
+            }
+            else if ( auto* button = dynamic_cast<PdmUiButton*>( currentItem ) )
+            {
+                QPushButton* qButton = findOrCreateButton( containerWidgetWithGridLayout, button, uiConfigName );
+                if ( qButton )
+                {
+                    parentLayout->addWidget( qButton, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
                     currentColumn += itemColumnSpan;
                 }
             }
@@ -460,6 +471,69 @@ QLabel* caf::PdmUiFormLayoutObjectEditor::findOrCreateLabel( QWidget*       pare
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QPushButton* caf::PdmUiFormLayoutObjectEditor::findOrCreateButton( QWidget*       parent,
+                                                                    PdmUiButton*   button,
+                                                                    const QString& uiConfigName )
+{
+    QString buttonKey = button->uiName( uiConfigName );
+    QPushButton* qButton = nullptr;
+
+    // Find or create button
+    std::map<QString, QPointer<QPushButton>>::iterator it;
+    it = m_buttons.find( buttonKey );
+
+    if ( it == m_buttons.end() )
+    {
+        auto newButtonIt = m_newButtons.find( buttonKey );
+        if ( newButtonIt != m_newButtons.end() )
+        {
+            auto message = "Detected duplicate button with text: " + buttonKey;
+            CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: %1. This may cause layout issues. Ensure unique button "
+                                        "texts in PdmUiOrdering." )
+                                   .arg( message ) );
+        }
+
+        qButton = new QPushButton( parent );
+        qButton->setText( button->uiName( uiConfigName ) );
+        qButton->setObjectName( buttonKey );
+
+        // Set icon if available
+        auto icon = button->uiIcon( uiConfigName );
+        if ( icon && !icon->isNull() )
+        {
+            qButton->setIcon( *icon );
+        }
+
+        // Connect callback if available
+        auto callback = button->clickCallback();
+        if ( callback )
+        {
+            QObject::connect( qButton, &QPushButton::clicked, [callback]() { callback(); } );
+        }
+
+        m_newButtons[buttonKey] = qButton;
+    }
+    else
+    {
+        qButton = it->second;
+        CAF_ASSERT( qButton );
+        m_newButtons[buttonKey] = qButton;
+    }
+
+    // Update the text and icon to support dynamic button content
+    qButton->setText( button->uiName( uiConfigName ) );
+    auto icon = button->uiIcon( uiConfigName );
+    if ( icon && !icon->isNull() )
+    {
+        qButton->setIcon( *icon );
+    }
+
+    return qButton;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateFieldEditor( QWidget*          parent,
                                                                                         PdmUiFieldHandle* field,
                                                                                         const QString&    uiConfigName )
@@ -591,6 +665,7 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
 
     m_newGroupBoxes.clear();
     m_newLabels.clear();
+    m_newButtons.clear();
 
     std::map<QString, QPointer<QMinimizePanel>>::iterator groupIt;
     for ( groupIt = m_groupBoxes.begin(); groupIt != m_groupBoxes.end(); ++groupIt )
@@ -619,6 +694,18 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
     }
 
     m_labels.clear();
+
+    std::map<QString, QPointer<QPushButton>>::iterator buttonIt;
+    for ( buttonIt = m_buttons.begin(); buttonIt != m_buttons.end(); ++buttonIt )
+    {
+        QPushButton* button = buttonIt->second;
+        if ( button )
+        {
+            delete button;
+        }
+    }
+
+    m_buttons.clear();
 
     // Note: Layouts are now managed by Qt's parent-child ownership system.
     // When added to parent layouts via addLayout(), Qt automatically handles cleanup.
@@ -694,6 +781,19 @@ void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiCo
         }
     }
     m_labels = m_newLabels;
+
+    // Clean up unused buttons
+    std::map<QString, QPointer<QPushButton>>::iterator buttonMapIt;
+    for ( buttonMapIt = m_buttons.begin(); buttonMapIt != m_buttons.end(); ++buttonMapIt )
+    {
+        std::map<QString, QPointer<QPushButton>>::iterator it = m_newButtons.find( buttonMapIt->first );
+        if ( it == m_newButtons.end() )
+        {
+            // The old button is not present anymore, get rid of it
+            if ( !buttonMapIt->second.isNull() ) delete buttonMapIt->second;
+        }
+    }
+    m_buttons = m_newButtons;
 
     // Notify pdm object when widgets have been created
     caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
