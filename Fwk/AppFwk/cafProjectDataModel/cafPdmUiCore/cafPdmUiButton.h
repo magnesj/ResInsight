@@ -61,7 +61,7 @@ public:
     void setIcon( const IconProvider& iconProvider );
     void setIconFromResourceString( const QString& iconResourceName );
 
-    void setClickCallback( const ClickCallback& callback );
+    void          setClickCallback( const ClickCallback& callback );
     ClickCallback clickCallback() const;
 
     bool isUiGroup() const override;

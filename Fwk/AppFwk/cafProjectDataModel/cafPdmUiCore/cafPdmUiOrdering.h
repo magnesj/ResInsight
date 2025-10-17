@@ -39,8 +39,8 @@
 #include "cafPdmUiItem.h"
 
 #include <QString>
-#include <vector>
 #include <functional>
+#include <vector>
 
 namespace caf
 {
@@ -94,16 +94,18 @@ public:
                            const PdmFieldHandle* fieldToInsert,
                            LayoutOptions         layout = defaultLayoutOptions() );
 
-    PdmUiGroup* addNewGroup( const QString& displayName, LayoutOptions layout = defaultLayoutOptions() );
-    PdmUiLabel* addNewLabel( const QString& labelText, LayoutOptions layout = defaultLayoutOptions() );
+    PdmUiGroup*  addNewGroup( const QString& displayName, LayoutOptions layout = defaultLayoutOptions() );
+    PdmUiLabel*  addNewLabel( const QString& labelText, LayoutOptions layout = defaultLayoutOptions() );
     PdmUiButton* addNewButton( const QString& buttonText, LayoutOptions layout = defaultLayoutOptions() );
-    PdmUiButton* addNewButton( const QString& buttonText, const std::function<void()>& callback, LayoutOptions layout = defaultLayoutOptions() );
-    PdmUiGroup* createGroupBeforeGroup( const QString& groupId,
-                                        const QString& displayName,
-                                        LayoutOptions  layout = defaultLayoutOptions() );
-    PdmUiGroup* createGroupBeforeItem( const PdmUiItem* item,
-                                       const QString&   displayName,
-                                       LayoutOptions    layout = defaultLayoutOptions() );
+    PdmUiButton* addNewButton( const QString&               buttonText,
+                               const std::function<void()>& callback,
+                               LayoutOptions                layout = defaultLayoutOptions() );
+    PdmUiGroup*  createGroupBeforeGroup( const QString& groupId,
+                                         const QString& displayName,
+                                         LayoutOptions  layout = defaultLayoutOptions() );
+    PdmUiGroup*  createGroupBeforeItem( const PdmUiItem* item,
+                                        const QString&   displayName,
+                                        LayoutOptions    layout = defaultLayoutOptions() );
 
     PdmUiGroup* addNewGroupWithKeyword( const QString& displayName,
                                         const QString& groupKeyword,

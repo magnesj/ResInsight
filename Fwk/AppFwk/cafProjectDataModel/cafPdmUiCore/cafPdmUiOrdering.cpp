@@ -37,9 +37,9 @@
 #include "cafPdmUiOrdering.h"
 
 #include "cafPdmObjectHandle.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLabel.h"
-#include "cafPdmUiButton.h"
 #include "cafPdmUiObjectHandle.h"
 
 namespace caf
@@ -111,7 +111,8 @@ PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, LayoutOptio
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, const std::function<void()>& callback, LayoutOptions layout )
+PdmUiButton*
+    PdmUiOrdering::addNewButton( const QString& buttonText, const std::function<void()>& callback, LayoutOptions layout )
 {
     auto* button = new PdmUiButton( buttonText, callback );
 
