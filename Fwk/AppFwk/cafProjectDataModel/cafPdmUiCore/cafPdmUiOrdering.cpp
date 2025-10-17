@@ -38,6 +38,7 @@
 
 #include "cafPdmObjectHandle.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiLabel.h"
 #include "cafPdmUiObjectHandle.h"
 
 namespace caf
@@ -51,6 +52,12 @@ PdmUiOrdering::~PdmUiOrdering()
     {
         delete createdGroup;
         createdGroup = nullptr;
+    }
+
+    for ( auto& createdLabel : m_createdLabels )
+    {
+        delete createdLabel;
+        createdLabel = nullptr;
     }
 }
 
@@ -66,6 +73,19 @@ PdmUiGroup* PdmUiOrdering::addNewGroup( const QString& displayName, LayoutOption
     m_ordering.emplace_back( group, layout );
 
     return group;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+PdmUiLabel* PdmUiOrdering::addNewLabel( const QString& labelText, LayoutOptions layout )
+{
+    auto* label = new PdmUiLabel( labelText );
+
+    m_createdLabels.push_back( label );
+    m_ordering.emplace_back( label, layout );
+
+    return label;
 }
 
 //--------------------------------------------------------------------------------------------------

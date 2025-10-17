@@ -43,6 +43,7 @@
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUiFieldEditorHelper.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiLabel.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiOrdering.h"
@@ -55,6 +56,7 @@
 #include <QCoreApplication>
 #include <QFrame>
 #include <QGridLayout>
+#include <QLabel>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -171,6 +173,15 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
                 parentLayout->setRowStretch( currentRowIndex, groupStretchFactor );
                 currentColumn += itemColumnSpan;
                 sumRowStretch += groupStretchFactor;
+            }
+            else if ( auto* label = dynamic_cast<PdmUiLabel*>( currentItem ) )
+            {
+                QLabel* qLabel = findOrCreateLabel( containerWidgetWithGridLayout, label, uiConfigName );
+                if ( qLabel )
+                {
+                    parentLayout->addWidget( qLabel, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
+                    currentColumn += itemColumnSpan;
+                }
             }
             else
             {
@@ -405,6 +416,50 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QLabel* caf::PdmUiFormLayoutObjectEditor::findOrCreateLabel( QWidget*       parent,
+                                                              PdmUiLabel*    label,
+                                                              const QString& uiConfigName )
+{
+    QString labelKey = label->uiName( uiConfigName );
+    QLabel* qLabel   = nullptr;
+
+    // Find or create label
+    std::map<QString, QPointer<QLabel>>::iterator it;
+    it = m_labels.find( labelKey );
+
+    if ( it == m_labels.end() )
+    {
+        auto newLabelIt = m_newLabels.find( labelKey );
+        if ( newLabelIt != m_newLabels.end() )
+        {
+            auto message = "Detected duplicate label with text: " + labelKey;
+            CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: %1. This may cause layout issues. Ensure unique label "
+                                        "texts in PdmUiOrdering." )
+                                   .arg( message ) );
+        }
+
+        qLabel = new QLabel( parent );
+        qLabel->setText( label->uiName( uiConfigName ) );
+        qLabel->setWordWrap( true );
+        qLabel->setObjectName( labelKey );
+
+        m_newLabels[labelKey] = qLabel;
+    }
+    else
+    {
+        qLabel = it->second;
+        CAF_ASSERT( qLabel );
+        m_newLabels[labelKey] = qLabel;
+    }
+
+    // Update the text to support dynamic label content
+    qLabel->setText( label->uiName( uiConfigName ) );
+    return qLabel;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateFieldEditor( QWidget*          parent,
                                                                                         PdmUiFieldHandle* field,
                                                                                         const QString&    uiConfigName )
@@ -535,6 +590,7 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
     m_fieldViews.clear();
 
     m_newGroupBoxes.clear();
+    m_newLabels.clear();
 
     std::map<QString, QPointer<QMinimizePanel>>::iterator groupIt;
     for ( groupIt = m_groupBoxes.begin(); groupIt != m_groupBoxes.end(); ++groupIt )
@@ -551,6 +607,18 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
     }
 
     m_groupBoxes.clear();
+
+    std::map<QString, QPointer<QLabel>>::iterator labelIt;
+    for ( labelIt = m_labels.begin(); labelIt != m_labels.end(); ++labelIt )
+    {
+        QLabel* label = labelIt->second;
+        if ( label )
+        {
+            delete label;
+        }
+    }
+
+    m_labels.clear();
 
     // Note: Layouts are now managed by Qt's parent-child ownership system.
     // When added to parent layouts via addLayout(), Qt automatically handles cleanup.
@@ -613,6 +681,19 @@ void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiCo
         }
     }
     m_groupBoxes = m_newGroupBoxes;
+
+    // Clean up unused labels
+    std::map<QString, QPointer<QLabel>>::iterator labelMapIt;
+    for ( labelMapIt = m_labels.begin(); labelMapIt != m_labels.end(); ++labelMapIt )
+    {
+        std::map<QString, QPointer<QLabel>>::iterator it = m_newLabels.find( labelMapIt->first );
+        if ( it == m_newLabels.end() )
+        {
+            // The old label is not present anymore, get rid of it
+            if ( !labelMapIt->second.isNull() ) delete labelMapIt->second;
+        }
+    }
+    m_labels = m_newLabels;
 
     // Notify pdm object when widgets have been created
     caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );

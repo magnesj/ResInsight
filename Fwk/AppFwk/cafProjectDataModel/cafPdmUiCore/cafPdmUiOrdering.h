@@ -44,6 +44,7 @@
 namespace caf
 {
 class PdmUiGroup;
+class PdmUiLabel;
 class PdmFieldHandle;
 class PdmObjectHandle;
 
@@ -92,6 +93,7 @@ public:
                            LayoutOptions         layout = defaultLayoutOptions() );
 
     PdmUiGroup* addNewGroup( const QString& displayName, LayoutOptions layout = defaultLayoutOptions() );
+    PdmUiLabel* addNewLabel( const QString& labelText, LayoutOptions layout = defaultLayoutOptions() );
     PdmUiGroup* createGroupBeforeGroup( const QString& groupId,
                                         const QString& displayName,
                                         LayoutOptions  layout = defaultLayoutOptions() );
@@ -152,6 +154,7 @@ private:
 
     std::vector<FieldAndLayout> m_ordering; ///< The order of groups and fields
     std::vector<PdmUiGroup*>    m_createdGroups; ///< Owned PdmUiGroups, for memory management only
+    std::vector<PdmUiLabel*>    m_createdLabels; ///< Owned PdmUiLabels, for memory management only
     bool                        m_skipRemainingFields;
 };
 

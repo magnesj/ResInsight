@@ -24,6 +24,20 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void LabelsAndHyperlinks::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.addNewLabel( "This is a standalone label without PDM field connection" );
+    uiOrdering.addNewLabel( "Labels can display informational text in the GUI" );
+    
+    uiOrdering.add( &m_labelTextField );
+    uiOrdering.add( &m_hyperlinkTextField );
+    
+    uiOrdering.addNewLabel( "Another label at the bottom demonstrating multiple labels" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void LabelsAndHyperlinks::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                  QString                    uiConfigName,
                                                  caf::PdmUiEditorAttribute* attribute )
