@@ -32,7 +32,7 @@ void LabelsAndHyperlinks::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     uiOrdering.addNewLabel( "This is a standalone label without PDM field connection" );
     uiOrdering.addNewLabel( "Labels can display informational text in the GUI" );
 
-    // Button with just text
+    // Button with just text of some sort
     uiOrdering.addNewButton( "Simple Button" );
 
     // Button with text and lambda callback
