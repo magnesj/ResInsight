@@ -40,11 +40,11 @@
 #include "cafPdmChildField.h"
 #include "cafPdmLogging.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUiFieldEditorHelper.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiLabel.h"
-#include "cafPdmUiButton.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiOrdering.h"
@@ -427,9 +427,7 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QLabel* caf::PdmUiFormLayoutObjectEditor::findOrCreateLabel( QWidget*       parent,
-                                                              PdmUiLabel*    label,
-                                                              const QString& uiConfigName )
+QLabel* caf::PdmUiFormLayoutObjectEditor::findOrCreateLabel( QWidget* parent, PdmUiLabel* label, const QString& uiConfigName )
 {
     QString labelKey = label->uiName( uiConfigName );
     QLabel* qLabel   = nullptr;
@@ -472,11 +470,11 @@ QLabel* caf::PdmUiFormLayoutObjectEditor::findOrCreateLabel( QWidget*       pare
 ///
 //--------------------------------------------------------------------------------------------------
 QPushButton* caf::PdmUiFormLayoutObjectEditor::findOrCreateButton( QWidget*       parent,
-                                                                    PdmUiButton*   button,
-                                                                    const QString& uiConfigName )
+                                                                   PdmUiButton*   button,
+                                                                   const QString& uiConfigName )
 {
-    QString buttonKey = button->uiName( uiConfigName );
-    QPushButton* qButton = nullptr;
+    QString      buttonKey = button->uiName( uiConfigName );
+    QPushButton* qButton   = nullptr;
 
     // Find or create button
     std::map<QString, QPointer<QPushButton>>::iterator it;
