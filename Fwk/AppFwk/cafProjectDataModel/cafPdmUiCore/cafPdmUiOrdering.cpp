@@ -55,11 +55,6 @@ PdmUiOrdering::~PdmUiOrdering()
         createdGroup = nullptr;
     }
 
-    for ( auto& createdLabel : m_createdLabels )
-    {
-        delete createdLabel;
-        createdLabel = nullptr;
-    }
 
     for ( auto& createdButton : m_createdButtons )
     {
@@ -87,12 +82,13 @@ PdmUiGroup* PdmUiOrdering::addNewGroup( const QString& displayName, LayoutOption
 //--------------------------------------------------------------------------------------------------
 PdmUiLabel* PdmUiOrdering::addNewLabel( const QString& labelText, LayoutOptions layout )
 {
-    auto* label = new PdmUiLabel( labelText );
+    auto label = std::make_unique<PdmUiLabel>( labelText );
+    PdmUiLabel* labelPtr = label.get();
 
-    m_createdLabels.push_back( label );
-    m_ordering.emplace_back( label, layout );
+    m_createdLabels.push_back( std::move( label ) );
+    m_ordering.emplace_back( labelPtr, layout );
 
-    return label;
+    return labelPtr;
 }
 
 //--------------------------------------------------------------------------------------------------

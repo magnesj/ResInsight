@@ -37,9 +37,12 @@
 #pragma once
 
 #include "cafPdmUiItem.h"
+#include "cafPdmUiLabel.h"
 
 #include <QString>
+
 #include <functional>
+#include <memory>
 #include <vector>
 
 namespace caf
@@ -158,11 +161,11 @@ private:
                                            const QString& groupKeyword,
                                            LayoutOptions  layout = defaultLayoutOptions() );
 
-    std::vector<FieldAndLayout> m_ordering; ///< The order of groups and fields
-    std::vector<PdmUiGroup*>    m_createdGroups; ///< Owned PdmUiGroups, for memory management only
-    std::vector<PdmUiLabel*>    m_createdLabels; ///< Owned PdmUiLabels, for memory management only
-    std::vector<PdmUiButton*>   m_createdButtons; ///< Owned PdmUiButtons, for memory management only
-    bool                        m_skipRemainingFields;
+    std::vector<FieldAndLayout>              m_ordering; ///< The order of groups and fields
+    std::vector<PdmUiGroup*>                 m_createdGroups; ///< Owned PdmUiGroups, for memory management only
+    std::vector<std::unique_ptr<PdmUiLabel>> m_createdLabels; ///< Owned PdmUiLabels, for memory management only
+    std::vector<PdmUiButton*>                m_createdButtons; ///< Owned PdmUiButtons, for memory management only
+    bool                                     m_skipRemainingFields;
 };
 
 } // End of namespace caf
