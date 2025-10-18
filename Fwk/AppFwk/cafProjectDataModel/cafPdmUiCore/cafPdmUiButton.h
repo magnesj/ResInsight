@@ -61,6 +61,9 @@ public:
     void setIcon( const IconProvider& iconProvider );
     void setIconFromResourceString( const QString& iconResourceName );
 
+    void          setAlignment( Qt::Alignment alignment );
+    Qt::Alignment alignment() const;
+
     void          setClickCallback( const ClickCallback& callback );
     ClickCallback clickCallback() const;
 
@@ -68,6 +71,7 @@ public:
 
 private:
     QString       m_text;
+    Qt::Alignment m_alignment;
     ClickCallback m_clickCallback;
 };
 

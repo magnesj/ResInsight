@@ -43,6 +43,7 @@ namespace caf
 ///
 //--------------------------------------------------------------------------------------------------
 PdmUiButton::PdmUiButton()
+    : m_alignment( Qt::AlignLeft | Qt::AlignTop )
 {
 }
 
@@ -51,6 +52,7 @@ PdmUiButton::PdmUiButton()
 //--------------------------------------------------------------------------------------------------
 PdmUiButton::PdmUiButton( const QString& buttonText )
     : m_text( buttonText )
+    , m_alignment( Qt::AlignLeft | Qt::AlignTop )
 {
     setUiName( buttonText );
 }
@@ -60,6 +62,7 @@ PdmUiButton::PdmUiButton( const QString& buttonText )
 //--------------------------------------------------------------------------------------------------
 PdmUiButton::PdmUiButton( const QString& buttonText, const ClickCallback& callback )
     : m_text( buttonText )
+    , m_alignment( Qt::AlignLeft | Qt::AlignTop )
     , m_clickCallback( callback )
 {
     setUiName( buttonText );
@@ -96,6 +99,22 @@ void PdmUiButton::setIcon( const IconProvider& iconProvider )
 void PdmUiButton::setIconFromResourceString( const QString& iconResourceName )
 {
     setUiIconFromResourceString( iconResourceName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiButton::setAlignment( Qt::Alignment alignment )
+{
+    m_alignment = alignment;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+Qt::Alignment PdmUiButton::alignment() const
+{
+    return m_alignment;
 }
 
 //--------------------------------------------------------------------------------------------------

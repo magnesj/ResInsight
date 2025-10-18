@@ -59,6 +59,18 @@ void LabelsAndHyperlinks::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
                                                 } );
     iconButton->setIconFromResourceString( ":/cafCommandFeatures/Delete.svg" );
 
+    // Button with left alignment (positioned left in its container)
+    auto* leftAlignButton = uiOrdering.addNewButton( "Left Aligned Button" );
+    leftAlignButton->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    // Button with center alignment (positioned center in its container)
+    auto* centerAlignButton = uiOrdering.addNewButton( "Center Aligned Button" );
+    centerAlignButton->setAlignment( Qt::AlignHCenter | Qt::AlignTop );
+
+    // Button with right alignment (positioned right in its container)
+    auto* rightAlignButton = uiOrdering.addNewButton( "Right Aligned Button" );
+    rightAlignButton->setAlignment( Qt::AlignRight | Qt::AlignTop );
+
     uiOrdering.add( &m_labelTextField );
     uiOrdering.add( &m_hyperlinkTextField );
 
