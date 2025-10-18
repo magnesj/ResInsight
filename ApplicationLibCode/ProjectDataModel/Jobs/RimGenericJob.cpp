@@ -18,9 +18,16 @@
 
 #include "RimGenericJob.h"
 
+#include "RiaColorTools.h"
+#include "RiaLogging.h"
+
+#include "RimJobMonitor.h"
 #include "RimProcess.h"
 
+#include "RiuGuiTheme.h"
+
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmUiTreeAttributes.h"
 #include "cafProgressInfo.h"
 
 #include <QMessageBox>
@@ -31,6 +38,10 @@ CAF_PDM_XML_ABSTRACT_SOURCE_INIT( RimGenericJob, "GenericJob" ); // Do not use. 
 ///
 //--------------------------------------------------------------------------------------------------
 RimGenericJob::RimGenericJob()
+    : m_percentageDone( 0.0 )
+    , m_lastRunFailed( false )
+    , m_isRunning( false )
+    , m_process( nullptr )
 {
     CAF_PDM_InitObject( "Generic Job" );
 }
@@ -45,10 +56,26 @@ RimGenericJob::~RimGenericJob()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+double RimGenericJob::percentageDone() const
+{
+    return m_percentageDone;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimGenericJob::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
-    menuBuilder << "RicRunJobFeature";
+    if ( isRunning() )
+    {
+        menuBuilder << "RicStopJobFeature";
+    }
+    else
+    {
+        menuBuilder << "RicRunJobFeature";
+    }
     menuBuilder << "RicDuplicateJobFeature";
+    menuBuilder << "RicViewJobLogFeature";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -62,49 +89,154 @@ QString RimGenericJob::workingDirectory() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimGenericJob::isRunning() const
+{
+    return m_isRunning;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimGenericJob::stop()
+{
+    if ( !m_process.isNull() )
+    {
+        m_process->terminate();
+        RiaLogging::info( "Job \"" + name() + "\" stopped by user." );
+        return true;
+    }
+    return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimGenericJob::execute()
 {
+    if ( isRunning() ) return false;
+
+    m_process        = nullptr;
+    m_percentageDone = 0.0;
+
     // job preparations
     {
-        caf::ProgressInfo prepProgress( 1, title(), false );
+        caf::ProgressInfo prepProgress( 1, name(), false );
 
         auto prepRun = prepProgress.task( "Preparing for run, please wait..." );
 
-        if ( !onPrepare() ) return false;
+        if ( !onPrepare() )
+        {
+            m_lastRunFailed = true;
+            onProgress( m_percentageDone );
+            return false;
+        }
     }
 
     // check if we should run
     if ( !onRun() ) return false;
 
-    // run job
-    bool runOk = false;
+    QStringList cmdLine = command();
+    if ( cmdLine.isEmpty() ) return false;
+
+    // cannot delete job while running
+    setDeletable( false );
+
+    m_process = new RimProcess( true, new RimJobMonitor( this ) );
+
+    m_isRunning     = true;
+    m_lastRunFailed = false;
+
+    onProgress( m_percentageDone );
+
+    // build process to run
+    QString cmd = cmdLine.takeFirst();
+    m_process->setCommand( cmd );
+    if ( !cmdLine.isEmpty() ) m_process->addParameters( cmdLine );
+    m_process->setWorkingDirectory( workingDirectory() );
+    for ( const auto& [name, value] : environment() )
     {
-        caf::ProgressInfo runProgress( 1, title() );
-
-        auto taskRun = runProgress.task( "Running job, please wait..." );
-
-        QStringList cmdLine = command();
-        if ( cmdLine.isEmpty() ) return false;
-
-        QString cmd = cmdLine.takeFirst();
-
-        RimProcess process;
-        process.setCommand( cmd );
-        if ( !cmdLine.isEmpty() ) process.addParameters( cmdLine );
-        process.setWorkingDirectory( workingDirectory() );
-        for ( const auto& [name, value] : environment() )
-        {
-            process.addEnvironmentVariable( name, value );
-        }
-
-        runOk = process.execute();
+        m_process->addEnvironmentVariable( name, value );
     }
+
+    // run process
+    bool startOk = m_process->start();
+    if ( !startOk )
+    {
+        onCompleted( false );
+        m_lastRunFailed = true;
+        m_isRunning     = false;
+        setDeletable( true );
+        QMessageBox::critical( nullptr, name(), "Failed to start job. Check log window for additional information." );
+    }
+
+    return startOk;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimGenericJob::setFinished( bool runOk )
+{
+    m_isRunning = false;
+
+    m_lastRunFailed = !runOk;
+
+    m_percentageDone = 100.0;
+    onProgress( m_percentageDone );
+    setDeletable( true );
 
     onCompleted( runOk );
 
-    if ( !runOk )
-    {
-        QMessageBox::critical( nullptr, title(), "Failed to run job. Check log window for additional information." );
-    }
     return runOk;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimGenericJob::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute ) )
+    {
+        if ( m_lastRunFailed )
+        {
+            auto tag = caf::PdmUiTreeViewItemAttribute::createTag( QColor( Qt::red ),
+                                                                   RiuGuiTheme::getColorByVariableName( "backgroundColor1" ),
+                                                                   "!!!" );
+            treeItemAttribute->tags.push_back( std::move( tag ) );
+        }
+        else
+        {
+            if ( ( m_percentageDone == 0.0 ) && ( !m_isRunning ) ) return;
+
+            auto tag = caf::PdmUiTreeViewItemAttribute::createTag();
+
+            if ( m_isRunning )
+            {
+                tag->text = QString( "%1 %" ).arg( m_percentageDone, 0, 'f', 1 );
+            }
+            else
+            {
+                tag->text = "Done";
+            }
+
+            double factor = m_percentageDone / 100.0;
+
+            cvf::Color3f viewColor = cvf::Color3f( cvf::Color3f::GREEN );
+            viewColor.set( viewColor.r() * factor, viewColor.g() * factor, viewColor.b() * factor );
+            cvf::Color3f viewTextColor = RiaColorTools::contrastColor( viewColor );
+            tag->bgColor               = QColor( RiaColorTools::toQColor( viewColor ) );
+            tag->fgColor               = QColor( RiaColorTools::toQColor( viewTextColor ) );
+            treeItemAttribute->tags.push_back( std::move( tag ) );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const QStringList RimGenericJob::jobLog() const
+{
+    if ( m_process.isNull() ) return QStringList();
+
+    return m_process->stdOut();
 }

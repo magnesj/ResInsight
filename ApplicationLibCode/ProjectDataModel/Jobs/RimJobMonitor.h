@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2025     Equinor ASA
+//  Copyright (C) 2025 Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,38 +15,27 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "cafPdmField.h"
+#include "RimProcessMonitor.h"
 
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
-
-#include <QString>
+#include "cafPdmPointer.h"
 
 class RimGenericJob;
 
-class RimJobCollection : public caf::PdmObject
+class RimJobMonitor : public RimProcessMonitor
 {
-    CAF_PDM_HEADER_INIT;
+    Q_OBJECT
 
 public:
-    RimJobCollection();
-    ~RimJobCollection() override;
-
-    void addNewJob( RimGenericJob* newJob );
-
-    bool isEmpty();
-
-    int numberOfRunningJobs() const;
-
-    void deleteAllJobs();
-
-    std::vector<RimGenericJob*> jobs() const;
+    RimJobMonitor( RimGenericJob* job );
+    ~RimJobMonitor();
 
 protected:
-    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    void readyReadStandardOutput() override;
+    void finished( int exitCode, QProcess::ExitStatus exitStatus ) override;
 
 private:
-    caf::PdmChildArrayField<RimGenericJob*> m_jobs;
+    caf::PdmPointer<RimGenericJob> m_job;
 };

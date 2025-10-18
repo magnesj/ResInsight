@@ -27,6 +27,8 @@
 #include "CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
 #include "EclipseCommands/RicCreateGridCaseEnsemblesFromFilesFeature.h"
 #include "JobCommands/RicRunJobFeature.h"
+#include "JobCommands/RicStopJobFeature.h"
+
 #include "RifOpmFlowDeckFile.h"
 
 #include "Ensemble/RimSummaryFileSetEnsemble.h"
@@ -95,6 +97,7 @@ void caf::AppEnum<RimOpmFlowJob::DateAppendType>::setUp()
 RimOpmFlowJob::RimOpmFlowJob()
     : m_fileDeckHasDates( false )
     , m_fileDeckIsRestart( false )
+    , m_startStepForProgress( -1 )
 {
     CAF_PDM_InitObject( "Opm Flow Simulation", ":/opm.png" );
 
@@ -144,6 +147,10 @@ RimOpmFlowJob::RimOpmFlowJob()
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_runButton );
     m_runButton.xmlCapability()->disableIO();
 
+    CAF_PDM_InitField( &m_stopButton, "stopButton", false, "" );
+    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_stopButton );
+    m_stopButton.xmlCapability()->disableIO();
+
     CAF_PDM_InitField( &m_resetRunIdButton, "resetRunIdButton", false, " " );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_resetRunIdButton );
     m_resetRunIdButton.xmlCapability()->disableIO();
@@ -181,6 +188,48 @@ void RimOpmFlowJob::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::decodeProgress( const QString& logLine )
+{
+    // Example log lines:
+    // Report step 757/773 at day 9466/10958, date = 01-Dec-2025
+    // Report step 758/773 at day 9497/10958, date = 01-Jan-2026
+    if ( logLine.startsWith( "Report step" ) )
+    {
+        auto parts = logLine.split( ' ', Qt::SkipEmptyParts );
+        if ( parts.size() >= 4 )
+        {
+            auto stepPart  = parts[2]; // 756/773
+            auto stepParts = stepPart.split( '/' );
+            if ( stepParts.size() == 2 )
+            {
+                bool ok1         = false;
+                bool ok2         = false;
+                int  currentStep = stepParts[0].toInt( &ok1 );
+                if ( ok1 && ( m_startStepForProgress < 0 ) )
+                {
+                    m_startStepForProgress = currentStep;
+                }
+
+                int totalSteps = stepParts[1].toInt( &ok2 );
+                if ( ok1 && ok2 )
+                {
+                    auto noSteps = totalSteps - m_startStepForProgress;
+                    if ( noSteps > 0 )
+                    {
+                        double perc = ( (double)( currentStep - m_startStepForProgress ) / (double)( noSteps ) ) * 100.0;
+                        perc        = std::max( 0.0, perc );
+                        perc        = std::min( perc, 100.0 );
+                        onProgress( perc );
+                    }
+                }
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     if ( field == &m_workDir )
@@ -196,7 +245,16 @@ void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QSt
         if ( pbAttribute )
         {
             pbAttribute->m_buttonText = "Run Simulation";
-            pbAttribute->m_buttonIcon = QIcon( ":/opm.png" );
+            pbAttribute->m_buttonIcon = QIcon( ":/Play.svg" );
+        }
+    }
+    else if ( field == &m_stopButton )
+    {
+        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
+        if ( pbAttribute )
+        {
+            pbAttribute->m_buttonText = "Stop";
+            pbAttribute->m_buttonIcon = QIcon( ":/stop.svg" );
         }
     }
     else if ( field == &m_openSelectButton )
@@ -223,7 +281,7 @@ void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QSt
             attr->enableEditableContent  = true;
             attr->enableAutoComplete     = false;
             attr->adjustWidthToContents  = true;
-            attr->notifyWhenTextIsEdited = true;
+            attr->notifyWhenTextIsEdited = false;
         }
     }
 }
@@ -233,6 +291,17 @@ void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QSt
 //--------------------------------------------------------------------------------------------------
 void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    if ( isRunning() )
+    {
+        auto runGrp = uiOrdering.addNewGroup( "Running" );
+        m_workDir.uiCapability()->setUiReadOnly( true );
+        runGrp->add( &m_workDir );
+        runGrp->add( &m_stopButton );
+        uiOrdering.skipRemainingFields();
+        return;
+    }
+    m_workDir.uiCapability()->setUiReadOnly( false );
+
     auto genGrp = uiOrdering.addNewGroup( "General" );
     genGrp->add( nameField() );
     genGrp->add( &m_deckFileName );
@@ -346,8 +415,7 @@ QList<caf::PdmOptionItemInfo> RimOpmFlowJob::calculateValueOptions( const caf::P
     }
     else if ( ( fieldNeedingOptions == &m_openTimeStep ) || ( fieldNeedingOptions == &m_endTimeStep ) )
     {
-        openDeckFile();
-        if ( m_deckFile != nullptr )
+        if ( openDeckFile() )
         {
             auto timeStepNames = dateStrings();
             for ( int i = 0; i < static_cast<int>( timeStepNames.size() - 1 ); ++i )
@@ -363,7 +431,7 @@ QList<caf::PdmOptionItemInfo> RimOpmFlowJob::calculateValueOptions( const caf::P
     }
     else if ( fieldNeedingOptions == &m_wellGroupName )
     {
-        for ( auto grp : wellgroupsInFileDeck() )
+        for ( auto& grp : wellgroupsInFileDeck() )
         {
             options.push_back( caf::PdmOptionItemInfo( grp, QVariant::fromValue( grp ) ) );
         }
@@ -444,6 +512,11 @@ void RimOpmFlowJob::fieldChangedByUi( const caf::PdmFieldHandle* changedField, c
         m_runButton = false;
         RicRunJobFeature::runJob( this );
     }
+    else if ( changedField == &m_stopButton )
+    {
+        m_stopButton = false;
+        RicStopJobFeature::stopJob( this );
+    }
     else if ( changedField == &m_resetRunIdButton )
     {
         m_resetRunIdButton = false;
@@ -499,13 +572,14 @@ void RimOpmFlowJob::setEclipseCase( RimEclipseCase* eCase )
     if ( eCase == nullptr )
     {
         m_deckFileName.setValue( QString() );
+        closeDeckFile();
         return;
     }
 
     QFileInfo fi( eCase->gridFileName() );
     m_deckFileName.setValue( fi.absolutePath() + "/" + fi.completeBaseName() + deckExtension() );
     m_eclipseCase = eCase;
-    m_deckFile.reset();
+    closeDeckFile();
     openDeckFile();
 }
 
@@ -516,7 +590,7 @@ void RimOpmFlowJob::setInputDataFile( QString filename )
 {
     m_deckName = "";
     m_deckFileName.setValue( filename );
-    m_deckFile.reset();
+    closeDeckFile();
     openDeckFile();
 }
 
@@ -525,33 +599,42 @@ void RimOpmFlowJob::setInputDataFile( QString filename )
 //--------------------------------------------------------------------------------------------------
 bool RimOpmFlowJob::openDeckFile()
 {
-    if ( m_deckFile == nullptr )
+    if ( m_deckFile.get() == nullptr )
     {
         m_deckFile      = std::make_unique<RifOpmFlowDeckFile>();
         bool deckLoadOk = false;
         try
         {
             deckLoadOk = m_deckFile->loadDeck( m_deckFileName().path().toStdString() );
+            if ( deckLoadOk )
+            {
+                m_fileDeckHasDates  = m_deckFile->hasDatesKeyword();
+                m_fileDeckIsRestart = m_deckFile->isRestartFile();
+            }
         }
         catch ( std::filesystem::filesystem_error& )
         {
+            deckLoadOk = false;
             RiaLogging::error( QString( "Failed to open %1, possibly unsupported or incorrect format." ).arg( m_deckFileName().path() ) );
         }
 
-        if ( deckLoadOk )
-        {
-            m_fileDeckHasDates  = m_deckFile->hasDatesKeyword();
-            m_fileDeckIsRestart = m_deckFile->isRestartFile();
-        }
-        else
+        if ( !deckLoadOk )
         {
             m_fileDeckHasDates  = false;
             m_fileDeckIsRestart = false;
-            m_deckFile.reset();
+            closeDeckFile();
         }
     }
 
-    return m_deckFile != nullptr;
+    return m_deckFile.get() != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::closeDeckFile()
+{
+    m_deckFile.reset();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -573,14 +656,6 @@ bool RimOpmFlowJob::copyUnrstFileToWorkDir()
     }
 
     return false;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimOpmFlowJob::title()
-{
-    return name();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -718,7 +793,7 @@ std::map<QString, QString> RimOpmFlowJob::environment()
 bool RimOpmFlowJob::onPrepare()
 {
     // reload file deck to make sure we start with the original
-    m_deckFile.reset();
+    closeDeckFile();
     if ( !openDeckFile() )
     {
         RiaLogging::error( "Unable to open input DATA file " + m_deckFileName().path() );
@@ -865,7 +940,8 @@ bool RimOpmFlowJob::onPrepare()
 
     // save DATA file to working folder
     bool saveOk = m_deckFile->saveDeck( workingDirectory().toStdString(), deckName().toStdString() + deckExtension().toStdString() );
-    m_deckFile.reset();
+
+    closeDeckFile();
 
     return saveOk;
 }
@@ -886,6 +962,15 @@ bool RimOpmFlowJob::onRun()
         if ( reply != QMessageBox::Ok ) return false;
     }
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::onProgress( double percentageDone )
+{
+    m_percentageDone = percentageDone;
+    updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------

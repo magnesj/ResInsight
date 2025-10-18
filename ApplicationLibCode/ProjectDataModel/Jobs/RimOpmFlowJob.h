@@ -71,15 +71,18 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          initAfterRead() override;
 
-    QString                    title() override;
+    void decodeProgress( const QString& logLine ) override;
+
     QStringList                command() override;
     std::map<QString, QString> environment() override;
     QString                    workingDirectory() const override;
     bool                       onPrepare() override;
     bool                       onRun() override;
     void                       onCompleted( bool success ) override;
+    void                       onProgress( double percentageDone ) override;
 
     bool openDeckFile();
+    void closeDeckFile();
     bool copyUnrstFileToWorkDir();
 
 private:
@@ -106,6 +109,7 @@ private:
     caf::PdmField<caf::FilePath> m_deckFileName;
     caf::PdmField<caf::FilePath> m_workDir;
     caf::PdmField<bool>          m_runButton;
+    caf::PdmField<bool>          m_stopButton;
     caf::PdmField<bool>          m_openSelectButton;
     caf::PdmField<int>           m_openWellDeckPosition;
 
@@ -141,4 +145,5 @@ private:
     std::unique_ptr<RifOpmFlowDeckFile> m_deckFile;
     bool                                m_fileDeckHasDates;
     bool                                m_fileDeckIsRestart;
+    int                                 m_startStepForProgress;
 };

@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2016 Statoil ASA
+//  Copyright (C) 2025     Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -16,38 +16,45 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicOpenLastUsedFileFeature.h"
+#include "RicViewJobLogFeature.h"
 
-#include "RiaGuiApplication.h"
-#include "RiaPreferences.h"
+#include "RiuTextDialog.h"
 
-#include "RiuMainWindow.h"
+#include "Jobs/RimGenericJob.h"
+
+#include "cafSelectionManager.h"
 
 #include <QAction>
+#include <QStringList>
 
-CAF_CMD_SOURCE_INIT( RicOpenLastUsedFileFeature, "RicOpenLastUsedFileFeature" );
+CAF_CMD_SOURCE_INIT( RicViewJobLogFeature, "RicViewJobLogFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicOpenLastUsedFileFeature::onActionTriggered( bool isChecked )
+void RicViewJobLogFeature::onActionTriggered( bool isChecked )
 {
-    RiaGuiApplication* app = RiaGuiApplication::instance();
-
-    if ( !app->checkWithUserBeforeClose() ) return;
-
-    QString fileName = RiaPreferences::current()->lastUsedProjectFileName;
-
-    if ( app->loadProject( fileName ) )
+    if ( auto job = dynamic_cast<RimGenericJob*>( caf::SelectionManager::instance()->selectedItem() ) )
     {
-        app->addToRecentFiles( fileName );
+        const QStringList log = job->jobLog();
+
+        QString text = log.join( "\n" );
+
+        auto* textDlg = new RiuTextDialog();
+        textDlg->setMinimumSize( 600, 800 );
+
+        textDlg->setWindowTitle( "Job log for \"" + job->name() + "\"" );
+        textDlg->setText( text );
+
+        textDlg->exec();
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicOpenLastUsedFileFeature::setupActionLook( QAction* actionToSetup )
+void RicViewJobLogFeature::setupActionLook( QAction* actionToSetup )
 {
-    actionToSetup->setText( "Open &Last Used Project" );
+    actionToSetup->setIcon( QIcon( ":/inspect.svg" ) );
+    actionToSetup->setText( "View Log..." );
 }
