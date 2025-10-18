@@ -36,6 +36,7 @@
 
 #pragma once
 
+#include "cafPdmUiButton.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiLabel.h"
 
@@ -103,20 +104,24 @@ public:
     PdmUiButton* addNewButton( const QString&               buttonText,
                                const std::function<void()>& callback,
                                LayoutOptions                layout = defaultLayoutOptions() );
-    PdmUiGroup*  createGroupBeforeGroup( const QString& groupId,
-                                         const QString& displayName,
-                                         LayoutOptions  layout = defaultLayoutOptions() );
-    PdmUiGroup*  createGroupBeforeItem( const PdmUiItem* item,
-                                        const QString&   displayName,
-                                        LayoutOptions    layout = defaultLayoutOptions() );
+
+    PdmUiGroup* createGroupBeforeGroup( const QString& groupId,
+                                        const QString& displayName,
+                                        LayoutOptions  layout = defaultLayoutOptions() );
+
+    PdmUiGroup* createGroupBeforeItem( const PdmUiItem* item,
+                                       const QString&   displayName,
+                                       LayoutOptions    layout = defaultLayoutOptions() );
 
     PdmUiGroup* addNewGroupWithKeyword( const QString& displayName,
                                         const QString& groupKeyword,
                                         LayoutOptions  layout = defaultLayoutOptions() );
+
     PdmUiGroup* createGroupWithIdBeforeGroup( const QString& groupId,
                                               const QString& displayName,
                                               const QString& newGroupId,
                                               LayoutOptions  layout = defaultLayoutOptions() );
+
     PdmUiGroup* createGroupWithIdBeforeItem( const PdmUiItem* item,
                                              const QString&   displayName,
                                              const QString&   newGroupId,
@@ -161,11 +166,11 @@ private:
                                            const QString& groupKeyword,
                                            LayoutOptions  layout = defaultLayoutOptions() );
 
-    std::vector<FieldAndLayout>              m_ordering; ///< The order of groups and fields
-    std::vector<PdmUiGroup*>                 m_createdGroups; ///< Owned PdmUiGroups, for memory management only
-    std::vector<std::unique_ptr<PdmUiLabel>> m_createdLabels; ///< Owned PdmUiLabels, for memory management only
-    std::vector<PdmUiButton*>                m_createdButtons; ///< Owned PdmUiButtons, for memory management only
-    bool                                     m_skipRemainingFields;
+    std::vector<FieldAndLayout>               m_ordering;
+    std::vector<std::unique_ptr<PdmUiGroup>>  m_createdGroups;
+    std::vector<std::unique_ptr<PdmUiLabel>>  m_createdLabels;
+    std::vector<std::unique_ptr<PdmUiButton>> m_createdButtons;
+    bool                                      m_skipRemainingFields;
 };
 
 } // End of namespace caf

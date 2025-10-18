@@ -49,18 +49,6 @@ namespace caf
 //--------------------------------------------------------------------------------------------------
 PdmUiOrdering::~PdmUiOrdering()
 {
-    for ( auto& createdGroup : m_createdGroups )
-    {
-        delete createdGroup;
-        createdGroup = nullptr;
-    }
-
-
-    for ( auto& createdButton : m_createdButtons )
-    {
-        delete createdButton;
-        createdButton = nullptr;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -68,13 +56,13 @@ PdmUiOrdering::~PdmUiOrdering()
 //--------------------------------------------------------------------------------------------------
 PdmUiGroup* PdmUiOrdering::addNewGroup( const QString& displayName, LayoutOptions layout )
 {
-    auto* group = new PdmUiGroup;
+    auto group = std::make_unique<PdmUiGroup>();
     group->setUiName( displayName );
 
-    m_createdGroups.push_back( group );
-    m_ordering.emplace_back( group, layout );
+    m_ordering.emplace_back( group.get(), layout );
+    m_createdGroups.push_back( std::move( group ) );
 
-    return group;
+    return m_createdGroups.back().get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -83,12 +71,11 @@ PdmUiGroup* PdmUiOrdering::addNewGroup( const QString& displayName, LayoutOption
 PdmUiLabel* PdmUiOrdering::addNewLabel( const QString& labelText, LayoutOptions layout )
 {
     auto label = std::make_unique<PdmUiLabel>( labelText );
-    PdmUiLabel* labelPtr = label.get();
 
+    m_ordering.emplace_back( label.get(), layout );
     m_createdLabels.push_back( std::move( label ) );
-    m_ordering.emplace_back( labelPtr, layout );
 
-    return labelPtr;
+    return m_createdLabels.back().get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -96,12 +83,12 @@ PdmUiLabel* PdmUiOrdering::addNewLabel( const QString& labelText, LayoutOptions 
 //--------------------------------------------------------------------------------------------------
 PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, LayoutOptions layout )
 {
-    auto* button = new PdmUiButton( buttonText );
+    auto button = std::make_unique<PdmUiButton>( buttonText );
 
-    m_createdButtons.push_back( button );
-    m_ordering.emplace_back( button, layout );
+    m_ordering.emplace_back( button.get(), layout );
+    m_createdButtons.push_back( std::move( button ) );
 
-    return button;
+    return m_createdButtons.back().get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,12 +97,12 @@ PdmUiButton* PdmUiOrdering::addNewButton( const QString& buttonText, LayoutOptio
 PdmUiButton*
     PdmUiOrdering::addNewButton( const QString& buttonText, const std::function<void()>& callback, LayoutOptions layout )
 {
-    auto* button = new PdmUiButton( buttonText, callback );
+    auto button = std::make_unique<PdmUiButton>( buttonText, callback );
 
-    m_createdButtons.push_back( button );
-    m_ordering.emplace_back( button, layout );
+    m_ordering.emplace_back( button.get(), layout );
+    m_createdButtons.push_back( std::move( button ) );
 
-    return button;
+    return m_createdButtons.back().get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -229,16 +216,14 @@ caf::PdmUiGroup* PdmUiOrdering::insertNewGroupWithKeyword( size_t         index,
                                                            const QString& groupKeyword,
                                                            LayoutOptions  layout )
 {
-    auto* group = new PdmUiGroup;
+    auto group = std::make_unique<PdmUiGroup>();
     group->setUiName( displayName );
-
-    m_createdGroups.push_back( group );
-
-    m_ordering.insert( m_ordering.begin() + index, std::make_pair( group, layout ) );
-
     group->setKeyword( groupKeyword );
 
-    return group;
+    m_ordering.insert( m_ordering.begin() + index, std::make_pair( group.get(), layout ) );
+    m_createdGroups.push_back( std::move( group ) );
+
+    return m_createdGroups.back().get();
 }
 
 //--------------------------------------------------------------------------------------------------
