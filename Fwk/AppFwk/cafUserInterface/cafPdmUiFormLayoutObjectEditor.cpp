@@ -496,7 +496,7 @@ QPushButton* caf::PdmUiFormLayoutObjectEditor::findOrCreateButton( QWidget*     
         qButton->setObjectName( buttonKey );
 
         // Set size policy to size the button to its content rather than fill available space
-        qButton->setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );
+        qButton->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
 
         // Set icon if available
         auto icon = button->uiIcon( uiConfigName );
