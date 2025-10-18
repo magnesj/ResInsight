@@ -36,9 +36,7 @@
 
 #pragma once
 
-#include "cafPdmUiButton.h"
 #include "cafPdmUiItem.h"
-#include "cafPdmUiLabel.h"
 
 #include <QString>
 
@@ -78,8 +76,7 @@ public:
     using RowLayout      = std::vector<FieldAndLayout>;
     using TableLayout    = std::vector<RowLayout>;
 
-    PdmUiOrdering()
-        : m_skipRemainingFields( false ) {};
+    PdmUiOrdering();
     virtual ~PdmUiOrdering();
 
     PdmUiOrdering( const PdmUiOrdering& )            = delete;
@@ -175,4 +172,5 @@ private:
 
 } // End of namespace caf
 
+// Included after PdmUiOrdering, as the group derives from PdmUiOrdering
 #include "cafPdmUiGroup.h"
