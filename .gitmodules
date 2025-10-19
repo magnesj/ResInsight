@@ -25,3 +25,6 @@
 [submodule "ThirdParty/custom-surfio/surfio"]
 	path = ThirdParty/custom-surfio/surfio
 	url = https://github.com/equinor/surfio.git
+[submodule "ThirdParty/custom-opm-flowdiag-app/opm-flowdiagnostics-applications"]
+	path = ThirdParty/custom-opm-flowdiag-app/opm-flowdiagnostics-applications
+	url = https://github.com/magnesj/opm-flowdiagnostics-applications
