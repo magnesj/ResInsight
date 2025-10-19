@@ -122,10 +122,13 @@ public:
     {
         try
         {
-            m_eclGraph = std::make_unique<Opm::ECLGraph>( Opm::ECLGraph::load( mainGrid, m_initData ) );
+            if ( mainGrid )
+            {
+                m_eclGraph   = std::make_unique<Opm::ECLGraph>( Opm::ECLGraph::load( mainGrid, m_initData ) );
+                m_poreVolume = m_eclGraph->poreVolume();
+            }
 
             m_hasUnifiedRestartFile = false;
-            m_poreVolume            = m_eclGraph->poreVolume();
 
             m_eclSaturationFunc = std::make_unique<Opm::ECLSaturationFunc>( m_initData );
         }
@@ -237,7 +240,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
     {
         progressInfo.setProgressDescription( "Grid access" );
 
-        if ( !ensureStaticDataObjectInstanceCreated() )
+        if ( !ensureStaticDataObjectInstanceCreated() || !m_opmFlowDiagStaticData->m_eclGraph )
         {
             return result;
         }
@@ -511,19 +514,23 @@ bool RigFlowDiagSolverInterface::ensureStaticDataObjectInstanceCreated()
         const RigEclipseCaseData* eclipseCaseData = m_eclipseCase->eclipseCaseData();
         if ( eclipseCaseData )
         {
-            auto fileReader = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->readerInterface();
-            auto eclOutput  = dynamic_cast<const RifReaderEclipseOutput*>( fileReader );
-            if ( eclOutput )
+            auto           fileReader = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->readerInterface();
+            ecl_grid_type* mainGrid   = nullptr;
+
+            if ( auto eclOutput = dynamic_cast<const RifReaderEclipseOutput*>( fileReader ) )
             {
-                ecl_grid_type* mainGrid = eclOutput->loadAllGrids();
+                mainGrid = eclOutput->loadAllGrids();
                 if ( !mainGrid )
                 {
                     return false;
                 }
+            }
 
-                RiaDefines::EclipseUnitSystem caseUnitSystem = eclipseCaseData->unitsType();
-                m_opmFlowDiagStaticData = std::make_unique<RigOpmFlowDiagStaticData>( mainGrid, initFileName, caseUnitSystem );
+            RiaDefines::EclipseUnitSystem caseUnitSystem = eclipseCaseData->unitsType();
+            m_opmFlowDiagStaticData = std::make_unique<RigOpmFlowDiagStaticData>( mainGrid, initFileName, caseUnitSystem );
 
+            if ( mainGrid )
+            {
                 ecl_grid_free( mainGrid );
             }
         }
@@ -654,7 +661,7 @@ RigFlowDiagDefines::FlowCharacteristicsResultFrame
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calculateRelPermCurves( size_t activeCellIndex )
+std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calculateRelPermCurves( size_t activeCellIndex, int satnum )
 {
     std::vector<RigFlowDiagDefines::RelPermCurve> retCurveArr;
 
@@ -721,14 +728,13 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                 scaling.enable = static_cast<unsigned char>( 0 );
             }
 
-            std::string                              gridID      = "";
-            int                                      satnumValue = 1;
+            std::string                              gridID = "";
             std::vector<Opm::FlowDiagnostics::Graph> graphArr =
                 m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( satFuncRequests,
                                                                                m_opmFlowDiagStaticData->m_initData,
                                                                                gridID,
                                                                                static_cast<int>( activeCellIndex ),
-                                                                               satnumValue,
+                                                                               satnum,
                                                                                scaling );
 
             for ( size_t i = 0; i < graphArr.size(); i++ )
