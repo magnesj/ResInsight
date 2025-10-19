@@ -117,18 +117,17 @@ void RigFlowDiagTimeStepResult::addResult( const RigFlowDiagResultAddress& resAd
 class RigOpmFlowDiagStaticData
 {
 public:
-    RigOpmFlowDiagStaticData( const ecl_grid_type* mainGrid, const std::wstring& init, RiaDefines::EclipseUnitSystem caseUnitSystem )
+    RigOpmFlowDiagStaticData( const ecl_grid_type* mainGrid, const std::wstring& initFilename, RiaDefines::EclipseUnitSystem caseUnitSystem )
+        : m_initData( initFilename )
     {
-        Opm::ECLInitFileData initData( init );
-
         try
         {
-            m_eclGraph = std::make_unique<Opm::ECLGraph>( Opm::ECLGraph::load( mainGrid, initData ) );
+            m_eclGraph = std::make_unique<Opm::ECLGraph>( Opm::ECLGraph::load( mainGrid, m_initData ) );
 
             m_hasUnifiedRestartFile = false;
             m_poreVolume            = m_eclGraph->poreVolume();
 
-            m_eclSaturationFunc = std::make_unique<Opm::ECLSaturationFunc>( *m_eclGraph, initData );
+            m_eclSaturationFunc = std::make_unique<Opm::ECLSaturationFunc>( m_initData );
         }
         catch ( ... )
         {
@@ -138,7 +137,7 @@ public:
 
         try
         {
-            m_eclPvtCurveCollection = std::make_unique<Opm::ECLPVT::ECLPvtCurveCollection>( *m_eclGraph, initData );
+            m_eclPvtCurveCollection = std::make_unique<Opm::ECLPVT::ECLPvtCurveCollection>( m_initData );
         }
         catch ( ... )
         {
@@ -168,6 +167,7 @@ public:
     }
 
 public:
+    Opm::ECLInitFileData                           m_initData;
     std::unique_ptr<Opm::ECLGraph>                 m_eclGraph;
     std::vector<double>                            m_poreVolume;
     std::unique_ptr<Opm::FlowDiagnostics::Toolbox> m_fldToolbox;
@@ -720,8 +720,17 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
             {
                 scaling.enable = static_cast<unsigned char>( 0 );
             }
+
+            std::string                              gridID      = "";
+            int                                      satnumValue = 1;
             std::vector<Opm::FlowDiagnostics::Graph> graphArr =
-                m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( satFuncRequests, static_cast<int>( activeCellIndex ), scaling );
+                m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( satFuncRequests,
+                                                                               m_opmFlowDiagStaticData->m_initData,
+                                                                               gridID,
+                                                                               static_cast<int>( activeCellIndex ),
+                                                                               satnumValue,
+                                                                               scaling );
+
             for ( size_t i = 0; i < graphArr.size(); i++ )
             {
                 const RigFlowDiagDefines::RelPermCurve::Ident curveIdent = curveIdentNameArr[i].first;
