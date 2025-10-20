@@ -17,9 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RiuRelativePermeabilityPlotUpdater.h"
-#include "Riu3dSelectionManager.h"
-#include "RiuRelativePermeabilityPlotPanel.h"
 
+#include "RiaLogging.h"
 #include "RiaResultNames.h"
 
 #include "RigActiveCellInfo.h"
@@ -37,6 +36,9 @@
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimExtrudedCurveIntersection.h"
+
+#include "Riu3dSelectionManager.h"
+#include "RiuRelativePermeabilityPlotPanel.h"
 
 #include <cmath>
 
@@ -134,10 +136,18 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
                                                                    timeStepIndex,
                                                                    RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE,
                                                                                             "SATNUM" ) );
+
+            if ( satnumAccessor.isNull() )
+            {
+                QString text = QString( "Could not read SATNUM value, not able to create relative permeability curves." );
+                RiaLogging::error( text );
+
+                return false;
+            }
+
             const double cellSWAT   = swatAccessor.notNull() ? swatAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
             const double cellSGAS   = sgasAccessor.notNull() ? sgasAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
-            const double cellSATNUM = satnumAccessor.notNull() ? satnumAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
-            // cvf::Trace::show("cellSWAT = %f  cellSGAS = %f  cellSATNUM = %f", cellSWAT, cellSGAS, cellSATNUM);
+            const int    cellSATNUM = satnumAccessor->cellScalar( gridLocalCellIndex );
 
             std::vector<RigFlowDiagDefines::RelPermCurve> relPermCurveArr =
                 eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( activeCellIndex, cellSATNUM );
