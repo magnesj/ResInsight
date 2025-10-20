@@ -178,20 +178,28 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
             }
             else if ( auto* label = dynamic_cast<PdmUiLabel*>( currentItem ) )
             {
-                QLabel* qLabel = findOrCreateLabel( containerWidgetWithGridLayout, label, uiConfigName );
-                if ( qLabel )
+                if ( auto qLabel = findOrCreateLabel( containerWidgetWithGridLayout, label, uiConfigName ) )
                 {
                     parentLayout->addWidget( qLabel, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
                     currentColumn += itemColumnSpan;
                 }
+                else
+                {
+                    CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: Failed to create label for text '%1'." )
+                                           .arg( label->uiName( uiConfigName ) ) );
+                }
             }
             else if ( auto* button = dynamic_cast<PdmUiButton*>( currentItem ) )
             {
-                QPushButton* qButton = findOrCreateButton( containerWidgetWithGridLayout, button, uiConfigName );
-                if ( qButton )
+                if ( auto qButton = findOrCreateButton( containerWidgetWithGridLayout, button, uiConfigName ) )
                 {
                     parentLayout->addWidget( qButton, currentRowIndex, currentColumn, 1, itemColumnSpan, button->alignment() );
                     currentColumn += itemColumnSpan;
+                }
+                else
+                {
+                    CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: Failed to create button for text '%1'." )
+                                           .arg( button->uiName( uiConfigName ) ) );
                 }
             }
             else
