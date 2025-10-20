@@ -102,11 +102,11 @@ inline Opm::FlowDiagnostics::ConnectionValues calculateFluxField( const Opm::ECL
                                                                   const Opm::ECLRestartData&               rstrt,
                                                                   RigFlowDiagResultAddress::PhaseSelection phaseSelection )
 {
-    auto satfunc = Opm::ECLSaturationFunc( G, init );
+    auto satfunc = Opm::ECLSaturationFunc( init );
 
     Opm::ECLFluxCalc calc( G, init, 9.80665, false );
 
-    auto getFlux = [&calc, &rstrt]( const Opm::ECLPhaseIndex p ) { return calc.flux( rstrt, p ); };
+    auto getFlux = [&calc, &init, &rstrt]( const Opm::ECLPhaseIndex p ) { return calc.flux( rstrt, init, p ); };
 
     return extractFluxField( G, getFlux, getPhases( phaseSelection ) );
 }

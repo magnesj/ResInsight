@@ -104,9 +104,6 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
         {
             // cvf::Trace::show("Updating RelPerm plot for active cell index: %d", static_cast<int>(activeCellIndex));
 
-            std::vector<RigFlowDiagDefines::RelPermCurve> relPermCurveArr =
-                eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( activeCellIndex );
-
             // Make sure we load the results that we'll query below
             RigCaseCellResultsData* cellResultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
             cellResultsData->ensureKnownResultLoaded(
@@ -141,6 +138,9 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
             const double cellSGAS   = sgasAccessor.notNull() ? sgasAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
             const double cellSATNUM = satnumAccessor.notNull() ? satnumAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
             // cvf::Trace::show("cellSWAT = %f  cellSGAS = %f  cellSATNUM = %f", cellSWAT, cellSGAS, cellSATNUM);
+
+            std::vector<RigFlowDiagDefines::RelPermCurve> relPermCurveArr =
+                eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( activeCellIndex, cellSATNUM );
 
             QString cellRefText = constructCellReferenceText( eclipseCaseData, gridIndex, gridLocalCellIndex, "SATNUM", cellSATNUM );
             QString caseName    = eclipseResultCase->caseUserDescription();
