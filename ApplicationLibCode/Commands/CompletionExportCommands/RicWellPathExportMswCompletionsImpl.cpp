@@ -291,7 +291,22 @@ void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( c
             formatter.setColumnSpacing( 2 );
             // formatter.setOptionalComment( exportDataSourceAsComment );
 
-            RicMswTableFormatterTools::exportCompsegData( formatter, compsegData, wellPath->name() );
+            // Filter compsegData, report a IJK only once
+            {
+                std::vector<RigCompsegData> uniqueCells;
+                std::set<size_t>            seenCells;
+                for ( const auto& data : compsegData )
+                {
+                    auto globalCellIndex = data.gridCell().globalCellIndex();
+                    if ( seenCells.find( globalCellIndex ) == seenCells.end() )
+                    {
+                        uniqueCells.push_back( data );
+                        seenCells.insert( globalCellIndex );
+                    }
+                }
+
+                RicMswTableFormatterTools::exportCompsegData( formatter, uniqueCells, wellPath->name() );
+            }
         }
     }
 }
