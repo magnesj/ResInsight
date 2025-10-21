@@ -345,8 +345,8 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
             assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
             auto fractureData = RicCompsegDataGenerator::generateCompsegData( exportInfo, maingrid );
-            auto fractures = RicCompsegDataGenerator::filterByCompletionType( fractureData, RigCompletionData::CompletionType::FRACTURE );
-            allCompsegData.insert( allCompsegData.end(), fractures.begin(), fractures.end() );
+            // auto fractures = RicCompsegDataGenerator::filterByCompletionType( fractureData, RigCompletionData::CompletionType::FRACTURE );
+            allCompsegData.insert( allCompsegData.end(), fractureData.begin(), fractureData.end() );
         }
     }
 
@@ -370,12 +370,14 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
                                         &fishbonesExportInfo,
                                         fishbonesExportInfo.mainBoreBranch() );
 
+        updateDataForMultipleItemsInSameGridCell( fishbonesExportInfo.mainBoreBranch() );
+
         int branchNumber = 1;
         assignBranchNumbersToBranch( eclipseCase, &fishbonesExportInfo, fishbonesExportInfo.mainBoreBranch(), &branchNumber );
 
         auto fishbonesData = RicCompsegDataGenerator::generateCompsegData( fishbonesExportInfo, maingrid );
-        auto fishbones     = RicCompsegDataGenerator::filterByCompletionType( fishbonesData, RigCompletionData::CompletionType::FISHBONES );
-        allCompsegData.insert( allCompsegData.end(), fishbones.begin(), fishbones.end() );
+        // auto fishbones     = RicCompsegDataGenerator::filterByCompletionType( fishbonesData, RigCompletionData::CompletionType::FISHBONES );
+        allCompsegData.insert( allCompsegData.end(), fishbonesData.begin(), fishbonesData.end() );
     }
 
     // Generate MSW data for perforations if present
@@ -402,9 +404,9 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
             assignBranchNumbersToBranch( eclipseCase, &perforationsExportInfo, perforationsExportInfo.mainBoreBranch(), &branchNumber );
 
             auto perforationData = RicCompsegDataGenerator::generateCompsegData( perforationsExportInfo, maingrid );
-            auto perforations =
-                RicCompsegDataGenerator::filterByCompletionType( perforationData, RigCompletionData::CompletionType::PERFORATION );
-            allCompsegData.insert( allCompsegData.end(), perforations.begin(), perforations.end() );
+            // auto perforations =
+            //     RicCompsegDataGenerator::filterByCompletionType( perforationData, RigCompletionData::CompletionType::PERFORATION );
+            allCompsegData.insert( allCompsegData.end(), perforationData.begin(), perforationData.end() );
         }
     }
 
