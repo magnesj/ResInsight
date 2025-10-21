@@ -1,6 +1,7 @@
 set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigCompletionData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigCompletionDataGridCell.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigCompsegData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseToStimPlanCellTransmissibilityCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseToThermalCellTransmissibilityCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityCondenser.h
@@ -14,6 +15,7 @@ set(SOURCE_GROUP_HEADER_FILES
 set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigCompletionData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigCompletionDataGridCell.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigCompsegData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseToStimPlanCellTransmissibilityCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseToThermalCellTransmissibilityCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityCondenser.cpp
