@@ -285,27 +285,60 @@ void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( c
                 lgrExportFile = unifiedLgrWellPathFile;
             }
 
-            QTextStream stream( exportFile.get() );
-
-            RifTextDataTableFormatter formatter( stream );
-            formatter.setColumnSpacing( 2 );
-            // formatter.setOptionalComment( exportDataSourceAsComment );
-
-            // Filter compsegData, report a IJK only once
+            if ( exportFile )
             {
-                std::vector<RigCompsegData> uniqueCells;
-                std::set<size_t>            seenCells;
-                for ( const auto& data : compsegData )
-                {
-                    auto globalCellIndex = data.gridCell().globalCellIndex();
-                    if ( seenCells.find( globalCellIndex ) == seenCells.end() )
-                    {
-                        uniqueCells.push_back( data );
-                        seenCells.insert( globalCellIndex );
-                    }
-                }
+                QTextStream stream( exportFile.get() );
 
-                RicMswTableFormatterTools::exportCompsegData( formatter, uniqueCells, wellPath->name() );
+                RifTextDataTableFormatter formatter( stream );
+                formatter.setColumnSpacing( 2 );
+                formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+                auto compsegDataForMainGrid = RicCompsegDataGenerator::mainGridData( compsegData );
+
+                // Filter compsegData, report a IJK only once
+                {
+                    std::vector<RigCompsegData> uniqueCells;
+                    std::set<size_t>            seenCells;
+                    for ( const auto& data : compsegDataForMainGrid )
+                    {
+                        auto globalCellIndex = data.gridCell().globalCellIndex();
+                        if ( seenCells.find( globalCellIndex ) == seenCells.end() )
+                        {
+                            uniqueCells.push_back( data );
+                            seenCells.insert( globalCellIndex );
+                        }
+                    }
+
+                    RicMswTableFormatterTools::exportCompsegData( formatter, uniqueCells, wellPath->completionSettings()->wellNameForExport() );
+                }
+            }
+
+            if ( lgrExportFile )
+            {
+                QTextStream stream( lgrExportFile.get() );
+
+                RifTextDataTableFormatter formatter( stream );
+                formatter.setColumnSpacing( 2 );
+                formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+                auto compsegDataForLgr = RicCompsegDataGenerator::lgrData( compsegData );
+
+                // Filter compsegData, report a IJK only once
+                {
+                    std::vector<RigCompsegData> uniqueCells;
+                    std::set<size_t>            seenCells;
+                    for ( const auto& data : compsegDataForLgr )
+                    {
+                        auto globalCellIndex = data.gridCell().globalCellIndex();
+                        if ( seenCells.find( globalCellIndex ) == seenCells.end() )
+                        {
+                            uniqueCells.push_back( data );
+                            seenCells.insert( globalCellIndex );
+                        }
+                    }
+
+                    RicMswTableFormatterTools::exportCompsegData( formatter, uniqueCells, wellPath->completionSettings()->wellNameForExport() );
+                }
             }
         }
     }
@@ -345,7 +378,6 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
             assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
             auto fractureData = RicCompsegDataGenerator::generateCompsegData( exportInfo, maingrid );
-            // auto fractures = RicCompsegDataGenerator::filterByCompletionType( fractureData, RigCompletionData::CompletionType::FRACTURE );
             allCompsegData.insert( allCompsegData.end(), fractureData.begin(), fractureData.end() );
         }
     }
@@ -370,13 +402,10 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
                                         &fishbonesExportInfo,
                                         fishbonesExportInfo.mainBoreBranch() );
 
-        updateDataForMultipleItemsInSameGridCell( fishbonesExportInfo.mainBoreBranch() );
-
         int branchNumber = 1;
         assignBranchNumbersToBranch( eclipseCase, &fishbonesExportInfo, fishbonesExportInfo.mainBoreBranch(), &branchNumber );
 
         auto fishbonesData = RicCompsegDataGenerator::generateCompsegData( fishbonesExportInfo, maingrid );
-        // auto fishbones     = RicCompsegDataGenerator::filterByCompletionType( fishbonesData, RigCompletionData::CompletionType::FISHBONES );
         allCompsegData.insert( allCompsegData.end(), fishbonesData.begin(), fishbonesData.end() );
     }
 
@@ -404,8 +433,6 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
             assignBranchNumbersToBranch( eclipseCase, &perforationsExportInfo, perforationsExportInfo.mainBoreBranch(), &branchNumber );
 
             auto perforationData = RicCompsegDataGenerator::generateCompsegData( perforationsExportInfo, maingrid );
-            // auto perforations =
-            //     RicCompsegDataGenerator::filterByCompletionType( perforationData, RigCompletionData::CompletionType::PERFORATION );
             allCompsegData.insert( allCompsegData.end(), perforationData.begin(), perforationData.end() );
         }
     }

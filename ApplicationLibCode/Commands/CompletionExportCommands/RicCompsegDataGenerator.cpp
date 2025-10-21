@@ -51,10 +51,16 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
                                                           const RigMainGrid*           mainGrid,
                                                           std::vector<RigCompsegData>& compsegData )
 {
+    if ( !branch ) return;
+
     for ( auto segment : branch->segments() )
     {
+        if ( !segment ) continue;
+
         for ( auto intersection : segment->intersections() )
         {
+            if ( !intersection ) continue;
+
             RigCompletionDataGridCell gridCell( intersection->globalCellIndex(), mainGrid );
 
             // Determine completion type from branch context
@@ -86,20 +92,6 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
     {
         processSegmentsRecursively( childBranch, wellName, mainGrid, compsegData );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<RigCompsegData> RicCompsegDataGenerator::filterByCompletionType( const std::vector<RigCompsegData>& data,
-                                                                             RigCompletionData::CompletionType  completionType )
-{
-    std::vector<RigCompsegData> filtered;
-    std::copy_if( data.begin(),
-                  data.end(),
-                  std::back_inserter( filtered ),
-                  [completionType]( const RigCompsegData& item ) { return item.completionType() == completionType; } );
-    return filtered;
 }
 
 //--------------------------------------------------------------------------------------------------

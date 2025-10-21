@@ -28,34 +28,11 @@ class RicMswExportInfo;
 //==================================================================================================
 ///  Simple generator for COMPSEGS data from MSW structure
 ///
-///  Usage example:
-///     // Generate all completion data
-///     auto allData = RicCompsegDataGenerator::generateCompsegData(exportInfo);
-///
-///     // Filter by completion type
-///     auto perforations = RicCompsegDataGenerator::filterByCompletionType(allData, RigCompletionData::CompletionType::PERFORATION);
-///     auto fractures = RicCompsegDataGenerator::filterByCompletionType(allData, RigCompletionData::CompletionType::FRACTURE);
-///
-///     // Separate by grid type
-///     auto mainGrid = RicCompsegDataGenerator::mainGridData(allData);
-///     auto lgrData = RicCompsegDataGenerator::lgrData(allData);
-///
-///     // Sort and export
-///     auto sortedData = RicCompsegDataGenerator::sortedData(mainGrid);
-///     QString wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-///     RicMswTableFormatterTools::exportCompsegData(formatter, sortedData, wellName);
-///
-///     // Or export with automatic LGR separation
-///     RicMswTableFormatterTools::exportCompsegDataSeparated(formatter, allData, wellName);
 //==================================================================================================
 class RicCompsegDataGenerator
 {
 public:
     static std::vector<RigCompsegData> generateCompsegData( const RicMswExportInfo& exportInfo, const RigMainGrid* mainGrid );
-
-    // Utility functions for filtering and organizing data
-    static std::vector<RigCompsegData> filterByCompletionType( const std::vector<RigCompsegData>& data,
-                                                               RigCompletionData::CompletionType  completionType );
 
     static std::vector<RigCompsegData> mainGridData( const std::vector<RigCompsegData>& data );
     static std::vector<RigCompsegData> lgrData( const std::vector<RigCompsegData>& data );
