@@ -39,26 +39,26 @@ public:
     bool operator<( const RigCompsegData& other ) const;
 
     // Required COMPSEGS fields
-    const QString&                   wellName() const { return m_wellName; }
-    const RigCompletionDataGridCell& gridCell() const { return m_gridCell; }
-    int                              branchNumber() const { return m_branchNumber; }
-    double                           startLength() const { return m_startLength; }
-    double                           endLength() const { return m_endLength; }
+    const QString&                   wellName() const;
+    const RigCompletionDataGridCell& gridCell() const;
+    int                              branchNumber() const;
+    double                           startLength() const;
+    double                           endLength() const;
 
     // Optional COMPSEGS fields
-    const QString& directionPenetration() const { return m_directionPenetration; }
-    double         endRange() const { return m_endRange; }
-    double         connectionDepth() const { return m_connectionDepth; }
-    RigCompletionData::CompletionType completionType() const { return m_completionType; }
+    const QString& directionPenetration() const;
+    double         endRange() const;
+    double         connectionDepth() const;
+    RigCompletionData::CompletionType completionType() const;
 
-    void setDirectionPenetration( const QString& dir ) { m_directionPenetration = dir; }
-    void setEndRange( double range ) { m_endRange = range; }
-    void setConnectionDepth( double depth ) { m_connectionDepth = depth; }
-    void setCompletionType( RigCompletionData::CompletionType type ) { m_completionType = type; }
+    void setDirectionPenetration( const QString& dir );
+    void setEndRange( double range );
+    void setConnectionDepth( double depth );
+    void setCompletionType( RigCompletionData::CompletionType type );
 
     // LGR support
-    bool isMainGrid() const { return m_gridCell.isMainGridCell(); }
-    QString lgrName() const { return m_gridCell.lgrName(); }
+    bool isMainGrid() const;
+    QString lgrName() const;
 
 private:
     // Required fields
