@@ -23,11 +23,11 @@
 //==================================================================================================
 ///
 //==================================================================================================
-RigCompsegData::RigCompsegData( const QString&                   wellName,
-                                const RigCompletionDataGridCell& gridCell,
-                                int                              branchNumber,
-                                double                           startLength,
-                                double                           endLength,
+RigCompsegData::RigCompsegData( const QString&                    wellName,
+                                const RigCompletionDataGridCell&  gridCell,
+                                int                               branchNumber,
+                                double                            startLength,
+                                double                            endLength,
                                 RigCompletionData::CompletionType completionType )
     : m_wellName( wellName )
     , m_gridCell( gridCell )

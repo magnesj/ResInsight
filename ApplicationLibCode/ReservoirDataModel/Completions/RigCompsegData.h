@@ -29,11 +29,11 @@
 class RigCompsegData
 {
 public:
-    RigCompsegData( const QString&                   wellName,
-                    const RigCompletionDataGridCell& gridCell,
-                    int                              branchNumber,
-                    double                           startLength,
-                    double                           endLength,
+    RigCompsegData( const QString&                    wellName,
+                    const RigCompletionDataGridCell&  gridCell,
+                    int                               branchNumber,
+                    double                            startLength,
+                    double                            endLength,
                     RigCompletionData::CompletionType completionType = RigCompletionData::CompletionType::CT_UNDEFINED );
 
     bool operator<( const RigCompsegData& other ) const;
@@ -46,9 +46,9 @@ public:
     double                           endLength() const { return m_endLength; }
 
     // Optional COMPSEGS fields
-    const QString& directionPenetration() const { return m_directionPenetration; }
-    double         endRange() const { return m_endRange; }
-    double         connectionDepth() const { return m_connectionDepth; }
+    const QString&                    directionPenetration() const { return m_directionPenetration; }
+    double                            endRange() const { return m_endRange; }
+    double                            connectionDepth() const { return m_connectionDepth; }
     RigCompletionData::CompletionType completionType() const { return m_completionType; }
 
     void setDirectionPenetration( const QString& dir ) { m_directionPenetration = dir; }
@@ -57,7 +57,7 @@ public:
     void setCompletionType( RigCompletionData::CompletionType type ) { m_completionType = type; }
 
     // LGR support
-    bool isMainGrid() const { return m_gridCell.isMainGridCell(); }
+    bool    isMainGrid() const { return m_gridCell.isMainGridCell(); }
     QString lgrName() const { return m_gridCell.lgrName(); }
 
 private:
@@ -67,10 +67,10 @@ private:
     int                       m_branchNumber;
     double                    m_startLength;
     double                    m_endLength;
-    
+
     // Optional fields
-    QString m_directionPenetration;
-    double  m_endRange;
-    double  m_connectionDepth;
+    QString                           m_directionPenetration;
+    double                            m_endRange;
+    double                            m_connectionDepth;
     RigCompletionData::CompletionType m_completionType;
 };
