@@ -46,9 +46,9 @@ public:
     double                           endLength() const;
 
     // Optional COMPSEGS fields
-    const QString& directionPenetration() const;
-    double         endRange() const;
-    double         connectionDepth() const;
+    const QString&                    directionPenetration() const;
+    double                            endRange() const;
+    double                            connectionDepth() const;
     RigCompletionData::CompletionType completionType() const;
 
     void setDirectionPenetration( const QString& dir );
@@ -57,7 +57,7 @@ public:
     void setCompletionType( RigCompletionData::CompletionType type );
 
     // LGR support
-    bool isMainGrid() const;
+    bool    isMainGrid() const;
     QString lgrName() const;
 
 private:
