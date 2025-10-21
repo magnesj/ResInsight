@@ -53,14 +53,12 @@ int completionTypeSortOrder( RigCompletionData::CompletionType type )
 //==================================================================================================
 ///
 //==================================================================================================
-RigCompsegData::RigCompsegData( const QString&                    wellName,
-                                const RigCompletionDataGridCell&  gridCell,
+RigCompsegData::RigCompsegData( const RigCompletionDataGridCell&  gridCell,
                                 int                               branchNumber,
                                 double                            startLength,
                                 double                            endLength,
                                 RigCompletionData::CompletionType completionType )
-    : m_wellName( wellName )
-    , m_gridCell( gridCell )
+    : m_gridCell( gridCell )
     , m_branchNumber( branchNumber )
     , m_startLength( startLength )
     , m_endLength( endLength )
@@ -75,11 +73,6 @@ RigCompsegData::RigCompsegData( const QString&                    wellName,
 //==================================================================================================
 bool RigCompsegData::operator<( const RigCompsegData& other ) const
 {
-    if ( m_wellName != other.m_wellName )
-    {
-        return ( m_wellName < other.m_wellName );
-    }
-
     if ( m_branchNumber != other.m_branchNumber )
     {
         return ( m_branchNumber < other.m_branchNumber );
@@ -96,14 +89,6 @@ bool RigCompsegData::operator<( const RigCompsegData& other ) const
     }
 
     return m_gridCell < other.m_gridCell;
-}
-
-//==================================================================================================
-///
-//==================================================================================================
-const QString& RigCompsegData::wellName() const
-{
-    return m_wellName;
 }
 
 //==================================================================================================

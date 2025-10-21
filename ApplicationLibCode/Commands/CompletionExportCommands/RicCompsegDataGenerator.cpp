@@ -36,9 +36,7 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::generateCompsegData( const 
 {
     std::vector<RigCompsegData> compsegData;
 
-    QString wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-
-    processSegmentsRecursively( exportInfo.mainBoreBranch(), wellName, mainGrid, compsegData );
+    processSegmentsRecursively( exportInfo.mainBoreBranch(), mainGrid, compsegData );
 
     return compsegData;
 }
@@ -47,7 +45,6 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::generateCompsegData( const 
 ///
 //--------------------------------------------------------------------------------------------------
 void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*          branch,
-                                                          const QString&               wellName,
                                                           const RigMainGrid*           mainGrid,
                                                           std::vector<RigCompsegData>& compsegData )
 {
@@ -71,7 +68,7 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
                 completionType = completion->completionType();
             }
 
-            RigCompsegData data( wellName, gridCell, branch->branchNumber(), segment->startMD(), segment->endMD(), completionType );
+            RigCompsegData data( gridCell, branch->branchNumber(), segment->startMD(), segment->endMD(), completionType );
 
             compsegData.push_back( data );
         }
@@ -82,7 +79,7 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
             auto mswCompletion = dynamic_cast<const RicMswCompletion*>( completion );
             if ( mswCompletion && !mswCompletion->segments().empty() )
             {
-                processSegmentsRecursively( mswCompletion, wellName, mainGrid, compsegData );
+                processSegmentsRecursively( mswCompletion, mainGrid, compsegData );
             }
         }
     }
@@ -90,7 +87,7 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
     // Process child branches
     for ( auto childBranch : branch->branches() )
     {
-        processSegmentsRecursively( childBranch, wellName, mainGrid, compsegData );
+        processSegmentsRecursively( childBranch, mainGrid, compsegData );
     }
 }
 
@@ -129,6 +126,5 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::sortedData( const std::vect
 //--------------------------------------------------------------------------------------------------
 bool RicCompsegDataGenerator::isValidData( const RigCompsegData& data )
 {
-    // Basic validation: well name not empty, valid branch number, start < end
-    return !data.wellName().isEmpty() && data.branchNumber() > 0 && data.startLength() < data.endLength();
+    return data.branchNumber() > 0 && data.startLength() < data.endLength();
 }

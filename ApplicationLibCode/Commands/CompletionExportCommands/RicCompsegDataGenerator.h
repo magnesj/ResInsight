@@ -43,8 +43,5 @@ public:
     static bool isValidData( const RigCompsegData& data );
 
 private:
-    static void processSegmentsRecursively( const RicMswBranch*          branch,
-                                            const QString&               wellName,
-                                            const RigMainGrid*           mainGrid,
-                                            std::vector<RigCompsegData>& compsegData );
+    static void processSegmentsRecursively( const RicMswBranch* branch, const RigMainGrid* mainGrid, std::vector<RigCompsegData>& compsegData );
 };

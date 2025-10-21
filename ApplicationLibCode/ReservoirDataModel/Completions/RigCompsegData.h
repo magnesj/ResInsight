@@ -29,8 +29,7 @@
 class RigCompsegData
 {
 public:
-    RigCompsegData( const QString&                    wellName,
-                    const RigCompletionDataGridCell&  gridCell,
+    RigCompsegData( const RigCompletionDataGridCell&  gridCell,
                     int                               branchNumber,
                     double                            startLength,
                     double                            endLength,
@@ -39,7 +38,6 @@ public:
     bool operator<( const RigCompsegData& other ) const;
 
     // Required COMPSEGS fields
-    const QString&                   wellName() const;
     const RigCompletionDataGridCell& gridCell() const;
     int                              branchNumber() const;
     double                           startLength() const;
@@ -62,7 +60,6 @@ public:
 
 private:
     // Required fields
-    QString                   m_wellName;
     RigCompletionDataGridCell m_gridCell;
     int                       m_branchNumber;
     double                    m_startLength;
