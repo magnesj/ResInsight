@@ -21,6 +21,7 @@
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
 #include "RicMswSegment.h"
+#include "RigCompsegData.h"
 
 #include <gsl/gsl>
 
@@ -47,6 +48,9 @@ private:
 public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
+
+    static std::vector<RigCompsegData> generateCompsegDataForAllCompletionTypes( RimEclipseCase*    eclipseCase,
+                                                                                const RimWellPath* wellPath );
 
     static void exportWellSegmentsForFractures( RimEclipseCase*        eclipseCase,
                                                 std::shared_ptr<QFile> exportFile,
