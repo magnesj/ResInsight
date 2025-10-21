@@ -271,6 +271,54 @@ void RicMswTableFormatterTools::writeWelsegsCompletionCommentHeader( RifTextData
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::exportCompsegData( RifTextDataTableFormatter& formatter, const std::vector<RigCompsegData>& compsegData, const QString& wellName )
+{
+    if ( compsegData.empty() ) return;
+
+    formatter.keyword( "COMPSEGS" );
+    
+    // Header with well name
+    {
+        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "Name" ) };
+        formatter.header( header );
+        formatter.add( wellName );
+        formatter.rowCompleted();
+    }
+    
+    // Data header
+    {
+        std::vector<RifTextDataTableColumn> header = { 
+            RifTextDataTableColumn( "I" ),
+            RifTextDataTableColumn( "J" ),
+            RifTextDataTableColumn( "K" ),
+            RifTextDataTableColumn( "Branch no" ),
+            RifTextDataTableColumn( "Start Length" ),
+            RifTextDataTableColumn( "End Length" ),
+            RifTextDataTableColumn( "Dir Pen" ),
+            RifTextDataTableColumn( "End Range" ),
+            RifTextDataTableColumn( "Connection Depth" ) 
+        };
+        formatter.header( header );
+    }
+    
+    // Export data rows
+    for ( const auto& data : compsegData )
+    {
+        formatter.addOneBasedCellIndex( data.gridCell().localCellIndexI() )
+                 .addOneBasedCellIndex( data.gridCell().localCellIndexJ() )
+                 .addOneBasedCellIndex( data.gridCell().localCellIndexK() )
+                 .add( data.branchNumber() )
+                 .add( data.startLength() )
+                 .add( data.endLength() )
+                 .add( data.directionPenetration().isEmpty() ? "1*" : data.directionPenetration() )
+                 .add( "1*" ) // End Range - defaulted for now
+                 .add( "1*" ) // Connection Depth - defaulted for now
+                 .rowCompleted();
+    }
+    
+    formatter.tableCompleted();
+}
+
 void RicMswTableFormatterTools::generateCompsegTables( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo, bool exportLgrData )
 {
     /*

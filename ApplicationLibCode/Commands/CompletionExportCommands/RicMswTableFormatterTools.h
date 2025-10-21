@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RigCompletionData.h"
+#include "RigCompsegData.h"
 
 #include "cvfVector3.h"
 
@@ -100,6 +101,7 @@ void writeCompletionsForSegment( gsl::not_null<const RicMswSegment*> outletSegme
 void writeWelsegsCompletionCommentHeader( RifTextDataTableFormatter& formatter, RigCompletionData::CompletionType completionType );
 
 void generateCompsegTables( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo, bool exportLgrData );
+void exportCompsegData( RifTextDataTableFormatter& formatter, const std::vector<RigCompsegData>& compsegData, const QString& wellName );
 
 void generateCompsegTable( RifTextDataTableFormatter&                         formatter,
                            RicMswExportInfo&                                  exportInfo,

@@ -16,6 +16,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicMswSegment.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswSegmentCellIntersection.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswValveAccumulators.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicCompsegDataGenerator.h
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureTextReportFeatureImpl.h
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureReportItem.h
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCompletionsForTemporaryLgrsFeature.h
@@ -40,6 +41,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicMswSegment.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswSegmentCellIntersection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswValveAccumulators.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicCompsegDataGenerator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureTextReportFeatureImpl.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureReportItem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCompletionsForTemporaryLgrsFeature.cpp
