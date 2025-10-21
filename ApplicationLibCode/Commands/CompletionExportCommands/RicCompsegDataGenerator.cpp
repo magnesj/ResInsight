@@ -54,11 +54,20 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
         {
             RigCompletionDataGridCell gridCell( intersection->globalCellIndex(), nullptr );
             
+            // Determine completion type from branch context
+            RigCompletionData::CompletionType completionType = RigCompletionData::CompletionType::CT_UNDEFINED;
+            auto completion = dynamic_cast<const RicMswCompletion*>( branch );
+            if ( completion )
+            {
+                completionType = completion->completionType();
+            }
+            
             RigCompsegData data( wellName,
                                 gridCell,
                                 branch->branchNumber(),
                                 segment->startMD(),
-                                segment->endMD() );
+                                segment->endMD(),
+                                completionType );
             
             compsegData.push_back( data );
         }

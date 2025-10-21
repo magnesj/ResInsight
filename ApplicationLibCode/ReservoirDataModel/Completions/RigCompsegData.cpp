@@ -27,7 +27,8 @@ RigCompsegData::RigCompsegData( const QString&                   wellName,
                                 const RigCompletionDataGridCell& gridCell,
                                 int                              branchNumber,
                                 double                           startLength,
-                                double                           endLength )
+                                double                           endLength,
+                                RigCompletionData::CompletionType completionType )
     : m_wellName( wellName )
     , m_gridCell( gridCell )
     , m_branchNumber( branchNumber )
@@ -35,6 +36,7 @@ RigCompsegData::RigCompsegData( const QString&                   wellName,
     , m_endLength( endLength )
     , m_endRange( std::numeric_limits<double>::infinity() )
     , m_connectionDepth( std::numeric_limits<double>::infinity() )
+    , m_completionType( completionType )
 {
 }
 

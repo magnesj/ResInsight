@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "RigCompletionData.h"
 #include "RigCompletionDataGridCell.h"
 
 #include <QString>
@@ -32,7 +33,8 @@ public:
                     const RigCompletionDataGridCell& gridCell,
                     int                              branchNumber,
                     double                           startLength,
-                    double                           endLength );
+                    double                           endLength,
+                    RigCompletionData::CompletionType completionType = RigCompletionData::CompletionType::CT_UNDEFINED );
 
     bool operator<( const RigCompsegData& other ) const;
 
@@ -47,10 +49,16 @@ public:
     const QString& directionPenetration() const { return m_directionPenetration; }
     double         endRange() const { return m_endRange; }
     double         connectionDepth() const { return m_connectionDepth; }
+    RigCompletionData::CompletionType completionType() const { return m_completionType; }
 
     void setDirectionPenetration( const QString& dir ) { m_directionPenetration = dir; }
     void setEndRange( double range ) { m_endRange = range; }
     void setConnectionDepth( double depth ) { m_connectionDepth = depth; }
+    void setCompletionType( RigCompletionData::CompletionType type ) { m_completionType = type; }
+
+    // LGR support
+    bool isMainGrid() const { return m_gridCell.isMainGridCell(); }
+    QString lgrName() const { return m_gridCell.lgrName(); }
 
 private:
     // Required fields
@@ -64,4 +72,5 @@ private:
     QString m_directionPenetration;
     double  m_endRange;
     double  m_connectionDepth;
+    RigCompletionData::CompletionType m_completionType;
 };

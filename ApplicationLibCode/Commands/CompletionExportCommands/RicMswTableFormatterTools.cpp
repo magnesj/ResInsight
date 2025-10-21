@@ -20,6 +20,7 @@
 
 #include "RiaLogging.h"
 
+#include "RicCompsegDataGenerator.h"
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
 
@@ -317,6 +318,82 @@ void RicMswTableFormatterTools::exportCompsegData( RifTextDataTableFormatter& fo
     }
     
     formatter.tableCompleted();
+}
+
+void RicMswTableFormatterTools::exportCompsegDataSeparated( RifTextDataTableFormatter& formatter, const std::vector<RigCompsegData>& compsegData, const QString& wellName )
+{
+    if ( compsegData.empty() ) return;
+
+    // Separate main grid and LGR data
+    std::vector<RigCompsegData> mainGridData;
+    std::vector<RigCompsegData> lgrData;
+    
+    for ( const auto& data : compsegData )
+    {
+        if ( data.isMainGrid() )
+        {
+            mainGridData.push_back( data );
+        }
+        else
+        {
+            lgrData.push_back( data );
+        }
+    }
+    
+    // Export main grid data as COMPSEGS
+    if ( !mainGridData.empty() )
+    {
+        exportCompsegData( formatter, mainGridData, wellName );
+    }
+    
+    // Export LGR data as COMPSEGL
+    if ( !lgrData.empty() )
+    {
+        formatter.keyword( "COMPSEGL" );
+        
+        // Header with well name
+        {
+            std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "Name" ) };
+            formatter.header( header );
+            formatter.add( wellName );
+            formatter.rowCompleted();
+        }
+        
+        // Data header for COMPSEGL (includes Grid column)
+        {
+            std::vector<RifTextDataTableColumn> header = { 
+                RifTextDataTableColumn( "Grid" ),
+                RifTextDataTableColumn( "I" ),
+                RifTextDataTableColumn( "J" ),
+                RifTextDataTableColumn( "K" ),
+                RifTextDataTableColumn( "Branch no" ),
+                RifTextDataTableColumn( "Start Length" ),
+                RifTextDataTableColumn( "End Length" ),
+                RifTextDataTableColumn( "Dir Pen" ),
+                RifTextDataTableColumn( "End Range" ),
+                RifTextDataTableColumn( "Connection Depth" ) 
+            };
+            formatter.header( header );
+        }
+        
+        // Export LGR data rows
+        for ( const auto& data : lgrData )
+        {
+            formatter.add( data.lgrName() )
+                     .addOneBasedCellIndex( data.gridCell().localCellIndexI() )
+                     .addOneBasedCellIndex( data.gridCell().localCellIndexJ() )
+                     .addOneBasedCellIndex( data.gridCell().localCellIndexK() )
+                     .add( data.branchNumber() )
+                     .add( data.startLength() )
+                     .add( data.endLength() )
+                     .add( data.directionPenetration().isEmpty() ? "1*" : data.directionPenetration() )
+                     .add( "1*" ) // End Range - defaulted for now
+                     .add( "1*" ) // Connection Depth - defaulted for now
+                     .rowCompleted();
+        }
+        
+        formatter.tableCompleted();
+    }
 }
 
 void RicMswTableFormatterTools::generateCompsegTables( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo, bool exportLgrData )
