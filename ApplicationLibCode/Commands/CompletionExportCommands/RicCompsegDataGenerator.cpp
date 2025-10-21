@@ -27,6 +27,8 @@
 #include "RimWellPath.h"
 #include "RimWellPathCompletionSettings.h"
 
+#include <algorithm>
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -88,4 +90,65 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
     {
         processSegmentsRecursively( childBranch, wellName, compsegData );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigCompsegData> RicCompsegDataGenerator::filterByCompletionType( const std::vector<RigCompsegData>& data,
+                                                                            RigCompletionData::CompletionType completionType )
+{
+    std::vector<RigCompsegData> filtered;
+    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
+                  [completionType]( const RigCompsegData& item ) {
+                      return item.completionType() == completionType;
+                  } );
+    return filtered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigCompsegData> RicCompsegDataGenerator::mainGridData( const std::vector<RigCompsegData>& data )
+{
+    std::vector<RigCompsegData> filtered;
+    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
+                  []( const RigCompsegData& item ) {
+                      return item.isMainGrid();
+                  } );
+    return filtered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigCompsegData> RicCompsegDataGenerator::lgrData( const std::vector<RigCompsegData>& data )
+{
+    std::vector<RigCompsegData> filtered;
+    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
+                  []( const RigCompsegData& item ) {
+                      return !item.isMainGrid();
+                  } );
+    return filtered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigCompsegData> RicCompsegDataGenerator::sortedData( const std::vector<RigCompsegData>& data )
+{
+    std::vector<RigCompsegData> sorted = data;
+    std::sort( sorted.begin(), sorted.end() );
+    return sorted;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RicCompsegDataGenerator::isValidData( const RigCompsegData& data )
+{
+    // Basic validation: well name not empty, valid branch number, start < end
+    return !data.wellName().isEmpty() && 
+           data.branchNumber() > 0 && 
+           data.startLength() < data.endLength();
 }
