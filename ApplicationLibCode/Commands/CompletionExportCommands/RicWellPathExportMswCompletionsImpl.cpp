@@ -266,6 +266,33 @@ void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( c
                                             exportSettings.exportDataSourceAsComment(),
                                             exportSettings.exportCompletionWelspecAfterMainBore() );
         }
+
+        // Export COMPSEG
+        {
+            auto compsegData = generateCompsegDataForAllCompletionTypes( exportSettings.caseToApply, wellPath );
+
+            std::shared_ptr<QFile> exportFile;
+            std::shared_ptr<QFile> lgrExportFile;
+
+            if ( unifiedExportFile )
+            {
+                exportFile    = unifiedExportFile;
+                lgrExportFile = unifiedLgrExportFile;
+            }
+            else if ( unifiedWellPathFile )
+            {
+                exportFile    = unifiedWellPathFile;
+                lgrExportFile = unifiedLgrWellPathFile;
+            }
+
+            QTextStream stream( exportFile.get() );
+
+            RifTextDataTableFormatter formatter( stream );
+            formatter.setColumnSpacing( 2 );
+            // formatter.setOptionalComment( exportDataSourceAsComment );
+
+            RicMswTableFormatterTools::exportCompsegData( formatter, compsegData, wellPath->name() );
+        }
     }
 }
 
@@ -276,68 +303,96 @@ std::vector<RigCompsegData> RicWellPathExportMswCompletionsImpl::generateCompseg
                                                                                                            const RimWellPath* wellPath )
 {
     std::vector<RigCompsegData> allCompsegData;
-    
+
     if ( !eclipseCase || !wellPath ) return allCompsegData;
-    
+
     // Get MSW parameters - required for MSW export
     auto mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters ) return allCompsegData;
-    
+
     // Get unit system and generate basic cell intersections
-    RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-    auto cellIntersections = generateCellSegments( eclipseCase, wellPath );
-    double initialMD = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-    
-    // Create base export info
-    RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, 
-                                mswParameters->lengthAndDepth().text(), 
-                                mswParameters->pressureDrop().text() );
-    
+    RiaDefines::EclipseUnitSystem unitSystem        = eclipseCase->eclipseCaseData()->unitsType();
+    auto                          cellIntersections = generateCellSegments( eclipseCase, wellPath );
+    double                        initialMD = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+    auto                          maingrid  = eclipseCase->eclipseCaseData()->mainGrid();
+
     // Generate MSW data for fractures if present
     auto fractureCompletions = wellPath->fractureCollection()->activeFractures();
     if ( !fractureCompletions.empty() )
     {
+        // Create base export info
+        RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
+
         if ( generateFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
         {
-            auto fractureData = RicCompsegDataGenerator::generateCompsegData( exportInfo );
+            int branchNumber = 1;
+
+            assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
+
+            auto fractureData = RicCompsegDataGenerator::generateCompsegData( exportInfo, maingrid );
             auto fractures = RicCompsegDataGenerator::filterByCompletionType( fractureData, RigCompletionData::CompletionType::FRACTURE );
             allCompsegData.insert( allCompsegData.end(), fractures.begin(), fractures.end() );
         }
     }
-    
+
     // Generate MSW data for fishbones if present
     auto fishbonesCompletions = wellPath->fishbonesCollection()->activeFishbonesSubs();
     if ( !fishbonesCompletions.empty() )
     {
         // Create fresh export info for fishbones
-        RicMswExportInfo fishbonesExportInfo( wellPath, unitSystem, initialMD,
-                                             mswParameters->lengthAndDepth().text(),
-                                             mswParameters->pressureDrop().text() );
-        
-        generateFishbonesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, fishbonesCompletions, true, &fishbonesExportInfo, fishbonesExportInfo.mainBoreBranch() );
-        
-        auto fishbonesData = RicCompsegDataGenerator::generateCompsegData( fishbonesExportInfo );
-        auto fishbones = RicCompsegDataGenerator::filterByCompletionType( fishbonesData, RigCompletionData::CompletionType::FISHBONES );
+        RicMswExportInfo fishbonesExportInfo( wellPath,
+                                              unitSystem,
+                                              initialMD,
+                                              mswParameters->lengthAndDepth().text(),
+                                              mswParameters->pressureDrop().text() );
+
+        generateFishbonesMswExportInfo( eclipseCase,
+                                        wellPath,
+                                        initialMD,
+                                        cellIntersections,
+                                        fishbonesCompletions,
+                                        true,
+                                        &fishbonesExportInfo,
+                                        fishbonesExportInfo.mainBoreBranch() );
+
+        int branchNumber = 1;
+        assignBranchNumbersToBranch( eclipseCase, &fishbonesExportInfo, fishbonesExportInfo.mainBoreBranch(), &branchNumber );
+
+        auto fishbonesData = RicCompsegDataGenerator::generateCompsegData( fishbonesExportInfo, maingrid );
+        auto fishbones     = RicCompsegDataGenerator::filterByCompletionType( fishbonesData, RigCompletionData::CompletionType::FISHBONES );
         allCompsegData.insert( allCompsegData.end(), fishbones.begin(), fishbones.end() );
     }
-    
+
     // Generate MSW data for perforations if present
     auto perforationIntervals = wellPath->perforationIntervalCollection()->perforations();
     if ( !perforationIntervals.empty() )
     {
         // Create fresh export info for perforations
-        RicMswExportInfo perforationsExportInfo( wellPath, unitSystem, initialMD,
+        RicMswExportInfo perforationsExportInfo( wellPath,
+                                                 unitSystem,
+                                                 initialMD,
                                                  mswParameters->lengthAndDepth().text(),
                                                  mswParameters->pressureDrop().text() );
-        
-        if ( generatePerforationsMswExportInfo( eclipseCase, wellPath, 0, initialMD, cellIntersections, &perforationsExportInfo, perforationsExportInfo.mainBoreBranch() ) )
+
+        if ( generatePerforationsMswExportInfo( eclipseCase,
+                                                wellPath,
+                                                0,
+                                                initialMD,
+                                                cellIntersections,
+                                                &perforationsExportInfo,
+                                                perforationsExportInfo.mainBoreBranch() ) )
+
         {
-            auto perforationData = RicCompsegDataGenerator::generateCompsegData( perforationsExportInfo );
-            auto perforations = RicCompsegDataGenerator::filterByCompletionType( perforationData, RigCompletionData::CompletionType::PERFORATION );
+            int branchNumber = 1;
+            assignBranchNumbersToBranch( eclipseCase, &perforationsExportInfo, perforationsExportInfo.mainBoreBranch(), &branchNumber );
+
+            auto perforationData = RicCompsegDataGenerator::generateCompsegData( perforationsExportInfo, maingrid );
+            auto perforations =
+                RicCompsegDataGenerator::filterByCompletionType( perforationData, RigCompletionData::CompletionType::PERFORATION );
             allCompsegData.insert( allCompsegData.end(), perforations.begin(), perforations.end() );
         }
     }
-    
+
     // Sort all data for consistent output
     return RicCompsegDataGenerator::sortedData( allCompsegData );
 }

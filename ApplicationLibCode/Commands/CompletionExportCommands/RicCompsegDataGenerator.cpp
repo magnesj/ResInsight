@@ -32,14 +32,14 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigCompsegData> RicCompsegDataGenerator::generateCompsegData( const RicMswExportInfo& exportInfo )
+std::vector<RigCompsegData> RicCompsegDataGenerator::generateCompsegData( const RicMswExportInfo& exportInfo, const RigMainGrid* mainGrid )
 {
     std::vector<RigCompsegData> compsegData;
-    
+
     QString wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-    
-    processSegmentsRecursively( exportInfo.mainBoreBranch(), wellName, compsegData );
-    
+
+    processSegmentsRecursively( exportInfo.mainBoreBranch(), wellName, mainGrid, compsegData );
+
     return compsegData;
 }
 
@@ -47,48 +47,44 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::generateCompsegData( const 
 ///
 //--------------------------------------------------------------------------------------------------
 void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*          branch,
-                                                         const QString&               wellName,
-                                                         std::vector<RigCompsegData>& compsegData )
+                                                          const QString&               wellName,
+                                                          const RigMainGrid*           mainGrid,
+                                                          std::vector<RigCompsegData>& compsegData )
 {
     for ( auto segment : branch->segments() )
     {
         for ( auto intersection : segment->intersections() )
         {
-            RigCompletionDataGridCell gridCell( intersection->globalCellIndex(), nullptr );
-            
+            RigCompletionDataGridCell gridCell( intersection->globalCellIndex(), mainGrid );
+
             // Determine completion type from branch context
             RigCompletionData::CompletionType completionType = RigCompletionData::CompletionType::CT_UNDEFINED;
-            auto completion = dynamic_cast<const RicMswCompletion*>( branch );
+            auto                              completion     = dynamic_cast<const RicMswCompletion*>( branch );
             if ( completion )
             {
                 completionType = completion->completionType();
             }
-            
-            RigCompsegData data( wellName,
-                                gridCell,
-                                branch->branchNumber(),
-                                segment->startMD(),
-                                segment->endMD(),
-                                completionType );
-            
+
+            RigCompsegData data( wellName, gridCell, branch->branchNumber(), segment->startMD(), segment->endMD(), completionType );
+
             compsegData.push_back( data );
         }
-        
+
         // Process completions on this segment
         for ( auto completion : segment->completions() )
         {
             auto mswCompletion = dynamic_cast<const RicMswCompletion*>( completion );
             if ( mswCompletion && !mswCompletion->segments().empty() )
             {
-                processSegmentsRecursively( mswCompletion, wellName, compsegData );
+                processSegmentsRecursively( mswCompletion, wellName, mainGrid, compsegData );
             }
         }
     }
-    
+
     // Process child branches
     for ( auto childBranch : branch->branches() )
     {
-        processSegmentsRecursively( childBranch, wellName, compsegData );
+        processSegmentsRecursively( childBranch, wellName, mainGrid, compsegData );
     }
 }
 
@@ -96,13 +92,13 @@ void RicCompsegDataGenerator::processSegmentsRecursively( const RicMswBranch*   
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<RigCompsegData> RicCompsegDataGenerator::filterByCompletionType( const std::vector<RigCompsegData>& data,
-                                                                            RigCompletionData::CompletionType completionType )
+                                                                             RigCompletionData::CompletionType  completionType )
 {
     std::vector<RigCompsegData> filtered;
-    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
-                  [completionType]( const RigCompsegData& item ) {
-                      return item.completionType() == completionType;
-                  } );
+    std::copy_if( data.begin(),
+                  data.end(),
+                  std::back_inserter( filtered ),
+                  [completionType]( const RigCompsegData& item ) { return item.completionType() == completionType; } );
     return filtered;
 }
 
@@ -112,10 +108,7 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::filterByCompletionType( con
 std::vector<RigCompsegData> RicCompsegDataGenerator::mainGridData( const std::vector<RigCompsegData>& data )
 {
     std::vector<RigCompsegData> filtered;
-    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
-                  []( const RigCompsegData& item ) {
-                      return item.isMainGrid();
-                  } );
+    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ), []( const RigCompsegData& item ) { return item.isMainGrid(); } );
     return filtered;
 }
 
@@ -125,10 +118,7 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::mainGridData( const std::ve
 std::vector<RigCompsegData> RicCompsegDataGenerator::lgrData( const std::vector<RigCompsegData>& data )
 {
     std::vector<RigCompsegData> filtered;
-    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ),
-                  []( const RigCompsegData& item ) {
-                      return !item.isMainGrid();
-                  } );
+    std::copy_if( data.begin(), data.end(), std::back_inserter( filtered ), []( const RigCompsegData& item ) { return !item.isMainGrid(); } );
     return filtered;
 }
 
@@ -148,7 +138,5 @@ std::vector<RigCompsegData> RicCompsegDataGenerator::sortedData( const std::vect
 bool RicCompsegDataGenerator::isValidData( const RigCompsegData& data )
 {
     // Basic validation: well name not empty, valid branch number, start < end
-    return !data.wellName().isEmpty() && 
-           data.branchNumber() > 0 && 
-           data.startLength() < data.endLength();
+    return !data.wellName().isEmpty() && data.branchNumber() > 0 && data.startLength() < data.endLength();
 }
