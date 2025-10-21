@@ -29,11 +29,11 @@
 class RigCompsegData
 {
 public:
-    RigCompsegData( const QString&                   wellName,
-                    const RigCompletionDataGridCell& gridCell,
-                    int                              branchNumber,
-                    double                           startLength,
-                    double                           endLength,
+    RigCompsegData( const QString&                    wellName,
+                    const RigCompletionDataGridCell&  gridCell,
+                    int                               branchNumber,
+                    double                            startLength,
+                    double                            endLength,
                     RigCompletionData::CompletionType completionType = RigCompletionData::CompletionType::CT_UNDEFINED );
 
     bool operator<( const RigCompsegData& other ) const;
@@ -67,10 +67,10 @@ private:
     int                       m_branchNumber;
     double                    m_startLength;
     double                    m_endLength;
-    
+
     // Optional fields
-    QString m_directionPenetration;
-    double  m_endRange;
-    double  m_connectionDepth;
+    QString                           m_directionPenetration;
+    double                            m_endRange;
+    double                            m_connectionDepth;
     RigCompletionData::CompletionType m_completionType;
 };

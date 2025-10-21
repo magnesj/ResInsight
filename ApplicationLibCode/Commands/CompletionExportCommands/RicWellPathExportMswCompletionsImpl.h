@@ -49,8 +49,7 @@ public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
 
-    static std::vector<RigCompsegData> generateCompsegDataForAllCompletionTypes( RimEclipseCase*    eclipseCase,
-                                                                                const RimWellPath* wellPath );
+    static std::vector<RigCompsegData> generateCompsegDataForAllCompletionTypes( RimEclipseCase* eclipseCase, const RimWellPath* wellPath );
 
     static void exportWellSegmentsForFractures( RimEclipseCase*        eclipseCase,
                                                 std::shared_ptr<QFile> exportFile,
