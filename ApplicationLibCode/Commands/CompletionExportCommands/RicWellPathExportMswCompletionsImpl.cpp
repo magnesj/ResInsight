@@ -19,6 +19,7 @@
 #include "RicWellPathExportMswCompletionsImpl.h"
 
 #include "RiaLogging.h"
+#include "RiaPreferencesSystem.h"
 
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
@@ -69,6 +70,12 @@ constexpr double VALVE_SEGMENT_LENGTH = 0.1;
 void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                                const std::vector<RimWellPath*>&         wellPaths )
 {
+    if ( RiaPreferencesSystem::current()->unifiedMswTables() )
+    {
+        exportUnifiedWellSegments( exportSettings, wellPaths );
+        return;
+    }
+
     std::shared_ptr<QFile> unifiedExportFile;
     std::shared_ptr<QFile> unifiedLgrExportFile;
     if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
@@ -563,6 +570,14 @@ void RicWellPathExportMswCompletionsImpl::updateDataForMultipleItemsInSameGridCe
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                     const std::vector<RimWellPath*>&         wellPaths )
+{
 }
 
 //--------------------------------------------------------------------------------------------------

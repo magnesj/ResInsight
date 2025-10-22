@@ -43,7 +43,6 @@ class QFile;
 
 class RicWellPathExportMswCompletionsImpl
 {
-private:
 public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
@@ -78,6 +77,8 @@ public:
                                                        gsl::not_null<RicMswBranch*>     branch );
 
 private:
+    static void exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
+
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,

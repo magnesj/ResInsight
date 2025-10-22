@@ -77,6 +77,9 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_showPdfExportDialog, "showPdfExportDialog", true, "Show PDF Export Dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showPdfExportDialog );
 
+    CAF_PDM_InitField( &m_unifiedMswTables, "unifiedMswTables", false, "Unified MSW Tables" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_unifiedMswTables );
+
     CAF_PDM_InitField( &m_mimimumAngularCellCount, "mimimumAngularCellCount", 40, "Minimum Angular Cell Count" );
 
     CAF_PDM_InitField( &m_gtestFilter, "gtestFilter", QString(), "Unit Test Filter (gtest)" );
@@ -229,6 +232,14 @@ double RiaPreferencesSystem::exportPdfScalingFactor() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RiaPreferencesSystem::unifiedMswTables() const
+{
+    return m_unifiedMswTables();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::optional<int> RiaPreferencesSystem::threadCount() const
 {
     const auto& [enabled, text] = m_maximumNumberOfThreads();
@@ -298,6 +309,7 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     uiOrdering.add( &m_showPdfExportDialog );
     uiOrdering.add( &m_exportScalingFactor );
     uiOrdering.add( &m_eclipseReaderMode );
+    uiOrdering.add( &m_unifiedMswTables );
 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Radial Grid" );

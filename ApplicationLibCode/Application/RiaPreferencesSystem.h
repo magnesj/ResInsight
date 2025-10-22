@@ -56,6 +56,7 @@ public:
     bool    showProgressBar() const;
     bool    showPdfExportDialog() const;
     double  exportPdfScalingFactor() const;
+    bool    unifiedMswTables() const;
 
     std::optional<int> threadCount() const;
 
@@ -87,6 +88,7 @@ private:
     caf::PdmField<double> m_exportScalingFactor;
 
     caf::PdmField<bool> m_showProgressBar;
+    caf::PdmField<bool> m_unifiedMswTables;
 
     caf::PdmField<int> m_mimimumAngularCellCount;
 
