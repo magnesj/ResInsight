@@ -87,6 +87,14 @@ private:
                                                 gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                                 gsl::not_null<RicMswBranch*>                     branch );
 
+    static void appendFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
+                                              const RimWellPath*                               wellPath,
+                                              double                                           initialMD,
+                                              const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                              bool                                             enableSegmentSplitting,
+                                              gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                              gsl::not_null<RicMswBranch*>                     branch );
+
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,
