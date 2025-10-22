@@ -278,6 +278,114 @@ void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                     const std::vector<RimWellPath*>&         wellPaths )
+{
+    RimEclipseCase* eclipseCase = exportSettings.caseToApply;
+    auto            timeStep    = exportSettings.timeStep;
+
+    QString fileName;
+
+    QFileInfo fi( exportSettings.customFileName() );
+    if ( !exportSettings.customFileName().isEmpty() )
+    {
+        fileName = fi.baseName() + "_MSW";
+    }
+    else
+    {
+        fileName = QString( "UnifiedCompletions_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
+    }
+
+    auto    unifiedExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                       fileName,
+                                                                                       fi.suffix(),
+                                                                                       exportSettings.exportDataSourceAsComment() );
+    QString lgrFileName;
+    if ( !exportSettings.customFileName().isEmpty() )
+    {
+        lgrFileName = fi.baseName() + "_LGR_MSW";
+    }
+    else
+    {
+        lgrFileName = QString( "UnifiedCompletions_LGR_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
+    }
+
+    auto unifiedLgrExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                          lgrFileName,
+                                                                                          fi.suffix(),
+                                                                                          exportSettings.exportDataSourceAsComment() );
+
+    for ( const auto& wellPath : wellPaths )
+    {
+        // auto allCompletions = wellPath->allCompletionsRecursively();
+
+        RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
+
+        auto mswParameters = wellPath->mswCompletionParameters();
+
+        if ( !mswParameters ) return;
+
+        auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
+        double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+
+        RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
+
+        if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
+        {
+            RiaLogging::error( "Failed to generate perforations MSW export info." );
+            return;
+        }
+
+        bool enableSegmentSplitting = false;
+        appendFishbonesMswExportInfo( eclipseCase,
+                                      wellPath,
+                                      initialMD,
+                                      cellIntersections,
+                                      enableSegmentSplitting,
+                                      &exportInfo,
+                                      exportInfo.mainBoreBranch() );
+
+        int branchNumber = 1;
+        assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
+
+        double maxSegmentLength = mswParameters->maxSegmentLength();
+
+        {
+            QTextStream               stream( unifiedExportFile.get() );
+            RifTextDataTableFormatter formatter( stream );
+            formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+            RicMswTableFormatterTools::generateWelsegsTable( formatter,
+                                                             exportInfo,
+                                                             maxSegmentLength,
+                                                             exportSettings.exportCompletionWelspecAfterMainBore() );
+            bool exportLgrData = false;
+            RicMswTableFormatterTools::generateCompsegTables( formatter, exportInfo, exportLgrData );
+            RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
+            RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
+        }
+
+        if ( exportInfo.hasSubGridIntersections() )
+        {
+            QTextStream               stream( unifiedLgrExportFile.get() );
+            RifTextDataTableFormatter formatter( stream );
+            formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+            RicMswTableFormatterTools::generateWelsegsTable( formatter,
+                                                             exportInfo,
+                                                             maxSegmentLength,
+                                                             exportSettings.exportCompletionWelspecAfterMainBore() );
+            bool exportLgrData = true;
+            RicMswTableFormatterTools::generateCompsegTables( formatter, exportInfo, exportLgrData );
+            RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
+            RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForPerforations( RimEclipseCase*        eclipseCase,
                                                                              std::shared_ptr<QFile> exportFile,
                                                                              std::shared_ptr<QFile> lgrExportFile,
@@ -569,78 +677,6 @@ void RicWellPathExportMswCompletionsImpl::updateDataForMultipleItemsInSameGridCe
                 icd->setArea( areaSum );
             }
         }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                                     const std::vector<RimWellPath*>&         wellPaths )
-{
-    RimEclipseCase* eclipseCase = exportSettings.caseToApply;
-    auto            timeStep    = exportSettings.timeStep;
-
-    for ( const auto& wellPath : wellPaths )
-    {
-        // auto allCompletions = wellPath->allCompletionsRecursively();
-
-        RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-
-        auto mswParameters = wellPath->mswCompletionParameters();
-
-        if ( !mswParameters ) return;
-
-        auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
-        double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-
-        RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
-
-        if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
-        {
-            RiaLogging::error( "Failed to generate perforations MSW export info." );
-            return;
-        }
-
-        bool enableSegmentSplitting = false;
-        appendFishbonesMswExportInfo( eclipseCase,
-                                      wellPath,
-                                      initialMD,
-                                      cellIntersections,
-                                      enableSegmentSplitting,
-                                      &exportInfo,
-                                      exportInfo.mainBoreBranch() );
-
-        int branchNumber = 1;
-        assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
-
-        double maxSegmentLength = mswParameters->maxSegmentLength();
-
-        /*
-                    {
-                        QTextStream               stream( exportFile.get() );
-                        RifTextDataTableFormatter formatter( stream );
-                        formatter.setOptionalComment( exportDataSourceAsComment );
-
-                        RicMswTableFormatterTools::generateWelsegsTable( formatter, exportInfo, maxSegmentLength,
-           completionSegmentsAfterMainBore ); bool exportLgrData = false; RicMswTableFormatterTools::generateCompsegTables( formatter,
-           exportInfo, exportLgrData ); RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
-                        RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
-                    }
-
-                    if ( exportInfo.hasSubGridIntersections() )
-                    {
-                        QTextStream               stream( lgrExportFile.get() );
-                        RifTextDataTableFormatter formatter( stream );
-                        formatter.setOptionalComment( exportDataSourceAsComment );
-
-                        RicMswTableFormatterTools::generateWelsegsTable( formatter, exportInfo, maxSegmentLength,
-           completionSegmentsAfterMainBore ); bool exportLgrData = true; RicMswTableFormatterTools::generateCompsegTables( formatter,
-           exportInfo, exportLgrData ); RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
-                        RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
-                    }
-                }
-        */
     }
 }
 
