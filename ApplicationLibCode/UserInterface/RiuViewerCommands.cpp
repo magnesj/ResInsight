@@ -887,11 +887,9 @@ void RiuViewerCommands::handlePickAction( int winPosX, int winPosY, Qt::Keyboard
                             QString resultInfoText;
                             resultInfoText += QString( "<b>Well Connection Factor :</b> %1<br><br>" ).arg( aggregatedConnectionFactor );
 
+                            if ( auto resultDefinition = eclipseView->cellResult() )
                             {
-                                RiuResultTextBuilder textBuilder( eclipseView,
-                                                                  eclipseView->cellResult(),
-                                                                  globalCellIndex,
-                                                                  eclipseView->currentTimeStep() );
+                                RiuResultTextBuilder textBuilder( eclipseView, resultDefinition, globalCellIndex, eclipseView->currentTimeStep() );
 
                                 resultInfoText += textBuilder.geometrySelectionText( "<br>" );
                             }
@@ -944,9 +942,10 @@ void RiuViewerCommands::handlePickAction( int winPosX, int winPosY, Qt::Keyboard
                                     QString resultInfoText =
                                         QString( "<b>Simulation Well Connection Factor :</b> %1<br><br>" ).arg( connectionFactor );
 
+                                    if ( auto resultDefinition = eclipseView->cellResult() )
                                     {
                                         RiuResultTextBuilder textBuilder( eclipseView,
-                                                                          eclipseView->cellResult(),
+                                                                          resultDefinition,
                                                                           globalCellIndex,
                                                                           eclipseView->currentTimeStep() );
 
