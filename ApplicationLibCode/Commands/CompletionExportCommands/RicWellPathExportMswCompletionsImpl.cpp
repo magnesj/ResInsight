@@ -317,8 +317,6 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
 
     for ( const auto& wellPath : wellPaths )
     {
-        // auto allCompletions = wellPath->allCompletionsRecursively();
-
         RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
 
         auto mswParameters = wellPath->mswCompletionParameters();
