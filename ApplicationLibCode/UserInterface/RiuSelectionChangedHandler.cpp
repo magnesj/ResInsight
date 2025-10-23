@@ -373,20 +373,28 @@ void RiuSelectionChangedHandler::updateResultInfo( const RiuSelectionItem* itemA
         {
             const RiuEclipseSelectionItem* eclipseSelectionItem = static_cast<const RiuEclipseSelectionItem*>( selItem );
 
-            RiuResultTextBuilder textBuilder( eclipseSelectionItem->m_view,
-                                              eclipseSelectionItem->m_resultDefinition,
-                                              eclipseSelectionItem->m_gridIndex,
-                                              eclipseSelectionItem->m_gridLocalCellIndex,
-                                              eclipseSelectionItem->m_timestepIdx );
+            if ( auto resultDefinition = eclipseSelectionItem->m_resultDefinition )
+            {
+                RiuResultTextBuilder textBuilder( eclipseSelectionItem->m_view,
+                                                  resultDefinition,
+                                                  eclipseSelectionItem->m_gridIndex,
+                                                  eclipseSelectionItem->m_gridLocalCellIndex,
+                                                  eclipseSelectionItem->m_timestepIdx );
 
-            textBuilder.setFace( eclipseSelectionItem->m_face );
-            textBuilder.setNncIndex( eclipseSelectionItem->m_nncIndex );
-            textBuilder.setIntersectionPointInDisplay( eclipseSelectionItem->m_localIntersectionPointInDisplay );
-            textBuilder.set2dIntersectionView( intersectionView );
+                textBuilder.setFace( eclipseSelectionItem->m_face );
+                textBuilder.setNncIndex( eclipseSelectionItem->m_nncIndex );
+                textBuilder.setIntersectionPointInDisplay( eclipseSelectionItem->m_localIntersectionPointInDisplay );
+                textBuilder.set2dIntersectionView( intersectionView );
 
-            resultInfo = textBuilder.mainResultText();
+                resultInfo = textBuilder.mainResultText();
 
-            pickInfo = textBuilder.geometrySelectionText( ", " );
+                pickInfo = textBuilder.geometrySelectionText( ", " );
+            }
+            else
+            {
+                resultInfo = "No result definition available for selected cell";
+                pickInfo   = "Grid cell selection";
+            }
         }
         else if ( selItem->type() == RiuSelectionItem::GEOMECH_SELECTION_OBJECT )
         {
