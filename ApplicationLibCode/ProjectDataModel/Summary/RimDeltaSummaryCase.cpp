@@ -308,8 +308,25 @@ std::pair<std::vector<time_t>, std::vector<double>> RimDeltaSummaryCase::calcula
         return ResultPair( reader2->timeSteps( address ), summaryValues );
     }
 
-    auto [isOk1, values1] = reader1->values( address );
-    auto [isOk2, values2] = reader2->values( address );
+    auto getValidatedTimeAndValues = []( RifSummaryReaderInterface*      reader,
+                                         const RifEclipseSummaryAddress& addr ) -> std::pair<std::vector<time_t>, std::vector<double>>
+    {
+        auto timeSteps      = reader->timeSteps( addr );
+        auto [isOk, values] = reader->values( addr );
+
+        // Ensure that timeSteps and values have the same size. Different sizes can occur for ongoing simulations.
+        size_t minSize = std::min( timeSteps.size(), values.size() );
+        if ( timeSteps.size() != values.size() )
+        {
+            timeSteps.resize( minSize );
+            values.resize( minSize );
+        }
+
+        return { timeSteps, values };
+    };
+
+    const auto [timeSteps1, values1] = getValidatedTimeAndValues( reader1, address );
+    const auto [timeSteps2, values2] = getValidatedTimeAndValues( reader2, address );
 
     if ( values1.empty() && values2.empty() )
     {
@@ -319,8 +336,8 @@ std::pair<std::vector<time_t>, std::vector<double>> RimDeltaSummaryCase::calcula
     auto                      interpolationMethod = address.hasAccumulatedData() ? RiaCurveDefines::InterpolationMethod::LINEAR
                                                                                  : RiaCurveDefines::InterpolationMethod::STEP_RIGHT;
     RiaTimeHistoryCurveMerger merger( interpolationMethod );
-    merger.addCurveData( reader1->timeSteps( address ), values1 );
-    merger.addCurveData( reader2->timeSteps( address ), values2 );
+    merger.addCurveData( timeSteps1, values1 );
+    merger.addCurveData( timeSteps2, values2 );
     merger.computeInterpolatedValues( includeIncompleteCurves );
     if ( merger.curveCount() < 2 )
     {
