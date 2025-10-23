@@ -1008,6 +1008,11 @@ void RicMswTableFormatterTools::writeCompletionsForSegment( gsl::not_null<const 
             writeValveWelsegsSegment( segment, segmentValve, formatter, exportInfo, maxSegmentLength, segmentNumber );
             *outletValve = segmentValve;
         }
+        else if ( fishboneIcd )
+        {
+            // Fishbone ICDs are connected to the segment directly
+            writeCompletionWelsegsSegments( segment, completion, formatter, exportInfo, maxSegmentLength, segmentNumber );
+        }
         else
         {
             // If we have a valve, the outlet segment is the valve's segment
