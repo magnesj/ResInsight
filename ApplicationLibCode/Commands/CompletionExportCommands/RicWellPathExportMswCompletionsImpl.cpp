@@ -70,12 +70,14 @@ constexpr double VALVE_SEGMENT_LENGTH = 0.1;
 void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                                const std::vector<RimWellPath*>&         wellPaths )
 {
-    if ( RiaPreferencesSystem::current()->unifiedMswTables() )
+    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE ||
+         exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
     {
         exportUnifiedWellSegments( exportSettings, wellPaths );
         return;
     }
 
+    // TODO: Remove unified support from this function
     std::shared_ptr<QFile> unifiedExportFile;
     std::shared_ptr<QFile> unifiedLgrExportFile;
     if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
@@ -284,44 +286,49 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
     RimEclipseCase* eclipseCase = exportSettings.caseToApply;
     auto            timeStep    = exportSettings.timeStep;
 
-    QString fileName;
+    std::shared_ptr<QFile> unifiedExportFile;
+    std::shared_ptr<QFile> unifiedLgrExportFile;
 
-    QFileInfo fi( exportSettings.customFileName() );
-    if ( !exportSettings.customFileName().isEmpty() )
+    // Create unified files if needed, else use per-well files
+    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
     {
-        fileName = fi.baseName() + "_MSW";
-    }
-    else
-    {
-        fileName = QString( "UnifiedCompletions_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
-    }
+        QString   fileName;
+        QFileInfo fi( exportSettings.customFileName() );
+        if ( !exportSettings.customFileName().isEmpty() )
+        {
+            fileName = fi.baseName() + "_MSW";
+        }
+        else
+        {
+            fileName = QString( "UnifiedCompletions_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
+        }
 
-    auto    unifiedExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                       fileName,
-                                                                                       fi.suffix(),
-                                                                                       exportSettings.exportDataSourceAsComment() );
-    QString lgrFileName;
-    if ( !exportSettings.customFileName().isEmpty() )
-    {
-        lgrFileName = fi.baseName() + "_LGR_MSW";
-    }
-    else
-    {
-        lgrFileName = QString( "UnifiedCompletions_LGR_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
-    }
+        unifiedExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                      fileName,
+                                                                                      fi.suffix(),
+                                                                                      exportSettings.exportDataSourceAsComment() );
+        QString lgrFileName;
+        if ( !exportSettings.customFileName().isEmpty() )
+        {
+            lgrFileName = fi.baseName() + "_LGR_MSW";
+        }
+        else
+        {
+            lgrFileName = QString( "UnifiedCompletions_LGR_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
+        }
 
-    auto unifiedLgrExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                          lgrFileName,
-                                                                                          fi.suffix(),
-                                                                                          exportSettings.exportDataSourceAsComment() );
+        unifiedLgrExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                         lgrFileName,
+                                                                                         fi.suffix(),
+                                                                                         exportSettings.exportDataSourceAsComment() );
+    }
 
     for ( const auto& wellPath : wellPaths )
     {
         RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
 
         auto mswParameters = wellPath->mswCompletionParameters();
-
-        if ( !mswParameters ) return;
+        if ( !mswParameters ) continue;
 
         auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
         double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
@@ -348,8 +355,30 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
 
         double maxSegmentLength = mswParameters->maxSegmentLength();
 
+        std::shared_ptr<QFile> mainGridMswFile;
+        std::shared_ptr<QFile> lgrGridMswFile;
+
+        if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
         {
-            QTextStream               stream( unifiedExportFile.get() );
+            mainGridMswFile = unifiedExportFile;
+            lgrGridMswFile  = unifiedExportFile;
+        }
+        else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
+        {
+            QString wellFileName =
+                QString( "%1_UnifiedCompletions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
+            mainGridMswFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                        wellFileName,
+                                                                                        "",
+                                                                                        exportSettings.exportDataSourceAsComment() );
+            lgrGridMswFile  = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                       wellFileName + "_LGR",
+                                                                                       "",
+                                                                                       exportSettings.exportDataSourceAsComment() );
+        }
+
+        {
+            QTextStream               stream( mainGridMswFile.get() );
             RifTextDataTableFormatter formatter( stream );
             formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
@@ -365,7 +394,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
 
         if ( exportInfo.hasSubGridIntersections() )
         {
-            QTextStream               stream( unifiedLgrExportFile.get() );
+            QTextStream               stream( lgrGridMswFile.get() );
             RifTextDataTableFormatter formatter( stream );
             formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
