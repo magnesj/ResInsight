@@ -350,6 +350,8 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
                                       &exportInfo,
                                       exportInfo.mainBoreBranch() );
 
+        appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
+
         int branchNumber = 1;
         assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
@@ -1138,6 +1140,65 @@ bool RicWellPathExportMswCompletionsImpl::generateFracturesMswExportInfo( RimEcl
         {
             branch->addChildBranch( std::move( childMswBranch ) );
         }
+    }
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RicWellPathExportMswCompletionsImpl::appendFracturesMswExportInfo( RimEclipseCase*                                  eclipseCase,
+                                                                        const RimWellPath*                               wellPath,
+                                                                        double                                           initialMD,
+                                                                        const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                                                        gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                                                        gsl::not_null<RicMswBranch*>                     branch )
+{
+    auto fractures = wellPath->fractureCollection()->activeFractures();
+    if ( !fractures.empty() )
+    {
+        std::vector<WellPathCellIntersectionInfo> filteredIntersections =
+            filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
+
+        bool foundSubGridIntersections = false;
+
+        // Check if fractures are to be assigned to current main bore segment
+        for ( RimWellPathFracture* fracture : fractures )
+        {
+            fracture->ensureValidNonDarcyProperties();
+
+            double fractureStartMD = fracture->fractureMD();
+            if ( fracture->fractureTemplate()->orientationType() == RimFractureTemplate::ALONG_WELL_PATH )
+            {
+                double perforationLength = fracture->fractureTemplate()->perforationLength();
+                fractureStartMD -= 0.5 * perforationLength;
+            }
+
+            auto segment = branch->findClosestSegmentWithLowerMD( fractureStartMD );
+            if ( segment )
+            {
+                std::vector<RigCompletionData> completionData =
+                    RicExportFractureCompletionsImpl::generateCompdatValues( eclipseCase,
+                                                                             wellPath->completionSettings()->wellNameForExport(),
+                                                                             wellPath->wellPathGeometry(),
+                                                                             { fracture },
+                                                                             nullptr,
+                                                                             nullptr );
+
+                assignFractureCompletionsToCellSegment( eclipseCase, wellPath, fracture, completionData, segment, &foundSubGridIntersections );
+            }
+        }
+
+        exportInfo->setHasSubGridIntersections( exportInfo->hasSubGridIntersections() || foundSubGridIntersections );
+    }
+
+    for ( auto& childBranch : branch->branches() )
+    {
+        auto childWellPath          = childBranch->wellPath();
+        auto childCellIntersections = generateCellSegments( eclipseCase, childWellPath );
+
+        appendFracturesMswExportInfo( eclipseCase, childWellPath, initialMD, childCellIntersections, exportInfo, childBranch );
     }
 
     return true;

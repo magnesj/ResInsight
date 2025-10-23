@@ -111,6 +111,13 @@ private:
                                                 gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                                 gsl::not_null<RicMswBranch*>                     branch );
 
+    static bool appendFracturesMswExportInfo( RimEclipseCase*                                  eclipseCase,
+                                              const RimWellPath*                               wellPath,
+                                              double                                           initialMD,
+                                              const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                              gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                              gsl::not_null<RicMswBranch*>                     branch );
+
     static bool generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
                                                    const RimWellPath*                               wellPath,
                                                    int                                              timeStep,
