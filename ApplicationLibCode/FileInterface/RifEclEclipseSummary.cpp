@@ -290,14 +290,15 @@ std::pair<bool, std::vector<double>> RifEclEclipseSummary::values( const RifEcli
         const ecl::smspec_node& ertSumVarNode = ecl_smspec_iget_node_w_node_index( m_ecl_SmSpec, variableIndex );
         int                     paramsIndex   = ertSumVarNode.get_params_index();
 
-        double_vector_type* dataValues = ecl_sum_alloc_data_vector( m_ecl_sum, paramsIndex, false );
+        // Use data access without memory allocation. Previous implementation used ecl_sum_alloc_data_vector()
+        // Related to https://github.com/OPM/ResInsight/issues/13064
+        int dataLength = ecl_sum_get_data_length( m_ecl_sum );
+        values.reserve( dataLength );
 
-        if ( dataValues )
+        for ( int timeIndex = 0; timeIndex < dataLength; ++timeIndex )
         {
-            int           dataSize = double_vector_size( dataValues );
-            const double* dataPtr  = double_vector_get_const_ptr( dataValues );
-            values.insert( values.end(), dataPtr, dataPtr + dataSize );
-            double_vector_free( dataValues );
+            double value = ecl_sum_iget( m_ecl_sum, timeIndex, paramsIndex );
+            values.push_back( value );
         }
     }
 
