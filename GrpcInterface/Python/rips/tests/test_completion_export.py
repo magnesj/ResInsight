@@ -48,7 +48,9 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
             )
 
         # Verify files have content and compare with reference data
-        reference_folder = case_root_path + "/completion_export_reference/unified_export"
+        reference_folder = (
+            case_root_path + "/completion_export_reference/unified_export"
+        )
 
         def normalize_content(text):
             lines = text.split("\n")
@@ -164,5 +166,3 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
         import shutil
 
         shutil.rmtree(export_folder, ignore_errors=True)
-
-
