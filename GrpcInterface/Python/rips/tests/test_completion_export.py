@@ -8,6 +8,45 @@ import rips
 import dataroot
 
 
+def normalize_content(text):
+    """Normalize content by removing the first two lines that might vary (timestamp and file path)."""
+    lines = text.split("\n")
+    # Skip the first two lines that might vary (timestamp and file path)
+    normalized_lines = lines[2:] if len(lines) > 2 else lines
+    return "\n".join(normalized_lines)
+
+
+def compare_with_reference(export_file_path, reference_file_path, file_description="file"):
+    """Compare an export file with reference data, ignoring variable header lines.
+    
+    Args:
+        export_file_path: Path to the exported file
+        reference_file_path: Path to the reference file
+        file_description: Description of the file for error messages
+    
+    Raises:
+        AssertionError: If files don't match or don't exist
+    """
+    assert os.path.exists(export_file_path), f"Export {file_description} does not exist: {export_file_path}"
+    assert os.path.getsize(export_file_path) > 0, f"Export {file_description} is empty"
+    
+    with open(export_file_path, "r") as f:
+        content = f.read()
+        assert len(content.strip()) > 0, f"Export {file_description} has no content"
+    
+    if os.path.exists(reference_file_path):
+        with open(reference_file_path, "r") as ref_f:
+            ref_content = ref_f.read()
+        
+        normalized_content = normalize_content(content)
+        normalized_ref_content = normalize_content(ref_content)
+        
+        assert normalized_content == normalized_ref_content, (
+            f"Export {file_description} differs from reference data. "
+            f"Export length: {len(normalized_content)}, Reference length: {len(normalized_ref_content)}"
+        )
+
+
 def test_export_completion_files_unified(rips_instance, initialize_test):
     case_root_path = dataroot.PATH + "/TEST10K_FLT_LGR_NNC"
     project_path = case_root_path + "/well_completions_export.rsp"
@@ -47,40 +86,13 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
                 "No completion files created - likely no completions exist for the wells"
             )
 
-        # Verify files have content and compare with reference data
+        # Compare exported files with reference data
         reference_folder = case_root_path + "/completion_export_reference/unified_export"
 
-        def normalize_content(text):
-            lines = text.split("\n")
-            normalized_lines = []
-            for line in lines:
-                # Skip timestamp lines that contain "Exported from ResInsight"
-                if not line.startswith("-- Exported from ResInsight"):
-                    normalized_lines.append(line)
-            return "\n".join(normalized_lines)
-
         for filename in exported_files:
-            filepath = os.path.join(export_folder, filename)
-            assert os.path.getsize(filepath) > 0, f"Export file {filename} is empty"
-
-            with open(filepath, "r") as f:
-                content = f.read()
-                assert (
-                    len(content.strip()) > 0
-                ), f"Export file {filename} has no content"
-
-            # Compare with reference data if it exists
-            reference_file = os.path.join(reference_folder, filename)
-            if os.path.exists(reference_file):
-                with open(reference_file, "r") as ref_f:
-                    ref_content = ref_f.read()
-
-                normalized_content = normalize_content(content)
-                normalized_ref_content = normalize_content(ref_content)
-
-                assert (
-                    normalized_content == normalized_ref_content
-                ), f"Export file {filename} differs from reference data"
+            export_file_path = os.path.join(export_folder, filename)
+            reference_file_path = os.path.join(reference_folder, filename)
+            compare_with_reference(export_file_path, reference_file_path, f"unified export file '{filename}'")
 
     finally:
         import shutil
@@ -125,40 +137,13 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
                 "No completion files created - likely no completions exist for the wells"
             )
 
-        # Verify files have content and compare with reference data
+        # Compare exported files with reference data
         reference_folder = case_root_path + "/completion_export_reference/split_by_well"
 
-        def normalize_content(text):
-            lines = text.split("\n")
-            normalized_lines = []
-            for line in lines:
-                # Skip timestamp lines that contain "Exported from ResInsight"
-                if not line.startswith("-- Exported from ResInsight"):
-                    normalized_lines.append(line)
-            return "\n".join(normalized_lines)
-
         for filename in exported_files:
-            filepath = os.path.join(export_folder, filename)
-            assert os.path.getsize(filepath) > 0, f"Export file {filename} is empty"
-
-            with open(filepath, "r") as f:
-                content = f.read()
-                assert (
-                    len(content.strip()) > 0
-                ), f"Export file {filename} has no content"
-
-            # Compare with reference data if it exists
-            reference_file = os.path.join(reference_folder, filename)
-            if os.path.exists(reference_file):
-                with open(reference_file, "r") as ref_f:
-                    ref_content = ref_f.read()
-
-                normalized_content = normalize_content(content)
-                normalized_ref_content = normalize_content(ref_content)
-
-                assert (
-                    normalized_content == normalized_ref_content
-                ), f"Export file {filename} differs from reference data"
+            export_file_path = os.path.join(export_folder, filename)
+            reference_file_path = os.path.join(reference_folder, filename)
+            compare_with_reference(export_file_path, reference_file_path, f"split by well file '{filename}'")
 
     finally:
         import shutil
