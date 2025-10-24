@@ -16,31 +16,35 @@ def normalize_content(text):
     return "\n".join(normalized_lines)
 
 
-def compare_with_reference(export_file_path, reference_file_path, file_description="file"):
+def compare_with_reference(
+    export_file_path, reference_file_path, file_description="file"
+):
     """Compare an export file with reference data, ignoring variable header lines.
-    
+
     Args:
         export_file_path: Path to the exported file
         reference_file_path: Path to the reference file
         file_description: Description of the file for error messages
-    
+
     Raises:
         AssertionError: If files don't match or don't exist
     """
-    assert os.path.exists(export_file_path), f"Export {file_description} does not exist: {export_file_path}"
+    assert os.path.exists(
+        export_file_path
+    ), f"Export {file_description} does not exist: {export_file_path}"
     assert os.path.getsize(export_file_path) > 0, f"Export {file_description} is empty"
-    
+
     with open(export_file_path, "r") as f:
         content = f.read()
         assert len(content.strip()) > 0, f"Export {file_description} has no content"
-    
+
     if os.path.exists(reference_file_path):
         with open(reference_file_path, "r") as ref_f:
             ref_content = ref_f.read()
-        
+
         normalized_content = normalize_content(content)
         normalized_ref_content = normalize_content(ref_content)
-        
+
         assert normalized_content == normalized_ref_content, (
             f"Export {file_description} differs from reference data. "
             f"Export length: {len(normalized_content)}, Reference length: {len(normalized_ref_content)}"
@@ -87,12 +91,18 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
             )
 
         # Compare exported files with reference data
-        reference_folder = case_root_path + "/completion_export_reference/unified_export"
+        reference_folder = (
+            case_root_path + "/completion_export_reference/unified_export"
+        )
 
         for filename in exported_files:
             export_file_path = os.path.join(export_folder, filename)
             reference_file_path = os.path.join(reference_folder, filename)
-            compare_with_reference(export_file_path, reference_file_path, f"unified export file '{filename}'")
+            compare_with_reference(
+                export_file_path,
+                reference_file_path,
+                f"unified export file '{filename}'",
+            )
 
     finally:
         import shutil
@@ -143,11 +153,13 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
         for filename in exported_files:
             export_file_path = os.path.join(export_folder, filename)
             reference_file_path = os.path.join(reference_folder, filename)
-            compare_with_reference(export_file_path, reference_file_path, f"split by well file '{filename}'")
+            compare_with_reference(
+                export_file_path,
+                reference_file_path,
+                f"split by well file '{filename}'",
+            )
 
     finally:
         import shutil
 
         shutil.rmtree(export_folder, ignore_errors=True)
-
-
