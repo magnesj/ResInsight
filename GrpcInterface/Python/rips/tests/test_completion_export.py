@@ -35,7 +35,11 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
         )
 
         # Check if any files were created in the export folder (completion files don't have extensions)
-        created_files = [f for f in os.listdir(export_folder) if os.path.isfile(os.path.join(export_folder, f))]
+        created_files = [
+            f
+            for f in os.listdir(export_folder)
+            if os.path.isfile(os.path.join(export_folder, f))
+        ]
 
         if not created_files:
             # If no files created, this might be expected if there are no completions
@@ -57,24 +61,27 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
                 assert len(content.strip()) > 0, "Export file has no content"
 
             # Compare with reference data - content should be identical except for timestamps
-            reference_file = case_root_path + "/completion_export_reference/unified_export/unified_export_reference.txt"
+            reference_file = (
+                case_root_path
+                + "/completion_export_reference/unified_export/unified_export_reference.txt"
+            )
             if os.path.exists(reference_file):
                 with open(reference_file, "r") as ref_file:
                     ref_content = ref_file.read()
-                
+
                 # Normalize content by removing timestamp lines for comparison
                 def normalize_content(text):
-                    lines = text.split('\n')
+                    lines = text.split("\n")
                     normalized_lines = []
                     for line in lines:
                         # Skip timestamp lines that contain "Exported from ResInsight"
-                        if not line.startswith('-- Exported from ResInsight'):
+                        if not line.startswith("-- Exported from ResInsight"):
                             normalized_lines.append(line)
-                    return '\n'.join(normalized_lines)
-                
+                    return "\n".join(normalized_lines)
+
                 normalized_content = normalize_content(content)
                 normalized_ref_content = normalize_content(ref_content)
-                
+
                 # Content should be identical after normalizing timestamps
                 assert normalized_content == normalized_ref_content, (
                     f"Export content differs from reference data. "
@@ -110,7 +117,11 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
             include_fishbones=False,
         )
 
-        exported_files = [f for f in os.listdir(export_folder) if os.path.isfile(os.path.join(export_folder, f))]
+        exported_files = [
+            f
+            for f in os.listdir(export_folder)
+            if os.path.isfile(os.path.join(export_folder, f))
+        ]
 
         if not exported_files:
             # If no files created, this might be expected if there are no completions
@@ -122,36 +133,38 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
 
         # Verify files have content and compare with reference data
         reference_folder = case_root_path + "/completion_export_reference/split_by_well"
-        
+
         def normalize_content(text):
-            lines = text.split('\n')
+            lines = text.split("\n")
             normalized_lines = []
             for line in lines:
                 # Skip timestamp lines that contain "Exported from ResInsight"
-                if not line.startswith('-- Exported from ResInsight'):
+                if not line.startswith("-- Exported from ResInsight"):
                     normalized_lines.append(line)
-            return '\n'.join(normalized_lines)
-        
+            return "\n".join(normalized_lines)
+
         for filename in exported_files:
             filepath = os.path.join(export_folder, filename)
             assert os.path.getsize(filepath) > 0, f"Export file {filename} is empty"
 
             with open(filepath, "r") as f:
                 content = f.read()
-                assert len(content.strip()) > 0, f"Export file {filename} has no content"
-            
+                assert (
+                    len(content.strip()) > 0
+                ), f"Export file {filename} has no content"
+
             # Compare with reference data if it exists
             reference_file = os.path.join(reference_folder, filename)
             if os.path.exists(reference_file):
                 with open(reference_file, "r") as ref_f:
                     ref_content = ref_f.read()
-                
+
                 normalized_content = normalize_content(content)
                 normalized_ref_content = normalize_content(ref_content)
-                
-                assert normalized_content == normalized_ref_content, (
-                    f"Export file {filename} differs from reference data"
-                )
+
+                assert (
+                    normalized_content == normalized_ref_content
+                ), f"Export file {filename} differs from reference data"
 
     finally:
         import shutil
@@ -210,32 +223,39 @@ def test_export_completion_parameter_variations(rips_instance, initialize_test):
             )
 
             # Check if any files were created
-            exported_files = [f for f in os.listdir(export_folder) if os.path.isfile(os.path.join(export_folder, f))]
+            exported_files = [
+                f
+                for f in os.listdir(export_folder)
+                if os.path.isfile(os.path.join(export_folder, f))
+            ]
             if exported_files:
                 export_file = os.path.join(export_folder, exported_files[0])
                 if os.path.getsize(export_file) > 0:
                     files_created = True
-                    
+
                     # Validate against reference data - content should be identical except timestamps
-                    reference_file = case_root_path + f"/completion_export_reference/parameter_variations/{test_case['name']}_reference.txt"
+                    reference_file = (
+                        case_root_path
+                        + f"/completion_export_reference/parameter_variations/{test_case['name']}_reference.txt"
+                    )
                     if os.path.exists(reference_file):
                         with open(export_file, "r") as f:
                             content = f.read()
                         with open(reference_file, "r") as ref_f:
                             ref_content = ref_f.read()
-                        
+
                         def normalize_content(text):
-                            lines = text.split('\n')
+                            lines = text.split("\n")
                             normalized_lines = []
                             for line in lines:
                                 # Skip timestamp lines that contain "Exported from ResInsight"
-                                if not line.startswith('-- Exported from ResInsight'):
+                                if not line.startswith("-- Exported from ResInsight"):
                                     normalized_lines.append(line)
-                            return '\n'.join(normalized_lines)
-                        
+                            return "\n".join(normalized_lines)
+
                         normalized_content = normalize_content(content)
                         normalized_ref_content = normalize_content(ref_content)
-                        
+
                         # Content should be identical after normalizing timestamps
                         assert normalized_content == normalized_ref_content, (
                             f"Export content for {test_case['name']} differs from reference data. "
@@ -261,12 +281,13 @@ def test_export_completion_with_reference_validation(rips_instance, initialize_t
     case_root_path = dataroot.PATH + "/TEST10K_FLT_LGR_NNC"
     project_path = case_root_path + "/well_completions_export.rsp"
     reference_path = case_root_path + "/completion_export_reference"
-    
+
     # Skip test if reference data is not available
     if not os.path.exists(reference_path):
         import pytest
+
         pytest.skip(f"Reference data not found at {reference_path}")
-    
+
     project = rips_instance.project.open(path=project_path)
     export_folder = tempfile.mkdtemp()
 
@@ -289,31 +310,39 @@ def test_export_completion_with_reference_validation(rips_instance, initialize_t
         )
 
         # Find the exported file
-        exported_files = [f for f in os.listdir(export_folder) if os.path.isfile(os.path.join(export_folder, f))]
-        exported_file = os.path.join(export_folder, exported_files[0]) if exported_files else None
-        
+        exported_files = [
+            f
+            for f in os.listdir(export_folder)
+            if os.path.isfile(os.path.join(export_folder, f))
+        ]
+        exported_file = (
+            os.path.join(export_folder, exported_files[0]) if exported_files else None
+        )
+
         if exported_file and os.path.exists(exported_file):
             with open(exported_file, "r") as f:
                 exported_content = f.read()
-            
+
             # Use the unified export reference for comparison
-            unified_reference_file = reference_path + "/unified_export/unified_export_reference.txt"
+            unified_reference_file = (
+                reference_path + "/unified_export/unified_export_reference.txt"
+            )
             if os.path.exists(unified_reference_file):
                 with open(unified_reference_file, "r") as ref_f:
                     ref_content = ref_f.read()
-                
+
                 def normalize_content(text):
-                    lines = text.split('\n')
+                    lines = text.split("\n")
                     normalized_lines = []
                     for line in lines:
                         # Skip timestamp lines that contain "Exported from ResInsight"
-                        if not line.startswith('-- Exported from ResInsight'):
+                        if not line.startswith("-- Exported from ResInsight"):
                             normalized_lines.append(line)
-                    return '\n'.join(normalized_lines)
-                
+                    return "\n".join(normalized_lines)
+
                 normalized_exported_content = normalize_content(exported_content)
                 normalized_ref_content = normalize_content(ref_content)
-                
+
                 # Content should be identical after normalizing timestamps
                 assert normalized_exported_content == normalized_ref_content, (
                     f"Export content differs from reference data. "
@@ -321,8 +350,10 @@ def test_export_completion_with_reference_validation(rips_instance, initialize_t
                 )
         else:
             import pytest
+
             pytest.skip("No export file was created")
 
     finally:
         import shutil
+
         shutil.rmtree(export_folder, ignore_errors=True)
