@@ -20,17 +20,22 @@
 
 #include <string>
 
+class RimEclipseCase;
+class RimWellPath;
+
 namespace Opm
 {
-class DeckItem;
+class DeckKeyword;
 } // namespace Opm
 
-namespace RifOpmDeckTools
+//==================================================================================================
+///
+///
+//==================================================================================================
+namespace RimKeywordFactory
 {
-Opm::DeckItem item( std::string name, std::string value );
-Opm::DeckItem item( std::string name, int value );
-Opm::DeckItem item( std::string name, size_t value );
-Opm::DeckItem item( std::string name, double value );
-Opm::DeckItem defaultItem( std::string name, int columns = 1 );
 
-} // namespace RifOpmDeckTools
+Opm::DeckKeyword welspecsKeyword( const std::string wellGrpName, RimEclipseCase* eCase, RimWellPath* wellPath );
+Opm::DeckKeyword compdatKeyword( RimEclipseCase* eCase, RimWellPath* wellPath );
+
+} // namespace RimKeywordFactory

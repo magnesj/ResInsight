@@ -40,6 +40,7 @@
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCaseEnsemble.h"
 #include "RimFishbones.h"
+#include "RimKeywordFactory.h"
 #include "RimKeywordWconinje.h"
 #include "RimKeywordWconprod.h"
 #include "RimOilField.h"
@@ -800,39 +801,16 @@ bool RimOpmFlowJob::onPrepare()
         }
         else
         {
-            // export new well settings from resinsight
-            exportBasicWellSettings();
-            if ( !QFile::exists( wellTempFile() ) )
+            mergePosition = mergeBasicWellSettings();
+            if ( mergePosition < 0 )
             {
-                RiaLogging::error( "Could not find exported well data from ResInsight: " + wellTempFile() );
+                RiaLogging::error( "Unable to merge new well data into DATA file. Please check file format." );
                 return false;
             }
-
-            if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
-            {
-                if ( !m_deckFile->mergeWellDeckAtTimeStep( m_openTimeStep(), wellTempFile().toStdString() ) )
-                {
-                    RiaLogging::error( "Unable to merge new well data into DATA file at selected time step due to parse errors." );
-                    return false;
-                }
-            }
-            else
-            {
-                mergePosition = m_deckFile->mergeWellDeckAtPosition( mergePosition, wellTempFile().toStdString() );
-                if ( mergePosition < m_openWellDeckPosition() )
-                {
-                    RiaLogging::error( "Unable to merge new well data into DATA file due to parse errors." );
-                    return false;
-                }
-            }
-            QFile::remove( wellTempFile() );
         }
 
-        Opm::DeckKeyword openKeyword = m_wconinjeKeyword->keyword( wellNameInDeck );
-        if ( m_wellOpenKeyword() == "WCONPROD" )
-        {
-            openKeyword = m_wconprodKeyword->keyword( wellNameInDeck );
-        }
+        Opm::DeckKeyword openKeyword = ( m_wellOpenKeyword() == "WCONPROD" ) ? m_wconprodKeyword->keyword( wellNameInDeck )
+                                                                             : m_wconinjeKeyword->keyword( wellNameInDeck );
 
         // open new well at selected timestep
         if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
@@ -1025,43 +1003,38 @@ RimEclipseCase* RimOpmFlowJob::findExistingCase( QString filename )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimOpmFlowJob::exportBasicWellSettings()
+int RimOpmFlowJob::mergeBasicWellSettings()
 {
-    RicExportCompletionDataSettingsUi exportSettings;
+    const int failure = -1;
 
-    exportSettings.fileSplit   = RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE;
-    exportSettings.caseToApply = m_eclipseCase();
-    exportSettings.setCustomFileName( wellTempFile() );
-    exportSettings.includeMsw = false;
-    exportSettings.setExportDataSourceAsComment( false );
+    int mergePosition = m_openWellDeckPosition();
 
-    exportSettings.folder = workingDirectory();
+    auto compdatKw  = RimKeywordFactory::compdatKeyword( m_eclipseCase(), m_wellPath() );
+    auto welspecsKw = RimKeywordFactory::welspecsKeyword( m_wellGroupName().toStdString(), m_eclipseCase(), m_wellPath() );
 
-    std::vector<RimWellPathFracture*>    wellPathFractures;
-    std::vector<RimFishbones*>           wellPathFishbones;
-    std::vector<RimPerforationInterval*> wellPathPerforations;
-
-    auto topLevelWell = m_wellPath->topLevelWellPath();
-
-    std::set<RimWellPath*> uniquePaths;
-    for ( auto w : topLevelWell->allWellPathLaterals() )
+    if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
     {
-        uniquePaths.insert( w );
+        // reverse order for correct insertion order
+        if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), compdatKw ) ) return failure;
+        if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), welspecsKw ) ) return failure;
+        return mergePosition;
+    }
+    else
+    {
+        mergePosition = m_deckFile->mergeKeywordAtPosition( mergePosition, welspecsKw );
+        if ( mergePosition < 0 ) return failure;
+        mergePosition = m_deckFile->mergeKeywordAtPosition( mergePosition, compdatKw );
+        if ( mergePosition < 0 ) return failure;
     }
 
-    for ( auto w : uniquePaths )
+    // increase wells and connections in welldims to make sure they are big enough
+    auto additionalConnections = (int)compdatKw.size();
+    auto welldims              = m_deckFile->welldims();
+    if ( !m_deckFile->setWelldims( (int)welldims[0] + 1, (int)( welldims[1] + additionalConnections ), (int)welldims[2] + 1, (int)welldims[3] + 1 ) )
     {
-        auto fractures = w->descendantsIncludingThisOfType<RimWellPathFracture>();
-        wellPathFractures.insert( wellPathFractures.end(), fractures.begin(), fractures.end() );
-
-        auto fishbones = w->descendantsIncludingThisOfType<RimFishbones>();
-        wellPathFishbones.insert( wellPathFishbones.end(), fishbones.begin(), fishbones.end() );
-
-        auto perforations = w->descendantsIncludingThisOfType<RimPerforationInterval>();
-        wellPathPerforations.insert( wellPathPerforations.end(), perforations.begin(), perforations.end() );
+        return failure;
     }
-
-    RicWellPathExportCompletionDataFeatureImpl::exportCompletions( { topLevelWell }, exportSettings );
+    return mergePosition;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1086,29 +1059,7 @@ std::string RimOpmFlowJob::exportMswWellSettings( int timeStep )
 
     exportSettings.folder = workingDirectory();
 
-    std::vector<RimWellPathFracture*>    wellPathFractures;
-    std::vector<RimFishbones*>           wellPathFishbones;
-    std::vector<RimPerforationInterval*> wellPathPerforations;
-
     auto topLevelWell = m_wellPath->topLevelWellPath();
-
-    std::set<RimWellPath*> uniquePaths;
-    for ( auto w : topLevelWell->allWellPathLaterals() )
-    {
-        uniquePaths.insert( w );
-    }
-
-    for ( auto w : uniquePaths )
-    {
-        auto fractures = w->descendantsIncludingThisOfType<RimWellPathFracture>();
-        wellPathFractures.insert( wellPathFractures.end(), fractures.begin(), fractures.end() );
-
-        auto fishbones = w->descendantsIncludingThisOfType<RimFishbones>();
-        wellPathFishbones.insert( wellPathFishbones.end(), fishbones.begin(), fishbones.end() );
-
-        auto perforations = w->descendantsIncludingThisOfType<RimPerforationInterval>();
-        wellPathPerforations.insert( wellPathPerforations.end(), perforations.begin(), perforations.end() );
-    }
 
     RicWellPathExportCompletionDataFeatureImpl::exportCompletions( { topLevelWell }, exportSettings );
 
@@ -1151,6 +1102,16 @@ void RimOpmFlowJob::resetEnsembleRunId()
     {
         m_currentRunId = 0;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::initAfterCopy()
+{
+    m_currentRunId    = 0;
+    m_gridEnsemble    = nullptr;
+    m_summaryEnsemble = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
