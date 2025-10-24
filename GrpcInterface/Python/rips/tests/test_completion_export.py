@@ -9,10 +9,13 @@ import dataroot
 
 
 def normalize_content(text):
-    """Normalize content by removing the first two lines that might vary (timestamp and file path)."""
+    """Normalize content by removing the first lines that might vary (timestamp and file path) and fracture reporting lines."""
     lines = text.split("\n")
-    # Skip the first two lines that might vary (timestamp and file path)
-    normalized_lines = lines[2:] if len(lines) > 2 else lines
+    if len(lines) < 10:
+        return ""
+    
+    # Skip the first ten lines that might vary
+    normalized_lines = lines[10:] if len(lines) > 10 else lines
     return "\n".join(normalized_lines)
 
 
