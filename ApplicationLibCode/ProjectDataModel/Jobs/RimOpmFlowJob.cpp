@@ -712,6 +712,7 @@ QStringList RimOpmFlowJob::command()
     cmd.append( opmPref->opmFlowCommand() );
     cmd.append( QString( "--output-dir=%1" ).arg( workDir ) );
     cmd.append( QString( "--ecl-deck-file-name=%1" ).arg( dataFile ) );
+    cmd.append( QString( "--enable-esmry=true" ) );
 
     return cmd;
 }
