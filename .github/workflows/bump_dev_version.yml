@@ -20,9 +20,14 @@ jobs:
           set -e
           version_file="ResInsightVersion.cmake"
           line=$(grep 'set(RESINSIGHT_DEV_VERSION' "$version_file")
-          current_version_str_quoted=$(echo "$line" | sed -n 's/.*RESINSIGHT_DEV_VERSION \(.*\))/\1/p' | xargs)
-          current_version_str=${current_version_str_quoted//"/}
-          version_num_str=${current_version_str#.}.
+          if [ -z "$line" ]; then
+            echo "Version line not found"
+            exit 1
+          fi
+
+          quoted_version=$(echo "$line" | grep -o '"*' || true)
+          version=${quoted_version//"/}
+          version_num_str=${version#.}.
 
           if ! [[ "$version_num_str" =~ ^[0-9]+$ ]]; then
             echo "Error: dev version is not a number: $version_num_str"
@@ -30,12 +35,14 @@ jobs:
           fi
 
           new_version_num=$((10#$version_num_str + 1))
-          new_version_num_str=$(printf "%02d" "$new_version_num")
+          new_version=$(printf ".%02d" "$new_version_num")
+          new_quoted_version="$new_version"
 
-          sed -i "s/\(set(RESINSIGHT_DEV_VERSION \"\).\)[0-9]\{1,\}\"/\1${new_version_num_str}/" "$version_file"
-          
-          new_version_str=".${new_version_num_str}"
-          echo "new_dev_version=$new_version_str" >> $GITHUB_OUTPUT
+          new_line=${line//$quoted_version/$new_quoted_version}
+
+          sed -i "s|$line|$new_line|" "$version_file"
+
+          echo "new_dev_version=$new_version" >> $GITHUB_OUTPUT
 
       - name: Commit and push changes
         run: |
