@@ -6,6 +6,10 @@ import rips
 
 import dataroot
 
+# The generated data is written to a .gitignore'd folder 'completion_export_output'.
+# The reference data is stored in 'completion_export_reference'.
+# If changes are made to the export functionality that are intended to change the output,
+# the reference data must be updated accordingly.
 
 def normalize_content(text):
     """Normalize content by removing header until '-- Grid Model:' line and excluding file path from compare."""
@@ -25,10 +29,34 @@ def normalize_content(text):
     return "\n".join(normalized_lines)
 
 
+def compare_exported_files_with_reference(export_folder, reference_folder, file_type_description):
+    """Compare all exported files with their corresponding reference files.
+    
+    Args:
+        export_folder: Path to folder containing exported files
+        reference_folder: Path to folder containing reference files
+        file_type_description: Description for error messages (e.g., "unified export", "split by well")
+    """
+    exported_files = [
+        f
+        for f in os.listdir(export_folder)
+        if os.path.isfile(os.path.join(export_folder, f))
+    ]
+    
+    for filename in exported_files:
+        export_file_path = os.path.join(export_folder, filename)
+        reference_file_path = os.path.join(reference_folder, filename)
+        compare_with_reference(
+            export_file_path,
+            reference_file_path,
+            f"{file_type_description} file '{filename}'",
+        )
+
+
 def compare_with_reference(
     export_file_path, reference_file_path, file_description="file"
 ):
-    """Compare an export file with reference data, ignoring variable header lines.
+    """Compare an export file with reference data
 
     Args:
         export_file_path: Path to the exported file
@@ -71,7 +99,6 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
 
         case = project.cases()[0]
 
-        # Use Well-1 for all tests
         well_names_to_use = ["Well-1"]
 
         case.export_well_path_completions(
@@ -79,30 +106,14 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
             well_path_names=well_names_to_use,
             file_split="UNIFIED_FILE",
             include_perforations=True,
-            include_fishbones=True,  # Match reference data generation
+            include_fishbones=True,
             export_welspec=True,
             export_comments=False,
         )
 
-        exported_files = [
-            f
-            for f in os.listdir(export_folder)
-            if os.path.isfile(os.path.join(export_folder, f))
-        ]
-
-        # Allow empty file list - no need to skip if no files are generated
-
         # Compare exported files with reference data
         reference_folder = case_root_path + "/completion_export_reference/unified_export"
-
-        for filename in exported_files:
-            export_file_path = os.path.join(export_folder, filename)
-            reference_file_path = os.path.join(reference_folder, filename)
-            compare_with_reference(
-                export_file_path,
-                reference_file_path,
-                f"unified export file '{filename}'",
-            )
+        compare_exported_files_with_reference(export_folder, reference_folder, "unified export")
 
     finally:
         pass  # Keep exported files in the output directory
@@ -133,25 +144,9 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
             export_comments=False,
         )
 
-        exported_files = [
-            f
-            for f in os.listdir(export_folder)
-            if os.path.isfile(os.path.join(export_folder, f))
-        ]
-
-        # Allow empty file list - no need to skip if no files are generated
-
         # Compare exported files with reference data
         reference_folder = case_root_path + "/completion_export_reference/split_by_well"
-
-        for filename in exported_files:
-            export_file_path = os.path.join(export_folder, filename)
-            reference_file_path = os.path.join(reference_folder, filename)
-            compare_with_reference(
-                export_file_path,
-                reference_file_path,
-                f"split by well file '{filename}'",
-            )
+        compare_exported_files_with_reference(export_folder, reference_folder, "split by well")
 
     finally:
         pass  # Keep exported files in the output directory

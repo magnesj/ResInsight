@@ -2,7 +2,7 @@
 -- RESINSIGHT DATA
 --
 -- Grid Model:
--- g:/gitroot/ResInsight/TestModels/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID
+-- M:/gitroot/ResInsight/TestModels/TEST10K_FLT_LGR_NNC/TEST10K_FLT_LGR_NNC.EGRID
 --
 -- Well   Location
 -- ------------------
@@ -28,11 +28,11 @@
 -- Well-1   Fracture_01   Ellipse Fracture Template      6155.815   0.000   0.000     N/A     1.000   0.216     N/A
 -- 
 --
---                                                                                                      Mean       Mean    Mean   Mean   Mean    Mean
---                                                                      Tr   #con      Fcd     Area     KfWf         Kf      wf     Xf      H      Km
--- Well     Fracture      Template                       [cP.rm3/day/bars]              []     [m2]    [mDm]       [mD]     [m]    [m]    [m]    [mD]
--- -----------------------------------------------------------------------------------------------------------------------------------------------------
--- Well-1   Fracture_01   Ellipse Fracture Template                  2.847     51   19.387   9373.7   1000.0   100000.0   0.010   84.1   55.7   0.613
+--                                                                                                       Mean       Mean    Mean   Mean   Mean    Mean
+--                                                                      Tr   #con      Fcd      Area     KfWf         Kf      wf     Xf      H      Km
+-- Well     Fracture      Template                       [cP.rm3/day/bars]              []      [m2]    [mDm]       [mD]     [m]    [m]    [m]    [mD]
+-- ------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Well-1   Fracture_01   Ellipse Fracture Template                  2.847     51   26.098   11598.5   1000.0   100000.0   0.010   77.3   75.0   0.496
 -- 
 --
 --
