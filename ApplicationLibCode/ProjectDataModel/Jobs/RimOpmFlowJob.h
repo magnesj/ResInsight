@@ -60,6 +60,7 @@ public:
     void setWorkingDirectory( QString workDir );
     void setEclipseCase( RimEclipseCase* eCase );
     void setInputDataFile( QString filename );
+    void initAfterCopy();
 
     QString deckName();
     QString mainWorkingDirectory() const;
@@ -101,28 +102,26 @@ private:
 
     static QString readFileContent( QString filename );
 
-    void        exportBasicWellSettings();
+    int         mergeBasicWellSettings();
     std::string exportMswWellSettings( int timeStep );
     void        selectOpenWellPosition();
+    void        resetEnsembleRunId();
 
 private:
     caf::PdmField<caf::FilePath> m_deckFileName;
     caf::PdmField<caf::FilePath> m_workDir;
-    caf::PdmField<bool>          m_runButton;
-    caf::PdmField<bool>          m_stopButton;
-    caf::PdmField<bool>          m_openSelectButton;
     caf::PdmField<int>           m_openWellDeckPosition;
 
     caf::PdmField<bool> m_pauseBeforeRun;
     caf::PdmField<bool> m_addToEnsemble;
     caf::PdmField<int>  m_currentRunId;
-    caf::PdmField<bool> m_resetRunIdButton;
     caf::PdmField<bool> m_useRestart;
 
     caf::PdmPtrField<RimWellPath*>            m_wellPath;
     caf::PdmPtrField<RimEclipseCase*>         m_eclipseCase;
     caf::PdmPtrField<RimEclipseCaseEnsemble*> m_gridEnsemble;
     caf::PdmPtrField<RimSummaryEnsemble*>     m_summaryEnsemble;
+
     caf::PdmField<int>                        m_openTimeStep;
     caf::PdmField<bool>                       m_endTimeStepEnabled;
     caf::PdmField<int>                        m_endTimeStep;

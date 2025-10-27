@@ -14,6 +14,7 @@ public:
     LabelsAndHyperlinks();
 
 protected:
+    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field,
                                 QString                    uiConfigName,
                                 caf::PdmUiEditorAttribute* attribute ) override;
@@ -21,4 +22,5 @@ protected:
 private:
     caf::PdmField<QString> m_labelTextField;
     caf::PdmField<QString> m_hyperlinkTextField;
+    caf::PdmField<bool>    m_showButton;
 };

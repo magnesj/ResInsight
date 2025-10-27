@@ -23,8 +23,12 @@
 #include "cvfArray.h"
 #include "cvfVector3.h"
 
+#include <expected>
+
 class RimEclipseView;
+class RimEclipseCase;
 class RicExportEclipseSectorModelUi;
+class RifOpmFlowDeckFile;
 
 //==================================================================================================
 ///
@@ -37,7 +41,7 @@ public:
     static void openDialogAndExecuteCommand( RimEclipseView* view );
     static void executeCommand( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings, const QString& logPrefix );
 
-    static std::pair<cvf::Vec3i, cvf::Vec3i> getVisibleCellRange( RimEclipseView* view, const cvf::UByteArray& cellVisibility );
+    static std::pair<cvf::Vec3st, cvf::Vec3st> getVisibleCellRange( RimEclipseView* view, const cvf::UByteArray& cellVisibility );
 
 protected:
     bool isCommandEnabled() const override;
@@ -45,7 +49,27 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    RimEclipseView*                  selectedView() const;
-    static cvf::ref<cvf::UByteArray> createVisibilityBasedOnBoxSelection( RimEclipseView*                      view,
-                                                                          const RicExportEclipseSectorModelUi& exportSettings );
+    RimEclipseView*                     selectedView() const;
+    static cvf::ref<cvf::UByteArray>    createVisibilityBasedOnBoxSelection( RimEclipseView*                      view,
+                                                                             const RicExportEclipseSectorModelUi& exportSettings );
+    static std::expected<void, QString> exportSimulationInput( RimEclipseCase&                      eclipseCase,
+                                                               const RicExportEclipseSectorModelUi& exportSettings );
+    static void                         exportGrid( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void                         exportFaults( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void                         exportParameters( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+
+    static std::expected<void, QString>
+        addFaultsToDeckFile( RimEclipseCase* eclipseCase, const RicExportEclipseSectorModelUi& exportSettings, RifOpmFlowDeckFile& deckFile );
+
+    static std::expected<void, QString> addBorderBoundaryConditions( RimEclipseCase*                      eclipseCase,
+                                                                     const RicExportEclipseSectorModelUi& exportSettings,
+                                                                     RifOpmFlowDeckFile&                  deckFile );
+
+    static std::expected<void, QString> replaceKeywordValuesInDeckFile( RimEclipseCase*                      eclipseCase,
+                                                                        const RicExportEclipseSectorModelUi& exportSettings,
+                                                                        RifOpmFlowDeckFile&                  deckFile );
+
+    static std::expected<void, QString> updateCornerPointGridInDeckFile( RimEclipseCase*                      eclipseCase,
+                                                                         const RicExportEclipseSectorModelUi& exportSettings,
+                                                                         RifOpmFlowDeckFile&                  deckFile );
 };

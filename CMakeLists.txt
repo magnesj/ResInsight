@@ -444,12 +444,12 @@ if(RESINSIGHT_ENABLE_OPENVDS)
   if(MSVC)
     FetchContent_Declare(
       openvds
-      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.6-win.zip
+      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.8-win.zip
     )
   else()
     FetchContent_Declare(
       openvds
-      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.6-manylinux_2014.tar.gz
+      URL https://downloads.bluware.com/artifactory/Releases-OpenVDSPlus/3.4/openvds+-3.4.8-manylinux_2014.tar.gz
     )
   endif()
 
@@ -559,7 +559,17 @@ list(APPEND THIRD_PARTY_LIBRARIES NRLib)
 # ##############################################################################
 
 add_definitions(-DOPENZGY_STATIC)
+
+# Suppress CMake deprecation warnings from openzgy/zfp's old CMakeLists.txt
+set(CMAKE_WARN_DEPRECATED
+    OFF
+    CACHE BOOL "" FORCE
+)
 add_subdirectory(ThirdParty/openzgy)
+set(CMAKE_WARN_DEPRECATED
+    ON
+    CACHE BOOL "" FORCE
+)
 
 list(APPEND THIRD_PARTY_LIBRARIES openzgy)
 set_property(TARGET zfp PROPERTY FOLDER "Thirdparty")
@@ -706,8 +716,24 @@ list(APPEND THIRD_PARTY_LIBRARIES FastFloat::fast_float spdlog::spdlog)
 find_package(Arrow CONFIG REQUIRED)
 if(MSVC)
   list(APPEND THIRD_PARTY_LIBRARIES Arrow::arrow_shared)
+  # Treat Arrow headers as system headers to suppress warnings from third-party
+  # code
+  set_target_properties(
+    Arrow::arrow_shared
+    PROPERTIES
+      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+      $<TARGET_PROPERTY:Arrow::arrow_shared,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 else()
   list(APPEND THIRD_PARTY_LIBRARIES Arrow::arrow_static)
+  # Treat Arrow headers as system headers to suppress warnings from third-party
+  # code
+  set_target_properties(
+    Arrow::arrow_static
+    PROPERTIES
+      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+      $<TARGET_PROPERTY:Arrow::arrow_static,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 # ##############################################################################
@@ -716,8 +742,24 @@ endif()
 find_package(Parquet CONFIG REQUIRED)
 if(MSVC)
   list(APPEND THIRD_PARTY_LIBRARIES Parquet::parquet_shared)
+  # Treat Parquet headers as system headers to suppress warnings from
+  # third-party code
+  set_target_properties(
+    Parquet::parquet_shared
+    PROPERTIES
+      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+      $<TARGET_PROPERTY:Parquet::parquet_shared,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 else()
   list(APPEND THIRD_PARTY_LIBRARIES Parquet::parquet_static)
+  # Treat Parquet headers as system headers to suppress warnings from
+  # third-party code
+  set_target_properties(
+    Parquet::parquet_static
+    PROPERTIES
+      INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+      $<TARGET_PROPERTY:Parquet::parquet_static,INTERFACE_INCLUDE_DIRECTORIES>
+  )
 endif()
 
 # ##############################################################################
@@ -796,11 +838,11 @@ else()
     set(OPENVDS_LIB_NAMES
         libopenvds.so
         libopenvds.so.3
-        libopenvds.so.3.4.6
-        libopenvds-e6a44892.so.3.4.6
+        libopenvds.so.3.4.8
+        libopenvds-6909d279.so.3.4.8
         libsegyutils.so
         libsegyutils.so.3
-        libsegyutils.so.3.4.6
+        libsegyutils.so.3.4.8
     )
     foreach(OPENVDS_LIB_NAME ${OPENVDS_LIB_NAMES})
       list(APPEND RI_FILENAMES
@@ -1052,11 +1094,11 @@ if(RESINSIGHT_ENABLE_OPENVDS)
     set(OPENVDS_SHARED_LIB_FILES
         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so
         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3
-        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3.4.6
-        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds-e6a44892.so.3.4.6
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds.so.3.4.8
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libopenvds-6909d279.so.3.4.8
         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so
         ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3
-        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3.4.6
+        ${RESINSIGHT_OPENVDS_API_DIR}/lib64/libsegyutils.so.3.4.8
     )
     install(FILES ${OPENVDS_SHARED_LIB_FILES}
             DESTINATION ${RESINSIGHT_INSTALL_FOLDER}

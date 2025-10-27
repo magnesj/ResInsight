@@ -61,8 +61,6 @@ RiuResultTextBuilder::RiuResultTextBuilder( RimGridView*                settings
                                             size_t                      cellIndex,
                                             size_t                      timeStepIndex )
 {
-    CVF_ASSERT( eclResDef );
-
     m_displayCoordView = settingsView;
     m_eclipseView      = dynamic_cast<RimEclipseView*>( settingsView );
     m_eclResDef        = eclResDef;
@@ -83,8 +81,6 @@ RiuResultTextBuilder::RiuResultTextBuilder( RimGridView*                settings
                                             size_t                      reservoirCellIndex,
                                             size_t                      timeStepIndex )
 {
-    CVF_ASSERT( eclResDef );
-
     m_displayCoordView = settingsView;
     m_eclipseView      = dynamic_cast<RimEclipseView*>( settingsView );
     m_eclResDef        = eclResDef;
@@ -92,11 +88,11 @@ RiuResultTextBuilder::RiuResultTextBuilder( RimGridView*                settings
     m_cellIndex        = 0;
     m_timeStepIndex    = timeStepIndex;
 
-    RimEclipseCase* eclipseCase = eclResDef->eclipseCase();
-    if ( eclipseCase && eclipseCase->eclipseCaseData() )
+    if ( eclResDef && eclResDef->eclipseCase() )
     {
-        RigEclipseCaseData* caseData = eclipseCase->eclipseCaseData();
-        RigMainGrid*        mainGrid = caseData->mainGrid();
+        RimEclipseCase*     eclipseCase = eclResDef->eclipseCase();
+        RigEclipseCaseData* caseData    = eclipseCase->eclipseCaseData();
+        RigMainGrid*        mainGrid    = caseData->mainGrid();
 
         const RigCell& cell = caseData->mainGrid()->cell( reservoirCellIndex );
 

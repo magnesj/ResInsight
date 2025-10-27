@@ -40,6 +40,7 @@
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCaseEnsemble.h"
 #include "RimFishbones.h"
+#include "RimKeywordFactory.h"
 #include "RimKeywordWconinje.h"
 #include "RimKeywordWconprod.h"
 #include "RimOilField.h"
@@ -54,6 +55,7 @@
 
 #include "Riu3DMainWindowTools.h"
 
+#include "cafPdmUiButton.h"
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
@@ -143,22 +145,6 @@ RimOpmFlowJob::RimOpmFlowJob()
     CAF_PDM_InitField( &m_numberOfNewDates, "NumberOfNewDates", 12, "Number of Dates to Append" );
     CAF_PDM_InitField( &m_dateAppendType, "DateAppendType", caf::AppEnum<DateAppendType>( DateAppendType::ADD_MONTHS ), " " );
 
-    CAF_PDM_InitField( &m_runButton, "runButton", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_runButton );
-    m_runButton.xmlCapability()->disableIO();
-
-    CAF_PDM_InitField( &m_stopButton, "stopButton", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_stopButton );
-    m_stopButton.xmlCapability()->disableIO();
-
-    CAF_PDM_InitField( &m_resetRunIdButton, "resetRunIdButton", false, " " );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_resetRunIdButton );
-    m_resetRunIdButton.xmlCapability()->disableIO();
-
-    CAF_PDM_InitField( &m_openSelectButton, "openSelectButton", false, " " );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_openSelectButton );
-    m_openSelectButton.xmlCapability()->disableIO();
-
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_addToEnsemble );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_pauseBeforeRun );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_useRestart );
@@ -239,40 +225,6 @@ void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QSt
             myAttr->m_selectDirectory = true;
         }
     }
-    else if ( field == &m_runButton )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Run Simulation";
-            pbAttribute->m_buttonIcon = QIcon( ":/Play.svg" );
-        }
-    }
-    else if ( field == &m_stopButton )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Stop";
-            pbAttribute->m_buttonIcon = QIcon( ":/stop.svg" );
-        }
-    }
-    else if ( field == &m_openSelectButton )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Select Open Keyword Position";
-        }
-    }
-    else if ( field == &m_resetRunIdButton )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Reset Ensemble Run Id";
-        }
-    }
     else if ( field == &m_wellGroupName )
     {
         auto attr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
@@ -296,7 +248,9 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
         auto runGrp = uiOrdering.addNewGroup( "Running" );
         m_workDir.uiCapability()->setUiReadOnly( true );
         runGrp->add( &m_workDir );
-        runGrp->add( &m_stopButton );
+        auto stopButton = runGrp->addNewButton( "Stop", [this]() { RicStopJobFeature::stopJob( this ); } );
+        stopButton->setUiIconFromResourceString( ":/stop.svg" );
+        stopButton->setAlignment( Qt::AlignCenter );
         uiOrdering.skipRemainingFields();
         return;
     }
@@ -337,6 +291,8 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
 
             wellGrp->add( &m_wellOpenType );
 
+            bool createOpenPostionButton = false;
+
             if ( m_fileDeckHasDates )
             {
                 if ( m_wellOpenType() == WellOpenType::OPEN_AT_DATE )
@@ -354,15 +310,22 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
                 }
                 else if ( m_wellOpenType == WellOpenType::OPEN_BY_POSITION )
                 {
-                    wellGrp->add( &m_openSelectButton );
+                    createOpenPostionButton = true;
                 }
                 m_wellOpenType.uiCapability()->setUiReadOnly( false );
             }
             else
             {
-                wellGrp->add( &m_openSelectButton );
+                createOpenPostionButton = true;
+
                 m_wellOpenType = WellOpenType::OPEN_BY_POSITION;
                 m_wellOpenType.uiCapability()->setUiReadOnly( true );
+            }
+
+            if ( createOpenPostionButton )
+            {
+                auto openSelectButton = wellGrp->addNewButton( "Select Open Keyword Position", [this]() { selectOpenWellPosition(); } );
+                openSelectButton->setAlignment( Qt::AlignRight );
             }
         }
     }
@@ -381,7 +344,11 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
     }
 
     auto opmGrp = uiOrdering.addNewGroup( "OPM Flow" );
-    opmGrp->add( &m_runButton );
+
+    auto runButton = opmGrp->addNewButton( "Run", [this]() { RicRunJobFeature::runJob( this ); } );
+    runButton->setUiIconFromResourceString( ":/Play.svg" );
+    runButton->setAlignment( Qt::AlignCenter );
+
     opmGrp->add( &m_pauseBeforeRun );
     if ( m_fileDeckHasDates )
     {
@@ -396,7 +363,9 @@ void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& 
     {
         auto advOpmGrp = opmGrp->addNewGroup( "Advanced" );
         advOpmGrp->setCollapsedByDefault();
-        advOpmGrp->add( &m_resetRunIdButton );
+
+        auto resetRunIdButton = advOpmGrp->addNewButton( "Reset Ensemble Run Id", [this]() { resetEnsembleRunId(); } );
+        resetRunIdButton->setAlignment( Qt::AlignRight );
     }
 
     uiOrdering.skipRemainingFields();
@@ -506,33 +475,6 @@ void RimOpmFlowJob::fieldChangedByUi( const caf::PdmFieldHandle* changedField, c
     if ( ( changedField == &m_deckFileName ) || ( changedField == &m_addToEnsemble ) )
     {
         m_deckName = "";
-    }
-    else if ( changedField == &m_runButton )
-    {
-        m_runButton = false;
-        RicRunJobFeature::runJob( this );
-    }
-    else if ( changedField == &m_stopButton )
-    {
-        m_stopButton = false;
-        RicStopJobFeature::stopJob( this );
-    }
-    else if ( changedField == &m_resetRunIdButton )
-    {
-        m_resetRunIdButton = false;
-        auto reply         = QMessageBox::information( nullptr,
-                                               "Opm Flow Job",
-                                               "Do you want to reset the ensemble run ID to 0?",
-                                               QMessageBox::Yes | QMessageBox::No );
-        if ( reply == QMessageBox::Yes )
-        {
-            m_currentRunId = 0;
-        }
-    }
-    else if ( changedField == &m_openSelectButton )
-    {
-        m_openSelectButton = false;
-        selectOpenWellPosition();
     }
     else if ( changedField == &m_wellPath )
     {
@@ -770,6 +712,7 @@ QStringList RimOpmFlowJob::command()
     cmd.append( opmPref->opmFlowCommand() );
     cmd.append( QString( "--output-dir=%1" ).arg( workDir ) );
     cmd.append( QString( "--ecl-deck-file-name=%1" ).arg( dataFile ) );
+    cmd.append( QString( "--enable-esmry=true" ) );
 
     return cmd;
 }
@@ -859,39 +802,16 @@ bool RimOpmFlowJob::onPrepare()
         }
         else
         {
-            // export new well settings from resinsight
-            exportBasicWellSettings();
-            if ( !QFile::exists( wellTempFile() ) )
+            mergePosition = mergeBasicWellSettings();
+            if ( mergePosition < 0 )
             {
-                RiaLogging::error( "Could not find exported well data from ResInsight: " + wellTempFile() );
+                RiaLogging::error( "Unable to merge new well data into DATA file. Please check file format." );
                 return false;
             }
-
-            if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
-            {
-                if ( !m_deckFile->mergeWellDeckAtTimeStep( m_openTimeStep(), wellTempFile().toStdString() ) )
-                {
-                    RiaLogging::error( "Unable to merge new well data into DATA file at selected time step due to parse errors." );
-                    return false;
-                }
-            }
-            else
-            {
-                mergePosition = m_deckFile->mergeWellDeckAtPosition( mergePosition, wellTempFile().toStdString() );
-                if ( mergePosition < m_openWellDeckPosition() )
-                {
-                    RiaLogging::error( "Unable to merge new well data into DATA file due to parse errors." );
-                    return false;
-                }
-            }
-            QFile::remove( wellTempFile() );
         }
 
-        Opm::DeckKeyword openKeyword = m_wconinjeKeyword->keyword( wellNameInDeck );
-        if ( m_wellOpenKeyword() == "WCONPROD" )
-        {
-            openKeyword = m_wconprodKeyword->keyword( wellNameInDeck );
-        }
+        Opm::DeckKeyword openKeyword = ( m_wellOpenKeyword() == "WCONPROD" ) ? m_wconprodKeyword->keyword( wellNameInDeck )
+                                                                             : m_wconinjeKeyword->keyword( wellNameInDeck );
 
         // open new well at selected timestep
         if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
@@ -1084,43 +1004,38 @@ RimEclipseCase* RimOpmFlowJob::findExistingCase( QString filename )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimOpmFlowJob::exportBasicWellSettings()
+int RimOpmFlowJob::mergeBasicWellSettings()
 {
-    RicExportCompletionDataSettingsUi exportSettings;
+    const int failure = -1;
 
-    exportSettings.fileSplit   = RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE;
-    exportSettings.caseToApply = m_eclipseCase();
-    exportSettings.setCustomFileName( wellTempFile() );
-    exportSettings.includeMsw = false;
-    exportSettings.setExportDataSourceAsComment( false );
+    int mergePosition = m_openWellDeckPosition();
 
-    exportSettings.folder = workingDirectory();
+    auto compdatKw  = RimKeywordFactory::compdatKeyword( m_eclipseCase(), m_wellPath() );
+    auto welspecsKw = RimKeywordFactory::welspecsKeyword( m_wellGroupName().toStdString(), m_eclipseCase(), m_wellPath() );
 
-    std::vector<RimWellPathFracture*>    wellPathFractures;
-    std::vector<RimFishbones*>           wellPathFishbones;
-    std::vector<RimPerforationInterval*> wellPathPerforations;
-
-    auto topLevelWell = m_wellPath->topLevelWellPath();
-
-    std::set<RimWellPath*> uniquePaths;
-    for ( auto w : topLevelWell->allWellPathLaterals() )
+    if ( m_wellOpenType == WellOpenType::OPEN_AT_DATE )
     {
-        uniquePaths.insert( w );
+        // reverse order for correct insertion order
+        if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), compdatKw ) ) return failure;
+        if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), welspecsKw ) ) return failure;
+        return mergePosition;
+    }
+    else
+    {
+        mergePosition = m_deckFile->mergeKeywordAtPosition( mergePosition, welspecsKw );
+        if ( mergePosition < 0 ) return failure;
+        mergePosition = m_deckFile->mergeKeywordAtPosition( mergePosition, compdatKw );
+        if ( mergePosition < 0 ) return failure;
     }
 
-    for ( auto w : uniquePaths )
+    // increase wells and connections in welldims to make sure they are big enough
+    auto additionalConnections = (int)compdatKw.size();
+    auto welldims              = m_deckFile->welldims();
+    if ( !m_deckFile->setWelldims( (int)welldims[0] + 1, (int)( welldims[1] + additionalConnections ), (int)welldims[2] + 1, (int)welldims[3] + 1 ) )
     {
-        auto fractures = w->descendantsIncludingThisOfType<RimWellPathFracture>();
-        wellPathFractures.insert( wellPathFractures.end(), fractures.begin(), fractures.end() );
-
-        auto fishbones = w->descendantsIncludingThisOfType<RimFishbones>();
-        wellPathFishbones.insert( wellPathFishbones.end(), fishbones.begin(), fishbones.end() );
-
-        auto perforations = w->descendantsIncludingThisOfType<RimPerforationInterval>();
-        wellPathPerforations.insert( wellPathPerforations.end(), perforations.begin(), perforations.end() );
+        return failure;
     }
-
-    RicWellPathExportCompletionDataFeatureImpl::exportCompletions( { topLevelWell }, exportSettings );
+    return mergePosition;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1145,29 +1060,7 @@ std::string RimOpmFlowJob::exportMswWellSettings( int timeStep )
 
     exportSettings.folder = workingDirectory();
 
-    std::vector<RimWellPathFracture*>    wellPathFractures;
-    std::vector<RimFishbones*>           wellPathFishbones;
-    std::vector<RimPerforationInterval*> wellPathPerforations;
-
     auto topLevelWell = m_wellPath->topLevelWellPath();
-
-    std::set<RimWellPath*> uniquePaths;
-    for ( auto w : topLevelWell->allWellPathLaterals() )
-    {
-        uniquePaths.insert( w );
-    }
-
-    for ( auto w : uniquePaths )
-    {
-        auto fractures = w->descendantsIncludingThisOfType<RimWellPathFracture>();
-        wellPathFractures.insert( wellPathFractures.end(), fractures.begin(), fractures.end() );
-
-        auto fishbones = w->descendantsIncludingThisOfType<RimFishbones>();
-        wellPathFishbones.insert( wellPathFishbones.end(), fishbones.begin(), fishbones.end() );
-
-        auto perforations = w->descendantsIncludingThisOfType<RimPerforationInterval>();
-        wellPathPerforations.insert( wellPathPerforations.end(), perforations.begin(), perforations.end() );
-    }
 
     RicWellPathExportCompletionDataFeatureImpl::exportCompletions( { topLevelWell }, exportSettings );
 
@@ -1198,6 +1091,28 @@ void RimOpmFlowJob::selectOpenWellPosition()
     }
 
     m_openWellDeckPosition = RimDeckPositionDlg::askForPosition( nullptr, kwVec, "--- Open New Well HERE ---", m_openWellDeckPosition );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::resetEnsembleRunId()
+{
+    if ( QMessageBox::information( nullptr, "Opm Flow Job", "Do you want to reset the ensemble run ID to 0?", QMessageBox::Yes | QMessageBox::No ) ==
+         QMessageBox::Yes )
+    {
+        m_currentRunId = 0;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimOpmFlowJob::initAfterCopy()
+{
+    m_currentRunId    = 0;
+    m_gridEnsemble    = nullptr;
+    m_summaryEnsemble = nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------

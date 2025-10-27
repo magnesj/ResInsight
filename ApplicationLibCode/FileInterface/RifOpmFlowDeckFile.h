@@ -34,11 +34,6 @@ class DeckRecord;
 class ParseContext;
 } // namespace Opm
 
-namespace RigEclipseResultTools
-{
-struct BorderCellFace;
-}
-
 //==================================================================================================
 ///
 ///
@@ -52,8 +47,8 @@ public:
     bool loadDeck( std::string filename );
     bool saveDeck( std::string folder, std::string filename );
 
-    bool mergeWellDeckAtTimeStep( int timeStep, std::string filename );
-    int  mergeWellDeckAtPosition( int position, std::string filename );
+    int  mergeKeywordAtPosition( int deckPosition, const Opm::DeckKeyword& keyword );
+    bool mergeKeywordAtTimeStep( int timeStep, const Opm::DeckKeyword& keyword );
 
     bool mergeMswData( std::vector<std::string>& mswFileData );
 
@@ -63,12 +58,13 @@ public:
     bool restartAtTimeStep( int timeStep, std::string deckName );
     bool stopAtTimeStep( int timeStep );
 
-    std::vector<std::string> keywords();
-    bool                     hasDatesKeyword();
-    bool                     isRestartFile();
-    std::vector<std::string> dateStrings();
-    std::vector<std::time_t> dates();
-    bool                     appendDateKeywords( const std::vector<std::time_t>& dates );
+    std::vector<std::string>        keywords( bool includeDates = true );
+    std::optional<Opm::DeckKeyword> findKeyword( const std::string& keyword );
+    bool                            hasDatesKeyword();
+    bool                            isRestartFile();
+    std::vector<std::string>        dateStrings();
+    std::vector<std::time_t>        dates();
+    bool                            appendDateKeywords( const std::vector<std::time_t>& dates );
 
     std::set<std::string> wellGroupsInFile();
 
@@ -80,18 +76,11 @@ public:
     bool             ensureRegdimsKeyword();
 
     bool addIncludeKeyword( std::string section, std::string keyword, std::string filePath );
-    bool addOperaterKeyword( std::string          section,
-                             std::string          targetProperty,
-                             int                  regionId,
-                             std::string          equation,
-                             std::string          inputProperty,
-                             std::optional<float> alpha,
-                             std::optional<float> beta );
 
-    bool addBcconKeyword( std::string section, const std::vector<RigEclipseResultTools::BorderCellFace>& borderCellFaces );
-    bool addBcpropKeyword( std::string                                               section,
-                           const std::vector<RigEclipseResultTools::BorderCellFace>& boundaryConditions,
-                           const std::vector<Opm::DeckRecord>&                       boundaryConditionProperties );
+    bool replaceKeywordData( const std::string& keyword, const std::vector<double>& data );
+    bool replaceKeywordData( const std::string& keyword, const std::vector<int>& data );
+
+    bool replaceKeyword( const std::string& section, const Opm::DeckKeyword& keyword );
 
 private:
     void splitDatesIfNecessary();
