@@ -1002,7 +1002,7 @@ RimEclipseCase* RimOpmFlowJob::findExistingCase( QString filename )
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+///  Returns value < 0 if failure to merge
 //--------------------------------------------------------------------------------------------------
 int RimOpmFlowJob::mergeBasicWellSettings()
 {
@@ -1018,7 +1018,7 @@ int RimOpmFlowJob::mergeBasicWellSettings()
         // reverse order for correct insertion order
         if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), compdatKw ) ) return failure;
         if ( !m_deckFile->mergeKeywordAtTimeStep( m_openTimeStep(), welspecsKw ) ) return failure;
-        return mergePosition;
+        return 0;
     }
     else
     {
