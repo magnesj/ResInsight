@@ -734,7 +734,6 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                                                                                m_opmFlowDiagStaticData->m_initData,
                                                                                gridID,
                                                                                static_cast<int>( activeCellIndex ),
-                                                                               satnum,
                                                                                scaling );
 
             for ( size_t i = 0; i < graphArr.size(); i++ )
