@@ -717,7 +717,7 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
         // Calculate and return curves for both drainage and imbibition with and without endpoint scaling
         const std::array<RigFlowDiagDefines::RelPermCurve::EpsMode, 2> epsModeArr = {
             { RigFlowDiagDefines::RelPermCurve::EPS_ON, RigFlowDiagDefines::RelPermCurve::EPS_OFF } };
-        
+
         const std::array<std::pair<Opm::ECLSaturationFunc::RawCurve::CurveSet, RigFlowDiagDefines::RelPermCurve::CurveSet>, 2> curveSetArr = {
             { { Opm::ECLSaturationFunc::RawCurve::CurveSet::Drainage, RigFlowDiagDefines::RelPermCurve::DRAINAGE },
               { Opm::ECLSaturationFunc::RawCurve::CurveSet::Imbibition, RigFlowDiagDefines::RelPermCurve::IMBIBITION } } };
@@ -739,7 +739,7 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                 for ( size_t i = 0; i < satFuncRequests.size(); i++ )
                 {
                     Opm::ECLSaturationFunc::RawCurve request = satFuncRequests[i];
-                    request.curveSet = curveSetPair.first;
+                    request.curveSet                         = curveSetPair.first;
                     curveSetRequests.push_back( request );
                 }
 
@@ -759,8 +759,9 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                     if ( !srcGraph.first.empty() )
                     {
                         // Use "I" prefix for imbibition curves following Eclipse convention
-                        const std::string curveName = ( curveSetPair.second == RigFlowDiagDefines::RelPermCurve::IMBIBITION ) ? "I" + baseName : baseName;
-                        
+                        const std::string curveName = ( curveSetPair.second == RigFlowDiagDefines::RelPermCurve::IMBIBITION ) ? "I" + baseName
+                                                                                                                              : baseName;
+
                         const std::vector<double>& xVals = srcGraph.first;
                         const std::vector<double>& yVals = srcGraph.second;
                         retCurveArr.push_back( { curveIdent, curveName, epsMode, curveSetPair.second, xVals, yVals } );

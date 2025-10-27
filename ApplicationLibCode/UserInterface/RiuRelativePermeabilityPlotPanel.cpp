@@ -119,11 +119,11 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOG" ), RigFlowDiagDefines::RelPermCurve::PCOG );
 
     // Create Curve Set group box
-    m_curveSetGroupBox = new QGroupBox( "Curve Set" );
-    m_drainageCheckBox = new QCheckBox( "Drainage" );
+    m_curveSetGroupBox   = new QGroupBox( "Curve Set" );
+    m_drainageCheckBox   = new QCheckBox( "Drainage" );
     m_imbibitionCheckBox = new QCheckBox( "Imbibition" );
-    m_drainageCheckBox->setChecked( true );  // Default on
-    
+    m_drainageCheckBox->setChecked( true ); // Default on
+
     QHBoxLayout* curveSetLayout = new QHBoxLayout;
     curveSetLayout->addWidget( m_drainageCheckBox );
     curveSetLayout->addWidget( m_imbibitionCheckBox );
