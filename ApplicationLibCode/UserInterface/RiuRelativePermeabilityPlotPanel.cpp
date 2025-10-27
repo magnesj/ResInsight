@@ -91,6 +91,9 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     , m_plotUpdater( new RiuRelativePermeabilityPlotUpdater( this ) )
     , m_qwtPlot( nullptr )
     , m_selectedCurvesButtonGroup( nullptr )
+    , m_curveSetGroupBox( nullptr )
+    , m_drainageCheckBox( nullptr )
+    , m_imbibitionCheckBox( nullptr )
     , m_groupBox( nullptr )
     , m_logarithmicScaleKrAxisCheckBox( nullptr )
     , m_showUnscaledCheckBox( nullptr )
@@ -114,6 +117,17 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KROG" ), RigFlowDiagDefines::RelPermCurve::KROG );
     m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOW" ), RigFlowDiagDefines::RelPermCurve::PCOW );
     m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOG" ), RigFlowDiagDefines::RelPermCurve::PCOG );
+
+    // Create Curve Set group box
+    m_curveSetGroupBox = new QGroupBox( "Curve Set" );
+    m_drainageCheckBox = new QCheckBox( "Drainage" );
+    m_imbibitionCheckBox = new QCheckBox( "Imbibition" );
+    m_drainageCheckBox->setChecked( true );  // Default on
+    
+    QHBoxLayout* curveSetLayout = new QHBoxLayout;
+    curveSetLayout->addWidget( m_drainageCheckBox );
+    curveSetLayout->addWidget( m_imbibitionCheckBox );
+    m_curveSetGroupBox->setLayout( curveSetLayout );
 
     m_groupBox                  = new QGroupBox( "Curves" );
     QGridLayout* groupBoxLayout = new QGridLayout;
@@ -141,6 +155,7 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     connect( showCurveSelection, SIGNAL( stateChanged( int ) ), SLOT( slotShowCurveSelectionWidgets( int ) ) );
 
     QVBoxLayout* leftLayout = new QVBoxLayout;
+    leftLayout->addWidget( m_curveSetGroupBox );
     leftLayout->addWidget( showCurveSelection );
     leftLayout->addWidget( m_groupBox );
     leftLayout->addWidget( m_logarithmicScaleKrAxisCheckBox );
@@ -158,6 +173,8 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     setLayout( mainLayout );
 
     connect( m_selectedCurvesButtonGroup, SIGNAL( idClicked( int ) ), SLOT( slotButtonInButtonGroupClicked( int ) ) );
+    connect( m_drainageCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
+    connect( m_imbibitionCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_logarithmicScaleKrAxisCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_showUnscaledCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_showScaledCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );

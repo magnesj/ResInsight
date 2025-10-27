@@ -126,6 +126,9 @@ private:
     QPointer<RiuDockedQwtPlot>                    m_qwtPlot;
     std::vector<QwtPlotMarker*>                   m_myPlotMarkers;
 
+    QGroupBox*    m_curveSetGroupBox;
+    QCheckBox*    m_drainageCheckBox;
+    QCheckBox*    m_imbibitionCheckBox;
     QGroupBox*    m_groupBox;
     QButtonGroup* m_selectedCurvesButtonGroup;
     QCheckBox*    m_showUnscaledCheckBox;
