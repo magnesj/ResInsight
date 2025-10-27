@@ -10,17 +10,17 @@ import dataroot
 def normalize_content(text):
     """Normalize content by removing header until '-- Grid Model:' line and excluding file path from compare."""
     lines = text.split("\n")
-    
+
     # Find the line containing "-- Grid Model:" and skip it and the following line
     start_index = 0
     for i, line in enumerate(lines):
         if "-- Grid Model:" in line:
             start_index = i + 2  # Skip "-- Grid Model:" and the line after it
             break
-    
+
     if start_index >= len(lines):
         return ""
-    
+
     normalized_lines = lines[start_index:]
     return "\n".join(normalized_lines)
 
@@ -63,7 +63,9 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
     project_path = case_root_path + "/well_completions_export.rsp"
     project = rips_instance.project.open(path=project_path)
 
-    export_folder = os.path.abspath(case_root_path + "/completion_export_output/unified_export")
+    export_folder = os.path.abspath(
+        case_root_path + "/completion_export_output/unified_export"
+    )
     os.makedirs(export_folder, exist_ok=True)
 
     try:
@@ -93,7 +95,9 @@ def test_export_completion_files_unified(rips_instance, initialize_test):
         # Allow empty file list - no need to skip if no files are generated
 
         # Compare exported files with reference data
-        reference_folder = case_root_path + "/completion_export_reference/unified_export"
+        reference_folder = (
+            case_root_path + "/completion_export_reference/unified_export"
+        )
 
         for filename in exported_files:
             export_file_path = os.path.join(export_folder, filename)
@@ -113,7 +117,9 @@ def test_export_completion_files_split_by_well(rips_instance, initialize_test):
     project_path = case_root_path + "/well_completions_export.rsp"
     project = rips_instance.project.open(path=project_path)
 
-    export_folder = os.path.abspath(case_root_path + "/completion_export_output/split_by_well")
+    export_folder = os.path.abspath(
+        case_root_path + "/completion_export_output/split_by_well"
+    )
     os.makedirs(export_folder, exist_ok=True)
 
     try:
