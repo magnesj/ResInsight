@@ -714,10 +714,14 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
 
     try
     {
-        // Calculate and return curves both with and without endpoint scaling and tag them accordingly
-        // Must use two calls to achieve this
+        // Calculate and return curves for both drainage and imbibition with and without endpoint scaling
         const std::array<RigFlowDiagDefines::RelPermCurve::EpsMode, 2> epsModeArr = {
             { RigFlowDiagDefines::RelPermCurve::EPS_ON, RigFlowDiagDefines::RelPermCurve::EPS_OFF } };
+        
+        const std::array<std::pair<Opm::ECLSaturationFunc::RawCurve::CurveSet, RigFlowDiagDefines::RelPermCurve::CurveSet>, 2> curveSetArr = {
+            { { Opm::ECLSaturationFunc::RawCurve::CurveSet::Drainage, RigFlowDiagDefines::RelPermCurve::DRAINAGE },
+              { Opm::ECLSaturationFunc::RawCurve::CurveSet::Imbibition, RigFlowDiagDefines::RelPermCurve::IMBIBITION } } };
+
         for ( RigFlowDiagDefines::RelPermCurve::EpsMode epsMode : epsModeArr )
         {
             const bool useEps = epsMode == RigFlowDiagDefines::RelPermCurve::EPS_ON;
@@ -728,24 +732,39 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                 scaling.enable = static_cast<unsigned char>( 0 );
             }
 
-            std::string                              gridID = "";
-            std::vector<Opm::FlowDiagnostics::Graph> graphArr =
-                m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( satFuncRequests,
-                                                                               m_opmFlowDiagStaticData->m_initData,
-                                                                               gridID,
-                                                                               static_cast<int>( activeCellIndex ),
-                                                                               scaling );
-
-            for ( size_t i = 0; i < graphArr.size(); i++ )
+            for ( const auto& curveSetPair : curveSetArr )
             {
-                const RigFlowDiagDefines::RelPermCurve::Ident curveIdent = curveIdentNameArr[i].first;
-                const std::string                             curveName  = curveIdentNameArr[i].second;
-                const Opm::FlowDiagnostics::Graph&            srcGraph   = graphArr[i];
-                if ( !srcGraph.first.empty() )
+                // Update saturation function requests to include the specific curve set (drainage/imbibition)
+                std::vector<Opm::ECLSaturationFunc::RawCurve> curveSetRequests;
+                for ( size_t i = 0; i < satFuncRequests.size(); i++ )
                 {
-                    const std::vector<double>& xVals = srcGraph.first;
-                    const std::vector<double>& yVals = srcGraph.second;
-                    retCurveArr.push_back( { curveIdent, curveName, epsMode, xVals, yVals } );
+                    Opm::ECLSaturationFunc::RawCurve request = satFuncRequests[i];
+                    request.curveSet = curveSetPair.first;
+                    curveSetRequests.push_back( request );
+                }
+
+                std::string                              gridID = "";
+                std::vector<Opm::FlowDiagnostics::Graph> graphArr =
+                    m_opmFlowDiagStaticData->m_eclSaturationFunc->getSatFuncCurve( curveSetRequests,
+                                                                                   m_opmFlowDiagStaticData->m_initData,
+                                                                                   gridID,
+                                                                                   static_cast<int>( activeCellIndex ),
+                                                                                   scaling );
+
+                for ( size_t i = 0; i < graphArr.size(); i++ )
+                {
+                    const RigFlowDiagDefines::RelPermCurve::Ident curveIdent = curveIdentNameArr[i].first;
+                    const std::string                             baseName   = curveIdentNameArr[i].second;
+                    const Opm::FlowDiagnostics::Graph&            srcGraph   = graphArr[i];
+                    if ( !srcGraph.first.empty() )
+                    {
+                        // Use "I" prefix for imbibition curves following Eclipse convention
+                        const std::string curveName = ( curveSetPair.second == RigFlowDiagDefines::RelPermCurve::IMBIBITION ) ? "I" + baseName : baseName;
+                        
+                        const std::vector<double>& xVals = srcGraph.first;
+                        const std::vector<double>& yVals = srcGraph.second;
+                        retCurveArr.push_back( { curveIdent, curveName, epsMode, curveSetPair.second, xVals, yVals } );
+                    }
                 }
             }
         }
