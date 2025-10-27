@@ -8,13 +8,20 @@ import dataroot
 
 
 def normalize_content(text):
-    """Normalize content by removing the first lines that might vary (timestamp and file path) and fracture reporting lines."""
+    """Normalize content by removing header until '-- Grid Model:' line and excluding file path from compare."""
     lines = text.split("\n")
-    if len(lines) < 10:
+    
+    # Find the line containing "-- Grid Model:" and skip it and the following line
+    start_index = 0
+    for i, line in enumerate(lines):
+        if "-- Grid Model:" in line:
+            start_index = i + 2  # Skip "-- Grid Model:" and the line after it
+            break
+    
+    if start_index >= len(lines):
         return ""
-
-    # Skip the first ten lines that might vary
-    normalized_lines = lines[10:] if len(lines) > 10 else lines
+    
+    normalized_lines = lines[start_index:]
     return "\n".join(normalized_lines)
 
 
