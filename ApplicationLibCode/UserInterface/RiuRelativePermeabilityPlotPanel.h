@@ -38,19 +38,12 @@ class QwtPlotCurve;
 class QPointF;
 class QGroupBox;
 
-// Interface for providing our custom picker with a tracker text
-class RiuRelPermTrackerTextProvider
-{
-public:
-    virtual QString trackerText() const = 0;
-};
-
 //==================================================================================================
 //
 //
 //
 //==================================================================================================
-class RiuRelativePermeabilityPlotPanel : public QWidget, public RiuRelPermTrackerTextProvider
+class RiuRelativePermeabilityPlotPanel : public QWidget
 {
     Q_OBJECT
 
@@ -118,7 +111,6 @@ private:
     const QwtPlotCurve* closestCurveSample( const QPoint& cursorPosition, int* closestSampleIndex ) const;
     size_t              indexOfQwtCurve( const QwtPlotCurve* qwtCurve ) const;
     void                updateTrackerPlotMarkerAndLabelFromPicker();
-    QString             trackerText() const override;
 
     void contextMenuEvent( QContextMenuEvent* event ) override;
 

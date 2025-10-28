@@ -58,6 +58,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 
 //==================================================================================================
 //
@@ -83,22 +84,22 @@ public:
 class RiuRelPermQwtPicker : public QwtPicker
 {
 public:
-    RiuRelPermQwtPicker( QwtPlot* plot, RiuRelPermTrackerTextProvider* trackerTextProvider )
+    RiuRelPermQwtPicker( QwtPlot* plot, std::function<QString()> textProvider )
         : QwtPicker( QwtPicker::NoRubberBand, QwtPicker::AlwaysOn, plot->canvas() )
-        , m_trackerTextProvider( trackerTextProvider )
+        , m_textProvider( textProvider )
     {
         setStateMachine( new QwtPickerTrackerMachine );
     }
 
     QwtText trackerText( const QPoint& ) const override
     {
-        QwtText text( m_trackerTextProvider->trackerText() );
+        QwtText text( m_textProvider() );
         text.setRenderFlags( Qt::AlignLeft );
         return text;
     }
 
 private:
-    const RiuRelPermTrackerTextProvider* m_trackerTextProvider;
+    std::function<QString()> m_textProvider;
 };
 
 //==================================================================================================
@@ -139,7 +140,7 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     applyFontSizes( false );
 
     // Initialize picker for curve value tracking
-    m_qwtPicker = new RiuRelPermQwtPicker( m_qwtPlot, this );
+    m_qwtPicker = new RiuRelPermQwtPicker( m_qwtPlot, [this]() { return m_trackerLabel; } );
     RiuGuiTheme::styleQwtItem( m_qwtPicker );
     connect( m_qwtPicker, SIGNAL( activated( bool ) ), this, SLOT( slotPickerActivated( bool ) ) );
     connect( m_qwtPicker, SIGNAL( moved( const QPoint& ) ), this, SLOT( slotPickerPointChanged( const QPoint& ) ) );
@@ -901,14 +902,6 @@ void RiuRelativePermeabilityPlotPanel::showEvent( QShowEvent* event )
 {
     if ( m_plotUpdater != nullptr ) m_plotUpdater->doDelayedUpdate();
     QWidget::showEvent( event );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RiuRelativePermeabilityPlotPanel::trackerText() const
-{
-    return m_trackerLabel;
 }
 
 //--------------------------------------------------------------------------------------------------
