@@ -97,7 +97,7 @@ void RicWellSegmentCompletionData::setBranchNumber( int branchNumber )
 void RicWellSegmentCompletionData::setSegmentRange( double startLength, double endLength )
 {
     m_startLength = startLength;
-    m_endLength = endLength;
+    m_endLength   = endLength;
 }
 
 //==================================================================================================

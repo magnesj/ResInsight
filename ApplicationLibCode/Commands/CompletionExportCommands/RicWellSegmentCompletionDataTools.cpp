@@ -18,27 +18,28 @@
 
 #include "RicWellSegmentCompletionDataTools.h"
 
-#include "RicWellSegmentCompletionData.h"
-#include "RicMswExportInfo.h"
 #include "RicMswBranch.h"
-#include "RicMswSegment.h"
 #include "RicMswCompletions.h"
+#include "RicMswExportInfo.h"
+#include "RicMswSegment.h"
+#include "RicWellSegmentCompletionData.h"
 
 #include "RifTextDataTableFormatter.h"
 
-#include "RimWellPathCompletionSettings.h"
 #include "RimWellPath.h"
+#include "RimWellPathCompletionSettings.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RicWellSegmentCompletionData> RicWellSegmentCompletionDataTools::generateCompletionData( RicMswExportInfo&                                  exportInfo,
-                                                                                        gsl::not_null<const RicMswBranch*>                 branch,
-                                                                                        bool                                               exportSubGridIntersections,
-                                                                                        const std::set<RigCompletionData::CompletionType>& exportCompletionTypes )
+std::vector<RicWellSegmentCompletionData>
+    RicWellSegmentCompletionDataTools::generateCompletionData( RicMswExportInfo&                  exportInfo,
+                                                               gsl::not_null<const RicMswBranch*> branch,
+                                                               bool                               exportSubGridIntersections,
+                                                               const std::set<RigCompletionData::CompletionType>& exportCompletionTypes )
 {
     std::vector<RicWellSegmentCompletionData> completionData;
-    std::set<size_t>                   intersectedCells;
+    std::set<size_t>                          intersectedCells;
 
     generateCompletionDataRecursively( exportInfo, branch, exportSubGridIntersections, exportCompletionTypes, completionData, intersectedCells );
 
@@ -48,11 +49,11 @@ std::vector<RicWellSegmentCompletionData> RicWellSegmentCompletionDataTools::gen
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentCompletionDataTools::writeCompsegsTable( RifTextDataTableFormatter&                formatter,
-                                                     const std::vector<RicWellSegmentCompletionData>&  completionData,
-                                                     const QString&                             wellName,
-                                                     RigCompletionData::CompletionType          completionType,
-                                                     bool                                       isLgr )
+void RicWellSegmentCompletionDataTools::writeCompsegsTable( RifTextDataTableFormatter&                       formatter,
+                                                            const std::vector<RicWellSegmentCompletionData>& completionData,
+                                                            const QString&                                   wellName,
+                                                            RigCompletionData::CompletionType                completionType,
+                                                            bool                                             isLgr )
 {
     if ( completionData.empty() ) return;
 
@@ -82,24 +83,23 @@ void RicWellSegmentCompletionDataTools::writeCompsegsTable( RifTextDataTableForm
     // Write data header
     {
         std::vector<RifTextDataTableColumn> headers;
-        
+
         if ( isLgr )
         {
             headers.push_back( RifTextDataTableColumn( "Grid" ) );
         }
-        
-        headers.insert( headers.end(), {
-            RifTextDataTableColumn( "I" ),
-            RifTextDataTableColumn( "J" ),
-            RifTextDataTableColumn( "K" ),
-            RifTextDataTableColumn( "Branch no" ),
-            RifTextDataTableColumn( "Start Length" ),
-            RifTextDataTableColumn( "End Length" ),
-            RifTextDataTableColumn( "Dir Pen" ),
-            RifTextDataTableColumn( "End Range" ),
-            RifTextDataTableColumn( "Connection Depth" )
-        });
-        
+
+        headers.insert( headers.end(),
+                        { RifTextDataTableColumn( "I" ),
+                          RifTextDataTableColumn( "J" ),
+                          RifTextDataTableColumn( "K" ),
+                          RifTextDataTableColumn( "Branch no" ),
+                          RifTextDataTableColumn( "Start Length" ),
+                          RifTextDataTableColumn( "End Length" ),
+                          RifTextDataTableColumn( "Dir Pen" ),
+                          RifTextDataTableColumn( "End Range" ),
+                          RifTextDataTableColumn( "Connection Depth" ) } );
+
         formatter.header( headers );
     }
 
@@ -117,22 +117,22 @@ void RicWellSegmentCompletionDataTools::writeCompsegsTable( RifTextDataTableForm
         }
 
         formatter.add( completion.i() + 1 ); // Convert to 1-based indexing
-        formatter.add( completion.j() + 1 ); // Convert to 1-based indexing  
+        formatter.add( completion.j() + 1 ); // Convert to 1-based indexing
         formatter.add( completion.k() + 1 ); // Convert to 1-based indexing
         formatter.add( completion.branchNumber() );
         formatter.add( completion.startLength() );
         formatter.add( completion.endLength() );
-        
+
         if ( !completion.directionPenetration().isEmpty() )
             formatter.add( completion.directionPenetration() );
         else
             formatter.addValueOrDefaultMarker( 0.0, RicWellSegmentCompletionData::defaultValue() );
-            
+
         if ( !RicWellSegmentCompletionData::isDefaultValue( completion.endRange() ) )
             formatter.add( completion.endRange() );
         else
             formatter.addValueOrDefaultMarker( completion.endRange(), RicWellSegmentCompletionData::defaultValue() );
-            
+
         if ( !RicWellSegmentCompletionData::isDefaultValue( completion.connectionDepth() ) )
             formatter.add( completion.connectionDepth() );
         else
@@ -147,10 +147,10 @@ void RicWellSegmentCompletionDataTools::writeCompsegsTable( RifTextDataTableForm
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentCompletionDataTools::writeCompseglTable( RifTextDataTableFormatter&                formatter,
-                                                     const std::vector<RicWellSegmentCompletionData>&  completionData,
-                                                     const QString&                             wellName,
-                                                     RigCompletionData::CompletionType          completionType )
+void RicWellSegmentCompletionDataTools::writeCompseglTable( RifTextDataTableFormatter&                       formatter,
+                                                            const std::vector<RicWellSegmentCompletionData>& completionData,
+                                                            const QString&                                   wellName,
+                                                            RigCompletionData::CompletionType                completionType )
 {
     // Filter for LGR data only
     std::vector<RicWellSegmentCompletionData> lgrData;
@@ -161,19 +161,19 @@ void RicWellSegmentCompletionDataTools::writeCompseglTable( RifTextDataTableForm
             lgrData.push_back( completion );
         }
     }
-    
+
     writeCompsegsTable( formatter, lgrData, wellName, completionType, true );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentCompletionDataTools::generateCompletionDataRecursively( RicMswExportInfo&                                  exportInfo,
-                                                                    gsl::not_null<const RicMswBranch*>                 branch,
-                                                                    bool                                               exportSubGridIntersections,
-                                                                    const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
-                                                                    std::vector<RicWellSegmentCompletionData>&                completionData,
-                                                                    std::set<size_t>&                                  intersectedCells )
+void RicWellSegmentCompletionDataTools::generateCompletionDataRecursively( RicMswExportInfo&                  exportInfo,
+                                                                           gsl::not_null<const RicMswBranch*> branch,
+                                                                           bool                               exportSubGridIntersections,
+                                                                           const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
+                                                                           std::vector<RicWellSegmentCompletionData>& completionData,
+                                                                           std::set<size_t>&                          intersectedCells )
 {
     QString wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
 
@@ -208,7 +208,7 @@ void RicWellSegmentCompletionDataTools::generateCompletionDataRecursively( RicMs
             if ( !intersectedCells.count( globalCellIndex ) )
             {
                 RicWellSegmentCompletionData compData( wellName, intersection->gridName() );
-                
+
                 cvf::Vec3st ijk = intersection->gridLocalCellIJK();
                 compData.setGridCell( static_cast<int>( ijk.x() ), static_cast<int>( ijk.y() ), static_cast<int>( ijk.z() ) );
 
@@ -228,7 +228,12 @@ void RicWellSegmentCompletionDataTools::generateCompletionDataRecursively( RicMs
         {
             if ( segmentCompletion->segments().empty() || !exportCompletionTypes.count( segmentCompletion->completionType() ) ) continue;
 
-            generateCompletionDataRecursively( exportInfo, segmentCompletion, exportSubGridIntersections, exportCompletionTypes, completionData, intersectedCells );
+            generateCompletionDataRecursively( exportInfo,
+                                               segmentCompletion,
+                                               exportSubGridIntersections,
+                                               exportCompletionTypes,
+                                               completionData,
+                                               intersectedCells );
         }
     }
 

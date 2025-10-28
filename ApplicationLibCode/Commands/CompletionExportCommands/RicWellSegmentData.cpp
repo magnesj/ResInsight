@@ -65,22 +65,22 @@ bool RicWellSegmentData::operator<( const RicWellSegmentData& other ) const
 ///
 //==================================================================================================
 void RicWellSegmentData::setSegmentProperties( int    branch,
-                                                int    joinSegment,
-                                                double length,
-                                                double depth,
-                                                double diameter,
-                                                double roughness,
-                                                double area,
-                                                double volume )
+                                               int    joinSegment,
+                                               double length,
+                                               double depth,
+                                               double diameter,
+                                               double roughness,
+                                               double area,
+                                               double volume )
 {
-    m_branch     = branch;
+    m_branch      = branch;
     m_joinSegment = joinSegment;
-    m_length     = length;
-    m_depth      = depth;
-    m_diameter   = diameter;
-    m_roughness  = roughness;
-    m_area       = area;
-    m_volume     = volume;
+    m_length      = length;
+    m_depth       = depth;
+    m_diameter    = diameter;
+    m_roughness   = roughness;
+    m_area        = area;
+    m_volume      = volume;
 }
 
 //==================================================================================================
@@ -219,4 +219,3 @@ const QString& RicWellSegmentData::comment() const
 {
     return m_comment;
 }
-
