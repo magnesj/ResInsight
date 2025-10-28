@@ -34,46 +34,39 @@ public:
 
     bool operator<( const RicWellSegmentData& other ) const;
 
-    void setSegmentProperties( int    branch,
-                               int    joinSegment,
-                               double length,
-                               double depth,
-                               double diameter,
-                               double roughness,
-                               double area,
-                               double volume );
+    void setSegmentProperties( int branch, int joinSegment, double length, double depth, double diameter, double roughness, double area, double volume );
 
     void setSegmentCoordinates( double lengthX, double lengthY );
     void setComment( const QString& comment );
 
-    static double                                   defaultValue();
-    static bool                                     isDefaultValue( double num );
-    const QString&                                  wellName() const;
-    int                                             segmentNumber() const;
-    int                                             branch() const;
-    int                                             joinSegment() const;
-    double                                          length() const;
-    double                                          depth() const;
-    double                                          diameter() const;
-    double                                          roughness() const;
-    double                                          area() const;
-    double                                          volume() const;
-    std::optional<double>                           lengthX() const;
-    std::optional<double>                           lengthY() const;
-    const QString&                                  comment() const;
+    static double         defaultValue();
+    static bool           isDefaultValue( double num );
+    const QString&        wellName() const;
+    int                   segmentNumber() const;
+    int                   branch() const;
+    int                   joinSegment() const;
+    double                length() const;
+    double                depth() const;
+    double                diameter() const;
+    double                roughness() const;
+    double                area() const;
+    double                volume() const;
+    std::optional<double> lengthX() const;
+    std::optional<double> lengthY() const;
+    const QString&        comment() const;
 
 private:
-    QString        m_wellName;
-    int            m_segmentNumber;
-    int            m_branch;
-    int            m_joinSegment;
-    double         m_length;
-    double         m_depth;
-    double         m_diameter;
-    double         m_roughness;
-    double         m_area;
-    double         m_volume;
-    QString        m_comment;
+    QString m_wellName;
+    int     m_segmentNumber;
+    int     m_branch;
+    int     m_joinSegment;
+    double  m_length;
+    double  m_depth;
+    double  m_diameter;
+    double  m_roughness;
+    double  m_area;
+    double  m_volume;
+    QString m_comment;
 
     std::optional<double> m_lengthX;
     std::optional<double> m_lengthY;

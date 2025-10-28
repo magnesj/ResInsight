@@ -18,25 +18,25 @@
 
 #include "RicWellSegmentValveDataTools.h"
 
-#include "RicWellSegmentValveData.h"
-#include "RicMswExportInfo.h"
 #include "RicMswBranch.h"
-#include "RicMswSegment.h"
 #include "RicMswCompletions.h"
+#include "RicMswExportInfo.h"
+#include "RicMswSegment.h"
+#include "RicWellSegmentValveData.h"
 
 #include "RifTextDataTableFormatter.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RicWellSegmentValveData> RicWellSegmentValveDataTools::generateValveData( RicMswExportInfo&               exportInfo,
-                                                                                       gsl::not_null<RicMswBranch*>    branch,
-                                                                                       const QString&                  wellNameForExport )
+std::vector<RicWellSegmentValveData> RicWellSegmentValveDataTools::generateValveData( RicMswExportInfo&            exportInfo,
+                                                                                      gsl::not_null<RicMswBranch*> branch,
+                                                                                      const QString&               wellNameForExport )
 {
     std::map<size_t, std::vector<RicWellSegmentValveData>> wsegvalveData;
-    
+
     generateValveDataRecursively( branch, wellNameForExport, wsegvalveData );
-    
+
     std::vector<RicWellSegmentValveData> valveData;
     for ( const auto& [segmentNumber, valves] : wsegvalveData )
     {
@@ -45,14 +45,14 @@ std::vector<RicWellSegmentValveData> RicWellSegmentValveDataTools::generateValve
             valveData.push_back( valve );
         }
     }
-    
+
     return valveData;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentValveDataTools::writeWsegvalvTable( RifTextDataTableFormatter&                 formatter,
+void RicWellSegmentValveDataTools::writeWsegvalvTable( RifTextDataTableFormatter&                  formatter,
                                                        const std::vector<RicWellSegmentValveData>& valveData,
                                                        const QString&                              wellName )
 {
@@ -70,13 +70,11 @@ void RicWellSegmentValveDataTools::writeWsegvalvTable( RifTextDataTableFormatter
 
     // Write data header
     {
-        std::vector<RifTextDataTableColumn> headers = {
-            RifTextDataTableColumn( "Seg No" ),
-            RifTextDataTableColumn( "Cv" ),
-            RifTextDataTableColumn( "Ac" ),
-            RifTextDataTableColumn( "L" ),
-            RifTextDataTableColumn( "Type" )
-        };
+        std::vector<RifTextDataTableColumn> headers = { RifTextDataTableColumn( "Seg No" ),
+                                                        RifTextDataTableColumn( "Cv" ),
+                                                        RifTextDataTableColumn( "Ac" ),
+                                                        RifTextDataTableColumn( "L" ),
+                                                        RifTextDataTableColumn( "Type" ) };
         formatter.header( headers );
     }
 
@@ -89,22 +87,22 @@ void RicWellSegmentValveDataTools::writeWsegvalvTable( RifTextDataTableFormatter
         }
 
         formatter.add( valve.segmentNumber() );
-        
+
         if ( !RicWellSegmentValveData::isDefaultValue( valve.flowCoefficient() ) )
             formatter.add( valve.flowCoefficient() );
         else
             formatter.addValueOrDefaultMarker( valve.flowCoefficient(), RicWellSegmentValveData::defaultValue() );
-            
+
         if ( !RicWellSegmentValveData::isDefaultValue( valve.area() ) )
             formatter.add( valve.area() );
         else
             formatter.addValueOrDefaultMarker( valve.area(), RicWellSegmentValveData::defaultValue() );
-            
+
         if ( !RicWellSegmentValveData::isDefaultValue( valve.additionalPipeLength() ) )
             formatter.add( valve.additionalPipeLength() );
         else
             formatter.addValueOrDefaultMarker( valve.additionalPipeLength(), RicWellSegmentValveData::defaultValue() );
-            
+
         if ( !valve.valveType().isEmpty() )
             formatter.add( valve.valveType() );
         else
@@ -119,8 +117,8 @@ void RicWellSegmentValveDataTools::writeWsegvalvTable( RifTextDataTableFormatter
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentValveDataTools::generateValveDataRecursively( gsl::not_null<RicMswBranch*>                    branch,
-                                                                 const QString&                                  wellNameForExport,
+void RicWellSegmentValveDataTools::generateValveDataRecursively( gsl::not_null<RicMswBranch*>                            branch,
+                                                                 const QString&                                          wellNameForExport,
                                                                  std::map<size_t, std::vector<RicWellSegmentValveData>>& wsegvalveData )
 {
     for ( auto segment : branch->segments() )
@@ -131,7 +129,7 @@ void RicWellSegmentValveDataTools::generateValveDataRecursively( gsl::not_null<R
             if ( !wsegValve ) continue;
 
             RicWellSegmentValveData valveData( wellNameForExport, segment->segmentNumber() );
-            
+
             valveData.setFlowCoefficient( wsegValve->flowCoefficient() );
             valveData.setArea( wsegValve->area() );
             valveData.setComment( wsegValve->label() );

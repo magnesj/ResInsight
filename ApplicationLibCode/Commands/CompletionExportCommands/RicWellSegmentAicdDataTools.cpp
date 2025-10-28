@@ -18,25 +18,25 @@
 
 #include "RicWellSegmentAicdDataTools.h"
 
-#include "RicWellSegmentAicdData.h"
-#include "RicMswExportInfo.h"
 #include "RicMswBranch.h"
-#include "RicMswSegment.h"
 #include "RicMswCompletions.h"
+#include "RicMswExportInfo.h"
+#include "RicMswSegment.h"
+#include "RicWellSegmentAicdData.h"
 
 #include "RifTextDataTableFormatter.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RicWellSegmentAicdData> RicWellSegmentAicdDataTools::generateAicdData( RicMswExportInfo&               exportInfo,
-                                                                                    gsl::not_null<RicMswBranch*>    branch,
-                                                                                    const QString&                  wellNameForExport )
+std::vector<RicWellSegmentAicdData> RicWellSegmentAicdDataTools::generateAicdData( RicMswExportInfo&            exportInfo,
+                                                                                   gsl::not_null<RicMswBranch*> branch,
+                                                                                   const QString&               wellNameForExport )
 {
     std::map<size_t, std::vector<RicWellSegmentAicdData>> wsegaicdData;
-    
+
     generateAicdDataRecursively( branch, wellNameForExport, wsegaicdData );
-    
+
     std::vector<RicWellSegmentAicdData> aicdData;
     for ( const auto& [segmentNumber, aicds] : wsegaicdData )
     {
@@ -45,16 +45,16 @@ std::vector<RicWellSegmentAicdData> RicWellSegmentAicdDataTools::generateAicdDat
             aicdData.push_back( aicd );
         }
     }
-    
+
     return aicdData;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&               formatter,
+void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&                 formatter,
                                                       const std::vector<RicWellSegmentAicdData>& aicdData,
-                                                      const QString&                            wellName )
+                                                      const QString&                             wellName )
 {
     if ( aicdData.empty() ) return;
 
@@ -70,23 +70,21 @@ void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&
 
     // Write data header
     {
-        std::vector<RifTextDataTableColumn> headers = {
-            RifTextDataTableColumn( "Seg No" ),
-            RifTextDataTableColumn( "Alpha" ),
-            RifTextDataTableColumn( "x" ),
-            RifTextDataTableColumn( "y" ),
-            RifTextDataTableColumn( "a" ),
-            RifTextDataTableColumn( "b" ),
-            RifTextDataTableColumn( "c" ),
-            RifTextDataTableColumn( "d" ),
-            RifTextDataTableColumn( "e" ),
-            RifTextDataTableColumn( "f" ),
-            RifTextDataTableColumn( "Rhocal" ),
-            RifTextDataTableColumn( "Viscal" ),
-            RifTextDataTableColumn( "DeviceOp" ),
-            RifTextDataTableColumn( "Length" ),
-            RifTextDataTableColumn( "ScalingFac" )
-        };
+        std::vector<RifTextDataTableColumn> headers = { RifTextDataTableColumn( "Seg No" ),
+                                                        RifTextDataTableColumn( "Alpha" ),
+                                                        RifTextDataTableColumn( "x" ),
+                                                        RifTextDataTableColumn( "y" ),
+                                                        RifTextDataTableColumn( "a" ),
+                                                        RifTextDataTableColumn( "b" ),
+                                                        RifTextDataTableColumn( "c" ),
+                                                        RifTextDataTableColumn( "d" ),
+                                                        RifTextDataTableColumn( "e" ),
+                                                        RifTextDataTableColumn( "f" ),
+                                                        RifTextDataTableColumn( "Rhocal" ),
+                                                        RifTextDataTableColumn( "Viscal" ),
+                                                        RifTextDataTableColumn( "DeviceOp" ),
+                                                        RifTextDataTableColumn( "Length" ),
+                                                        RifTextDataTableColumn( "ScalingFac" ) };
         formatter.header( headers );
     }
 
@@ -99,7 +97,7 @@ void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&
         }
 
         formatter.add( aicd.segmentNumber() );
-        
+
         // Add parameters (Alpha, x, y, a, b, c, d, e, f, Rhocal, Viscal)
         const auto& params = aicd.parameters();
         for ( size_t i = 0; i < params.size(); ++i )
@@ -109,16 +107,16 @@ void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&
             else
                 formatter.addValueOrDefaultMarker( params[i], RicWellSegmentAicdData::defaultValue() );
         }
-        
+
         // Device operation status
         formatter.add( aicd.deviceOpen() ? "OPEN" : "SHUT" );
-        
+
         // Length
         if ( !RicWellSegmentAicdData::isDefaultValue( aicd.length() ) )
             formatter.add( aicd.length() );
         else
             formatter.addValueOrDefaultMarker( aicd.length(), RicWellSegmentAicdData::defaultValue() );
-            
+
         // Flow scaling factor
         if ( !RicWellSegmentAicdData::isDefaultValue( aicd.flowScalingFactor() ) )
             formatter.add( aicd.flowScalingFactor() );
@@ -134,8 +132,8 @@ void RicWellSegmentAicdDataTools::writeWsegaicdTable( RifTextDataTableFormatter&
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellSegmentAicdDataTools::generateAicdDataRecursively( gsl::not_null<RicMswBranch*>                    branch,
-                                                               const QString&                                  wellNameForExport,
+void RicWellSegmentAicdDataTools::generateAicdDataRecursively( gsl::not_null<RicMswBranch*>                           branch,
+                                                               const QString&                                         wellNameForExport,
                                                                std::map<size_t, std::vector<RicWellSegmentAicdData>>& wsegaicdData )
 {
     for ( auto segment : branch->segments() )
@@ -146,7 +144,7 @@ void RicWellSegmentAicdDataTools::generateAicdDataRecursively( gsl::not_null<Ric
             if ( !aicdCompletion ) continue;
 
             RicWellSegmentAicdData aicdData( wellNameForExport, segment->segmentNumber() );
-            
+
             aicdData.setDeviceOpen( aicdCompletion->isOpen() );
             aicdData.setLength( aicdCompletion->length() );
             aicdData.setFlowScalingFactor( aicdCompletion->flowScalingFactor() );

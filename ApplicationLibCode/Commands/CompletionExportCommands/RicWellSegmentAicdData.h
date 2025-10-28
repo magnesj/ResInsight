@@ -43,9 +43,9 @@ public:
     void   setFlowScalingFactor( double scalingFactor );
     double flowScalingFactor() const;
 
-    void                                           setParameters( const std::array<double, AICD_NUM_PARAMS>& parameters );
-    const std::array<double, AICD_NUM_PARAMS>&    parameters() const;
-    std::array<double, AICD_NUM_PARAMS>&          parameters();
+    void                                       setParameters( const std::array<double, AICD_NUM_PARAMS>& parameters );
+    const std::array<double, AICD_NUM_PARAMS>& parameters() const;
+    std::array<double, AICD_NUM_PARAMS>&       parameters();
 
     void    setComment( const QString& comment );
     QString comment() const;

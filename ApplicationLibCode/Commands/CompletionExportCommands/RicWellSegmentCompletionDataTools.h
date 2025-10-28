@@ -21,8 +21,8 @@
 #include "RigCompletionData.h"
 
 #include <QString>
-#include <vector>
 #include <set>
+#include <vector>
 
 #include <gsl/gsl>
 
@@ -37,28 +37,29 @@ class RifTextDataTableFormatter;
 class RicWellSegmentCompletionDataTools
 {
 public:
-    static std::vector<RicWellSegmentCompletionData> generateCompletionData( RicMswExportInfo&                                  exportInfo,
-                                                                      gsl::not_null<const RicMswBranch*>                 branch,
-                                                                      bool                                               exportSubGridIntersections,
-                                                                      const std::set<RigCompletionData::CompletionType>& exportCompletionTypes );
+    static std::vector<RicWellSegmentCompletionData>
+        generateCompletionData( RicMswExportInfo&                                  exportInfo,
+                                gsl::not_null<const RicMswBranch*>                 branch,
+                                bool                                               exportSubGridIntersections,
+                                const std::set<RigCompletionData::CompletionType>& exportCompletionTypes );
 
-    static void writeCompsegsTable( RifTextDataTableFormatter&                formatter,
-                                    const std::vector<RicWellSegmentCompletionData>&  completionData,
-                                    const QString&                             wellName,
-                                    RigCompletionData::CompletionType          completionType,
-                                    bool                                       isLgr = false );
+    static void writeCompsegsTable( RifTextDataTableFormatter&                       formatter,
+                                    const std::vector<RicWellSegmentCompletionData>& completionData,
+                                    const QString&                                   wellName,
+                                    RigCompletionData::CompletionType                completionType,
+                                    bool                                             isLgr = false );
 
-    static void writeCompseglTable( RifTextDataTableFormatter&                formatter,
-                                    const std::vector<RicWellSegmentCompletionData>&  completionData,
-                                    const QString&                             wellName,
-                                    RigCompletionData::CompletionType          completionType );
+    static void writeCompseglTable( RifTextDataTableFormatter&                       formatter,
+                                    const std::vector<RicWellSegmentCompletionData>& completionData,
+                                    const QString&                                   wellName,
+                                    RigCompletionData::CompletionType                completionType );
 
 private:
     static void generateCompletionDataRecursively( RicMswExportInfo&                                  exportInfo,
                                                    gsl::not_null<const RicMswBranch*>                 branch,
                                                    bool                                               exportSubGridIntersections,
                                                    const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
-                                                   std::vector<RicWellSegmentCompletionData>&                completionData,
+                                                   std::vector<RicWellSegmentCompletionData>&         completionData,
                                                    std::set<size_t>&                                  intersectedCells );
 
     static QString getCompletionTypeComment( RigCompletionData::CompletionType completionType );

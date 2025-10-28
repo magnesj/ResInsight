@@ -19,8 +19,8 @@
 #pragma once
 
 #include <QString>
-#include <vector>
 #include <map>
+#include <vector>
 
 #include <gsl/gsl>
 
@@ -35,18 +35,17 @@ class RifTextDataTableFormatter;
 class RicWellSegmentValveDataTools
 {
 public:
-    static std::vector<RicWellSegmentValveData> generateValveData( RicMswExportInfo&               exportInfo,
-                                                                   gsl::not_null<RicMswBranch*>    branch,
-                                                                   const QString&                  wellNameForExport );
+    static std::vector<RicWellSegmentValveData>
+        generateValveData( RicMswExportInfo& exportInfo, gsl::not_null<RicMswBranch*> branch, const QString& wellNameForExport );
 
-    static void writeWsegvalvTable( RifTextDataTableFormatter&                 formatter,
+    static void writeWsegvalvTable( RifTextDataTableFormatter&                  formatter,
                                     const std::vector<RicWellSegmentValveData>& valveData,
                                     const QString&                              wellName );
 
 private:
-    static void generateValveDataRecursively( gsl::not_null<RicMswBranch*>                    branch,
-                                             const QString&                                  wellNameForExport,
-                                             std::map<size_t, std::vector<RicWellSegmentValveData>>& wsegvalveData );
+    static void generateValveDataRecursively( gsl::not_null<RicMswBranch*>                            branch,
+                                              const QString&                                          wellNameForExport,
+                                              std::map<size_t, std::vector<RicWellSegmentValveData>>& wsegvalveData );
 
     static QString getValveTypeString( int valveType );
 };

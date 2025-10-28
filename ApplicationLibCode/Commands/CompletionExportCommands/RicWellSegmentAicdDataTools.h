@@ -19,8 +19,8 @@
 #pragma once
 
 #include <QString>
-#include <vector>
 #include <map>
+#include <vector>
 
 #include <gsl/gsl>
 
@@ -35,16 +35,15 @@ class RifTextDataTableFormatter;
 class RicWellSegmentAicdDataTools
 {
 public:
-    static std::vector<RicWellSegmentAicdData> generateAicdData( RicMswExportInfo&               exportInfo,
-                                                                 gsl::not_null<RicMswBranch*>    branch,
-                                                                 const QString&                  wellNameForExport );
+    static std::vector<RicWellSegmentAicdData>
+        generateAicdData( RicMswExportInfo& exportInfo, gsl::not_null<RicMswBranch*> branch, const QString& wellNameForExport );
 
-    static void writeWsegaicdTable( RifTextDataTableFormatter&               formatter,
+    static void writeWsegaicdTable( RifTextDataTableFormatter&                 formatter,
                                     const std::vector<RicWellSegmentAicdData>& aicdData,
-                                    const QString&                            wellName );
+                                    const QString&                             wellName );
 
 private:
-    static void generateAicdDataRecursively( gsl::not_null<RicMswBranch*>                  branch,
-                                             const QString&                                wellNameForExport,
+    static void generateAicdDataRecursively( gsl::not_null<RicMswBranch*>                           branch,
+                                             const QString&                                         wellNameForExport,
                                              std::map<size_t, std::vector<RicWellSegmentAicdData>>& wsegaicdData );
 };
