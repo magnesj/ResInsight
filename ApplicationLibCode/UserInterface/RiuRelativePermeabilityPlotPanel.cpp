@@ -37,10 +37,13 @@
 #include "cvfAssert.h"
 
 #include "qwt_legend.h"
+#include "qwt_picker_machine.h"
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_plot_marker.h"
+#include "qwt_plot_picker.h"
 #include "qwt_scale_engine.h"
+#include "qwt_symbol.h"
 #include "qwt_text.h"
 
 #include <QButtonGroup>
@@ -73,6 +76,32 @@ public:
 };
 
 //==================================================================================================
+//
+//
+//
+//==================================================================================================
+class RiuRelPermQwtPicker : public QwtPicker
+{
+public:
+    RiuRelPermQwtPicker( QwtPlot* plot, RiuRelPermTrackerTextProvider* trackerTextProvider )
+        : QwtPicker( QwtPicker::NoRubberBand, QwtPicker::AlwaysOn, plot->canvas() )
+        , m_trackerTextProvider( trackerTextProvider )
+    {
+        setStateMachine( new QwtPickerTrackerMachine );
+    }
+
+    QwtText trackerText( const QPoint& ) const override
+    {
+        QwtText text( m_trackerTextProvider->trackerText() );
+        text.setRenderFlags( Qt::AlignLeft );
+        return text;
+    }
+
+private:
+    const RiuRelPermTrackerTextProvider* m_trackerTextProvider;
+};
+
+//==================================================================================================
 ///
 /// \class RiuRelativePermeabilityPlotPanel
 ///
@@ -100,6 +129,7 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     , m_showScaledCheckBox( nullptr )
     , m_fixedXAxisCheckBox( nullptr )
     , m_fixedLeftYAxisCheckBox( nullptr )
+    , m_trackerPlotMarker( nullptr )
 
 {
     m_qwtPlot = new RelPermQwtPlot( this );
@@ -107,6 +137,12 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
 
     setPlotDefaults( m_qwtPlot );
     applyFontSizes( false );
+
+    // Initialize picker for curve value tracking
+    m_qwtPicker = new RiuRelPermQwtPicker( m_qwtPlot, this );
+    RiuGuiTheme::styleQwtItem( m_qwtPicker );
+    connect( m_qwtPicker, SIGNAL( activated( bool ) ), this, SLOT( slotPickerActivated( bool ) ) );
+    connect( m_qwtPicker, SIGNAL( moved( const QPoint& ) ), this, SLOT( slotPickerPointChanged( const QPoint& ) ) );
 
     m_selectedCurvesButtonGroup = new QButtonGroup( this );
     m_selectedCurvesButtonGroup->setExclusive( false );
@@ -865,4 +901,157 @@ void RiuRelativePermeabilityPlotPanel::showEvent( QShowEvent* event )
 {
     if ( m_plotUpdater != nullptr ) m_plotUpdater->doDelayedUpdate();
     QWidget::showEvent( event );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiuRelativePermeabilityPlotPanel::trackerText() const
+{
+    return m_trackerLabel;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::slotPickerPointChanged( const QPoint& pt )
+{
+    updateTrackerPlotMarkerAndLabelFromPicker();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::slotPickerActivated( bool on )
+{
+    updateTrackerPlotMarkerAndLabelFromPicker();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::updateTrackerPlotMarkerAndLabelFromPicker()
+{
+    bool    hasValidSamplePoint = false;
+    QPointF samplePoint;
+    QString curveTitle = "";
+
+    if ( m_qwtPicker && m_qwtPicker->isActive() )
+    {
+        const QPoint trackerPos = m_qwtPicker->trackerPosition();
+
+        int                 pointSampleIdx  = -1;
+        const QwtPlotCurve* closestQwtCurve = closestCurveSample( trackerPos, &pointSampleIdx );
+        if ( closestQwtCurve && pointSampleIdx >= 0 )
+        {
+            samplePoint         = closestQwtCurve->sample( pointSampleIdx );
+            hasValidSamplePoint = true;
+            curveTitle          = closestQwtCurve->title().text();
+        }
+    }
+
+    m_trackerLabel = "";
+
+    bool needsReplot = false;
+
+    if ( hasValidSamplePoint )
+    {
+        if ( !m_trackerPlotMarker )
+        {
+            m_trackerPlotMarker = new QwtPlotMarker;
+            m_trackerPlotMarker->setTitle( QString( "TrackedPoint" ) );
+
+            QwtSymbol* symbol = new QwtSymbol( QwtSymbol::Ellipse );
+            symbol->setSize( 13, 13 );
+            symbol->setBrush( Qt::NoBrush );
+            m_trackerPlotMarker->setSymbol( symbol );
+            m_trackerPlotMarker->attach( m_qwtPlot );
+            RiuGuiTheme::styleQwtItem( m_trackerPlotMarker );
+
+            needsReplot = true;
+        }
+
+        if ( m_trackerPlotMarker->value() != samplePoint )
+        {
+            m_trackerPlotMarker->setValue( samplePoint );
+            needsReplot = true;
+        }
+
+        m_trackerLabel = QString( "%1: (%2, %3)" ).arg( curveTitle ).arg( samplePoint.x(), 0, 'f', 3 ).arg( samplePoint.y(), 0, 'f', 3 );
+    }
+    else
+    {
+        if ( m_trackerPlotMarker )
+        {
+            m_trackerPlotMarker->detach();
+            delete m_trackerPlotMarker;
+            m_trackerPlotMarker = nullptr;
+
+            needsReplot = true;
+        }
+    }
+
+    if ( needsReplot )
+    {
+        m_qwtPlot->replot();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const QwtPlotCurve* RiuRelativePermeabilityPlotPanel::closestCurveSample( const QPoint& cursorPosition, int* closestSampleIndex ) const
+{
+    if ( !m_qwtPlot ) return nullptr;
+
+    // Get all curves currently attached to the plot
+    const QwtPlotItemList& plotItems = m_qwtPlot->itemList( QwtPlotItem::Rtti_PlotCurve );
+
+    double              minDistSquared   = std::numeric_limits<double>::max();
+    const QwtPlotCurve* closestCurve     = nullptr;
+    int                 closestPtIdx     = -1;
+
+    for ( auto plotItem : plotItems )
+    {
+        const QwtPlotCurve* candidateCurve = dynamic_cast<const QwtPlotCurve*>( plotItem );
+        if ( !candidateCurve || !candidateCurve->isVisible() ) continue;
+
+        for ( size_t ptIdx = 0; ptIdx < candidateCurve->dataSize(); ptIdx++ )
+        {
+            QPointF samplePoint = candidateCurve->sample( static_cast<int>( ptIdx ) );
+            QPoint  screenPoint = QPoint( m_qwtPlot->transform( candidateCurve->xAxis(), samplePoint.x() ),
+                                         m_qwtPlot->transform( candidateCurve->yAxis(), samplePoint.y() ) );
+
+            double distSquared = pow( screenPoint.x() - cursorPosition.x(), 2 ) + pow( screenPoint.y() - cursorPosition.y(), 2 );
+
+            if ( distSquared < minDistSquared )
+            {
+                minDistSquared   = distSquared;
+                closestCurve     = candidateCurve;
+                closestPtIdx     = static_cast<int>( ptIdx );
+            }
+        }
+    }
+
+    const double maxAllowedDistanceSquared = 20.0 * 20.0; // 20 pixels
+    if ( minDistSquared <= maxAllowedDistanceSquared )
+    {
+        if ( closestSampleIndex ) *closestSampleIndex = closestPtIdx;
+        return closestCurve;
+    }
+
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t RiuRelativePermeabilityPlotPanel::indexOfQwtCurve( const QwtPlotCurve* qwtCurve ) const
+{
+    auto it = std::find( m_qwtCurveArr.begin(), m_qwtCurveArr.end(), qwtCurve );
+    if ( it != m_qwtCurveArr.end() )
+    {
+        return std::distance( m_qwtCurveArr.begin(), it );
+    }
+    return std::numeric_limits<size_t>::max();
 }

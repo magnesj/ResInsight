@@ -29,6 +29,7 @@
 
 class RiuDockedQwtPlot;
 class RiuRelativePermeabilityPlotUpdater;
+class RiuRelPermQwtPicker;
 class QButtonGroup;
 class QCheckBox;
 class QwtPlot;
@@ -37,12 +38,19 @@ class QwtPlotCurve;
 class QPointF;
 class QGroupBox;
 
+// Interface for providing our custom picker with a tracker text
+class RiuRelPermTrackerTextProvider
+{
+public:
+    virtual QString trackerText() const = 0;
+};
+
 //==================================================================================================
 //
 //
 //
 //==================================================================================================
-class RiuRelativePermeabilityPlotPanel : public QWidget
+class RiuRelativePermeabilityPlotPanel : public QWidget, public RiuRelPermTrackerTextProvider
 {
     Q_OBJECT
 
@@ -107,6 +115,11 @@ private:
     std::vector<RigFlowDiagDefines::RelPermCurve> gatherUiSelectedCurves() const;
     QString                                       asciiDataForUiSelectedCurves() const;
 
+    const QwtPlotCurve* closestCurveSample( const QPoint& cursorPosition, int* closestSampleIndex ) const;
+    size_t              indexOfQwtCurve( const QwtPlotCurve* qwtCurve ) const;
+    void                updateTrackerPlotMarkerAndLabelFromPicker();
+    QString             trackerText() const override;
+
     void contextMenuEvent( QContextMenuEvent* event ) override;
 
 private slots:
@@ -114,6 +127,8 @@ private slots:
     void slotSomeCheckBoxStateChanged( int );
     void slotCurrentPlotDataInTextDialog();
     void slotShowCurveSelectionWidgets( int state );
+    void slotPickerActivated( bool );
+    void slotPickerPointChanged( const QPoint& pt );
     void showEvent( QShowEvent* event ) override;
 
 private:
@@ -125,6 +140,11 @@ private:
     QString                                       m_cellReferenceText;
     QPointer<RiuDockedQwtPlot>                    m_qwtPlot;
     std::vector<QwtPlotMarker*>                   m_myPlotMarkers;
+
+    std::vector<const QwtPlotCurve*>              m_qwtCurveArr;  // Array of qwt curves for tracking
+    QPointer<RiuRelPermQwtPicker>                 m_qwtPicker;
+    QString                                       m_trackerLabel;
+    QwtPlotMarker*                                m_trackerPlotMarker;
 
     QGroupBox* m_curveSetGroupBox;
     QCheckBox* m_showDrainageCheckBox;
