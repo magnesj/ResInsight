@@ -399,14 +399,8 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
             RifTextDataTableFormatter formatter( stream );
             formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-            RicMswTableFormatterTools::generateWelsegsTable( formatter,
-                                                             exportInfo,
-                                                             maxSegmentLength,
-                                                             exportSettings.exportCompletionWelspecAfterMainBore() );
             bool exportLgrData = true;
             RicMswTableFormatterTools::generateCompsegTables( formatter, exportInfo, exportLgrData );
-            RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
-            RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
         }
     }
 }
