@@ -119,15 +119,15 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOG" ), RigFlowDiagDefines::RelPermCurve::PCOG );
 
     // Create Curve Set groupbox
-    m_curveSetGroupBox = new QGroupBox( "Curve Set" );
+    m_curveSetGroupBox          = new QGroupBox( "Curve Set" );
     QHBoxLayout* curveSetLayout = new QHBoxLayout;
     m_curveSetGroupBox->setLayout( curveSetLayout );
-    
-    m_showDrainageCheckBox = new QCheckBox( "Drainage" );
+
+    m_showDrainageCheckBox   = new QCheckBox( "Drainage" );
     m_showImbibitionCheckBox = new QCheckBox( "Imbibition" );
     m_showDrainageCheckBox->setChecked( true );
     m_showImbibitionCheckBox->setChecked( true );
-    
+
     curveSetLayout->addWidget( m_showDrainageCheckBox );
     curveSetLayout->addWidget( m_showImbibitionCheckBox );
 
@@ -734,7 +734,8 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RiuRelativePermeabilityPlotPanel::
             curveSetSelected = true;
         }
 
-        if ( curveSetSelected && m_selectedCurvesButtonGroup->button( curveIdent ) && m_selectedCurvesButtonGroup->button( curveIdent )->isChecked() )
+        if ( curveSetSelected && m_selectedCurvesButtonGroup->button( curveIdent ) &&
+             m_selectedCurvesButtonGroup->button( curveIdent )->isChecked() )
         {
             if ( ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_ON ) && showScaled ) ||
                  ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_OFF ) && showUnscaled ) )
