@@ -724,15 +724,8 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RiuRelativePermeabilityPlotPanel::
         const RigFlowDiagDefines::RelPermCurve::CurveSet curveSet     = m_allCurvesArr[i].curveSet;
 
         // Check if curve type is selected
-        bool curveSetSelected = false;
-        if ( curveSet == RigFlowDiagDefines::RelPermCurve::DRAINAGE && showDrainage )
-        {
-            curveSetSelected = true;
-        }
-        else if ( curveSet == RigFlowDiagDefines::RelPermCurve::IMBIBITION && showImbibition )
-        {
-            curveSetSelected = true;
-        }
+        const bool curveSetSelected = ( curveSet == RigFlowDiagDefines::RelPermCurve::DRAINAGE && showDrainage ) ||
+                                      ( curveSet == RigFlowDiagDefines::RelPermCurve::IMBIBITION && showImbibition );
 
         if ( curveSetSelected && m_selectedCurvesButtonGroup->button( curveIdent ) &&
              m_selectedCurvesButtonGroup->button( curveIdent )->isChecked() )
