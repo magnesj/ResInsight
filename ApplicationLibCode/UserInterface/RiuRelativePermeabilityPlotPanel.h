@@ -133,10 +133,10 @@ private:
     QPointer<RiuDockedQwtPlot>                    m_qwtPlot;
     std::vector<QwtPlotMarker*>                   m_myPlotMarkers;
 
-    std::vector<const QwtPlotCurve*>              m_qwtCurveArr;  // Array of qwt curves for tracking
-    QPointer<RiuRelPermQwtPicker>                 m_qwtPicker;
-    QString                                       m_trackerLabel;
-    QwtPlotMarker*                                m_trackerPlotMarker;
+    std::vector<const QwtPlotCurve*> m_qwtCurveArr; // Array of qwt curves for tracking
+    QPointer<RiuRelPermQwtPicker>    m_qwtPicker;
+    QString                          m_trackerLabel;
+    QwtPlotMarker*                   m_trackerPlotMarker;
 
     QGroupBox* m_curveSetGroupBox;
     QCheckBox* m_showDrainageCheckBox;

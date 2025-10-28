@@ -1000,9 +1000,9 @@ const QwtPlotCurve* RiuRelativePermeabilityPlotPanel::closestCurveSample( const 
     // Get all curves currently attached to the plot
     const QwtPlotItemList& plotItems = m_qwtPlot->itemList( QwtPlotItem::Rtti_PlotCurve );
 
-    double              minDistSquared   = std::numeric_limits<double>::max();
-    const QwtPlotCurve* closestCurve     = nullptr;
-    int                 closestPtIdx     = -1;
+    double              minDistSquared = std::numeric_limits<double>::max();
+    const QwtPlotCurve* closestCurve   = nullptr;
+    int                 closestPtIdx   = -1;
 
     for ( auto plotItem : plotItems )
     {
@@ -1019,9 +1019,9 @@ const QwtPlotCurve* RiuRelativePermeabilityPlotPanel::closestCurveSample( const 
 
             if ( distSquared < minDistSquared )
             {
-                minDistSquared   = distSquared;
-                closestCurve     = candidateCurve;
-                closestPtIdx     = static_cast<int>( ptIdx );
+                minDistSquared = distSquared;
+                closestCurve   = candidateCurve;
+                closestPtIdx   = static_cast<int>( ptIdx );
             }
         }
     }
