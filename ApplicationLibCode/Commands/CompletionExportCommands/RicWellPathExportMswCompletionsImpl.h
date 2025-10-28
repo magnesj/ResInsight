@@ -43,7 +43,6 @@ class QFile;
 
 class RicWellPathExportMswCompletionsImpl
 {
-private:
 public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
@@ -78,6 +77,8 @@ public:
                                                        gsl::not_null<RicMswBranch*>     branch );
 
 private:
+    static void exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
+
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,
@@ -85,6 +86,14 @@ private:
                                                 bool                                             enableSegmentSplitting,
                                                 gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                                 gsl::not_null<RicMswBranch*>                     branch );
+
+    static void appendFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
+                                              const RimWellPath*                               wellPath,
+                                              double                                           initialMD,
+                                              const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                              bool                                             enableSegmentSplitting,
+                                              gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                              gsl::not_null<RicMswBranch*>                     branch );
 
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
@@ -101,6 +110,13 @@ private:
                                                 const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
                                                 gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                                 gsl::not_null<RicMswBranch*>                     branch );
+
+    static bool appendFracturesMswExportInfo( RimEclipseCase*                                  eclipseCase,
+                                              const RimWellPath*                               wellPath,
+                                              double                                           initialMD,
+                                              const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                              gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                              gsl::not_null<RicMswBranch*>                     branch );
 
     static bool generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
                                                    const RimWellPath*                               wellPath,
