@@ -758,6 +758,12 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RigFlowDiagSolverInterface::calcul
                                                                                scaling );
 
             // Process results - now includes both drainage and imbibition curves
+            if ( graphArr.size() != satFuncRequests.size() )
+            {
+                reportRelPermCurveError( "Mismatch between number of requested and received rel-perm curves." );
+                continue;
+            }
+
             for ( size_t i = 0; i < graphArr.size(); i++ )
             {
                 const RigFlowDiagDefines::RelPermCurve::Ident    curveIdent = curveRequests[i].ident;
