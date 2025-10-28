@@ -26,6 +26,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentCompletionDataTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentValveData.h
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentValveDataTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentAicdData.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentAicdDataTools.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -56,6 +58,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentCompletionDataTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentValveData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentValveDataTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentAicdData.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellSegmentAicdDataTools.cpp
 )
 
 list(APPEND COMMAND_CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})
