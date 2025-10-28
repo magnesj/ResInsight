@@ -406,6 +406,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         CVF_ASSERT( curve.saturationVals.size() == curve.yVals.size() );
         qwtCurve->setSamples( curve.saturationVals.data(), curve.yVals.data(), static_cast<int>( curve.saturationVals.size() ) );
 
+        // Use the actual curve name which includes "I" prefix for imbibition curves
         qwtCurve->setTitle( curve.name.c_str() );
 
         qwtCurve->setStyle( QwtPlotCurve::Lines );
@@ -414,23 +415,17 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         switch ( curve.ident )
         {
             case RigFlowDiagDefines::RelPermCurve::KRW:
-                qwtCurve->setTitle( "KRW" );
                 break;
             case RigFlowDiagDefines::RelPermCurve::KROW:
-                qwtCurve->setTitle( "KROW" );
                 break;
             case RigFlowDiagDefines::RelPermCurve::PCOW:
-                qwtCurve->setTitle( "PCOW" );
                 penStyle = Qt::DashLine;
                 break;
             case RigFlowDiagDefines::RelPermCurve::KRG:
-                qwtCurve->setTitle( "KRG" );
                 break;
             case RigFlowDiagDefines::RelPermCurve::KROG:
-                qwtCurve->setTitle( "KROG" );
                 break;
             case RigFlowDiagDefines::RelPermCurve::PCOG:
-                qwtCurve->setTitle( "PCOG" );
                 penStyle = Qt::DashLine;
                 break;
         }
