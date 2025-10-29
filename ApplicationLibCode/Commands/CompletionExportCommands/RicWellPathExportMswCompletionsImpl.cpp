@@ -335,7 +335,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
         RifTextDataTableFormatter formatter( stream );
         formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-        RicMswDataFormatter::formatUnifiedMswTables( formatter, unifiedData );
+        RicMswDataFormatter::formatMswTables( formatter, unifiedData );
     }
 
     // Create LGR file if needed
@@ -360,7 +360,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
         RifTextDataTableFormatter formatter( stream );
         formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-        RicMswDataFormatter::formatUnifiedCompsegsTable( formatter, unifiedData, true ); // LGR only
+        RicMswDataFormatter::formatCompsegsTable( formatter, unifiedData, true ); // LGR only
     }
 }
 

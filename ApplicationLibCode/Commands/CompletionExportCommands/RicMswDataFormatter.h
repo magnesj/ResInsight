@@ -26,21 +26,17 @@ class RicMswUnifiedData;
 //==================================================================================================
 namespace RicMswDataFormatter
 {
-    // Single well data formatting
-    void formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
+    // Consolidated data formatting - works with any compatible data source
     void formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData, bool isLgrData = false );
+    void formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData, bool isLgrData = false );
     void formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
+    void formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
     void formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
+    void formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
+    void formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
+    void formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
 
-    // Unified data formatting (multiple wells)
-    void formatUnifiedWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
-    void formatUnifiedCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData, bool isLgrData = false );
-    void formatUnifiedWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
-    void formatUnifiedWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
-
-    // Complete MSW export for single well
+    // Complete MSW export
     void formatMswTables( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
-    
-    // Complete MSW export for multiple wells  
-    void formatUnifiedMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
+    void formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
 }
