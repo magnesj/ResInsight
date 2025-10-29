@@ -28,7 +28,7 @@ namespace
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WELSEGS segment data rows
 //--------------------------------------------------------------------------------------------------
-template<typename RowContainer>
+template <typename RowContainer>
 void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
 {
     for ( const auto& row : rows )
@@ -37,9 +37,9 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
         formatter.add( row.segmentNumber );
         formatter.add( row.branchNumber );
         formatter.add( row.outletSegmentNumber );
-        formatter.add( row.startMD );
+        formatter.add( row.length );
 
-        formatter.addOptionalValue( row.startTVD, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.depth, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
 
@@ -50,7 +50,7 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format COMPSEGS data rows
 //--------------------------------------------------------------------------------------------------
-template<typename RowContainer>
+template <typename RowContainer>
 void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContainer& rows, bool isLgrData )
 {
     for ( const auto& row : rows )
@@ -80,7 +80,7 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WSEGVALV data rows
 //--------------------------------------------------------------------------------------------------
-template<typename RowContainer>
+template <typename RowContainer>
 void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
 {
     for ( const auto& row : rows )
@@ -100,7 +100,7 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WSEGAICD data rows
 //--------------------------------------------------------------------------------------------------
-template<typename RowContainer>
+template <typename RowContainer>
 void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
 {
     for ( const auto& row : rows )
@@ -188,12 +188,12 @@ std::vector<RifTextDataTableColumn> createWsegaicdHeader()
 //--------------------------------------------------------------------------------------------------
 std::vector<RifTextDataTableColumn> createWelsegsSegmentHeader()
 {
-    return { RifTextDataTableColumn( "Seg No" ),
-             RifTextDataTableColumn( "Seg No" ),
+    return { RifTextDataTableColumn( "First Seg" ),
+             RifTextDataTableColumn( "Last Seg" ),
              RifTextDataTableColumn( "Branch No" ),
-             RifTextDataTableColumn( "Out" ),
-             RifTextDataTableColumn( "Len" ),
-             RifTextDataTableColumn( "Dep" ),
+             RifTextDataTableColumn( "Outlet Seg" ),
+             RifTextDataTableColumn( "Length" ),
+             RifTextDataTableColumn( "Depth Change" ),
              RifTextDataTableColumn( "Diam" ),
              RifTextDataTableColumn( "Rough" ) };
 }
@@ -225,10 +225,7 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.add( welsegsHeader->wellName );
         formatter.add( welsegsHeader->topMD );
         formatter.add( welsegsHeader->topTVD );
-        if ( welsegsHeader->volume.has_value() )
-            formatter.add( welsegsHeader->volume.value() );
-        else
-            formatter.add( RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( welsegsHeader->volume, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( welsegsHeader->lengthAndDepthText );
         formatter.add( welsegsHeader->pressureDropText );
         formatter.rowCompleted();
@@ -325,10 +322,7 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.add( header.wellName );
         formatter.add( header.topMD );
         formatter.add( header.topTVD );
-        if ( header.volume.has_value() )
-            formatter.add( header.volume.value() );
-        else
-            formatter.add( RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( header.volume, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( header.lengthAndDepthText );
         formatter.add( header.pressureDropText );
         formatter.rowCompleted();

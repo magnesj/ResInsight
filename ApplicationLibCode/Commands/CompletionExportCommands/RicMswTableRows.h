@@ -19,20 +19,20 @@
 #pragma once
 
 #include <QString>
-#include <optional>
 #include <cstddef>
+#include <optional>
 
 //==================================================================================================
 /// Header structure for WELSEGS table (well-level information)
 //==================================================================================================
 struct WelsegsHeader
 {
-    QString wellName;
-    double  topMD;
-    double  topTVD;
+    QString               wellName;
+    double                topMD;
+    double                topTVD;
     std::optional<double> volume;
-    QString lengthAndDepthText;
-    QString pressureDropText;
+    QString               lengthAndDepthText;
+    QString               pressureDropText;
 };
 
 //==================================================================================================
@@ -40,13 +40,11 @@ struct WelsegsHeader
 //==================================================================================================
 struct WelsegsRow
 {
-    int    segmentNumber;
-    int    outletSegmentNumber;
-    int    branchNumber;
-    double startMD;
-    double endMD;
-    std::optional<double> startTVD;
-    std::optional<double> endTVD;
+    int                   segmentNumber;
+    int                   outletSegmentNumber;
+    int                   branchNumber;
+    double                length;
+    std::optional<double> depth;
     std::optional<double> diameter;
     std::optional<double> roughness;
     std::optional<double> volume;
@@ -57,20 +55,20 @@ struct WelsegsRow
 //==================================================================================================
 struct CompsegsRow
 {
-    QString wellName;
-    size_t  cellI;
-    size_t  cellJ; 
-    size_t  cellK;
-    int     branchNumber;
-    double  startLength;
-    double  endLength;
+    QString               wellName;
+    size_t                cellI;
+    size_t                cellJ;
+    size_t                cellK;
+    int                   branchNumber;
+    double                startLength;
+    double                endLength;
     std::optional<int>    direction;
     std::optional<double> endRange;
     std::optional<double> connectionFactor;
     std::optional<double> diameter;
     std::optional<double> skinFactor;
-    QString gridName;      // Empty for main grid, populated for LGR data
-    
+    QString               gridName; // Empty for main grid, populated for LGR data
+
     bool isMainGrid() const { return gridName.isEmpty(); }
     bool isLgrGrid() const { return !gridName.isEmpty(); }
 };
@@ -80,11 +78,11 @@ struct CompsegsRow
 //==================================================================================================
 struct WsegvalvRow
 {
-    QString wellName;
-    int     segmentNumber;
-    double  flowCoefficient;
+    QString               wellName;
+    int                   segmentNumber;
+    double                flowCoefficient;
     std::optional<double> area;
-    QString deviceType;
+    QString               deviceType;
     std::optional<double> additionalParameter1;
     std::optional<double> additionalParameter2;
 };
@@ -94,12 +92,12 @@ struct WsegvalvRow
 //==================================================================================================
 struct WsegaicdRow
 {
-    QString wellName;
-    int     segmentNumber;
-    double  flowCoefficient;
+    QString               wellName;
+    int                   segmentNumber;
+    double                flowCoefficient;
     std::optional<double> area;
     std::optional<double> oilViscosityParameter;
     std::optional<double> waterViscosityParameter;
     std::optional<double> gasViscosityParameter;
-    QString deviceType;
+    QString               deviceType;
 };
