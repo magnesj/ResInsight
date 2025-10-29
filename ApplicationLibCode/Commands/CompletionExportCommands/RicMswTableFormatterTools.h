@@ -79,6 +79,37 @@ void collectWsegvalvData( RicMswTableData&              tableData,
 void collectWsegAicdData( RicMswTableData&              tableData,
                          RicMswExportInfo&             exportInfo );
 
+// Helper functions for data collection
+void collectWelsegsSegment( RicMswTableData&                        tableData,
+                           RicMswSegment*                          segment,
+                           const RicMswSegment*                    previousSegment,
+                           RicMswExportInfo&                       exportInfo,
+                           double                                  maxSegmentLength,
+                           gsl::not_null<RicMswBranch*>            branch,
+                           int*                                    segmentNumber );
+
+void collectValveWelsegsSegment( RicMswTableData&         tableData,
+                                const RicMswSegment*     outletSegment,
+                                RicMswValve*             valve,
+                                RicMswExportInfo&        exportInfo,
+                                double                   maxSegmentLength,
+                                int*                     segmentNumber );
+
+void collectCompletionsForSegment( RicMswTableData&                         tableData,
+                                  gsl::not_null<const RicMswSegment*>     outletSegment,
+                                  gsl::not_null<RicMswSegment*>           segment,
+                                  RicMswValve**                           outletValve,
+                                  RicMswExportInfo&                       exportInfo,
+                                  double                                  maxSegmentLength,
+                                  int*                                    segmentNumber );
+
+void collectCompletionWelsegsSegments( RicMswTableData&                         tableData,
+                                      gsl::not_null<const RicMswSegment*>     outletSegment,
+                                      gsl::not_null<RicMswCompletion*>        completion,
+                                      RicMswExportInfo&                       exportInfo,
+                                      double                                  maxSegmentLength,
+                                      int*                                    segmentNumber );
+
 // Existing formatter functions (kept for backward compatibility)
 void generateWelsegsTable( RifTextDataTableFormatter& formatter,
                            RicMswExportInfo&          exportInfo,
