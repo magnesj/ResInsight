@@ -1126,7 +1126,7 @@ void RicMswTableFormatterTools::collectWelsegsDataRecursively( RicMswTableData& 
         row.startTVD = segment->startTVD();
         row.endTVD = segment->endTVD();
         row.diameter = segment->equivalentDiameter();
-        row.roughness = segment->roughnessFactor();
+        row.roughness = segment->openHoleRoughnessFactor();
         
         tableData.addWelsegsRow( row );
         
@@ -1169,9 +1169,9 @@ void RicMswTableFormatterTools::collectCompsegData( RicMswTableData& tableData,
                             
                         CompsegsRow row;
                         row.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-                        row.cellI = intersection->localIJK().x() + 1; // Convert to 1-based
-                        row.cellJ = intersection->localIJK().y() + 1;
-                        row.cellK = intersection->localIJK().z() + 1;
+                        row.cellI = intersection->gridLocalCellIJK().x() + 1; // Convert to 1-based
+                        row.cellJ = intersection->gridLocalCellIJK().y() + 1;
+                        row.cellK = intersection->gridLocalCellIJK().z() + 1;
                         row.branchNumber = completion->branchNumber();
                         row.startLength = completionSegment->startMD();
                         row.endLength = completionSegment->endMD();
