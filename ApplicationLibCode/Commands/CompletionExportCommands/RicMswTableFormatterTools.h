@@ -73,11 +73,26 @@ void collectCompsegData( RicMswTableData&                           tableData,
                         RicMswExportInfo&                          exportInfo,
                         bool                                       exportSubGridIntersections );
 
+void collectCompsegDataByType( RicMswTableData&                                 tableData,
+                              RicMswExportInfo&                                exportInfo,
+                              gsl::not_null<const RicMswBranch*>               branch,
+                              bool                                             exportSubGridIntersections,
+                              const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
+                              gsl::not_null<std::set<size_t>*>                 intersectedCells );
+
 void collectWsegvalvData( RicMswTableData&              tableData,
                          RicMswExportInfo&             exportInfo );
 
+void collectWsegvalvDataRecursively( RicMswTableData&              tableData,
+                                    gsl::not_null<RicMswBranch*>  branch,
+                                    const QString&                wellNameForExport );
+
 void collectWsegAicdData( RicMswTableData&              tableData,
                          RicMswExportInfo&             exportInfo );
+
+void collectWsegAicdDataRecursively( RicMswTableData&                    tableData,
+                                    RicMswExportInfo&                   exportInfo,
+                                    gsl::not_null<const RicMswBranch*>  branch );
 
 // Helper functions for data collection
 void collectWelsegsSegment( RicMswTableData&                        tableData,
