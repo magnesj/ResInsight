@@ -21,6 +21,7 @@
 #include <QString>
 #include <QTextStream>
 
+#include <optional>
 #include <vector>
 
 //==================================================================================================
@@ -173,6 +174,7 @@ public:
     RifTextDataTableFormatter& add( size_t num );
     RifTextDataTableFormatter& addOneBasedCellIndex( size_t zeroBasedIndex );
     RifTextDataTableFormatter& addValueOrDefaultMarker( double value, double defaultValue );
+    RifTextDataTableFormatter& addOptionalValue( const std::optional<double>& value, double defaultValue );
     RifTextDataTableFormatter& comment( const QString& str );
     RifTextDataTableFormatter& addOptionalComment( const QString& str );
     RifTextDataTableFormatter& addHorizontalLine( const QChar& str );

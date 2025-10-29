@@ -23,6 +23,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableRows.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableData.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswUnifiedData.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicMswDataFormatter.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -49,6 +50,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableFormatterTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswUnifiedData.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicMswDataFormatter.cpp
 )
 
 list(APPEND COMMAND_CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

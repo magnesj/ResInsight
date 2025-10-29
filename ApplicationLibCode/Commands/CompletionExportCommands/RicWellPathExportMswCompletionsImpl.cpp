@@ -22,6 +22,7 @@
 
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
+#include "RicMswDataFormatter.h"
 #include "RicMswExportInfo.h"
 #include "RicMswTableFormatterTools.h"
 #include "RicMswValveAccumulators.h"
@@ -284,30 +285,62 @@ void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( c
 void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                      const std::vector<RimWellPath*>&         wellPaths )
 {
-    RimEclipseCase* eclipseCase = exportSettings.caseToApply;
-    auto            timeStep    = exportSettings.timeStep;
-
-    std::shared_ptr<QFile> unifiedExportFile;
-    std::shared_ptr<QFile> unifiedLgrExportFile;
-
-    // Create unified files if needed, else use per-well files
+    // Use new unified data extraction approach
     if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
     {
-        QString   fileName;
-        QFileInfo fi( exportSettings.customFileName() );
-        if ( !exportSettings.customFileName().isEmpty() )
-        {
-            fileName = fi.baseName() + "_MSW";
-        }
-        else
-        {
-            fileName = QString( "UnifiedCompletions_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
-        }
+        exportUnifiedMswData( exportSettings, wellPaths );
+    }
+    else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
+    {
+        exportSplitMswData( exportSettings, wellPaths );
+    }
+}
 
-        unifiedExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                      fileName,
-                                                                                      fi.suffix(),
-                                                                                      exportSettings.exportDataSourceAsComment() );
+//--------------------------------------------------------------------------------------------------
+/// Export MSW data to unified files using new data extraction approach
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                               const std::vector<RimWellPath*>&         wellPaths )
+{
+    // Extract all MSW data using new approach
+    RicMswUnifiedData unifiedData = extractUnifiedMswData( exportSettings, wellPaths );
+    
+    if ( unifiedData.isEmpty() )
+    {
+        RiaLogging::warning( "No MSW data to export." );
+        return;
+    }
+
+    // Set up file names
+    QString   fileName;
+    QFileInfo fi( exportSettings.customFileName() );
+    if ( !exportSettings.customFileName().isEmpty() )
+    {
+        fileName = fi.baseName() + "_MSW";
+    }
+    else
+    {
+        fileName = QString( "UnifiedCompletions_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
+    }
+
+    // Create main grid file
+    auto mainGridFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                  fileName,
+                                                                                  fi.suffix(),
+                                                                                  exportSettings.exportDataSourceAsComment() );
+
+    // Write main grid data
+    {
+        QTextStream               stream( mainGridFile.get() );
+        RifTextDataTableFormatter formatter( stream );
+        formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+        RicMswDataFormatter::formatUnifiedMswTables( formatter, unifiedData );
+    }
+
+    // Create LGR file if needed
+    if ( unifiedData.hasAnyLgrData() )
+    {
         QString lgrFileName;
         if ( !exportSettings.customFileName().isEmpty() )
         {
@@ -318,91 +351,73 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedWellSegments( const RicEx
             lgrFileName = QString( "UnifiedCompletions_LGR_MSW_%1" ).arg( exportSettings.caseToApply->caseUserDescription() );
         }
 
-        unifiedLgrExportFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                         lgrFileName,
-                                                                                         fi.suffix(),
-                                                                                         exportSettings.exportDataSourceAsComment() );
-    }
+        auto lgrFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                lgrFileName,
+                                                                                fi.suffix(),
+                                                                                exportSettings.exportDataSourceAsComment() );
 
+        QTextStream               stream( lgrFile.get() );
+        RifTextDataTableFormatter formatter( stream );
+        formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+        RicMswDataFormatter::formatUnifiedCompsegsTable( formatter, unifiedData, true ); // LGR only
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Export MSW data to separate files per well using new data extraction approach
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswCompletionsImpl::exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                             const std::vector<RimWellPath*>&         wellPaths )
+{
     for ( const auto& wellPath : wellPaths )
     {
-        RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-
-        auto mswParameters = wellPath->mswCompletionParameters();
-        if ( !mswParameters ) continue;
-
-        auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
-        double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-
-        RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
-
-        if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
+        try
         {
-            RiaLogging::error( "Failed to generate perforations MSW export info." );
-            return;
-        }
+            // Extract data for single well
+            auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+            
+            if ( wellData.isEmpty() )
+            {
+                continue; // Skip wells with no MSW data
+            }
 
-        bool enableSegmentSplitting = false;
-        appendFishbonesMswExportInfo( eclipseCase,
-                                      wellPath,
-                                      initialMD,
-                                      cellIntersections,
-                                      enableSegmentSplitting,
-                                      &exportInfo,
-                                      exportInfo.mainBoreBranch() );
+            // Set up file names
+            QString wellFileName = QString( "%1_UnifiedCompletions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
 
-        appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
+            // Create main grid file
+            auto mainGridFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                          wellFileName,
+                                                                                          "",
+                                                                                          exportSettings.exportDataSourceAsComment() );
 
-        int branchNumber = 1;
-        assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
+            // Write main grid data
+            {
+                QTextStream               stream( mainGridFile.get() );
+                RifTextDataTableFormatter formatter( stream );
+                formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-        double maxSegmentLength = mswParameters->maxSegmentLength();
+                RicMswDataFormatter::formatMswTables( formatter, wellData );
+            }
 
-        std::shared_ptr<QFile> mainGridMswFile;
-        std::shared_ptr<QFile> lgrGridMswFile;
-
-        if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
-        {
-            mainGridMswFile = unifiedExportFile;
-            lgrGridMswFile  = unifiedExportFile;
-        }
-        else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
-        {
-            QString wellFileName =
-                QString( "%1_UnifiedCompletions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
-            mainGridMswFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                        wellFileName,
+            // Create LGR file if needed
+            if ( wellData.hasLgrData() )
+            {
+                auto lgrFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
+                                                                                        wellFileName + "_LGR",
                                                                                         "",
                                                                                         exportSettings.exportDataSourceAsComment() );
-            lgrGridMswFile  = RicWellPathExportCompletionsFileTools::openFileForExport( exportSettings.folder,
-                                                                                       wellFileName + "_LGR",
-                                                                                       "",
-                                                                                       exportSettings.exportDataSourceAsComment() );
+
+                QTextStream               stream( lgrFile.get() );
+                RifTextDataTableFormatter formatter( stream );
+                formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
+
+                RicMswDataFormatter::formatCompsegsTable( formatter, wellData, true ); // LGR only
+            }
         }
-
+        catch ( const std::exception& e )
         {
-            QTextStream               stream( mainGridMswFile.get() );
-            RifTextDataTableFormatter formatter( stream );
-            formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
-
-            RicMswTableFormatterTools::generateWelsegsTable( formatter,
-                                                             exportInfo,
-                                                             maxSegmentLength,
-                                                             exportSettings.exportCompletionWelspecAfterMainBore() );
-            bool exportLgrData = false;
-            RicMswTableFormatterTools::generateCompsegTables( formatter, exportInfo, exportLgrData );
-            RicMswTableFormatterTools::generateWsegvalvTable( formatter, exportInfo );
-            RicMswTableFormatterTools::generateWsegAicdTable( formatter, exportInfo );
-        }
-
-        if ( exportInfo.hasSubGridIntersections() )
-        {
-            QTextStream               stream( lgrGridMswFile.get() );
-            RifTextDataTableFormatter formatter( stream );
-            formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
-
-            bool exportLgrData = true;
-            RicMswTableFormatterTools::generateCompsegTables( formatter, exportInfo, exportLgrData );
+            RiaLogging::error( QString( "Failed to export MSW data for well %1: %2" ).arg( wellPath->name(), QString::fromStdString( e.what() ) ) );
         }
     }
 }

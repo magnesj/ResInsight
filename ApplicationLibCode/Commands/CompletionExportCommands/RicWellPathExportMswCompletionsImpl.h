@@ -81,6 +81,9 @@ public:
 private:
     static void exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
 
+    static void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
+    static void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
+
     // New data extraction functions
     static RicMswUnifiedData extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                     const std::vector<RimWellPath*>& wellPaths );
