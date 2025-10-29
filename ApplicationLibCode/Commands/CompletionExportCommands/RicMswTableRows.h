@@ -64,10 +64,9 @@ struct CompsegsRow
     double                endLength;
     std::optional<int>    direction;
     std::optional<double> endRange;
-    std::optional<double> connectionFactor;
-    std::optional<double> diameter;
-    std::optional<double> skinFactor;
-    QString               gridName; // Empty for main grid, populated for LGR data
+    std::optional<double> connectionDepth;
+
+    QString gridName; // Empty for main grid, populated for LGR data
 
     bool isMainGrid() const { return gridName.isEmpty(); }
     bool isLgrGrid() const { return !gridName.isEmpty(); }

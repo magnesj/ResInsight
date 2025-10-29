@@ -360,7 +360,10 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
         RifTextDataTableFormatter formatter( stream );
         formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-        RicMswDataFormatter::formatCompsegsTable( formatter, unifiedData, true ); // LGR only
+        for ( const auto& tableData : unifiedData.wellDataList() )
+        {
+            RicMswDataFormatter::formatCompsegsTable( formatter, tableData, true ); // LGR only
+        }
     }
 }
 

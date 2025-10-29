@@ -69,9 +69,7 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
 
         formatter.addOptionalValue( row.direction, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.endRange, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.connectionFactor, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.skinFactor, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.connectionDepth, RicMswExportInfo::defaultDoubleValue() );
 
         formatter.rowCompleted();
     }
@@ -134,9 +132,7 @@ std::vector<RifTextDataTableColumn> createCompsegsHeader( bool isLgrData )
                  RifTextDataTableColumn( "End Length" ),
                  RifTextDataTableColumn( "Dir Pen" ),
                  RifTextDataTableColumn( "End Range" ),
-                 RifTextDataTableColumn( "Connection Factor" ),
-                 RifTextDataTableColumn( "Diameter" ),
-                 RifTextDataTableColumn( "Skin Factor" ) };
+                 RifTextDataTableColumn( "Connection Depth" ) };
     }
     else
     {
@@ -148,9 +144,7 @@ std::vector<RifTextDataTableColumn> createCompsegsHeader( bool isLgrData )
                  RifTextDataTableColumn( "End Length" ),
                  RifTextDataTableColumn( "Dir Pen" ),
                  RifTextDataTableColumn( "End Range" ),
-                 RifTextDataTableColumn( "Connection Factor" ),
-                 RifTextDataTableColumn( "Diameter" ),
-                 RifTextDataTableColumn( "Skin Factor" ) };
+                 RifTextDataTableColumn( "Connection Depth" ) };
     }
 }
 
@@ -258,6 +252,15 @@ void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
     if ( rows.empty() ) return;
 
     formatter.keyword( "COMPSEGS" );
+
+    // Add well name
+    {
+        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "Name" ) };
+        formatter.header( header );
+        formatter.add( rows.front().wellName );
+        formatter.rowCompleted();
+    }
+
     auto header = createCompsegsHeader( isLgrData );
     formatter.header( header );
 
@@ -339,23 +342,6 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Format COMPSEGS table for unified data (multiple wells)
-//--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData, bool isLgrData )
-{
-    auto rows = unifiedData.getAllCompsegsRows( isLgrData );
-    if ( rows.empty() ) return;
-
-    formatter.keyword( "COMPSEGS" );
-    auto header = createCompsegsHeader( isLgrData );
-    formatter.header( header );
-
-    formatCompsegsRows( formatter, rows, isLgrData );
-
-    formatter.tableCompleted();
-}
-
-//--------------------------------------------------------------------------------------------------
 /// Format WSEGVALV table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
 void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
@@ -412,11 +398,11 @@ void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter,
 void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
 {
     formatWelsegsTable( formatter, unifiedData );
-    formatCompsegsTable( formatter, unifiedData, false ); // Main grid
 
-    if ( unifiedData.hasAnyLgrData() )
+    for ( const auto& wellData : unifiedData.wellDataList() )
     {
-        formatCompsegsTable( formatter, unifiedData, true ); // LGR data
+        bool isLgrData = false;
+        formatCompsegsTable( formatter, wellData, isLgrData ); // Main grid, LGR is handeled separately
     }
 
     formatWsegvalvTable( formatter, unifiedData );

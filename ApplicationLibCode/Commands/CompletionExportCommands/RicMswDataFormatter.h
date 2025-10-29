@@ -28,7 +28,6 @@ namespace RicMswDataFormatter
 {
 // Consolidated data formatting - works with any compatible data source
 void formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData, bool isLgrData = false );
-void formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData, bool isLgrData = false );
 void formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
 void formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData );
 void formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData );
