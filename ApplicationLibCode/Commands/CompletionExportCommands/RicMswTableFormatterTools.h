@@ -25,6 +25,7 @@
 #include <gsl/gsl>
 
 class RicMswExportInfo;
+class RicMswTableData;
 class RifTextDataTableFormatter;
 class RicMswBranch;
 class RicMswSegment;
@@ -54,6 +55,31 @@ public:
     }
 };
 
+// New data collection functions (replace formatter versions)
+void collectWelsegsData( RicMswTableData&             tableData,
+                        RicMswExportInfo&            exportInfo,
+                        double                       maxSegmentLength,
+                        bool                         exportCompletionSegmentsAfterMainBore );
+
+void collectWelsegsDataRecursively( RicMswTableData&             tableData,
+                                   RicMswExportInfo&            exportInfo,
+                                   gsl::not_null<RicMswBranch*> branch,
+                                   gsl::not_null<int*>          segmentNumber,
+                                   double                       maxSegmentLength,
+                                   bool                         exportCompletionSegmentsAfterMainBore,
+                                   RicMswSegment*               connectedToSegment );
+
+void collectCompsegData( RicMswTableData&                           tableData,
+                        RicMswExportInfo&                          exportInfo,
+                        bool                                       exportSubGridIntersections );
+
+void collectWsegvalvData( RicMswTableData&              tableData,
+                         RicMswExportInfo&             exportInfo );
+
+void collectWsegAicdData( RicMswTableData&              tableData,
+                         RicMswExportInfo&             exportInfo );
+
+// Existing formatter functions (kept for backward compatibility)
 void generateWelsegsTable( RifTextDataTableFormatter& formatter,
                            RicMswExportInfo&          exportInfo,
                            double                     maxSegmentLength,

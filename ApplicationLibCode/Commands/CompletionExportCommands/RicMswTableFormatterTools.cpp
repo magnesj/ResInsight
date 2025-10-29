@@ -22,6 +22,7 @@
 
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
+#include "RicMswTableData.h"
 
 #include "RifTextDataTableFormatter.h"
 
@@ -1071,4 +1072,143 @@ void RicMswTableFormatterTools::writeWsegvalHeader( RifTextDataTableFormatter& f
         RifTextDataTableColumn( "Ac" ),
     };
     formatter.header( header );
+}
+
+//--------------------------------------------------------------------------------------------------
+// New data collection functions
+//--------------------------------------------------------------------------------------------------
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::collectWelsegsData( RicMswTableData& tableData,
+                                                    RicMswExportInfo& exportInfo,
+                                                    double maxSegmentLength,
+                                                    bool exportCompletionSegmentsAfterMainBore )
+{
+    // Set up WELSEGS header
+    WelsegsHeader header;
+    header.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
+    header.topMD = exportInfo.mainBoreBranch()->startMD();
+    header.topTVD = exportInfo.mainBoreBranch()->startTVD();
+    header.volume = exportInfo.topWellBoreVolume();
+    header.lengthAndDepthText = exportInfo.lengthAndDepthText();
+    header.pressureDropText = exportInfo.pressureDropText();
+    
+    tableData.setWelsegsHeader( header );
+
+    // Collect segment data recursively
+    int segmentNumber = 1;
+    collectWelsegsDataRecursively( tableData, exportInfo, exportInfo.mainBoreBranch(), &segmentNumber,
+                                  maxSegmentLength, exportCompletionSegmentsAfterMainBore, nullptr );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::collectWelsegsDataRecursively( RicMswTableData& tableData,
+                                                               RicMswExportInfo& exportInfo,
+                                                               gsl::not_null<RicMswBranch*> branch,
+                                                               gsl::not_null<int*> segmentNumber,
+                                                               double maxSegmentLength,
+                                                               bool exportCompletionSegmentsAfterMainBore,
+                                                               RicMswSegment* connectedToSegment )
+{
+    // This is a simplified version - we'll need to port the full logic from writeWelsegsSegmentsRecursively
+    for ( auto segment : branch->segments() )
+    {
+        WelsegsRow row;
+        row.segmentNumber = (*segmentNumber)++;
+        row.outletSegmentNumber = connectedToSegment ? connectedToSegment->segmentNumber() : 1;
+        row.branchNumber = branch->branchNumber();
+        row.startMD = segment->startMD();
+        row.endMD = segment->endMD();
+        row.startTVD = segment->startTVD();
+        row.endTVD = segment->endTVD();
+        row.diameter = segment->equivalentDiameter();
+        row.roughness = segment->roughnessFactor();
+        
+        tableData.addWelsegsRow( row );
+        
+        // TODO: Handle completions and sub-segments
+        // This needs to be expanded with the full logic from the original function
+    }
+    
+    // Recurse into child branches
+    for ( auto childBranch : branch->branches() )
+    {
+        collectWelsegsDataRecursively( tableData, exportInfo, childBranch, segmentNumber,
+                                      maxSegmentLength, exportCompletionSegmentsAfterMainBore,
+                                      branch->segments().empty() ? nullptr : branch->segments().back() );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::collectCompsegData( RicMswTableData& tableData,
+                                                    RicMswExportInfo& exportInfo,
+                                                    bool exportSubGridIntersections )
+{
+    // Collect COMPSEGS data - simplified version
+    // TODO: Port full logic from generateCompsegTable
+    
+    auto collectFromBranch = [&]( const RicMswBranch* branch, auto& self ) -> void {
+        for ( auto segment : branch->segments() )
+        {
+            for ( auto completion : segment->completions() )
+            {
+                for ( auto completionSegment : completion->segments() )
+                {
+                    for ( auto intersection : completionSegment->intersections() )
+                    {
+                        // Filter based on LGR requirement
+                        bool isLgr = !intersection->gridName().isEmpty();
+                        if ( exportSubGridIntersections != isLgr )
+                            continue;
+                            
+                        CompsegsRow row;
+                        row.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
+                        row.cellI = intersection->localIJK().x() + 1; // Convert to 1-based
+                        row.cellJ = intersection->localIJK().y() + 1;
+                        row.cellK = intersection->localIJK().z() + 1;
+                        row.branchNumber = completion->branchNumber();
+                        row.startLength = completionSegment->startMD();
+                        row.endLength = completionSegment->endMD();
+                        row.gridName = intersection->gridName();
+                        
+                        tableData.addCompsegsRow( row );
+                    }
+                }
+            }
+        }
+        
+        // Recurse
+        for ( auto childBranch : branch->branches() )
+        {
+            self( childBranch, self );
+        }
+    };
+    
+    collectFromBranch( exportInfo.mainBoreBranch(), collectFromBranch );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::collectWsegvalvData( RicMswTableData& tableData,
+                                                     RicMswExportInfo& exportInfo )
+{
+    // TODO: Implement WSEGVALV data collection
+    // This needs to port logic from generateWsegvalvTableRecursively
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswTableFormatterTools::collectWsegAicdData( RicMswTableData& tableData,
+                                                     RicMswExportInfo& exportInfo )
+{
+    // TODO: Implement WSEGAICD data collection  
+    // This needs to port logic from generateWsegAicdTableRecursively
 }
