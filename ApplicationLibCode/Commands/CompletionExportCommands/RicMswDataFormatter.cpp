@@ -57,17 +57,14 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.rowCompleted();
 
         // Column headers for segment data
-        std::vector<RifTextDataTableColumn> segmentHeader = {
-            RifTextDataTableColumn( "Seg No" ),
-            RifTextDataTableColumn( "Seg No" ),
-            RifTextDataTableColumn( "Branch No" ),
-            RifTextDataTableColumn( "Out" ),
-            RifTextDataTableColumn( "Len" ),
-            RifTextDataTableColumn( "Dep" ),
-            RifTextDataTableColumn( "Diam" ),
-            RifTextDataTableColumn( "Rough" ),
-            RifTextDataTableColumn( "Vol" )
-        };
+        std::vector<RifTextDataTableColumn> segmentHeader = { RifTextDataTableColumn( "Seg No" ),
+                                                              RifTextDataTableColumn( "Seg No" ),
+                                                              RifTextDataTableColumn( "Branch No" ),
+                                                              RifTextDataTableColumn( "Out" ),
+                                                              RifTextDataTableColumn( "Len" ),
+                                                              RifTextDataTableColumn( "Dep" ),
+                                                              RifTextDataTableColumn( "Diam" ),
+                                                              RifTextDataTableColumn( "Rough" ) };
         formatter.header( segmentHeader );
     }
 
@@ -79,14 +76,11 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.add( row.branchNumber );
         formatter.add( row.outletSegmentNumber );
         formatter.add( row.startMD );
-        formatter.add( row.endMD );
-        
+
         formatter.addOptionalValue( row.startTVD, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.endTVD, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.volume, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -111,40 +105,36 @@ void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
     if ( rows.empty() ) return;
 
     formatter.keyword( "COMPSEGS" );
-    
+
     if ( isLgrData )
     {
-        std::vector<RifTextDataTableColumn> lgrCompsegsHeader = {
-            RifTextDataTableColumn( "Grid" ),
-            RifTextDataTableColumn( "I" ),
-            RifTextDataTableColumn( "J" ),
-            RifTextDataTableColumn( "K" ),
-            RifTextDataTableColumn( "Branch no" ),
-            RifTextDataTableColumn( "Start Length" ),
-            RifTextDataTableColumn( "End Length" ),
-            RifTextDataTableColumn( "Dir Pen" ),
-            RifTextDataTableColumn( "End Range" ),
-            RifTextDataTableColumn( "Connection Factor" ),
-            RifTextDataTableColumn( "Diameter" ),
-            RifTextDataTableColumn( "Skin Factor" )
-        };
+        std::vector<RifTextDataTableColumn> lgrCompsegsHeader = { RifTextDataTableColumn( "Grid" ),
+                                                                  RifTextDataTableColumn( "I" ),
+                                                                  RifTextDataTableColumn( "J" ),
+                                                                  RifTextDataTableColumn( "K" ),
+                                                                  RifTextDataTableColumn( "Branch no" ),
+                                                                  RifTextDataTableColumn( "Start Length" ),
+                                                                  RifTextDataTableColumn( "End Length" ),
+                                                                  RifTextDataTableColumn( "Dir Pen" ),
+                                                                  RifTextDataTableColumn( "End Range" ),
+                                                                  RifTextDataTableColumn( "Connection Factor" ),
+                                                                  RifTextDataTableColumn( "Diameter" ),
+                                                                  RifTextDataTableColumn( "Skin Factor" ) };
         formatter.header( lgrCompsegsHeader );
     }
     else
     {
-        std::vector<RifTextDataTableColumn> compsegsHeader = {
-            RifTextDataTableColumn( "I" ),
-            RifTextDataTableColumn( "J" ),
-            RifTextDataTableColumn( "K" ),
-            RifTextDataTableColumn( "Branch no" ),
-            RifTextDataTableColumn( "Start Length" ),
-            RifTextDataTableColumn( "End Length" ),
-            RifTextDataTableColumn( "Dir Pen" ),
-            RifTextDataTableColumn( "End Range" ),
-            RifTextDataTableColumn( "Connection Factor" ),
-            RifTextDataTableColumn( "Diameter" ),
-            RifTextDataTableColumn( "Skin Factor" )
-        };
+        std::vector<RifTextDataTableColumn> compsegsHeader = { RifTextDataTableColumn( "I" ),
+                                                               RifTextDataTableColumn( "J" ),
+                                                               RifTextDataTableColumn( "K" ),
+                                                               RifTextDataTableColumn( "Branch no" ),
+                                                               RifTextDataTableColumn( "Start Length" ),
+                                                               RifTextDataTableColumn( "End Length" ),
+                                                               RifTextDataTableColumn( "Dir Pen" ),
+                                                               RifTextDataTableColumn( "End Range" ),
+                                                               RifTextDataTableColumn( "Connection Factor" ),
+                                                               RifTextDataTableColumn( "Diameter" ),
+                                                               RifTextDataTableColumn( "Skin Factor" ) };
         formatter.header( compsegsHeader );
     }
 
@@ -154,20 +144,20 @@ void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
         {
             formatter.add( row.gridName );
         }
-        
+
         formatter.add( row.cellI );
         formatter.add( row.cellJ );
         formatter.add( row.cellK );
         formatter.add( row.branchNumber );
         formatter.add( row.startLength );
         formatter.add( row.endLength );
-        
+
         formatter.addOptionalValue( row.direction, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.endRange, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.connectionFactor, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.skinFactor, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -182,15 +172,13 @@ void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& format
     if ( !tableData.hasWsegvalvData() ) return;
 
     formatter.keyword( "WSEGVALV" );
-    std::vector<RifTextDataTableColumn> wsegvalvHeader = {
-        RifTextDataTableColumn( "Well" ),
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Cv" ),
-        RifTextDataTableColumn( "Ac" ),
-        RifTextDataTableColumn( "Device Type" ),
-        RifTextDataTableColumn( "Param 1" ),
-        RifTextDataTableColumn( "Param 2" )
-    };
+    std::vector<RifTextDataTableColumn> wsegvalvHeader = { RifTextDataTableColumn( "Well" ),
+                                                           RifTextDataTableColumn( "Seg No" ),
+                                                           RifTextDataTableColumn( "Cv" ),
+                                                           RifTextDataTableColumn( "Ac" ),
+                                                           RifTextDataTableColumn( "Device Type" ),
+                                                           RifTextDataTableColumn( "Param 1" ),
+                                                           RifTextDataTableColumn( "Param 2" ) };
     formatter.header( wsegvalvHeader );
 
     for ( const auto& row : tableData.wsegvalvData() )
@@ -202,7 +190,7 @@ void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& format
         formatter.add( row.deviceType );
         formatter.addOptionalValue( row.additionalParameter1, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.additionalParameter2, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -217,16 +205,14 @@ void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
     if ( !tableData.hasWsegaicdData() ) return;
 
     formatter.keyword( "WSEGAICD" );
-    std::vector<RifTextDataTableColumn> wsegaicdHeader = {
-        RifTextDataTableColumn( "Well" ),
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Flow Coeff" ),
-        RifTextDataTableColumn( "Area" ),
-        RifTextDataTableColumn( "Oil Visc" ),
-        RifTextDataTableColumn( "Water Visc" ),
-        RifTextDataTableColumn( "Gas Visc" ),
-        RifTextDataTableColumn( "Device Type" )
-    };
+    std::vector<RifTextDataTableColumn> wsegaicdHeader = { RifTextDataTableColumn( "Well" ),
+                                                           RifTextDataTableColumn( "Seg No" ),
+                                                           RifTextDataTableColumn( "Flow Coeff" ),
+                                                           RifTextDataTableColumn( "Area" ),
+                                                           RifTextDataTableColumn( "Oil Visc" ),
+                                                           RifTextDataTableColumn( "Water Visc" ),
+                                                           RifTextDataTableColumn( "Gas Visc" ),
+                                                           RifTextDataTableColumn( "Device Type" ) };
     formatter.header( wsegaicdHeader );
 
     for ( const auto& row : tableData.wsegaicdData() )
@@ -239,7 +225,7 @@ void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
         formatter.addOptionalValue( row.waterViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.gasViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( row.deviceType );
-        
+
         formatter.rowCompleted();
     }
 
@@ -254,19 +240,17 @@ void RicMswDataFormatter::formatUnifiedWelsegsTable( RifTextDataTableFormatter& 
     if ( unifiedData.isEmpty() ) return;
 
     auto headers = unifiedData.getAllWelsegsHeaders();
-    auto rows = unifiedData.getAllWelsegsRows();
-    
+    auto rows    = unifiedData.getAllWelsegsRows();
+
     if ( headers.empty() && rows.empty() ) return;
 
     formatter.keyword( "WELSEGS" );
-    std::vector<RifTextDataTableColumn> unifiedWelsegsHeader = {
-        RifTextDataTableColumn( "Well" ),
-        RifTextDataTableColumn( "Dep 1" ),
-        RifTextDataTableColumn( "Tlen 1" ),
-        RifTextDataTableColumn( "Vol 1" ),
-        RifTextDataTableColumn( "Len&Dep" ),
-        RifTextDataTableColumn( "PresDrop" )
-    };
+    std::vector<RifTextDataTableColumn> unifiedWelsegsHeader = { RifTextDataTableColumn( "Well" ),
+                                                                 RifTextDataTableColumn( "Dep 1" ),
+                                                                 RifTextDataTableColumn( "Tlen 1" ),
+                                                                 RifTextDataTableColumn( "Vol 1" ),
+                                                                 RifTextDataTableColumn( "Len&Dep" ),
+                                                                 RifTextDataTableColumn( "PresDrop" ) };
     formatter.header( unifiedWelsegsHeader );
 
     // Write headers for all wells
@@ -285,17 +269,14 @@ void RicMswDataFormatter::formatUnifiedWelsegsTable( RifTextDataTableFormatter& 
     }
 
     // Column headers for segment data
-    std::vector<RifTextDataTableColumn> unifiedSegmentHeader = {
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Branch No" ),
-        RifTextDataTableColumn( "Out" ),
-        RifTextDataTableColumn( "Len" ),
-        RifTextDataTableColumn( "Dep" ),
-        RifTextDataTableColumn( "Diam" ),
-        RifTextDataTableColumn( "Rough" ),
-        RifTextDataTableColumn( "Vol" )
-    };
+    std::vector<RifTextDataTableColumn> unifiedSegmentHeader = { RifTextDataTableColumn( "Seg No" ),
+                                                                 RifTextDataTableColumn( "Seg No" ),
+                                                                 RifTextDataTableColumn( "Branch No" ),
+                                                                 RifTextDataTableColumn( "Out" ),
+                                                                 RifTextDataTableColumn( "Len" ),
+                                                                 RifTextDataTableColumn( "Dep" ),
+                                                                 RifTextDataTableColumn( "Diam" ),
+                                                                 RifTextDataTableColumn( "Rough" ) };
     formatter.header( unifiedSegmentHeader );
 
     // Write all segment data
@@ -306,14 +287,11 @@ void RicMswDataFormatter::formatUnifiedWelsegsTable( RifTextDataTableFormatter& 
         formatter.add( row.branchNumber );
         formatter.add( row.outletSegmentNumber );
         formatter.add( row.startMD );
-        formatter.add( row.endMD );
-        
+
         formatter.addOptionalValue( row.startTVD, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.endTVD, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.volume, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -329,40 +307,36 @@ void RicMswDataFormatter::formatUnifiedCompsegsTable( RifTextDataTableFormatter&
     if ( rows.empty() ) return;
 
     formatter.keyword( "COMPSEGS" );
-    
+
     if ( isLgrData )
     {
-        std::vector<RifTextDataTableColumn> unifiedLgrCompsegsHeader = {
-            RifTextDataTableColumn( "Grid" ),
-            RifTextDataTableColumn( "I" ),
-            RifTextDataTableColumn( "J" ),
-            RifTextDataTableColumn( "K" ),
-            RifTextDataTableColumn( "Branch no" ),
-            RifTextDataTableColumn( "Start Length" ),
-            RifTextDataTableColumn( "End Length" ),
-            RifTextDataTableColumn( "Dir Pen" ),
-            RifTextDataTableColumn( "End Range" ),
-            RifTextDataTableColumn( "Connection Factor" ),
-            RifTextDataTableColumn( "Diameter" ),
-            RifTextDataTableColumn( "Skin Factor" )
-        };
+        std::vector<RifTextDataTableColumn> unifiedLgrCompsegsHeader = { RifTextDataTableColumn( "Grid" ),
+                                                                         RifTextDataTableColumn( "I" ),
+                                                                         RifTextDataTableColumn( "J" ),
+                                                                         RifTextDataTableColumn( "K" ),
+                                                                         RifTextDataTableColumn( "Branch no" ),
+                                                                         RifTextDataTableColumn( "Start Length" ),
+                                                                         RifTextDataTableColumn( "End Length" ),
+                                                                         RifTextDataTableColumn( "Dir Pen" ),
+                                                                         RifTextDataTableColumn( "End Range" ),
+                                                                         RifTextDataTableColumn( "Connection Factor" ),
+                                                                         RifTextDataTableColumn( "Diameter" ),
+                                                                         RifTextDataTableColumn( "Skin Factor" ) };
         formatter.header( unifiedLgrCompsegsHeader );
     }
     else
     {
-        std::vector<RifTextDataTableColumn> unifiedCompsegsHeader = {
-            RifTextDataTableColumn( "I" ),
-            RifTextDataTableColumn( "J" ),
-            RifTextDataTableColumn( "K" ),
-            RifTextDataTableColumn( "Branch no" ),
-            RifTextDataTableColumn( "Start Length" ),
-            RifTextDataTableColumn( "End Length" ),
-            RifTextDataTableColumn( "Dir Pen" ),
-            RifTextDataTableColumn( "End Range" ),
-            RifTextDataTableColumn( "Connection Factor" ),
-            RifTextDataTableColumn( "Diameter" ),
-            RifTextDataTableColumn( "Skin Factor" )
-        };
+        std::vector<RifTextDataTableColumn> unifiedCompsegsHeader = { RifTextDataTableColumn( "I" ),
+                                                                      RifTextDataTableColumn( "J" ),
+                                                                      RifTextDataTableColumn( "K" ),
+                                                                      RifTextDataTableColumn( "Branch no" ),
+                                                                      RifTextDataTableColumn( "Start Length" ),
+                                                                      RifTextDataTableColumn( "End Length" ),
+                                                                      RifTextDataTableColumn( "Dir Pen" ),
+                                                                      RifTextDataTableColumn( "End Range" ),
+                                                                      RifTextDataTableColumn( "Connection Factor" ),
+                                                                      RifTextDataTableColumn( "Diameter" ),
+                                                                      RifTextDataTableColumn( "Skin Factor" ) };
         formatter.header( unifiedCompsegsHeader );
     }
 
@@ -372,20 +346,20 @@ void RicMswDataFormatter::formatUnifiedCompsegsTable( RifTextDataTableFormatter&
         {
             formatter.add( row.gridName );
         }
-        
+
         formatter.add( row.cellI );
         formatter.add( row.cellJ );
         formatter.add( row.cellK );
         formatter.add( row.branchNumber );
         formatter.add( row.startLength );
         formatter.add( row.endLength );
-        
+
         formatter.addOptionalValue( row.direction, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.endRange, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.connectionFactor, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.skinFactor, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -401,15 +375,13 @@ void RicMswDataFormatter::formatUnifiedWsegvalvTable( RifTextDataTableFormatter&
     if ( rows.empty() ) return;
 
     formatter.keyword( "WSEGVALV" );
-    std::vector<RifTextDataTableColumn> unifiedWsegvalvHeader = {
-        RifTextDataTableColumn( "Well" ),
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Cv" ),
-        RifTextDataTableColumn( "Ac" ),
-        RifTextDataTableColumn( "Device Type" ),
-        RifTextDataTableColumn( "Param 1" ),
-        RifTextDataTableColumn( "Param 2" )
-    };
+    std::vector<RifTextDataTableColumn> unifiedWsegvalvHeader = { RifTextDataTableColumn( "Well" ),
+                                                                  RifTextDataTableColumn( "Seg No" ),
+                                                                  RifTextDataTableColumn( "Cv" ),
+                                                                  RifTextDataTableColumn( "Ac" ),
+                                                                  RifTextDataTableColumn( "Device Type" ),
+                                                                  RifTextDataTableColumn( "Param 1" ),
+                                                                  RifTextDataTableColumn( "Param 2" ) };
     formatter.header( unifiedWsegvalvHeader );
 
     for ( const auto& row : rows )
@@ -421,7 +393,7 @@ void RicMswDataFormatter::formatUnifiedWsegvalvTable( RifTextDataTableFormatter&
         formatter.add( row.deviceType );
         formatter.addOptionalValue( row.additionalParameter1, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.additionalParameter2, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.rowCompleted();
     }
 
@@ -437,16 +409,14 @@ void RicMswDataFormatter::formatUnifiedWsegaicdTable( RifTextDataTableFormatter&
     if ( rows.empty() ) return;
 
     formatter.keyword( "WSEGAICD" );
-    std::vector<RifTextDataTableColumn> unifiedWsegaicdHeader = {
-        RifTextDataTableColumn( "Well" ),
-        RifTextDataTableColumn( "Seg No" ),
-        RifTextDataTableColumn( "Flow Coeff" ),
-        RifTextDataTableColumn( "Area" ),
-        RifTextDataTableColumn( "Oil Visc" ),
-        RifTextDataTableColumn( "Water Visc" ),
-        RifTextDataTableColumn( "Gas Visc" ),
-        RifTextDataTableColumn( "Device Type" )
-    };
+    std::vector<RifTextDataTableColumn> unifiedWsegaicdHeader = { RifTextDataTableColumn( "Well" ),
+                                                                  RifTextDataTableColumn( "Seg No" ),
+                                                                  RifTextDataTableColumn( "Flow Coeff" ),
+                                                                  RifTextDataTableColumn( "Area" ),
+                                                                  RifTextDataTableColumn( "Oil Visc" ),
+                                                                  RifTextDataTableColumn( "Water Visc" ),
+                                                                  RifTextDataTableColumn( "Gas Visc" ),
+                                                                  RifTextDataTableColumn( "Device Type" ) };
     formatter.header( unifiedWsegaicdHeader );
 
     for ( const auto& row : rows )
@@ -459,7 +429,7 @@ void RicMswDataFormatter::formatUnifiedWsegaicdTable( RifTextDataTableFormatter&
         formatter.addOptionalValue( row.waterViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.gasViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( row.deviceType );
-        
+
         formatter.rowCompleted();
     }
 
@@ -473,12 +443,12 @@ void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter,
 {
     formatWelsegsTable( formatter, tableData );
     formatCompsegsTable( formatter, tableData, false ); // Main grid
-    
+
     if ( tableData.hasLgrData() )
     {
         formatCompsegsTable( formatter, tableData, true ); // LGR data
     }
-    
+
     formatWsegvalvTable( formatter, tableData );
     formatWsegaicdTable( formatter, tableData );
 }
@@ -490,12 +460,12 @@ void RicMswDataFormatter::formatUnifiedMswTables( RifTextDataTableFormatter& for
 {
     formatUnifiedWelsegsTable( formatter, unifiedData );
     formatUnifiedCompsegsTable( formatter, unifiedData, false ); // Main grid
-    
+
     if ( unifiedData.hasAnyLgrData() )
     {
         formatUnifiedCompsegsTable( formatter, unifiedData, true ); // LGR data
     }
-    
+
     formatUnifiedWsegvalvTable( formatter, unifiedData );
     formatUnifiedWsegaicdTable( formatter, unifiedData );
 }
