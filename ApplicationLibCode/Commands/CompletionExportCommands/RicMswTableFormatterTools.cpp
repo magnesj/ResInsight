@@ -1371,6 +1371,11 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
         tableData.addWelsegsRow( row );
 
         ( *segmentNumber )++;
+
+        for ( auto comp : completionSegment->completions() )
+        {
+            collectCompletionWelsegsSegments( tableData, outletSegment, comp, exportInfo, maxSegmentLength, segmentNumber );
+        }
     }
 }
 
@@ -1380,9 +1385,15 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
 void RicMswTableFormatterTools::collectCompsegData( RicMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections )
 {
     // Define completion types to export
-    std::set<RigCompletionData::CompletionType> perforationTypes = { RigCompletionData::CompletionType::PERFORATION };
-    std::set<RigCompletionData::CompletionType> fishbonesTypes   = { RigCompletionData::CompletionType::FISHBONES };
-    std::set<RigCompletionData::CompletionType> fractureTypes    = { RigCompletionData::CompletionType::FRACTURE };
+    std::set<RigCompletionData::CompletionType> perforationTypes = { RigCompletionData::CompletionType::PERFORATION,
+                                                                     RigCompletionData::CompletionType::PERFORATION_ICD,
+                                                                     RigCompletionData::CompletionType::PERFORATION_ICV,
+                                                                     RigCompletionData::CompletionType::PERFORATION_AICD };
+
+    std::set<RigCompletionData::CompletionType> fishbonesTypes = { RigCompletionData::CompletionType::FISHBONES_ICD,
+                                                                   RigCompletionData::CompletionType::FISHBONES };
+
+    std::set<RigCompletionData::CompletionType> fractureTypes = { RigCompletionData::CompletionType::FRACTURE };
 
     std::set<size_t> intersectedCells;
 
