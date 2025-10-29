@@ -20,8 +20,8 @@
 
 #include "RicMswTableData.h"
 
-#include <vector>
 #include <map>
+#include <vector>
 
 //==================================================================================================
 /// Container class for unified MSW table data from multiple wells
@@ -32,28 +32,28 @@ public:
     RicMswUnifiedData() = default;
 
     // Data modification
-    void addWellData(RicMswTableData wellData);
+    void addWellData( RicMswTableData wellData );
     void clear();
 
     // Data access
     const std::vector<RicMswTableData>& wellDataList() const { return m_wellDataList; }
-    const RicMswTableData* getWellData(const QString& wellName) const;
-    
+    const RicMswTableData*              getWellData( const QString& wellName ) const;
+
     // Aggregated data access - combines data from all wells
     std::vector<WelsegsHeader> getAllWelsegsHeaders() const;
-    std::vector<WelsegsRow> getAllWelsegsRows() const;
-    std::vector<CompsegsRow> getAllCompsegsRows(bool lgrOnly = false) const;
-    std::vector<WsegvalvRow> getAllWsegvalvRows() const;
-    std::vector<WsegaicdRow> getAllWsegaicdRows() const;
+    std::vector<WelsegsRow>    getAllWelsegsRows() const;
+    std::vector<CompsegsRow>   getAllCompsegsRows( bool lgrOnly = false ) const;
+    std::vector<WsegvalvRow>   getAllWsegvalvRows() const;
+    std::vector<WsegaicdRow>   getAllWsegaicdRows() const;
 
     // Metadata and analysis
-    bool isEmpty() const { return m_wellDataList.empty(); }
-    bool hasAnyLgrData() const;
-    size_t wellCount() const { return m_wellDataList.size(); }
+    bool                 isEmpty() const { return m_wellDataList.empty(); }
+    bool                 hasAnyLgrData() const;
+    size_t               wellCount() const { return m_wellDataList.size(); }
     std::vector<QString> wellNames() const;
 
     // Data validation
-    bool isValid() const;
+    bool                 isValid() const;
     std::vector<QString> validationErrors() const;
 
     // Iterator support for range-based loops
@@ -64,7 +64,7 @@ public:
 
 private:
     std::vector<RicMswTableData> m_wellDataList;
-    std::map<QString, size_t> m_wellNameToIndex;
+    std::map<QString, size_t>    m_wellNameToIndex;
 
     void updateIndex();
 };

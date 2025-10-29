@@ -18,12 +18,12 @@
 
 #pragma once
 
-#include "RicMswTableRows.h"
 #include "RiaDefines.h"
+#include "RicMswTableRows.h"
 
 #include <QString>
-#include <vector>
 #include <optional>
+#include <vector>
 
 //==================================================================================================
 /// Container class for MSW table data for a single well
@@ -31,27 +31,26 @@
 class RicMswTableData
 {
 public:
-    RicMswTableData(const QString& wellName, 
-                    RiaDefines::EclipseUnitSystem unitSystem);
+    RicMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem );
 
     // Data access
     const std::optional<WelsegsHeader>& welsegsHeader() const { return m_welsegsHeader; }
-    const std::vector<WelsegsRow>& welsegsData() const { return m_welsegsData; }
-    const std::vector<CompsegsRow>& compsegsData() const { return m_compsegsData; }
-    const std::vector<WsegvalvRow>& wsegvalvData() const { return m_wsegvalvData; }
-    const std::vector<WsegaicdRow>& wsegaicdData() const { return m_wsegaicdData; }
+    const std::vector<WelsegsRow>&      welsegsData() const { return m_welsegsData; }
+    const std::vector<CompsegsRow>&     compsegsData() const { return m_compsegsData; }
+    const std::vector<WsegvalvRow>&     wsegvalvData() const { return m_wsegvalvData; }
+    const std::vector<WsegaicdRow>&     wsegaicdData() const { return m_wsegaicdData; }
 
     // Data modification
-    void setWelsegsHeader(const WelsegsHeader& header);
-    void addWelsegsRow(const WelsegsRow& row);
-    void addCompsegsRow(const CompsegsRow& row);
-    void addWsegvalvRow(const WsegvalvRow& row);
-    void addWsegaicdRow(const WsegaicdRow& row);
+    void setWelsegsHeader( const WelsegsHeader& header );
+    void addWelsegsRow( const WelsegsRow& row );
+    void addCompsegsRow( const CompsegsRow& row );
+    void addWsegvalvRow( const WsegvalvRow& row );
+    void addWsegaicdRow( const WsegaicdRow& row );
 
     // Metadata
-    QString wellName() const { return m_wellName; }
+    QString                       wellName() const { return m_wellName; }
     RiaDefines::EclipseUnitSystem unitSystem() const { return m_unitSystem; }
-    
+
     // Data analysis
     bool hasLgrData() const;
     bool isEmpty() const;
@@ -65,16 +64,16 @@ public:
     std::vector<CompsegsRow> lgrCompsegsData() const;
 
     // Data validation
-    bool isValid() const;
+    bool                 isValid() const;
     std::vector<QString> validationErrors() const;
 
 private:
-    QString m_wellName;
+    QString                       m_wellName;
     RiaDefines::EclipseUnitSystem m_unitSystem;
 
     std::optional<WelsegsHeader> m_welsegsHeader;
-    std::vector<WelsegsRow> m_welsegsData;
-    std::vector<CompsegsRow> m_compsegsData;
-    std::vector<WsegvalvRow> m_wsegvalvData;
-    std::vector<WsegaicdRow> m_wsegaicdData;
+    std::vector<WelsegsRow>      m_welsegsData;
+    std::vector<CompsegsRow>     m_compsegsData;
+    std::vector<WsegvalvRow>     m_wsegvalvData;
+    std::vector<WsegaicdRow>     m_wsegaicdData;
 };
