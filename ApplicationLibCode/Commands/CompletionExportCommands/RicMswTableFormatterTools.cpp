@@ -1481,7 +1481,6 @@ void RicMswTableFormatterTools::collectCompsegDataByType( RigMswTableData&      
             if ( !intersectedCells->count( globalCellIndex ) )
             {
                 CompsegsRow row;
-                row.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport().toStdString();
 
                 cvf::Vec3st ijk = intersection->gridLocalCellIJK();
                 row.cellI       = ijk.x() + 1; // Convert to 1-based

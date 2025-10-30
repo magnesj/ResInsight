@@ -56,7 +56,6 @@ struct WelsegsRow
 //==================================================================================================
 struct CompsegsRow
 {
-    std::string           wellName;
     size_t                cellI;
     size_t                cellJ;
     size_t                cellK;

@@ -249,7 +249,7 @@ void RigMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
     {
         std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "Name" ) };
         formatter.header( header );
-        formatter.addStdString( rows.front().wellName );
+        formatter.addStdString( tableData.wellName() );
         formatter.rowCompleted();
     }
 
