@@ -23,6 +23,7 @@
 #include "CompletionsMsw/RigMswTableData.h"
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
+#include "RicMswTableFormatterTools.h"
 
 #include "RifTextDataTableFormatter.h"
 

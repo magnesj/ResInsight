@@ -24,6 +24,7 @@
 
 #include <gsl/gsl>
 
+#include <expected>
 #include <set>
 
 class RicExportCompletionDataSettingsUi;
@@ -53,7 +54,8 @@ class QFile;
 class RicWellPathExportMswTableData
 {
 public:
-    static RigMswTableData extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
+    static std::expected<RigMswTableData, std::string>
+        extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
 
 private:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,

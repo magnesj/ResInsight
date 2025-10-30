@@ -20,7 +20,6 @@
 
 #include "RiaLogging.h"
 
-#include "CompletionsMsw/RigMswTableData.h"
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswExportInfo.h"
@@ -31,6 +30,9 @@
 #include "RicWellPathExportCompletionsFileTools.h"
 
 #include "RifTextDataTableFormatter.h"
+
+#include "CompletionsMsw/RigMswTableData.h"
+#include "RigMswDataFormatter.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
@@ -378,12 +380,13 @@ void RicWellPathExportMswTableData::exportSplitMswData( const RicExportCompletio
         try
         {
             // Extract data for single well
-            auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
-
-            if ( wellData.isEmpty() )
+            auto wellDataResult = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+            if ( !wellDataResult.has_value() )
             {
                 continue; // Skip wells with no MSW data
             }
+
+            auto wellData = wellDataResult.value();
 
             // Set up file names
             QString wellFileName =
@@ -2283,16 +2286,14 @@ RicMswUnifiedDataWIP RicWellPathExportMswTableData::extractUnifiedMswData( const
 
     for ( RimWellPath* wellPath : wellPaths )
     {
-        try
-        {
-            auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
-            unifiedData.addWellData( std::move( wellData ) );
-        }
-        catch ( const std::exception& e )
+        auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+        if ( !wellData.has_value() )
         {
             RiaLogging::error(
-                QString( "Failed to extract MSW data for well %1: %2" ).arg( wellPath->name(), QString::fromStdString( e.what() ) ) );
+                QString( "Failed to extract MSW data for well %1: %2" ).arg( wellPath->name(), QString::fromStdString( wellData.error() ) ) );
+            continue;
         }
+        unifiedData.addWellData( std::move( wellData.value() ) );
     }
 
     return unifiedData;
@@ -2301,12 +2302,18 @@ RicMswUnifiedDataWIP RicWellPathExportMswTableData::extractUnifiedMswData( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMswTableData RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
+std::expected<RigMswTableData, std::string>
+    RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
 {
+    if ( !eclipseCase || !wellPath )
+    {
+        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
+    }
+
     auto mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters )
     {
-        throw std::runtime_error( "No MSW parameters found for well" );
+        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
     }
 
     auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
@@ -2318,7 +2325,7 @@ RigMswTableData RicWellPathExportMswTableData::extractSingleWellMswData( RimEcli
     // Generate all completion data using existing functions
     if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
     {
-        throw std::runtime_error( "Failed to generate perforations MSW export info" );
+        return std::unexpected( "Failed to generate perforations MSW export info" );
     }
 
     // Add other completion types
