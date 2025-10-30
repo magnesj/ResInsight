@@ -58,6 +58,7 @@
 #include <QFile>
 #include <QFileInfo>
 
+#include "RicWellPathExportMswTableData.h"
 #include <algorithm>
 
 namespace internal
@@ -378,7 +379,8 @@ void RicWellPathExportMswCompletionsImpl::exportSplitMswData( const RicExportCom
         try
         {
             // Extract data for single well
-            auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+            auto wellData =
+                RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
 
             if ( wellData.isEmpty() )
             {
@@ -2286,7 +2288,8 @@ RicMswUnifiedData_to_be_deleted
     {
         try
         {
-            auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+            auto wellData =
+                RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
             unifiedData.addWellData( std::move( wellData ) );
         }
         catch ( const std::exception& e )
@@ -2297,61 +2300,4 @@ RicMswUnifiedData_to_be_deleted
     }
 
     return unifiedData;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigMswTableData RicWellPathExportMswCompletionsImpl::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
-{
-    auto mswParameters = wellPath->mswCompletionParameters();
-    if ( !mswParameters )
-    {
-        throw std::runtime_error( "No MSW parameters found for well" );
-    }
-
-    auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
-    double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-
-    RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-    RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
-
-    // Generate all completion data using existing functions
-    if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
-    {
-        throw std::runtime_error( "Failed to generate perforations MSW export info" );
-    }
-
-    // Add other completion types
-    bool enableSegmentSplitting = false;
-    appendFishbonesMswExportInfo( eclipseCase,
-                                  wellPath,
-                                  initialMD,
-                                  cellIntersections,
-                                  enableSegmentSplitting,
-                                  &exportInfo,
-                                  exportInfo.mainBoreBranch() );
-    appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
-
-    // Assign branch numbers
-    int branchNumber = 1;
-    assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
-
-    // Create table data container and extract data
-    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
-
-    // Use the new collection functions to populate the table data
-    RicMswTableFormatterTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );
-
-    RicMswTableFormatterTools::collectCompsegData( tableData, exportInfo, false );
-
-    if ( exportInfo.hasSubGridIntersections() )
-    {
-        RicMswTableFormatterTools::collectCompsegData( tableData, exportInfo, true );
-    }
-
-    RicMswTableFormatterTools::collectWsegvalvData( tableData, exportInfo );
-    RicMswTableFormatterTools::collectWsegAicdData( tableData, exportInfo );
-
-    return tableData;
 }

@@ -88,8 +88,6 @@ private:
     static RicMswUnifiedData_to_be_deleted extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                   const std::vector<RimWellPath*>&         wellPaths );
 
-    static RigMswTableData extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
-
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,

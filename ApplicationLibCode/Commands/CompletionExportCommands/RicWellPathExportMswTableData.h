@@ -45,6 +45,10 @@ class QFile;
 
 //--------------------------------------------------------------------------------------------------
 /// This class is responsible for exporting well path MSW table data
+/// This class is based on RicWellPathExportMswCompletionsImpl
+///
+/// TODO
+/// - remove all functions not used by extractSingleWellMswData()
 //--------------------------------------------------------------------------------------------------
 class RicWellPathExportMswTableData
 {

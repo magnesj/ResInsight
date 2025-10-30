@@ -24,6 +24,7 @@
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswExportInfo.h"
+#include "RicMswTableDataTools.h"
 #include "RicMswTableFormatterTools.h"
 #include "RicMswUnifiedData.h"
 #include "RicMswValveAccumulators.h"
@@ -2340,17 +2341,17 @@ RigMswTableData RicWellPathExportMswTableData::extractSingleWellMswData( RimEcli
     RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
 
     // Use the new collection functions to populate the table data
-    RicMswTableFormatterTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );
+    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );
 
-    RicMswTableFormatterTools::collectCompsegData( tableData, exportInfo, false );
+    RicMswTableDataTools::collectCompsegData( tableData, exportInfo, false );
 
     if ( exportInfo.hasSubGridIntersections() )
     {
-        RicMswTableFormatterTools::collectCompsegData( tableData, exportInfo, true );
+        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, true );
     }
 
-    RicMswTableFormatterTools::collectWsegvalvData( tableData, exportInfo );
-    RicMswTableFormatterTools::collectWsegAicdData( tableData, exportInfo );
+    RicMswTableDataTools::collectWsegvalvData( tableData, exportInfo );
+    RicMswTableDataTools::collectWsegAicdData( tableData, exportInfo );
 
     return tableData;
 }
