@@ -549,7 +549,7 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addValueOrDefaultMarker( d
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Add optional value or default marker if the optional is empty or equals defaultValue
+/// Add optional value or default marker if the optional is empty
 //--------------------------------------------------------------------------------------------------
 RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalValue( const std::optional<double>& value )
 {
