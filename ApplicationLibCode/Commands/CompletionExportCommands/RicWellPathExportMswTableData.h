@@ -43,6 +43,9 @@ struct WellPathCellIntersectionInfo;
 
 class QFile;
 
+//--------------------------------------------------------------------------------------------------
+/// This class is responsible for exporting well path MSW table data
+//--------------------------------------------------------------------------------------------------
 class RicWellPathExportMswTableData
 {
 public:
