@@ -86,7 +86,7 @@ private:
 
     // New data extraction functions
     static RicMswUnifiedDataWIP extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                                  const std::vector<RimWellPath*>&         wellPaths );
+                                                       const std::vector<RimWellPath*>&         wellPaths );
 
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,

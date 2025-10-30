@@ -2278,9 +2278,8 @@ std::pair<double, double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswUnifiedDataWIP
-    RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                                const std::vector<RimWellPath*>&         wellPaths )
+RicMswUnifiedDataWIP RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                                 const std::vector<RimWellPath*>&         wellPaths )
 {
     RicMswUnifiedDataWIP unifiedData;
 
