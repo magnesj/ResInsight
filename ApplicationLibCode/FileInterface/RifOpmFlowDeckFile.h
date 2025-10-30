@@ -48,9 +48,7 @@ public:
     bool saveDeck( std::string folder, std::string filename );
 
     int  mergeKeywordAtPosition( int deckPosition, const Opm::DeckKeyword& keyword );
-    bool mergeKeywordAtTimeStep( int timeStep, const Opm::DeckKeyword& keyword );
-
-    bool mergeMswData( std::vector<std::string>& mswFileData );
+    bool mergeKeywordAtTimeStep( int timeStep, const Opm::DeckKeyword& keyword, std::string insertAfterKeyword = "" );
 
     bool openWellAtTimeStep( int timeStep, Opm::DeckKeyword& openKeyword );
     bool openWellAtDeckPosition( int deckPosition, Opm::DeckKeyword& openKeyword );
@@ -70,6 +68,9 @@ public:
 
     std::vector<int> welldims();
     bool             setWelldims( int maxWells, int maxConnections, int maxGroups, int maxWellsInGroup );
+
+    std::vector<int> wsegdims();
+    bool             setWsegdims( int maxMSWells, int maxSegmentsPerWell, int maxBranchesPerWell );
 
     std::vector<int> regdims();
     bool             setRegdims( int maxRegions, int maxRegionDefinitions, int maxRegionFlowConnections, int maxFIPRegions );
