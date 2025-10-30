@@ -40,25 +40,6 @@ class RimWellPath;
 //--------------------------------------------------------------------------------------------------
 namespace RicMswTableDataTools
 {
-class WsegvalveData;
-class AicdWsegvalveData;
-
-class CvfVec3stComparator
-{
-public:
-    bool operator()( const cvf::Vec3st& lhs, const cvf::Vec3st& rhs ) const
-    {
-        if ( lhs.z() == rhs.z() )
-        {
-            if ( lhs.y() == rhs.y() )
-            {
-                return lhs.x() < rhs.x();
-            }
-            return lhs.y() < rhs.y();
-        }
-        return lhs.z() < rhs.z();
-    }
-};
 
 // New data collection functions (replace formatter versions)
 void collectWelsegsData( RigMswTableData&  tableData,
@@ -122,83 +103,5 @@ void collectCompletionWelsegsSegments( RigMswTableData&                    table
                                        RicMswExportInfo&                   exportInfo,
                                        double                              maxSegmentLength,
                                        int*                                segmentNumber );
-
-// Existing formatter functions (kept for backward compatibility)
-void generateWelsegsTable( RifTextDataTableFormatter& formatter,
-                           RicMswExportInfo&          exportInfo,
-                           double                     maxSegmentLength,
-                           bool                       exportCompletionSegmentsAfterMainBore );
-
-void writeWelsegsSegmentsRecursively( RifTextDataTableFormatter&   formatter,
-                                      RicMswExportInfo&            exportInfo,
-                                      gsl::not_null<RicMswBranch*> branch,
-                                      gsl::not_null<int*>          segmentNumber,
-                                      double                       maxSegmentLength,
-                                      bool                         exportCompletionSegmentsAfterMainBore,
-                                      RicMswSegment*               connectedToSegment );
-
-void writeWelsegsSegment( RicMswSegment*               segment,
-                          const RicMswSegment*         previousSegment,
-                          RifTextDataTableFormatter&   formatter,
-                          RicMswExportInfo&            exportInfo,
-                          double                       maxSegmentLength,
-                          gsl::not_null<RicMswBranch*> branch,
-                          int*                         segmentNumber );
-
-void writeValveWelsegsSegment( const RicMswSegment*       outletSegment,
-                               RicMswValve*               valve,
-                               RifTextDataTableFormatter& formatter,
-                               RicMswExportInfo&          exportInfo,
-                               double                     maxSegmentLength,
-                               int*                       segmentNumber );
-
-void writeCompletionWelsegsSegments( gsl::not_null<const RicMswSegment*>    outletSegment,
-                                     gsl::not_null<const RicMswCompletion*> completion,
-                                     RifTextDataTableFormatter&             formatter,
-                                     RicMswExportInfo&                      exportInfo,
-                                     double                                 maxSegmentLength,
-                                     int*                                   segmentNumber );
-
-void writeCompletionsForSegment( gsl::not_null<const RicMswSegment*> outletSegment,
-                                 gsl::not_null<RicMswSegment*>       segment,
-                                 RicMswValve**                       outletValve,
-                                 RifTextDataTableFormatter&          formatter,
-                                 RicMswExportInfo&                   exportInfo,
-                                 double                              maxSegmentLength,
-                                 int*                                segmentNumber );
-
-void writeWelsegsCompletionCommentHeader( RifTextDataTableFormatter& formatter, RigCompletionData::CompletionType completionType );
-
-void generateCompsegTables( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo, bool exportLgrData );
-
-void generateCompsegTable( RifTextDataTableFormatter&                         formatter,
-                           RicMswExportInfo&                                  exportInfo,
-                           gsl::not_null<const RicMswBranch*>                 branch,
-                           bool                                               exportSubGridIntersections,
-                           const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
-                           gsl::not_null<bool*>                               headerGenerated,
-                           gsl::not_null<std::set<size_t>*>                   intersectedCells );
-
-void generateCompsegHeader( RifTextDataTableFormatter&        formatter,
-                            RicMswExportInfo&                 exportInfo,
-                            RigCompletionData::CompletionType completionType,
-                            bool                              exportSubGridIntersections );
-
-void generateWsegvalvTable( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo );
-
-void generateWsegvalvTableRecursively( gsl::not_null<RicMswBranch*>                  branch,
-                                       const QString&                                wellNameForExport,
-                                       std::map<size_t, std::vector<WsegvalveData>>& wsegvalveData );
-
-void generateWsegAicdTable( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo );
-void generateWsegAicdTableRecursively( RicMswExportInfo&                                 exportInfo,
-                                       gsl::not_null<const RicMswBranch*>                branch,
-                                       std::map<size_t, std::vector<AicdWsegvalveData>>& aicdValveData );
-
-std::vector<std::pair<double, double>> createSubSegmentMDPairs( double startMD, double endMD, double maxSegmentLength );
-
-double tvdFromMeasuredDepth( gsl::not_null<const RimWellPath*> wellPath, double measuredDepth );
-
-void writeWsegvalHeader( RifTextDataTableFormatter& formatter );
 
 } // namespace RicMswTableDataTools
