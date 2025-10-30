@@ -414,6 +414,8 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::header( const std::vector<
 //--------------------------------------------------------------------------------------------------
 RifTextDataTableFormatter& RifTextDataTableFormatter::comment( const QString& comment )
 {
+    if ( comment.isEmpty() ) return *this;
+
     RifTextDataTableLine line;
     line.data.push_back( comment );
     line.lineType      = COMMENT;

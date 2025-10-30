@@ -1297,6 +1297,7 @@ void RicMswTableFormatterTools::collectValveWelsegsSegment( RicMswTableData&    
         row.depth               = valveSegment->startTVD();
         row.diameter            = valveSegment->equivalentDiameter();
         row.roughness           = valveSegment->openHoleRoughnessFactor();
+        row.description         = QString( "Valve %1" ).arg( valve->label() );
 
         tableData.addWelsegsRow( row );
 
@@ -1355,6 +1356,8 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
                                                                   double                              maxSegmentLength,
                                                                   int*                                segmentNumber )
 {
+    bool isDescriptionAdded = false;
+
     for ( auto completionSegment : completion->segments() )
     {
         completionSegment->setSegmentNumber( *segmentNumber );
@@ -1367,6 +1370,12 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
         row.depth               = completionSegment->startTVD();
         row.diameter            = completionSegment->equivalentDiameter();
         row.roughness           = completionSegment->openHoleRoughnessFactor();
+
+        if ( !isDescriptionAdded )
+        {
+            row.description    = completion->label();
+            isDescriptionAdded = true;
+        }
 
         tableData.addWelsegsRow( row );
 

@@ -48,6 +48,7 @@ struct WelsegsRow
     std::optional<double> diameter;
     std::optional<double> roughness;
     std::optional<double> volume;
+    QString               description;
 };
 
 //==================================================================================================
