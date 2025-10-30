@@ -1358,13 +1358,15 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
 {
     bool isDescriptionAdded = false;
 
+    auto outletNumber = outletSegment->segmentNumber();
+
     for ( auto completionSegment : completion->segments() )
     {
         completionSegment->setSegmentNumber( *segmentNumber );
 
         WelsegsRow row;
         row.segmentNumber       = completionSegment->segmentNumber();
-        row.outletSegmentNumber = outletSegment->segmentNumber();
+        row.outletSegmentNumber = outletNumber;
         row.branchNumber        = completion->branchNumber();
         row.length              = completionSegment->startMD();
         row.depth               = completionSegment->startTVD();
@@ -1379,11 +1381,12 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
 
         tableData.addWelsegsRow( row );
 
+        outletNumber = *segmentNumber;
         ( *segmentNumber )++;
 
         for ( auto comp : completionSegment->completions() )
         {
-            collectCompletionWelsegsSegments( tableData, outletSegment, comp, exportInfo, maxSegmentLength, segmentNumber );
+            collectCompletionWelsegsSegments( tableData, completionSegment, comp, exportInfo, maxSegmentLength, segmentNumber );
         }
     }
 }
