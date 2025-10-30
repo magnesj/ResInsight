@@ -515,6 +515,14 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::add( size_t num )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RifTextDataTableFormatter& RifTextDataTableFormatter::addStdString( const std::string& str )
+{
+    return add( QString::fromStdString( str ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RifTextDataTableFormatter& RifTextDataTableFormatter::addOneBasedCellIndex( size_t zeroBasedIndex )
 {
     size_t column = m_lineBuffer.size();
@@ -538,6 +546,18 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addValueOrDefaultMarker( d
         return add( m_defaultMarker );
     }
     return add( value );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add optional value or default marker if the optional is empty
+//--------------------------------------------------------------------------------------------------
+RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalValue( const std::optional<double>& value )
+{
+    if ( value.has_value() )
+    {
+        return add( value.value() );
+    }
+    return add( m_defaultMarker );
 }
 
 //--------------------------------------------------------------------------------------------------
