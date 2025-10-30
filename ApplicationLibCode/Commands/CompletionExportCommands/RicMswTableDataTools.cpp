@@ -203,9 +203,6 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&             t
             length = midPointMD;
         }
 
-        double subStartTVD = RicMswTableFormatterTools::tvdFromMeasuredDepth( branch->wellPath(), subStartMD );
-        double subEndTVD   = RicMswTableFormatterTools::tvdFromMeasuredDepth( branch->wellPath(), subEndMD );
-
         const auto linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem() );
         const auto roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem() );
 
