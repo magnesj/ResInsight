@@ -16,12 +16,12 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicMswDataFormatter.h"
+#include "RigMswDataFormatter.h"
 
 #include "RicMswExportInfo.h"
-#include "RicMswTableData.h"
 #include "RicMswUnifiedData.h"
 #include "RifTextDataTableFormatter.h"
+#include "RigMswTableData.h"
 
 namespace
 {

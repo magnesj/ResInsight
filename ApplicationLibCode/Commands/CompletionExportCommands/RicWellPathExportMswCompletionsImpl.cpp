@@ -22,13 +22,13 @@
 
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
-#include "RicMswDataFormatter.h"
 #include "RicMswExportInfo.h"
-#include "RicMswTableData.h"
 #include "RicMswTableFormatterTools.h"
 #include "RicMswUnifiedData.h"
 #include "RicMswValveAccumulators.h"
 #include "RicWellPathExportCompletionsFileTools.h"
+#include "RigMswDataFormatter.h"
+#include "RigMswTableData.h"
 
 #include "RifTextDataTableFormatter.h"
 
