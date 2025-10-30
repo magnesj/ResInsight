@@ -18,10 +18,10 @@
 
 #include "RigMswDataFormatter.h"
 
+#include "CompletionsMsw/RigMswTableData.h"
 #include "RicMswExportInfo.h"
 #include "RicMswUnifiedData.h"
 #include "RifTextDataTableFormatter.h"
-#include "RigMswTableData.h"
 
 namespace
 {
@@ -197,32 +197,29 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
     if ( !tableData.hasWelsegsData() ) return;
 
     const auto& welsegsHeader = tableData.welsegsHeader();
-    if ( welsegsHeader.has_value() )
-    {
-        formatter.keyword( "WELSEGS" );
-        std::vector<RifTextDataTableColumn> tableHeader = {
-            RifTextDataTableColumn( "Well" ),
-            RifTextDataTableColumn( "Dep 1" ),
-            RifTextDataTableColumn( "Tlen 1" ),
-            RifTextDataTableColumn( "Vol 1" ),
-            RifTextDataTableColumn( "Len&Dep" ),
-            RifTextDataTableColumn( "PresDrop" ),
-        };
-        formatter.header( tableHeader );
+    formatter.keyword( "WELSEGS" );
+    std::vector<RifTextDataTableColumn> tableHeader = {
+        RifTextDataTableColumn( "Well" ),
+        RifTextDataTableColumn( "Dep 1" ),
+        RifTextDataTableColumn( "Tlen 1" ),
+        RifTextDataTableColumn( "Vol 1" ),
+        RifTextDataTableColumn( "Len&Dep" ),
+        RifTextDataTableColumn( "PresDrop" ),
+    };
+    formatter.header( tableHeader );
 
-        // Write header row
-        formatter.addStdString( welsegsHeader->wellName );
-        formatter.add( welsegsHeader->topTVD );
-        formatter.add( welsegsHeader->topMD );
-        formatter.addOptionalValue( welsegsHeader->volume );
-        formatter.addStdString( welsegsHeader->lengthAndDepthText );
-        formatter.addStdString( welsegsHeader->pressureDropText );
-        formatter.rowCompleted();
+    // Write header row
+    formatter.addStdString( welsegsHeader.wellName );
+    formatter.add( welsegsHeader.topTVD );
+    formatter.add( welsegsHeader.topMD );
+    formatter.addOptionalValue( welsegsHeader.volume );
+    formatter.addStdString( welsegsHeader.lengthAndDepthText );
+    formatter.addStdString( welsegsHeader.pressureDropText );
+    formatter.rowCompleted();
 
-        // Column headers for segment data
-        auto segmentHeader = createWelsegsSegmentHeader();
-        formatter.header( segmentHeader );
-    }
+    // Column headers for segment data
+    auto segmentHeader = createWelsegsSegmentHeader();
+    formatter.header( segmentHeader );
 
     // Write segment data using helper function
     formatWelsegsRows( formatter, tableData.welsegsData() );

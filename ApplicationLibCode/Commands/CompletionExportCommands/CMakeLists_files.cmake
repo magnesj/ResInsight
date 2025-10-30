@@ -20,8 +20,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureReportItem.h
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCompletionsForTemporaryLgrsFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableFormatterTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigMswTableRows.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigMswTableData.h
     ${CMAKE_CURRENT_LIST_DIR}/RicMswUnifiedData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigMswDataFormatter.h
 )
@@ -48,7 +46,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureReportItem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCompletionsForTemporaryLgrsFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableFormatterTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigMswTableData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswUnifiedData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigMswDataFormatter.cpp
 )

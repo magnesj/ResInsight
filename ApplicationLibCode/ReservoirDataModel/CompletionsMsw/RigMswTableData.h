@@ -34,11 +34,11 @@ public:
     RigMswTableData( const std::string& wellName, RiaDefines::EclipseUnitSystem unitSystem );
 
     // Data access
-    const std::optional<WelsegsHeader>& welsegsHeader() const { return m_welsegsHeader; }
-    const std::vector<WelsegsRow>&      welsegsData() const { return m_welsegsData; }
-    const std::vector<CompsegsRow>&     compsegsData() const { return m_compsegsData; }
-    const std::vector<WsegvalvRow>&     wsegvalvData() const { return m_wsegvalvData; }
-    const std::vector<WsegaicdRow>&     wsegaicdData() const { return m_wsegaicdData; }
+    const WelsegsHeader&            welsegsHeader() const { return m_welsegsHeader; }
+    const std::vector<WelsegsRow>&  welsegsData() const { return m_welsegsData; }
+    const std::vector<CompsegsRow>& compsegsData() const { return m_compsegsData; }
+    const std::vector<WsegvalvRow>& wsegvalvData() const { return m_wsegvalvData; }
+    const std::vector<WsegaicdRow>& wsegaicdData() const { return m_wsegaicdData; }
 
     // Data modification
     void setWelsegsHeader( const WelsegsHeader& header );
@@ -71,9 +71,9 @@ private:
     std::string                   m_wellName;
     RiaDefines::EclipseUnitSystem m_unitSystem;
 
-    std::optional<WelsegsHeader> m_welsegsHeader;
-    std::vector<WelsegsRow>      m_welsegsData;
-    std::vector<CompsegsRow>     m_compsegsData;
-    std::vector<WsegvalvRow>     m_wsegvalvData;
-    std::vector<WsegaicdRow>     m_wsegaicdData;
+    WelsegsHeader            m_welsegsHeader;
+    std::vector<WelsegsRow>  m_welsegsData;
+    std::vector<CompsegsRow> m_compsegsData;
+    std::vector<WsegvalvRow> m_wsegvalvData;
+    std::vector<WsegaicdRow> m_wsegaicdData;
 };

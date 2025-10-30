@@ -20,9 +20,9 @@
 
 #include "RiaLogging.h"
 
+#include "CompletionsMsw/RigMswTableData.h"
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
-#include "RigMswTableData.h"
 
 #include "RifTextDataTableFormatter.h"
 

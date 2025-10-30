@@ -28,7 +28,7 @@
 #include "RicMswValveAccumulators.h"
 #include "RicWellPathExportCompletionsFileTools.h"
 #include "RigMswDataFormatter.h"
-#include "RigMswTableData.h"
+#include "CompletionsMsw/RigMswTableData.h"
 
 #include "RifTextDataTableFormatter.h"
 

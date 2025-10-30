@@ -76,10 +76,7 @@ std::vector<WelsegsHeader> RicMswUnifiedData_to_be_deleted::getAllWelsegsHeaders
 
     for ( const auto& wellData : m_wellDataList )
     {
-        if ( wellData.welsegsHeader().has_value() )
-        {
-            allHeaders.push_back( wellData.welsegsHeader().value() );
-        }
+        allHeaders.push_back( wellData.welsegsHeader() );
     }
 
     return allHeaders;

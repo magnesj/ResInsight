@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RigMswTableData.h"
+#include "CompletionsMsw/RigMswTableData.h"
 
 #include <map>
 #include <vector>
