@@ -93,7 +93,8 @@ void collectWelsegsSegment( RicMswTableData&             tableData,
                             RicMswExportInfo&            exportInfo,
                             double                       maxSegmentLength,
                             gsl::not_null<RicMswBranch*> branch,
-                            int*                         segmentNumber );
+                            int*                         segmentNumber,
+                            QString                      branchDescription );
 
 void collectValveWelsegsSegment( RicMswTableData&     tableData,
                                  const RicMswSegment* outletSegment,

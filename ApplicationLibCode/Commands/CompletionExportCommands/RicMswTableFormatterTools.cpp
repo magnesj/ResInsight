@@ -1144,7 +1144,13 @@ void RicMswTableFormatterTools::collectWelsegsDataRecursively( RicMswTableData& 
         auto segment = *it;
         segment->setSegmentNumber( *segmentNumber );
 
-        collectWelsegsSegment( tableData, segment, outletSegment, exportInfo, maxSegmentLength, branch, segmentNumber );
+        QString branchDescription;
+        if ( it == branchSegments.begin() )
+        {
+            branchDescription = QString( "Segments on branch %1" ).arg( branch->label() );
+        }
+
+        collectWelsegsSegment( tableData, segment, outletSegment, exportInfo, maxSegmentLength, branch, segmentNumber, branchDescription );
         outletSegment = segment;
 
         if ( !exportCompletionSegmentsAfterMainBore )
@@ -1190,7 +1196,8 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RicMswTableData&         
                                                        RicMswExportInfo&            exportInfo,
                                                        double                       maxSegmentLength,
                                                        gsl::not_null<RicMswBranch*> branch,
-                                                       int*                         segmentNumber )
+                                                       int*                         segmentNumber,
+                                                       QString                      branchDescription )
 {
     CVF_ASSERT( segment && segmentNumber );
 
@@ -1208,6 +1215,8 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RicMswTableData&         
         prevOutMD  = previousSegment->outputMD();
         prevOutTVD = previousSegment->outputTVD();
     }
+
+    bool setDescription = true;
 
     auto outletSegment = previousSegment;
     for ( const auto& [subStartMD, subEndMD] : segments )
@@ -1251,6 +1260,11 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RicMswTableData&         
         row.depth               = depth;
         row.diameter            = linerDiameter;
         row.roughness           = roughnessFactor;
+        if ( setDescription )
+        {
+            row.description = branchDescription;
+            setDescription  = false;
+        }
 
         tableData.addWelsegsRow( row );
 
@@ -1297,7 +1311,7 @@ void RicMswTableFormatterTools::collectValveWelsegsSegment( RicMswTableData&    
         row.depth               = valveSegment->startTVD();
         row.diameter            = valveSegment->equivalentDiameter();
         row.roughness           = valveSegment->openHoleRoughnessFactor();
-        row.description         = QString( "Valve %1" ).arg( valve->label() );
+        // row.description         = QString( "Valve %1" ).arg( valve->label() );
 
         tableData.addWelsegsRow( row );
 
