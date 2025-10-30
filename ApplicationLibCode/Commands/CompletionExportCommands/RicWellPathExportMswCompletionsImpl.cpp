@@ -2276,8 +2276,9 @@ std::pair<double, double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswUnifiedData_to_be_deleted RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                                              const std::vector<RimWellPath*>&         wellPaths )
+RicMswUnifiedData_to_be_deleted
+    RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                const std::vector<RimWellPath*>&         wellPaths )
 {
     RicMswUnifiedData_to_be_deleted unifiedData;
 

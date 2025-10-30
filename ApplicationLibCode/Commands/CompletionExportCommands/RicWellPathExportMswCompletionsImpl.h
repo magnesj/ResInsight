@@ -86,7 +86,7 @@ private:
 
     // New data extraction functions
     static RicMswUnifiedData_to_be_deleted extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                    const std::vector<RimWellPath*>&         wellPaths );
+                                                                  const std::vector<RimWellPath*>&         wellPaths );
 
     static RigMswTableData extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
 

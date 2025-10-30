@@ -51,9 +51,9 @@ public:
 
     std::string m_wellName;
     std::string m_comment;
-    int     m_segmentNumber;
-    double  m_cv;
-    double  m_ac;
+    int         m_segmentNumber;
+    double      m_cv;
+    double      m_ac;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -500,8 +500,11 @@ void RicMswTableFormatterTools::generateWsegvalvTableRecursively( gsl::not_null<
 
             auto flowCoefficient = tieInValve->flowCoefficient();
 
-            wsegvalveData[cellIndex].push_back(
-                WsegvalveData( wellNameForExport.toStdString(), tieInValve->label().toStdString(), firstSubSegment->segmentNumber(), flowCoefficient, tieInValve->area() ) );
+            wsegvalveData[cellIndex].push_back( WsegvalveData( wellNameForExport.toStdString(),
+                                                               tieInValve->label().toStdString(),
+                                                               firstSubSegment->segmentNumber(),
+                                                               flowCoefficient,
+                                                               tieInValve->area() ) );
         }
     }
 
@@ -529,8 +532,11 @@ void RicMswTableFormatterTools::generateWsegvalvTableRecursively( gsl::not_null<
                         comment = wsegValve->label();
                     }
 
-                    wsegvalveData[cellIndex].push_back(
-                        WsegvalveData( wellNameForExport.toStdString(), comment.toStdString(), segmentNumber, wsegValve->flowCoefficient(), wsegValve->area() ) );
+                    wsegvalveData[cellIndex].push_back( WsegvalveData( wellNameForExport.toStdString(),
+                                                                       comment.toStdString(),
+                                                                       segmentNumber,
+                                                                       wsegValve->flowCoefficient(),
+                                                                       wsegValve->area() ) );
                 }
             }
         }
@@ -689,8 +695,12 @@ void RicMswTableFormatterTools::generateWsegAicdTableRecursively( RicMswExportIn
 
                         auto wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
                         auto comment  = aicd->label();
-                        aicdValveData[cellIndex].push_back(
-                            AicdWsegvalveData( wellName.toStdString(), comment.toStdString(), segmentNumber, aicd->flowScalingFactor(), aicd->isOpen(), aicd->values() ) );
+                        aicdValveData[cellIndex].push_back( AicdWsegvalveData( wellName.toStdString(),
+                                                                               comment.toStdString(),
+                                                                               segmentNumber,
+                                                                               aicd->flowScalingFactor(),
+                                                                               aicd->isOpen(),
+                                                                               aicd->values() ) );
                     }
                 }
                 else
