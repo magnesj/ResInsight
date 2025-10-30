@@ -1537,7 +1537,6 @@ void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RicMswTableData&
             row.segmentNumber   = firstSubSegment->segmentNumber();
             row.flowCoefficient = flowCoefficient;
             row.area            = tieInValve->area();
-            row.deviceType      = tieInValve->label();
 
             tableData.addWsegvalvRow( row );
         }
@@ -1570,7 +1569,6 @@ void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RicMswTableData&
                     row.segmentNumber   = segmentNumber;
                     row.flowCoefficient = wsegValve->flowCoefficient();
                     row.area            = wsegValve->area();
-                    row.deviceType      = comment;
 
                     tableData.addWsegvalvRow( row );
                 }

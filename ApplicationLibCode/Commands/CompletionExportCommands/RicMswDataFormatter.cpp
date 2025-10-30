@@ -88,9 +88,6 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
         formatter.add( row.segmentNumber );
         formatter.add( row.flowCoefficient );
         formatter.addOptionalValue( row.area, RicMswExportInfo::defaultDoubleValue() );
-        formatter.add( row.deviceType );
-        formatter.addOptionalValue( row.additionalParameter1, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.additionalParameter2, RicMswExportInfo::defaultDoubleValue() );
 
         formatter.rowCompleted();
     }
@@ -157,10 +154,7 @@ std::vector<RifTextDataTableColumn> createWsegvalvHeader()
     return { RifTextDataTableColumn( "Well" ),
              RifTextDataTableColumn( "Seg No" ),
              RifTextDataTableColumn( "Cv" ),
-             RifTextDataTableColumn( "Ac" ),
-             RifTextDataTableColumn( "Device Type" ),
-             RifTextDataTableColumn( "Param 1" ),
-             RifTextDataTableColumn( "Param 2" ) };
+             RifTextDataTableColumn( "Ac", RifTextDataTableDoubleFormatting( RIF_CONSISE, 4 ) ) };
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -190,7 +184,7 @@ std::vector<RifTextDataTableColumn> createWelsegsSegmentHeader()
              RifTextDataTableColumn( "Length" ),
              RifTextDataTableColumn( "Depth Change" ),
              RifTextDataTableColumn( "Diam" ),
-             RifTextDataTableColumn( "Rough" ) };
+             RifTextDataTableColumn( "Rough", RifTextDataTableDoubleFormatting( RIF_FLOAT, 7 ) ) };
 }
 
 } // namespace

@@ -82,9 +82,6 @@ struct WsegvalvRow
     int                   segmentNumber;
     double                flowCoefficient;
     std::optional<double> area;
-    QString               deviceType;
-    std::optional<double> additionalParameter1;
-    std::optional<double> additionalParameter2;
 };
 
 //==================================================================================================
