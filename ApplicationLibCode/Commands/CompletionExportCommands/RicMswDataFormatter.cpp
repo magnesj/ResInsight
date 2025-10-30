@@ -42,7 +42,7 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
         formatter.addOptionalValue( row.depth, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
-        
+
         formatter.addOptionalComment( row.description );
         formatter.rowCompleted();
     }
