@@ -33,7 +33,7 @@ class RimFishbones;
 class RimPerforationInterval;
 class RimWellPath;
 class RigMswTableData;
-class RicMswUnifiedData_to_be_deleted;
+class RicMswUnifiedDataWIP;
 class RimWellPathFracture;
 class RimMswCompletionParameters;
 class RigWellPath;
@@ -95,7 +95,7 @@ private:
     static void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
 
     // New data extraction functions
-    static RicMswUnifiedData_to_be_deleted extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+    static RicMswUnifiedDataWIP extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                   const std::vector<RimWellPath*>&         wellPaths );
 
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,

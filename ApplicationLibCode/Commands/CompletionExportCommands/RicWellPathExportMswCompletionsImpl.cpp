@@ -304,7 +304,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
                                                                 const std::vector<RimWellPath*>&         wellPaths )
 {
     // Extract all MSW data using new approach
-    RicMswUnifiedData_to_be_deleted unifiedData = extractUnifiedMswData( exportSettings, wellPaths );
+    RicMswUnifiedDataWIP unifiedData = extractUnifiedMswData( exportSettings, wellPaths );
 
     if ( unifiedData.isEmpty() )
     {
@@ -2278,11 +2278,11 @@ std::pair<double, double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswUnifiedData_to_be_deleted
+RicMswUnifiedDataWIP
     RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                 const std::vector<RimWellPath*>&         wellPaths )
 {
-    RicMswUnifiedData_to_be_deleted unifiedData;
+    RicMswUnifiedDataWIP unifiedData;
 
     for ( RimWellPath* wellPath : wellPaths )
     {

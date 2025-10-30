@@ -26,10 +26,10 @@
 //==================================================================================================
 /// Container class for unified MSW table data from multiple wells
 //==================================================================================================
-class RicMswUnifiedData_to_be_deleted
+class RicMswUnifiedDataWIP
 {
 public:
-    RicMswUnifiedData_to_be_deleted() = default;
+    RicMswUnifiedDataWIP() = default;
 
     // Data modification
     void addWellData( RigMswTableData wellData );
