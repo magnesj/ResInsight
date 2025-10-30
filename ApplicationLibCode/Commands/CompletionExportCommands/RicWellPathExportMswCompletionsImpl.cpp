@@ -20,6 +20,7 @@
 
 #include "RiaLogging.h"
 
+#include "CompletionsMsw/RigMswTableData.h"
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswExportInfo.h"
@@ -28,7 +29,6 @@
 #include "RicMswValveAccumulators.h"
 #include "RicWellPathExportCompletionsFileTools.h"
 #include "RigMswDataFormatter.h"
-#include "CompletionsMsw/RigMswTableData.h"
 
 #include "RifTextDataTableFormatter.h"
 
