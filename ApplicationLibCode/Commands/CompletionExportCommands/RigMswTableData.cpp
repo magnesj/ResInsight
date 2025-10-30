@@ -23,7 +23,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMswTableData::RigMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem )
+RigMswTableData::RigMswTableData( const std::string& wellName, RiaDefines::EclipseUnitSystem unitSystem )
     : m_wellName( wellName )
     , m_unitSystem( unitSystem )
 {
@@ -126,7 +126,7 @@ std::vector<QString> RigMswTableData::validationErrors() const
 {
     std::vector<QString> errors;
 
-    if ( m_wellName.isEmpty() )
+    if ( m_wellName.empty() )
     {
         errors.push_back( "Well name is empty" );
     }

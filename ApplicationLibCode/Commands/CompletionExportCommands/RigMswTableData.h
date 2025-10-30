@@ -31,7 +31,7 @@
 class RigMswTableData
 {
 public:
-    RigMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem );
+    RigMswTableData( const std::string& wellName, RiaDefines::EclipseUnitSystem unitSystem );
 
     // Data access
     const std::optional<WelsegsHeader>& welsegsHeader() const { return m_welsegsHeader; }
@@ -48,7 +48,7 @@ public:
     void addWsegaicdRow( const WsegaicdRow& row );
 
     // Metadata
-    QString                       wellName() const { return m_wellName; }
+    std::string                   wellName() const { return m_wellName; }
     RiaDefines::EclipseUnitSystem unitSystem() const { return m_unitSystem; }
 
     // Data analysis
@@ -68,7 +68,7 @@ public:
     std::vector<QString> validationErrors() const;
 
 private:
-    QString                       m_wellName;
+    std::string                   m_wellName;
     RiaDefines::EclipseUnitSystem m_unitSystem;
 
     std::optional<WelsegsHeader> m_welsegsHeader;

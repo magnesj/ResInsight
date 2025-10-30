@@ -26,10 +26,10 @@
 //==================================================================================================
 /// Container class for unified MSW table data from multiple wells
 //==================================================================================================
-class RicMswUnifiedData
+class RicMswUnifiedData_to_be_deleted
 {
 public:
-    RicMswUnifiedData() = default;
+    RicMswUnifiedData_to_be_deleted() = default;
 
     // Data modification
     void addWellData( RigMswTableData wellData );
@@ -37,7 +37,7 @@ public:
 
     // Data access
     const std::vector<RigMswTableData>& wellDataList() const { return m_wellDataList; }
-    const RigMswTableData*              getWellData( const QString& wellName ) const;
+    const RigMswTableData*              getWellData( const std::string& wellName ) const;
 
     // Aggregated data access - combines data from all wells
     std::vector<WelsegsHeader> getAllWelsegsHeaders() const;
@@ -47,10 +47,10 @@ public:
     std::vector<WsegaicdRow>   getAllWsegaicdRows() const;
 
     // Metadata and analysis
-    bool                 isEmpty() const { return m_wellDataList.empty(); }
-    bool                 hasAnyLgrData() const;
-    size_t               wellCount() const { return m_wellDataList.size(); }
-    std::vector<QString> wellNames() const;
+    bool                     isEmpty() const { return m_wellDataList.empty(); }
+    bool                     hasAnyLgrData() const;
+    size_t                   wellCount() const { return m_wellDataList.size(); }
+    std::vector<std::string> wellNames() const;
 
     // Data validation
     bool                 isValid() const;
@@ -63,8 +63,8 @@ public:
     auto end() { return m_wellDataList.end(); }
 
 private:
-    std::vector<RigMswTableData> m_wellDataList;
-    std::map<QString, size_t>    m_wellNameToIndex;
+    std::vector<RigMswTableData>  m_wellDataList;
+    std::map<std::string, size_t> m_wellNameToIndex;
 
     void updateIndex();
 };

@@ -23,11 +23,11 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswUnifiedData::addWellData( RigMswTableData wellData )
+void RicMswUnifiedData_to_be_deleted::addWellData( RigMswTableData wellData )
 {
     // Check if well name already exists
-    const QString& wellName = wellData.wellName();
-    auto           it       = std::find_if( m_wellDataList.begin(),
+    const std::string& wellName = wellData.wellName();
+    auto               it       = std::find_if( m_wellDataList.begin(),
                             m_wellDataList.end(),
                             [&wellName]( const RigMswTableData& data ) { return data.wellName() == wellName; } );
 
@@ -48,7 +48,7 @@ void RicMswUnifiedData::addWellData( RigMswTableData wellData )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswUnifiedData::clear()
+void RicMswUnifiedData_to_be_deleted::clear()
 {
     m_wellDataList.clear();
     m_wellNameToIndex.clear();
@@ -57,7 +57,7 @@ void RicMswUnifiedData::clear()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RigMswTableData* RicMswUnifiedData::getWellData( const QString& wellName ) const
+const RigMswTableData* RicMswUnifiedData_to_be_deleted::getWellData( const std::string& wellName ) const
 {
     auto it = m_wellNameToIndex.find( wellName );
     if ( it != m_wellNameToIndex.end() && it->second < m_wellDataList.size() )
@@ -70,7 +70,7 @@ const RigMswTableData* RicMswUnifiedData::getWellData( const QString& wellName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WelsegsHeader> RicMswUnifiedData::getAllWelsegsHeaders() const
+std::vector<WelsegsHeader> RicMswUnifiedData_to_be_deleted::getAllWelsegsHeaders() const
 {
     std::vector<WelsegsHeader> allHeaders;
 
@@ -88,7 +88,7 @@ std::vector<WelsegsHeader> RicMswUnifiedData::getAllWelsegsHeaders() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WelsegsRow> RicMswUnifiedData::getAllWelsegsRows() const
+std::vector<WelsegsRow> RicMswUnifiedData_to_be_deleted::getAllWelsegsRows() const
 {
     std::vector<WelsegsRow> allRows;
 
@@ -104,7 +104,7 @@ std::vector<WelsegsRow> RicMswUnifiedData::getAllWelsegsRows() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<CompsegsRow> RicMswUnifiedData::getAllCompsegsRows( bool lgrOnly ) const
+std::vector<CompsegsRow> RicMswUnifiedData_to_be_deleted::getAllCompsegsRows( bool lgrOnly ) const
 {
     std::vector<CompsegsRow> allRows;
 
@@ -130,7 +130,7 @@ std::vector<CompsegsRow> RicMswUnifiedData::getAllCompsegsRows( bool lgrOnly ) c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WsegvalvRow> RicMswUnifiedData::getAllWsegvalvRows() const
+std::vector<WsegvalvRow> RicMswUnifiedData_to_be_deleted::getAllWsegvalvRows() const
 {
     std::vector<WsegvalvRow> allRows;
 
@@ -146,7 +146,7 @@ std::vector<WsegvalvRow> RicMswUnifiedData::getAllWsegvalvRows() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WsegaicdRow> RicMswUnifiedData::getAllWsegaicdRows() const
+std::vector<WsegaicdRow> RicMswUnifiedData_to_be_deleted::getAllWsegaicdRows() const
 {
     std::vector<WsegaicdRow> allRows;
 
@@ -162,7 +162,7 @@ std::vector<WsegaicdRow> RicMswUnifiedData::getAllWsegaicdRows() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicMswUnifiedData::hasAnyLgrData() const
+bool RicMswUnifiedData_to_be_deleted::hasAnyLgrData() const
 {
     return std::any_of( m_wellDataList.begin(), m_wellDataList.end(), []( const RigMswTableData& wellData ) { return wellData.hasLgrData(); } );
 }
@@ -170,9 +170,9 @@ bool RicMswUnifiedData::hasAnyLgrData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RicMswUnifiedData::wellNames() const
+std::vector<std::string> RicMswUnifiedData_to_be_deleted::wellNames() const
 {
-    std::vector<QString> names;
+    std::vector<std::string> names;
     names.reserve( m_wellDataList.size() );
 
     std::transform( m_wellDataList.begin(),
@@ -186,7 +186,7 @@ std::vector<QString> RicMswUnifiedData::wellNames() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicMswUnifiedData::isValid() const
+bool RicMswUnifiedData_to_be_deleted::isValid() const
 {
     return validationErrors().empty();
 }
@@ -194,7 +194,7 @@ bool RicMswUnifiedData::isValid() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RicMswUnifiedData::validationErrors() const
+std::vector<QString> RicMswUnifiedData_to_be_deleted::validationErrors() const
 {
     std::vector<QString> errors;
 
@@ -212,18 +212,18 @@ std::vector<QString> RicMswUnifiedData::validationErrors() const
             auto wellErrors = wellData.validationErrors();
             for ( const auto& error : wellErrors )
             {
-                errors.push_back( QString( "%1: %2" ).arg( wellData.wellName(), error ) );
+                errors.push_back( QString( "%1: %2" ).arg( QString::fromStdString( wellData.wellName() ), error ) );
             }
         }
     }
 
     // Check for duplicate well names
-    std::vector<QString> names = wellNames();
+    std::vector<std::string> names = wellNames();
     std::sort( names.begin(), names.end() );
     auto it = std::adjacent_find( names.begin(), names.end() );
     if ( it != names.end() )
     {
-        errors.push_back( QString( "Duplicate well name: %1" ).arg( *it ) );
+        errors.push_back( QString( "Duplicate well name: %1" ).arg( QString::fromStdString( *it ) ) );
     }
 
     return errors;
@@ -232,7 +232,7 @@ std::vector<QString> RicMswUnifiedData::validationErrors() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswUnifiedData::updateIndex()
+void RicMswUnifiedData_to_be_deleted::updateIndex()
 {
     m_wellNameToIndex.clear();
 

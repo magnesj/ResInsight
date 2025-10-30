@@ -303,7 +303,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
                                                                 const std::vector<RimWellPath*>&         wellPaths )
 {
     // Extract all MSW data using new approach
-    RicMswUnifiedData unifiedData = extractUnifiedMswData( exportSettings, wellPaths );
+    RicMswUnifiedData_to_be_deleted unifiedData = extractUnifiedMswData( exportSettings, wellPaths );
 
     if ( unifiedData.isEmpty() )
     {
@@ -2276,10 +2276,10 @@ std::pair<double, double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswUnifiedData RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
+RicMswUnifiedData_to_be_deleted RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                               const std::vector<RimWellPath*>&         wellPaths )
 {
-    RicMswUnifiedData unifiedData;
+    RicMswUnifiedData_to_be_deleted unifiedData;
 
     for ( RimWellPath* wellPath : wellPaths )
     {
@@ -2337,7 +2337,7 @@ RigMswTableData RicWellPathExportMswCompletionsImpl::extractSingleWellMswData( R
     assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
     // Create table data container and extract data
-    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport(), unitSystem );
+    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
 
     // Use the new collection functions to populate the table data
     RicMswTableFormatterTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );

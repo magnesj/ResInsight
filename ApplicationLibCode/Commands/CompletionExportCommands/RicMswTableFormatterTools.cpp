@@ -40,7 +40,7 @@
 class RicMswTableFormatterTools::WsegvalveData
 {
 public:
-    explicit WsegvalveData( const QString& wellName, const QString& comment, int segmentNumber, double cv, double ac )
+    explicit WsegvalveData( const std::string& wellName, const std::string& comment, int segmentNumber, double cv, double ac )
         : m_wellName( wellName )
         , m_comment( comment )
         , m_segmentNumber( segmentNumber )
@@ -49,8 +49,8 @@ public:
     {
     }
 
-    QString m_wellName;
-    QString m_comment;
+    std::string m_wellName;
+    std::string m_comment;
     int     m_segmentNumber;
     double  m_cv;
     double  m_ac;
@@ -62,8 +62,8 @@ public:
 class RicMswTableFormatterTools::AicdWsegvalveData
 {
 public:
-    explicit AicdWsegvalveData( const QString&                             wellName,
-                                const QString&                             comment,
+    explicit AicdWsegvalveData( const std::string&                         wellName,
+                                const std::string&                         comment,
                                 int                                        segmentNumber,
                                 double                                     flowScalingFactor,
                                 bool                                       isOpen,
@@ -78,8 +78,8 @@ public:
     {
     }
 
-    QString                             m_wellName;
-    QString                             m_comment;
+    std::string                         m_wellName;
+    std::string                         m_comment;
     int                                 m_segmentNumber;
     double                              m_flowScalingFactor;
     bool                                m_isOpen;
@@ -467,7 +467,7 @@ void RicMswTableFormatterTools::generateWsegvalvTable( RifTextDataTableFormatter
 
             auto firstDataObject = dataForSameGridCell.front();
 
-            formatter.add( firstDataObject.m_wellName );
+            formatter.addStdString( firstDataObject.m_wellName );
             formatter.add( firstDataObject.m_segmentNumber );
             formatter.add( firstDataObject.m_cv );
             formatter.add( QString( "%1" ).arg( combinedFlowArea, 8, 'g', 4 ) );
@@ -501,7 +501,7 @@ void RicMswTableFormatterTools::generateWsegvalvTableRecursively( gsl::not_null<
             auto flowCoefficient = tieInValve->flowCoefficient();
 
             wsegvalveData[cellIndex].push_back(
-                WsegvalveData( wellNameForExport, tieInValve->label(), firstSubSegment->segmentNumber(), flowCoefficient, tieInValve->area() ) );
+                WsegvalveData( wellNameForExport.toStdString(), tieInValve->label().toStdString(), firstSubSegment->segmentNumber(), flowCoefficient, tieInValve->area() ) );
         }
     }
 
@@ -530,7 +530,7 @@ void RicMswTableFormatterTools::generateWsegvalvTableRecursively( gsl::not_null<
                     }
 
                     wsegvalveData[cellIndex].push_back(
-                        WsegvalveData( wellNameForExport, comment, segmentNumber, wsegValve->flowCoefficient(), wsegValve->area() ) );
+                        WsegvalveData( wellNameForExport.toStdString(), comment.toStdString(), segmentNumber, wsegValve->flowCoefficient(), wsegValve->area() ) );
                 }
             }
         }
@@ -614,7 +614,7 @@ void RicMswTableFormatterTools::generateWsegAicdTable( RifTextDataTableFormatter
             for ( const auto& aicdData : aicdDataForSameCell )
             {
                 accumulatedFlowScalingFactorDivisor += 1.0 / aicdData.m_flowScalingFactor;
-                comments.push_back( aicdData.m_comment );
+                comments.push_back( QString::fromStdString( aicdData.m_comment ) );
             }
 
             for ( auto comment : comments )
@@ -624,7 +624,7 @@ void RicMswTableFormatterTools::generateWsegAicdTable( RifTextDataTableFormatter
 
             auto firstDataObject = aicdDataForSameCell.front();
 
-            tighterFormatter.add( firstDataObject.m_wellName ); // #1
+            tighterFormatter.addStdString( firstDataObject.m_wellName ); // #1
             tighterFormatter.add( firstDataObject.m_segmentNumber );
             tighterFormatter.add( firstDataObject.m_segmentNumber );
 
@@ -690,7 +690,7 @@ void RicMswTableFormatterTools::generateWsegAicdTableRecursively( RicMswExportIn
                         auto wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
                         auto comment  = aicd->label();
                         aicdValveData[cellIndex].push_back(
-                            AicdWsegvalveData( wellName, comment, segmentNumber, aicd->flowScalingFactor(), aicd->isOpen(), aicd->values() ) );
+                            AicdWsegvalveData( wellName.toStdString(), comment.toStdString(), segmentNumber, aicd->flowScalingFactor(), aicd->isOpen(), aicd->values() ) );
                     }
                 }
                 else
@@ -754,7 +754,7 @@ void RicMswTableFormatterTools::writeWelsegsSegment( RicMswSegment*             
             prevOutTVD = branch->startTVD();
         }
 
-        if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+        if ( exportInfo.lengthAndDepthText() == "INC" )
         {
             depth  = midPointTVD - prevOutTVD;
             length = midPointMD - prevOutMD;
@@ -861,7 +861,7 @@ void RicMswTableFormatterTools::writeValveWelsegsSegment( const RicMswSegment*  
         double depth  = 0;
         double length = 0;
 
-        if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+        if ( exportInfo.lengthAndDepthText() == "INC" )
         {
             depth  = subEndTVD - subStartTVD;
             length = subEndMD - subStartMD;
@@ -946,7 +946,7 @@ void RicMswTableFormatterTools::writeCompletionWelsegsSegments( gsl::not_null<co
             double depth  = 0;
             double length = 0;
 
-            if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+            if ( exportInfo.lengthAndDepthText() == "INC" )
             {
                 depth  = subEndTVD - subStartTVD;
                 length = subEndMD - subStartMD;
@@ -1088,12 +1088,12 @@ void RicMswTableFormatterTools::collectWelsegsData( RigMswTableData&  tableData,
 {
     // Set up WELSEGS header
     WelsegsHeader header;
-    header.wellName           = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
+    header.wellName           = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport().toStdString();
     header.topMD              = exportInfo.mainBoreBranch()->startMD();
     header.topTVD             = exportInfo.mainBoreBranch()->startTVD();
     header.volume             = exportInfo.topWellBoreVolume();
-    header.lengthAndDepthText = exportInfo.lengthAndDepthText();
-    header.pressureDropText   = exportInfo.pressureDropText();
+    header.lengthAndDepthText = exportInfo.lengthAndDepthText().toStdString();
+    header.pressureDropText   = exportInfo.pressureDropText().toStdString();
 
     tableData.setWelsegsHeader( header );
 
@@ -1235,7 +1235,7 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RigMswTableData&         
             prevOutTVD = branch->startTVD();
         }
 
-        if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+        if ( exportInfo.lengthAndDepthText() == "INC" )
         {
             depth  = midPointTVD - prevOutTVD;
             length = midPointMD - prevOutMD;
@@ -1262,7 +1262,7 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RigMswTableData&         
         row.roughness           = roughnessFactor;
         if ( setDescription )
         {
-            row.description = branchDescription;
+            row.description = branchDescription.toStdString();
             setDescription  = false;
         }
 
@@ -1389,7 +1389,7 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RigMswTableDat
 
         if ( !isDescriptionAdded )
         {
-            row.description    = completion->label();
+            row.description    = completion->label().toStdString();
             isDescriptionAdded = true;
         }
 
@@ -1471,7 +1471,7 @@ void RicMswTableFormatterTools::collectCompsegDataByType( RigMswTableData&      
             if ( !intersectedCells->count( globalCellIndex ) )
             {
                 CompsegsRow row;
-                row.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
+                row.wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport().toStdString();
 
                 cvf::Vec3st ijk = intersection->gridLocalCellIJK();
                 row.cellI       = ijk.x() + 1; // Convert to 1-based
@@ -1484,7 +1484,7 @@ void RicMswTableFormatterTools::collectCompsegDataByType( RigMswTableData&      
 
                 row.startLength = startLength;
                 row.endLength   = endLength;
-                row.gridName    = exportSubGridIntersections ? intersection->gridName() : "";
+                row.gridName    = exportSubGridIntersections ? intersection->gridName().toStdString() : "";
 
                 tableData.addCompsegsRow( row );
                 intersectedCells->insert( globalCellIndex );
@@ -1512,7 +1512,7 @@ void RicMswTableFormatterTools::collectCompsegDataByType( RigMswTableData&      
 void RicMswTableFormatterTools::collectWsegvalvData( RigMswTableData& tableData, RicMswExportInfo& exportInfo )
 {
     QString wellNameForExport = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-    collectWsegvalvDataRecursively( tableData, exportInfo.mainBoreBranch(), wellNameForExport );
+    collectWsegvalvDataRecursively( tableData, exportInfo.mainBoreBranch(), wellNameForExport.toStdString() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1520,7 +1520,7 @@ void RicMswTableFormatterTools::collectWsegvalvData( RigMswTableData& tableData,
 //--------------------------------------------------------------------------------------------------
 void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RigMswTableData&             tableData,
                                                                 gsl::not_null<RicMswBranch*> branch,
-                                                                const QString&               wellNameForExport )
+                                                                const std::string&           wellNameForExport )
 {
     // Handle tie-in ICV at branch level
     {
@@ -1617,10 +1617,10 @@ void RicMswTableFormatterTools::collectWsegAicdDataRecursively( RigMswTableData&
                         auto comment  = aicd->label();
 
                         WsegaicdRow row;
-                        row.wellName        = wellName;
+                        row.wellName        = wellName.toStdString();
                         row.segmentNumber   = segmentNumber;
                         row.flowCoefficient = aicd->flowScalingFactor();
-                        row.deviceType      = comment;
+                        row.deviceType      = comment.toStdString();
 
                         // Extract AICD-specific parameters from the values array
                         auto values = aicd->values();

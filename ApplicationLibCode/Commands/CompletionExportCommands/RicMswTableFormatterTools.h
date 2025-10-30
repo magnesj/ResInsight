@@ -80,7 +80,7 @@ void collectCompsegDataByType( RigMswTableData&                                 
 
 void collectWsegvalvData( RigMswTableData& tableData, RicMswExportInfo& exportInfo );
 
-void collectWsegvalvDataRecursively( RigMswTableData& tableData, gsl::not_null<RicMswBranch*> branch, const QString& wellNameForExport );
+void collectWsegvalvDataRecursively( RigMswTableData& tableData, gsl::not_null<RicMswBranch*> branch, const std::string& wellNameForExport );
 
 void collectWsegAicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo );
 

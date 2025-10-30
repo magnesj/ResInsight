@@ -43,7 +43,7 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
         formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
 
-        formatter.addOptionalComment( row.description );
+        formatter.addOptionalComment( QString::fromStdString( row.description ) );
         formatter.rowCompleted();
     }
 }
@@ -58,7 +58,7 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
     {
         if ( isLgrData )
         {
-            formatter.add( row.gridName );
+            formatter.addStdString( row.gridName );
         }
 
         formatter.add( row.cellI );
@@ -84,7 +84,7 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
 {
     for ( const auto& row : rows )
     {
-        formatter.add( row.wellName );
+        formatter.addStdString( row.wellName );
         formatter.add( row.segmentNumber );
         formatter.add( row.flowCoefficient );
         formatter.addOptionalValue( row.area, RicMswExportInfo::defaultDoubleValue() );
@@ -101,14 +101,14 @@ void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const RowContaine
 {
     for ( const auto& row : rows )
     {
-        formatter.add( row.wellName );
+        formatter.addStdString( row.wellName );
         formatter.add( row.segmentNumber );
         formatter.add( row.flowCoefficient );
         formatter.addOptionalValue( row.area, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.oilViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.waterViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
         formatter.addOptionalValue( row.gasViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
-        formatter.add( row.deviceType );
+        formatter.addStdString( row.deviceType );
 
         formatter.rowCompleted();
     }
@@ -211,12 +211,12 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.header( tableHeader );
 
         // Write header row
-        formatter.add( welsegsHeader->wellName );
+        formatter.addStdString( welsegsHeader->wellName );
         formatter.add( welsegsHeader->topTVD );
         formatter.add( welsegsHeader->topMD );
         formatter.addOptionalValue( welsegsHeader->volume, RicMswExportInfo::defaultDoubleValue() );
-        formatter.add( welsegsHeader->lengthAndDepthText );
-        formatter.add( welsegsHeader->pressureDropText );
+        formatter.addStdString( welsegsHeader->lengthAndDepthText );
+        formatter.addStdString( welsegsHeader->pressureDropText );
         formatter.rowCompleted();
 
         // Column headers for segment data
@@ -252,7 +252,7 @@ void RigMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
     {
         std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "Name" ) };
         formatter.header( header );
-        formatter.add( rows.front().wellName );
+        formatter.addStdString( rows.front().wellName );
         formatter.rowCompleted();
     }
 
@@ -296,7 +296,7 @@ void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WELSEGS table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData_to_be_deleted& unifiedData )
 {
     if ( unifiedData.isEmpty() ) return;
 
@@ -317,12 +317,12 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
     // Write headers for all wells
     for ( const auto& header : headers )
     {
-        formatter.add( header.wellName );
+        formatter.addStdString( header.wellName );
         formatter.add( header.topTVD );
         formatter.add( header.topMD );
         formatter.addOptionalValue( header.volume, RicMswExportInfo::defaultDoubleValue() );
-        formatter.add( header.lengthAndDepthText );
-        formatter.add( header.pressureDropText );
+        formatter.addStdString( header.lengthAndDepthText );
+        formatter.addStdString( header.pressureDropText );
         formatter.rowCompleted();
     }
 
@@ -339,7 +339,7 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGVALV table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RigMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData_to_be_deleted& unifiedData )
 {
     auto rows = unifiedData.getAllWsegvalvRows();
     if ( rows.empty() ) return;
@@ -356,7 +356,7 @@ void RigMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGAICD table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData_to_be_deleted& unifiedData )
 {
     auto rows = unifiedData.getAllWsegaicdRows();
     if ( rows.empty() ) return;
@@ -390,7 +390,7 @@ void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter,
 //--------------------------------------------------------------------------------------------------
 /// Format all MSW tables for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData_to_be_deleted& unifiedData )
 {
     formatWelsegsTable( formatter, unifiedData );
 
