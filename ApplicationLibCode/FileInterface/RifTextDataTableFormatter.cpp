@@ -517,6 +517,14 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::add( size_t num )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RifTextDataTableFormatter& RifTextDataTableFormatter::addStdString( const std::string& str )
+{
+    return add( QString::fromStdString( str ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RifTextDataTableFormatter& RifTextDataTableFormatter::addOneBasedCellIndex( size_t zeroBasedIndex )
 {
     size_t column = m_lineBuffer.size();
