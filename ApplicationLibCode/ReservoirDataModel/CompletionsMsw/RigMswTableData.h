@@ -21,8 +21,6 @@
 #include "RiaDefines.h"
 #include "RigMswTableRows.h"
 
-#include <QString>
-#include <optional>
 #include <vector>
 
 //==================================================================================================
