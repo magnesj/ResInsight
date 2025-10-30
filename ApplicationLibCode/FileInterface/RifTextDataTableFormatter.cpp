@@ -414,8 +414,6 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::header( const std::vector<
 //--------------------------------------------------------------------------------------------------
 RifTextDataTableFormatter& RifTextDataTableFormatter::comment( const QString& comment )
 {
-    if ( comment.isEmpty() ) return *this;
-
     RifTextDataTableLine line;
     line.data.push_back( comment );
     line.lineType      = COMMENT;
@@ -553,11 +551,11 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addValueOrDefaultMarker( d
 //--------------------------------------------------------------------------------------------------
 /// Add optional value or default marker if the optional is empty or equals defaultValue
 //--------------------------------------------------------------------------------------------------
-RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalValue( const std::optional<double>& value, double defaultValue )
+RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalValue( const std::optional<double>& value )
 {
     if ( value.has_value() )
     {
-        return addValueOrDefaultMarker( value.value(), defaultValue );
+        return add( value.value() );
     }
     return add( m_defaultMarker );
 }

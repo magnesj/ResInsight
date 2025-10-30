@@ -39,9 +39,9 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
         formatter.add( row.outletSegmentNumber );
         formatter.add( row.length );
 
-        formatter.addOptionalValue( row.depth, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.diameter, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.roughness, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.depth );
+        formatter.addOptionalValue( row.diameter );
+        formatter.addOptionalValue( row.roughness );
 
         formatter.addOptionalComment( QString::fromStdString( row.description ) );
         formatter.rowCompleted();
@@ -68,9 +68,9 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
         formatter.add( row.startLength );
         formatter.add( row.endLength );
 
-        formatter.addOptionalValue( row.direction, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.endRange, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.connectionDepth, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.direction );
+        formatter.addOptionalValue( row.endRange );
+        formatter.addOptionalValue( row.connectionDepth );
 
         formatter.rowCompleted();
     }
@@ -87,7 +87,7 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
         formatter.addStdString( row.wellName );
         formatter.add( row.segmentNumber );
         formatter.add( row.flowCoefficient );
-        formatter.addOptionalValue( row.area, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.area );
 
         formatter.rowCompleted();
     }
@@ -104,10 +104,10 @@ void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const RowContaine
         formatter.addStdString( row.wellName );
         formatter.add( row.segmentNumber );
         formatter.add( row.flowCoefficient );
-        formatter.addOptionalValue( row.area, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.oilViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.waterViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
-        formatter.addOptionalValue( row.gasViscosityParameter, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( row.area );
+        formatter.addOptionalValue( row.oilViscosityParameter );
+        formatter.addOptionalValue( row.waterViscosityParameter );
+        formatter.addOptionalValue( row.gasViscosityParameter );
         formatter.addStdString( row.deviceType );
 
         formatter.rowCompleted();
@@ -214,7 +214,7 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.addStdString( welsegsHeader->wellName );
         formatter.add( welsegsHeader->topTVD );
         formatter.add( welsegsHeader->topMD );
-        formatter.addOptionalValue( welsegsHeader->volume, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( welsegsHeader->volume );
         formatter.addStdString( welsegsHeader->lengthAndDepthText );
         formatter.addStdString( welsegsHeader->pressureDropText );
         formatter.rowCompleted();
@@ -320,7 +320,7 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         formatter.addStdString( header.wellName );
         formatter.add( header.topTVD );
         formatter.add( header.topMD );
-        formatter.addOptionalValue( header.volume, RicMswExportInfo::defaultDoubleValue() );
+        formatter.addOptionalValue( header.volume );
         formatter.addStdString( header.lengthAndDepthText );
         formatter.addStdString( header.pressureDropText );
         formatter.rowCompleted();
