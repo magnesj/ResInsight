@@ -218,8 +218,8 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 
         // Write header row
         formatter.add( welsegsHeader->wellName );
-        formatter.add( welsegsHeader->topMD );
         formatter.add( welsegsHeader->topTVD );
+        formatter.add( welsegsHeader->topMD );
         formatter.addOptionalValue( welsegsHeader->volume, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( welsegsHeader->lengthAndDepthText );
         formatter.add( welsegsHeader->pressureDropText );
@@ -324,8 +324,8 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
     for ( const auto& header : headers )
     {
         formatter.add( header.wellName );
-        formatter.add( header.topMD );
         formatter.add( header.topTVD );
+        formatter.add( header.topMD );
         formatter.addOptionalValue( header.volume, RicMswExportInfo::defaultDoubleValue() );
         formatter.add( header.lengthAndDepthText );
         formatter.add( header.pressureDropText );
