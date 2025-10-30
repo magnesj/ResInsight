@@ -23,7 +23,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswTableData::RicMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem )
+RigMswTableData::RigMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem )
     : m_wellName( wellName )
     , m_unitSystem( unitSystem )
 {
@@ -32,7 +32,7 @@ RicMswTableData::RicMswTableData( const QString& wellName, RiaDefines::EclipseUn
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableData::setWelsegsHeader( const WelsegsHeader& header )
+void RigMswTableData::setWelsegsHeader( const WelsegsHeader& header )
 {
     m_welsegsHeader = header;
 }
@@ -40,7 +40,7 @@ void RicMswTableData::setWelsegsHeader( const WelsegsHeader& header )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableData::addWelsegsRow( const WelsegsRow& row )
+void RigMswTableData::addWelsegsRow( const WelsegsRow& row )
 {
     m_welsegsData.push_back( row );
 }
@@ -48,7 +48,7 @@ void RicMswTableData::addWelsegsRow( const WelsegsRow& row )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableData::addCompsegsRow( const CompsegsRow& row )
+void RigMswTableData::addCompsegsRow( const CompsegsRow& row )
 {
     m_compsegsData.push_back( row );
 }
@@ -56,7 +56,7 @@ void RicMswTableData::addCompsegsRow( const CompsegsRow& row )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableData::addWsegvalvRow( const WsegvalvRow& row )
+void RigMswTableData::addWsegvalvRow( const WsegvalvRow& row )
 {
     m_wsegvalvData.push_back( row );
 }
@@ -64,7 +64,7 @@ void RicMswTableData::addWsegvalvRow( const WsegvalvRow& row )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableData::addWsegaicdRow( const WsegaicdRow& row )
+void RigMswTableData::addWsegaicdRow( const WsegaicdRow& row )
 {
     m_wsegaicdData.push_back( row );
 }
@@ -72,7 +72,7 @@ void RicMswTableData::addWsegaicdRow( const WsegaicdRow& row )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicMswTableData::hasLgrData() const
+bool RigMswTableData::hasLgrData() const
 {
     return std::any_of( m_compsegsData.begin(), m_compsegsData.end(), []( const CompsegsRow& row ) { return row.isLgrGrid(); } );
 }
@@ -80,7 +80,7 @@ bool RicMswTableData::hasLgrData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicMswTableData::isEmpty() const
+bool RigMswTableData::isEmpty() const
 {
     return m_welsegsData.empty() && m_compsegsData.empty() && m_wsegvalvData.empty() && m_wsegaicdData.empty();
 }
@@ -88,7 +88,7 @@ bool RicMswTableData::isEmpty() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<CompsegsRow> RicMswTableData::mainGridCompsegsData() const
+std::vector<CompsegsRow> RigMswTableData::mainGridCompsegsData() const
 {
     std::vector<CompsegsRow> mainGridRows;
     std::copy_if( m_compsegsData.begin(),
@@ -101,7 +101,7 @@ std::vector<CompsegsRow> RicMswTableData::mainGridCompsegsData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<CompsegsRow> RicMswTableData::lgrCompsegsData() const
+std::vector<CompsegsRow> RigMswTableData::lgrCompsegsData() const
 {
     std::vector<CompsegsRow> lgrRows;
     std::copy_if( m_compsegsData.begin(),
@@ -114,7 +114,7 @@ std::vector<CompsegsRow> RicMswTableData::lgrCompsegsData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicMswTableData::isValid() const
+bool RigMswTableData::isValid() const
 {
     return validationErrors().empty();
 }
@@ -122,7 +122,7 @@ bool RicMswTableData::isValid() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RicMswTableData::validationErrors() const
+std::vector<QString> RigMswTableData::validationErrors() const
 {
     std::vector<QString> errors;
 

@@ -335,7 +335,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
         RifTextDataTableFormatter formatter( stream );
         formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-        RicMswDataFormatter::formatMswTables( formatter, unifiedData );
+        RigMswDataFormatter::formatMswTables( formatter, unifiedData );
     }
 
     // Create LGR file if needed
@@ -362,7 +362,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
 
         for ( const auto& tableData : unifiedData.wellDataList() )
         {
-            RicMswDataFormatter::formatCompsegsTable( formatter, tableData, true ); // LGR only
+            RigMswDataFormatter::formatCompsegsTable( formatter, tableData, true ); // LGR only
         }
     }
 }
@@ -401,7 +401,7 @@ void RicWellPathExportMswCompletionsImpl::exportSplitMswData( const RicExportCom
                 RifTextDataTableFormatter formatter( stream );
                 formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-                RicMswDataFormatter::formatMswTables( formatter, wellData );
+                RigMswDataFormatter::formatMswTables( formatter, wellData );
             }
 
             // Create LGR file if needed
@@ -416,7 +416,7 @@ void RicWellPathExportMswCompletionsImpl::exportSplitMswData( const RicExportCom
                 RifTextDataTableFormatter formatter( stream );
                 formatter.setOptionalComment( exportSettings.exportDataSourceAsComment() );
 
-                RicMswDataFormatter::formatCompsegsTable( formatter, wellData, true ); // LGR only
+                RigMswDataFormatter::formatCompsegsTable( formatter, wellData, true ); // LGR only
             }
         }
         catch ( const std::exception& e )
@@ -2301,7 +2301,7 @@ RicMswUnifiedData RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswTableData RicWellPathExportMswCompletionsImpl::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
+RigMswTableData RicWellPathExportMswCompletionsImpl::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
 {
     auto mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters )
@@ -2337,7 +2337,7 @@ RicMswTableData RicWellPathExportMswCompletionsImpl::extractSingleWellMswData( R
     assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
     // Create table data container and extract data
-    RicMswTableData tableData( wellPath->completionSettings()->wellNameForExport(), unitSystem );
+    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport(), unitSystem );
 
     // Use the new collection functions to populate the table data
     RicMswTableFormatterTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );

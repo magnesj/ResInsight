@@ -1081,7 +1081,7 @@ void RicMswTableFormatterTools::writeWsegvalHeader( RifTextDataTableFormatter& f
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWelsegsData( RicMswTableData&  tableData,
+void RicMswTableFormatterTools::collectWelsegsData( RigMswTableData&  tableData,
                                                     RicMswExportInfo& exportInfo,
                                                     double            maxSegmentLength,
                                                     bool              exportCompletionSegmentsAfterMainBore )
@@ -1112,7 +1112,7 @@ void RicMswTableFormatterTools::collectWelsegsData( RicMswTableData&  tableData,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWelsegsDataRecursively( RicMswTableData&             tableData,
+void RicMswTableFormatterTools::collectWelsegsDataRecursively( RigMswTableData&             tableData,
                                                                RicMswExportInfo&            exportInfo,
                                                                gsl::not_null<RicMswBranch*> branch,
                                                                gsl::not_null<int*>          segmentNumber,
@@ -1190,7 +1190,7 @@ void RicMswTableFormatterTools::collectWelsegsDataRecursively( RicMswTableData& 
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for a single segment with sub-segmentation
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWelsegsSegment( RicMswTableData&             tableData,
+void RicMswTableFormatterTools::collectWelsegsSegment( RigMswTableData&             tableData,
                                                        RicMswSegment*               segment,
                                                        const RicMswSegment*         previousSegment,
                                                        RicMswExportInfo&            exportInfo,
@@ -1292,7 +1292,7 @@ void RicMswTableFormatterTools::collectWelsegsSegment( RicMswTableData&         
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for valve completions
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectValveWelsegsSegment( RicMswTableData&     tableData,
+void RicMswTableFormatterTools::collectValveWelsegsSegment( RigMswTableData&     tableData,
                                                             const RicMswSegment* outletSegment,
                                                             RicMswValve*         valve,
                                                             RicMswExportInfo&    exportInfo,
@@ -1323,7 +1323,7 @@ void RicMswTableFormatterTools::collectValveWelsegsSegment( RicMswTableData&    
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for completions on a segment
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectCompletionsForSegment( RicMswTableData&                    tableData,
+void RicMswTableFormatterTools::collectCompletionsForSegment( RigMswTableData&                    tableData,
                                                               gsl::not_null<const RicMswSegment*> outletSegment,
                                                               gsl::not_null<RicMswSegment*>       segment,
                                                               RicMswValve**                       outletValve,
@@ -1363,7 +1363,7 @@ void RicMswTableFormatterTools::collectCompletionsForSegment( RicMswTableData&  
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for a completion's segments
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableData&                    tableData,
+void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RigMswTableData&                    tableData,
                                                                   gsl::not_null<const RicMswSegment*> outletSegment,
                                                                   gsl::not_null<RicMswCompletion*>    completion,
                                                                   RicMswExportInfo&                   exportInfo,
@@ -1408,7 +1408,7 @@ void RicMswTableFormatterTools::collectCompletionWelsegsSegments( RicMswTableDat
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectCompsegData( RicMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections )
+void RicMswTableFormatterTools::collectCompsegData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections )
 {
     // Define completion types to export
     std::set<RigCompletionData::CompletionType> perforationTypes = { RigCompletionData::CompletionType::PERFORATION,
@@ -1432,7 +1432,7 @@ void RicMswTableFormatterTools::collectCompsegData( RicMswTableData& tableData, 
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect COMPSEGS data for specific completion types
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectCompsegDataByType( RicMswTableData&                                   tableData,
+void RicMswTableFormatterTools::collectCompsegDataByType( RigMswTableData&                                   tableData,
                                                           RicMswExportInfo&                                  exportInfo,
                                                           gsl::not_null<const RicMswBranch*>                 branch,
                                                           bool                                               exportSubGridIntersections,
@@ -1509,7 +1509,7 @@ void RicMswTableFormatterTools::collectCompsegDataByType( RicMswTableData&      
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWsegvalvData( RicMswTableData& tableData, RicMswExportInfo& exportInfo )
+void RicMswTableFormatterTools::collectWsegvalvData( RigMswTableData& tableData, RicMswExportInfo& exportInfo )
 {
     QString wellNameForExport = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
     collectWsegvalvDataRecursively( tableData, exportInfo.mainBoreBranch(), wellNameForExport );
@@ -1518,7 +1518,7 @@ void RicMswTableFormatterTools::collectWsegvalvData( RicMswTableData& tableData,
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WSEGVALV data recursively through branches
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RicMswTableData&             tableData,
+void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RigMswTableData&             tableData,
                                                                 gsl::not_null<RicMswBranch*> branch,
                                                                 const QString&               wellNameForExport )
 {
@@ -1586,7 +1586,7 @@ void RicMswTableFormatterTools::collectWsegvalvDataRecursively( RicMswTableData&
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWsegAicdData( RicMswTableData& tableData, RicMswExportInfo& exportInfo )
+void RicMswTableFormatterTools::collectWsegAicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo )
 {
     collectWsegAicdDataRecursively( tableData, exportInfo, exportInfo.mainBoreBranch() );
 }
@@ -1594,7 +1594,7 @@ void RicMswTableFormatterTools::collectWsegAicdData( RicMswTableData& tableData,
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WSEGAICD data recursively through branches
 //--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::collectWsegAicdDataRecursively( RicMswTableData&                   tableData,
+void RicMswTableFormatterTools::collectWsegAicdDataRecursively( RigMswTableData&                   tableData,
                                                                 RicMswExportInfo&                  exportInfo,
                                                                 gsl::not_null<const RicMswBranch*> branch )
 {

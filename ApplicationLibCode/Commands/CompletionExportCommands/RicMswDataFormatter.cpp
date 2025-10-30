@@ -192,7 +192,7 @@ std::vector<RifTextDataTableColumn> createWelsegsSegmentHeader()
 //--------------------------------------------------------------------------------------------------
 /// Format WELSEGS table for a single well
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData )
+void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData )
 {
     if ( !tableData.hasWelsegsData() ) return;
 
@@ -232,7 +232,7 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 //--------------------------------------------------------------------------------------------------
 /// Format COMPSEGS table for a single well
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData, bool isLgrData )
+void RigMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData, bool isLgrData )
 {
     std::vector<CompsegsRow> rows;
     if ( isLgrData )
@@ -266,7 +266,7 @@ void RicMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGVALV table for a single well
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData )
+void RigMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData )
 {
     if ( !tableData.hasWsegvalvData() ) return;
 
@@ -281,7 +281,7 @@ void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGAICD table for a single well
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData )
+void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData )
 {
     if ( !tableData.hasWsegaicdData() ) return;
 
@@ -296,7 +296,7 @@ void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WELSEGS table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
 {
     if ( unifiedData.isEmpty() ) return;
 
@@ -339,7 +339,7 @@ void RicMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGVALV table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
 {
     auto rows = unifiedData.getAllWsegvalvRows();
     if ( rows.empty() ) return;
@@ -356,7 +356,7 @@ void RicMswDataFormatter::formatWsegvalvTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format WSEGAICD table for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
 {
     auto rows = unifiedData.getAllWsegaicdRows();
     if ( rows.empty() ) return;
@@ -373,7 +373,7 @@ void RicMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 /// Format all MSW tables for a single well
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswTableData& tableData )
+void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData )
 {
     formatWelsegsTable( formatter, tableData );
     formatCompsegsTable( formatter, tableData, false ); // Main grid
@@ -390,7 +390,7 @@ void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter,
 //--------------------------------------------------------------------------------------------------
 /// Format all MSW tables for unified data (multiple wells)
 //--------------------------------------------------------------------------------------------------
-void RicMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
+void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RicMswUnifiedData& unifiedData )
 {
     formatWelsegsTable( formatter, unifiedData );
 

@@ -19,7 +19,7 @@
 #pragma once
 
 #include "RiaDefines.h"
-#include "RicMswTableRows.h"
+#include "RigMswTableRows.h"
 
 #include <QString>
 #include <optional>
@@ -28,10 +28,10 @@
 //==================================================================================================
 /// Container class for MSW table data for a single well
 //==================================================================================================
-class RicMswTableData
+class RigMswTableData
 {
 public:
-    RicMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem );
+    RigMswTableData( const QString& wellName, RiaDefines::EclipseUnitSystem unitSystem );
 
     // Data access
     const std::optional<WelsegsHeader>& welsegsHeader() const { return m_welsegsHeader; }

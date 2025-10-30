@@ -25,7 +25,7 @@
 #include <gsl/gsl>
 
 class RicMswExportInfo;
-class RicMswTableData;
+class RigMswTableData;
 class RifTextDataTableFormatter;
 class RicMswBranch;
 class RicMswSegment;
@@ -56,12 +56,12 @@ public:
 };
 
 // New data collection functions (replace formatter versions)
-void collectWelsegsData( RicMswTableData&  tableData,
+void collectWelsegsData( RigMswTableData&  tableData,
                          RicMswExportInfo& exportInfo,
                          double            maxSegmentLength,
                          bool              exportCompletionSegmentsAfterMainBore );
 
-void collectWelsegsDataRecursively( RicMswTableData&             tableData,
+void collectWelsegsDataRecursively( RigMswTableData&             tableData,
                                     RicMswExportInfo&            exportInfo,
                                     gsl::not_null<RicMswBranch*> branch,
                                     gsl::not_null<int*>          segmentNumber,
@@ -69,25 +69,25 @@ void collectWelsegsDataRecursively( RicMswTableData&             tableData,
                                     bool                         exportCompletionSegmentsAfterMainBore,
                                     RicMswSegment*               connectedToSegment );
 
-void collectCompsegData( RicMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections );
+void collectCompsegData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections );
 
-void collectCompsegDataByType( RicMswTableData&                                   tableData,
+void collectCompsegDataByType( RigMswTableData&                                   tableData,
                                RicMswExportInfo&                                  exportInfo,
                                gsl::not_null<const RicMswBranch*>                 branch,
                                bool                                               exportSubGridIntersections,
                                const std::set<RigCompletionData::CompletionType>& exportCompletionTypes,
                                gsl::not_null<std::set<size_t>*>                   intersectedCells );
 
-void collectWsegvalvData( RicMswTableData& tableData, RicMswExportInfo& exportInfo );
+void collectWsegvalvData( RigMswTableData& tableData, RicMswExportInfo& exportInfo );
 
-void collectWsegvalvDataRecursively( RicMswTableData& tableData, gsl::not_null<RicMswBranch*> branch, const QString& wellNameForExport );
+void collectWsegvalvDataRecursively( RigMswTableData& tableData, gsl::not_null<RicMswBranch*> branch, const QString& wellNameForExport );
 
-void collectWsegAicdData( RicMswTableData& tableData, RicMswExportInfo& exportInfo );
+void collectWsegAicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo );
 
-void collectWsegAicdDataRecursively( RicMswTableData& tableData, RicMswExportInfo& exportInfo, gsl::not_null<const RicMswBranch*> branch );
+void collectWsegAicdDataRecursively( RigMswTableData& tableData, RicMswExportInfo& exportInfo, gsl::not_null<const RicMswBranch*> branch );
 
 // Helper functions for data collection
-void collectWelsegsSegment( RicMswTableData&             tableData,
+void collectWelsegsSegment( RigMswTableData&             tableData,
                             RicMswSegment*               segment,
                             const RicMswSegment*         previousSegment,
                             RicMswExportInfo&            exportInfo,
@@ -96,14 +96,14 @@ void collectWelsegsSegment( RicMswTableData&             tableData,
                             int*                         segmentNumber,
                             QString                      branchDescription );
 
-void collectValveWelsegsSegment( RicMswTableData&     tableData,
+void collectValveWelsegsSegment( RigMswTableData&     tableData,
                                  const RicMswSegment* outletSegment,
                                  RicMswValve*         valve,
                                  RicMswExportInfo&    exportInfo,
                                  double               maxSegmentLength,
                                  int*                 segmentNumber );
 
-void collectCompletionsForSegment( RicMswTableData&                    tableData,
+void collectCompletionsForSegment( RigMswTableData&                    tableData,
                                    gsl::not_null<const RicMswSegment*> outletSegment,
                                    gsl::not_null<RicMswSegment*>       segment,
                                    RicMswValve**                       outletValve,
@@ -111,7 +111,7 @@ void collectCompletionsForSegment( RicMswTableData&                    tableData
                                    double                              maxSegmentLength,
                                    int*                                segmentNumber );
 
-void collectCompletionWelsegsSegments( RicMswTableData&                    tableData,
+void collectCompletionWelsegsSegments( RigMswTableData&                    tableData,
                                        gsl::not_null<const RicMswSegment*> outletSegment,
                                        gsl::not_null<RicMswCompletion*>    completion,
                                        RicMswExportInfo&                   exportInfo,

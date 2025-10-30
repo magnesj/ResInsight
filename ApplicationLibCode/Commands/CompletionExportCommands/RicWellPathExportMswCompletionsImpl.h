@@ -32,7 +32,7 @@ class RimEclipseCase;
 class RimFishbones;
 class RimPerforationInterval;
 class RimWellPath;
-class RicMswTableData;
+class RigMswTableData;
 class RicMswUnifiedData;
 class RimWellPathFracture;
 class RimMswCompletionParameters;
@@ -88,7 +88,7 @@ private:
     static RicMswUnifiedData extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
                                                     const std::vector<RimWellPath*>&         wellPaths );
 
-    static RicMswTableData extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
+    static RigMswTableData extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep );
 
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,

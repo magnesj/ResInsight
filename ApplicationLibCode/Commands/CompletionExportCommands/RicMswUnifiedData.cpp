@@ -23,13 +23,13 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicMswUnifiedData::addWellData( RicMswTableData wellData )
+void RicMswUnifiedData::addWellData( RigMswTableData wellData )
 {
     // Check if well name already exists
     const QString& wellName = wellData.wellName();
     auto           it       = std::find_if( m_wellDataList.begin(),
                             m_wellDataList.end(),
-                            [&wellName]( const RicMswTableData& data ) { return data.wellName() == wellName; } );
+                            [&wellName]( const RigMswTableData& data ) { return data.wellName() == wellName; } );
 
     if ( it != m_wellDataList.end() )
     {
@@ -57,7 +57,7 @@ void RicMswUnifiedData::clear()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const RicMswTableData* RicMswUnifiedData::getWellData( const QString& wellName ) const
+const RigMswTableData* RicMswUnifiedData::getWellData( const QString& wellName ) const
 {
     auto it = m_wellNameToIndex.find( wellName );
     if ( it != m_wellNameToIndex.end() && it->second < m_wellDataList.size() )
@@ -164,7 +164,7 @@ std::vector<WsegaicdRow> RicMswUnifiedData::getAllWsegaicdRows() const
 //--------------------------------------------------------------------------------------------------
 bool RicMswUnifiedData::hasAnyLgrData() const
 {
-    return std::any_of( m_wellDataList.begin(), m_wellDataList.end(), []( const RicMswTableData& wellData ) { return wellData.hasLgrData(); } );
+    return std::any_of( m_wellDataList.begin(), m_wellDataList.end(), []( const RigMswTableData& wellData ) { return wellData.hasLgrData(); } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -178,7 +178,7 @@ std::vector<QString> RicMswUnifiedData::wellNames() const
     std::transform( m_wellDataList.begin(),
                     m_wellDataList.end(),
                     std::back_inserter( names ),
-                    []( const RicMswTableData& wellData ) { return wellData.wellName(); } );
+                    []( const RigMswTableData& wellData ) { return wellData.wellName(); } );
 
     return names;
 }
