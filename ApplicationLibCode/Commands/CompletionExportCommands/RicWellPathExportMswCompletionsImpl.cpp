@@ -1789,6 +1789,12 @@ void RicWellPathExportMswCompletionsImpl::assignBranchNumbersToBranch( const Rim
 {
     branch->setBranchNumber( *branchNumber );
 
+    for ( auto childBranch : branch->branches() )
+    {
+        ( *branchNumber )++;
+        assignBranchNumbersToBranch( eclipseCase, exportInfo, childBranch, branchNumber );
+    }
+
     // Assign perforations first to ensure the same branch number as the segment
     for ( auto segment : branch->segments() )
     {
@@ -1799,13 +1805,6 @@ void RicWellPathExportMswCompletionsImpl::assignBranchNumbersToBranch( const Rim
     for ( auto segment : branch->segments() )
     {
         assignBranchNumbersToOtherCompletions( eclipseCase, segment, branchNumber );
-    }
-
-    ( *branchNumber )++;
-
-    for ( auto childBranch : branch->branches() )
-    {
-        assignBranchNumbersToBranch( eclipseCase, exportInfo, childBranch, branchNumber );
     }
 }
 
