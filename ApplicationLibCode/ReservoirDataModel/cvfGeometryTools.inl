@@ -27,6 +27,11 @@ namespace cvf
 template <typename Vec3Type>
 Vec3Type GeometryTools::computePolygonCenter( const std::vector<Vec3Type>& polygon )
 {
+    if ( polygon.empty() )
+    {
+        return Vec3Type();
+    }
+
     Vec3Type s;
 
     for ( size_t i = 0; i < polygon.size(); i++ )
@@ -969,7 +974,8 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
     }
 
     iData.intersectionPointIndex = vxIndexIntersectionPoint;
-    CVF_ASSERT( e1P1 < m_edgeIntsectMap.size() );
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || 
+         e2P1 >= m_edgeIntsectMap.size() || e2P2 >= m_edgeIntsectMap.size() ) return;
     m_edgeIntsectMap[e1P1][e1P2][e2P1][e2P2] = iData;
 }
 
@@ -992,7 +998,9 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
-    if ( !m_edgeIntsectMap[e1P1].size() ) return false;
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || 
+         e2P1 >= m_edgeIntsectMap.size() || e2P2 >= m_edgeIntsectMap.size() ||
+         !m_edgeIntsectMap[e1P1].size() ) return false;
 
     typename std::map<IndexType, std::map<IndexType, std::map<IndexType, IntersectData>>>::iterator it;
     it = m_edgeIntsectMap[e1P1].find( e1P2 );
