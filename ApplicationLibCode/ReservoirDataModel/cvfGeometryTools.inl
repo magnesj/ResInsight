@@ -928,7 +928,7 @@ void EdgeIntersectStorage<IndexType>::canonizeAddress( IndexType& e1P1,
 
     flipE1E2 = ( flipE1 ? e1P2 : e1P1 ) > ( flipE2 ? e2P2 : e2P1 );
 
-    static IndexType temp;
+    IndexType temp;
     if ( flipE1 )
     {
         temp = e1P1;
@@ -967,13 +967,13 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
                                                        double                            fractionAlongEdge1,
                                                        double                            fractionAlongEdge2 )
 {
-    static bool flipE1;
-    static bool flipE2;
-    static bool flipE1E2;
+    bool flipE1;
+    bool flipE2;
+    bool flipE1E2;
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
-    static IntersectData iData;
+    IntersectData iData;
 
     iData.fractionAlongEdge1 = flipE1 ? 1 - fractionAlongEdge1 : fractionAlongEdge1;
     iData.fractionAlongEdge2 = flipE2 ? 1 - fractionAlongEdge2 : fractionAlongEdge2;
