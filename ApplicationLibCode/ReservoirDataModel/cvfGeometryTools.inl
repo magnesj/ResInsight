@@ -246,20 +246,18 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
 /// The second face must have opposite winding of the first
 //--------------------------------------------------------------------------------------------------
 template <typename VerticeArrayType, typename IndexType>
-bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*                         polygon,
-                                                       std::vector<cvf::Vec3d>*                        createdVertexes,
+bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&                         polygon,
+                                                       std::vector<cvf::Vec3d>&                        createdVertexes,
                                                        EdgeIntersectStorage<IndexType>*                edgeIntersectionStorage,
                                                        ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodes,
                                                        const IndexType                                 cv1CubeFaceIndices[4],
                                                        const IndexType                                 cv2CubeFaceIndices[4],
                                                        double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
-    CVF_ASSERT( createdVertexes );
 
     // Topology analysis
 
-    IndexType newVertexIndex = static_cast<IndexType>( nodes.size() + createdVertexes->size() );
+    IndexType newVertexIndex = static_cast<IndexType>( nodes.size() + createdVertexes.size() );
 
     bool cv1VxTouchCv2[4]     = { false, false, false, false };
     bool cv2VxTouchCv1[4]     = { false, false, false, false };
@@ -290,7 +288,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 0; k < 4; ++k )
         {
-            polygon->push_back( cv1CubeFaceIndices[k] );
+            polygon.push_back( cv1CubeFaceIndices[k] );
         }
 
         return true;
@@ -334,7 +332,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 0; k < 4; ++k )
         {
-            polygon->push_back( cv1CubeFaceIndices[k] );
+            polygon.push_back( cv1CubeFaceIndices[k] );
         }
 
         return true;
@@ -345,7 +343,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 3; k >= 0; --k ) // Return opposite winding, to match winding of face 1
         {
-            polygon->push_back( cv2CubeFaceIndices[k] );
+            polygon.push_back( cv2CubeFaceIndices[k] );
         }
         return true;
     }
@@ -366,9 +364,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         if ( cv1VxTouchCv2[cv1Idx] && cv1VxTouchCv2Edge[cv1Idx] == -1 ) // Start of cv1 edge is touching inside the cv2
                                                                         // polygon (not on an cv2 edge)
         {
-            if ( polygon->empty() || polygon->back() != cv1CubeFaceIndices[cv1Idx] )
+            if ( polygon.empty() || polygon.back() != cv1CubeFaceIndices[cv1Idx] )
             {
-                polygon->push_back( cv1CubeFaceIndices[cv1Idx] );
+                polygon.push_back( cv1CubeFaceIndices[cv1Idx] );
             }
 
             if ( cv1VxTouchCv2[nextCv1Idx] && cv1VxTouchCv2Edge[nextCv1Idx] == -1 )
@@ -450,7 +448,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                         case GeometryTools::LINES_CROSSES:
                         {
                             intersectionVxIndex = newVertexIndex;
-                            createdVertexes->push_back( intersection );
+                            createdVertexes.push_back( intersection );
                             ++newVertexIndex;
                         }
                         break;
@@ -538,9 +536,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         typename std::map<double, IndexType>::iterator it;
         for ( it = sortingMap.begin(); it != sortingMap.end(); ++it )
         {
-            if ( polygon->empty() || polygon->back() != it->second )
+            if ( polygon.empty() || polygon.back() != it->second )
             {
-                polygon->push_back( it->second );
+                polygon.push_back( it->second );
             }
         }
 
@@ -569,9 +567,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                                     // outside, so we
                                                                                                     // must stop
                 {
-                    if ( polygon->empty() || polygon->back() != cv2CubeFaceIndices[cv2Idx] )
+                    if ( polygon.empty() || polygon.back() != cv2CubeFaceIndices[cv2Idx] )
                     {
-                        polygon->push_back( cv2CubeFaceIndices[cv2Idx] );
+                        polygon.push_back( cv2CubeFaceIndices[cv2Idx] );
                     }
                     --cv2Idx;
                     if ( cv2Idx < 0 ) cv2Idx = 3;
@@ -585,17 +583,17 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         }
     }
 
-    if ( polygon->size() > 2 )
+    if ( polygon.size() > 2 )
     {
-        if ( polygon->back() == polygon->front() ) polygon->pop_back();
+        if ( polygon.back() == polygon.front() ) polygon.pop_back();
     }
 
     // Sanity checks
-    if ( polygon->size() < 3 )
+    if ( polygon.size() < 3 )
     {
         // cvf::Trace::show(cvf::String("Degenerated connection polygon detected. (Less than 3 vertexes) Cv's probably
         // not in contact: %1 , %2").arg(m_ownerCvId).arg(m_neighborCvId));
-        polygon->clear();
+        polygon.clear();
 
         return false;
     }

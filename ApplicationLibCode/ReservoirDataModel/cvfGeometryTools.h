@@ -117,8 +117,8 @@ public:
                                                double                                          tolerance = 1e-6 );
 
     template <typename VerticeArrayType, typename IndexType>
-    static bool calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*                         polygon,
-                                                   std::vector<cvf::Vec3d>*                        createdVertexes,
+    static bool calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&                         polygon,
+                                                   std::vector<cvf::Vec3d>&                        createdVertexes,
                                                    EdgeIntersectStorage<IndexType>*                edgeIntersectionStorage,
                                                    ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodes,
                                                    const IndexType                                 cv1CubeFaceIndices[4],

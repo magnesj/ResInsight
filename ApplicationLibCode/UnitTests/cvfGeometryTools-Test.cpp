@@ -108,8 +108,8 @@ TEST( CellFaceIntersectionTst, Intersection1 )
     edgeIntersectionStorage.setVertexCount( nodes.size() );
     {
         std::vector<cvf::uint> polygon;
-        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                      &additionalVertices,
+        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                      additionalVertices,
                                                                       &edgeIntersectionStorage,
                                                                       wrapArrayConst( &nodes ),
                                                                       faces[0].data(),
@@ -125,8 +125,8 @@ TEST( CellFaceIntersectionTst, Intersection1 )
 
     {
         std::vector<cvf::uint> polygon;
-        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                      &additionalVertices,
+        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                      additionalVertices,
                                                                       &edgeIntersectionStorage,
                                                                       wrapArrayConst( &nodes ),
                                                                       faces[0].data(),
@@ -142,8 +142,8 @@ TEST( CellFaceIntersectionTst, Intersection1 )
 
     {
         std::vector<cvf::uint> polygon;
-        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                      &additionalVertices,
+        bool                   isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                      additionalVertices,
                                                                       &edgeIntersectionStorage,
                                                                       wrapArrayConst( &nodes ),
                                                                       faces[0].data(),
@@ -274,8 +274,8 @@ TEST( CellFaceIntersectionTst, Intersection )
     nodes[6] = cvf::Vec3d( 1, 1, 0 );
     nodes[7] = cvf::Vec3d( 0, 1, 0 );
 
-    bool isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                  &additionalVertices,
+    bool isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                  additionalVertices,
                                                                   &edgeIntersectionStorage,
                                                                   wrapArrayConst( &nodes ),
                                                                   cv1CubeFaceIndices,
@@ -297,8 +297,8 @@ TEST( CellFaceIntersectionTst, Intersection )
     nodes[7] = cvf::Vec3d( -0.25, 0.5, 0 );
     polygon.clear();
 
-    isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                             &additionalVertices,
+    isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                             additionalVertices,
                                                              &edgeIntersectionStorage,
                                                              wrapArrayConst( &nodes ),
                                                              cv1CubeFaceIndices,
@@ -338,8 +338,8 @@ TEST( CellFaceIntersectionTst, FreeFacePolygon )
     nodes[6] = cvf::Vec3d( 1, 1, 0 );
     nodes[7] = cvf::Vec3d( 0, 1, 0 );
 
-    bool isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                  &additionalVertices,
+    bool isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                  additionalVertices,
                                                                   &edgeIntersectionStorage,
                                                                   wrapArrayConst( &nodes ),
                                                                   cv1CubeFaceIndices,
@@ -376,8 +376,8 @@ TEST( CellFaceIntersectionTst, FreeFacePolygon )
     nodes[7] = cvf::Vec3d( -0.25, 0.5, 0 );
     polygon.clear();
 
-    isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                             &additionalVertices,
+    isOk = GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                             additionalVertices,
                                                              &edgeIntersectionStorage,
                                                              wrapArrayConst( &nodes ),
                                                              cv1CubeFaceIndices,
