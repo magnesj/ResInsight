@@ -281,9 +281,9 @@ bool RiaPreferencesSystem::isLoggingActivatedForKeyword( const QString& keyword 
 //--------------------------------------------------------------------------------------------------
 bool RiaPreferencesSystem::isFeatureEnabled( const QString& keyword ) const
 {
-    if ( keyword.isEmpty() ) return true;
+    if ( keyword.isEmpty() ) return false;
 
-    QStringList keywords = m_featureKeywords().split( ";" );
+    const QStringList keywords = m_featureKeywords().split( ";", Qt::SkipEmptyParts );
 
     if ( keywords.contains( "enable-all" ) ) return true;
 
