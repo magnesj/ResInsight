@@ -254,7 +254,6 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
                                                        const IndexType                                 cv2CubeFaceIndices[4],
                                                        double                                          tolerance )
 {
-
     // Topology analysis
 
     IndexType newVertexIndex = static_cast<IndexType>( nodes.size() + createdVertexes.size() );
@@ -428,8 +427,8 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
                                                                        cv2CubeFaceIndices[nextCv2Idx],
                                                                        &intersectionVxIndex,
                                                                        &intersectStatus,
-                                                                       &fractionAlongEdge1,
-                                                                       &fractionAlongEdge2 );
+                                                                       fractionAlongEdge1,
+                                                                       fractionAlongEdge2 );
 
                 if ( !found )
                 {
@@ -467,7 +466,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
                                 // Numerical precision issue at edge boundary
                                 // Create intersection vertex at the computed intersection point as fallback
                                 intersectionVxIndex = newVertexIndex;
-                                createdVertexes.push_back(intersection);
+                                createdVertexes.push_back( intersection );
                                 ++newVertexIndex;
                             }
                         }
@@ -487,7 +486,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
                                 // Numerical precision issue at edge boundary
                                 // Create intersection vertex at the computed intersection point as fallback
                                 intersectionVxIndex = newVertexIndex;
-                                createdVertexes.push_back(intersection);
+                                createdVertexes.push_back( intersection );
                                 ++newVertexIndex;
                             }
                         }
@@ -611,10 +610,10 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
     // Sanity checks with logging
     if ( polygon.size() < 3 )
     {
-        caf::PdmLogging::warning(QString("GeometryTools: Generated degenerate polygon with %1 vertices. "
-                                         "Input faces may not overlap significantly. Tolerance=%2")
-                                 .arg(polygon.size())
-                                 .arg(tolerance));
+        caf::PdmLogging::warning( QString( "GeometryTools: Generated degenerate polygon with %1 vertices. "
+                                           "Input faces may not overlap significantly. Tolerance=%2" )
+                                      .arg( polygon.size() )
+                                      .arg( tolerance ) );
         polygon.clear();
 
         return false;
@@ -1004,8 +1003,8 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
                                                         IndexType                          e2P2,
                                                         IndexType*                         vxIndexIntersectionPoint,
                                                         GeometryTools::IntersectionStatus* intersectionStatus,
-                                                        double*                            fractionAlongEdge1,
-                                                        double*                            fractionAlongEdge2 )
+                                                        double&                            fractionAlongEdge1,
+                                                        double&                            fractionAlongEdge2 )
 {
     static bool flipE1;
     static bool flipE2;
@@ -1034,17 +1033,17 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
 
     if ( flipE1E2 )
     {
-        *fractionAlongEdge1 = it3->second.fractionAlongEdge2;
-        *fractionAlongEdge2 = it3->second.fractionAlongEdge1;
+        fractionAlongEdge1 = it3->second.fractionAlongEdge2;
+        fractionAlongEdge2 = it3->second.fractionAlongEdge1;
     }
     else
     {
-        *fractionAlongEdge1 = it3->second.fractionAlongEdge1;
-        *fractionAlongEdge2 = it3->second.fractionAlongEdge2;
+        fractionAlongEdge1 = it3->second.fractionAlongEdge1;
+        fractionAlongEdge2 = it3->second.fractionAlongEdge2;
     }
 
-    if ( flipE1 ) *fractionAlongEdge1 = 1 - *fractionAlongEdge1;
-    if ( flipE2 ) *fractionAlongEdge2 = 1 - *fractionAlongEdge2;
+    if ( flipE1 ) fractionAlongEdge1 = 1 - fractionAlongEdge1;
+    if ( flipE2 ) fractionAlongEdge2 = 1 - fractionAlongEdge2;
 
     return true;
 }

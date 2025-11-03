@@ -151,8 +151,8 @@ public:
                            IndexType                          e2P2,
                            IndexType*                         vxIndexIntersectionPoint,
                            GeometryTools::IntersectionStatus* intersectionStatus,
-                           double*                            fractionAlongEdge1,
-                           double*                            fractionAlongEdge2 );
+                           double&                            fractionAlongEdge1,
+                           double&                            fractionAlongEdge2 );
     void addIntersection( IndexType                         e1P1,
                           IndexType                         e1P2,
                           IndexType                         e2P1,

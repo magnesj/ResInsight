@@ -609,7 +609,7 @@ TEST( GeometryToolsErrorHandling, EdgeIntersectStorageBoundsCheck )
     double                            fraction1, fraction2;
 
     // Test finding intersection with out-of-bounds index
-    bool found = storage.findIntersection( 10, 11, 0, 1, &intersectionIndex, &status, &fraction1, &fraction2 );
+    bool found = storage.findIntersection( 10, 11, 0, 1, &intersectionIndex, &status, fraction1, fraction2 );
     EXPECT_FALSE( found );
 }
 
