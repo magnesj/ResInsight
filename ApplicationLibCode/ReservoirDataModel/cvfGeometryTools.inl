@@ -1006,9 +1006,9 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
                                                         double&                            fractionAlongEdge1,
                                                         double&                            fractionAlongEdge2 )
 {
-    static bool flipE1;
-    static bool flipE2;
-    static bool flipE1E2;
+    bool flipE1;
+    bool flipE2;
+    bool flipE1E2;
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
@@ -1016,16 +1016,13 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
          e2P2 >= m_edgeIntsectMap.size() || !m_edgeIntsectMap[e1P1].size() )
         return false;
 
-    typename std::map<IndexType, std::map<IndexType, std::map<IndexType, IntersectData>>>::iterator it;
-    it = m_edgeIntsectMap[e1P1].find( e1P2 );
+    auto it = m_edgeIntsectMap[e1P1].find( e1P2 );
     if ( it == m_edgeIntsectMap[e1P1].end() ) return false;
 
-    typename std::map<IndexType, std::map<IndexType, IntersectData>>::iterator it2;
-    it2 = it->second.find( e2P1 );
+    auto it2 = it->second.find( e2P1 );
     if ( it2 == it->second.end() ) return false;
 
-    typename std::map<IndexType, IntersectData>::iterator it3;
-    it3 = it2->second.find( e2P2 );
+    auto it3 = it2->second.find( e2P2 );
     if ( it3 == it2->second.end() ) return false;
 
     *vxIndexIntersectionPoint = it3->second.intersectionPointIndex;
