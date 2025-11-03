@@ -395,13 +395,11 @@ GeometryTools::IntersectionStatus GeometryTools::inPlaneLineIntersect3D( const c
                                                                          const cvf::Vec3d& p2,
                                                                          const cvf::Vec3d& p3,
                                                                          const cvf::Vec3d& p4,
-                                                                         cvf::Vec3d*       intersectionPoint,
+                                                                         cvf::Vec3d&       intersectionPoint,
                                                                          double&           fractionAlongLine1,
                                                                          double&           fractionAlongLine2,
                                                                          double            tolerance )
 {
-    CVF_ASSERT( intersectionPoint != nullptr );
-
     int    Z = findClosestAxis( planeNormal );
     int    X = ( Z + 1 ) % 3;
     int    Y = ( Z + 2 ) % 3;
@@ -417,11 +415,11 @@ GeometryTools::IntersectionStatus GeometryTools::inPlaneLineIntersect3D( const c
     // Check if we have a valid intersection point
     if ( intersectionStatus == NO_INTERSECTION || intersectionStatus == LINES_OVERLAP )
     {
-        intersectionPoint->setZero();
+        intersectionPoint.setZero();
     }
     else
     {
-        *intersectionPoint = p1 + ( fractionAlongLine1 ) * ( p2 - p1 );
+        intersectionPoint = p1 + ( fractionAlongLine1 ) * ( p2 - p1 );
     }
 
     return intersectionStatus;

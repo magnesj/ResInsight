@@ -437,7 +437,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&  
                                                                              nodes[cv1CubeFaceIndices[nextCv1Idx]],
                                                                              nodes[cv2CubeFaceIndices[cv2Idx]],
                                                                              nodes[cv2CubeFaceIndices[nextCv2Idx]],
-                                                                             &intersection,
+                                                                             intersection,
                                                                              fractionAlongEdge1,
                                                                              fractionAlongEdge2,
                                                                              tolerance );

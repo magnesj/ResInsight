@@ -106,7 +106,7 @@ public:
                                                       const cvf::Vec3d& p2,
                                                       const cvf::Vec3d& p3,
                                                       const cvf::Vec3d& p4,
-                                                      cvf::Vec3d*       intersectionPoint,
+                                                      cvf::Vec3d&       intersectionPoint,
                                                       double&           fractionAlongLine1,
                                                       double&           fractionAlongLine2,
                                                       double            tolerance = 1e-6 );
