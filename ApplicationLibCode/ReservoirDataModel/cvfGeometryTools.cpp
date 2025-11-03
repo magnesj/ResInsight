@@ -239,10 +239,10 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
                                                         double  y4,
                                                         double  l1NormalizedTolerance,
                                                         double  l2NormalizedTolerance,
-                                                        double* x,
-                                                        double* y,
-                                                        double* fractionAlongLine1,
-                                                        double* fractionAlongLine2 )
+                                                        double& x,
+                                                        double& y,
+                                                        double& fractionAlongLine1,
+                                                        double& fractionAlongLine2 )
 {
     double mua, mub;
     double denom, numera, numerb;
@@ -256,13 +256,6 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
     // Are the line coincident?
     if ( fabs( numera ) < EPS && fabs( numerb ) < EPS && fabs( denom ) < EPS )
     {
-#if 0
-       *x = 0;
-       *y = 0;
-       *fractionAlongLine1 = 0;
-       *fractionAlongLine2 = 0;
-       return GeometryTools::LINES_OVERLAP;
-#else
         cvf::Vec3d p12( x2 - x1, y2 - y1, 0 );
         cvf::Vec3d p13( x3 - x1, y3 - y1, 0 );
         cvf::Vec3d p34( x4 - x3, y4 - y3, 0 );
@@ -274,10 +267,10 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
 
         if ( length12 < EPS )
         {
-            *x                  = x1;
-            *y                  = y1;
-            *fractionAlongLine1 = 1;
-            *fractionAlongLine2 = p13.length() / p34.length();
+            x                  = x1;
+            y                  = y1;
+            fractionAlongLine1 = 1;
+            fractionAlongLine2 = p13.length() / p34.length();
             return GeometryTools::LINES_OVERLAP;
         }
 
@@ -292,10 +285,10 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
         if ( ( normDist13 < 0 - l1NormalizedTolerance && normDist14 < 0 - l1NormalizedTolerance ) ||
              ( normDist13 > 1 + l1NormalizedTolerance && normDist14 > 1 + l1NormalizedTolerance ) )
         {
-            *x                  = 0;
-            *y                  = 0;
-            *fractionAlongLine1 = 0;
-            *fractionAlongLine2 = 0;
+            x                  = 0;
+            y                  = 0;
+            fractionAlongLine1 = 0;
+            fractionAlongLine2 = 0;
             return GeometryTools::NO_INTERSECTION;
         }
 
@@ -311,56 +304,55 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
 
         if ( pt3IsInside && !pt4IsInside )
         {
-            *fractionAlongLine1 = normDist13;
-            *fractionAlongLine2 = 0.0;
-            *x                  = x3;
-            *y                  = y3;
+            fractionAlongLine1 = normDist13;
+            fractionAlongLine2 = 0.0;
+            x                  = x3;
+            y                  = y3;
         }
         else if ( pt4IsInside && !pt3IsInside )
         {
-            *fractionAlongLine1 = normDist14;
-            *fractionAlongLine2 = 1.0;
-            *x                  = x4;
-            *y                  = y4;
+            fractionAlongLine1 = normDist14;
+            fractionAlongLine2 = 1.0;
+            x                  = x4;
+            y                  = y4;
         }
         else if ( pt3IsInside && pt4IsInside )
         {
             // Return edge 2 vertex furthest along edge 1
             if ( normDist13 <= normDist14 )
             {
-                *fractionAlongLine1 = normDist14;
-                *fractionAlongLine2 = 1.0;
-                *x                  = x4;
-                *y                  = y4;
+                fractionAlongLine1 = normDist14;
+                fractionAlongLine2 = 1.0;
+                x                  = x4;
+                y                  = y4;
             }
             else
             {
-                *fractionAlongLine1 = normDist13;
-                *fractionAlongLine2 = 0.0;
-                *x                  = x3;
-                *y                  = y3;
+                fractionAlongLine1 = normDist13;
+                fractionAlongLine2 = 0.0;
+                x                  = x3;
+                y                  = y3;
             }
         }
         else // both outside on each side
         {
             // Return End of edge 1
-            *fractionAlongLine1 = 1.0;
-            *fractionAlongLine2 = normDist32;
-            *x                  = x2;
-            *y                  = y2;
+            fractionAlongLine1 = 1.0;
+            fractionAlongLine2 = normDist32;
+            x                  = x2;
+            y                  = y2;
         }
 
         return GeometryTools::LINES_OVERLAP;
-#endif
     }
 
     /* Are the line parallel */
     if ( fabs( denom ) < EPS )
     {
-        *x                  = 0;
-        *y                  = 0;
-        *fractionAlongLine1 = 0;
-        *fractionAlongLine2 = 0;
+        x                  = 0;
+        y                  = 0;
+        fractionAlongLine1 = 0;
+        fractionAlongLine2 = 0;
 
         return GeometryTools::NO_INTERSECTION;
     }
@@ -369,10 +361,10 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
     mua = numera / denom;
     mub = numerb / denom;
 
-    *x                  = x1 + mua * ( x2 - x1 );
-    *y                  = y1 + mua * ( y2 - y1 );
-    *fractionAlongLine1 = mua;
-    *fractionAlongLine2 = mub;
+    x                  = x1 + mua * ( x2 - x1 );
+    y                  = y1 + mua * ( y2 - y1 );
+    fractionAlongLine1 = mua;
+    fractionAlongLine2 = mub;
 
     if ( mua < 0 - l1NormalizedTolerance || 1 + l1NormalizedTolerance < mua || mub < 0 - l2NormalizedTolerance ||
          1 + l2NormalizedTolerance < mub )
@@ -382,10 +374,10 @@ GeometryTools::IntersectionStatus inPlaneLineIntersect( double  x1,
     else if ( fabs( mua ) < l1NormalizedTolerance || fabs( 1 - mua ) < l1NormalizedTolerance || fabs( mub ) < l2NormalizedTolerance ||
               fabs( 1 - mub ) < l2NormalizedTolerance )
     {
-        if ( fabs( mua ) < l1NormalizedTolerance ) *fractionAlongLine1 = 0;
-        if ( fabs( 1 - mua ) < l1NormalizedTolerance ) *fractionAlongLine1 = 1;
-        if ( fabs( mub ) < l2NormalizedTolerance ) *fractionAlongLine2 = 0;
-        if ( fabs( 1 - mub ) < l2NormalizedTolerance ) *fractionAlongLine2 = 1;
+        if ( fabs( mua ) < l1NormalizedTolerance ) fractionAlongLine1 = 0;
+        if ( fabs( 1 - mua ) < l1NormalizedTolerance ) fractionAlongLine1 = 1;
+        if ( fabs( mub ) < l2NormalizedTolerance ) fractionAlongLine2 = 0;
+        if ( fabs( 1 - mub ) < l2NormalizedTolerance ) fractionAlongLine2 = 1;
         return GeometryTools::LINES_TOUCH;
     }
     else
@@ -404,8 +396,8 @@ GeometryTools::IntersectionStatus GeometryTools::inPlaneLineIntersect3D( const c
                                                                          const cvf::Vec3d& p3,
                                                                          const cvf::Vec3d& p4,
                                                                          cvf::Vec3d*       intersectionPoint,
-                                                                         double*           fractionAlongLine1,
-                                                                         double*           fractionAlongLine2,
+                                                                         double&           fractionAlongLine1,
+                                                                         double&           fractionAlongLine2,
                                                                          double            tolerance )
 {
     CVF_ASSERT( intersectionPoint != nullptr );
@@ -420,7 +412,7 @@ GeometryTools::IntersectionStatus GeometryTools::inPlaneLineIntersect3D( const c
     double l2NormTol = tolerance / ( p4 - p3 ).length();
 
     IntersectionStatus intersectionStatus =
-        inPlaneLineIntersect( p1[X], p1[Y], p2[X], p2[Y], p3[X], p3[Y], p4[X], p4[Y], l1NormTol, l2NormTol, &x, &y, fractionAlongLine1, fractionAlongLine2 );
+        inPlaneLineIntersect( p1[X], p1[Y], p2[X], p2[Y], p3[X], p3[Y], p4[X], p4[Y], l1NormTol, l2NormTol, x, y, fractionAlongLine1, fractionAlongLine2 );
 
     // Check if we have a valid intersection point
     if ( intersectionStatus == NO_INTERSECTION || intersectionStatus == LINES_OVERLAP )
@@ -429,7 +421,7 @@ GeometryTools::IntersectionStatus GeometryTools::inPlaneLineIntersect3D( const c
     }
     else
     {
-        *intersectionPoint = p1 + ( *fractionAlongLine1 ) * ( p2 - p1 );
+        *intersectionPoint = p1 + ( fractionAlongLine1 ) * ( p2 - p1 );
     }
 
     return intersectionStatus;
