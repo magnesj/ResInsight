@@ -163,7 +163,7 @@ TEST( CellFaceIntersectionTst, Intersection1 )
 
     for ( cvf::uint vxIdx = 0; vxIdx < nodes.size(); ++vxIdx )
     {
-        GeometryTools::insertVertexInPolygon( &basePolygon, wrapArrayConst( &nodes ), vxIdx, 1e-6 );
+        GeometryTools::insertVertexInPolygon( basePolygon, wrapArrayConst( &nodes ), vxIdx, 1e-6 );
     }
 
     EXPECT_EQ( (size_t)8, basePolygon.size() );
@@ -173,7 +173,7 @@ TEST( CellFaceIntersectionTst, Intersection1 )
     {
         for ( cvf::uint vxIdx = 0; vxIdx < nodes.size(); ++vxIdx )
         {
-            GeometryTools::insertVertexInPolygon( &overlapPolygons[pIdx], wrapArrayConst( &nodes ), vxIdx, 1e-6 );
+            GeometryTools::insertVertexInPolygon( overlapPolygons[pIdx], wrapArrayConst( &nodes ), vxIdx, 1e-6 );
         }
 
         if ( pIdx == 0 )

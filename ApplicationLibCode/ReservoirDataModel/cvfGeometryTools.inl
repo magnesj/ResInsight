@@ -70,25 +70,22 @@ DataType GeometryTools::interpolateQuad( const cvf::Vec3d& v1,
 /// Todo: If a vertex is replaced, the VxToCv map in TimeStepGeometry should be updated
 //--------------------------------------------------------------------------------------------------
 template <typename VerticeArrayType, typename IndexType>
-bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*                         polygon,
+bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>&                         polygon,
                                            ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodeCoords,
                                            IndexType                                       vertexIndex,
                                            double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
-
     // Check if vertex is directly included already
 
-    for ( typename std::vector<IndexType>::iterator it = polygon->begin(); it != polygon->end(); ++it )
+    for ( typename std::vector<IndexType>::iterator it = polygon.begin(); it != polygon.end(); ++it )
     {
         if ( *it == vertexIndex ) return true;
     }
 
-#if 1
     // Check if the new point is within tolerance of one of the polygon vertices
 
     bool existsOrInserted = false;
-    for ( typename std::vector<IndexType>::iterator it = polygon->begin(); it != polygon->end(); ++it )
+    for ( typename std::vector<IndexType>::iterator it = polygon.begin(); it != polygon.end(); ++it )
     {
         if ( ( nodeCoords[*it] - nodeCoords[vertexIndex] ).length() < tolerance )
         {
@@ -98,14 +95,13 @@ bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*              
     }
 
     if ( existsOrInserted ) return true;
-#endif
 
     // Copy the start polygon to a list
 
     std::list<IndexType> listPolygon;
-    for ( size_t pcIdx = 0; pcIdx < polygon->size(); ++pcIdx )
+    for ( size_t pcIdx = 0; pcIdx < polygon.size(); ++pcIdx )
     {
-        listPolygon.push_back( ( *polygon )[pcIdx] );
+        listPolygon.push_back( polygon[pcIdx] );
     }
 
     // Insert vertex in polygon if the distance to one of the edges is small enough
@@ -130,10 +126,10 @@ bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*              
 
     // Write polygon back into the vector
 
-    polygon->clear();
+    polygon.clear();
     for ( typename std::list<IndexType>::iterator it = listPolygon.begin(); it != listPolygon.end(); ++it )
     {
-        polygon->push_back( *it );
+        polygon.push_back( *it );
     }
 
     return existsOrInserted;
@@ -974,8 +970,9 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
     }
 
     iData.intersectionPointIndex = vxIndexIntersectionPoint;
-    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || 
-         e2P1 >= m_edgeIntsectMap.size() || e2P2 >= m_edgeIntsectMap.size() ) return;
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() )
+        return;
     m_edgeIntsectMap[e1P1][e1P2][e2P1][e2P2] = iData;
 }
 
@@ -998,9 +995,9 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
-    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || 
-         e2P1 >= m_edgeIntsectMap.size() || e2P2 >= m_edgeIntsectMap.size() ||
-         !m_edgeIntsectMap[e1P1].size() ) return false;
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() || !m_edgeIntsectMap[e1P1].size() )
+        return false;
 
     typename std::map<IndexType, std::map<IndexType, std::map<IndexType, IntersectData>>>::iterator it;
     it = m_edgeIntsectMap[e1P1].find( e1P2 );

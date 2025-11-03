@@ -93,7 +93,7 @@ public:
                                  std::vector<cvf::Vec3d>*               createdVertexes );
 
     template <typename VerticeArrayType, typename IndexType>
-    static bool insertVertexInPolygon( std::vector<IndexType>*                         polygon,
+    static bool insertVertexInPolygon( std::vector<IndexType>&                         polygon,
                                        ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodeCoords,
                                        IndexType                                       vertexIndex,
                                        double                                          tolerance );
