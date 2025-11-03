@@ -23,6 +23,9 @@
 #include "cvfArrayWrapperConst.h"
 #include "cvfMatrix3.h"
 #include "cvfMatrix4.h"
+
+#include "cafPdmLogging.h"
+
 #include <list>
 #include <map>
 
