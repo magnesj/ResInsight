@@ -158,7 +158,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
                                                    cvf::ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> vertices,
                                                    cvf::ArrayWrapperConst<PolygonArrayType, IndexType>  indices,
                                                    const cvf::Vec3d&                                    point,
-                                                   int*                                                 touchedEdgeIndex,
+                                                   int&                                                 touchedEdgeIndex,
                                                    double                                               tolerance )
 {
     size_t numIndices = indices.size();
@@ -184,9 +184,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
     size_t firstIdx;
     size_t secondIdx;
 
-    CVF_TIGHT_ASSERT( touchedEdgeIndex );
-
-    *touchedEdgeIndex = -1;
+    touchedEdgeIndex = -1;
     for ( firstIdx = 0, secondIdx = 1; firstIdx < numIndices; ++firstIdx, ++secondIdx )
     {
         if ( secondIdx >= numIndices ) secondIdx = 0;
@@ -196,7 +194,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
         double sqDist = GeometryTools::linePointSquareDist( vx0, vx1, point );
         if ( sqDist < tolerance * tolerance )
         {
-            *touchedEdgeIndex = static_cast<int>( firstIdx );
+            touchedEdgeIndex = static_cast<int>( firstIdx );
             return true;
         }
     }
@@ -312,7 +310,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                   nodes,
                                                                                   wrapArrayConst( cv2CubeFaceIndices, 4 ),
                                                                                   nodes[cv1CubeFaceIndices[cv1Idx]],
-                                                                                  &( cv1VxTouchCv2Edge[cv1Idx] ),
+                                                                                  cv1VxTouchCv2Edge[cv1Idx],
                                                                                   tolerance );
             if ( cv1VxTouchCv2[cv1Idx] ) ++numCv1VxesOnCv2;
         }
@@ -323,7 +321,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                   nodes,
                                                                                   wrapArrayConst( cv1CubeFaceIndices, 4 ),
                                                                                   nodes[cv2CubeFaceIndices[cv1Idx]],
-                                                                                  &( cv2VxTouchCv1Edge[cv1Idx] ),
+                                                                                  cv2VxTouchCv1Edge[cv1Idx],
                                                                                   tolerance );
             if ( cv2VxTouchCv1[cv1Idx] ) ++numCv2VxesOnCv1;
         }

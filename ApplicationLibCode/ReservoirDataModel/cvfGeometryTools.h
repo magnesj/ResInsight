@@ -113,7 +113,7 @@ public:
                                                ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> vertices,
                                                ArrayWrapperConst<PolygonArrayType, IndexType>  indices,
                                                const cvf::Vec3d&                               point,
-                                               int*                                            touchedEdgeIndex,
+                                               int&                                            touchedEdgeIndex,
                                                double                                          tolerance = 1e-6 );
 
     template <typename VerticeArrayType, typename IndexType>
