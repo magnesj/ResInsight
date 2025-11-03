@@ -2036,7 +2036,7 @@ void RicWellPathExportMswCompletionsImpl::exportSplitMswData( const RicExportCom
         auto wellDataResult =
             RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
 
-        if ( wellDataResult.has_value() )
+        if ( !wellDataResult.has_value() )
         {
             continue; // Skip wells with no MSW data
         }
