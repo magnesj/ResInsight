@@ -49,7 +49,7 @@ TEST( OpmSummaryTests, DISABLED_PerformanceReadOfRestartFilename )
     for ( int i = 0; i < N; i++ )
     {
         std::vector<QString> warnings;
-        auto                 restartFileInfos = RifEclipseSummaryTools::getRestartFileNamesOpm( filePath, warnings );
+        auto                 restartFileInfos = RifEclipseSummaryTools::getRestartFileNames( filePath, warnings );
     }
     RiaLogging::logElapsedTime( "Completed opm-common", startTime );
 
