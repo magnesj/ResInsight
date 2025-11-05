@@ -22,17 +22,28 @@
 #include <optional>
 #include <string>
 
+// clang-format off
+
+
+// The structures below represent data from various MSW tables
+// The variable names correspond to the table names in Opm::ParserKeywords
+// Example file path:
+// custom-opm-common/generated-opm-common/include/opm/input/eclipse/Parser/ParserKeywords/W.hpp
+
 //==================================================================================================
 /// Header structure for WELSEGS table (well-level information)
 //==================================================================================================
 struct WelsegsHeader
 {
-    std::string           wellName;
-    double                topMD;
-    double                topTVD;
-    std::optional<double> volume;
-    std::string           lengthAndDepthText;
-    std::string           pressureDropText;
+    // type                     variableName;       // Opm::ParserKeywords::WELSEGS::...
+
+    std::string                 well;               // WELNAME
+    double                      topDepth;           // TOPDEP
+    double                      topLength;          // TOPLEN
+    std::optional<double>       wellboreVolume;     // WBORVOL
+    std::string                 infoType;           // TUBOPT
+    std::string                 pressureComponents; // PRESOPT
+    std::optional<std::string>  flowModel;          // FLOWOPT
 };
 
 //==================================================================================================
@@ -40,14 +51,16 @@ struct WelsegsHeader
 //==================================================================================================
 struct WelsegsRow
 {
-    int                   segmentNumber;
-    int                   outletSegmentNumber;
-    int                   branchNumber;
-    double                length;
-    std::optional<double> depth;
-    std::optional<double> diameter;
-    std::optional<double> roughness;
-    std::optional<double> volume;
+    // type               variableName; // Opm::ParserKeywords::WELSEGS::...
+
+    int                   segment1;     // ISEG1
+    int                   segment2;     // ISEG2
+    int                   branch;       // IBRANCH
+    int                   joinSegment;  // ISEG3
+    double                length;       // LENGTH
+    double                depth;        // DEPTH
+    std::optional<double> diameter;     // ID
+    std::optional<double> roughness;    // EPSILON
     std::string           description;
 };
 
@@ -56,15 +69,14 @@ struct WelsegsRow
 //==================================================================================================
 struct CompsegsRow
 {
-    size_t                cellI;
-    size_t                cellJ;
-    size_t                cellK;
-    int                   branchNumber;
-    double                startLength;
-    double                endLength;
-    std::optional<int>    direction;
-    std::optional<double> endRange;
-    std::optional<double> connectionDepth;
+    // type               variableName; // Opm::ParserKeywords::WELSEGS::...
+
+    size_t                      i;              // I
+    size_t                      j;              // J
+    size_t                      k;              // K
+    int                         branch;         // IBRANCH
+    double                      distanceStart;  // LENGTH1
+    double                      distanceEnd;    // LENGTH2
 
     std::string gridName; // Empty for main grid, populated for LGR data
 
