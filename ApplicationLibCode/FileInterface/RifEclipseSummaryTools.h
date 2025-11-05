@@ -69,7 +69,6 @@ public:
     static void dumpMetaData( RifSummaryReaderInterface* readerEclipseSummary );
 
     static std::vector<QString> getRestartFileNames( const QString& headerFileName, std::vector<QString>& warnings );
-    static std::vector<QString> getRestartFileNamesOpm( const QString& headerFileName, std::vector<QString>& warnings );
 
     static RifRestartFileInfo getFileInfoAndTimeSteps( const QString& headerFileName );
 
@@ -81,12 +80,15 @@ public:
     static std::pair<std::string, std::string> splitVectorNameAndSuffix( const std::string& vectorName );
     static std::vector<std::string>            nativeVectorNames( const std::vector<std::string>& vectorNames );
 
-private:
-    static void                 findSummaryFiles( const QString& inputFile, QString* headerFile, QStringList* dataFiles );
-    static QString              getRestartRelativeFilePathResdata( const QString& headerFileName );
-    static QString              getRestartRelativeFilePathOpm( const QString& headerFileName );
+    // Do not use this method directly, use the overload that infers the useOpmReader from Preferences
+    // This method is public to be able to call it from unit tests
     static std::vector<QString> getRestartFileNames( const QString& headerFileName, bool useOpmReader, std::vector<QString>& warnings );
-    static QString              getRestartFilePath( const QString& headerFileName, const QString& restartCaseNameFromFile );
+
+private:
+    static void    findSummaryFiles( const QString& inputFile, QString* headerFile, QStringList* dataFiles );
+    static QString getRestartRelativeFilePathResdata( const QString& headerFileName );
+    static QString getRestartRelativeFilePathOpm( const QString& headerFileName );
+    static QString getRestartFilePath( const QString& headerFileName, const QString& restartCaseNameFromFile );
 
     static void findSummaryHeaderFileInfo( const QString& inputFile, QString* headerFile, QString* path, QString* base, bool* isFormatted );
 };
