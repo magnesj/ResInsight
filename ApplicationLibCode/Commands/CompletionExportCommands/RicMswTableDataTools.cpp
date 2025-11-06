@@ -493,10 +493,10 @@ void RicMswTableDataTools::collectWsegvalvDataRecursively( RigMswTableData&     
             auto flowCoefficient = tieInValve->flowCoefficient();
 
             WsegvalvRow row;
-            row.wellName        = wellNameForExport;
-            row.segmentNumber   = firstSubSegment->segmentNumber();
-            row.flowCoefficient = flowCoefficient;
-            row.area            = tieInValve->area();
+            row.well          = wellNameForExport;
+            row.segmentNumber = firstSubSegment->segmentNumber();
+            row.cv            = flowCoefficient;
+            row.area          = tieInValve->area();
 
             tableData.addWsegvalvRow( row );
         }
@@ -525,10 +525,10 @@ void RicMswTableDataTools::collectWsegvalvDataRecursively( RigMswTableData&     
                     }
 
                     WsegvalvRow row;
-                    row.wellName        = wellNameForExport;
-                    row.segmentNumber   = segmentNumber;
-                    row.flowCoefficient = wsegValve->flowCoefficient();
-                    row.area            = wsegValve->area();
+                    row.well          = wellNameForExport;
+                    row.segmentNumber = segmentNumber;
+                    row.cv            = wsegValve->flowCoefficient();
+                    row.area          = wsegValve->area();
 
                     tableData.addWsegvalvRow( row );
                 }
@@ -577,19 +577,14 @@ void RicMswTableDataTools::collectWsegAicdDataRecursively( RigMswTableData&     
                         auto comment  = aicd->label();
 
                         WsegaicdRow row;
-                        row.wellName        = wellName.toStdString();
-                        row.segmentNumber   = segmentNumber;
-                        row.flowCoefficient = aicd->flowScalingFactor();
-                        row.deviceType      = comment.toStdString();
+                        row.well     = wellName.toStdString();
+                        row.segment1 = segmentNumber;
+                        row.segment2 = segmentNumber;
+                        row.strength = aicd->flowScalingFactor();
+                        row.length   = aicd->length();
 
                         // Extract AICD-specific parameters from the values array
-                        auto values = aicd->values();
-                        if ( values.size() >= 3 )
-                        {
-                            row.oilViscosityParameter   = values[0];
-                            row.waterViscosityParameter = values[1];
-                            row.gasViscosityParameter   = values[2];
-                        }
+                        // auto values = aicd->values();
 
                         tableData.addWsegaicdRow( row );
                     }

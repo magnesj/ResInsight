@@ -61,6 +61,7 @@ struct WelsegsRow
     double                depth;        // DEPTH
     std::optional<double> diameter;     // ID
     std::optional<double> roughness;    // EPSILON
+    
     std::string           description;
 };
 
@@ -69,7 +70,7 @@ struct WelsegsRow
 //==================================================================================================
 struct CompsegsRow
 {
-    // type               variableName; // Opm::ParserKeywords::WELSEGS::...
+    // type               variableName;         // Opm::ParserKeywords::COMPSEGS::...
 
     size_t                      i;              // I
     size_t                      j;              // J
@@ -89,10 +90,18 @@ struct CompsegsRow
 //==================================================================================================
 struct WsegvalvRow
 {
-    std::string           wellName;
-    int                   segmentNumber;
-    double                flowCoefficient;
-    std::optional<double> area;
+    // type                     variableName;   // Opm::ParserKeywords::WSEGVALV::...
+
+    std::string                 well;           // WELNAME
+    int                         segmentNumber;  // ISEG1
+    double                      cv;             // ICDCV
+    double                      area;           // AREARESET
+    std::optional<double>       extraLength;    // SEGLEN
+    std::optional<double>       pipeD;          // ID
+    std::optional<double>       roughness;      // EPSILON
+    std::optional<double>       pipeA;          // AREAPIPE
+    std::optional<std::string>  status;         // STATUS
+    std::optional<double>       maxA;           // AREAMAX
 };
 
 //==================================================================================================
@@ -100,12 +109,27 @@ struct WsegvalvRow
 //==================================================================================================
 struct WsegaicdRow
 {
-    std::string           wellName;
-    int                   segmentNumber;
-    double                flowCoefficient;
-    std::optional<double> area;
-    std::optional<double> oilViscosityParameter;
-    std::optional<double> waterViscosityParameter;
-    std::optional<double> gasViscosityParameter;
-    std::string           deviceType;
+    // type                     variableName;       // Opm::ParserKeywords::WSEGAICD::...
+
+    std::string                 well;               //  1 WELNAME
+    int                         segment1;           //  2 ISEG1
+    int                         segment2;           //  3 ISEG2
+    double                      strength;           //  4 ICDSTREN
+    std::optional<double>       length;             //  5 ICDLEN
+    std::optional<double>       densityCali;        //  6 CALDEN
+    std::optional<double>       viscosityCali;      //  7 CALVISC
+    std::optional<double>       criticalValue;      //  8 EMLCRT
+    std::optional<double>       widthTrans;         //  9 EMLTRANS
+    std::optional<double>       maxViscRatio;       // 10 EMLMAX
+    std::optional<int>          methodScalingFactor;// 11 NSCALFAC
+    double                      maxAbsRate;         // 12 CALRATE
+    double                      flowRateExponent;   // 13 RATEXP
+    double                      viscExponent;       // 14 VISCEXP
+    std::optional<std::string>  status;             // 15 STATUS
+    std::optional<double>       oilFlowFraction;    // 16 A1
+    std::optional<double>       waterFlowFraction;  // 17 A2
+    std::optional<double>       gasFlowFraction;    // 18 A3
+    std::optional<double>       oilViscFraction;    // 19 B1
+    std::optional<double>       waterViscFraction;  // 20 B2
+    std::optional<double>       gasViscFraction;    // 21 B3
 };

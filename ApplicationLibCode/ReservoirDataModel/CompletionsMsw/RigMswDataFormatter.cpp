@@ -84,10 +84,24 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
 {
     for ( const auto& row : rows )
     {
-        formatter.addStdString( row.wellName );
+        formatter.addStdString( row.well );
         formatter.add( row.segmentNumber );
-        formatter.add( row.flowCoefficient );
-        formatter.addOptionalValue( row.area );
+        formatter.add( row.cv );
+        formatter.add( row.area );
+        formatter.addOptionalValue( row.extraLength );
+        formatter.addOptionalValue( row.pipeD );
+        formatter.addOptionalValue( row.roughness );
+        formatter.addOptionalValue( row.pipeA );
+
+        if ( row.status.has_value() )
+        {
+            formatter.addStdString( row.status.value() );
+        }
+        else
+        {
+            formatter.addStdString( "OPEN" );
+        }
+        formatter.addOptionalValue( row.maxA );
 
         formatter.rowCompleted();
     }
@@ -101,14 +115,44 @@ void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const RowContaine
 {
     for ( const auto& row : rows )
     {
-        formatter.addStdString( row.wellName );
-        formatter.add( row.segmentNumber );
-        formatter.add( row.flowCoefficient );
-        formatter.addOptionalValue( row.area );
-        formatter.addOptionalValue( row.oilViscosityParameter );
-        formatter.addOptionalValue( row.waterViscosityParameter );
-        formatter.addOptionalValue( row.gasViscosityParameter );
-        formatter.addStdString( row.deviceType );
+        formatter.addStdString( row.well );
+        formatter.add( row.segment1 );
+        formatter.add( row.segment2 );
+        formatter.add( row.strength );
+        formatter.addOptionalValue( row.length );
+        formatter.addOptionalValue( row.densityCali );
+        formatter.addOptionalValue( row.viscosityCali );
+        formatter.addOptionalValue( row.criticalValue );
+        formatter.addOptionalValue( row.widthTrans );
+
+        if ( row.methodScalingFactor.has_value() )
+        {
+            formatter.add( row.methodScalingFactor.value() );
+        }
+        else
+        {
+            formatter.add( formatter.defaultMarker() );
+        }
+
+        formatter.add( row.maxAbsRate );
+        formatter.add( row.flowRateExponent );
+        formatter.add( row.viscExponent );
+
+        if ( row.status.has_value() )
+        {
+            formatter.addStdString( row.status.value() );
+        }
+        else
+        {
+            formatter.addStdString( "OPEN" );
+        }
+
+        formatter.addOptionalValue( row.oilFlowFraction );
+        formatter.addOptionalValue( row.waterFlowFraction );
+        formatter.addOptionalValue( row.gasFlowFraction );
+        formatter.addOptionalValue( row.oilViscFraction );
+        formatter.addOptionalValue( row.waterViscFraction );
+        formatter.addOptionalValue( row.gasViscFraction );
 
         formatter.rowCompleted();
     }
