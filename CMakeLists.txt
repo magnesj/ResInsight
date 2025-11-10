@@ -568,7 +568,6 @@ set(CMAKE_WARN_DEPRECATED
 
 add_subdirectory(ThirdParty/openzgy)
 
-
 set(CMAKE_WARN_DEPRECATED
     ON
     CACHE BOOL "" FORCE
@@ -1242,10 +1241,11 @@ endif(RESINSIGHT_BUILD_DOCUMENTATION)
 
 # ##############################################################################
 # Final cleanup: Remove unwanted third-party library files from install
-# Libraries that create files in include/ and lib/ are removed here
-# Removed file from zfp and mdspan
+# Libraries that create files in include/ and lib/ are removed here Removed file
+# from zfp and mdspan
 # ##############################################################################
-install(CODE "
+install(
+  CODE "
   # Remove all third-party include and lib files
   if(IS_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/include\")
     message(STATUS \"Removing all include files: \${CMAKE_INSTALL_PREFIX}/include\")
@@ -1255,4 +1255,5 @@ install(CODE "
     message(STATUS \"Removing all lib files: \${CMAKE_INSTALL_PREFIX}/lib\")
     file(REMOVE_RECURSE \"\${CMAKE_INSTALL_PREFIX}/lib\")
   endif()
-")
+"
+)
