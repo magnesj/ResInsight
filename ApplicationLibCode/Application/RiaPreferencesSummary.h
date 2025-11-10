@@ -105,7 +105,6 @@ public:
 
     SummaryRestartFilesImportMode summaryImportMode() const;
     SummaryRestartFilesImportMode gridImportMode() const;
-    SummaryRestartFilesImportMode summaryEnsembleImportMode() const;
     QString                       defaultSummaryCurvesTextFilter() const;
     bool                          colorCurvesByPhase() const;
     bool                          appendHistoryVectors() const;
@@ -121,6 +120,9 @@ public:
 
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void initAfterRead() override;
+
+    void appendGridFields( caf::PdmUiOrdering& uiOrdering );
 
 protected:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
@@ -134,7 +136,6 @@ private:
     caf::PdmField<bool>                              m_summaryRestartFilesShowImportDialog;
     caf::PdmField<SummaryRestartFilesImportModeType> m_summaryImportMode;
     caf::PdmField<SummaryRestartFilesImportModeType> m_gridImportMode;
-    caf::PdmField<SummaryRestartFilesImportModeType> m_summaryEnsembleImportMode;
 
     caf::PdmField<QString>                          m_defaultSummaryCurvesTextFilter;
     caf::PdmField<QString>                          m_crossPlotAddressCombinations;
