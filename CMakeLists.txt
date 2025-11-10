@@ -568,36 +568,6 @@ set(CMAKE_WARN_DEPRECATED
 
 add_subdirectory(ThirdParty/openzgy)
 
-# After zfp target is created, add a custom install rule that excludes zfp files
-if(TARGET zfp)
-  # Create a custom install script that filters out zfp files
-  install(CODE "
-    # Remove all zfp-related files and directories
-    file(GLOB_RECURSE ZFP_FILES 
-         \"\${CMAKE_INSTALL_PREFIX}/include/*zfp*\"
-         \"\${CMAKE_INSTALL_PREFIX}/include/bitstream.h\"
-         \"\${CMAKE_INSTALL_PREFIX}/lib/*zfp*\"
-         \"\${CMAKE_INSTALL_PREFIX}/lib/cmake/*zfp*\")
-    
-    # Remove zfp files if they exist
-    foreach(ZFP_FILE \${ZFP_FILES})
-      if(EXISTS \"\${ZFP_FILE}\")
-        message(STATUS \"Removing zfp file: \${ZFP_FILE}\")
-        file(REMOVE \"\${ZFP_FILE}\")
-      endif()
-    endforeach()
-    
-    # Remove zfp directories completely
-    if(IS_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/include/zfp\")
-      message(STATUS \"Removing zfp directory: \${CMAKE_INSTALL_PREFIX}/include/zfp\")
-      file(REMOVE_RECURSE \"\${CMAKE_INSTALL_PREFIX}/include/zfp\")
-    endif()
-    if(IS_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/lib/cmake/zfp\")
-      message(STATUS \"Removing zfp cmake directory: \${CMAKE_INSTALL_PREFIX}/lib/cmake/zfp\")
-      file(REMOVE_RECURSE \"\${CMAKE_INSTALL_PREFIX}/lib/cmake/zfp\")
-    endif()
-  ")
-endif()
 
 set(CMAKE_WARN_DEPRECATED
     ON
@@ -1269,3 +1239,20 @@ if(RESINSIGHT_BUILD_DOCUMENTATION)
   # IF you do NOT want the documentation to be generated EVERY time you build
   # the project then leave out the 'ALL' keyword from the above command.
 endif(RESINSIGHT_BUILD_DOCUMENTATION)
+
+# ##############################################################################
+# Final cleanup: Remove unwanted third-party library files from install
+# Libraries that create files in include/ and lib/ are removed here
+# Removed file from zfp and mdspan
+# ##############################################################################
+install(CODE "
+  # Remove all third-party include and lib files
+  if(IS_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/include\")
+    message(STATUS \"Removing all include files: \${CMAKE_INSTALL_PREFIX}/include\")
+    file(REMOVE_RECURSE \"\${CMAKE_INSTALL_PREFIX}/include\")
+  endif()
+  if(IS_DIRECTORY \"\${CMAKE_INSTALL_PREFIX}/lib\")
+    message(STATUS \"Removing all lib files: \${CMAKE_INSTALL_PREFIX}/lib\")
+    file(REMOVE_RECURSE \"\${CMAKE_INSTALL_PREFIX}/lib\")
+  endif()
+")
