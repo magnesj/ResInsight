@@ -70,9 +70,9 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
         formatter.add( row.branch );
         formatter.add( row.distanceStart );
         formatter.add( row.distanceEnd );
-    }
 
-    formatter.rowCompleted();
+        formatter.rowCompleted();
+    }
 }
 } // namespace
 
@@ -247,6 +247,7 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         RifTextDataTableColumn( "Vol 1" ),
         RifTextDataTableColumn( "Len&Dep" ),
         RifTextDataTableColumn( "PresDrop" ),
+        RifTextDataTableColumn( "FlowOpt" ),
     };
     formatter.header( tableHeader );
 
