@@ -1940,14 +1940,14 @@ void RicWellPathExportMswCompletionsImpl::exportExperimentalMswToSeparateFolder(
 
     const auto exportFolder = exportSettings.folder() + "/prototype";
 
-    // Use new unified data extraction approach
-    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
+    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
     {
-        exportUnifiedMswData( exportSettings, exportFolder, wellPaths );
-    }
-    else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
-    {
+        RiaLogging::info( "    Experimental MSW export to " + exportFolder );
         exportSplitMswData( exportSettings, exportFolder, wellPaths );
+    }
+    else
+    {
+        RiaLogging::warning( "'Unified' or 'Split on well and completion type' export not supported in experimental MSW export." );
     }
 }
 
