@@ -8,7 +8,13 @@ FetchContent_Declare(
   GIT_REPOSITORY https://github.com/kokkos/mdspan.git
   GIT_TAG 9ceface91483775a6c74d06ebf717bbb2768452f # mdspan-0.6.0
 )
-FetchContent_MakeAvailable(mdspan)
+
+# Disable install for mdspan by excluding it from INSTALL_ALL
+FetchContent_GetProperties(mdspan)
+if(NOT mdspan_POPULATED)
+  FetchContent_Populate(mdspan)
+  add_subdirectory(${mdspan_SOURCE_DIR} ${mdspan_BINARY_DIR} EXCLUDE_FROM_ALL)
+endif()
 
 # surfio_lib
 set(SRC_PATH "${CMAKE_CURRENT_LIST_DIR}/surfio/src/lib")
@@ -23,7 +29,8 @@ target_sources(
 target_include_directories(
   surfio_lib
   INTERFACE ${SRC_PATH}/include
-  PRIVATE $<BUILD_INTERFACE:${mdspan_SOURCE_DIR}/include/>
   PRIVATE ../mio
 )
+
+target_link_libraries(surfio_lib PRIVATE mdspan)
 
