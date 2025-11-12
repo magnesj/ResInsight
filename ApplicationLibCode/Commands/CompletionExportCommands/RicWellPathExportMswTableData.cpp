@@ -2133,13 +2133,13 @@ void RicWellPathExportMswTableData::assignPerforationIntersections( const std::v
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::assignBranchNumbersToPerforations( const RimEclipseCase*         eclipseCase,
                                                                        gsl::not_null<RicMswSegment*> segment,
-                                                                       gsl::not_null<int*>           branchNumber )
+                                                                       int                           branchNumber )
 {
     for ( auto completion : segment->completions() )
     {
         if ( completion->completionType() == RigCompletionData::CompletionType::PERFORATION )
         {
-            completion->setBranchNumber( *branchNumber );
+            completion->setBranchNumber( branchNumber );
         }
     }
 }
@@ -2173,7 +2173,8 @@ void RicWellPathExportMswTableData::assignBranchNumbersToBranch( const RimEclips
                                                                  gsl::not_null<RicMswBranch*> branch,
                                                                  gsl::not_null<int*>          branchNumber )
 {
-    branch->setBranchNumber( *branchNumber );
+    const auto currentBranchNumber = *branchNumber;
+    branch->setBranchNumber( currentBranchNumber );
 
     for ( auto childBranch : branch->branches() )
     {
@@ -2184,7 +2185,7 @@ void RicWellPathExportMswTableData::assignBranchNumbersToBranch( const RimEclips
     // Assign perforations first to ensure the same branch number as the segment
     for ( auto segment : branch->segments() )
     {
-        assignBranchNumbersToPerforations( eclipseCase, segment, branchNumber );
+        assignBranchNumbersToPerforations( eclipseCase, segment, currentBranchNumber );
     }
 
     // Assign other completions with an incremented branch number
