@@ -28,8 +28,7 @@ namespace
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WELSEGS segment data rows
 //--------------------------------------------------------------------------------------------------
-template <typename RowContainer>
-void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
+void formatWelsegsRows( RifTextDataTableFormatter& formatter, const std::vector<WelsegsRow>& rows )
 {
     for ( const auto& row : rows )
     {
@@ -54,8 +53,7 @@ void formatWelsegsRows( RifTextDataTableFormatter& formatter, const RowContainer
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format COMPSEGS data rows
 //--------------------------------------------------------------------------------------------------
-template <typename RowContainer>
-void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContainer& rows, bool isLgrData )
+void formatCompsegsRows( RifTextDataTableFormatter& formatter, const std::vector<CompsegsRow>& rows, bool isLgrData )
 {
     for ( const auto& row : rows )
     {
@@ -79,8 +77,7 @@ void formatCompsegsRows( RifTextDataTableFormatter& formatter, const RowContaine
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WSEGVALV data rows
 //--------------------------------------------------------------------------------------------------
-template <typename RowContainer>
-void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
+void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const std::vector<WsegvalvRow>& rows )
 {
     for ( const auto& row : rows )
     {
@@ -110,8 +107,7 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const RowContaine
 //--------------------------------------------------------------------------------------------------
 /// Helper function to format WSEGAICD data rows
 //--------------------------------------------------------------------------------------------------
-template <typename RowContainer>
-void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const RowContainer& rows )
+void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const std::vector<WsegaicdRow>& rows )
 {
     for ( const auto& row : rows )
     {
@@ -247,7 +243,6 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
         RifTextDataTableColumn( "Vol 1" ),
         RifTextDataTableColumn( "Len&Dep" ),
         RifTextDataTableColumn( "PresDrop" ),
-        RifTextDataTableColumn( "FlowOpt" ),
     };
     formatter.header( tableHeader );
 
@@ -257,8 +252,16 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
     formatter.add( welsegsHeader.topLength );
     formatter.addOptionalValue( welsegsHeader.wellboreVolume );
     formatter.addStdString( welsegsHeader.infoType );
-    formatter.addOptionalStdString( welsegsHeader.pressureComponents );
-    formatter.addOptionalStdString( welsegsHeader.flowModel );
+
+    if ( welsegsHeader.pressureComponents.has_value() )
+    {
+        formatter.addStdString( "'" + welsegsHeader.pressureComponents.value() + "'" );
+    }
+    else
+    {
+        formatter.add( formatter.defaultMarker() );
+    }
+
     formatter.rowCompleted();
 
     // Column headers for segment data

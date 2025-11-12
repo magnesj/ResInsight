@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ResInsightProject>
-    <DocumentFileName>C:/gitroot/ResInsight/TestModels/msw-export/project-files/base.rsp</DocumentFileName>
+    <DocumentFileName>C:/gitroot/ResInsight/TestModels/msw-export/project-files/perf_valve.rsp</DocumentFileName>
     <ProjectFileVersionString>2025.09.4-dev.01</ProjectFileVersionString>
     <ReferencedExternalFiles>
         $PathId_001$ C:/gitroot/ResInsight/TestModels/msw-export/opm-simulation-reference/BASE_MODEL_1.EGRID;
@@ -1963,7 +1963,26 @@
                                                     <StartDate>2000_01_01-00:00:00</StartDate>
                                                     <UseCustomEndDate>False </UseCustomEndDate>
                                                     <EndDate>2000_12_30-00:00:00</EndDate>
-                                                    <Valves/>
+                                                    <Valves>
+                                                        <WellPathValve>
+                                                            <Name>1 ICD: 3196.41 - 3730.39</Name>
+                                                            <IsChecked>True </IsChecked>
+                                                            <ValveTemplate>.. .. .. .. .. .. CompletionTemplateCollection 0 ValveTemplates 0 ValveDefinitions 1</ValveTemplate>
+                                                            <StartMeasuredDepth>3196.41483453272</StartMeasuredDepth>
+                                                            <ValveLocations>
+                                                                <RimMultipleValveLocations>
+                                                                    <LocationMode>VALVE_COUNT</LocationMode>
+                                                                    <RangeStart>3196.41483453272</RangeStart>
+                                                                    <RangeEnd>3730.38634705782</RangeEnd>
+                                                                    <ValveSpacing>533.9715125251</ValveSpacing>
+                                                                    <RangeValveCount>1</RangeValveCount>
+                                                                    <LocationOfValves>3196.41483453272 </LocationOfValves>
+                                                                </RimMultipleValveLocations>
+                                                            </ValveLocations>
+                                                            <EditTemplate>False </EditTemplate>
+                                                            <CreateTemplate>False </CreateTemplate>
+                                                        </WellPathValve>
+                                                    </Valves>
                                                 </Perforation>
                                             </Perforations>
                                             <NonDarcyParameters>
@@ -2982,7 +3001,7 @@
         </RimGridCalculationCollection>
     </GridCalculationCollection>
     <MultiSnapshotDefinitions/>
-    <TreeViewStates>-1-11000;-1-110100080;-1-1101000110;-1-1101000;-1-11010;-1-110;-1-1300020;-1-13000;-1-130||-1-110</TreeViewStates>
+    <TreeViewStates>-1-11000;-1-110100080;-1-1101000110;-1-1101000;-1-11010;-1-110;-1-130002000;-1-1300020;-1-13000;-1-130||-1-110</TreeViewStates>
     <TreeViewCurrentModelIndexPaths>3 0;0 0||1 0;0 0</TreeViewCurrentModelIndexPaths>
     <PlotWindowTreeViewStates>-1-100|-1-100|||</PlotWindowTreeViewStates>
     <PlotWindowTreeViewCurrentModelIndexPaths>||||</PlotWindowTreeViewCurrentModelIndexPaths>
