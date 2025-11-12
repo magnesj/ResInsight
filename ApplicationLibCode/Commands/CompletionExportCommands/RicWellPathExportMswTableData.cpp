@@ -2347,6 +2347,8 @@ std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extra
                                   exportInfo.mainBoreBranch() );
     appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
 
+    updateDataForMultipleItemsInSameGridCell( exportInfo.mainBoreBranch() );
+
     // Assign branch numbers
     int branchNumber = 1;
     assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );

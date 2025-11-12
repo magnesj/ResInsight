@@ -383,6 +383,7 @@ void RicMswTableDataTools::collectCompletionsForSegment( RigMswTableData&       
 
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for a completion's segments
+/// Porting of RicMswTableFormatterTools::writeCompletionWelsegsSegments()
 //--------------------------------------------------------------------------------------------------
 void RicMswTableDataTools::collectCompletionWelsegsSegments( RigMswTableData&                    tableData,
                                                              gsl::not_null<const RicMswSegment*> outletSegment,
@@ -395,34 +396,80 @@ void RicMswTableDataTools::collectCompletionWelsegsSegments( RigMswTableData&   
 
     auto outletNumber = outletSegment->segmentNumber();
 
-    for ( auto completionSegment : completion->segments() )
+    for ( auto segment : completion->segments() )
     {
-        completionSegment->setSegmentNumber( *segmentNumber );
+        segment->setSegmentNumber( *segmentNumber );
 
-        WelsegsRow row;
-        row.segment1    = completionSegment->segmentNumber();
-        row.segment2    = completionSegment->segmentNumber();
-        row.joinSegment = outletNumber;
-        row.branch      = completion->branchNumber();
-        row.length      = completionSegment->startMD();
-        row.depth       = completionSegment->startTVD();
-        row.diameter    = completionSegment->equivalentDiameter();
-        row.roughness   = completionSegment->openHoleRoughnessFactor();
+        double startMD  = segment->startMD();
+        double endMD    = segment->endMD();
+        double startTVD = segment->startTVD();
+        double endTVD   = segment->endTVD();
 
-        if ( !isDescriptionAdded )
+        auto splitSegments = RicMswTableFormatterTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength );
+        for ( const auto& [subStartMD, subEndMD] : splitSegments )
         {
-            row.description    = completion->label().toStdString();
-            isDescriptionAdded = true;
+            int subSegmentNumber = ( *segmentNumber )++;
+
+            // TODO: Verify this calculation for fractures
+            double subStartTVD = RicMswTableFormatterTools::tvdFromMeasuredDepth( completion->wellPath(), subStartMD );
+            double subEndTVD   = RicMswTableFormatterTools::tvdFromMeasuredDepth( completion->wellPath(), subEndMD );
+
+            if ( completion->completionType() == RigCompletionData::CompletionType::FISHBONES )
+            {
+                // Not possible to do interpolation based on well path geometry here
+                // Use linear interpolation based on start/end TVD for segment
+                {
+                    auto normalizedWeight = ( subStartMD - startMD ) / ( endMD - startMD );
+                    subStartTVD           = startTVD * ( 1.0 - normalizedWeight ) + endTVD * normalizedWeight;
+                }
+                {
+                    auto normalizedWeight = ( subEndMD - startMD ) / ( endMD - startMD );
+
+                    subEndTVD = startTVD * ( 1.0 - normalizedWeight ) + endTVD * normalizedWeight;
+                }
+            }
+
+            double depth  = 0;
+            double length = 0;
+
+            if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+            {
+                depth  = subEndTVD - subStartTVD;
+                length = subEndMD - subStartMD;
+            }
+            else
+            {
+                depth  = subEndTVD;
+                length = subEndMD;
+            }
+
+            double diameter = segment->equivalentDiameter();
+            if ( segment->effectiveDiameter() > 0.0 ) diameter = segment->effectiveDiameter();
+
+            WelsegsRow row;
+            row.segment1    = subSegmentNumber;
+            row.segment2    = subSegmentNumber;
+            row.joinSegment = outletNumber;
+            row.branch      = completion->branchNumber();
+            row.length      = length;
+            row.depth       = depth;
+            row.diameter    = diameter;
+            row.roughness   = segment->openHoleRoughnessFactor();
+
+            if ( !isDescriptionAdded )
+            {
+                row.description    = completion->label().toStdString();
+                isDescriptionAdded = true;
+            }
+
+            tableData.addWelsegsRow( row );
+
+            outletNumber = subSegmentNumber;
         }
 
-        tableData.addWelsegsRow( row );
-
-        outletNumber = *segmentNumber;
-        ( *segmentNumber )++;
-
-        for ( auto comp : completionSegment->completions() )
+        for ( auto comp : segment->completions() )
         {
-            collectCompletionWelsegsSegments( tableData, completionSegment, comp, exportInfo, maxSegmentLength, segmentNumber );
+            collectCompletionWelsegsSegments( tableData, segment, comp, exportInfo, maxSegmentLength, segmentNumber );
         }
     }
 }
