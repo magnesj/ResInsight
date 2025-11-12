@@ -1061,10 +1061,10 @@
                                             <WindowController>
                                                 <MdiWindowController>
                                                     <MainWindowID>0</MainWindowID>
-                                                    <xPos>400</xPos>
+                                                    <xPos>0</xPos>
                                                     <yPos>0</yPos>
-                                                    <Width>400</Width>
-                                                    <Height>400</Height>
+                                                    <Width>1174</Width>
+                                                    <Height>480</Height>
                                                     <IsMaximized>True </IsMaximized>
                                                 </MdiWindowController>
                                             </WindowController>
@@ -1079,10 +1079,10 @@
                                                     <AddSampleSpacing>False </AddSampleSpacing>
                                                 </RimViewNameConfig>
                                             </NameConfig>
-                                            <CameraPosition>-0.955741337275351 -0.164076805364744 0.244207489984283 263.191274293802 0.23941377816901 -0.916167784241664 0.321430605170944 990.720835186399 0.170995728151214 0.365671154261611 0.914901671161998 -4156.48225919048 0 0 0 1</CameraPosition>
-                                            <CameraPointOfInterest>727.0218091156 1016.22910791337 697.639278848061</CameraPointOfInterest>
-                                            <CameraPositionProxy>-0.955741337275351 -0.164076805364744 0.244207489984283 263.191274293802 0.23941377816901 -0.916167784241664 0.321430605170944 990.720835186399 0.170995728151214 0.365671154261611 0.914901671161998 -4156.48225919048 0 0 0 1</CameraPositionProxy>
-                                            <CameraPointOfInterestProxy>727.0218091156 1016.22910791337 697.639278848061</CameraPointOfInterestProxy>
+                                            <CameraPosition>-0.967155222606826 -0.206275759349899 0.148529749508181 1008.21173953321 0.147463959923488 0.0206203041309467 0.988852457943667 -743.415694354018 -0.207039020254696 0.978276604116734 0.0104752054779744 -2341.28355863008 0 0 0 1</CameraPosition>
+                                            <CameraPointOfInterest>1216.69443106598 1656.36188012115 501.172276252353</CameraPointOfInterest>
+                                            <CameraPositionProxy>-0.967155222606826 -0.206275759349899 0.148529749508181 1008.21173953321 0.147463959923488 0.0206203041309467 0.988852457943667 -743.415694354018 -0.207039020254696 0.978276604116734 0.0104752054779744 -2341.28355863008 0 0 0 1</CameraPositionProxy>
+                                            <CameraPointOfInterestProxy>1216.69443106598 1656.36188012115 501.172276252353</CameraPointOfInterestProxy>
                                             <PerspectiveProjection>True </PerspectiveProjection>
                                             <GridZScale>5</GridZScale>
                                             <BackgroundColor>0.689997732639313 0.770000755786896 0.869993150234222</BackgroundColor>
@@ -1305,7 +1305,7 @@
                                             </ReservoirSurfaceResultDefColl>
                                             <GridCollection>
                                                 <GridCollection>
-                                                    <IsActive>True </IsActive>
+                                                    <IsActive>False </IsActive>
                                                     <MainGrid>
                                                         <GridInfo>
                                                             <IsActive>True </IsActive>
@@ -1655,7 +1655,7 @@
                                             </VirtualPerforationResult>
                                             <WellCollection>
                                                 <Wells>
-                                                    <Active>True </Active>
+                                                    <Active>False </Active>
                                                     <ShowWellsIntersectingVisibleCells>False </ShowWellsIntersectingVisibleCells>
                                                     <WellHeadScale>1</WellHeadScale>
                                                     <WellHeadPositionScaleFactor>0.1</WellHeadPositionScaleFactor>
@@ -1779,7 +1779,7 @@
                                                         </Well>
                                                     </Wells>
                                                     <ShowWellValvesTristate>True </ShowWellValvesTristate>
-                                                    <WellDiskSummaryCase></WellDiskSummaryCase>
+                                                    <WellDiskSummaryCase>.. .. .. .. .. SummaryCaseCollection 0 SummaryCases 1</WellDiskSummaryCase>
                                                     <WellDiskQuantity>WOPT</WellDiskQuantity>
                                                     <WellDiskPropertyType>PROPERTY_TYPE_PREDEFINED</WellDiskPropertyType>
                                                     <WellDiskPropertyConfigType>PRODUCTION_RATES</WellDiskPropertyConfigType>
@@ -1953,10 +1953,10 @@
                                             <IsChecked>True </IsChecked>
                                             <Perforations>
                                                 <Perforation>
-                                                    <Name>3196.41 - 3730.39</Name>
+                                                    <Name>3100 - 3800</Name>
                                                     <IsChecked>True </IsChecked>
-                                                    <StartMeasuredDepth>3196.41483453272</StartMeasuredDepth>
-                                                    <EndMeasuredDepth>3730.38634705782</EndMeasuredDepth>
+                                                    <StartMeasuredDepth>3100</StartMeasuredDepth>
+                                                    <EndMeasuredDepth>3800</EndMeasuredDepth>
                                                     <Diameter>0.216</Diameter>
                                                     <SkinFactor>0</SkinFactor>
                                                     <UseCustomStartDate>False </UseCustomStartDate>
@@ -1965,18 +1965,18 @@
                                                     <EndDate>2000_12_30-00:00:00</EndDate>
                                                     <Valves>
                                                         <WellPathValve>
-                                                            <Name>1 ICD: 3196.41 - 3730.39</Name>
+                                                            <Name>1 ICD: 3100 - 3800</Name>
                                                             <IsChecked>True </IsChecked>
                                                             <ValveTemplate>.. .. .. .. .. .. CompletionTemplateCollection 0 ValveTemplates 0 ValveDefinitions 1</ValveTemplate>
-                                                            <StartMeasuredDepth>3196.41483453272</StartMeasuredDepth>
+                                                            <StartMeasuredDepth>3100</StartMeasuredDepth>
                                                             <ValveLocations>
                                                                 <RimMultipleValveLocations>
                                                                     <LocationMode>VALVE_COUNT</LocationMode>
-                                                                    <RangeStart>3196.41483453272</RangeStart>
-                                                                    <RangeEnd>3730.38634705782</RangeEnd>
-                                                                    <ValveSpacing>533.9715125251</ValveSpacing>
+                                                                    <RangeStart>3100</RangeStart>
+                                                                    <RangeEnd>3800</RangeEnd>
+                                                                    <ValveSpacing>700</ValveSpacing>
                                                                     <RangeValveCount>1</RangeValveCount>
-                                                                    <LocationOfValves>3196.41483453272 </LocationOfValves>
+                                                                    <LocationOfValves>3100 </LocationOfValves>
                                                                 </RimMultipleValveLocations>
                                                             </ValveLocations>
                                                             <EditTemplate>False </EditTemplate>

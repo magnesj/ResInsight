@@ -2347,13 +2347,16 @@ std::expected<RigMswTableData, std::string>
     RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
 
     // Use the new collection functions to populate the table data
-    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), false );
+    bool exportCompletionsAfterMainBore = true;
+    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBore );
 
-    RicMswTableDataTools::collectCompsegData( tableData, exportInfo, false );
+    bool isLgr = false;
+    RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
 
     if ( exportInfo.hasSubGridIntersections() )
     {
-        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, true );
+        isLgr = true;
+        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
     }
 
     RicMswTableDataTools::collectWsegvalvData( tableData, exportInfo );

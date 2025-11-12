@@ -250,6 +250,7 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&             t
 
 //--------------------------------------------------------------------------------------------------
 /// Helper function to collect WELSEGS data for valve completions
+/// Ported from RicMswTableFormatterTools::writeValveWelsegsSegment()
 //--------------------------------------------------------------------------------------------------
 void RicMswTableDataTools::collectValveWelsegsSegment( RigMswTableData&     tableData,
                                                        const RicMswSegment* outletSegment,
@@ -258,25 +259,85 @@ void RicMswTableDataTools::collectValveWelsegsSegment( RigMswTableData&     tabl
                                                        double               maxSegmentLength,
                                                        int*                 segmentNumber )
 {
-    for ( auto valveSegment : valve->segments() )
-    {
-        valveSegment->setSegmentNumber( *segmentNumber );
+    if ( !valve ) return;
+    if ( !valve->isValid() ) return;
+    if ( !valve->wellPath() ) return;
 
+    auto segments = valve->segments();
+
+    double startMD = 0.0;
+    double endMD   = 0.0;
+
+    if ( valve->completionType() == RigCompletionData::CompletionType::PERFORATION_ICD ||
+         valve->completionType() == RigCompletionData::CompletionType::PERFORATION_AICD )
+    {
+        CVF_ASSERT( segments.size() > 1 );
+
+        // The 0.1 valve segment is the first, the perforated segment is the second
+        auto subSegment = segments[0];
+        subSegment->setSegmentNumber( *segmentNumber );
+
+        double midPointMD = subSegment->outputMD();
+        startMD           = midPointMD;
+        endMD             = startMD + 0.1;
+    }
+    else
+    {
+        auto subSegment = segments.front();
+        subSegment->setSegmentNumber( *segmentNumber );
+
+        startMD = subSegment->startMD();
+        endMD   = subSegment->endMD();
+    }
+
+    auto splitSegments = RicMswTableFormatterTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength );
+
+    int        outletSegmentNumber = outletSegment ? outletSegment->segmentNumber() : 1;
+    const auto linerDiameter       = valve->wellPath()->mswCompletionParameters()->linerDiameter( exportInfo.unitSystem() );
+    const auto roughnessFactor     = valve->wellPath()->mswCompletionParameters()->roughnessFactor( exportInfo.unitSystem() );
+
+    bool isCommentAdded = false;
+    for ( const auto& [subStartMD, subEndMD] : splitSegments )
+    {
         WelsegsRow row;
-        row.segment1    = valveSegment->segmentNumber();
-        row.segment2    = valveSegment->segmentNumber();
-        row.joinSegment = outletSegment ? outletSegment->segmentNumber() : 1;
+
+        if ( !isCommentAdded )
+        {
+            row.description = valve->label().toStdString();
+            isCommentAdded  = true;
+        }
+
+        row.segment1    = *segmentNumber;
+        row.segment2    = *segmentNumber;
+        row.joinSegment = outletSegmentNumber;
         row.branch      = valve->branchNumber();
-        row.length      = valveSegment->startMD();
-        row.depth       = valveSegment->startTVD();
-        row.diameter    = valveSegment->equivalentDiameter();
-        row.roughness   = valveSegment->openHoleRoughnessFactor();
-        // row.description         = QString( "Valve %1" ).arg( valve->label() );
+
+        const double subStartTVD = RicMswTableFormatterTools::tvdFromMeasuredDepth( valve->wellPath(), subStartMD );
+        const double subEndTVD   = RicMswTableFormatterTools::tvdFromMeasuredDepth( valve->wellPath(), subEndMD );
+
+        double depth  = 0;
+        double length = 0;
+
+        if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+        {
+            depth  = subEndTVD - subStartTVD;
+            length = subEndMD - subStartMD;
+        }
+        else
+        {
+            depth  = subEndTVD;
+            length = subEndMD;
+        }
+
+        row.length    = length;
+        row.depth     = depth;
+        row.diameter  = linerDiameter;
+        row.roughness = roughnessFactor;
 
         tableData.addWelsegsRow( row );
 
+        outletSegmentNumber = *segmentNumber;
         ( *segmentNumber )++;
-        outletSegment = valveSegment;
     }
 }
 
