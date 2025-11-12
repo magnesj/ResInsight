@@ -380,7 +380,10 @@ void RicWellPathExportMswTableData::exportSplitMswData( const RicExportCompletio
         try
         {
             // Extract data for single well
-            auto wellDataResult = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+            auto wellDataResult = extractSingleWellMswData( exportSettings.caseToApply,
+                                                            wellPath,
+                                                            exportSettings.timeStep,
+                                                            exportSettings.exportCompletionWelspecAfterMainBore() );
             if ( !wellDataResult.has_value() )
             {
                 continue; // Skip wells with no MSW data
@@ -2286,7 +2289,10 @@ RigMswUnifiedDataWIP RicWellPathExportMswTableData::extractUnifiedMswData( const
 
     for ( RimWellPath* wellPath : wellPaths )
     {
-        auto wellData = extractSingleWellMswData( exportSettings.caseToApply, wellPath, exportSettings.timeStep );
+        auto wellData = extractSingleWellMswData( exportSettings.caseToApply,
+                                                  wellPath,
+                                                  exportSettings.timeStep,
+                                                  exportSettings.exportCompletionWelspecAfterMainBore() );
         if ( !wellData.has_value() )
         {
             RiaLogging::error(
@@ -2302,8 +2308,10 @@ RigMswUnifiedDataWIP RicWellPathExportMswTableData::extractUnifiedMswData( const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::expected<RigMswTableData, std::string>
-    RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase, RimWellPath* wellPath, int timeStep )
+std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase,
+                                                                                                     RimWellPath*    wellPath,
+                                                                                                     int             timeStep,
+                                                                                                     bool exportCompletionsAfterMainBoreSegments )
 {
     if ( !eclipseCase || !wellPath || eclipseCase->eclipseCaseData() == nullptr )
     {
@@ -2347,8 +2355,7 @@ std::expected<RigMswTableData, std::string>
     RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
 
     // Use the new collection functions to populate the table data
-    bool exportCompletionsAfterMainBore = true;
-    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBore );
+    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBoreSegments );
 
     bool isLgr = false;
     RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
