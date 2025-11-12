@@ -85,20 +85,6 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const std::vector
         formatter.add( row.segmentNumber );
         formatter.add( row.cv );
         formatter.add( row.area );
-        formatter.addOptionalValue( row.extraLength );
-        formatter.addOptionalValue( row.pipeD );
-        formatter.addOptionalValue( row.roughness );
-        formatter.addOptionalValue( row.pipeA );
-
-        if ( row.status.has_value() )
-        {
-            formatter.addStdString( row.status.value() );
-        }
-        else
-        {
-            formatter.addStdString( "OPEN" );
-        }
-        formatter.addOptionalValue( row.maxA );
 
         formatter.rowCompleted();
     }
