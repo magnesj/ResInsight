@@ -22,6 +22,7 @@
 
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
+#include "RicMswTableDataTools.h"
 
 #include "RifTextDataTableFormatter.h"
 
@@ -54,36 +55,6 @@ public:
     int     m_segmentNumber;
     double  m_cv;
     double  m_ac;
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class RicMswTableFormatterTools::AicdWsegvalveData
-{
-public:
-    explicit AicdWsegvalveData( const QString&                             wellName,
-                                const QString&                             comment,
-                                int                                        segmentNumber,
-                                double                                     flowScalingFactor,
-                                bool                                       isOpen,
-                                const std::array<double, AICD_NUM_PARAMS>& values )
-        : m_wellName( wellName )
-        , m_comment( comment )
-        , m_segmentNumber( segmentNumber )
-        , m_flowScalingFactor( flowScalingFactor )
-        , m_isOpen( isOpen )
-        , m_values( values )
-
-    {
-    }
-
-    QString                             m_wellName;
-    QString                             m_comment;
-    int                                 m_segmentNumber;
-    double                              m_flowScalingFactor;
-    bool                                m_isOpen;
-    std::array<double, AICD_NUM_PARAMS> m_values;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -547,9 +518,9 @@ void RicMswTableFormatterTools::generateWsegvalvTableRecursively( gsl::not_null<
 //--------------------------------------------------------------------------------------------------
 void RicMswTableFormatterTools::generateWsegAicdTable( RifTextDataTableFormatter& formatter, RicMswExportInfo& exportInfo )
 {
-    std::map<size_t, std::vector<AicdWsegvalveData>> aicdValveData;
+    std::map<size_t, std::vector<RicMswTableDataTools::AicdWsegvalveData>> aicdValveData;
 
-    generateWsegAicdTableRecursively( exportInfo, exportInfo.mainBoreBranch(), aicdValveData );
+    RicMswTableDataTools::generateWsegAicdTableRecursively( exportInfo, exportInfo.mainBoreBranch(), aicdValveData );
 
     if ( !aicdValveData.empty() )
     {
@@ -620,52 +591,6 @@ void RicMswTableFormatterTools::generateWsegAicdTable( RifTextDataTableFormatter
         }
 
         tightFormatter.tableCompleted();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicMswTableFormatterTools::generateWsegAicdTableRecursively( RicMswExportInfo&                                 exportInfo,
-                                                                  gsl::not_null<const RicMswBranch*>                branch,
-                                                                  std::map<size_t, std::vector<AicdWsegvalveData>>& aicdValveData )
-{
-    for ( auto segment : branch->segments() )
-    {
-        for ( auto completion : segment->completions() )
-        {
-            if ( completion->completionType() == RigCompletionData::CompletionType::PERFORATION_AICD )
-            {
-                auto aicd = static_cast<const RicMswPerforationAICD*>( completion );
-                if ( aicd->isValid() )
-                {
-                    int segmentNumber = -1;
-                    for ( auto seg : aicd->segments() )
-                    {
-                        if ( seg->segmentNumber() > -1 ) segmentNumber = seg->segmentNumber();
-                        if ( seg->intersections().empty() ) continue;
-
-                        size_t cellIndex = seg->intersections().front()->globalCellIndex();
-
-                        auto wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
-                        auto comment  = aicd->label();
-                        aicdValveData[cellIndex].push_back(
-                            AicdWsegvalveData( wellName, comment, segmentNumber, aicd->flowScalingFactor(), aicd->isOpen(), aicd->values() ) );
-                    }
-                }
-                else
-                {
-                    RiaLogging::error( QString( "Export AICD Valve (%1): Valve is invalid. At least one required "
-                                                "template parameter is not set." )
-                                           .arg( aicd->label() ) );
-                }
-            }
-        }
-    }
-
-    for ( auto childBranch : branch->branches() )
-    {
-        generateWsegAicdTableRecursively( exportInfo, childBranch, aicdValveData );
     }
 }
 

@@ -95,17 +95,20 @@ void formatWsegvalvRows( RifTextDataTableFormatter& formatter, const std::vector
 //--------------------------------------------------------------------------------------------------
 void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const std::vector<WsegaicdRow>& rows )
 {
+    constexpr auto defaultValue = std::numeric_limits<double>::infinity();
+
     for ( const auto& row : rows )
     {
         formatter.addStdString( row.well );
         formatter.add( row.segment1 );
         formatter.add( row.segment2 );
-        formatter.add( row.strength );
+        formatter.addValueOrDefaultMarker( row.strength, defaultValue );
         formatter.addOptionalValue( row.length );
         formatter.addOptionalValue( row.densityCali );
         formatter.addOptionalValue( row.viscosityCali );
         formatter.addOptionalValue( row.criticalValue );
         formatter.addOptionalValue( row.widthTrans );
+        formatter.addOptionalValue( row.maxViscRatio );
 
         if ( row.methodScalingFactor.has_value() )
         {
@@ -116,9 +119,9 @@ void formatWsegaicdRows( RifTextDataTableFormatter& formatter, const std::vector
             formatter.add( formatter.defaultMarker() );
         }
 
-        formatter.add( row.maxAbsRate );
-        formatter.add( row.flowRateExponent );
-        formatter.add( row.viscExponent );
+        formatter.addValueOrDefaultMarker( row.maxAbsRate, defaultValue );
+        formatter.addValueOrDefaultMarker( row.flowRateExponent, defaultValue );
+        formatter.addValueOrDefaultMarker( row.viscExponent, defaultValue );
 
         if ( row.status.has_value() )
         {

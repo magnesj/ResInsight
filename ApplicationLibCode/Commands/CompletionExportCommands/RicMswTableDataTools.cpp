@@ -477,6 +477,52 @@ void RicMswTableDataTools::collectCompletionWelsegsSegments( RigMswTableData&   
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicMswTableDataTools::generateWsegAicdTableRecursively( RicMswExportInfo&                                 exportInfo,
+                                                             gsl::not_null<const RicMswBranch*>                branch,
+                                                             std::map<size_t, std::vector<AicdWsegvalveData>>& aicdValveData )
+{
+    for ( auto segment : branch->segments() )
+    {
+        for ( auto completion : segment->completions() )
+        {
+            if ( completion->completionType() == RigCompletionData::CompletionType::PERFORATION_AICD )
+            {
+                auto aicd = static_cast<const RicMswPerforationAICD*>( completion );
+                if ( aicd->isValid() )
+                {
+                    int segmentNumber = -1;
+                    for ( auto seg : aicd->segments() )
+                    {
+                        if ( seg->segmentNumber() > -1 ) segmentNumber = seg->segmentNumber();
+                        if ( seg->intersections().empty() ) continue;
+
+                        size_t cellIndex = seg->intersections().front()->globalCellIndex();
+
+                        auto wellName = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport();
+                        auto comment  = aicd->label();
+                        aicdValveData[cellIndex].push_back(
+                            AicdWsegvalveData( wellName, comment, segmentNumber, aicd->flowScalingFactor(), aicd->isOpen(), aicd->values() ) );
+                    }
+                }
+                else
+                {
+                    RiaLogging::error( QString( "Export AICD Valve (%1): Valve is invalid. At least one required "
+                                                "template parameter is not set." )
+                                           .arg( aicd->label() ) );
+                }
+            }
+        }
+    }
+
+    for ( auto childBranch : branch->branches() )
+    {
+        generateWsegAicdTableRecursively( exportInfo, childBranch, aicdValveData );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicMswTableDataTools::collectCompsegData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, bool exportSubGridIntersections )
 {
     // Define completion types to export
@@ -652,11 +698,79 @@ void RicMswTableDataTools::collectWsegvalvDataRecursively( RigMswTableData&     
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Based on RicMswTableFormatterTools::generateWsegAicdTable()
 //--------------------------------------------------------------------------------------------------
 void RicMswTableDataTools::collectWsegAicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo )
 {
-    collectWsegAicdDataRecursively( tableData, exportInfo, exportInfo.mainBoreBranch() );
+    std::map<size_t, std::vector<AicdWsegvalveData>> aicdValveData;
+    generateWsegAicdTableRecursively( exportInfo, exportInfo.mainBoreBranch(), aicdValveData );
+
+    {
+        // Export data for each cell with AICD valves
+
+        for ( auto [globalCellIndex, aicdDataForSameCell] : aicdValveData )
+        {
+            if ( aicdDataForSameCell.empty() ) continue;
+
+            double      accumulatedFlowScalingFactorDivisor = 0.0;
+            QStringList comments;
+
+            // See RicMswAICDAccumulator::accumulateValveParameters for similar accumulation for multiple valves in same
+            // segment
+
+            for ( const auto& aicdData : aicdDataForSameCell )
+            {
+                accumulatedFlowScalingFactorDivisor += 1.0 / aicdData.m_flowScalingFactor;
+                comments.push_back( aicdData.m_comment );
+            }
+
+            WsegaicdRow row;
+
+            auto commentsCombined = comments.join( "; " );
+            row.description       = commentsCombined.toStdString();
+
+            auto firstDataObject = aicdDataForSameCell.front();
+
+            row.well     = firstDataObject.m_wellName.toStdString(); // #1
+            row.segment1 = firstDataObject.m_segmentNumber; // #2
+            row.segment2 = firstDataObject.m_segmentNumber; // #3
+
+            std::array<double, AICD_NUM_PARAMS> values = firstDataObject.m_values;
+
+            row.strength = values[AICD_STRENGTH]; // #4 : AICD Strength
+
+            double flowScalingFactor = 1.0 / accumulatedFlowScalingFactorDivisor;
+            row.length               = flowScalingFactor; // #5 : AICD Length is used to store the flow scaling factor
+
+            auto setOptional = [&exportInfo]( double value ) -> std::optional<double>
+            {
+                if ( value == exportInfo.defaultDoubleValue() ) return std::nullopt;
+
+                return value;
+            };
+
+            row.densityCali         = setOptional( values[AICD_DENSITY_CALIB_FLUID] ); // #6
+            row.viscosityCali       = setOptional( values[AICD_VISCOSITY_CALIB_FLUID] ); // #7
+            row.criticalValue       = setOptional( values[AICD_CRITICAL_WATER_IN_LIQUID_FRAC] ); // #8
+            row.widthTrans          = setOptional( values[AICD_EMULSION_VISC_TRANS_REGION] ); // #9
+            row.maxViscRatio        = setOptional( values[AICD_MAX_RATIO_EMULSION_VISC] ); // #10
+            row.methodScalingFactor = 1; // #11 : Always use method "b. Scale factor". The value of the
+                                         // scale factor is given in item #5
+            row.maxAbsRate       = values[AICD_MAX_FLOW_RATE]; // #12
+            row.flowRateExponent = values[AICD_VOL_FLOW_EXP]; // #13
+            row.viscExponent     = values[AICD_VISOSITY_FUNC_EXP]; // #14
+            row.status           = firstDataObject.m_isOpen ? "OPEN" : "SHUT"; // #15
+
+            row.oilFlowFraction   = setOptional( values[AICD_EXP_OIL_FRAC_DENSITY] ); // #16
+            row.waterFlowFraction = setOptional( values[AICD_EXP_WATER_FRAC_DENSITY] ); // #17
+            row.gasFlowFraction   = setOptional( values[AICD_EXP_GAS_FRAC_DENSITY] ); // #18
+            row.oilViscFraction   = setOptional( values[AICD_EXP_OIL_FRAC_VISCOSITY] ); // #19
+            row.waterViscFraction = setOptional( values[AICD_EXP_WATER_FRAC_VISCOSITY] ); // #20
+            row.gasViscFraction   = setOptional( values[AICD_EXP_GAS_FRAC_VISCOSITY] ); // #21
+
+            tableData.addWsegaicdRow( row );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
