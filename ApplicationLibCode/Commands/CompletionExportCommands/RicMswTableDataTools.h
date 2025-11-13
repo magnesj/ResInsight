@@ -20,6 +20,8 @@
 
 #include "RigCompletionData.h"
 
+#include "RimWellPathAicdParameters.h"
+
 #include "cvfVector3.h"
 
 #include <gsl/gsl>
