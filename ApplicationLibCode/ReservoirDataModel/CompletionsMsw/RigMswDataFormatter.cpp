@@ -184,21 +184,6 @@ std::vector<RifTextDataTableColumn> createWsegvalvHeader()
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Helper function to create WSEGAICD headers
-//--------------------------------------------------------------------------------------------------
-std::vector<RifTextDataTableColumn> createWsegaicdHeader()
-{
-    return { RifTextDataTableColumn( "Well" ),
-             RifTextDataTableColumn( "Seg No" ),
-             RifTextDataTableColumn( "Flow Coeff" ),
-             RifTextDataTableColumn( "Area" ),
-             RifTextDataTableColumn( "Oil Visc" ),
-             RifTextDataTableColumn( "Water Visc" ),
-             RifTextDataTableColumn( "Gas Visc" ),
-             RifTextDataTableColumn( "Device Type" ) };
-}
-
-//--------------------------------------------------------------------------------------------------
 /// Helper function to create WELSEGS segment headers
 //--------------------------------------------------------------------------------------------------
 std::vector<RifTextDataTableColumn> createWelsegsSegmentHeader()
@@ -260,6 +245,52 @@ void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatt
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigMswDataFormatter::writeWsegaicdHeader( RifTextDataTableFormatter& formatter )
+{
+    // Write out header for AICD table
+
+    std::vector<QString> columnDescriptions = { "Well Name",
+                                                "Segment Number",
+                                                "Segment Number",
+                                                "Strength of AICD",
+                                                "Flow Scaling Factor for AICD",
+                                                "Density of Calibration Fluid",
+                                                "Viscosity of Calibration Fluid",
+                                                "Critical water in liquid fraction for emulsions viscosity model",
+                                                "Emulsion viscosity transition region",
+                                                "Max ratio of emulsion viscosity to continuous phase viscosity",
+                                                "Flow scaling factor method",
+                                                "Maximum flow rate for AICD device",
+                                                "Volume flow rate exponent, x",
+                                                "Viscosity function exponent, y",
+                                                "Device OPEN/SHUT",
+                                                "Exponent of the oil flowing fraction in the density mixture calculation",
+                                                "Exponent of the water flowing fraction in the density mixture calculation",
+                                                "Exponent of the gas flowing fraction in the density mixture calculation",
+                                                "Exponent of the oil flowing fraction in the density viscosity calculation",
+                                                "Exponent of the water flowing fraction in the density viscosity calculation",
+                                                "Exponent of the gas flowing fraction in the density viscosity calculation" };
+
+    formatter.keyword( "WSEGAICD" );
+    formatter.comment( "Column Overview:" );
+    for ( size_t i = 0; i < columnDescriptions.size(); ++i )
+    {
+        formatter.comment( QString( "%1: %2" ).arg( i + 1, 2, 10, QChar( '0' ) ).arg( columnDescriptions[i] ) );
+    }
+
+    std::vector<RifTextDataTableColumn> header;
+    for ( size_t i = 1; i <= 21; ++i )
+    {
+        QString                cName = QString( "%1" ).arg( i, 2, 10, QChar( '0' ) );
+        RifTextDataTableColumn col( cName, RifTextDataTableDoubleFormatting( RifTextDataTableDoubleFormat::RIF_CONSISE ), RIGHT );
+        header.push_back( col );
+    }
+    formatter.header( header );
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Format COMPSEGS table for a single well
 //--------------------------------------------------------------------------------------------------
 void RigMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData, bool isLgrData )
@@ -315,12 +346,14 @@ void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 {
     if ( !tableData.hasWsegaicdData() ) return;
 
-    formatter.keyword( "WSEGAICD" );
-    auto header = createWsegaicdHeader();
-    formatter.header( header );
+    RifTextDataTableFormatter tightFormatter( formatter );
+    tightFormatter.setColumnSpacing( 1 );
+    tightFormatter.setTableRowPrependText( "   " );
 
-    formatWsegaicdRows( formatter, tableData.wsegaicdData() );
-    formatter.tableCompleted();
+    writeWsegaicdHeader( tightFormatter );
+
+    formatWsegaicdRows( tightFormatter, tableData.wsegaicdData() );
+    tightFormatter.tableCompleted();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -356,13 +389,14 @@ void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
     auto rows = unifiedData.getAllWsegaicdRows();
     if ( rows.empty() ) return;
 
-    formatter.keyword( "WSEGAICD" );
-    auto header = createWsegaicdHeader();
-    formatter.header( header );
+    RifTextDataTableFormatter tightFormatter( formatter );
+    tightFormatter.setColumnSpacing( 1 );
+    tightFormatter.setTableRowPrependText( "   " );
 
-    formatWsegaicdRows( formatter, rows );
+    writeWsegaicdHeader( tightFormatter );
 
-    formatter.tableCompleted();
+    formatWsegaicdRows( tightFormatter, unifiedData.getAllWsegaicdRows() );
+    tightFormatter.tableCompleted();
 }
 
 //--------------------------------------------------------------------------------------------------
