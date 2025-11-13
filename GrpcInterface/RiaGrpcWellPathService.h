@@ -29,6 +29,7 @@ namespace rips
 class SimulationWellRequest;
 class SimulationWellStatus;
 class SimulatorWelspecsEntry;
+class SimulatorWelsegsEntry;
 } // namespace rips
 
 class RiaGrpcCallbackInterface;
@@ -36,6 +37,7 @@ class RiaGrpcCallbackInterface;
 class RimEclipseCase;
 class RimWellPathCompletionSettings;
 class RigCompletionData;
+class RigMswTableData;
 
 //==================================================================================================
 //
@@ -58,4 +60,6 @@ private:
                                     RimEclipseCase*                      eclipseCase,
                                     int                                  gridI,
                                     int                                  gridJ );
+
+    static void copyWelsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorWelsegsEntry* grpcData );
 };

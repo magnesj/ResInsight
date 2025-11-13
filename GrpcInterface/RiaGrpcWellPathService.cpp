@@ -21,7 +21,9 @@
 #include "RiaGrpcHelper.h"
 
 #include "../Commands/CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
+#include "../Commands/CompletionExportCommands/RicWellPathExportMswTableData.h"
 
+#include "CompletionsMsw/RigMswTableData.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 #include "RigMainGrid.h"
@@ -73,6 +75,23 @@ grpc::Status RiaGrpcWellPathService::GetCompletionData( grpc::ServerContext*    
     SimulatorWelspecsEntry* grpcData = reply->add_welspecs();
     RiaGrpcWellPathService::copyWelspecsToGrpc( compSettings, grpcData, eclipseCase, ijPos.second.x(), ijPos.second.y() );
 
+    // Multisegment wells
+
+    int  timeStep         = 0;
+    auto mswDataContainer = RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, timeStep );
+    if ( mswDataContainer.has_value() )
+    {
+        auto tables = mswDataContainer.value();
+
+        if ( tables.hasWelsegsData() )
+        {
+            if ( SimulatorWelsegsEntry* grpcSegData = reply->add_welsegs() )
+            {
+                RiaGrpcWellPathService::copyWelsegsToGrpc( tables, grpcSegData );
+            }
+        }
+    }
+
     return grpc::Status::OK;
 }
 
@@ -107,6 +126,19 @@ void RiaGrpcWellPathService::copyWelspecsToGrpc( const RimWellPathCompletionSett
     grpcData->set_pvt_num( compSettings->wellBoreFluidPVT() );
     grpcData->set_hydrostatic_density_calc( compSettings->hydrostaticDensityForExport().toStdString() );
     grpcData->set_fip_region( compSettings->fluidInPlaceRegion() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaGrpcWellPathService::copyWelsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorWelsegsEntry* grpcData )
+{
+    if ( !mswTableData.hasWelsegsData() ) return;
+
+    auto headerEntry   = grpcData->header();
+    auto welsegsHeader = mswTableData.welsegsHeader();
+    headerEntry.set_well_name( welsegsHeader.well );
+    headerEntry.set_top_depth( welsegsHeader.topDepth );
 }
 
 //--------------------------------------------------------------------------------------------------

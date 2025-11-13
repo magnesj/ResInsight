@@ -49,8 +49,37 @@ message SimulatorWelspecsEntry {
   optional int32 fip_region = 13;
 }
 
+message SimulatorWelsegsHeaderEntry {
+  string well_name = 1;
+  double top_depth = 2;
+  double top_length = 3;
+  optional double wellbore_volume = 4;
+  string info_type = 5;
+  optional string pressure_omponents = 6;
+  optional string flow_model = 7;
+}
+
+message SimulatorWelsegsRowEntry {
+  int32 segment_1 = 1;
+  int32 segment_2 = 2;
+  int32 branch = 3;
+  int32 join_segment = 4;
+  double length = 5;
+  double depth = 6;
+  optional double diameter = 7;
+  optional double roughness = 8;
+  optional string description = 9;
+}
+
+message SimulatorWelsegsEntry {
+  SimulatorWelsegsHeaderEntry header = 1;
+  repeated SimulatorWelsegsRowEntry rows = 2;
+}
+
+
 message SimulatorTableData {
   repeated SimulatorCompdatEntry compdat = 1;
   repeated SimulatorWelspecsEntry welspecs = 2;
+  repeated SimulatorWelsegsEntry welsegs = 3;
 }
 
