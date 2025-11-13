@@ -63,4 +63,6 @@ private:
 
     static void copyWelsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorWelsegsEntry* grpcData );
     static void copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
+    static void copyWsegvalvToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
+    static void copyWsegaicdToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
 };

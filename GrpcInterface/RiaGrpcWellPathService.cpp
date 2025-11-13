@@ -95,6 +95,16 @@ grpc::Status RiaGrpcWellPathService::GetCompletionData( grpc::ServerContext*    
         {
             RiaGrpcWellPathService::copyCompsegsToGrpc( tables, reply );
         }
+
+        if ( tables.hasWsegvalvData() )
+        {
+            RiaGrpcWellPathService::copyWsegvalvToGrpc( tables, reply );
+        }
+
+        if ( tables.hasWsegaicdData() )
+        {
+            RiaGrpcWellPathService::copyWsegaicdToGrpc( tables, reply );
+        }
     }
 
     return grpc::Status::OK;
@@ -206,6 +216,131 @@ void RiaGrpcWellPathService::copyCompsegsToGrpc( const RigMswTableData& mswTable
         if ( !compsegsRow.gridName.empty() )
         {
             grpcCompData->set_grid_name( compsegsRow.gridName );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaGrpcWellPathService::copyWsegvalvToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply )
+{
+    if ( !mswTableData.hasWsegvalvData() ) return;
+
+    for ( const auto& wsegvalvRow : mswTableData.wsegvalvData() )
+    {
+        auto* grpcValvData = reply->add_wsegvalv();
+        
+        grpcValvData->set_well_name( wsegvalvRow.well );
+        grpcValvData->set_segment_number( wsegvalvRow.segmentNumber );
+        grpcValvData->set_cv( wsegvalvRow.cv );
+        grpcValvData->set_area( wsegvalvRow.area );
+        
+        if ( wsegvalvRow.extraLength.has_value() )
+        {
+            grpcValvData->set_extra_length( wsegvalvRow.extraLength.value() );
+        }
+        if ( wsegvalvRow.pipeD.has_value() )
+        {
+            grpcValvData->set_pipe_d( wsegvalvRow.pipeD.value() );
+        }
+        if ( wsegvalvRow.roughness.has_value() )
+        {
+            grpcValvData->set_roughness( wsegvalvRow.roughness.value() );
+        }
+        if ( wsegvalvRow.pipeA.has_value() )
+        {
+            grpcValvData->set_pipe_a( wsegvalvRow.pipeA.value() );
+        }
+        if ( wsegvalvRow.status.has_value() )
+        {
+            grpcValvData->set_status( wsegvalvRow.status.value() );
+        }
+        if ( wsegvalvRow.maxA.has_value() )
+        {
+            grpcValvData->set_max_a( wsegvalvRow.maxA.value() );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaGrpcWellPathService::copyWsegaicdToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply )
+{
+    if ( !mswTableData.hasWsegaicdData() ) return;
+
+    for ( const auto& wsegaicdRow : mswTableData.wsegaicdData() )
+    {
+        auto* grpcAicdData = reply->add_wsegaicd();
+        
+        grpcAicdData->set_well_name( wsegaicdRow.well );
+        grpcAicdData->set_segment_1( wsegaicdRow.segment1 );
+        grpcAicdData->set_segment_2( wsegaicdRow.segment2 );
+        grpcAicdData->set_strength( wsegaicdRow.strength );
+        grpcAicdData->set_max_abs_rate( wsegaicdRow.maxAbsRate );
+        grpcAicdData->set_flow_rate_exponent( wsegaicdRow.flowRateExponent );
+        grpcAicdData->set_visc_exponent( wsegaicdRow.viscExponent );
+        
+        if ( wsegaicdRow.length.has_value() )
+        {
+            grpcAicdData->set_length( wsegaicdRow.length.value() );
+        }
+        if ( wsegaicdRow.densityCali.has_value() )
+        {
+            grpcAicdData->set_density_cali( wsegaicdRow.densityCali.value() );
+        }
+        if ( wsegaicdRow.viscosityCali.has_value() )
+        {
+            grpcAicdData->set_viscosity_cali( wsegaicdRow.viscosityCali.value() );
+        }
+        if ( wsegaicdRow.criticalValue.has_value() )
+        {
+            grpcAicdData->set_critical_value( wsegaicdRow.criticalValue.value() );
+        }
+        if ( wsegaicdRow.widthTrans.has_value() )
+        {
+            grpcAicdData->set_width_trans( wsegaicdRow.widthTrans.value() );
+        }
+        if ( wsegaicdRow.maxViscRatio.has_value() )
+        {
+            grpcAicdData->set_max_visc_ratio( wsegaicdRow.maxViscRatio.value() );
+        }
+        if ( wsegaicdRow.methodScalingFactor.has_value() )
+        {
+            grpcAicdData->set_method_scaling_factor( wsegaicdRow.methodScalingFactor.value() );
+        }
+        if ( wsegaicdRow.status.has_value() )
+        {
+            grpcAicdData->set_status( wsegaicdRow.status.value() );
+        }
+        if ( wsegaicdRow.oilFlowFraction.has_value() )
+        {
+            grpcAicdData->set_oil_flow_fraction( wsegaicdRow.oilFlowFraction.value() );
+        }
+        if ( wsegaicdRow.waterFlowFraction.has_value() )
+        {
+            grpcAicdData->set_water_flow_fraction( wsegaicdRow.waterFlowFraction.value() );
+        }
+        if ( wsegaicdRow.gasFlowFraction.has_value() )
+        {
+            grpcAicdData->set_gas_flow_fraction( wsegaicdRow.gasFlowFraction.value() );
+        }
+        if ( wsegaicdRow.oilViscFraction.has_value() )
+        {
+            grpcAicdData->set_oil_visc_fraction( wsegaicdRow.oilViscFraction.value() );
+        }
+        if ( wsegaicdRow.waterViscFraction.has_value() )
+        {
+            grpcAicdData->set_water_visc_fraction( wsegaicdRow.waterViscFraction.value() );
+        }
+        if ( wsegaicdRow.gasViscFraction.has_value() )
+        {
+            grpcAicdData->set_gas_visc_fraction( wsegaicdRow.gasViscFraction.value() );
+        }
+        if ( !wsegaicdRow.description.empty() )
+        {
+            grpcAicdData->set_description( wsegaicdRow.description );
         }
     }
 }
