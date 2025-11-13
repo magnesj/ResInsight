@@ -93,10 +93,7 @@ grpc::Status RiaGrpcWellPathService::GetCompletionData( grpc::ServerContext*    
 
         if ( tables.hasCompsegsData() )
         {
-            if ( SimulatorCompsegsEntry* grpcCompData = reply->add_compsegs() )
-            {
-                RiaGrpcWellPathService::copyCompsegsToGrpc( tables, grpcCompData );
-            }
+            RiaGrpcWellPathService::copyCompsegsToGrpc( tables, reply );
         }
     }
 
@@ -189,26 +186,26 @@ void RiaGrpcWellPathService::copyWelsegsToGrpc( const RigMswTableData& mswTableD
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaGrpcWellPathService::copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorCompsegsEntry* grpcData )
+void RiaGrpcWellPathService::copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply )
 {
     if ( !mswTableData.hasCompsegsData() ) return;
 
     for ( const auto& compsegsRow : mswTableData.compsegsData() )
     {
-        auto* rowEntry = grpcData->add_rows();
+        auto* grpcCompData = reply->add_compsegs();
         
         // Convert to 1-based indexing for grid coordinates
-        rowEntry->set_i( static_cast<int32_t>( compsegsRow.i + 1 ) );
-        rowEntry->set_j( static_cast<int32_t>( compsegsRow.j + 1 ) );
-        rowEntry->set_k( static_cast<int32_t>( compsegsRow.k + 1 ) );
+        grpcCompData->set_i( static_cast<int32_t>( compsegsRow.i + 1 ) );
+        grpcCompData->set_j( static_cast<int32_t>( compsegsRow.j + 1 ) );
+        grpcCompData->set_k( static_cast<int32_t>( compsegsRow.k + 1 ) );
         
-        rowEntry->set_branch( compsegsRow.branch );
-        rowEntry->set_distance_start( compsegsRow.distanceStart );
-        rowEntry->set_distance_end( compsegsRow.distanceEnd );
+        grpcCompData->set_branch( compsegsRow.branch );
+        grpcCompData->set_distance_start( compsegsRow.distanceStart );
+        grpcCompData->set_distance_end( compsegsRow.distanceEnd );
         
         if ( !compsegsRow.gridName.empty() )
         {
-            rowEntry->set_grid_name( compsegsRow.gridName );
+            grpcCompData->set_grid_name( compsegsRow.gridName );
         }
     }
 }

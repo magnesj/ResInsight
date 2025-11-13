@@ -62,5 +62,5 @@ private:
                                     int                                  gridJ );
 
     static void copyWelsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorWelsegsEntry* grpcData );
-    static void copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorCompsegsEntry* grpcData );
+    static void copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
 };
