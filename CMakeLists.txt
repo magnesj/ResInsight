@@ -1212,6 +1212,16 @@ if(MSVC AND RESINSIGHT_ENABLE_STATIC_ANALYSIS)
 endif(MSVC AND RESINSIGHT_ENABLE_STATIC_ANALYSIS)
 
 # ##############################################################################
+# Examples
+# ##############################################################################
+option(RESINSIGHT_BUILD_EXAMPLES
+       "Build code examples (requires experimental compiler features)" OFF
+)
+if(RESINSIGHT_BUILD_EXAMPLES)
+  add_subdirectory(Examples/Cpp26Reflection)
+endif()
+
+# ##############################################################################
 # Code documentation using Doxygen
 # ##############################################################################
 option(RESINSIGHT_BUILD_DOCUMENTATION
