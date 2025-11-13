@@ -135,10 +135,47 @@ void RiaGrpcWellPathService::copyWelsegsToGrpc( const RigMswTableData& mswTableD
 {
     if ( !mswTableData.hasWelsegsData() ) return;
 
-    auto headerEntry   = grpcData->header();
-    auto welsegsHeader = mswTableData.welsegsHeader();
-    headerEntry.set_well_name( welsegsHeader.well );
-    headerEntry.set_top_depth( welsegsHeader.topDepth );
+    auto* headerEntry   = grpcData->mutable_header();
+    auto  welsegsHeader = mswTableData.welsegsHeader();
+    headerEntry->set_well_name( welsegsHeader.well );
+    headerEntry->set_top_depth( welsegsHeader.topDepth );
+    headerEntry->set_top_length( welsegsHeader.topLength );
+    if ( welsegsHeader.wellboreVolume.has_value() )
+    {
+        headerEntry->set_wellbore_volume( welsegsHeader.wellboreVolume.value() );
+    }
+    headerEntry->set_info_type( welsegsHeader.infoType );
+    if ( welsegsHeader.pressureComponents.has_value() )
+    {
+        headerEntry->set_pressure_omponents( welsegsHeader.pressureComponents.value() );
+    }
+    if ( welsegsHeader.flowModel.has_value() )
+    {
+        headerEntry->set_flow_model( welsegsHeader.flowModel.value() );
+    }
+
+    for ( const auto& welsegsRow : mswTableData.welsegsData() )
+    {
+        auto* rowEntry = grpcData->add_row();
+        rowEntry->set_segment_1( welsegsRow.segment1 );
+        rowEntry->set_segment_2( welsegsRow.segment2 );
+        rowEntry->set_branch( welsegsRow.branch );
+        rowEntry->set_join_segment( welsegsRow.joinSegment );
+        rowEntry->set_length( welsegsRow.length );
+        rowEntry->set_depth( welsegsRow.depth );
+        if ( welsegsRow.diameter.has_value() )
+        {
+            rowEntry->set_diameter( welsegsRow.diameter.value() );
+        }
+        if ( welsegsRow.roughness.has_value() )
+        {
+            rowEntry->set_roughness( welsegsRow.roughness.value() );
+        }
+        if ( !welsegsRow.description.empty() )
+        {
+            rowEntry->set_description( welsegsRow.description );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

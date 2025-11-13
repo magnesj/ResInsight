@@ -73,7 +73,7 @@ message SimulatorWelsegsRowEntry {
 
 message SimulatorWelsegsEntry {
   SimulatorWelsegsHeaderEntry header = 1;
-  repeated SimulatorWelsegsRowEntry rows = 2;
+  repeated SimulatorWelsegsRowEntry row = 2;
 }
 
 
