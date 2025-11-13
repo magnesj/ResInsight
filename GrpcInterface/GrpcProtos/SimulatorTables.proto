@@ -76,10 +76,24 @@ message SimulatorWelsegsEntry {
   repeated SimulatorWelsegsRowEntry row = 2;
 }
 
+message SimulatorCompsegsRowEntry {
+  int32 i = 1;
+  int32 j = 2;
+  int32 k = 3;
+  int32 branch = 4;
+  double distance_start = 5;
+  double distance_end = 6;
+  optional string grid_name = 7;
+}
+
+message SimulatorCompsegsEntry {
+  repeated SimulatorCompsegsRowEntry rows = 1;
+}
 
 message SimulatorTableData {
   repeated SimulatorCompdatEntry compdat = 1;
   repeated SimulatorWelspecsEntry welspecs = 2;
   repeated SimulatorWelsegsEntry welsegs = 3;
+  repeated SimulatorCompsegsEntry compsegs = 4;
 }
 
