@@ -142,7 +142,7 @@ grpc::Status RiaGrpcWellPathService::GetCompletionDataUnified( grpc::ServerConte
         RiaGrpcWellPathService::copyWelspecsToGrpc( compSettings, grpcData, eclipseCase, ijPos.second.x(), ijPos.second.y() );
 
         // Add multisegment well data for this well
-        int  timeStep         = 0;
+        int timeStep = 0;
         auto mswDataContainer = RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, timeStep );
         if ( mswDataContainer.has_value() )
         {
@@ -456,8 +456,8 @@ std::vector<RiaGrpcCallbackInterface*> RiaGrpcWellPathService::createCallbacks()
                                                                                         &Self::GetCompletionData,
                                                                                         &Self::RequestGetCompletionData ),
              new RiaGrpcUnaryCallback<Self, SimulatorTableUnifiedRequest, SimulatorTableData>( this,
-                                                                                                &Self::GetCompletionDataUnified,
-                                                                                                &Self::RequestGetCompletionDataUnified ) };
+                                                                                               &Self::GetCompletionDataUnified,
+                                                                                               &Self::RequestGetCompletionDataUnified ) };
 }
 
 static bool RiaGrpcWellPathService_init = RiaGrpcServiceFactory::instance()->registerCreator<RiaGrpcWellPathService>(
