@@ -1,6 +1,6 @@
 import uuid
 import grpc
-from typing import List, Optional, Union
+from typing import List, Optional, Union, cast
 
 import SimulatorTables_pb2
 import SimulatorTables_pb2_grpc
@@ -137,7 +137,7 @@ def completion_data_unified(
         well_names = [wp.name for wp in self.well_paths()]
     elif all(isinstance(w, str) for w in wells):
         # List of well names
-        well_names = list(wells)  # Type cast to List[str]
+        well_names = cast(List[str], wells)
     elif all(hasattr(w, "name") for w in wells):
         # List of WellPath objects
         well_names = [w.name for w in wells if hasattr(w, "name")]
