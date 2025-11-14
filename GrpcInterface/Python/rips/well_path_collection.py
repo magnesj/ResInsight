@@ -137,10 +137,10 @@ def completion_data_unified(
         well_names = [wp.name for wp in self.well_paths()]
     elif all(isinstance(w, str) for w in wells):
         # List of well names
-        well_names = wells
+        well_names = list(wells)  # Type cast to List[str]
     elif all(hasattr(w, "name") for w in wells):
         # List of WellPath objects
-        well_names = [w.name for w in wells]
+        well_names = [w.name for w in wells if hasattr(w, "name")]
     else:
         raise ValueError(
             "wells parameter must be a list of WellPath objects or strings"
