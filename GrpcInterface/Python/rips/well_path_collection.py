@@ -18,6 +18,7 @@ def __custom_init__(
 ) -> None:
     self.__well_path_stub = SimulatorTables_pb2_grpc.WellPathStub(channel)
 
+
 @add_method(WellPathCollection)
 def import_well_path_from_points(
     self: WellPathCollection, name: str, coordinates: List[List[float]]
@@ -94,6 +95,7 @@ def import_well_path_from_points(
         project.remove_key_values(x_key)
         project.remove_key_values(y_key)
         project.remove_key_values(z_key)
+
 
 @add_method(WellPathCollection)
 def completion_data(
