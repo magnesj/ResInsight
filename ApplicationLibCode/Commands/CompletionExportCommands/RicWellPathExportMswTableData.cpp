@@ -882,7 +882,7 @@ void RicWellPathExportMswTableData::generateFishbonesMswExportInfo( const RimEcl
 
                         size_t i, j, k;
                         localGrid->ijkFromCellIndex( localGridCellIndex, &i, &j, &k );
-                        cvf::Vec3st localIJK( i, j, k );
+                        caf::VecIjk0 localIJK( i, j, k );
 
                         auto mswIntersect = std::make_shared<RicMswSegmentCellIntersection>( gridName,
                                                                                              intersection.globCellIndex,
@@ -1053,7 +1053,7 @@ void RicWellPathExportMswTableData::appendFishbonesMswExportInfo( const RimEclip
 
                         size_t i, j, k;
                         localGrid->ijkFromCellIndex( localGridCellIndex, &i, &j, &k );
-                        cvf::Vec3st localIJK( i, j, k );
+                        caf::VecIjk0 localIJK( i, j, k );
 
                         auto mswIntersect = std::make_shared<RicMswSegmentCellIntersection>( gridName,
                                                                                              intersection.globCellIndex,
@@ -1993,7 +1993,7 @@ void RicWellPathExportMswTableData::assignFishbonesLateralIntersections( const R
 
             auto intersection = std::make_shared<RicMswSegmentCellIntersection>( gridName,
                                                                                  cellIntInfo.globCellIndex,
-                                                                                 cvf::Vec3st( i, j, k ),
+                                                                                 caf::VecIjk0( i, j, k ),
                                                                                  cellIntInfo.intersectionLengthsInCellCS );
             subSegment->addIntersection( std::move( intersection ) );
             completion->addSegment( std::move( subSegment ) );
@@ -2038,7 +2038,7 @@ void RicWellPathExportMswTableData::assignFractureCompletionsToCellSegment( cons
             *foundSubGridIntersections = true;
         }
 
-        cvf::Vec3st localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
+        caf::VecIjk0 localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
 
         auto intersection =
             std::make_shared<RicMswSegmentCellIntersection>( cell.lgrName(), cell.globalCellIndex(), localIJK, cvf::Vec3d::ZERO );
@@ -2117,7 +2117,7 @@ void RicWellPathExportMswTableData::assignPerforationIntersections( const std::v
 
         if ( cell.globalCellIndex() != currCellId ) continue;
 
-        cvf::Vec3st localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
+        caf::VecIjk0 localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
 
         auto intersection = std::make_shared<RicMswSegmentCellIntersection>( cell.lgrName(),
                                                                              cell.globalCellIndex(),

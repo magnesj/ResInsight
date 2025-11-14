@@ -21,10 +21,10 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicMswSegmentCellIntersection::RicMswSegmentCellIntersection( const QString&     gridName,
-                                                              size_t             globalCellIndex,
-                                                              const cvf::Vec3st& gridLocalCellIJK,
-                                                              const cvf::Vec3d&  lengthsInCell )
+RicMswSegmentCellIntersection::RicMswSegmentCellIntersection( const QString&      gridName,
+                                                              size_t              globalCellIndex,
+                                                              const caf::VecIjk0& gridLocalCellIJK,
+                                                              const cvf::Vec3d&   lengthsInCell )
     : m_gridName( gridName )
     , m_globalCellIndex( globalCellIndex )
     , m_gridLocalCellIJK( gridLocalCellIJK )
@@ -51,7 +51,7 @@ size_t RicMswSegmentCellIntersection::globalCellIndex() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3st RicMswSegmentCellIntersection::gridLocalCellIJK() const
+caf::VecIjk0 RicMswSegmentCellIntersection::gridLocalCellIJK() const
 {
     return m_gridLocalCellIJK;
 }

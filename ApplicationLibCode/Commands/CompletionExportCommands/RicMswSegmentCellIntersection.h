@@ -17,9 +17,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include "cafVecIjk.h"
+
 #include "cvfVector3.h"
 
 #include <QString>
+
 #include <memory>
 #include <vector>
 
@@ -29,18 +32,18 @@
 class RicMswSegmentCellIntersection
 {
 public:
-    RicMswSegmentCellIntersection( const QString&     gridName, // Pass in empty string for main grid
-                                   size_t             globalCellIndex,
-                                   const cvf::Vec3st& gridLocalCellIJK,
-                                   const cvf::Vec3d&  lengthsInCell );
+    RicMswSegmentCellIntersection( const QString&      gridName, // Pass in empty string for main grid
+                                   size_t              globalCellIndex,
+                                   const caf::VecIjk0& gridLocalCellIJK,
+                                   const cvf::Vec3d&   lengthsInCell );
     const QString&    gridName() const;
     size_t            globalCellIndex() const;
-    cvf::Vec3st       gridLocalCellIJK() const;
+    caf::VecIjk0      gridLocalCellIJK() const;
     const cvf::Vec3d& lengthsInCell() const;
 
 private:
-    QString     m_gridName;
-    size_t      m_globalCellIndex;
-    cvf::Vec3st m_gridLocalCellIJK;
-    cvf::Vec3d  m_lengthsInCell;
+    QString      m_gridName;
+    size_t       m_globalCellIndex;
+    caf::VecIjk0 m_gridLocalCellIJK;
+    cvf::Vec3d   m_lengthsInCell;
 };
