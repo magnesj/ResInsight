@@ -1,10 +1,22 @@
 import uuid
+import grpc
 from typing import List
+
+import SimulatorTables_pb2
+import SimulatorTables_pb2_grpc
+
+import PdmObject_pb2
 
 from .pdmobject import add_method
 from .resinsight_classes import WellPathCollection
 from .project import Project
 
+
+@add_method(WellPathCollection)
+def __custom_init__(
+    self: WellPathCollection, pb2_object: PdmObject_pb2.PdmObject, channel: grpc.Channel
+) -> None:
+    self.__well_path_stub = SimulatorTables_pb2_grpc.WellPathStub(channel)
 
 @add_method(WellPathCollection)
 def import_well_path_from_points(
@@ -82,3 +94,22 @@ def import_well_path_from_points(
         project.remove_key_values(x_key)
         project.remove_key_values(y_key)
         project.remove_key_values(z_key)
+
+@add_method(WellPathCollection)
+def completion_data(
+    self: WellPathCollection, well_names: List[str], case_id: int
+) -> SimulatorTables_pb2.SimulatorTableData:
+    """Get well completion data
+
+    **SimulatorTableUnifiedRequest description**::
+
+       Parameter   | Description                                                   | Type
+       ----------- | ------------------------------------------------------------- | -----
+       well_names  | Well names                                                    | List[str]
+       case_id     | ID of the case to use when extracting completion data         | int
+
+    """
+    sim_tab_req = SimulatorTables_pb2.SimulatorTableUnifiedRequest(
+        wellpath_names=well_names, case_id=case_id
+    )
+    return self.__well_path_stub.GetCompletionDataUnified(sim_tab_req)
