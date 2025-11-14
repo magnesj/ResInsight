@@ -51,6 +51,10 @@ public:
                                     const ::rips::SimulatorTableRequest* request,
                                     ::rips::SimulatorTableData*          response ) override;
 
+    grpc::Status GetCompletionDataUnified( ::grpc::ServerContext*                      context,
+                                           const ::rips::SimulatorTableUnifiedRequest* request,
+                                           ::rips::SimulatorTableData*                 response ) override;
+
     std::vector<RiaGrpcCallbackInterface*> createCallbacks() override;
 
 private:
