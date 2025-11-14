@@ -203,16 +203,16 @@ void RiaGrpcWellPathService::copyCompsegsToGrpc( const RigMswTableData& mswTable
     for ( const auto& compsegsRow : mswTableData.compsegsData() )
     {
         auto* grpcCompData = reply->add_compsegs();
-        
+
         // Convert to 1-based indexing for grid coordinates
         grpcCompData->set_i( static_cast<int32_t>( compsegsRow.i + 1 ) );
         grpcCompData->set_j( static_cast<int32_t>( compsegsRow.j + 1 ) );
         grpcCompData->set_k( static_cast<int32_t>( compsegsRow.k + 1 ) );
-        
+
         grpcCompData->set_branch( compsegsRow.branch );
         grpcCompData->set_distance_start( compsegsRow.distanceStart );
         grpcCompData->set_distance_end( compsegsRow.distanceEnd );
-        
+
         if ( !compsegsRow.gridName.empty() )
         {
             grpcCompData->set_grid_name( compsegsRow.gridName );
@@ -230,12 +230,12 @@ void RiaGrpcWellPathService::copyWsegvalvToGrpc( const RigMswTableData& mswTable
     for ( const auto& wsegvalvRow : mswTableData.wsegvalvData() )
     {
         auto* grpcValvData = reply->add_wsegvalv();
-        
+
         grpcValvData->set_well_name( wsegvalvRow.well );
         grpcValvData->set_segment_number( wsegvalvRow.segmentNumber );
         grpcValvData->set_cv( wsegvalvRow.cv );
         grpcValvData->set_area( wsegvalvRow.area );
-        
+
         if ( wsegvalvRow.extraLength.has_value() )
         {
             grpcValvData->set_extra_length( wsegvalvRow.extraLength.value() );
@@ -273,7 +273,7 @@ void RiaGrpcWellPathService::copyWsegaicdToGrpc( const RigMswTableData& mswTable
     for ( const auto& wsegaicdRow : mswTableData.wsegaicdData() )
     {
         auto* grpcAicdData = reply->add_wsegaicd();
-        
+
         grpcAicdData->set_well_name( wsegaicdRow.well );
         grpcAicdData->set_segment_1( wsegaicdRow.segment1 );
         grpcAicdData->set_segment_2( wsegaicdRow.segment2 );
@@ -281,7 +281,7 @@ void RiaGrpcWellPathService::copyWsegaicdToGrpc( const RigMswTableData& mswTable
         grpcAicdData->set_max_abs_rate( wsegaicdRow.maxAbsRate );
         grpcAicdData->set_flow_rate_exponent( wsegaicdRow.flowRateExponent );
         grpcAicdData->set_visc_exponent( wsegaicdRow.viscExponent );
-        
+
         if ( wsegaicdRow.length.has_value() )
         {
             grpcAicdData->set_length( wsegaicdRow.length.value() );
