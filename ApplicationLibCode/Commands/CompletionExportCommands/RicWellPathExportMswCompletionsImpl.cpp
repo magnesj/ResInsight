@@ -731,7 +731,7 @@ void RicWellPathExportMswCompletionsImpl::generateFishbonesMswExportInfo( const 
 
                         size_t i, j, k;
                         localGrid->ijkFromCellIndex( localGridCellIndex, &i, &j, &k );
-                        cvf::Vec3st localIJK( i, j, k );
+                        caf::VecIjk0 localIJK( i, j, k );
 
                         auto mswIntersect = std::make_shared<RicMswSegmentCellIntersection>( gridName,
                                                                                              intersection.globCellIndex,
@@ -1622,7 +1622,7 @@ void RicWellPathExportMswCompletionsImpl::assignFishbonesLateralIntersections( c
 
             auto intersection = std::make_shared<RicMswSegmentCellIntersection>( gridName,
                                                                                  cellIntInfo.globCellIndex,
-                                                                                 cvf::Vec3st( i, j, k ),
+                                                                                 caf::VecIjk0( i, j, k ),
                                                                                  cellIntInfo.intersectionLengthsInCellCS );
             subSegment->addIntersection( std::move( intersection ) );
             completion->addSegment( std::move( subSegment ) );
@@ -1667,7 +1667,7 @@ void RicWellPathExportMswCompletionsImpl::assignFractureCompletionsToCellSegment
             *foundSubGridIntersections = true;
         }
 
-        cvf::Vec3st localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
+        caf::VecIjk0 localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
 
         auto intersection =
             std::make_shared<RicMswSegmentCellIntersection>( cell.lgrName(), cell.globalCellIndex(), localIJK, cvf::Vec3d::ZERO );
@@ -1746,7 +1746,7 @@ void RicWellPathExportMswCompletionsImpl::assignPerforationIntersections( const 
 
         if ( cell.globalCellIndex() != currCellId ) continue;
 
-        cvf::Vec3st localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
+        caf::VecIjk0 localIJK( cell.localCellIndexI(), cell.localCellIndexJ(), cell.localCellIndexK() );
 
         auto intersection = std::make_shared<RicMswSegmentCellIntersection>( cell.lgrName(),
                                                                              cell.globalCellIndex(),

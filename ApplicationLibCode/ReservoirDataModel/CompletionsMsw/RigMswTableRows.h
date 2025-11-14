@@ -74,9 +74,9 @@ struct CompsegsRow
 {
     // type               variableName;         // Opm::ParserKeywords::COMPSEGS::...
 
-    size_t                      i;              // I
-    size_t                      j;              // J
-    size_t                      k;              // K
+    size_t                      i;              // I (1-based)
+    size_t                      j;              // J (1-based)
+    size_t                      k;              // K (1-based)
     int                         branch;         // IBRANCH
     double                      distanceStart;  // LENGTH1
     double                      distanceEnd;    // LENGTH2
