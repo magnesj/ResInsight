@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "RiaStatisticsTools.h"
+#include "RigStatisticsTools.h"
 
 #include <QDebug>
 //--------------------------------------------------------------------------------------------------
@@ -38,7 +38,7 @@ TEST( RiaStatisticsTools, NoCorrelation )
     {
         b.push_back( (double)std::rand() );
     }
-    double correlation = RiaStatisticsTools::pearsonCorrelation( a, b );
+    double correlation = RigStatisticsTools::pearsonCorrelation( a, b );
     EXPECT_LE( correlation, 0.25 );
 }
 
@@ -59,7 +59,7 @@ TEST( RiaStatisticsTools, FullCorrelation )
     {
         b.push_back( i * 2.0 + 1.0 );
     }
-    double correlation = RiaStatisticsTools::pearsonCorrelation( a, b );
+    double correlation = RigStatisticsTools::pearsonCorrelation( a, b );
     EXPECT_NEAR( correlation, 1.0, 1.0e-2 );
 }
 
@@ -80,7 +80,7 @@ TEST( RiaStatisticsTools, NegativeCorrelation )
     {
         b.push_back( i * -2.0 + 1.0 );
     }
-    double correlation = RiaStatisticsTools::pearsonCorrelation( a, b );
+    double correlation = RigStatisticsTools::pearsonCorrelation( a, b );
     EXPECT_NEAR( correlation, -1.0, 1.0e-2 );
 }
 
@@ -95,7 +95,7 @@ TEST( RiaStatisticsTools, MinValue )
     {
         a.push_back( static_cast<double>( i ) );
     }
-    double minValue = RiaStatisticsTools::minimumValue( a );
+    double minValue = RigStatisticsTools::minimumValue( a );
     EXPECT_EQ( minValue, 10.0 );
 }
 
@@ -110,6 +110,6 @@ TEST( RiaStatisticsTools, MaxValue )
     {
         a.push_back( static_cast<double>( i ) );
     }
-    double maxValue = RiaStatisticsTools::maximumValue( a );
+    double maxValue = RigStatisticsTools::maximumValue( a );
     EXPECT_EQ( maxValue, 999.0 );
 }
