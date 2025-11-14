@@ -31,6 +31,7 @@ class RimEclipseCaseEnsemble;
 class RimSummaryEnsemble;
 class RimKeywordWconprod;
 class RimKeywordWconinje;
+class RimOpmFlowJobSettings;
 
 //==================================================================================================
 ///
@@ -72,7 +73,7 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          initAfterRead() override;
 
-    void decodeProgress( const QString& logLine ) override;
+    void processLogOutput( const QString& logLine ) override;
 
     QStringList                command() override;
     std::map<QString, QString> environment() override;
@@ -132,8 +133,9 @@ private:
     caf::PdmField<int>                          m_numberOfNewDates;
     caf::PdmField<caf::AppEnum<DateAppendType>> m_dateAppendType;
 
-    caf::PdmChildField<RimKeywordWconprod*> m_wconprodKeyword;
-    caf::PdmChildField<RimKeywordWconinje*> m_wconinjeKeyword;
+    caf::PdmChildField<RimKeywordWconprod*>    m_wconprodKeyword;
+    caf::PdmChildField<RimKeywordWconinje*>    m_wconinjeKeyword;
+    caf::PdmChildField<RimOpmFlowJobSettings*> m_jobSettings;
 
     caf::PdmField<QString> m_wellOpenKeyword;
 
