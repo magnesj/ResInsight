@@ -57,16 +57,4 @@ public:
 
     std::vector<RiaGrpcCallbackInterface*> createCallbacks() override;
 
-private:
-    static void copyCompdatToGrpc( const RigCompletionData& inputData, rips::SimulatorCompdatEntry* compDat );
-    static void copyWelspecsToGrpc( const RimWellPathCompletionSettings* compSettings,
-                                    rips::SimulatorWelspecsEntry*        grpcData,
-                                    RimEclipseCase*                      eclipseCase,
-                                    int                                  gridI,
-                                    int                                  gridJ );
-
-    static void copyWelsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorWelsegsEntry* grpcData );
-    static void copyCompsegsToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
-    static void copyWsegvalvToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
-    static void copyWsegaicdToGrpc( const RigMswTableData& mswTableData, rips::SimulatorTableData* reply );
 };
