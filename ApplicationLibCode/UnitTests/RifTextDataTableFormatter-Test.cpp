@@ -368,3 +368,58 @@ TEST( RifTextDataTableFormatter, ReplaceTokensInString )
         EXPECT_STREQ( resolvedText.toStdString().data(), "VALUE1, $KEY1_WITH_MORE_2" );
     }
 }
+
+TEST( RifTextDataTableFormatter, AddIjkTest )
+{
+    QString                   tableText;
+    QTextStream               stream( &tableText );
+    RifTextDataTableFormatter formatter( stream );
+
+    std::vector<RifTextDataTableColumn> header = {
+        RifTextDataTableColumn( "Name" ),
+        RifTextDataTableColumn( "I" ),
+        RifTextDataTableColumn( "J" ),
+        RifTextDataTableColumn( "K" ),
+    };
+
+    formatter.header( header );
+
+    // Test with 0-based index - should be converted to 1-based
+    formatter.add( "Cell1" );
+    caf::VecIjk0 ijk0( 0, 1, 2 ); // 0-based indices
+    formatter.addIjk( ijk0 );
+    formatter.rowCompleted();
+
+    formatter.add( "Cell2" );
+    caf::VecIjk0 ijk0_2( 10, 20, 30 ); // 0-based indices
+    formatter.addIjk( ijk0_2 );
+    formatter.rowCompleted();
+
+    formatter.tableCompleted();
+
+    QStringList lines = RiaTextStringTools::splitSkipEmptyParts( tableText, QRegularExpression( "[\r\n]" ) );
+
+    // Check that the output contains 1-based indices (0->1, 1->2, 2->3, 10->11, 20->21, 30->31)
+    bool foundCell1 = false;
+    bool foundCell2 = false;
+    for ( const QString& line : lines )
+    {
+        if ( line.contains( "Cell1" ) )
+        {
+            foundCell1 = true;
+            EXPECT_TRUE( line.contains( "1" ) );  // I index (0+1)
+            EXPECT_TRUE( line.contains( "2" ) );  // J index (1+1)
+            EXPECT_TRUE( line.contains( "3" ) );  // K index (2+1)
+        }
+        if ( line.contains( "Cell2" ) )
+        {
+            foundCell2 = true;
+            EXPECT_TRUE( line.contains( "11" ) ); // I index (10+1)
+            EXPECT_TRUE( line.contains( "21" ) ); // J index (20+1)
+            EXPECT_TRUE( line.contains( "31" ) ); // K index (30+1)
+        }
+    }
+
+    EXPECT_TRUE( foundCell1 );
+    EXPECT_TRUE( foundCell2 );
+}
