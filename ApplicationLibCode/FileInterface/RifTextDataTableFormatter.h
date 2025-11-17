@@ -175,7 +175,7 @@ public:
     RifTextDataTableFormatter& add( double num );
     RifTextDataTableFormatter& add( int num );
     RifTextDataTableFormatter& add( size_t num );
-    RifTextDataTableFormatter& addIjk( const caf::VecIjk0& zeroBased );
+    RifTextDataTableFormatter& addIjk( const caf::VecIjk1& oneBased );
     RifTextDataTableFormatter& addValueOrDefaultMarker( double value, double defaultValue );
     RifTextDataTableFormatter& addOptionalValue( const std::optional<double>& value );
     RifTextDataTableFormatter& addOptionalStdString( const std::optional<std::string>& value );

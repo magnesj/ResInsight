@@ -523,10 +523,8 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addStdString( const std::s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifTextDataTableFormatter& RifTextDataTableFormatter::addIjk( const caf::VecIjk0& zeroBased )
+RifTextDataTableFormatter& RifTextDataTableFormatter::addIjk( const caf::VecIjk1& oneBased )
 {
-    caf::VecIjk1 oneBased = zeroBased.toOneBased();
-    
     add( oneBased.i() );
     add( oneBased.j() );
     add( oneBased.k() );

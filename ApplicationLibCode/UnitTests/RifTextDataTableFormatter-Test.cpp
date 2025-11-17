@@ -384,15 +384,15 @@ TEST( RifTextDataTableFormatter, AddIjkTest )
 
     formatter.header( header );
 
-    // Test with 0-based index - should be converted to 1-based
+    // Test with 0-based index - convert to 1-based in client code
     formatter.add( "Cell1" );
     caf::VecIjk0 ijk0( 0, 1, 2 ); // 0-based indices
-    formatter.addIjk( ijk0 );
+    formatter.addIjk( ijk0.toOneBased() );
     formatter.rowCompleted();
 
     formatter.add( "Cell2" );
     caf::VecIjk0 ijk0_2( 10, 20, 30 ); // 0-based indices
-    formatter.addIjk( ijk0_2 );
+    formatter.addIjk( ijk0_2.toOneBased() );
     formatter.rowCompleted();
 
     formatter.tableCompleted();
