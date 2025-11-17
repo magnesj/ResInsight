@@ -75,7 +75,11 @@ grpc::Status RiaGrpcWellPathService::GetCompletionData( grpc::ServerContext*    
     auto compSettings = wellPath->completionSettings();
 
     SimulatorWelspecsEntry* grpcData = reply->add_welspecs();
-    RiaWellPathDataToGrpcConverter::copyWelspecsToGrpc( compSettings, grpcData, eclipseCase, ijPos.second.x(), ijPos.second.y() );
+    RiaWellPathDataToGrpcConverter::copyWelspecsToGrpc( compSettings,
+                                                        grpcData,
+                                                        eclipseCase,
+                                                        ijPos.second.x(),
+                                                        ijPos.second.y() );
 
     // Multisegment wells
 
@@ -141,7 +145,11 @@ grpc::Status RiaGrpcWellPathService::GetCompletionDataUnified( grpc::ServerConte
         auto compSettings = wellPath->completionSettings();
 
         SimulatorWelspecsEntry* grpcData = reply->add_welspecs();
-        RiaWellPathDataToGrpcConverter::copyWelspecsToGrpc( compSettings, grpcData, eclipseCase, ijPos.second.x(), ijPos.second.y() );
+        RiaWellPathDataToGrpcConverter::copyWelspecsToGrpc( compSettings,
+                                                            grpcData,
+                                                            eclipseCase,
+                                                            ijPos.second.x(),
+                                                            ijPos.second.y() );
 
         // Add multisegment well data for this well
         int timeStep = 0;
@@ -164,7 +172,6 @@ grpc::Status RiaGrpcWellPathService::GetCompletionDataUnified( grpc::ServerConte
 
     return grpc::Status::OK;
 }
-
 
 //--------------------------------------------------------------------------------------------------
 ///

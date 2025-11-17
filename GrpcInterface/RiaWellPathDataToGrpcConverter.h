@@ -34,7 +34,7 @@ class RiaWellPathDataToGrpcConverter
 {
 public:
     static void copyCompdatToGrpc( const RigCompletionData& inputData, rips::SimulatorCompdatEntry* compDat );
-    
+
     static void copyWelspecsToGrpc( const RimWellPathCompletionSettings* compSettings,
                                     rips::SimulatorWelspecsEntry*        grpcData,
                                     RimEclipseCase*                      eclipseCase,
