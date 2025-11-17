@@ -587,10 +587,10 @@ void RicMswTableDataTools::collectCompsegDataByType( RigMswTableData&           
             {
                 CompsegsRow row;
 
-                cvf::Vec3st ijk = intersection->gridLocalCellIJK();
-                row.i           = ijk.x() + 1; // Convert to 1-based
-                row.j           = ijk.y() + 1;
-                row.k           = ijk.z() + 1;
+                auto ijk = intersection->gridLocalCellIJK().toOneBased();
+                row.i    = ijk.i();
+                row.j    = ijk.j();
+                row.k    = ijk.k();
 
                 int branchNumber = -1;
                 if ( completion ) branchNumber = completion->branchNumber();
