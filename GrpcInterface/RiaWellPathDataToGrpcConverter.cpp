@@ -18,8 +18,8 @@
 
 #include "RiaWellPathDataToGrpcConverter.h"
 
-#include "RigCompletionData.h"
 #include "CompletionsMsw/RigMswTableData.h"
+#include "RigCompletionData.h"
 
 #include "RimEclipseCase.h"
 #include "RimWellPathCompletionSettings.h"

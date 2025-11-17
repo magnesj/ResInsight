@@ -56,5 +56,4 @@ public:
                                            ::rips::SimulatorTableData*                 response ) override;
 
     std::vector<RiaGrpcCallbackInterface*> createCallbacks() override;
-
 };
