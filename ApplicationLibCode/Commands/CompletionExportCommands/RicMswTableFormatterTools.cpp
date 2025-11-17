@@ -321,8 +321,9 @@ void RicMswTableFormatterTools::generateCompsegTable( RifTextDataTableFormatter&
                     formatter.add( intersection->gridName() );
                 }
 
-                cvf::Vec3st ijk = intersection->gridLocalCellIJK();
-                formatter.addOneBasedCellIndex( ijk.x() ).addOneBasedCellIndex( ijk.y() ).addOneBasedCellIndex( ijk.z() );
+                cvf::Vec3st  ijk  = intersection->gridLocalCellIJK();
+                caf::VecIjk0 ijk0 = caf::VecIjk0( ijk.x(), ijk.y(), ijk.z() );
+                formatter.addIjk( ijk0 );
 
                 int branchNumber = -1;
                 if ( completion ) branchNumber = completion->branchNumber();

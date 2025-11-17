@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "cafVecIjk.h"
+
 #include <QString>
 #include <QTextStream>
 
@@ -173,7 +175,7 @@ public:
     RifTextDataTableFormatter& add( double num );
     RifTextDataTableFormatter& add( int num );
     RifTextDataTableFormatter& add( size_t num );
-    RifTextDataTableFormatter& addOneBasedCellIndex( size_t zeroBasedIndex );
+    RifTextDataTableFormatter& addIjk( const caf::VecIjk0& zeroBased );
     RifTextDataTableFormatter& addValueOrDefaultMarker( double value, double defaultValue );
     RifTextDataTableFormatter& addOptionalValue( const std::optional<double>& value );
     RifTextDataTableFormatter& addOptionalStdString( const std::optional<std::string>& value );

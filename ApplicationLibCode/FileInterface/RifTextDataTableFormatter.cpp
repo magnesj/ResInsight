@@ -523,16 +523,14 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addStdString( const std::s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifTextDataTableFormatter& RifTextDataTableFormatter::addOneBasedCellIndex( size_t zeroBasedIndex )
+RifTextDataTableFormatter& RifTextDataTableFormatter::addIjk( const caf::VecIjk0& zeroBased )
 {
-    size_t column = m_lineBuffer.size();
-    CVF_ASSERT( column < m_columns.size() );
-
-    // Increase index by 1 to use Eclipse 1-based cell index instead of ResInsight 0-based
-    zeroBasedIndex++;
-
-    m_columns[column].width = std::max( measure( zeroBasedIndex ), m_columns[column].width );
-    m_lineBuffer.push_back( format( zeroBasedIndex ) );
+    caf::VecIjk1 oneBased = zeroBased.toOneBased();
+    
+    add( oneBased.i() );
+    add( oneBased.j() );
+    add( oneBased.k() );
+    
     return *this;
 }
 
