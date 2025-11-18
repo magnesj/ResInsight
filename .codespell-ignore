@@ -45,6 +45,7 @@ QString
 QVector
 quantIt
 localY
+ThirdParty
 
 # Framework/library abbreviations
 caf
