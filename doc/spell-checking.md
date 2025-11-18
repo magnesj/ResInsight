@@ -33,7 +33,18 @@ ResInsight uses automated spell checking to maintain code quality and catch typo
 
 **Use case:** Preventing new typos from being introduced in PRs
 
-## Whitelists for Domain-Specific Terms
+## Configuration Files
+
+### .codespellrc
+
+Central configuration file for codespell that defines:
+- Files to skip (e.g., SVG, JSON, XML files)
+- Ignore words file location
+- Default directories to check
+- File types to include
+- Output formatting options
+
+This configuration is automatically used by both GitHub workflows and local runs.
 
 ### .codespell-ignore
 
@@ -87,14 +98,20 @@ You can run spell checks locally before pushing:
 # Install codespell
 pip install codespell
 
-# Check specific files
-codespell --ignore-words=.codespell-ignore myfile.cpp
+# Check specific files (uses .codespellrc automatically)
+codespell myfile.cpp
 
-# Check a directory
-codespell --ignore-words=.codespell-ignore ApplicationLibCode/
+# Check a directory (uses .codespellrc automatically)
+codespell ApplicationLibCode/
+
+# Check all default directories (defined in .codespellrc)
+codespell
 
 # Apply fixes automatically (use with caution)
-codespell --write-changes --ignore-words=.codespell-ignore ApplicationLibCode/
+codespell --write-changes
+
+# Override config file settings if needed
+codespell --ignore-words=custom-ignore.txt --skip="*.log,*.tmp" myfile.cpp
 ```
 
 ## Troubleshooting

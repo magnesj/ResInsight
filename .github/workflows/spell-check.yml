@@ -23,15 +23,7 @@ jobs:
       
       - name: Run codespell and apply fixes
         run: |
-          codespell \
-            --write-changes \
-            --ignore-words=.codespell-ignore \
-            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*,*.data" \
-            ApplicationExeCode/ \
-            ApplicationLibCode/ \
-            Fwk/AppFwk/ \
-            GrpcInterface/ \
-            || true
+          codespell --write-changes || true
       
       - uses: peter-evans/create-pull-request@v7
         with:

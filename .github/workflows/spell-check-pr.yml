@@ -47,7 +47,4 @@ jobs:
       - name: Run codespell on changed files
         if: steps.changed-files.outputs.files != ''
         run: |
-          codespell \
-            --ignore-words=.codespell-ignore \
-            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*,*.data" \
-            ${{ steps.changed-files.outputs.files }}
+          codespell ${{ steps.changed-files.outputs.files }}
