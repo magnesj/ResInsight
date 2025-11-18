@@ -152,7 +152,7 @@ std::set<RifEclipseRftAddress::RifEclipseRftAddress::RftWellLogChannelType> RifE
 {
     return { RifEclipseRftAddress::RftWellLogChannelType::ORAT,
              RifEclipseRftAddress::RftWellLogChannelType::WRAT,
-             RifEclipseRftAddress::RftWellLogChannelType::GRAT };
+             RifEclipseRftAddress::RftWellLogChannelType::GREAT };
 }
 
 //--------------------------------------------------------------------------------------------------

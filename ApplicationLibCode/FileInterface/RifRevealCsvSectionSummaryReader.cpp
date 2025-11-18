@@ -87,13 +87,13 @@ bool RifRevealCsvSectionSummaryReader::parse( const QString&                    
 
     std::map<QString, QString> nameMapping = { { "WaterCut", prefix + "WCT" },           { "GOR", prefix + "GOR" },
                                                { "BottomHolePressure", prefix + "BHP" }, { "CumLiquidInjected", prefix + "LIT" },
-                                               { "CumWaterInjected", prefix + "WIT" },   { "CumGasInjected", prefix + "GIT" },
+                                               { "CumWaterInjected", prefix + "WITH" },   { "CumGasInjected", prefix + "GIT" },
                                                { "CumOilInjected", prefix + "OIT" },     { "CumLiquidProduced", prefix + "LPT" },
                                                { "CumWaterProduced", prefix + "WPT" },   { "CumGasProduced", prefix + "GPT" },
                                                { "CumOilProduced", prefix + "OPT" },     { "LiquidProduced", prefix + "LPR" },
                                                { "WaterProduced", prefix + "WPR" },      { "GasProduced", prefix + "GPR" },
                                                { "OilProduced", prefix + "OPR" },        { "LiquidInjected", prefix + "LIR" },
-                                               { "WaterInjected", prefix + "WIR" },      { "GasInjected", prefix + "GIR" },
+                                               { "WaterInjected", prefix + "WIR" },      { "GasInjected", prefix + "GIT" },
                                                { "OilInjected", prefix + "OIR" },        { "WaterGasRatio", prefix + "WGR" },
                                                { "GasLiftRate", prefix + "GLIR" } };
 

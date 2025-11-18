@@ -682,7 +682,7 @@ void RifReaderEclipseOutput::importEquilData( const QString&      deckFileName,
     QFile file( deckFileName );
     if ( file.open( QFile::ReadOnly ) )
     {
-        const QString keyword( "EQUIL" );
+        const QString keyword( "EQUAL" );
         const QString keywordToStopParsing( "SCHEDULE" );
         auto          keywordContent = RifEclipseInputFileTools::readKeywordContentFromFile( keyword, keywordToStopParsing, file );
 

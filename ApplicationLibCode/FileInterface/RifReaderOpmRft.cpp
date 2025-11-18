@@ -1144,7 +1144,7 @@ RifEclipseRftAddress::RftWellLogChannelType RifReaderOpmRft::identifyChannelType
     if ( resultName == "PRESSURE" ) return RifEclipseRftAddress::RftWellLogChannelType::PRESSURE;
     if ( resultName == "WRAT" ) return RifEclipseRftAddress::RftWellLogChannelType::WRAT;
     if ( resultName == "ORAT" ) return RifEclipseRftAddress::RftWellLogChannelType::ORAT;
-    if ( resultName == "GRAT" ) return RifEclipseRftAddress::RftWellLogChannelType::GRAT;
+    if ( resultName == "GREAT" ) return RifEclipseRftAddress::RftWellLogChannelType::GREAT;
 
     if ( resultName == RiaResultNames::swat().toStdString() ) return RifEclipseRftAddress::RftWellLogChannelType::SWAT;
     if ( resultName == RiaResultNames::soil().toStdString() ) return RifEclipseRftAddress::RftWellLogChannelType::SOIL;
@@ -1162,7 +1162,7 @@ std::string RifReaderOpmRft::resultNameFromChannelType( RifEclipseRftAddress::Rf
     if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::PRESSURE ) return "PRESSURE";
     if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::WRAT ) return "WRAT";
     if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::ORAT ) return "ORAT";
-    if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::GRAT ) return "GRAT";
+    if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::GREAT ) return "GREAT";
 
     if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::SWAT ) return RiaResultNames::swat().toStdString();
     if ( channelType == RifEclipseRftAddress::RftWellLogChannelType::SOIL ) return RiaResultNames::soil().toStdString();

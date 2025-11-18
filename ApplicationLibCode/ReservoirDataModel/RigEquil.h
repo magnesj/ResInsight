@@ -22,7 +22,7 @@
 
 //--------------------------------------------------------------------------------------------------
 //
-// Inspired by /opm-common/src/opm/parser/eclipse/EclipseState/InitConfig/Equil.cpp
+// Inspired by /opm-common/src/opm/parser/eclipse/EclipseState/InitConfig/Equal.cpp
 //
 //--------------------------------------------------------------------------------------------------
 class RigEquil

@@ -57,7 +57,7 @@ RimEquilibriumAxisAnnotation::RimEquilibriumAxisAnnotation()
     CAF_PDM_InitFieldNoDefault( &m_annotationType, "AnnotationType", "AnnotationType" );
 
     CAF_PDM_InitFieldNoDefault( &m_sourceCase, "Associated3DCase", "Eclipse Case" );
-    CAF_PDM_InitFieldNoDefault( &m_equilNum, "m_equilNum", "equil Num" );
+    CAF_PDM_InitFieldNoDefault( &m_equilNum, "m_equilNum", "equal Num" );
 }
 
 //--------------------------------------------------------------------------------------------------

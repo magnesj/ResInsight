@@ -68,7 +68,7 @@ std::vector<RimSaturationPressurePlot*> RicCreateSaturationPressurePlotsFeature:
 
         if ( eclipseCaseData->equilData().empty() )
         {
-            RiaLogging::error( "CreateSaturationPressurePlots:: No EQUIL data available" );
+            RiaLogging::error( "CreateSaturationPressurePlots:: No EQUAL data available" );
             return plots;
         }
 
@@ -162,7 +162,7 @@ void RicCreateSaturationPressurePlotsFeature::onActionTriggered( bool isChecked 
     {
         QString text = "No plots generated.\n\n";
         text += "Data required to generate saturation/pressure plots:\n";
-        text += " - EQUIL property defining at least one region\n";
+        text += " - EQUAL property defining at least one region\n";
         text += " - EQLNUM property defining at least one region\n";
         text += " - Dynamic properties PRESSURE, PBUB and PDEW\n\n";
         text += "Make sure to add 'PBPD' to the RPTRST keyword in the SOLUTION selection. ";

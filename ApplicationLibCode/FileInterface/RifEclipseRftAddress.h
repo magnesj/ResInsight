@@ -43,7 +43,7 @@ public:
         SGAS,
         WRAT,
         ORAT,
-        GRAT,
+        GREAT,
         MD,
         PRESSURE_P10,
         PRESSURE_P50,

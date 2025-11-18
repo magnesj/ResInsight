@@ -7,6 +7,6 @@ EDIT
 
 SCHEDULE
 
--- searching for EQUIL stops when SCHEDULE keyword is detected
+-- searching for EQUAL stops when SCHEDULE keyword is detected
 INCLUDE
   '../include/solution/equilibiration.inc' /

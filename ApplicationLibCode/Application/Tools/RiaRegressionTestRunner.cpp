@@ -660,7 +660,7 @@ void RiaRegressionTestRunner::selectObjectsInProject()
         std::vector<caf::PdmObjectHandle*> childObjects = f->children();
         for ( auto childObject : childObjects )
         {
-            // Skip RimSummaryCaseMainCollection, as this container contains all the summary addresses, and can potentially contain extemely
+            // Skip RimSummaryCaseMainCollection, as this container contains all the summary addresses, and can potentially contain extremely
             // many objects
             if ( dynamic_cast<RimSummaryCaseMainCollection*>( childObject ) != nullptr )
             {

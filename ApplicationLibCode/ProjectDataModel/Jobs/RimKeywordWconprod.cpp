@@ -40,7 +40,7 @@ RimKeywordWconprod::RimKeywordWconprod()
     CAF_PDM_InitField( &m_target, "target", QString( "LRAT" ), "Target Production Phase" );
     CAF_PDM_InitFieldNoDefault( &m_orat, "orat", "Max Surface Oil Production Rate" );
     CAF_PDM_InitFieldNoDefault( &m_wrat, "wrat", "Max Surface Water Production Rate" );
-    CAF_PDM_InitFieldNoDefault( &m_grat, "grat", "Max Surface Gas Production Rate" );
+    CAF_PDM_InitFieldNoDefault( &m_grat, "great", "Max Surface Gas Production Rate" );
     CAF_PDM_InitFieldNoDefault( &m_lrat, "lrat", "Max Surface Liquid Production Rate" );
     CAF_PDM_InitFieldNoDefault( &m_resv, "resv", "Max Reservoir Volume Rate" );
     CAF_PDM_InitFieldNoDefault( &m_bhp, "bhp", "Max Bottom Hole Pressure" );
@@ -74,12 +74,12 @@ QList<caf::PdmOptionItemInfo> RimKeywordWconprod::calculateValueOptions( const c
     {
         options.push_back( caf::PdmOptionItemInfo( "ORAT", QVariant::fromValue( QString( "ORAT" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "WRAT", QVariant::fromValue( QString( "WRAT" ) ) ) );
-        options.push_back( caf::PdmOptionItemInfo( "GRAT", QVariant::fromValue( QString( "GRAT" ) ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "GREAT", QVariant::fromValue( QString( "GREAT" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "LRAT", QVariant::fromValue( QString( "LRAT" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "RESV", QVariant::fromValue( QString( "RESV" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "BHP", QVariant::fromValue( QString( "BHP" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "THP", QVariant::fromValue( QString( "THP" ) ) ) );
-        options.push_back( caf::PdmOptionItemInfo( "GRUP", QVariant::fromValue( QString( "GRUP" ) ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "GROUP", QVariant::fromValue( QString( "GROUP" ) ) ) );
     }
 
     return options;
@@ -117,7 +117,7 @@ Opm::DeckKeyword RimKeywordWconprod::keyword( const QString& wellName )
     items.push_back( RifOpmDeckTools::item( W::CMODE::itemName, m_target().toStdString() ) );
     items.push_back( RifOpmDeckTools::optionalItem( W::ORAT::itemName, m_orat() ) );
     items.push_back( RifOpmDeckTools::optionalItem( W::WRAT::itemName, m_wrat() ) );
-    items.push_back( RifOpmDeckTools::optionalItem( W::GRAT::itemName, m_grat() ) );
+    items.push_back( RifOpmDeckTools::optionalItem( W::GREAT::itemName, m_grat() ) );
     items.push_back( RifOpmDeckTools::optionalItem( W::LRAT::itemName, m_lrat() ) );
     items.push_back( RifOpmDeckTools::optionalItem( W::RESV::itemName, m_resv() ) );
     items.push_back( RifOpmDeckTools::optionalItem( W::BHP::itemName, m_bhp() ) );

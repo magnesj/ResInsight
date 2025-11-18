@@ -80,7 +80,7 @@ QList<caf::PdmOptionItemInfo> RimKeywordWconinje::calculateValueOptions( const c
         options.push_back( caf::PdmOptionItemInfo( "RESV", QVariant::fromValue( QString( "RESV" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "BHP", QVariant::fromValue( QString( "BHP" ) ) ) );
         options.push_back( caf::PdmOptionItemInfo( "THP", QVariant::fromValue( QString( "THP" ) ) ) );
-        options.push_back( caf::PdmOptionItemInfo( "GRUP", QVariant::fromValue( QString( "GRUP" ) ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "GROUP", QVariant::fromValue( QString( "GROUP" ) ) ) );
     }
 
     return options;

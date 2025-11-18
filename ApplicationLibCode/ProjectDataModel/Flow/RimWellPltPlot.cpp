@@ -298,7 +298,7 @@ public:
         const auto wellNameForRft = RimWellPlotTools::simWellName( wellPathName );
 
         RifEclipseRftAddress gasRateAddress =
-            RifEclipseRftAddress::createAddress( wellNameForRft, m_timeStep, RifEclipseRftAddress::RftWellLogChannelType::GRAT );
+            RifEclipseRftAddress::createAddress( wellNameForRft, m_timeStep, RifEclipseRftAddress::RftWellLogChannelType::GREAT );
         RifEclipseRftAddress oilRateAddress =
             RifEclipseRftAddress::createAddress( wellNameForRft, m_timeStep, RifEclipseRftAddress::RftWellLogChannelType::ORAT );
         RifEclipseRftAddress watRateAddress =

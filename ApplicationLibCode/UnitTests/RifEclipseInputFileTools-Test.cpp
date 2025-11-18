@@ -151,7 +151,7 @@ TEST( RifEclipseInputFileToolsTest, EquilData )
         std::vector<std::pair<QString, QString>> pathAliasDefinitions;
         RifEclipseInputFileTools::parseAndReadPathAliasKeyword( fileName, &pathAliasDefinitions );
 
-        const QString        keyword( "EQUIL" );
+        const QString        keyword( "EQUAL" );
         const QString        keywordToStopParsing;
         const qint64         startPositionInFile = 0;
         QStringList          keywordContent;
@@ -277,7 +277,7 @@ TEST( RifEclipseInputFileToolsTest, StopAtKeyword )
     }
 
     {
-        const QString                            keyword( "EQUIL" );
+        const QString                            keyword( "EQUAL" );
         const QString                            keywordToStopParsing( "SCHEDULE" );
         const qint64                             startPositionInFile = 0;
         std::vector<std::pair<QString, QString>> pathAliasDefinitions;

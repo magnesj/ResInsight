@@ -78,7 +78,7 @@ RiaPreferencesGrid::RiaPreferencesGrid()
                        "Include File Absolute Path Prefix",
                        "",
                        "Path used to prefix absolute UNIX paths in include statements on Windows, used when searching "
-                       "for FAULTS and EQUIL",
+                       "for FAULTS and EQUAL",
                        "" );
 
     CAF_PDM_InitField( &m_autoComputeDepthRelatedProperties,

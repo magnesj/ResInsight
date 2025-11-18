@@ -47,7 +47,7 @@ macro( precompiled_header sources includes target_name header_name compiler_defi
         get_directory_property( defines_build ${defines_for_build_name} )
         list( APPEND defines ${defines_build} )
 
-        # Apppend special compiler defines
+        # Append special compiler defines
         list( APPEND defines ${compiler_defines} )
 
         # Add the "-D" prefix to all of them

@@ -202,9 +202,9 @@ void RigEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsM
         if ( !isPlanIntersected || planeCellPolygons.empty() ) continue;
 
         cvf::Vec3d localX;
-        cvf::Vec3d localY;
+        cvf::Vec3d locally;
         cvf::Vec3d localZ;
-        RigCellGeometryTools::findCellLocalXYZ( hexCorners, localX, localY, localZ );
+        RigCellGeometryTools::findCellLocalXYZ( hexCorners, localX, locally, localZ );
 
         // Transform planCell polygon(s) and averageZdirection to x/y coordinate system (where fracturePolygon already
         // is located)
@@ -251,7 +251,7 @@ void RigEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsM
             fracturePlane.setFromPointAndNormal( static_cast<cvf::Vec3d>( m_fractureTransform.translation() ),
                                                  static_cast<cvf::Vec3d>( m_fractureTransform.col( 2 ) ) );
 
-            Ax += fabs( area * ( fracturePlane.normal().dot( localY ) ) );
+            Ax += fabs( area * ( fracturePlane.normal().dot( locally ) ) );
             Ay += fabs( area * ( fracturePlane.normal().dot( localX ) ) );
             Az += fabs( area * ( fracturePlane.normal().dot( localZ ) ) );
         }

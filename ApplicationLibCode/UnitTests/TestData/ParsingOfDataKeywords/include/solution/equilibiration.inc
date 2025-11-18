@@ -1,4 +1,4 @@
-EQUIL 
+EQUAL 
 --	Datum	P-datum	WOC	Pcwoc	GOC	Pcgoc	RSVD	RSVD
 	1950	634.8	1940	0.00	3904	0.00	1	1	/ asdf
 	1950	634.8	1944	0.00	3904	0.00	2	2	/ asdf

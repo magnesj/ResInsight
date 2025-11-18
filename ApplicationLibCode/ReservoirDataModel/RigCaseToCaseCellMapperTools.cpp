@@ -84,11 +84,11 @@ void RigCaseToCaseCellMapperTools::estimatedFemCellFromEclCell( const RigMainGri
 
     // Cell corner Averaging mapping: Local cell index in neighbor matching specific corner of this cell
     // N - Negative P - positive
-    // 0 <- NI[1] NINJ[2] NJ[3] NK[4] NINK[5] NINJNK[6] NJNK[7]
+    // 0 <- NI[1] NINJA[2] NJ[3] NK[4] NINK[5] NINJNK[6] NJNK[7]
     // 1 <- NJ[2] PINJ[3] PI[0] NK[5] NJNK[6] PINJNK[7] PINK[4]
     // 2 <- PI[3] PIPJ[0] PJ[1] NK[6] PINK[7] PIPJNK[4] PJNK[5]
     // 3 <- PJ[0] NIPJ[1] NI[2] NK[7] PJNK[4] NIPJNK[5] NINK[6]
-    // 4 <- NI[5] NINJ[6] NJ[7] PK[0] NIPK[1] NINJPK[2] NJPK[3]
+    // 4 <- NI[5] NINJA[6] NJ[7] PK[0] NIPK[1] NINJPK[2] NJPK[3]
     // 5 <- NJ[6] PINJ[7] PI[4] PK[1] NJPK[2] PINJPK[3] PIPK[0]
     // 6 <- PI[7] PIPJ[4] PJ[5] PK[2] PIPK[3] PIPJPK[0] PJPK[1]
     // 7 <- PJ[4] NIPJ[5] NI[6] PK[3] PJPK[0] NIPJPK[1] NIPK[2]
@@ -100,7 +100,7 @@ void RigCaseToCaseCellMapperTools::estimatedFemCellFromEclCell( const RigMainGri
     const std::array<size_t, 8>* PJ   = nbFinder.neighborIndices( 0, 1, 0 );
     const std::array<size_t, 8>* NK   = nbFinder.neighborIndices( 0, 0, -1 );
     const std::array<size_t, 8>* PK   = nbFinder.neighborIndices( 0, 0, 1 );
-    const std::array<size_t, 8>* NINJ = nbFinder.neighborIndices( -1, -1, 0 );
+    const std::array<size_t, 8>* NINJA = nbFinder.neighborIndices( -1, -1, 0 );
     const std::array<size_t, 8>* PINJ = nbFinder.neighborIndices( 1, -1, 0 );
 
     const std::array<size_t, 8>* PIPJ = nbFinder.neighborIndices( 1, 1, 0 );
@@ -127,7 +127,7 @@ void RigCaseToCaseCellMapperTools::estimatedFemCellFromEclCell( const RigMainGri
 
     if ( IJK ) contributingNodeIndicesPrCellCorner[0].push_back( ( *IJK )[0] );
     if ( NI ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NI )[1] );
-    if ( NINJ ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NINJ )[2] );
+    if ( NINJA ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NINJA )[2] );
     if ( NJ ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NJ )[3] );
     if ( NK ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NK )[4] );
     if ( NINK ) contributingNodeIndicesPrCellCorner[0].push_back( ( *NINK )[5] );
@@ -161,11 +161,11 @@ void RigCaseToCaseCellMapperTools::estimatedFemCellFromEclCell( const RigMainGri
     if ( NIPJNK ) contributingNodeIndicesPrCellCorner[3].push_back( ( *NIPJNK )[5] );
     if ( NINK ) contributingNodeIndicesPrCellCorner[3].push_back( ( *NINK )[6] );
 
-    // 4 <- NI[5] NINJ[6] NJ[7] PK[0] NIPK[1] NINJPK[2] NJPK[3]
+    // 4 <- NI[5] NINJA[6] NJ[7] PK[0] NIPK[1] NINJPK[2] NJPK[3]
 
     if ( IJK ) contributingNodeIndicesPrCellCorner[4].push_back( ( *IJK )[4] );
     if ( NI ) contributingNodeIndicesPrCellCorner[4].push_back( ( *NI )[5] );
-    if ( NINJ ) contributingNodeIndicesPrCellCorner[4].push_back( ( *NINJ )[6] );
+    if ( NINJA ) contributingNodeIndicesPrCellCorner[4].push_back( ( *NINJA )[6] );
     if ( NJ ) contributingNodeIndicesPrCellCorner[4].push_back( ( *NJ )[7] );
     if ( PK ) contributingNodeIndicesPrCellCorner[4].push_back( ( *PK )[0] );
     if ( NIPK ) contributingNodeIndicesPrCellCorner[4].push_back( ( *NIPK )[1] );

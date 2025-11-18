@@ -236,18 +236,18 @@ TEST( RigCellGeometryTools, findCellAverageZTest )
     hexCorners[7] = cvf::Vec3d( 0, 1, 1 );
 
     cvf::Vec3d localX;
-    cvf::Vec3d localY;
+    cvf::Vec3d locally;
     cvf::Vec3d localZ;
 
-    RigCellGeometryTools::findCellLocalXYZ( hexCorners, localX, localY, localZ );
+    RigCellGeometryTools::findCellLocalXYZ( hexCorners, localX, locally, localZ );
 
     EXPECT_DOUBLE_EQ( localX[0], 1 );
     EXPECT_DOUBLE_EQ( localX[1], 0 );
     EXPECT_DOUBLE_EQ( localX[2], 0 );
 
-    EXPECT_DOUBLE_EQ( localY[0], 0 );
-    EXPECT_DOUBLE_EQ( localY[1], 1 );
-    EXPECT_DOUBLE_EQ( localY[2], 0 );
+    EXPECT_DOUBLE_EQ( locally[0], 0 );
+    EXPECT_DOUBLE_EQ( locally[1], 1 );
+    EXPECT_DOUBLE_EQ( locally[2], 0 );
 
     EXPECT_DOUBLE_EQ( localZ[0], 0 );
     EXPECT_DOUBLE_EQ( localZ[1], 0 );
@@ -556,7 +556,7 @@ TEST( RigWellPathStimplanIntersector, intersection )
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-// Test of whether we can transport edge information trough clipper clipping
+// Test of whether we can transport edge information through clipper clipping
 // Seems as if it might be possible, but clipper will ignore the edge information
 // processed by the callback if one of the edges is horizontal
 //

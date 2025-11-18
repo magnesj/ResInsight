@@ -87,7 +87,7 @@ void caf::AppEnum<RifEclipseRftAddress::RftWellLogChannelType>::setUp()
     addItem( RifEclipseRftAddress::RftWellLogChannelType::SGAS, RiaResultNames::sgas(), "Gas Saturation" );
     addItem( RifEclipseRftAddress::RftWellLogChannelType::WRAT, "WRAT", "Water Flow" );
     addItem( RifEclipseRftAddress::RftWellLogChannelType::ORAT, "ORAT", "Oil Flow" );
-    addItem( RifEclipseRftAddress::RftWellLogChannelType::GRAT, "GRAT", "Gas flow" );
+    addItem( RifEclipseRftAddress::RftWellLogChannelType::GREAT, "GREAT", "Gas flow" );
     addItem( RifEclipseRftAddress::RftWellLogChannelType::MD, "MD", "Measured Depth" );
     addItem( RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_P10, "PRESSURE_P10", "P10: Pressure" );
     addItem( RifEclipseRftAddress::RftWellLogChannelType::PRESSURE_P50, "PRESSURE_P50", "P50: Pressure" );
@@ -125,7 +125,7 @@ RiaDefines::PhaseType RimWellLogRftCurve::phaseType() const
         }
 
         if ( m_wellLogChannelName() == RifEclipseRftAddress::RftWellLogChannelType::SGAS ||
-             m_wellLogChannelName() == RifEclipseRftAddress::RftWellLogChannelType::GRAT )
+             m_wellLogChannelName() == RifEclipseRftAddress::RftWellLogChannelType::GREAT )
         {
             return RiaDefines::PhaseType::GAS_PHASE;
         }
