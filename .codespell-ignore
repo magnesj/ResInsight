@@ -43,6 +43,10 @@ nullptr
 QString
 QVector
 
+# Framework/library abbreviations
+caf
+# CAF = Computer Application Framework (internal framework namespace)
+
 # Common technical abbreviations
 API
 GUI
