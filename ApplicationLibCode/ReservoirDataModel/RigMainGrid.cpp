@@ -1135,7 +1135,7 @@ std::array<double, 6> RigMainGrid::defaultMapAxes()
     const double xPoint[2] = { 1.0, 0.0 };
     const double yPoint[2] = { 0.0, 1.0 };
 
-    // Order (see Elipse Reference Manual for keyword MAPAXES): Y_x, Y_y, O_x, O_y, X_x, X_y
+    // Order (see Reference Manual for keyword MAPAXES): Y_x, Y_y, O_x, O_y, X_x, X_y
     return { yPoint[0], yPoint[1], origin[0], origin[1], xPoint[0], xPoint[1] };
 }
 

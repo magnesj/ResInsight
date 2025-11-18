@@ -390,7 +390,7 @@ void RigTransmissibilityCondenser::calculateCondensedTransmissibilities()
         condensedSystem = Tee - Tei * m_TiiInv * m_Tie;
     }
 
-    // std::cout  << "Te = " << std::endl <<  condensedSystem << std::endl << std::endl;
+    // std::cout  << "Te = " << std::endl <<  condensedSystem << std::endl << std::endl; codespell:ignore
 
     for ( int exEqIdx = 0; exEqIdx < externalEquationCount; ++exEqIdx )
     {
