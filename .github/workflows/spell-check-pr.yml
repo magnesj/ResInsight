@@ -8,6 +8,9 @@ on:
       - 'Fwk/AppFwk/**'
       - 'GrpcInterface/**'
 
+permissions:
+  contents: read
+
 jobs:
   spell-check:
     runs-on: ubuntu-24.04
