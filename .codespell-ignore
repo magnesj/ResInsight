@@ -44,6 +44,7 @@ nullptr
 QString
 QVector
 quantIt
+localY
 
 # Framework/library abbreviations
 caf
@@ -61,6 +62,16 @@ SVG
 PNG
 DOUB
 OPERATER
+Equil.
+EQUIL
+grat
+GRAT
+WIR
+WIT
+GIR
+GIT
+GRUP
+NINJ
 
 # Units and measurements
 ft
