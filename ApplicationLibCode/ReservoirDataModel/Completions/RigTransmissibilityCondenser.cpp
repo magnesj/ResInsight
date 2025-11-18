@@ -453,7 +453,7 @@ void printCellAddress( std::stringstream&                        str,
 
         case CellAddress::WELL:
         {
-            str << "WEL ";
+            str << "WEL "; // codespell:ignore
             str << std::setw( 5 ) << cellAddr.m_globalCellIdx << std::setw( 5 ) << " " << std::setw( 5 ) << " ";
         }
         break;
