@@ -21,6 +21,7 @@ SMSPEC
 ESMRY
 GRDECL
 LGR
+MULTY
 
 # Other simulation/visualization terms
 Abaqus
@@ -42,6 +43,7 @@ Plt
 nullptr
 QString
 QVector
+quantIt
 
 # Framework/library abbreviations
 caf
@@ -57,6 +59,8 @@ JSON
 XML
 SVG
 PNG
+DOUB
+OPERATER
 
 # Units and measurements
 ft
@@ -68,6 +72,7 @@ psi
 sqrt
 vec
 rgba
+tHi
 
 # Proper names and organizations
 ResInsight
