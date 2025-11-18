@@ -9,7 +9,7 @@
 -- production well. The model is initialized with dry gas (VAPOIL keyword removed from RUNSPEC)
 -- The production well is controlled with a high initial gas rate. 
  
--- Presure drop calculations for multi-segment well model icludes 
+-- Presure drop calculations for multi-segment well model includes 
 -- all available components (HFA, hydrostatic, Friction and acceleration)
 
 -- Summary section includes keywords SGFR, SPRD, SPRDH, SPRDF and SPRDA

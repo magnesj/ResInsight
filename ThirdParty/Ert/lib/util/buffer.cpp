@@ -156,7 +156,7 @@ buffer_type * buffer_alloc_private_wrapper(void * data , size_t buffer_size ) {
 /**
    This function will free the buffer data structure, but NOT the
    actual storage. Can typically be used when some other pointer has
-   taken posession of the buffer content:
+   taken possession of the buffer content:
 
    buffer_type * buffer = buffer_alloc( );
 
@@ -247,7 +247,7 @@ size_t buffer_fwrite(buffer_type * buffer,
 
 
 /*****************************************************************/
-/* Various (slighly) higher level functions                      */
+/* Various (slightly) higher level functions                      */
 
 
 void buffer_rewind(buffer_type * buffer ) {
@@ -496,7 +496,7 @@ void * buffer_alloc_data_copy(const buffer_type * buffer) {
    | 0 | 1 | 2 | 3 | x | x | x | 4 | 5 | 6 | 7 | x |
    -------------------------------------------------
 
-   If you are shifting beyound the end of the buffer, it will be
+   If you are shifting beyond the end of the buffer, it will be
    automatically resized.
 
 
@@ -757,7 +757,7 @@ size_t buffer_stream_fwrite_n( const buffer_type * buffer , size_t offset , ssiz
       len = buffer->content_size - offset - labs( write_size );
 
     if (len < 0)
-      util_abort("%s: invalid length spesifier - tried to write %ld bytes \n",__func__ , len);
+      util_abort("%s: invalid length specifier - tried to write %ld bytes \n",__func__ , len);
 
     util_fwrite( &buffer->data[offset] , 1 , len , stream , __func__);
     return len;
@@ -788,7 +788,7 @@ void buffer_store(const buffer_type * buffer , const char * filename) {
 /*
    The functions buffer_fread_string() and buffer_fwrite_string()
    should not be used; the embedded integer just creates chaos and
-   should the sole responsability of the calling scope.
+   should the sole responsibility of the calling scope.
 */
 
 /**

@@ -457,7 +457,7 @@ TEST(ProgramOptionsTest, UsageText)
     ProgramOptions po;
     po.registerOption("calculate", "",                "Do the calculation.", ProgramOptions::NO_VALUE);
     po.registerOption("size",      "<x> <y>",         "Set widow size.", ProgramOptions::MULTI_VALUE);
-    po.registerOption("replace",   "<id> <filName>",  "Replace file for case with specified id.", ProgramOptions::MULTI_VALUE);
+    po.registerOption("replace",   "<id> <filename>",  "Replace file for case with specified id.", ProgramOptions::MULTI_VALUE);
     po.registerOption("search",    "<filters>",       "Search filters", ProgramOptions::MULTI_VALUE);
     po.registerOption("outFile",   "<fileName>",      "Output file name", ProgramOptions::SINGLE_VALUE);
 

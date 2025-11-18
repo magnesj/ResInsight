@@ -55,7 +55,7 @@ extern "C" {
 
 /**
    These are the different variable types, see table 3.4 in the
-   ECLIPFE file format docuemntation for naming conventions.
+   ECLIPFE file format documentation for naming conventions.
 
    Only the variable types marked with "X" below are supported in the
    remaining implementation. To add support for a new variable type

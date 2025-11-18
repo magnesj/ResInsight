@@ -66,7 +66,7 @@ public:
     virtual void        majorTickValues(std::vector<double>* domainValues ) const;
     
 protected:
-    virtual void        rangeUpdated() {}; //< Called when the range is changed. Subclasses can reimplment to recalculate cached values
+    virtual void        rangeUpdated() {}; //< Called when the range is changed. Subclasses can reimplement to recalculate cached values
     Color3ub            colorFromUserColorGradient(double normalizedValue) const;
 
     double              m_rangeMin;

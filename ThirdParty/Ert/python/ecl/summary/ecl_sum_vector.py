@@ -127,7 +127,7 @@ class EclSumVector(object):
         """
         Will return an EclSumNode for element @index; should be called
         through the [] operator, otherwise you can come across
-        unitialized data.
+        uninitialized data.
         """
         return EclSumNode(self.__report_step[index],
                           self.__days[index],

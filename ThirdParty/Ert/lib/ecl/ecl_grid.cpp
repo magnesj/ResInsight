@@ -48,7 +48,7 @@
 
 
 /**
-  this function implements functionality to load eclispe grid files,
+  this function implements functionality to load eclipse grid files,
   both .egrid and .grid files - in a transparent fashion.
 
   observe the following convention:
@@ -238,7 +238,7 @@
                                                                                        |
                                                                                        |
                                                                         we query the lgr_grid instance to find which
-                                                                        occurence of the solution data we should look
+                                                                        occurrence of the solution data we should look
                                                                         up in the ecl_file instance with restart data. puuhh!!
 
             {
@@ -318,7 +318,7 @@
       inactive cells, matrix active, fracture active and
       matrix+fracture active respectively.
 
-    - For the GRID files there is abolutely no metadata to tell that
+    - For the GRID files there is absolutely no metadata to tell that
       this is a dual porosity run (I think ...) - instead the whole
       grid is repeated one more time with cells for the fractures
       following after the matrix cells.
@@ -473,7 +473,7 @@ and it should(?) be possible to formulate different conventions
 (i.e. handedness and direction of z-axis) with the same format.
 
 The corners in a cell are numbered 0 - 7, where corners 0-3 constitute
-one layer and the corners 4-7 consitute the other layer. Observe the
+one layer and the corners 4-7 constitute the other layer. Observe the
 numbering does not follow a consistent rotation around the face:
 
 
@@ -494,13 +494,13 @@ also have higher z-value.
 
 Warning: The main author of this code suspects that the coordinate
 system can be right-handed as well, giving a z axis which will
-increase 'towards the sky'; the safest is probaly to check this
+increase 'towards the sky'; the safest is probably to check this
 explicitly if it matters for the case at hand.
 
 Method 0 corresponds to a tetrahedron decomposition which will split
 the lower layer along the 1-2 diagonal and the upper layer along the
 4-7 diagonal, method 1 corresponds to the alternative decomposition
-which splits the lower face along the 0-3 diagnoal and the upper face
+which splits the lower face along the 0-3 diagonal and the upper face
 along the 5-6 diagonal.
 */
 
@@ -995,7 +995,7 @@ static double ecl_cell_max_y( const ecl_cell_type * cell ) {
 
 /**
    Grids with invalid cells. Typically
-   the cells accomodating numerical aquifers are located at an utm
+   the cells accommodating numerical aquifers are located at an utm
    position (0,0).
 
    Cells which have some pillars located in (0,0) and some cells
@@ -1371,7 +1371,7 @@ static bool triangle_contains3d(const point_type *p0,
 /*
    if the layer defined by the cell corners 0-1-2-3 (lower == true) or
    4-5-6-7 (lower == false) contain the point (x,y) the function will
-   return true - otehrwise false.
+   return true - otherwise false.
 
    the function works by dividing the cell face into two triangles,
    which are checked one at a time with the function
@@ -1666,7 +1666,7 @@ static void ecl_grid_set_cell_GRID(ecl_grid_type * ecl_grid,
 
   /*
     This is the rather hysterical treatment of dual porosity in GRID
-    files. Cells with k >= nz consitute the fracture part of the
+    files. Cells with k >= nz constitute the fracture part of the
     grid. For these cell the cell properties are not recalculated, but
     the active flag is updated to include the active|inactive
     properties of the fracture.
@@ -1719,7 +1719,7 @@ static void ecl_grid_set_cell_GRID(ecl_grid_type * ecl_grid,
     case 4:                /* all cells active */
       cell->active += active_value;
       break;
-    case 5:                /* only spesific cells active - no lgr */
+    case 5:                /* only specific cells active - no lgr */
       cell->active  += coords[4] * active_value;
       break;
     case 7:
@@ -2097,10 +2097,10 @@ static void ecl_grid_init_mapaxes( ecl_grid_type * ecl_grid , bool apply_mapaxes
    grid:
 
     1. in the main_grid->lgr_list the lgr instances are inserted in
-       order of occurence in the grid file. the following equalities
+       order of occurrence in the grid file. the following equalities
        should apply:
 
-          occurence number in file == lgr_grid->grid_nr
+          occurrence number in file == lgr_grid->grid_nr
 
        This 'mostly' agrees with the GRIDHEAD(4) item, but
        unfortunately not always. Cases have popped up where the series
@@ -2116,7 +2116,7 @@ static void ecl_grid_init_mapaxes( ecl_grid_type * ecl_grid , bool apply_mapaxes
 
     observe that this is in principle somewhat different from the
     install functions below; here the lgr is added to the top level
-    grid (i.e. the main grid) which has the storage responsability of
+    grid (i.e. the main grid) which has the storage responsibility of
     all the lgr instances. the cell->lgr relationship is established
     in the _install_egrid / install_grid functions further down.
 */
@@ -2841,7 +2841,7 @@ static void ecl_grid_init_cell_nnc_info(ecl_grid_type * ecl_grid, int global_ind
    2. To get valid NNC information to load in e.g. Resinsight the
       corresponding TRANNNC keyword must be added to the INIT file,
       i.e. the calling scope must create a ecl_kw with
-      transmissibility values in parallell with adding NNC information
+      transmissibility values in parallel with adding NNC information
       to the grid:
 
          fortio_type * init_file = fortio_open_writer( "CASE.INIT" , ...
@@ -2909,7 +2909,7 @@ static void ecl_grid_init_nnc_cells( ecl_grid_type * grid1, ecl_grid_type * grid
   /*
     In the ECLIPSE output format grids with dual porosity are (to some
     extent ...) modeled as two independent grids stacked on top of
-    eachother, where the fracture cells have global index in the range
+    each other, where the fracture cells have global index in the range
     [nx*ny*nz, 2*nx*ny*nz).
 
     The physical connection between the matrix and the fractures in
@@ -3617,7 +3617,7 @@ ecl_grid_type * ecl_grid_alloc_dxv_dyv_dzv_depthz( int nx, int ny , int nz , con
    be many constraints among the different values.
 
    The x and y position of a cell is found by adding the increments
-   from dx and dy, whereas the vertical position is read dircetly out
+   from dx and dy, whereas the vertical position is read directly out
    of the tops array.
 
    The ECLIPSE input format only requires size(dz) >= nx*ny and the
@@ -4320,7 +4320,7 @@ bool ecl_grid_cell_contains_xyz3( const ecl_grid_type * ecl_grid , int i, int j 
   point_type p;
   ecl_cell_type * cell = ecl_grid_get_cell( ecl_grid , ecl_grid_get_global_index3( ecl_grid , i, j , k ));
   point_set( &p , x , y , z);
-  int method = (i + j + k) % 2; // Chooses the approperiate decomposition method for the cell
+  int method = (i + j + k) % 2; // Chooses the appropriate decomposition method for the cell
 
   if (GET_CELL_FLAG(cell , CELL_FLAG_TAINTED))
     return false;
@@ -4607,7 +4607,7 @@ void ecl_grid_alloc_blocking_variables(ecl_grid_type * grid, int block_dim) {
   else if (block_dim == 3)
     grid->block_size = grid->size;
   else
-    util_abort("%: valid values are two and three. Value:%d invaid \n",__func__ , block_dim);
+    util_abort("%: valid values are two and three. Value:%d invalid \n",__func__ , block_dim);
 
   grid->values         = (double_vector_type**)util_calloc( grid->block_size , sizeof * grid->values );
   for (index = 0; index < grid->block_size; index++)
@@ -5319,7 +5319,7 @@ static void __assert_main_grid(const ecl_grid_type * ecl_grid) {
 
 
 /**
-   This functon will return a a ecl_grid instance corresponding to the
+   This function will return a a ecl_grid instance corresponding to the
    lgr with name lgr_name. The function will fail HARD if no lgr with
    this name is installed under the present main grid; check first
    with ecl_grid_has_lgr() if you are whimp.
@@ -5516,7 +5516,7 @@ int ecl_grid_get_lgr_nr_from_name( const ecl_grid_type * grid , const char * nam
 
 /**
    This function returns the lgr_nr field of the grid; for GRID files, this
-   is just the occurence number in the grid file. Starting with 0 at the main
+   is just the occurrence number in the grid file. Starting with 0 at the main
    grid, and then increasing consecutively through the lgr sections.
    For EGRID files, this is the LGR number (fourth element in the
    gridhead).
@@ -5771,7 +5771,7 @@ double ecl_grid_get_property(const ecl_grid_type * ecl_grid , const ecl_kw_type 
 
    The column vector will be filled with double values, the content of
    ecl_kw will be converted to double in the case INTE,REAL and DOUB
-   types, otherwsie it is crash and burn.
+   types, otherwise it is crash and burn.
 */
 
 
@@ -5826,7 +5826,7 @@ void ecl_grid_get_column_property(const ecl_grid_type * ecl_grid , const ecl_kw_
         cell is in the space of active cells, otherwise it is in terms
         of the global indexing.
 
-   Observe the following about the ecl_kw instance wth region data:
+   Observe the following about the ecl_kw instance with region data:
 
     * It must be of type integer - otherwise we blow up hard.  The
     * size must be the total number of cells (should handle boxes and

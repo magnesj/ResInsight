@@ -156,7 +156,7 @@ options parse_opts( const char* opts ) noexcept {
  * to/from host carefully swaps endianness for a large array.
  *
  * The switch guarantees that byte swap happens properly, even on platforms
- * where sizeof(char) == sizeof(int32), without accidently terminating before,
+ * where sizeof(char) == sizeof(int32), without accidentally terminating before,
  * relying on hton being well-defined on such platforms. Should any non-char,
  * int16, and int32 sizes be passed through, nothing should happen, but
  * non-zero is returned.
@@ -304,7 +304,7 @@ int eclfio_get( std::FILE* fp,
     }
 
     /*
-     * read was sucessful, but the tail didn't match. However, missing tails
+     * read was successful, but the tail didn't match. However, missing tails
      * are ok, so rewind the tail, and preserve position at end-of-record
      */
     if( read == 1 and head != tail and o.allow_notail ) {
@@ -323,7 +323,7 @@ int eclfio_get( std::FILE* fp,
     }
 
     /*
-     * read was succesful, but the tail didn't match, so flag the record as
+     * read was successful, but the tail didn't match, so flag the record as
      * invalid and rewind
      */
     if( read == 1 and head != tail )

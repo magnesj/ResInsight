@@ -812,7 +812,7 @@ Function Process-Project( [Parameter(Mandatory=$true)][string]       $vcxprojPat
   {
     # [HACK] pch generation crashes on VS 15.5 because of STL library, known bug.
     # Triggered by addition of line directives to improve std::function debugging.
-    # There's a definition that supresses line directives.
+    # There's a definition that suppresses line directives.
 
     $preprocessorDefinitions += "-D_DEBUG_FUNCTIONAL_MACHINERY"
   }

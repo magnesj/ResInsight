@@ -43,7 +43,7 @@ extern "C" {
  *    failed and NOTHING IS GUARANTEED. The file stream is left in an unspecified
  *    state, and must be recovered accordingly.
  * 2. in eclfio_get, the output record buffer must always be considered dirty
- *    and incomplete unless the function suceeds, or ECL_EINVAL is returned.
+ *    and incomplete unless the function succeeds, or ECL_EINVAL is returned.
  *
  *
  * ECL_ERR_SEEK should be rather rare, but to provide strong guarantees, this
@@ -73,7 +73,7 @@ extern "C" {
  *      T - don't transform/byteswap data (does not affect heads/tails)
  *
  * endianness parameter applies to both head, tail, and data, but head/tail can
- * be interepreted with endianness byteswapping data by disabling transform
+ * be interpreted with endianness byteswapping data by disabling transform
  *
  * fault tolerance:
  *      # - ignore size hint
@@ -83,14 +83,14 @@ extern "C" {
 
 /*
  * Get the size (number of elements) of the current record. The file position
- * is approperiately rewinded afterwards, as if the function was never called.
+ * is appropriately rewinded afterwards, as if the function was never called.
  *
  * If this function fails, out is not modified.
  *
  * If the read fails, ECL_ERR_READ is returned.
  *
  * This function is largely intended for peeking the size of the next record,
- * to approperiately allocate a large enough buffer, which is useful when
+ * to appropriately allocate a large enough buffer, which is useful when
  * dealing with unknown files. If it is know in advance how large the records
  * are, it is not necessary to call this function before reading a record.
  */
@@ -112,7 +112,7 @@ int eclfio_skip( FILE*, const char* opts, int n );
 /*
  * Get the next record, and its number of elements.
  *
- * The record buffer is generally assumed to be of approperiate size, which can
+ * The record buffer is generally assumed to be of appropriate size, which can
  * be queried with eclfio_sizeof.
  *
  * On success, the value of recordsize denotes the number of elements read,

@@ -31,7 +31,7 @@ def source_root():
 #       skipUnless(EclTest.EQUINOR_DATA, "Missing Equinor testdata")
 #
 # but that has been surprisingly difficult to achieve. The current
-# implemenation is based on the skip() function from the unittest/case.py
+# implementation is based on the skip() function from the unittest/case.py
 # module in the Python standard distribution. There are unfortunately several
 # problems with this:
 #

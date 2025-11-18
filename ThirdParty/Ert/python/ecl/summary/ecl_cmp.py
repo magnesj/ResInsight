@@ -84,7 +84,7 @@ class EclCmp(object):
         """Class to compare to simulation cases with Eclipse formatted result files.
 
         The first argument is supposed to be the test_case and the
-        second argument is the reference case. The arguemnts should be
+        second argument is the reference case. The arguments should be
         the basenames of the simulation, with an optional path
         prefix - an extension is accepted, but will be ignored.
 
@@ -107,7 +107,7 @@ class EclCmp(object):
 
     def has_summary_vector(self, key):
         """
-        Will check if both test and refernce have @key.
+        Will check if both test and reference have @key.
         """
         return (key in self.test_case, key in self.ref_case)
 

@@ -488,7 +488,7 @@ stringlist_type * hash_alloc_stringlist(const hash_type * hash) {
 void hash_insert_copy(hash_type *hash , const char *key , const void *value , copyc_ftype *copyc , free_ftype *del) {
   hash_node_type *hash_node;
   if (copyc == NULL || del == NULL)
-    util_abort("%s: must provide copy constructer and delete operator for insert copy - aborting \n",__func__);
+    util_abort("%s: must provide copy constructor and delete operator for insert copy - aborting \n",__func__);
   {
     node_data_type * data_node = node_data_alloc_ptr( value , copyc , del );
     hash_node                  = hash_node_alloc_new(key , data_node , hash->hashf , hash->size);

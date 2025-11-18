@@ -1154,7 +1154,7 @@ TEST(Matrix4Test, CreateMatrixWithRotation)
 
     const double absErr = 1e-15;
 
-    // Rotation axis and vector parallell
+    // Rotation axis and vector parallel
     {
         const Mat4d m(mx1);
         const Vec3d iv(1, 0, 0);

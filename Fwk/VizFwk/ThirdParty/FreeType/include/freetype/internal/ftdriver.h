@@ -255,7 +255,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Driver_ClassRec struct.       */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a Create funtion will need    */
+  /*    When FT_CONFIG_OPTION_PIC is defined a Create function will need    */
   /*    to called with a pointer where the allocated stracture is returned.*/
   /*    And when it is no longer needed a Destroy function needs           */
   /*    to be called to release that allocation.                           */

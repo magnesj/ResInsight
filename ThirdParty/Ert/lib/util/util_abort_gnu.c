@@ -7,13 +7,13 @@
     execinfo.h  : The backtrace functions backtrace() and backtrace_symbols().
     _GNU_SOURCE : To get the dladdr() function.
 
-  If not all these features are availbale the simpler version in
+  If not all these features are available the simpler version in
   util_abort_simple.c is built instead.
 */
 
 /**
   This function uses the external program addr2line to convert the
-  hexadecimal adress given by the libc function backtrace() into a
+  hexadecimal address given by the libc function backtrace() into a
   function name and file:line.
 
   Observe that the function is quite involved, so if util_abort() is
@@ -135,9 +135,9 @@ bool util_addr2line_lookup(const void * bt_addr , char ** func_name , char ** fi
 
   Observe that it is __VERY__ important that the arguments and the
   format string match up, otherwise the util_abort() routine will hang
-  indefinetely; without printing anything to stream.
+  indefinitely; without printing anything to stream.
 
-  A backtrace is also included, with the help of the exernal utility
+  A backtrace is also included, with the help of the external utility
   addr2line, this backtrace is converted into usable
   function/file/line information (provided the required debugging
   information is compiled in).

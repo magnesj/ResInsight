@@ -398,7 +398,7 @@ class VectorTemplate(BaseCClass):
     # End mathematical operations
     #################################################################
 
-    # Essentally implements a = b
+    # Essentially implements a = b
     def assign(self, value):
         """
         Implements assignment of type a = b.

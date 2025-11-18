@@ -9,7 +9,7 @@
 -- production well and one standard water injection well. Production well starts with 
 -- an initial water cut around 0.2 and this increases to 0.5 throught the simulation.
  
--- Presure drop calculations for multi-segment well model icludes 
+-- Presure drop calculations for multi-segment well model includes 
 -- all available components (HFA, hydrostatic, Friction and acceleration)
 
 -- Summary section includes keywords SOFR, SPRD, SPRDH, SPRDF and SPRDA

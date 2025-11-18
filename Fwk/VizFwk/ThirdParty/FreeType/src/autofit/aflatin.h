@@ -47,7 +47,7 @@ FT_BEGIN_HEADER
   /*
    *  The following declarations could be embedded in the file `aflatin.c';
    *  they have been made semi-public to allow alternate script hinters to
-   *  re-use some of them.
+   *  reuse some of them.
    */
 
 

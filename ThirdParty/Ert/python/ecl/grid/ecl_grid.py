@@ -229,7 +229,7 @@ class EclGrid(BaseCClass):
         # If we have not succeeded in creatin the grid we *assume* the
         # error is due to a failed malloc.
         if ecl_grid is None:
-            raise MemoryError("Failed to allocated regualar grid")
+            raise MemoryError("Failed to allocated regular grid")
 
         return ecl_grid
 
@@ -529,7 +529,7 @@ class EclGrid(BaseCClass):
         """Checks if the cell has valid geometry.
 
         There are at least two reasons why a cell might have invalid
-        gemetry:
+        geometry:
 
           1. In the case of GRID files it is not necessary to supply
              the geometry for all the cells; in that case this
@@ -782,13 +782,13 @@ class EclGrid(BaseCClass):
 
     def find_cell(self, x, y, z, start_ijk=None):
         """
-        Lookup cell containg true position (x,y,z).
+        Lookup cell containing true position (x,y,z).
 
         Will locate the cell in the grid which contains the true
         position (@x,@y,@z), the return value is as a triplet
         (i,j,k). The underlying C implementation is not veeery
         efficient, and can potentially take quite long time. If you
-        provide a good intial guess with the parameter @start_ijk (a
+        provide a good initial guess with the parameter @start_ijk (a
         tuple (i,j,k)) things can speed up quite substantially.
 
         If the location (@x,@y,@z) can not be found in the grid, the
@@ -1006,7 +1006,7 @@ class EclGrid(BaseCClass):
 
     def grid_value(self, kw, i, j, k):
         """
-        Will evalute @kw in location (@i,@j,@k).
+        Will evaluate @kw in location (@i,@j,@k).
 
         The ECLIPSE properties and solution vectors are stored in
         restart and init files as 1D vectors of length nx*nx*nz or
@@ -1277,10 +1277,10 @@ class EclGrid(BaseCClass):
             size = self.get_num_active()
         else:
             size = self.get_global_size()
-        indx = numpy.zeros(size, dtype=numpy.int32)
+        index = numpy.zeros(size, dtype=numpy.int32)
         data = numpy.zeros([size, 4], dtype=numpy.int32)
-        self._export_index_frame( indx.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), data.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), active_only )
-        df = pandas.DataFrame(data=data, index=indx, columns=['i', 'j', 'k', 'active'])
+        self._export_index_frame( index.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), data.ctypes.data_as(ctypes.POINTER(ctypes.c_int32)), active_only )
+        df = pandas.DataFrame(data=data, index=index, columns=['i', 'j', 'k', 'active'])
         return df
         
     def export_data(self, index_frame, kw, default = 0):
@@ -1359,7 +1359,7 @@ class EclGrid(BaseCClass):
 
         In total there are eight 8 corners. They are described as follows:
         The corners in a cell are numbered 0 - 7, where corners 0-3 constitute
-        one layer and the corners 4-7 consitute the other layer. Observe 
+        one layer and the corners 4-7 constitute the other layer. Observe 
         that the numbering does not follow a consistent rotation around the face:
 
 

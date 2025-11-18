@@ -125,7 +125,7 @@ namespace Opm {
         ///
         /// \code
         ///    for (const auto& connection : cellNeighbourhood(cell) {
-        ///        // connection.neigbour is the neigbouring cell
+        ///        // connection.neighbour is the neighbouring cell
         ///        // connection.weight   is the corresponding connection weight
         ///     }
         /// \endcode

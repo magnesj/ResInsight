@@ -55,7 +55,7 @@ procedure:
      statically.
 
 Both of these solutions are unsatisfactory. Currently the shared
-libaries are installed globally as:
+libraries are installed globally as:
 
    /project/res/x86_64_RH_X/lib/python/lib/libXXX.so
 
@@ -159,7 +159,7 @@ members, this is achieved by calling the function
 gen_data_config_update_active() which will collect active/inactive
 statistics according to AND:
 
-     activ[index] = AND( active[index,iens=0] , active[index,iens=1] ,
+     active[index] = AND( active[index,iens=0] , active[index,iens=1] ,
      ...)
 
 The final active mask is stored with an enkf_fs_case_tstep() call, so
@@ -176,10 +176,10 @@ gen_data_config_load_active().
 
 There are two different configuration systems present in the ERT
 code. libconfig/src/config.c implements the "config" system, whereas
-the "conf" system is implememented in libconfig/src/conf.c. The "conf"
+the "conf" system is implemented in libconfig/src/conf.c. The "conf"
 system is only used in the observation system, whereas the "config"
 system is used for the main configuration file and also some other
-small areas of the code. The occurence of two different config systems
+small areas of the code. The occurrence of two different config systems
 is of course a major embarressement, it should all have been xml :-(
 
 Since the observation file is implemented with the "conf" system, that
@@ -199,7 +199,7 @@ Concrete tips:
      to split on " ".
 
         .....
-        OBS_SCRIPT = /path/to/som/script/make_obs.py
+        OBS_SCRIPT = /path/to/some/script/make_obs.py
         SCRIPT_ARG = "ARG1 ARG2 ARG3 ...ARG17"
         ....
 
@@ -272,7 +272,7 @@ input. The required coordinates are:
      ECLIPSE report steps (ECLIPSE is unfortunately not just any FORWARD
      model, but still has severe influence on the structure of ERT :-( )
 
-Observe that the state "coordindate" is not treated like a first class
+Observe that the state "coordinate" is not treated like a first class
 coordinate in the same manner as iens and tstep. Exactly how the state
 coordinate is handled differs for the different data types:
 
@@ -387,7 +387,7 @@ keywords, that is what the index/kw_list is used for.
 The enkf_fs layer does not directly store nodes to disk, instead that
 task is passed on to a driver. When the enkf_fs layer has completed
 filling up a buffer instance with the data to store, that buffer is
-passed on to the apropriate driver. The driver is a structure with
+passed on to the appropriate driver. The driver is a structure with
 function pointers to functions for doing the very basic low-level
 read/write operations and also whatever state needed by the
 driver. The use of these pluggable drivers for read and write

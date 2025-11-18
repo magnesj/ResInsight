@@ -76,7 +76,7 @@
 
     1. In point 4. above - if you ask the vector for it's size you
        will get 3, and int_vector_iget(vector, 3) will fail because
-       that is beyound the end of the vector.
+       that is beyond the end of the vector.
 
     2. The size of the vector is the index (+1) of the last validly
        set element in the vector.
@@ -518,7 +518,7 @@ void @TYPE@_vector_scale(@TYPE@_vector_type * vector, @TYPE@ factor) {
 }
 
 
-/* Vector / scalar; seperate _div function to ensure correct integer division. */
+/* Vector / scalar; separate _div function to ensure correct integer division. */
 void @TYPE@_vector_div(@TYPE@_vector_type * vector, @TYPE@ divisor) {
   int i;
   for (i=0; i < vector->size; i++)
@@ -704,7 +704,7 @@ void @TYPE@_vector_idel_block( @TYPE@_vector_type * vector , int index , int blo
 
 
 /**
-   Removes all occurences of @value from the vector, thereby shrinking
+   Removes all occurrences of @value from the vector, thereby shrinking
    the vector. The return value is the number of elements removed from
    the vector.
 */
@@ -837,7 +837,7 @@ const @TYPE@ * @TYPE@_vector_get_const_ptr(const @TYPE@_vector_type * vector) {
    Observe that there is a principle difference between the get_ptr()
    functions and alloc_data_copy() when the vector has zero size. The
    former functions will always return valid (@TYPE@ *) pointer,
-   altough possibly none of the elements have been set by the vector
+   although possibly none of the elements have been set by the vector
    instance, whereas the alloc_data_copy() function will return NULL
    in that case.
 */

@@ -39,7 +39,7 @@ static void spawn_init_redirection__(posix_spawn_file_actions_t * file_actions, 
 
   /* The _addopen() call will first close the fd and then reopen it;
      if no file is specified for stdout/stderr redirect the child will
-     send stdout & stderr to whereever the parent process was already
+     send stdout & stderr to wherever the parent process was already
      sending it.
   */
   if (stdout_file)

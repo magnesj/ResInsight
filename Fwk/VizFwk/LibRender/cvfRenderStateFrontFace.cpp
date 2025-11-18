@@ -50,7 +50,7 @@ namespace cvf {
 /// \ingroup Render
 ///
 /// Encapsulate OpenGL glFrontFace() used to specify polygon winding. Used together with RenderStateCullFace
-/// render state and the gl_FrontFacing bultin shader input variable.
+/// render state and the gl_FrontFacing builtin shader input variable.
 ///
 /// \sa http://www.opengl.org/sdk/docs/man/xhtml/glFrontFace.xml
 /// \sa http://www.opengl.org/sdk/docs/manglsl/xhtml/gl_FrontFacing.xml

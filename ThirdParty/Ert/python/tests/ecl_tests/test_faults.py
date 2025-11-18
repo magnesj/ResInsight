@@ -279,7 +279,7 @@ class FaultTest(EclTest):
         with self.assertRaises(ValueError):
             Fault.intersectFaultRays(( p3,dir3),(p1,dir1))
 
-        # Parallell with offset
+        # Parallel with offset
         p4 = (0,1)
         dir4 = (1,0)
         with self.assertRaises(ValueError):

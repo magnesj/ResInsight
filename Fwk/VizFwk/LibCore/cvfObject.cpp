@@ -92,8 +92,8 @@ void Object::dumpActiveObjectInstances()
     
 #if ((CVF_TRACK_ACTIVE_OBJECT_INSTANCES >= 1 && defined(_DEBUG)) || CVF_TRACK_ACTIVE_OBJECT_INSTANCES == 2)
 
-    // Use a map to count the number of occurences of each class
-    std::map<std::string, int> occurences;
+    // Use a map to count the number of occurrences of each class
+    std::map<std::string, int> occurrences;
 
     std::set<Object*>::iterator it;
     for (it = objInstances->begin(); it != objInstances->end(); ++it)
@@ -102,20 +102,20 @@ void Object::dumpActiveObjectInstances()
 
         const type_info& typeInfo = typeid(*obj);
         const char* className = typeInfo.name();
-        if (occurences.find(className) != occurences.end())
+        if (occurrences.find(className) != occurrences.end())
         {
-            occurences[className] += 1;
+            occurrences[className] += 1;
         }
         else
         {
-            occurences[className] = 1;
+            occurrences[className] = 1;
         }
     }
 
-    if (occurences.size() > 0)
+    if (occurrences.size() > 0)
     {
         std::map<std::string, int>::iterator it;
-        for (it = occurences.begin(); it != occurences.end(); ++it)
+        for (it = occurrences.begin(); it != occurrences.end(); ++it)
         {
             Trace::show("%6d instances of:  %s", it->second, it->first.data());
         }

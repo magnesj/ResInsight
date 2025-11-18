@@ -14,8 +14,8 @@ and not addressing some issues. The known issues are :
 	Option 1 seems intuitive for one case operations
 	How does these two relate ?
 
-3. Do we need functions to retreive the selected/active cases/groups ?
-4. Do we need functions to retreive info on what Parent cells an LGR occupies ?
+3. Do we need functions to retrieve the selected/active cases/groups ?
+4. Do we need functions to retrieve info on what Parent cells an LGR occupies ?
 
 
 Project Information
@@ -29,7 +29,7 @@ Vector[Casenames] riGetCaseNames()
 	This probably needs some additions related to Case Groups
 
 
-Retreiving Grid Metadata
+Retrieving Grid Metadata
 ==================================
 
 Matrix[ActiveCells][8] riGetActiveCellInfo( [CaseName/CaseIndex])
@@ -73,12 +73,12 @@ Vector[Days] riGetTimestepDays([Casename/CaseIndex])
 	Returns a vector of all the timesteps in a case as days from start
 
 
-Retreiving property data
+Retrieving property data
 ==================================
 
 Matrix[ActiveCells][Timesteps] riGetActiveCellProperty( [CaseName/CaseIndex], PropertyName )
 
-	Returns a two dimentional matrix: [ActiveCells][Timesteps]
+	Returns a two dimensional matrix: [ActiveCells][Timesteps]
 
 	Containing the requested property data from the Eclipse Case defined.
 	If the Eclipse Case is not defined, the active View in ResInsight is used.		

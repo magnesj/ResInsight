@@ -48,7 +48,7 @@
    2. The files can have comment sections; even in the data block.
 
    3. The * notation can be used to print repeated values in a compact
-      form, i.e.  1000*0.25 to get 1000 conecutive 0.25 values.
+      form, i.e.  1000*0.25 to get 1000 consecutive 0.25 values.
 
   The typical ECLIPSE keywords found in the datafile contain a mixture
   of numeric and character data; the current code assumes that all the
@@ -352,7 +352,7 @@ static char * fscanf_alloc_grdecl_data( const char * header , bool strict , ecl_
               data = (char*) util_realloc( data , byte_size );
             } else {
               /*
-                We are asking for more elements than can possible be adressed in
+                We are asking for more elements than can possible be addressed in
                 an integer. Return NULL - and data size == 0; let calling scope
                 try to handle it.
               */

@@ -448,7 +448,7 @@ void ProgramOptions::addNewParsedOption(ParsedOption* parsedOption)
         }
         else
         {
-            // Last occurence wins
+            // Last occurrence wins
             // Erase existing and add ourselves at the end
             m_parsedOptions.erase(existingOption.p());
             m_parsedOptions.push_back(parsedOption);

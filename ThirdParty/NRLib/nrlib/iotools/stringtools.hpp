@@ -74,7 +74,7 @@ namespace NRLib {
 
   /// Prepend prefix to str. Returns str if prefix is empty, if str is empty
   /// or if str is a complete path starting with /.
-  /// Adds '/' as directory seperator if missing.
+  /// Adds '/' as directory separator if missing.
   std::string PrependDir(const std::string& prefix,
                          const std::string& str);
 
@@ -86,7 +86,7 @@ namespace NRLib {
   std::string AddExtension(const std::string& filename,
                            const std::string& extension);
 
-  /// In string text replace all occurences odf string "out" with string "in".
+  /// In string text replace all occurrences odf string "out" with string "in".
   void Substitute(std::string       & text,
                   const std::string & out,
                   const std::string & in);

@@ -2,10 +2,10 @@
 
 if (argc > 0)
 {
-	ordner = argv[0];
-	if (basename(ordner) == "") /* ist Ordner */
+	order = argv[0];
+	if (basename(order) == "") /* ist Order */
 	{
-		ChangeFilenames(ordner);
+		ChangeFilenames(order);
 	}
 }
 

@@ -120,7 +120,7 @@ DEFUN_DLD (riGetActiveCellProperty, args, nargout,
     int nargin = args.length ();
     if (nargin < 1)
     {
-        error("riGetActiveCellProperty: Too few arguments. The name of the property requested is neccesary.\n");
+        error("riGetActiveCellProperty: Too few arguments. The name of the property requested is necessary.\n");
         print_usage();
         return octave_value_list ();
     }

@@ -171,7 +171,7 @@ class EclSMSPECNode(BaseCClass):
         """
         Will check if the variable in question is a rate variable.
 
-        The conecpt of rate variabel is important (internally) when
+        The concept of rate variable is important (internally) when
         interpolation values to arbitrary times.
         """
         return self._node_is_rate()

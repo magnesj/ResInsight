@@ -18,7 +18,7 @@
 
 %%% Copyright   Ulf A. Lindgren
 %%%
-%%% Note        Premission is granted to modify this file under
+%%% Note        Permission is granted to modify this file under
 %%%             the condition that it is saved using another
 %%%             file and package name.
 %%%
@@ -42,7 +42,7 @@
 %%%                  backmatter, pointed out by Lapo Mori
 %%%
 %%% Revision    1.31 (2004)
-%%%             Sep. 21th problem with the Rejne definition streched text
+%%%             Sep. 21th problem with the Rejne definition stretched text
 %%%                  caused ugly gaps in the vrule aligned with the title
 %%%                  text. Kindly pointed out to me by Hendri Adriaens
 %%%
@@ -112,7 +112,7 @@
   \setcounter{section}{0}%
   \inapptrue%
   \renewcommand\@chapapp{\appendixname}%
-  \renewcommand\thechapter{\@Alph\c@chapter}}
+  \renewcommand\thechapter{\@Alpha\c@chapter}}
 
 %%%%% Fix for frontmatter, mainmatter, and backmatter 040920
 
@@ -482,7 +482,7 @@
 %    \raggedleft\CTV\FmTi{#1}\par\nobreak
 %    \vskip 60\p@}
 %% Fix suggested by Tomas Lundberg
-    \setlength{\py}{25pt}  % eller vad man vill
+    \setlength{\py}{25pt}  % eller vad man will
     \setlength{\pyy}{\py}
     \setlength{\backskip}{\py}
     \addtolength{\backskip}{2pt}
@@ -547,7 +547,7 @@
     \addtolength{\px}{-1\RW}
     \rule[-1\px]{\RW}{\myhi}\mghrulefill{\RW}\hskip
     10pt\raisebox{-0.5\py}{\CNoV\thechapter}\hskip 10pt\mghrulefill{\RW}\rule[-1\px]{\RW}{\myhi}\par\nobreak
-     \vskip -3\p@% Added -2pt vskip to correct for streched text v1.31
+     \vskip -3\p@% Added -2pt vskip to correct for stretched text v1.31
     }
   \renewcommand{\DOTI}[1]{%
     \setlength{\mylen}{\textwidth}
@@ -555,7 +555,7 @@
     \addtolength{\mylen}{-2\RW}
     {\vrule width\RW}\parbox{\mylen}{\CTV\FmTi{#1}}{\vrule width\RW}\par\nobreak%
     \vskip -3pt\rule{\RW}{2\baselineskip}\mghrulefill{\RW}\rule{\RW}{2\baselineskip}%
-    \vskip 60\p@% Added -2pt in vskip to correct for streched text v1.31
+    \vskip 60\p@% Added -2pt in vskip to correct for stretched text v1.31
     }
   \renewcommand{\DOTIS}[1]{%
     \setlength{\py}{\fboxrule}

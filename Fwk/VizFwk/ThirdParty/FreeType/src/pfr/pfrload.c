@@ -199,7 +199,7 @@
   FT_LOCAL_DEF( FT_Error )
   pfr_log_font_count( FT_Stream  stream,
                       FT_UInt32  section_offset,
-                      FT_UInt   *acount )
+                      FT_UInt   *account )
   {
     FT_Error  error;
     FT_UInt   count;
@@ -212,7 +212,7 @@
     result = count;
 
   Exit:
-    *acount = result;
+    *account = result;
     return error;
   }
 

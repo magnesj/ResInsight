@@ -45,11 +45,11 @@
 #include "detail/ecl/ecl_sum_file_data.hpp"
 
 /*
-  This file implements the sruct ecl_sum_data which manages the actual simulated
+  This file implements the struct ecl_sum_data which manages the actual simulated
   values from a summary file, including all time-related information. In the
   case of restarted simulations the different summary cases will be internalized
   as separate ecl_sum_file_data instances. The ecl_sum_file_data class is an
-  internal implemenation detail which is not exported. More details about the
+  internal implementation detail which is not exported. More details about the
   internal storage of summary data can be found in that file.
 
   For this file the implementation mainly consists of maintaining an ordered
@@ -195,7 +195,7 @@ namespace {
 
     /*
       This will check that we have a datafile which report range covers the
-      report argument, in adition there can be 'holes' in the series - that must
+      report argument, in addition there can be 'holes' in the series - that must
       be checked by actually querying the data_file object.
     */
 
@@ -294,7 +294,7 @@ static void ecl_sum_data_append_file_data( ecl_sum_data_type * sum_data, ecl::ec
 
    If the supplied report_step is invalid the function will set both
    return values to -1 (the return value from safe_iget). In that case
-   it is the responsability of the calling scope to check the return
+   it is the responsibility of the calling scope to check the return
    values, alternatively one can use the query function
    ecl_sum_data_has_report_step() first.
 */
@@ -480,7 +480,7 @@ static int ecl_sum_data_get_index_from_sim_time( const ecl_sum_data_type * data 
   }
 
   /*
-     The moment we have passed the intial test we MUST find a valid
+     The moment we have passed the initial test we MUST find a valid
      ministep index, however care should be taken that there can
      perfectly well be 'holes' in the time domain, because of e.g. the
      RPTONLY keyword.
@@ -737,7 +737,7 @@ ecl_sum_data_type * ecl_sum_data_fread_alloc( ecl_smspec_type * smspec , const s
   /*****************************************************************/
   /* OK - now we have loaded all the data. Must sort the internal
      storage vector, and build up various internal indexing vectors;
-     this is done in a sepearate function.
+     this is done in a separate function.
   */
   ecl_sum_data_build_index( data );
   return data;
@@ -925,7 +925,7 @@ double ecl_sum_data_get_from_sim_time( const ecl_sum_data_type * data , time_t s
 
        However - as indicated on the figure above there is a zero
        measure point right at the start which corresponds to
-       time_index == 0; this is to ensure that there is correspondance
+       time_index == 0; this is to ensure that there is correspondence
        with the ECLIPSE results if you ask for a value interpolated to
        the starting time.
     */

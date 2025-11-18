@@ -31,7 +31,7 @@ void 		     ecl_io_config_set_unified_restart(ecl_io_config_type *, bool );
 void 		     ecl_io_config_set_unified_summary(ecl_io_config_type *, bool );
 
 
-/* Accesors */
+/* Accessors */
 bool 		     ecl_io_config_get_formatted(ecl_io_config_type *);
 bool 		     ecl_io_config_get_unified_restart(ecl_io_config_type *);
 bool 		     ecl_io_config_get_unified_summary(ecl_io_config_type *);

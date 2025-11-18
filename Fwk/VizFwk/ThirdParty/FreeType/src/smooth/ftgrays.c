@@ -1222,7 +1222,7 @@ typedef ptrdiff_t  FT_PtrDist;
   gray_hline( RAS_ARG_ TCoord  x,
                        TCoord  y,
                        TPos    area,
-                       TCoord  acount )
+                       TCoord  account )
   {
     FT_Span*  span;
     int       count;
@@ -1276,7 +1276,7 @@ typedef ptrdiff_t  FT_PtrDist;
            (int)span->x + span->len == (int)x &&
            span->coverage == coverage         )
       {
-        span->len = (unsigned short)( span->len + acount );
+        span->len = (unsigned short)( span->len + account );
         return;
       }
 
@@ -1314,7 +1314,7 @@ typedef ptrdiff_t  FT_PtrDist;
 
       /* add a gray span to the current list */
       span->x        = (short)x;
-      span->len      = (unsigned short)acount;
+      span->len      = (unsigned short)account;
       span->coverage = (unsigned char)coverage;
 
       ras.num_gray_spans++;

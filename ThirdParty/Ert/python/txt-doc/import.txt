@@ -1,7 +1,7 @@
 Python has a system for packages and sub packages which maps to the
 filesystem; there are many different ways to import symbols into the
 Python interpreter context. These things are exploited in the ert python
-bindings, here we try to document the python apporach to packages and
+bindings, here we try to document the python approach to packages and
 importing in general, and the conventions used in ert python in special.
 
 Example module (file: example.py)
@@ -164,7 +164,7 @@ When issuing the import statement:
    import ert.ecl.ecl_grid
 
 The directory 'ert/' must be on PYTHONPATH. In principle it is possible
-to circumvent the lowest level packge, and go directly to the 'ecl'
+to circumvent the lowest level package, and go directly to the 'ecl'
 subpackage:
 
     import ecl.ecl_grid

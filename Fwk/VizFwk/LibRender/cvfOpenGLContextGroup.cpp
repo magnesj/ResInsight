@@ -147,7 +147,7 @@ bool OpenGLContextGroup::initializeContextGroup(OpenGLContext* currentContext)
 
         if (!initializeGLEW(currentContext))
         {
-            CVF_LOG_ERROR(m_logger.p(), "Failed to intitialize GLEW in context group");
+            CVF_LOG_ERROR(m_logger.p(), "Failed to initialize GLEW in context group");
             return false;
         }
 
@@ -156,7 +156,7 @@ bool OpenGLContextGroup::initializeContextGroup(OpenGLContext* currentContext)
 #ifdef WIN32
         if (!initializeWGLEW(currentContext))
         {
-            CVF_LOG_ERROR(m_logger.p(), "Failed to intitialize WGLEW in context group");
+            CVF_LOG_ERROR(m_logger.p(), "Failed to initialize WGLEW in context group");
             return false;
         }
 #endif

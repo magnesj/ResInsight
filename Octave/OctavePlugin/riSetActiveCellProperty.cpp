@@ -125,7 +125,7 @@ DEFUN_DLD (riSetActiveCellProperty, args, nargout,
     int nargin = args.length ();
     if (nargin < 2)
     {
-        error("riSetActiveCellProperty: Too few arguments. The data matrix and the name of the property requested is neccesary\n");
+        error("riSetActiveCellProperty: Too few arguments. The data matrix and the name of the property requested is necessary\n");
         print_usage();
         return octave_value_list ();
     }

@@ -97,7 +97,7 @@ const int NUM_EFFECTS = sizeof(DEFAULT_EFFECT_COLORS)/sizeof(cvf::Color3f);
 
 
 //--------------------------------------------------------------------------------------------------
-/// Setup default config wiht 3x3x3 primitives
+/// Setup default config with 3x3x3 primitives
 //--------------------------------------------------------------------------------------------------
 PartCompoundGenerator::PartCompoundGenerator()
 :   m_partDistribution(3, 3, 3),

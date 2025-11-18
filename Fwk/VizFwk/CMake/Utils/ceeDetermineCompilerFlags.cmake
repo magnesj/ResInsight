@@ -18,7 +18,7 @@ if (CMAKE_COMPILER_IS_GNUCXX)
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE}  ")
 endif()
 
-# We alwys want Unicode on Win
+# We always want Unicode on Win
 if (MSVC)
 	add_definitions(-DUNICODE -D_UNICODE)
 endif()

@@ -8,7 +8,7 @@
 #include <unistd.h>
 
 /**
-    This function will TRY to aquire an exclusive lock to the file
+    This function will TRY to acquire an exclusive lock to the file
     filename. If the file does not exist it will be created. The mode
     will be changed to 'mode' (irrespective of whether it exists
     already or not).
@@ -18,7 +18,7 @@
     to open the file (with modes O_WRONLY + O_CREATE), the function
     will fail hard before even reaching the lockf system call.
 
-    If the lock is aquired the function will return true, otherwise it
+    If the lock is acquired the function will return true, otherwise it
     will return false. The lock is only active as long as the lockfile
     is open, we therefore have to keep track of the relevant file
     descriptor; it is passed back to the calling scope through a
@@ -66,7 +66,7 @@ bool util_try_lockf(const char * lockfile , mode_t mode , int * __fd) {
 
 
 /*
-   Opens a file, and locks it for exclusive acces. fclose() will
+   Opens a file, and locks it for exclusive access. fclose() will
    release all locks.
 */
 

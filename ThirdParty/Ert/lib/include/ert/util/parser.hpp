@@ -123,12 +123,12 @@ typedef struct basic_parser_struct basic_parser_type;
 
 
 basic_parser_type * basic_parser_alloc(
-  const char * whitespace,       /** Set to NULL if not interessting.         */
-  const char * quoters,          /** Set to NULL if not interessting.         */
-  const char * specials,         /** Set to NULL if not interessting.         */
+  const char * whitespace,       /** Set to NULL if not interesting.         */
+  const char * quoters,          /** Set to NULL if not interesting.         */
+  const char * specials,         /** Set to NULL if not interesting.         */
   const char * delete_set,
-  const char * comment_start,    /** Set to NULL if not interessting.         */
-  const char * comment_end);     /** Set to NULL if not interessting.         */
+  const char * comment_start,    /** Set to NULL if not interesting.         */
+  const char * comment_end);     /** Set to NULL if not interesting.         */
 
 
 void       basic_parser_set_splitters( basic_parser_type * parser , const char * splitters );

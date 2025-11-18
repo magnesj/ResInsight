@@ -242,7 +242,7 @@ void TgaLoader::LoadCompressedTGA (FILE* pFile)
 				++iCurrentPixel;
 			}
 		}
-		else // chunkheader > 128 RLE data, next color reapeated (chunkheader - 127) times
+		else // chunkheader > 128 RLE data, next color repeated (chunkheader - 127) times
 		{
 			ucChunkHeader -= 127;	// Subteact 127 to get rid of the ID bit
 

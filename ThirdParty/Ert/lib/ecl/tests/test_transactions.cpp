@@ -33,7 +33,7 @@
 
 
 /*
-  This test is slightly awkward beacuse it tests quite internal implementation details.
+  This test is slightly awkward because it tests quite internal implementation details.
 */
 
 void test_transaction() {

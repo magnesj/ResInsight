@@ -32,7 +32,7 @@
   /* modified to avoid fopen(), fclose(), fread(), fseek(), ftell(),       */
   /* malloc(), realloc(), and free().                                      */
   /*                                                                       */
-  /* Those C library functions are often not thread-safe or cant be        */
+  /* Those C library functions are often not thread-safe or can't be        */
   /* used in a shared Amiga library. If that's not a problem for you,       */
   /* you can of course use the default ftsystem.c with C library calls     */
   /* instead.                                                              */

@@ -414,7 +414,7 @@ int NRLib::FindGridFileType(const std::string& filename )
 
 void NRLib::WriteBinaryShort(std::ostream& stream,
                               short s,
-                              Endianess file_format)
+                              Endianness file_format)
 {
   char buffer[2];
 
@@ -436,7 +436,7 @@ void NRLib::WriteBinaryShort(std::ostream& stream,
 
 
 short NRLib::ReadBinaryShort(std::istream& stream,
-                              Endianess file_format)
+                              Endianness file_format)
 {
   unsigned short us;
   char buffer[2];
@@ -465,7 +465,7 @@ short NRLib::ReadBinaryShort(std::istream& stream,
 
 void NRLib::WriteBinaryInt(std::ostream& stream,
                             int i,
-                            Endianess file_format)
+                            Endianness file_format)
 {
   char buffer[4];
 
@@ -487,7 +487,7 @@ void NRLib::WriteBinaryInt(std::ostream& stream,
 
 
 int NRLib::ReadBinaryInt(std::istream& stream,
-                          Endianess file_format)
+                          Endianness file_format)
 {
   unsigned int ui;
   char buffer[4];
@@ -516,7 +516,7 @@ int NRLib::ReadBinaryInt(std::istream& stream,
 
 void NRLib::WriteBinaryFloat(std::ostream& stream,
                               float f,
-                              Endianess file_format)
+                              Endianness file_format)
 {
   char buffer[4];
 
@@ -538,7 +538,7 @@ void NRLib::WriteBinaryFloat(std::ostream& stream,
 
 
 float NRLib::ReadBinaryFloat(std::istream& stream,
-                              Endianess file_format)
+                              Endianness file_format)
 {
   float f;
   char buffer[4];
@@ -567,7 +567,7 @@ float NRLib::ReadBinaryFloat(std::istream& stream,
 
 void NRLib::WriteBinaryDouble(std::ostream& stream,
                                double d,
-                               Endianess file_format)
+                               Endianness file_format)
 {
   char buffer[8];
 
@@ -589,7 +589,7 @@ void NRLib::WriteBinaryDouble(std::ostream& stream,
 
 
 double NRLib::ReadBinaryDouble(std::istream& stream,
-                                Endianess file_format)
+                                Endianness file_format)
 {
   double d;
   char buffer[8];
@@ -618,7 +618,7 @@ double NRLib::ReadBinaryDouble(std::istream& stream,
 
 void NRLib::WriteBinaryIbmFloat(std::ostream& stream,
                                  float f,
-                                 Endianess file_format)
+                                 Endianness file_format)
 {
   char buffer[4];
 
@@ -640,7 +640,7 @@ void NRLib::WriteBinaryIbmFloat(std::ostream& stream,
 
 
 float NRLib::ReadBinaryIbmFloat(std::istream& stream,
-                                 Endianess file_format)
+                                 Endianness file_format)
 {
   float f;
   char buffer[4];

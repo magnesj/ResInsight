@@ -30,9 +30,9 @@
 
 struct basic_parser_struct
 {
-  char * splitters;         /* The string is split into tokens on the occurence of one of these characters - and they are removed. */
+  char * splitters;         /* The string is split into tokens on the occurrence of one of these characters - and they are removed. */
   char * specials;          /* This exactly like the splitters - but these characters are retained as tokens. */
-  char * delete_set;        /* The chracters are just plain removed - but without any splitting on them. */
+  char * delete_set;        /* The characters are just plain removed - but without any splitting on them. */
   char * quoters;
   char * comment_start;
   char * comment_end;
@@ -81,12 +81,12 @@ void basic_parser_set_comment_end( basic_parser_type * parser , const char * com
 
 
 basic_parser_type * basic_parser_alloc(
-  const char * splitters,        /** Set to NULL if not interessting.            */
-  const char * quoters,          /** Set to NULL if not interessting.            */
-  const char * specials,         /** Set to NULL if not interessting.            */
+  const char * splitters,        /** Set to NULL if not interesting.            */
+  const char * quoters,          /** Set to NULL if not interesting.            */
+  const char * specials,         /** Set to NULL if not interesting.            */
   const char * delete_set,
-  const char * comment_start,    /** Set to NULL if not interessting.            */
-  const char * comment_end)      /** Set to NULL  if not interessting.           */
+  const char * comment_start,    /** Set to NULL if not interesting.            */
+  const char * comment_end)      /** Set to NULL  if not interesting.           */
 {
   basic_parser_type * parser = (basic_parser_type*)util_malloc(sizeof * parser);
   parser->splitters     = NULL;
@@ -179,9 +179,9 @@ static bool is_in_delete_set(const char c , const basic_parser_type * parser) {
 
 /**
   This finds the number of characters up til
-  and including the next occurence of buffer[0].
+  and including the next occurrence of buffer[0].
 
-  E.g. using this funciton on
+  E.g. using this function on
 
   char * example = "1231abcd";
 
@@ -194,9 +194,9 @@ static bool is_in_delete_set(const char c , const basic_parser_type * parser) {
   characters; but one quoted string must be wholly quoted with EITHER
   ' or ".
 
-  Escaped occurences of the first character are
+  Escaped occurrences of the first character are
   not counted. E.g. if PARSER_ESCAPE_CHAR
-  occurs in front of a new occurence of the first
+  occurs in front of a new occurrence of the first
   character, this is *NOT* regarded as the end.
 */
 
@@ -289,7 +289,7 @@ static char * alloc_quoted_token( const char * buffer, int length,  bool strip_q
 
 
 /**
-    This does not care about the possible occurence of characters in
+    This does not care about the possible occurrence of characters in
     the delete_set. That is handled when the token is inserted in the
     token list.
 */
@@ -536,7 +536,7 @@ bool basic_parser_fseek_string(const basic_parser_type * parser , FILE * stream 
   if (!case_sensitive)
     util_strupr( string );
   {
-    long int initial_pos     = util_ftell( stream );   /* Store the inital position. */
+    long int initial_pos     = util_ftell( stream );   /* Store the initial position. */
     bool cont                = true;
 
     if (strstr( string , parser->comment_start ) != NULL)
@@ -666,7 +666,7 @@ void basic_parser_strip_buffer(const basic_parser_type * parser , char ** __buff
     }
 
     /**
-       OK -it is a god damn normal charactar - copy it straight over:
+       OK -it is a god damn normal character - copy it straight over:
     */
     target[target_position] = src[src_position];
     src_position    += 1;

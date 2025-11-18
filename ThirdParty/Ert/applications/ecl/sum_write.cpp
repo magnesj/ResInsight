@@ -85,7 +85,7 @@
       and NUMS vectors are ignored in the case of field variable like
       FOPT.
 
-   3. The actual data is organised in blocks of data, one continous
+   3. The actual data is organised in blocks of data, one continuous
       block for each (simulator) timestep. These blocks are collected
       in report steps; when stored the data can be either lumped
       together in a unified file, or split in many different files.
@@ -141,7 +141,7 @@
         key BPR:i,j,k where the coordinates (i,j,k) are offset 1.
 
   Due to the fixed size nature of the summary file format described in
-  point 4 above, the library is somewhat cumbersome and unflexible to
+  point 4 above, the library is somewhat cumbersome and inflexible to
   use. Very briefly the usage pattern will be like:
 
     1. Create a ecl_sum instance and add variables to it with the
@@ -212,7 +212,7 @@ int main( int argc , char ** argv) {
 
       5. The unit for this variable.
 
-      6. A defualt value for this variable.
+      6. A default value for this variable.
 
   */
   ecl_sum_add_var( ecl_sum , "FOPT" , NULL   , 0   , "Barrels" , 99.0 );
@@ -225,7 +225,7 @@ int main( int argc , char ** argv) {
     The return value from the ecl_sum_add_var() function is an
     ecl::smspec_node instance (implemented in file smspec_node.c);
     which is essentially a struct holding header information about
-    this varible. There are several options on how to handle the
+    this variable. There are several options on how to handle the
     return value from the ecl_sum_add_var() function; which affect how
     you can add data at a later stage:
 

@@ -108,7 +108,7 @@ endif()
 # ##############################################################################
 # OpenMP
 # ##############################################################################
-option(RESINSIGHT_USE_OPENMP "Enable OpenMP parallellization in the code" ON)
+option(RESINSIGHT_USE_OPENMP "Enable OpenMP parallelization in the code" ON)
 if(RESINSIGHT_USE_OPENMP)
   find_package(OpenMP)
   if(OPENMP_FOUND)

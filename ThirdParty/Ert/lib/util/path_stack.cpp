@@ -93,7 +93,7 @@ void path_stack_pop( path_stack_type * path_stack ) {
   const std::string& path = path_stack->stack.top();
 
   if (util_chdir( path.c_str() ) != 0)
-    // The directory has become inaccesible ...
+    // The directory has become inaccessible ...
     util_abort("%s: could not pop back to directory:%s Error:%s\n", __func__ , path.c_str() , strerror( errno ));
 
   path_stack->stack.pop();

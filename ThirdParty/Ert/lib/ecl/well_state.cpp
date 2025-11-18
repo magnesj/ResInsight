@@ -86,7 +86,7 @@ Segment 5   \
 The boxes show connections C0 - C7; the connections serve as sinks (or
 sources in the case of injectors) removing fluids from the
 reservoir. As ind             icated by the use of isolated boxes the ECLIPSE model
-contains no geomtric concept linking the different connections into a
+contains no geometric concept linking the different connections into a
 connected 'well-like' object.
 
 Ordinary wells in the ECLIPSE model are just a collection of
@@ -135,7 +135,7 @@ coupledte implementation these objects are modelled as such:
        }
 
     The connections to the global grid are stored with the 'LGR' name
-    given by the symbole ECL_GRID_GLOBAL_GRID, or alternatively the
+    given by the symbol ECL_GRID_GLOBAL_GRID, or alternatively the
     function well_state_get_global_connections( well_state ) can be
     used.
 

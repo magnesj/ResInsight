@@ -14,7 +14,7 @@ language has good documentation, including tutorials on
 http://www.python.org, however some language concepts which will be
 much used in the documentation will be briefly explained here. The
 rest of this section will focus on the following little example which
-contains the class defintion of a circle object.
+contains the class definition of a circle object.
 
 .. code-block:: python
    :linenos:          
@@ -153,7 +153,7 @@ Optional arguments with suitable defaults is used quite a lot in the
 ert. The ERT python code is mainly based on classes, it is not
 required to use classes in the the code you write yourself - but ample
 use of functions is highly recommended to aid readiblity and
-maintainence.
+maintenance.
 
 
 
@@ -267,7 +267,7 @@ object, and then afterwards you can can use the methods of the
 object. For instance you must have a :code:`Circle` instance available
 before you can call the :code:`getArea()` method. However there are
 situations where you would like to make functionality available with a
-particular class, without really requring a class instance - then a
+particular class, without really requiring a class instance - then a
 *class method* can be used. Se for instance the :code:`calculateArea`
 method of :code:`Circle` class. Since a class method is implemented
 without a class instance, the implementation *can not make use of
@@ -368,7 +368,7 @@ and :code:`__setitem__` are bound to the :code:`[]` operator [1]_:
    # Check that the elements are correctly set
    for i in range(len(v)):
        if not v[i] == i:
-          raise Exception("operator[] not corectly implemented")
+          raise Exception("operator[] not correctly implemented")
 
    # When getitem is implemented we can loop over the whole vector 
    sum = 0
@@ -683,7 +683,7 @@ work:
    #!/usr/bin/env python
    import ert
 
-   print "Python: the ert package has been sucessfuly loaded"
+   print "Python: the ert package has been successfully loaded"
 
 
 If this works as intended you are ready to actually start working on

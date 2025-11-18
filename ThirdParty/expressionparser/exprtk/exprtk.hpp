@@ -450,7 +450,7 @@ namespace exprtk
          "exp", "expm1", "false", "floor", "for", "frac", "grad2deg",
          "hypot", "iclamp", "if",  "else", "ilike", "in",  "inrange",
          "like",  "log",  "log10", "log2",  "logn",  "log1p", "mand",
-         "max", "min",  "mod", "mor",  "mul", "ncdf",  "nand", "nor",
+         "max", "min",  "mod", "more",  "mul", "ncdf",  "nand", "nor",
          "not",   "not_equal",   "null",   "or",   "pow",  "rad2deg",
          "repeat", "return", "root", "round", "roundn", "sec", "sgn",
          "shl", "shr", "sin", "sinc", "sinh", "sqrt", "sum",  "swap",
@@ -466,7 +466,7 @@ namespace exprtk
          "atan2",  "avg",  "ceil",  "clamp",  "cos",  "cosh",  "cot",
          "csc",  "equal",  "erf",  "erfc",  "exp",  "expm1", "floor",
          "frac", "hypot", "iclamp",  "like", "log", "log10",  "log2",
-         "logn", "log1p", "mand", "max", "min", "mod", "mor",  "mul",
+         "logn", "log1p", "mand", "max", "min", "mod", "more",  "mul",
          "ncdf",  "pow",  "root",  "round",  "roundn",  "sec", "sgn",
          "sin", "sinc", "sinh", "sqrt", "sum", "swap", "tan", "tanh",
          "trunc",  "not_equal",  "inrange",  "deg2grad",   "deg2rad",
@@ -24844,7 +24844,7 @@ namespace exprtk
          static const std::string s_min     = "min" ;
          static const std::string s_max     = "max" ;
          static const std::string s_mand    = "mand";
-         static const std::string s_mor     = "mor" ;
+         static const std::string s_mor     = "more" ;
          static const std::string s_multi   = "~"   ;
          static const std::string s_mswitch = "[*]" ;
 
@@ -27239,7 +27239,7 @@ namespace exprtk
          else if (details::imatch(symbol, "mand")) opt_type = details::e_mand;
          else if (details::imatch(symbol, "max" )) opt_type = details::e_max ;
          else if (details::imatch(symbol, "min" )) opt_type = details::e_min ;
-         else if (details::imatch(symbol, "mor" )) opt_type = details::e_mor ;
+         else if (details::imatch(symbol, "more" )) opt_type = details::e_mor ;
          else if (details::imatch(symbol, "mul" )) opt_type = details::e_prod;
          else if (details::imatch(symbol, "sum" )) opt_type = details::e_sum ;
          else

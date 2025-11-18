@@ -117,7 +117,7 @@ bool StructGridImport::import(const cvf::String& filename, DataType dataType, ui
 
     fclose(stream); 
 
-    Trace::show("Compleated reading data");
+    Trace::show("Completed reading data");
 
     return true;
 }

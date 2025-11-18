@@ -88,8 +88,8 @@ extern "C" {
   int                ecl_file_iget_named_size( const ecl_file_type * file , const char * kw , int ith);
   void               ecl_file_indexed_read(const ecl_file_type * file , const char * kw, int index, const int_vector_type * index_map, char* buffer);
 
-  ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence);
-  ecl_file_view_type * ecl_file_alloc_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence);
+  ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurrence);
+  ecl_file_view_type * ecl_file_alloc_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurrence);
   ecl_file_view_type * ecl_file_get_global_view( ecl_file_type * ecl_file );
   ecl_file_view_type * ecl_file_get_active_view( ecl_file_type * ecl_file );
   //bool               ecl_file_writable( const ecl_file_type * ecl_file );
@@ -100,7 +100,7 @@ extern "C" {
 /*               R E S T A R T  F I L E S                        */
 
   double           ecl_file_iget_restart_sim_days( const ecl_file_type * restart_file , int index );
-  time_t           ecl_file_iget_restart_sim_date( const ecl_file_type * restart_file , int occurence );
+  time_t           ecl_file_iget_restart_sim_date( const ecl_file_type * restart_file , int occurrence );
   int              ecl_file_get_restart_index( const ecl_file_type * restart_file , time_t sim_time);
   bool             ecl_file_has_report_step( const ecl_file_type * ecl_file , int report_step);
   bool             ecl_file_has_sim_time( const ecl_file_type * ecl_file , time_t sim_time);
@@ -120,8 +120,8 @@ extern "C" {
 
   void             ecl_file_push_block( ecl_file_type * ecl_file );
   void             ecl_file_pop_block( ecl_file_type * ecl_file );
-  bool             ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence);
-  bool             ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence);
+  bool             ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurrence);
+  bool             ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurrence);
 
   bool             ecl_file_select_rstblock_sim_time( ecl_file_type * ecl_file , time_t sim_time);
   bool             ecl_file_select_rstblock_report_step( ecl_file_type * ecl_file , int report_step);

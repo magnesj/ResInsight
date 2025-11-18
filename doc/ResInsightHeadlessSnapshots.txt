@@ -1,5 +1,5 @@
 
-Investigations on using ResInsight to render plots in a compleatly Headless state
+Investigations on using ResInsight to render plots in a completely Headless state
 
 - Qt 5.8 or higher needed, it seems. Tested with Qt 5.14.1. Tested with Qt 5.6.1 on CentOS 6 and the plots was rendered without fonts.
 - Start ResInsight with the additional options -platform offscreen

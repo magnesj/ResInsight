@@ -171,12 +171,12 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an array of FT_ServiceDescRec structs.          */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a Create funtion will need    */
+  /*    When FT_CONFIG_OPTION_PIC is defined a Create function will need    */
   /*    to called with a pointer where the allocated array is returned.    */
   /*    And when it is no longer needed a Destroy function needs           */
   /*    to be called to release that allocation.                           */
   /*                                                                       */
-  /*    These functions should be manyally called from the pic_init and    */
+  /*    These functions should be manually called from the pic_init and    */
   /*    pic_free functions of your module (see FT_DEFINE_MODULE)           */
   /*                                                                       */
   /*    When FT_CONFIG_OPTION_PIC is not defined the array will be         */

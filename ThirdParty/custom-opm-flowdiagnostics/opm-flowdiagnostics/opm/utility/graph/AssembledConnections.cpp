@@ -196,7 +196,7 @@ void
 Opm::AssembledConnections::CSR::sort()
 {
     // Transposition is, effectively, a linear time bucket insert, so
-    // transposing the structure twice creates a structure with colum
+    // transposing the structure twice creates a structure with column
     // indices in (ascendingly) sorted order.
 
     this->transpose();

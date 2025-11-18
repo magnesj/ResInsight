@@ -41,7 +41,7 @@ typedef enum {
   ECL_FILE_WRITABLE      =  2    /*
                                     This flag opens the file in a mode where it can be updated and modified, but it
                                     must still exist and be readable. I.e. this should not compared with the normal:
-                                    fopen(filename , "w") where an existing file is truncated to zero upon successfull
+                                    fopen(filename , "w") where an existing file is truncated to zero upon successful
                                     open.
                                  */
 } ecl_file_flag_type;
@@ -81,11 +81,11 @@ typedef struct ecl_file_transaction_struct ecl_file_transaction_type;
   void      ecl_file_view_fwrite( const ecl_file_view_type * ecl_file_view , fortio_type * target , int offset);
   int       ecl_file_view_iget_occurence( const ecl_file_view_type * ecl_file_view , int global_index);
   void      ecl_file_view_fprintf_kw_list(const ecl_file_view_type * ecl_file_view , FILE * stream);
-  ecl_file_view_type * ecl_file_view_add_blockview(ecl_file_view_type * ecl_file_view , const char * header, int occurence);
-  ecl_file_view_type * ecl_file_view_add_blockview2(ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurence);
+  ecl_file_view_type * ecl_file_view_add_blockview(ecl_file_view_type * ecl_file_view , const char * header, int occurrence);
+  ecl_file_view_type * ecl_file_view_add_blockview2(ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurrence);
   ecl_file_view_type * ecl_file_view_add_restart_view(ecl_file_view_type * file_view , int seqnum_index, int report_step , time_t sim_time, double sim_days);
-  ecl_file_view_type * ecl_file_view_alloc_blockview(const ecl_file_view_type * ecl_file_view , const char * header, int occurence);
-  ecl_file_view_type * ecl_file_view_alloc_blockview2(const ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurence);
+  ecl_file_view_type * ecl_file_view_alloc_blockview(const ecl_file_view_type * ecl_file_view , const char * header, int occurrence);
+  ecl_file_view_type * ecl_file_view_alloc_blockview2(const ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurrence);
 
   void ecl_file_view_add_child( ecl_file_view_type * parent , ecl_file_view_type * child);
   bool ecl_file_view_drop_flag( ecl_file_view_type * file_view , int flag);

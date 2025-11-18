@@ -75,7 +75,7 @@ namespace cvf {
 /// </PRE>
 ///
 /// Beware when porting code that uses C style double array indexing. In this case, the first 
-/// index given will corrspond to the columnd, eg M[3][0] = Tx, M[3][1] = Ty, M[3][2] = Tz
+/// index given will correspond to the columnd, eg M[3][0] = Tx, M[3][1] = Ty, M[3][2] = Tz
 ///
 /// To ease accessing the internal 1D array in implementations, the private eij constants can be used.
 /// These are consistent with the normal row column ordering, so that e02 accesses the element 

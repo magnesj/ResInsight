@@ -2263,13 +2263,13 @@ struct jpeg_color_quantizer {
 
 #ifdef RIGHT_SHIFT_IS_UNSIGNED
 #define SHIFT_TEMPS	INT32 shift_temp;
-#define RIGHT_SHIFT(x,shft)  \
+#define RIGHT_SHIFT(x,shift)  \
 	((shift_temp = (x)) < 0 ? \
-	(shift_temp >> (shft)) | ((~((INT32) 0)) << (32-(shft))) : \
-	(shift_temp >> (shft)))
+	(shift_temp >> (shift)) | ((~((INT32) 0)) << (32-(shift))) : \
+	(shift_temp >> (shift)))
 #else
 #define SHIFT_TEMPS
-#define RIGHT_SHIFT(x,shft)	((x) >> (shft))
+#define RIGHT_SHIFT(x,shift)	((x) >> (shift))
 #endif
 
 
@@ -8757,7 +8757,7 @@ jpeg_simple_progression (j_compress_ptr cinfo)
 	* We need to put it in the permanent pool in case the application performs
 	* multiple compressions without changing the settings.  To avoid a memory
 	* leak if jpeg_simple_progression is called repeatedly for the same JPEG
-	* object, we try to re-use previously allocated space, and we allocate
+	* object, we try to reuse previously allocated space, and we allocate
 	* enough space to handle YCbCr even if initially asked for grayscale.
 	*/
 	if (cinfo->script_space == NULL || cinfo->script_space_size < nscans) {
@@ -8888,13 +8888,13 @@ typedef jcphuff_phuff_entropy_encoder * jcphuff_phuff_entropy_ptr;
 
 #ifdef RIGHT_SHIFT_IS_UNSIGNED
 #define ISHIFT_TEMPS	int ishift_temp;
-#define IRIGHT_SHIFT(x,shft)  \
+#define IRIGHT_SHIFT(x,shift)  \
 	((ishift_temp = (x)) < 0 ? \
-	(ishift_temp >> (shft)) | ((~0) << (16-(shft))) : \
-	(ishift_temp >> (shft)))
+	(ishift_temp >> (shift)) | ((~0) << (16-(shift))) : \
+	(ishift_temp >> (shift)))
 #else
 #define ISHIFT_TEMPS
-#define IRIGHT_SHIFT(x,shft)	((x) >> (shft))
+#define IRIGHT_SHIFT(x,shift)	((x) >> (shift))
 #endif
 
 /* Forward declarations */
@@ -10643,7 +10643,7 @@ jpeg_copy_critical_parameters (j_decompress_ptr srcinfo,
 			outcomp->v_samp_factor = incomp->v_samp_factor;
 			outcomp->quant_tbl_no = incomp->quant_tbl_no;
 			/* Make sure saved quantization table for component matches the qtable
-			* slot.  If not, the input file re-used this qtable slot.
+			* slot.  If not, the input file reused this qtable slot.
 			* IJG encoder currently cannot duplicate this.
 			*/
 			tblno = outcomp->quant_tbl_no;
@@ -11151,7 +11151,7 @@ default_decompress_parms (j_decompress_ptr cinfo)
 * jpeg_destroy to release any temporary space.)
 * If an abbreviated (tables only) datastream is presented, the routine will
 * return JPEG_HEADER_TABLES_ONLY upon reaching EOI.  The application may then
-* re-use the JPEG object to read the abbreviated image datastream(s).
+* reuse the JPEG object to read the abbreviated image datastream(s).
 * It is unnecessary (but OK) to call jpeg_abort in this case.
 * The JPEG_SUSPENDED return code only occurs if the data source module
 * requests suspension of the decompressor.  In this case the application
@@ -20020,13 +20020,13 @@ Sorry, this code only copes with 8x8 DCTs. /* deliberate syntax err */
 #else
 #define DCTELEMBITS  32		/* DCTELEM must be 32 bits */
 #endif
-#define IRIGHT_SHIFT(x,shft)  \
+#define IRIGHT_SHIFT(x,shift)  \
 	((ishift_temp = (x)) < 0 ? \
-	(ishift_temp >> (shft)) | ((~((DCTELEM) 0)) << (DCTELEMBITS-(shft))) : \
-	(ishift_temp >> (shft)))
+	(ishift_temp >> (shift)) | ((~((DCTELEM) 0)) << (DCTELEMBITS-(shift))) : \
+	(ishift_temp >> (shift)))
 #else
 #define ISHIFT_TEMPS
-#define IRIGHT_SHIFT(x,shft)	((x) >> (shft))
+#define IRIGHT_SHIFT(x,shift)	((x) >> (shift))
 #endif
 
 #ifdef USE_ACCURATE_ROUNDING
@@ -23284,7 +23284,7 @@ jinit_1pass_quantizer (j_decompress_ptr cinfo)
 * and clamping those that do overflow to the maximum value will give close-
 * enough results.  This reduces the recommended histogram size from 256Kb
 * to 128Kb, which is a useful savings on PC-class machines.
-* (In the second pass the histogram space is re-used for pixel mapping data;
+* (In the second pass the histogram space is reused for pixel mapping data;
 * in that capacity, each cell must be able to store zero to the number of
 * desired colors.  16 bits/cell is plenty for that too.)
 * Since the JPEG code is intended to run in small memory model on 80x86
@@ -23743,7 +23743,7 @@ select_colors (j_decompress_ptr cinfo, int desired_colors)
 * These routines are concerned with the time-critical task of mapping input
 * colors to the nearest color in the selected colormap.
 *
-* We re-use the histogram space as an "inverse color map", essentially a
+* We reuse the histogram space as an "inverse color map", essentially a
 * cache for the results of nearest-color searches.  All colors within a
 * histogram cell will be mapped to the same colormap entry, namely the one
 * closest to the cell's center.  This may not be quite the closest entry to
@@ -24932,7 +24932,7 @@ FI_STRUCT(FreeImageIO) {
 	FI_ReadProc  read_proc;     // pointer to the function used to read data
 	FI_WriteProc write_proc;    // pointer to the function used to write data
 	FI_SeekProc  seek_proc;     // pointer to the function used to seek
-	FI_TellProc  tell_proc;     // pointer to the function used to aquire the current position
+	FI_TellProc  tell_proc;     // pointer to the function used to acquire the current position
 };
 
 
@@ -25023,7 +25023,7 @@ _MemoryReadProc(void *buffer, unsigned size, unsigned count, fi_handle handle) {
 	FIMEMORYHEADER *mem_header = (FIMEMORYHEADER*)(((FIMEMORY*)handle)->data);
 
 	for(x = 0; x < count; x++) {
-		//if there isnt size bytes left to read, set pos to eof and return a short count
+		//if there isn't size bytes left to read, set pos to eof and return a short count
 		if( (mem_header->filelen - mem_header->curpos) < (long)size ) {
 			mem_header->curpos = mem_header->filelen;
 			break;
@@ -25045,7 +25045,7 @@ _MemoryWriteProc(void *buffer, unsigned size, unsigned count, fi_handle handle) 
 
 	//double the data block size if we need to
 	while( (mem_header->curpos + (long)(size*count)) >= mem_header->datalen ) {
-		//if we are at or above 1G, we cant double without going negative
+		//if we are at or above 1G, we can't double without going negative
 		if( mem_header->datalen & 0x40000000 ) {
 			//max 2G
 			if( mem_header->datalen == 0x7FFFFFFF ) {

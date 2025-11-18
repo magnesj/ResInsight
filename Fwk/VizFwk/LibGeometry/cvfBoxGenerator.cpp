@@ -57,7 +57,7 @@ namespace cvf {
 /// Default constructor
 /// 
 /// Will generate a box with one corner in (0,0,0) and the other corner in (1,1,1). 
-/// Tesselation will be done using one quad for each of the box's six faces.
+/// Tessellation will be done using one quad for each of the box's six faces.
 //--------------------------------------------------------------------------------------------------
 BoxGenerator::BoxGenerator()
 :   m_minCoord(0, 0, 0),

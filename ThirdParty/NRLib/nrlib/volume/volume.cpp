@@ -482,7 +482,7 @@ double Volume::RecalculateLZ()
 {
   double lz = 0.0;
   if (lx_ > 0.0 || ly_ > 0.0) { //Only do if area is initialized.
-    // Just using a arbitary grid resolution.
+    // Just using a arbitrary grid resolution.
     int nx = 100;
     int ny = 100;
 

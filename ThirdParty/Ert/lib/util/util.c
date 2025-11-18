@@ -476,7 +476,7 @@ char * util_alloc_strupr_copy(const char * s) {
 
 
 /**
-    Replaces all occurences of c1 in s with c2.
+    Replaces all occurrences of c1 in s with c2.
 */
 void util_string_tr(char * s, char c1, char c2) {
   size_t i;
@@ -489,7 +489,7 @@ void util_string_tr(char * s, char c1, char c2) {
 
 /**
    This function will reposition the stream pointer at the the first
-   occurence of 'string'. If 'string' is found the function will
+   occurrence of 'string'. If 'string' is found the function will
    return true, otherwise the function will return false, and stream
    pointer will be at the original position.
 
@@ -509,7 +509,7 @@ bool util_fseek_string(FILE * stream , const char * __string , bool skip_string 
     util_strupr( string );
   {
     int len              = strlen( string );
-    long int initial_pos = util_ftell( stream );   /* Store the inital position. */
+    long int initial_pos = util_ftell( stream );   /* Store the initial position. */
     bool cont            = true;
     do {
       int c = fgetc( stream );
@@ -724,7 +724,7 @@ bool util_is_cwd( const char * path ) {
         not set. Actually - this is a property of the filesystem, and
         not the operating system - the whole check is probably broken?
       */
-      util_abort("%s: Internal error - function not properly implmented on Windows \n",__func__);
+      util_abort("%s: Internal error - function not properly implemented on Windows \n",__func__);
 #else
       stat_type cwd_stat;
       util_stat(cwd , &cwd_stat);
@@ -986,7 +986,7 @@ char * util_alloc_rel_path( const char * __root_path , const char * path) {
 
 /*
   This function will return a new string where all "../" and "./"
-  occurences have been normalized away. The function is based on pure
+  occurrences have been normalized away. The function is based on pure
   string scanning, and will not consider the filesystem at
   all.
 */
@@ -1221,7 +1221,7 @@ char * util_fscanf_alloc_token(FILE * stream) {
 
 
 
-  /* At this point we are guranteed to return something != NULL */
+  /* At this point we are guaranteed to return something != NULL */
   cont = true;
   {
     int length = 0;
@@ -1255,8 +1255,8 @@ char * util_fscanf_alloc_token(FILE * stream) {
 
 
 /**
-  This function parses a string literal (hopfully) containing a
-  represantation of a double. The return value is true|false depending
+  This function parses a string literal (hopefully) containing a
+  representation of a double. The return value is true|false depending
   on the success of the parse operation, the parsed value is returned
   by reference.
 
@@ -1798,7 +1798,7 @@ bool util_fscanf_bool(FILE * stream , bool * value) {
    Takes a stream as input. Reads one string token from the stream,
    and tries to interpret the token as an integer with the function
    util_sscanf_int(). Returns true if the parsing succeeded, and false
-   otherwise. If parsing succeded, the integer value is returned by
+   otherwise. If parsing succeeded, the integer value is returned by
    reference.
 
    If the parsing fails the stream is repositioned at the location it
@@ -2148,7 +2148,7 @@ int util_fmove( FILE * stream , long offset , long shift) {
 
 /*
   Windows *might* have both the symbols _access() and access(), but we prefer
-  the _access() symbol as that seems to be preferred by Windows. We therefor do
+  the _access() symbol as that seems to be preferred by Windows. We therefore do
   the #HAVE_WINDOWS__ACCESS check first.
 */
 
@@ -2400,7 +2400,7 @@ static int util_get_base_length(const char * file) {
    Observe the following:
 
     * It is easy to be fooled by the optional existence of an extension
-      (badly desgined API).
+      (badly designed API).
 
     * The function is **NOT** based purely on string parsing, but also
       on checking stat() output to check if the argument you send in
@@ -3139,7 +3139,7 @@ char ** util_stringlist_append_copy(char ** string_list, int size , const char *
 
 /**
    This is nearly the same as util_stringlist_append_copy(), but for
-   this case only a refernce to the new string is appended.
+   this case only a reference to the new string is appended.
 
    Slightly more dangerous to use ...
 */
@@ -3248,7 +3248,7 @@ bool util_string_match(const char * string , const char * pattern) {
       string_ptr = (strncmp(string , sub_pattern[0] , strlen(sub_pattern[0])) == 0) ? (char * ) string : NULL;
 
     if (string_ptr != NULL) {
-      /* Inital part matched */
+      /* Initial part matched */
       int i;
           string_ptr += strlen( sub_pattern[0] );
       for (i=1; i < num_patterns; i++) {
@@ -3522,11 +3522,11 @@ void util_split_string(const char *line , const char *sep_set, int *_tokens, cha
 
 /**
    This function will split the input string in two parts, it will
-   split on occurence of one or several of the characters in
+   split on occurrence of one or several of the characters in
    sep_set.
 
 
-   o If split_on_first is true it will split on the first occurence of
+   o If split_on_first is true it will split on the first occurrence of
      split_set, and otherwise it will split on the last:
 
        util_binary_split_string("A:B:C:D , ":" , true  , ) => "A"     & "B:C:D"
@@ -3777,7 +3777,7 @@ int util_string_replace_inplace(char ** _buffer , const char * expr , const char
 
 
 /**
-  This allocates a copy of buff_org where occurences of the string expr are replaced with subs.
+  This allocates a copy of buff_org where occurrences of the string expr are replaced with subs.
 */
 char * util_string_replace_alloc(const char * buff_org, const char * expr, const char * subs)
 {
@@ -3797,7 +3797,7 @@ char * util_string_replace_alloc(const char * buff_org, const char * expr, const
 
 
 /**
-   This allocates a copy of buff_org where occurences of expr[i] are replaced with subs[i] for i=1,..,num_expr.
+   This allocates a copy of buff_org where occurrences of expr[i] are replaced with subs[i] for i=1,..,num_expr.
 */
 char * util_string_replacen_alloc(const char * buff_org, int num_expr, const char ** expr, const char ** subs)
 {
@@ -4093,7 +4093,7 @@ void util_double_vector_max_min(int N , const double *vector, double *_max , dou
     if (vector[i] > max)
       max = vector[i];
 
-    /* Can not have else here - because same item might succed on both tests. */
+    /* Can not have else here - because same item might succeed on both tests. */
 
     if (vector[i] < min)
       min = vector[i];
@@ -4215,7 +4215,7 @@ void util_fread(void *ptr , size_t element_size , size_t items, FILE * stream , 
 /*****************************************************************/
 
 void * util_realloc(void * old_ptr , size_t new_size ) {
-  /* The realloc documentation as ambigous regarding realloc() with size 0 - WE return NULL. */
+  /* The realloc documentation as ambiguous regarding realloc() with size 0 - WE return NULL. */
   if (new_size == 0) {
     if (old_ptr != NULL)
       free(old_ptr);
@@ -4311,7 +4311,7 @@ void * util_realloc_copy(void * org_ptr , const void * src , size_t byte_size ) 
 
 
 /**
-   This function allocates a string acoording to the fmt
+   This function allocates a string according to the fmt
    specification, and arguments. The arguments (except the format) are
    entered as a variable length argument list, and the function is
    basically a thin wrapper around vsnprintf().

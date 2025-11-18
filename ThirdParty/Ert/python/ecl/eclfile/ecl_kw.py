@@ -28,7 +28,7 @@ I.e. it starts with of header consisting of a 8 characters name, a
 length and a datatype, immediately followed by the actual
 data.
 
-Altough the term "restart format" is used to describe the format, this
+Although the term "restart format" is used to describe the format, this
 particular format is not limited to restart files; it is (at least)
 used in INIT, EGRID, GRID, Snnn, UNSMRY, SMSPEC, UNRST, Xnnnn and RFT
 files. This module also has (some) support for working with GRDECL
@@ -235,7 +235,7 @@ class EclKW(BaseCClass):
         seek() method of the file object first.
 
         Observe that there is a strict 8 character limit on @kw -
-        altough you could in principle use an arbitrary external
+        although you could in principle use an arbitrary external
         program to create grdecl files with more than 8 character
         length headers, this implementation will refuse to even try
         loading them. In that case you will have to rename the
@@ -268,7 +268,7 @@ class EclKW(BaseCClass):
 
            Observe that (currently) no case conversions take place
            when checking the 'int_kw_set'. The current built in set is
-           accesible through the int_kw property.
+           accessible through the int_kw property.
 
 
         3. Otherwise the default is float, i.e. ECL_FLOAT.
@@ -559,7 +559,7 @@ class EclKW(BaseCClass):
                     if isinstance(factor, int) or isinstance(factor, float):
                         self._scale_float(factor)
                     else:
-                        raise TypeError("Only muliplication with scalar supported")
+                        raise TypeError("Only multiplication with scalar supported")
         else:
             raise TypeError("Not numeric type")
 
@@ -765,7 +765,7 @@ class EclKW(BaseCClass):
                         if isinstance(value, int) or isinstance(value, float):
                             self._set_float(value)
                         else:
-                            raise TypeError("Only muliplication with scalar supported")
+                            raise TypeError("Only multiplication with scalar supported")
 
 
     def add(self, other, mask=None, force_active=False):

@@ -144,7 +144,7 @@ class EclNPV(object):
         if sum:
             self.baseCase = sum
         else:
-            raise Error("Failed to open ECLIPSE sumamry case:%s" % baseCase)
+            raise Error("Failed to open ECLIPSE summary case:%s" % baseCase)
         self.expression = None
         self.keyList = {}
         self.start = None

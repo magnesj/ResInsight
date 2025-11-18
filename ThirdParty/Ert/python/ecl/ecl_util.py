@@ -113,8 +113,8 @@ class EclUtil(object):
         """
         Parse ECLIPSE datafile and determine how many CPUs are needed.
 
-        Will look for the "PARALLELL" keyword, and then read off the
-        number of CPUs required. Will return one if no PARALLELL keyword
+        Will look for the "PARALLEL" keyword, and then read off the
+        number of CPUs required. Will return one if no PARALLEL keyword
         is found.
         """
         return EclUtil._get_num_cpu(datafile)

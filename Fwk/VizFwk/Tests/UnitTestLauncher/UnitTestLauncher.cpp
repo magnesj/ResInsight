@@ -193,7 +193,7 @@ int main(int argc, char **argv)
         const String unitTestName = unitTestList[i];
 
         
-        // Replace all occurences of our own executable name with the name of the unit test
+        // Replace all occurrences of our own executable name with the name of the unit test
         String fullUnitTestPath;
         {
             std::string testPath = myExecPath.toStdString();
@@ -244,7 +244,7 @@ int main(int argc, char **argv)
 
         String statusStr = testOK ? " OK " : "FAIL";
 
-        cout << "Staus: " << statusStr.toStdString() << "   " << unitTestList[i].toStdString() << endl;
+        cout << "Status: " << statusStr.toStdString() << "   " << unitTestList[i].toStdString() << endl;
     }
 
     cout << "--------------------------------------------------------------" << endl;

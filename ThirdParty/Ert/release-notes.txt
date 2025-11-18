@@ -24,7 +24,7 @@ Build & testing:
  - Fix broken behavior with internal test data [97].
  - Travis - compile with -Werror [122, 123, 127, 130]
  - Started to support Python3 syntax [150, 161]
- - Add support for paralell builds on Travis [149]
+ - Add support for parallel builds on Travis [149]
 
 libecl now fully supports OSX. On Travis it is compiled with
 -Werror=all which should protect against future warnings.
@@ -59,7 +59,7 @@ Core:
 
 Misc:
 
- - Added legacy pacakge ert/ [48, 99]
+ - Added legacy package ert/ [48, 99]
  - Improved logging - adding enums for og levels [90, 140, 141]
  - Refactored to use snake_case instead of CamelCase [144, 145]
 
@@ -125,7 +125,7 @@ Eclipse library:
  - Add nnc index to the information exported by ecl_nnc_export() [1204].
  - Marked solvent related total keywords ?NIT and ?NPT.* as totals [1241].
  - Top active cell in grid [1322].
- - Added absolute epsilon to ecl_kw comparsion [1345,1351].
+ - Added absolute epsilon to ecl_kw comparison [1345,1351].
 
 Smoother, updates and 'running':
 
@@ -137,7 +137,7 @@ Smoother, updates and 'running':
  - Removes the ability to update dynamic variables [1189].
  - Allow max CV FOLD to be the number of ensembles [1205, 1208].
  - Fix for min_realizations logic [1206].
- - Can assign a specific analyis module for one local update [1224].
+ - Can assign a specific analysis module for one local update [1224].
  - Handle updates when some summary relaisations are "too short" [1400, 1405].
  - Extending hook manager to support PRE_UPDATE and POST_UPDATE hooks [1340,1360].
  - RML logging is on by default [1318].
@@ -163,9 +163,9 @@ Python code:
  - Added EclKW.numpyView( ) and EclKW.numpyCopy( ) [1188].
  - Bug in EclKW slice access [1203].
  - Expose active_list better in Python [1392].
- - @TYPE@_vector suppports negative indices in __getitem__ and
+ - @TYPE@_vector supports negative indices in __getitem__ and
    __setitem__; added repr method [1378].
- - added root() methdo ert/__init__.py [1293].
+ - added root() method ert/__init__.py [1293].
 
 GUI / Configuration / Documentation
 

@@ -7,7 +7,7 @@
 
 -- This model is based on model1/BASE_MODEL_1.DATA, and includes one multi-segment 
 -- production well with initial high oil rate. 
--- Presure drop calculations for multi-segment well model icludes 
+-- Presure drop calculations for multi-segment well model includes 
 -- all available components (HFA, hydrostatic, Friction and acceleration)
 
 -- Summary section includes keywords SOFR, SPRD, SPRDH, SPRDF and SPRDA

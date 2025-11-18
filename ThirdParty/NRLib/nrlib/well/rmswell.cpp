@@ -74,7 +74,7 @@ RMSWell::RMSWell(const std::string& filename)
     std::istringstream ist(dummy);
     lognames_[i+3] = NRLib::Uppercase(ReadNext<std::string>(ist, line));
 
-    //token = ReadNext<std::string>(ist, line); //H Error if line only containts log-name (test_case 19).
+    //token = ReadNext<std::string>(ist, line); //H Error if line only contains log-name (test_case 19).
     ReadNextToken(ist, token, line);
 
     if (token != "") {

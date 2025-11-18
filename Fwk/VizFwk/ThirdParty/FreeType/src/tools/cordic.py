@@ -18,11 +18,11 @@ def  print_val( n, x ):
 
     lo  = int(x)
     hi  = lo + 1
-    alo = math.atan(lo)
+    also = math.atan(lo)
     ahi = math.atan(hi)
     ax  = math.atan(2.0**n)
 
-    errlo = abs( alo - ax )
+    errlo = abs( also - ax )
     errhi = abs( ahi - ax )
 
     if ( errlo < errhi ):

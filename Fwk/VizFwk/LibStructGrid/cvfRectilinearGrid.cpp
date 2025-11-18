@@ -933,9 +933,9 @@ void RectilinearGrid::filteredCellCenterResultVectors(Vec3dArray& positions, Vec
             while (i < cellCountI())
             {
                 size_t cellIndex = cellIndexFromIJK(i, j, k);
-                double lenght = vectorResult->get(cellIndex).length();
+                double length = vectorResult->get(cellIndex).length();
 
-                if (lenght >= resultVectorLengthThreshold)
+                if (length >= resultVectorLengthThreshold)
                 {
                     filteredCellIndices.push_back(cellIndex);
                 }

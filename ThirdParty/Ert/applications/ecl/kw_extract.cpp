@@ -33,7 +33,7 @@
 
 
 /**
-   This file will extract all occurences of kw1,kw2,...,kwn from the
+   This file will extract all occurrences of kw1,kw2,...,kwn from the
    source file and copy them over to the target file. Ordering in the
    target file will be according to the ordering in the source file,
    and not by the ordering given on the command line.

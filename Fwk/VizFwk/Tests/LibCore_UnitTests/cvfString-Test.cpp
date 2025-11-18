@@ -1014,7 +1014,7 @@ TEST(StringTest, Split)
 {
     std::vector<String> tokens;
 
-    // Default delimeter is " "
+    // Default delimiter is " "
     String source = "a b c";
     tokens = source.split();
     EXPECT_EQ(3, tokens.size());
@@ -1026,8 +1026,8 @@ TEST(StringTest, Split)
 
     tokens.clear();
     source = "a:b  ::  c :";
-    String delimeters = " :";
-    tokens = source.split(delimeters);
+    String delimiters = " :";
+    tokens = source.split(delimiters);
     EXPECT_EQ(3, tokens.size());
 
     EXPECT_EQ(1, tokens[0].size());
@@ -1096,7 +1096,7 @@ TEST(StringTest, subString)
 {
     String s = "testing 123";
 
-    EXPECT_STREQ("sting", s.subString(2, 5).toAscii().ptr());
+    EXPECT_STREQ("string", s.subString(2, 5).toAscii().ptr());
     EXPECT_STREQ("g 123", s.subString(6).toAscii().ptr());
 }
 

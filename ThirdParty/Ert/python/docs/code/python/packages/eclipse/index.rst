@@ -82,7 +82,7 @@ What actually hits the disk looks like this:
 
 The header and tail is a 4 byte integer, which value is the number of
 bytes in the immediately following record. In addition the ECLIPSE
-files are ususally(?) written in the "the other" endianness. The
+files are usually(?) written in the "the other" endianness. The
 :code:`FortIO` class should handle these matters transparently. For
 normal use of the library it should not be necessary to explicitly use
 the :code:`FortIO` class.
@@ -747,7 +747,7 @@ message if:
  1. The case can not be found in the filesystem.
 
  2. The :code:`SMSPEC` is not 100% identical to the current
-    :code:`SMSPEC` setion; this will typically fail if you have modified
+    :code:`SMSPEC` section; this will typically fail if you have modified
     the :code:`SUMMARY` section of the ECLIPSE deck between the two
     simulations.
 
@@ -798,12 +798,12 @@ following about the smspec index:
     is consulted depends on the type of variable, for e.g. WWCT the
     well name is fetched from the WGNAMES vector, whereas the NUMS
     vector is ignored. On the other hand the WGNAMES vector is ignored
-    (explictly by using the dummy well +-+-+-) for BPR but the cell
+    (explicitly by using the dummy well +-+-+-) for BPR but the cell
     coordinate is read off from the NUMS vector.
 
   - For the properties defined in the grid like BPR and COPR both the
     key based directly on the NUMS value and the key based on
-    tranforming the NUMS value to i,j,k are present. This is not the
+    transforming the NUMS value to i,j,k are present. This is not the
     case for local grid properties, where only the i,j,k variety is
     used. For these keys the offset of :code:`(i,j,k)` is *one-based*
     , which is slightly untypical for the :code:`ert` code.
@@ -970,7 +970,7 @@ get_interp( key , days = None , date = None )
 ,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
 
 
-This method will return the summary value correponding to key
+This method will return the summary value corresponding to key
 (e.g. :code:`WWCT:A6-H`) interpolated to simulation date or simulation
 days days - one-and-only-one of the two optional parameters must be
 supplied. The date parameter is a normal python

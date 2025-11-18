@@ -11,7 +11,7 @@
 -- ----------------------------------------------------------------------------
 
 ROCK
--- REF. PRES   COMPRESSIBILITY
+-- REF. PRESS   COMPRESSIBILITY
    280.000        5.6E-5 /
  
 PVTW

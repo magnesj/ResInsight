@@ -826,7 +826,7 @@ void ecl_util_alloc_summary_data_files(const char * path , const char * base , b
      3. X.S0001, X.S0002, X.S0003, ...
      4. X.UNSMRY
 
-   In principle a directory can contain all different (altough that is
+   In principle a directory can contain all different (although that is
    probably not typical). The algorithm is a a two step algorithm:
 
      1. Determine wether to use X.FSMSPEC or X.SMSPEC based on which
@@ -878,7 +878,7 @@ bool ecl_util_alloc_summary_files(const char * path , const char * _base , const
     if ((input_type != ECL_OTHER_FILE) && (input_type != ECL_DATA_FILE)) {
       /*
          The file has been recognized as a file type from which we can
-         at least infer formatted/unformatted inforamtion.
+         at least infer formatted/unformatted information.
       */
       fmt_set = true;
       switch (input_type) {
@@ -1177,7 +1177,7 @@ int ecl_util_get_month_nr(const char * month_name) {
   the start_date; otherwise one might quite quickly end up with a
   half-baked DATA-file parser. I think that path leads straight to an
   asylum. But of course - not many points are awarded for pointing out
-  that this parsing is extremly ugly.
+  that this parsing is extremely ugly.
 
     ECLIPSE100 has default date: 1. of january 1983.
     ECLIPSE300 has default date: 1. of january 1990.
@@ -1398,7 +1398,7 @@ bool ecl_util_valid_basename_fmt(const char * basename_fmt)
   month following after start_date.
 
   If end_date corresponds to the first day of the month the list will
-  end with end_date, otherwise it will ende with the first day in the
+  end with end_date, otherwise it will end with the first day in the
   month prior to end_date:
 
      (1,1,2000)  , (10,3,2000) => {(1,1,2000) , (1,2,2000) , (1,3,2000) }

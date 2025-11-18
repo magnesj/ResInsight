@@ -139,7 +139,7 @@ struct TiXmlCursor
 	are simply called with Visit().
 
 	If you return 'true' from a Visit method, recursive parsing will continue. If you return
-	false, <b>no children of this node or its sibilings</b> will be Visited.
+	false, <b>no children of this node or its siblings</b> will be Visited.
 
 	All flavors of Visit methods have a default implementation that returns 'true' (continue 
 	visiting). You need to only override methods that are interesting to you.
@@ -171,7 +171,7 @@ public:
 	virtual bool Visit( const TiXmlText& /*text*/ )					{ return true; }
 	/// Visit a comment node
 	virtual bool Visit( const TiXmlComment& /*comment*/ )			{ return true; }
-	/// Visit an unknow node
+	/// Visit an unknown node
 	virtual bool Visit( const TiXmlUnknown& /*unknown*/ )			{ return true; }
 };
 
@@ -273,7 +273,7 @@ public:
 	void* GetUserData()						{ return userData; }	///< Get a pointer to arbitrary user data.
 	const void* GetUserData() const 		{ return userData; }	///< Get a pointer to arbitrary user data.
 
-	// Table that returs, for a given lead byte, the total number of bytes
+	// Table that returns, for a given lead byte, the total number of bytes
 	// in the UTF-8 sequence.
 	static const int utf8ByteTable[256];
 
@@ -281,7 +281,7 @@ public:
 								TiXmlParsingData* data, 
 								TiXmlEncoding encoding /*= TIXML_ENCODING_UNKNOWN */ ) = 0;
 
-	/** Expands entities in a string. Note this should not contian the tag's '<', '>', etc, 
+	/** Expands entities in a string. Note this should not contain the tag's '<', '>', etc, 
 		or they will be transformed into entities!
 	*/
 	static void EncodeString( const TIXML_STRING& str, TIXML_STRING* out );
@@ -601,7 +601,7 @@ public:
 	#endif
 
 	/** Add a new node related to this. Adds a child past the LastChild.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertEndChild( const TiXmlNode& addThis );
 
@@ -618,17 +618,17 @@ public:
 	TiXmlNode* LinkEndChild( TiXmlNode* addThis );
 
 	/** Add a new node related to this. Adds a child before the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertBeforeChild( TiXmlNode* beforeThis, const TiXmlNode& addThis );
 
 	/** Add a new node related to this. Adds a child after the specified child.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* InsertAfterChild(  TiXmlNode* afterThis, const TiXmlNode& addThis );
 
 	/** Replace a child of this node.
-		Returns a pointer to the new object or NULL if an error occured.
+		Returns a pointer to the new object or NULL if an error occurred.
 	*/
 	TiXmlNode* ReplaceChild( TiXmlNode* replaceThis, const TiXmlNode& withThis );
 
@@ -738,7 +738,7 @@ public:
 	*/
 	virtual TiXmlNode* Clone() const = 0;
 
-	/** Accept a hierchical visit the nodes in the TinyXML DOM. Every node in the 
+	/** Accept a hierarchical visit the nodes in the TinyXML DOM. Every node in the 
 		XML tree will be conditionally visited and the host will be called back
 		via the TiXmlVisitor interface.
 
@@ -1143,7 +1143,7 @@ public:
 	// Print the Element to a FILE stream.
 	virtual void Print( FILE* cfile, int depth ) const;
 
-	/*	Attribtue parsing starts: next char past '<'
+	/*	Attribute parsing starts: next char past '<'
 						 returns: next char past '>'
 	*/
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
@@ -1196,7 +1196,7 @@ public:
 	// Write this Comment to a FILE stream.
 	virtual void Print( FILE* cfile, int depth ) const;
 
-	/*	Attribtue parsing starts: at the ! of the !--
+	/*	Attribute parsing starts: at the ! of the !--
 						 returns: next char past '>'
 	*/
 	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
@@ -1493,7 +1493,7 @@ public:
 		@sa SetTabSize, Row, Column
 	*/
 	int ErrorRow() const	{ return errorLocation.row+1; }
-	int ErrorCol() const	{ return errorLocation.col+1; }	///< The column where the error occured. See ErrorRow()
+	int ErrorCol() const	{ return errorLocation.col+1; }	///< The column where the error occurred. See ErrorRow()
 
 	/** SetTabSize() allows the error reporting functions (ErrorRow() and ErrorCol())
 		to report the correct values for row and column. It does not change the output
@@ -1773,7 +1773,7 @@ public:
 		but tab (\t) is also useful, or null/empty string for no indentation.
 	*/
 	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : "" ; }
-	/// Query the indention string.
+	/// Query the indentation string.
 	const char* Indent()							{ return indent.c_str(); }
 	/** Set the line breaking string. By default set to newline (\n). 
 		Some operating systems prefer other characters, or can be
@@ -3802,7 +3802,7 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
 {
 	// This will only work for low-ascii, everything else is assumed to be a valid
 	// letter. I'm not sure this is the best approach, but it is quite tricky trying
-	// to figure out alhabetical vs. not across encoding. So take a very 
+	// to figure out alphabetical vs. not across encoding. So take a very 
 	// conservative approach.
 
 //	if ( encoding == TIXML_ENCODING_UTF8 )
@@ -3823,7 +3823,7 @@ void TiXmlBase::ConvertUTF32ToUTF8( unsigned long input, char* output, int* leng
 {
 	// This will only work for low-ascii, everything else is assumed to be a valid
 	// letter. I'm not sure this is the best approach, but it is quite tricky trying
-	// to figure out alhabetical vs. not across encoding. So take a very 
+	// to figure out alphabetical vs. not across encoding. So take a very 
 	// conservative approach.
 
 //	if ( encoding == TIXML_ENCODING_UTF8 )
@@ -4072,7 +4072,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
 //
 const char* TiXmlBase::ReadName( const char* p, TIXML_STRING * name, TiXmlEncoding encoding )
 {
-	// Oddly, not supported on some comilers,
+	// Oddly, not supported on some compilers,
 	//name->clear();
 	// So use this:
 	*name = "";
@@ -4508,7 +4508,7 @@ TiXmlNode* TiXmlNode::Identify( const char* p, TiXmlEncoding encoding )
 	// - Elements start with a letter or underscore, but xml is reserved.
 	// - Comments: <!--
 	// - Decleration: <?xml
-	// - Everthing else is unknown to tinyxml.
+	// - Everything else is unknown to tinyxml.
 	//
 
 	const char* xmlHeader = { "<?xml" };
@@ -5345,7 +5345,7 @@ distribution.
 
 //#include "tinyxml.h"
 
-// The goal of the seperate error file is to make the first
+// The goal of the separate error file is to make the first
 // step towards localization. tinyxml (currently) only supports
 // english error messages, but the could now be translated.
 //

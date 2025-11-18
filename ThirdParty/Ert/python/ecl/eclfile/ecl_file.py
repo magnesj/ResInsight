@@ -303,7 +303,7 @@ class EclFile(BaseCClass):
         should be a datetime instance.
 
         If the restart section you ask for can not be found the method
-        will raise a ValueError exeception. To protect against this
+        will raise a ValueError exception. To protect against this
         you can query first with the has_report_step(),
         has_sim_time() or num_report_steps() methods.
 
@@ -483,11 +483,11 @@ class EclFile(BaseCClass):
 
         # We ensure that this scope owns the new_kw instance; the
         # new_kw will be handed over to the ecl_file instance, and we
-        # can not give away something we do not alreeady own.
+        # can not give away something we do not already own.
         if not new_kw.data_owner:
             new_kw = EclKW.copy( new_kw )
 
-        # The ecl_file instance will take responsability for freeing
+        # The ecl_file instance will take responsibility for freeing
         # this ecl_kw instance.
         new_kw.data_owner = False
         self._replace_kw( old_kw , new_kw , False )
@@ -595,7 +595,7 @@ class EclFile(BaseCClass):
         Check if current EclFile instance has a keyword @kw.
 
         If the optional argument @num is given it will check if the
-        EclFile has at least @num occurences of @kw.
+        EclFile has at least @num occurrences of @kw.
         """
 
         return self.num_named_kw( kw ) > num

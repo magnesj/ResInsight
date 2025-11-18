@@ -41,7 +41,7 @@ class EclSubsidence(BaseCClass):
 
       1. Create the EclSubsidence instance.
       2. Add surveys with the add_survey_XXXX() methods.
-      3. Evalute the subsidence response with the eval() method.
+      3. Evaluate the subsidence response with the eval() method.
     """
     TYPE_NAME = "ecl_subsidence"
     _alloc               = EclPrototype("void* ecl_subsidence_alloc( ecl_grid , ecl_file )" , bind = False)
@@ -75,7 +75,7 @@ class EclSubsidence(BaseCClass):
 
         Add a new survey; in this context a survey is the state of
         reservoir, i.e. an ECLIPSE restart file. The @survey_name
-        input argument will be used when refering to this survey at a
+        input argument will be used when referring to this survey at a
         later stage. The @restart_file input argument should be an
         EclFile instance with data from one report step. A typical way
         to load the @restart_file argument is:

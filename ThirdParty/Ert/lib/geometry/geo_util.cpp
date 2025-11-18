@@ -160,7 +160,7 @@ geo_util_xlines_status_enum geo_util_xlines( const double ** points , double * x
     double a2 = dy2 / dx2;
 
     if (a1 != a2) {
-      // The two lines are not parallell and we will have a normal solution.
+      // The two lines are not parallel and we will have a normal solution.
       double x = ((y3 - y1) - a2*x3 + a1*x1) / (a1 - a2);
       double y = a1*(x - x1) + y1;
 
@@ -169,7 +169,7 @@ geo_util_xlines_status_enum geo_util_xlines( const double ** points , double * x
 
       return GEO_UTIL_LINES_CROSSING;
     } else {
-      // The two lines are parallell - potentially overlapping.
+      // The two lines are parallel - potentially overlapping.
       double ytest = a1*(x3 - x1) + y1;
       if (ytest == y3)
         return GEO_UTIL_LINES_OVERLAPPING;
@@ -230,7 +230,7 @@ geo_util_xlines_status_enum geo_util_xsegments( const double ** points , double 
   }
 
 
-  // Parallell
+  // Parallel
   if (fabs(denominator) < EPSILON)
     return GEO_UTIL_NOT_CROSSING;
 

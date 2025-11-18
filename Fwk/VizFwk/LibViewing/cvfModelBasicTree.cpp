@@ -153,7 +153,7 @@ void ModelBasicTreeNode::removePart(Part* part)
 
 
 //--------------------------------------------------------------------------------------------------
-/// Add a child node to this node. The node can have any number of childern.
+/// Add a child node to this node. The node can have any number of children.
 //--------------------------------------------------------------------------------------------------
 void ModelBasicTreeNode::addChild(ModelBasicTreeNode* child)
 {

@@ -62,7 +62,7 @@ COMPORD
 /
  
 
--- Define group tree hierarcy 
+-- Define group tree hierarchy 
 GRUPTREE 
 ---------------------------------------
    'FIELD_N'     'FIELD'  /

@@ -103,7 +103,7 @@ namespace cvf {
 
     //=================================================================================================================================
     /// Internal node in the AABB tree. It have at least two child nodes, but can have many more (grand-children etc.). Both the Left
-    /// and right tree node pointes must exist (or else it should be a leaf node).
+    /// and right tree node points must exist (or else it should be a leaf node).
     //=================================================================================================================================
     class AABBTreeNodeInternal : public AABBTreeNode
     {
@@ -151,7 +151,7 @@ namespace cvf {
     /// but the IntersectLeafLeaf() and IntersectBoxLeaf() methods should be implemented in any tree classes used for intersection 
     /// testing. 
     ///
-    /// The Find() method only searches for matches in bounding boxes, and must be reimplemented in the decendant classes for 
+    /// The Find() method only searches for matches in bounding boxes, and must be reimplemented in the descendant classes for 
     /// accurate testing of leaf nodes when the leaf node properties are known.
     //=================================================================================================================================
     class AABBTree : public cvf::Object

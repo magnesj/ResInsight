@@ -226,7 +226,7 @@ double Timer::time() const
 
     uint64_t timeNow = mach_absolute_time();
     uint64_t timeUsed = timeNow - m_timerState->m_startTime;
-    timeUsed *= m_timerState->m_info.numer;
+    timeUsed *= m_timerState->m_info.number;
     uint64_t timeUsedNanoSec = timeUsed/m_timerState->m_info.denom;
     double timeUsedSec = timeUsedNanoSec/1.0e9;
     return timeUsedSec;
@@ -260,7 +260,7 @@ double Timer::lapTime()
 
     uint64_t timeNow = mach_absolute_time();
     uint64_t timeUsed = timeNow - m_timerState->m_lastLapTime;
-    timeUsed *= m_timerState->m_info.numer;
+    timeUsed *= m_timerState->m_info.number;
     uint64_t timeUsedNanoSec = timeUsed/m_timerState->m_info.denom;
     double lapTime = timeUsedNanoSec/1.0e9;
     m_timerState->m_lastLapTime = timeNow;

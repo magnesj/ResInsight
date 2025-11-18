@@ -1203,7 +1203,7 @@
 	no longer used if FreeType is built with GNU make.
 
 	* docs/CHANGES, docs/CUSTOMIZE, docs/INSTALL, docs/INSTALL.ANY,
-	docs/INSTALL.GNU, docs/INSTALL.UNX: Document new build mechanism.
+	docs/INSTALL.GNU, docs/INSTALL.UNIX: Document new build mechanism.
 	Other minor updates.
 
 	* modules.txt: Removed.  Contents included in `modules.cfg'.
@@ -1513,7 +1513,7 @@
 	which are monotone.
 
 	* src/truetype/ttgload.c (compute_glyph_metrics): Some fixes and
-	formattings in vertical metrics faking.  There is still room for
+	formatting in vertical metrics faking.  There is still room for
 	improvements (and so does the CFF module).
 
 2006-01-15  Chia-I Wu  <b90201047@ntu.edu.tw>
@@ -2506,8 +2506,8 @@
 	section.
 	Print synopsis only if we have a data type, function, etc.
 
-	* docs/INSTALL.ANY, docs/INSTALL, docs/INSTALL.UNX, docs/CUSTOMIZE,
-	docs/INSTALL.GNU, docs/TRUETYPE, docs/DEBUG, docs/UPGRADE.UNX,
+	* docs/INSTALL.ANY, docs/INSTALL, docs/INSTALL.UNIX, docs/CUSTOMIZE,
+	docs/INSTALL.GNU, docs/TRUETYPE, docs/DEBUG, docs/UPGRADE.UNIX,
 	docs/VERSION.DLL, docs/formats.txt: Revised, formatted.
 
 2005-08-28  George Williams  <gww@silcom.com>

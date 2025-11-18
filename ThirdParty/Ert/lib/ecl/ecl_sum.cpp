@@ -347,7 +347,7 @@ ecl_sum_type * ecl_sum_alloc_restart_writer2( const char * ecl_case , const char
 
 
 /*
-  This does not take in the restart_step argument is depcrecated. You should use the
+  This does not take in the restart_step argument is deprecated. You should use the
   ecl_sum_alloc_restart_writer2() function.
 */
 
@@ -518,7 +518,7 @@ double ecl_sum_time2days( const ecl_sum_type * ecl_sum , time_t sim_time) {
 /*****************************************************************/
 /*
    Here comes lots of access functions - these are mostly thin
-   wrapppers around ecl_smspec functions. See more 'extensive'
+   wrappers around ecl_smspec functions. See more 'extensive'
    documentation in ecl_smspec.c
 
    The functions returning an actual value,
@@ -762,7 +762,7 @@ const char * ecl_sum_get_general_var_unit( const ecl_sum_type * ecl_sum , const 
 ecl_sum_type * ecl_sum_alloc_resample(const ecl_sum_type * ecl_sum, const char * ecl_case, const time_t_vector_type * times, bool lower_extrapolation, bool upper_extrapolation) {
   /*
     If lower and  / or upper extrapolation is set to true it makes sure that resampling returns the first / last value of the simulation
-    or in the case of derivate / rate then it gets zero. if these are set to false, we jus throw exception
+    or in the case of derivate / rate then it gets zero. if these are set to false, we just throw exception
   */
 
   time_t start_time = ecl_sum_get_data_start(ecl_sum);
@@ -1392,7 +1392,7 @@ ecl_smspec_type * ecl_sum_get_smspec( const ecl_sum_type * ecl_sum ) {
 /*****************************************************************/
 
 /*
-   The functions below are extremly simple functions which only serve
+   The functions below are extremely simple functions which only serve
    as an easy access to the smspec_alloc_xxx_key() functions which
    know how to create the various composite keys.
 */

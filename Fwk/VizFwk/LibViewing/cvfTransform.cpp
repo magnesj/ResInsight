@@ -132,7 +132,7 @@ void Transform::setEyeLiftFactor(double eyeLiftFactor)
 {
     // The lift factor will be translated into an eye space scaling of the eye space vertex positions during rendering.
     // Since it is a scaling it moves the vertex more at the far-plane and less at the front-plane.
-    // Inspired by the follwing shader code from:
+    // Inspired by the following shader code from:
     // http://www.opengl.org/discussion_boards/ubbthreads.php?ubb=showflat&Number=252937&Searchpage=6&Main=49189&Words=wireframe&Search=true#Post252937
     //
     // vec4 v = gl_ModelViewMatrix * gl_Vertex;

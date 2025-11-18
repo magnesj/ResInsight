@@ -655,7 +655,7 @@
 	[Win64] Improve the computation of random seed from stack address.
 
 	On LLP64 platform, the conversion from pointer to FT_Fixed need
-	to drop higher 32-bit.  Explict casts are required. Reported by
+	to drop higher 32-bit.  Explicit casts are required. Reported by
 	NightStrike from MinGW-w64 project.  See
 	http://lists.gnu.org/archive/html/freetype/2009-09/msg00000.html
 
@@ -1150,7 +1150,7 @@
 
 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
 
-	cache: Insert explict casts for LP64 systems.
+	cache: Insert explicit casts for LP64 systems.
 
 	* src/cache/ftcbasic.c (FTC_ImageCache_Lookup,
 	FTC_SBitCache_Lookup): The type of FTC_ImageType->width
@@ -1585,7 +1585,7 @@
 
 2009-07-31  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
 
-	fttypes.h: Cast FT_MAKE_TAG output to FT_Tag exlicitly.
+	fttypes.h: Cast FT_MAKE_TAG output to FT_Tag explicitly.
 
 	* include/freetype/fttypes.h (FT_MAKE_TAG):
 	Cast the result to FT_Tag.
@@ -2479,7 +2479,7 @@
 	af_latin_script_class struct will have function to init it instead of
 	being allocated in the global scope.
 	Change af_latin_blue_chars to be PIC-compatible by being a two
-	dimentional array rather than array of pointers.
+	dimensional array rather than array of pointers.
 
 
 	* src/autofit/aflatin2.h declare af_latin2_script_class
@@ -2489,11 +2489,11 @@
 	af_latin2_script_class struct will have function to init it instead of
 	being allocated in the global scope.
 	Change af_latin2_blue_chars to be PIC-compatible by being a two
-	dimentional array rather than array of pointers.
+	dimensional array rather than array of pointers.
 
 	* src/autofit/afglobal.c when FT_CONFIG_OPTION_PIC is defined
 	af_script_classes array initialization was moved to afpic.c and
-	is later refered using macros defeined in afpic.h.
+	is later referred using macros defeined in afpic.h.
 
 	New Files:
 	* src/autofit/afpic.h declare struct to hold PIC globals for autofit
@@ -2573,7 +2573,7 @@
 	Macros will be used from rastpic.h in order to access
 	ft_standard_raster from the pic_container (allocated in ftraster.c).
 	In ft_raster1_render when PIC is enabled, the last letter of
-	module_name is used to verfy the renderer class rather than the
+	module_name is used to verify the renderer class rather than the
 	class pointer.
 
 	* src/raster/ftraster.c when FT_CONFIG_OPTION_PIC is defined
@@ -2755,7 +2755,7 @@
 	And macros will be used from ttpic.h in order to access them
 	from the pic_container.
 	* src/truetype/ttobjs.c change trick_names array to be
-	PIC-compatible by being a two dimentional array rather than array
+	PIC-compatible by being a two dimensional array rather than array
 	of pointers.
 
 	New Files:
@@ -2784,14 +2784,14 @@
 	Add macros to declare, allocate and initialize drivers
 	(FT_Driver_ClassRec).
 	* include/freetype/internal/ftpic.h new file to declare the
-	FT_PIC_Container struct and the functions to allocate and detroy it.
+	FT_PIC_Container struct and the functions to allocate and destroy it.
 	* include/freetype/internal/ftserv.h add macros to allocate and
-	destory arrays of FT_ServiceDescRec.
+	destroy arrays of FT_ServiceDescRec.
 	* include/freetype/internal/internal.h define macro to include
 	ftpic.h.
 
 	New Files:
-	* src/base/ftpic.c implement functions to allocate and destory the
+	* src/base/ftpic.c implement functions to allocate and destroy the
 	global pic_container.
 	* src/base/basepic.h declare struct to hold PIC globals for base and
 	macros to access them.
@@ -4387,7 +4387,7 @@
 
 	* src/cff/cffload.c (cff_font_load): Pass `pure_cff'.
 	Invert sids table only if `pure_cff' is set.
-	* src/cff/cffload.h: Udpated.
+	* src/cff/cffload.h: Updated.
 
 	* src/cff/cffobjs.c (cff_face_init): Updated.
 	Set FT_FACE_FLAG_CID_KEYED only if pure_cff is set.
@@ -7170,7 +7170,7 @@
 
 2006-10-12  Werner Lemberg  <wl@gnu.org>
 
-	* docs/INSTALL.UNX, docs/UPGRADE.UNX: Renamed to...
+	* docs/INSTALL.UNIX, docs/UPGRADE.UNIX: Renamed to...
 	* docs/INSTALL.UNIX, docs/UPGRADE.UNIX: This.  Update all documents
 	which reference those files.
 
@@ -7366,7 +7366,7 @@
 	to recognize a few fonts that require the automatic unpatented
 	loader.
 
-	* src/smooth/ftgrays.c: Optmize the performance of the anti-aliased
+	* src/smooth/ftgrays.c: Optimize the performance of the anti-aliased
 	rasterizer.  The speed improvement is between 15% and 25%, depending
 	on the font data.
 
@@ -7517,7 +7517,7 @@
 2006-08-15  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>
 
 	* modules.cfg (BASE_EXTENSIONS): Compile in ftgxval.c by default to
-	build ftvalid in ft2demos.  This has been inadvertedly changed
+	build ftvalid in ft2demos.  This has been inadvertently changed
 	2006-08-13.
 
 2006-08-15  suzuki toshiya  <mpsuzuki@hiroshima-u.ac.jp>

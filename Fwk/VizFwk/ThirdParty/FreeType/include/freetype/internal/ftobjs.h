@@ -961,7 +961,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Outline_Funcs struct.         */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need to  */
   /*    called with a pre-allocated stracture to be filled.                */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
@@ -1001,7 +1001,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Raster_Funcs struct.          */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need to  */
   /*    called with a pre-allocated stracture to be filled.                */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
@@ -1056,7 +1056,7 @@ FT_BEGIN_HEADER
   /*                                                                       */
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Glyph_Class struct.           */
-  /*    When FT_CONFIG_OPTION_PIC is defined an init funtion will need to  */
+  /*    When FT_CONFIG_OPTION_PIC is defined an init function will need to  */
   /*    called with a pre-allocated stracture to be filled.                */
   /*    When FT_CONFIG_OPTION_PIC is not defined the struct will be        */
   /*    allocated in the global scope (or the scope where the macro        */
@@ -1106,7 +1106,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Renderer_Class struct.        */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a Create funtion will need    */
+  /*    When FT_CONFIG_OPTION_PIC is defined a Create function will need    */
   /*    to called with a pointer where the allocated stracture is returned.*/
   /*    And when it is no longer needed a Destroy function needs           */
   /*    to be called to release that allocation.                           */
@@ -1277,7 +1277,7 @@ FT_BEGIN_HEADER
   /* <Description>                                                         */
   /*    Used to initialize an instance of FT_Module_Class struct.          */
   /*                                                                       */
-  /*    When FT_CONFIG_OPTION_PIC is defined a Create funtion will need    */
+  /*    When FT_CONFIG_OPTION_PIC is defined a Create function will need    */
   /*    to called with a pointer where the allocated stracture is returned.*/
   /*    And when it is no longer needed a Destroy function needs           */
   /*    to be called to release that allocation.                           */

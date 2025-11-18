@@ -69,7 +69,7 @@ struct inflate_blocks_state {
 #define UPDATE {UPDBITS UPDIN UPDOUT}
 #define LEAVE {UPDATE return inflate_flush(s,z,r);}
 /*   get bytes and bits */
-#define LOADIN {p=z->next_in;n=z->avail_in;b=s->bitb;k=s->bitk;}
+#define LOADING {p=z->next_in;n=z->avail_in;b=s->bitb;k=s->bitk;}
 #define NEEDBYTE {if(n)r=Z_OK;else LEAVE}
 #define NEXTBYTE (n--,*p++)
 #define NEEDBITS(j) {while(k<(j)){NEEDBYTE;b|=((uLong)NEXTBYTE)<<k;k+=8;}}
@@ -82,7 +82,7 @@ struct inflate_blocks_state {
 #define NEEDOUT {if(m==0){WRAP if(m==0){FLUSH WRAP if(m==0) LEAVE}}r=Z_OK;}
 #define OUTBYTE(a) {*q++=(Byte)(a);m--;}
 /*   load local pointers */
-#define LOAD {LOADIN LOADOUT}
+#define LOAD {LOADING LOADOUT}
 
 /* masks for lower bits (size given to avoid silly warnings with Visual C++) */
 #ifndef NO_INFLATE_MASK

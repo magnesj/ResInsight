@@ -399,7 +399,7 @@ bool ShaderProgram::validateProgram(OpenGLContext* oglContext) const
     }
     else
     {
-        // Any textual result of the vaidation is presented in the log
+        // Any textual result of the validation is presented in the log
         CVF_LOG_RENDER_ERROR(oglContext, programInfoLog(oglContext));
         return false;
     }

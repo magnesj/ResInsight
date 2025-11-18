@@ -272,7 +272,7 @@ string and assigns the correct restype and argtypes attributes.
 
 
 All the calls to the prototype() method are typically assembled in the
-bottom of the file implementing a class defintion. E.g. the bottom of
+bottom of the file implementing a class definition. E.g. the bottom of
 the ecl_kw.py file looks like this:
 
   # 1: Load the shared library  

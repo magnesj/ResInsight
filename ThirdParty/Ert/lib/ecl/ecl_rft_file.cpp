@@ -293,9 +293,9 @@ ecl_rft_node_type * ecl_rft_file_iget_node( const ecl_rft_file_type * rft_file ,
       ecl_rft_iget_well_rft(rft_file , "P2" , 1)
 
    will return the rft node indicated by the arrow (i.e. the second
-   occurence of well "P2" in the file.)
+   occurrence of well "P2" in the file.)
 
-   If the rft_file does not have the well, or that occurence, the
+   If the rft_file does not have the well, or that occurrence, the
    function will go down in flames with util_abort(). Use
    ecl_rft_file_has_well() and ecl_rft_file_get_well_occurences()
    first if you can not take util_abort().
@@ -360,7 +360,7 @@ bool ecl_rft_file_has_well( const ecl_rft_file_type * rft_file , const char * we
 
 
 /**
-   Returns the number of occurences of 'well' in rft_file.
+   Returns the number of occurrences of 'well' in rft_file.
 */
 
 int ecl_rft_file_get_well_occurences( const ecl_rft_file_type * rft_file , const char * well) {

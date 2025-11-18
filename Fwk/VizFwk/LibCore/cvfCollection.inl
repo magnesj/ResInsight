@@ -234,7 +234,7 @@ bool Collection<T>::contains(const T* data) const
 
 
 //--------------------------------------------------------------------------------------------------
-/// Find index of the first occurence of the specified element
+/// Find index of the first occurrence of the specified element
 ///
 /// Returns UNDEFINED_SIZE_T if element could not be found
 //--------------------------------------------------------------------------------------------------

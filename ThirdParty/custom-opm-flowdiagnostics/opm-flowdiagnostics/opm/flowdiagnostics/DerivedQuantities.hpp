@@ -75,7 +75,7 @@ namespace FlowDiagnostics
     /// one. If the coefficient is zero (so the F-Phi curve is a
     /// straight line) we have perfect piston-like displacement
     /// while a coefficient of one indicates infinitely
-    /// heterogenous displacement (essentially no sweep).
+    /// heterogeneous displacement (essentially no sweep).
     ///
     /// Note: The coefficient is analogous to the Gini coefficient
     /// of economic theory, where the name Lorenz curve is applied

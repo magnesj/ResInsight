@@ -44,7 +44,7 @@
   The library libwell contains functionality to read and interpret
   some of the well related keywords from an ECLIPSE restart
   file. Roughly speaking the implementation is spread between three
-  six datatypes; users of the libwell library are mainly conserned
+  six datatypes; users of the libwell library are mainly concerned
   with three first.
 
     well_info_type: This is the container type which holds information
@@ -111,7 +111,7 @@
 
             ii) The well_path instances corresponding to the two LGRs
                 will have one branch only, whereas the well_path
-                corrseponding to the global grid will have two branches.
+                corresponding to the global grid will have two branches.
 
            In pseudo json:
 
@@ -240,7 +240,7 @@ static void well_info_add_state(well_info_type* well_info, well_state_type* well
      - well_info_load_rstfile()
 
    The two first functions expect an open ecl_file instance as input;
-   whereas the last funtion expects the name of a restart file as
+   whereas the last function expects the name of a restart file as
    input.
 
    If you need ecl_file access to the restart files for another reason
@@ -252,7 +252,7 @@ static void well_info_add_state(well_info_type* well_info, well_state_type* well
    using an existing ecl_file instance is that you do not have to
    rebuild the index. The disadvantage of using an existing ecl_file
    instance is that after the call to add_wells() the well related
-   kewywords will stay in (probaly unused) in memory.
+   kewywords will stay in (probably unused) in memory.
 
    The three different methods to add restart data can be
    interchganged, and also called repeatedly. All the relevant data is

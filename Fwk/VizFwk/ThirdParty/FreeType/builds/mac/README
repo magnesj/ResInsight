@@ -2,7 +2,7 @@ This folder contains
 
   * Makefile skeltons for Apple MPW (Macintosh's Programmers Workshop)
 
-  * Python script to generate MPW makefile from skelton
+  * Python script to generate MPW makefile from skeleton
 
   * Metrowerks CodeWarrior 9.0 project file in XML format
 
@@ -121,7 +121,7 @@ environment by Metrowerks. GCC for MPW and Symantec
     The skeltons are designed to use in the top
     directory where there are builds, include, src etc.
     You must name the generated MPW makefile by removing
-    ".txt" from source skelton name.
+    ".txt" from source skeleton name.
 
     3-1-2. Add resource forks to related files
     ------------------------------------------

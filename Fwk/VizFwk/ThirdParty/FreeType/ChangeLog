@@ -869,7 +869,7 @@
 	Use defined macros to set {platform,encoding}_id.
 
 	* src/bdf/bdfdrivr.c: Include ttnameid.h and use macros to
-	set charmap.{platfom,encoding}_id.
+	set charmap.{platform,encoding}_id.
 	* src/pcf/pcfdrivr.c: Ditto.
 	* src/winfonts/winfnt.c: Ditto.
 	* src/type1/t1objs.c: Ditto.

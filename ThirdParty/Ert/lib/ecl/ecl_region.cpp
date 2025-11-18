@@ -1094,7 +1094,7 @@ void ecl_region_deselect_below_plane( ecl_region_type * region, const double n[3
    When it comes to depth the polygon select function works as
    follows:
 
-     1. The defining polygon is layed out at the top of the reservoir.
+     1. The defining polygon is laid out at the top of the reservoir.
 
      2. The set {(i,j,0)} of cells in the top layer inside the polygon
         is selected by checking the polygon perimeter.
@@ -1105,7 +1105,7 @@ void ecl_region_deselect_below_plane( ecl_region_type * region, const double n[3
           polygon will effectively qbe translated as a function of
           depth.
 
-        * If the pillars are not parallell the selection polygon will
+        * If the pillars are not parallel the selection polygon will
           effectively change in size.
 */
 

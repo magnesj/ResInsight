@@ -5,8 +5,8 @@ class SourceEnumerator(object):
 
     @classmethod
     def removeComments(cls, code_string):
-        code_string = re.sub(re.compile("/\*.*?\*/",re.DOTALL ) ,"" ,code_string) # remove all occurance streamed comments (/*COMMENT */) from string
-        code_string = re.sub(re.compile("//.*?\n" ) ,"" ,code_string) # remove all occurance singleline comments (//COMMENT\n ) from string
+        code_string = re.sub(re.compile("/\*.*?\*/",re.DOTALL ) ,"" ,code_string) # remove all occurrence streamed comments (/*COMMENT */) from string
+        code_string = re.sub(re.compile("//.*?\n" ) ,"" ,code_string) # remove all occurrence singleline comments (//COMMENT\n ) from string
         return code_string
 
     

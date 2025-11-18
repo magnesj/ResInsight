@@ -612,10 +612,10 @@ inline void SwapPolyIndexes(TEdge &Edge1, TEdge &Edge2)
 }
 //------------------------------------------------------------------------------
 
-inline cInt TopX(TEdge &edge, const cInt currentY)
+inline cInt TopX(TEdge &edge, const cInt currently)
 {
-  return ( currentY == edge.Top.Y ) ?
-    edge.Top.X : edge.Bot.X + Round(edge.Dx *(currentY - edge.Bot.Y));
+  return ( currently == edge.Top.Y ) ?
+    edge.Top.X : edge.Bot.X + Round(edge.Dx *(currently - edge.Bot.Y));
 }
 //------------------------------------------------------------------------------
 
@@ -1311,7 +1311,7 @@ IntRect ClipperBase::GetBounds()
     result.bottom = std::max(result.bottom, lm->LeftBound->Bot.Y);
     TEdge* e = lm->LeftBound;
     for (;;) {
-      TEdge* bottomE = e;
+      TEdge* bottom = e;
       while (e->NextInLML)
       {
         if (e->Bot.X < result.left) result.left = e->Bot.X;
@@ -1323,7 +1323,7 @@ IntRect ClipperBase::GetBounds()
       result.left = std::min(result.left, e->Top.X);
       result.right = std::max(result.right, e->Top.X);
       result.top = std::min(result.top, e->Top.Y);
-      if (bottomE == lm->LeftBound) e = lm->RightBound;
+      if (bottom == lm->LeftBound) e = lm->RightBound;
       else break;
     }
     ++lm;
@@ -2679,7 +2679,7 @@ void Clipper::ProcessHorizontal(TEdge *horzEdge)
     {
 
         //this code block inserts extra coords into horizontal edges (in output
-        //polygons) whereever maxima touch these horizontal edges. This helps
+        //polygons) wherever maxima touch these horizontal edges. This helps
         //'simplifying' polygons (ie if the Simplify property is set).
         if (m_Maxima.size() > 0)
         {

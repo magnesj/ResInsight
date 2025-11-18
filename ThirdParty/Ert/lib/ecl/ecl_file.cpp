@@ -65,8 +65,8 @@
    painful to work with this large and unvieldy index, and it is
    convenient to create a sub index based on a subset of the
    keywords. The creation of these sub indices is based on identifying
-   a keyword from name and occurence number, and then including all
-   keywords up to the next occurence of the same keyword:
+   a keyword from name and occurrence number, and then including all
+   keywords up to the next occurrence of the same keyword:
 
       SEQHDR            ---\
       MINISTEP  0          |
@@ -98,7 +98,7 @@
    is called 'Block 2' in the figure above. In particular for restart
    files this abstraction is very convenient, because an extra layer
    of functionality is required to get from natural time coordinates
-   (i.e. simulation time or report step) to the occurence number (see
+   (i.e. simulation time or report step) to the occurrence number (see
    ecl_rstfile for more details).
 
    To select a subindex as the active index you use the
@@ -147,7 +147,7 @@ struct ecl_file_struct {
   way to access the various keywords. The kw_index is a hash table
   with entries 'SEQHDR', 'MINISTEP' and 'PARAMS'. Each entry in the
   hash table is an integer vector which again contains the internal
-  index of the various occurences:
+  index of the various occurrences:
 
    ------------------
    SEQHDR            \
@@ -233,7 +233,7 @@ void ecl_file_fwrite(const ecl_file_type * ecl_file , const char * filename, boo
 
    * ecl_file_iget_named_kw(): This function will take a keyword
    (char *) and an integer as input. The integer corresponds to the
-   ith occurence of the keyword in the file.
+   ith occurrence of the keyword in the file.
 
    * ecl_file_iget_kw(): This function just takes an integer index as
    input, and returns the corresponding ecl_kw instance - without
@@ -252,15 +252,15 @@ void ecl_file_fwrite(const ecl_file_type * ecl_file , const char * filename, boo
    for (ikw = 0; ikw < ecl_file_get_num_distinct_kw(ecl_file); ikw++) {
    const char * kw = ecl_file_iget_distinct_kw(ecl_file , ikw);
 
-   printf("The file contains: %d occurences of \'%s\' \n",ecl_file_get_num_named_kw( ecl_file , kw) , kw);
+   printf("The file contains: %d occurrences of \'%s\' \n",ecl_file_get_num_named_kw( ecl_file , kw) , kw);
    }
    ....
 
    For the summary file showed in the top this code will produce:
 
-   The file contains 1 occurences of 'SEQHDR'
-   The file contains 3 occurences of 'MINISTEP'
-   The file contains 3 occurences of 'PARAMS'
+   The file contains 1 occurrences of 'SEQHDR'
+   The file contains 3 occurrences of 'MINISTEP'
+   The file contains 3 occurrences of 'PARAMS'
 
 */
 
@@ -306,7 +306,7 @@ void ecl_file_fwrite(const ecl_file_type * ecl_file , const char * filename, boo
    +---------> Using initial_pressure => Crash and burn!
 
    The ecl_file structure takes ownership of all the keywords, and
-   will also take ownership of the newly instered @new_kw instance; if
+   will also take ownership of the newly inserted @new_kw instance; if
    the boolean @insert_copy is set to true the function will insert a
    copy of @new_kw, leaving the original reference untouched.
 */
@@ -351,10 +351,10 @@ int ecl_file_get_num_named_kw(const ecl_file_type * ecl_file , const char * kw) 
    With the example above we get:
 
    ecl_file_iget_occurence(ecl_file , 2) -> 0; Global index 2 will
-   look up the first occurence of PARAMS.
+   look up the first occurrence of PARAMS.
 
    ecl_file_iget_occurence(ecl_file , 5) -> 2; Global index 5 will
-   look up th third occurence of MINISTEP.
+   look up th third occurrence of MINISTEP.
 
    The enkf layer uses this funny functionality.
 */
@@ -375,7 +375,7 @@ int ecl_file_get_size( const ecl_file_type * ecl_file ){
 
 
 /**
-   Returns true if the ecl_file instance has at-least one occurence of
+   Returns true if the ecl_file instance has at-least one occurrence of
    ecl_kw 'kw'.
 */
 bool ecl_file_has_kw( const ecl_file_type * ecl_file , const char * kw) {
@@ -434,8 +434,8 @@ const char * ecl_file_iget_header( const ecl_file_type * file , int global_index
 /* ---------- */
 
 /*
-   This function will return the ith occurence of 'kw' in
-   ecl_file. Will abort hard if the request can not be satisifed - use
+   This function will return the ith occurrence of 'kw' in
+   ecl_file. Will abort hard if the request can not be satisfied - use
    query functions if you can not take that.
 */
 
@@ -468,20 +468,20 @@ ecl_file_view_type * ecl_file_get_active_view( ecl_file_type * ecl_file ) {
   return ecl_file->active_view;
 }
 
-ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  ecl_file_view_type * view = ecl_file_view_add_blockview( ecl_file->global_view , kw , occurence );
+ecl_file_view_type * ecl_file_get_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurrence) {
+  ecl_file_view_type * view = ecl_file_view_add_blockview( ecl_file->global_view , kw , occurrence );
   return view;
 }
 
 
-ecl_file_view_type * ecl_file_alloc_global_blockview2( ecl_file_type * ecl_file , const char * start_kw , const char * end_kw, int occurence) {
-  ecl_file_view_type * view = ecl_file_view_alloc_blockview2( ecl_file->global_view , start_kw , end_kw, occurence );
+ecl_file_view_type * ecl_file_alloc_global_blockview2( ecl_file_type * ecl_file , const char * start_kw , const char * end_kw, int occurrence) {
+  ecl_file_view_type * view = ecl_file_view_alloc_blockview2( ecl_file->global_view , start_kw , end_kw, occurrence );
   return view;
 }
 
 
-ecl_file_view_type * ecl_file_alloc_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  return ecl_file_alloc_global_blockview2( ecl_file , kw , kw , occurence );
+ecl_file_view_type * ecl_file_alloc_global_blockview( ecl_file_type * ecl_file , const char * kw , int occurrence) {
+  return ecl_file_alloc_global_blockview2( ecl_file , kw , kw , occurrence );
 }
 
 
@@ -889,15 +889,15 @@ void ecl_file_pop_block( ecl_file_type * ecl_file ) {
 }
 
 
-static ecl_file_view_type * ecl_file_get_relative_blockview( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  ecl_file_view_type * view = ecl_file_view_add_blockview( ecl_file->active_view , kw , occurence );
+static ecl_file_view_type * ecl_file_get_relative_blockview( ecl_file_type * ecl_file , const char * kw , int occurrence) {
+  ecl_file_view_type * view = ecl_file_view_add_blockview( ecl_file->active_view , kw , occurrence );
   return view;
 }
 
 
 
-bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurence) {
-  ecl_file_view_type * blockmap = ecl_file_get_relative_blockview( ecl_file , kw , occurence);
+bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int occurrence) {
+  ecl_file_view_type * blockmap = ecl_file_get_relative_blockview( ecl_file , kw , occurrence);
   if (blockmap != NULL) {
     ecl_file->active_view = blockmap;
     return true;
@@ -906,8 +906,8 @@ bool ecl_file_subselect_block( ecl_file_type * ecl_file , const char * kw , int 
 }
 
 
-bool ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurence ) {
-  ecl_file_view_type * blockmap = ecl_file_get_global_blockview( ecl_file , kw , occurence);
+bool ecl_file_select_block( ecl_file_type * ecl_file , const char * kw , int occurrence ) {
+  ecl_file_view_type * blockmap = ecl_file_get_global_blockview( ecl_file , kw , occurrence);
   if (blockmap != NULL) {
     ecl_file->active_view = blockmap;
     return true;

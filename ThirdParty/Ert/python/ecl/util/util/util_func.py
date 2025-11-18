@@ -39,7 +39,7 @@ When the standard strcmp() function is used for comparing strings
 the '1' will compare as less than the '9' and the order will be
 the reverse. Observe that the '-' is not interpreted as a sign
 prefix. The strcmp_int function will interpret '.' as separating
-character, wheras the strcmp_float() function will interpret '.'
+character, whereas the strcmp_float() function will interpret '.'
 as a descimal point.
 
 @type: (str, str) -> int

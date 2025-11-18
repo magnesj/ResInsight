@@ -189,7 +189,7 @@ static bool fortio_is_fortran_stream__(FILE * stream , bool endian_flip) {
    Now, when this is done we do the following test:
 
    If header == tail. This is (probably) a fortran file, however if
-   header == 0, we might have a normal file with two consequitive
+   header == 0, we might have a normal file with two consecutive
    zeroes. In that case it is difficult to determine, and we continue.
 
 */
@@ -218,7 +218,7 @@ fortio_type * fortio_alloc_FILE_wrapper(const char *filename , bool endian_flip_
 /*****************************************************************/
 /*
   Observe that the stream open functions accept a failure, and call
-  the fopen() function driectly.
+  the fopen() function directly.
 */
 
 static const char * fortio_fopen_read_mode( bool fmt_file ) {
@@ -834,7 +834,7 @@ bool fortio_read_at_eof( fortio_type * fortio ) {
 
 /*
   When this function is called the underlying file is unlinked, and
-  the entry will be removed from the filsystem. Subsequent calls which
+  the entry will be removed from the filesystem. Subsequent calls which
   write to this file will still (superficially) succeed.
 */
 

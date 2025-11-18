@@ -77,7 +77,7 @@ TEST(PrimitiveTestsTest, intersectLines)
         EXPECT_DOUBLE_EQ(0, isect.y());
     }
 
-    // Parallell
+    // Parallel
     {
         Vec2d p1(0, 0);  Vec2d p2(2, 0);
         Vec2d p3(0, 2);  Vec2d p4(2, 2);

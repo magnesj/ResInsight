@@ -126,7 +126,7 @@ static void util_walk_file_callbacks__(const char               * root_path ,
 /**
    This function will start at 'root_path' and then recursively go
    through all file/subdirectore located below root_path. For each
-   file/directory in the tree it will call the user-supplied funtions
+   file/directory in the tree it will call the user-supplied functions
    'file_callback' and 'dir_callback'.
 
    The arguments to file_callback will be:

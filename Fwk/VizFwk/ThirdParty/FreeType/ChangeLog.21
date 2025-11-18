@@ -1829,7 +1829,7 @@
 
 2004-08-05  David Turner  <david@freetype.org>
 
-	`Activate' gray-scale specifing hinting within the TrueType
+	`Activate' gray-scale specifying hinting within the TrueType
 	bytecode interpreter.  This is an experimental feature which
 	should probably be made optional.
 
@@ -2700,7 +2700,7 @@
 	* builds/unix/unix.mk (BUILD_DIR, PLATFORM): Define.
 	Use BUILD_DIR.
 
-	* docs/INSTALL, docs/INSTALL.GNU, docs/INSTALL.UNX: Update
+	* docs/INSTALL, docs/INSTALL.GNU, docs/INSTALL.UNIX: Update
 	documentation on makepp.
 
 2004-04-11  Werner Lemberg  <wl@gnu.org>
@@ -3331,7 +3331,7 @@
 
 	* src/cff/cffdrivr.c (cff_get_cmap_info): Call sfnt module's TT CMap
 	Info service function if the cmap comes from sfnt.  Return 0 if the
-	cmap is sythesized in cff module.
+	cmap is synthesized in cff module.
 
 2004-01-20  David Turner  <david@freetype.org>
 
@@ -3460,7 +3460,7 @@
 
 2003-12-25  Werner Lemberg  <wl@gnu.org>
 
-	* src/base/fttrigon.c, src/base/ftgloadr.c: Inlude
+	* src/base/fttrigon.c, src/base/ftgloadr.c: Include
 	FT_INTERNAL_OBJECTS_H.
 
 	* src/base/ftstroke.c (FT_Outline_GetInsideBorder,
@@ -4659,7 +4659,7 @@
 
 	* src/type42/t42drivr.c: Include FT_SERVICE_XFREE86_NAME_H,
 	FT_SERVICE_GLYPH_DICT_H, and FT_SERVICE_POSTSCRIPT_NAME_H.
-	(t42_service_glyph_dict, t42_service_ps_name): New strucures
+	(t42_service_glyph_dict, t42_service_ps_name): New structures
 	providing Type 42 services.
 	(t42_services): New services list.
 	(T42_Get_Interface): Use `ft_service_list_lookup'.
@@ -5931,7 +5931,7 @@
 
 2003-04-20  Werner Lemberg  <wl@gnu.org>
 
-	* doc/INSTALL.UNX: Cleaned up.
+	* doc/INSTALL.UNIX: Cleaned up.
 
 2003-04-09  Torrey Lyons  <torrey@mrcla.com>
 
@@ -5960,9 +5960,9 @@
 
 2003-03-27  David Turner  <david@freetype.org>
 
-	* README: Udpated.
+	* README: Updated.
 
-	* README.UNX: Removed (now replaced by docs/INSTALL.UNX).
+	* README.UNIX: Removed (now replaced by docs/INSTALL.UNIX).
 
 	* src/pshinter/pshalgo3.c: The hinter now performs as in 2.1.3 and
 	will ignore stem quantization only when FT_LOAD_TARGET_SMOOTH is
@@ -5990,8 +5990,8 @@
 	* docs/BUGS, docs/BUILD: Removed.
 	* docs/DEBUG.TXT: Renamed to...
 	* docs/DEBUG: This.
-	* docs/CUSTOMIZE, docs/TRUETYPE, docs/UPGRADE.UNX: New files.
-	* docs/INSTALL.ANY, docs/INSTALL.UNX, docs/INSTALL.GNU New files,
+	* docs/CUSTOMIZE, docs/TRUETYPE, docs/UPGRADE.UNIX: New files.
+	* docs/INSTALL.ANY, docs/INSTALL.UNIX, docs/INSTALL.GNU New files,
 	containing platform specific information previously in INSTALL.
 	* docs/readme.vms: Renamed to...
 	* docs/INSTALL.VMS: This.
@@ -8245,7 +8245,7 @@
 	`fttype1.c' in src/base.
 
 	* src/pshinter/pshglob.c (psh_blues_scale_zones): Fixed a bug that
-	prevented family blue zones substitution from hapenning correctly.
+	prevented family blue zones substitution from happening correctly.
 
 	* include/freetype/ftbdf.h FT_Get_BDF_Charset_ID): Adding
 	documentation comment.
@@ -8700,7 +8700,7 @@
 
 2002-04-12  David Turner  <david@freetype.org>
 
-	* README.UNX: Updated the Unix-specific quick-compilation guide to
+	* README.UNIX: Updated the Unix-specific quick-compilation guide to
 	warn about the GNU Make requirement at compile time.
 
 	* include/freetype/config/ftstdlib.h,

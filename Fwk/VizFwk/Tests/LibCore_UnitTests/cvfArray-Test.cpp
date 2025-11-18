@@ -533,7 +533,7 @@ TEST(ArrayTest, SetPtr)
 
     Vec3fArray af;
     af.setPtr(reinterpret_cast<Vec3f*> (f), 2);     // Naughty! How to do this differently
-    f = 0; // af has owership
+    f = 0; // af has ownership
 
     ASSERT_FLOAT_EQ(1.0f, af[0].x());
     ASSERT_FLOAT_EQ(2.0f, af[0].y());

@@ -408,8 +408,8 @@ char ** stringlist_alloc_char_ref(const stringlist_type * stringlist) {
 
 /**
     Scans the stringlist (linear scan) to see if it contains (at
-    least) one occurence of 's'. Will never return true if the input
-    string @s equals NULL, altough the stringlist itself can contain
+    least) one occurrence of 's'. Will never return true if the input
+    string @s equals NULL, although the stringlist itself can contain
     NULL elements.
 */
 
@@ -431,10 +431,10 @@ bool stringlist_contains(const stringlist_type * stringlist , const char * s) {
 
 
 /**
-  Finds the indicies of the entries matching 's'.
+  Finds the indices of the entries matching 's'.
 */
 int_vector_type * stringlist_find(const stringlist_type * stringlist, const char * s) {
-  int_vector_type * indicies = int_vector_alloc(0, -1);
+  int_vector_type * indices = int_vector_alloc(0, -1);
   int  size     = stringlist_get_size( stringlist );
   int  index    = 0;
 
@@ -442,10 +442,10 @@ int_vector_type * stringlist_find(const stringlist_type * stringlist, const char
     const char * istring = stringlist_iget(stringlist , index);
     if (istring != NULL)
       if (strcmp(istring , s) == 0)
-        int_vector_append(indicies, index);
+        int_vector_append(indices, index);
     index++;
   }
-  return indicies;
+  return indices;
 }
 
 

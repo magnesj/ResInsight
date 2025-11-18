@@ -219,7 +219,7 @@ Vec2f ScalarMapperUniformLevels::mapToTextureCoord(double scalarValue) const
         }
         else 
         {
-            // If we get here we have som NaN, Use lowest legal texture coord
+            // If we get here we have some NaN, Use lowest legal texture coord
             return Vec2f(0.0f, 0.0f);
         }
     }

@@ -1,6 +1,6 @@
 # Workflow to build and distribute OpenSSL 3
 
-From Qt 6.5, OpenSSL 3 is used for authentication workflows. On RHEL8 the only available system package is OpenSSL 1.1. The authentication framwork in Qt (in a ResInsight build used by install/plugins/tls/libqopensslbackend.so) requires OpenSSL3. This document describes how to build OpenSSL3 using vcpkg and bundle required dynamic libraries in the install package of ResInsight. When running ResInsight without these libraries, the following error message is displayed:
+From Qt 6.5, OpenSSL 3 is used for authentication workflows. On RHEL8 the only available system package is OpenSSL 1.1. The authentication framework in Qt (in a ResInsight build used by install/plugins/tls/libqopensslbackend.so) requires OpenSSL3. This document describes how to build OpenSSL3 using vcpkg and bundle required dynamic libraries in the install package of ResInsight. When running ResInsight without these libraries, the following error message is displayed:
 
     qt.tlsbackend.ossl: Incompatible version of OpenSSL (built with OpenSSL >= 3.x, runtime version is < 3.x)
     qt.network.ssl: No functional TLS backend was found

@@ -182,7 +182,7 @@ class EclFileTest(EclTest):
     def test_broken_file(self):
         with TestAreaContext("test_broken_file"):
             with open("CASE.FINIT", "w") as f:
-                f.write("This - is not a ECLISPE file\nsdlcblhcdbjlwhc\naschscbasjhcasc\nascasck c s s aiasic asc")
+                f.write("This - is not a ECLIPSE file\nsdlcblhcdbjlwhc\naschscbasjhcasc\nascasck c s s aiasic asc")
             f = EclFile("CASE.FINIT")
             self.assertEqual(len(f), 0)
 

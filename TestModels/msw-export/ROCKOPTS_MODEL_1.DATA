@@ -208,7 +208,7 @@ ROCKOPTS
  2*   'ROCKNUM' /
 
 ROCK
--- REF. PRES   COMPRESSIBILITY
+-- REF. PRESS   COMPRESSIBILITY
    280.000        5.6E-5 /
 /  -- default, copy of previous record
 
@@ -354,7 +354,7 @@ COMPDAT
 
 
 
--- Define group tree hierarcy 
+-- Define group tree hierarchy 
 GRUPTREE 
 ---------------------------------------
    'FIELD_N'     'FIELD'  /

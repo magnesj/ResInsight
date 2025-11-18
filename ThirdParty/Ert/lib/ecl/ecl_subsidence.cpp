@@ -54,7 +54,7 @@ struct ecl_subsidence_struct {
   const ecl_file_type  * init_file;    /* The init file - a shared reference owned by calling scope. */
   ecl::ecl_grid_cache  * grid_cache;
   bool                 * aquifer_cell;
-  hash_type            * surveys;      /* A hash table containg ecl_subsidence_survey_type instances; one instance
+  hash_type            * surveys;      /* A hash table containing ecl_subsidence_survey_type instances; one instance
                                           for each interesting time. */
   double               * compressibility; /*total compressibility*/
   double               * poisson_ratio;

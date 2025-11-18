@@ -3,7 +3,7 @@ set(RESINSIGHT_MAJOR_VERSION 2025)
 set(RESINSIGHT_MINOR_VERSION 09)
 set(RESINSIGHT_PATCH_VERSION 4)
 
-# Opional text with no restrictions
+# Optional text with no restrictions
 set(RESINSIGHT_VERSION_TEXT "-dev")
 #set(RESINSIGHT_VERSION_TEXT "-RC_2")
 

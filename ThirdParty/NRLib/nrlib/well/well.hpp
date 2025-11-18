@@ -200,7 +200,7 @@ namespace NRLib {
     std::string well_name_;
     /// Date
     std::string date_;
-    /// Missing value for continous logs.
+    /// Missing value for continuous logs.
     double well_rmissing_;
     /// Missing value for discrete logs.
     int    well_imissing_;

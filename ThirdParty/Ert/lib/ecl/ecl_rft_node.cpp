@@ -90,7 +90,7 @@ struct ecl_rft_node_struct {
 */
 static ecl_rft_enum translate_from_sting_to_ecl_rft_enum(const char * data_type_string){
     ecl_rft_enum data_type = SEGMENT;
-    /* According to the ECLIPSE documentaton. */
+    /* According to the ECLIPSE documentation. */
     if (strchr(data_type_string , 'P') != NULL)
         data_type = PLT;
     else if (strchr(data_type_string, 'R') != NULL)

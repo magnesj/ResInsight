@@ -1,22 +1,22 @@
 This file is brief overview of the various files and the functionality
 in the libecl library. The library is written to read/write ECLIPSE
-files in restart format, the organsiation of the units in the library
+files in restart format, the organisation of the units in the library
 are closely linked to the concept of ECLIPSE files. In addition to the
 various files in this library, the library needs access to the
 library libutil.
 
 The diagram below illustrates the (main) files in libecl, and how they
-depend on eachother. The dependencies follow the links, i.e. one file
+depend on each other. The dependencies follow the links, i.e. one file
 depends (explicitly) on all the files it points at. Observe that in
 the diagram below only explicit dependencies are illustrated.
 
 ----------------------------------------------------------------------
 
-The executive summary of this diagram is that there are essentally
+The executive summary of this diagram is that there are essentially
 three different layers in the libecl library:
 
   [High level]: At the highest level are function which implement
-     functionality to work with spesific ECLIPSE files, these are
+     functionality to work with specific ECLIPSE files, these are
      ecl_sum.c for summaryfiles, ecl_rft_file for rft files and
      ecl_grid for GRID files.
 
@@ -66,7 +66,7 @@ three different layers in the libecl library:
 		       | The file ecl_sum.c implements the ecl_sum_type    |  |	 	     |  | The file ecl_grid.c implements the type  |  	  |
 		       | which is used to load summary files, and do	   |  |	 	     | 	| ecl_grid_type. The functionality impl-   |  	  |
 		       | queries on them. The ecl_sum type is a quite thin |  |	 	     | 	| emented in ecl_grid.c is to load itself  |  	  |
-		       | wrapper, containg a ecl_sum_data instance for the |  |	 	     | 	| from an existing EGRID or GRID file.     |  	  |
+		       | wrapper, containing a ecl_sum_data instance for the |  |	 	     | 	| from an existing EGRID or GRID file.     |  	  |
 		       | actual data, and a ecl_smspec instance for the    |  |	       	     |   \________________________________________/   	  |
 		       | header information.                               |  |	       	     | 	   |   	     |	       |		      	  |
 		        \_________________________________________________/   \	 	     | 	   |	     |	       |		      	  |
@@ -91,14 +91,14 @@ three different layers in the libecl library:
 			    |	       /                                                              \	  |  |	       |		      	  |
 			    |	      |                       ecl_file.c                               | \|/ |	       |		      	 \|/
 			    |	      | -------------------------------------------------------------- |  |  |	       |		      	  |
-			    |	      | The ecl_file file implements functinality to load a an         |  |  |	       |		      	  |
+			    |	      | The ecl_file file implements functionality to load a an         |  |  |	       |		      	  |
 			    |	      | ECLIPSE file consisting of ecl_kw_type vectors. The ecl_file   |  |  |	       |		      	  |
 	|-----------------------------| instance can either be used to load fthe full content of a     |  |  |	       |		      	  |
-       	|      	       	    |  	      | file, or it can stop loading when a certain keyowrd is         |  |  |	       |		      	  |
+       	|      	       	    |  	      | file, or it can stop loading when a certain keyword is         |  |  |	       |		      	  |
 	|		    |	      | reached. The latter is useful for loading parts of a unified   |  |  |	       |		      	  |
 	|		    |	      | summary/restart file.                                          |  |  |	       |		      	  |
 	|		    |	      | ecl_file is a simplification of the functionality which        |  |  |	       |		      	  |
-	|		    |	      | prevously existed in ecl_block/ecl_fstate.                     |  |  |	       |		      	  |
+	|		    |	      | previously existed in ecl_block/ecl_fstate.                     |  |  |	       |		      	  |
 	|		    |	       \______________________________________________________________/	  |  |	       |		      	  |
         |                   |             |	 			 |     	 	       		  | \|/	       |		      	  |
 	|		    |		  |	 			 |     	 	       		  |  |	       |		      	  |

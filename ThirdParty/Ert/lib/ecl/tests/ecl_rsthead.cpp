@@ -27,7 +27,7 @@
 #include <ert/ecl/ecl_rsthead.hpp>
 
 
-void test_file( const char * filename , int occurence , bool exists , const ecl_rsthead_type * true_header) {
+void test_file( const char * filename , int occurrence , bool exists , const ecl_rsthead_type * true_header) {
   int report_step = ecl_util_filename_report_nr( filename );
   ecl_file_type * rst_file = ecl_file_open( filename , 0);
   ecl_file_enum file_type = ecl_util_get_file_type( filename , NULL , NULL );
@@ -37,14 +37,14 @@ void test_file( const char * filename , int occurence , bool exists , const ecl_
   if (file_type == ECL_RESTART_FILE)
     rst_view = ecl_file_get_global_view( rst_file );
   else
-    rst_view = ecl_file_get_restart_view( rst_file , occurence , -1 , -1 , -1 );
+    rst_view = ecl_file_get_restart_view( rst_file , occurrence , -1 , -1 , -1 );
 
   if (exists) {
     test_assert_not_NULL( rst_view );
     rst_head = ecl_rsthead_alloc( rst_view , report_step);
     test_assert_not_NULL( rst_head );
 
-    if (occurence == 0) {
+    if (occurrence == 0) {
       ecl_rsthead_type * rst_head0 = ecl_rsthead_alloc( rst_view , report_step );
 
       test_assert_true( ecl_rsthead_equal( rst_head , rst_head0 ));

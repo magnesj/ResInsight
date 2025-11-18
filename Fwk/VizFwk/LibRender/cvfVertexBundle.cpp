@@ -444,7 +444,7 @@ void VertexBundle::releaseBufferObjectsGPU()
 /// If buffer objects have been created and uploaded for the bundle, they will be used. Otherwise 
 /// the vertex attrib pointers will be set up from client memory.
 /// 
-/// \warning Remember to call finishUseBundle() when finsihed drawing with this bundle.
+/// \warning Remember to call finishUseBundle() when finished drawing with this bundle.
 /// \warning Requires at least OpenGL2 capability. Will assert if this condition is not met.
 //--------------------------------------------------------------------------------------------------
 void VertexBundle::useBundle(OpenGLContext* oglContext, VertexBundleUsage* bundleUsage, ShaderProgram* shaderProgram) const

@@ -434,7 +434,7 @@ static void print_var( FILE * stream , const char * var , double q , const char 
         Now - the totally confusing part is that it is not clear what
         S3Graph expects on this third line, in the case of well/group
         variables it is a well/group name from the WGNAMES array,
-        whereas for e.g. a region or block varaiable it wants an
+        whereas for e.g. a region or block variable it wants an
         element from the NUMS array, and for e.g. a field variable it
         wants nothing extra. When it comes to variables which need
         both NUMS and WGNAMES to become unique (e.g completion
@@ -774,7 +774,7 @@ void usage() {
   printf("     HEADER: Like plain, but with a header at the top\n\n");
   printf("  The remaining arguments on the output line corresponds to the \n");
   printf("  summary vector & quantile you are interested in. Each of these values\n");
-  printf("  is a \":\" separated string consting of:\n");
+  printf("  is a \":\" separated string consisting of:\n");
   printf("  \n");
   printf("     VAR: The ECLIPSE summary variable we are interested in, (nearly)\n");
   printf("          all variables found in the summary file are available,\n");
@@ -783,7 +783,7 @@ void usage() {
   printf("     WG?: This is extra information added to the variable to make it\n");
   printf("          unique, e.g. the name of a well or group for rate variables\n");
   printf("          and the region number for a region. Not all variables, in\n");
-  printf("          particalar the field rates, Fxxx, have this string.\n");
+  printf("          particular the field rates, Fxxx, have this string.\n");
   printf("\n");
   printf("     Q:   The quantile we are interested in, e.g 0.10 to get the P10\n");
   printf("          quantile and 0.90 to get the P90 quantile.\n");

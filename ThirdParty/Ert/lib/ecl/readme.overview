@@ -1,5 +1,5 @@
 The EnKF functionality is organized in xxx libraries with different
-functionalities. The different libraries depend on eachother, and the
+functionalities. The different libraries depend on each other, and the
 libraries must be built in correct order. The dependencies is as
 follows:
 

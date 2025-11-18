@@ -86,7 +86,7 @@ inline size_t page_size()
 }
 
 /**
- * Alligns `offset` to the operating's system page size such that it subtracts the
+ * Aligns `offset` to the operating's system page size such that it subtracts the
  * difference until the nearest page boundary before `offset`, or does nothing if
  * `offset` is already page aligned.
  */
@@ -333,7 +333,7 @@ public:
     const_reference operator[](const size_type i) const noexcept { return data_[i]; }
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *
@@ -357,7 +357,7 @@ public:
             const size_type length, std::error_code& error);
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *
@@ -376,7 +376,7 @@ public:
 
     /**
      * Establishes a memory mapping with AccessMode. If the mapping is
-     * unsuccesful, the reason is reported via `error` and the object remains in
+     * unsuccessful, the reason is reported via `error` and the object remains in
      * a state as if this function hadn't been called.
      *
      * `handle`, which must be a valid file handle, which is used to memory map the
@@ -398,7 +398,7 @@ public:
 
     /**
      * Establishes a memory mapping with AccessMode. If the mapping is
-     * unsuccesful, the reason is reported via `error` and the object remains in
+     * unsuccessful, the reason is reported via `error` and the object remains in
      * a state as if this function hadn't been called.
      *
      * `handle`, which must be a valid file handle, which is used to memory map the
@@ -1340,7 +1340,7 @@ inline size_t page_size()
 }
 
 /**
- * Alligns `offset` to the operating's system page size such that it subtracts the
+ * Aligns `offset` to the operating's system page size such that it subtracts the
  * difference until the nearest page boundary before `offset`, or does nothing if
  * `offset` is already page aligned.
  */
@@ -1580,7 +1580,7 @@ public:
     const_reference operator[](const size_type i) const noexcept { return (*pimpl_)[i]; }
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *
@@ -1607,7 +1607,7 @@ public:
     }
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *
@@ -1625,7 +1625,7 @@ public:
     }
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *
@@ -1650,7 +1650,7 @@ public:
     }
 
     /**
-     * Establishes a memory mapping with AccessMode. If the mapping is unsuccesful, the
+     * Establishes a memory mapping with AccessMode. If the mapping is unsuccessful, the
      * reason is reported via `error` and the object remains in a state as if this
      * function hadn't been called.
      *

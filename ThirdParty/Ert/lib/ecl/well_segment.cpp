@@ -185,7 +185,7 @@ bool well_segment_link( well_segment_type * segment , well_segment_type * outlet
     return true;
   } else
     /*
-       This is a quite fatal topological error - and aborting is probaly the wisest
+       This is a quite fatal topological error - and aborting is probably the wisest
        thing to do. I.e.  the function well_segment_link_strict() is recommended.
     */
     return false;

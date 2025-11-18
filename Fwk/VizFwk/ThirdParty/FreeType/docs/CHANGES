@@ -970,7 +970,7 @@ CHANGES BETWEEN 2.1.10 and 2.1.9
 
     - The BDF driver  no longer converts  all returned bitmaps  with a
       depth of 2bpp or 4bpp to a depth of 8bpp.  The documentation has
-      not  mentioned  this  explicitly,  but  implementors  might have
+      not  mentioned  this  explicitly,  but  implementers  might have
       relied on this after looking into the source files.
 
     - A new option `--ftversion' has been  added to freetype-config to
@@ -1778,7 +1778,7 @@ CHANGES BETWEEN 2.1.0 and 2.0.9
       Otherwise,  it  will display  a  message  proposing  to use  the
       GNUMAKE environment variable to name it.
 
-      The Unix-specific file README.UNX has been modified accordingly.
+      The Unix-specific file README.UNIX has been modified accordingly.
 
 
   III. MISCELLANEOUS
@@ -2359,7 +2359,7 @@ CHANGES BETWEEN 2.0.2 and 2.0.1
         when they shouldn't.
       * Many casts were added to  make the code more 64-bits safe.  It
         also now compiles on Windows XP 64-bits without warnings.
-      * Some incorrect writable statics were removed in the `autohint'
+      * Some incorrect writable statistics were removed in the `autohint'
         and `pcf' drivers.  FreeType 2 now compiles on Epoc again.
 
 
@@ -2502,7 +2502,7 @@ CHANGES BETWEEN beta8 and 2.0
       been removed.
 
   - Revamped the  build system  to make it  a lot more  generic.  This
-    will  allow us  to  re-use  nearly un-modified  in  lots of  other
+    will  allow us  to  reuse  nearly un-modified  in  lots of  other
     projects (including FreeType Layout).
 
   - Changed `cid' to use `psaux' too.
@@ -2781,7 +2781,7 @@ BETA-8 (RELEASE CANDIDATE) CHANGES
         automatically when needed.
 
   - Reformatted all  modules source  code in order  to get rid  of the
-    basic data types redifinitions (i.e. `TT_Int' instead of `FT_Int',
+    basic data types redefinitions (i.e. `TT_Int' instead of `FT_Int',
     `T1_Fixed'  instead  of  `FT_Fixed').  Hence  the  format-specific
     prefixes like  `TT_', `T1_',  `T2_' and `CID_'  are only  used for
     relevant structures.
@@ -2817,7 +2817,7 @@ OLD CHANGES FOR BETA 7
     `recognized' as TrueType font files..
 
   - moved a lot of stuff from  the TrueType driver to the SFNT module,
-    this   allows   greater   code   re-use   between   font   drivers
+    this   allows   greater   code   reuse   between   font   drivers
     (e.g. TrueType, OpenType, Compact-TrueType, etc..)
 
   - added a tiny segment cache to the SFNT Charmap 4 decoder, in order

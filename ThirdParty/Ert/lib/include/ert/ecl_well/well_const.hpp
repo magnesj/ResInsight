@@ -121,7 +121,7 @@ extern "C" {
   ones given in the enum below. Unfortunately it turns out that when
   the well is closed the integer value in the IWEL array can be 0, if
   the well is indeed closed we accept this zero - otherwise we fail
-  hard. Theese hoops are in the well_state_alloc() routine.
+  hard. These hoops are in the well_state_alloc() routine.
 */
 
 #define IWEL_UNDOCUMENTED_ZERO 0

@@ -33,7 +33,7 @@ namespace NRLib {
   public:
     enum FileFormat {STORM_BINARY = 0, STORM_ASCII};
 
-    explicit StormContGrid(const std::string& filename, Endianess file_format = END_BIG_ENDIAN);
+    explicit StormContGrid(const std::string& filename, Endianness file_format = END_BIG_ENDIAN);
     explicit StormContGrid(size_t nx = 0, size_t ny = 0, size_t nz = 0);
     explicit StormContGrid(const Volume &vol, const Grid<float> & grid);
     explicit StormContGrid(const Volume &vol, size_t nx = 0, size_t ny = 0, size_t nz = 0);
@@ -76,18 +76,18 @@ namespace NRLib {
     void WriteToFile(const std::string& filename,
                      const std::string& predefinedHeader = "",
                      bool plainAscii=false,
-                     Endianess file_format = END_BIG_ENDIAN,
+                     Endianness file_format = END_BIG_ENDIAN,
                      bool remove_path = true) const;
 
     void WriteToSgriFile(const std::string & file_name,
                          const std::string & file_name_header,
                          const std::string & label,
                          double              simbox_dz,
-                         Endianess           file_format = END_BIG_ENDIAN) const;
+                         Endianness           file_format = END_BIG_ENDIAN) const;
 
     /// \throw IOError if the file can not be opened.
     /// \throw FileFormatError if file format is not either storm_binary or storm_ascii, or if grid contains barriers.
-    void ReadFromFile(const std::string& filename, bool commonPath = true, Endianess file_format = END_BIG_ENDIAN);
+    void ReadFromFile(const std::string& filename, bool commonPath = true, Endianness file_format = END_BIG_ENDIAN);
 
     double GetDX() const       { return GetLX() / GetNI(); }
     double GetDY() const       { return GetLY() / GetNJ(); }

@@ -34,7 +34,7 @@ To avoid conflict with other application using the ert libraries the
 Python code should be able to locate the shared libraries without
 (necessarily) using the LD_LIBRARY_PATH variable. The default
 behaviour is to try to load from the library ../../lib64, but by using
-the enviornment variable ERT_LIBRARY_PATH you can alter how ert looks
+the environment variable ERT_LIBRARY_PATH you can alter how ert looks
 for shared libraries.
 
    1. By default the code will try to load the shared libraries from

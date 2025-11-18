@@ -102,7 +102,7 @@ namespace Catch {
 // The following features are defined:
 //
 // CATCH_CONFIG_COUNTER : is the __COUNTER__ macro supported?
-// CATCH_CONFIG_WINDOWS_SEH : is Windows SEH supported?
+// CATCH_CONFIG_WINDOWS_SEH : is Windows SHE supported?
 // CATCH_CONFIG_POSIX_SIGNALS : are POSIX signals supported?
 // ****************
 // Note to maintainers: if new toggles are added please document them
@@ -171,7 +171,7 @@ namespace Catch {
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////
-// Not all Windows environments support SEH properly
+// Not all Windows environments support SHE properly
 #if defined(__MINGW32__)
 #    define CATCH_INTERNAL_CONFIG_NO_WINDOWS_SEH
 #endif
@@ -194,7 +194,7 @@ namespace Catch {
 #    define CATCH_INTERNAL_CONFIG_CPP17_UNCAUGHT_EXCEPTIONS
 #  endif
 
-// Universal Windows platform does not support SEH
+// Universal Windows platform does not support SHE
 // Or console colours (or console at all...)
 #  if defined(WINAPI_FAMILY) && (WINAPI_FAMILY == WINAPI_FAMILY_APP)
 #    define CATCH_CONFIG_COLOUR_NONE
@@ -2465,7 +2465,7 @@ public:
 
     // The following functions create the actual matcher objects.
     // The user has to explicitly specify type to the function, because
-    // infering std::function<bool(T const&)> is hard (but possible) and
+    // inferring std::function<bool(T const&)> is hard (but possible) and
     // requires a lot of TMP.
     template<typename T>
     Generic::PredicateMatcher<T> Predicate(std::function<bool(T const&)> const& predicate, std::string const& description = "") {
@@ -7349,7 +7349,7 @@ namespace {
     }
 }
 
-#endif // signals/SEH handling
+#endif // signals/SHE handling
 
 #if defined( CATCH_CONFIG_WINDOWS_SEH )
 
@@ -7488,7 +7488,7 @@ namespace Catch {
     void FatalConditionHandler::reset() {}
 }
 
-#endif // signals/SEH handling
+#endif // signals/SHE handling
 
 #if defined(__GNUC__)
 #    pragma GCC diagnostic pop
@@ -10056,7 +10056,7 @@ namespace Catch {
     void enforceNotReservedTag( std::string const& tag, SourceLineInfo const& _lineInfo ) {
         CATCH_ENFORCE( !isReservedTag(tag),
                       "Tag name: [" << tag << "] is not allowed.\n"
-                      << "Tag names starting with non alpha-numeric characters are reserved\n"
+                      << "Tag names starting with non alphanumeric characters are reserved\n"
                       << _lineInfo );
     }
 

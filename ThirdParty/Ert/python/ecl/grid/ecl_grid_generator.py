@@ -98,7 +98,7 @@ class EclGridGenerator:
         # If we have not succeeded in creatin the grid we *assume* the
         # error is due to a failed malloc.
         if ecl_grid is None:
-            raise MemoryError("Failed to allocated regualar grid")
+            raise MemoryError("Failed to allocated regular grid")
 
         return ecl_grid
 
@@ -217,14 +217,14 @@ class EclGridGenerator:
 
         # Validate arguments
         if min(dims + dV) <= 0:
-            raise ValueError("Expected positive grid and cell dimentions")
+            raise ValueError("Expected positive grid and cell dimensions")
 
         if offset < 0:
             raise ValueError("Expected non-negative offset")
 
         if irregular and offset + (dz/2. if irregular_offset else 0) > dz:
             raise AssertionError("Arguments can result in self-" +
-                    "intersecting cells. Increase dz, deactivate eiter " +
+                    "intersecting cells. Increase dz, deactivate either " +
                     "irregular or irregular_offset, or decrease offset to avoid " +
                     "any problems")
 
@@ -236,11 +236,11 @@ class EclGridGenerator:
             misalign=False):
         """
         Will create a new grid where each cell is a parallelogram (skewed by z-value).
-        The number of cells are given by @dims = (nx, ny, nz) and the dimention
+        The number of cells are given by @dims = (nx, ny, nz) and the dimension
         of each cell by @dV = (dx, dy, dz).
 
         All cells are guaranteed to not be self-intersecting. Hence, no twisted
-        cells and somewhat meaningfull cells.
+        cells and somewhat meaningful cells.
 
         @offset gives how much the layers should fluctuate or "wave" as you
         move along the X-axis.
@@ -260,7 +260,7 @@ class EclGridGenerator:
         @faults decides if there are to be faults in the grid.
 
         @scale A positive number that scales the "lower" endpoint of all
-        coord's. In particular, @scale != 1 creates trapeziod cells in both the XZ
+        coord's. In particular, @scale != 1 creates trapezoid cells in both the XZ
         and YZ-plane.
 
         @translation the lower part of the grid is translated ("slided") by the specified
@@ -322,7 +322,7 @@ class EclGridGenerator:
         Raises an AssertionError if the zcorn is not as expected. In
         patricular, it is verified that:
 
-            - zcorn has the approperiate length (8*nx*ny*nz) and
+            - zcorn has the appropriate length (8*nx*ny*nz) and
             - that no cell is twisted.
 
         """
@@ -411,7 +411,7 @@ class EclGridGenerator:
         Raises an AssertionError if the coord is not as expected. In
         particular, it is verified that:
 
-            - coord has the approperiate length (6*(nx+1)*(ny+1)) and
+            - coord has the appropriate length (6*(nx+1)*(ny+1)) and
             - that all values are positive unless negative_values are
               explicitly allowed.
 
@@ -425,7 +425,7 @@ class EclGridGenerator:
 
         if not negative_values and min(coord) < 0:
             raise AssertionError("Negative COORD values was generated. " +
-                    "This is likely due to a tranformation. " +
+                    "This is likely due to a transformation. " +
                     "Increasing the escape_origio_shift will most likely " +
                     "fix the problem")
 
@@ -436,7 +436,7 @@ class EclGridGenerator:
         Raises an AssertionError if the actnum is not as expected. In
         particular, it is verified that:
 
-            - actnum has the approperiate length nx*ny*nz and
+            - actnum has the appropriate length nx*ny*nz and
             - that all values are either 0 or 1.
 
         """
@@ -608,7 +608,7 @@ class EclGridGenerator:
         Extracts subgrid data from COORD, ZCORN and potentially ACTNUM. It
         returns similar formatted data for the subgrid described by the bounds.
 
-        @dims: The dimentions (nx, ny, nz) of the grid
+        @dims: The dimensions (nx, ny, nz) of the grid
 
         @coord: The COORD data of the grid.
 

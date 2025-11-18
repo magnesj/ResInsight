@@ -83,7 +83,7 @@ ref<UIntArray> TriangleVertexSplitter::triangleIndices()
 
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the new vertex array containg only the referenced nodes in the triangle mesh, but with
+/// Returns the new vertex array containing only the referenced nodes in the triangle mesh, but with
 /// split nodes wherever needed.
 //--------------------------------------------------------------------------------------------------
 ref<Vec3fArray> TriangleVertexSplitter::vertexArray()

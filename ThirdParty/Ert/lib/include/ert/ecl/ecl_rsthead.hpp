@@ -51,7 +51,7 @@ extern "C" {
     /* All fields below the line are taken literally (apart from
        lowercasing) from the section about restart files in the
        ECLIPSE File Formats Reference Manual. The elements typically
-       serve as dimensions in the ?WEL, ?SEG and ?CON arrays.
+       serve as dimensions in the ?WELL, ?SEG and ?CON arrays.
     */
 
     // Pure well properties

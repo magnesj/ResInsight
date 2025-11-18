@@ -33,7 +33,7 @@ class Ecl3DKW(EclKW):
     [i,j,k] indexing, and a defined default value which is used when
     reading an inactive value. The Ecl3DKW keyword instances are
     returned from the EclInitFile and EclRestartFile classes, in
-    addition you can excplicitly \"cast\" a EclKW keyword to Ecl3DKW
+    addition you can explicitly \"cast\" a EclKW keyword to Ecl3DKW
     with the Ecl3DKW.castFromKW() classmethod.
 
     Usage example:

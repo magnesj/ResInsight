@@ -19,10 +19,10 @@
 
   This file has no information about how to index into the PARAMS
   vector, i.e. at which location can the WWCT for well P6 be found,
-  that is responsability of the ecl_smspec_type.
+  that is responsibility of the ecl_smspec_type.
 
   The time direction in this system is implemented in terms of
-  ministeps. There are some query / convert functons based on report
+  ministeps. There are some query / convert functions based on report
   steps.
 */
 
@@ -60,7 +60,7 @@
 
    Observe the following:
 
-     * The MINISTEP counter runs continously, and does not
+     * The MINISTEP counter runs continuously, and does not
        differentiate between unified files and not unified files.
 
      * When using multiple files we can read off the report number
@@ -69,7 +69,7 @@
        report_step 1 and then count afterwards.
 
      * When asking for a summary variable at a particular REPORT STEP
-       (as we do in enkf) it is ambigous as to which ministep within
+       (as we do in enkf) it is ambiguous as to which ministep within
        the block one should use. The convention we have employed
        (which corresponds to the old RPTONLY based behaviour) is to
        use the last ministep in the block.
@@ -82,7 +82,7 @@
 
 
 
-   About MINISTEP, REPORTSTEP, rates and continous sim_time/sim_days:
+   About MINISTEP, REPORTSTEP, rates and continuous sim_time/sim_days:
    ------------------------------------------------------------------
 
    For ECLIPSE summary files the smallest unit of time resolution is
@@ -102,7 +102,7 @@
           M1     M2           M3                 M4                      M5                     M6
 
    The first reportstep consist of four ministeps, the second
-   reportstep consits of only two ministeps. As a user you have no
+   reportstep consists of only two ministeps. As a user you have no
    control over the length/number of ministeps apart from:
 
       1. Indirectly through the TUNING keywords.
@@ -130,7 +130,7 @@
         reservoir state at THE END OF THE MINISTEP.
 
    This difference between state variables and rates implies a
-   difference in how continous time-variables (in the middle of a
+   difference in how continuous time-variables (in the middle of a
    ministep) are reported, i.e.
 
 
@@ -140,7 +140,7 @@
                                                 |
                                                 |
 
-   We have enteeed the sim_days/sim_time cooresponding to the location
+   We have enteeed the sim_days/sim_time corresponding to the location
    of 'X' on the timeline, i.e. in the middle of ministep M3. If we
    are interested in the rate at this time the function:
 
@@ -156,8 +156,8 @@
 
    Indexing and _get() versus _iget()
    ----------------------------------
-   As already mentionded the set of ministeps is not necessarrily a
-   continous series, we can easily have a series of ministeps with
+   As already mentionded the set of ministeps is not necessarily a
+   continuous series, we can easily have a series of ministeps with
    "holes" in it, and the series can also start on a non-zero
    value. Internally all the ministeps are stored in a dense, zero
    offset vector instance; and we must be able to translate back and

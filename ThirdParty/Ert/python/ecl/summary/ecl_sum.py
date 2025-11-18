@@ -160,7 +160,7 @@ class EclSum(BaseCClass):
         component, and also an extension - the latter will be ignored.
 
         The @join_string is the string used when combining elements
-        from the WGNAMES, KEYWORDS and NUMS vectors into a composit
+        from the WGNAMES, KEYWORDS and NUMS vectors into a composite
         key; with @join_string == ":" the water cut in well OP_1 will
         be available as "WWCT:OP_1".
 
@@ -752,7 +752,7 @@ are advised to fetch vector as a numpy vector and then scale that yourself:
         """
         Will lookup vector @key at time given by @days or @date.
 
-        Requiers exactly one input argument @days or @date; will raise
+        Requires exactly one input argument @days or @date; will raise
         exception ValueError if this is not satisfied.
 
         The method will check that the time argument is within the
@@ -920,7 +920,7 @@ are advised to fetch vector as a numpy vector and then scale that yourself:
         """
         Will return numpy vector with interpolated values.
 
-        Requiers exactly one input argument @days or @date; will raise
+        Requires exactly one input argument @days or @date; will raise
         exception ValueError if this is not satisfied.
 
         The method will check that the time arguments are within the
@@ -1065,7 +1065,7 @@ are advised to fetch vector as a numpy vector and then scale that yourself:
     # In addition to the get_xxx() methods there are properties with
     # the same name (excluding the 'get'); these properties correspond
     # to an get_xxx() invocation with optional argument report_only
-    # set to False (i.e. the defualt).
+    # set to False (i.e. the default).
 
     @property
     def days(self):
@@ -1203,7 +1203,7 @@ are advised to fetch vector as a numpy vector and then scale that yourself:
     def sim_length(self):
         """Will return the total time span for the simulation data.
 
-        The lengt will be returned in time unit used in the simulation data;
+        The length will be returned in time unit used in the simulation data;
         i.e. typically days.
         """
         return self.getSimulationLength()

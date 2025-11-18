@@ -201,7 +201,7 @@
                                         GXV_Validator  valid )
   {
     FT_Bytes   p = table;
-    FT_Fixed   substThreshhold; /* Apple misspelled "Threshhold" */
+    FT_Fixed   substThreshhold; /* Apple misspelled "Threshold" */
     FT_UShort  addGlyph;
     FT_UShort  substGlyph;
 

@@ -1,6 +1,6 @@
 # This macro will initialize the current cmake session for Python. The
 # macro starts by looking for the Python interpreter of correct
-# version. When a Python interepreter of the correct version has been
+# version. When a Python interpreter of the correct version has been
 # located the macro will continue to set variables, load other cmake
 # modules and generate scripts to be used in the remaining part of the
 # cmake process. 

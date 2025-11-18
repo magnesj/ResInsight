@@ -25,7 +25,7 @@
     - functions ftell() and fseek() must use 64 bit offset types.
     - The size field in struct stat must be 64 bit.
 
-  On linux (at least on 64 bit platform) this is the deafult,
+  On linux (at least on 64 bit platform) this is the default,
   i.e. large files can be accessed out of the box. On windows the
   situaton is more complicated:
 

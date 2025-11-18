@@ -790,7 +790,7 @@ class EclRegion(BaseCClass):
         """
         Will select all points outside polygon.
 
-        See select_inside_polygon for more docuemntation.
+        See select_inside_polygon for more documentation.
         """
         self._select_outside_polygon( CPolyline( init_points = points ))
 
@@ -798,7 +798,7 @@ class EclRegion(BaseCClass):
         """
         Will select all points outside polygon.
 
-        See select_inside_polygon for more docuemntation.
+        See select_inside_polygon for more documentation.
         """
         self._deselect_inside_polygon( CPolyline( init_points = points ))
 
@@ -806,7 +806,7 @@ class EclRegion(BaseCClass):
         """
         Will select all points outside polygon.
 
-        See select_inside_polygon for more docuemntation.
+        See select_inside_polygon for more documentation.
         """
         self._deselect_outside_polygon( CPolyline( init_points = points ))
 
@@ -869,7 +869,7 @@ class EclRegion(BaseCClass):
         """
         The functions iadd_kw(), copy_kw(), set_kw(), scale_kw() and
         shift_kw() are not meant to be used as methods of the
-        EclRegion class (altough that is of course perfectly OK) -
+        EclRegion class (although that is of course perfectly OK) -
         rather a EclRegion instance is passed as an argument to an
         EclKW method, and then that method "flips things around" and
         calls one of these methods with the EclKW instance as

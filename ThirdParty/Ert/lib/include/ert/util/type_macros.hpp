@@ -21,7 +21,7 @@ extern "C" {
    the arguments to callback functions like pthread_create.
 
     UTIL_TYPE_ID_DECLARATION: Adds a field "int __type_id;" to the
-      struct defintion.
+      struct definition.
 
     UTIL_TYPE_ID_INIT: Should be added to the allocation routine,
       inserts a "->__type_id = magic_int;" code line in the alloc

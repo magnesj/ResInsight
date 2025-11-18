@@ -61,7 +61,7 @@ void well_conn_collection_add( well_conn_collection_type * wellcc , well_conn_ty
 }
 
 /*
-  The collection only stores a refernce to the object, which will be destroyed by 'someone else'.
+  The collection only stores a reference to the object, which will be destroyed by 'someone else'.
 */
 
 void well_conn_collection_add_ref( well_conn_collection_type * wellcc , well_conn_type * conn) {

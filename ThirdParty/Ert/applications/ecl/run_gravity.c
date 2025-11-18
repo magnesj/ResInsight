@@ -129,7 +129,7 @@ void print_usage(int line) {
   fprintf(stderr,"\n");
   fprintf(stderr,"    bash%%  run_gravity.x  BASE_CASE  10 178  ../config/grav_stations\n");
   fprintf(stderr,"\n");
-  fprintf(stderr,"This will look up restart/grid/init files in the current dirtectory,\n");
+  fprintf(stderr,"This will look up restart/grid/init files in the current directory,\n");
   fprintf(stderr,"for a simulation with baseame 'BASE_CASE'. It will compare report\n");
   fprintf(stderr,"steps 10 and 178, and load station locations from the file\n");
   fprintf(stderr,"'../config/grav_stations'. \n");
@@ -144,7 +144,7 @@ void print_usage(int line) {
   fprintf(stderr,"and you must give all the required files as arguments on the command\n");
   fprintf(stderr,"line. This is the most flexible approach, in addition to files stored\n");
   fprintf(stderr,"different places this also allows to combine files with different\n");
-  fprintf(stderr,"ECLISPE basenames. There are two different ways to enter restart\n");
+  fprintf(stderr,"ECLIPSE basenames. There are two different ways to enter restart\n");
   fprintf(stderr,"information, depending on whether you use unified or non-unified\n");
   fprintf(stderr,"restart files.\n");
   fprintf(stderr,"\n");
@@ -159,7 +159,7 @@ void print_usage(int line) {
   fprintf(stderr,"     bash%% run_gravity.x CASE_3.X0010  ../path/CASE_2.X0178  /path/init/BASE_CASE.INIT   /path/to/grid/BASE_CASE.EGRID  ../config/stations.txt\n");
   fprintf(stderr,"     \n");
   fprintf(stderr,"\n");
-  fprintf(stderr,"  When the program has completed succesfully it will write the changes\n");
+  fprintf(stderr,"  When the program has completed successfully it will write the changes\n");
   fprintf(stderr,"  in local gravity to a file 'RUN_GRAVITY.out', in addition the same\n");
   fprintf(stderr,"  information (with something more) will be sent to stdout.\n");
   fprintf(stderr,"\n");
@@ -206,7 +206,7 @@ static void grav_station_add_obs( grav_station_type * g , double obs, double std
 /**
    The station information is in a file with the following rules:
 
-    1. Each station on a seperate line.
+    1. Each station on a separate line.
     2. For each station we have four items:
 -----
          name   utm_x  utm_y   depth
@@ -955,7 +955,7 @@ int main(int argc , char ** argv) {
     /* 
        OK - now it seems the provided files have all the information
        we need. Let us start using it. The main loop is run in
-       parallell on four threads - most people have four cores these
+       parallel on four threads - most people have four cores these
        days.
     */
     {

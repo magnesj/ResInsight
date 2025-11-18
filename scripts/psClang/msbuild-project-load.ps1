@@ -208,7 +208,7 @@ Function InitializeMsBuildProjectProperties()
     Set-Var -name "MSBuildProjectName"       -value (Get-FileName -path $global:vcxprojPath -noext)
     Set-Var -name "MSBuildProjectDirectory"  -value (Get-FileDirectory -filePath $global:vcxprojPath)
     Set-Var -name "MSBuildProgramFiles32"    -value "${Env:ProgramFiles(x86)}"
-    # defaults for projectname and targetname, may be overriden by project settings
+    # defaults for projectname and targetname, may be overridden by project settings
     Set-Var -name "ProjectName"              -value $MSBuildProjectName
     Set-Var -name "TargetName"               -value $MSBuildProjectName
 

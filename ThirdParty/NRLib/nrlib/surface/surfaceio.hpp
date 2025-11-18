@@ -166,7 +166,7 @@ void NRLib::ReadStormBinarySurf(const std::string & filename,
     surface.SetName(GetStem(filename));
   }
   catch (EndOfFile& ) {
-    throw FileFormatError("Unexcpected end of file found while parsing "
+    throw FileFormatError("Unexpected end of file found while parsing "
                            " \"" + filename + "\"");
   }
   catch (Exception& e) {
@@ -248,7 +248,7 @@ void NRLib::ReadIrapClassicAsciiSurf(const std::string & filename,
     }
   }
   catch (EndOfFile& ) {
-    throw FileFormatError("Unexcpected end of file found while parsing "
+    throw FileFormatError("Unexpected end of file found while parsing "
                           " \"" + filename + "\"");
   }
   catch (Exception& e) {

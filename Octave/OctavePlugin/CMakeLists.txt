@@ -77,7 +77,7 @@ message(STATUS "Compiling Octave plugins using : ${OCTAVE_MKOCTFILE}")
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
   option(RESINSIGHT_OCTAVE_PLUGIN_QT
-         "Compile Octave plugin using Qt located insided Octave root folder" ON
+         "Compile Octave plugin using Qt located inside Octave root folder" ON
   )
 endif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 
@@ -196,7 +196,7 @@ if(OCTAVE_MKOCTFILE)
 
   endforeach()
 
-  # Create depencedy string represeting the full path to all generated oct-files
+  # Create depencedy string representing the full path to all generated oct-files
   foreach(item ${CPP_SOURCES})
     string(REPLACE ".cpp" ".oct" item ${item})
     list(APPEND DEPENDENCY_STRING ${CMAKE_CURRENT_BINARY_DIR}/${item})
@@ -219,7 +219,7 @@ if(OCTAVE_MKOCTFILE)
         "Target ResInsight exists, add copy of Octave plugins to ApplicationExeCode folder"
     )
 
-    # Make ResInsight dependant on Octave, makes it easiser to debug Octave
+    # Make ResInsight dependent on Octave, makes it easiser to debug Octave
     # functionality by compiling ResInsight
     add_dependencies(ResInsight octave_plugins)
 

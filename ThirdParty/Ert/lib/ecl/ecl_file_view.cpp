@@ -33,7 +33,7 @@
 struct ecl_file_view_struct {
   std::vector<ecl_file_kw_type *>   kw_list;
   std::map<std::string,std::vector<int>> kw_index;
-  std::vector<std::string> distinct_kw;  /* A list of the keywords occuring in the file - each string occurs ONLY ONCE. */
+  std::vector<std::string> distinct_kw;  /* A list of the keywords occurring in the file - each string occurs ONLY ONCE. */
   fortio_type       * fortio;       /* The same fortio instance pointer as in the ecl_file styructure. */
   bool                owner;        /* Is this map the owner of the ecl_file_kw instances; only true for the global_map. */
   inv_map_type      * inv_map;      /* Shared reference owned by the ecl_file structure. */
@@ -326,18 +326,18 @@ int ecl_file_view_iget_occurence( const ecl_file_view_type * ecl_file_view , int
   const char * header              = ecl_file_kw_get_header( file_kw );
   const auto& index_vector         = ecl_file_view->kw_index.at(header);
 
-  int occurence = -1;
+  int occurrence = -1;
   {
     /* Manual reverse lookup. */
     for (size_t i=0; i < index_vector.size(); i++) {
       if (index_vector[i] == global_index)
-        occurence = i;
+        occurrence = i;
     }
   }
-  if (occurence < 0)
+  if (occurrence < 0)
     util_abort("%s: internal error ... \n" , __func__);
 
-  return occurence;
+  return occurrence;
 }
 
 void ecl_file_view_fprintf_kw_list(const ecl_file_view_type * ecl_file_view , FILE * stream) {
@@ -352,15 +352,15 @@ void ecl_file_view_fprintf_kw_list(const ecl_file_view_type * ecl_file_view , FI
 }
 
 
-ecl_file_view_type * ecl_file_view_alloc_blockview2(const ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurence) {
-  if ((start_kw != NULL) && ecl_file_view_get_num_named_kw( ecl_file_view , start_kw ) <= occurence)
+ecl_file_view_type * ecl_file_view_alloc_blockview2(const ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurrence) {
+  if ((start_kw != NULL) && ecl_file_view_get_num_named_kw( ecl_file_view , start_kw ) <= occurrence)
     return NULL;
 
 
   ecl_file_view_type * block_map = ecl_file_view_alloc( ecl_file_view->fortio , ecl_file_view->flags , ecl_file_view->inv_map , false);
   size_t kw_index = 0;
   if (start_kw)
-    kw_index = ecl_file_view_get_global_index( ecl_file_view , start_kw , occurence );
+    kw_index = ecl_file_view_get_global_index( ecl_file_view , start_kw , occurrence );
 
   {
     ecl_file_kw_type * file_kw = ecl_file_view->kw_list[kw_index];
@@ -386,13 +386,13 @@ ecl_file_view_type * ecl_file_view_alloc_blockview2(const ecl_file_view_type * e
 /**
    Will return NULL if the block which is asked for is not present.
 */
-ecl_file_view_type * ecl_file_view_alloc_blockview(const ecl_file_view_type * ecl_file_view , const char * header, int occurence) {
-  return ecl_file_view_alloc_blockview2( ecl_file_view , header , header , occurence );
+ecl_file_view_type * ecl_file_view_alloc_blockview(const ecl_file_view_type * ecl_file_view , const char * header, int occurrence) {
+  return ecl_file_view_alloc_blockview2( ecl_file_view , header , header , occurrence );
 }
 
 
-ecl_file_view_type * ecl_file_view_add_blockview(ecl_file_view_type * file_view , const char * header, int occurence) {
-  ecl_file_view_type * child  = ecl_file_view_alloc_blockview2(file_view, header, header, occurence);
+ecl_file_view_type * ecl_file_view_add_blockview(ecl_file_view_type * file_view , const char * header, int occurrence) {
+  ecl_file_view_type * child  = ecl_file_view_alloc_blockview2(file_view, header, header, occurrence);
 
   if (child)
     file_view->child_list.push_back(child);
@@ -401,8 +401,8 @@ ecl_file_view_type * ecl_file_view_add_blockview(ecl_file_view_type * file_view 
 }
 
 
-ecl_file_view_type * ecl_file_view_add_blockview2(ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurence) {
-  ecl_file_view_type * child  = ecl_file_view_alloc_blockview2(ecl_file_view, start_kw , end_kw , occurence);
+ecl_file_view_type * ecl_file_view_add_blockview2(ecl_file_view_type * ecl_file_view , const char * start_kw, const char * end_kw, int occurrence) {
+  ecl_file_view_type * child  = ecl_file_view_alloc_blockview2(ecl_file_view, start_kw , end_kw , occurrence);
 
   if (child)
     ecl_file_view->child_list.push_back(child);
@@ -485,10 +485,10 @@ This restart file has the following features:
 
  o It contains 5 blocks of collected keywords corresponding to one
    time instant, each of these blocks is called a report_step,
-   typcially coming from one DATES keyword in the ECLIPSE
+   typically coming from one DATES keyword in the ECLIPSE
    datafile. Observe that the file does not have the block structure
    visualized on this figure, the only thing separating the blocks in
-   the file is the occurence of a SEQNUM keyword.
+   the file is the occurrence of a SEQNUM keyword.
 
  o Only a few of the report steps are present, namely 0, 5, 10, 20 and
    40.
@@ -496,10 +496,10 @@ This restart file has the following features:
  o The different blocks are not equally long, the fourth block has an
    extra keyword OIL_DEN.
 
-To adress these keywords and blocks using different time coordinates
+To address these keywords and blocks using different time coordinates
 we have introduced the following concepts:
 
- report_step: This corresponds to the value of the SEQNUM keword,
+ report_step: This corresponds to the value of the SEQNUM keyword,
     i.e. to do queries based on the report_step we must load the
     seqnum kewyord and read the value.
 
@@ -509,7 +509,7 @@ we have introduced the following concepts:
         ecl_file_has_report_step( ecl_file , 5 ) => True
         ecl_file_has_report_step( ecl_file , 2 ) => False
 
- sim_time: This correpsonds to the true simulation time of the report
+ sim_time: This corresponds to the true simulation time of the report
     step, the simulation time is stored as integers DAY, MONTH, YEAR
     in the INTEHEAD keyword; the function INTEHEAD_date() will extract
     the DAY, MONTH and YEAR values from an INTEHEAD keyword instance
@@ -524,10 +524,10 @@ we have introduced the following concepts:
     the keyword in the file; this is the unique address of the keyword
     which is used for the final lookup.
 
- occurence: The nth' time a particular keyword has occured in the
-    file, i.e. the SEQNUM keyword in block C is the third occurence of
-    SEQNUM. Instead of occurence xxxx_index is also used to indicate
-    the occurence of keyword xxxx. The occurence number is the integer
+ occurrence: The nth' time a particular keyword has occurred in the
+    file, i.e. the SEQNUM keyword in block C is the third occurrence of
+    SEQNUM. Instead of occurrence xxxx_index is also used to indicate
+    the occurrence of keyword xxxx. The occurrence number is the integer
     argument to the xxx_iget_named_kw() function, and also the final
     call to create blockmaps.
 
@@ -594,7 +594,7 @@ int ecl_file_view_find_sim_time(const ecl_file_view_type * ecl_file_view , time_
 /**
    This function will scan through the ecl_file looking for INTEHEAD
    headers corresponding to sim_time. If sim_time is found the
-   function will return the INTEHEAD occurence number, i.e. for a
+   function will return the INTEHEAD occurrence number, i.e. for a
    unified restart file like:
 
    INTEHEAD  /  01.01.2000
@@ -627,7 +627,7 @@ int ecl_file_view_find_sim_time(const ecl_file_view_type * ecl_file_view , time_
    Observe that the function requires on-the-second-equality; which is
    of course quite strict.
 
-   Each report step only has one occurence of SEQNUM, but one INTEHEAD
+   Each report step only has one occurrence of SEQNUM, but one INTEHEAD
    for each LGR; i.e. one should call iselect_rstblock() prior to
    calling this function.
 */

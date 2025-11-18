@@ -134,7 +134,7 @@ DEFUN_DLD (riGetGridProperty, args, nargout,
     int nargin = args.length ();
     if (nargin < 2)
     {
-        error("riGetGridProperty: Too few arguments. The name of the property and index of the grid requested is neccesary.\n");
+        error("riGetGridProperty: Too few arguments. The name of the property and index of the grid requested is necessary.\n");
         print_usage();
         return octave_value_list ();
     }

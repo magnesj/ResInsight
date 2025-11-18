@@ -73,7 +73,7 @@ double ecl_grav_common_eval_biot_savart( const ecl::ecl_grid_cache& grid_cache ,
         double dist    = sqrt( dist_x*dist_x + dist_y*dist_y + dist_z*dist_z );
 
         /**
-            For numerical precision it might be benficial to use the
+            For numerical precision it might be beneficial to use the
             util_kahan_sum() function to do a Kahan summation.
         */
         sum += weight[index] * dist_z/(dist * dist * dist );
@@ -139,7 +139,7 @@ double ecl_grav_common_eval_geertsma( const ecl::ecl_grid_cache& grid_cache , ec
         double displacement = ecl_grav_common_eval_geertsma_kernel( index, xpos.data() , ypos.data() , zpos.data(), utm_x, utm_y , depth, poisson_ratio, seabed);
 
         /**
-            For numerical precision it might be benficial to use the
+            For numerical precision it might be beneficial to use the
             util_kahan_sum() function to do a Kahan summation.
         */
         sum += weight[index] * displacement;

@@ -311,7 +311,7 @@
 #ifdef FT_CONFIG_OPTION_OLD_INTERNALS
 
     /*
-     * If cmap_index is greater than the maximum number of cachable
+     * If cmap_index is greater than the maximum number of cacheable
      * charmaps, we assume the request is from a legacy rogue client 
      * using old internal header. See include/config/ftoption.h.
      */

@@ -16,7 +16,7 @@
 
 """
   ecl_rft/[EclRFTFile , EclRFT , EclRFTCell]: Loads an ECLIPSE RFT/PLT
-     file, and can afterwords be used to support various queries.
+     file, and can afterwards be used to support various queries.
 """
 
 from .well_trajectory import WellTrajectory

@@ -194,7 +194,7 @@ void util_fread_compressed(void *__data , FILE * stream) {
       int file_offset;
       fread(&file_offset , sizeof offset , 1 , stream);
       if (file_offset != offset)
-        util_abort("%s: something wrong when reding compressed stream - aborting \n",__func__);
+        util_abort("%s: something wrong when reading compressed stream - aborting \n",__func__);
     }
   } while (offset < size);
   free(zbuffer);

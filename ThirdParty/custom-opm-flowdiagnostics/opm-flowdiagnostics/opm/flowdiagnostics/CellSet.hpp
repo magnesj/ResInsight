@@ -57,7 +57,7 @@ namespace FlowDiagnostics
         using IndexSet = std::unordered_set<int>;
 
     public:
-        /// Contruct empty cell set, use insert() to populate.
+        /// Construct empty cell set, use insert() to populate.
         explicit CellSet(CellSetID id);
 
         /// Construct non-empty cell set.

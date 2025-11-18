@@ -155,9 +155,9 @@ ecl_file_kw_type * ecl_file_kw_alloc0( const char * header , ecl_data_type data_
    the input keyword. Typically only the header has been loaded from
    the keyword.
 
-   Observe that it is the users responsability that the @offset
+   Observe that it is the users responsibility that the @offset
    argument in ecl_file_kw_alloc() comes from the same fortio instance
-   as used when calling ecl_file_kw_get_kw() to actually instatiate
+   as used when calling ecl_file_kw_get_kw() to actually instantiate
    the ecl_kw. This is automatically assured when using ecl_file to
    access the ecl_file_kw instances.
 */

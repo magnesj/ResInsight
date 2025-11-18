@@ -487,7 +487,7 @@ class SumTest(EclTest):
 
         # We do not really have support for writing anything else than the
         # default MERIC unit system. To be able to test the read functionality
-        # we therefor monkey-patch the summary files in place.
+        # we therefore monkey-patch the summary files in place.
         with TestAreaContext("unit_test"):
             case = create_case("UNITS")
             case.fwrite()

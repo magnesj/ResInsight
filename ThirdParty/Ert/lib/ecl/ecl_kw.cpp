@@ -135,7 +135,7 @@ UTIL_IS_INSTANCE_FUNCTION(ecl_kw , ECL_KW_TYPE_ID )
 
     o In the formatted ECLIPSE files the characters BOOL_TRUE_CHAR and
       BOOL_FALSE_CHAR are used to represent true and false values
-      repsectively.
+      respectively.
 
     o In the unformatted ECLIPSE files the boolean values are
       represented as integers with the values ECL_BOOL_TRUE_INT and
@@ -880,7 +880,7 @@ const char * ecl_kw_iget_string_ptr( const ecl_kw_type * ecl_kw, int i) {
 
 
 /**
-   This will set the elemnts of the ecl_kw data storage in index to
+   This will set the elements of the ecl_kw data storage in index to
    the value of s8; if s8 is shorter than 8 characters the result will
    be padded, if s8 is longer than 8 characters the characters from 9
    and out will be ignored.
@@ -888,7 +888,7 @@ const char * ecl_kw_iget_string_ptr( const ecl_kw_type * ecl_kw, int i) {
 void ecl_kw_iset_string8(ecl_kw_type * ecl_kw , int index , const char *s8) {
   char * ecl_string = (char *) ecl_kw_iget_ptr( ecl_kw , index );
   if (strlen( s8 ) >= ECL_STRING8_LENGTH) {
-    /* The whole string goes in - possibly loosing content at the end. */
+    /* The whole string goes in - possibly losing content at the end. */
     int i;
     for (i=0; i < ECL_STRING8_LENGTH; i++)
       ecl_string[i] = s8[i];
@@ -931,8 +931,8 @@ void ecl_kw_iset_char_ptr( ecl_kw_type * ecl_kw , int index, const char * s) {
 }
 
 /**
- This function will verify that the given string is of approperiate
- length (0 <= lenght <= data_type.element_size). If so, the elements
+ This function will verify that the given string is of appropriate
+ length (0 <= length <= data_type.element_size). If so, the elements
  of @s will be written to the @ecl_kw string array starting at
  @index. If the input string is shorter than the type length the
  string will be padded with trailing spaces.

@@ -103,7 +103,7 @@ void test_nums_default() {
   /*
     The integer constant default nums corresponds to the symbol nums_unused
     in smspec_node.cpp. It is duplicated here to avoid exporting it - it should
-    not really be a publically available symbol.
+    not really be a publicly available symbol.
   */
 
   test_assert_int_equal( field_node.get_num(), default_nums);

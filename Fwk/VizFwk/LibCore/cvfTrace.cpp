@@ -149,7 +149,7 @@ void Trace::showTraceOutput(String text, bool addNewLine)
 
     // Show output in "Output window" in Visual Studio
 #if defined(WIN32) && defined(_DEBUG)
-    // Alternativly use OutputDebugStringA(text.toAscii().ptr()); if this does not work on some platforms
+    // Alternatively use OutputDebugStringA(text.toAscii().ptr()); if this does not work on some platforms
     _RPT0(_CRT_WARN, text.toAscii().ptr());
     if (addNewLine)
     {

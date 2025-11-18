@@ -39,7 +39,7 @@ void unpack_file(const char * filename) {
     util_exit("Can only unpack unified ECLIPSE summary and restart files\n");
 
   if (target_type == ECL_SUMMARY_FILE) {
-    printf("** Warning: when unpacking unified summary files it as ambigous - starting with 0001  -> \n");
+    printf("** Warning: when unpacking unified summary files it as ambiguous - starting with 0001  -> \n");
   }
   {
     ecl_file_type * src_file = ecl_file_open( filename , 0 );

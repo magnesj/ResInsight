@@ -3762,7 +3762,7 @@ rrvocalicvowelsigndeva;0944
 rrvocalicvowelsigngujarati;0AC4
 rsuperior;F6F1
 rtblock;2590
-rturned;0279
+returned;0279
 rturnedsuperior;02B4
 ruhiragana;308B
 rukatakana;30EB

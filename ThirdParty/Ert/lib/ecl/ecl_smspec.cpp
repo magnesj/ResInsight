@@ -74,7 +74,7 @@
 
       Historically everything started with specific lookup as in case b);
       however the general lookup proved to be very convenient, and the
-      specfic lookup method has seen less use[*]. The final step in
+      specific lookup method has seen less use[*]. The final step in
       supporting a new variable is to update the function
       ecl_smspec_fread_header().
 
@@ -92,7 +92,7 @@
            also possible to support queries like: give me all the
            well names.
 
-  4. Mark the variable type as supported with a 'X' in the defintion of
+  4. Mark the variable type as supported with a 'X' in the definition of
      ecl_smspec_var_type in ecl_smspec.h.
 
  */
@@ -158,7 +158,7 @@ struct ecl_smspec_struct {
 About indexing:
 ---------------
 
-The ECLISPE summary files are organised (roughly) like this:
+The ECLIPSE summary files are organised (roughly) like this:
 
  1. A header-file called xxx.SMPSEC is written, which is common to
     every timestep.
@@ -169,12 +169,12 @@ The ECLISPE summary files are organised (roughly) like this:
     info in the SMSPEC file to disentangle the summary data.
 
 Here I will try to describe how the header in SMSPEC is organised, and
-how that support is imlemented here. The SMSPEC header is organized
+how that support is implemented here. The SMSPEC header is organized
 around three character vectors, of length N. To find the position in
 the PARAMS vector of a certain quantity, you must consult one, two or
 all three of these vectors. The most important vecor - which must
 always be consulted is the KEYWORDS vector, then it is the WGNAMES and
-NUMS (integer) vectors whcih must be consulted for some variable
+NUMS (integer) vectors which must be consulted for some variable
 types.
 
 
@@ -215,7 +215,7 @@ Completion var:    VAR_TYPE:WELL_NAME:NUM
   The smspec_required_keywords variable contains a list of keywords
   which are *absolutely* required in the SMSPEC file, but observe that
   depending on the content of the "KEYWORDS" array other keywords
-  might bre requred as well - this typically includes the NUMS
+  might bre required as well - this typically includes the NUMS
   keyword. Such 'second-order' dependencies are not accounted for with
   this simple list.
 */
@@ -268,7 +268,7 @@ int ecl_smspec_num_nodes( const ecl_smspec_type * smspec) {
 /*
   When loading a summary case from file many of the nodes can be ignored, in
   that case the size of PARAMS vector in the data files is larger than the
-  number of internalized nodes. Therefor we need to maintain the
+  number of internalized nodes. Therefore we need to maintain the
   params_size member.
 */
 
@@ -737,7 +737,7 @@ static void ecl_smspec_install_special_keys( ecl_smspec_type * ecl_smspec , cons
     ecl_smspec->block_var_index[num][keyword] = &smspec_node;
     break;
     /**
-        The variables below are ONLY accesable through the gen_key
+        The variables below are ONLY accessible through the gen_key
         setup; but the must be mentioned in this switch statement,
         otherwise they will induce a hard failure in the default: target
         below.
@@ -762,7 +762,7 @@ static void ecl_smspec_install_special_keys( ecl_smspec_type * ecl_smspec , cons
 }
 
 /**
-   The usage of this functon breaks down completely if LGR's are involved.
+   The usage of this function breaks down completely if LGR's are involved.
 */
 
 bool ecl_smspec_needs_wgname( ecl_smspec_var_type var_type ) {
@@ -806,7 +806,7 @@ bool ecl_smspec_needs_wgname( ecl_smspec_var_type var_type ) {
 
 
 /**
-   The usage of this functon breaks down completely if LGR's are involved.
+   The usage of this function breaks down completely if LGR's are involved.
 */
 bool ecl_smspec_needs_num( ecl_smspec_var_type var_type ) {
   switch( var_type ) {
@@ -1292,7 +1292,7 @@ int ecl_smspec_get_num_regions(const ecl_smspec_type * ecl_smspec) {
    For each type of summary data (according to the types in
    ecl_smcspec_var_type there are a set accessor functions:
 
-   xx_get_xx: This function will take the apropriate input, and
+   xx_get_xx: This function will take the appropriate input, and
    return a double value. The function will fail with util_abort()
    if the ecl_smspec object can not recognize the input. THis
    function is not here.
@@ -1758,7 +1758,7 @@ const char * ecl_smspec_get_join_string( const ecl_smspec_type * smspec) {
 
 /**
     Returns a stringlist instance with all the (valid) well names. It
-    is the responsability of the calling scope to free the stringlist
+    is the responsibility of the calling scope to free the stringlist
     with stringlist_free();
 
 
@@ -1790,7 +1790,7 @@ stringlist_type * ecl_smspec_alloc_well_list( const ecl_smspec_type * smspec , c
 
 /**
     Returns a stringlist instance with all the (valid) group names. It
-    is the responsability of the calling scope to free the stringlist
+    is the responsibility of the calling scope to free the stringlist
     with stringlist_free();
 */
 
@@ -1802,7 +1802,7 @@ stringlist_type * ecl_smspec_alloc_group_list( const ecl_smspec_type * smspec , 
 
 /**
     Returns a stringlist instance with all the well variables.  It is
-    the responsability of the calling scope to free the stringlist
+    the responsibility of the calling scope to free the stringlist
     with stringlist_free();
 */
 

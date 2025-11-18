@@ -190,7 +190,7 @@ class GeometryTools(object):
         intersection2 = GeometryTools.rayPolygonIntersections(p2, ray2, bounding_polygon)[0] # assume convex
 
 
-        # Check for intersection between the polyline extensions on the inside of the bounadary
+        # Check for intersection between the polyline extensions on the inside of the boundary
         internal_intersection = GeometryTools.lineIntersection( p1 , intersection1[1] , p2 , intersection2[1])
         if internal_intersection:
             start_point = poly_line[0]
@@ -279,7 +279,7 @@ class GeometryTools(object):
             
             
         if abs(r_x_s) < GeometryTools.EPSILON:
-            # Parallell
+            # Parallel
             return None
 
 
@@ -326,7 +326,7 @@ class GeometryTools(object):
     @staticmethod
     def distance(p1,p2):
         if len(p1) != len(p2):
-            raise ValueError("Different lenght of objects")
+            raise ValueError("Different length of objects")
         
         sqr_distance = 0
         for x1,x2 in zip(p1,p2):

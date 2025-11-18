@@ -221,7 +221,7 @@ LasWell::ParseVersionInformation(std::ifstream & fin,
       start_pos = line.find_first_of(" ",start_pos);
       end_pos   = line.find_first_of(":",start_pos);
       if(end_pos == std::string::npos)
-        err_txt += "Not enough items under keyword "+token+" under ~VERSION INOFRMATION in "+GetWellName()+".\n";
+        err_txt += "Not enough items under keyword "+token+" under ~VERSION INFORMATION in "+GetWellName()+".\n";
       else {
         std::string value = NRLib::Chomp(line.substr(start_pos,end_pos-start_pos));
         if(token == "VERS")
@@ -267,7 +267,7 @@ LasWell::ParseWellInformation(std::ifstream & fin,
       start_pos = line.find_first_of(" ",start_pos);
       end_pos   = line.find_first_of(":",start_pos);
       if(end_pos == std::string::npos)
-        err_txt += "Not enough items under keyword "+token+" under ~WELL INOFRMATION in "+GetWellName()+".\n";
+        err_txt += "Not enough items under keyword "+token+" under ~WELL INFORMATION in "+GetWellName()+".\n";
       else {
         std::string value = NRLib::Chomp(line.substr(start_pos,end_pos-start_pos));
         ParseWellToken(token, value, line, err_txt);
@@ -345,7 +345,7 @@ LasWell::ParseCurveInformation(std::ifstream            & fin,
       std::string unit                 = NRLib::Chomp(line.substr(start_pos, end_pos-start_pos));
       start_pos   = line.find_first_of(":",start_pos);
       if(start_pos == std::string::npos)
-        err_txt += "Not enough items under keyword "+token+" under ~CURVE INOFRMATION in "+GetWellName()+".\n";
+        err_txt += "Not enough items under keyword "+token+" under ~CURVE INFORMATION in "+GetWellName()+".\n";
       else {
         log_name_.push_back(token);
         log_unit_.push_back(unit);
@@ -406,7 +406,7 @@ LasWell::ReadLogs(std::ifstream                  & fin,
     n_records++;
   if(n_errors >= 5) //Note intentional use of err_txt below, final error.
      err_txt += tmp_err_txt +"Too many log errors found in well "+GetWellName()+". Stopped processing.\n";
-  else if(tmp_err_txt == "" && n_records < n_data && n_data_given == true) { //Note intentional use of err_txt below, only this error has occured.
+  else if(tmp_err_txt == "" && n_records < n_data && n_data_given == true) { //Note intentional use of err_txt below, only this error has occurred.
     err_txt += "Wrong number of data records found in well "+GetWellName()+", found "+NRLib::ToString(n_records)
       +" while expecting "+NRLib::ToString(n_data)+".\n";
   }

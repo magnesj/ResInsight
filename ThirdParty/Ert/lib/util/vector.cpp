@@ -86,7 +86,7 @@ void vector_grow_NULL( vector_type * vector , int new_size ) {
 }
 
 /**
-   This functon will allocate a vector 'size' elements. Each of these
+   This function will allocate a vector 'size' elements. Each of these
    elements is initialized with NULL pointers.
 */
 
@@ -265,7 +265,7 @@ void vector_insert_owned_ref(vector_type * vector , int index , const void * dat
 /**
   This function appends a COPY of user object. This implies that the
   calling scope is still responsible for the instance declared and
-  used in that scope, whereas the vector takes responsability of
+  used in that scope, whereas the vector takes responsibility of
   freeing it's own copy.
 */
 
@@ -450,7 +450,7 @@ const void * vector_get_last_const(const vector_type * vector) {
    This function removes the last element from the vector and returns
    it to the calling scope. Irrespective of whether the element _was_
    inserted with a destructor: when calling vector_pop() the calling
-   scope takes responsability for freeing data; i.e. vector_pop will
+   scope takes responsibility for freeing data; i.e. vector_pop will
    NEVER call a destructor.
 */
 
@@ -484,7 +484,7 @@ void * vector_pop_front(vector_type * vector ) {
 
     node_data_free_container( node );  /* Free the container holding data. */
     {
-      int bytes = (vector->size - 1) * sizeof * vector->data;  /* Move the storage one element to  the left (could als be implemented with an offset??). */
+      int bytes = (vector->size - 1) * sizeof * vector->data;  /* Move the storage one element to  the left (could also be implemented with an offset??). */
       memmove( vector->data , &vector->data[1] , bytes);
     }
     vector->size--;                    /* Shrink the vector */
@@ -542,7 +542,7 @@ static int vector_cmp(const void * s1 , const void * s2) {
        int (* user_cmp) (const void *, const void *)
 
    i.e. the same as for qsort. The vector implementation considers
-   (fully) untyped data, it is therefore the users responsability to
+   (fully) untyped data, it is therefore the users responsibility to
    ensure that the comparison makes sense. For example:
 
 
