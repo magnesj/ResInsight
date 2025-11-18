@@ -196,7 +196,7 @@ double RigSimulationWellCoordsAndMD::simWellDipAngle( const cvf::Vec3d& position
         cvf::Vec3d direction = p1 - p2;
 
         double horizontal = sqrt( pow( direction.x(), 2 ) + pow( direction.y(), 2 ) );
-        double vertical  = direction.z();
+        double vertical   = direction.z();
 
         if ( fabs( vertical ) > 1e-5 )
         {
