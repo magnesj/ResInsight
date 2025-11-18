@@ -1,18 +1,8 @@
-# Specific file/line exceptions
 ^ApplicationLibCode/ReservoirDataModel/Well/RigWellLogLasFile.cpp:28:aswell
 ^ApplicationLibCode/ReservoirDataModel/RigLasFileExporter.cpp:33:aswell
+^ApplicationExeCode/Resources/EastView.svg
+^ApplicationExeCode/Resources/NorthView.svg
+^ApplicationExeCode/Resources/SouthView.svg
+^ApplicationExeCode/Resources/WestView.svg
 ^ApplicationLibCode/ProjectDataModel/RimEclipseStatisticsCaseEvaluator.cpp
 ^ApplicationLibCode/Commands/ExportCommands/RicCreateDepthAdjustedLasFilesImpl.cpp
-
-# SVG and other binary/generated files
-^ApplicationExeCode/Resources/.*\.svg$
-^.*\.xml$
-^.*\.json$
-
-# Third-party and vendor files
-^ThirdParty/
-^vcpkg/
-^build/
-
-# Test data and models
-^TestModels/

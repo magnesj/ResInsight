@@ -14,7 +14,7 @@ ResInsight uses automated spell checking to maintain code quality and catch typo
   - `ApplicationLibCode/`
   - `Fwk/AppFwk/`
   - `GrpcInterface/`
-- Uses `misspell-fixer` to find and suggest fixes for typos
+- Uses `codespell` to find and suggest fixes for typos
 - Automatically creates a PR with fixes if typos are found
 - PR will be created on a branch named `spell-check-patches-*`
 
@@ -37,7 +37,7 @@ ResInsight uses automated spell checking to maintain code quality and catch typo
 
 ### .codespell-ignore
 
-Used by `codespell` (PR workflow). Contains domain-specific terms that should not be flagged:
+Used by `codespell` (both workflows). Contains domain-specific terms that should not be flagged:
 
 - Petroleum engineering terms: `perm`, `porosity`, `wellbore`, `facies`
 - Eclipse file formats: `EGRID`, `INIT`, `UNRST`, `SMSPEC`
@@ -46,16 +46,6 @@ Used by `codespell` (PR workflow). Contains domain-specific terms that should no
 - Units: `ft`, `mD`, `bbl`, `psi`
 
 **To add a word:** Simply add it to `.codespell-ignore` (one word per line, comments start with `#`)
-
-### .misspell-fixer.ignore
-
-Used by `misspell-fixer` (full repository workflow). Contains file patterns and specific line exceptions:
-
-- File patterns to skip (e.g., `^ApplicationExeCode/Resources/.*\.svg$`)
-- Specific file:line:word exceptions
-- Third-party directories
-
-**To add an exception:** Add a regex pattern matching the file path
 
 ## How to Fix Typos
 
@@ -66,7 +56,7 @@ When the spell-check workflow creates a PR:
 1. Review the PR created by the workflow
 2. Check if the suggested changes are correct
 3. If correct: merge the PR
-4. If incorrect: close the PR and add the word to `.codespell-ignore` or `.misspell-fixer.ignore`
+4. If incorrect: close the PR and add the word to `.codespell-ignore`
 
 ### From PR Review Check
 
@@ -102,18 +92,9 @@ codespell --ignore-words=.codespell-ignore myfile.cpp
 
 # Check a directory
 codespell --ignore-words=.codespell-ignore ApplicationLibCode/
-```
 
-### Using misspell-fixer (matches the full workflow)
-
-```bash
-# Install misspell-fixer
-git clone https://github.com/vlajos/misspell_fixer
-cd misspell_fixer
-export PATH=$PATH:$(pwd)
-
-# Run on a directory
-misspell_fixer -rsvnuR /path/to/ResInsight/ApplicationLibCode/
+# Apply fixes automatically (use with caution)
+codespell --write-changes --ignore-words=.codespell-ignore ApplicationLibCode/
 ```
 
 ## Troubleshooting
@@ -121,8 +102,7 @@ misspell_fixer -rsvnuR /path/to/ResInsight/ApplicationLibCode/
 ### False Positives
 
 If a word is flagged but is correct:
-1. Add it to `.codespell-ignore` (for PR checks)
-2. Add a pattern to `.misspell-fixer.ignore` (for full checks)
+1. Add it to `.codespell-ignore`
 
 ### Words That Should Be Fixed
 
