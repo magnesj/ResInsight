@@ -23,8 +23,14 @@ jobs:
       
       - name: Run codespell and apply fixes
         run: |
-          codespell --write-changes || true
-      
+          codespell \
+            --write-changes \
+            ApplicationExeCode/ \
+            ApplicationLibCode/ \
+            Fwk/AppFwk/ \
+            GrpcInterface/ \
+            || true
+
       - uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
