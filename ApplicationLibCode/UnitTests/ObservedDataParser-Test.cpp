@@ -268,8 +268,9 @@ DAYS;BARS;BARS;BARS
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( parseOptions );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( parseOptions );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto timeColumn = parser.columnInfo( 0 );
     ASSERT_TRUE( timeColumn != nullptr );
@@ -298,8 +299,9 @@ DATE       ;VECTOR    ;VALUE ;ERROR
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( {} );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( {} );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto tableData   = parser.tableData();
     auto columnInfos = tableData.columnInfos();
@@ -337,8 +339,9 @@ DATE       ;VECTOR    ;VALUE
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( {} );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( {} );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto tableData   = parser.tableData();
     auto columnInfos = tableData.columnInfos();
