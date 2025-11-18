@@ -26,7 +26,7 @@ jobs:
           codespell \
             --write-changes \
             --ignore-words=.codespell-ignore \
-            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*" \
+            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*,*.data" \
             ApplicationExeCode/ \
             ApplicationLibCode/ \
             Fwk/AppFwk/ \

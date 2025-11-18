@@ -49,5 +49,5 @@ jobs:
         run: |
           codespell \
             --ignore-words=.codespell-ignore \
-            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*" \
+            --skip="*.svg,*.xml,*.json,*.glsl,*.qss,*gtest*,*.data" \
             ${{ steps.changed-files.outputs.files }}
