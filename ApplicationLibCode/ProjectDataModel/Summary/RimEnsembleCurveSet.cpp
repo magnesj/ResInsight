@@ -2165,7 +2165,6 @@ void RimEnsembleCurveSet::updateEnsembleCurves( const std::vector<RimSummaryCase
 
             auto curves = realizationCurves();
 
-#pragma omp parallel for
             for ( int i = 0; i < (int)curves.size(); ++i )
             {
                 // When the curves are created, they contain no data. Curves can be reattached to the plot without loading of data in
