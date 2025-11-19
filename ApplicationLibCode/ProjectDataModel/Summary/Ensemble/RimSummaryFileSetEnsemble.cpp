@@ -174,7 +174,7 @@ void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet( bool noti
         // Update name of cases and ensemble after all cases are added
         for ( auto summaryCase : newCases )
         {
-            summaryCase->setShowVectorItemsInProjectTree( false );
+            summaryCase->setShowTreeNodes( false );
             summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
             summaryCase->updateAutoShortName();
         }

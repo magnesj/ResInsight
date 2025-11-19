@@ -44,7 +44,7 @@ bool RicShowDataSourcesForRealization::isCommandChecked() const
     const auto selection = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
     if ( !selection.empty() )
     {
-        return selection.front()->showVectorItemsInProjectTree();
+        return selection.front()->showTreeNodes();
     }
 
     return false;
@@ -75,10 +75,10 @@ void RicShowDataSourcesForRealization::onActionTriggered( bool isChecked )
     const auto selection = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
     if ( selection.empty() ) return;
 
-    bool enableDataSources = !selection.front()->showVectorItemsInProjectTree();
+    bool enableDataSources = !selection.front()->showTreeNodes();
 
     for ( auto summaryCase : selection )
     {
-        summaryCase->setShowVectorItemsInProjectTree( enableDataSources );
+        summaryCase->setShowTreeNodes( enableDataSources );
     }
 }

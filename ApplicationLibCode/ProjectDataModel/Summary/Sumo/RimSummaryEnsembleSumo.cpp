@@ -551,7 +551,7 @@ void RimSummaryEnsembleSumo::onLoadDataAndUpdate()
                 realization->setRealizationNumber( realId.toInt() );
                 realization->updateAutoShortName();
 
-                realization->setShowVectorItemsInProjectTree( m_cases.empty() );
+                realization->setShowTreeNodes( m_cases.empty() );
 
                 m_cases.push_back( realization );
             }

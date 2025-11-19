@@ -399,7 +399,7 @@ bool RiaSummaryTools::isCalculationRequired( const RimUserDefinedCalculation* su
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( RimSummaryCase* summaryCase, bool createAddressObjects )
+void RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( RimSummaryCase* summaryCase )
 {
     if ( !summaryCase ) return;
 
@@ -408,7 +408,8 @@ void RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( RimSummaryCase* 
     // Recreate the reader interface, but do not create address objects yet. For ensembles, we do not want to create addresses for all cases
     summaryCase->createSummaryReaderInterface();
 
-    if ( createAddressObjects )
+    // Create addresses for cases marked to show tree nodes. Avoid other cases (ensembles) to speed up the process.
+    if ( summaryCase->showTreeNodes() )
     {
         if ( auto reader = summaryCase->summaryReader() )
         {
@@ -416,21 +417,14 @@ void RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( RimSummaryCase* 
         }
     }
     summaryCase->createRftReaderInterface();
-    summaryCase->refreshMetaData();
+    summaryCase->buildTreeNodesIfRequired();
 
     RiaSummaryTools::updateRequiredCalculatedCurves( summaryCase );
 
     RimSummaryMultiPlotCollection* summaryPlotColl = RiaSummaryTools::summaryMultiPlotCollection();
     for ( RimSummaryMultiPlot* multiPlot : summaryPlotColl->multiPlots() )
     {
-        for ( RimSummaryPlot* summaryPlot : multiPlot->summaryPlots() )
-        {
-            summaryPlot->loadDataAndUpdate();
-
-            // Consider to make the zoom optional
-            summaryPlot->zoomAll();
-        }
-
+        multiPlot->loadDataAndUpdateAllPlots();
         multiPlot->updatePlotTitles();
     }
 
