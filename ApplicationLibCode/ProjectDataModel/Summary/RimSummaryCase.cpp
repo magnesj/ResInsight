@@ -102,7 +102,7 @@ bool RimSummaryCase::isObservedData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimSummaryCase::showVectorItemsInProjectTree() const
+bool RimSummaryCase::showTreeNodes() const
 {
     return m_showSubNodesInTree();
 }
@@ -110,7 +110,7 @@ bool RimSummaryCase::showVectorItemsInProjectTree() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::setShowVectorItemsInProjectTree( bool enable )
+void RimSummaryCase::setShowTreeNodes( bool enable )
 {
     m_showSubNodesInTree = enable;
 
@@ -221,20 +221,6 @@ QString RimSummaryCase::errorMessagesFromReader()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::buildChildNodes()
-{
-    m_dataVectorFolders->deleteChildren();
-
-    RifSummaryReaderInterface* reader = summaryReader();
-    if ( !reader ) return;
-
-    auto addresses = reader->allResultAddresses();
-    m_dataVectorFolders->updateFolderStructure( addresses, m_caseId );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 int RimSummaryCase::serialNumber()
 {
     auto reader = summaryReader();
@@ -337,9 +323,12 @@ void RimSummaryCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCase::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName /*= ""*/ )
 {
-    if ( !ensemble() || m_showSubNodesInTree() )
+    if ( showTreeNodes() )
     {
-        if ( m_dataVectorFolders->isEmpty() ) buildChildNodes();
+        if ( m_dataVectorFolders->isEmpty() )
+        {
+            buildTreeNodesIfRequired();
+        }
         m_dataVectorFolders->updateUiTreeOrdering( uiTreeOrdering );
     }
 
@@ -476,10 +465,17 @@ void RimSummaryCase::setCustomCaseName( const QString& caseName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::refreshMetaData()
+void RimSummaryCase::buildTreeNodesIfRequired()
 {
-    buildChildNodes();
-    updateConnectedEditors();
+    m_dataVectorFolders->deleteChildren();
+
+    if ( !showTreeNodes() ) return;
+
+    RifSummaryReaderInterface* reader = summaryReader();
+    if ( !reader ) return;
+
+    auto addresses = reader->allResultAddresses();
+    m_dataVectorFolders->updateFolderStructure( addresses, m_caseId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -494,7 +490,8 @@ void RimSummaryCase::onCalculationUpdated()
     {
         // Build the child nodes if they are not already built. This function will also create the
         // calculated objects so we can do a early return.
-        refreshMetaData();
+        buildTreeNodesIfRequired();
+        updateConnectedEditors();
 
         return;
     }

@@ -153,7 +153,7 @@ void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase, bool notifyChange
 {
     summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
 
-    summaryCase->setShowVectorItemsInProjectTree( m_cases.empty() );
+    summaryCase->setShowTreeNodes( m_cases.empty() );
 
     m_cases.push_back( summaryCase );
     m_cachedSortedEnsembleParameters.clear();
@@ -217,7 +217,7 @@ void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summa
         summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
         if ( m_cases.empty() )
         {
-            summaryCase->setShowVectorItemsInProjectTree( true );
+            summaryCase->setShowTreeNodes( true );
         }
         m_cases.push_back( summaryCase );
     }
@@ -236,8 +236,7 @@ void RimSummaryEnsemble::reloadCases()
 {
     for ( auto summaryCase : allSummaryCases() )
     {
-        bool buildAddressObjects = false;
-        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase, buildAddressObjects );
+        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
 
         RiaLogging::info( QString( "Reloaded data for %1" ).arg( summaryCase->summaryHeaderFilename() ) );
     }

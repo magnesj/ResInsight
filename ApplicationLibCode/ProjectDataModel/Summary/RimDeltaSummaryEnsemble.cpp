@@ -482,7 +482,7 @@ RimDeltaSummaryCase* RimDeltaSummaryEnsemble::firstCaseNotInUse()
     auto newCase = new RimDeltaSummaryCase();
 
     // Show realization data source for the first case. If we create for all, the performance will be bad
-    newCase->setShowVectorItemsInProjectTree( m_cases.empty() );
+    newCase->setShowTreeNodes( m_cases.empty() );
 
     m_cases.push_back( newCase );
     return newCase;

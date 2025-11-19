@@ -23,6 +23,7 @@
 #include <vector>
 
 class RimSummaryCase;
+class RimSummaryEnsemble;
 
 class RicReloadSummaryCaseFeature : public caf::CmdFeature
 {
@@ -38,5 +39,5 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    static std::vector<RimSummaryCase*> selectedSummaryCases();
+    static std::pair<std::vector<RimSummaryCase*>, std::vector<RimSummaryEnsemble*>> selectedSummarySources();
 };
