@@ -118,24 +118,27 @@ template <typename T>
 int UiTreeManager<T>::createNode( T data, int parentIndex )
 {
     int nodeIndex;
+    
+    // Validate parent index - set to -1 if invalid
+    int validParentIndex = (parentIndex >= 0 && isValidIndex( parentIndex )) ? parentIndex : -1;
 
     // Reuse free slot if available
     if ( !m_freeIndices.empty() )
     {
         nodeIndex = m_freeIndices.back();
         m_freeIndices.pop_back();
-        m_nodes[nodeIndex] = TreeNode( data, parentIndex );
+        m_nodes[nodeIndex] = TreeNode( data, validParentIndex );
     }
     else
     {
         nodeIndex = static_cast<int>( m_nodes.size() );
-        m_nodes.emplace_back( data, parentIndex );
+        m_nodes.emplace_back( data, validParentIndex );
     }
 
-    // Add to parent's children if parent exists
-    if ( parentIndex >= 0 && isValidIndex( parentIndex ) )
+    // Add to parent's children if parent exists and is valid
+    if ( validParentIndex >= 0 )
     {
-        m_nodes[parentIndex].childIndices.push_back( nodeIndex );
+        m_nodes[validParentIndex].childIndices.push_back( nodeIndex );
     }
 
     return nodeIndex;
