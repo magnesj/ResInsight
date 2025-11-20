@@ -355,14 +355,14 @@ QModelIndex caf::PdmUiTreeSelectionQModel::parent( const QModelIndex& index ) co
 {
     if ( !index.isValid() ) return QModelIndex();
 
-    int childNodeIndex = static_cast<int>( index.internalId() );
+    int childNodeIndex  = static_cast<int>( index.internalId() );
     int parentNodeIndex = m_treeManager.getParentIndex( childNodeIndex );
 
     if ( parentNodeIndex == m_treeManager.getRootIndex() || !m_treeManager.isValidIndex( parentNodeIndex ) )
         return QModelIndex();
 
     int row = m_treeManager.getRow( parentNodeIndex );
-    
+
     return createIndex( row, 0, static_cast<quintptr>( parentNodeIndex ) );
 }
 
@@ -569,7 +569,7 @@ void caf::PdmUiTreeSelectionQModel::clearIndexForLastUncheckedItem()
 void caf::PdmUiTreeSelectionQModel::buildOptionItemTree( int parentOptionIndex, int parentNodeIndex )
 {
     if ( !m_treeManager.isValidIndex( parentNodeIndex ) ) return;
-    
+
     if ( parentNodeIndex == m_treeManager.getRootIndex() )
     {
         for ( int i = 0; i < m_options.size(); i++ )
@@ -583,7 +583,7 @@ void caf::PdmUiTreeSelectionQModel::buildOptionItemTree( int parentOptionIndex, 
     }
     else
     {
-        int parentData = m_treeManager.getNodeData( parentNodeIndex );
+        int parentData         = m_treeManager.getNodeData( parentNodeIndex );
         int currentOptionIndex = parentOptionIndex + 1;
         while ( currentOptionIndex < m_options.size() &&
                 m_options[currentOptionIndex].level() > m_options[parentData].level() )

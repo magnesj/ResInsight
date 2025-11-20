@@ -118,9 +118,9 @@ template <typename T>
 int UiTreeManager<T>::createNode( T data, int parentIndex )
 {
     int nodeIndex;
-    
+
     // Validate parent index - set to -1 if invalid
-    int validParentIndex = (parentIndex >= 0 && isValidIndex( parentIndex )) ? parentIndex : -1;
+    int validParentIndex = ( parentIndex >= 0 && isValidIndex( parentIndex ) ) ? parentIndex : -1;
 
     // Reuse free slot if available
     if ( !m_freeIndices.empty() )

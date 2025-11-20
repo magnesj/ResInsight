@@ -65,20 +65,20 @@ TEST( UiTreeManagerTest, BasicTreeOperations )
     // Create child nodes
     int child1 = treeManager.createNode( 200, rootIndex );
     int child2 = treeManager.createNode( 300, rootIndex );
-    
+
     EXPECT_TRUE( treeManager.isValidIndex( child1 ) );
     EXPECT_TRUE( treeManager.isValidIndex( child2 ) );
-    
+
     // Test parent-child relationships
     EXPECT_EQ( rootIndex, treeManager.getParentIndex( child1 ) );
     EXPECT_EQ( rootIndex, treeManager.getParentIndex( child2 ) );
     EXPECT_EQ( 2, treeManager.getChildCount( rootIndex ) );
-    
+
     // Test child access
     EXPECT_EQ( child1, treeManager.getChildIndex( rootIndex, 0 ) );
     EXPECT_EQ( child2, treeManager.getChildIndex( rootIndex, 1 ) );
     EXPECT_EQ( -1, treeManager.getChildIndex( rootIndex, 2 ) ); // Out of bounds
-    
+
     // Test row positions
     EXPECT_EQ( 0, treeManager.getRow( child1 ) );
     EXPECT_EQ( 1, treeManager.getRow( child2 ) );
@@ -90,7 +90,7 @@ TEST( UiTreeManagerTest, BasicTreeOperations )
 TEST( UiTreeManagerTest, TreeNavigation )
 {
     caf::UiTreeManager<int> treeManager;
-    
+
     // Build tree structure:
     //   root(0)
     //   ├── child1(10)
@@ -98,10 +98,10 @@ TEST( UiTreeManagerTest, TreeNavigation )
     //   │   └── grandchild2(12)
     //   └── child2(20)
     //       └── grandchild3(21)
-    
-    int root = treeManager.createRootNode( 0 );
-    int child1 = treeManager.createNode( 10, root );
-    int child2 = treeManager.createNode( 20, root );
+
+    int root        = treeManager.createRootNode( 0 );
+    int child1      = treeManager.createNode( 10, root );
+    int child2      = treeManager.createNode( 20, root );
     int grandchild1 = treeManager.createNode( 11, child1 );
     int grandchild2 = treeManager.createNode( 12, child1 );
     int grandchild3 = treeManager.createNode( 21, child2 );
@@ -150,17 +150,17 @@ TEST( UiTreeManagerTest, TreeNavigation )
 TEST( UiTreeManagerTest, DataModification )
 {
     caf::UiTreeManager<int> treeManager;
-    
-    int root = treeManager.createRootNode( 100 );
+
+    int root  = treeManager.createRootNode( 100 );
     int child = treeManager.createNode( 200, root );
-    
+
     // Test data modification
     EXPECT_TRUE( treeManager.setNodeData( root, 999 ) );
     EXPECT_EQ( 999, treeManager.getNodeData( root ) );
-    
+
     EXPECT_TRUE( treeManager.setNodeData( child, 888 ) );
     EXPECT_EQ( 888, treeManager.getNodeData( child ) );
-    
+
     // Test invalid index modification
     EXPECT_FALSE( treeManager.setNodeData( -1, 777 ) );
     EXPECT_FALSE( treeManager.setNodeData( 999, 777 ) );
@@ -172,37 +172,37 @@ TEST( UiTreeManagerTest, DataModification )
 TEST( UiTreeManagerTest, NodeRemoval )
 {
     caf::UiTreeManager<int> treeManager;
-    
+
     // Build tree structure:
     //   root(0)
     //   ├── child1(10)
     //   │   ├── grandchild1(11)
     //   │   └── grandchild2(12)
     //   └── child2(20)
-    
-    int root = treeManager.createRootNode( 0 );
-    int child1 = treeManager.createNode( 10, root );
-    int child2 = treeManager.createNode( 20, root );
+
+    int root        = treeManager.createRootNode( 0 );
+    int child1      = treeManager.createNode( 10, root );
+    int child2      = treeManager.createNode( 20, root );
     int grandchild1 = treeManager.createNode( 11, child1 );
     int grandchild2 = treeManager.createNode( 12, child1 );
-    
+
     EXPECT_EQ( 2, treeManager.getChildCount( root ) );
     EXPECT_EQ( 2, treeManager.getChildCount( child1 ) );
-    
+
     // Remove child1 (should also remove grandchildren)
     EXPECT_TRUE( treeManager.removeNode( child1 ) );
-    
+
     // Verify child1 and grandchildren are invalid
     EXPECT_FALSE( treeManager.isValidIndex( child1 ) );
     EXPECT_FALSE( treeManager.isValidIndex( grandchild1 ) );
     EXPECT_FALSE( treeManager.isValidIndex( grandchild2 ) );
-    
+
     // Verify root and child2 are still valid
     EXPECT_TRUE( treeManager.isValidIndex( root ) );
     EXPECT_TRUE( treeManager.isValidIndex( child2 ) );
     EXPECT_EQ( 1, treeManager.getChildCount( root ) );
     EXPECT_EQ( child2, treeManager.getChildIndex( root, 0 ) );
-    
+
     // Test removing root
     EXPECT_TRUE( treeManager.removeNode( root ) );
     EXPECT_FALSE( treeManager.isValidIndex( root ) );
@@ -216,17 +216,17 @@ TEST( UiTreeManagerTest, NodeRemoval )
 TEST( UiTreeManagerTest, ClearOperation )
 {
     caf::UiTreeManager<int> treeManager;
-    
-    int root = treeManager.createRootNode( 0 );
+
+    int root   = treeManager.createRootNode( 0 );
     int child1 = treeManager.createNode( 10, root );
     int child2 = treeManager.createNode( 20, root );
-    
+
     EXPECT_TRUE( treeManager.isValidIndex( root ) );
     EXPECT_TRUE( treeManager.isValidIndex( child1 ) );
     EXPECT_TRUE( treeManager.isValidIndex( child2 ) );
-    
+
     treeManager.clear();
-    
+
     EXPECT_EQ( -1, treeManager.getRootIndex() );
     EXPECT_FALSE( treeManager.isValidIndex( root ) );
     EXPECT_FALSE( treeManager.isValidIndex( child1 ) );
@@ -240,7 +240,7 @@ TEST( UiTreeManagerTest, ClearOperation )
 TEST( UiTreeManagerTest, EdgeCases )
 {
     caf::UiTreeManager<int> treeManager;
-    
+
     // Test operations on empty tree
     EXPECT_EQ( 0, treeManager.getNodeData( -1 ) ); // Should return default value
     EXPECT_EQ( 0, treeManager.getNodeData( 999 ) ); // Should return default value
@@ -258,16 +258,16 @@ TEST( UiTreeManagerTest, EdgeCases )
     EXPECT_FALSE( treeManager.hasGrandChildren( 999 ) );
     EXPECT_FALSE( treeManager.removeNode( -1 ) );
     EXPECT_FALSE( treeManager.removeNode( 999 ) );
-    
+
     // Create tree and test boundary conditions
-    int root = treeManager.createRootNode( 0 );
+    int root  = treeManager.createRootNode( 0 );
     int child = treeManager.createNode( 10, root );
-    
+
     // Test out-of-bounds child access
     EXPECT_EQ( -1, treeManager.getChildIndex( root, -1 ) );
     EXPECT_EQ( -1, treeManager.getChildIndex( root, 2 ) );
     EXPECT_EQ( -1, treeManager.getChildIndex( child, 0 ) ); // No children
-    
+
     // Test creating node with invalid parent
     int orphan = treeManager.createNode( 99, 999 ); // Invalid parent index
     EXPECT_TRUE( treeManager.isValidIndex( orphan ) );
@@ -280,31 +280,31 @@ TEST( UiTreeManagerTest, EdgeCases )
 TEST( UiTreeManagerTest, MemoryReuse )
 {
     caf::UiTreeManager<int> treeManager;
-    
+
     // Create and remove nodes to test slot reuse
-    int root = treeManager.createRootNode( 0 );
+    int root   = treeManager.createRootNode( 0 );
     int child1 = treeManager.createNode( 10, root );
     int child2 = treeManager.createNode( 20, root );
-    
+
     EXPECT_EQ( 2, treeManager.getChildCount( root ) );
-    
+
     // Remove child1
     EXPECT_TRUE( treeManager.removeNode( child1 ) );
     EXPECT_FALSE( treeManager.isValidIndex( child1 ) );
     EXPECT_EQ( 1, treeManager.getChildCount( root ) );
-    
+
     // Create new node (should potentially reuse the slot)
     int child3 = treeManager.createNode( 30, root );
     EXPECT_TRUE( treeManager.isValidIndex( child3 ) );
     EXPECT_EQ( 30, treeManager.getNodeData( child3 ) );
     EXPECT_EQ( root, treeManager.getParentIndex( child3 ) );
     EXPECT_EQ( 2, treeManager.getChildCount( root ) );
-    
+
     // Verify tree integrity
     EXPECT_TRUE( treeManager.isValidIndex( root ) );
     EXPECT_TRUE( treeManager.isValidIndex( child2 ) );
     EXPECT_TRUE( treeManager.isValidIndex( child3 ) );
-    
+
     // Note: child1 index might be reused by child3, so we can't guarantee it's invalid
     // The important thing is that the tree structure is correct
 }
@@ -315,19 +315,19 @@ TEST( UiTreeManagerTest, MemoryReuse )
 TEST( UiTreeManagerTest, StringDataType )
 {
     caf::UiTreeManager<std::string> treeManager;
-    
-    int root = treeManager.createRootNode( "root" );
+
+    int root   = treeManager.createRootNode( "root" );
     int child1 = treeManager.createNode( "child1", root );
     int child2 = treeManager.createNode( "child2", root );
-    
+
     EXPECT_EQ( "root", treeManager.getNodeData( root ) );
     EXPECT_EQ( "child1", treeManager.getNodeData( child1 ) );
     EXPECT_EQ( "child2", treeManager.getNodeData( child2 ) );
-    
+
     // Test data modification
     EXPECT_TRUE( treeManager.setNodeData( child1, "modified_child1" ) );
     EXPECT_EQ( "modified_child1", treeManager.getNodeData( child1 ) );
-    
+
     // Test default return value for invalid index
     EXPECT_EQ( std::string(), treeManager.getNodeData( 999 ) ); // Should return empty string
 }
