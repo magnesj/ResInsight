@@ -246,8 +246,6 @@ int UiTreeManager<T>::getRow( int nodeIndex ) const
     if ( !isValidIndex( nodeIndex ) ) return 0;
 
     int parentIndex = m_nodes[nodeIndex].parentIndex;
-    if ( parentIndex < 0 ) return 0;
-
     if ( !isValidIndex( parentIndex ) ) return 0;
 
     const auto& parentChildren = m_nodes[parentIndex].childIndices;
