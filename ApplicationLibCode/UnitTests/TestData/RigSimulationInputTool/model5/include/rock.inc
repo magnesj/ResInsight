@@ -10,6 +10,6 @@
 
 -- ROCK COMPRESSIBILITY
 --
---   REF.PRES.   COMPR.
+--   REF.PRESS.   COMPR.
 ROCK
       277.0      4.22425e-05 /
