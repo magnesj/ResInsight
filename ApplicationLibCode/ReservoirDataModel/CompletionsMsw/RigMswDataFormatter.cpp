@@ -308,7 +308,14 @@ void RigMswDataFormatter::formatCompsegsTable( RifTextDataTableFormatter& format
 
     if ( rows.empty() ) return;
 
-    formatter.keyword( "COMPSEGS" );
+    if ( isLgrData )
+    {
+        formatter.keyword( "COMPSEGL" );
+    }
+    else
+    {
+        formatter.keyword( "COMPSEGS" );
+    }
 
     // Add well name
     {
