@@ -369,7 +369,10 @@ void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 //--------------------------------------------------------------------------------------------------
 void RigMswDataFormatter::formatWelsegsTable( RifTextDataTableFormatter& formatter, const RigMswUnifiedDataWIP& unifiedData )
 {
-    // TODO: Handle multiple WELSEGS headers?
+    for ( const auto& wellData : unifiedData.wellDataList() )
+    {
+        formatWelsegsTable( formatter, wellData );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
