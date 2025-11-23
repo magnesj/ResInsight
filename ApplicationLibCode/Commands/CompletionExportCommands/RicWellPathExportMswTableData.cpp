@@ -20,19 +20,14 @@
 
 #include "RiaLogging.h"
 
-#include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
+#include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
 #include "RicMswTableDataTools.h"
 #include "RicMswTableFormatterTools.h"
 #include "RicMswValveAccumulators.h"
-#include "RicWellPathExportCompletionsFileTools.h"
 
-#include "RifTextDataTableFormatter.h"
-
-#include "CompletionsMsw/RigMswDataFormatter.h"
 #include "CompletionsMsw/RigMswTableData.h"
-
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
@@ -55,9 +50,6 @@
 #include "RimWellPathFractureCollection.h"
 #include "RimWellPathTieIn.h"
 #include "RimWellPathValve.h"
-
-#include <QFile>
-#include <QFileInfo>
 
 #include <algorithm>
 

@@ -15,18 +15,21 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "RicMswBranch.h"
-#include "RicMswCompletions.h"
-#include "RicMswExportInfo.h"
-#include "RicMswSegment.h"
+#include "RiaDefines.h"
 
 #include <gsl/gsl>
 
 #include <expected>
 #include <set>
 
+class RicMswCompletion;
+class RigCompletionData;
+class RicMswSegment;
+class RicMswExportInfo;
+class RicMswBranch;
 class RicExportCompletionDataSettingsUi;
 class RigActiveCellInfo;
 class RimEclipseCase;
@@ -41,14 +44,9 @@ class RimModeledWellPath;
 
 struct WellPathCellIntersectionInfo;
 
-class QFile;
-
 //--------------------------------------------------------------------------------------------------
 /// This class is responsible for exporting well path MSW table data
 /// This class is based on RicWellPathExportMswCompletionsImpl
-///
-/// TODO
-/// - remove all functions not used by extractSingleWellMswData()
 //--------------------------------------------------------------------------------------------------
 class RicWellPathExportMswTableData
 {
@@ -62,7 +60,6 @@ public:
 private:
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
-private:
     static bool generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
                                                    const RimWellPath*                               wellPath,
                                                    int                                              timeStep,
