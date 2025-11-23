@@ -70,11 +70,17 @@ constexpr double VALVE_SEGMENT_LENGTH = 0.1;
 
 }; // namespace internal
 
+void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                               const std::vector<RimWellPath*>&         wellPaths )
+{
+    exportExperimentalMswToSeparateFolder( exportSettings, wellPaths );
+}
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                                               const std::vector<RimWellPath*>&         wellPaths )
+void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions_original( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                                                        const std::vector<RimWellPath*>& wellPaths )
 {
     std::shared_ptr<QFile> unifiedExportFile;
     std::shared_ptr<QFile> unifiedLgrExportFile;
@@ -1936,19 +1942,17 @@ RigMswUnifiedDataWIP RicWellPathExportMswCompletionsImpl::extractUnifiedMswData(
 void RicWellPathExportMswCompletionsImpl::exportExperimentalMswToSeparateFolder( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                                  const std::vector<RimWellPath*>&         wellPaths )
 {
-    QDir folder( exportSettings.folder() );
-    folder.mkdir( "prototype" );
-
-    const auto exportFolder = exportSettings.folder() + "/prototype";
-
     if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
     {
-        RiaLogging::info( "    Experimental MSW export to " + exportFolder );
-        exportSplitMswData( exportSettings, exportFolder, wellPaths );
+        exportSplitMswData( exportSettings, exportSettings.folder(), wellPaths );
+    }
+    else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
+    {
+        exportUnifiedMswData( exportSettings, exportSettings.folder(), wellPaths );
     }
     else
     {
-        RiaLogging::warning( "'Unified' or 'Split on well and completion type' export not supported in experimental MSW export." );
+        RiaLogging::warning( "'Split on well and completion type' is not supported." );
     }
 }
 

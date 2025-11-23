@@ -79,6 +79,9 @@ public:
                                                        gsl::not_null<RicMswBranch*>     branch );
 
 private:
+    static void exportWellSegmentsForAllCompletions_original( const RicExportCompletionDataSettingsUi& exportSettings,
+                                                              const std::vector<RimWellPath*>&         wellPaths );
+
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,
