@@ -2360,12 +2360,15 @@ std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extra
     // Use the new collection functions to populate the table data
     RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBoreSegments );
 
-    bool isLgr = false;
-    RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
-
-    if ( exportInfo.hasSubGridIntersections() )
     {
-        isLgr = true;
+        // Get COMPSEGS for main grid
+        bool isLgr = false;
+        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
+    }
+
+    {
+        // Get COMPSEGS for LGR grids
+        bool isLgr = true;
         RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
     }
 
