@@ -41,8 +41,6 @@ void RigMswUnifiedDataWIP::addWellData( RigMswTableData wellData )
         // Add new data
         m_wellDataList.push_back( std::move( wellData ) );
     }
-
-    updateIndex();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -51,51 +49,6 @@ void RigMswUnifiedDataWIP::addWellData( RigMswTableData wellData )
 void RigMswUnifiedDataWIP::clear()
 {
     m_wellDataList.clear();
-    m_wellNameToIndex.clear();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const RigMswTableData* RigMswUnifiedDataWIP::getWellData( const std::string& wellName ) const
-{
-    auto it = m_wellNameToIndex.find( wellName );
-    if ( it != m_wellNameToIndex.end() && it->second < m_wellDataList.size() )
-    {
-        return &m_wellDataList[it->second];
-    }
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<WelsegsHeader> RigMswUnifiedDataWIP::getAllWelsegsHeaders() const
-{
-    std::vector<WelsegsHeader> allHeaders;
-
-    for ( const auto& wellData : m_wellDataList )
-    {
-        allHeaders.push_back( wellData.welsegsHeader() );
-    }
-
-    return allHeaders;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<WelsegsRow> RigMswUnifiedDataWIP::getAllWelsegsRows() const
-{
-    std::vector<WelsegsRow> allRows;
-
-    for ( const auto& wellData : m_wellDataList )
-    {
-        const auto& wellRows = wellData.welsegsData();
-        allRows.insert( allRows.end(), wellRows.begin(), wellRows.end() );
-    }
-
-    return allRows;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -224,17 +177,4 @@ std::vector<QString> RigMswUnifiedDataWIP::validationErrors() const
     }
 
     return errors;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigMswUnifiedDataWIP::updateIndex()
-{
-    m_wellNameToIndex.clear();
-
-    for ( size_t i = 0; i < m_wellDataList.size(); ++i )
-    {
-        m_wellNameToIndex[m_wellDataList[i].wellName()] = i;
-    }
 }
