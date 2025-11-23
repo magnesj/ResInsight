@@ -23,7 +23,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMswUnifiedDataWIP::addWellData( RigMswTableData wellData )
+void RigMswUnifiedData::addWellData( RigMswTableData wellData )
 {
     // Check if well name already exists
     const std::string& wellName = wellData.wellName();
@@ -46,7 +46,7 @@ void RigMswUnifiedDataWIP::addWellData( RigMswTableData wellData )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMswUnifiedDataWIP::clear()
+void RigMswUnifiedData::clear()
 {
     m_wellDataList.clear();
 }
@@ -54,7 +54,7 @@ void RigMswUnifiedDataWIP::clear()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<CompsegsRow> RigMswUnifiedDataWIP::getAllCompsegsRows( bool lgrOnly ) const
+std::vector<CompsegsRow> RigMswUnifiedData::getAllCompsegsRows( bool lgrOnly ) const
 {
     std::vector<CompsegsRow> allRows;
 
@@ -80,7 +80,7 @@ std::vector<CompsegsRow> RigMswUnifiedDataWIP::getAllCompsegsRows( bool lgrOnly 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WsegvalvRow> RigMswUnifiedDataWIP::getAllWsegvalvRows() const
+std::vector<WsegvalvRow> RigMswUnifiedData::getAllWsegvalvRows() const
 {
     std::vector<WsegvalvRow> allRows;
 
@@ -96,7 +96,7 @@ std::vector<WsegvalvRow> RigMswUnifiedDataWIP::getAllWsegvalvRows() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<WsegaicdRow> RigMswUnifiedDataWIP::getAllWsegaicdRows() const
+std::vector<WsegaicdRow> RigMswUnifiedData::getAllWsegaicdRows() const
 {
     std::vector<WsegaicdRow> allRows;
 
@@ -112,7 +112,7 @@ std::vector<WsegaicdRow> RigMswUnifiedDataWIP::getAllWsegaicdRows() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigMswUnifiedDataWIP::hasAnyLgrData() const
+bool RigMswUnifiedData::hasAnyLgrData() const
 {
     return std::any_of( m_wellDataList.begin(), m_wellDataList.end(), []( const RigMswTableData& wellData ) { return wellData.hasLgrData(); } );
 }
@@ -120,7 +120,7 @@ bool RigMswUnifiedDataWIP::hasAnyLgrData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<std::string> RigMswUnifiedDataWIP::wellNames() const
+std::vector<std::string> RigMswUnifiedData::wellNames() const
 {
     std::vector<std::string> names;
     names.reserve( m_wellDataList.size() );
@@ -136,7 +136,7 @@ std::vector<std::string> RigMswUnifiedDataWIP::wellNames() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigMswUnifiedDataWIP::isValid() const
+bool RigMswUnifiedData::isValid() const
 {
     return validationErrors().empty();
 }
@@ -144,7 +144,7 @@ bool RigMswUnifiedDataWIP::isValid() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RigMswUnifiedDataWIP::validationErrors() const
+std::vector<QString> RigMswUnifiedData::validationErrors() const
 {
     std::vector<QString> errors;
 

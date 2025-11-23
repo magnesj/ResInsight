@@ -26,10 +26,10 @@
 //==================================================================================================
 /// Container class for unified MSW table data from multiple wells
 //==================================================================================================
-class RigMswUnifiedDataWIP
+class RigMswUnifiedData
 {
 public:
-    RigMswUnifiedDataWIP() = default;
+    RigMswUnifiedData() = default;
 
     // Data modification
     void addWellData( RigMswTableData wellData );

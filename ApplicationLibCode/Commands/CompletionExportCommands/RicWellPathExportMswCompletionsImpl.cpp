@@ -1917,11 +1917,11 @@ std::pair<double, double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMswUnifiedDataWIP RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( RimEclipseCase*                  eclipseCase,
+RigMswUnifiedData RicWellPathExportMswCompletionsImpl::extractUnifiedMswData( RimEclipseCase*                  eclipseCase,
                                                                                  int                              timeStep,
                                                                                  const std::vector<RimWellPath*>& wellPaths )
 {
-    RigMswUnifiedDataWIP unifiedData;
+    RigMswUnifiedData unifiedData;
 
     for ( RimWellPath* wellPath : wellPaths )
     {
@@ -1964,7 +1964,7 @@ void RicWellPathExportMswCompletionsImpl::exportUnifiedMswData( const RicExportC
                                                                 const std::vector<RimWellPath*>&         wellPaths )
 {
     // Extract all MSW data using new approach
-    RigMswUnifiedDataWIP unifiedData = extractUnifiedMswData( exportSettings.caseToApply, exportSettings.timeStep, wellPaths );
+    RigMswUnifiedData unifiedData = extractUnifiedMswData( exportSettings.caseToApply, exportSettings.timeStep, wellPaths );
 
     if ( unifiedData.isEmpty() )
     {
