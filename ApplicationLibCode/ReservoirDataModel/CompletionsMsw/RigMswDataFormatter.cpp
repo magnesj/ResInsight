@@ -413,12 +413,9 @@ void RigMswDataFormatter::formatWsegaicdTable( RifTextDataTableFormatter& format
 void RigMswDataFormatter::formatMswTables( RifTextDataTableFormatter& formatter, const RigMswTableData& tableData )
 {
     formatWelsegsTable( formatter, tableData );
-    formatCompsegsTable( formatter, tableData, false ); // Main grid
 
-    if ( tableData.hasLgrData() )
-    {
-        formatCompsegsTable( formatter, tableData, true ); // LGR data
-    }
+    bool isLgrData = false;
+    formatCompsegsTable( formatter, tableData, isLgrData ); // Main grid
 
     formatWsegvalvTable( formatter, tableData );
     formatWsegaicdTable( formatter, tableData );
