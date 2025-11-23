@@ -34,7 +34,6 @@ class RimFishbones;
 class RimPerforationInterval;
 class RimWellPath;
 class RigMswTableData;
-class RigMswUnifiedDataWIP;
 class RimWellPathFracture;
 class RimMswCompletionParameters;
 class RigWellPath;
@@ -61,9 +60,6 @@ public:
                                                                                  bool exportCompletionsAfterMainBoreSegments = true );
 
 private:
-    static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                     const std::vector<RimWellPath*>&         wellPaths );
-
     static void exportWellSegmentsForFractures( RimEclipseCase*        eclipseCase,
                                                 std::shared_ptr<QFile> exportFile,
                                                 std::shared_ptr<QFile> lgrExportFile,
@@ -94,15 +90,6 @@ private:
                                                        gsl::not_null<RicMswBranch*>     branch );
 
 private:
-    static void exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-
-    static void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-    static void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-
-    // New data extraction functions
-    static RigMswUnifiedDataWIP extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                       const std::vector<RimWellPath*>&         wellPaths );
-
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,
