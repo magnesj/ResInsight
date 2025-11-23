@@ -49,29 +49,7 @@ public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
 
-    static void exportWellSegmentsForFractures( RimEclipseCase*        eclipseCase,
-                                                std::shared_ptr<QFile> exportFile,
-                                                std::shared_ptr<QFile> lgrExportFile,
-                                                const RimWellPath*     wellPath,
-                                                bool                   exportDataSourceAsComment,
-                                                bool                   completionSegmentsAfterMainBore );
-
-    static void exportWellSegmentsForFishbones( RimEclipseCase*        eclipseCase,
-                                                std::shared_ptr<QFile> exportFile,
-                                                std::shared_ptr<QFile> lgrExportFile,
-                                                const RimWellPath*     wellPath,
-                                                bool                   exportDataSourceAsComment,
-                                                bool                   completionSegmentsAfterMainBore );
-
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
-
-    static void exportWellSegmentsForPerforations( RimEclipseCase*        eclipseCase,
-                                                   std::shared_ptr<QFile> exportFile,
-                                                   std::shared_ptr<QFile> lgrExportFile,
-                                                   const RimWellPath*     wellPath,
-                                                   int                    timeStep,
-                                                   bool                   exportDataSourceAsComment,
-                                                   bool                   completionSegmentsAfterMainBore );
 
     static void generateFishbonesMswExportInfoForWell( const RimEclipseCase*            eclipseCase,
                                                        const RimWellPath*               wellPath,
@@ -79,9 +57,6 @@ public:
                                                        gsl::not_null<RicMswBranch*>     branch );
 
 private:
-    static void exportWellSegmentsForAllCompletions_original( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                              const std::vector<RimWellPath*>&         wellPaths );
-
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                 const RimWellPath*                               wellPath,
                                                 double                                           initialMD,
