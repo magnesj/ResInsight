@@ -19,7 +19,7 @@
 
 //--------------------------------------------------------------------------------------------------
 /// Test calculateRelPermCurves for Oil relative permeability in Oil-Gas system
-/// Based on Relperm_Oil_in_Oil_Gas test from OPM flowdiagnostics applications
+/// Based on Relperm_Oil_in_Oil_Gas test from OPM flowdiagnostics applications by SINTEF
 //--------------------------------------------------------------------------------------------------
 TEST( FlowDiagnosticsTest, calculateRelPermCurves_Oil_in_Oil_Gas )
 {
