@@ -51,7 +51,7 @@ struct WellPathCellIntersectionInfo;
 class RicWellPathExportMswTableData
 {
 public:
-    // The intension is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
+    // The intention is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
     static std::expected<RigMswTableData, std::string> extractSingleWellMswData( RimEclipseCase* eclipseCase,
                                                                                  RimWellPath*    wellPath,
                                                                                  int             timeStep,
