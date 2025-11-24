@@ -91,14 +91,7 @@ std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extra
     }
 
     // Add other completion types
-    bool enableSegmentSplitting = false;
-    appendFishbonesMswExportInfo( eclipseCase,
-                                  wellPath,
-                                  initialMD,
-                                  cellIntersections,
-                                  enableSegmentSplitting,
-                                  &exportInfo,
-                                  exportInfo.mainBoreBranch() );
+    appendFishbonesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
     appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
 
     updateDataForMultipleItemsInSameGridCell( exportInfo.mainBoreBranch() );
@@ -159,14 +152,7 @@ void RicWellPathExportMswTableData::generateFishbonesMswExportInfoForWell( const
         return;
     }
 
-    bool enableSegmentSplitting = false;
-    appendFishbonesMswExportInfo( eclipseCase,
-                                  wellPath,
-                                  initialMD,
-                                  cellIntersections,
-                                  enableSegmentSplitting,
-                                  exportInfo,
-                                  exportInfo->mainBoreBranch() );
+    appendFishbonesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, exportInfo, exportInfo->mainBoreBranch() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -289,7 +275,6 @@ void RicWellPathExportMswTableData::appendFishbonesMswExportInfo( const RimEclip
                                                                   const RimWellPath*                               wellPath,
                                                                   double                                           initialMD,
                                                                   const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                                  bool                                             enableSegmentSplitting,
                                                                   gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                                                   gsl::not_null<RicMswBranch*>                     branch )
 {
@@ -300,7 +285,7 @@ void RicWellPathExportMswTableData::appendFishbonesMswExportInfo( const RimEclip
 
     bool foundSubGridIntersections = false;
 
-    double maxSegmentLength = enableSegmentSplitting ? mswParameters->maxSegmentLength() : std::numeric_limits<double>::infinity();
+    double maxSegmentLength = mswParameters->maxSegmentLength();
 
     auto unitSystem = exportInfo->unitSystem();
 
@@ -439,7 +424,7 @@ void RicWellPathExportMswTableData::appendFishbonesMswExportInfo( const RimEclip
     {
         auto childWellPath          = childBranch->wellPath();
         auto childCellIntersections = generateCellSegments( eclipseCase, childWellPath );
-        appendFishbonesMswExportInfo( eclipseCase, childWellPath, initialMD, childCellIntersections, enableSegmentSplitting, exportInfo, childBranch );
+        appendFishbonesMswExportInfo( eclipseCase, childWellPath, initialMD, childCellIntersections, exportInfo, childBranch );
     }
 }
 
