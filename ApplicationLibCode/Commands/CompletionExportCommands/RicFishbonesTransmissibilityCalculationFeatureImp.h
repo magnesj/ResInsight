@@ -26,6 +26,7 @@
 
 class RigCompletionData;
 class RimWellPath;
+class RimEclipseCase;
 class RimFishbones;
 class RicExportCompletionDataSettingsUi;
 class RigEclipseCaseData;
@@ -44,11 +45,11 @@ public:
 private:
     static void findFishboneLateralsWellBoreParts( std::map<size_t, std::vector<WellBorePartForTransCalc>>& wellBorePartsInCells,
                                                    const RimWellPath*                                       wellPath,
-                                                   const RicExportCompletionDataSettingsUi&                 settings );
+                                                   const RimEclipseCase*                                    eclipseCase );
 
     static void appendMainWellBoreParts( std::map<size_t, std::vector<WellBorePartForTransCalc>>& wellBorePartsInCells,
                                          const RimWellPath*                                       wellPath,
-                                         const RicExportCompletionDataSettingsUi&                 settings,
+                                         const RigEclipseCaseData*                                eclipseCaseData,
                                          double                                                   skinFactor,
                                          double                                                   holeRadius,
                                          double                                                   startMeasuredDepth,
