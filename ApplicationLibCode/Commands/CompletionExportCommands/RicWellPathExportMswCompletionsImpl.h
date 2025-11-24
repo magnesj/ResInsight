@@ -49,12 +49,12 @@ public:
     static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                      const std::vector<RimWellPath*>&         wellPaths );
 
+private:
     static void generateFishbonesMswExportInfoForWell( const RimEclipseCase*            eclipseCase,
                                                        const RimWellPath*               wellPath,
                                                        gsl::not_null<RicMswExportInfo*> exportInfo,
                                                        gsl::not_null<RicMswBranch*>     branch );
 
-private:
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
     static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
