@@ -45,7 +45,6 @@
 
 #include "cvfTrace.h"
 
-
 class RigOpmFlowDiagStaticData
 {
 public:
