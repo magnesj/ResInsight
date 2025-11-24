@@ -84,7 +84,7 @@ void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettin
         }
         else
         {
-            return QString( "UnifiedCompletions%1_%2" ).arg( postFix ).arg( exportSettings.caseToApply->caseUserDescription() );
+            return QString( "UnifiedCompletions_%1_%2" ).arg( exportSettings.caseToApply->caseUserDescription() ).arg( postFix );
         }
     };
 
@@ -107,7 +107,7 @@ void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettin
     // Create LGR file if needed
     if ( unifiedData.hasAnyLgrData() )
     {
-        QString lgrFileName = generateFileName( exportSettings, "_LGR_MSW" );
+        QString lgrFileName = generateFileName( exportSettings, "_MSW_LGR" );
 
         auto lgrFile =
             RicWellPathExportCompletionsFileTools::openFileForExport( exportFolder, lgrFileName, "", exportSettings.exportDataSourceAsComment() );
@@ -146,8 +146,7 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
         auto wellData = wellDataResult.value();
 
         // Set up file names
-        QString wellFileName =
-            QString( "%1_UnifiedCompletions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
+        QString wellFileName = QString( "%1_Completions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
 
         // Create main grid file
         auto mainGridFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportFolder,
@@ -189,16 +188,14 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
 void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                                const std::vector<RimWellPath*>&         wellPaths )
 {
-    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
+    // There are two modes of MSW export, either split on well or unified. The split on completion type is used for export of COMPDAT
+    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL ||
+         exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL_AND_COMPLETION_TYPE )
     {
         internal::exportSplitMswData( exportSettings, exportSettings.folder(), wellPaths );
     }
     else if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
     {
         internal::exportUnifiedMswData( exportSettings, exportSettings.folder(), wellPaths );
-    }
-    else
-    {
-        RiaLogging::warning( "'Split on well and completion type' is not supported." );
     }
 }
