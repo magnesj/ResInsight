@@ -15,18 +15,21 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "RicMswBranch.h"
-#include "RicMswCompletions.h"
-#include "RicMswExportInfo.h"
-#include "RicMswSegment.h"
+#include "RiaDefines.h"
 
 #include <gsl/gsl>
 
 #include <expected>
 #include <set>
 
+class RicMswCompletion;
+class RigCompletionData;
+class RicMswSegment;
+class RicMswExportInfo;
+class RicMswBranch;
 class RicExportCompletionDataSettingsUi;
 class RigActiveCellInfo;
 class RimEclipseCase;
@@ -34,7 +37,6 @@ class RimFishbones;
 class RimPerforationInterval;
 class RimWellPath;
 class RigMswTableData;
-class RigMswUnifiedDataWIP;
 class RimWellPathFracture;
 class RimMswCompletionParameters;
 class RigWellPath;
@@ -42,73 +44,34 @@ class RimModeledWellPath;
 
 struct WellPathCellIntersectionInfo;
 
-class QFile;
-
 //--------------------------------------------------------------------------------------------------
 /// This class is responsible for exporting well path MSW table data
 /// This class is based on RicWellPathExportMswCompletionsImpl
-///
-/// TODO
-/// - remove all functions not used by extractSingleWellMswData()
 //--------------------------------------------------------------------------------------------------
 class RicWellPathExportMswTableData
 {
 public:
+    // The intension is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
     static std::expected<RigMswTableData, std::string> extractSingleWellMswData( RimEclipseCase* eclipseCase,
                                                                                  RimWellPath*    wellPath,
                                                                                  int             timeStep,
                                                                                  bool exportCompletionsAfterMainBoreSegments = true );
 
+    static void generateFishbonesMswExportInfoForWell( const RimEclipseCase* eclipseCase,
+                                                       const RimWellPath*    wellPath,
+                                                       RicMswExportInfo*     exportInfo,
+                                                       RicMswBranch*         branch );
+
 private:
-    static void exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                     const std::vector<RimWellPath*>&         wellPaths );
-
-    static void exportWellSegmentsForFractures( RimEclipseCase*        eclipseCase,
-                                                std::shared_ptr<QFile> exportFile,
-                                                std::shared_ptr<QFile> lgrExportFile,
-                                                const RimWellPath*     wellPath,
-                                                bool                   exportDataSourceAsComment,
-                                                bool                   completionSegmentsAfterMainBore );
-
-    static void exportWellSegmentsForFishbones( RimEclipseCase*        eclipseCase,
-                                                std::shared_ptr<QFile> exportFile,
-                                                std::shared_ptr<QFile> lgrExportFile,
-                                                const RimWellPath*     wellPath,
-                                                bool                   exportDataSourceAsComment,
-                                                bool                   completionSegmentsAfterMainBore );
-
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
-    static void exportWellSegmentsForPerforations( RimEclipseCase*        eclipseCase,
-                                                   std::shared_ptr<QFile> exportFile,
-                                                   std::shared_ptr<QFile> lgrExportFile,
-                                                   const RimWellPath*     wellPath,
-                                                   int                    timeStep,
-                                                   bool                   exportDataSourceAsComment,
-                                                   bool                   completionSegmentsAfterMainBore );
-
-    static void generateFishbonesMswExportInfoForWell( const RimEclipseCase*            eclipseCase,
-                                                       const RimWellPath*               wellPath,
-                                                       gsl::not_null<RicMswExportInfo*> exportInfo,
-                                                       gsl::not_null<RicMswBranch*>     branch );
-
-private:
-    static void exportUnifiedWellSegments( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-
-    static void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-    static void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings, const std::vector<RimWellPath*>& wellPaths );
-
-    // New data extraction functions
-    static RigMswUnifiedDataWIP extractUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettings,
-                                                       const std::vector<RimWellPath*>&         wellPaths );
-
-    static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
-                                                const RimWellPath*                               wellPath,
-                                                double                                           initialMD,
-                                                const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                bool                                             enableSegmentSplitting,
-                                                gsl::not_null<RicMswExportInfo*>                 exportInfo,
-                                                gsl::not_null<RicMswBranch*>                     branch );
+    static bool generatePerforationsMswExportInfo( const RimEclipseCase*                            eclipseCase,
+                                                   const RimWellPath*                               wellPath,
+                                                   int                                              timeStep,
+                                                   double                                           initialMD,
+                                                   const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                                   gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                                   gsl::not_null<RicMswBranch*>                     branch );
 
     static void appendFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                               const RimWellPath*                               wellPath,
@@ -118,36 +81,12 @@ private:
                                               gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                               gsl::not_null<RicMswBranch*>                     branch );
 
-    static void generateFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
-                                                const RimWellPath*                               wellPath,
-                                                double                                           initialMD,
-                                                const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                const std::vector<RimFishbones*>&                fishbonesSubs,
-                                                bool                                             enableSegmentSplitting,
-                                                gsl::not_null<RicMswExportInfo*>                 exportInfo,
-                                                gsl::not_null<RicMswBranch*>                     branch );
-
-    static bool generateFracturesMswExportInfo( RimEclipseCase*                                  eclipseCase,
-                                                const RimWellPath*                               wellPath,
-                                                double                                           initialMD,
-                                                const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                gsl::not_null<RicMswExportInfo*>                 exportInfo,
-                                                gsl::not_null<RicMswBranch*>                     branch );
-
     static bool appendFracturesMswExportInfo( RimEclipseCase*                                  eclipseCase,
                                               const RimWellPath*                               wellPath,
                                               double                                           initialMD,
                                               const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
                                               gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                               gsl::not_null<RicMswBranch*>                     branch );
-
-    static bool generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
-                                                   const RimWellPath*                               wellPath,
-                                                   int                                              timeStep,
-                                                   double                                           initialMD,
-                                                   const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                   gsl::not_null<RicMswExportInfo*>                 exportInfo,
-                                                   gsl::not_null<RicMswBranch*>                     branch );
 
     static std::vector<WellPathCellIntersectionInfo> generateCellSegments( const RimEclipseCase* eclipseCase, const RimWellPath* wellPath );
 
