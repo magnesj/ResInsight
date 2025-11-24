@@ -75,7 +75,7 @@ std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extra
     auto mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters )
     {
-        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
+        return std::unexpected( "Missing MSW completion parameters" );
     }
 
     auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
