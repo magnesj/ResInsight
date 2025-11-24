@@ -62,6 +62,116 @@ constexpr double VALVE_SEGMENT_LENGTH = 0.1;
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase,
+                                                                                                     RimWellPath*    wellPath,
+                                                                                                     int             timeStep,
+                                                                                                     bool exportCompletionsAfterMainBoreSegments )
+{
+    if ( !eclipseCase || !wellPath || eclipseCase->eclipseCaseData() == nullptr )
+    {
+        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
+    }
+
+    auto mswParameters = wellPath->mswCompletionParameters();
+    if ( !mswParameters )
+    {
+        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
+    }
+
+    auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
+    double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+
+    RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
+    RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
+
+    // Generate all completion data using existing functions
+    if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
+    {
+        return std::unexpected( "Failed to generate perforations MSW export info" );
+    }
+
+    // Add other completion types
+    bool enableSegmentSplitting = false;
+    appendFishbonesMswExportInfo( eclipseCase,
+                                  wellPath,
+                                  initialMD,
+                                  cellIntersections,
+                                  enableSegmentSplitting,
+                                  &exportInfo,
+                                  exportInfo.mainBoreBranch() );
+    appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
+
+    updateDataForMultipleItemsInSameGridCell( exportInfo.mainBoreBranch() );
+
+    // Assign branch numbers
+    int branchNumber = 1;
+    assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
+
+    // Create table data container and extract data
+    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
+
+    // Use the new collection functions to populate the table data
+    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBoreSegments );
+
+    {
+        // Get COMPSEGS for main grid
+        bool isLgr = false;
+        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
+    }
+
+    {
+        // Get COMPSEGS for LGR grids
+        bool isLgr = true;
+        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
+    }
+
+    RicMswTableDataTools::collectWsegvalvData( tableData, exportInfo );
+    RicMswTableDataTools::collectWsegAicdData( tableData, exportInfo );
+
+    return tableData;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswTableData::generateFishbonesMswExportInfoForWell( const RimEclipseCase* eclipseCase,
+                                                                           const RimWellPath*    wellPath,
+                                                                           RicMswExportInfo*     exportInfo,
+                                                                           RicMswBranch*         branch )
+{
+    if ( !eclipseCase || !wellPath || !eclipseCase->eclipseCaseData() || !exportInfo || !branch )
+    {
+        return;
+    }
+
+    auto mswParameters = wellPath->mswCompletionParameters();
+    if ( !mswParameters )
+    {
+        return;
+    }
+
+    auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
+    double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+
+    int timeStep = 0;
+    if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, exportInfo, exportInfo->mainBoreBranch() ) )
+    {
+        return;
+    }
+
+    bool enableSegmentSplitting = false;
+    appendFishbonesMswExportInfo( eclipseCase,
+                                  wellPath,
+                                  initialMD,
+                                  cellIntersections,
+                                  enableSegmentSplitting,
+                                  exportInfo,
+                                  exportInfo->mainBoreBranch() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch )
 {
     auto allSegments = branch->allSegmentsRecursively();
@@ -395,7 +505,7 @@ bool RicWellPathExportMswTableData::appendFracturesMswExportInfo( RimEclipseCase
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RicWellPathExportMswTableData::generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
+bool RicWellPathExportMswTableData::generatePerforationsMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                                        const RimWellPath*                               wellPath,
                                                                        int                                              timeStep,
                                                                        double                                           initialMD,
@@ -1441,76 +1551,4 @@ std::pair<double, double>
         }
     }
     return std::make_pair( 0.0, 0.0 );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase,
-                                                                                                     RimWellPath*    wellPath,
-                                                                                                     int             timeStep,
-                                                                                                     bool exportCompletionsAfterMainBoreSegments )
-{
-    if ( !eclipseCase || !wellPath || eclipseCase->eclipseCaseData() == nullptr )
-    {
-        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
-    }
-
-    auto mswParameters = wellPath->mswCompletionParameters();
-    if ( !mswParameters )
-    {
-        return std::unexpected( "Invalid eclipse case or well path provided for MSW data extraction" );
-    }
-
-    auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
-    double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-
-    RiaDefines::EclipseUnitSystem unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-    RicMswExportInfo exportInfo( wellPath, unitSystem, initialMD, mswParameters->lengthAndDepth().text(), mswParameters->pressureDrop().text() );
-
-    // Generate all completion data using existing functions
-    if ( !generatePerforationsMswExportInfo( eclipseCase, wellPath, timeStep, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() ) )
-    {
-        return std::unexpected( "Failed to generate perforations MSW export info" );
-    }
-
-    // Add other completion types
-    bool enableSegmentSplitting = false;
-    appendFishbonesMswExportInfo( eclipseCase,
-                                  wellPath,
-                                  initialMD,
-                                  cellIntersections,
-                                  enableSegmentSplitting,
-                                  &exportInfo,
-                                  exportInfo.mainBoreBranch() );
-    appendFracturesMswExportInfo( eclipseCase, wellPath, initialMD, cellIntersections, &exportInfo, exportInfo.mainBoreBranch() );
-
-    updateDataForMultipleItemsInSameGridCell( exportInfo.mainBoreBranch() );
-
-    // Assign branch numbers
-    int branchNumber = 1;
-    assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
-
-    // Create table data container and extract data
-    RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
-
-    // Use the new collection functions to populate the table data
-    RicMswTableDataTools::collectWelsegsData( tableData, exportInfo, mswParameters->maxSegmentLength(), exportCompletionsAfterMainBoreSegments );
-
-    {
-        // Get COMPSEGS for main grid
-        bool isLgr = false;
-        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
-    }
-
-    {
-        // Get COMPSEGS for LGR grids
-        bool isLgr = true;
-        RicMswTableDataTools::collectCompsegData( tableData, exportInfo, isLgr );
-    }
-
-    RicMswTableDataTools::collectWsegvalvData( tableData, exportInfo );
-    RicMswTableDataTools::collectWsegAicdData( tableData, exportInfo );
-
-    return tableData;
 }

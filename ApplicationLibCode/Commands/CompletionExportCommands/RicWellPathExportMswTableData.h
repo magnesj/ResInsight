@@ -57,10 +57,15 @@ public:
                                                                                  int             timeStep,
                                                                                  bool exportCompletionsAfterMainBoreSegments = true );
 
+    static void generateFishbonesMswExportInfoForWell( const RimEclipseCase* eclipseCase,
+                                                       const RimWellPath*    wellPath,
+                                                       RicMswExportInfo*     exportInfo,
+                                                       RicMswBranch*         branch );
+
 private:
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
-    static bool generatePerforationsMswExportInfo( RimEclipseCase*                                  eclipseCase,
+    static bool generatePerforationsMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                                    const RimWellPath*                               wellPath,
                                                    int                                              timeStep,
                                                    double                                           initialMD,

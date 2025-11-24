@@ -25,6 +25,7 @@
 #include "RicMswSegment.h"
 #include "RicWellPathExportCompletionDataFeatureImpl.h"
 #include "RicWellPathExportMswCompletionsImpl.h"
+#include "RicWellPathExportMswTableData.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCompletionData.h"
@@ -207,7 +208,7 @@ void RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWell
                                  mswParameters->lengthAndDepth().text(),
                                  mswParameters->pressureDrop().text() );
 
-    RicWellPathExportMswCompletionsImpl::generateFishbonesMswExportInfoForWell( eclipseCase, wellPath, &exportInfo, exportInfo.mainBoreBranch() );
+    RicWellPathExportMswTableData::generateFishbonesMswExportInfoForWell( eclipseCase, wellPath, &exportInfo, exportInfo.mainBoreBranch() );
 
     bool isMainBore = false;
 
