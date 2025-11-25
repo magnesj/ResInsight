@@ -56,6 +56,8 @@ class PdmField;
 class PdmUiEditorAttribute;
 class PdmUiTreeOrdering;
 class PdmObjectCapability;
+class PdmValidationCapability;
+struct ValidationResult;
 
 #define CAF_PDM_HEADER_INIT CAF_PDM_XML_HEADER_INIT
 #define CAF_PDM_SOURCE_INIT CAF_PDM_XML_SOURCE_INIT
@@ -205,6 +207,9 @@ public:
     /// Does the same as the above method, but omits the default value.
     /// Consider this method private. Please use the CAF_PDM_InitFieldNoDefault() macro instead.
     void addFieldUiNoDefault( PdmFieldHandle* field, const QString& keyword, PdmUiItemInfo* fieldDescription );
+
+    /// Convenience method to validate this object
+    ValidationResult validate( const QString& configName = "" ) const;
 
 protected:
     PdmObjectHandle* doCopyObject() const override;

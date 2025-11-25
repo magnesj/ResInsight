@@ -1,6 +1,7 @@
 #include "cafPdmObject.h"
 
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmValidationCapability.h"
 
 using namespace caf;
 
@@ -126,4 +127,12 @@ void PdmObject::childrenFromClassKeyword( const QString& classKeyword, std::vect
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+ValidationResult PdmObject::validate( const QString& configName ) const
+{
+    return PdmValidationCapability::validateObject( this, configName );
 }
