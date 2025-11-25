@@ -63,6 +63,8 @@ set(PROJECT_FILES
     cafPdmDeprecation.h
     cafPdmLogging.h
     cafPdmLogging.cpp
+    cafPdmValidationCapability.h
+    cafPdmValidationCapability.cpp
 )
 
 add_library(${PROJECT_NAME} ${PROJECT_FILES})
