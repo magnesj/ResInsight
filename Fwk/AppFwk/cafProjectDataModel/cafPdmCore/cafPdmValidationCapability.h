@@ -49,21 +49,21 @@ class PdmObjectHandle;
 
 enum class ValidationStatus
 {
-    Valid,           // All fields and their combinations are valid
-    Warning,         // Non-critical issues that should be noted  
-    Error,           // Critical validation errors that prevent proper functionality
-    Incomplete       // Required fields are missing or incomplete
+    Valid, // All fields and their combinations are valid
+    Warning, // Non-critical issues that should be noted
+    Error, // Critical validation errors that prevent proper functionality
+    Incomplete // Required fields are missing or incomplete
 };
 
 struct ValidationResult
 {
-    ValidationStatus                status = ValidationStatus::Valid;
-    QString                        message;                    // Overall validation message
-    std::map<QString, QString>     fieldErrors;               // Map of field keywords to error messages
+    ValidationStatus           status = ValidationStatus::Valid;
+    QString                    message; // Overall validation message
+    std::map<QString, QString> fieldErrors; // Map of field keywords to error messages
 };
 
 // Type alias for validation callback function
-using ValidationCallback = std::function<ValidationResult(const QString& configName)>;
+using ValidationCallback = std::function<ValidationResult( const QString& configName )>;
 
 //==================================================================================================
 //
@@ -83,24 +83,28 @@ public:
     static ValidationResult validateObject( const PdmObjectHandle* object, const QString& configName = "" );
 
 private:
-    PdmObjectHandle*    m_owner;
-    ValidationCallback  m_validationCallback;
+    PdmObjectHandle*   m_owner;
+    ValidationCallback m_validationCallback;
 };
 
 } // namespace caf
 
 // Macro to add validation capability with a callback function
-#define CAF_PDM_InitValidation( validationFunction ) \
-    this->addCapability( new caf::PdmValidationCapability( this, true, \
-        [this]( const QString& configName ) -> caf::ValidationResult { \
-            return this->validationFunction( configName ); \
-        } ), true );
+#define CAF_PDM_InitValidation( validationFunction )                                                                    \
+    this->addCapability( new caf::PdmValidationCapability( this,                                                        \
+                                                           true,                                                        \
+                                                           [this]( const QString& configName ) -> caf::ValidationResult \
+                                                           { return this->validationFunction( configName ); } ),        \
+                         true );
 
 // Macro for objects that don't need validation (creates a default "valid" callback)
-#define CAF_PDM_InitDefaultValidation() \
-    this->addCapability( new caf::PdmValidationCapability( this, true, \
-        []( const QString& ) -> caf::ValidationResult { \
-            caf::ValidationResult result; \
-            result.status = caf::ValidationStatus::Valid; \
-            return result; \
-        } ), true );
+#define CAF_PDM_InitDefaultValidation()                                                                      \
+    this->addCapability( new caf::PdmValidationCapability( this,                                             \
+                                                           true,                                             \
+                                                           []( const QString& ) -> caf::ValidationResult     \
+                                                           {                                                 \
+                                                               caf::ValidationResult result;                 \
+                                                               result.status = caf::ValidationStatus::Valid; \
+                                                               return result;                                \
+                                                           } ),                                              \
+                         true );

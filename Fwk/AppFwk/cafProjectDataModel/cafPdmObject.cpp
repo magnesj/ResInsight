@@ -136,4 +136,3 @@ ValidationResult PdmObject::validate( const QString& configName ) const
 {
     return PdmValidationCapability::validateObject( this, configName );
 }
-

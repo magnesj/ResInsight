@@ -46,7 +46,7 @@ using namespace caf;
 PdmValidationCapability::PdmValidationCapability( PdmObjectHandle* owner, bool giveOwnership, ValidationCallback callback )
     : PdmObjectCapability()
     , m_owner( owner )
-    , m_validationCallback( std::move(callback) )
+    , m_validationCallback( std::move( callback ) )
 {
 }
 
@@ -59,7 +59,7 @@ ValidationResult PdmValidationCapability::validate( const QString& configName ) 
     {
         return m_validationCallback( configName );
     }
-    
+
     // No callback provided - assume valid
     ValidationResult result;
     result.status = ValidationStatus::Valid;
@@ -74,7 +74,7 @@ ValidationResult PdmValidationCapability::validateObject( const PdmObjectHandle*
     if ( !object )
     {
         ValidationResult result;
-        result.status = ValidationStatus::Error;
+        result.status  = ValidationStatus::Error;
         result.message = "Object is null";
         return result;
     }
@@ -84,7 +84,7 @@ ValidationResult PdmValidationCapability::validateObject( const PdmObjectHandle*
     {
         return validationCap->validate( configName );
     }
-    
+
     // No validation capability - assume valid
     ValidationResult result;
     result.status = ValidationStatus::Valid;
