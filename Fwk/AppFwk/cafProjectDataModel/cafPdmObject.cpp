@@ -127,3 +127,15 @@ void PdmObject::childrenFromClassKeyword( const QString& classKeyword, std::vect
         }
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+ValidationResult PdmObject::validate( const QString& configName ) const
+{
+    ValidationResult result;
+    result.status = ValidationStatus::Valid;
+
+    // Default implementation - derived classes override for custom validation logic
+    return result;
+}

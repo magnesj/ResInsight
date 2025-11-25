@@ -48,6 +48,8 @@ class QXmlStreamWriter;
 #include "cafPdmXmlObjectHandle.h"
 #include "cafPdmXmlObjectHandleMacros.h"
 
+#include <map>
+
 namespace caf
 {
 class PdmFieldHandle;
@@ -56,6 +58,21 @@ class PdmField;
 class PdmUiEditorAttribute;
 class PdmUiTreeOrdering;
 class PdmObjectCapability;
+
+enum class ValidationStatus
+{
+    Valid, // All fields and their combinations are valid
+    Warning, // Non-critical issues that should be noted
+    Error, // Critical validation errors that prevent proper functionality
+    Incomplete // Required fields are missing or incomplete
+};
+
+struct ValidationResult
+{
+    ValidationStatus           status = ValidationStatus::Valid;
+    QString                    message; // Overall validation message
+    std::map<QString, QString> fieldErrors; // Map of field keywords to error messages
+};
 
 #define CAF_PDM_HEADER_INIT CAF_PDM_XML_HEADER_INIT
 #define CAF_PDM_SOURCE_INIT CAF_PDM_XML_SOURCE_INIT
@@ -205,6 +222,11 @@ public:
     /// Does the same as the above method, but omits the default value.
     /// Consider this method private. Please use the CAF_PDM_InitFieldNoDefault() macro instead.
     void addFieldUiNoDefault( PdmFieldHandle* field, const QString& keyword, PdmUiItemInfo* fieldDescription );
+
+    /// Validates the object and its field combinations
+    /// The configName parameter can be used for context-specific validation (e.g., "UI", "Python")
+    /// Returns a ValidationResult containing status and any error messages
+    virtual ValidationResult validate( const QString& configName = "" ) const;
 
 protected:
     PdmObjectHandle* doCopyObject() const override;
