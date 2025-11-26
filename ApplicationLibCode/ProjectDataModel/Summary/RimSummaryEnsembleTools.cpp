@@ -519,5 +519,6 @@ void RimSummaryEnsembleTools::updateDependentDeltaEnsembles( const RimSummaryEns
     for ( auto referringEnsemble : referringObjects )
     {
         referringEnsemble->onSourceEnsembleChanged();
+        updateDependentDeltaEnsembles( referringEnsemble );
     }
 }
