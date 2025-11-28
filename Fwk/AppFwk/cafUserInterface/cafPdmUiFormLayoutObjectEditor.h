@@ -108,8 +108,8 @@ private:
                                             std::set<QString>*             fieldKeywordNames,
                                             std::set<QString>*             groupNames );
 
-    QLabel*      createLabel( QWidget* parent, PdmUiLabel* label, const QString& uiConfigName );
-    QPushButton* createButton( QWidget* parent, PdmUiButton* button, const QString& uiConfigName );
+    QLabel*      createLabel( QWidget* parent, const PdmUiLabel& label, const QString& uiConfigName );
+    QPushButton* createButton( QWidget* parent, const PdmUiButton& button, const QString& uiConfigName );
 
 private:
     std::map<PdmFieldHandle*, PdmUiFieldEditorHandle*> m_fieldViews;

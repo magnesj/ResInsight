@@ -178,7 +178,7 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
             }
             else if ( auto* label = dynamic_cast<PdmUiLabel*>( currentItem ) )
             {
-                if ( auto qLabel = createLabel( containerWidgetWithGridLayout, label, uiConfigName ) )
+                if ( auto qLabel = createLabel( containerWidgetWithGridLayout, *label, uiConfigName ) )
                 {
                     parentLayout->addWidget( qLabel, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
                     currentColumn += itemColumnSpan;
@@ -191,7 +191,7 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
             }
             else if ( auto* button = dynamic_cast<PdmUiButton*>( currentItem ) )
             {
-                if ( auto qButton = createButton( containerWidgetWithGridLayout, button, uiConfigName ) )
+                if ( auto qButton = createButton( containerWidgetWithGridLayout, *button, uiConfigName ) )
                 {
                     parentLayout->addWidget( qButton, currentRowIndex, currentColumn, 1, itemColumnSpan, button->alignment() );
                     currentColumn += itemColumnSpan;
@@ -433,13 +433,11 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, PdmUiLabel* label, const QString& uiConfigName )
+QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, const PdmUiLabel& label, const QString& uiConfigName )
 {
-    // Always create new label
     QLabel* qLabel = new QLabel( parent );
-    qLabel->setText( label->uiName( uiConfigName ) );
+    qLabel->setText( label.uiName( uiConfigName ) );
     qLabel->setWordWrap( true );
-    qLabel->setObjectName( label->uiName( uiConfigName ) );
 
     m_labels.push_back( qLabel );
     return qLabel;
@@ -448,26 +446,25 @@ QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, PdmUiLab
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QPushButton*
-    caf::PdmUiFormLayoutObjectEditor::createButton( QWidget* parent, PdmUiButton* button, const QString& uiConfigName )
+QPushButton* caf::PdmUiFormLayoutObjectEditor::createButton( QWidget*           parent,
+                                                             const PdmUiButton& button,
+                                                             const QString&     uiConfigName )
 {
-    // Always create new button
     QPushButton* qButton = new QPushButton( parent );
-    qButton->setText( button->uiName( uiConfigName ) );
-    qButton->setObjectName( button->uiName( uiConfigName ) );
+    qButton->setText( button.uiName( uiConfigName ) );
 
     // Set size policy to size the button to its content rather than fill available space
     qButton->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
 
     // Set icon if available
-    auto icon = button->uiIcon( uiConfigName );
+    auto icon = button.uiIcon( uiConfigName );
     if ( icon && !icon->isNull() )
     {
         qButton->setIcon( *icon );
     }
 
     // Connect callback if available
-    auto callback = button->clickCallback();
+    auto callback = button.clickCallback();
     if ( callback )
     {
         QObject::connect( qButton, &QPushButton::clicked, [callback]() { callback(); } );
