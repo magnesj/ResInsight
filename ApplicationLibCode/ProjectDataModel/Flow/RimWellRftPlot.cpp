@@ -1034,7 +1034,7 @@ void RimWellRftPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
 
     if ( changedField == &m_wellPathNameOrSimWellName )
     {
-        m_nameConfig->setCustomName( QString( plotNameFormatString() ).arg( m_wellPathNameOrSimWellName ) );
+        m_nameConfig->setCustomName( QString( plotNameFormatString() ).arg( m_wellPathNameOrSimWellName() ) );
 
         m_branchIndex = 0;
 

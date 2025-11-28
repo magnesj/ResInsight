@@ -318,7 +318,7 @@ caf::PdmScriptResponse RicExportContourMapToTextFeature::execute()
     QFile exportFile( m_exportFileName );
     if ( !exportFile.open( QIODevice::WriteOnly | QIODevice::Text ) )
     {
-        errorMessages << QString( "Export Contour Map to Text : Could not open the file: %1" ).arg( m_exportFileName );
+        errorMessages << QString( "Export Contour Map to Text : Could not open the file: %1" ).arg( m_exportFileName() );
     }
     else
     {

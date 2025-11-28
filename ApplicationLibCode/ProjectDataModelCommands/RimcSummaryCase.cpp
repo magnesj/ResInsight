@@ -189,7 +189,7 @@ std::expected<caf::PdmObjectHandle*, QString> RimSummaryCase_resampleValues::exe
     auto [isOk, values] = sumReader->values( adr );
     if ( !isOk )
     {
-        return std::unexpected( QString( "No values found for address: '%1'" ).arg( m_addressString ) );
+        return std::unexpected( QString( "No values found for address: '%1'" ).arg( m_addressString() ) );
     }
 
     const auto& timeValues = sumReader->timeSteps( adr );
