@@ -470,296 +470,299 @@ QPushButton* caf::PdmUiFormLayoutObjectEditor::createButton( QWidget*           
         // Connect callback if available
         if ( button->clickCallback() )
         {
-            QObject::connect( qButton, &QPushButton::clicked, [button]() mutable {
-                auto callback = button->clickCallback();
-                if ( callback )
+            QObject::connect( qButton,
+                              &QPushButton::clicked,
+                              [button]() mutable
+                              {
+                                  auto callback = button->clickCallback();
+                                  if ( callback )
+                                  {
+                                      callback();
+                                  }
+                              } );
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        ///
+        //--------------------------------------------------------------------------------------------------
+        caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateFieldEditor( QWidget * parent,
+                                                                                                PdmUiFieldHandle * field,
+                                                                                                const QString& uiConfigName )
+        {
+            caf::PdmUiFieldEditorHandle* fieldEditor = nullptr;
+
+            std::map<PdmFieldHandle*, PdmUiFieldEditorHandle*>::iterator it = m_fieldViews.find( field->fieldHandle() );
+
+            if ( it == m_fieldViews.end() )
+            {
+                fieldEditor = PdmUiFieldEditorHelper::createFieldEditorForField( field, uiConfigName );
+
+                if ( fieldEditor )
                 {
-                    callback();
+                    m_fieldViews[field->fieldHandle()] = fieldEditor;
+                    fieldEditor->setContainingEditor( this );
+                    fieldEditor->setUiField( field );
+                    fieldEditor->createWidgets( parent );
                 }
-            } );
-        }
+                else
+                {
+                    // This happens if no editor is available for a given field
+                    // If the macro for registering the editor is put as the single statement
+                    // in a cpp file, a dummy static class must be used to make sure the compile unit
+                    // is included
+                    //
+                    // See cafPdmUiCoreColor3f and cafPdmUiCoreVec3d
+                    //
+                    // Default editors are registered in cafPdmUiDefaultObjectEditor.cpp
+                    //
+                    // Exclude childArray and child object fields from this warning. A PdmChildArrayFieldHandle field
+                    // typically use a list or table editor, see RimWellPathGeometryDef::m_wellTargets
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateFieldEditor( QWidget*          parent,
-                                                                                        PdmUiFieldHandle* field,
-                                                                                        const QString&    uiConfigName )
-{
-    caf::PdmUiFieldEditorHandle* fieldEditor = nullptr;
-
-    std::map<PdmFieldHandle*, PdmUiFieldEditorHandle*>::iterator it = m_fieldViews.find( field->fieldHandle() );
-
-    if ( it == m_fieldViews.end() )
-    {
-        fieldEditor = PdmUiFieldEditorHelper::createFieldEditorForField( field, uiConfigName );
-
-        if ( fieldEditor )
-        {
-            m_fieldViews[field->fieldHandle()] = fieldEditor;
-            fieldEditor->setContainingEditor( this );
-            fieldEditor->setUiField( field );
-            fieldEditor->createWidgets( parent );
-        }
-        else
-        {
-            // This happens if no editor is available for a given field
-            // If the macro for registering the editor is put as the single statement
-            // in a cpp file, a dummy static class must be used to make sure the compile unit
-            // is included
-            //
-            // See cafPdmUiCoreColor3f and cafPdmUiCoreVec3d
-            //
-            // Default editors are registered in cafPdmUiDefaultObjectEditor.cpp
-            //
-            // Exclude childArray and child object fields from this warning. A PdmChildArrayFieldHandle field
-            // typically use a list or table editor, see RimWellPathGeometryDef::m_wellTargets
-
-            bool isChildArrayField  = dynamic_cast<PdmChildArrayFieldHandle*>( field->fieldHandle() ) != nullptr;
-            bool isChildObjectField = dynamic_cast<PdmChildFieldHandle*>( field->fieldHandle() ) != nullptr;
-            if ( !isChildArrayField && !isChildObjectField )
-            {
-                QString fieldTypeName = field ? field->fieldHandle()->keyword() : "unknown";
-                CAF_PDM_LOG_ERROR(
-                    QString( "UI Form Layout Editor: No field editor available for field type '%1' in config '%2'. "
-                             "Check that the field editor is properly registered." )
-                        .arg( fieldTypeName )
-                        .arg( uiConfigName.isEmpty() ? "default" : uiConfigName ) );
-            }
-        }
-    }
-    else
-    {
-        fieldEditor = it->second;
-    }
-
-    if ( fieldEditor )
-    {
-        m_usedFields.insert( field->fieldHandle() );
-    }
-
-    return fieldEditor;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void caf::PdmUiFormLayoutObjectEditor::ensureWidgetContainsEmptyGridLayout( QWidget* containerWidget,
-                                                                            QMargins contentMargins )
-{
-    CAF_ASSERT( containerWidget );
-    QLayout* layout = containerWidget->layout();
-    if ( layout != nullptr )
-    {
-        // Remove all items from the layout, then reparent the layout to a temporary
-        // This is because you cannot remove a layout from a widget but it gets moved when reparenting.
-        QLayoutItem* item;
-        while ( ( item = layout->takeAt( 0 ) ) != 0 )
-        {
-            delete item;
-        }
-        QWidget().setLayout( layout );
-    }
-
-    QGridLayout* gridLayout = new QGridLayout;
-    gridLayout->setContentsMargins( contentMargins );
-    containerWidget->setLayout( gridLayout );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void caf::PdmUiFormLayoutObjectEditor::groupBoxExpandedStateToggled( bool isExpanded )
-{
-    if ( !this->pdmObject()->xmlCapability() ) return;
-
-    QString         objKeyword = this->pdmObject()->xmlCapability()->classKeyword();
-    QMinimizePanel* panel      = dynamic_cast<QMinimizePanel*>( this->sender() );
-
-    if ( !panel ) return;
-
-    m_objectKeywordGroupUiNameExpandedState[objKeyword][panel->objectName()] = isExpanded;
-
-    // Required to update the layout when the group box is expanded
-    // https://github.com/OPM/ResInsight/issues/12119
-    updateUi();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
-{
-    // Trigger a hide event the editor to allow it to clean up. This is required to persist the changes in
-    // the editor when changing to a different dock widget. Hide all editors before deleting them.
-    // https://github.com/OPM/ResInsight/issues/12599
-    for ( const auto& [fieldHandle, fieldEditor] : m_fieldViews )
-    {
-        if ( fieldEditor && fieldEditor->editorWidget() )
-        {
-            fieldEditor->editorWidget()->hide();
-        }
-    }
-
-    // Delete all field editors, make sure this is done after the field editors have been hidden
-    for ( const auto& [fieldHandle, fieldEditor] : m_fieldViews )
-    {
-        if ( fieldEditor )
-        {
-            delete fieldEditor;
-        }
-    }
-    m_fieldViews.clear();
-
-    m_newGroupBoxes.clear();
-
-    std::map<QString, QPointer<QMinimizePanel>>::iterator groupIt;
-    for ( groupIt = m_groupBoxes.begin(); groupIt != m_groupBoxes.end(); ++groupIt )
-    {
-        QMinimizePanel* groupBox = groupIt->second;
-        if ( groupBox )
-        {
-            // https://github.com/OPM/ResInsight/issues/9719
-            // When opening a summary file from the command line, it seems like the groupBoxes are not deleted when
-            // using groupBox->deleteLater()
-
-            delete groupBox;
-        }
-    }
-
-    m_groupBoxes.clear();
-
-    for ( auto& label : m_labels )
-    {
-        if ( label )
-        {
-            delete label;
-        }
-    }
-    m_labels.clear();
-
-    for ( auto& button : m_buttons )
-    {
-        if ( button )
-        {
-            delete button;
-        }
-    }
-    m_buttons.clear();
-
-    // Note: Layouts are now managed by Qt's parent-child ownership system.
-    // When added to parent layouts via addLayout(), Qt automatically handles cleanup.
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiConfigName )
-{
-    caf::PdmUiOrdering config;
-    if ( pdmObject() )
-    {
-        caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
-        if ( uiObject )
-        {
-            uiObject->uiOrdering( uiConfigName, config );
-        }
-    }
-
-    // Set all fieldViews to be unvisited
-
-    m_usedFields.clear();
-
-    // Set all group Boxes to be unvisited
-    m_newGroupBoxes.clear();
-
-    recursivelyConfigureAndUpdateTopLevelUiOrdering( config, uiConfigName );
-
-    // Remove all fieldViews not mentioned by the configuration from the layout
-
-    std::vector<PdmFieldHandle*> fvhToRemoveFromMap;
-    for ( auto oldFvIt = m_fieldViews.begin(); oldFvIt != m_fieldViews.end(); ++oldFvIt )
-    {
-        if ( m_usedFields.count( oldFvIt->first ) == 0 )
-        {
-            // The old field editor is not present anymore, get rid of it
-            delete oldFvIt->second;
-            fvhToRemoveFromMap.push_back( oldFvIt->first );
-        }
-    }
-
-    for ( size_t i = 0; i < fvhToRemoveFromMap.size(); ++i )
-    {
-        m_fieldViews.erase( fvhToRemoveFromMap[i] );
-    }
-
-    // Remove all unmentioned group boxes
-
-    std::map<QString, QPointer<QMinimizePanel>>::iterator itOld;
-    std::map<QString, QPointer<QMinimizePanel>>::iterator itNew;
-
-    for ( itOld = m_groupBoxes.begin(); itOld != m_groupBoxes.end(); ++itOld )
-    {
-        itNew = m_newGroupBoxes.find( itOld->first );
-        if ( itNew == m_newGroupBoxes.end() )
-        {
-            // The old groupBox is not present anymore, get rid of it
-            if ( !itOld->second.isNull() ) delete itOld->second;
-        }
-    }
-    m_groupBoxes = m_newGroupBoxes;
-
-    // Notify pdm object when widgets have been created
-    caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
-    if ( uiObject )
-    {
-        uiObject->onEditorWidgetsCreated();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Unused. Should probably remove
-//--------------------------------------------------------------------------------------------------
-void caf::PdmUiFormLayoutObjectEditor::recursiveVerifyUniqueNames( const std::vector<PdmUiItem*>& uiItems,
-                                                                   const QString&                 uiConfigName,
-                                                                   std::set<QString>*             fieldKeywordNames,
-                                                                   std::set<QString>*             groupNames )
-{
-    for ( size_t i = 0; i < uiItems.size(); ++i )
-    {
-        if ( uiItems[i]->isUiGroup() )
-        {
-            PdmUiGroup*                    group         = static_cast<PdmUiGroup*>( uiItems[i] );
-            const std::vector<PdmUiItem*>& groupChildren = group->uiItems();
-
-            QString groupBoxKey = group->keyword();
-
-            if ( groupNames->find( groupBoxKey ) != groupNames->end() )
-            {
-                // It is not supported to have two groups with identical names
-                CAF_ASSERT( false );
+                    bool isChildArrayField = dynamic_cast<PdmChildArrayFieldHandle*>( field->fieldHandle() ) != nullptr;
+                    bool isChildObjectField = dynamic_cast<PdmChildFieldHandle*>( field->fieldHandle() ) != nullptr;
+                    if ( !isChildArrayField && !isChildObjectField )
+                    {
+                        QString fieldTypeName = field ? field->fieldHandle()->keyword() : "unknown";
+                        CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: No field editor available for field type "
+                                                    "'%1' in config '%2'. "
+                                                    "Check that the field editor is properly registered." )
+                                               .arg( fieldTypeName )
+                                               .arg( uiConfigName.isEmpty() ? "default" : uiConfigName ) );
+                    }
+                }
             }
             else
             {
-                groupNames->insert( groupBoxKey );
+                fieldEditor = it->second;
             }
 
-            recursiveVerifyUniqueNames( groupChildren, uiConfigName, fieldKeywordNames, groupNames );
+            if ( fieldEditor )
+            {
+                m_usedFields.insert( field->fieldHandle() );
+            }
+
+            return fieldEditor;
         }
-        else
+
+        //--------------------------------------------------------------------------------------------------
+        ///
+        //--------------------------------------------------------------------------------------------------
+        void caf::PdmUiFormLayoutObjectEditor::ensureWidgetContainsEmptyGridLayout( QWidget * containerWidget,
+                                                                                    QMargins contentMargins )
         {
-            PdmUiFieldHandle* field = dynamic_cast<PdmUiFieldHandle*>( uiItems[i] );
-
-            QString fieldKeyword = field->fieldHandle()->keyword();
-            if ( fieldKeywordNames->find( fieldKeyword ) != fieldKeywordNames->end() )
+            CAF_ASSERT( containerWidget );
+            QLayout* layout = containerWidget->layout();
+            if ( layout != nullptr )
             {
-                // It is not supported to have two fields with identical names
-                CAF_ASSERT( false );
+                // Remove all items from the layout, then reparent the layout to a temporary
+                // This is because you cannot remove a layout from a widget but it gets moved when reparenting.
+                QLayoutItem* item;
+                while ( ( item = layout->takeAt( 0 ) ) != 0 )
+                {
+                    delete item;
+                }
+                QWidget().setLayout( layout );
             }
-            else
+
+            QGridLayout* gridLayout = new QGridLayout;
+            gridLayout->setContentsMargins( contentMargins );
+            containerWidget->setLayout( gridLayout );
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        ///
+        //--------------------------------------------------------------------------------------------------
+        void caf::PdmUiFormLayoutObjectEditor::groupBoxExpandedStateToggled( bool isExpanded )
+        {
+            if ( !this->pdmObject()->xmlCapability() ) return;
+
+            QString         objKeyword = this->pdmObject()->xmlCapability()->classKeyword();
+            QMinimizePanel* panel      = dynamic_cast<QMinimizePanel*>( this->sender() );
+
+            if ( !panel ) return;
+
+            m_objectKeywordGroupUiNameExpandedState[objKeyword][panel->objectName()] = isExpanded;
+
+            // Required to update the layout when the group box is expanded
+            // https://github.com/OPM/ResInsight/issues/12119
+            updateUi();
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        ///
+        //--------------------------------------------------------------------------------------------------
+        void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
+        {
+            // Trigger a hide event the editor to allow it to clean up. This is required to persist the changes in
+            // the editor when changing to a different dock widget. Hide all editors before deleting them.
+            // https://github.com/OPM/ResInsight/issues/12599
+            for ( const auto& [fieldHandle, fieldEditor] : m_fieldViews )
             {
-                fieldKeywordNames->insert( fieldKeyword );
+                if ( fieldEditor && fieldEditor->editorWidget() )
+                {
+                    fieldEditor->editorWidget()->hide();
+                }
+            }
+
+            // Delete all field editors, make sure this is done after the field editors have been hidden
+            for ( const auto& [fieldHandle, fieldEditor] : m_fieldViews )
+            {
+                if ( fieldEditor )
+                {
+                    delete fieldEditor;
+                }
+            }
+            m_fieldViews.clear();
+
+            m_newGroupBoxes.clear();
+
+            std::map<QString, QPointer<QMinimizePanel>>::iterator groupIt;
+            for ( groupIt = m_groupBoxes.begin(); groupIt != m_groupBoxes.end(); ++groupIt )
+            {
+                QMinimizePanel* groupBox = groupIt->second;
+                if ( groupBox )
+                {
+                    // https://github.com/OPM/ResInsight/issues/9719
+                    // When opening a summary file from the command line, it seems like the groupBoxes are not deleted
+                    // when using groupBox->deleteLater()
+
+                    delete groupBox;
+                }
+            }
+
+            m_groupBoxes.clear();
+
+            for ( auto& label : m_labels )
+            {
+                if ( label )
+                {
+                    delete label;
+                }
+            }
+            m_labels.clear();
+
+            for ( auto& button : m_buttons )
+            {
+                if ( button )
+                {
+                    delete button;
+                }
+            }
+            m_buttons.clear();
+
+            // Note: Layouts are now managed by Qt's parent-child ownership system.
+            // When added to parent layouts via addLayout(), Qt automatically handles cleanup.
+        }
+
+        //--------------------------------------------------------------------------------------------------
+        ///
+        //--------------------------------------------------------------------------------------------------
+        void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiConfigName )
+        {
+            caf::PdmUiOrdering config;
+            if ( pdmObject() )
+            {
+                caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
+                if ( uiObject )
+                {
+                    uiObject->uiOrdering( uiConfigName, config );
+                }
+            }
+
+            // Set all fieldViews to be unvisited
+
+            m_usedFields.clear();
+
+            // Set all group Boxes to be unvisited
+            m_newGroupBoxes.clear();
+
+            recursivelyConfigureAndUpdateTopLevelUiOrdering( config, uiConfigName );
+
+            // Remove all fieldViews not mentioned by the configuration from the layout
+
+            std::vector<PdmFieldHandle*> fvhToRemoveFromMap;
+            for ( auto oldFvIt = m_fieldViews.begin(); oldFvIt != m_fieldViews.end(); ++oldFvIt )
+            {
+                if ( m_usedFields.count( oldFvIt->first ) == 0 )
+                {
+                    // The old field editor is not present anymore, get rid of it
+                    delete oldFvIt->second;
+                    fvhToRemoveFromMap.push_back( oldFvIt->first );
+                }
+            }
+
+            for ( size_t i = 0; i < fvhToRemoveFromMap.size(); ++i )
+            {
+                m_fieldViews.erase( fvhToRemoveFromMap[i] );
+            }
+
+            // Remove all unmentioned group boxes
+
+            std::map<QString, QPointer<QMinimizePanel>>::iterator itOld;
+            std::map<QString, QPointer<QMinimizePanel>>::iterator itNew;
+
+            for ( itOld = m_groupBoxes.begin(); itOld != m_groupBoxes.end(); ++itOld )
+            {
+                itNew = m_newGroupBoxes.find( itOld->first );
+                if ( itNew == m_newGroupBoxes.end() )
+                {
+                    // The old groupBox is not present anymore, get rid of it
+                    if ( !itOld->second.isNull() ) delete itOld->second;
+                }
+            }
+            m_groupBoxes = m_newGroupBoxes;
+
+            // Notify pdm object when widgets have been created
+            caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
+            if ( uiObject )
+            {
+                uiObject->onEditorWidgetsCreated();
             }
         }
-    }
-}
+
+        //--------------------------------------------------------------------------------------------------
+        /// Unused. Should probably remove
+        //--------------------------------------------------------------------------------------------------
+        void caf::PdmUiFormLayoutObjectEditor::recursiveVerifyUniqueNames( const std::vector<PdmUiItem*>& uiItems,
+                                                                           const QString&                 uiConfigName,
+                                                                           std::set<QString>* fieldKeywordNames,
+                                                                           std::set<QString>* groupNames )
+        {
+            for ( size_t i = 0; i < uiItems.size(); ++i )
+            {
+                if ( uiItems[i]->isUiGroup() )
+                {
+                    PdmUiGroup*                    group         = static_cast<PdmUiGroup*>( uiItems[i] );
+                    const std::vector<PdmUiItem*>& groupChildren = group->uiItems();
+
+                    QString groupBoxKey = group->keyword();
+
+                    if ( groupNames->find( groupBoxKey ) != groupNames->end() )
+                    {
+                        // It is not supported to have two groups with identical names
+                        CAF_ASSERT( false );
+                    }
+                    else
+                    {
+                        groupNames->insert( groupBoxKey );
+                    }
+
+                    recursiveVerifyUniqueNames( groupChildren, uiConfigName, fieldKeywordNames, groupNames );
+                }
+                else
+                {
+                    PdmUiFieldHandle* field = dynamic_cast<PdmUiFieldHandle*>( uiItems[i] );
+
+                    QString fieldKeyword = field->fieldHandle()->keyword();
+                    if ( fieldKeywordNames->find( fieldKeyword ) != fieldKeywordNames->end() )
+                    {
+                        // It is not supported to have two fields with identical names
+                        CAF_ASSERT( false );
+                    }
+                    else
+                    {
+                        fieldKeywordNames->insert( fieldKeyword );
+                    }
+                }
+            }
+        }
