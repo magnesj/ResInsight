@@ -59,7 +59,7 @@ jobs:
               unity-build: false,
               publish-to-pypi: false,
               vcpkg-bootstrap: bootstrap-vcpkg.sh,
-              qt-version: 6.7.0,
+              qt-version: 6.10.1,
               ri-unit-test-path: "ResInsight-tests",
             }
     env:
