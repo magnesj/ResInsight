@@ -448,9 +448,8 @@ QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, PdmUiLab
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QPushButton* caf::PdmUiFormLayoutObjectEditor::createButton( QWidget*       parent,
-                                                                   PdmUiButton*   button,
-                                                                   const QString& uiConfigName )
+QPushButton*
+    caf::PdmUiFormLayoutObjectEditor::createButton( QWidget* parent, PdmUiButton* button, const QString& uiConfigName )
 {
     // Always create new button
     QPushButton* qButton = new QPushButton( parent );
@@ -707,7 +706,6 @@ void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiCo
         }
     }
     m_groupBoxes = m_newGroupBoxes;
-
 
     // Notify pdm object when widgets have been created
     caf::PdmUiObjectHandle* uiObject = uiObj( pdmObject() );
