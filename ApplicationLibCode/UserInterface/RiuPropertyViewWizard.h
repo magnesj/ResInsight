@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2025     Equinor ASA
+//  Copyright (C) 2025 Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,40 +15,33 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "cafPdmField.h"
+#include <QStringList>
+#include <QWizard>
 
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
-
-#include <QString>
-
-class RimGenericJob;
-
-class RimJobCollection : public caf::PdmObject
+namespace caf
 {
-    CAF_PDM_HEADER_INIT;
+class PdmObject;
+class PdmUiPropertyView;
+} // namespace caf
 
+class QWidget;
+
+class RiuPropertyViewWizard : public QWizard
+{
 public:
-    RimJobCollection();
-    ~RimJobCollection() override;
+    RiuPropertyViewWizard( QWidget*           parent,
+                           caf::PdmObject*    object,
+                           const QString&     windowTitle,
+                           const QStringList& uiConfigNameForPages,
+                           const QStringList& pageSubtitles );
+    ~RiuPropertyViewWizard() override;
 
-    void addNewJob( RimGenericJob* newJob );
-
-    bool isEmpty();
-
-    int numberOfRunningJobs() const;
-
-    void deleteAllJobs();
-
-    std::vector<RimGenericJob*> jobs() const;
-
-    std::vector<RimGenericJob*> jobsMatchingKeyValue( const QString& key, const QString& value ) const;
-
-protected:
-    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    QSize minimumSizeHint() const override;
+    QSize sizeHint() const override;
 
 private:
-    caf::PdmChildArrayField<RimGenericJob*> m_jobs;
+    std::vector<caf::PdmUiPropertyView*> m_pageWidgets;
 };

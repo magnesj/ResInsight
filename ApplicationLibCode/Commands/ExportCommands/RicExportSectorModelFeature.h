@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2019-     Equinor ASA
-
+//  Copyright (C) 2025   Equinor ASA
+//
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
@@ -18,30 +18,23 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include "cafCmdFeature.h"
 
-class QString;
-class QDateTime;
-
-class RimSimWellInView;
-class RifSummaryReaderInterface;
-class RimSummaryCase;
+class RimEclipseView;
+class RicExportSectorModelUi;
 
 //==================================================================================================
 ///
-///
 //==================================================================================================
-namespace RimSimWellInViewTools
+class RicExportSectorModelFeature : public caf::CmdFeature
 {
-RimSummaryCase*              summaryCaseForWell( RimSimWellInView* well );
-std::vector<RimSummaryCase*> summaryCases();
-bool                         isInjector( RimSimWellInView* well );
-bool                         isProducer( RimSimWellInView* well );
+    CAF_CMD_HEADER_INIT;
 
-double extractValueForTimeStep( RifSummaryReaderInterface* summaryReader,
-                                const QString&             wellName,
-                                const std::string&         vectorName,
-                                const QDateTime&           currentDate,
-                                bool*                      isOk );
-} // namespace RimSimWellInViewTools
+protected:
+    bool isCommandEnabled() const override;
+    void onActionTriggered( bool isChecked ) override;
+    void setupActionLook( QAction* actionToSetup ) override;
+
+private:
+    void doExport( RicExportSectorModelUi* exportSettings, RimEclipseView* view );
+};

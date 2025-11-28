@@ -49,8 +49,7 @@ class RicExportEclipseSectorModelFeature : public caf::CmdFeature
 public:
     static void openDialogAndExecuteCommand( RimEclipseView* view );
     static void executeCommand( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings, const QString& logPrefix );
-
-    static std::pair<caf::VecIjk0, caf::VecIjk0> getVisibleCellRange( RimEclipseView* view, const cvf::UByteArray& cellVisibility );
+    static RimEclipseView* selectedView();
 
 protected:
     bool isCommandEnabled() const override;
@@ -58,10 +57,7 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    RimEclipseView*                  selectedView() const;
-    static cvf::ref<cvf::UByteArray> createVisibilityBasedOnBoxSelection( RimEclipseView*                      view,
-                                                                          const RicExportEclipseSectorModelUi& exportSettings );
-    static void                      exportGrid( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
-    static void                      exportFaults( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
-    static void                      exportParameters( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void exportGrid( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void exportFaults( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void exportParameters( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
 };

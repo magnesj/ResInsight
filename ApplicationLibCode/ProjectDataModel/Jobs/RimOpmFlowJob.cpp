@@ -119,7 +119,7 @@ RimOpmFlowJob::RimOpmFlowJob()
     CAF_PDM_InitField( &m_pauseBeforeRun, "PauseBeforeRun", false, "Pause before running OPM Flow" );
     CAF_PDM_InitField( &m_addNewWell, "AddNewWell", true, "Add New Well" );
     CAF_PDM_InitField( &m_openWellDeckPosition, "OpenWellDeckPosition", -1, "Open Well at Keyword Index" );
-    CAF_PDM_InitField( &m_includeMSWData, "IncludeMswData", false, "Include MSW Data (experimental)" );
+    CAF_PDM_InitField( &m_includeMSWData, "IncludeMswData", false, "Include MSW Data" );
     CAF_PDM_InitField( &m_addToEnsemble, "AddToEnsemble", false, "Add Runs to Ensemble" );
     CAF_PDM_InitField( &m_useRestart, "UseRestart", false, "Restart Simulation at Well Open Date" );
     CAF_PDM_InitField( &m_currentRunId, "CurrentRunID", 0, "Current Ensemble Run ID" );
@@ -233,6 +233,18 @@ void RimOpmFlowJob::processLogOutput( const QString& logLine )
     {
         m_errorsDetected++;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimOpmFlowJob::matchesKeyValue( const QString& key, const QString& value ) const
+{
+    if ( key == jobInputFileKey() )
+    {
+        return ( m_deckFileName() == value );
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -656,18 +668,32 @@ QString RimOpmFlowJob::deckName()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimOpmFlowJob::baseDeckName() const
+QString RimOpmFlowJob::baseDeckName()
 {
-    QFileInfo fi( m_deckFileName().path() );
-    return fi.completeBaseName();
+    if ( m_deckName.isEmpty() )
+    {
+        m_deckName = name();
+        m_deckName.replace( ' ', '_' );
+        m_deckName = m_deckName.toUpper();
+    }
+    return m_deckName;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimOpmFlowJob::restartDeckName() const
+QString RimOpmFlowJob::restartDeckName()
 {
-    return baseDeckName() + "_RST";
+    return inputDeckName() + "_RST";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimOpmFlowJob::inputDeckName() const
+{
+    QFileInfo fi( m_deckFileName().path() );
+    return fi.completeBaseName();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -735,6 +761,12 @@ std::map<QString, QString> RimOpmFlowJob::environment()
 //--------------------------------------------------------------------------------------------------
 bool RimOpmFlowJob::onPrepare()
 {
+    if ( name().isEmpty() )
+    {
+        RiaLogging::error( "Please set a name for the OPM Flow Job." );
+        return false;
+    }
+
     // reload file deck to make sure we start with the original
     closeDeckFile();
     if ( !openDeckFile() )
@@ -1191,4 +1223,12 @@ std::vector<QString> RimOpmFlowJob::wellgroupsInFileDeck()
         }
     }
     return groups;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimOpmFlowJob::jobInputFileKey()
+{
+    return "OpmFlowInputFile";
 }

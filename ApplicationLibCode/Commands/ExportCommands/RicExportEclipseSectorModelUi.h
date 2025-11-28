@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RigSimulationInputSettings.h"
+#include "RiaModelExportDefines.h"
 
 #include "cafAppEnum.h"
 #include "cafPdmChildArrayField.h"
@@ -37,7 +37,6 @@
 class RigEclipseCaseData;
 class RigSimWellData;
 class RimEclipseView;
-class RimKeywordBcprop;
 
 //==================================================================================================
 ///
@@ -55,17 +54,8 @@ class RicExportEclipseSectorModelUi : public caf::PdmObject
     };
     using ResultExportOptionsEnum = caf::AppEnum<ResultExportOptions>;
 
-    enum GridBoxSelection
-    {
-        VISIBLE_CELLS_BOX,
-        ACTIVE_CELLS_BOX,
-        VISIBLE_WELLS_BOX,
-        FULL_GRID_BOX,
-        MANUAL_SELECTION
-    };
-    using GridBoxSelectionEnum = caf::AppEnum<GridBoxSelection>;
-
-    using BoundaryConditionEnum = caf::AppEnum<RigSimulationInputSettings::BoundaryCondition>;
+    using GridBoxSelectionEnum  = caf::AppEnum<RiaModelExportDefines::GridBoxSelection>;
+    using BoundaryConditionEnum = caf::AppEnum<RiaModelExportDefines::BoundaryCondition>;
 
 public:
     RicExportEclipseSectorModelUi();
@@ -90,10 +80,6 @@ public:
     QString exportParametersFilename() const;
     bool    writeEchoKeywords() const;
 
-    static std::vector<const RigSimWellData*> getVisibleSimulationWells( RimEclipseView* view );
-    static std::pair<caf::VecIjk0, caf::VecIjk0>
-        computeVisibleWellCells( RimEclipseView* view, RigEclipseCaseData* caseData, int visibleWellsPadding );
-
     caf::PdmField<bool> exportGrid;
     caf::PdmField<bool> exportInLocalCoordinates;
     caf::PdmField<bool> makeInvisibleCellsInactive;
@@ -105,14 +91,6 @@ public:
     caf::PdmField<std::vector<QString>> selectedKeywords;
 
     caf::PdmField<GridBoxSelectionEnum> exportGridBox;
-
-    caf::PdmChildArrayField<RimKeywordBcprop*> m_bcpropKeywords;
-
-    caf::PdmField<bool> m_exportSimulationInput;
-
-    caf::PdmField<BoundaryConditionEnum> m_boundaryCondition;
-
-    caf::PdmField<double> m_porvMultiplier;
 
     caf::PdmField<int> m_visibleWellsPadding;
 

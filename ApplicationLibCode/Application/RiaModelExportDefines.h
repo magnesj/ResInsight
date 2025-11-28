@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2025     Equinor ASA
+//  Copyright (C) 2025 Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -15,40 +15,27 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
-
-#include "cafPdmField.h"
-
-#include "cafPdmChildArrayField.h"
-#include "cafPdmObject.h"
 
 #include <QString>
 
-class RimGenericJob;
-
-class RimJobCollection : public caf::PdmObject
+namespace RiaModelExportDefines
 {
-    CAF_PDM_HEADER_INIT;
 
-public:
-    RimJobCollection();
-    ~RimJobCollection() override;
-
-    void addNewJob( RimGenericJob* newJob );
-
-    bool isEmpty();
-
-    int numberOfRunningJobs() const;
-
-    void deleteAllJobs();
-
-    std::vector<RimGenericJob*> jobs() const;
-
-    std::vector<RimGenericJob*> jobsMatchingKeyValue( const QString& key, const QString& value ) const;
-
-protected:
-    void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
-
-private:
-    caf::PdmChildArrayField<RimGenericJob*> m_jobs;
+enum GridBoxSelection
+{
+    VISIBLE_CELLS_BOX,
+    ACTIVE_CELLS_BOX,
+    VISIBLE_WELLS_BOX,
+    FULL_GRID_BOX,
+    MANUAL_SELECTION
 };
+
+enum BoundaryCondition
+{
+    OPERNUM_OPERATER,
+    BCCON_BCPROP
+};
+
+} // namespace RiaModelExportDefines

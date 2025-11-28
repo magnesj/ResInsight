@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaLogging.h"
+#include "RiaModelExportDefines.h"
 #include "RiaResultNames.h"
 
 #include "RicExportEclipseSectorModelUi.h"
@@ -40,6 +41,7 @@
 #include "RimFaultInView.h"
 #include "RimFaultInViewCollection.h"
 #include "RimProject.h"
+#include "Tools/RimEclipseViewTools.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigBoundingBoxIjk.h"
@@ -95,9 +97,9 @@ void RicExportEclipseSectorModelFeature::openDialogAndExecuteCommand( RimEclipse
     cvf::UByteArray cellVisibility;
     view->calculateCurrentTotalCellVisibility( &cellVisibility, view->currentTimeStep() );
 
-    const auto& [min, max] = getVisibleCellRange( view, cellVisibility );
+    const auto& [min, max] = RimEclipseViewTools::getVisibleCellRange( view, cellVisibility );
 
-    RicExportEclipseSectorModelUi* exportSettings = RimProject::current()->dialogData()->exportSectorModelUi();
+    RicExportEclipseSectorModelUi* exportSettings = RimProject::current()->dialogData()->exportEclipseSectorModelUi();
     exportSettings->setCaseData( caseData, view, min, max );
 
     exportSettings->applyBoundaryDefaults();
@@ -149,39 +151,6 @@ void RicExportEclipseSectorModelFeature::executeCommand( RimEclipseView*        
         auto task = progress.task( "Export Faults", faultsProgressPercentage );
         exportFaults( view, exportSettings );
     }
-
-    // Export simulation input if enabled
-    if ( exportSettings.m_exportSimulationInput() )
-    {
-        // Convert UI settings to RigSimulationInputSettings
-        RigSimulationInputSettings settings;
-        settings.setMin( exportSettings.min() );
-        settings.setMax( exportSettings.max() );
-        settings.setRefinement( exportSettings.refinement() );
-
-        std::vector<Opm::DeckRecord> bcpropKeywords;
-        for ( auto bcprop : exportSettings.m_bcpropKeywords )
-        {
-            Opm::DeckKeyword kw     = bcprop->keyword();
-            const auto&      record = kw.getRecord( 0 );
-            bcpropKeywords.push_back( record );
-        }
-        settings.setBcpropKeywords( bcpropKeywords );
-        settings.setBoundaryCondition( exportSettings.m_boundaryCondition() );
-        settings.setPorvMultiplier( exportSettings.m_porvMultiplier() );
-
-        // Get input deck file name from eclipse case
-        QFileInfo fi( view->eclipseCase()->gridFileName() );
-        QString   dataFileName = fi.absolutePath() + "/" + fi.completeBaseName() + ".DATA";
-        settings.setInputDeckFileName( dataFileName );
-        settings.setOutputDeckFileName( exportSettings.exportGridFilename() );
-
-        cvf::ref<cvf::UByteArray> cellVisibility = createVisibilityBasedOnBoxSelection( view, exportSettings );
-        if ( auto result = RigSimulationInputTool::exportSimulationInput( *view->eclipseCase(), settings, cellVisibility.p() ); !result )
-        {
-            RiaLogging::error( QString( "Failed to export simulation input: %1" ).arg( result.error() ) );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -191,7 +160,6 @@ void RicExportEclipseSectorModelFeature::exportGrid( RimEclipseView* view, const
 {
     cvf::UByteArray cellVisibility;
     view->calculateCurrentTotalCellVisibility( &cellVisibility, view->currentTimeStep() );
-    getVisibleCellRange( view, cellVisibility );
 
     const cvf::UByteArray* cellVisibilityForActnum = exportSettings.makeInvisibleCellsInactive() ? &cellVisibility : nullptr;
 
@@ -317,35 +285,6 @@ void RicExportEclipseSectorModelFeature::exportFaults( RimEclipseView* view, con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<caf::VecIjk0, caf::VecIjk0> RicExportEclipseSectorModelFeature::getVisibleCellRange( RimEclipseView*        view,
-                                                                                               const cvf::UByteArray& cellVisibillity )
-{
-    const RigMainGrid* mainGrid = view->eclipseCase()->mainGrid();
-    caf::VecIjk0       max      = caf::VecIjk0::ZERO;
-    caf::VecIjk0       min( mainGrid->cellCountI() - 1, mainGrid->cellCountJ() - 1, mainGrid->cellCountK() - 1 );
-
-    size_t cellCount = mainGrid->cellCount();
-    for ( size_t index = 0; index < cellCount; ++index )
-    {
-        if ( cellVisibillity[index] )
-        {
-            auto ijk = mainGrid->ijkFromCellIndex( index );
-            if ( ijk.has_value() )
-            {
-                for ( int n = 0; n < 3; ++n )
-                {
-                    min[n] = std::min( min[n], ijk.value()[n] );
-                    max[n] = std::max( max[n], ijk.value()[n] );
-                }
-            }
-        }
-    }
-    return std::make_pair( min, max );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 bool RicExportEclipseSectorModelFeature::isCommandEnabled() const
 {
     return selectedView() != nullptr;
@@ -371,7 +310,7 @@ void RicExportEclipseSectorModelFeature::setupActionLook( QAction* actionToSetup
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEclipseView* RicExportEclipseSectorModelFeature::selectedView() const
+RimEclipseView* RicExportEclipseSectorModelFeature::selectedView()
 {
     auto contextViewer = dynamic_cast<RiuViewer*>( caf::CmdFeatureManager::instance()->currentContextMenuTargetWidget() );
     if ( contextViewer != nullptr )
@@ -384,64 +323,4 @@ RimEclipseView* RicExportEclipseSectorModelFeature::selectedView() const
     // Command triggered from project tree or file menu
     auto view = caf::SelectionManager::instance()->selectedItemAncestorOfType<RimEclipseView>();
     return view;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-cvf::ref<cvf::UByteArray>
-    RicExportEclipseSectorModelFeature::createVisibilityBasedOnBoxSelection( RimEclipseView*                      view,
-                                                                             const RicExportEclipseSectorModelUi& exportSettings )
-{
-    RigEclipseCaseData* caseData = view->eclipseCase()->eclipseCaseData();
-
-    switch ( exportSettings.exportGridBox() )
-    {
-        case RicExportEclipseSectorModelUi::VISIBLE_WELLS_BOX:
-        {
-            auto [minWellCells, maxWellCells] =
-                RicExportEclipseSectorModelUi::computeVisibleWellCells( view, caseData, exportSettings.m_visibleWellsPadding() );
-            return RigEclipseCaseDataTools::createVisibilityFromIjkBounds( caseData, minWellCells, maxWellCells );
-        }
-        case RicExportEclipseSectorModelUi::ACTIVE_CELLS_BOX:
-        {
-            // For active cells, we need to create a
-            // visibility array based on active cells
-            auto   activeCellInfo       = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-            auto   activeReservoirCells = activeCellInfo->activeReservoirCellIndices();
-            size_t totalCellCount       = caseData->mainGrid()->cellCount();
-
-            cvf::ref<cvf::UByteArray> visibility = new cvf::UByteArray( totalCellCount );
-            visibility->setAll( false );
-
-            for ( auto activeCellIdx : activeReservoirCells )
-            {
-                visibility->set( activeCellIdx.value(), true );
-            }
-            return visibility;
-        }
-        case RicExportEclipseSectorModelUi::VISIBLE_CELLS_BOX:
-        {
-            // Use the current total cell visibility
-            // from the view
-            cvf::ref<cvf::UByteArray> cellVisibility = new cvf::UByteArray();
-            view->calculateCurrentTotalCellVisibility( cellVisibility.p(), view->currentTimeStep() );
-            return cellVisibility;
-        }
-        case RicExportEclipseSectorModelUi::MANUAL_SELECTION:
-        {
-            return RigEclipseCaseDataTools::createVisibilityFromIjkBounds( caseData, exportSettings.min(), exportSettings.max() );
-        }
-        case RicExportEclipseSectorModelUi::FULL_GRID_BOX:
-        {
-            // For full grid, create visibility for
-            // all cells
-            const RigMainGrid* mainGrid = caseData->mainGrid();
-            const caf::VecIjk0 minIjk   = caf::VecIjk0::ZERO;
-            const caf::VecIjk0 maxIjk( mainGrid->cellCountI(), mainGrid->cellCountJ(), mainGrid->cellCountK() );
-            return RigEclipseCaseDataTools::createVisibilityFromIjkBounds( caseData, minIjk, maxIjk );
-        }
-        default:
-            return nullptr;
-    }
 }
