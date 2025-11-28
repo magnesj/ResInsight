@@ -467,12 +467,17 @@ QPushButton* caf::PdmUiFormLayoutObjectEditor::createButton( QWidget*           
     auto callback = button.clickCallback();
     if ( callback )
     {
-        QObject::connect( qButton, &QPushButton::clicked, [callback]() { callback(); } );
-    }
-
-    m_buttons.push_back( qButton );
-    return qButton;
-}
+        // Connect callback if available
+        if ( button->clickCallback() )
+        {
+            QObject::connect( qButton, &QPushButton::clicked, [button]() mutable {
+                auto callback = button->clickCallback();
+                if ( callback )
+                {
+                    callback();
+                }
+            } );
+        }
 
 //--------------------------------------------------------------------------------------------------
 ///
