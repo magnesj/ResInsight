@@ -31,26 +31,27 @@ def test_get_completion_data_basic(rips_instance, initialize_test):
     # Get the trajectory properties to find valid MD range
     result = well_path.trajectory_properties(resampling_interval=10.0)
     measured_depths = result["measured_depth"]
-    
+
     # Use measured depth range from the actual well trajectory
     start_md = measured_depths[len(measured_depths) // 2]  # Middle of well
-    end_md = measured_depths[len(measured_depths) // 2 + 10] if len(measured_depths) > 20 else measured_depths[-1]
+    end_md = (
+        measured_depths[len(measured_depths) // 2 + 10]
+        if len(measured_depths) > 20
+        else measured_depths[-1]
+    )
 
     # Add perforation intervals (completions)
     perf_interval = well_path.append_perforation_interval(
-        start_md=start_md,
-        end_md=end_md, 
-        diameter=0.25,
-        skin_factor=0.1
+        start_md=start_md, end_md=end_md, diameter=0.25, skin_factor=0.1
     )
     assert perf_interval is not None
 
     # Test the completion_data method
     completion_data = well_path.completion_data(case.id)
-    
+
     # Verify basic structure exists
     assert completion_data is not None
-    
+
     # Should have WELSPECS data for the well
     assert len(completion_data.welspecs) > 0
     welspec = completion_data.welspecs[0]
@@ -67,7 +68,7 @@ def test_get_completion_data_basic(rips_instance, initialize_test):
     assert compdat.upper_k > 0
     assert compdat.lower_k > 0
     assert compdat.open_shut_flag in ["OPEN", "SHUT"]
-    
+
     # Check measured depth information in COMPDAT
     assert compdat.HasField("start_md")
     assert compdat.HasField("end_md")
@@ -96,14 +97,15 @@ def test_get_completion_data_with_valves(rips_instance, initialize_test):
     result = well_path.trajectory_properties(resampling_interval=10.0)
     measured_depths = result["measured_depth"]
     start_md = measured_depths[len(measured_depths) // 2]
-    end_md = measured_depths[len(measured_depths) // 2 + 10] if len(measured_depths) > 20 else measured_depths[-1]
+    end_md = (
+        measured_depths[len(measured_depths) // 2 + 10]
+        if len(measured_depths) > 20
+        else measured_depths[-1]
+    )
 
     # Add perforation interval with valve
     perf_interval = well_path.append_perforation_interval(
-        start_md=start_md,
-        end_md=end_md,
-        diameter=0.25,
-        skin_factor=0.1
+        start_md=start_md, end_md=end_md, diameter=0.25, skin_factor=0.1
     )
 
     # Add a valve to the perforation interval
@@ -117,7 +119,7 @@ def test_get_completion_data_with_valves(rips_instance, initialize_test):
         template=valve_defs[0],
         start_md=valve_start_md,
         end_md=valve_end_md,
-        valve_count=2
+        valve_count=2,
     )
     assert valve is not None
 
@@ -152,22 +154,22 @@ def test_get_completion_data_multiple_intervals(rips_instance, initialize_test):
     # Get trajectory properties for valid MD ranges
     result = well_path.trajectory_properties(resampling_interval=10.0)
     measured_depths = result["measured_depth"]
-    
+
     # Create three intervals along the well path
     total_length = len(measured_depths)
     if total_length >= 30:
         # Interval 1: Early part of well
         start_md1 = measured_depths[total_length // 4]
         end_md1 = measured_depths[total_length // 4 + 5]
-        
-        # Interval 2: Middle part of well 
+
+        # Interval 2: Middle part of well
         start_md2 = measured_depths[total_length // 2]
         end_md2 = measured_depths[total_length // 2 + 5]
-        
+
         # Interval 3: Later part of well
         start_md3 = measured_depths[3 * total_length // 4]
         end_md3 = measured_depths[3 * total_length // 4 + 5]
-        
+
         # Add multiple perforation intervals
         interval1 = well_path.append_perforation_interval(
             start_md=start_md1, end_md=end_md1, diameter=0.2, skin_factor=0.0
@@ -202,7 +204,7 @@ def test_get_completion_data_multiple_intervals(rips_instance, initialize_test):
                 has_md_data = True
                 assert compdat.start_md >= 0
                 assert compdat.end_md >= compdat.start_md
-                
+
         assert has_md_data, "Should have measured depth data in COMPDAT"
     else:
         # Skip test if well is too short for multiple intervals
@@ -228,7 +230,11 @@ def test_get_completion_data_field_validation(rips_instance, initialize_test):
     result = well_path.trajectory_properties(resampling_interval=10.0)
     measured_depths = result["measured_depth"]
     start_md = measured_depths[len(measured_depths) // 2]
-    end_md = measured_depths[len(measured_depths) // 2 + 5] if len(measured_depths) > 10 else measured_depths[-1]
+    end_md = (
+        measured_depths[len(measured_depths) // 2 + 5]
+        if len(measured_depths) > 10
+        else measured_depths[-1]
+    )
 
     perf_interval = well_path.append_perforation_interval(start_md, end_md, 0.25, 0.1)
     assert perf_interval is not None
@@ -240,7 +246,7 @@ def test_get_completion_data_field_validation(rips_instance, initialize_test):
     # Validate COMPDAT optional fields
     if len(completion_data.compdat) > 0:
         comp = completion_data.compdat[0]
-        
+
         # Test required fields
         assert comp.well_name == "FieldValidationTest"
         assert comp.grid_i > 0
@@ -248,7 +254,7 @@ def test_get_completion_data_field_validation(rips_instance, initialize_test):
         assert comp.upper_k > 0
         assert comp.lower_k > 0
         assert comp.open_shut_flag in ["OPEN", "SHUT"]
-        
+
         # Test optional double fields - verify type and range when present
         if comp.HasField("transmissibility"):
             assert comp.transmissibility >= 0.0
@@ -262,14 +268,14 @@ def test_get_completion_data_field_validation(rips_instance, initialize_test):
     # Validate WELSPECS required and optional fields
     if len(completion_data.welspecs) > 0:
         welspec = completion_data.welspecs[0]
-        
+
         # Required fields
         assert welspec.well_name == "FieldValidationTest"
         assert welspec.group_name
         assert welspec.grid_i > 0
         assert welspec.grid_j > 0
         assert welspec.phase in ["OIL", "GAS", "WATER", "LIQ"]
-        
+
         # Optional fields
         if welspec.HasField("bhp_depth"):
             assert welspec.bhp_depth >= 0.0
@@ -293,7 +299,7 @@ def test_get_completion_data_invalid_case_id(rips_instance, initialize_test):
     geometry = well_path.well_path_geometry()
     surface_coord = [460000.0, 5930000.0, 1600.0]
     bottom_coord = [461000.0, 5931000.0, 1900.0]
-    
+
     geometry.append_well_target(surface_coord)
     geometry.append_well_target(bottom_coord)
     well_path.update()
@@ -310,7 +316,11 @@ def test_get_completion_data_invalid_case_id(rips_instance, initialize_test):
         # With invalid case, completion data should be empty or minimal
     except Exception as e:
         # Acceptable if it throws an error for invalid case ID
-        assert "case" in str(e).lower() or "invalid" in str(e).lower() or "id" in str(e).lower()
+        assert (
+            "case" in str(e).lower()
+            or "invalid" in str(e).lower()
+            or "id" in str(e).lower()
+        )
 
 
 def test_get_completion_data_empty_well(rips_instance, initialize_test):
@@ -329,7 +339,7 @@ def test_get_completion_data_empty_well(rips_instance, initialize_test):
     geometry = well_path.well_path_geometry()
     surface_coord = [460000.0, 5930000.0, 1600.0]
     bottom_coord = [461000.0, 5931000.0, 1900.0]
-    
+
     geometry.append_well_target(surface_coord)
     geometry.append_well_target(bottom_coord)
     well_path.update()
