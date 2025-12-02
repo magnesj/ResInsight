@@ -20,6 +20,8 @@
 
 #include "RiaDefines.h"
 
+#include "Tools/enum_bitmask.hpp"
+
 #include <gsl/gsl>
 
 #include <expected>
@@ -49,11 +51,23 @@ struct WellPathCellIntersectionInfo;
 class RicWellPathExportMswTableData
 {
 public:
+    enum class CompletionType
+    {
+        NONE         = 0x00,
+        PERFORATIONS = 0x01,
+        FISHBONES    = 0x02,
+        FRACTURES    = 0x04,
+        ALL          = PERFORATIONS | FISHBONES | FRACTURES
+    };
+
     // The intention is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
     static std::expected<RigMswTableData, std::string> extractSingleWellMswData( RimEclipseCase* eclipseCase,
                                                                                  RimWellPath*    wellPath,
                                                                                  int             timeStep,
-                                                                                 bool exportCompletionsAfterMainBoreSegments = true );
+                                                                                 bool exportCompletionsAfterMainBoreSegments = true,
+                                                                                 CompletionType completionType = CompletionType::ALL );
+
+    static CompletionType convertFromExportSettings( const class RicExportCompletionDataSettingsUi& settings );
 
     static void generateFishbonesMswExportInfoForWell( const RimEclipseCase* eclipseCase,
                                                        const RimWellPath*    wellPath,
@@ -63,13 +77,14 @@ public:
 private:
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
-    static bool generatePerforationsMswExportInfo( const RimEclipseCase*                            eclipseCase,
-                                                   const RimWellPath*                               wellPath,
-                                                   int                                              timeStep,
-                                                   double                                           initialMD,
-                                                   const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
-                                                   gsl::not_null<RicMswExportInfo*>                 exportInfo,
-                                                   gsl::not_null<RicMswBranch*>                     branch );
+    static bool generateWellSegmentsForMswExportInfo( const RimEclipseCase*                            eclipseCase,
+                                                      const RimWellPath*                               wellPath,
+                                                      bool                                             createSegmentsForPerforations,
+                                                      int                                              timeStep,
+                                                      double                                           initialMD,
+                                                      const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
+                                                      gsl::not_null<RicMswExportInfo*>                 exportInfo,
+                                                      gsl::not_null<RicMswBranch*>                     branch );
 
     static void appendFishbonesMswExportInfo( const RimEclipseCase*                            eclipseCase,
                                               const RimWellPath*                               wellPath,
@@ -169,3 +184,5 @@ private:
 
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
 };
+
+ENABLE_BITMASK_OPERATORS( RicWellPathExportMswTableData::CompletionType )

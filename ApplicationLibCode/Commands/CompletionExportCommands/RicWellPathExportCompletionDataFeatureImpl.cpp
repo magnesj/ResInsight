@@ -199,9 +199,6 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                 }
 
                 std::map<size_t, std::vector<RigCompletionData>> completionsPerEclipseCellAllCompletionTypes;
-                std::map<size_t, std::vector<RigCompletionData>> completionsPerEclipseCellFishbones;
-                std::map<size_t, std::vector<RigCompletionData>> completionsPerEclipseCellFracture;
-                std::map<size_t, std::vector<RigCompletionData>> completionsPerEclipseCellPerforations;
 
                 for ( auto wellPathLateral : allWellPathLaterals )
                 {
@@ -220,7 +217,6 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                                                                exportSettings );
 
                         appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, perforationCompletionData );
-                        appendCompletionData( &completionsPerEclipseCellPerforations, perforationCompletionData );
                     }
 
                     if ( exportSettings.includeFishbones )
@@ -233,7 +229,6 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                                                                                                                                      exportSettings );
 
                         appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, fishbonesCompletionData );
-                        appendCompletionData( &completionsPerEclipseCellFishbones, fishbonesCompletionData );
                     }
 
                     if ( exportSettings.includeFractures() )
@@ -253,33 +248,12 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                                                                                                exportSettings.transScalingWBHP() ) );
 
                         appendCompletionData( &completionsPerEclipseCellAllCompletionTypes, fractureCompletionData );
-                        appendCompletionData( &completionsPerEclipseCellFracture, fractureCompletionData );
                     }
                 }
 
-                if ( exportSettings.reportCompletionsTypesIndividually() )
+                for ( auto& data : completionsPerEclipseCellAllCompletionTypes )
                 {
-                    for ( auto& data : completionsPerEclipseCellFracture )
-                    {
-                        completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
-                    }
-
-                    for ( auto& data : completionsPerEclipseCellFishbones )
-                    {
-                        completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
-                    }
-
-                    for ( auto& data : completionsPerEclipseCellPerforations )
-                    {
-                        completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
-                    }
-                }
-                else
-                {
-                    for ( auto& data : completionsPerEclipseCellAllCompletionTypes )
-                    {
-                        completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
-                    }
+                    completions.push_back( combineEclipseCellCompletions( data.second, exportSettings ) );
                 }
 
                 progress.incrementProgress();
@@ -329,7 +303,7 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                     }
                 }
 
-                QString fileName = QString( "%1_UnifiedCompletions_%2" ).arg( wellPath->name() ).arg( eclipseCaseName );
+                QString fileName = QString( "%1_Completions_%2" ).arg( wellPath->name() ).arg( eclipseCaseName );
                 sortAndExportCompletionsToFile( exportSettings.caseToApply,
                                                 exportSettings.folder,
                                                 fileName,
@@ -338,62 +312,6 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
                                                 exportSettings.compdatExport,
                                                 exportSettings.exportDataSourceAsComment(),
                                                 exportSettings.exportWelspec() );
-            }
-        }
-        else if ( exportSettings.fileSplit == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL_AND_COMPLETION_TYPE )
-        {
-            std::vector<RigCompletionData::CompletionType> completionTypes;
-            completionTypes.push_back( RigCompletionData::CompletionType::FISHBONES );
-            completionTypes.push_back( RigCompletionData::CompletionType::FRACTURE );
-            completionTypes.push_back( RigCompletionData::CompletionType::PERFORATION );
-
-            for ( const auto& completionType : completionTypes )
-            {
-                for ( auto wellPath : wellPaths )
-                {
-                    std::vector<RigCompletionData> completionsForWell;
-                    for ( const auto& completion : completions )
-                    {
-                        if ( completionType == completion.completionType() )
-                        {
-                            if ( wellPath == topLevelWellPath( completion ) )
-                            {
-                                completionsForWell.push_back( completion );
-                            }
-                        }
-                    }
-
-                    if ( completionsForWell.empty() ) continue;
-
-                    std::vector<RicWellPathFractureReportItem> reportItemsForWell;
-                    if ( completionType == RigCompletionData::CompletionType::FRACTURE )
-                    {
-                        for ( const auto& fracItem : fractureDataReportItems )
-                        {
-                            if ( fracItem.wellPathNameForExport() == wellPath->completionSettings()->wellNameForExport() )
-                            {
-                                reportItemsForWell.push_back( fracItem );
-                            }
-                        }
-                    }
-
-                    {
-                        QString completionTypeText;
-                        if ( completionType == RigCompletionData::CompletionType::FISHBONES ) completionTypeText = "Fishbones";
-                        if ( completionType == RigCompletionData::CompletionType::FRACTURE ) completionTypeText = "Fracture";
-                        if ( completionType == RigCompletionData::CompletionType::PERFORATION ) completionTypeText = "Perforation";
-
-                        QString fileName = QString( "%1_%2_%3" ).arg( wellPath->name() ).arg( completionTypeText ).arg( eclipseCaseName );
-                        sortAndExportCompletionsToFile( exportSettings.caseToApply,
-                                                        exportSettings.folder,
-                                                        fileName,
-                                                        completionsForWell,
-                                                        reportItemsForWell,
-                                                        exportSettings.compdatExport,
-                                                        exportSettings.exportDataSourceAsComment(),
-                                                        exportSettings.exportWelspec() );
-                    }
-                }
             }
         }
     }

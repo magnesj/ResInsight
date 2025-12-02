@@ -41,14 +41,19 @@ namespace internal
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMswUnifiedData extractUnifiedMswData( RimEclipseCase* eclipseCase, int timeStep, const std::vector<RimWellPath*>& wellPaths )
+RigMswUnifiedData
+    extractUnifiedMswData( RimEclipseCase*                  eclipseCase,
+                           int                              timeStep,
+                           const std::vector<RimWellPath*>& wellPaths,
+                           RicWellPathExportMswTableData::CompletionType completionType = RicWellPathExportMswTableData::CompletionType::ALL )
 {
     RigMswUnifiedData unifiedData;
 
     for ( RimWellPath* wellPath : wellPaths )
     {
         bool exportAfterMainbore = true;
-        auto wellData = RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, timeStep, exportAfterMainbore );
+        auto wellData =
+            RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, timeStep, exportAfterMainbore, completionType );
         if ( wellData.has_value() )
         {
             unifiedData.addWellData( std::move( wellData.value() ) );
@@ -65,8 +70,8 @@ void exportUnifiedMswData( const RicExportCompletionDataSettingsUi& exportSettin
                            const QString&                           exportFolder,
                            const std::vector<RimWellPath*>&         wellPaths )
 {
-    // Extract all MSW data using new approach
-    RigMswUnifiedData unifiedData = extractUnifiedMswData( exportSettings.caseToApply, exportSettings.timeStep, wellPaths );
+    auto              completionType = RicWellPathExportMswTableData::convertFromExportSettings( exportSettings );
+    RigMswUnifiedData unifiedData = extractUnifiedMswData( exportSettings.caseToApply, exportSettings.timeStep, wellPaths, completionType );
 
     if ( unifiedData.isEmpty() )
     {
@@ -134,11 +139,12 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
 {
     for ( const auto& wellPath : wellPaths )
     {
-        // Extract data for single well
+        auto completionType = RicWellPathExportMswTableData::convertFromExportSettings( exportSettings );
         auto wellDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply,
                                                                                        wellPath,
                                                                                        exportSettings.timeStep,
-                                                                                       exportSettings.exportCompletionWelspecAfterMainBore() );
+                                                                                       exportSettings.exportCompletionWelspecAfterMainBore(),
+                                                                                       completionType );
 
         if ( !wellDataResult.has_value() )
         {
@@ -148,7 +154,7 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
         auto wellData = wellDataResult.value();
 
         // Set up file names
-        QString wellFileName = QString( "%1_Completions_MSW_%2" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
+        QString wellFileName = QString( "%1_Completions_%2_MSW" ).arg( wellPath->name(), exportSettings.caseToApply->caseUserDescription() );
 
         // Create main grid file
         auto mainGridFile = RicWellPathExportCompletionsFileTools::openFileForExport( exportFolder,
@@ -190,9 +196,7 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
 void RicWellPathExportMswCompletionsImpl::exportWellSegmentsForAllCompletions( const RicExportCompletionDataSettingsUi& exportSettings,
                                                                                const std::vector<RimWellPath*>&         wellPaths )
 {
-    // There are two modes of MSW export, either split on well or unified. The split on completion type is used for export of COMPDAT
-    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL ||
-         exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL_AND_COMPLETION_TYPE )
+    if ( exportSettings.fileSplit() == RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL )
     {
         internal::exportSplitMswData( exportSettings, exportSettings.folder(), wellPaths );
     }
