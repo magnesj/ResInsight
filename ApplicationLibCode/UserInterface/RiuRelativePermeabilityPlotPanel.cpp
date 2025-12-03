@@ -19,6 +19,7 @@
 #include "RiuRelativePermeabilityPlotPanel.h"
 
 #include "RiaCurveDataTools.h"
+#include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaInterpolationTools.h"
 #include "RiaPlotDefines.h"
@@ -264,7 +265,8 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
                                                     double                                               swat,
                                                     double                                               sgas,
                                                     const QString&                                       caseName,
-                                                    const QString&                                       cellReferenceText )
+                                                    const QString&                                       cellReferenceText,
+                                                    const std::set<RiaDefines::PhaseType>&              availablePhases )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -274,7 +276,9 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
     m_sgas              = sgas;
     m_caseName          = caseName;
     m_cellReferenceText = cellReferenceText;
+    m_availablePhases   = availablePhases;
 
+    updateUiControlsVisibility();
     plotUiSelectedCurves();
 }
 
@@ -312,6 +316,7 @@ void RiuRelativePermeabilityPlotPanel::clearPlot()
     m_sgas = HUGE_VAL;
     m_caseName.clear();
     m_cellReferenceText.clear();
+    m_availablePhases.clear();
 
     plotCurvesInQwt( m_unitSystem, m_allCurvesArr, m_swat, m_sgas, m_cellReferenceText, false, true, true, m_qwtPlot, &m_myPlotMarkers, false, false );
 }
@@ -746,12 +751,89 @@ std::vector<RigFlowDiagDefines::RelPermCurve> RiuRelativePermeabilityPlotPanel::
             if ( ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_ON ) && showScaled ) ||
                  ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_OFF ) && showUnscaled ) )
             {
-                selectedCurves.push_back( m_allCurvesArr[i] );
+                // Only include curve if its phase is available in the simulation
+                if ( isCurvePhaseAvailable( m_allCurvesArr[i] ) )
+                {
+                    selectedCurves.push_back( m_allCurvesArr[i] );
+                }
             }
         }
     }
 
     return selectedCurves;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiuRelativePermeabilityPlotPanel::isCurvePhaseAvailable( const RigFlowDiagDefines::RelPermCurve& curve ) const
+{
+    // If no phase information available, show all curves (fallback for compatibility)
+    if ( m_availablePhases.empty() ) return true;
+
+    // Check if the curve's phase is available in the simulation
+    switch ( curve.ident )
+    {
+        case RigFlowDiagDefines::RelPermCurve::KRW:  // Water relative permeability
+        case RigFlowDiagDefines::RelPermCurve::KROW: // Oil relative permeability in Oil-Water system
+        case RigFlowDiagDefines::RelPermCurve::PCOW: // Oil-Water capillary pressure
+            return m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE ) && 
+                   m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
+
+        case RigFlowDiagDefines::RelPermCurve::KRG:  // Gas relative permeability
+        case RigFlowDiagDefines::RelPermCurve::KROG: // Oil relative permeability in Oil-Gas system
+        case RigFlowDiagDefines::RelPermCurve::PCOG: // Oil-Gas capillary pressure
+            return m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE ) && 
+                   m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
+
+        default:
+            return true; // Unknown curve types - show by default
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::updateUiControlsVisibility()
+{
+    // If no phase information available, show all controls (fallback for compatibility)
+    if ( m_availablePhases.empty() )
+    {
+        // Enable all controls
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRW ) )
+            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRG ) )
+            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROW ) )
+            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROG ) )
+            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOW ) )
+            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
+            button->setVisible( true );
+        return;
+    }
+
+    // Check which phases are available
+    const bool hasWater = m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
+    const bool hasGas   = m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE );
+    const bool hasOil   = m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
+
+    // Show/hide controls based on available phases
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRW ) )
+        button->setVisible( hasWater && hasOil );
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROW ) )
+        button->setVisible( hasWater && hasOil );
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOW ) )
+        button->setVisible( hasWater && hasOil );
+
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRG ) )
+        button->setVisible( hasGas && hasOil );
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROG ) )
+        button->setVisible( hasGas && hasOil );
+    if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
+        button->setVisible( hasGas && hasOil );
 }
 
 //--------------------------------------------------------------------------------------------------

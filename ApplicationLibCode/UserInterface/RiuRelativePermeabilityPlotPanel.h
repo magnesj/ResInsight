@@ -26,6 +26,7 @@
 #include <QWidget>
 
 #include <memory>
+#include <set>
 
 class RiuDockedQwtPlot;
 class RiuRelativePermeabilityPlotUpdater;
@@ -56,7 +57,8 @@ public:
                       double                                               swat,
                       double                                               sgas,
                       const QString&                                       caseName,
-                      const QString&                                       cellReferenceText );
+                      const QString&                                       cellReferenceText,
+                      const std::set<RiaDefines::PhaseType>&              availablePhases = {} );
 
     void enableImbibitionCurveSelection( bool enable );
 
@@ -110,6 +112,8 @@ private:
 
     std::vector<RigFlowDiagDefines::RelPermCurve> gatherUiSelectedCurves() const;
     QString                                       asciiDataForUiSelectedCurves() const;
+    bool                                          isCurvePhaseAvailable( const RigFlowDiagDefines::RelPermCurve& curve ) const;
+    void                                          updateUiControlsVisibility();
 
     const QwtPlotCurve* closestCurveSample( const QPoint& cursorPosition, int* closestSampleIndex ) const;
     void                updateTrackerPlotMarkerAndLabelFromPicker();
@@ -132,6 +136,7 @@ private:
     double                                        m_sgas;
     QString                                       m_caseName;
     QString                                       m_cellReferenceText;
+    std::set<RiaDefines::PhaseType>               m_availablePhases;
     QPointer<RiuDockedQwtPlot>                    m_qwtPlot;
     std::vector<QwtPlotMarker*>                   m_myPlotMarkers;
 
