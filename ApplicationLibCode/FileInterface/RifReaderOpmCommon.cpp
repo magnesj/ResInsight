@@ -971,6 +971,12 @@ void RifReaderOpmCommon::buildMetaData( RigEclipseCaseData* eclipseCaseData, caf
         m_eclipseCaseData->setUnitsType( unitsType );
     }
 
+    // Set available phases from INTEHEAD
+    {
+        auto phases = availablePhases();
+        m_eclipseCaseData->setAvailablePhases( phases );
+    }
+
     auto task = progress.task( "Handling well information", 10 );
     if ( loadWellDataEnabled() && !m_restartFileName.empty() )
     {
