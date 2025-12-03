@@ -1078,7 +1078,7 @@ std::vector<int> RifReaderOpmCommon::readInteheadKeyword() const
             RiaLogging::error( QString( "Failed to read INTEHEAD keyword from init file: %1" ).arg( e.what() ) );
         }
     }
-    
+
     return {};
 }
 
@@ -1088,13 +1088,13 @@ std::vector<int> RifReaderOpmCommon::readInteheadKeyword() const
 int RifReaderOpmCommon::readPhasesFromIntehead() const
 {
     namespace VI = Opm::RestartIO::Helpers::VectorItems;
-    
+
     auto intehead = readInteheadKeyword();
     if ( intehead.size() > VI::intehead::PHASE )
     {
         return intehead[VI::intehead::PHASE];
     }
-    
+
     return -1;
 }
 
@@ -1104,30 +1104,30 @@ int RifReaderOpmCommon::readPhasesFromIntehead() const
 std::set<RiaDefines::PhaseType> RifReaderOpmCommon::availablePhases() const
 {
     std::set<RiaDefines::PhaseType> phases;
-    
+
     int phaseIndicator = readPhasesFromIntehead();
     if ( phaseIndicator < 0 ) return phases;
-    
+
     // Phase values are bitfields:
     // ECL_OIL_PHASE = 1 (bit 0)
     // ECL_GAS_PHASE = 2 (bit 1)
     // ECL_WATER_PHASE = 4 (bit 2)
-    
+
     if ( phaseIndicator & 1 ) // ECL_OIL_PHASE
     {
         phases.insert( RiaDefines::PhaseType::OIL_PHASE );
     }
-    
+
     if ( phaseIndicator & 2 ) // ECL_GAS_PHASE
     {
         phases.insert( RiaDefines::PhaseType::GAS_PHASE );
     }
-    
+
     if ( phaseIndicator & 4 ) // ECL_WATER_PHASE
     {
         phases.insert( RiaDefines::PhaseType::WATER_PHASE );
     }
-    
+
     return phases;
 }
 

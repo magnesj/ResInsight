@@ -58,7 +58,7 @@ public:
                       double                                               sgas,
                       const QString&                                       caseName,
                       const QString&                                       cellReferenceText,
-                      const std::set<RiaDefines::PhaseType>&              availablePhases = {} );
+                      const std::set<RiaDefines::PhaseType>&               availablePhases = {} );
 
     void enableImbibitionCurveSelection( bool enable );
 

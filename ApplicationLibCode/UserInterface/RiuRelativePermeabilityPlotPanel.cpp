@@ -266,7 +266,7 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
                                                     double                                               sgas,
                                                     const QString&                                       caseName,
                                                     const QString&                                       cellReferenceText,
-                                                    const std::set<RiaDefines::PhaseType>&              availablePhases )
+                                                    const std::set<RiaDefines::PhaseType>&               availablePhases )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -774,16 +774,16 @@ bool RiuRelativePermeabilityPlotPanel::isCurvePhaseAvailable( const RigFlowDiagD
     // Check if the curve's phase is available in the simulation
     switch ( curve.ident )
     {
-        case RigFlowDiagDefines::RelPermCurve::KRW:  // Water relative permeability
+        case RigFlowDiagDefines::RelPermCurve::KRW: // Water relative permeability
         case RigFlowDiagDefines::RelPermCurve::KROW: // Oil relative permeability in Oil-Water system
         case RigFlowDiagDefines::RelPermCurve::PCOW: // Oil-Water capillary pressure
-            return m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE ) && 
+            return m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE ) &&
                    m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
 
-        case RigFlowDiagDefines::RelPermCurve::KRG:  // Gas relative permeability
+        case RigFlowDiagDefines::RelPermCurve::KRG: // Gas relative permeability
         case RigFlowDiagDefines::RelPermCurve::KROG: // Oil relative permeability in Oil-Gas system
         case RigFlowDiagDefines::RelPermCurve::PCOG: // Oil-Gas capillary pressure
-            return m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE ) && 
+            return m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE ) &&
                    m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
 
         default:
@@ -800,18 +800,12 @@ void RiuRelativePermeabilityPlotPanel::updateUiControlsVisibility()
     if ( m_availablePhases.empty() )
     {
         // Enable all controls
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRW ) )
-            button->setVisible( true );
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRG ) )
-            button->setVisible( true );
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROW ) )
-            button->setVisible( true );
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROG ) )
-            button->setVisible( true );
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOW ) )
-            button->setVisible( true );
-        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
-            button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRW ) ) button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KRG ) ) button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROW ) ) button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::KROG ) ) button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOW ) ) button->setVisible( true );
+        if ( auto* button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) ) button->setVisible( true );
         return;
     }
 
