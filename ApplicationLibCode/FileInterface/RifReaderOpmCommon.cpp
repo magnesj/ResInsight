@@ -1059,7 +1059,7 @@ std::vector<RifReaderOpmCommon::TimeDataFile> RifReaderOpmCommon::readTimeSteps(
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<int> RifReaderOpmCommon::readInteheadKeyword()
+std::vector<int> RifReaderOpmCommon::readInteheadKeyword() const
 {
     if ( m_initFile )
     {
@@ -1079,7 +1079,7 @@ std::vector<int> RifReaderOpmCommon::readInteheadKeyword()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RifReaderOpmCommon::readPhasesFromIntehead()
+int RifReaderOpmCommon::readPhasesFromIntehead() const
 {
     namespace VI = Opm::RestartIO::Helpers::VectorItems;
     
@@ -1095,7 +1095,7 @@ int RifReaderOpmCommon::readPhasesFromIntehead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::set<RiaDefines::PhaseType> RifReaderOpmCommon::availablePhases()
+std::set<RiaDefines::PhaseType> RifReaderOpmCommon::availablePhases() const
 {
     std::set<RiaDefines::PhaseType> phases;
     

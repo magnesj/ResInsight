@@ -62,7 +62,7 @@ public:
     bool dynamicResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, size_t stepIndex, std::vector<double>* values ) override;
 
     std::vector<QDateTime>              timeStepsOnFile( QString gridFileName );
-    std::set<RiaDefines::PhaseType>     availablePhases();
+    std::set<RiaDefines::PhaseType>     availablePhases() const;
 
 protected:
     virtual bool importGrid( RigMainGrid* mainGrid, RigEclipseCaseData* caseData );
@@ -108,8 +108,8 @@ private:
     std::vector<TimeDataFile> readTimeSteps();
     QDateTime dateTimeFromTimeStepOnFile( RifReaderOpmCommon::TimeDataFile timeOnFile, QDate startDate, double startDayOffset );
 
-    std::vector<int> readInteheadKeyword();
-    int              readPhasesFromIntehead();
+    std::vector<int> readInteheadKeyword() const;
+    int              readPhasesFromIntehead() const;
 
 protected:
     enum class ActiveType
