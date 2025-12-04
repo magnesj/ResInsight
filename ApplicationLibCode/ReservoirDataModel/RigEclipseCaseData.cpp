@@ -855,3 +855,19 @@ const std::vector<double>* RigEclipseCaseData::resultValues( RiaDefines::Porosit
 
     return swatResults;
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RiaDefines::PhaseType> RigEclipseCaseData::availablePhases() const
+{
+    return m_availablePhases;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigEclipseCaseData::setAvailablePhases( const std::set<RiaDefines::PhaseType>& phases )
+{
+    m_availablePhases = phases;
+}
