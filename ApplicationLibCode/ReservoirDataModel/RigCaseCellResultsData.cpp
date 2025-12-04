@@ -1718,7 +1718,6 @@ void RigCaseCellResultsData::computeSOILForTimeStep( size_t timeStepIndex )
     calculator.calculate( SOILAddr, timeStepIndex );
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
