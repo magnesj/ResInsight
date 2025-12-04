@@ -150,7 +150,7 @@ void RifReaderOpmRft::values( const RifEclipseRftAddress& rftAddress, std::vecto
              !isNativeResultAvailable( RiaResultNames::soil().toStdString(), wellName, y, m, d ) )
         {
             // Compute SOIL from SWAT and SGAS
-            // There is a similar function in RigSoilResultCalculator, but they are too different to be merged
+            // There is a similar function in RigSaturationResultCalculator, but they are too different to be merged
             auto computeSoil = [&]( const std::string& wellName, int y, int m, int d ) -> std::vector<float>
             {
                 auto swat = resultAsFloat( RiaResultNames::swat().toStdString(), wellName, y, m, d );

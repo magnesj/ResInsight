@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigSoilResultCalculator.h"
+#include "RigSaturationResultCalculator.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultInfo.h"
 #include "RigEclipseCaseData.h"
@@ -28,7 +28,7 @@
 //==================================================================================================
 ///
 //==================================================================================================
-RigSoilResultCalculator::RigSoilResultCalculator( RigCaseCellResultsData& resultsData )
+RigSaturationResultCalculator::RigSaturationResultCalculator( RigCaseCellResultsData& resultsData )
     : RigEclipseResultCalculator( resultsData )
 {
 }
@@ -36,14 +36,14 @@ RigSoilResultCalculator::RigSoilResultCalculator( RigCaseCellResultsData& result
 //==================================================================================================
 ///
 //==================================================================================================
-RigSoilResultCalculator::~RigSoilResultCalculator()
+RigSaturationResultCalculator::~RigSaturationResultCalculator()
 {
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigSoilResultCalculator::isMatching( const RigEclipseResultAddress& resVarAddr ) const
+bool RigSaturationResultCalculator::isMatching( const RigEclipseResultAddress& resVarAddr ) const
 {
     return resVarAddr.resultName() == RiaResultNames::soil() && resVarAddr.resultCatType() == RiaDefines::ResultCatType::DYNAMIC_NATIVE;
 }
@@ -51,7 +51,7 @@ bool RigSoilResultCalculator::isMatching( const RigEclipseResultAddress& resVarA
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigSoilResultCalculator::calculate( const RigEclipseResultAddress& resVarAddr, size_t timeStepIndex )
+void RigSaturationResultCalculator::calculate( const RigEclipseResultAddress& resVarAddr, size_t timeStepIndex )
 {
     // See similar function in RifReaderOpmRft::values, but the current implementation is not suitable for merging
     // Compute SGAS based on SWAT if the simulation contains no oil
@@ -151,7 +151,7 @@ void RigSoilResultCalculator::calculate( const RigEclipseResultAddress& resVarAd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigSoilResultCalculator::getSaturationDataForCalculation( const RigEclipseResultAddress& address,
+const std::vector<double>& RigSaturationResultCalculator::getSaturationDataForCalculation( const RigEclipseResultAddress& address,
                                                                                      size_t                         scalarIndex,
                                                                                      size_t                         timeStepIndex ) const
 {
@@ -169,7 +169,7 @@ const std::vector<double>& RigSoilResultCalculator::getSaturationDataForCalculat
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigSoilResultCalculator::checkAndCreateSwatForWaterOnlySimulation( size_t timeStepIndex )
+void RigSaturationResultCalculator::checkAndCreateSwatForWaterOnlySimulation( size_t timeStepIndex )
 {
     // Get available phases from the case data
     const std::set<RiaDefines::PhaseType> availablePhases = m_resultsData->m_ownerCaseData->availablePhases();
@@ -192,7 +192,7 @@ void RigSoilResultCalculator::checkAndCreateSwatForWaterOnlySimulation( size_t t
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigSoilResultCalculator::createSwatWithFullSaturation()
+void RigSaturationResultCalculator::createSwatWithFullSaturation()
 {
     const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
     
@@ -234,7 +234,7 @@ void RigSoilResultCalculator::createSwatWithFullSaturation()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigSoilResultCalculator::testAndComputeSgasForTimeStep( size_t timeStepIndex )
+void RigSaturationResultCalculator::testAndComputeSgasForTimeStep( size_t timeStepIndex )
 {
     // Check if SWAT is present
     const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );

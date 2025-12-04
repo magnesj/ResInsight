@@ -46,7 +46,7 @@
 #include "RigMobilePoreVolumeResultCalculator.h"
 #include "RigOilVolumeResultCalculator.h"
 #include "RigPorvSoilSgasResultCalculator.h"
-#include "RigSoilResultCalculator.h"
+#include "RigSaturationResultCalculator.h"
 #include "RigStatisticsDataCache.h"
 #include "RigStatisticsMath.h"
 
@@ -1714,7 +1714,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
 void RigCaseCellResultsData::computeSOILForTimeStep( size_t timeStepIndex )
 {
     RigEclipseResultAddress SOILAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
-    RigSoilResultCalculator calculator( *this );
+    RigSaturationResultCalculator calculator( *this );
     calculator.calculate( SOILAddr, timeStepIndex );
 }
 

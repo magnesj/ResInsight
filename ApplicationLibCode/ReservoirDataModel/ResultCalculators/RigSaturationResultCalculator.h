@@ -29,11 +29,11 @@ class RigEclipseResultAddress;
 //==================================================================================================
 ///
 //==================================================================================================
-class RigSoilResultCalculator : public RigEclipseResultCalculator
+class RigSaturationResultCalculator : public RigEclipseResultCalculator
 {
 public:
-    RigSoilResultCalculator( RigCaseCellResultsData& resultsData );
-    ~RigSoilResultCalculator() override;
+    RigSaturationResultCalculator( RigCaseCellResultsData& resultsData );
+    ~RigSaturationResultCalculator() override;
     bool isMatching( const RigEclipseResultAddress& resVarAddr ) const override;
     void calculate( const RigEclipseResultAddress& resVarAddr, size_t timeStepIndex ) override;
 

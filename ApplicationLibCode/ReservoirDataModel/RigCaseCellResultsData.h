@@ -163,7 +163,7 @@ private:
     // Add a friend class, as this way of loading data requires careful management of state
     // All other data access assumes all time steps are loaded at the same time
     friend class RimEclipseStatisticsCaseEvaluator;
-    friend class RigSoilResultCalculator;
+    friend class RigSaturationResultCalculator;
     friend class RigFaultDistanceResultCalculator;
     friend class RigMobilePoreVolumeResultCalculator;
     friend class RigIndexIjkResultCalculator;
