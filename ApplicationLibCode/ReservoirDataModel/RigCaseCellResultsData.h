@@ -183,7 +183,6 @@ private:
     void setMustBeCalculated( size_t scalarResultIndex );
 
     void computeSOILForTimeStep( size_t timeStepIndex );
-    void testAndComputeSgasForTimeStep( size_t timeStepIndex );
 
     bool hasCompleteTransmissibilityResults() const;
 
