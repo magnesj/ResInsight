@@ -926,7 +926,7 @@ void RifReaderEclipseOutput::buildMetaData( ecl_grid_type* grid )
         m_eclipseCaseData->setUnitsType( unitsType );
     }
 
-    // Set available phases from INIT file
+    // Set available phases from INIT or UNRST file
     {
         std::set<RiaDefines::PhaseType> phases;
         if ( m_ecl_init_file )

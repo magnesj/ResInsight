@@ -20,6 +20,7 @@
 
 #include "RiaEclipseFileNameTools.h"
 #include "RiaLogging.h"
+#include "RiaOpmParserTools.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaResultNames.h"
@@ -1075,7 +1076,7 @@ std::vector<int> RifReaderOpmCommon::readInteheadKeyword() const
         }
         catch ( const std::exception& e )
         {
-            RiaLogging::error( QString( "Failed to read INTEHEAD keyword from init file: %1" ).arg( e.what() ) );
+            RiaLogging::warning( QString( "Failed to read INTEHEAD keyword from init file: %1" ).arg( e.what() ) );
         }
     }
 
@@ -1103,32 +1104,8 @@ int RifReaderOpmCommon::readPhasesFromIntehead() const
 //--------------------------------------------------------------------------------------------------
 std::set<RiaDefines::PhaseType> RifReaderOpmCommon::availablePhases() const
 {
-    std::set<RiaDefines::PhaseType> phases;
-
     int phaseIndicator = readPhasesFromIntehead();
-    if ( phaseIndicator < 0 ) return phases;
-
-    // ThirdParty\custom-opm-common\opm-common\opm\output\eclipse\VectorItems\intehead.hpp
-    //  Phase indicator:
-    //     1: oil, 2: water, 3: O/W, 4: gas,
-    //     5: G/O, 6: G/W, 7: O/G/W
-    //
-    if ( phaseIndicator & 1 ) // oil
-    {
-        phases.insert( RiaDefines::PhaseType::OIL_PHASE );
-    }
-
-    if ( phaseIndicator & 2 ) // water
-    {
-        phases.insert( RiaDefines::PhaseType::WATER_PHASE );
-    }
-
-    if ( phaseIndicator & 4 ) // gas
-    {
-        phases.insert( RiaDefines::PhaseType::GAS_PHASE );
-    }
-
-    return phases;
+    return RiaOpmParserTools::phasesFromInteheadValue( phaseIndicator );
 }
 
 //--------------------------------------------------------------------------------------------------

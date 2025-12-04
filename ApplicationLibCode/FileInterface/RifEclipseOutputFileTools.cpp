@@ -20,6 +20,7 @@
 
 #include "RifEclipseOutputFileTools.h"
 
+#include "RiaOpmParserTools.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaStringEncodingTools.h"
 
@@ -564,38 +565,17 @@ QString RifEclipseOutputFileTools::createIndexFileName( const QString& resultFil
 //--------------------------------------------------------------------------------------------------
 std::set<RiaDefines::PhaseType> RifEclipseOutputFileTools::findAvailablePhases( const ecl_file_type* ecl_file )
 {
-    std::set<RiaDefines::PhaseType> phaseTypes;
-
     if ( ecl_file )
     {
         const ecl_kw_type* intehead = ecl_file_iget_named_kw( ecl_file, INTEHEAD_KW, 0 );
         if ( intehead )
         {
             int phases = ecl_kw_iget_int( intehead, INTEHEAD_PHASE_INDEX );
-
-            // See RifReaderOpmCommon::availablePhases
-            // Phase indicator from OPM Common specification:
-            // 1: oil, 2: water, 3: O/W, 4: gas, 5: G/O, 6: G/W, 7: O/G/W
-            // Use bitwise logic: oil=bit 0, water=bit 1, gas=bit 2
-
-            if ( phases & 1 ) // oil
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::OIL_PHASE );
-            }
-
-            if ( phases & 2 ) // water
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::WATER_PHASE );
-            }
-
-            if ( phases & 4 ) // gas
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::GAS_PHASE );
-            }
+            return RiaOpmParserTools::phasesFromInteheadValue( phases );
         }
     }
 
-    return phaseTypes;
+    return std::set<RiaDefines::PhaseType>();
 }
 
 //--------------------------------------------------------------------------------------------------
