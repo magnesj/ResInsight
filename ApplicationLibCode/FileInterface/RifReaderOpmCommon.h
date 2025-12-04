@@ -62,7 +62,7 @@ public:
     bool dynamicResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, size_t stepIndex, std::vector<double>* values ) override;
 
     std::vector<QDateTime>          timeStepsOnFile( QString gridFileName );
-    std::set<RiaDefines::PhaseType> availablePhases() const;
+    std::set<RiaDefines::PhaseType> availablePhases() const override;
 
 protected:
     virtual bool importGrid( RigMainGrid* mainGrid, RigEclipseCaseData* caseData );
