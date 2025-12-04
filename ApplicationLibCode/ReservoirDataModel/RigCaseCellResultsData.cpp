@@ -1713,11 +1713,10 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResultForTimeStep( const Rig
 //--------------------------------------------------------------------------------------------------
 void RigCaseCellResultsData::computeSOILForTimeStep( size_t timeStepIndex )
 {
-    RigEclipseResultAddress SOILAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
+    RigEclipseResultAddress       SOILAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
     RigSaturationResultCalculator calculator( *this );
     calculator.calculate( SOILAddr, timeStepIndex );
 }
-
 
 //--------------------------------------------------------------------------------------------------
 ///
