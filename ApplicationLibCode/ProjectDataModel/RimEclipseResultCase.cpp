@@ -90,6 +90,10 @@ RimEclipseResultCase::RimEclipseResultCase()
     m_unitSystem.registerGetMethod( RimProject::current(), &RimProject::commonUnitSystemForAllCases );
     m_unitSystem.uiCapability()->setUiReadOnly( true );
 
+    CAF_PDM_InitFieldNoDefault( &m_phases, "Phases", "Phases" );
+    m_phases.registerGetMethod( this, &RimEclipseResultCase::phasesAsString );
+    m_phases.uiCapability()->setUiReadOnly( true );
+
     CAF_PDM_InitFieldNoDefault( &m_flowDiagSolutions, "FlowDiagSolutions", "Flow Diagnostics Solutions" );
     m_flowDiagSolutions.uiCapability()->setUiTreeChildrenHidden( true );
 
@@ -127,6 +131,31 @@ void RimEclipseResultCase::initAfterRead()
         auto folderNames       = RimFormationTools::formationFoldersFromCaseFileName( m_caseFileName().path() );
         m_activeFormationNames = RimFormationTools::loadFormationNamesFromFolder( folderNames );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimEclipseResultCase::phasesAsString() const
+{
+    if ( auto caseData = eclipseCaseData() )
+    {
+        QStringList phaseNames;
+        const auto  phases = caseData->availablePhases();
+        for ( const auto& phase : phases )
+        {
+            phaseNames.append( caf::AppEnum<RiaDefines::PhaseType>::uiText( phase ) );
+        }
+
+        if ( phaseNames.isEmpty() )
+        {
+            return "No phases available";
+        }
+
+        return phaseNames.join( ", " );
+    }
+
+    return "No data available";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -680,6 +709,7 @@ void RimEclipseResultCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     uiOrdering.add( &m_caseId );
     uiOrdering.add( &m_caseFileName );
     uiOrdering.add( &m_unitSystem );
+    uiOrdering.add( &m_phases );
 
     auto group = uiOrdering.addNewGroup( "Case Options" );
     group->add( &m_activeFormationNames );
