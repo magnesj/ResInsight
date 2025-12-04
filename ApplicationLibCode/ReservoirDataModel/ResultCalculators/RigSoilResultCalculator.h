@@ -40,4 +40,6 @@ public:
 private:
     const std::vector<double>&
         getSaturationDataForCalculation( const RigEclipseResultAddress& address, size_t scalarIndex, size_t timeStepIndex ) const;
+    void checkAndCreateSwatForWaterOnlySimulation( size_t timeStepIndex );
+    void createSwatWithFullSaturation();
 };

@@ -19,8 +19,11 @@
 #include "RigSoilResultCalculator.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultInfo.h"
+#include "RigEclipseCaseData.h"
+#include "RigActiveCellInfo.h"
 
 #include "RiaResultNames.h"
+#include "RiaDefines.h"
 
 //==================================================================================================
 ///
@@ -53,6 +56,9 @@ void RigSoilResultCalculator::calculate( const RigEclipseResultAddress& resVarAd
     // See similar function in RifReaderOpmRft::values, but the current implementation is not suitable for merging
     // Compute SGAS based on SWAT if the simulation contains no oil
     m_resultsData->testAndComputeSgasForTimeStep( timeStepIndex );
+
+    // Check available phases and create SWAT if only water phase is present and SWAT is missing
+    checkAndCreateSwatForWaterOnlySimulation( timeStepIndex );
 
     // Create result addresses for saturation components
     const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
@@ -158,4 +164,69 @@ const std::vector<double>& RigSoilResultCalculator::getSaturationDataForCalculat
 
     const std::vector<double>& data = m_resultsData->cellScalarResults( address, timeStepIndex );
     return data.empty() ? emptyVector : data;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigSoilResultCalculator::checkAndCreateSwatForWaterOnlySimulation( size_t timeStepIndex )
+{
+    // Get available phases from the case data
+    const std::set<RiaDefines::PhaseType> availablePhases = m_resultsData->m_ownerCaseData->availablePhases();
+    
+    // Check if only water phase is present
+    if ( availablePhases.size() == 1 && availablePhases.count( RiaDefines::PhaseType::WATER_PHASE ) == 1 )
+    {
+        // Check if SWAT is already present
+        const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
+        const size_t swatScalarIndex = m_resultsData->findOrLoadKnownScalarResultForTimeStep( swatAddr, timeStepIndex );
+        
+        if ( swatScalarIndex == cvf::UNDEFINED_SIZE_T )
+        {
+            // SWAT is not present, create it with 1.0 for all cells and all time steps
+            createSwatWithFullSaturation();
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigSoilResultCalculator::createSwatWithFullSaturation()
+{
+    const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
+    
+    // Create or find the scalar result index for SWAT
+    const size_t swatScalarIndex = m_resultsData->findOrCreateScalarResultIndex( swatAddr, false );
+    
+    // Get the number of time steps and cells from existing data
+    size_t timeStepCount = 0;
+    size_t cellCount = 0;
+    
+    // Find an existing result to determine dimensions
+    if ( !m_resultsData->m_cellScalarResults.empty() && !m_resultsData->m_cellScalarResults[0].empty() )
+    {
+        timeStepCount = m_resultsData->m_cellScalarResults[0].size();
+        if ( timeStepCount > 0 )
+        {
+            cellCount = m_resultsData->m_cellScalarResults[0][0].size();
+        }
+    }
+    
+    // If we still don't have dimensions, get from active cell count
+    if ( cellCount == 0 && m_resultsData->m_activeCellInfo )
+    {
+        cellCount = m_resultsData->m_activeCellInfo->reservoirCellCount();
+    }
+    
+    // Create SWAT data with 1.0 saturation for all time steps
+    if ( timeStepCount > 0 && cellCount > 0 )
+    {
+        m_resultsData->m_cellScalarResults[swatScalarIndex].resize( timeStepCount );
+        
+        for ( size_t timeStep = 0; timeStep < timeStepCount; ++timeStep )
+        {
+            m_resultsData->m_cellScalarResults[swatScalarIndex][timeStep].assign( cellCount, 1.0 );
+        }
+    }
 }
