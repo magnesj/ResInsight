@@ -20,10 +20,14 @@
 
 #pragma once
 
-#include "RiaDefines.h"
 #include "RiaPorosityModel.h"
-
 #include "RifReaderSettings.h"
+
+namespace RiaDefines
+{
+enum class PorosityModelType;
+enum class PhaseType;
+}
 
 #include "cvfCollection.h"
 #include "cvfObject.h"

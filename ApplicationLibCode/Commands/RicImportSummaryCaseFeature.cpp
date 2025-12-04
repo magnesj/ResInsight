@@ -18,6 +18,8 @@
 
 #include "RicImportSummaryCaseFeature.h"
 
+#include "RiaDefines.h"
+
 #include <QAction>
 
 CAF_CMD_SOURCE_INIT( RicImportSummaryCaseFeature, "RicImportSummaryCaseFeature" );

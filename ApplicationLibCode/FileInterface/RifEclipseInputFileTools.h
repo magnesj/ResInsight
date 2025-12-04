@@ -23,8 +23,12 @@
 #include "cvfCollection.h"
 #include "cvfObject.h"
 
-#include "RiaDefines.h"
 #include "RigFault.h"
+
+namespace RiaDefines
+{
+enum class EclipseUnitSystem;
+}
 
 #include "ert/ecl/ecl_kw.h"
 

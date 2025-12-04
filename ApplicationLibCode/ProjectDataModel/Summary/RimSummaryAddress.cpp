@@ -18,6 +18,7 @@
 
 #include "RimSummaryAddress.h"
 
+#include "RiaDefines.h"
 #include "RiaLogging.h"
 #include "Summary/RiaSummaryDefines.h"
 

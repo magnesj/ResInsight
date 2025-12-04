@@ -18,6 +18,7 @@
 
 #include "RifOpmCommonSummary.h"
 
+#include "RiaDefines.h"
 #include "RiaLogging.h"
 #include "RiaStdStringTools.h"
 #include "RifOpmSummaryTools.h"

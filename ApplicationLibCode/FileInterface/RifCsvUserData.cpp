@@ -19,6 +19,7 @@
 #include "RifCsvUserData.h"
 
 #include "RiaDateStringParser.h"
+#include "RiaDefines.h"
 #include "RiaLogging.h"
 #include "RiaQDateTimeTools.h"
 

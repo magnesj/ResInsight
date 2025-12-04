@@ -21,6 +21,7 @@
 #include "RifEclipseInputFileTools.h"
 
 #include "RiaCellDividingTools.h"
+#include "RiaDefines.h"
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 #include "RiaStringEncodingTools.h"

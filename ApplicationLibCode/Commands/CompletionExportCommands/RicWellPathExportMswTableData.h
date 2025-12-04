@@ -18,9 +18,12 @@
 
 #pragma once
 
-#include "RiaDefines.h"
-
 #include "Tools/enum_bitmask.hpp"
+
+namespace RiaDefines
+{
+enum class EclipseUnitSystem;
+}
 
 #include <gsl/gsl>
 

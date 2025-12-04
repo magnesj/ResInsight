@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "RiaDefines.h"
-
 #include "cvfVector3.h"
 
 #include "cafVecIjk.h"

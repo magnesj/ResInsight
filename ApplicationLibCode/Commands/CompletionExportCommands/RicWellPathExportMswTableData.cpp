@@ -18,6 +18,7 @@
 
 #include "RicWellPathExportMswTableData.h"
 
+#include "RiaDefines.h"
 #include "RiaLogging.h"
 
 #include "RicExportCompletionDataSettingsUi.h"

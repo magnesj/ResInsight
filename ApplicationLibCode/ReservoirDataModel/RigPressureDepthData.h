@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "RiaDefines.h"
-
 #include <QDateTime>
 #include <QString>
 

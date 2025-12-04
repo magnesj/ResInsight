@@ -21,7 +21,10 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
-#include "RiaDefines.h"
+namespace RiaDefines
+{
+enum class PhaseType;
+}
 
 #include "RifEclipseSummaryAddressQMetaType.h"
 
