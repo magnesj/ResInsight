@@ -968,7 +968,7 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
     // SOIL
     {
         RigSoilResultCalculator soilCalculator( *this );
-        soilCalculator.createPlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
+        soilCalculator.checkAndCreatePlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
     }
 
     // Oil Volume

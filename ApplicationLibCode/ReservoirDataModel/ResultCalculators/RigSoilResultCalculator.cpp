@@ -40,7 +40,7 @@ RigSoilResultCalculator::~RigSoilResultCalculator()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigSoilResultCalculator::createPlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
+void RigSoilResultCalculator::checkAndCreatePlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
 {
     if ( !isMatching( resVarAddr ) ) return;
 

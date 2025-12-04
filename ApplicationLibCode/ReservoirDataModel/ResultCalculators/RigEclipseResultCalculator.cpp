@@ -36,6 +36,6 @@ RigEclipseResultCalculator::~RigEclipseResultCalculator()
 //==================================================================================================
 ///
 //==================================================================================================
-void RigEclipseResultCalculator::createPlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
+void RigEclipseResultCalculator::checkAndCreatePlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
 {
 }
