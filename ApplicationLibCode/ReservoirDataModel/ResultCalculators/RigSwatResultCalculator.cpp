@@ -46,12 +46,12 @@ void RigSwatResultCalculator::checkAndCreatePlaceholderEntry( const RigEclipseRe
 {
     if ( !isMatching( resVarAddr ) ) return;
 
-    bool needsToBeStored = false;
-
     if ( !m_resultsData->hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) ) )
     {
         if ( hasOnlyWaterPhase() )
         {
+            bool needsToBeStored = false;
+
             size_t swatIndex = m_resultsData->findOrCreateScalarResultIndex( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
                                                                                                       RiaResultNames::swat() ),
                                                                              needsToBeStored );
