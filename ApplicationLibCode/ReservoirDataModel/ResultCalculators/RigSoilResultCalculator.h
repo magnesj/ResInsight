@@ -19,6 +19,7 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 
 #include "RigEclipseResultCalculator.h"
 
@@ -35,4 +36,8 @@ public:
     ~RigSoilResultCalculator() override;
     bool isMatching( const RigEclipseResultAddress& resVarAddr ) const override;
     void calculate( const RigEclipseResultAddress& resVarAddr, size_t timeStepIndex ) override;
+
+private:
+    const std::vector<double>&
+        getSaturationDataForCalculation( const RigEclipseResultAddress& address, size_t scalarIndex, size_t timeStepIndex ) const;
 };
