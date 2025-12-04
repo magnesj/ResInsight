@@ -40,6 +40,28 @@ RigSoilResultCalculator::~RigSoilResultCalculator()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RigSoilResultCalculator::createPlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
+{
+    if ( !isMatching( resVarAddr ) ) return;
+
+    bool needsToBeStored = false;
+
+    if ( !m_resultsData->hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) ) )
+    {
+        if ( m_resultsData->hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) ) ||
+             m_resultsData->hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() ) ) )
+        {
+            size_t soilIndex = m_resultsData->findOrCreateScalarResultIndex( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
+                                                                                                      RiaResultNames::soil() ),
+                                                                             needsToBeStored );
+            m_resultsData->setMustBeCalculated( soilIndex );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RigSoilResultCalculator::isMatching( const RigEclipseResultAddress& resVarAddr ) const
 {
     return resVarAddr.resultName() == RiaResultNames::soil() && resVarAddr.resultCatType() == RiaDefines::ResultCatType::DYNAMIC_NATIVE;

@@ -967,17 +967,8 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
     bool needsToBeStored = false;
     // SOIL
     {
-        if ( !hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) ) )
-        {
-            if ( hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) ) ||
-                 hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() ) ) )
-            {
-                size_t soilIndex = findOrCreateScalarResultIndex( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
-                                                                                           RiaResultNames::soil() ),
-                                                                  needsToBeStored );
-                setMustBeCalculated( soilIndex );
-            }
-        }
+        RigSoilResultCalculator soilCalculator( *this );
+        soilCalculator.createPlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
     }
 
     // Oil Volume
