@@ -120,11 +120,11 @@ bool RifEclipseUnifiedRestartFileAccess::openFile()
                 }
             }
         }
+
+        m_availablePhases = RifEclipseOutputFileTools::findAvailablePhases( m_ecl_file );
     }
 
     if ( !m_ecl_file ) return false;
-
-    m_availablePhases = RifEclipseOutputFileTools::findAvailablePhases( m_ecl_file );
 
     return true;
 }

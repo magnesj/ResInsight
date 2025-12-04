@@ -401,4 +401,37 @@ std::string aicdTemplateId()
     return "ID_NUMBER";
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RiaDefines::PhaseType> phasesFromInteheadValue( int phaseIndicator )
+{
+    std::set<RiaDefines::PhaseType> phases;
+
+    if ( phaseIndicator < 0 ) return phases;
+
+    // Phase indicator from OPM Common specification:
+    // ThirdParty\custom-opm-common\opm-common\opm\output\eclipse\VectorItems\intehead.hpp
+    // PHASE = 14, Phase indicator:
+    //   1: oil, 2: water, 3: O/W, 4: gas, 5: G/O, 6: G/W, 7: O/G/W
+    // Use bitwise logic: oil=bit 0, water=bit 1, gas=bit 2
+
+    if ( phaseIndicator & 1 ) // oil
+    {
+        phases.insert( RiaDefines::PhaseType::OIL_PHASE );
+    }
+
+    if ( phaseIndicator & 2 ) // water
+    {
+        phases.insert( RiaDefines::PhaseType::WATER_PHASE );
+    }
+
+    if ( phaseIndicator & 4 ) // gas
+    {
+        phases.insert( RiaDefines::PhaseType::GAS_PHASE );
+    }
+
+    return phases;
+}
+
 } // namespace RiaOpmParserTools

@@ -107,6 +107,9 @@ public:
     RiaDefines::EclipseUnitSystem unitsType() const { return m_unitsType; }
     void                          setUnitsType( RiaDefines::EclipseUnitSystem unitsType ) { m_unitsType = unitsType; }
 
+    std::set<RiaDefines::PhaseType> availablePhases() const;
+    void                            setAvailablePhases( const std::set<RiaDefines::PhaseType>& phases );
+
     std::vector<QString> simulationWellNames() const;
     bool                 hasSimulationWell( const QString& simWellName ) const;
 
@@ -148,7 +151,8 @@ private:
     cvf::Collection<cvf::UIntArray> m_gridCellToResultWellIndex; //< Array pr grid with index to well pr cell telling
                                                                  // which well a cell is in
 
-    RiaDefines::EclipseUnitSystem m_unitsType;
+    RiaDefines::EclipseUnitSystem   m_unitsType;
+    std::set<RiaDefines::PhaseType> m_availablePhases;
 
     bool                  m_hasParsedDeckForEquilData;
     std::vector<RigEquil> m_equil;
