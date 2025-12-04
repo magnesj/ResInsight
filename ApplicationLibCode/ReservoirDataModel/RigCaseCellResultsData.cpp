@@ -47,6 +47,7 @@
 #include "RigOilVolumeResultCalculator.h"
 #include "RigPorvSoilSgasResultCalculator.h"
 #include "RigSoilResultCalculator.h"
+#include "RigSwatResultCalculator.h"
 #include "RigStatisticsDataCache.h"
 #include "RigStatisticsMath.h"
 
@@ -969,6 +970,12 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
     {
         RigSoilResultCalculator soilCalculator( *this );
         soilCalculator.checkAndCreatePlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
+    }
+
+    // SWAT
+    {
+        RigSwatResultCalculator swatCalculator( *this );
+        swatCalculator.checkAndCreatePlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
     }
 
     // Oil Volume
