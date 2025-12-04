@@ -85,17 +85,7 @@ void RigSwatResultCalculator::calculate( const RigEclipseResultAddress& resVarAd
     // Make sure memory is allocated for the SWAT results
     size_t swatResultScalarIndex = m_resultsData->findScalarResultIndexFromAddress( resVarAddr );
 
-    // Get time step count from any existing result, or default to 1
-    size_t      timeStepCount = 1;
-    const auto& resultInfos   = m_resultsData->infoForEachResultIndex();
-    for ( const auto& resultInfo : resultInfos )
-    {
-        if ( !resultInfo.timeStepInfos().empty() )
-        {
-            timeStepCount = qMax( timeStepCount, resultInfo.timeStepInfos().size() );
-        }
-    }
-
+    size_t timeStepCount = m_resultsData->maxTimeStepCount();
     m_resultsData->m_cellScalarResults[swatResultScalarIndex].resize( timeStepCount );
 
     if ( !m_resultsData->cellScalarResults( resVarAddr, timeStepIndex ).empty() )
@@ -123,12 +113,7 @@ bool RigSwatResultCalculator::hasOnlyWaterPhase() const
     if ( !eclipseCaseData ) return false;
 
     std::set<RiaDefines::PhaseType> availablePhases = eclipseCaseData->availablePhases();
-
-    // Check if we have only water phase and no SWAT data exists yet
     bool hasOnlyWater = availablePhases.size() == 1 && availablePhases.count( RiaDefines::PhaseType::WATER_PHASE ) > 0;
 
-    bool hasExistingSwat =
-        m_resultsData->hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
-
-    return hasOnlyWater && !hasExistingSwat;
+    return hasOnlyWater;
 }

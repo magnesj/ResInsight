@@ -47,9 +47,9 @@
 #include "RigOilVolumeResultCalculator.h"
 #include "RigPorvSoilSgasResultCalculator.h"
 #include "RigSoilResultCalculator.h"
-#include "RigSwatResultCalculator.h"
 #include "RigStatisticsDataCache.h"
 #include "RigStatisticsMath.h"
+#include "RigSwatResultCalculator.h"
 
 #include "RimCompletionCellIntersectionCalc.h"
 #include "RimEclipseCase.h"
@@ -969,13 +969,15 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
     // SOIL
     {
         RigSoilResultCalculator soilCalculator( *this );
-        soilCalculator.checkAndCreatePlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
+        soilCalculator.checkAndCreatePlaceholderEntry(
+            RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
     }
 
     // SWAT
     {
         RigSwatResultCalculator swatCalculator( *this );
-        swatCalculator.checkAndCreatePlaceholderEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
+        swatCalculator.checkAndCreatePlaceholderEntry(
+            RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
     }
 
     // Oil Volume
@@ -1438,6 +1440,20 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
                 {
                     computeSOILForTimeStep( timeStepIdx );
                 }
+            }
+
+            return scalarResultIndex;
+        }
+    }
+    else if ( resultName == RiaResultNames::swat() )
+    {
+        if ( mustBeCalculated( scalarResultIndex ) )
+        {
+            RigSwatResultCalculator swatCalculator( *this );
+
+            for ( size_t timeStepIdx = 0; timeStepIdx < maxTimeStepCount(); timeStepIdx++ )
+            {
+                swatCalculator.calculate( resVarAddr, timeStepIdx );
             }
 
             return scalarResultIndex;
