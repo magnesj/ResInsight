@@ -20,6 +20,7 @@
 
 #include "RiaEclipseFileNameTools.h"
 #include "RiaLogging.h"
+#include "RiaOpmParserTools.h"
 #include "RiaPreferencesSystem.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaResultNames.h"
@@ -971,6 +972,12 @@ void RifReaderOpmCommon::buildMetaData( RigEclipseCaseData* eclipseCaseData, caf
         m_eclipseCaseData->setUnitsType( unitsType );
     }
 
+    // Set available phases from INTEHEAD
+    {
+        auto phases = availablePhases();
+        m_eclipseCaseData->setAvailablePhases( phases );
+    }
+
     auto task = progress.task( "Handling well information", 10 );
     if ( loadWellDataEnabled() && !m_restartFileName.empty() )
     {
@@ -1054,6 +1061,51 @@ std::vector<RifReaderOpmCommon::TimeDataFile> RifReaderOpmCommon::readTimeSteps(
     }
 
     return reportTimeData;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RifReaderOpmCommon::readInteheadKeyword() const
+{
+    if ( m_initFile )
+    {
+        try
+        {
+            return m_initFile->getInitData<int>( "INTEHEAD" );
+        }
+        catch ( const std::exception& e )
+        {
+            RiaLogging::warning( QString( "Failed to read INTEHEAD keyword from init file: %1" ).arg( e.what() ) );
+        }
+    }
+
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+int RifReaderOpmCommon::readPhasesFromIntehead() const
+{
+    namespace VI = Opm::RestartIO::Helpers::VectorItems;
+
+    auto intehead = readInteheadKeyword();
+    if ( intehead.size() > VI::intehead::PHASE )
+    {
+        return intehead[VI::intehead::PHASE];
+    }
+
+    return -1;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RiaDefines::PhaseType> RifReaderOpmCommon::availablePhases() const
+{
+    int phaseIndicator = readPhasesFromIntehead();
+    return RiaOpmParserTools::phasesFromInteheadValue( phaseIndicator );
 }
 
 //--------------------------------------------------------------------------------------------------

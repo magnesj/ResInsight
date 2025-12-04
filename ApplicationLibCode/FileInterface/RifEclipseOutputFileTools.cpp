@@ -20,6 +20,7 @@
 
 #include "RifEclipseOutputFileTools.h"
 
+#include "RiaOpmParserTools.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaStringEncodingTools.h"
 
@@ -564,33 +565,17 @@ QString RifEclipseOutputFileTools::createIndexFileName( const QString& resultFil
 //--------------------------------------------------------------------------------------------------
 std::set<RiaDefines::PhaseType> RifEclipseOutputFileTools::findAvailablePhases( const ecl_file_type* ecl_file )
 {
-    std::set<RiaDefines::PhaseType> phaseTypes;
-
     if ( ecl_file )
     {
         const ecl_kw_type* intehead = ecl_file_iget_named_kw( ecl_file, INTEHEAD_KW, 0 );
         if ( intehead )
         {
             int phases = ecl_kw_iget_int( intehead, INTEHEAD_PHASE_INDEX );
-
-            if ( phases & ECL_OIL_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::OIL_PHASE );
-            }
-
-            if ( phases & ECL_GAS_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::GAS_PHASE );
-            }
-
-            if ( phases & ECL_WATER_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::WATER_PHASE );
-            }
+            return RiaOpmParserTools::phasesFromInteheadValue( phases );
         }
     }
 
-    return phaseTypes;
+    return std::set<RiaDefines::PhaseType>();
 }
 
 //--------------------------------------------------------------------------------------------------

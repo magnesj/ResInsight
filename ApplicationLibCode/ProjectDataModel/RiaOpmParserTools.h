@@ -18,7 +18,10 @@
 
 #pragma once
 
+#include "RiaDefines.h"
+
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -41,4 +44,8 @@ std::vector<AicdTemplateValues> extractWsegAicd( const std::string& filename );
 std::vector<AicdTemplateValues> extractWsegAicdCompletor( const std::string& filename );
 
 std::string aicdTemplateId();
+
+// Phase conversion utilities
+std::set<RiaDefines::PhaseType> phasesFromInteheadValue( int phaseIndicator );
+
 }; // namespace RiaOpmParserTools
