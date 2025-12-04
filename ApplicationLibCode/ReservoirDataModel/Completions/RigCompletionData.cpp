@@ -24,6 +24,7 @@
 
 #include <QString>
 
+#include <cmath>
 #include <limits>
 
 //==================================================================================================
@@ -46,6 +47,7 @@ RigCompletionData::RigCompletionData( const QString& wellName, const RigCompleti
     , m_secondOrderingValue( std::numeric_limits<double>::infinity() )
     , m_startMD( std::nullopt )
     , m_endMD( std::nullopt )
+    , m_completionNumber( std::nullopt )
 {
 }
 
@@ -264,6 +266,17 @@ void RigCompletionData::setDFactor( double dFactor )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RigCompletionData::setPerConnectionDfactor()
+{
+    if ( isDefaultValue( m_dFactor ) ) return;
+
+    // We use per connection dfactors, they have negative values, ref OPM Flow manual - COMPDAT kw
+    m_dFactor = std::abs( m_dFactor ) * -1.0;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RigCompletionData::setKh( double kh )
 {
     m_kh = kh;
@@ -379,6 +392,14 @@ std::optional<double> RigCompletionData::startMD() const
 std::optional<double> RigCompletionData::endMD() const
 {
     return m_endMD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<int> RigCompletionData::completionNumber() const
+{
+    return m_completionNumber;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -517,6 +538,7 @@ void RigCompletionData::copy( RigCompletionData& target, const RigCompletionData
     target.m_firstOrderingValue  = from.m_firstOrderingValue;
     target.m_secondOrderingValue = from.m_secondOrderingValue;
     target.m_sourcePdmObject     = from.m_sourcePdmObject;
+    target.m_completionNumber    = from.m_completionNumber;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -526,4 +548,12 @@ void RigCompletionData::setDepthRange( double startMD, double endMD )
 {
     m_startMD = startMD;
     m_endMD   = endMD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigCompletionData::setCompletionNumber( int completionNumber )
+{
+    m_completionNumber = completionNumber;
 }

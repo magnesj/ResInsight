@@ -86,6 +86,7 @@ public:
     void setDiameter( double diameter );
     void setTransmissibility( double transmissibility );
     void setDepthRange( double startMD, double endMD );
+    void setCompletionNumber( int completionNumber );
 
     void setTransAndWPImultBackgroundDataFromFishbone( double        transmissibility,
                                                        double        skinFactor,
@@ -120,6 +121,7 @@ public:
     bool isNonDarcyFlow() const;
     void setDFactor( double dFactor );
     void setKh( double kh );
+    void setPerConnectionDfactor();
 
     void addMetadata( const QString& name, const QString& comment );
 
@@ -140,6 +142,7 @@ public:
     bool                                      isMainBore() const;
     std::optional<double>                     startMD() const;
     std::optional<double>                     endMD() const;
+    std::optional<int>                        completionNumber() const;
     QString                                   directionStringIJK() const;
     QString                                   directionStringXYZ() const;
     QString                                   metaDataString() const;
@@ -165,6 +168,8 @@ private:
 
     std::optional<double> m_startMD; // start MD in completion cell
     std::optional<double> m_endMD; // end MD in completion cell
+
+    std::optional<int> m_completionNumber; // for complump kword
 
     bool m_isMainBore; // to use mainbore for Eclipse calculation
 

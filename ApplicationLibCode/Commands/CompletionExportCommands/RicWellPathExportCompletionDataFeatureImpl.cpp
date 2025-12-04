@@ -260,6 +260,12 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompletions( const std::v
             }
         }
 
+        // make sure we use per-connection D-factors, must be done after combining completions
+        for ( auto& completion : completions )
+        {
+            completion.setPerConnectionDfactor();
+        }
+
         const QString eclipseCaseName = exportSettings.caseToApply->caseUserDescription();
 
         if ( exportSettings.fileSplit == RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE )
@@ -413,8 +419,9 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
     auto isValidTransmissibility = []( double transmissibility )
     { return RiaStatisticsTools::isValidNumber<double>( transmissibility ) && transmissibility >= 0.0; };
 
-    auto startMD = completions[0].startMD();
-    auto endMD   = completions[0].endMD();
+    auto startMD          = completions[0].startMD();
+    auto endMD            = completions[0].endMD();
+    auto completionNumber = completions[0].completionNumber();
 
     for ( const RigCompletionData& completion : completions )
     {
@@ -439,6 +446,14 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
             if ( completion.endMD().has_value() && ( completion.endMD().value() > endMD.value() ) )
             {
                 endMD = completion.endMD();
+            }
+        }
+
+        if ( !completionNumber.has_value() )
+        {
+            if ( completion.completionNumber().has_value() )
+            {
+                completionNumber = completion.completionNumber();
             }
         }
 
@@ -468,6 +483,7 @@ RigCompletionData RicWellPathExportCompletionDataFeatureImpl::combineEclipseCell
     {
         resultCompletion.setDepthRange( startMD.value(), endMD.value() );
     }
+    if ( completionNumber.has_value() ) resultCompletion.setCompletionNumber( completionNumber.value() );
 
     double combinedDiameter   = diameterCalculator.weightedMean();
     double combinedSkinFactor = skinFactorCalculator.weightedMean();
@@ -898,6 +914,15 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompdatAndWpimultTables(
         {
             exportWpimultTableUsingFormatter( formatter, gridName, completions );
         }
+
+        for ( auto& completion : completions )
+        {
+            if ( completion.completionNumber().has_value() )
+            {
+                exportComplumpTableUsingFormatter( formatter, gridName, completions );
+                break;
+            }
+        }
     }
 
     RiaLogging::info( QString( "Successfully exported completion data to %1" ).arg( exportFile->fileName() ) );
@@ -1000,10 +1025,7 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompdatTableUsingFormatte
         formatter.addValueOrDefaultMarker( data.diameter(), RigCompletionData::defaultValue() );
         formatter.addValueOrDefaultMarker( data.kh(), RigCompletionData::defaultValue() );
         formatter.addValueOrDefaultMarker( data.skinFactor(), RigCompletionData::defaultValue() );
-        if ( RigCompletionData::isDefaultValue( data.dFactor() ) )
-            formatter.add( "1*" );
-        else
-            formatter.add( -data.dFactor() );
+        formatter.addValueOrDefaultMarker( data.dFactor(), RigCompletionData::defaultValue() );
 
         switch ( data.direction() )
         {
@@ -1018,6 +1040,65 @@ void RicWellPathExportCompletionDataFeatureImpl::exportCompdatTableUsingFormatte
                 formatter.add( "'Z'" );
                 break;
         }
+
+        formatter.rowCompleted();
+    }
+    formatter.tableCompleted();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportCompletionDataFeatureImpl::exportComplumpTableUsingFormatter( RifTextDataTableFormatter&            formatter,
+                                                                                    const QString&                        gridName,
+                                                                                    const std::vector<RigCompletionData>& completionData )
+{
+    if ( gridName.isEmpty() )
+    {
+        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "WELL", "NAME" ),
+                                                       RifTextDataTableColumn( "", "I" ),
+                                                       RifTextDataTableColumn( "", "J" ),
+                                                       RifTextDataTableColumn( "", "K1" ),
+                                                       RifTextDataTableColumn( "", "K2" ),
+                                                       RifTextDataTableColumn( "COMP", "NUM" ) };
+
+        formatter.header( header );
+        formatter.keyword( "COMPLUMP" );
+    }
+    else
+    {
+        std::vector<RifTextDataTableColumn> header = { RifTextDataTableColumn( "WELL", "NAME" ),
+                                                       RifTextDataTableColumn( "LGR", "NAME" ),
+                                                       RifTextDataTableColumn( "", "I" ),
+                                                       RifTextDataTableColumn( "", "J" ),
+                                                       RifTextDataTableColumn( "", "K1" ),
+                                                       RifTextDataTableColumn( "", "K2" ),
+                                                       RifTextDataTableColumn( "COMP", "NUM" ) };
+
+        formatter.header( header );
+        formatter.keyword( "COMPLMPL" );
+    }
+
+    for ( const RigCompletionData& data : completionData )
+    {
+        if ( !data.completionNumber().has_value() || data.transmissibility() == 0.0 || data.wpimult() == 0.0 )
+        {
+            // Don't export completions without transmissibility or completion number set
+            continue;
+        }
+
+        formatter.add( data.wellName() );
+
+        if ( !gridName.isEmpty() )
+        {
+            formatter.add( gridName );
+        }
+
+        formatter.add( data.completionDataGridCell().localCellIndexI() + 1 )
+            .add( data.completionDataGridCell().localCellIndexJ() + 1 )
+            .add( data.completionDataGridCell().localCellIndexK() + 1 )
+            .add( data.completionDataGridCell().localCellIndexK() + 1 )
+            .add( data.completionNumber().value() );
 
         formatter.rowCompleted();
     }
@@ -1172,6 +1253,7 @@ std::vector<RigCompletionData>
                                                                             kh,
                                                                             direction );
                 completion.setDepthRange( cell.startMD, cell.endMD );
+                if ( interval->completionNumber() > 0 ) completion.setCompletionNumber( interval->completionNumber() );
 
                 completion.addMetadata( "Perforation Completion",
                                         QString( "MD In: %1 - MD Out: %2" ).arg( cell.startMD ).arg( cell.endMD ) +
@@ -1726,6 +1808,13 @@ std::vector<RigCompletionData> RicWellPathExportCompletionDataFeatureImpl::compl
     }
 
     std::sort( completions.begin(), completions.end() );
+
+    // make sure we set per-connection D-factors, must be done after combining completions
+    for ( auto& completion : completions )
+    {
+        completion.setPerConnectionDfactor(); // we calculate per connection D-factors, which are negative per definition (ref. OPM Flow
+                                              // manual)
+    }
 
     return completions;
 }
