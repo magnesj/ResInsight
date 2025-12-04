@@ -42,4 +42,5 @@ private:
         getSaturationDataForCalculation( const RigEclipseResultAddress& address, size_t scalarIndex, size_t timeStepIndex ) const;
     void checkAndCreateSwatForWaterOnlySimulation( size_t timeStepIndex );
     void createSwatWithFullSaturation();
+    void testAndComputeSgasForTimeStep( size_t timeStepIndex );
 };
