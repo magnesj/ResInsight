@@ -55,7 +55,7 @@ void RigSoilResultCalculator::calculate( const RigEclipseResultAddress& resVarAd
 {
     // See similar function in RifReaderOpmRft::values, but the current implementation is not suitable for merging
     // Compute SGAS based on SWAT if the simulation contains no oil
-    m_resultsData->testAndComputeSgasForTimeStep( timeStepIndex );
+    testAndComputeSgasForTimeStep( timeStepIndex );
 
     // Check available phases and create SWAT if only water phase is present and SWAT is missing
     checkAndCreateSwatForWaterOnlySimulation( timeStepIndex );
@@ -228,5 +228,90 @@ void RigSoilResultCalculator::createSwatWithFullSaturation()
         {
             m_resultsData->m_cellScalarResults[swatScalarIndex][timeStep].assign( cellCount, 1.0 );
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigSoilResultCalculator::testAndComputeSgasForTimeStep( size_t timeStepIndex )
+{
+    // Check if SWAT is present
+    const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
+    const size_t swatScalarIndex = m_resultsData->findOrLoadKnownScalarResultForTimeStep( swatAddr, timeStepIndex );
+    if ( swatScalarIndex == cvf::UNDEFINED_SIZE_T )
+    {
+        return;
+    }
+
+    // Get available phases from case data
+    const std::set<RiaDefines::PhaseType> phases = m_resultsData->m_ownerCaseData->availablePhases();
+    
+    // Only compute SGAS for gas-water simulations (no oil phase)
+    if ( phases.count( RiaDefines::PhaseType::GAS_PHASE ) == 0 ) return;
+    if ( phases.count( RiaDefines::PhaseType::OIL_PHASE ) > 0 ) return;
+
+    // Create or find SGAS result
+    const RigEclipseResultAddress sgasAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() );
+    const size_t sgasScalarIndex = m_resultsData->findOrCreateScalarResultIndex( sgasAddr, false );
+    
+    // Check if SGAS data already exists for this time step
+    if ( m_resultsData->m_cellScalarResults[sgasScalarIndex].size() > timeStepIndex )
+    {
+        std::vector<double>& sgasValues = m_resultsData->m_cellScalarResults[sgasScalarIndex][timeStepIndex];
+        if ( !sgasValues.empty() )
+        {
+            return; // SGAS already computed
+        }
+    }
+
+    // Get SWAT data dimensions
+    size_t cellCount = 0;
+    size_t timeStepCount = 0;
+
+    {
+        const std::vector<double>& swatData = m_resultsData->m_cellScalarResults[swatScalarIndex][timeStepIndex];
+        if ( !swatData.empty() )
+        {
+            cellCount = swatData.size();
+            timeStepCount = m_resultsData->infoForEachResultIndex()[swatScalarIndex].timeStepInfos().size();
+        }
+    }
+
+    // Allocate SGAS data
+    m_resultsData->m_cellScalarResults[sgasScalarIndex].resize( timeStepCount );
+
+    // Check again if data exists after resize
+    if ( !m_resultsData->m_cellScalarResults[sgasScalarIndex][timeStepIndex].empty() )
+    {
+        return;
+    }
+
+    m_resultsData->m_cellScalarResults[sgasScalarIndex][timeStepIndex].resize( cellCount );
+
+    // Get data references
+    const std::vector<double>* swatData = nullptr;
+    {
+        swatData = &( m_resultsData->m_cellScalarResults[swatScalarIndex][timeStepIndex] );
+        if ( swatData->empty() )
+        {
+            swatData = nullptr;
+        }
+    }
+
+    std::vector<double>& sgasData = m_resultsData->m_cellScalarResults[sgasScalarIndex][timeStepIndex];
+
+    // Compute SGAS = 1.0 - SWAT for gas-water simulation
+#pragma omp parallel for
+    for ( int cellIdx = 0; cellIdx < static_cast<int>( cellCount ); cellIdx++ )
+    {
+        double gasValue = 1.0; // Start with total pore space
+
+        if ( swatData )
+        {
+            gasValue -= swatData->at( cellIdx );
+        }
+
+        sgasData[cellIdx] = gasValue;
     }
 }
