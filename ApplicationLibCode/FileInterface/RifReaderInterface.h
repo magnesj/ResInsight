@@ -27,7 +27,7 @@ namespace RiaDefines
 {
 enum class PorosityModelType;
 enum class PhaseType;
-}
+} // namespace RiaDefines
 
 #include "cvfCollection.h"
 #include "cvfObject.h"
