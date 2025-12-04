@@ -54,117 +54,108 @@ void RigSoilResultCalculator::calculate( const RigEclipseResultAddress& resVarAd
     // Compute SGAS based on SWAT if the simulation contains no oil
     m_resultsData->testAndComputeSgasForTimeStep( timeStepIndex );
 
-    RigEclipseResultAddress SWATAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
-    RigEclipseResultAddress SGASAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() );
-    RigEclipseResultAddress SSOLAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, "SSOL" );
+    // Create result addresses for saturation components
+    const RigEclipseResultAddress swatAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
+    const RigEclipseResultAddress sgasAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() );
+    const RigEclipseResultAddress ssolAddr( RiaDefines::ResultCatType::DYNAMIC_NATIVE, "SSOL" );
 
-    size_t scalarIndexSWAT =
-        m_resultsData->findOrLoadKnownScalarResultForTimeStep( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
-                                                                                        RiaResultNames::swat() ),
-                                                               timeStepIndex );
-    size_t scalarIndexSGAS =
-        m_resultsData->findOrLoadKnownScalarResultForTimeStep( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
-                                                                                        RiaResultNames::sgas() ),
-                                                               timeStepIndex );
-    size_t scalarIndexSSOL =
-        m_resultsData->findOrLoadKnownScalarResultForTimeStep( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, "SSOL" ),
-                                                               timeStepIndex );
+    // Load scalar indices for each saturation component
+    const size_t swatScalarIndex = m_resultsData->findOrLoadKnownScalarResultForTimeStep( swatAddr, timeStepIndex );
+    const size_t sgasScalarIndex = m_resultsData->findOrLoadKnownScalarResultForTimeStep( sgasAddr, timeStepIndex );
+    const size_t ssolScalarIndex = m_resultsData->findOrLoadKnownScalarResultForTimeStep( ssolAddr, timeStepIndex );
 
     // Early exit if none of SWAT or SGAS is present
-    if ( scalarIndexSWAT == cvf::UNDEFINED_SIZE_T && scalarIndexSGAS == cvf::UNDEFINED_SIZE_T )
+    if ( swatScalarIndex == cvf::UNDEFINED_SIZE_T && sgasScalarIndex == cvf::UNDEFINED_SIZE_T )
     {
         return;
     }
 
-    size_t soilResultValueCount = 0;
-    size_t soilTimeStepCount    = 0;
+    // Determine result dimensions from available data
+    size_t cellCount      = 0;
+    size_t totalTimeSteps = 0;
 
-    if ( scalarIndexSWAT != cvf::UNDEFINED_SIZE_T )
+    if ( swatScalarIndex != cvf::UNDEFINED_SIZE_T )
     {
-        const std::vector<double>& swatForTimeStep = m_resultsData->cellScalarResults( SWATAddr, timeStepIndex );
-        if ( !swatForTimeStep.empty() )
+        const std::vector<double>& swatData = m_resultsData->cellScalarResults( swatAddr, timeStepIndex );
+        if ( !swatData.empty() )
         {
-            soilResultValueCount = swatForTimeStep.size();
-            soilTimeStepCount    = m_resultsData->infoForEachResultIndex()[scalarIndexSWAT].timeStepInfos().size();
+            cellCount      = swatData.size();
+            totalTimeSteps = m_resultsData->infoForEachResultIndex()[swatScalarIndex].timeStepInfos().size();
         }
     }
 
-    if ( scalarIndexSGAS != cvf::UNDEFINED_SIZE_T )
+    if ( sgasScalarIndex != cvf::UNDEFINED_SIZE_T )
     {
-        const std::vector<double>& sgasForTimeStep = m_resultsData->cellScalarResults( SGASAddr, timeStepIndex );
-        if ( !sgasForTimeStep.empty() )
+        const std::vector<double>& sgasData = m_resultsData->cellScalarResults( sgasAddr, timeStepIndex );
+        if ( !sgasData.empty() )
         {
-            soilResultValueCount = qMax( soilResultValueCount, sgasForTimeStep.size() );
+            cellCount = qMax( cellCount, sgasData.size() );
 
-            size_t sgasTimeStepCount = m_resultsData->infoForEachResultIndex()[scalarIndexSGAS].timeStepInfos().size();
-            soilTimeStepCount        = qMax( soilTimeStepCount, sgasTimeStepCount );
+            const size_t sgasTimeSteps = m_resultsData->infoForEachResultIndex()[sgasScalarIndex].timeStepInfos().size();
+            totalTimeSteps             = qMax( totalTimeSteps, sgasTimeSteps );
         }
     }
 
-    // Make sure memory is allocated for the new SOIL results
-    size_t soilResultScalarIndex = m_resultsData->findScalarResultIndexFromAddress( resVarAddr );
-    m_resultsData->m_cellScalarResults[soilResultScalarIndex].resize( soilTimeStepCount );
+    // Allocate memory for SOIL results
+    const size_t soilScalarIndex = m_resultsData->findScalarResultIndexFromAddress( resVarAddr );
+    m_resultsData->m_cellScalarResults[soilScalarIndex].resize( totalTimeSteps );
 
     if ( !m_resultsData->cellScalarResults( resVarAddr, timeStepIndex ).empty() )
     {
-        // Data is computed and allocated, nothing more to do
+        // Data is already computed and allocated
         return;
     }
 
-    m_resultsData->m_cellScalarResults[soilResultScalarIndex][timeStepIndex].resize( soilResultValueCount );
+    m_resultsData->m_cellScalarResults[soilScalarIndex][timeStepIndex].resize( cellCount );
 
-    const std::vector<double>* swatForTimeStep = nullptr;
-    const std::vector<double>* sgasForTimeStep = nullptr;
-    const std::vector<double>* ssolForTimeStep = nullptr;
+    // Get data vectors for calculation
+    const std::vector<double>& swatData = getSaturationDataForCalculation( swatAddr, swatScalarIndex, timeStepIndex );
+    const std::vector<double>& sgasData = getSaturationDataForCalculation( sgasAddr, sgasScalarIndex, timeStepIndex );
+    const std::vector<double>& ssolData = getSaturationDataForCalculation( ssolAddr, ssolScalarIndex, timeStepIndex );
 
-    if ( scalarIndexSWAT != cvf::UNDEFINED_SIZE_T )
-    {
-        swatForTimeStep = &( m_resultsData->cellScalarResults( SWATAddr, timeStepIndex ) );
-        if ( swatForTimeStep->empty() )
-        {
-            swatForTimeStep = nullptr;
-        }
-    }
+    std::vector<double>* soilData = m_resultsData->modifiableCellScalarResult( resVarAddr, timeStepIndex );
 
-    if ( scalarIndexSGAS != cvf::UNDEFINED_SIZE_T )
-    {
-        sgasForTimeStep = &( m_resultsData->cellScalarResults( SGASAddr, timeStepIndex ) );
-        if ( sgasForTimeStep->empty() )
-        {
-            sgasForTimeStep = nullptr;
-        }
-    }
-
-    if ( scalarIndexSSOL != cvf::UNDEFINED_SIZE_T )
-    {
-        ssolForTimeStep = &( m_resultsData->cellScalarResults( SSOLAddr, timeStepIndex ) );
-        if ( ssolForTimeStep->empty() )
-        {
-            ssolForTimeStep = nullptr;
-        }
-    }
-
-    std::vector<double>* soilForTimeStep = m_resultsData->modifiableCellScalarResult( resVarAddr, timeStepIndex );
-
+    // Calculate SOIL using material balance equation: SOIL = 1.0 - SWAT - SGAS - SSOL
+    // This ensures that all fluid saturations sum to 1.0 in each cell
 #pragma omp parallel for
-    for ( int idx = 0; idx < static_cast<int>( soilResultValueCount ); idx++ )
+    for ( int cellIdx = 0; cellIdx < static_cast<int>( cellCount ); cellIdx++ )
     {
-        double soilValue = 1.0;
-        if ( sgasForTimeStep )
+        double oilSaturation = 1.0; // Start with total pore space
+
+        // Subtract other phase saturations
+        if ( !sgasData.empty() )
         {
-            soilValue -= sgasForTimeStep->at( idx );
+            oilSaturation -= sgasData[cellIdx];
         }
 
-        if ( swatForTimeStep )
+        if ( !swatData.empty() )
         {
-            soilValue -= swatForTimeStep->at( idx );
+            oilSaturation -= swatData[cellIdx];
         }
 
-        if ( ssolForTimeStep )
+        if ( !ssolData.empty() )
         {
-            soilValue -= ssolForTimeStep->at( idx );
+            oilSaturation -= ssolData[cellIdx];
         }
 
-        soilForTimeStep->at( idx ) = soilValue;
+        soilData->at( cellIdx ) = oilSaturation;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<double>& RigSoilResultCalculator::getSaturationDataForCalculation( const RigEclipseResultAddress& address,
+                                                                                     size_t                         scalarIndex,
+                                                                                     size_t                         timeStepIndex ) const
+{
+    static const std::vector<double> emptyVector;
+
+    if ( scalarIndex == cvf::UNDEFINED_SIZE_T )
+    {
+        return emptyVector;
+    }
+
+    const std::vector<double>& data = m_resultsData->cellScalarResults( address, timeStepIndex );
+    return data.empty() ? emptyVector : data;
 }
