@@ -573,19 +573,24 @@ std::set<RiaDefines::PhaseType> RifEclipseOutputFileTools::findAvailablePhases( 
         {
             int phases = ecl_kw_iget_int( intehead, INTEHEAD_PHASE_INDEX );
 
-            if ( phases & ECL_OIL_PHASE )
+            // See RifReaderOpmCommon::availablePhases
+            // Phase indicator from OPM Common specification:
+            // 1: oil, 2: water, 3: O/W, 4: gas, 5: G/O, 6: G/W, 7: O/G/W
+            // Use bitwise logic: oil=bit 0, water=bit 1, gas=bit 2
+
+            if ( phases & 1 ) // oil
             {
                 phaseTypes.insert( RiaDefines::PhaseType::OIL_PHASE );
             }
 
-            if ( phases & ECL_GAS_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::GAS_PHASE );
-            }
-
-            if ( phases & ECL_WATER_PHASE )
+            if ( phases & 2 ) // water
             {
                 phaseTypes.insert( RiaDefines::PhaseType::WATER_PHASE );
+            }
+
+            if ( phases & 4 ) // gas
+            {
+                phaseTypes.insert( RiaDefines::PhaseType::GAS_PHASE );
             }
         }
     }
