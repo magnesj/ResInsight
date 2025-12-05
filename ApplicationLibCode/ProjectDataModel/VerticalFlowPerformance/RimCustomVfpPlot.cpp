@@ -27,6 +27,8 @@
 
 #include "RigVfpTables.h"
 
+#include <numeric>
+
 #include "RimColorLegend.h"
 #include "RimColorLegendItem.h"
 #include "RimPlotAxisProperties.h"
@@ -911,26 +913,6 @@ void RimCustomVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget*           
     updateConnectedEditors();
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RimCustomVfpPlot::axisTitle( RimVfpDefines::ProductionVariableType variableType, RimVfpDefines::FlowingPhaseType flowingPhase )
-{
-    QString title;
-
-    if ( flowingPhase == RimVfpDefines::FlowingPhaseType::GAS )
-    {
-        title = "Gas ";
-    }
-    else
-    {
-        title = "Liquid ";
-    }
-    title += QString( "%1 %2" ).arg( caf::AppEnum<RimVfpDefines::ProductionVariableType>::uiText( variableType ),
-                                     getDisplayUnitWithBracket( variableType ) );
-
-    return title;
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -1181,28 +1163,35 @@ void RimCustomVfpPlot::initializeFromInitData( const VfpTableInitialData& table 
     m_flowingWaterFraction = table.waterFraction;
 }
 
+
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimCustomVfpPlot::getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType )
+QString RimCustomVfpPlot::getDisplayUnit( RimVfpDefines::ProductionVariableType variableType ) const
 {
-    QString unit = getDisplayUnit( variableType );
-    if ( !unit.isEmpty() ) return QString( "[%1]" ).arg( unit );
-
-    return {};
+    // Use RigVfpTables to get proper unit strings based on the actual unit system
+    if ( m_mainDataSource && m_mainDataSource->dataSource() && m_mainDataSource->dataSource()->vfpTables() )
+    {
+        auto vfpTables = m_mainDataSource->dataSource()->vfpTables();
+        
+        // Use the static method from RigVfpTables that properly handles unit systems
+        return RigVfpTables::getDisplayUnit( variableType, vfpTables->unitSystem() );
+    }
+    
+    // Return empty string if VFP data not available
+    return "";
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RimCustomVfpPlot::getDisplayUnit( RimVfpDefines::ProductionVariableType variableType )
-
+QString RimCustomVfpPlot::getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType ) const
 {
-    if ( variableType == RimVfpDefines::ProductionVariableType::THP ) return "Bar";
+    QString unit = getDisplayUnit( variableType );
+    if ( !unit.isEmpty() ) return QString( "[%1]" ).arg( unit );
 
-    if ( variableType == RimVfpDefines::ProductionVariableType::FLOW_RATE ) return "Sm3/day";
-
-    return "";
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
