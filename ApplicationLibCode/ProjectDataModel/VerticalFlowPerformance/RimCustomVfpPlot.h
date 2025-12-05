@@ -123,8 +123,8 @@ private:
                                       RimVfpDefines::ProductionVariableType   primaryVariable,
                                       RimVfpDefines::ProductionVariableType   familyVariable );
 
-    QString        getDisplayUnit( RimVfpDefines::ProductionVariableType variableType ) const;
-    QString        getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType ) const;
+    QString getDisplayUnit( RimVfpDefines::ProductionVariableType variableType ) const;
+    QString getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType ) const;
 
     struct CurveNameContent
     {
@@ -145,7 +145,6 @@ private:
                                          const CurveNameContent&  curveNameContent );
 
     void updateLegendWidget( size_t curveSetCount, CurveNameContent& curveNameContent );
-
 
     void connectAxisSignals( RimPlotAxisProperties* axis );
     void axisSettingsChanged( const caf::SignalEmitter* emitter );

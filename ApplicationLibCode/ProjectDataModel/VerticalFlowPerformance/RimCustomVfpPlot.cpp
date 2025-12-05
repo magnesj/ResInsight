@@ -913,7 +913,6 @@ void RimCustomVfpPlot::populatePlotWidgetWithPlotData( RiuPlotWidget*           
     updateConnectedEditors();
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -1163,8 +1162,6 @@ void RimCustomVfpPlot::initializeFromInitData( const VfpTableInitialData& table 
     m_flowingWaterFraction = table.waterFraction;
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -1174,11 +1171,11 @@ QString RimCustomVfpPlot::getDisplayUnit( RimVfpDefines::ProductionVariableType 
     if ( m_mainDataSource && m_mainDataSource->dataSource() && m_mainDataSource->dataSource()->vfpTables() )
     {
         auto vfpTables = m_mainDataSource->dataSource()->vfpTables();
-        
+
         // Use the static method from RigVfpTables that properly handles unit systems
         return RigVfpTables::getDisplayUnit( variableType, vfpTables->unitSystem() );
     }
-    
+
     // Return empty string if VFP data not available
     return "";
 }
