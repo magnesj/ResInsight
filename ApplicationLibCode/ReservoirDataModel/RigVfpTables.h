@@ -104,7 +104,9 @@ struct VfpTableInitialData
 class RigVfpTables
 {
 public:
-    void setUnitSystem( const Opm::UnitSystem& unitSystem );
+    void                  setUnitSystem( const Opm::UnitSystem& unitSystem );
+    const Opm::UnitSystem unitSystem() const;
+
     void addInjectionTable( const RifVfpInjTable& table );
     void addProductionTable( const RifVfpProdTable& table );
 

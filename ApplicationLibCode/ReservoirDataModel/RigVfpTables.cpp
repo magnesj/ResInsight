@@ -147,6 +147,14 @@ VfpPlotData RigVfpTables::populatePlotData( const RifVfpProdTable&              
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+const Opm::UnitSystem RigVfpTables::unitSystem() const
+{
+    return m_unitSystem;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 VfpPlotData RigVfpTables::populatePlotData( int                                     tableIndex,
                                             RimVfpDefines::ProductionVariableType   primaryVariable,
                                             RimVfpDefines::ProductionVariableType   familyVariable,
