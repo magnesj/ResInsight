@@ -16,8 +16,6 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#pragma once
-
 //==================================================================================================
 //
 //  RifVfpInjTable - VFP Injection Table Reader
@@ -39,6 +37,8 @@
 //  - Added storage for original UNITS and BODY_DEF strings for reference
 //
 //==================================================================================================
+
+#pragma once
 
 #include <array>
 #include <string>
@@ -74,6 +74,8 @@ public:
 
     std::array<size_t, 2> shape() const;
     double                operator()( size_t thp_idx, size_t flo_idx ) const;
+
+    static void check_axis( const std::vector<double>& axis );
 
 private:
     int         m_table_num;

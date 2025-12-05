@@ -28,6 +28,7 @@
 //==================================================================================================
 
 #include "RifVfpProdTable.h"
+#include "RifVfpInjTable.h"
 
 #include <opm/input/eclipse/Deck/DeckItem.hpp>
 #include <opm/input/eclipse/Deck/DeckKeyword.hpp>
@@ -39,8 +40,6 @@
 #include <cmath>
 #include <stdexcept>
 
-namespace
-{
 RifVfpProdTable::FLO_TYPE getFloType( const Opm::DeckItem& item )
 {
     const std::string& flo_string = item.getTrimmedString( 0 );
@@ -100,15 +99,6 @@ RifVfpProdTable::ALQ_TYPE getALQType( const Opm::DeckItem& item, bool gaslift_op
         throw std::invalid_argument( "Invalid ALQ_DEF string: " + alq_string );
     }
 }
-
-void check_axis( const std::vector<double>& axis )
-{
-    if ( axis.size() == 0 ) throw std::invalid_argument( "Empty axis" );
-
-    if ( !std::is_sorted( axis.begin(), axis.end() ) ) throw std::invalid_argument( "Axis is not sorted" );
-}
-
-} // namespace
 
 RifVfpProdTable::RifVfpProdTable()
 {
@@ -243,11 +233,11 @@ void RifVfpProdTable::check()
 {
     if ( m_table_num <= 0 ) throw std::invalid_argument( "Invalid table number" );
 
-    check_axis( m_flo_data );
-    check_axis( m_thp_data );
-    check_axis( m_wfr_data );
-    check_axis( m_gfr_data );
-    check_axis( m_alq_data );
+    RifVfpInjTable::check_axis( m_flo_data );
+    RifVfpInjTable::check_axis( m_thp_data );
+    RifVfpInjTable::check_axis( m_wfr_data );
+    RifVfpInjTable::check_axis( m_gfr_data );
+    RifVfpInjTable::check_axis( m_alq_data );
 
     size_t nt = m_thp_data.size();
     size_t nw = m_wfr_data.size();

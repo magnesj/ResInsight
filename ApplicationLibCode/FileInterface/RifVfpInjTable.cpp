@@ -51,6 +51,7 @@ inline const Opm::DeckItem& getNonEmptyItem( const Opm::DeckRecord& record )
     }
     return retval;
 }
+} // namespace
 
 RifVfpInjTable::FLO_TYPE getFloType( const std::string& flo_string )
 {
@@ -61,14 +62,12 @@ RifVfpInjTable::FLO_TYPE getFloType( const std::string& flo_string )
     throw std::invalid_argument( "Invalid RATE_TYPE string" );
 }
 
-void check_axis( const std::vector<double>& axis )
+void RifVfpInjTable::check_axis( const std::vector<double>& axis )
 {
     if ( axis.size() == 0 ) throw std::invalid_argument( "Empty axis" );
 
     if ( !std::is_sorted( axis.begin(), axis.end() ) ) throw std::invalid_argument( "Axis is not sorted" );
 }
-
-} // namespace
 
 RifVfpInjTable::RifVfpInjTable()
 {
