@@ -62,9 +62,9 @@ public:
     RifVfpInjTable();
     RifVfpInjTable( const Opm::DeckKeyword& table );
 
-    int            getTableNum() const { return m_table_num; }
-    double         getDatumDepth() const { return m_datum_depth; }
-    FLO_TYPE       getFloType() const { return m_flo_type; }
+    int                getTableNum() const { return m_table_num; }
+    double             getDatumDepth() const { return m_datum_depth; }
+    FLO_TYPE           getFloType() const { return m_flo_type; }
     const std::string& getUnits() const { return m_units; }
     const std::string& getBodyDef() const { return m_body_def; }
 
@@ -73,7 +73,7 @@ public:
     const std::vector<double>& getTable() const { return m_data; }
 
     std::array<size_t, 2> shape() const;
-    double operator()( size_t thp_idx, size_t flo_idx ) const;
+    double                operator()( size_t thp_idx, size_t flo_idx ) const;
 
 private:
     int         m_table_num;
@@ -86,6 +86,6 @@ private:
     std::vector<double> m_thp_data;
     std::vector<double> m_data;
 
-    void check();
+    void    check();
     double& operator()( size_t thp_idx, size_t flo_idx );
 };

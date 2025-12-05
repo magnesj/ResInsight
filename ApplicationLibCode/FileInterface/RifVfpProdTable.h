@@ -87,12 +87,12 @@ public:
     RifVfpProdTable();
     RifVfpProdTable( const Opm::DeckKeyword& table, bool gaslift_opt_active );
 
-    int            getTableNum() const { return m_table_num; }
-    double         getDatumDepth() const { return m_datum_depth; }
-    FLO_TYPE       getFloType() const { return m_flo_type; }
-    WFR_TYPE       getWFRType() const { return m_wfr_type; }
-    GFR_TYPE       getGFRType() const { return m_gfr_type; }
-    ALQ_TYPE       getALQType() const { return m_alq_type; }
+    int                getTableNum() const { return m_table_num; }
+    double             getDatumDepth() const { return m_datum_depth; }
+    FLO_TYPE           getFloType() const { return m_flo_type; }
+    WFR_TYPE           getWFRType() const { return m_wfr_type; }
+    GFR_TYPE           getGFRType() const { return m_gfr_type; }
+    ALQ_TYPE           getALQType() const { return m_alq_type; }
     const std::string& getUnits() const { return m_units; }
     const std::string& getBodyDef() const { return m_body_def; }
 
@@ -104,7 +104,7 @@ public:
     const std::vector<double>& getTable() const { return m_data; }
 
     std::array<size_t, 5> shape() const;
-    double operator()( size_t thp_idx, size_t wfr_idx, size_t gfr_idx, size_t alq_idx, size_t flo_idx ) const;
+    double                operator()( size_t thp_idx, size_t wfr_idx, size_t gfr_idx, size_t alq_idx, size_t flo_idx ) const;
 
 private:
     int         m_table_num;
@@ -123,6 +123,6 @@ private:
     std::vector<double> m_alq_data;
     std::vector<double> m_data;
 
-    void check();
+    void    check();
     double& operator()( size_t thp_idx, size_t wfr_idx, size_t gfr_idx, size_t alq_idx, size_t flo_idx );
 };

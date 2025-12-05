@@ -20,9 +20,9 @@
 #include "RiaLogging.h"
 #include "RiaTextStringTools.h"
 
-#include "RifEclipseInputFileTools.h"
 #include "FileInterface/RifVfpInjTable.h"
 #include "FileInterface/RifVfpProdTable.h"
+#include "RifEclipseInputFileTools.h"
 
 #include "cafPdmUiItem.h"
 #include "cafUtils.h"

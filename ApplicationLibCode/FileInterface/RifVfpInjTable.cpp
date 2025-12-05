@@ -54,25 +54,20 @@ inline const Opm::DeckItem& getNonEmptyItem( const Opm::DeckRecord& record )
 
 RifVfpInjTable::FLO_TYPE getFloType( const std::string& flo_string )
 {
-    if ( flo_string == "OIL" )
-        return RifVfpInjTable::FLO_TYPE::FLO_OIL;
+    if ( flo_string == "OIL" ) return RifVfpInjTable::FLO_TYPE::FLO_OIL;
 
-    if ( flo_string == "WAT" )
-        return RifVfpInjTable::FLO_TYPE::FLO_WAT;
+    if ( flo_string == "WAT" ) return RifVfpInjTable::FLO_TYPE::FLO_WAT;
 
-    if ( flo_string == "GAS" )
-        return RifVfpInjTable::FLO_TYPE::FLO_GAS;
+    if ( flo_string == "GAS" ) return RifVfpInjTable::FLO_TYPE::FLO_GAS;
 
     throw std::invalid_argument( "Invalid RATE_TYPE string" );
 }
 
 void check_axis( const std::vector<double>& axis )
 {
-    if ( axis.size() == 0 )
-        throw std::invalid_argument( "Empty axis" );
+    if ( axis.size() == 0 ) throw std::invalid_argument( "Empty axis" );
 
-    if ( !std::is_sorted( axis.begin(), axis.end() ) )
-        throw std::invalid_argument( "Axis is not sorted" );
+    if ( !std::is_sorted( axis.begin(), axis.end() ) ) throw std::invalid_argument( "Axis is not sorted" );
 }
 
 } // namespace
@@ -182,14 +177,12 @@ double& RifVfpInjTable::operator()( size_t thp_idx, size_t flo_idx )
 
 void RifVfpInjTable::check()
 {
-    if ( m_table_num <= 0 )
-        throw std::invalid_argument( "Invalid table number" );
+    if ( m_table_num <= 0 ) throw std::invalid_argument( "Invalid table number" );
 
     check_axis( m_flo_data );
     check_axis( m_thp_data );
 
-    if ( m_data.size() != m_thp_data.size() * m_flo_data.size() )
-        throw std::invalid_argument( "Wrong data size" );
+    if ( m_data.size() != m_thp_data.size() * m_flo_data.size() ) throw std::invalid_argument( "Wrong data size" );
 
     for ( size_t t = 0; t < m_thp_data.size(); ++t )
     {
