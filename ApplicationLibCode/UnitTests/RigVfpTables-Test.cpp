@@ -21,7 +21,13 @@
 #include "ProjectDataModel/VerticalFlowPerformance/RimVfpDefines.h"
 #include "RigVfpTables.h"
 
+#include "ProjectDataModel/RiaOpmParserTools.h"
+#include "FileInterface/RifVfpProdTable.h"
+#include "FileInterface/RifVfpInjTable.h"
+
 #include "opm/input/eclipse/Units/UnitSystem.hpp"
+
+#include "RiaTestDataDirectory.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -125,4 +131,89 @@ TEST( RigVfpTables, MetricUnitDisplayUnits )
 
     QString flowRateUnitBracket = RigVfpTables::getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType::FLOW_RATE, metricUnitSystem );
     EXPECT_EQ( "[Sm3/day]", flowRateUnitBracket.toStdString() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RigVfpTables, ImportVfpDataFromFile )
+{
+    // Import VFP data using the new ResInsight VFP file readers
+    std::string vfpFilePath = QString( "%1/RigSimulationInputTool/model5/include/flowl_b_vfp.ecl" ).arg( TEST_DATA_DIR ).toStdString();
+    
+    auto [unitSystem, prodTables, injTables] = RiaOpmParserTools::extractVfpTablesFromDataFile( vfpFilePath );
+    
+    // Verify we got data
+    EXPECT_FALSE( prodTables.empty() );
+    EXPECT_TRUE( injTables.empty() ); // This file contains only production tables
+    
+    // Check unit system is metric (based on VFPPROD header "METRIC")
+    EXPECT_EQ( Opm::UnitSystem::UnitType::UNIT_TYPE_METRIC, unitSystem.getType() );
+    
+    // Verify first production table
+    const auto& table = prodTables[0];
+    EXPECT_EQ( 4, table.getTableNum() );
+    EXPECT_DOUBLE_EQ( 114.60, table.getDatumDepth() );
+    
+    // Check table type indicators
+    EXPECT_EQ( RifVfpProdTable::FLO_TYPE::FLO_LIQ, table.getFloType() );
+    EXPECT_EQ( RifVfpProdTable::WFR_TYPE::WFR_WCT, table.getWFRType() );
+    EXPECT_EQ( RifVfpProdTable::GFR_TYPE::GFR_GOR, table.getGFRType() );
+    EXPECT_EQ( RifVfpProdTable::ALQ_TYPE::ALQ_GRAT, table.getALQType() );
+    
+    // Verify axis data preserved from original file
+    const auto& floAxis = table.getFloAxis();
+    EXPECT_EQ( 19, floAxis.size() );
+    EXPECT_DOUBLE_EQ( 20.0, floAxis[0] );
+    EXPECT_DOUBLE_EQ( 30.0, floAxis[1] );
+    EXPECT_DOUBLE_EQ( 11171.0, floAxis[floAxis.size() - 1] );
+    
+    const auto& thpAxis = table.getTHPAxis();
+    EXPECT_EQ( 6, thpAxis.size() );
+    EXPECT_DOUBLE_EQ( 2.00, thpAxis[0] );
+    EXPECT_DOUBLE_EQ( 35.00, thpAxis[thpAxis.size() - 1] );
+    
+    const auto& wfrAxis = table.getWFRAxis();
+    EXPECT_EQ( 10, wfrAxis.size() );
+    EXPECT_DOUBLE_EQ( 0.000, wfrAxis[0] );
+    EXPECT_DOUBLE_EQ( 0.990, wfrAxis[wfrAxis.size() - 1] );
+    
+    const auto& gfrAxis = table.getGFRAxis();
+    EXPECT_EQ( 9, gfrAxis.size() );
+    EXPECT_DOUBLE_EQ( 20.0, gfrAxis[0] );
+    EXPECT_DOUBLE_EQ( 1000.0, gfrAxis[gfrAxis.size() - 1] );
+    
+    const auto& alqAxis = table.getALQAxis();
+    EXPECT_EQ( 6, alqAxis.size() );
+    EXPECT_DOUBLE_EQ( 0.0, alqAxis[0] );
+    EXPECT_DOUBLE_EQ( 300000.0, alqAxis[alqAxis.size() - 1] );
+    
+    // Test table dimensions
+    auto shape = table.shape();
+    EXPECT_EQ( 6, shape[0] );   // THP
+    EXPECT_EQ( 10, shape[1] );  // WFR
+    EXPECT_EQ( 9, shape[2] );   // GFR
+    EXPECT_EQ( 6, shape[3] );   // ALQ
+    EXPECT_EQ( 19, shape[4] );  // FLO
+    
+    // Test specific table value (first data point from file)
+    // THP=1, WFR=1, GFR=1, ALQ=1 should give BHP=13.977
+    EXPECT_DOUBLE_EQ( 13.977, table( 0, 0, 0, 0, 0 ) );
+    
+    // Test RigVfpTables functionality with imported data
+    RigVfpTables vfpTables;
+    vfpTables.setUnitSystem( unitSystem );
+    vfpTables.addProductionTable( table );
+    
+    // Verify table numbers
+    auto tableNumbers = vfpTables.productionTableNumbers();
+    EXPECT_EQ( 1, tableNumbers.size() );
+    EXPECT_EQ( 4, tableNumbers[0] );
+    
+    // Test unit display with imported data
+    QString thpUnit = RigVfpTables::getDisplayUnit( RimVfpDefines::ProductionVariableType::THP, vfpTables.unitSystem() );
+    EXPECT_EQ( "Bar", thpUnit.toStdString() );
+    
+    QString flowRateUnit = RigVfpTables::getDisplayUnit( RimVfpDefines::ProductionVariableType::FLOW_RATE, vfpTables.unitSystem() );
+    EXPECT_EQ( "Sm3/day", flowRateUnit.toStdString() );
 }
