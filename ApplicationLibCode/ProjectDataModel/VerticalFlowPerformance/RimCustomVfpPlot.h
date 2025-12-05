@@ -123,8 +123,6 @@ private:
                                       RimVfpDefines::ProductionVariableType   primaryVariable,
                                       RimVfpDefines::ProductionVariableType   familyVariable );
 
-    static double  convertToDisplayUnit( double value, RimVfpDefines::ProductionVariableType variableType );
-    static void    convertToDisplayUnit( std::vector<double>& values, RimVfpDefines::ProductionVariableType variableType );
     static QString getDisplayUnit( RimVfpDefines::ProductionVariableType variableType );
     static QString getDisplayUnitWithBracket( RimVfpDefines::ProductionVariableType variableType );
 
