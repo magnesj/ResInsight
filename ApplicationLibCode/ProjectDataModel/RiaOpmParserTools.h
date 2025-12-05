@@ -22,8 +22,13 @@
 #include <string>
 #include <vector>
 
-#include "opm/input/eclipse/Schedule/VFPInjTable.hpp"
-#include "opm/input/eclipse/Schedule/VFPProdTable.hpp"
+namespace Opm
+{
+class UnitSystem;
+}
+
+class RifVfpInjTable;
+class RifVfpProdTable;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -31,7 +36,7 @@
 namespace RiaOpmParserTools
 {
 
-std::tuple<Opm::UnitSystem, std::vector<Opm::VFPProdTable>, std::vector<Opm::VFPInjTable>>
+std::tuple<Opm::UnitSystem, std::vector<RifVfpProdTable>, std::vector<RifVfpInjTable>>
     extractVfpTablesFromDataFile( const std::string& dataDeckFilename );
 
 std::map<std::string, std::vector<std::pair<int, int>>> extractWseglink( const std::string& filename );

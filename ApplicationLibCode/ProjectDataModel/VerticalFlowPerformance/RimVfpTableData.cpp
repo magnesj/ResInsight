@@ -20,11 +20,12 @@
 
 #include "RiaOpmParserTools.h"
 
+#include "RifVfpInjTable.h"
+#include "RifVfpProdTable.h"
+
 #include "RigVfpTables.h"
 
 #include "RimVfpTable.h"
-
-#include <opm/input/eclipse/Units/UnitSystem.hpp>
 
 #include "cafCmdFeatureMenuBuilder.h"
 
