@@ -113,7 +113,7 @@ bool RigSwatResultCalculator::hasOnlyWaterPhase() const
     if ( !eclipseCaseData ) return false;
 
     std::set<RiaDefines::PhaseType> availablePhases = eclipseCaseData->availablePhases();
-    bool hasOnlyWater = availablePhases.size() == 1 && availablePhases.count( RiaDefines::PhaseType::WATER_PHASE ) > 0;
+    bool hasOnlyWater = availablePhases.size() == 1 && availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
 
     return hasOnlyWater;
 }
