@@ -55,9 +55,7 @@ inline const Opm::DeckItem& getNonEmptyItem( const Opm::DeckRecord& record )
 RifVfpInjTable::FLO_TYPE getFloType( const std::string& flo_string )
 {
     if ( flo_string == "OIL" ) return RifVfpInjTable::FLO_TYPE::FLO_OIL;
-
     if ( flo_string == "WAT" ) return RifVfpInjTable::FLO_TYPE::FLO_WAT;
-
     if ( flo_string == "GAS" ) return RifVfpInjTable::FLO_TYPE::FLO_GAS;
 
     throw std::invalid_argument( "Invalid RATE_TYPE string" );

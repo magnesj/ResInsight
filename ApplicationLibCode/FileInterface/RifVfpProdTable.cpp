@@ -44,10 +44,9 @@ namespace
 RifVfpProdTable::FLO_TYPE getFloType( const Opm::DeckItem& item )
 {
     const std::string& flo_string = item.getTrimmedString( 0 );
+
     if ( flo_string == "OIL" ) return RifVfpProdTable::FLO_TYPE::FLO_OIL;
-
     if ( flo_string == "LIQ" ) return RifVfpProdTable::FLO_TYPE::FLO_LIQ;
-
     if ( flo_string == "GAS" ) return RifVfpProdTable::FLO_TYPE::FLO_GAS;
 
     throw std::invalid_argument( "Invalid RATE_TYPE string: " + flo_string );
@@ -56,10 +55,9 @@ RifVfpProdTable::FLO_TYPE getFloType( const Opm::DeckItem& item )
 RifVfpProdTable::WFR_TYPE getWFRType( const Opm::DeckItem& item )
 {
     const std::string& wfr_string = item.getTrimmedString( 0 );
+
     if ( wfr_string == "WOR" ) return RifVfpProdTable::WFR_TYPE::WFR_WOR;
-
     if ( wfr_string == "WCT" ) return RifVfpProdTable::WFR_TYPE::WFR_WCT;
-
     if ( wfr_string == "WGR" ) return RifVfpProdTable::WFR_TYPE::WFR_WGR;
 
     throw std::invalid_argument( "Invalid WFR string" );
@@ -68,10 +66,9 @@ RifVfpProdTable::WFR_TYPE getWFRType( const Opm::DeckItem& item )
 RifVfpProdTable::GFR_TYPE getGFRType( const Opm::DeckItem& item )
 {
     const std::string& gfr_string = item.getTrimmedString( 0 );
+
     if ( gfr_string == "GOR" ) return RifVfpProdTable::GFR_TYPE::GFR_GOR;
-
     if ( gfr_string == "GLR" ) return RifVfpProdTable::GFR_TYPE::GFR_GLR;
-
     if ( gfr_string == "OGR" ) return RifVfpProdTable::GFR_TYPE::GFR_OGR;
 
     throw std::invalid_argument( "Invalid GFR string" );
@@ -89,17 +86,11 @@ RifVfpProdTable::ALQ_TYPE getALQType( const Opm::DeckItem& item, bool gaslift_op
         const std::string& alq_string = item.getTrimmedString( 0 );
 
         if ( alq_string == "GRAT" ) return RifVfpProdTable::ALQ_TYPE::ALQ_GRAT;
-
         if ( alq_string == "IGLR" ) return RifVfpProdTable::ALQ_TYPE::ALQ_IGLR;
-
         if ( alq_string == "TGLR" ) return RifVfpProdTable::ALQ_TYPE::ALQ_TGLR;
-
         if ( alq_string == "PUMP" ) return RifVfpProdTable::ALQ_TYPE::ALQ_PUMP;
-
         if ( alq_string == "COMP" ) return RifVfpProdTable::ALQ_TYPE::ALQ_COMP;
-
         if ( alq_string == "BEAN" ) return RifVfpProdTable::ALQ_TYPE::ALQ_BEAN;
-
         if ( alq_string == "" )
         {
             if ( gaslift_opt_active ) return RifVfpProdTable::ALQ_TYPE::ALQ_GRAT;
