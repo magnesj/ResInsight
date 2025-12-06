@@ -68,7 +68,10 @@ void RicNewPolygonFilterFeature::onActionTriggered( bool isChecked )
     }
     if ( !cellFilterCollection ) return;
 
-    auto sourceCase = cellFilterCollection->firstAncestorOrThisOfTypeAsserted<Rim3dView>()->ownerCase();
+    auto view3d = cellFilterCollection->firstAncestorOrThisOfType<Rim3dView>();
+    if ( !view3d ) return;
+    
+    auto sourceCase = view3d->ownerCase();
     if ( !sourceCase ) return;
 
     std::vector<RimPolygon*> polygons;
