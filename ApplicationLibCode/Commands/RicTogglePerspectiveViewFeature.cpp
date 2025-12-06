@@ -53,7 +53,7 @@ void RicTogglePerspectiveViewFeature::onActionTriggered( bool isChecked )
     {
         if ( RiaApplication::instance()->activeGridView() && activeReservoirView->viewer() )
         {
-            bool isPerspective = activeReservoirView->isPerspectiveView();
+            bool isPerspective                     = activeReservoirView->isPerspectiveView();
             activeReservoirView->isPerspectiveView = !isPerspective;
             activeReservoirView->isPerspectiveView.uiCapability()->updateConnectedEditors();
 

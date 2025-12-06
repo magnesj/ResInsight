@@ -131,7 +131,6 @@ bool RicWellPathPickEventHandler::handle3dPickEvent( const Ric3dPickEvent& event
                 }
                 else if ( auto measurement = dynamic_cast<RimWellMeasurement*>( sourceInfo->object() ) )
                 {
-
                     QString measurementText = QString( "Well path name: %1\n" ).arg( measurement->wellName() );
                     measurementText += QString( "Measured Depth: %1\n" ).arg( measurement->MD() );
                     measurementText += QString( "Value: %1\n" ).arg( measurement->value() );

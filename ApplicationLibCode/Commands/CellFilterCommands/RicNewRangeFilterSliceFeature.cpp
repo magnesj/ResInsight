@@ -51,7 +51,7 @@ void RicNewRangeFilterSliceFeature::onActionTriggered( bool isChecked )
     if ( !colls.empty() )
     {
         filterCollection = colls.front();
-        auto view3d = filterCollection->firstAncestorOrThisOfType<Rim3dView>();
+        auto view3d      = filterCollection->firstAncestorOrThisOfType<Rim3dView>();
         if ( view3d ) sourceCase = view3d->ownerCase();
     }
 

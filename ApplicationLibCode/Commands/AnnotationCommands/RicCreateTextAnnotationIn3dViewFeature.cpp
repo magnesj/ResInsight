@@ -55,7 +55,7 @@ void RicCreateTextAnnotationIn3dViewFeature::onActionTriggered( bool isChecked )
 
         auto viewer = activeView->viewer();
         if ( !viewer ) return;
-        
+
         auto viewerCommands = viewer->viewerCommands();
         if ( !viewerCommands ) return;
 

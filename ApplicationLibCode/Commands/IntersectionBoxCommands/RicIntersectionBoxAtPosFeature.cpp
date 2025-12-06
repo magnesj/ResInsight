@@ -57,10 +57,10 @@ void RicIntersectionBoxAtPosFeature::onActionTriggered( bool isChecked )
 
         auto viewer = activeView->viewer();
         if ( !viewer ) return;
-        
+
         auto viewerCommands = viewer->viewerCommands();
         if ( !viewerCommands ) return;
-        
+
         cvf::Vec3d domainCoord = viewerCommands->lastPickPositionInDomainCoords();
 
         intersectionBox->setToDefaultSizeSlice( RimBoxIntersection::PLANE_STATE_NONE, domainCoord );
