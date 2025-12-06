@@ -42,10 +42,10 @@ void RicIntersectionFeatureImpl::createIntersectionBoxSlize( const QString& name
 
         auto viewer = activeView->viewer();
         if ( !viewer ) return;
-        
+
         auto viewerCommands = viewer->viewerCommands();
         if ( !viewerCommands ) return;
-        
+
         cvf::Vec3d domainCoord = viewerCommands->lastPickPositionInDomainCoords();
 
         RimBoxIntersection* intersectionBox = new RimBoxIntersection();

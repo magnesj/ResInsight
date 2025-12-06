@@ -70,7 +70,7 @@ void RicNewPolygonFilterFeature::onActionTriggered( bool isChecked )
 
     auto view3d = cellFilterCollection->firstAncestorOrThisOfType<Rim3dView>();
     if ( !view3d ) return;
-    
+
     auto sourceCase = view3d->ownerCase();
     if ( !sourceCase ) return;
 

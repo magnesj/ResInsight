@@ -53,7 +53,7 @@ void RicCopyGridStatisticsToClipboardFeature::onActionTriggered( bool isChecked 
     {
         auto viewer = activeView->viewer();
         if ( !viewer ) return;
-        
+
         auto text = viewer->infoText();
         if ( !text.isEmpty() )
         {

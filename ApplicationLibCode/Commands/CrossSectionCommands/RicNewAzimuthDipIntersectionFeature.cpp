@@ -105,7 +105,7 @@ void RicNewAzimuthDipIntersectionFeatureCmd::redo()
 
     auto view3d = m_intersectionCollection->firstAncestorOrThisOfType<Rim3dView>();
     if ( !view3d ) return;
-    
+
     RimCase* rimCase = view3d->ownerCase();
     if ( !rimCase ) return;
 

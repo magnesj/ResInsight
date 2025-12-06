@@ -45,7 +45,7 @@ void RicNewUserDefinedIndexFilterFeature::onActionTriggered( bool isChecked )
     // and the case to use
     auto view3d = filtColl->firstAncestorOrThisOfType<Rim3dView>();
     if ( !view3d ) return;
-    
+
     RimCase* sourceCase = view3d->ownerCase();
 
     if ( sourceCase )
