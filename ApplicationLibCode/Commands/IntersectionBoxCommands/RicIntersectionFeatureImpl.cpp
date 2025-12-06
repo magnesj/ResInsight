@@ -40,7 +40,13 @@ void RicIntersectionFeatureImpl::createIntersectionBoxSlize( const QString& name
         RimIntersectionCollection* coll = activeMainOrComparisonView->intersectionCollection();
         CVF_ASSERT( coll );
 
-        cvf::Vec3d domainCoord = activeView->viewer()->viewerCommands()->lastPickPositionInDomainCoords();
+        auto viewer = activeView->viewer();
+        if ( !viewer ) return;
+        
+        auto viewerCommands = viewer->viewerCommands();
+        if ( !viewerCommands ) return;
+        
+        cvf::Vec3d domainCoord = viewerCommands->lastPickPositionInDomainCoords();
 
         RimBoxIntersection* intersectionBox = new RimBoxIntersection();
         intersectionBox->setName( name );
