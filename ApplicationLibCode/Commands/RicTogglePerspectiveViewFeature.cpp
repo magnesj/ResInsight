@@ -37,7 +37,11 @@ bool RicTogglePerspectiveViewFeature::isCommandEnabled() const
 {
     RimGridView*              activeGridView = RiaApplication::instance()->activeGridView();
     RimEclipseContourMapView* view2d         = dynamic_cast<RimEclipseContourMapView*>( activeGridView );
-    return !view2d && activeGridView && RiaApplication::instance()->activeReservoirView()->viewer();
+    if ( auto activeReservoirView = RiaApplication::instance()->activeReservoirView() )
+    {
+        return !view2d && activeGridView && activeReservoirView->viewer();
+    }
+    return false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -45,16 +49,19 @@ bool RicTogglePerspectiveViewFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicTogglePerspectiveViewFeature::onActionTriggered( bool isChecked )
 {
-    if ( RiaApplication::instance()->activeGridView() && RiaApplication::instance()->activeReservoirView()->viewer() )
+    if ( auto activeReservoirView = RiaApplication::instance()->activeReservoirView() )
     {
-        bool isPerspective = RiaApplication::instance()->activeReservoirView()->isPerspectiveView();
-        RiaApplication::instance()->activeReservoirView()->isPerspectiveView = !isPerspective;
-        RiaApplication::instance()->activeReservoirView()->isPerspectiveView.uiCapability()->updateConnectedEditors();
+        if ( RiaApplication::instance()->activeGridView() && activeReservoirView->viewer() )
+        {
+            bool isPerspective = activeReservoirView->isPerspectiveView();
+            activeReservoirView->isPerspectiveView = !isPerspective;
+            activeReservoirView->isPerspectiveView.uiCapability()->updateConnectedEditors();
 
-        RiaApplication::instance()->activeReservoirView()->viewer()->enableParallelProjection( isPerspective );
-        RiaApplication::instance()->activeReservoirView()->viewer()->navigationPolicyUpdate();
+            activeReservoirView->viewer()->enableParallelProjection( isPerspective );
+            activeReservoirView->viewer()->navigationPolicyUpdate();
 
-        action(); // Retrieve the action to update the looks
+            action(); // Retrieve the action to update the looks
+        }
     }
 }
 
@@ -63,9 +70,9 @@ void RicTogglePerspectiveViewFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicTogglePerspectiveViewFeature::setupActionLook( QAction* actionToSetup )
 {
-    if ( RiaApplication::instance()->activeReservoirView() && RiaApplication::instance()->activeReservoirView()->viewer() )
+    if ( auto activeReservoirView = RiaApplication::instance()->activeReservoirView() )
     {
-        if ( RiaApplication::instance()->activeReservoirView()->isPerspectiveView() )
+        if ( activeReservoirView->viewer() && activeReservoirView->isPerspectiveView() )
         {
             actionToSetup->setText( "Parallel View" );
             actionToSetup->setIcon( QIcon( ":/Parallel.svg" ) );
