@@ -12,8 +12,6 @@ Add OpenTelemetry logging capability to ResInsight for crash reporting and telem
 {
   "enabled": true,
   "connection_string": "InstrumentationKey=1056617c-eab1-4c4c-b413-f379270e4502;IngestionEndpoint=https://swedencentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://swedencentral.livediagnostics.monitor.azure.com/;ApplicationId=096a4759-08db-4e41-9309-255911863ae9",
-  "service_name": "ResInsight",
-  "service_version": "2025.04.4-dev",
   "batch_timeout_ms": 5000,
   "max_batch_size": 512,
   "connection_timeout_ms": 10000,
@@ -35,11 +33,13 @@ public:
     static RiaPreferencesOpenTelemetry* current();
     void setData(const std::map<QString, QString>& keyValuePairs);
     
+    // Service name and version are hardcoded, not configurable
+    QString serviceName() const { return "ResInsight"; }
+    QString serviceVersion() const; // Read from ResInsightVersion.cmake
+    
 private:
     caf::PdmField<bool> m_enabled;
     caf::PdmField<QString> m_connectionString;  // Azure Application Insights connection string
-    caf::PdmField<QString> m_serviceName;
-    caf::PdmField<QString> m_serviceVersion;
     caf::PdmField<int> m_batchTimeoutMs;
     caf::PdmField<int> m_maxBatchSize;
     caf::PdmField<int> m_connectionTimeoutMs;
