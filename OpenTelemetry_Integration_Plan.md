@@ -300,4 +300,164 @@ void RiaOpenTelemetryManager::reportTestCrash(const std::stacktrace& trace)
 ### Menu Location
 The test action will be added to the existing **Test** menu alongside other testing utilities, making it easily accessible for developers and QA testing.
 
+## 10. Stack Trace Analysis on Azure Application Insights
+
+### Data Location and Access
+Stack traces sent via OpenTelemetry will appear in Azure Application Insights under several locations:
+
+#### 1. Traces Table
+- **Location**: Logs > Tables > `traces`
+- **Query**: `traces | where message contains "crash" or message contains "stack_trace"`
+- **Fields**: `timestamp`, `message`, `customDimensions`, `operation_Name`
+
+#### 2. Custom Events
+- **Location**: Logs > Tables > `customEvents`  
+- **Query**: `customEvents | where name == "crash.signal_handler"`
+- **Fields**: `timestamp`, `name`, `customDimensions` (contains stack trace)
+
+### KQL Queries for Stack Trace Analysis
+
+#### Basic Crash Investigation
+```kusto
+// Find all crashes in last 24 hours
+traces
+| where timestamp > ago(24h)
+| where customDimensions.["crash.signal"] != ""
+| project timestamp, 
+          signal = customDimensions.["crash.signal"],
+          thread_id = customDimensions.["crash.thread_id"],
+          stack_trace = customDimensions.["crash.stack_trace"]
+| order by timestamp desc
+```
+
+#### Crash Frequency Analysis
+```kusto
+// Group crashes by signal type
+traces
+| where timestamp > ago(7d)
+| where customDimensions.["crash.signal"] != ""
+| summarize count() by signal = tostring(customDimensions.["crash.signal"])
+| order by count_ desc
+```
+
+#### Stack Trace Pattern Analysis
+```kusto
+// Find common crash patterns
+traces
+| where customDimensions.["crash.stack_trace"] != ""
+| extend stack_trace = tostring(customDimensions.["crash.stack_trace"])
+| extend top_function = extract(@"#0\s+([^\s]+)", 1, stack_trace)
+| summarize count() by top_function
+| order by count_ desc
+```
+
+### Analysis Capabilities
+
+#### 1. **Crash Hotspots**
+- **Function-level analysis**: Identify which functions appear most frequently in crashes
+- **Module analysis**: Track crashes by source file or library
+- **Thread analysis**: Correlate crashes with specific thread IDs
+
+#### 2. **Time-based Analysis**
+- **Crash trends**: Daily/weekly crash patterns
+- **Version correlation**: Compare crash rates between ResInsight versions
+- **User session impact**: Link crashes to user workflows
+
+#### 3. **Environment Correlation**
+```kusto
+// Correlate crashes with system information
+traces
+| where customDimensions.["crash.signal"] != ""
+| join kind=inner (
+    customEvents
+    | where name == "session.startup"
+    | project session_id = operation_Id, 
+              os_version = customDimensions.["os.version"],
+              qt_version = customDimensions.["qt.version"]
+) on $left.operation_Id == $right.session_id
+| summarize crashes = count() by os_version, qt_version
+```
+
+### Azure Application Insights Features
+
+#### 1. **Application Map**
+- **Service dependencies**: Visualize ResInsight's interaction with external services
+- **Failure rates**: See crash impact on overall application health
+- **Performance impact**: Correlate crashes with response times
+
+#### 2. **Smart Detection**
+- **Anomaly detection**: Automatic alerts for unusual crash patterns
+- **Failure rate increases**: Notifications when crash rates spike
+- **Performance degradation**: Detect when crashes affect user experience
+
+#### 3. **Live Metrics**
+- **Real-time monitoring**: See crashes as they happen
+- **Immediate investigation**: Quick access to recent crash data
+- **System health**: Monitor application stability in real-time
+
+### Workbook Templates
+
+#### Crash Analysis Dashboard
+```json
+{
+  "version": "Notebook/1.0",
+  "items": [
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "traces | where customDimensions.['crash.signal'] != '' | summarize count() by bin(timestamp, 1h)",
+        "title": "Crashes per Hour"
+      }
+    },
+    {
+      "type": 3,
+      "content": {
+        "version": "KqlItem/1.0",
+        "query": "traces | where customDimensions.['crash.signal'] != '' | extend stack_trace = tostring(customDimensions.['crash.stack_trace']) | extend top_function = extract(@'#0\\s+([^\\s]+)', 1, stack_trace) | summarize count() by top_function",
+        "title": "Top Crash Functions"
+      }
+    }
+  ]
+}
+```
+
+### Alert Configuration
+
+#### Critical Crash Alert
+- **Condition**: More than 5 crashes in 15 minutes
+- **Action**: Email notification to development team
+- **Query**: `traces | where customDimensions.["crash.signal"] != "" | summarize count()`
+
+#### New Crash Pattern Alert
+- **Condition**: New crash signature detected
+- **Action**: Teams notification with stack trace details
+- **Query**: `traces | where customDimensions.["crash.signal"] != "" | extend signature = hash_sha1(tostring(customDimensions.["crash.stack_trace"]))`
+
+### Privacy and Compliance
+
+#### Data Retention
+- **Default**: 90 days for telemetry data
+- **Compliance**: GDPR-compliant with data anonymization
+- **Export**: Raw data can be exported for deeper analysis
+
+#### Sensitive Data Handling
+- **Filtered paths**: Personal directories replaced with `<HOME>`
+- **Sanitized traces**: Function names preserved, personal info removed
+- **Audit trail**: All queries and access logged for compliance
+
+### Integration with Development Workflow
+
+#### 1. **CI/CD Integration**
+- **Automated alerts**: Notify on crash rate increases after deployments
+- **Regression testing**: Compare crash patterns between versions
+- **Quality gates**: Block releases if crash rates exceed thresholds
+
+#### 2. **Issue Tracking**
+- **Azure DevOps integration**: Automatically create work items for new crash patterns
+- **GitHub integration**: Link crashes to code commits and pull requests
+- **JIRA integration**: Create bugs with full stack trace context
+
+This comprehensive analysis capability enables the development team to proactively identify, investigate, and resolve crashes in ResInsight deployments worldwide.
+
 This plan provides a comprehensive, privacy-aware, and resilient OpenTelemetry integration that prioritizes crash reporting while maintaining ResInsight's performance and reliability.
