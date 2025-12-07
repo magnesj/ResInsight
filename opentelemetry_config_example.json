@@ -1,0 +1,30 @@
+{
+  "environments": {
+    "development": {
+      "enabled": true,
+      "endpoint": "http://localhost:4317",
+      "use_local_collector": true
+    },
+    "production": {
+      "enabled": true,
+      "connection_string": "InstrumentationKey=YOUR_KEY_HERE;IngestionEndpoint=https://YOUR_REGION.in.applicationinsights.azure.com/;LiveEndpoint=https://YOUR_REGION.livediagnostics.monitor.azure.com/;ApplicationId=YOUR_APP_ID_HERE"
+    }
+  },
+  "active_environment": "production",
+  "batch_timeout_ms": 5000,
+  "max_batch_size": 512,
+  "max_queue_size": 10000,
+  "connection_timeout_ms": 10000,
+  "memory_threshold_mb": 50,
+  "sampling_rate": 1.0,
+  "privacy": {
+    "filter_file_paths": true,
+    "filter_user_data": true,
+    "allowed_attributes": ["crash_type", "stack_trace", "signal", "thread_id"]
+  },
+  "fallback": {
+    "enable_local_logging": true,
+    "failure_threshold": 3,
+    "retry_interval_seconds": 300
+  }
+}
