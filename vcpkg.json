@@ -11,6 +11,14 @@
         "spdlog",
         "pugixml"
     ],
+    "features": {
+        "opentelemetry": {
+            "description": "Enable OpenTelemetry integration for crash reporting and telemetry",
+            "dependencies": [
+                "opentelemetry-cpp[otlp-http]"
+            ]
+        }
+    },
     "overrides": [
         {
             "name": "fmt",
