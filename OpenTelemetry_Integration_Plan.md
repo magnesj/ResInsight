@@ -11,14 +11,9 @@ Add OpenTelemetry logging capability to ResInsight for crash reporting and telem
 ```json
 {
   "enabled": true,
-  "endpoint": "https://otel-collector.company.com:4317",
-  "protocol": "grpc",
+  "connection_string": "InstrumentationKey=1056617c-eab1-4c4c-b413-f379270e4502;IngestionEndpoint=https://swedencentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://swedencentral.livediagnostics.monitor.azure.com/;ApplicationId=096a4759-08db-4e41-9309-255911863ae9",
   "service_name": "ResInsight",
   "service_version": "2025.04.4-dev",
-  "headers": {
-    "x-api-key": "your-api-key",
-    "authorization": "Bearer token"
-  },
   "batch_timeout_ms": 5000,
   "max_batch_size": 512,
   "connection_timeout_ms": 10000,
@@ -42,10 +37,13 @@ public:
     
 private:
     caf::PdmField<bool> m_enabled;
-    caf::PdmField<QString> m_endpoint;
-    caf::PdmField<QString> m_protocol;
+    caf::PdmField<QString> m_connectionString;  // Azure Application Insights connection string
     caf::PdmField<QString> m_serviceName;
-    // Additional fields...
+    caf::PdmField<QString> m_serviceVersion;
+    caf::PdmField<int> m_batchTimeoutMs;
+    caf::PdmField<int> m_maxBatchSize;
+    caf::PdmField<int> m_connectionTimeoutMs;
+    // Privacy settings...
 };
 ```
 
@@ -203,7 +201,7 @@ ApplicationLibCode/
 find_package(opentelemetry-cpp CONFIG REQUIRED)
 target_link_libraries(ApplicationLibCode PRIVATE 
     opentelemetry-cpp::opentelemetry_trace
-    opentelemetry-cpp::opentelemetry_otlp_grpc_exporter)
+    opentelemetry-cpp::opentelemetry_otlp_http_exporter)  # HTTP for Azure Application Insights
 ```
 
 ### Build Configuration
@@ -213,5 +211,35 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
     target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_OPENTELEMETRY_ENABLED)
 endif()
 ```
+
+## 8. Azure Application Insights Integration Notes
+
+### Connection String Format
+The configuration uses Azure Application Insights connection string format:
+- **InstrumentationKey**: Legacy key for backwards compatibility
+- **IngestionEndpoint**: HTTPS endpoint for telemetry data (Sweden Central region)
+- **LiveEndpoint**: Real-time diagnostics endpoint
+- **ApplicationId**: Unique application identifier
+
+### Exporter Configuration
+```cpp
+// Initialize Azure Application Insights exporter
+auto opts = opentelemetry::exporter::otlp::OtlpHttpExporterOptions();
+opts.url = extractIngestionEndpoint(connectionString);  // Extract from connection string
+opts.headers["x-ms-instrumentation-key"] = extractInstrumentationKey(connectionString);
+
+auto exporter = std::make_unique<opentelemetry::exporter::otlp::OtlpHttpExporter>(opts);
+```
+
+### Azure-Specific Features
+- **Application Map**: Automatic service dependency mapping
+- **Live Metrics**: Real-time performance monitoring
+- **Smart Detection**: AI-powered anomaly detection
+- **Retention**: 90-day default retention for telemetry data
+
+### Regional Deployment
+- **Current Region**: Sweden Central (`swedencentral`)
+- **Ingestion Endpoint**: `https://swedencentral-0.in.applicationinsights.azure.com/`
+- **Benefits**: Reduced latency for Nordic/European users, GDPR compliance
 
 This plan provides a comprehensive, privacy-aware, and resilient OpenTelemetry integration that prioritizes crash reporting while maintaining ResInsight's performance and reliability.
