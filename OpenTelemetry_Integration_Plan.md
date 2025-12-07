@@ -166,6 +166,7 @@ ApplicationLibCode/
 2. **Logging System** (`RiaLogging.cpp`): Optional telemetry forwarding 
 3. **Application Startup** (`RiaGuiApplication.cpp`): Initialize telemetry manager
 4. **Configuration Loading** (`RiaConnectorTools.cpp`): Load OpenTelemetry config
+5. **Test Menu** (`RiuMainWindow.cpp`): Add test telemetry action
 
 ## 6. Implementation Steps
 
@@ -179,7 +180,8 @@ ApplicationLibCode/
 1. Integrate with existing signal handler
 2. Add stack trace sanitization
 3. Create crash-specific span attributes
-4. Test with controlled crashes
+4. Add Test menu action for telemetry testing
+5. Test with controlled crashes
 
 ### Phase 3: Extended Telemetry
 1. Add span creation to major operations
@@ -241,5 +243,61 @@ auto exporter = std::make_unique<opentelemetry::exporter::otlp::OtlpHttpExporter
 - **Current Region**: Sweden Central (`swedencentral`)
 - **Ingestion Endpoint**: `https://swedencentral-0.in.applicationinsights.azure.com/`
 - **Benefits**: Reduced latency for Nordic/European users, GDPR compliance
+
+## 9. Test Menu Integration
+
+### Test Telemetry Action
+Add a new action to the existing Test menu for sending test telemetry data:
+
+```cpp
+// In RiuMainWindow.cpp - createTestActions()
+auto* testTelemetryAction = new QAction("Send Test Telemetry", this);
+testTelemetryAction->setToolTip("Send test logging and stack trace to OpenTelemetry endpoint");
+connect(testTelemetryAction, &QAction::triggered, this, &RiuMainWindow::slotSendTestTelemetry);
+testMenu->addAction(testTelemetryAction);
+```
+
+### Test Implementation
+```cpp
+void RiuMainWindow::slotSendTestTelemetry()
+{
+    if (!RiaOpenTelemetryManager::instance().isEnabled()) {
+        RiaLogging::warning("OpenTelemetry is not enabled or configured");
+        return;
+    }
+    
+    // Send test logging events
+    RiaOpenTelemetryManager::instance().reportEventAsync("test.logging", {
+        {"test_type", "manual_test"},
+        {"timestamp", QDateTime::currentDateTime().toString(Qt::ISODate).toStdString()},
+        {"user_action", "test_menu_triggered"}
+    });
+    
+    // Generate and send test stack trace
+    auto testStackTrace = std::stacktrace::current();
+    RiaOpenTelemetryManager::instance().reportTestCrash(testStackTrace);
+    
+    RiaLogging::info("Test telemetry data sent to OpenTelemetry endpoint");
+}
+```
+
+### Test Stack Trace Method
+```cpp
+// In RiaOpenTelemetryManager
+void RiaOpenTelemetryManager::reportTestCrash(const std::stacktrace& trace)
+{
+    auto span = m_tracer->StartSpan("test.stack_trace");
+    span->SetAttribute("test.type", "manual_stack_trace");
+    span->SetAttribute("test.thread_id", std::this_thread::get_id());
+    span->SetAttribute("test.timestamp", std::chrono::system_clock::now());
+    span->SetAttribute("test.stack_trace", RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace(
+        internal::formatStacktrace(trace)));
+    span->SetStatus(opentelemetry::trace::StatusCode::kOk, "Test stack trace generated");
+    span->End();
+}
+```
+
+### Menu Location
+The test action will be added to the existing **Test** menu alongside other testing utilities, making it easily accessible for developers and QA testing.
 
 This plan provides a comprehensive, privacy-aware, and resilient OpenTelemetry integration that prioritizes crash reporting while maintaining ResInsight's performance and reliability.
