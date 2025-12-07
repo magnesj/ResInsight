@@ -10,15 +10,33 @@ Add OpenTelemetry logging capability to ResInsight for crash reporting and telem
 
 ```json
 {
-  "enabled": true,
-  "connection_string": "InstrumentationKey=1056617c-eab1-4c4c-b413-f379270e4502;IngestionEndpoint=https://swedencentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://swedencentral.livediagnostics.monitor.azure.com/;ApplicationId=096a4759-08db-4e41-9309-255911863ae9",
+  "environments": {
+    "development": {
+      "enabled": true,
+      "endpoint": "http://localhost:4317",
+      "use_local_collector": true
+    },
+    "production": {
+      "enabled": true,
+      "connection_string": "InstrumentationKey=1056617c-eab1-4c4c-b413-f379270e4502;IngestionEndpoint=https://swedencentral-0.in.applicationinsights.azure.com/;LiveEndpoint=https://swedencentral.livediagnostics.monitor.azure.com/;ApplicationId=096a4759-08db-4e41-9309-255911863ae9"
+    }
+  },
+  "active_environment": "production",
   "batch_timeout_ms": 5000,
   "max_batch_size": 512,
+  "max_queue_size": 10000,
   "connection_timeout_ms": 10000,
+  "memory_threshold_mb": 50,
+  "sampling_rate": 1.0,
   "privacy": {
     "filter_file_paths": true,
     "filter_user_data": true,
     "allowed_attributes": ["crash_type", "stack_trace", "signal", "thread_id"]
+  },
+  "fallback": {
+    "enable_local_logging": true,
+    "failure_threshold": 3,
+    "retry_interval_seconds": 300
   }
 }
 ```
@@ -37,13 +55,25 @@ public:
     QString serviceName() const { return "ResInsight"; }
     QString serviceVersion() const; // Read from ResInsightVersion.cmake
     
+    // Configuration validation
+    struct ValidationResult {
+        bool isValid;
+        QString errorMessage;
+        std::vector<QString> warnings;
+    };
+    ValidationResult validate() const;
+    bool testConnection() const;
+    
 private:
-    caf::PdmField<bool> m_enabled;
-    caf::PdmField<QString> m_connectionString;  // Azure Application Insights connection string
+    caf::PdmField<QString> m_activeEnvironment;
+    caf::PdmField<QString> m_connectionString;
+    caf::PdmField<QString> m_localEndpoint;
     caf::PdmField<int> m_batchTimeoutMs;
     caf::PdmField<int> m_maxBatchSize;
-    caf::PdmField<int> m_connectionTimeoutMs;
-    // Privacy settings...
+    caf::PdmField<int> m_maxQueueSize;
+    caf::PdmField<int> m_memoryThresholdMb;
+    caf::PdmField<double> m_samplingRate;
+    // Privacy and fallback settings...
 };
 ```
 
@@ -111,7 +141,7 @@ void RiaOpenTelemetryTracer::reportCrash(int signalCode, const std::stacktrace& 
 
 ## 4. Async/Non-Blocking Implementation
 
-### Thread Safety Design
+### Enhanced Manager Design
 ```cpp
 class RiaOpenTelemetryManager
 {
@@ -120,15 +150,44 @@ public:
     void initializeAsync();
     void reportEventAsync(const std::string& event, 
                          const std::map<std::string, std::string>& attributes);
-    void shutdown();
+    void shutdown(std::chrono::seconds timeout = std::chrono::seconds(30));
+    
+    // Performance and memory management
+    void setMaxQueueSize(size_t maxEvents);
+    void enableBackpressure(bool enable);
+    void setMemoryThreshold(size_t maxMemoryMB);
+    void setSamplingRate(double rate);
+    
+    // Health monitoring
+    struct HealthMetrics {
+        std::atomic<uint64_t> eventsQueued{0};
+        std::atomic<uint64_t> eventsSent{0};
+        std::atomic<uint64_t> eventsDropped{0};
+        std::atomic<uint64_t> networkFailures{0};
+        std::chrono::steady_clock::time_point lastSuccessfulSend;
+    };
+    HealthMetrics getHealthMetrics() const;
+    bool isHealthy() const;
+    
+    // Error handling
+    enum class TelemetryError { ConfigurationError, NetworkError, AuthenticationError, QuotaExceeded };
+    using ErrorCallback = std::function<void(TelemetryError, const QString& details)>;
+    void setErrorCallback(ErrorCallback callback);
     
 private:
     std::atomic<bool> m_initialized{false};
     std::atomic<bool> m_connected{false};
+    std::atomic<bool> m_isShuttingDown{false};
     std::unique_ptr<std::thread> m_workerThread;
-    std::queue<Event> m_eventQueue;
-    std::mutex m_queueMutex;
-    std::condition_variable m_queueCondition;
+    std::unique_ptr<LockFreeQueue<Event>> m_eventQueue;  // Lock-free for performance
+    mutable std::mutex m_configMutex;
+    HealthMetrics m_healthMetrics;
+    ErrorCallback m_errorCallback;
+    
+    // Fallback system
+    void switchToOfflineMode();
+    void attemptReconnection();
+    void flushPendingEvents();
 };
 ```
 
@@ -170,47 +229,99 @@ ApplicationLibCode/
 
 ## 6. Implementation Steps
 
-### Phase 1: Core Infrastructure
+### Phase 1: Foundation & Configuration
 1. Add opentelemetry-cpp to vcpkg dependencies
-2. Create configuration classes following OSDU pattern
-3. Implement privacy filter with unit tests
-4. Create async manager with circuit breaker
+2. Create environment-based configuration system with validation
+3. Implement privacy filter with comprehensive unit tests
+4. Create basic async manager with lock-free queue
 
-### Phase 2: Crash Reporting
-1. Integrate with existing signal handler
-2. Add stack trace sanitization
-3. Create crash-specific span attributes
-4. Add Test menu action for telemetry testing
-5. Test with controlled crashes
+### Phase 2: Core Telemetry & Testing
+1. Integrate with existing signal handler for crash reporting
+2. Add stack trace sanitization and filtering
+3. Implement Test menu action for telemetry validation
+4. Create local development collector support
+5. Add configuration validation and connection testing
 
-### Phase 3: Extended Telemetry
-1. Add span creation to major operations
-2. Implement performance tracking spans
-3. Add optional error forwarding from logging system
-4. Create telemetry dashboard integration
+### Phase 3: Enhanced Reliability
+1. Implement health monitoring and metrics collection
+2. Add fallback system with offline mode
+3. Create comprehensive error handling with callbacks
+4. Implement graceful shutdown with timeout management
+5. Add memory management and backpressure controls
 
-### Phase 4: Production Readiness
-1. Add comprehensive error handling
-2. Implement configuration validation
-3. Add telemetry for telemetry system health
-4. Performance optimization and memory management
+### Phase 4: Production Features
+1. Add span creation to major ResInsight operations
+2. Implement performance tracking and sampling
+3. Create telemetry dashboard integration and alerts
+4. Add CI/CD integration for crash monitoring
+5. Implement comprehensive testing framework
+
+### Phase 5: Advanced Features
+1. Add plugin architecture for multiple backends
+2. Implement feature flag system for gradual rollout
+3. Create performance benchmarking and validation
+4. Add development tools and debugging capabilities
+5. Optimize memory usage and performance
 
 ## 7. CMake Integration
 
 ### vcpkg Dependencies
 ```cmake
 # Add to ThirdParty/CMakeLists.txt
-find_package(opentelemetry-cpp CONFIG REQUIRED)
-target_link_libraries(ApplicationLibCode PRIVATE 
-    opentelemetry-cpp::opentelemetry_trace
-    opentelemetry-cpp::opentelemetry_otlp_http_exporter)  # HTTP for Azure Application Insights
+if(RESINSIGHT_ENABLE_OPENTELEMETRY)
+    find_package(opentelemetry-cpp CONFIG REQUIRED)
+    find_package(Threads REQUIRED)  # For lock-free queue implementation
+    
+    target_link_libraries(ApplicationLibCode PRIVATE 
+        opentelemetry-cpp::opentelemetry_trace
+        opentelemetry-cpp::opentelemetry_otlp_http_exporter   # HTTP for Azure Application Insights
+        opentelemetry-cpp::opentelemetry_otlp_grpc_exporter   # gRPC for local development
+        opentelemetry-cpp::opentelemetry_resources
+        Threads::Threads)
+        
+    # Optional: Add lock-free data structures library
+    find_package(moodycamel-concurrentqueue CONFIG QUIET)
+    if(moodycamel-concurrentqueue_FOUND)
+        target_link_libraries(ApplicationLibCode PRIVATE moodycamel-concurrentqueue::concurrentqueue)
+        target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_USE_LOCKFREE_QUEUE)
+    endif()
+endif()
 ```
 
 ### Build Configuration
 ```cmake
 option(RESINSIGHT_ENABLE_OPENTELEMETRY "Enable OpenTelemetry integration" OFF)
+option(RESINSIGHT_OPENTELEMETRY_LOCAL_COLLECTOR "Enable local OTLP collector for development" OFF)
+
 if(RESINSIGHT_ENABLE_OPENTELEMETRY)
-    target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_OPENTELEMETRY_ENABLED)
+    target_compile_definitions(ApplicationLibCode PRIVATE 
+        RESINSIGHT_OPENTELEMETRY_ENABLED
+        OTEL_VERSION="${opentelemetry-cpp_VERSION}")
+        
+    if(RESINSIGHT_OPENTELEMETRY_LOCAL_COLLECTOR)
+        target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_ENABLE_LOCAL_COLLECTOR)
+    endif()
+    
+    # Performance optimization for release builds
+    if(CMAKE_BUILD_TYPE STREQUAL "Release")
+        target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_OTEL_OPTIMIZED)
+    endif()
+endif()
+```
+
+### CMake Testing Integration
+```cmake
+if(RESINSIGHT_ENABLE_OPENTELEMETRY AND BUILD_TESTING)
+    # Add OpenTelemetry tests
+    add_subdirectory(ApplicationLibCode/Application/Tools/Telemetry/Tests)
+    
+    # Add test for configuration validation
+    add_test(NAME opentelemetry_config_validation 
+             COMMAND ResInsightTelemetryTests --test-config-validation)
+             
+    # Add test for privacy filtering
+    add_test(NAME opentelemetry_privacy_filter 
+             COMMAND ResInsightTelemetryTests --test-privacy-filter)
 endif()
 ```
 
@@ -459,5 +570,144 @@ traces
 - **JIRA integration**: Create bugs with full stack trace context
 
 This comprehensive analysis capability enables the development team to proactively identify, investigate, and resolve crashes in ResInsight deployments worldwide.
+
+## 11. Development and Testing Tools
+
+### Local Development Support
+```cpp
+class RiaOpenTelemetryDevTools {
+public:
+    void startLocalCollector(int port = 4317);  // Start OTLP collector for development
+    void enableTelemetryViewer();              // Debug UI for telemetry inspection
+    void exportSessionData(const QString& filepath);  // Export telemetry for analysis
+    void generateMockEvents();                 // Generate test data for development
+    void validateSpanHierarchy();             // Verify span relationships
+    bool isLocalCollectorRunning() const;
+    
+private:
+    std::unique_ptr<QProcess> m_collectorProcess;
+    bool m_isCollectorRunning = false;
+};
+```
+
+### Comprehensive Testing Framework
+```cpp
+class RiaOpenTelemetryTestSuite {
+public:
+    // Configuration testing
+    bool testConfigurationLoading();
+    bool testEnvironmentSwitching();
+    bool testConfigurationValidation();
+    
+    // Reliability testing
+    bool testNetworkFailureHandling();
+    bool testMemoryPressure();
+    bool testConcurrentAccess();
+    bool testGracefulShutdown();
+    
+    // Crash simulation and privacy
+    bool simulateCrashScenarios();
+    bool testStackTraceFiltering();
+    bool testPrivacyFiltering();
+    bool testSignalHandlerIntegration();
+    
+    // Performance testing
+    bool testThroughputLimits();
+    bool testMemoryUsage();
+    bool testLatencyRequirements();
+};
+```
+
+## 12. Advanced Features for Future Considerations
+
+### Plugin Architecture for Multiple Backends
+```cpp
+// Extensible backend system for future telemetry providers
+class RiaOpenTelemetryBackendRegistry {
+public:
+    void registerBackend(const QString& name, std::unique_ptr<ITelemetryBackend> backend);
+    void setActiveBackend(const QString& name);
+    std::vector<QString> getAvailableBackends() const;
+    
+private:
+    std::map<QString, std::unique_ptr<ITelemetryBackend>> m_backends;
+};
+
+class ITelemetryBackend {
+public:
+    virtual ~ITelemetryBackend() = default;
+    virtual bool initialize(const QVariantMap& config) = 0;
+    virtual void sendSpan(const Span& span) = 0;
+    virtual bool testConnection() = 0;
+};
+
+// Implementations: AzureApplicationInsightsBackend, JaegerBackend, ZipkinBackend
+```
+
+### Feature Flag System for Gradual Rollout
+```cpp
+class RiaOpenTelemetryFeatureFlags {
+public:
+    void enableGradualRollout(double percentage);  // Roll out to % of users
+    void enableABTesting(const QString& experiment);
+    void setFeatureFlag(const QString& feature, bool enabled);
+    bool isFeatureEnabled(const QString& feature) const;
+    
+    // User-based rollout (by organization, user type, etc.)
+    void setUserBasedRollout(std::function<bool(const QString&)> userCheck);
+    
+private:
+    std::map<QString, bool> m_flags;
+    double m_rolloutPercentage = 0.0;
+    std::function<bool(const QString&)> m_userCheck;
+};
+```
+
+### Performance Benchmarking System
+```cpp
+class RiaOpenTelemetryBenchmark {
+public:
+    struct BenchmarkResults {
+        double avgSpanCreationTime;      // Microseconds
+        double avgEventQueueTime;        // Microseconds  
+        double avgNetworkLatency;        // Milliseconds
+        size_t memoryOverhead;           // Bytes
+        double throughputEventsPerSec;   // Events/second
+        double cpuOverheadPercent;       // % of CPU time
+    };
+    
+    static BenchmarkResults runPerformanceTests();
+    static void generatePerformanceReport(const QString& reportPath);
+    static bool validatePerformanceRequirements();
+    
+    // Continuous monitoring
+    static void enableContinuousBenchmarking(bool enable);
+    static void setPerformanceThresholds(const BenchmarkResults& thresholds);
+};
+```
+
+### Advanced Privacy and Compliance Features
+```cpp
+class RiaOpenTelemetryComplianceManager {
+public:
+    // Data retention management
+    void setDataRetentionPolicy(std::chrono::days retentionPeriod);
+    void enableGDPRCompliance(bool enable);
+    void enableCCPACompliance(bool enable);
+    
+    // User consent management
+    bool hasUserConsent() const;
+    void setUserConsent(bool consent);
+    void logConsentChange(bool newConsent, const QString& reason);
+    
+    // Data anonymization
+    void enableAdvancedAnonymization(bool enable);
+    void setAnonymizationLevel(int level);  // 1=basic, 2=advanced, 3=maximum
+    
+    // Audit logging
+    void enableAuditLogging(bool enable);
+    void generateComplianceReport(const QString& reportPath);
+};
+```
 
 This plan provides a comprehensive, privacy-aware, and resilient OpenTelemetry integration that prioritizes crash reporting while maintaining ResInsight's performance and reliability.
