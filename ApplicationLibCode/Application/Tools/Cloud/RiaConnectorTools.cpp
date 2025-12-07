@@ -23,6 +23,10 @@
 #include "RiaPreferencesOsdu.h"
 #include "RiaPreferencesSumo.h"
 
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+#include "RiaPreferencesOpenTelemetry.h"
+#endif
+
 #include <QDir>
 #include <QFile>
 #include <QFileInfo>
@@ -184,4 +188,26 @@ void RiaConnectorTools::readCloudConfigFiles( RiaPreferences* preferences )
             }
         }
     }
+
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+    {
+        QStringList otelFilePathCandidates;
+        otelFilePathCandidates << QDir::homePath() + "/.resinsight/opentelemetry_config.json";
+        otelFilePathCandidates << QCoreApplication::applicationDirPath() + "/../share/cloud_services/opentelemetry_config.json";
+        otelFilePathCandidates << QCoreApplication::applicationDirPath() + "/../../share/cloud_services/opentelemetry_config.json";
+
+        for ( const auto& otelFileCandidate : otelFilePathCandidates )
+        {
+            auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( otelFileCandidate );
+            if ( !keyValuePairs.empty() )
+            {
+                RiaLogging::info( QString( "Imported OpenTelemetry configuration from : '%1'" ).arg( otelFileCandidate ) );
+
+                RiaPreferencesOpenTelemetry::current()->setData( keyValuePairs );
+                RiaPreferencesOpenTelemetry::current()->setFieldsReadOnly();
+                break;
+            }
+        }
+    }
+#endif
 }
