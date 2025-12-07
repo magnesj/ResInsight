@@ -1,0 +1,217 @@
+# ResInsight OpenTelemetry Integration Plan
+
+## Overview
+Add OpenTelemetry logging capability to ResInsight for crash reporting and telemetry, with privacy protection, async operation, and JSON configuration following the OSDU config pattern.
+
+## 1. Configuration System Design
+
+### JSON Configuration File
+**Location:** `~/.resinsight/opentelemetry_config.json`
+
+```json
+{
+  "enabled": true,
+  "endpoint": "https://otel-collector.company.com:4317",
+  "protocol": "grpc",
+  "service_name": "ResInsight",
+  "service_version": "2025.04.4-dev",
+  "headers": {
+    "x-api-key": "your-api-key",
+    "authorization": "Bearer token"
+  },
+  "batch_timeout_ms": 5000,
+  "max_batch_size": 512,
+  "connection_timeout_ms": 10000,
+  "privacy": {
+    "filter_file_paths": true,
+    "filter_user_data": true,
+    "allowed_attributes": ["crash_type", "stack_trace", "signal", "thread_id"]
+  }
+}
+```
+
+### Configuration Class
+```cpp
+// RiaPreferencesOpenTelemetry.h
+class RiaPreferencesOpenTelemetry : public caf::PdmObject
+{
+    CAF_PDM_HEADER_INIT;
+public:
+    static RiaPreferencesOpenTelemetry* current();
+    void setData(const std::map<QString, QString>& keyValuePairs);
+    
+private:
+    caf::PdmField<bool> m_enabled;
+    caf::PdmField<QString> m_endpoint;
+    caf::PdmField<QString> m_protocol;
+    caf::PdmField<QString> m_serviceName;
+    // Additional fields...
+};
+```
+
+## 2. Data Filtering/Sanitization System
+
+### Privacy Filter Design
+```cpp
+class RiaOpenTelemetryPrivacyFilter
+{
+public:
+    struct FilterRules {
+        bool filterFilePaths = true;
+        bool filterUserData = true;
+        std::set<std::string> allowedAttributes;
+    };
+    
+    static std::string sanitizeStackTrace(const std::string& stackTrace);
+    static std::map<std::string, std::string> filterAttributes(
+        const std::map<std::string, std::string>& attributes);
+    
+private:
+    static std::string removePersonalPaths(const std::string& path);
+    static bool isSensitiveAttribute(const std::string& key);
+};
+```
+
+### Filtering Logic
+- **File Paths**: Replace user home directory with `<HOME>`, remove usernames
+- **Stack Traces**: Keep function names, line numbers, remove absolute paths  
+- **Sensitive Keywords**: Filter environment variables, credentials, personal data
+- **Allowlist Approach**: Only explicitly allowed attributes are transmitted
+
+## 3. Span Organization Strategy
+
+### Hierarchical Span Structure
+```
+Application Root Span (ResInsight Session)
+├── Feature Spans (File Operations, Visualization, Simulation)
+│   ├── Operation Spans (Load Project, Generate Plot, Run Analysis)
+│   │   └── Detail Spans (File I/O, Computation, Rendering)
+│   └── Error Spans (Crashes, Exceptions, Failures)
+└── Background Spans (Auto-save, Cache Updates)
+```
+
+### Span Categories
+1. **Session Spans**: Application lifecycle, startup/shutdown
+2. **Feature Spans**: Major functional areas (Eclipse data, visualization, wells)
+3. **Operation Spans**: User actions (load file, create plot, export data)
+4. **Error Spans**: Crash traces, exceptions, validation errors
+5. **Performance Spans**: Long-running operations, memory usage
+
+### Critical Spans for Crash Reporting
+```cpp
+void RiaOpenTelemetryTracer::reportCrash(int signalCode, const std::stacktrace& trace)
+{
+    auto span = tracer->StartSpan("crash.signal_handler");
+    span->SetAttribute("crash.signal", signalCode);
+    span->SetAttribute("crash.thread_id", std::this_thread::get_id());
+    span->SetAttribute("crash.timestamp", std::chrono::system_clock::now());
+    span->SetAttribute("crash.stack_trace", formatFilteredStackTrace(trace));
+    span->SetStatus(opentelemetry::trace::StatusCode::kError, "Application crashed");
+    span->End();
+}
+```
+
+## 4. Async/Non-Blocking Implementation
+
+### Thread Safety Design
+```cpp
+class RiaOpenTelemetryManager
+{
+public:
+    static RiaOpenTelemetryManager& instance();
+    void initializeAsync();
+    void reportEventAsync(const std::string& event, 
+                         const std::map<std::string, std::string>& attributes);
+    void shutdown();
+    
+private:
+    std::atomic<bool> m_initialized{false};
+    std::atomic<bool> m_connected{false};
+    std::unique_ptr<std::thread> m_workerThread;
+    std::queue<Event> m_eventQueue;
+    std::mutex m_queueMutex;
+    std::condition_variable m_queueCondition;
+};
+```
+
+### Resilience Strategy
+- **Circuit Breaker**: Disable after 3 consecutive connection failures
+- **Exponential Backoff**: Retry with increasing delays (1s, 2s, 4s, 8s)
+- **Local Queuing**: Buffer events in memory when server unavailable
+- **Graceful Degradation**: Continue normal operation if telemetry fails
+- **Timeout Management**: 10s connection timeout, 5s send timeout
+
+### Background Processing
+- Dedicated worker thread for all OpenTelemetry operations
+- Non-blocking event queueing from main thread
+- Batch processing to reduce network overhead
+- Automatic retry mechanism with exponential backoff
+
+## 5. Code Organization
+
+### File Structure
+```
+ApplicationLibCode/
+├── Application/Tools/Telemetry/
+│   ├── RiaOpenTelemetryManager.h/.cpp      # Main manager class
+│   ├── RiaOpenTelemetryTracer.h/.cpp       # Span creation and management
+│   ├── RiaOpenTelemetryPrivacyFilter.h/.cpp # Data sanitization
+│   └── RiaOpenTelemetryExporter.h/.cpp     # Custom exporter implementation
+├── Application/
+│   └── RiaPreferencesOpenTelemetry.h/.cpp  # Configuration management
+└── ApplicationExeCode/
+    └── RiaMainTools.cpp                     # Integrate with crash handler
+```
+
+### Integration Points
+1. **Crash Handler** (`RiaMainTools.cpp:manageSegFailure`): Report crash spans
+2. **Logging System** (`RiaLogging.cpp`): Optional telemetry forwarding 
+3. **Application Startup** (`RiaGuiApplication.cpp`): Initialize telemetry manager
+4. **Configuration Loading** (`RiaConnectorTools.cpp`): Load OpenTelemetry config
+
+## 6. Implementation Steps
+
+### Phase 1: Core Infrastructure
+1. Add opentelemetry-cpp to vcpkg dependencies
+2. Create configuration classes following OSDU pattern
+3. Implement privacy filter with unit tests
+4. Create async manager with circuit breaker
+
+### Phase 2: Crash Reporting
+1. Integrate with existing signal handler
+2. Add stack trace sanitization
+3. Create crash-specific span attributes
+4. Test with controlled crashes
+
+### Phase 3: Extended Telemetry
+1. Add span creation to major operations
+2. Implement performance tracking spans
+3. Add optional error forwarding from logging system
+4. Create telemetry dashboard integration
+
+### Phase 4: Production Readiness
+1. Add comprehensive error handling
+2. Implement configuration validation
+3. Add telemetry for telemetry system health
+4. Performance optimization and memory management
+
+## 7. CMake Integration
+
+### vcpkg Dependencies
+```cmake
+# Add to ThirdParty/CMakeLists.txt
+find_package(opentelemetry-cpp CONFIG REQUIRED)
+target_link_libraries(ApplicationLibCode PRIVATE 
+    opentelemetry-cpp::opentelemetry_trace
+    opentelemetry-cpp::opentelemetry_otlp_grpc_exporter)
+```
+
+### Build Configuration
+```cmake
+option(RESINSIGHT_ENABLE_OPENTELEMETRY "Enable OpenTelemetry integration" OFF)
+if(RESINSIGHT_ENABLE_OPENTELEMETRY)
+    target_compile_definitions(ApplicationLibCode PRIVATE RESINSIGHT_OPENTELEMETRY_ENABLED)
+endif()
+```
+
+This plan provides a comprehensive, privacy-aware, and resilient OpenTelemetry integration that prioritizes crash reporting while maintaining ResInsight's performance and reliability.
