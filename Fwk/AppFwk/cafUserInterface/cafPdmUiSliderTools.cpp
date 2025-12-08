@@ -64,12 +64,12 @@ PdmDoubleValidator::PdmDoubleValidator( double bottom, double top, int decimals,
 void PdmDoubleValidator::fixup( QString& stringValue ) const
 {
     double doubleValue = stringValue.toDouble();
-    
+
     if ( std::isinf( doubleValue ) || std::isnan( doubleValue ) )
     {
         return;
     }
-    
+
     doubleValue = qBound( bottom(), doubleValue, top() );
     stringValue = QString::number( doubleValue, 'g', decimals() );
 }
