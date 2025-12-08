@@ -1,24 +1,17 @@
 {
-    "dependencies": [
-        "arrow",
-        "boost-filesystem",
-        "boost-spirit",
-        "boost-test",
-        "eigen3",
-        "grpc",
-        "type-lite",
-        "fast-float",
-        "spdlog",
-        "pugixml"
-    ],
-    "features": {
-        "opentelemetry": {
-            "description": "Enable OpenTelemetry integration for crash reporting and telemetry",
-            "dependencies": [
-                "opentelemetry-cpp[otlp-http]"
-            ]
-        }
-    },
+  "dependencies": [
+    "arrow",
+    "boost-filesystem",
+    "boost-spirit",
+    "boost-test",
+    "eigen3",
+    "grpc",
+    "type-lite",
+    "fast-float",
+    "spdlog",
+    "pugixml",
+    "opentelemetry-cpp"
+  ],
     "overrides": [
         {
             "name": "fmt",
