@@ -219,41 +219,45 @@ endif()
 #
 option(RESINSIGHT_ENABLE_OPENTELEMETRY "Enable OpenTelemetry integration" OFF)
 if(RESINSIGHT_ENABLE_OPENTELEMETRY)
-    message(STATUS "OpenTelemetry support enabled")
-    add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
-    
-    find_package(opentelemetry-cpp CONFIG REQUIRED)
-    find_package(Threads REQUIRED)
-    
+  message(STATUS "OpenTelemetry support enabled")
+  add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
+
+  find_package(opentelemetry-cpp CONFIG REQUIRED)
+  find_package(Threads REQUIRED)
+
+  list(
+    APPEND
+    OPENTELEMETRY_LIBRARIES
+    opentelemetry-cpp::api
+    opentelemetry-cpp::sdk
+    opentelemetry-cpp::ext
+    opentelemetry-cpp::trace
+    opentelemetry-cpp::resources
+    Threads::Threads
+  )
+
+  # Create telemetry source files list
+  set(OPENTELEMETRY_FILES
+      Application/RiaPreferencesOpenTelemetry.h
+      Application/RiaPreferencesOpenTelemetry.cpp
+      Application/Tools/Telemetry/RiaOpenTelemetryManager.h
+      Application/Tools/Telemetry/RiaOpenTelemetryManager.cpp
+      Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.h
+      Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.cpp
+  )
+
+  list(APPEND CPP_SOURCES ${OPENTELEMETRY_FILES})
+
+  # Optional: Add lock-free data structures library
+  find_package(moodycamel-concurrentqueue CONFIG QUIET)
+  if(moodycamel-concurrentqueue_FOUND)
     list(APPEND OPENTELEMETRY_LIBRARIES
-        opentelemetry-cpp::api
-        opentelemetry-cpp::sdk
-        opentelemetry-cpp::ext
-        opentelemetry-cpp::trace
-        opentelemetry-cpp::resources
-        Threads::Threads
+         moodycamel-concurrentqueue::concurrentqueue
     )
-    
-    # Create telemetry source files list
-    set(OPENTELEMETRY_FILES
-        Application/RiaPreferencesOpenTelemetry.h
-        Application/RiaPreferencesOpenTelemetry.cpp
-        Application/Tools/Telemetry/RiaOpenTelemetryManager.h
-        Application/Tools/Telemetry/RiaOpenTelemetryManager.cpp
-        Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.h
-        Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.cpp
-    )
-    
-    list(APPEND CPP_SOURCES ${OPENTELEMETRY_FILES})
-    
-    # Optional: Add lock-free data structures library
-    find_package(moodycamel-concurrentqueue CONFIG QUIET)
-    if(moodycamel-concurrentqueue_FOUND)
-        list(APPEND OPENTELEMETRY_LIBRARIES moodycamel-concurrentqueue::concurrentqueue)
-        add_definitions(-DRESINSIGHT_USE_LOCKFREE_QUEUE)
-    endif()
-    
-    list(APPEND EXTERNAL_LINK_LIBRARIES ${OPENTELEMETRY_LIBRARIES})
+    add_definitions(-DRESINSIGHT_USE_LOCKFREE_QUEUE)
+  endif()
+
+  list(APPEND EXTERNAL_LINK_LIBRARIES ${OPENTELEMETRY_LIBRARIES})
 endif()
 
 qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
