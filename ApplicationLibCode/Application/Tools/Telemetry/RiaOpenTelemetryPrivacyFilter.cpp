@@ -71,7 +71,8 @@ std::string RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( const std::string
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::map<std::string, std::string> RiaOpenTelemetryPrivacyFilter::filterAttributes( const std::map<std::string, std::string>& attributes, const FilterRules& rules )
+std::map<std::string, std::string> RiaOpenTelemetryPrivacyFilter::filterAttributes( const std::map<std::string, std::string>& attributes,
+                                                                                    const FilterRules&                        rules )
 {
     std::map<std::string, std::string> filtered;
 
@@ -81,7 +82,7 @@ std::map<std::string, std::string> RiaOpenTelemetryPrivacyFilter::filterAttribut
         if ( rules.allowedAttributes.find( key ) != rules.allowedAttributes.end() )
         {
             std::string sanitizedValue = value;
-            
+
             // Apply sanitization even to allowed attributes
             if ( key == "crash.stack_trace" || key == "test.stack_trace" )
             {
@@ -91,14 +92,14 @@ std::map<std::string, std::string> RiaOpenTelemetryPrivacyFilter::filterAttribut
             {
                 sanitizedValue = sanitizeMessage( value, rules );
             }
-            
+
             filtered[key] = sanitizedValue;
         }
         else if ( !isSensitiveAttribute( key ) && !containsSensitiveKeywords( value ) )
         {
             // Allow non-sensitive attributes that don't contain sensitive data
             std::string sanitizedValue = rules.filterUserData ? sanitizeMessage( value, rules ) : value;
-            filtered[key] = sanitizedValue;
+            filtered[key]              = sanitizedValue;
         }
         // Otherwise, skip the attribute (filter it out)
     }
@@ -207,7 +208,7 @@ bool RiaOpenTelemetryPrivacyFilter::isSensitiveAttribute( const std::string& key
 bool RiaOpenTelemetryPrivacyFilter::containsSensitiveKeywords( const std::string& value )
 {
     const auto& sensitiveKeywords = getSensitiveKeywords();
-    
+
     std::string lowerValue = value;
     std::transform( lowerValue.begin(), lowerValue.end(), lowerValue.begin(), ::tolower );
 
@@ -227,24 +228,22 @@ bool RiaOpenTelemetryPrivacyFilter::containsSensitiveKeywords( const std::string
 //--------------------------------------------------------------------------------------------------
 const std::set<std::string>& RiaOpenTelemetryPrivacyFilter::getSensitiveAttributes()
 {
-    static std::set<std::string> sensitiveAttrs = {
-        "password",
-        "secret",
-        "key",
-        "token",
-        "credential",
-        "auth",
-        "authorization",
-        "bearer",
-        "username",
-        "user_id",
-        "email",
-        "personal_id",
-        "ssn",
-        "social_security",
-        "credit_card",
-        "api_key"
-    };
+    static std::set<std::string> sensitiveAttrs = { "password",
+                                                    "secret",
+                                                    "key",
+                                                    "token",
+                                                    "credential",
+                                                    "auth",
+                                                    "authorization",
+                                                    "bearer",
+                                                    "username",
+                                                    "user_id",
+                                                    "email",
+                                                    "personal_id",
+                                                    "ssn",
+                                                    "social_security",
+                                                    "credit_card",
+                                                    "api_key" };
     return sensitiveAttrs;
 }
 
@@ -253,19 +252,8 @@ const std::set<std::string>& RiaOpenTelemetryPrivacyFilter::getSensitiveAttribut
 //--------------------------------------------------------------------------------------------------
 const std::set<std::string>& RiaOpenTelemetryPrivacyFilter::getSensitiveKeywords()
 {
-    static std::set<std::string> sensitiveKeywords = {
-        "password",
-        "secret",
-        "token",
-        "credential",
-        "api_key",
-        "private_key",
-        "access_token",
-        "refresh_token",
-        "bearer",
-        "authorization",
-        "auth_token"
-    };
+    static std::set<std::string> sensitiveKeywords =
+        { "password", "secret", "token", "credential", "api_key", "private_key", "access_token", "refresh_token", "bearer", "authorization", "auth_token" };
     return sensitiveKeywords;
 }
 
@@ -274,15 +262,6 @@ const std::set<std::string>& RiaOpenTelemetryPrivacyFilter::getSensitiveKeywords
 //--------------------------------------------------------------------------------------------------
 const std::set<std::string>& RiaOpenTelemetryPrivacyFilter::getPathKeywords()
 {
-    static std::set<std::string> pathKeywords = {
-        "users",
-        "home",
-        "documents",
-        "desktop",
-        "downloads",
-        "appdata",
-        "temp",
-        "tmp"
-    };
+    static std::set<std::string> pathKeywords = { "users", "home", "documents", "desktop", "downloads", "appdata", "temp", "tmp" };
     return pathKeywords;
 }
