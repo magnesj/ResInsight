@@ -33,15 +33,16 @@ class RiaOpenTelemetryPrivacyFilter
 public:
     struct FilterRules
     {
-        bool                 filterFilePaths = true;
-        bool                 filterUserData  = true;
+        bool                  filterFilePaths = true;
+        bool                  filterUserData  = true;
         std::set<std::string> allowedAttributes;
-        
+
         FilterRules();
     };
 
     static std::string                        sanitizeStackTrace( const std::string& stackTrace, const FilterRules& rules = FilterRules() );
-    static std::map<std::string, std::string> filterAttributes( const std::map<std::string, std::string>& attributes, const FilterRules& rules = FilterRules() );
+    static std::map<std::string, std::string> filterAttributes( const std::map<std::string, std::string>& attributes,
+                                                                const FilterRules&                        rules = FilterRules() );
     static std::string                        sanitizeFilePath( const std::string& filePath );
     static std::string                        sanitizeMessage( const std::string& message, const FilterRules& rules = FilterRules() );
 
@@ -51,7 +52,7 @@ private:
     static std::string removeEnvironmentVariables( const std::string& text );
     static bool        isSensitiveAttribute( const std::string& key );
     static bool        containsSensitiveKeywords( const std::string& value );
-    
+
     static const std::set<std::string>& getSensitiveAttributes();
     static const std::set<std::string>& getSensitiveKeywords();
     static const std::set<std::string>& getPathKeywords();
