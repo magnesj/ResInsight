@@ -424,17 +424,8 @@ bool RiaOpenTelemetryManager::createExporter()
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
 
-        // Create a simple tracer provider without specific exporters for now
-        // This allows the build to succeed and can be enhanced later
-        auto processor = std::make_unique<sdk::trace::SimpleSpanProcessor>( nullptr );
-
-        // Create tracer provider
-        m_provider = nostd::shared_ptr<trace::TracerProvider>( new sdk::trace::TracerProvider( std::move( processor ) ) );
-
-        // Set global provider
-        trace::Provider::SetTracerProvider( m_provider );
-
-        // Get tracer
+        // For now, disable span processor creation to avoid crash
+        // Use the default global tracer provider which is safe
         m_tracer = trace::Provider::GetTracerProvider()->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
 
         return true;
