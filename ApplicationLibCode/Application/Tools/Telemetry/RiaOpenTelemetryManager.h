@@ -33,13 +33,15 @@
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 #include <stacktrace>
-#include "opentelemetry/exporters/otlp/otlp_http_exporter.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/trace/simple_processor.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 namespace trace = opentelemetry::trace;
-namespace otlp  = opentelemetry::exporter::otlp;
+namespace sdk = opentelemetry::sdk;
+namespace nostd = opentelemetry::nostd;
 #endif
 
 class QString;
@@ -66,6 +68,19 @@ public:
     using ErrorCallback = std::function<void( TelemetryError, const QString& details )>;
 
     // Health monitoring
+    struct HealthSnapshot
+    {
+        uint64_t                                        eventsQueued{ 0 };
+        uint64_t                                        eventsSent{ 0 };
+        uint64_t                                        eventsDropped{ 0 };
+        uint64_t                                        networkFailures{ 0 };
+        std::chrono::steady_clock::time_point           lastSuccessfulSend;
+        std::chrono::steady_clock::time_point           systemStartTime;
+        
+        double getSuccessRate() const;
+        bool   isHealthy() const;
+    };
+    
     struct HealthMetrics
     {
         std::atomic<uint64_t>                           eventsQueued{ 0 };
@@ -74,9 +89,6 @@ public:
         std::atomic<uint64_t>                           networkFailures{ 0 };
         std::chrono::steady_clock::time_point           lastSuccessfulSend;
         std::chrono::steady_clock::time_point           systemStartTime;
-        
-        double getSuccessRate() const;
-        bool   isHealthy() const;
     };
 
     static RiaOpenTelemetryManager& instance();
@@ -102,7 +114,7 @@ public:
     size_t getCurrentQueueSize() const;
 
     // Health monitoring
-    HealthMetrics getHealthMetrics() const;
+    HealthSnapshot getHealthMetrics() const;
     bool          isHealthy() const;
     void          enableHealthMonitoring( bool enable );
 
@@ -153,7 +165,7 @@ private:
 
     // Thread safety
     mutable std::mutex                           m_configMutex;
-    std::mutex                                   m_queueMutex;
+    mutable std::mutex                           m_queueMutex;
     std::condition_variable                      m_queueCondition;
     std::queue<Event>                            m_eventQueue;
 
@@ -183,7 +195,7 @@ private:
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     // OpenTelemetry objects
-    std::shared_ptr<trace::TracerProvider>       m_provider;
-    std::shared_ptr<trace::Tracer>               m_tracer;
+    nostd::shared_ptr<trace::TracerProvider>       m_provider;
+    nostd::shared_ptr<trace::Tracer>               m_tracer;
 #endif
 };

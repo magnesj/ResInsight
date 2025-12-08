@@ -226,9 +226,11 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
     find_package(Threads REQUIRED)
     
     list(APPEND OPENTELEMETRY_LIBRARIES
-        opentelemetry-cpp::opentelemetry_trace
-        opentelemetry-cpp::opentelemetry_otlp_http_exporter
-        opentelemetry-cpp::opentelemetry_resources
+        opentelemetry-cpp::api
+        opentelemetry-cpp::sdk
+        opentelemetry-cpp::ext
+        opentelemetry-cpp::trace
+        opentelemetry-cpp::resources
         Threads::Threads
     )
     
