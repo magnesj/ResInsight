@@ -40,11 +40,15 @@ for well in wells:
 
     welspecs = completion_data.welspecs
     welspecl_entries = []
-    
+
     for line in welspecs:
         # Check if grid_name is present and not empty
-        has_grid_name = hasattr(line, 'grid_name') and line.HasField('grid_name') and line.grid_name.strip()
-        
+        has_grid_name = (
+            hasattr(line, "grid_name")
+            and line.HasField("grid_name")
+            and line.grid_name.strip()
+        )
+
         if has_grid_name:
             # Store for WELSPECL section
             welspecl_entries.append(line)
@@ -72,7 +76,7 @@ for well in wells:
     # Output WELSPECL section if there are entries with grid_name
     if len(welspecl_entries) > 0:
         print("WELSPECL")
-        
+
         for line in welspecl_entries:
             txt = line.well_name + "  "
             txt += line.group_name + "  "
@@ -103,8 +107,12 @@ for well in wells:
 
     for line in compdat:
         # Check if grid_name is present and not empty
-        has_grid_name = hasattr(line, 'grid_name') and line.HasField('grid_name') and line.grid_name.strip()
-        
+        has_grid_name = (
+            hasattr(line, "grid_name")
+            and line.HasField("grid_name")
+            and line.grid_name.strip()
+        )
+
         if has_grid_name:
             # Store for COMPDATL section
             compdatl_entries.append(line)
@@ -152,7 +160,7 @@ for well in wells:
     # Output COMPDATL section if there are entries with grid_name
     if len(compdatl_entries) > 0:
         print("COMPDATL")
-        
+
         for line in compdatl_entries:
             txt = ""
 
@@ -228,14 +236,18 @@ for well in wells:
     print("\nCOMPSEGS")
     compsegs = completion_data.compsegs
     compsegl_entries = []
-    
+
     if (compsegs is None) or (len(compsegs) == 0):
         print("  -- No COMPSEGS data --")
     else:
         for compseg in compsegs:
             # Check if grid_name is present and not empty
-            has_grid_name = hasattr(compseg, 'grid_name') and compseg.HasField('grid_name') and compseg.grid_name.strip()
-            
+            has_grid_name = (
+                hasattr(compseg, "grid_name")
+                and compseg.HasField("grid_name")
+                and compseg.grid_name.strip()
+            )
+
             if has_grid_name:
                 # Store for COMPSEGL section
                 compsegl_entries.append(compseg)
@@ -256,7 +268,7 @@ for well in wells:
     # Output COMPSEGL section if there are entries with grid_name
     if len(compsegl_entries) > 0:
         print("COMPSEGL")
-        
+
         for compseg in compsegl_entries:
             txt = "   "
             txt += compseg.grid_name + "  "
