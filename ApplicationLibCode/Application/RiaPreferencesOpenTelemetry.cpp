@@ -21,7 +21,6 @@
 #include "RiaVersionInfo.h"
 
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiSpinBoxEditor.h"
 #include "cafPdmUiTextEditor.h"
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesOpenTelemetry, "RiaPreferencesOpenTelemetry" );
@@ -43,21 +42,16 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitField( &m_localEndpoint, "localEndpoint", QString( "http://localhost:4317" ), "Local OTLP Endpoint" );
     
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
-    m_batchTimeoutMs.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     CAF_PDM_InitField( &m_maxBatchSize, "maxBatchSize", 512, "Max Batch Size" );
-    m_maxBatchSize.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     CAF_PDM_InitField( &m_maxQueueSize, "maxQueueSize", 10000, "Max Queue Size" );
-    m_maxQueueSize.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     CAF_PDM_InitField( &m_memoryThresholdMb, "memoryThresholdMb", 50, "Memory Threshold (MB)" );
-    m_memoryThresholdMb.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     CAF_PDM_InitField( &m_samplingRate, "samplingRate", 1.0, "Sampling Rate" );
     
     CAF_PDM_InitField( &m_connectionTimeoutMs, "connectionTimeoutMs", 10000, "Connection Timeout (ms)" );
-    m_connectionTimeoutMs.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     // Privacy settings
     CAF_PDM_InitField( &m_filterFilePaths, "filterFilePaths", true, "Filter File Paths" );
@@ -66,10 +60,8 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     // Fallback settings
     CAF_PDM_InitField( &m_enableLocalLogging, "enableLocalLogging", true, "Enable Local Logging Fallback" );
     CAF_PDM_InitField( &m_failureThreshold, "failureThreshold", 3, "Failure Threshold" );
-    m_failureThreshold.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
     
     CAF_PDM_InitField( &m_retryIntervalSeconds, "retryIntervalSeconds", 300, "Retry Interval (seconds)" );
-    m_retryIntervalSeconds.uiCapability()->setUiEditorTypeName( caf::PdmUiSpinBoxEditor::uiEditorTypeName() );
 }
 
 //--------------------------------------------------------------------------------------------------
