@@ -18,21 +18,21 @@
 
 #include "RiaOpenTelemetryManager.h"
 
-#include "RiaPreferencesOpenTelemetry.h"
 #include "RiaLogging.h"
+#include "RiaPreferencesOpenTelemetry.h"
 
 #include <QString>
-#include <thread>
-#include <random>
 #include <algorithm>
+#include <random>
 #include <sstream>
+#include <thread>
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/trace/provider.h"
 #include "opentelemetry/sdk/trace/exporter.h"
-namespace sdk = opentelemetry::sdk;
+#include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/trace/provider.h"
+namespace sdk      = opentelemetry::sdk;
 namespace resource = opentelemetry::sdk::resource;
 #endif
 
@@ -52,9 +52,9 @@ double RiaOpenTelemetryManager::HealthSnapshot::getSuccessRate() const
 bool RiaOpenTelemetryManager::HealthSnapshot::isHealthy() const
 {
     // Consider healthy if success rate > 90% and we've had recent successful sends
-    const auto now = std::chrono::steady_clock::now();
+    const auto now                  = std::chrono::steady_clock::now();
     const auto timeSinceLastSuccess = now - lastSuccessfulSend;
-    
+
     return getSuccessRate() > 0.9 && timeSinceLastSuccess < std::chrono::minutes( 5 );
 }
 
@@ -72,7 +72,7 @@ RiaOpenTelemetryManager& RiaOpenTelemetryManager::instance()
 //--------------------------------------------------------------------------------------------------
 RiaOpenTelemetryManager::RiaOpenTelemetryManager()
 {
-    m_healthMetrics.systemStartTime = std::chrono::steady_clock::now();
+    m_healthMetrics.systemStartTime    = std::chrono::steady_clock::now();
     m_healthMetrics.lastSuccessfulSend = m_healthMetrics.systemStartTime;
 }
 
@@ -91,14 +91,14 @@ bool RiaOpenTelemetryManager::initialize()
 {
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     std::lock_guard<std::mutex> lock( m_configMutex );
-    
+
     if ( m_initialized.load() )
     {
         return true;
     }
 
-    auto* prefs = RiaPreferencesOpenTelemetry::current();
-    auto validation = prefs->validate();
+    auto* prefs      = RiaPreferencesOpenTelemetry::current();
+    auto  validation = prefs->validate();
     if ( !validation.isValid )
     {
         handleError( TelemetryError::ConfigurationError, validation.errorMessage );
@@ -112,13 +112,13 @@ bool RiaOpenTelemetryManager::initialize()
 
     // Start worker thread
     m_isShuttingDown = false;
-    m_workerThread = std::make_unique<std::thread>( &RiaOpenTelemetryManager::workerThread, this );
+    m_workerThread   = std::make_unique<std::thread>( &RiaOpenTelemetryManager::workerThread, this );
 
     m_initialized = true;
-    m_enabled = true;
+    m_enabled     = true;
 
     RiaLogging::info( "OpenTelemetry initialized successfully" );
-    
+
     // Send initial health span
     if ( m_healthMonitoringEnabled )
     {
@@ -145,7 +145,7 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
     RiaLogging::info( "Shutting down OpenTelemetry" );
 
     m_isShuttingDown = true;
-    m_enabled = false;
+    m_enabled        = false;
 
     // Flush pending events
     flushPendingEvents();
@@ -157,12 +157,10 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
     if ( m_workerThread && m_workerThread->joinable() )
     {
         auto deadline = std::chrono::steady_clock::now() + timeout;
-        
+
         // Try to join with timeout
         std::unique_lock<std::mutex> lock( m_queueMutex );
-        bool finished = m_queueCondition.wait_until( lock, deadline, [this]() {
-            return m_eventQueue.empty();
-        });
+        bool                         finished = m_queueCondition.wait_until( lock, deadline, [this]() { return m_eventQueue.empty(); } );
         lock.unlock();
 
         m_workerThread->join();
@@ -188,7 +186,7 @@ void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, co
     }
 
     std::unique_lock<std::mutex> lock( m_queueMutex );
-    
+
     // Check queue size and apply backpressure
     if ( m_backpressureEnabled && m_eventQueue.size() >= m_maxQueueSize )
     {
@@ -198,7 +196,7 @@ void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, co
 
     m_eventQueue.emplace( eventName, attributes );
     m_healthMetrics.eventsQueued++;
-    
+
     lock.unlock();
     m_queueCondition.notify_one();
 }
@@ -215,28 +213,27 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
 
     // Format stack trace using existing ResInsight formatter
     std::stringstream ss;
-    int frame = 0;
+    int               frame = 0;
     for ( const auto& entry : trace )
     {
-        ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":"
-           << entry.source_line() << "\n";
+        ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":" << entry.source_line() << "\n";
     }
-    
-    std::string rawStackTrace = ss.str();
+
+    std::string rawStackTrace       = ss.str();
     std::string sanitizedStackTrace = RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( rawStackTrace );
 
     std::map<std::string, std::string> attributes;
-    attributes["crash.signal"] = std::to_string( signalCode );
-    attributes["crash.thread_id"] = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
+    attributes["crash.signal"]      = std::to_string( signalCode );
+    attributes["crash.thread_id"]   = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
     attributes["crash.stack_trace"] = sanitizedStackTrace;
-    attributes["service.name"] = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
-    attributes["service.version"] = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
+    attributes["service.name"]      = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
+    attributes["service.version"]   = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
     // Filter attributes through privacy filter
     RiaOpenTelemetryPrivacyFilter::FilterRules rules;
     rules.filterFilePaths = RiaPreferencesOpenTelemetry::current()->filterFilePaths();
-    rules.filterUserData = RiaPreferencesOpenTelemetry::current()->filterUserData();
-    
+    rules.filterUserData  = RiaPreferencesOpenTelemetry::current()->filterUserData();
+
     auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
 
     // Report with high priority (bypass sampling)
@@ -261,28 +258,27 @@ void RiaOpenTelemetryManager::reportTestCrash( const std::stacktrace& trace )
 
     // Format stack trace
     std::stringstream ss;
-    int frame = 0;
+    int               frame = 0;
     for ( const auto& entry : trace )
     {
-        ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":"
-           << entry.source_line() << "\n";
+        ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":" << entry.source_line() << "\n";
     }
-    
-    std::string rawStackTrace = ss.str();
+
+    std::string rawStackTrace       = ss.str();
     std::string sanitizedStackTrace = RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( rawStackTrace );
 
     std::map<std::string, std::string> attributes;
-    attributes["test.type"] = "manual_stack_trace";
-    attributes["test.thread_id"] = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
+    attributes["test.type"]        = "manual_stack_trace";
+    attributes["test.thread_id"]   = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
     attributes["test.stack_trace"] = sanitizedStackTrace;
-    attributes["service.name"] = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
-    attributes["service.version"] = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
+    attributes["service.name"]     = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
+    attributes["service.version"]  = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
     // Filter attributes through privacy filter
     RiaOpenTelemetryPrivacyFilter::FilterRules rules;
     rules.filterFilePaths = RiaPreferencesOpenTelemetry::current()->filterFilePaths();
-    rules.filterUserData = RiaPreferencesOpenTelemetry::current()->filterUserData();
-    
+    rules.filterUserData  = RiaPreferencesOpenTelemetry::current()->filterUserData();
+
     auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
 
     reportEventAsync( "test.stack_trace", filteredAttributes );
@@ -366,12 +362,12 @@ size_t RiaOpenTelemetryManager::getCurrentQueueSize() const
 RiaOpenTelemetryManager::HealthSnapshot RiaOpenTelemetryManager::getHealthMetrics() const
 {
     HealthSnapshot result;
-    result.eventsQueued = m_healthMetrics.eventsQueued.load();
-    result.eventsSent = m_healthMetrics.eventsSent.load();
-    result.eventsDropped = m_healthMetrics.eventsDropped.load();
-    result.networkFailures = m_healthMetrics.networkFailures.load();
+    result.eventsQueued       = m_healthMetrics.eventsQueued.load();
+    result.eventsSent         = m_healthMetrics.eventsSent.load();
+    result.eventsDropped      = m_healthMetrics.eventsDropped.load();
+    result.networkFailures    = m_healthMetrics.networkFailures.load();
     result.lastSuccessfulSend = m_healthMetrics.lastSuccessfulSend;
-    result.systemStartTime = m_healthMetrics.systemStartTime;
+    result.systemStartTime    = m_healthMetrics.systemStartTime;
     return result;
 }
 
@@ -427,24 +423,20 @@ bool RiaOpenTelemetryManager::createExporter()
     try
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
-        
+
         // Create a simple tracer provider without specific exporters for now
         // This allows the build to succeed and can be enhanced later
         auto processor = std::make_unique<sdk::trace::SimpleSpanProcessor>( nullptr );
-        
+
         // Create tracer provider
-        m_provider = nostd::shared_ptr<trace::TracerProvider>( 
-            new sdk::trace::TracerProvider( std::move( processor ) ) );
-        
+        m_provider = nostd::shared_ptr<trace::TracerProvider>( new sdk::trace::TracerProvider( std::move( processor ) ) );
+
         // Set global provider
         trace::Provider::SetTracerProvider( m_provider );
-        
+
         // Get tracer
-        m_tracer = trace::Provider::GetTracerProvider()->GetTracer( 
-            prefs->serviceName().toStdString(), 
-            prefs->serviceVersion().toStdString() 
-        );
-        
+        m_tracer = trace::Provider::GetTracerProvider()->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
+
         return true;
     }
     catch ( const std::exception& e )
@@ -476,12 +468,12 @@ void RiaOpenTelemetryManager::workerThread()
     while ( !m_isShuttingDown.load() )
     {
         processEvents();
-        
+
         // Health monitoring
         if ( m_healthMonitoringEnabled )
         {
             static auto lastHealthCheck = std::chrono::steady_clock::now();
-            auto now = std::chrono::steady_clock::now();
+            auto        now             = std::chrono::steady_clock::now();
             if ( now - lastHealthCheck > std::chrono::minutes( 5 ) )
             {
                 sendHealthSpan();
@@ -497,30 +489,28 @@ void RiaOpenTelemetryManager::workerThread()
 void RiaOpenTelemetryManager::processEvents()
 {
     std::unique_lock<std::mutex> lock( m_queueMutex );
-    
+
     // Wait for events or shutdown signal
-    m_queueCondition.wait( lock, [this]() {
-        return !m_eventQueue.empty() || m_isShuttingDown.load();
-    });
-    
+    m_queueCondition.wait( lock, [this]() { return !m_eventQueue.empty() || m_isShuttingDown.load(); } );
+
     if ( m_eventQueue.empty() )
     {
         return;
     }
-    
+
     // Process a batch of events
     std::queue<Event> batch;
-    auto* prefs = RiaPreferencesOpenTelemetry::current();
-    int maxBatchSize = prefs ? prefs->maxBatchSize() : 100;
-    
+    auto*             prefs        = RiaPreferencesOpenTelemetry::current();
+    int               maxBatchSize = prefs ? prefs->maxBatchSize() : 100;
+
     for ( int i = 0; i < maxBatchSize && !m_eventQueue.empty(); ++i )
     {
         batch.push( m_eventQueue.front() );
         m_eventQueue.pop();
     }
-    
+
     lock.unlock();
-    
+
     // Process events outside of lock
     while ( !batch.empty() )
     {
@@ -540,21 +530,20 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         updateHealthMetrics( false );
         return;
     }
-    
+
     try
     {
         auto span = m_tracer->StartSpan( event.name );
-        
+
         // Set attributes
         for ( const auto& [key, value] : event.attributes )
         {
             span->SetAttribute( key, value );
         }
-        
+
         // Set timestamp
-        span->SetAttribute( "timestamp", std::chrono::duration_cast<std::chrono::milliseconds>( 
-            event.timestamp.time_since_epoch() ).count() );
-        
+        span->SetAttribute( "timestamp", std::chrono::duration_cast<std::chrono::milliseconds>( event.timestamp.time_since_epoch() ).count() );
+
         if ( event.name.find( "crash" ) != std::string::npos )
         {
             span->SetStatus( trace::StatusCode::kError, "Application crashed" );
@@ -563,9 +552,9 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         {
             span->SetStatus( trace::StatusCode::kOk );
         }
-        
+
         span->End();
-        
+
         updateHealthMetrics( true );
         resetCircuitBreaker();
     }
@@ -586,10 +575,10 @@ bool RiaOpenTelemetryManager::shouldSampleEvent() const
     {
         return true;
     }
-    
-    static thread_local std::mt19937 gen( std::random_device{}() );
+
+    static thread_local std::mt19937                           gen( std::random_device{}() );
     static thread_local std::uniform_real_distribution<double> dis( 0.0, 1.0 );
-    
+
     return dis( gen ) < m_samplingRate;
 }
 
@@ -608,18 +597,18 @@ void RiaOpenTelemetryManager::flushPendingEvents()
 void RiaOpenTelemetryManager::handleError( TelemetryError error, const QString& context )
 {
     m_consecutiveFailures++;
-    
+
     if ( m_consecutiveFailures >= 3 )
     {
         m_circuitBreakerOpen = true;
         RiaLogging::warning( "OpenTelemetry circuit breaker opened due to consecutive failures" );
     }
-    
+
     if ( m_errorCallback )
     {
         m_errorCallback( error, context );
     }
-    
+
     RiaLogging::warning( QString( "OpenTelemetry error: %1" ).arg( context ) );
 }
 
@@ -651,9 +640,9 @@ void RiaOpenTelemetryManager::attemptReconnection()
     {
         return; // Don't retry too frequently
     }
-    
+
     m_lastReconnectAttempt = now;
-    
+
     // Try to reinitialize connection
     if ( createExporter() )
     {
@@ -676,7 +665,7 @@ bool RiaOpenTelemetryManager::isCircuitBreakerOpen() const
 void RiaOpenTelemetryManager::resetCircuitBreaker()
 {
     m_consecutiveFailures = 0;
-    m_circuitBreakerOpen = false;
+    m_circuitBreakerOpen  = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -704,15 +693,15 @@ void RiaOpenTelemetryManager::sendHealthSpan()
     {
         return;
     }
-    
-    auto metrics = getHealthMetrics();
+
+    auto                               metrics = getHealthMetrics();
     std::map<std::string, std::string> attributes;
-    attributes["health.events_queued"] = std::to_string( metrics.eventsQueued );
-    attributes["health.events_sent"] = std::to_string( metrics.eventsSent );
-    attributes["health.events_dropped"] = std::to_string( metrics.eventsDropped );
+    attributes["health.events_queued"]    = std::to_string( metrics.eventsQueued );
+    attributes["health.events_sent"]      = std::to_string( metrics.eventsSent );
+    attributes["health.events_dropped"]   = std::to_string( metrics.eventsDropped );
     attributes["health.network_failures"] = std::to_string( metrics.networkFailures );
-    attributes["health.success_rate"] = std::to_string( metrics.getSuccessRate() );
-    attributes["health.queue_size"] = std::to_string( getCurrentQueueSize() );
-    
+    attributes["health.success_rate"]     = std::to_string( metrics.getSuccessRate() );
+    attributes["health.queue_size"]       = std::to_string( getCurrentQueueSize() );
+
     reportEventAsync( "health.status", attributes );
 }

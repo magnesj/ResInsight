@@ -30,8 +30,8 @@
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 #include "RiaOpenTelemetryManager.h"
-#include <stacktrace>
 #include <QDateTime>
+#include <stacktrace>
 #endif
 
 #include "RicGridCalculatorDialog.h"
@@ -2021,20 +2021,20 @@ void RiuMainWindow::slotSendTestTelemetry()
         RiaLogging::warning( "OpenTelemetry is not enabled or configured" );
         return;
     }
-    
+
     // Send test logging events
     std::map<std::string, std::string> attributes;
-    attributes["test_type"] = "manual_test";
-    attributes["timestamp"] = QDateTime::currentDateTime().toString( Qt::ISODate ).toStdString();
-    attributes["user_action"] = "test_menu_triggered";
+    attributes["test_type"]    = "manual_test";
+    attributes["timestamp"]    = QDateTime::currentDateTime().toString( Qt::ISODate ).toStdString();
+    attributes["user_action"]  = "test_menu_triggered";
     attributes["service.name"] = "ResInsight";
-    
+
     otelManager.reportEventAsync( "test.logging", attributes );
-    
+
     // Generate and send test stack trace
     auto testStackTrace = std::stacktrace::current();
     otelManager.reportTestCrash( testStackTrace );
-    
+
     RiaLogging::info( "Test telemetry data sent to OpenTelemetry endpoint" );
 #else
     RiaLogging::warning( "OpenTelemetry not enabled at compile time" );

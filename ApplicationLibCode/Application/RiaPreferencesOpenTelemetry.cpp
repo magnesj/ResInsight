@@ -40,27 +40,27 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitField( &m_activeEnvironment, "activeEnvironment", QString( "production" ), "Active Environment" );
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
     CAF_PDM_InitField( &m_localEndpoint, "localEndpoint", QString( "http://localhost:4317" ), "Local OTLP Endpoint" );
-    
+
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
-    
+
     CAF_PDM_InitField( &m_maxBatchSize, "maxBatchSize", 512, "Max Batch Size" );
-    
+
     CAF_PDM_InitField( &m_maxQueueSize, "maxQueueSize", 10000, "Max Queue Size" );
-    
+
     CAF_PDM_InitField( &m_memoryThresholdMb, "memoryThresholdMb", 50, "Memory Threshold (MB)" );
-    
+
     CAF_PDM_InitField( &m_samplingRate, "samplingRate", 1.0, "Sampling Rate" );
-    
+
     CAF_PDM_InitField( &m_connectionTimeoutMs, "connectionTimeoutMs", 10000, "Connection Timeout (ms)" );
-    
+
     // Privacy settings
     CAF_PDM_InitField( &m_filterFilePaths, "filterFilePaths", true, "Filter File Paths" );
     CAF_PDM_InitField( &m_filterUserData, "filterUserData", true, "Filter User Data" );
-    
+
     // Fallback settings
     CAF_PDM_InitField( &m_enableLocalLogging, "enableLocalLogging", true, "Enable Local Logging Fallback" );
     CAF_PDM_InitField( &m_failureThreshold, "failureThreshold", 3, "Failure Threshold" );
-    
+
     CAF_PDM_InitField( &m_retryIntervalSeconds, "retryIntervalSeconds", 300, "Retry Interval (seconds)" );
 }
 
@@ -341,9 +341,7 @@ bool RiaPreferencesOpenTelemetry::testConnection() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaPreferencesOpenTelemetry::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                                     const QVariant&            oldValue,
-                                                     const QVariant&            newValue )
+void RiaPreferencesOpenTelemetry::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     // Validate configuration when fields change
     ValidationResult validation = validate();

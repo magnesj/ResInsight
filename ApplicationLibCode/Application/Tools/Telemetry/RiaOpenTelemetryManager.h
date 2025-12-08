@@ -32,15 +32,15 @@
 #include <thread>
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include <stacktrace>
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/nostd/shared_ptr.h"
 #include "opentelemetry/sdk/trace/batch_span_processor.h"
+#include "opentelemetry/sdk/trace/simple_processor.h"
+#include "opentelemetry/sdk/trace/tracer_provider.h"
 #include "opentelemetry/trace/provider.h"
 #include "opentelemetry/trace/tracer.h"
-#include "opentelemetry/nostd/shared_ptr.h"
+#include <stacktrace>
 namespace trace = opentelemetry::trace;
-namespace sdk = opentelemetry::sdk;
+namespace sdk   = opentelemetry::sdk;
 namespace nostd = opentelemetry::nostd;
 #endif
 
@@ -70,25 +70,25 @@ public:
     // Health monitoring
     struct HealthSnapshot
     {
-        uint64_t                                        eventsQueued{ 0 };
-        uint64_t                                        eventsSent{ 0 };
-        uint64_t                                        eventsDropped{ 0 };
-        uint64_t                                        networkFailures{ 0 };
-        std::chrono::steady_clock::time_point           lastSuccessfulSend;
-        std::chrono::steady_clock::time_point           systemStartTime;
-        
+        uint64_t                              eventsQueued{ 0 };
+        uint64_t                              eventsSent{ 0 };
+        uint64_t                              eventsDropped{ 0 };
+        uint64_t                              networkFailures{ 0 };
+        std::chrono::steady_clock::time_point lastSuccessfulSend;
+        std::chrono::steady_clock::time_point systemStartTime;
+
         double getSuccessRate() const;
         bool   isHealthy() const;
     };
-    
+
     struct HealthMetrics
     {
-        std::atomic<uint64_t>                           eventsQueued{ 0 };
-        std::atomic<uint64_t>                           eventsSent{ 0 };
-        std::atomic<uint64_t>                           eventsDropped{ 0 };
-        std::atomic<uint64_t>                           networkFailures{ 0 };
-        std::chrono::steady_clock::time_point           lastSuccessfulSend;
-        std::chrono::steady_clock::time_point           systemStartTime;
+        std::atomic<uint64_t>                 eventsQueued{ 0 };
+        std::atomic<uint64_t>                 eventsSent{ 0 };
+        std::atomic<uint64_t>                 eventsDropped{ 0 };
+        std::atomic<uint64_t>                 networkFailures{ 0 };
+        std::chrono::steady_clock::time_point lastSuccessfulSend;
+        std::chrono::steady_clock::time_point systemStartTime;
     };
 
     static RiaOpenTelemetryManager& instance();
@@ -115,8 +115,8 @@ public:
 
     // Health monitoring
     HealthSnapshot getHealthMetrics() const;
-    bool          isHealthy() const;
-    void          enableHealthMonitoring( bool enable );
+    bool           isHealthy() const;
+    void           enableHealthMonitoring( bool enable );
 
 private:
     RiaOpenTelemetryManager();
@@ -127,8 +127,8 @@ private:
 
     struct Event
     {
-        std::string                        name;
-        std::map<std::string, std::string> attributes;
+        std::string                           name;
+        std::map<std::string, std::string>    attributes;
         std::chrono::system_clock::time_point timestamp;
 
         Event( const std::string& eventName, const std::map<std::string, std::string>& attrs )
@@ -145,11 +145,11 @@ private:
     void setupResourceAttributes();
 
     // Event processing
-    void        workerThread();
-    void        processEvents();
-    void        processEvent( const Event& event );
-    bool        shouldSampleEvent() const;
-    void        flushPendingEvents();
+    void workerThread();
+    void processEvents();
+    void processEvent( const Event& event );
+    bool shouldSampleEvent() const;
+    void flushPendingEvents();
 
     // Circuit breaker and resilience
     void handleError( TelemetryError error, const QString& context );
@@ -164,38 +164,38 @@ private:
     void sendHealthSpan();
 
     // Thread safety
-    mutable std::mutex                           m_configMutex;
-    mutable std::mutex                           m_queueMutex;
-    std::condition_variable                      m_queueCondition;
-    std::queue<Event>                            m_eventQueue;
+    mutable std::mutex      m_configMutex;
+    mutable std::mutex      m_queueMutex;
+    std::condition_variable m_queueCondition;
+    std::queue<Event>       m_eventQueue;
 
     // State
-    std::atomic<bool>                            m_initialized{ false };
-    std::atomic<bool>                            m_enabled{ false };
-    std::atomic<bool>                            m_isShuttingDown{ false };
-    std::atomic<bool>                            m_circuitBreakerOpen{ false };
+    std::atomic<bool> m_initialized{ false };
+    std::atomic<bool> m_enabled{ false };
+    std::atomic<bool> m_isShuttingDown{ false };
+    std::atomic<bool> m_circuitBreakerOpen{ false };
 
     // Worker thread
-    std::unique_ptr<std::thread>                 m_workerThread;
+    std::unique_ptr<std::thread> m_workerThread;
 
     // Configuration
-    size_t                                       m_maxQueueSize{ 10000 };
-    bool                                         m_backpressureEnabled{ true };
-    size_t                                       m_memoryThresholdMB{ 50 };
-    double                                       m_samplingRate{ 1.0 };
-    
+    size_t m_maxQueueSize{ 10000 };
+    bool   m_backpressureEnabled{ true };
+    size_t m_memoryThresholdMB{ 50 };
+    double m_samplingRate{ 1.0 };
+
     // Error handling
-    ErrorCallback                                m_errorCallback;
-    std::atomic<int>                             m_consecutiveFailures{ 0 };
-    std::chrono::steady_clock::time_point        m_lastReconnectAttempt;
+    ErrorCallback                         m_errorCallback;
+    std::atomic<int>                      m_consecutiveFailures{ 0 };
+    std::chrono::steady_clock::time_point m_lastReconnectAttempt;
 
     // Health monitoring
-    mutable HealthMetrics                        m_healthMetrics;
-    bool                                         m_healthMonitoringEnabled{ true };
+    mutable HealthMetrics m_healthMetrics;
+    bool                  m_healthMonitoringEnabled{ true };
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     // OpenTelemetry objects
-    nostd::shared_ptr<trace::TracerProvider>       m_provider;
-    nostd::shared_ptr<trace::Tracer>               m_tracer;
+    nostd::shared_ptr<trace::TracerProvider> m_provider;
+    nostd::shared_ptr<trace::Tracer>         m_tracer;
 #endif
 };
