@@ -477,15 +477,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         std::string displayName = curve.name;
         if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
         {
-            if ( RiaPhaseTools::isTwoPhaseGasWater( availablePhases ) )
-            {
-                // Replace "PCOG" with "PCGW" in the display name
-                size_t pos = displayName.find( "PCOG" );
-                if ( pos != std::string::npos )
-                {
-                    displayName.replace( pos, 4, "PCGW" );
-                }
-            }
+            displayName = RiaPhaseTools::getPreferredPcogName( availablePhases ).toStdString();
         }
 
         QwtPlotCurve* qwtCurve = new QwtPlotCurve( displayName.c_str() );
