@@ -267,7 +267,7 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
                                                     double                                               sgas,
                                                     const QString&                                       caseName,
                                                     const QString&                                       cellReferenceText,
-                                                    const std::set<RiaDefines::PhaseType>&              availablePhases )
+                                                    const std::set<RiaDefines::PhaseType>&               availablePhases )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -318,7 +318,19 @@ void RiuRelativePermeabilityPlotPanel::clearPlot()
     m_caseName.clear();
     m_cellReferenceText.clear();
 
-    plotCurvesInQwt( m_unitSystem, m_allCurvesArr, m_swat, m_sgas, m_cellReferenceText, false, true, true, m_qwtPlot, &m_myPlotMarkers, false, false, m_availablePhases );
+    plotCurvesInQwt( m_unitSystem,
+                     m_allCurvesArr,
+                     m_swat,
+                     m_sgas,
+                     m_cellReferenceText,
+                     false,
+                     true,
+                     true,
+                     m_qwtPlot,
+                     &m_myPlotMarkers,
+                     false,
+                     false,
+                     m_availablePhases );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -424,7 +436,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
                                                         std::vector<QwtPlotMarker*>*                         myPlotMarkers,
                                                         bool                                                 showScaled,
                                                         bool                                                 showUnscaled,
-                                                        const std::set<RiaDefines::PhaseType>&              availablePhases )
+                                                        const std::set<RiaDefines::PhaseType>&               availablePhases )
 {
     bool skipUnscaledLegends = showScaled && showUnscaled;
 
