@@ -21,6 +21,7 @@
 #include "RiaCurveDataTools.h"
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
+#include "RiaPhaseTools.h"
 #include "RiaInterpolationTools.h"
 #include "RiaPlotDefines.h"
 #include "RiaResultNames.h"
@@ -464,12 +465,7 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         std::string displayName = curve.name;
         if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
         {
-            // Check if we have only GAS and WATER phases (no OIL)
-            bool hasGas   = availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE );
-            bool hasWater = availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
-            bool hasOil   = availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
-
-            if ( hasGas && hasWater && !hasOil )
+            if ( RiaPhaseTools::isTwoPhaseGasWater( availablePhases ) )
             {
                 // Replace "PCOG" with "PCGW" in the display name
                 size_t pos = displayName.find( "PCOG" );
@@ -853,23 +849,12 @@ QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
 //--------------------------------------------------------------------------------------------------
 void RiuRelativePermeabilityPlotPanel::updateCheckboxTexts()
 {
-    // Check if we have only GAS and WATER phases (no OIL)
-    bool hasGas   = m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE );
-    bool hasWater = m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
-    bool hasOil   = m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
-
     // Update PCOG checkbox text to PCGW for GAS/WATER cases
     if ( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
     {
         QCheckBox* pcogCheckBox = static_cast<QCheckBox*>( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) );
-        if ( hasGas && hasWater && !hasOil )
-        {
-            pcogCheckBox->setText( "PCGW" );
-        }
-        else
-        {
-            pcogCheckBox->setText( "PCOG" );
-        }
+        QString    preferredName = RiaPhaseTools::getPreferredPcogName( m_availablePhases );
+        pcogCheckBox->setText( preferredName );
     }
 }
 
