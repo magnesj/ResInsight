@@ -21,8 +21,8 @@
 #include "RiaCurveDataTools.h"
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
-#include "RiaPhaseTools.h"
 #include "RiaInterpolationTools.h"
+#include "RiaPhaseTools.h"
 #include "RiaPlotDefines.h"
 #include "RiaResultNames.h"
 
@@ -864,7 +864,7 @@ void RiuRelativePermeabilityPlotPanel::updateCheckboxTexts()
     // Update PCOG checkbox text to PCGW for GAS/WATER cases
     if ( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
     {
-        QCheckBox* pcogCheckBox = static_cast<QCheckBox*>( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) );
+        QCheckBox* pcogCheckBox  = static_cast<QCheckBox*>( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) );
         QString    preferredName = RiaPhaseTools::getPreferredPcogName( m_availablePhases );
         pcogCheckBox->setText( preferredName );
     }
