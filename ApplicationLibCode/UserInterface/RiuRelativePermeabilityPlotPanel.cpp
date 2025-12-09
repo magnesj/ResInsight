@@ -19,6 +19,7 @@
 #include "RiuRelativePermeabilityPlotPanel.h"
 
 #include "RiaCurveDataTools.h"
+#include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaInterpolationTools.h"
 #include "RiaPlotDefines.h"
@@ -264,7 +265,8 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
                                                     double                                               swat,
                                                     double                                               sgas,
                                                     const QString&                                       caseName,
-                                                    const QString&                                       cellReferenceText )
+                                                    const QString&                                       cellReferenceText,
+                                                    const std::set<RiaDefines::PhaseType>&              availablePhases )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -274,7 +276,9 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
     m_sgas              = sgas;
     m_caseName          = caseName;
     m_cellReferenceText = cellReferenceText;
+    m_availablePhases   = availablePhases;
 
+    updateCheckboxTexts();
     plotUiSelectedCurves();
 }
 
@@ -313,7 +317,7 @@ void RiuRelativePermeabilityPlotPanel::clearPlot()
     m_caseName.clear();
     m_cellReferenceText.clear();
 
-    plotCurvesInQwt( m_unitSystem, m_allCurvesArr, m_swat, m_sgas, m_cellReferenceText, false, true, true, m_qwtPlot, &m_myPlotMarkers, false, false );
+    plotCurvesInQwt( m_unitSystem, m_allCurvesArr, m_swat, m_sgas, m_cellReferenceText, false, true, true, m_qwtPlot, &m_myPlotMarkers, false, false, m_availablePhases );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -353,7 +357,8 @@ void RiuRelativePermeabilityPlotPanel::plotUiSelectedCurves()
                      m_qwtPlot,
                      &m_myPlotMarkers,
                      m_showScaledCheckBox->isChecked(),
-                     m_showUnscaledCheckBox->isChecked() );
+                     m_showUnscaledCheckBox->isChecked(),
+                     m_availablePhases );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -417,7 +422,8 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
                                                         QwtPlot*                                             plot,
                                                         std::vector<QwtPlotMarker*>*                         myPlotMarkers,
                                                         bool                                                 showScaled,
-                                                        bool                                                 showUnscaled )
+                                                        bool                                                 showUnscaled,
+                                                        const std::set<RiaDefines::PhaseType>&              availablePhases )
 {
     bool skipUnscaledLegends = showScaled && showUnscaled;
 
@@ -454,13 +460,33 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
             plotOnWhichYAxis = RIGHT_YAXIS;
         }
 
-        QwtPlotCurve* qwtCurve = new QwtPlotCurve( curve.name.c_str() );
+        // Determine display name for the curve
+        std::string displayName = curve.name;
+        if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
+        {
+            // Check if we have only GAS and WATER phases (no OIL)
+            bool hasGas   = availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE );
+            bool hasWater = availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
+            bool hasOil   = availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
+
+            if ( hasGas && hasWater && !hasOil )
+            {
+                // Replace "PCOG" with "PCGW" in the display name
+                size_t pos = displayName.find( "PCOG" );
+                if ( pos != std::string::npos )
+                {
+                    displayName.replace( pos, 4, "PCGW" );
+                }
+            }
+        }
+
+        QwtPlotCurve* qwtCurve = new QwtPlotCurve( displayName.c_str() );
 
         CVF_ASSERT( curve.saturationVals.size() == curve.yVals.size() );
         qwtCurve->setSamples( curve.saturationVals.data(), curve.yVals.data(), static_cast<int>( curve.saturationVals.size() ) );
 
-        // Use the actual curve name which includes "I" prefix for imbibition curves
-        qwtCurve->setTitle( curve.name.c_str() );
+        // Use the display name which may be modified for GAS/WATER cases
+        qwtCurve->setTitle( displayName.c_str() );
 
         qwtCurve->setStyle( QwtPlotCurve::Lines );
 
@@ -820,6 +846,31 @@ QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
     }
 
     return outTxt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::updateCheckboxTexts()
+{
+    // Check if we have only GAS and WATER phases (no OIL)
+    bool hasGas   = m_availablePhases.contains( RiaDefines::PhaseType::GAS_PHASE );
+    bool hasWater = m_availablePhases.contains( RiaDefines::PhaseType::WATER_PHASE );
+    bool hasOil   = m_availablePhases.contains( RiaDefines::PhaseType::OIL_PHASE );
+
+    // Update PCOG checkbox text to PCGW for GAS/WATER cases
+    if ( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
+    {
+        QCheckBox* pcogCheckBox = static_cast<QCheckBox*>( m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) );
+        if ( hasGas && hasWater && !hasOil )
+        {
+            pcogCheckBox->setText( "PCGW" );
+        }
+        else
+        {
+            pcogCheckBox->setText( "PCOG" );
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
