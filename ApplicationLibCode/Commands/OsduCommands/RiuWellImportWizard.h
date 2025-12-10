@@ -302,7 +302,7 @@ private slots:
 
 private:
     static const int MINIMUM_CHARACTERS_FOR_SEARCH = 3;
-    
+
     void loadSearchHistory();
     void saveSearchHistory();
     void addToSearchHistory( const QString& fieldName );
@@ -365,13 +365,13 @@ private:
     bool shouldIncludeTrajectory( const QString& existenceKind ) const;
     void updateSummaryDisplay();
 
-    RiaOsduConnector* m_osduConnector;
-    QTextEdit*        m_textEdit;
-    QRadioButton*     m_showAllRadioButton;
-    QRadioButton*     m_showActualRadioButton;
-    std::set<QString> m_pendingWellboreIds;
+    RiaOsduConnector*                                      m_osduConnector;
+    QTextEdit*                                             m_textEdit;
+    QRadioButton*                                          m_showAllRadioButton;
+    QRadioButton*                                          m_showActualRadioButton;
+    std::set<QString>                                      m_pendingWellboreIds;
     std::map<QString, std::vector<OsduWellboreTrajectory>> m_wellboreTrajectories;
-    mutable QMutex    m_mutex;
+    mutable QMutex                                         m_mutex;
 };
 
 //--------------------------------------------------------------------------------------------------

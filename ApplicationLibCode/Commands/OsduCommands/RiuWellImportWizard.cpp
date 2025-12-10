@@ -22,11 +22,11 @@
 #include <QObject>
 #include <QString>
 
+#include <QComboBox>
+#include <QRadioButton>
+#include <QSettings>
 #include <QtNetwork>
 #include <QtWidgets>
-#include <QRadioButton>
-#include <QComboBox>
-#include <QSettings>
 
 #include <optional>
 #include <vector>
@@ -239,7 +239,7 @@ FieldSelectionPage::FieldSelectionPage( RiaOsduConnector* osduConnector, QWidget
     setLayout( layout );
 
     QHBoxLayout* searchLayout = new QHBoxLayout;
-    m_searchComboBox = new QComboBox( this );
+    m_searchComboBox          = new QComboBox( this );
     m_searchComboBox->setEditable( true );
     m_searchComboBox->setInsertPolicy( QComboBox::NoInsert );
     m_searchComboBox->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Fixed );
@@ -404,15 +404,18 @@ WellSelectionPage::WellSelectionPage( RiaOsduConnector* osduConnector, QWidget* 
     header->setStretchLastSection( true );
 
     QObject::connect( m_filterComboBox->lineEdit(), &QLineEdit::textChanged, m_proxyModel, &QSortFilterProxyModel::setFilterWildcard );
-    
+
     // Add to history when text is entered and filter is applied
-    QObject::connect( m_filterComboBox->lineEdit(), &QLineEdit::editingFinished, [this]() {
-        QString filterText = m_filterComboBox->currentText();
-        if ( !filterText.isEmpty() && filterText.length() >= 2 ) // Minimum 2 characters for history
-        {
-            addToWellFilterHistory( filterText );
-        }
-    } );
+    QObject::connect( m_filterComboBox->lineEdit(),
+                      &QLineEdit::editingFinished,
+                      [this]()
+                      {
+                          QString filterText = m_filterComboBox->currentText();
+                          if ( !filterText.isEmpty() && filterText.length() >= 2 ) // Minimum 2 characters for history
+                          {
+                              addToWellFilterHistory( filterText );
+                          }
+                      } );
 
     m_osduConnector = osduConnector;
     connect( m_osduConnector, SIGNAL( wellboresByFieldIdFinished( const QString& ) ), SLOT( wellboresByFieldIdFinished( const QString& ) ) );
@@ -530,15 +533,15 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
     // Existence Kind filter
     QHBoxLayout* existenceFilterLayout = new QHBoxLayout;
     existenceFilterLayout->addWidget( new QLabel( "Import:", this ) );
-    
-    m_showAllRadioButton = new QRadioButton( "All", this );
+
+    m_showAllRadioButton    = new QRadioButton( "All", this );
     m_showActualRadioButton = new QRadioButton( "Actual only", this );
-    m_showActualRadioButton->setChecked( true );  // Default to Actual only
-    
+    m_showActualRadioButton->setChecked( true ); // Default to Actual only
+
     existenceFilterLayout->addWidget( m_showAllRadioButton );
     existenceFilterLayout->addWidget( m_showActualRadioButton );
     existenceFilterLayout->addStretch();
-    
+
     layout->addLayout( existenceFilterLayout );
 
     m_textEdit = new QTextEdit( this );
@@ -587,7 +590,7 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId, int
 
     {
         QMutexLocker lock( &m_mutex );
-        
+
         // Store trajectory data for filtering
         m_wellboreTrajectories[wellboreId] = wellboreTrajectories;
 
@@ -646,7 +649,7 @@ void WellSummaryPage::updateSummaryDisplay()
     wiz->clearWellInfos();
 
     QMutexLocker lock( &m_mutex );
-    
+
     for ( const auto& [wellboreId, trajectories] : m_wellboreTrajectories )
     {
         std::optional<OsduWellbore> wellbore = m_osduConnector->wellboreById( wellboreId );
@@ -687,9 +690,8 @@ void WellSummaryPage::updateSummaryDisplay()
             }
             else
             {
-                m_textEdit->append( QString( "Wellbore '%1': Found %2 trajectory(ies)." )
-                                        .arg( wellbore.value().name )
-                                        .arg( trajectories.size() ) );
+                m_textEdit->append(
+                    QString( "Wellbore '%1': Found %2 trajectory(ies)." ).arg( wellbore.value().name ).arg( trajectories.size() ) );
             }
         }
     }
@@ -717,12 +719,12 @@ bool WellSummaryPage::shouldIncludeTrajectory( const QString& existenceKind ) co
 //--------------------------------------------------------------------------------------------------
 void FieldSelectionPage::loadSearchHistory()
 {
-    QSettings settings;
+    QSettings   settings;
     QStringList history = settings.value( "OsduWellImport/FieldSearchHistory" ).toStringList();
-    
+
     m_searchComboBox->clear();
     m_searchComboBox->addItems( history );
-    
+
     // Set the last used search term as default (first item in history)
     if ( !history.isEmpty() )
     {
@@ -732,7 +734,7 @@ void FieldSelectionPage::loadSearchHistory()
     }
     else
     {
-        m_searchComboBox->setCurrentText( "" );  // Start with empty text if no history
+        m_searchComboBox->setCurrentText( "" ); // Start with empty text if no history
         m_searchButton->setEnabled( false );
     }
 }
@@ -742,15 +744,15 @@ void FieldSelectionPage::loadSearchHistory()
 //--------------------------------------------------------------------------------------------------
 void FieldSelectionPage::saveSearchHistory()
 {
-    QSettings settings;
+    QSettings   settings;
     QStringList history;
-    
+
     // Get current items from combobox
     for ( int i = 0; i < m_searchComboBox->count(); ++i )
     {
         history.append( m_searchComboBox->itemText( i ) );
     }
-    
+
     settings.setValue( "OsduWellImport/FieldSearchHistory", history );
 }
 
@@ -760,26 +762,26 @@ void FieldSelectionPage::saveSearchHistory()
 void FieldSelectionPage::addToSearchHistory( const QString& fieldName )
 {
     if ( fieldName.isEmpty() ) return;
-    
+
     // Remove if already exists to avoid duplicates
     int existingIndex = m_searchComboBox->findText( fieldName );
     if ( existingIndex >= 0 )
     {
         m_searchComboBox->removeItem( existingIndex );
     }
-    
+
     // Add to the beginning
     m_searchComboBox->insertItem( 0, fieldName );
-    
+
     // Limit history to 10 items
     while ( m_searchComboBox->count() > 10 )
     {
         m_searchComboBox->removeItem( m_searchComboBox->count() - 1 );
     }
-    
+
     // Set as current text
     m_searchComboBox->setCurrentText( fieldName );
-    
+
     // Save to persistent storage
     saveSearchHistory();
 }
@@ -789,12 +791,12 @@ void FieldSelectionPage::addToSearchHistory( const QString& fieldName )
 //--------------------------------------------------------------------------------------------------
 void WellSelectionPage::loadWellFilterHistory()
 {
-    QSettings settings;
+    QSettings   settings;
     QStringList history = settings.value( "OsduWellImport/WellFilterHistory" ).toStringList();
-    
+
     m_filterComboBox->clear();
     m_filterComboBox->addItems( history );
-    
+
     // Set the last used filter as default (first item in history)
     if ( !history.isEmpty() )
     {
@@ -807,7 +809,7 @@ void WellSelectionPage::loadWellFilterHistory()
     }
     else
     {
-        m_filterComboBox->setCurrentText( "" );  // Start with empty text if no history
+        m_filterComboBox->setCurrentText( "" ); // Start with empty text if no history
         if ( m_proxyModel )
         {
             m_proxyModel->setFilterWildcard( "" );
@@ -820,15 +822,15 @@ void WellSelectionPage::loadWellFilterHistory()
 //--------------------------------------------------------------------------------------------------
 void WellSelectionPage::saveWellFilterHistory()
 {
-    QSettings settings;
+    QSettings   settings;
     QStringList history;
-    
+
     // Get current items from combobox
     for ( int i = 0; i < m_filterComboBox->count(); ++i )
     {
         history.append( m_filterComboBox->itemText( i ) );
     }
-    
+
     settings.setValue( "OsduWellImport/WellFilterHistory", history );
 }
 
@@ -838,26 +840,26 @@ void WellSelectionPage::saveWellFilterHistory()
 void WellSelectionPage::addToWellFilterHistory( const QString& filterText )
 {
     if ( filterText.isEmpty() || filterText.length() < 2 ) return;
-    
+
     // Remove if already exists to avoid duplicates
     int existingIndex = m_filterComboBox->findText( filterText );
     if ( existingIndex >= 0 )
     {
         m_filterComboBox->removeItem( existingIndex );
     }
-    
+
     // Add to the beginning
     m_filterComboBox->insertItem( 0, filterText );
-    
+
     // Limit history to 10 items
     while ( m_filterComboBox->count() > 10 )
     {
         m_filterComboBox->removeItem( m_filterComboBox->count() - 1 );
     }
-    
+
     // Set as current text
     m_filterComboBox->setCurrentText( filterText );
-    
+
     // Save to persistent storage
     saveWellFilterHistory();
 }
