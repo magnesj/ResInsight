@@ -303,10 +303,6 @@ private slots:
 private:
     static const int MINIMUM_CHARACTERS_FOR_SEARCH = 3;
 
-    void loadSearchHistory();
-    void saveSearchHistory();
-    void addToSearchHistory( const QString& fieldName );
-
     QComboBox*           m_searchComboBox;
     QPushButton*         m_searchButton;
     RiaOsduConnector*    m_osduConnector;
@@ -333,9 +329,6 @@ private slots:
     void selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection );
 
 private:
-    void loadWellFilterHistory();
-    void saveWellFilterHistory();
-    void addToWellFilterHistory( const QString& filterText );
 
     RiaOsduConnector*       m_osduConnector;
     QTableView*             m_tableView;
