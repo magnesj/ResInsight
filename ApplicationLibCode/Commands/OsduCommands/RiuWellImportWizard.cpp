@@ -264,6 +264,7 @@ FieldSelectionPage::FieldSelectionPage( RiaOsduConnector* osduConnector, QWidget
     connect( m_osduConnector, SIGNAL( fieldsFinished() ), SLOT( fieldsFinished() ) );
 
     connect( m_searchTextEdit, SIGNAL( textChanged( const QString& ) ), this, SLOT( onSearchTextChanged( const QString& ) ) );
+    connect( m_searchTextEdit, SIGNAL( returnPressed() ), this, SLOT( searchForFields() ) );
 
     connect( m_searchButton, SIGNAL( clicked() ), this, SLOT( searchForFields() ) );
 
