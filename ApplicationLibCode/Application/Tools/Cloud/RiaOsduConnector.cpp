@@ -413,11 +413,12 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
             m_wellboreTrajectories[wellboreId].clear();
             for ( const QJsonValue& value : resultsArray )
             {
-                QJsonObject resultObj = value.toObject();
-                QString     id        = resultObj["id"].toString();
-                QString     kind      = resultObj["kind"].toString();
+                QJsonObject resultObj     = value.toObject();
+                QString     id            = resultObj["id"].toString();
+                QString     kind          = resultObj["kind"].toString();
+                QString     existenceKind = resultObj["data"].toObject()["ExistenceKind"].toString();
 
-                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId } );
+                m_wellboreTrajectories[wellboreId].push_back( OsduWellboreTrajectory{ id, kind, wellboreId, existenceKind } );
             }
         }
 
