@@ -35,6 +35,7 @@ class QLabel;
 class QTextEdit;
 class QTableView;
 class QRadioButton;
+class QComboBox;
 class OsduFieldTableModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -301,8 +302,12 @@ private slots:
 
 private:
     static const int MINIMUM_CHARACTERS_FOR_SEARCH = 3;
+    
+    void loadSearchHistory();
+    void saveSearchHistory();
+    void addToSearchHistory( const QString& fieldName );
 
-    QLineEdit*           m_searchTextEdit;
+    QComboBox*           m_searchComboBox;
     QPushButton*         m_searchButton;
     RiaOsduConnector*    m_osduConnector;
     QTableView*          m_tableView;
@@ -328,10 +333,15 @@ private slots:
     void selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection );
 
 private:
+    void loadWellFilterHistory();
+    void saveWellFilterHistory();
+    void addToWellFilterHistory( const QString& filterText );
+
     RiaOsduConnector*       m_osduConnector;
     QTableView*             m_tableView;
     OsduWellboreTableModel* m_osduWellboresModel;
     QSortFilterProxyModel*  m_proxyModel;
+    QComboBox*              m_filterComboBox;
 };
 
 //--------------------------------------------------------------------------------------------------
