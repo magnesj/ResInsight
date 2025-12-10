@@ -329,7 +329,6 @@ private slots:
     void selectWellbore( const QItemSelection& newSelection, const QItemSelection& oldSelection );
 
 private:
-
     RiaOsduConnector*       m_osduConnector;
     QTableView*             m_tableView;
     OsduWellboreTableModel* m_osduWellboresModel;

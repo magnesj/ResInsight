@@ -296,11 +296,11 @@ FieldSelectionPage::FieldSelectionPage( RiaOsduConnector* osduConnector, QWidget
     // Load search history after all UI elements are created
     {
         RiaStringListSerializer serializer( "OsduWellImport/FieldSearchHistory" );
-        QStringList history = serializer.textStrings();
-        
+        QStringList             history = serializer.textStrings();
+
         m_searchComboBox->clear();
         m_searchComboBox->addItems( history );
-        
+
         // Set the last used search term as default (first item in history)
         if ( !history.isEmpty() )
         {
@@ -454,11 +454,11 @@ WellSelectionPage::WellSelectionPage( RiaOsduConnector* osduConnector, QWidget* 
     // Load well filter history after all UI elements and proxy model are created
     {
         RiaStringListSerializer serializer( "OsduWellImport/WellFilterHistory" );
-        QStringList history = serializer.textStrings();
-        
+        QStringList             history = serializer.textStrings();
+
         m_filterComboBox->clear();
         m_filterComboBox->addItems( history );
-        
+
         // Set the last used filter as default (first item in history)
         if ( !history.isEmpty() )
         {
@@ -761,7 +761,6 @@ bool WellSummaryPage::shouldIncludeTrajectory( const QString& existenceKind ) co
     }
     return true;
 }
-
 
 //--------------------------------------------------------------------------------------------------
 ///
