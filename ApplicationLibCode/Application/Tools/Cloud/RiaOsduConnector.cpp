@@ -415,11 +415,11 @@ void RiaOsduConnector::parseWellTrajectory( QNetworkReply* reply, const QString&
             {
                 QJsonObject resultObj = value.toObject();
                 if ( resultObj.isEmpty() ) continue;
-                
-                QString id = resultObj["id"].toString();
+
+                QString id   = resultObj["id"].toString();
                 QString kind = resultObj["kind"].toString();
                 QString existenceKind;
-                
+
                 // Safely extract existenceKind from nested data object
                 QJsonObject dataObj = resultObj["data"].toObject();
                 if ( !dataObj.isEmpty() && dataObj.contains( "ExistenceKind" ) )
