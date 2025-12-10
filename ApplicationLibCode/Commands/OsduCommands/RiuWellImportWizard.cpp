@@ -24,6 +24,7 @@
 
 #include <QtNetwork>
 #include <QtWidgets>
+#include <QRadioButton>
 
 #include <optional>
 #include <vector>
@@ -156,6 +157,14 @@ std::vector<RiuWellImportWizard::WellInfo> RiuWellImportWizard::importedWells() 
 void RiuWellImportWizard::addWellInfo( RiuWellImportWizard::WellInfo wellInfo )
 {
     m_wellInfos.push_back( wellInfo );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuWellImportWizard::clearWellInfos()
+{
+    m_wellInfos.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -490,6 +499,20 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
     QVBoxLayout* layout = new QVBoxLayout;
     setLayout( layout );
 
+    // Existence Kind filter
+    QHBoxLayout* existenceFilterLayout = new QHBoxLayout;
+    existenceFilterLayout->addWidget( new QLabel( "Import:", this ) );
+    
+    m_showAllRadioButton = new QRadioButton( "All", this );
+    m_showActualRadioButton = new QRadioButton( "Actual only", this );
+    m_showActualRadioButton->setChecked( true );  // Default to Actual only
+    
+    existenceFilterLayout->addWidget( m_showAllRadioButton );
+    existenceFilterLayout->addWidget( m_showActualRadioButton );
+    existenceFilterLayout->addStretch();
+    
+    layout->addLayout( existenceFilterLayout );
+
     m_textEdit = new QTextEdit( this );
     m_textEdit->setReadOnly( true );
     layout->addWidget( m_textEdit );
@@ -499,6 +522,9 @@ WellSummaryPage::WellSummaryPage( RiaOsduConnector* osduConnector, QWidget* pare
     connect( m_osduConnector,
              SIGNAL( wellboreTrajectoryFinished( const QString&, int, const QString& ) ),
              SLOT( wellboreTrajectoryFinished( const QString&, int, const QString& ) ) );
+
+    connect( m_showAllRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
+    connect( m_showActualRadioButton, SIGNAL( toggled( bool ) ), this, SLOT( onFilterChanged() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -512,6 +538,7 @@ void WellSummaryPage::initializePage()
 
     QMutexLocker lock( &m_mutex );
     m_pendingWellboreIds.clear();
+    m_wellboreTrajectories.clear();
     for ( const QString& wellboreId : wiz->selectedWellboreIds() )
     {
         m_pendingWellboreIds.insert( wellboreId );
@@ -530,10 +557,11 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId, int
 {
     std::vector<OsduWellboreTrajectory> wellboreTrajectories = m_osduConnector->wellboreTrajectories( wellboreId );
 
-    RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
-
     {
         QMutexLocker lock( &m_mutex );
+        
+        // Store trajectory data for filtering
+        m_wellboreTrajectories[wellboreId] = wellboreTrajectories;
 
         std::optional<OsduWellbore> wellbore = m_osduConnector->wellboreById( wellboreId );
         if ( wellbore.has_value() )
@@ -550,23 +578,110 @@ void WellSummaryPage::wellboreTrajectoryFinished( const QString& wellboreId, int
             {
                 m_textEdit->append( QString( "Wellbore '%1': Found %2 trajectory(ies)." ).arg( wellbore.value().name ).arg( numTrajectories ) );
             }
-
-            for ( auto w : wellboreTrajectories )
-            {
-                QString wellboreTrajectoryId = w.id;
-                wiz->addWellInfo( { .name                 = wellbore.value().name,
-                                    .wellId               = wellbore.value().wellId,
-                                    .wellboreId           = w.wellboreId,
-                                    .wellboreTrajectoryId = wellboreTrajectoryId,
-                                    .existenceKind        = w.existenceKind,
-                                    .datumElevation       = wellbore.value().datumElevation } );
-            }
         }
 
         m_pendingWellboreIds.erase( wellboreId );
     }
 
+    // Update the display after data is loaded
+    if ( m_pendingWellboreIds.empty() )
+    {
+        updateSummaryDisplay();
+    }
+
     emit( completeChanged() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void WellSummaryPage::onFilterChanged()
+{
+    if ( m_pendingWellboreIds.empty() )
+    {
+        updateSummaryDisplay();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void WellSummaryPage::updateSummaryDisplay()
+{
+    RiuWellImportWizard* wiz = dynamic_cast<RiuWellImportWizard*>( wizard() );
+    if ( !wiz ) return;
+
+    // Clear the text display
+    m_textEdit->clear();
+
+    // Clear existing well infos and rebuild based on current filter
+    wiz->clearWellInfos();
+
+    QMutexLocker lock( &m_mutex );
+    
+    for ( const auto& [wellboreId, trajectories] : m_wellboreTrajectories )
+    {
+        std::optional<OsduWellbore> wellbore = m_osduConnector->wellboreById( wellboreId );
+        if ( wellbore.has_value() )
+        {
+            int includedCount = 0;
+            for ( const auto& w : trajectories )
+            {
+                if ( shouldIncludeTrajectory( w.existenceKind ) )
+                {
+                    QString wellboreTrajectoryId = w.id;
+                    wiz->addWellInfo( { .name                 = wellbore.value().name,
+                                        .wellId               = wellbore.value().wellId,
+                                        .wellboreId           = w.wellboreId,
+                                        .wellboreTrajectoryId = wellboreTrajectoryId,
+                                        .existenceKind        = w.existenceKind,
+                                        .datumElevation       = wellbore.value().datumElevation } );
+                    includedCount++;
+                }
+            }
+
+            // Show trajectory count and filtering info
+            if ( m_showActualRadioButton->isChecked() )
+            {
+                if ( includedCount != static_cast<int>( trajectories.size() ) )
+                {
+                    m_textEdit->append( QString( "Wellbore '%1': Found %2 trajectory(ies), %3 included after filtering." )
+                                            .arg( wellbore.value().name )
+                                            .arg( trajectories.size() )
+                                            .arg( includedCount ) );
+                }
+                else
+                {
+                    m_textEdit->append( QString( "Wellbore '%1': Found %2 trajectory(ies) (all match filter)." )
+                                            .arg( wellbore.value().name )
+                                            .arg( trajectories.size() ) );
+                }
+            }
+            else
+            {
+                m_textEdit->append( QString( "Wellbore '%1': Found %2 trajectory(ies)." )
+                                        .arg( wellbore.value().name )
+                                        .arg( trajectories.size() ) );
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool WellSummaryPage::shouldIncludeTrajectory( const QString& existenceKind ) const
+{
+    if ( m_showAllRadioButton->isChecked() )
+    {
+        return true;
+    }
+    else if ( m_showActualRadioButton->isChecked() )
+    {
+        // Match the OSDU format: "data:reference-data--ExistenceKind:Actual:"
+        return existenceKind.contains( ":Actual:", Qt::CaseInsensitive );
+    }
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -34,6 +34,7 @@ class QFile;
 class QLabel;
 class QTextEdit;
 class QTableView;
+class QRadioButton;
 class OsduFieldTableModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -348,11 +349,18 @@ public:
 
 private slots:
     void wellboreTrajectoryFinished( const QString& wellboreId, int numTrajectories, const QString& errorMessage );
+    void onFilterChanged();
 
 private:
+    bool shouldIncludeTrajectory( const QString& existenceKind ) const;
+    void updateSummaryDisplay();
+
     RiaOsduConnector* m_osduConnector;
     QTextEdit*        m_textEdit;
+    QRadioButton*     m_showAllRadioButton;
+    QRadioButton*     m_showActualRadioButton;
     std::set<QString> m_pendingWellboreIds;
+    std::map<QString, std::vector<OsduWellboreTrajectory>> m_wellboreTrajectories;
     mutable QMutex    m_mutex;
 };
 
@@ -386,6 +394,7 @@ public:
     std::vector<QString> selectedWellboreIds() const;
 
     void                                       addWellInfo( RiuWellImportWizard::WellInfo wellInfo );
+    void                                       clearWellInfos();
     std::vector<RiuWellImportWizard::WellInfo> importedWells() const;
 
 public slots:
