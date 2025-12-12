@@ -407,12 +407,6 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
         eclipseCaseData->mainGrid()->invalidateCellsAboveI( iLimitFromEdfm - 1 /* zero based index */ );
     }
 
-    auto iLimitFromEdfm = RifEdfmTools::checkForEdfmLimitI( fileName );
-    if ( iLimitFromEdfm > 0 )
-    {
-        eclipseCaseData->mainGrid()->invalidateCellsAboveI( iLimitFromEdfm - 1 /* zero based index */ );
-    }
-
     {
         auto task = progress.task( "Reading faults", 10 );
 

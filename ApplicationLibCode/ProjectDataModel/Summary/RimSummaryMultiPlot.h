@@ -158,8 +158,6 @@ private:
 
     void updateReadOnlyState();
 
-    void updateReadOutSettings();
-
     std::pair<double, double> adjustedMinMax( const RimPlotAxisProperties* axis, double min, double max ) const;
 
     RimSummaryPlotReadOut* activeReadoutSettings() const;

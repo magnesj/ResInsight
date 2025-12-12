@@ -20,7 +20,6 @@
 
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-#include "cafPdmPtrField.h"
 
 #include <QString>
 #include <vector>

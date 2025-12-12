@@ -21,8 +21,6 @@
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 
-#include "RiaResultNames.h"
-
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"

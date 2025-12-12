@@ -27,8 +27,6 @@
 
 #include "RimVfpTable.h"
 
-#include <opm/input/eclipse/Units/UnitSystem.hpp>
-
 #include "cafCmdFeatureMenuBuilder.h"
 
 #include <QFileInfo>

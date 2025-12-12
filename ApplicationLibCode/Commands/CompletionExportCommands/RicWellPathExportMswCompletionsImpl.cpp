@@ -190,12 +190,6 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
 
 }; // namespace internal
 
-namespace internal
-{
-constexpr double VALVE_SEGMENT_LENGTH = 0.1;
-
-}; // namespace internal
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

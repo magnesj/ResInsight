@@ -487,8 +487,6 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         scriptGroup->add( &scriptDirectories );
         scriptGroup->add( &m_maxScriptFoldersDepth );
         scriptGroup->add( &scriptEditorExecutable );
-
-        m_opmPreferences()->appendItems( uiOrdering );
     }
     else if ( uiConfigName == RiaPreferences::tabNameOpmFlow() )
     {

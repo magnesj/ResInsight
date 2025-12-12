@@ -83,7 +83,6 @@ public:
     // Do not use this method directly, use the overload that infers the useOpmReader from Preferences
     // This method is public to be able to call it from unit tests
     static std::vector<QString> getRestartFileNames( const QString& headerFileName, bool useOpmReader, std::vector<QString>& warnings );
-    static QString              getRestartFilePath( const QString& headerFileName, const QString& restartCaseNameFromFile );
 
 private:
     static void    findSummaryFiles( const QString& inputFile, QString* headerFile, QStringList* dataFiles );

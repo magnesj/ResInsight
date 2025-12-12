@@ -104,8 +104,6 @@ std::tuple<Opm::UnitSystem, std::vector<RifVfpProdTable>, std::vector<RifVfpInjT
 
     std::optional<Opm::UnitSystem> unitSystemFromTables;
 
-    std::optional<Opm::UnitSystem> unitSystemFromTables;
-
     try
     {
         // The parser is not robust when looking for a small number of keywords. Several keywords is added as parsing error occurs.
