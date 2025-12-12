@@ -87,8 +87,7 @@ void RimFractureContainmentTools::appendNeighborCellForFace( const std::set<size
 //--------------------------------------------------------------------------------------------------
 double computeAverageZForTwoDeepestZ( const RigMainGrid* mainGrid, size_t globalReservoirCellIndex, cvf::StructGridInterface::FaceType face )
 {
-    cvf::Vec3d hexCorners[8];
-    mainGrid->cellCornerVertices( globalReservoirCellIndex, hexCorners );
+    std::array<cvf::Vec3d, 8> hexCorners = mainGrid->cellCornerVertices( globalReservoirCellIndex );
 
     double avgZ = 0.0;
 
@@ -250,8 +249,7 @@ std::set<size_t> RimFractureContainmentTools::getCellsIntersectingFracturePlane(
 
         for ( const auto& globalCellIndex : indicesToPotentiallyFracturedCells )
         {
-            std::array<cvf::Vec3d, 8> hexCorners;
-            mainGrid->cellCornerVertices( globalCellIndex, hexCorners.data() );
+            std::array<cvf::Vec3d, 8>            hexCorners = mainGrid->cellCornerVertices( globalCellIndex );
             std::vector<std::vector<cvf::Vec3d>> planeCellPolygons;
 
             bool isPlanIntersected =

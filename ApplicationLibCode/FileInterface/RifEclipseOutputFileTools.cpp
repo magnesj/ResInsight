@@ -20,6 +20,8 @@
 
 #include "RifEclipseOutputFileTools.h"
 
+#include "RiaLogging.h"
+#include "RiaOpmParserTools.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaStringEncodingTools.h"
 
@@ -564,33 +566,17 @@ QString RifEclipseOutputFileTools::createIndexFileName( const QString& resultFil
 //--------------------------------------------------------------------------------------------------
 std::set<RiaDefines::PhaseType> RifEclipseOutputFileTools::findAvailablePhases( const ecl_file_type* ecl_file )
 {
-    std::set<RiaDefines::PhaseType> phaseTypes;
-
     if ( ecl_file )
     {
         const ecl_kw_type* intehead = ecl_file_iget_named_kw( ecl_file, INTEHEAD_KW, 0 );
         if ( intehead )
         {
             int phases = ecl_kw_iget_int( intehead, INTEHEAD_PHASE_INDEX );
-
-            if ( phases & ECL_OIL_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::OIL_PHASE );
-            }
-
-            if ( phases & ECL_GAS_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::GAS_PHASE );
-            }
-
-            if ( phases & ECL_WATER_PHASE )
-            {
-                phaseTypes.insert( RiaDefines::PhaseType::WATER_PHASE );
-            }
+            return RiaOpmParserTools::phasesFromInteheadValue( phases );
         }
     }
 
-    return phaseTypes;
+    return std::set<RiaDefines::PhaseType>();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -965,4 +951,91 @@ void RifEclipseOutputFileTools::extractResultValuesBasedOnPorosityModel( RigEcli
             sourceStartPosition += ( matrixActiveCellCount + fractureActiveCellCount );
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<RiaDefines::EclipseUnitSystem> RifEclipseOutputFileTools::unitValueToEnum( int unitValue )
+{
+    if ( unitValue == 1 )
+        return RiaDefines::EclipseUnitSystem::UNITS_METRIC;
+    else if ( unitValue == 2 )
+        return RiaDefines::EclipseUnitSystem::UNITS_FIELD;
+    else if ( unitValue == 3 )
+        return RiaDefines::EclipseUnitSystem::UNITS_LAB;
+
+    return std::nullopt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaDefines::EclipseUnitSystem RifEclipseOutputFileTools::determineUnitSystem( const std::optional<RiaDefines::EclipseUnitSystem>& egridUnit,
+                                                                              const std::optional<RiaDefines::EclipseUnitSystem>& initUnit,
+                                                                              const std::optional<RiaDefines::EclipseUnitSystem>& unrstUnit )
+{
+    // Helper lambda to get unit name string
+    auto getUnitName = []( RiaDefines::EclipseUnitSystem unit ) -> QString
+    {
+        if ( unit == RiaDefines::EclipseUnitSystem::UNITS_METRIC ) return "METRIC";
+        if ( unit == RiaDefines::EclipseUnitSystem::UNITS_FIELD ) return "FIELD";
+        if ( unit == RiaDefines::EclipseUnitSystem::UNITS_LAB ) return "LAB";
+        return "UNKNOWN";
+    };
+
+    // Determine which unit to use based on priority: egrid > init > unrst
+    std::optional<RiaDefines::EclipseUnitSystem> selectedUnit;
+    QString                                      selectedSource;
+
+    if ( egridUnit.has_value() )
+    {
+        selectedUnit   = egridUnit;
+        selectedSource = "EGRID";
+    }
+    else if ( initUnit.has_value() )
+    {
+        selectedUnit   = initUnit;
+        selectedSource = "INIT";
+    }
+    else if ( unrstUnit.has_value() )
+    {
+        selectedUnit   = unrstUnit;
+        selectedSource = "UNRST";
+    }
+
+    // Check for mismatches and warn
+    if ( selectedUnit.has_value() )
+    {
+        // Build list of sources that differ from selected
+        QStringList conflicts;
+
+        if ( egridUnit.has_value() && initUnit.has_value() && egridUnit.value() != initUnit.value() )
+        {
+            conflicts.append( QString( "INIT file has %1" ).arg( getUnitName( initUnit.value() ) ) );
+        }
+        if ( egridUnit.has_value() && unrstUnit.has_value() && egridUnit.value() != unrstUnit.value() )
+        {
+            conflicts.append( QString( "UNRST file has %1" ).arg( getUnitName( unrstUnit.value() ) ) );
+        }
+        if ( !egridUnit.has_value() && initUnit.has_value() && unrstUnit.has_value() && initUnit.value() != unrstUnit.value() )
+        {
+            conflicts.append( QString( "UNRST file has %1" ).arg( getUnitName( unrstUnit.value() ) ) );
+        }
+
+        if ( !conflicts.isEmpty() )
+        {
+            QString warning = QString( "Unit system mismatch detected: Using %1 from %2 file, but %3. "
+                                       "Please verify your simulation files have consistent unit systems." )
+                                  .arg( getUnitName( selectedUnit.value() ) )
+                                  .arg( selectedSource )
+                                  .arg( conflicts.join( " and " ) );
+            RiaLogging::warning( warning );
+        }
+
+        return selectedUnit.value();
+    }
+
+    // Default to METRIC if no unit found
+    return RiaDefines::EclipseUnitSystem::UNITS_METRIC;
 }

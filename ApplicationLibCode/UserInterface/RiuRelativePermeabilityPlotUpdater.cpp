@@ -17,8 +17,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 
 #include "RiuRelativePermeabilityPlotUpdater.h"
-#include "Riu3dSelectionManager.h"
-#include "RiuRelativePermeabilityPlotPanel.h"
+
+#include "RiaLogging.h"
+#include "RiaResultNames.h"
 
 #include "RiaResultNames.h"
 
@@ -26,7 +27,9 @@
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
+#include "RigFlowDiagSolverInterface.h"
 #include "RigGridBase.h"
+#include "RigMainGrid.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
 
@@ -37,7 +40,8 @@
 #include "RimEclipseView.h"
 #include "RimExtrudedCurveIntersection.h"
 
-// #include "cvfTrace.h"
+#include "Riu3dSelectionManager.h"
+#include "RiuRelativePermeabilityPlotPanel.h"
 
 #include <cmath>
 
@@ -48,6 +52,84 @@
 ///
 ///
 //==================================================================================================
+
+namespace internal
+{
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::pair<std::string, size_t> computeGridNameAndLocalActiveCellIndex( const RigEclipseCaseData* eclipseCaseData, size_t globalActiveCellIndex )
+{
+    // Use empty string for main grid, grid name for LGRs
+    std::string gridName             = "";
+    size_t      localActiveCellIndex = globalActiveCellIndex;
+
+    if ( const RigActiveCellInfo* activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ) )
+    {
+        const auto activeReservoirCellIndices = activeCellInfo->activeReservoirCellIndices();
+        if ( globalActiveCellIndex < activeReservoirCellIndices.size() )
+        {
+            const size_t reservoirCellIndex = activeReservoirCellIndices[globalActiveCellIndex].value();
+            if ( const RigMainGrid* mainGrid = eclipseCaseData->mainGrid() )
+            {
+                size_t localCellIndex = 0;
+                if ( const RigGridBase* grid = mainGrid->gridAndGridLocalIdxFromGlobalCellIdx( reservoirCellIndex, &localCellIndex ) )
+                {
+                    if ( !grid->isMainGrid() )
+                    {
+                        gridName = grid->gridName();
+
+                        // Convert global active cell index to local active cell index within this grid
+                        const size_t gridIdx = grid->gridIndex();
+
+                        // Calculate offset: sum of active cells in all grids before this one
+                        size_t activeCellOffset = 0;
+                        for ( size_t i = 0; i < gridIdx; ++i )
+                        {
+                            activeCellOffset += activeCellInfo->gridActiveCellCounts( i );
+                        }
+
+                        // Local active cell index = global active cell index - offset
+                        if ( globalActiveCellIndex >= activeCellOffset )
+                        {
+                            localActiveCellIndex = globalActiveCellIndex - activeCellOffset;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return std::make_pair( gridName, localActiveCellIndex );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+size_t mapToActiveCellIndex( const RigEclipseCaseData* eclipseCaseData, size_t gridIndex, size_t gridLocalCellIndex )
+{
+    const size_t gridCount = eclipseCaseData ? eclipseCaseData->gridCount() : 0;
+
+    const RigGridBase* grid = gridIndex < gridCount ? eclipseCaseData->grid( gridIndex ) : nullptr;
+
+    if ( grid && gridLocalCellIndex < grid->cellCount() )
+    {
+        // Note!!
+        // Which type of porosity model to choose? Currently hard-code to MATRIX_MODEL
+        const RigActiveCellInfo* activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+        CVF_ASSERT( activeCellInfo );
+
+        const size_t reservoirCellIndex = grid->reservoirCellIndex( gridLocalCellIndex );
+        const size_t activeCellIndex    = activeCellInfo->cellResultIndex( reservoirCellIndex );
+
+        return activeCellIndex;
+    }
+
+    return cvf::UNDEFINED_SIZE_T;
+}
+
+}; // namespace internal
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -99,14 +181,11 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
 
     if ( eclipseResultCase && eclipseCaseData && eclipseResultCase->flowDiagSolverInterface() )
     {
-        size_t activeCellIndex = CellLookupHelper::mapToActiveCellIndex( eclipseCaseData, gridIndex, gridLocalCellIndex );
+        size_t activeCellIndex = internal::mapToActiveCellIndex( eclipseCaseData, gridIndex, gridLocalCellIndex );
 
         if ( activeCellIndex != cvf::UNDEFINED_SIZE_T )
         {
             // cvf::Trace::show("Updating RelPerm plot for active cell index: %d", static_cast<int>(activeCellIndex));
-
-            std::vector<RigFlowDiagSolverInterface::RelPermCurve> relPermCurveArr =
-                eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( activeCellIndex );
 
             // Make sure we load the results that we'll query below
             RigCaseCellResultsData* cellResultsData = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
@@ -114,7 +193,10 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
                 RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
             cellResultsData->ensureKnownResultLoaded(
                 RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() ) );
-            cellResultsData->ensureKnownResultLoaded( RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, "SATNUM" ) );
+            cellResultsData->ensureKnownResultLoaded(
+                RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::satnumResult() ) );
+            cellResultsData->ensureKnownResultLoaded(
+                RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::imbnumResult() ) );
 
             // Fetch SWAT and SGAS cell values for the selected cell
             cvf::ref<RigResultAccessor> swatAccessor =
@@ -137,16 +219,45 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
                                                                    RiaDefines::PorosityModelType::MATRIX_MODEL,
                                                                    timeStepIndex,
                                                                    RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE,
-                                                                                            "SATNUM" ) );
-            const double cellSWAT   = swatAccessor.notNull() ? swatAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
-            const double cellSGAS   = sgasAccessor.notNull() ? sgasAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
-            const double cellSATNUM = satnumAccessor.notNull() ? satnumAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
-            // cvf::Trace::show("cellSWAT = %f  cellSGAS = %f  cellSATNUM = %f", cellSWAT, cellSGAS, cellSATNUM);
+                                                                                            RiaResultNames::satnumResult() ) );
 
-            QString cellRefText = constructCellReferenceText( eclipseCaseData, gridIndex, gridLocalCellIndex, "SATNUM", cellSATNUM );
-            QString caseName    = eclipseResultCase->caseUserDescription();
+            cvf::ref<RigResultAccessor> imbnumAccessor =
+                RigResultAccessorFactory::createFromResultAddress( eclipseCaseData,
+                                                                   gridIndex,
+                                                                   RiaDefines::PorosityModelType::MATRIX_MODEL,
+                                                                   timeStepIndex,
+                                                                   RigEclipseResultAddress( RiaDefines::ResultCatType::STATIC_NATIVE,
+                                                                                            RiaResultNames::imbnumResult() ) );
 
-            m_targetPlotPanel->setPlotData( eclipseCaseData->unitsType(), relPermCurveArr, cellSWAT, cellSGAS, caseName, cellRefText );
+            const double cellSWAT = swatAccessor.notNull() ? swatAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
+            const double cellSGAS = sgasAccessor.notNull() ? sgasAccessor->cellScalar( gridLocalCellIndex ) : HUGE_VAL;
+
+            // Get grid name and local active cell index for the active cell
+            const auto& [gridName, localActiveCellIndex] = internal::computeGridNameAndLocalActiveCellIndex( eclipseCaseData, activeCellIndex );
+
+            std::vector<RigFlowDiagDefines::RelPermCurve> relPermCurveArr =
+                eclipseResultCase->flowDiagSolverInterface()->calculateRelPermCurves( gridName, localActiveCellIndex );
+
+            QString cellRefText = constructCellReferenceText( eclipseCaseData, gridIndex, gridLocalCellIndex );
+
+            if ( satnumAccessor.notNull() )
+            {
+                const int cellSATNUM = satnumAccessor->cellScalar( gridLocalCellIndex );
+                cellRefText += QString( ", SATNUM: %1" ).arg( cellSATNUM );
+            }
+
+            if ( imbnumAccessor.notNull() )
+            {
+                const int cellIMBNUM = imbnumAccessor->cellScalar( gridLocalCellIndex );
+                cellRefText += QString( ", IMBNUM: %1" ).arg( cellIMBNUM );
+            }
+
+            QString caseName = eclipseResultCase->caseUserDescription();
+
+            const bool enableImbibitionCurveSelection = ( imbnumAccessor.notNull() && imbnumAccessor->cellScalar( gridLocalCellIndex ) > 0 );
+            m_targetPlotPanel->enableImbibitionCurveSelection( enableImbibitionCurveSelection );
+            const auto phases = eclipseCaseData->availablePhases();
+            m_targetPlotPanel->setPlotData( eclipseCaseData->unitsType(), relPermCurveArr, cellSWAT, cellSGAS, caseName, cellRefText, phases );
 
             return true;
         }
@@ -160,9 +271,7 @@ bool RiuRelativePermeabilityPlotUpdater::queryDataAndUpdatePlot( const RimEclips
 //--------------------------------------------------------------------------------------------------
 QString RiuRelativePermeabilityPlotUpdater::constructCellReferenceText( const RigEclipseCaseData* eclipseCaseData,
                                                                         size_t                    gridIndex,
-                                                                        size_t                    gridLocalCellIndex,
-                                                                        const QString&            valueName,
-                                                                        double                    cellValue )
+                                                                        size_t                    gridLocalCellIndex )
 {
     const size_t       gridCount = eclipseCaseData ? eclipseCaseData->gridCount() : 0;
     const RigGridBase* grid      = gridIndex < gridCount ? eclipseCaseData->grid( gridIndex ) : nullptr;
@@ -187,46 +296,10 @@ QString RiuRelativePermeabilityPlotUpdater::constructCellReferenceText( const Ri
             {
                 retText = QString( "LGR %1, Cell: [%2, %3, %4]" ).arg( gridIndex ).arg( i ).arg( j ).arg( k );
             }
-            if ( cellValue != HUGE_VAL )
-            {
-                retText += QString( " (%1=%2)" ).arg( valueName ).arg( cellValue );
-            }
 
             return retText;
         }
     }
 
     return QString();
-}
-
-//==================================================================================================
-//
-//
-//
-//==================================================================================================
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-size_t CellLookupHelper::mapToActiveCellIndex( const RigEclipseCaseData* eclipseCaseData, size_t gridIndex, size_t gridLocalCellIndex )
-{
-    const size_t gridCount = eclipseCaseData ? eclipseCaseData->gridCount() : 0;
-
-    const RigGridBase* grid = gridIndex < gridCount ? eclipseCaseData->grid( gridIndex ) : nullptr;
-
-    if ( grid && gridLocalCellIndex < grid->cellCount() )
-    {
-        // Note!!
-        // Which type of porosity model to choose? Currently hard-code to MATRIX_MODEL
-        const RigActiveCellInfo* activeCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-
-        CVF_ASSERT( activeCellInfo );
-
-        const size_t reservoirCellIndex = grid->reservoirCellIndex( gridLocalCellIndex );
-        const size_t activeCellIndex    = activeCellInfo->cellResultIndex( reservoirCellIndex );
-
-        return activeCellIndex;
-    }
-
-    return cvf::UNDEFINED_SIZE_T;
 }

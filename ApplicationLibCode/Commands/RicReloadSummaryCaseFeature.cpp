@@ -23,9 +23,11 @@
 
 #include "RimObservedDataCollection.h"
 #include "RimObservedSummaryData.h"
+#include "RimProject.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryEnsemble.h"
+#include "RimSummaryEnsembleTools.h"
 
 #include "cafPdmObject.h"
 #include "cafSelectionManager.h"
@@ -39,11 +41,8 @@ CAF_CMD_SOURCE_INIT( RicReloadSummaryCaseFeature, "RicReloadSummaryCaseFeature" 
 //--------------------------------------------------------------------------------------------------
 bool RicReloadSummaryCaseFeature::isCommandEnabled() const
 {
-    auto ensembles = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
-    if ( !ensembles.empty() ) return true;
-
-    std::vector<RimSummaryCase*> caseSelection = selectedSummaryCases();
-    return !caseSelection.empty();
+    const auto& [caseSelection, ensembleSelection] = selectedSummarySources();
+    return !caseSelection.empty() || !ensembleSelection.empty();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -51,24 +50,7 @@ bool RicReloadSummaryCaseFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicReloadSummaryCaseFeature::onActionTriggered( bool isChecked )
 {
-    auto ensembles = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
-    if ( !ensembles.empty() )
-    {
-        for ( RimSummaryEnsemble* ensemble : ensembles )
-        {
-            ensemble->reloadCases();
-        }
-
-        return;
-    }
-
-    std::vector<RimSummaryCase*> caseSelection = selectedSummaryCases();
-    for ( RimSummaryCase* summaryCase : caseSelection )
-    {
-        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
-
-        RiaLogging::info( QString( "Reloaded data for %1" ).arg( summaryCase->summaryHeaderFilename() ) );
-    }
+    reloadSelectedCasesAndUpdate();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -77,29 +59,95 @@ void RicReloadSummaryCaseFeature::onActionTriggered( bool isChecked )
 void RicReloadSummaryCaseFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setText( "Reload" );
+    actionToSetup->setToolTip( "Reload selected summary and/or ensemble cases" );
     actionToSetup->setIcon( QIcon( ":/Refresh.svg" ) );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RimSummaryCase*> RicReloadSummaryCaseFeature::selectedSummaryCases()
+std::pair<std::vector<RimSummaryCase*>, std::vector<RimSummaryEnsemble*>> RicReloadSummaryCaseFeature::selectedSummarySources()
 {
-    const auto mainCollectionSelection = caf::SelectionManager::instance()->objectsByType<RimSummaryCaseMainCollection>();
-    if ( !mainCollectionSelection.empty() )
+    std::vector<RimSummaryCase*>     caseSelection;
+    std::vector<RimSummaryEnsemble*> ensembleSelection;
+
+    auto ensembles = caf::SelectionManager::instance()->objectsByType<RimSummaryEnsemble>();
+    for ( RimSummaryEnsemble* ensemble : ensembles )
     {
-        return mainCollectionSelection[0]->allSummaryCases();
+        ensembleSelection.push_back( ensemble );
     }
 
-    std::vector<RimSummaryCase*> caseSelection = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
-
+    std::vector<RimSummaryCase*> selectionManagerCases = caf::SelectionManager::instance()->objectsByType<RimSummaryCase>();
+    for ( RimSummaryCase* summaryCase : selectionManagerCases )
     {
-        for ( auto collection : caf::SelectionManager::instance()->objectsByType<RimObservedDataCollection>() )
+        caseSelection.push_back( summaryCase );
+    }
+
+    for ( auto collection : caf::SelectionManager::instance()->objectsByType<RimObservedDataCollection>() )
+    {
+        std::vector<RimObservedSummaryData*> observedCases = collection->allObservedSummaryData();
+        caseSelection.insert( caseSelection.end(), observedCases.begin(), observedCases.end() );
+    }
+
+    if ( ensembleSelection.empty() && caseSelection.empty() )
+    {
+        const auto sumCaseColl = caf::SelectionManager::instance()->objectsByType<RimSummaryCaseMainCollection>();
+        if ( !sumCaseColl.empty() )
         {
-            std::vector<RimObservedSummaryData*> observedCases = collection->allObservedSummaryData();
-            caseSelection.insert( caseSelection.end(), observedCases.begin(), observedCases.end() );
+            ensembleSelection = sumCaseColl.front()->summaryEnsembles();
+
+            // Make sure to select top-level cases only, not cases part of ensembles
+            caseSelection = sumCaseColl.front()->topLevelSummaryCases();
         }
     }
 
-    return caseSelection;
+    return { caseSelection, ensembleSelection };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicReloadSummaryCaseFeature::reloadTaggedSummaryCasesAndUpdate()
+{
+    auto proj = RimProject::current();
+    for ( auto summaryCase : proj->allSummaryCases() )
+    {
+        if ( summaryCase->includeInAutoReload() )
+        {
+            RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
+            summaryCase->updateConnectedEditors();
+        }
+    }
+
+    for ( RimSummaryEnsemble* ensemble : proj->summaryEnsembles() )
+    {
+        if ( ensemble->includeInAutoReload() )
+        {
+            ensemble->reloadCases();
+            ensemble->updateConnectedEditors();
+            RimSummaryEnsembleTools::updateDependentDeltaEnsembles( ensemble );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicReloadSummaryCaseFeature::reloadSelectedCasesAndUpdate()
+{
+    const auto& [caseSelection, ensembleSelection] = selectedSummarySources();
+
+    for ( RimSummaryEnsemble* ensemble : ensembleSelection )
+    {
+        ensemble->reloadCases();
+        RimSummaryEnsembleTools::updateDependentDeltaEnsembles( ensemble );
+    }
+
+    for ( RimSummaryCase* summaryCase : caseSelection )
+    {
+        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
+        summaryCase->updateConnectedEditors();
+
+        RiaLogging::info( QString( "Reloaded data for %1" ).arg( summaryCase->summaryHeaderFilename() ) );
+    }
 }

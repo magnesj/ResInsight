@@ -34,16 +34,18 @@ public:
     QStringList stdOut() const;
     QStringList stdErr() const;
 
+    void setProcessId( int processId );
+
 signals:
 
 public slots:
-    void error( QProcess::ProcessError error );
-    void finished( int exitCode, QProcess::ExitStatus exitStatus );
-    void readyReadStandardError();
-    void readyReadStandardOutput();
-    void started();
+    virtual void error( QProcess::ProcessError error );
+    virtual void finished( int exitCode, QProcess::ExitStatus exitStatus );
+    virtual void readyReadStandardError();
+    virtual void readyReadStandardOutput();
+    virtual void started();
 
-private:
+protected:
     QString     addPrefix( QString message );
     int         m_processId;
     bool        m_logStdOutErr;

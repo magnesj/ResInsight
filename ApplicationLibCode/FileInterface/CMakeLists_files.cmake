@@ -80,6 +80,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifSeismicZGYReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmRadialGridTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmDeckTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RifCsvSummaryReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifRevealSummaryCsvReader.h
     ${CMAKE_CURRENT_LIST_DIR}/RifRevealCsvSectionSummaryReader.h
@@ -104,6 +105,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifByteArrayArrowRandomAccessFile.h
     ${CMAKE_CURRENT_LIST_DIR}/RifArrowTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderRegularGridModel.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifVfpInjTable.h
+    ${CMAKE_CURRENT_LIST_DIR}/RifVfpProdTable.h
     ${CMAKE_CURRENT_LIST_DIR}/RifVtkSurfaceImporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RifSurfio.h
     ${CMAKE_CURRENT_LIST_DIR}/RifFileTools.h
@@ -176,6 +179,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifParameterXmlReader.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmCommonSummary.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmDeckTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEnsembleFractureStatisticsExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifSummaryReaderAggregator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclEclipseSummary.cpp
@@ -212,6 +216,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RifByteArrayArrowRandomAccessFile.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifArrowTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderRegularGridModel.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifVfpInjTable.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifVfpProdTable.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifVtkSurfaceImporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifSurfio.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifFileTools.cpp

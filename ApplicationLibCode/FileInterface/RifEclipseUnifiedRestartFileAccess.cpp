@@ -120,11 +120,11 @@ bool RifEclipseUnifiedRestartFileAccess::openFile()
                 }
             }
         }
+
+        m_availablePhases = RifEclipseOutputFileTools::findAvailablePhases( m_ecl_file );
     }
 
     if ( !m_ecl_file ) return false;
-
-    m_availablePhases = RifEclipseOutputFileTools::findAvailablePhases( m_ecl_file );
 
     return true;
 }
@@ -134,6 +134,7 @@ bool RifEclipseUnifiedRestartFileAccess::openFile()
 //--------------------------------------------------------------------------------------------------
 bool RifEclipseUnifiedRestartFileAccess::useResultIndexFile() const
 {
+    // Refactoring note: Consider using RifReaderSettings instead of RiaPreferencesGrid directly
     RiaPreferencesGrid* prefs = RiaPreferencesGrid::current();
     return prefs->useResultIndexFile();
 }

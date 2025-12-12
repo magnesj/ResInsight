@@ -40,6 +40,8 @@
 
 #include <QTcpSocket>
 
+#include <array>
+
 //--------------------------------------------------------------------------------------------------
 /// Convert internal ResInsight representation of cells with negative depth to positive depth.
 //--------------------------------------------------------------------------------------------------
@@ -52,7 +54,7 @@ static inline void convertVec3dToPositiveDepth( cvf::Vec3d* vec )
 //--------------------------------------------------------------------------------------------------
 /// Retrieve a cell corner where the depth is represented as negative converted to positive depth.
 //--------------------------------------------------------------------------------------------------
-static inline double getCellCornerWithPositiveDepth( const cvf::Vec3d* cornerVerts, size_t cornerIndexMapping, int coordIdx )
+static inline double getCellCornerWithPositiveDepth( const std::array<cvf::Vec3d, 8>& cornerVerts, size_t cornerIndexMapping, int coordIdx )
 {
     if ( coordIdx == 2 )
     {
@@ -277,7 +279,6 @@ public:
         //  dv(3) = 8;
         //  dv(4) = 3;
 
-        cvf::Vec3d          cornerVerts[8];
         size_t              blockByteCount = cellCount * sizeof( double );
         std::vector<double> doubleValues( blockByteCount );
 
@@ -296,8 +297,8 @@ public:
                         for ( size_t i = 0; i < cellCountI; i++ )
                         {
                             size_t gridLocalCellIndex = rigGrid->cellIndexFromIJK( i, j, k );
-                            rigGrid->cellCornerVertices( gridLocalCellIndex, cornerVerts );
 
+                            std::array<cvf::Vec3d, 8> cornerVerts = rigGrid->cellCornerVertices( gridLocalCellIndex );
                             doubleValues[valueIndex++] = getCellCornerWithPositiveDepth( cornerVerts, cornerIndexMapping, coordIdx );
                         }
                     }
@@ -365,7 +366,6 @@ public:
         //  dv(1) = 8;
         //  dv(2) = 3;
 
-        cvf::Vec3d          cornerVerts[8];
         size_t              blockByteCount = activeCellCount * sizeof( double );
         std::vector<double> doubleValues( blockByteCount );
 
@@ -381,9 +381,8 @@ public:
                 {
                     if ( !actCellInfo->isActive( reservoirCellIndex ) ) continue;
 
-                    mainGrid->cellCornerVertices( reservoirCellIndex, cornerVerts );
-
-                    doubleValues[valueIndex++] = getCellCornerWithPositiveDepth( cornerVerts, cornerIndexMapping, coordIdx );
+                    std::array<cvf::Vec3d, 8> cornerVerts = mainGrid->cellCornerVertices( reservoirCellIndex );
+                    doubleValues[valueIndex++]            = getCellCornerWithPositiveDepth( cornerVerts, cornerIndexMapping, coordIdx );
                 }
 
                 CVF_ASSERT( valueIndex == activeCellCount );

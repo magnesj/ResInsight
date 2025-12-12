@@ -159,7 +159,7 @@ void RiuSelectionChangedHandler::addResultCurveFromSelectionItem( const RiuEclip
     RimEclipseResultDefinition* eclResDef = eclipseSelectionItem->m_resultDefinition;
     if ( !eclResDef ) return;
 
-    if ( eclResDef->isFlowDiagOrInjectionFlooding() && eclResDef->resultVariable() != RIG_NUM_FLOODED_PV )
+    if ( eclResDef->isFlowDiagOrInjectionFlooding() && eclResDef->resultVariable() != RigFlowDiagDefines::numFloodedPv() )
     {
         // NB! Do not read out data for flow results, as this can be a time consuming operation
 
@@ -518,7 +518,7 @@ void RiuSelectionChangedHandler::addDepthCurveFromSelectionItem( const RiuSelect
     RimEclipseResultDefinition* eclResDef = eclipseSelectionItem->m_resultDefinition;
     if ( !eclResDef ) return;
 
-    if ( eclResDef->isFlowDiagOrInjectionFlooding() && eclResDef->resultVariable() != RIG_NUM_FLOODED_PV )
+    if ( eclResDef->isFlowDiagOrInjectionFlooding() && eclResDef->resultVariable() != RigFlowDiagDefines::numFloodedPv() )
     {
         // NB! Do not read out data for flow results, as this can be a time consuming operation
         return;

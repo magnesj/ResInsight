@@ -63,6 +63,7 @@
 
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
+#include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
@@ -155,6 +156,10 @@ RimSummaryMultiPlot::RimSummaryMultiPlot()
     m_readOutSettings = new RimSummaryPlotReadOut;
     m_readOutSettings.uiCapability()->setUiTreeChildrenHidden( true );
 
+    CAF_PDM_InitFieldNoDefault( &m_goToCommonSettings, "GoToCommonSettings", "" );
+    m_goToCommonSettings.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
+    m_goToCommonSettings.xmlCapability()->disableIO();
+
     CAF_PDM_InitFieldNoDefault( &m_axisRangeAggregation, "AxisRangeAggregation", "Y Axis Range" );
 
     CAF_PDM_InitField( &m_hidePlotsWithValuesBelow, "HidePlotsWithValuesBelow", false, "" );
@@ -223,6 +228,8 @@ void RimSummaryMultiPlot::insertPlot( RimPlot* plot, size_t index )
         }
 
         RimMultiPlot::insertPlot( plot, index );
+
+        updateReadOutSettings();
     }
 }
 
@@ -395,11 +402,18 @@ void RimSummaryMultiPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     axesGroup->add( &m_autoAdjustAppearance );
 
     auto readOutGroup = uiOrdering.addNewGroup( "Mouse Cursor Readout" );
-    m_readOutSettings->uiOrdering( uiConfigName, *readOutGroup );
+    if ( m_readOutSettings == activeReadoutSettings() )
+    {
+        m_readOutSettings->uiOrdering( uiConfigName, *readOutGroup );
+    }
+    else
+    {
+        readOutGroup->add( &m_goToCommonSettings );
+    }
 
     auto plotVisibilityFilterGroup = uiOrdering.addNewGroup( "Plot Visibility Filter" );
     plotVisibilityFilterGroup->add( &m_plotFilterYAxisThreshold );
-    plotVisibilityFilterGroup->add( &m_hidePlotsWithValuesBelow );
+    plotVisibilityFilterGroup->add( &m_hidePlotsWithValuesBelow, { .newRow = false } );
 
     auto dataSourceGroup = uiOrdering.addNewGroup( "Data Source" );
     dataSourceGroup->setCollapsedByDefault();
@@ -537,10 +551,24 @@ void RimSummaryMultiPlot::defineEditorAttribute( const caf::PdmFieldHandle* fiel
 {
     if ( &m_hidePlotsWithValuesBelow == field )
     {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
+        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
         {
             attrib->m_buttonText = "Apply Filter";
+        }
+    }
+    else if ( field == &m_goToCommonSettings )
+    {
+        if ( auto labelEditorAttribute = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute ) )
+        {
+            labelEditorAttribute->m_useWordWrap           = true;
+            labelEditorAttribute->m_linkText              = "Select <a href=\"dummy\">Summary Plots</a> to edit Common Readout Settings.";
+            labelEditorAttribute->m_linkActivatedCallback = []( const QString& link )
+            {
+                if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )
+                {
+                    RiuPlotMainWindowTools::selectAsCurrentItem( plotCollection );
+                }
+            };
         }
     }
 }
@@ -1490,7 +1518,7 @@ void RimSummaryMultiPlot::updateReadOutSettings()
 {
     for ( auto plot : summaryPlots() )
     {
-        if ( !m_readOutSettings->enableVerticalLine() )
+        if ( !activeReadoutSettings()->enableVerticalLine() )
         {
             if ( auto axisProps = plot->timeAxisProperties() )
             {
@@ -1498,7 +1526,7 @@ void RimSummaryMultiPlot::updateReadOutSettings()
             }
         }
 
-        if ( !m_readOutSettings->enableHorizontalLine() )
+        if ( !activeReadoutSettings()->enableHorizontalLine() )
         {
             if ( auto axis = plot->axisPropertiesForPlotAxis( RiuPlotAxis::defaultLeft() ) )
             {
@@ -1506,7 +1534,7 @@ void RimSummaryMultiPlot::updateReadOutSettings()
             }
         }
 
-        plot->enableCurvePointTracking( m_readOutSettings->enableCurvePointTracking() );
+        plot->enableCurvePointTracking( activeReadoutSettings()->enableCurvePointTracking() );
 
         plot->updateAndRedrawTimeAnnotations();
     }
@@ -1538,6 +1566,22 @@ std::pair<double, double> RimSummaryMultiPlot::adjustedMinMax( const RimPlotAxis
     auto adjustedMax = RiaNumericalTools::roundToClosestPowerOfTenCeil( max );
 
     return { adjustedMin, adjustedMax };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimSummaryPlotReadOut* RimSummaryMultiPlot::activeReadoutSettings() const
+{
+    if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )
+    {
+        if ( plotCollection->commonReadOutSettings().has_value() )
+        {
+            return plotCollection->commonReadOutSettings().value();
+        }
+    }
+
+    return m_readOutSettings();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1766,7 +1810,10 @@ void RimSummaryMultiPlot::selectWell( QString wellName )
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue )
 {
-    if ( !m_readOutSettings->enableVerticalLine() && !m_readOutSettings->enableHorizontalLine() ) return;
+    auto readOutSettings = activeReadoutSettings();
+    if ( !readOutSettings ) return;
+
+    if ( !readOutSettings->enableVerticalLine() && !readOutSettings->enableHorizontalLine() ) return;
 
     const auto    timeTValue       = RiaTimeTTools::fromDouble( qwtTimeValue );
     const QString dateFormatString = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat(),
@@ -1776,21 +1823,21 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
     {
         if ( !plot ) continue;
 
-        if ( m_readOutSettings->enableVerticalLine() && plot->timeAxisProperties() )
+        if ( readOutSettings->enableVerticalLine() && plot->timeAxisProperties() )
         {
             plot->timeAxisProperties()->removeAllAnnotations();
 
-            auto lineAppearance = m_readOutSettings->lineAppearance();
+            auto lineAppearance = readOutSettings->lineAppearance();
             auto anno           = RimTimeAxisAnnotation::createTimeAnnotation( timeTValue, lineAppearance->color() );
 
             Qt::PenStyle style = lineAppearance->isDashed() ? Qt::PenStyle::DashLine : Qt::PenStyle::SolidLine;
             anno->setPenStyle( style );
-            anno->setAlignment( m_readOutSettings->verticalLineLabelAlignment() );
+            anno->setAlignment( readOutSettings->verticalLineLabelAlignment() );
 
             plot->timeAxisProperties()->appendAnnotation( anno );
         }
 
-        if ( m_readOutSettings->enableHorizontalLine() )
+        if ( readOutSettings->enableHorizontalLine() )
         {
             std::vector<RimSummaryCurve*> summaryCurves;
 
@@ -1799,7 +1846,9 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
             {
                 for ( auto highlightCurve : plotWidget->highlightedCurves() )
                 {
-                    if ( auto summaryCurve = dynamic_cast<RimSummaryCurve*>( highlightCurve ) )
+                    if ( highlightCurve.isNull() ) continue;
+
+                    if ( auto summaryCurve = dynamic_cast<RimSummaryCurve*>( highlightCurve.p() ) )
                     {
                         summaryCurves.push_back( summaryCurve );
                     }
@@ -1834,12 +1883,12 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
 
                 anno->setName( valueText );
 
-                auto lineAppearance = m_readOutSettings->lineAppearance();
+                auto lineAppearance = readOutSettings->lineAppearance();
 
                 Qt::PenStyle style = lineAppearance->isDashed() ? Qt::PenStyle::DashLine : Qt::PenStyle::SolidLine;
                 anno->setPenStyle( style );
                 anno->setColor( lineAppearance->color() );
-                anno->setAlignment( m_readOutSettings->horizontalLineLabelAlignment() );
+                anno->setAlignment( readOutSettings->horizontalLineLabelAlignment() );
 
                 annotationAxis->appendAnnotation( anno );
             }

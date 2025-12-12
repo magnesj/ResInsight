@@ -151,6 +151,17 @@ std::set<RifEclipseSummaryAddress> RimDeltaSummaryEnsemble::ensembleSummaryAddre
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimDeltaSummaryEnsemble::onSourceEnsembleChanged()
+{
+    createDerivedEnsembleCases();
+    buildMetaData();
+    updateReferringCurveSets();
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimDeltaSummaryEnsemble::createDerivedEnsembleCases()
 {
     if ( !m_ensemble1 || !m_ensemble2 ) return;
@@ -407,9 +418,9 @@ void RimDeltaSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chang
         updateReferringCurveSetsZoomAll();
 
         // If other derived ensembles are referring to this ensemble, update their cases as well
-        for ( auto refering : findReferringEnsembles() )
+        for ( auto referring : findReferringEnsembles() )
         {
-            refering->updateReferringCurveSetsZoomAll();
+            referring->updateReferringCurveSetsZoomAll();
         }
     }
 }
@@ -482,7 +493,7 @@ RimDeltaSummaryCase* RimDeltaSummaryEnsemble::firstCaseNotInUse()
     auto newCase = new RimDeltaSummaryCase();
 
     // Show realization data source for the first case. If we create for all, the performance will be bad
-    newCase->setShowVectorItemsInProjectTree( m_cases.empty() );
+    newCase->setShowTreeNodes( m_cases.empty() );
 
     m_cases.push_back( newCase );
     return newCase;
@@ -514,7 +525,10 @@ void RimDeltaSummaryEnsemble::updateDerivedEnsembleCases()
     {
         derivedCase->createSummaryReaderInterface();
 
-        auto crp = derivedCase->summaryCase1()->caseRealizationParameters();
+        auto summaryCase1 = derivedCase->summaryCase1();
+        if ( !summaryCase1 ) continue;
+
+        auto crp = summaryCase1->caseRealizationParameters();
         if ( !crp ) continue;
         derivedCase->setCaseRealizationParameters( crp );
     }

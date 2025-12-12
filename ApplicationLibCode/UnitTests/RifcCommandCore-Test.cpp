@@ -128,11 +128,11 @@ TEST( RicfCommands, Test1 )
 //--------------------------------------------------------------------------------------------------
 TEST( RicfCommands, ErrorMessages )
 {
-    QString commandString( "TesCommand1(IntArgument=3, TextArgument=\"Dette er en tekst, \\\"og\\\" jeg er: (happy)\", "
+    QString commandString( "TesCommand1(IntArgument=3, TextArgument=\"Dette er en text, \\\"og\\\" jeg er: (happy)\", "
                            "DoubleArgument=5.0e3) \n"
-                           "TestCommand1 (  IntArgument = , \n  TextA rgument =  \"Dette er en tekst, \\\"og\\\" jeg "
+                           "TestCommand1 (  IntArgument = , \n  TextA rgument =  \"Dette er en text, \\\"og\\\" jeg "
                            "er: (happy)\", \n  DoubleArgument  ) \n"
-                           "  TestCommand1(TextArgument=Litt kortere tekst.\") \n"
+                           "  TestCommand1(TextArgument=Litt kortere text.\") \n"
                            "TC3 ( ta = \"Hepp\", ia = 3, da= 0.123)" );
 
     std::cout << commandString.toStdString() << std::endl;

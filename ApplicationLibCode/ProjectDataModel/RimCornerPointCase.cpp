@@ -140,7 +140,7 @@ std::array<cvf::Vec3d, 8> RimCornerPointCase::getCorners( const RigMainGrid&    
     for ( size_t n = 0; n < 8; n++ )
         corners[n].z() = zcorn[zind[n]];
 
-    // calculate indices for grid pillars in COORD arrray
+    // calculate indices for grid pillars in COORD array
     std::array<size_t, 4> pind;
     pind[0] = j * ( nx + 1 ) * 6 + i * 6;
     pind[1] = pind[0] + 6;
@@ -200,8 +200,8 @@ void RimCornerPointCase::buildGrid( RigEclipseCaseData&       eclipseCaseData,
     RigMainGrid* mainGrid = eclipseCaseData.mainGrid();
     CVF_ASSERT( mainGrid );
 
-    cvf::Vec3st gridPointDim( nx + 1, ny + 1, nz + 1 );
-    mainGrid->setGridPointDimensions( gridPointDim );
+    mainGrid->setCellCounts( cvf::Vec3st( nx, ny, nz ) );
+
     mainGrid->setGridName( "Main grid" );
 
     size_t totalCellCount = nx * ny * nz;

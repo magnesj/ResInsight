@@ -30,6 +30,7 @@
 class RimStimPlanFractureTemplate;
 class RimThermalFractureTemplate;
 class RimEclipseCase;
+class RimWellPath;
 
 //==================================================================================================
 ///
@@ -143,4 +144,41 @@ private:
     caf::PdmField<QString> m_inclination;
     caf::PdmField<QString> m_azimuth;
     caf::PdmField<QString> m_dogleg;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcWellPath_addWellLogInternal : public caf::PdmObjectCreationMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcWellPath_addWellLogInternal( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+    QString                                       classKeywordReturnedType() const override;
+
+private:
+    caf::PdmField<QString> m_name;
+    caf::PdmField<QString> m_measuredDepthKey;
+    caf::PdmField<QString> m_channelKeysCsv;
+    caf::PdmField<QString> m_tvdMslKey;
+    caf::PdmField<QString> m_tvdRkbKey;
+};
+
+//==================================================================================================
+///
+//==================================================================================================
+class RimcWellPath_appendLateralFromGeometry : public caf::PdmVoidObjectMethod
+{
+    CAF_PDM_HEADER_INIT;
+
+public:
+    RimcWellPath_appendLateralFromGeometry( caf::PdmObjectHandle* self );
+
+    std::expected<caf::PdmObjectHandle*, QString> execute() override;
+
+private:
+    caf::PdmPtrField<RimWellPath*> m_lateral;
 };

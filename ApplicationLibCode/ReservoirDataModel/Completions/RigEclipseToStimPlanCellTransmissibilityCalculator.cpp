@@ -36,6 +36,8 @@
 
 #include "cvfGeometryTools.h"
 
+#include <array>
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -193,8 +195,7 @@ void RigEclipseToStimPlanCellTransmissibilityCalculator::calculateStimPlanCellsM
         const RigMainGrid* mainGrid = m_case->eclipseCaseData()->mainGrid();
         if ( !m_fracture->isEclipseCellOpenForFlow( mainGrid, reservoirCellIndicesOpenForFlow, reservoirCellIndex ) ) continue;
 
-        std::array<cvf::Vec3d, 8> hexCorners;
-        mainGrid->cellCornerVertices( reservoirCellIndex, hexCorners.data() );
+        std::array<cvf::Vec3d, 8> hexCorners = mainGrid->cellCornerVertices( reservoirCellIndex );
 
         std::vector<std::vector<cvf::Vec3d>> planeCellPolygons;
         bool isPlanIntersected = RigHexIntersectionTools::planeHexIntersectionPolygons( hexCorners, m_fractureTransform, planeCellPolygons );

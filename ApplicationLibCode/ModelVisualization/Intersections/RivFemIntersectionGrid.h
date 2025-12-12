@@ -38,12 +38,12 @@ class RivFemIntersectionGrid : public RivIntersectionHexGridInterface
 public:
     explicit RivFemIntersectionGrid( const RigFemPartCollection* femParts, const RimGeoMechPartCollection* parts );
 
-    cvf::Vec3d          displayOffset() const override;
-    cvf::BoundingBox    boundingBox() const override;
-    std::vector<size_t> findIntersectingCells( const cvf::BoundingBox& intersectingBB ) const override;
-    bool                useCell( size_t cellIndex ) const override;
-    void                cellCornerVertices( size_t cellIndex, cvf::Vec3d cellCorners[8] ) const override;
-    void                cellCornerIndices( size_t cellIndex, size_t cornerIndices[8] ) const override;
+    cvf::Vec3d                              displayOffset() const override;
+    cvf::BoundingBox                        boundingBox() const override;
+    std::vector<size_t>                     findIntersectingCells( const cvf::BoundingBox& intersectingBB ) const override;
+    bool                                    useCell( size_t cellIndex ) const override;
+    [[nodiscard]] std::array<cvf::Vec3d, 8> cellCornerVertices( size_t cellIndex ) const override;
+    [[nodiscard]] std::array<size_t, 8>     cellCornerIndices( size_t cellIndex ) const override;
     const RigFault* findFaultFromCellIndexAndCellFace( size_t reservoirCellIndex, cvf::StructGridInterface::FaceType face ) const override;
     void            setKIntervalFilter( bool enabled, std::string kIntervalStr ) override;
 

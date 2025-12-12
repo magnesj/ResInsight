@@ -18,10 +18,13 @@
 
 #pragma once
 
+#include "RiaModelExportDefines.h"
+
 #include "cafAppEnum.h"
 #include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
+#include "cafVecIjk.h"
 
 #include "cvfVector3.h"
 
@@ -32,6 +35,8 @@
 #include <vector>
 
 class RigEclipseCaseData;
+class RigSimWellData;
+class RimEclipseView;
 
 //==================================================================================================
 ///
@@ -49,30 +54,26 @@ class RicExportEclipseSectorModelUi : public caf::PdmObject
     };
     using ResultExportOptionsEnum = caf::AppEnum<ResultExportOptions>;
 
-    enum GridBoxSelection
-    {
-        VISIBLE_CELLS_BOX,
-        ACTIVE_CELLS_BOX,
-        FULL_GRID_BOX,
-        MANUAL_SELECTION
-    };
-    using GridBoxSelectionEnum = caf::AppEnum<GridBoxSelection>;
+    using GridBoxSelectionEnum  = caf::AppEnum<RiaModelExportDefines::GridBoxSelection>;
+    using BoundaryConditionEnum = caf::AppEnum<RiaModelExportDefines::BoundaryCondition>;
 
 public:
     RicExportEclipseSectorModelUi();
     ~RicExportEclipseSectorModelUi() override;
     const QStringList& tabNames() const;
 
-    void setCaseData( RigEclipseCaseData* caseData   = nullptr,
-                      const cvf::Vec3i&   visibleMin = cvf::Vec3i::ZERO,
-                      const cvf::Vec3i&   visibleMax = cvf::Vec3i::ZERO );
+    void setCaseData( RigEclipseCaseData* caseData    = nullptr,
+                      RimEclipseView*     eclipseView = nullptr,
+                      const caf::VecIjk0& visibleMin  = caf::VecIjk0::ZERO,
+                      const caf::VecIjk0& visibleMax  = caf::VecIjk0::ZERO );
 
-    cvf::Vec3i min() const;
-    cvf::Vec3i max() const;
-    void       setMin( const cvf::Vec3i& min );
-    void       setMax( const cvf::Vec3i& max );
-    void       applyBoundaryDefaults();
-    void       removeInvalidKeywords();
+    caf::VecIjk0 min() const;
+    caf::VecIjk0 max() const;
+    void         setMin( const caf::VecIjk0& min );
+    void         setMax( const caf::VecIjk0& max );
+    void         applyBoundaryDefaults();
+    void         removeInvalidKeywords();
+    cvf::Vec3st  refinement() const;
 
     QString exportFaultsFilename() const;
     QString exportGridFilename() const;
@@ -90,6 +91,8 @@ public:
     caf::PdmField<std::vector<QString>> selectedKeywords;
 
     caf::PdmField<GridBoxSelectionEnum> exportGridBox;
+
+    caf::PdmField<int> m_visibleWellsPadding;
 
     caf::PdmField<int> refinementCountI;
     caf::PdmField<int> refinementCountJ;
@@ -122,7 +125,8 @@ private:
     caf::PdmField<bool>          m_writeEchoInGrdeclFiles;
 
     RigEclipseCaseData* m_caseData;
-    cvf::Vec3i          m_visibleMin;
-    cvf::Vec3i          m_visibleMax;
+    RimEclipseView*     m_eclipseView;
+    caf::VecIjk0        m_visibleMin;
+    caf::VecIjk0        m_visibleMax;
     QStringList         m_tabNames;
 };

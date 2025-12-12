@@ -20,6 +20,7 @@
 
 #include "cafAssert.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdlib>
 #include <limits>
@@ -51,27 +52,18 @@ double RiaInterpolationTools::linear( const std::vector<double>& x, const std::v
         return std::numeric_limits<double>::infinity();
     }
 
-    // Find the lower boundary
-    bool found      = false;
-    int  lowerIndex = 0;
-    for ( int i = 0; i < static_cast<int>( x.size() - 1 ); i++ )
-    {
-        if ( x[i] <= value && x[i + 1] >= value )
-        {
-            lowerIndex = i;
-            found      = true;
-        }
-    }
+    // Check if we are just outside the boundaries
+    if ( almostEqual( value, x[0] ) )
+        return y[0];
+    else if ( almostEqual( value, x[x.size() - 1] ) )
+        return y[x.size() - 1];
+
+    // Use upper_bound to find first element greater than value
+    auto it = std::upper_bound( x.begin(), x.end(), value );
 
     // Value is outside of the defined range
-    if ( !found )
+    if ( it == x.end() || it == x.begin() )
     {
-        // Check if we are just outside the boundaries
-        if ( almostEqual( value, x[0] ) )
-            return y[0];
-        else if ( almostEqual( value, x[x.size() - 1] ) )
-            return y[x.size() - 1];
-
         if ( extrapolationMode == ExtrapolationMode::CLOSEST )
         {
             return extrapolateClosestValue( x, y, value );
@@ -85,15 +77,23 @@ double RiaInterpolationTools::linear( const std::vector<double>& x, const std::v
         return std::numeric_limits<double>::infinity();
     }
 
-    int upperIndex = lowerIndex + 1;
+    // Calculate indices
+    auto upperIndex = it - x.begin();
+    auto lowerIndex = upperIndex - 1;
 
     double lowerX = x[lowerIndex];
     double lowerY = y[lowerIndex];
     double upperX = x[upperIndex];
     double upperY = y[upperIndex];
 
-    double deltaY = upperY - lowerY;
     double deltaX = upperX - lowerX;
+    double deltaY = upperY - lowerY;
+
+    // Protect against divide by zero
+    if ( std::abs( deltaX ) < std::numeric_limits<double>::epsilon() )
+    {
+        return lowerY;
+    }
 
     return lowerY + ( ( value - lowerX ) / deltaX ) * deltaY;
 }

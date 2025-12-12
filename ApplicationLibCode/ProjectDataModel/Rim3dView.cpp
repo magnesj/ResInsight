@@ -372,7 +372,7 @@ void Rim3dView::updateViewWidgetAfterCreation()
 void Rim3dView::setId( int id )
 {
     m_id                  = id;
-    QString viewIdTooltip = QString( "View id: %1" ).arg( m_id );
+    QString viewIdTooltip = QString( "View id: %1" ).arg( m_id() );
     this->setUiToolTip( viewIdTooltip );
 }
 
@@ -451,7 +451,7 @@ RimViewController* Rim3dView::viewController() const
 void Rim3dView::deleteViewWidget()
 {
     // Earlier implementations has used m_viewer->deleteLater(). This caused issues triggered by 3D editors and
-    // interaction with the event processing. deleteLater() will not be handeled by processEvents() if we are in the
+    // interaction with the event processing. deleteLater() will not be handled by processEvents() if we are in the
     // state of processing UI events, ie in the process of handling a QAction
 
     delete m_viewer;

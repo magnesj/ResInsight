@@ -26,6 +26,8 @@
 
 #include "RimEclipseCase.h"
 
+#include <array>
+
 using namespace rips;
 
 //--------------------------------------------------------------------------------------------------
@@ -102,10 +104,9 @@ grpc::Status RiaCellCenterStateHandler::assignCornersReply( rips::CellCornersArr
     size_t       indexInPackage = 0u;
     reply->mutable_cells()->Reserve( (int)packageSize );
 
-    cvf::Vec3d cornerVerts[8];
     for ( ; indexInPackage < packageSize && m_currentCellIdx < m_grid->cellCount(); ++indexInPackage )
     {
-        m_grid->cellCornerVertices( m_currentCellIdx, cornerVerts );
+        std::array<cvf::Vec3d, 8> cornerVerts = m_grid->cellCornerVertices( m_currentCellIdx );
         for ( cvf::Vec3d& corner : cornerVerts )
         {
             RiaGrpcHelper::convertVec3dToPositiveDepth( &corner );

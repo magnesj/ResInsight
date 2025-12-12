@@ -34,7 +34,7 @@ CAF_PDM_SOURCE_INIT( RimJobCollection, "JobCollection" );
 //--------------------------------------------------------------------------------------------------
 RimJobCollection::RimJobCollection()
 {
-    CAF_PDM_InitObject( "Jobs" + RiaDefines::betaFeaturePostfix(), ":/gear.svg" );
+    CAF_PDM_InitObject( "Jobs", ":/gear_icon_16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_jobs, "Jobs", "Jobs" );
 
@@ -60,6 +60,24 @@ std::vector<RimGenericJob*> RimJobCollection::jobs() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RimGenericJob*> RimJobCollection::jobsMatchingKeyValue( const QString& key, const QString& value ) const
+{
+    std::vector<RimGenericJob*> foundJobs;
+
+    for ( auto job : jobs() )
+    {
+        if ( job->matchesKeyValue( key, value ) )
+        {
+            foundJobs.push_back( job );
+        }
+    }
+
+    return foundJobs;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RimJobCollection::isEmpty()
 {
     return !m_jobs.hasChildren();
@@ -77,8 +95,30 @@ void RimJobCollection::addNewJob( RimGenericJob* newJob )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+int RimJobCollection::numberOfRunningJobs() const
+{
+    int nRunning = 0;
+    for ( auto job : jobs() )
+    {
+        if ( job->isRunning() ) nRunning++;
+    }
+
+    return nRunning;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimJobCollection::deleteAllJobs()
 {
+    for ( auto job : jobs() )
+    {
+        if ( job->isRunning() )
+        {
+            job->stop();
+            RiaLogging::info( "Stopped running job '" + job->name() );
+        }
+    }
     m_jobs.deleteChildren();
 }
 

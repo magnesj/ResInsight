@@ -34,7 +34,7 @@ void RicOpenLastUsedFileFeature::onActionTriggered( bool isChecked )
 {
     RiaGuiApplication* app = RiaGuiApplication::instance();
 
-    if ( !app->askUserToSaveModifiedProject() ) return;
+    if ( !app->checkWithUserBeforeClose() ) return;
 
     QString fileName = RiaPreferences::current()->lastUsedProjectFileName;
 

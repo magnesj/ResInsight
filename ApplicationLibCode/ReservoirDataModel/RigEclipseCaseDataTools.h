@@ -20,7 +20,15 @@
 
 #include "QString"
 
+#include "cafVecIjk.h"
+#include "cvfBoundingBox.h"
+#include "cvfObject.h"
+#include "cvfVector3.h"
+
+#include <utility>
+
 class RigEclipseCaseData;
+class RigSimWellData;
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -29,4 +37,28 @@ class RigEclipseCaseDataTools
 {
 public:
     static QString firstProducer( RigEclipseCaseData* eclipseCaseData );
+
+    static cvf::BoundingBox wellBoundingBoxInDomainCoords( RigEclipseCaseData*   eclipseCaseData,
+                                                           const RigSimWellData* simWellData,
+                                                           int                   timeStepIndex,
+                                                           bool                  isAutoDetectingBranches,
+                                                           bool                  isUsingCellCenterForPipe );
+
+    static std::pair<caf::VecIjk0, caf::VecIjk0> wellBoundingBoxIjk( RigEclipseCaseData*   eclipseCaseData,
+                                                                     const RigSimWellData* simWellData,
+                                                                     int                   timeStepIndex,
+                                                                     bool                  isAutoDetectingBranches,
+                                                                     bool                  isUsingCellCenterForPipe );
+
+    static std::pair<caf::VecIjk0, caf::VecIjk0> wellsBoundingBoxIjk( RigEclipseCaseData*                       eclipseCaseData,
+                                                                      const std::vector<const RigSimWellData*>& simWells,
+                                                                      int                                       timeStepIndex,
+                                                                      bool                                      isAutoDetectingBranches,
+                                                                      bool                                      isUsingCellCenterForPipe );
+
+    static std::pair<caf::VecIjk0, caf::VecIjk0>
+        expandBoundingBoxIjk( RigEclipseCaseData* eclipseCaseData, const caf::VecIjk0& minIjk, const caf::VecIjk0& maxIjk, size_t numPadding );
+
+    static cvf::ref<cvf::UByteArray>
+        createVisibilityFromIjkBounds( RigEclipseCaseData* eclipseCaseData, const caf::VecIjk0& minIjk, const caf::VecIjk0& maxIjk );
 };

@@ -52,6 +52,7 @@ from .resinsight_classes import (
     Case as Case,
     EclipseCase as EclipseCase,
     GeoMechCase as GeoMechCase,
+    Reservoir as Reservoir,
     WellBoreStabilityPlot as WellBoreStabilityPlot,
     WbsParameters as WbsParameters,
 )
@@ -394,7 +395,6 @@ def export_well_path_completions(
     include_perforations=True,
     include_fishbones=True,
     fishbones_exclude_main_bore=True,
-    combination_mode="INDIVIDUALLY",
     export_welspec=True,
     export_comments=True,
     custom_file_name="",
@@ -413,7 +413,6 @@ def export_well_path_completions(
         include_perforations        | Export perforations?                             | bool
         include_fishbones           | Export fishbones?                                | bool
         fishbones_exclude_main_bore | Exclude main bore when exporting fishbones?      | bool
-        combination_mode            | Settings for multiple completions in same cell   | String Enum
         export_welspec              | Export WELSPEC keyword                           | bool
         export_comments             | Export completion data source as comment         | bool
         custom_file_name            | Custom filename when file_split is "UNIFIED_FILE"| String
@@ -424,7 +423,6 @@ def export_well_path_completions(
         ----------------------------------- | ------------
         "UNIFIED_FILE"                      | A single file with all combined transmissibilities
         "SPLIT_ON_WELL"                     | One file for each well with combined transmissibilities
-        "SPLIT_ON_WELL_AND_COMPLETION_TYPE" | One file for each completion type for each well
 
     **Enum compdat_export**::
 
@@ -432,13 +430,6 @@ def export_well_path_completions(
         ------------------------------------------- | ------------
         "TRANSMISSIBILITIES"                        | Direct export of transmissibilities
         "WPIMULT_AND_DEFAULT_CONNECTION_FACTORS"    | Include WPIMULT in addition to transmissibilities
-
-    **Enum combination_mode**::
-
-        Option              | Description
-        ------------------- | ------------
-        "INDIVIDUALLY"      | Exports the different completion types into separate sections
-        "COMBINED"          | Export one combined transmissibility for each cell
 
     """
     if isinstance(well_path_names, str):
@@ -453,7 +444,6 @@ def export_well_path_completions(
             includePerforations=include_perforations,
             includeFishbones=include_fishbones,
             excludeMainBoreForFishbones=fishbones_exclude_main_bore,
-            combinationMode=combination_mode,
             exportWelspec=export_welspec,
             exportComments=export_comments,
             customFileName=custom_file_name,
@@ -539,9 +529,9 @@ def create_lgr_for_completion(
         --------------- | -------------------------------------- | -----
         time_steps      | Time step index                        | Integer
         well_path_names | List of well path names                | List of Strings
-        refinement_i    | Refinment in x-direction               | Integer
-        refinement_j    | Refinment in y-direction               | Integer
-        refinement_k    | Refinment in z-direction               | Integer
+        refinement_i    | Refinement in x-direction              | Integer
+        refinement_j    | Refinement in y-direction              | Integer
+        refinement_k    | Refinement in z-direction              | Integer
         split_type      | Defines how to split LGRS              | String enum
 
     **Enum split_type**::
@@ -1336,7 +1326,7 @@ def set_nnc_connections_values(
         raise IndexError
 
 
-@add_method(EclipseCase)
+@add_method(Reservoir)
 def grid_property_for_positions(
     self,
     positions: List[List[float]],
@@ -1386,3 +1376,50 @@ def grid_property_for_positions(
         return result
     else:
         return []
+
+
+@add_method(Reservoir)
+def export_corner_point_grid(
+    self,
+) -> Tuple[List[float], List[float], List[int], int, int, int]:
+    """Export corner point grid data from case
+
+    Returns:
+        Tuple of (zcorn, coord, actnum, nx, ny, nz) where:
+        - zcorn: Corner depths as defined by the Eclipse keyword ZCORN
+        - coord: Coordinate lines as COORD keyword in Eclipse
+        - actnum: Active cell info: cells with values > 0 are active
+        - nx, ny, nz: Grid dimensions in I, J, K directions
+    """
+    shared_uuid = uuid.uuid4()
+    zcorn_key = "{}_{}".format(shared_uuid, "zcorn")
+    coord_key = "{}_{}".format(shared_uuid, "coord")
+    actnum_key = "{}_{}".format(shared_uuid, "actnum")
+
+    # Call internal C++ method to populate key-value store
+    self.export_corner_point_grid_internal(
+        zcorn_key=zcorn_key, coord_key=coord_key, actnum_key=actnum_key
+    )
+
+    # Retrieve results from key-value store
+    project = self.ancestor(Project)
+    if project:
+        zcorn = project.key_values(zcorn_key)
+        coord = project.key_values(coord_key)
+        actnum_raw = project.key_values(actnum_key)
+        actnum = [int(x) for x in actnum_raw]
+
+        # Retrieve grid dimensions
+        dimensions_key = zcorn_key + "_dimensions"
+        dimensions = project.key_values(dimensions_key)
+        nx, ny, nz = int(dimensions[0]), int(dimensions[1]), int(dimensions[2])
+
+        # Clean up
+        project.remove_key_values(zcorn_key)
+        project.remove_key_values(coord_key)
+        project.remove_key_values(actnum_key)
+        project.remove_key_values(dimensions_key)
+
+        return (zcorn, coord, actnum, nx, ny, nz)
+    else:
+        return ([], [], [], 0, 0, 0)

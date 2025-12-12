@@ -197,9 +197,6 @@ void RivSurfaceIntersectionGeometryGenerator::calculateArrays()
             cvf::Plane plane;
             plane.setFromPoints( p0, p1, p2 );
 
-            std::array<cvf::Vec3d, 8> cellCorners;
-            std::array<size_t, 8>     cornerIndices;
-
             for ( size_t globalCellIdx : triIntersectedCellCandidates )
             {
                 if ( !m_hexGrid->useCell( globalCellIdx ) ) continue;
@@ -208,12 +205,12 @@ void RivSurfaceIntersectionGeometryGenerator::calculateArrays()
                 cellFaceForEachTriangleEdge.clear();
                 cellCutTriangles.clear();
 
-                m_hexGrid->cellCornerVertices( globalCellIdx, &cellCorners[0] );
-                m_hexGrid->cellCornerIndices( globalCellIdx, &cornerIndices[0] );
+                const std::array<cvf::Vec3d, 8> cellCorners   = m_hexGrid->cellCornerVertices( globalCellIdx );
+                const std::array<size_t, 8>     cornerIndices = m_hexGrid->cellCornerIndices( globalCellIdx );
 
                 int triangleCount = caf::HexGridIntersectionTools::planeHexIntersectionMCTet( plane,
-                                                                                              &cellCorners[0],
-                                                                                              &cornerIndices[0],
+                                                                                              cellCorners,
+                                                                                              cornerIndices,
                                                                                               &hexPlaneCutTriangleVxes,
                                                                                               &cellFaceForEachTriangleEdge );
 

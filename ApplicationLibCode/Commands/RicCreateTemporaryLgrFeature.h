@@ -30,13 +30,10 @@
 
 class LgrInfo;
 class RigMainGrid;
-class RigCell;
 class RimEclipseCase;
-class RimSimWellInView;
 class RimWellPath;
-class RicExportLgrUi;
-class QFile;
-class QTextStream;
+class RigGridBase;
+class RigEclipseCaseData;
 
 //==================================================================================================
 ///
@@ -49,20 +46,17 @@ public:
     void createLgrsForWellPaths( std::vector<RimWellPath*>                          wellPaths,
                                  RimEclipseCase*                                    eclipseCase,
                                  size_t                                             timeStep,
-                                 caf::VecIjk                                        lgrCellCounts,
+                                 const cvf::Vec3st&                                 refinement,
                                  Lgr::SplitType                                     splitType,
                                  const std::set<RigCompletionData::CompletionType>& completionTypes,
                                  QStringList*                                       wellsIntersectingOtherLgrs );
 
-    void updateViews( RimEclipseCase* eclipseCase );
+    static RigGridBase* createLgr( const LgrInfo& lgrInfo, RigEclipseCaseData* caseData );
 
-protected:
+private:
     bool isCommandEnabled() const override;
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
 
-private:
-    void createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
-    void computeCachedData( RimEclipseCase* eclipseCase );
-    void deleteAllCachedData( RimEclipseCase* eclipseCase );
+    static RigGridBase* createLgrForGrid( const LgrInfo& lgrInfo, RigMainGrid* mainGrid );
 };

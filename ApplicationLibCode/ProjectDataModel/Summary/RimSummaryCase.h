@@ -66,7 +66,7 @@ public:
     void setCaseId( int caseId );
     int  caseId() const;
 
-    void refreshMetaData();
+    void buildTreeNodesIfRequired();
     void onCalculationUpdated();
 
     virtual void                       createSummaryReaderInterface() = 0;
@@ -81,8 +81,8 @@ public:
 
     bool isObservedData() const;
 
-    bool showVectorItemsInProjectTree() const;
-    void setShowVectorItemsInProjectTree( bool enable );
+    bool showTreeNodes() const;
+    void setShowTreeNodes( bool enable );
 
     void setCaseRealizationParameters( const std::shared_ptr<RigCaseRealizationParameters>& crlParameters );
     std::shared_ptr<RigCaseRealizationParameters> caseRealizationParameters() const;
@@ -90,6 +90,8 @@ public:
     RimSummaryEnsemble*                           ensemble() const;
     void                                          copyFrom( const RimSummaryCase& rhs );
     bool                                          operator<( const RimSummaryCase& rhs ) const;
+
+    bool includeInAutoReload() const;
 
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
@@ -107,8 +109,7 @@ protected:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder, bool showCurveCalculator ) const;
 
 private:
-    void buildChildNodes();
-    int  serialNumber();
+    int serialNumber();
 
 protected:
     caf::PdmField<QString>         m_displayName;
@@ -116,6 +117,7 @@ protected:
     caf::PdmField<caf::FilePath>   m_summaryHeaderFilename;
 
     caf::PdmField<bool> m_showSubNodesInTree;
+    caf::PdmField<bool> m_includeInAutoReload;
 
     caf::PdmChildField<RimSummaryAddressCollection*> m_dataVectorFolders;
 

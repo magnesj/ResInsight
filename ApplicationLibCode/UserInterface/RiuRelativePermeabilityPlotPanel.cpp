@@ -18,12 +18,16 @@
 
 #include "RiuRelativePermeabilityPlotPanel.h"
 
-#include "RigFlowDiagSolverInterface.h"
-
 #include "RiaCurveDataTools.h"
+#include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
+#include "RiaInterpolationTools.h"
+#include "RiaPhaseTools.h"
 #include "RiaPlotDefines.h"
 #include "RiaResultNames.h"
+
+#include "RigFlowDiagSolverInterface.h"
+
 #include "RiuDockedQwtPlot.h"
 #include "RiuGuiTheme.h"
 #include "RiuPlotCurveSymbol.h"
@@ -35,10 +39,13 @@
 #include "cvfAssert.h"
 
 #include "qwt_legend.h"
+#include "qwt_picker_machine.h"
 #include "qwt_plot.h"
 #include "qwt_plot_curve.h"
 #include "qwt_plot_marker.h"
+#include "qwt_plot_picker.h"
 #include "qwt_scale_engine.h"
+#include "qwt_symbol.h"
 #include "qwt_text.h"
 
 #include <QButtonGroup>
@@ -53,6 +60,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <functional>
 
 //==================================================================================================
 //
@@ -68,6 +76,32 @@ public:
     }
     QSize sizeHint() const override { return QSize( 100, 100 ); }
     QSize minimumSizeHint() const override { return QSize( 0, 0 ); }
+};
+
+//==================================================================================================
+//
+//
+//
+//==================================================================================================
+class RiuRelPermQwtPicker : public QwtPicker
+{
+public:
+    RiuRelPermQwtPicker( QwtPlot* plot, std::function<QString()> textProvider )
+        : QwtPicker( QwtPicker::NoRubberBand, QwtPicker::AlwaysOn, plot->canvas() )
+        , m_textProvider( textProvider )
+    {
+        setStateMachine( new QwtPickerTrackerMachine );
+    }
+
+    QwtText trackerText( const QPoint& ) const override
+    {
+        QwtText text( m_textProvider() );
+        text.setRenderFlags( Qt::AlignLeft );
+        return text;
+    }
+
+private:
+    std::function<QString()> m_textProvider;
 };
 
 //==================================================================================================
@@ -88,6 +122,9 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     , m_sgas( HUGE_VAL )
     , m_plotUpdater( new RiuRelativePermeabilityPlotUpdater( this ) )
     , m_qwtPlot( nullptr )
+    , m_curveSetGroupBox( nullptr )
+    , m_showDrainageCheckBox( nullptr )
+    , m_showImbibitionCheckBox( nullptr )
     , m_selectedCurvesButtonGroup( nullptr )
     , m_groupBox( nullptr )
     , m_logarithmicScaleKrAxisCheckBox( nullptr )
@@ -95,6 +132,7 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     , m_showScaledCheckBox( nullptr )
     , m_fixedXAxisCheckBox( nullptr )
     , m_fixedLeftYAxisCheckBox( nullptr )
+    , m_trackerPlotMarker( nullptr )
 
 {
     m_qwtPlot = new RelPermQwtPlot( this );
@@ -103,15 +141,34 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     setPlotDefaults( m_qwtPlot );
     applyFontSizes( false );
 
+    // Initialize picker for curve value tracking
+    m_qwtPicker = new RiuRelPermQwtPicker( m_qwtPlot, [this]() { return m_trackerLabel; } );
+    RiuGuiTheme::styleQwtItem( m_qwtPicker );
+    connect( m_qwtPicker, SIGNAL( activated( bool ) ), this, SLOT( slotPickerActivated( bool ) ) );
+    connect( m_qwtPicker, SIGNAL( moved( const QPoint& ) ), this, SLOT( slotPickerPointChanged( const QPoint& ) ) );
+
     m_selectedCurvesButtonGroup = new QButtonGroup( this );
     m_selectedCurvesButtonGroup->setExclusive( false );
 
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KRW" ), RigFlowDiagSolverInterface::RelPermCurve::KRW );
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KRG" ), RigFlowDiagSolverInterface::RelPermCurve::KRG );
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KROW" ), RigFlowDiagSolverInterface::RelPermCurve::KROW );
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KROG" ), RigFlowDiagSolverInterface::RelPermCurve::KROG );
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOW" ), RigFlowDiagSolverInterface::RelPermCurve::PCOW );
-    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOG" ), RigFlowDiagSolverInterface::RelPermCurve::PCOG );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KRW" ), RigFlowDiagDefines::RelPermCurve::KRW );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KRG" ), RigFlowDiagDefines::RelPermCurve::KRG );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KROW" ), RigFlowDiagDefines::RelPermCurve::KROW );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "KROG" ), RigFlowDiagDefines::RelPermCurve::KROG );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOW" ), RigFlowDiagDefines::RelPermCurve::PCOW );
+    m_selectedCurvesButtonGroup->addButton( new QCheckBox( "PCOG" ), RigFlowDiagDefines::RelPermCurve::PCOG );
+
+    // Create Curve Set groupbox
+    m_curveSetGroupBox          = new QGroupBox( "Curve Set" );
+    QHBoxLayout* curveSetLayout = new QHBoxLayout;
+    m_curveSetGroupBox->setLayout( curveSetLayout );
+
+    m_showDrainageCheckBox   = new QCheckBox( "Drainage" );
+    m_showImbibitionCheckBox = new QCheckBox( "Imbibition" );
+    m_showDrainageCheckBox->setChecked( true );
+    m_showImbibitionCheckBox->setChecked( false );
+
+    curveSetLayout->addWidget( m_showDrainageCheckBox );
+    curveSetLayout->addWidget( m_showImbibitionCheckBox );
 
     m_groupBox                  = new QGroupBox( "Curves" );
     QGridLayout* groupBoxLayout = new QGridLayout;
@@ -139,6 +196,7 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     connect( showCurveSelection, SIGNAL( stateChanged( int ) ), SLOT( slotShowCurveSelectionWidgets( int ) ) );
 
     QVBoxLayout* leftLayout = new QVBoxLayout;
+    leftLayout->addWidget( m_curveSetGroupBox );
     leftLayout->addWidget( showCurveSelection );
     leftLayout->addWidget( m_groupBox );
     leftLayout->addWidget( m_logarithmicScaleKrAxisCheckBox );
@@ -156,6 +214,8 @@ RiuRelativePermeabilityPlotPanel::RiuRelativePermeabilityPlotPanel( QWidget* par
     setLayout( mainLayout );
 
     connect( m_selectedCurvesButtonGroup, SIGNAL( idClicked( int ) ), SLOT( slotButtonInButtonGroupClicked( int ) ) );
+    connect( m_showDrainageCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
+    connect( m_showImbibitionCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_logarithmicScaleKrAxisCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_showUnscaledCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
     connect( m_showScaledCheckBox, SIGNAL( stateChanged( int ) ), SLOT( slotSomeCheckBoxStateChanged( int ) ) );
@@ -201,12 +261,13 @@ void RiuRelativePermeabilityPlotPanel::setPlotDefaults( QwtPlot* plot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                                unitSystem,
-                                                    const std::vector<RigFlowDiagSolverInterface::RelPermCurve>& relPermCurves,
-                                                    double                                                       swat,
-                                                    double                                                       sgas,
-                                                    const QString&                                               caseName,
-                                                    const QString&                                               cellReferenceText )
+void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSystem                        unitSystem,
+                                                    const std::vector<RigFlowDiagDefines::RelPermCurve>& relPermCurves,
+                                                    double                                               swat,
+                                                    double                                               sgas,
+                                                    const QString&                                       caseName,
+                                                    const QString&                                       cellReferenceText,
+                                                    const std::set<RiaDefines::PhaseType>&               availablePhases )
 {
     // cvf::Trace::show("Set RelPerm plot data");
 
@@ -216,8 +277,26 @@ void RiuRelativePermeabilityPlotPanel::setPlotData( RiaDefines::EclipseUnitSyste
     m_sgas              = sgas;
     m_caseName          = caseName;
     m_cellReferenceText = cellReferenceText;
+    m_availablePhases   = availablePhases;
 
+    updateCheckboxTexts();
     plotUiSelectedCurves();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::enableImbibitionCurveSelection( bool enable )
+{
+    if ( !enable )
+    {
+        m_showImbibitionCheckBox->setChecked( false );
+        m_showImbibitionCheckBox->setDisabled( true );
+    }
+    else
+    {
+        m_showImbibitionCheckBox->setDisabled( false );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -239,7 +318,19 @@ void RiuRelativePermeabilityPlotPanel::clearPlot()
     m_caseName.clear();
     m_cellReferenceText.clear();
 
-    plotCurvesInQwt( m_unitSystem, m_allCurvesArr, m_swat, m_sgas, m_cellReferenceText, false, true, true, m_qwtPlot, &m_myPlotMarkers, false, false );
+    plotCurvesInQwt( m_unitSystem,
+                     m_allCurvesArr,
+                     m_swat,
+                     m_sgas,
+                     m_cellReferenceText,
+                     false,
+                     true,
+                     true,
+                     m_qwtPlot,
+                     &m_myPlotMarkers,
+                     false,
+                     false,
+                     m_availablePhases );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -263,7 +354,7 @@ void RiuRelativePermeabilityPlotPanel::applyFontSizes( bool replot /*= true*/ )
 //--------------------------------------------------------------------------------------------------
 void RiuRelativePermeabilityPlotPanel::plotUiSelectedCurves()
 {
-    std::vector<RigFlowDiagSolverInterface::RelPermCurve> selectedCurves = gatherUiSelectedCurves();
+    std::vector<RigFlowDiagDefines::RelPermCurve> selectedCurves = gatherUiSelectedCurves();
 
     const bool useLogScale = m_logarithmicScaleKrAxisCheckBox->isChecked();
     const bool fixedXAxis  = m_fixedXAxisCheckBox->isChecked();
@@ -279,7 +370,8 @@ void RiuRelativePermeabilityPlotPanel::plotUiSelectedCurves()
                      m_qwtPlot,
                      &m_myPlotMarkers,
                      m_showScaledCheckBox->isChecked(),
-                     m_showUnscaledCheckBox->isChecked() );
+                     m_showUnscaledCheckBox->isChecked(),
+                     m_availablePhases );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -332,18 +424,19 @@ void RiuRelativePermeabilityPlotPanel::addTransparentCurve( QwtPlot*            
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitSystem                                unitSystem,
-                                                        const std::vector<RigFlowDiagSolverInterface::RelPermCurve>& curveArr,
-                                                        double                                                       swat,
-                                                        double                                                       sgas,
-                                                        QString                                                      cellReferenceText,
-                                                        bool                                                         logScaleLeftAxis,
-                                                        bool                                                         fixedXAxis,
-                                                        bool                                                         fixedLeftYAxis,
-                                                        QwtPlot*                                                     plot,
-                                                        std::vector<QwtPlotMarker*>*                                 myPlotMarkers,
-                                                        bool                                                         showScaled,
-                                                        bool                                                         showUnscaled )
+void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitSystem                        unitSystem,
+                                                        const std::vector<RigFlowDiagDefines::RelPermCurve>& curveArr,
+                                                        double                                               swat,
+                                                        double                                               sgas,
+                                                        QString                                              cellReferenceText,
+                                                        bool                                                 logScaleLeftAxis,
+                                                        bool                                                 fixedXAxis,
+                                                        bool                                                 fixedLeftYAxis,
+                                                        QwtPlot*                                             plot,
+                                                        std::vector<QwtPlotMarker*>*                         myPlotMarkers,
+                                                        bool                                                 showScaled,
+                                                        bool                                                 showUnscaled,
+                                                        const std::set<RiaDefines::PhaseType>&               availablePhases )
 {
     bool skipUnscaledLegends = showScaled && showUnscaled;
 
@@ -369,49 +462,45 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
 
     for ( size_t i = 0; i < curveArr.size(); i++ )
     {
-        const RigFlowDiagSolverInterface::RelPermCurve& curve = curveArr[i];
+        const RigFlowDiagDefines::RelPermCurve& curve = curveArr[i];
 
-        const auto unscaledCurve = ( curve.epsMode == RigFlowDiagSolverInterface::RelPermCurve::EPS_OFF );
+        const auto unscaledCurve = ( curve.epsMode == RigFlowDiagDefines::RelPermCurve::EPS_OFF );
 
         // Which axis should this curve be plotted on
         WhichYAxis plotOnWhichYAxis = LEFT_YAXIS;
-        if ( curve.ident == RigFlowDiagSolverInterface::RelPermCurve::PCOW || curve.ident == RigFlowDiagSolverInterface::RelPermCurve::PCOG )
+        if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOW || curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
         {
             plotOnWhichYAxis = RIGHT_YAXIS;
         }
 
-        QwtPlotCurve* qwtCurve = new QwtPlotCurve( curve.name.c_str() );
+        // Determine display name for the curve
+        std::string displayName = curve.name;
+        if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
+        {
+            std::string preferredName;
+            if ( curve.curveSet == RigFlowDiagDefines::RelPermCurve::IMBIBITION )
+            {
+                preferredName += "I";
+            }
+            preferredName += RiaPhaseTools::getPreferredPcogName( availablePhases ).toStdString();
+
+            displayName = preferredName;
+        }
+
+        QwtPlotCurve* qwtCurve = new QwtPlotCurve( displayName.c_str() );
 
         CVF_ASSERT( curve.saturationVals.size() == curve.yVals.size() );
         qwtCurve->setSamples( curve.saturationVals.data(), curve.yVals.data(), static_cast<int>( curve.saturationVals.size() ) );
 
-        qwtCurve->setTitle( curve.name.c_str() );
+        // Use the display name which may be modified for GAS/WATER cases
+        qwtCurve->setTitle( displayName.c_str() );
 
         qwtCurve->setStyle( QwtPlotCurve::Lines );
 
-        Qt::PenStyle penStyle = Qt::SolidLine;
-        switch ( curve.ident )
+        auto penStyle = Qt::SolidLine;
+        if ( curve.ident == RigFlowDiagDefines::RelPermCurve::PCOW || curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
         {
-            case RigFlowDiagSolverInterface::RelPermCurve::KRW:
-                qwtCurve->setTitle( "KRW" );
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::KROW:
-                qwtCurve->setTitle( "KROW" );
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::PCOW:
-                qwtCurve->setTitle( "PCOW" );
-                penStyle = Qt::DashLine;
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::KRG:
-                qwtCurve->setTitle( "KRG" );
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::KROG:
-                qwtCurve->setTitle( "KROG" );
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::PCOG:
-                qwtCurve->setTitle( "PCOG" );
-                penStyle = Qt::DashLine;
-                break;
+            penStyle = Qt::DashLine;
         }
 
         const QPen curvePen( QBrush(), 1, penStyle );
@@ -446,16 +535,16 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
         // Note that if we're using log scale we must guard against non-positive values
         if ( swat != HUGE_VAL )
         {
-            if ( curve.ident == RigFlowDiagSolverInterface::RelPermCurve::KRW || curve.ident == RigFlowDiagSolverInterface::RelPermCurve::KROW ||
-                 curve.ident == RigFlowDiagSolverInterface::RelPermCurve::PCOW )
+            if ( curve.ident == RigFlowDiagDefines::RelPermCurve::KRW || curve.ident == RigFlowDiagDefines::RelPermCurve::KROW ||
+                 curve.ident == RigFlowDiagDefines::RelPermCurve::PCOW )
             {
                 addCurveConstSaturationIntersectionMarker( curve, swat, waterColor, plotOnWhichYAxis, plot, myPlotMarkers, &points, &axes );
             }
         }
         if ( sgas != HUGE_VAL )
         {
-            if ( curve.ident == RigFlowDiagSolverInterface::RelPermCurve::KRG || curve.ident == RigFlowDiagSolverInterface::RelPermCurve::KROG ||
-                 curve.ident == RigFlowDiagSolverInterface::RelPermCurve::PCOG )
+            if ( curve.ident == RigFlowDiagDefines::RelPermCurve::KRG || curve.ident == RigFlowDiagDefines::RelPermCurve::KROG ||
+                 curve.ident == RigFlowDiagDefines::RelPermCurve::PCOG )
             {
                 addCurveConstSaturationIntersectionMarker( curve, sgas, gasColor, plotOnWhichYAxis, plot, myPlotMarkers, &points, &axes );
             }
@@ -552,6 +641,9 @@ void RiuRelativePermeabilityPlotPanel::plotCurvesInQwt( RiaDefines::EclipseUnitS
     plot->replot();
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QwtPlotCurve* RiuRelativePermeabilityPlotPanel::getLegendCurve( QString title, bool scaled )
 {
     QwtPlotCurve* curve = new QwtPlotCurve( title );
@@ -579,46 +671,24 @@ QwtPlotCurve* RiuRelativePermeabilityPlotPanel::getLegendCurve( QString title, b
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiuRelativePermeabilityPlotPanel::determineXAxisTitleFromCurveCollection( const std::vector<RigFlowDiagSolverInterface::RelPermCurve>& curveArr )
+QString RiuRelativePermeabilityPlotPanel::determineXAxisTitleFromCurveCollection( const std::vector<RigFlowDiagDefines::RelPermCurve>& curveArr )
 {
     bool sawWater = false;
     bool sawGas   = false;
 
-    for ( RigFlowDiagSolverInterface::RelPermCurve curve : curveArr )
+    for ( const RigFlowDiagDefines::RelPermCurve& curve : curveArr )
     {
-        switch ( curve.ident )
-        {
-            case RigFlowDiagSolverInterface::RelPermCurve::KRW:
-                sawWater = true;
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::KROW:
-                sawWater = true;
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::PCOW:
-                sawWater = true;
-                break;
-
-            case RigFlowDiagSolverInterface::RelPermCurve::KRG:
-                sawGas = true;
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::KROG:
-                sawGas = true;
-                break;
-            case RigFlowDiagSolverInterface::RelPermCurve::PCOG:
-                sawGas = true;
-                break;
-        }
+        if ( curve.isWaterCurve() ) sawWater = true;
+        if ( curve.isGasCurve() ) sawGas = true;
     }
 
     QString title = "";
     if ( sawWater && sawGas )
-        title = "Water/Gas ";
+        title = "SWAT/SGAS";
     else if ( sawWater )
-        title = "Water ";
+        title = "SWAT";
     else if ( sawGas )
-        title = "Gas ";
-
-    title += "Saturation";
+        title = "SGAS";
 
     return title;
 }
@@ -647,16 +717,16 @@ void RiuRelativePermeabilityPlotPanel::addVerticalSaturationMarkerLine( double  
 //--------------------------------------------------------------------------------------------------
 /// Add a marker at the intersection of the passed curve and the constant saturation value
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker( const RigFlowDiagSolverInterface::RelPermCurve& curve,
-                                                                                  double                       saturationValue,
-                                                                                  QColor                       markerColor,
-                                                                                  WhichYAxis                   whichYAxis,
-                                                                                  QwtPlot*                     plot,
-                                                                                  std::vector<QwtPlotMarker*>* myPlotMarkers,
-                                                                                  std::vector<QPointF>*        points,
-                                                                                  std::vector<WhichYAxis>*     axes )
+void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker( const RigFlowDiagDefines::RelPermCurve& curve,
+                                                                                  double                                  saturationValue,
+                                                                                  QColor                                  markerColor,
+                                                                                  WhichYAxis                              whichYAxis,
+                                                                                  QwtPlot*                                plot,
+                                                                                  std::vector<QwtPlotMarker*>*            myPlotMarkers,
+                                                                                  std::vector<QPointF>*                   points,
+                                                                                  std::vector<WhichYAxis>*                axes )
 {
-    const double yVal = interpolatedCurveYValue( curve.saturationVals, curve.yVals, saturationValue );
+    const double yVal = RiaInterpolationTools::linear( curve.saturationVals, curve.yVals, saturationValue );
     if ( yVal != HUGE_VAL )
     {
         QwtPlotMarker* pointMarker = new QwtPlotMarker;
@@ -681,65 +751,33 @@ void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Assumes that all the x-values are ordered in increasing order
-//--------------------------------------------------------------------------------------------------
-double RiuRelativePermeabilityPlotPanel::interpolatedCurveYValue( const std::vector<double>& xVals, const std::vector<double>& yVals, double x )
-{
-    if ( xVals.empty() ) return HUGE_VAL;
-    if ( x < xVals.front() ) return HUGE_VAL;
-    if ( x > xVals.back() ) return HUGE_VAL;
-
-    // Find first element greater or equal to the passed x-value
-    std::vector<double>::const_iterator it = std::upper_bound( xVals.begin(), xVals.end(), x );
-
-    // Due to checks above, we should never come up empty, but to safeguard against NaNs etc
-    if ( it == xVals.end() )
-    {
-        return HUGE_VAL;
-    }
-
-    // Corner case - exact match on first element
-    if ( it == xVals.begin() )
-    {
-        return yVals.front();
-    }
-
-    const size_t idx1 = it - xVals.begin();
-    CVF_ASSERT( idx1 > 0 );
-    const size_t idx0 = idx1 - 1;
-
-    const double x0 = xVals[idx0];
-    const double y0 = yVals[idx0];
-    const double x1 = xVals[idx1];
-    const double y1 = yVals[idx1];
-    CVF_ASSERT( x1 > x0 );
-
-    const double t = ( x1 - x0 ) > 0 ? ( x - x0 ) / ( x1 - x0 ) : 0;
-    const double y = y0 * ( 1.0 - t ) + y1 * t;
-
-    return y;
-}
-
-//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigFlowDiagSolverInterface::RelPermCurve> RiuRelativePermeabilityPlotPanel::gatherUiSelectedCurves() const
+std::vector<RigFlowDiagDefines::RelPermCurve> RiuRelativePermeabilityPlotPanel::gatherUiSelectedCurves() const
 {
-    std::vector<RigFlowDiagSolverInterface::RelPermCurve> selectedCurves;
+    std::vector<RigFlowDiagDefines::RelPermCurve> selectedCurves;
 
     // Determine which curves to actually plot based on selection in GUI
-    const bool showScaled   = m_showScaledCheckBox->isChecked();
-    const bool showUnscaled = m_showUnscaledCheckBox->isChecked();
+    const bool showScaled     = m_showScaledCheckBox->isChecked();
+    const bool showUnscaled   = m_showUnscaledCheckBox->isChecked();
+    const bool showDrainage   = m_showDrainageCheckBox->isChecked();
+    const bool showImbibition = m_showImbibitionCheckBox->isChecked();
 
     for ( size_t i = 0; i < m_allCurvesArr.size(); i++ )
     {
-        const RigFlowDiagSolverInterface::RelPermCurve::Ident   curveIdent   = m_allCurvesArr[i].ident;
-        const RigFlowDiagSolverInterface::RelPermCurve::EpsMode curveEpsMode = m_allCurvesArr[i].epsMode;
+        const RigFlowDiagDefines::RelPermCurve::Ident    curveIdent   = m_allCurvesArr[i].ident;
+        const RigFlowDiagDefines::RelPermCurve::EpsMode  curveEpsMode = m_allCurvesArr[i].epsMode;
+        const RigFlowDiagDefines::RelPermCurve::CurveSet curveSet     = m_allCurvesArr[i].curveSet;
 
-        if ( m_selectedCurvesButtonGroup->button( curveIdent ) && m_selectedCurvesButtonGroup->button( curveIdent )->isChecked() )
+        // Check if curve type is selected
+        const bool curveSetSelected = ( curveSet == RigFlowDiagDefines::RelPermCurve::DRAINAGE && showDrainage ) ||
+                                      ( curveSet == RigFlowDiagDefines::RelPermCurve::IMBIBITION && showImbibition );
+
+        if ( curveSetSelected && m_selectedCurvesButtonGroup->button( curveIdent ) &&
+             m_selectedCurvesButtonGroup->button( curveIdent )->isChecked() )
         {
-            if ( ( ( curveEpsMode == RigFlowDiagSolverInterface::RelPermCurve::EPS_ON ) && showScaled ) ||
-                 ( ( curveEpsMode == RigFlowDiagSolverInterface::RelPermCurve::EPS_OFF ) && showUnscaled ) )
+            if ( ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_ON ) && showScaled ) ||
+                 ( ( curveEpsMode == RigFlowDiagDefines::RelPermCurve::EPS_OFF ) && showUnscaled ) )
             {
                 selectedCurves.push_back( m_allCurvesArr[i] );
             }
@@ -754,7 +792,7 @@ std::vector<RigFlowDiagSolverInterface::RelPermCurve> RiuRelativePermeabilityPlo
 //--------------------------------------------------------------------------------------------------
 QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
 {
-    std::vector<RigFlowDiagSolverInterface::RelPermCurve> selectedCurves = gatherUiSelectedCurves();
+    std::vector<RigFlowDiagDefines::RelPermCurve> selectedCurves = gatherUiSelectedCurves();
 
     QString outTxt;
 
@@ -766,8 +804,14 @@ QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
     {
         if ( icurve > 0 ) outTxt += "\t";
 
-        const RigFlowDiagSolverInterface::RelPermCurve& curve = selectedCurves[icurve];
-        outTxt += "Saturation";
+        const RigFlowDiagDefines::RelPermCurve& curve = selectedCurves[icurve];
+
+        if ( curve.isWaterCurve() )
+            outTxt += "SWAT";
+        else if ( curve.isGasCurve() )
+            outTxt += "SGAS";
+        else
+            outTxt += "Saturation";
         outTxt += "\t";
         outTxt += curve.name.c_str();
     }
@@ -785,7 +829,7 @@ QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
         {
             if ( icurve > 0 ) lineStr += "\t";
 
-            const RigFlowDiagSolverInterface::RelPermCurve& curve = selectedCurves[icurve];
+            const RigFlowDiagDefines::RelPermCurve& curve = selectedCurves[icurve];
             if ( sampleIndex < curve.saturationVals.size() && sampleIndex < curve.yVals.size() )
             {
                 lineStr += QString::number( curve.saturationVals[sampleIndex], 'g', 6 );
@@ -809,6 +853,19 @@ QString RiuRelativePermeabilityPlotPanel::asciiDataForUiSelectedCurves() const
     }
 
     return outTxt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::updateCheckboxTexts()
+{
+    // Update PCOG checkbox text to PCGW for GAS/WATER cases
+    if ( auto button = m_selectedCurvesButtonGroup->button( RigFlowDiagDefines::RelPermCurve::PCOG ) )
+    {
+        QString preferredName = RiaPhaseTools::getPreferredPcogName( m_availablePhases );
+        button->setText( preferredName );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -880,35 +937,134 @@ void RiuRelativePermeabilityPlotPanel::showEvent( QShowEvent* event )
     QWidget::showEvent( event );
 }
 
-//==================================================================================================
-//
-//
-//
-//==================================================================================================
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RiuRelativePermeabilityPlotPanel::ValueRange::ValueRange()
-    : min( HUGE_VAL )
-    , max( -HUGE_VAL )
+void RiuRelativePermeabilityPlotPanel::slotPickerPointChanged( const QPoint& pt )
 {
+    updateTrackerPlotMarkerAndLabelFromPicker();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuRelativePermeabilityPlotPanel::ValueRange::add( const ValueRange& range )
+void RiuRelativePermeabilityPlotPanel::slotPickerActivated( bool on )
 {
-    if ( range.max >= range.min )
+    updateTrackerPlotMarkerAndLabelFromPicker();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuRelativePermeabilityPlotPanel::updateTrackerPlotMarkerAndLabelFromPicker()
+{
+    bool    hasValidSamplePoint = false;
+    QPointF samplePoint;
+    QString curveTitle = "";
+
+    if ( m_qwtPicker && m_qwtPicker->isActive() )
     {
-        if ( range.max > max )
+        const QPoint trackerPos = m_qwtPicker->trackerPosition();
+
+        int                 pointSampleIdx  = -1;
+        const QwtPlotCurve* closestQwtCurve = closestCurveSample( trackerPos, &pointSampleIdx );
+        if ( closestQwtCurve && pointSampleIdx >= 0 )
         {
-            max = range.max;
-        }
-        if ( range.min < min )
-        {
-            min = range.min;
+            samplePoint         = closestQwtCurve->sample( pointSampleIdx );
+            hasValidSamplePoint = true;
+            curveTitle          = closestQwtCurve->title().text();
         }
     }
+
+    m_trackerLabel = "";
+
+    bool needsReplot = false;
+
+    if ( hasValidSamplePoint )
+    {
+        if ( !m_trackerPlotMarker )
+        {
+            m_trackerPlotMarker = new QwtPlotMarker;
+            m_trackerPlotMarker->setTitle( QString( "TrackedPoint" ) );
+
+            QwtSymbol* symbol = new QwtSymbol( QwtSymbol::Ellipse );
+            symbol->setSize( 13, 13 );
+            symbol->setBrush( Qt::NoBrush );
+            m_trackerPlotMarker->setSymbol( symbol );
+            m_trackerPlotMarker->attach( m_qwtPlot );
+            RiuGuiTheme::styleQwtItem( m_trackerPlotMarker );
+
+            needsReplot = true;
+        }
+
+        if ( m_trackerPlotMarker->value() != samplePoint )
+        {
+            m_trackerPlotMarker->setValue( samplePoint );
+            needsReplot = true;
+        }
+
+        m_trackerLabel = QString( "%1: (%2, %3)" ).arg( curveTitle ).arg( samplePoint.x(), 0, 'f', 3 ).arg( samplePoint.y(), 0, 'f', 3 );
+    }
+    else
+    {
+        if ( m_trackerPlotMarker )
+        {
+            m_trackerPlotMarker->detach();
+            delete m_trackerPlotMarker;
+            m_trackerPlotMarker = nullptr;
+
+            needsReplot = true;
+        }
+    }
+
+    if ( needsReplot )
+    {
+        m_qwtPlot->replot();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const QwtPlotCurve* RiuRelativePermeabilityPlotPanel::closestCurveSample( const QPoint& cursorPosition, int* closestSampleIndex ) const
+{
+    if ( !m_qwtPlot ) return nullptr;
+
+    // Get all curves currently attached to the plot
+    const QwtPlotItemList& plotItems = m_qwtPlot->itemList( QwtPlotItem::Rtti_PlotCurve );
+
+    double              minDistSquared = std::numeric_limits<double>::max();
+    const QwtPlotCurve* closestCurve   = nullptr;
+    int                 closestPtIdx   = -1;
+
+    for ( auto plotItem : plotItems )
+    {
+        const QwtPlotCurve* candidateCurve = dynamic_cast<const QwtPlotCurve*>( plotItem );
+        if ( !candidateCurve || !candidateCurve->isVisible() ) continue;
+
+        for ( size_t ptIdx = 0; ptIdx < candidateCurve->dataSize(); ptIdx++ )
+        {
+            QPointF samplePoint = candidateCurve->sample( static_cast<int>( ptIdx ) );
+            QPoint  screenPoint = QPoint( m_qwtPlot->transform( candidateCurve->xAxis(), samplePoint.x() ),
+                                         m_qwtPlot->transform( candidateCurve->yAxis(), samplePoint.y() ) );
+
+            double distSquared = pow( screenPoint.x() - cursorPosition.x(), 2 ) + pow( screenPoint.y() - cursorPosition.y(), 2 );
+
+            if ( distSquared < minDistSquared )
+            {
+                minDistSquared = distSquared;
+                closestCurve   = candidateCurve;
+                closestPtIdx   = static_cast<int>( ptIdx );
+            }
+        }
+    }
+
+    const double maxAllowedDistanceSquared = 20.0 * 20.0; // 20 pixels
+    if ( minDistSquared <= maxAllowedDistanceSquared )
+    {
+        if ( closestSampleIndex ) *closestSampleIndex = closestPtIdx;
+        return closestCurve;
+    }
+
+    return nullptr;
 }

@@ -39,6 +39,7 @@
 #include "cvfBoundingBox.h"
 
 #include <algorithm>
+#include <array>
 
 namespace caf
 {
@@ -62,9 +63,7 @@ namespace cvf
 //--------------------------------------------------------------------------------------------------
 StructGridInterface::StructGridInterface()
 {
-    m_characteristicCellSizeI = cvf::UNDEFINED_DOUBLE;
-    m_characteristicCellSizeJ = cvf::UNDEFINED_DOUBLE;
-    m_characteristicCellSizeK = cvf::UNDEFINED_DOUBLE;
+    m_characteristicCellSize = cvf::Vec3d::UNDEFINED;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -302,10 +301,8 @@ cvf::Vec3d StructGridInterface::displayModelOffset() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void StructGridInterface::characteristicCellSizes( double* iSize, double* jSize, double* kSize ) const
+cvf::Vec3d StructGridInterface::characteristicCellSizes() const
 {
-    CVF_ASSERT( iSize && jSize && kSize );
-
     if ( !hasValidCharacteristicCellSizes() )
     {
         std::vector<size_t> reservoirCellIndices;
@@ -315,9 +312,7 @@ void StructGridInterface::characteristicCellSizes( double* iSize, double* jSize,
         computeCharacteristicCellSize( reservoirCellIndices );
     }
 
-    *iSize = m_characteristicCellSizeI;
-    *jSize = m_characteristicCellSizeJ;
-    *kSize = m_characteristicCellSizeK;
+    return m_characteristicCellSize;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -325,11 +320,7 @@ void StructGridInterface::characteristicCellSizes( double* iSize, double* jSize,
 //--------------------------------------------------------------------------------------------------
 bool StructGridInterface::hasValidCharacteristicCellSizes() const
 {
-    if ( m_characteristicCellSizeI == cvf::UNDEFINED_DOUBLE || m_characteristicCellSizeJ == cvf::UNDEFINED_DOUBLE ||
-         m_characteristicCellSizeK == cvf::UNDEFINED_DOUBLE )
-        return false;
-
-    return true;
+    return !m_characteristicCellSize.isUndefined();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -372,8 +363,7 @@ void StructGridInterface::computeCharacteristicCellSize( const std::vector<size_
         double jLengthAccumulated = 0.0;
         double kLengthAccumulated = 0.0;
 
-        cvf::Vec3d cornerVerts[8];
-        size_t     evaluatedCellCount = 0;
+        size_t evaluatedCellCount = 0;
 
         // Evaluate N-th cells, compute the stride between each index
         size_t stride = std::max( size_t( 1 ), globalCellIndices.size() / 100 );
@@ -386,7 +376,7 @@ void StructGridInterface::computeCharacteristicCellSize( const std::vector<size_
             ijkFromCellIndex( cellIndex, &i, &j, &k );
             if ( isCellValid( i, j, k ) )
             {
-                cellCornerVertices( cellIndex, cornerVerts );
+                std::array<cvf::Vec3d, 8> cornerVerts = cellCornerVertices( cellIndex );
 
                 cvf::BoundingBox bb;
                 for ( const auto& v : cornerVerts )
@@ -427,9 +417,9 @@ void StructGridInterface::computeCharacteristicCellSize( const std::vector<size_
 
             if ( divisor > 0.0 )
             {
-                m_characteristicCellSizeI = cvf::Math::sqrt( iLengthAccumulated / divisor );
-                m_characteristicCellSizeJ = cvf::Math::sqrt( jLengthAccumulated / divisor );
-                m_characteristicCellSizeK = cvf::Math::sqrt( kLengthAccumulated / divisor );
+                m_characteristicCellSize = cvf::Vec3d( cvf::Math::sqrt( iLengthAccumulated / divisor ),
+                                                       cvf::Math::sqrt( jLengthAccumulated / divisor ),
+                                                       cvf::Math::sqrt( kLengthAccumulated / divisor ) );
 
                 return;
             }

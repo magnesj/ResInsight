@@ -17,15 +17,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "cvfObject.h"
-
 #include <vector>
 
-class RigFlowDiagResultFrames : public cvf::Object
+class RigFlowDiagResultFrames
 {
 public:
     explicit RigFlowDiagResultFrames( size_t frameCount );
-    ~RigFlowDiagResultFrames() override;
 
     const std::vector<double>& frameData( size_t frameIndex ) const;
     std::vector<double>&       frameData( size_t frameIndex );

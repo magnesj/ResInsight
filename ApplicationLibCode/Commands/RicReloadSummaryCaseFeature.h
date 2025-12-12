@@ -23,10 +23,15 @@
 #include <vector>
 
 class RimSummaryCase;
+class RimSummaryEnsemble;
 
 class RicReloadSummaryCaseFeature : public caf::CmdFeature
 {
     CAF_CMD_HEADER_INIT;
+
+public:
+    static void reloadTaggedSummaryCasesAndUpdate();
+    static void reloadSelectedCasesAndUpdate();
 
 protected:
     bool isCommandEnabled() const override;
@@ -34,5 +39,5 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    static std::vector<RimSummaryCase*> selectedSummaryCases();
+    static std::pair<std::vector<RimSummaryCase*>, std::vector<RimSummaryEnsemble*>> selectedSummarySources();
 };

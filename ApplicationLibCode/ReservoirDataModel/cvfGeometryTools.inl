@@ -27,6 +27,11 @@ namespace cvf
 template <typename Vec3Type>
 Vec3Type GeometryTools::computePolygonCenter( const std::vector<Vec3Type>& polygon )
 {
+    if ( polygon.empty() )
+    {
+        return Vec3Type::UNDEFINED;
+    }
+
     Vec3Type s;
 
     for ( size_t i = 0; i < polygon.size(); i++ )
@@ -65,25 +70,22 @@ DataType GeometryTools::interpolateQuad( const cvf::Vec3d& v1,
 /// Todo: If a vertex is replaced, the VxToCv map in TimeStepGeometry should be updated
 //--------------------------------------------------------------------------------------------------
 template <typename VerticeArrayType, typename IndexType>
-bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*                         polygon,
+bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>&                         polygon,
                                            ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodeCoords,
                                            IndexType                                       vertexIndex,
                                            double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
-
     // Check if vertex is directly included already
 
-    for ( typename std::vector<IndexType>::iterator it = polygon->begin(); it != polygon->end(); ++it )
+    for ( typename std::vector<IndexType>::iterator it = polygon.begin(); it != polygon.end(); ++it )
     {
         if ( *it == vertexIndex ) return true;
     }
 
-#if 1
     // Check if the new point is within tolerance of one of the polygon vertices
 
     bool existsOrInserted = false;
-    for ( typename std::vector<IndexType>::iterator it = polygon->begin(); it != polygon->end(); ++it )
+    for ( typename std::vector<IndexType>::iterator it = polygon.begin(); it != polygon.end(); ++it )
     {
         if ( ( nodeCoords[*it] - nodeCoords[vertexIndex] ).length() < tolerance )
         {
@@ -93,14 +95,13 @@ bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*              
     }
 
     if ( existsOrInserted ) return true;
-#endif
 
     // Copy the start polygon to a list
 
     std::list<IndexType> listPolygon;
-    for ( size_t pcIdx = 0; pcIdx < polygon->size(); ++pcIdx )
+    for ( size_t pcIdx = 0; pcIdx < polygon.size(); ++pcIdx )
     {
-        listPolygon.push_back( ( *polygon )[pcIdx] );
+        listPolygon.push_back( polygon[pcIdx] );
     }
 
     // Insert vertex in polygon if the distance to one of the edges is small enough
@@ -125,10 +126,10 @@ bool GeometryTools::insertVertexInPolygon( std::vector<IndexType>*              
 
     // Write polygon back into the vector
 
-    polygon->clear();
+    polygon.clear();
     for ( typename std::list<IndexType>::iterator it = listPolygon.begin(); it != listPolygon.end(); ++it )
     {
-        polygon->push_back( *it );
+        polygon.push_back( *it );
     }
 
     return existsOrInserted;
@@ -157,7 +158,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
                                                    cvf::ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> vertices,
                                                    cvf::ArrayWrapperConst<PolygonArrayType, IndexType>  indices,
                                                    const cvf::Vec3d&                                    point,
-                                                   int*                                                 touchedEdgeIndex,
+                                                   int&                                                 touchedEdgeIndex,
                                                    double                                               tolerance )
 {
     size_t numIndices = indices.size();
@@ -183,9 +184,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
     size_t firstIdx;
     size_t secondIdx;
 
-    CVF_TIGHT_ASSERT( touchedEdgeIndex );
-
-    *touchedEdgeIndex = -1;
+    touchedEdgeIndex = -1;
     for ( firstIdx = 0, secondIdx = 1; firstIdx < numIndices; ++firstIdx, ++secondIdx )
     {
         if ( secondIdx >= numIndices ) secondIdx = 0;
@@ -195,7 +194,7 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
         double sqDist = GeometryTools::linePointSquareDist( vx0, vx1, point );
         if ( sqDist < tolerance * tolerance )
         {
-            *touchedEdgeIndex = static_cast<int>( firstIdx );
+            touchedEdgeIndex = static_cast<int>( firstIdx );
             return true;
         }
     }
@@ -247,20 +246,17 @@ bool GeometryTools::isPointTouchingIndexedPolygon( const cvf::Vec3d&            
 /// The second face must have opposite winding of the first
 //--------------------------------------------------------------------------------------------------
 template <typename VerticeArrayType, typename IndexType>
-bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*                         polygon,
-                                                       std::vector<cvf::Vec3d>*                        createdVertexes,
+bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>&                         polygon,
+                                                       std::vector<cvf::Vec3d>&                        createdVertexes,
                                                        EdgeIntersectStorage<IndexType>*                edgeIntersectionStorage,
                                                        ArrayWrapperConst<VerticeArrayType, cvf::Vec3d> nodes,
                                                        const IndexType                                 cv1CubeFaceIndices[4],
                                                        const IndexType                                 cv2CubeFaceIndices[4],
                                                        double                                          tolerance )
 {
-    CVF_ASSERT( polygon );
-    CVF_ASSERT( createdVertexes );
-
     // Topology analysis
 
-    IndexType newVertexIndex = static_cast<IndexType>( nodes.size() + createdVertexes->size() );
+    IndexType newVertexIndex = static_cast<IndexType>( nodes.size() + createdVertexes.size() );
 
     bool cv1VxTouchCv2[4]     = { false, false, false, false };
     bool cv2VxTouchCv1[4]     = { false, false, false, false };
@@ -291,7 +287,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 0; k < 4; ++k )
         {
-            polygon->push_back( cv1CubeFaceIndices[k] );
+            polygon.push_back( cv1CubeFaceIndices[k] );
         }
 
         return true;
@@ -311,7 +307,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                   nodes,
                                                                                   wrapArrayConst( cv2CubeFaceIndices, 4 ),
                                                                                   nodes[cv1CubeFaceIndices[cv1Idx]],
-                                                                                  &( cv1VxTouchCv2Edge[cv1Idx] ),
+                                                                                  cv1VxTouchCv2Edge[cv1Idx],
                                                                                   tolerance );
             if ( cv1VxTouchCv2[cv1Idx] ) ++numCv1VxesOnCv2;
         }
@@ -322,7 +318,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                   nodes,
                                                                                   wrapArrayConst( cv1CubeFaceIndices, 4 ),
                                                                                   nodes[cv2CubeFaceIndices[cv1Idx]],
-                                                                                  &( cv2VxTouchCv1Edge[cv1Idx] ),
+                                                                                  cv2VxTouchCv1Edge[cv1Idx],
                                                                                   tolerance );
             if ( cv2VxTouchCv1[cv1Idx] ) ++numCv2VxesOnCv1;
         }
@@ -335,7 +331,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 0; k < 4; ++k )
         {
-            polygon->push_back( cv1CubeFaceIndices[k] );
+            polygon.push_back( cv1CubeFaceIndices[k] );
         }
 
         return true;
@@ -346,7 +342,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         int k;
         for ( k = 3; k >= 0; --k ) // Return opposite winding, to match winding of face 1
         {
-            polygon->push_back( cv2CubeFaceIndices[k] );
+            polygon.push_back( cv2CubeFaceIndices[k] );
         }
         return true;
     }
@@ -357,7 +353,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
     // Loop over edges in the face of Cv1. Intersect each one with all the edges of the Cv2 face.
     // Add first point of the cv1 edge to polygon if it really touches Cv2 ( touch of edge is considered as not
     // touching) Add each intersection point along the Cv1 edge if present and finally: if the cv1 edge is going out of
-    // cv2, the add the cv2 vertexes from that intersection as long as they touch cv1.
+    // cv2, the add the cv2 vertices from that intersection as long as they touch cv1.
 
     int nextCv1Idx = 1;
     for ( cv1Idx = 0; cv1Idx < 4; ++cv1Idx, ++nextCv1Idx )
@@ -367,9 +363,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         if ( cv1VxTouchCv2[cv1Idx] && cv1VxTouchCv2Edge[cv1Idx] == -1 ) // Start of cv1 edge is touching inside the cv2
                                                                         // polygon (not on an cv2 edge)
         {
-            if ( polygon->empty() || polygon->back() != cv1CubeFaceIndices[cv1Idx] )
+            if ( polygon.empty() || polygon.back() != cv1CubeFaceIndices[cv1Idx] )
             {
-                polygon->push_back( cv1CubeFaceIndices[cv1Idx] );
+                polygon.push_back( cv1CubeFaceIndices[cv1Idx] );
             }
 
             if ( cv1VxTouchCv2[nextCv1Idx] && cv1VxTouchCv2Edge[nextCv1Idx] == -1 )
@@ -431,8 +427,8 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                        cv2CubeFaceIndices[nextCv2Idx],
                                                                        &intersectionVxIndex,
                                                                        &intersectStatus,
-                                                                       &fractionAlongEdge1,
-                                                                       &fractionAlongEdge2 );
+                                                                       fractionAlongEdge1,
+                                                                       fractionAlongEdge2 );
 
                 if ( !found )
                 {
@@ -441,9 +437,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                              nodes[cv1CubeFaceIndices[nextCv1Idx]],
                                                                              nodes[cv2CubeFaceIndices[cv2Idx]],
                                                                              nodes[cv2CubeFaceIndices[nextCv2Idx]],
-                                                                             &intersection,
-                                                                             &fractionAlongEdge1,
-                                                                             &fractionAlongEdge2,
+                                                                             intersection,
+                                                                             fractionAlongEdge1,
+                                                                             fractionAlongEdge2,
                                                                              tolerance );
 
                     switch ( intersectStatus )
@@ -451,7 +447,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                         case GeometryTools::LINES_CROSSES:
                         {
                             intersectionVxIndex = newVertexIndex;
-                            createdVertexes->push_back( intersection );
+                            createdVertexes.push_back( intersection );
                             ++newVertexIndex;
                         }
                         break;
@@ -466,7 +462,13 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                             else if ( fractionAlongEdge2 >= 1.0 )
                                 intersectionVxIndex = cv2CubeFaceIndices[nextCv2Idx];
                             else
-                                CVF_ASSERT( false ); // Tolerance trouble
+                            {
+                                // Numerical precision issue at edge boundary
+                                // Create intersection vertex at the computed intersection point as fallback
+                                intersectionVxIndex = newVertexIndex;
+                                createdVertexes.push_back( intersection );
+                                ++newVertexIndex;
+                            }
                         }
                         break;
                         case GeometryTools::LINES_OVERLAP:
@@ -480,7 +482,13 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                             else if ( fractionAlongEdge2 >= 1.0 )
                                 intersectionVxIndex = cv2CubeFaceIndices[nextCv2Idx];
                             else
-                                CVF_ASSERT( false ); // Tolerance trouble
+                            {
+                                // Numerical precision issue at edge boundary
+                                // Create intersection vertex at the computed intersection point as fallback
+                                intersectionVxIndex = newVertexIndex;
+                                createdVertexes.push_back( intersection );
+                                ++newVertexIndex;
+                            }
                         }
                         break;
                         default:
@@ -504,7 +512,11 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
             if ( ( intersectStatus == GeometryTools::LINES_CROSSES ) || ( intersectStatus == GeometryTools::LINES_TOUCH ) ||
                  ( intersectStatus == GeometryTools::LINES_OVERLAP ) )
             {
-                CVF_ASSERT( intersectionVxIndex != cvf::UNDEFINED_UINT );
+                if ( intersectionVxIndex == cvf::UNDEFINED_UINT )
+                {
+                    // Invalid intersection - skip and continue processing
+                    continue;
+                }
 
                 intersectionFractionsAlongEdge.push_back( fractionAlongEdge1 );
                 intersectedCv2EdgeIdxs.push_back( cv2Idx );
@@ -539,9 +551,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
         typename std::map<double, IndexType>::iterator it;
         for ( it = sortingMap.begin(); it != sortingMap.end(); ++it )
         {
-            if ( polygon->empty() || polygon->back() != it->second )
+            if ( polygon.empty() || polygon.back() != it->second )
             {
-                polygon->push_back( it->second );
+                polygon.push_back( it->second );
             }
         }
 
@@ -570,9 +582,9 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
                                                                                                     // outside, so we
                                                                                                     // must stop
                 {
-                    if ( polygon->empty() || polygon->back() != cv2CubeFaceIndices[cv2Idx] )
+                    if ( polygon.empty() || polygon.back() != cv2CubeFaceIndices[cv2Idx] )
                     {
-                        polygon->push_back( cv2CubeFaceIndices[cv2Idx] );
+                        polygon.push_back( cv2CubeFaceIndices[cv2Idx] );
                     }
                     --cv2Idx;
                     if ( cv2Idx < 0 ) cv2Idx = 3;
@@ -581,22 +593,27 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
             }
             else
             {
-                CVF_ASSERT( lastIntersection < intersectedCv2EdgeIdxs.size() );
+                if ( lastIntersection >= intersectedCv2EdgeIdxs.size() )
+                {
+                    // Array bounds exceeded - exit processing gracefully
+                    break;
+                }
             }
         }
     }
 
-    if ( polygon->size() > 2 )
+    if ( polygon.size() > 2 )
     {
-        if ( polygon->back() == polygon->front() ) polygon->pop_back();
+        if ( polygon.back() == polygon.front() ) polygon.pop_back();
     }
 
     // Sanity checks
-    if ( polygon->size() < 3 )
+    if ( polygon.size() < 3 )
     {
-        // cvf::Trace::show(cvf::String("Degenerated connection polygon detected. (Less than 3 vertexes) Cv's probably
-        // not in contact: %1 , %2").arg(m_ownerCvId).arg(m_neighborCvId));
-        polygon->clear();
+        // Do not log here - this is a common situation when cube faces only touch at edges or corners. The logging system can be flooded in
+        // some cases.
+
+        polygon.clear();
 
         return false;
     }
@@ -605,7 +622,7 @@ bool GeometryTools::calculateOverlapPolygonOfTwoQuads( std::vector<IndexType>*  
 }
 
 //--------------------------------------------------------------------------------------------------
-/// This method assumes that all intersection and mid edge vertexes are created an are already
+/// This method assumes that all intersection and mid edge vertices are created an are already
 /// merged into all the polygons. We can also assume that all the connection polygons are completely
 /// inside (or sharing edges with) the cube face polygon initially
 //--------------------------------------------------------------------------------------------------
@@ -910,7 +927,7 @@ void EdgeIntersectStorage<IndexType>::canonizeAddress( IndexType& e1P1,
 
     flipE1E2 = ( flipE1 ? e1P2 : e1P1 ) > ( flipE2 ? e2P2 : e2P1 );
 
-    static IndexType temp;
+    IndexType temp;
     if ( flipE1 )
     {
         temp = e1P1;
@@ -949,13 +966,13 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
                                                        double                            fractionAlongEdge1,
                                                        double                            fractionAlongEdge2 )
 {
-    static bool flipE1;
-    static bool flipE2;
-    static bool flipE1E2;
+    bool flipE1;
+    bool flipE2;
+    bool flipE1E2;
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
-    static IntersectData iData;
+    IntersectData iData;
 
     iData.fractionAlongEdge1 = flipE1 ? 1 - fractionAlongEdge1 : fractionAlongEdge1;
     iData.fractionAlongEdge2 = flipE2 ? 1 - fractionAlongEdge2 : fractionAlongEdge2;
@@ -969,7 +986,9 @@ void EdgeIntersectStorage<IndexType>::addIntersection( IndexType                
     }
 
     iData.intersectionPointIndex = vxIndexIntersectionPoint;
-    CVF_ASSERT( e1P1 < m_edgeIntsectMap.size() );
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() )
+        return;
     m_edgeIntsectMap[e1P1][e1P2][e2P1][e2P2] = iData;
 }
 
@@ -983,27 +1002,26 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
                                                         IndexType                          e2P2,
                                                         IndexType*                         vxIndexIntersectionPoint,
                                                         GeometryTools::IntersectionStatus* intersectionStatus,
-                                                        double*                            fractionAlongEdge1,
-                                                        double*                            fractionAlongEdge2 )
+                                                        double&                            fractionAlongEdge1,
+                                                        double&                            fractionAlongEdge2 )
 {
-    static bool flipE1;
-    static bool flipE2;
-    static bool flipE1E2;
+    bool flipE1;
+    bool flipE2;
+    bool flipE1E2;
 
     canonizeAddress( e1P1, e1P2, e2P1, e2P2, flipE1, flipE2, flipE1E2 );
 
-    if ( !m_edgeIntsectMap[e1P1].size() ) return false;
+    if ( e1P1 >= m_edgeIntsectMap.size() || e1P2 >= m_edgeIntsectMap.size() || e2P1 >= m_edgeIntsectMap.size() ||
+         e2P2 >= m_edgeIntsectMap.size() || !m_edgeIntsectMap[e1P1].size() )
+        return false;
 
-    typename std::map<IndexType, std::map<IndexType, std::map<IndexType, IntersectData>>>::iterator it;
-    it = m_edgeIntsectMap[e1P1].find( e1P2 );
+    auto it = m_edgeIntsectMap[e1P1].find( e1P2 );
     if ( it == m_edgeIntsectMap[e1P1].end() ) return false;
 
-    typename std::map<IndexType, std::map<IndexType, IntersectData>>::iterator it2;
-    it2 = it->second.find( e2P1 );
+    auto it2 = it->second.find( e2P1 );
     if ( it2 == it->second.end() ) return false;
 
-    typename std::map<IndexType, IntersectData>::iterator it3;
-    it3 = it2->second.find( e2P2 );
+    auto it3 = it2->second.find( e2P2 );
     if ( it3 == it2->second.end() ) return false;
 
     *vxIndexIntersectionPoint = it3->second.intersectionPointIndex;
@@ -1011,17 +1029,17 @@ bool EdgeIntersectStorage<IndexType>::findIntersection( IndexType               
 
     if ( flipE1E2 )
     {
-        *fractionAlongEdge1 = it3->second.fractionAlongEdge2;
-        *fractionAlongEdge2 = it3->second.fractionAlongEdge1;
+        fractionAlongEdge1 = it3->second.fractionAlongEdge2;
+        fractionAlongEdge2 = it3->second.fractionAlongEdge1;
     }
     else
     {
-        *fractionAlongEdge1 = it3->second.fractionAlongEdge1;
-        *fractionAlongEdge2 = it3->second.fractionAlongEdge2;
+        fractionAlongEdge1 = it3->second.fractionAlongEdge1;
+        fractionAlongEdge2 = it3->second.fractionAlongEdge2;
     }
 
-    if ( flipE1 ) *fractionAlongEdge1 = 1 - *fractionAlongEdge1;
-    if ( flipE2 ) *fractionAlongEdge2 = 1 - *fractionAlongEdge2;
+    if ( flipE1 ) fractionAlongEdge1 = 1 - fractionAlongEdge1;
+    if ( flipE2 ) fractionAlongEdge2 = 1 - fractionAlongEdge2;
 
     return true;
 }

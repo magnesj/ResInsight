@@ -40,6 +40,7 @@
 #include "RiaRegressionTestRunner.h"
 #include "RiaSocketServer.h"
 #include "RiaTextStringTools.h"
+#include "RiaToCafLogging.h"
 #include "RiaVersionInfo.h"
 #include "RiaViewRedrawScheduler.h"
 #include "RiaWellNameComparer.h"
@@ -192,6 +193,9 @@ RiaApplication::RiaApplication()
 RiaApplication::~RiaApplication()
 {
     RiaFontCache::clear();
+
+    // Shutdown CAF logging bridge
+    RiaCafLoggingManager::shutdownCafLogging();
 
     caf::SelectionManager::instance()->setPdmRootObject( nullptr );
 
@@ -666,7 +670,7 @@ bool RiaApplication::loadProject( const QString& projectFileName, ProjectLoadAct
             RimMainPlotCollection* mainPlotColl = RimMainPlotCollection::current();
             mainPlotColl->ensureDefaultFlowPlotsAreCreated();
 
-            // RimVfpTable are not presisted in the project file, and are created in vfpDataCollection->loadDataAndUpdate(). Existing VFP
+            // RimVfpTable are not persisted in the project file, and are created in vfpDataCollection->loadDataAndUpdate(). Existing VFP
             // plots will have references to RimVfpTables. Call resolveReferencesRecursively() to update the references to RimVfpTable objects.
             mainPlotColl->vfpPlotCollection()->resolveReferencesRecursively();
         }
@@ -1632,6 +1636,9 @@ void RiaApplication::initialize()
     m_project->setPlotTemplateFolders( m_preferences->plotTemplateFolders() );
 
     caf::SelectionManager::instance()->setPdmRootObject( project() );
+
+    // Initialize CAF logging bridge to forward CAF framework messages to ResInsight logging
+    RiaCafLoggingManager::initializeCafLogging();
 
     initializeDataLoadController();
 }

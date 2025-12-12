@@ -66,16 +66,18 @@ CMakeSettings.json
 enc_temp_folder
 CMakeUserPresets.json
 
-#Visual Studio Code files
+# Tool files
 .vscode
+.claude
 
-#Temp files
+# Temp files
 *.temp
 /Resinsight_Host.includes
 /Resinsight_Host.files
 /Resinsight_Host.creator
 /Resinsight_Host.config
 *.RESINSIGHT_IDX
+*.rspdb
 
 #Python
 *.pyc

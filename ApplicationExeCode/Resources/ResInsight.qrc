@@ -295,12 +295,17 @@
         <file>arrow-swap.svg</file>
         <file>inspect.svg</file>
         <file>pin.svg</file>
-        <file>pinned.svg</file>
+		<file>Play.svg</file>
+		<file>gear_icon_16x16.png</file>
+		<file>pinned.svg</file>
         <file>pinned-remove.svg</file>
         <file>Select.svg</file>
+		<file>TimedRefresh.png</file>
         <file>NavigationProperty.svg</file>
         <file>user-defined-view.svg</file>
-        <file>gear.svg</file>
+		<file>stop.svg</file>
+		<file>gear.svg</file>
+		<file>warning.png</file>
 		<file>Parameter.svg</file>
     </qresource>
     <qresource prefix="/Shader">

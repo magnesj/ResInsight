@@ -25,6 +25,7 @@
 class RimWellPathTarget;
 class RimWellPath;
 class RimWellPathGeometryDef;
+class RimEclipseCase;
 
 class RimModeledWellPath : public RimWellPath
 {
@@ -41,6 +42,8 @@ public:
     QString                 wellPlanText();
     void                    updateTieInLocationFromParentWell();
     void                    updateReferencePoint();
+
+    void connectWellPaths( RimWellPath* parentWell, double tieInMeasuredDepth ) override;
 
 private:
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName ) override;

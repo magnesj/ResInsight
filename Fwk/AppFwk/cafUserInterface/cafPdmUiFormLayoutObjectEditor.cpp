@@ -36,10 +36,15 @@
 
 #include "cafPdmUiFormLayoutObjectEditor.h"
 
+#include "cafPdmChildArrayField.h"
+#include "cafPdmChildField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObjectHandle.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafPdmUiFieldEditorHelper.h"
 #include "cafPdmUiFieldHandle.h"
+#include "cafPdmUiLabel.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectHandle.h"
 #include "cafPdmUiOrdering.h"
@@ -52,6 +57,8 @@
 #include <QCoreApplication>
 #include <QFrame>
 #include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -67,6 +74,12 @@ caf::PdmUiFormLayoutObjectEditor::~PdmUiFormLayoutObjectEditor()
 {
     // If there are field editor present, the usage of this editor has not cleared correctly
     // The intended usage is to call the method setPdmObject(NULL) before closing the dialog
+    if ( !m_fieldViews.empty() )
+    {
+        CAF_PDM_LOG_WARNING( QString( "UI Form Layout Editor: Destructor called with %1 field views still present. "
+                                      "Call setPdmObject(nullptr) before destruction." )
+                                 .arg( m_fieldViews.size() ) );
+    }
     CAF_ASSERT( m_fieldViews.empty() );
 }
 
@@ -163,6 +176,32 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
                 currentColumn += itemColumnSpan;
                 sumRowStretch += groupStretchFactor;
             }
+            else if ( auto* label = dynamic_cast<PdmUiLabel*>( currentItem ) )
+            {
+                if ( auto qLabel = createLabel( containerWidgetWithGridLayout, *label, uiConfigName ) )
+                {
+                    parentLayout->addWidget( qLabel, currentRowIndex, currentColumn, 1, itemColumnSpan, Qt::AlignTop );
+                    currentColumn += itemColumnSpan;
+                }
+                else
+                {
+                    CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: Failed to create label for text '%1'." )
+                                           .arg( label->uiName( uiConfigName ) ) );
+                }
+            }
+            else if ( auto* button = dynamic_cast<PdmUiButton*>( currentItem ) )
+            {
+                if ( auto qButton = createButton( containerWidgetWithGridLayout, *button, uiConfigName ) )
+                {
+                    parentLayout->addWidget( qButton, currentRowIndex, currentColumn, 1, itemColumnSpan, button->alignment() );
+                    currentColumn += itemColumnSpan;
+                }
+                else
+                {
+                    CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: Failed to create button for text '%1'." )
+                                           .arg( button->uiName( uiConfigName ) ) );
+                }
+            }
             else
             {
                 PdmUiFieldEditorHandle* fieldEditor = nullptr;
@@ -214,8 +253,6 @@ int caf::PdmUiFormLayoutObjectEditor::recursivelyConfigureAndUpdateUiOrderingInG
                                                          Qt::AlignTop );
                                 labelAndFieldVerticalLayout->addWidget( fieldLabelWidget, 0, Qt::AlignTop );
                                 labelAndFieldVerticalLayout->addWidget( fieldEditorWidget, 1, Qt::AlignTop );
-
-                                m_layouts.push_back( labelAndFieldVerticalLayout );
 
                                 // Apply margins determined by the editor type
                                 // fieldLabelWidget->setContentsMargins(fieldEditor->labelContentMargins());
@@ -343,9 +380,7 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
     QMinimizePanel* groupBox    = nullptr;
 
     // Find or create groupBox
-    std::map<QString, QPointer<QMinimizePanel>>::iterator it;
-    it = m_groupBoxes.find( groupBoxKey );
-
+    auto it = m_groupBoxes.find( groupBoxKey );
     if ( it == m_groupBoxes.end() )
     {
         auto newBoxIt = m_newGroupBoxes.find( groupBoxKey );
@@ -356,6 +391,9 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
             // Suggested approach: Make sure that all objects and groups in PdmUiOrdering have unique names.
 
             auto message = "Detected duplicate group box with keyword: " + groupBoxKey;
+            CAF_PDM_LOG_ERROR( QString( "UI Form Layout Editor: %1. This may cause layout issues. Ensure unique group "
+                                        "names in PdmUiOrdering." )
+                                   .arg( message ) );
             CAF_ASSERT( false && message.toStdString().data() );
         }
 
@@ -395,6 +433,50 @@ QMinimizePanel* caf::PdmUiFormLayoutObjectEditor::findOrCreateGroupBox( QWidget*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QLabel* caf::PdmUiFormLayoutObjectEditor::createLabel( QWidget* parent, const PdmUiLabel& label, const QString& uiConfigName )
+{
+    QLabel* qLabel = new QLabel( parent );
+    qLabel->setText( label.uiName( uiConfigName ) );
+    qLabel->setWordWrap( true );
+
+    m_labels.push_back( qLabel );
+    return qLabel;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QPushButton* caf::PdmUiFormLayoutObjectEditor::createButton( QWidget*           parent,
+                                                             const PdmUiButton& button,
+                                                             const QString&     uiConfigName )
+{
+    QPushButton* qButton = new QPushButton( parent );
+    qButton->setText( button.uiName( uiConfigName ) );
+
+    // Set size policy to size the button to its content rather than fill available space
+    qButton->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
+
+    // Set icon if available
+    auto icon = button.uiIcon( uiConfigName );
+    if ( icon && !icon->isNull() )
+    {
+        qButton->setIcon( *icon );
+    }
+
+    // Connect callback if available
+    auto callback = button.clickCallback();
+    if ( callback )
+    {
+        QObject::connect( qButton, &QPushButton::clicked, [callback]() { callback(); } );
+    }
+
+    m_buttons.push_back( qButton );
+    return qButton;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateFieldEditor( QWidget*          parent,
                                                                                         PdmUiFieldHandle* field,
                                                                                         const QString&    uiConfigName )
@@ -416,16 +498,29 @@ caf::PdmUiFieldEditorHandle* caf::PdmUiFormLayoutObjectEditor::findOrCreateField
         }
         else
         {
-            // This assert happens if no editor is available for a given field
+            // This happens if no editor is available for a given field
             // If the macro for registering the editor is put as the single statement
             // in a cpp file, a dummy static class must be used to make sure the compile unit
             // is included
             //
             // See cafPdmUiCoreColor3f and cafPdmUiCoreVec3d
+            //
+            // Default editors are registered in cafPdmUiDefaultObjectEditor.cpp
+            //
+            // Exclude childArray and child object fields from this warning. A PdmChildArrayFieldHandle field
+            // typically use a list or table editor, see RimWellPathGeometryDef::m_wellTargets
 
-            // This assert will trigger for PdmChildArrayField and PdmChildField
-            // Consider to exclude assert or add editors for these types if the assert is reintroduced
-            // CAF_ASSERT(false);
+            bool isChildArrayField  = dynamic_cast<PdmChildArrayFieldHandle*>( field->fieldHandle() ) != nullptr;
+            bool isChildObjectField = dynamic_cast<PdmChildFieldHandle*>( field->fieldHandle() ) != nullptr;
+            if ( !isChildArrayField && !isChildObjectField )
+            {
+                QString fieldTypeName = field ? field->fieldHandle()->keyword() : "unknown";
+                CAF_PDM_LOG_ERROR(
+                    QString( "UI Form Layout Editor: No field editor available for field type '%1' in config '%2'. "
+                             "Check that the field editor is properly registered." )
+                        .arg( fieldTypeName )
+                        .arg( uiConfigName.isEmpty() ? "default" : uiConfigName ) );
+            }
         }
     }
     else
@@ -456,6 +551,7 @@ void caf::PdmUiFormLayoutObjectEditor::ensureWidgetContainsEmptyGridLayout( QWid
         QLayoutItem* item;
         while ( ( item = layout->takeAt( 0 ) ) != 0 )
         {
+            delete item;
         }
         QWidget().setLayout( layout );
     }
@@ -528,26 +624,34 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
 
     m_groupBoxes.clear();
 
-    // https://github.com/OPM/ResInsight/issues/9939
-    //
-    // The following lines causes crash. m_layouts contains pointers to layouts that are invalid at this point. The
-    // m_layouts are created for widgets where the labels are located on top of the widget, and this option is
-    // rarely used. The crash happens on exit every time when a layout has been created.
-    //
-    // A crash has also happened during runtime, but is hard to reproduce.
-    //
-    // NB! There will be memory leak at this point, but the workaround allowing memory leak is considered OK on
-    // short term. Investigate and find a correct solution
-    //
-    /*
-        for ( auto l : m_layouts )
-        {
-            delete l;
-            l = nullptr;
-        }
-    */
+    deleteLabelsAndButtons();
 
-    m_layouts.clear();
+    // Note: Layouts are now managed by Qt's parent-child ownership system.
+    // When added to parent layouts via addLayout(), Qt automatically handles cleanup.
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void caf::PdmUiFormLayoutObjectEditor::deleteLabelsAndButtons()
+{
+    for ( auto& label : m_labels )
+    {
+        if ( label )
+        {
+            label->deleteLater();
+        }
+    }
+    m_labels.clear();
+
+    for ( auto& button : m_buttons )
+    {
+        if ( button )
+        {
+            button->deleteLater();
+        }
+    }
+    m_buttons.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -555,6 +659,8 @@ void caf::PdmUiFormLayoutObjectEditor::cleanupBeforeSettingPdmObject()
 //--------------------------------------------------------------------------------------------------
 void caf::PdmUiFormLayoutObjectEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
+    deleteLabelsAndButtons();
+
     caf::PdmUiOrdering config;
     if ( pdmObject() )
     {

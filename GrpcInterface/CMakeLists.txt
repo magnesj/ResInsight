@@ -37,6 +37,8 @@ set(SOURCE_GROUP_HEADER_FILES
     RiaGrpcNNCPropertiesService.h
     RiaGrpcPdmObjectService.h
     RiaGrpcApplicationInterface.h
+    RiaGrpcWellPathService.h
+    RiaWellPathDataToGrpcConverter.h
     )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -53,7 +55,10 @@ set(SOURCE_GROUP_SOURCE_FILES
     RiaGrpcKeyValueStoreService.cpp
     RiaGrpcNNCPropertiesService.cpp
     RiaGrpcPdmObjectService.cpp
-    RiaGrpcApplicationInterface.cpp)
+    RiaGrpcApplicationInterface.cpp
+    RiaGrpcWellPathService.cpp
+    RiaWellPathDataToGrpcConverter.cpp
+)
 
 # Find Protobuf installation Looks for protobuf-config.cmake file installed by
 # Protobuf's cmake installation.

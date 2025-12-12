@@ -19,10 +19,12 @@
 #include "RifEclipseSummaryTools.h"
 
 #include "RiaFilePathTools.h"
+#include "RiaPreferencesSummary.h"
 #include "RiaStdStringTools.h"
 #include "RiaStringEncodingTools.h"
 #include "Summary/RiaSummaryAddressAnalyzer.h"
 
+#include "RifOpmSummaryTools.h"
 #include "RifSummaryReaderInterface.h"
 
 #include "cafAppEnum.h"
@@ -156,7 +158,9 @@ void RifEclipseSummaryTools::dumpMetaData( RifSummaryReaderInterface* readerEcli
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RifEclipseSummaryTools::getRestartFileNames( const QString& headerFileName, std::vector<QString>& warnings )
 {
-    const bool useOpmReader = false;
+    RiaPreferencesSummary* prefs        = RiaPreferencesSummary::current();
+    const bool             useOpmReader = prefs->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON;
+
     return getRestartFileNames( headerFileName, useOpmReader, warnings );
 }
 
@@ -205,6 +209,16 @@ std::vector<QString>
             if ( useOpmReader )
             {
                 relativeFilePathFromFile = getRestartRelativeFilePathOpm( currentFileName );
+
+                // When ResInsight creates restart files by writing ESMRY files, there is no support for writing the RESTART keyword to the
+                // ESMRY. As fallback in this situation, read restart file path from SMSPEC.
+                //
+                // See ESmry::make_esmry_file() and RifOpmCommonEclipseSummary::writeEsmryFile()
+                if ( relativeFilePathFromFile.isEmpty() )
+                {
+                    auto smspecFileName      = RifOpmSummaryTools::smspecSummaryFilename( currentFileName );
+                    relativeFilePathFromFile = getRestartRelativeFilePathResdata( smspecFileName );
+                }
             }
             else
             {
@@ -280,14 +294,6 @@ RifRestartFileInfo RifEclipseSummaryTools::getFileInfoAndTimeSteps( const QStrin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RifEclipseSummaryTools::getRestartFileNamesOpm( const QString& headerFileName, std::vector<QString>& warnings )
-{
-    return getRestartFileNames( headerFileName, true, warnings );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryTools::findSummaryHeaderFileInfo( const QString& inputFile, QString* headerFile, QString* path, QString* base, bool* isFormatted )
 {
     char* myPath        = nullptr;
@@ -357,12 +363,42 @@ QString RifEclipseSummaryTools::getRestartRelativeFilePathOpm( const QString& he
         Opm::EclIO::EclFile eclFile( headerFileName.toStdString() );
         eclFile.loadData( "RESTART" );
 
-        std::string restartCaseNameFromFile;
+        if ( !eclFile.hasKey( "RESTART" ) ) return "";
 
-        auto restartData = eclFile.get<std::string>( "RESTART" );
+        std::string restartCaseNameFromFile;
+        auto        restartData = eclFile.get<std::string>( "RESTART" );
         for ( const auto& string : restartData )
         {
-            restartCaseNameFromFile += string;
+            auto candidate = QDir::cleanPath( QString::fromStdString( string ) );
+
+            // Find "realization-" in both paths
+            int incomingRealizationPos = headerFileName.indexOf( "realization-" );
+            int foundRealizationPos    = candidate.indexOf( "realization-" );
+
+            if ( incomingRealizationPos != -1 && foundRealizationPos != -1 )
+            {
+                // Extract prefix from incoming path (everything up to "realization-")
+                QString prefix = headerFileName.left( incomingRealizationPos );
+
+                // Extract suffix from cleaned found path (everything from "realization-" onwards)
+                QString suffix = candidate.mid( foundRealizationPos );
+
+                // Combine to get the target path
+                QString targetPath = QDir::cleanPath( prefix + suffix );
+
+                // Get the directory of the incoming file
+                QFileInfo incomingFileInfo( headerFileName );
+                QDir      incomingDir = incomingFileInfo.absoluteDir();
+
+                // Create relative path from incoming directory to target
+                QString relativePath = incomingDir.relativeFilePath( targetPath );
+
+                restartCaseNameFromFile += relativePath.toStdString();
+            }
+            else
+            {
+                restartCaseNameFromFile += string;
+            }
         }
 
         return QString::fromStdString( restartCaseNameFromFile );

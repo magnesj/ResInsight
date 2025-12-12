@@ -44,7 +44,9 @@
 #include "RimWellLogCurveCommonDataSource.h"
 #include "RimWellLogPlot.h"
 #include "RimWellRftPlot.h"
+#include "Tools/RimAutomationSettings.h"
 
+#include "RicReloadSummaryCaseFeature.h"
 #include "SummaryPlotCommands/RicSummaryCurveCalculatorDialog.h"
 #include "SummaryPlotCommands/RicSummaryPlotEditorDialog.h"
 
@@ -79,6 +81,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSettings>
+#include <QTimer>
 #include <QToolBar>
 #include <QTreeView>
 #include <QUndoStack>
@@ -91,6 +94,9 @@ RiuPlotMainWindow::RiuPlotMainWindow()
     : m_activePlotViewWindow( nullptr )
     , m_selection3DLinkEnabled( false )
     , m_toggleSelectionLinkAction( nullptr )
+    , m_toggleAutoUpdateAction( nullptr )
+    , m_autoUpdateEnabled( false )
+    , m_autoUpdateTimerId( -1 )
 {
     m_mdiArea = new RiuMdiArea( this );
     connect( m_mdiArea, SIGNAL( subWindowActivated( QMdiSubWindow* ) ), SLOT( slotSubWindowActivated( QMdiSubWindow* ) ) );
@@ -111,6 +117,17 @@ RiuPlotMainWindow::RiuPlotMainWindow()
     m_toggleSelectionLinkAction->setCheckable( true );
     m_toggleSelectionLinkAction->setChecked( m_selection3DLinkEnabled );
     connect( m_toggleSelectionLinkAction, SIGNAL( triggered() ), SLOT( slotToggleSelectionLink() ) );
+
+    m_toggleAutoUpdateAction = new QAction( QIcon( ":/TimedRefresh.png" ), tr( "Auto-update plots." ), this );
+    m_toggleAutoUpdateAction->setToolTip( "Reload cases at interval specified in Automation Settings." );
+    m_toggleAutoUpdateAction->setCheckable( true );
+    m_toggleAutoUpdateAction->setChecked( m_autoUpdateEnabled );
+    connect( m_toggleAutoUpdateAction, SIGNAL( triggered() ), SLOT( slotToggleAutoUpdate() ) );
+
+    m_reloadSelectedCasesAction = new QAction( QIcon( ":/Refresh.svg" ), tr( "Reload Selected Cases" ), this );
+    m_reloadSelectedCasesAction->setToolTip( "Reload selected summary and/or ensemble cases." );
+    m_reloadSelectedCasesAction->setCheckable( false );
+    connect( m_reloadSelectedCasesAction, SIGNAL( triggered() ), SLOT( slotReloadSelectedCases() ) );
 
     createMenus();
     createToolBars();
@@ -219,22 +236,20 @@ void RiuPlotMainWindow::initializeGuiNewProjectLoaded()
 
     refreshToolbars();
 
-    // Find the project tree and reselect items to trigger the selectionChanged signal. This will make sure that the property view is
-    // updated based on the selection in the main project tree.
-    if ( auto dockWidget = RiuDockWidgetTools::findDockWidget( dockManager(), RiuDockWidgetTools::plotMainWindowPlotsTreeName() ) )
+    // Sync selections with property views.
+    // Go backwards as the most "important" tree view is first in the list
+    // and we want that to use the property editor in case multiple tree views are visible
+    for ( int i = (int)m_projectTreeViews.size() - 1; i >= 0; i-- )
     {
-        if ( auto tree = dynamic_cast<caf::PdmUiTreeView*>( dockWidget->widget() ) )
+        auto projectTree = projectTreeView( i );
+        if ( !projectTree->isVisible() ) continue;
+
+        std::vector<caf::PdmUiItem*> uiItems;
+        projectTree->selectedUiItems( uiItems );
+        if ( !uiItems.empty() )
         {
-            std::vector<caf::PdmUiItem*> uiItems;
-            tree->selectedUiItems( uiItems );
-
-            std::vector<const caf::PdmUiItem*> constSelectedItems;
-            for ( auto item : uiItems )
-            {
-                constSelectedItems.push_back( item );
-            }
-
-            tree->selectItems( constSelectedItems );
+            auto firstSelectedObject = dynamic_cast<caf::PdmObjectHandle*>( uiItems.front() );
+            if ( i < (int)m_propertyViews.size() ) m_propertyViews[i]->showProperties( firstSelectedObject );
         }
     }
 }
@@ -286,7 +301,7 @@ void RiuPlotMainWindow::closeEvent( QCloseEvent* event )
     RiaGuiApplication* app = RiaGuiApplication::instance();
     if ( !app->isMain3dWindowVisible() )
     {
-        if ( !app->askUserToSaveModifiedProject() )
+        if ( !app->checkWithUserBeforeClose() )
         {
             event->ignore();
             return;
@@ -430,6 +445,8 @@ void RiuPlotMainWindow::createToolBars()
         if ( toolbarName == "View" )
         {
             toolbar->addAction( m_toggleSelectionLinkAction );
+            toolbar->addAction( m_reloadSelectedCasesAction );
+            toolbar->addAction( m_toggleAutoUpdateAction );
         }
     }
 
@@ -499,7 +516,7 @@ void RiuPlotMainWindow::createDockPanels()
 
         caf::PdmUiTreeView* projectTree = projectTreeView( i );
         projectTree->enableSelectionManagerUpdating( true );
-
+        projectTree->setObjectName( treeViewDockNames[i] );
         projectTree->enableAppendOfClassNameToUiItemText( RiaPreferencesSystem::current()->appendClassNameToUiText() );
 
         dockWidget->setWidget( projectTree );
@@ -961,7 +978,7 @@ void RiuPlotMainWindow::selectedObjectsChanged( caf::PdmUiTreeView* projectTree,
             selectedWindow = firstSelectedObject->firstAncestorOrThisOfType<RimViewWindow>();
         }
 
-        // If we cant find the view window as an MDI sub window, we search higher in the
+        // If we can't find the view window as an MDI sub window, we search higher in the
         // project tree to find a possible parent view window that has.
         if ( selectedWindow && !findMdiSubWindow( selectedWindow->viewWidget() ) )
         {
@@ -1112,4 +1129,45 @@ bool RiuPlotMainWindow::selection3DLinkEnabled()
 void RiuPlotMainWindow::slotToggleSelectionLink()
 {
     m_selection3DLinkEnabled = !m_selection3DLinkEnabled;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::slotToggleAutoUpdate()
+{
+    m_autoUpdateEnabled = !m_autoUpdateEnabled;
+
+    if ( ( m_autoUpdateEnabled ) && ( m_autoUpdateTimerId == -1 ) )
+    {
+        auto intervalMs     = RimProject::current()->automationSettings()->caseReloadIntervalMs();
+        m_autoUpdateTimerId = startTimer( intervalMs );
+    }
+    else
+    {
+        if ( m_autoUpdateTimerId != -1 )
+        {
+            killTimer( m_autoUpdateTimerId );
+            m_autoUpdateTimerId = -1;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::slotReloadSelectedCases()
+{
+    RicReloadSummaryCaseFeature::reloadSelectedCasesAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiuPlotMainWindow::timerEvent( QTimerEvent* event )
+{
+    if ( event->timerId() == m_autoUpdateTimerId )
+    {
+        RicReloadSummaryCaseFeature::reloadTaggedSummaryCasesAndUpdate();
+    }
 }

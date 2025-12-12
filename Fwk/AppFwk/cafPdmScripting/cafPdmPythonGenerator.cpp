@@ -35,9 +35,11 @@
 //##################################################################################################
 #include "cafPdmPythonGenerator.h"
 
+#include "cafAssert.h"
 #include "cafPdmAbstractFieldScriptingCapability.h"
 #include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmObjectFactory.h"
 #include "cafPdmObjectMethod.h"
@@ -60,6 +62,49 @@
 using namespace caf;
 
 CAF_PDM_CODE_GENERATOR_SOURCE_INIT( PdmPythonGenerator, "py" );
+
+namespace internal
+{
+void appendCodeForMethod( std::map<QString, std::map<QString, QString>>& classMethods,
+                          const std::list<QString>&                      classInheritanceStack,
+                          const QString&                                 classKeyword,
+                          const QString&                                 methodName,
+                          const QString&                                 sourceCode )
+{
+    // Check if method already exists in any super class. This is not supported, and causes the generated
+    // Python code to silently ignore the second version of the source code. Show an error message and assert will be
+    // issued. It is difficult to trap this error earlier. The method names are registered with the macro
+    // CAF_PDM_OBJECT_METHOD_SOURCE_INIT, and this macro does not have access to the class inheritance structure.
+    // See "cafPdmObjectMethod.h"
+    // https://github.com/OPM/ResInsight/issues/12972
+
+    for ( auto it = classInheritanceStack.begin(); it != classInheritanceStack.end(); ++it )
+    {
+        const auto& superClassKeyword = *it;
+        if ( superClassKeyword == classKeyword ) continue;
+
+        if ( classMethods[superClassKeyword].contains( methodName ) )
+        {
+            QString txt =
+                QString( "Method '%1' already exists in super class '%2'. Cannot add method '%3' to class '%4'." )
+                    .arg( methodName )
+                    .arg( superClassKeyword )
+                    .arg( methodName )
+                    .arg( classKeyword );
+
+            caf::PdmLogging::error( txt );
+
+            // Show both message and assert, as this is a serious error that must be fixed by the developer. Not
+            // possible to have dynamic error message in the assert message.
+            CAF_ASSERT( false && "Detected duplicated super class method name when creating a Python class method" );
+
+            return;
+        }
+    }
+
+    classMethods[classKeyword][methodName] = sourceCode;
+}
+} //namespace internal
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -295,8 +340,6 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
 
                 QString snake_method_name = camelToSnakeCase( methodName );
 
-                if ( classMethodsGenerated[classKeyword][snake_method_name].length() ) continue;
-
                 QStringList inputArgumentStrings;
                 QStringList outputArgumentStrings;
                 QStringList argumentComments;
@@ -382,7 +425,11 @@ QString caf::PdmPythonGenerator::generate( PdmObjectFactory* factory, std::vecto
                                          .arg( fullComment )
                                          .arg( methodBody );
 
-                classMethodsGenerated[classKeyword][snake_method_name] = methodCode;
+                internal::appendCodeForMethod( classMethodsGenerated,
+                                               classInheritanceStack,
+                                               classKeyword,
+                                               snake_method_name,
+                                               methodCode );
             }
         }
     }

@@ -42,8 +42,10 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
+#include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeOrdering.h"
 
 #include <QFileInfo>
@@ -73,6 +75,9 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     CAF_PDM_InitField( &m_nameTemplateString, "NameTemplateString", defaultText, "Name Template", "", tooltipText );
 
     CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
+
+    CAF_PDM_InitScriptableField( &m_includeInAutoReload, "IncludeInAutoReload", false, "Include in Automatic Case Reloads" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_includeInAutoReload );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_nameAndItemCount, "NameCount", "Name" );
     m_nameAndItemCount.registerGetMethod( this, &RimSummaryEnsemble::nameAndItemCount );
@@ -148,7 +153,7 @@ void RimSummaryEnsemble::addCase( RimSummaryCase* summaryCase, bool notifyChange
 {
     summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
 
-    summaryCase->setShowVectorItemsInProjectTree( m_cases.empty() );
+    summaryCase->setShowTreeNodes( m_cases.empty() );
 
     m_cases.push_back( summaryCase );
     m_cachedSortedEnsembleParameters.clear();
@@ -212,7 +217,7 @@ void RimSummaryEnsemble::replaceCases( const std::vector<RimSummaryCase*>& summa
         summaryCase->nameChanged.connect( this, &RimSummaryEnsemble::onCaseNameChanged );
         if ( m_cases.empty() )
         {
-            summaryCase->setShowVectorItemsInProjectTree( true );
+            summaryCase->setShowTreeNodes( true );
         }
         m_cases.push_back( summaryCase );
     }
@@ -231,8 +236,7 @@ void RimSummaryEnsemble::reloadCases()
 {
     for ( auto summaryCase : allSummaryCases() )
     {
-        bool buildAddressObjects = false;
-        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase, buildAddressObjects );
+        RiaSummaryTools::reloadSummaryCaseAndUpdateConnectedPlots( summaryCase );
 
         RiaLogging::info( QString( "Reloaded data for %1" ).arg( summaryCase->summaryHeaderFilename() ) );
     }
@@ -558,6 +562,8 @@ std::vector<std::pair<RigEnsembleParameter, double>>
 
             for ( auto parameter : parameters )
             {
+                if ( caseIdx >= parameter.values.size() ) continue;
+
                 if ( parameter.isNumeric() && parameter.isValid() )
                 {
                     double paramValue = parameter.values[caseIdx].toDouble();
@@ -985,6 +991,8 @@ void RimSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     uiOrdering.add( &m_ensembleDescription );
 
+    uiOrdering.add( &m_includeInAutoReload );
+
     uiOrdering.skipRemainingFields( true );
 }
 
@@ -1025,6 +1033,22 @@ void RimSummaryEnsemble::defineEditorAttribute( const caf::PdmFieldHandle* field
         {
             attr->placeholderText        = RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName();
             attr->notifyWhenTextIsEdited = true;
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryEnsemble::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( auto* treeItemAttribute = dynamic_cast<caf::PdmUiTreeViewItemAttribute*>( attribute ) )
+    {
+        if ( m_includeInAutoReload() )
+        {
+            auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
+            tag->icon = caf::IconProvider( ":/TimedRefresh.png" );
+            treeItemAttribute->tags.push_back( std::move( tag ) );
         }
     }
 }
@@ -1243,4 +1267,12 @@ void RimSummaryEnsemble::onCalculationUpdated()
 void RimSummaryEnsemble::clearChildNodes()
 {
     m_dataVectorFolders->deleteChildren();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimSummaryEnsemble::includeInAutoReload() const
+{
+    return m_includeInAutoReload();
 }

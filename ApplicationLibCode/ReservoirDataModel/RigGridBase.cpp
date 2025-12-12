@@ -29,7 +29,7 @@
 #include <cstdlib>
 
 RigGridBase::RigGridBase( RigMainGrid* mainGrid )
-    : m_gridPointDimensions( 0, 0, 0 )
+    : m_cellCounts( 0, 0, 0 )
     , m_indexToStartOfCells( 0 )
     , m_mainGrid( mainGrid )
     , m_cellCountIJK( 0 )
@@ -54,14 +54,9 @@ RigGridBase::~RigGridBase()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigGridBase::setGridPointDimensions( const cvf::Vec3st& gridDimensions )
+void RigGridBase::setCellCounts( const cvf::Vec3st& cellCount )
 {
-    m_gridPointDimensions = gridDimensions;
-
-    m_cellCount.x() = ( m_gridPointDimensions.x() > 0 ? m_gridPointDimensions.x() - 1 : 0 );
-    m_cellCount.y() = ( m_gridPointDimensions.y() > 0 ? m_gridPointDimensions.y() - 1 : 0 );
-    m_cellCount.z() = ( m_gridPointDimensions.z() > 0 ? m_gridPointDimensions.z() - 1 : 0 );
-
+    m_cellCounts   = cellCount;
     m_cellCountIJ  = cellCountI() * cellCountJ();
     m_cellCountIJK = m_cellCountIJ * cellCountK();
 }
@@ -80,6 +75,22 @@ void RigGridBase::setGridName( const std::string& gridName )
 std::string RigGridBase::gridName() const
 {
     return m_gridName;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RigGridBase::isRadial() const
+{
+    return m_isRadial;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigGridBase::setIsRadial( bool isRadial )
+{
+    m_isRadial = isRadial;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -164,11 +175,12 @@ void RigGridBase::initSubCellsMainGridCellIndex()
 
 //--------------------------------------------------------------------------------------------------
 /// For main grid, this will work with reservoirCellIndices retrieving the correct lgr cells as well.
-/// the cell() call retreives correct cell, because main grid has offset of 0, and we access the global
+/// the cell() call retrieves correct cell, because main grid has offset of 0, and we access the global
 /// cell array in main grid.
 //--------------------------------------------------------------------------------------------------
-void RigGridBase::cellCornerVertices( size_t cellIndex, cvf::Vec3d vertices[8] ) const
+std::array<cvf::Vec3d, 8> RigGridBase::cellCornerVertices( size_t cellIndex ) const
 {
+    std::array<cvf::Vec3d, 8>    vertices;
     const std::array<size_t, 8>& indices = cell( cellIndex ).cornerIndices();
 
     vertices[0].set( m_mainGrid->nodes()[indices[0]] );
@@ -179,6 +191,8 @@ void RigGridBase::cellCornerVertices( size_t cellIndex, cvf::Vec3d vertices[8] )
     vertices[5].set( m_mainGrid->nodes()[indices[5]] );
     vertices[6].set( m_mainGrid->nodes()[indices[6]] );
     vertices[7].set( m_mainGrid->nodes()[indices[7]] );
+
+    return vertices;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -187,9 +201,9 @@ void RigGridBase::cellCornerVertices( size_t cellIndex, cvf::Vec3d vertices[8] )
 size_t RigGridBase::cellIndexFromIJK( size_t i, size_t j, size_t k ) const
 {
     CVF_TIGHT_ASSERT( i != cvf::UNDEFINED_SIZE_T && j != cvf::UNDEFINED_SIZE_T && k != cvf::UNDEFINED_SIZE_T );
-    CVF_TIGHT_ASSERT( i < m_gridPointDimensions.x() && j < m_gridPointDimensions.y() && k < m_gridPointDimensions.z() );
+    CVF_TIGHT_ASSERT( i < m_cellCounts.x() && j < m_cellCounts.y() && k < m_cellCounts.z() );
 
-    return i + j * m_cellCount.x() + k * m_cellCountIJ;
+    return i + j * m_cellCounts.x() + k * m_cellCountIJ;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -197,7 +211,7 @@ size_t RigGridBase::cellIndexFromIJK( size_t i, size_t j, size_t k ) const
 //--------------------------------------------------------------------------------------------------
 size_t RigGridBase::cellIndexFromIJKUnguarded( size_t i, size_t j, size_t k ) const
 {
-    return i + j * m_cellCount.x() + k * m_cellCountIJ;
+    return i + j * m_cellCounts.x() + k * m_cellCountIJ;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -216,13 +230,13 @@ bool RigGridBase::ijkFromCellIndex( size_t cellIndex, size_t* i, size_t* j, size
 
     size_t index = cellIndex;
 
-    if ( m_gridPointDimensions[0] <= 1u || m_gridPointDimensions[1] <= 1u )
+    if ( m_cellCounts[0] <= 0u || m_cellCounts[1] <= 0u )
     {
         return false;
     }
 
-    const size_t cellCountI = m_cellCount.x();
-    const size_t cellCountJ = m_cellCount.y();
+    const size_t cellCountI = m_cellCounts.x();
+    const size_t cellCountJ = m_cellCounts.y();
 
     *i = index % cellCountI;
     index /= cellCountI;
@@ -235,12 +249,12 @@ bool RigGridBase::ijkFromCellIndex( size_t cellIndex, size_t* i, size_t* j, size
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<caf::VecIjk> RigGridBase::ijkFromCellIndex( size_t cellIndex ) const
+std::optional<caf::VecIjk0> RigGridBase::ijkFromCellIndex( size_t cellIndex ) const
 {
     size_t i, j, k;
     if ( ijkFromCellIndex( cellIndex, &i, &j, &k ) )
     {
-        return caf::VecIjk( i, j, k );
+        return caf::VecIjk0( i, j, k );
     }
 
     return std::nullopt;
@@ -254,8 +268,8 @@ void RigGridBase::ijkFromCellIndexUnguarded( size_t cellIndex, size_t* i, size_t
 {
     size_t index = cellIndex;
 
-    const size_t cellCountI = m_cellCount.x();
-    const size_t cellCountJ = m_cellCount.y();
+    const size_t cellCountI = m_cellCounts.x();
+    const size_t cellCountJ = m_cellCounts.y();
 
     *i = index % cellCountI;
     index /= cellCountI;
@@ -324,7 +338,7 @@ cvf::Vec3d RigGridBase::maxCoordinate() const
 //--------------------------------------------------------------------------------------------------
 bool RigGridBase::isCellValid( size_t i, size_t j, size_t k ) const
 {
-    if ( i >= m_cellCount.x() || j >= m_cellCount.y() || k >= m_cellCount.z() )
+    if ( i >= m_cellCounts.x() || j >= m_cellCounts.y() || k >= m_cellCounts.z() )
     {
         return false;
     }
@@ -388,28 +402,20 @@ cvf::Vec3d RigGridBase::displayModelOffset() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the min size of the I and J charactristic cell sizes
+/// Returns the min size of the I and J characteristic cell sizes
 //--------------------------------------------------------------------------------------------------
 double RigGridBase::characteristicIJCellSize() const
 {
-    double characteristicCellSize = HUGE_VAL;
+    cvf::Vec3d cellSize = characteristicCellSizes();
 
-    double cellSizeI, cellSizeJ, cellSizeK;
-    characteristicCellSizes( &cellSizeI, &cellSizeJ, &cellSizeK );
-
-    if ( cellSizeI < characteristicCellSize ) characteristicCellSize = cellSizeI;
-    if ( cellSizeJ < characteristicCellSize ) characteristicCellSize = cellSizeJ;
-
-    return characteristicCellSize;
+    return std::min( cellSize.x(), cellSize.y() );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigGridBase::characteristicCellSizes( double* iSize, double* jSize, double* kSize ) const
+cvf::Vec3d RigGridBase::characteristicCellSizes() const
 {
-    CVF_ASSERT( iSize && jSize && kSize );
-
     if ( !hasValidCharacteristicCellSizes() )
     {
         std::vector<size_t> reservoirCellIndices;
@@ -419,9 +425,7 @@ void RigGridBase::characteristicCellSizes( double* iSize, double* jSize, double*
         computeCharacteristicCellSize( reservoirCellIndices );
     }
 
-    *iSize = m_characteristicCellSizeI;
-    *jSize = m_characteristicCellSizeJ;
-    *kSize = m_characteristicCellSizeK;
+    return m_characteristicCellSize;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -493,12 +497,9 @@ cvf::BoundingBox RigGridBase::boundingBox()
 {
     if ( !m_boundingBox.isValid() )
     {
-        cvf::Vec3d cornerVerts[8];
-
         for ( size_t i = 0; i < cellCount(); i++ )
         {
-            cellCornerVertices( i, cornerVerts );
-
+            std::array<cvf::Vec3d, 8> cornerVerts = cellCornerVertices( i );
             for ( size_t j = 0; j < 8; j++ )
             {
                 m_boundingBox.add( cornerVerts[j] );
@@ -507,6 +508,58 @@ cvf::BoundingBox RigGridBase::boundingBox()
     }
 
     return m_boundingBox;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<size_t> RigGridBase::neighborCells( size_t cellIndex, bool ignoreInvalidKLayers ) const
+{
+    auto ijk = ijkFromCellIndex( cellIndex );
+    if ( !ijk.has_value() ) return {};
+    auto& ijkVec = ijk.value();
+
+    std::vector<size_t> neighbors;
+
+    for ( auto face : { FaceType::NEG_I, FaceType::NEG_J, FaceType::NEG_K, FaceType::POS_I, FaceType::POS_J, FaceType::POS_K } )
+    {
+        size_t ni, nj, nk;
+        neighborIJKAtCellFace( ijkVec.i(), ijkVec.j(), ijkVec.k(), face, &ni, &nj, &nk );
+        if ( nk > cellCountK() ) continue;
+        if ( isCellValid( ni, nj, nk ) )
+        {
+            auto neighborIdx = cellIndexFromIJKUnguarded( ni, nj, nk );
+            neighbors.push_back( neighborIdx );
+        }
+        else if ( face == FaceType::NEG_K )
+        {
+            while ( ignoreInvalidKLayers && ( nk > 1 ) )
+            {
+                nk--;
+                if ( isCellValid( ni, nj, nk ) )
+                {
+                    auto neighborIdx = cellIndexFromIJKUnguarded( ni, nj, nk );
+                    neighbors.push_back( neighborIdx );
+                    break;
+                }
+            }
+        }
+        else if ( face == FaceType::POS_K )
+        {
+            while ( ignoreInvalidKLayers && ( nk < cellCountK() ) )
+            {
+                nk++;
+                if ( isCellValid( ni, nj, nk ) )
+                {
+                    auto neighborIdx = cellIndexFromIJKUnguarded( ni, nj, nk );
+                    neighbors.push_back( neighborIdx );
+                    break;
+                }
+            }
+        }
+    }
+
+    return neighbors;
 }
 
 //--------------------------------------------------------------------------------------------------

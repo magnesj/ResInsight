@@ -515,17 +515,9 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::add( size_t num )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifTextDataTableFormatter& RifTextDataTableFormatter::addOneBasedCellIndex( size_t zeroBasedIndex )
+RifTextDataTableFormatter& RifTextDataTableFormatter::addStdString( const std::string& str )
 {
-    size_t column = m_lineBuffer.size();
-    CVF_ASSERT( column < m_columns.size() );
-
-    // Increase index by 1 to use Eclipse 1-based cell index instead of ResInsight 0-based
-    zeroBasedIndex++;
-
-    m_columns[column].width = std::max( measure( zeroBasedIndex ), m_columns[column].width );
-    m_lineBuffer.push_back( format( zeroBasedIndex ) );
-    return *this;
+    return add( QString::fromStdString( str ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -538,6 +530,30 @@ RifTextDataTableFormatter& RifTextDataTableFormatter::addValueOrDefaultMarker( d
         return add( m_defaultMarker );
     }
     return add( value );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add optional value or default marker if the optional is empty
+//--------------------------------------------------------------------------------------------------
+RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalValue( const std::optional<double>& value )
+{
+    if ( value.has_value() )
+    {
+        return add( value.value() );
+    }
+    return add( m_defaultMarker );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add optional value or default marker if the optional is empty
+//--------------------------------------------------------------------------------------------------
+RifTextDataTableFormatter& RifTextDataTableFormatter::addOptionalStdString( const std::optional<std::string>& value )
+{
+    if ( value.has_value() )
+    {
+        return addStdString( value.value() );
+    }
+    return add( m_defaultMarker );
 }
 
 //--------------------------------------------------------------------------------------------------

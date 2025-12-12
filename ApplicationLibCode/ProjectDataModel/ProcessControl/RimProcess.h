@@ -27,13 +27,14 @@
 #include <vector>
 
 class RimProcessMonitor;
+class QProcess;
 
 class RimProcess : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimProcess( bool logStdOutErr = true );
+    RimProcess( bool logStdOutErr = true, RimProcessMonitor* monitor = nullptr );
     ~RimProcess() override;
 
     void setDescription( QString desc );
@@ -51,7 +52,13 @@ public:
     QStringList parameters() const;
     int         ID() const;
 
+    // blocking run
     bool execute( bool enableStdOut = true, bool enableStdErr = true );
+
+    // async run
+    bool start( bool enableStdOut = true, bool enableStdErr = true );
+    void cleanUpAfterRun();
+    void terminate();
 
     QStringList stdErr() const;
     QStringList stdOut() const;
@@ -77,4 +84,5 @@ private:
     static int         m_nextProcessId;
     RimProcessMonitor* m_monitor;
     bool               m_enableLogging;
+    QProcess*          m_qProcess;
 };

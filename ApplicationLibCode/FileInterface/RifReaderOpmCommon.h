@@ -18,9 +18,11 @@
 
 #pragma once
 
+#include "RiaDefines.h"
 #include "RifReaderInterface.h"
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -59,7 +61,8 @@ public:
     bool staticResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, std::vector<double>* values ) override;
     bool dynamicResult( const QString& result, RiaDefines::PorosityModelType matrixOrFracture, size_t stepIndex, std::vector<double>* values ) override;
 
-    std::vector<QDateTime> timeStepsOnFile( QString gridFileName );
+    std::vector<QDateTime>          timeStepsOnFile( QString gridFileName );
+    std::set<RiaDefines::PhaseType> availablePhases() const override;
 
 protected:
     virtual bool importGrid( RigMainGrid* mainGrid, RigEclipseCaseData* caseData );
@@ -105,6 +108,9 @@ private:
     std::vector<TimeDataFile> readTimeSteps();
     QDateTime dateTimeFromTimeStepOnFile( RifReaderOpmCommon::TimeDataFile timeOnFile, QDate startDate, double startDayOffset );
 
+    std::vector<int> readInteheadKeyword() const;
+    int              readPhasesFromIntehead() const;
+
 protected:
     enum class ActiveType
     {
@@ -123,4 +129,5 @@ private:
     std::string                        m_restartFileName;
     std::unique_ptr<Opm::EclIO::ERst>  m_restartFile;
     std::unique_ptr<Opm::EclIO::EInit> m_initFile;
+    bool                               m_radialGridDetected = false;
 };

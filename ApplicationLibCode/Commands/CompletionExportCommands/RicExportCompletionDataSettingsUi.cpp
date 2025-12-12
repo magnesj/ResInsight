@@ -33,10 +33,7 @@ void RicExportCompletionDataSettingsUi::ExportSplitType::setUp()
 {
     addItem( RicExportCompletionDataSettingsUi::ExportSplit::UNIFIED_FILE, "UNIFIED_FILE", "Unified File" );
     addItem( RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL, "SPLIT_ON_WELL", "Split on Well" );
-    addItem( RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL_AND_COMPLETION_TYPE,
-             "SPLIT_ON_WELL_AND_COMPLETION_TYPE",
-             "Split on Well and Completion Type" );
-    setDefault( RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL_AND_COMPLETION_TYPE );
+    setDefault( RicExportCompletionDataSettingsUi::ExportSplit::SPLIT_ON_WELL );
 }
 
 template <>
@@ -47,14 +44,6 @@ void RicExportCompletionDataSettingsUi::CompdatExportType::setUp()
              "WPIMULT_AND_DEFAULT_CONNECTION_FACTORS",
              "Default Connection Factors and WPIMULT (Fractures Not Supported)" );
     setDefault( RicExportCompletionDataSettingsUi::CompdatExport::TRANSMISSIBILITIES );
-}
-
-template <>
-void RicExportCompletionDataSettingsUi::CombinationModeType::setUp()
-{
-    addItem( RicExportCompletionDataSettingsUi::CombinationMode::INDIVIDUALLY, "INDIVIDUALLY", "Individually" );
-    addItem( RicExportCompletionDataSettingsUi::CombinationMode::COMBINED, "COMBINED", "Combined" );
-    setDefault( RicExportCompletionDataSettingsUi::CombinationMode::INDIVIDUALLY );
 }
 
 template <>
@@ -104,12 +93,19 @@ RicExportCompletionDataSettingsUi::RicExportCompletionDataSettingsUi()
                        "definition",
                        "" );
 
-    CAF_PDM_InitFieldNoDefault( &m_reportCompletionTypesSeparately, "ReportCompletionTypesSeparately", "Export Completion Types" );
-
     CAF_PDM_InitField( &m_exportDataSourceAsComment, "ExportDataSourceAsComment", true, "Comments" );
 
     CAF_PDM_InitField( &m_exportWelspec, "ExportWelspec", true, "WELSPEC keyword" );
-    CAF_PDM_InitField( &m_completionWelspecAfterMainBore, "CompletionWelspecAfterMainBore", true, "WELSEGS per Completion Type" );
+
+    const QString completionWelspecAfterMainBoreDesc = "If checked, export all mainbore well segments first, then completions. "
+                                                       "Otherwise, export completion segments based on measured depth. "
+                                                       "Applies to Fracture and Fishbones completions.";
+    CAF_PDM_InitField( &m_completionWelspecAfterMainBore,
+                       "CompletionWelspecAfterMainBore",
+                       true,
+                       "Export completion well segments after main bore",
+                       "",
+                       completionWelspecAfterMainBoreDesc );
 
     CAF_PDM_InitField( &m_useCustomFileName, "UseCustomFileName", false, "Use Custom Filename" );
     CAF_PDM_InitField( &m_customFileName, "CustomFileName", {}, "Custom Filename" );
@@ -125,14 +121,6 @@ RicExportCompletionDataSettingsUi::RicExportCompletionDataSettingsUi()
 void RicExportCompletionDataSettingsUi::enableIncludeMsw()
 {
     includeMsw = true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicExportCompletionDataSettingsUi::setCombinationMode( CombinationMode combinationMode )
-{
-    m_reportCompletionTypesSeparately = combinationMode;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -165,14 +153,6 @@ void RicExportCompletionDataSettingsUi::showPerforationsInUi( bool enable )
 void RicExportCompletionDataSettingsUi::showFishbonesInUi( bool enable )
 {
     m_fishbonesEnabled = enable;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RicExportCompletionDataSettingsUi::reportCompletionsTypesIndividually() const
-{
-    return m_reportCompletionTypesSeparately() == CombinationMode::INDIVIDUALLY;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -351,7 +331,6 @@ void RicExportCompletionDataSettingsUi::defineUiOrdering( QString uiConfigName, 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "File Settings" );
         group->add( &fileSplit );
-        group->add( &m_reportCompletionTypesSeparately );
         group->add( &folder );
 
         if ( fileSplit() == ExportSplit::UNIFIED_FILE )

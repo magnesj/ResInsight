@@ -49,6 +49,9 @@ RimSummaryCase::RimSummaryCase()
     CAF_PDM_InitScriptableField( &m_showSubNodesInTree, "ShowSubNodesInTree", true, "Show Summary Data Sub-Tree" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showSubNodesInTree );
 
+    CAF_PDM_InitScriptableField( &m_includeInAutoReload, "IncludeInAutoReload", false, "Include in Automatic Case Reloads" );
+    caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_includeInAutoReload );
+
     CAF_PDM_InitScriptableField( &m_useAutoShortName_OBSOLETE, "AutoShortyName", false, "Use Auto Display Name" );
     m_useAutoShortName_OBSOLETE.xmlCapability()->setIOWritable( false );
     m_useAutoShortName_OBSOLETE.uiCapability()->setUiHidden( true );
@@ -99,7 +102,7 @@ bool RimSummaryCase::isObservedData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimSummaryCase::showVectorItemsInProjectTree() const
+bool RimSummaryCase::showTreeNodes() const
 {
     return m_showSubNodesInTree();
 }
@@ -107,7 +110,7 @@ bool RimSummaryCase::showVectorItemsInProjectTree() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::setShowVectorItemsInProjectTree( bool enable )
+void RimSummaryCase::setShowTreeNodes( bool enable )
 {
     m_showSubNodesInTree = enable;
 
@@ -218,20 +221,6 @@ QString RimSummaryCase::errorMessagesFromReader()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::buildChildNodes()
-{
-    m_dataVectorFolders->deleteChildren();
-
-    RifSummaryReaderInterface* reader = summaryReader();
-    if ( !reader ) return;
-
-    auto addresses = reader->allResultAddresses();
-    m_dataVectorFolders->updateFolderStructure( addresses, m_caseId );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 int RimSummaryCase::serialNumber()
 {
     auto reader = summaryReader();
@@ -299,6 +288,12 @@ void RimSummaryCase::defineObjectEditorAttribute( QString uiConfigName, caf::Pdm
 
             treeItemAttribute->tags.push_back( std::move( tag ) );
         }
+        if ( m_includeInAutoReload() )
+        {
+            auto tag  = caf::PdmUiTreeViewItemAttribute::createTag();
+            tag->icon = caf::IconProvider( ":/TimedRefresh.png" );
+            treeItemAttribute->tags.push_back( std::move( tag ) );
+        }
     }
 }
 
@@ -311,8 +306,14 @@ void RimSummaryCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     uiOrdering.add( &m_displayNameOption );
     uiOrdering.add( &m_summaryHeaderFilename );
     uiOrdering.add( &m_caseId );
-
-    if ( ensemble() ) uiOrdering.add( &m_showSubNodesInTree );
+    if ( ensemble() )
+    {
+        uiOrdering.add( &m_showSubNodesInTree );
+    }
+    else
+    {
+        uiOrdering.add( &m_includeInAutoReload );
+    }
 
     uiOrdering.skipRemainingFields( true );
 }
@@ -322,9 +323,12 @@ void RimSummaryCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCase::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName /*= ""*/ )
 {
-    if ( !ensemble() || m_showSubNodesInTree() )
+    if ( showTreeNodes() )
     {
-        if ( m_dataVectorFolders->isEmpty() ) buildChildNodes();
+        if ( m_dataVectorFolders->isEmpty() )
+        {
+            buildTreeNodesIfRequired();
+        }
         m_dataVectorFolders->updateUiTreeOrdering( uiTreeOrdering );
     }
 
@@ -428,6 +432,14 @@ void RimSummaryCase::updateAutoShortName()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimSummaryCase::includeInAutoReload() const
+{
+    return m_includeInAutoReload;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryCase::setCaseId( int caseId )
 {
     m_caseId = caseId;
@@ -453,10 +465,17 @@ void RimSummaryCase::setCustomCaseName( const QString& caseName )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryCase::refreshMetaData()
+void RimSummaryCase::buildTreeNodesIfRequired()
 {
-    buildChildNodes();
-    updateConnectedEditors();
+    m_dataVectorFolders->deleteChildren();
+
+    if ( !showTreeNodes() ) return;
+
+    RifSummaryReaderInterface* reader = summaryReader();
+    if ( !reader ) return;
+
+    auto addresses = reader->allResultAddresses();
+    m_dataVectorFolders->updateFolderStructure( addresses, m_caseId );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -471,7 +490,8 @@ void RimSummaryCase::onCalculationUpdated()
     {
         // Build the child nodes if they are not already built. This function will also create the
         // calculated objects so we can do a early return.
-        refreshMetaData();
+        buildTreeNodesIfRequired();
+        updateConnectedEditors();
 
         return;
     }

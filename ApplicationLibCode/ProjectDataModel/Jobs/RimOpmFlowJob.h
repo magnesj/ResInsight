@@ -29,6 +29,9 @@ class RimWellPath;
 class RifOpmFlowDeckFile;
 class RimEclipseCaseEnsemble;
 class RimSummaryEnsemble;
+class RimKeywordWconprod;
+class RimKeywordWconinje;
+class RimOpmFlowJobSettings;
 
 //==================================================================================================
 ///
@@ -45,6 +48,12 @@ public:
         OPEN_AT_DATE
     };
 
+    enum class DateAppendType
+    {
+        ADD_DAYS,
+        ADD_MONTHS
+    };
+
 public:
     RimOpmFlowJob();
     ~RimOpmFlowJob() override;
@@ -52,8 +61,12 @@ public:
     void setWorkingDirectory( QString workDir );
     void setEclipseCase( RimEclipseCase* eCase );
     void setInputDataFile( QString filename );
+    void initAfterCopy();
 
     QString deckName();
+    QString mainWorkingDirectory() const;
+
+    static QString jobInputFileKey();
 
 protected:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
@@ -62,56 +75,76 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          initAfterRead() override;
 
-    QString     title() override;
-    QStringList command() override;
-    QString     workingDirectory() const override;
-    bool        onPrepare() override;
-    void        onCompleted( bool success ) override;
+    bool matchesKeyValue( const QString& key, const QString& value ) const override;
+    void processLogOutput( const QString& logLine ) override;
+
+    QStringList                command() override;
+    std::map<QString, QString> environment() override;
+    QString                    workingDirectory() const override;
+    bool                       onPrepare() override;
+    bool                       onRun() override;
+    void                       onCompleted( bool success ) override;
+    void                       onProgress( double percentageDone ) override;
 
     bool openDeckFile();
+    void closeDeckFile();
     bool copyUnrstFileToWorkDir();
 
 private:
     RimEclipseCase* findExistingCase( QString filename );
     QString         deckExtension() const;
-    QString         wellTempFile( int timeStep = -1, bool includeMSW = false, bool includeLGR = false ) const;
-    QString         openWellTempFile() const;
-    QString         baseDeckName() const;
-    QString         restartDeckName() const;
+    QString         baseDeckName();
+    QString         restartDeckName();
+    QString         inputDeckName() const;
 
-    static QString readFileContent( QString filename );
+    std::vector<QDateTime> datesInFileDeck();
+    std::vector<QString>   wellgroupsInFileDeck();
 
-    void        exportBasicWellSettings();
-    std::string exportMswWellSettings( QDateTime date, int timeStep );
-    QString     generateBasicOpenWellText();
-    void        selectOpenWellPosition();
+    std::vector<QString>   dateStrings();
+    std::vector<QDateTime> dateTimes();
+    std::vector<QDateTime> addedDateTimes();
+
+    int  mergeBasicWellSettings();
+    int  mergeMswData( int mergePosition );
+    void selectOpenWellPosition();
+    void resetEnsembleRunId();
 
 private:
     caf::PdmField<caf::FilePath> m_deckFileName;
     caf::PdmField<caf::FilePath> m_workDir;
-    caf::PdmField<bool>          m_runButton;
-    caf::PdmField<bool>          m_openSelectButton;
     caf::PdmField<int>           m_openWellDeckPosition;
 
     caf::PdmField<bool> m_pauseBeforeRun;
     caf::PdmField<bool> m_addToEnsemble;
     caf::PdmField<int>  m_currentRunId;
-    caf::PdmField<bool> m_resetRunIdButton;
     caf::PdmField<bool> m_useRestart;
 
     caf::PdmPtrField<RimWellPath*>            m_wellPath;
     caf::PdmPtrField<RimEclipseCase*>         m_eclipseCase;
     caf::PdmPtrField<RimEclipseCaseEnsemble*> m_gridEnsemble;
     caf::PdmPtrField<RimSummaryEnsemble*>     m_summaryEnsemble;
+
     caf::PdmField<int>                        m_openTimeStep;
+    caf::PdmField<bool>                       m_endTimeStepEnabled;
+    caf::PdmField<int>                        m_endTimeStep;
     caf::PdmField<bool>                       m_addNewWell;
     caf::PdmField<caf::AppEnum<WellOpenType>> m_wellOpenType;
     caf::PdmField<bool>                       m_includeMSWData;
+    caf::PdmField<QString>                    m_wellGroupName;
+
+    caf::PdmField<bool>                         m_appendNewDates;
+    caf::PdmField<int>                          m_newDatesInterval;
+    caf::PdmField<int>                          m_numberOfNewDates;
+    caf::PdmField<caf::AppEnum<DateAppendType>> m_dateAppendType;
+
+    caf::PdmChildField<RimKeywordWconprod*>    m_wconprodKeyword;
+    caf::PdmChildField<RimKeywordWconinje*>    m_wconinjeKeyword;
+    caf::PdmChildField<RimOpmFlowJobSettings*> m_jobSettings;
 
     caf::PdmField<QString> m_wellOpenKeyword;
-    caf::PdmField<QString> m_wellOpenText;
 
-    QString                             m_deckName;
     std::unique_ptr<RifOpmFlowDeckFile> m_deckFile;
     bool                                m_fileDeckHasDates;
+    bool                                m_fileDeckIsRestart;
+    int                                 m_startStepForProgress;
 };

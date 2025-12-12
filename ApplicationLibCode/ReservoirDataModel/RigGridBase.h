@@ -20,7 +20,6 @@
 
 #pragma once
 
-#include "RifReaderInterface.h"
 #include "RigFault.h"
 
 #include "cafVecIjk.h"
@@ -29,6 +28,7 @@
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfVector3.h"
 
+#include <array>
 #include <optional>
 #include <string>
 #include <vector>
@@ -43,17 +43,21 @@ public:
     explicit RigGridBase( RigMainGrid* mainGrid );
     ~RigGridBase() override;
 
-    void setGridPointDimensions( const cvf::Vec3st& gridDimensions );
+    void setCellCounts( const cvf::Vec3st& cellCounts );
 
-    size_t         cellCountI() const override { return m_cellCount.x(); }
-    size_t         cellCountJ() const override { return m_cellCount.y(); }
-    size_t         cellCountK() const override { return m_cellCount.z(); }
+    size_t         cellCountI() const override { return m_cellCounts.x(); }
+    size_t         cellCountJ() const override { return m_cellCounts.y(); }
+    size_t         cellCountK() const override { return m_cellCounts.z(); }
+    cvf::Vec3st    cellCounts() const { return m_cellCounts; }
     virtual size_t cellCount() const { return m_cellCountIJK; }
+
+    bool isRadial() const;
+    void setIsRadial( bool isRadial );
 
     virtual RigCell&       cell( size_t gridLocalCellIndex );
     virtual const RigCell& cell( size_t gridLocalCellIndex ) const;
 
-    void characteristicCellSizes( double* iSize, double* jSize, double* kSize ) const override;
+    cvf::Vec3d characteristicCellSizes() const override;
 
     size_t reservoirCellIndex( size_t gridLocalCellIndex ) const;
     void   setIndexToStartOfCells( size_t indexToStartOfCells ) { m_indexToStartOfCells = indexToStartOfCells; }
@@ -98,13 +102,13 @@ public:
     bool           ijkFromCellIndex( size_t cellIndex, size_t* i, size_t* j, size_t* k ) const override;
     virtual void   ijkFromCellIndexUnguarded( size_t cellIndex, size_t* i, size_t* j, size_t* k ) const;
 
-    std::optional<caf::VecIjk> ijkFromCellIndex( size_t cellIndex ) const;
+    std::optional<caf::VecIjk0> ijkFromCellIndex( size_t cellIndex ) const;
 
     bool cellIJKFromCoordinate( const cvf::Vec3d& coord, size_t* i, size_t* j, size_t* k ) const override; // unused
     void cellMinMaxCordinates( size_t cellIndex, cvf::Vec3d* minCoordinate, cvf::Vec3d* maxCoordinate ) const override; // unused
 
-    void       cellCornerVertices( size_t cellIndex, cvf::Vec3d vertices[8] ) const override;
-    cvf::Vec3d cellCentroid( size_t cellIndex ) const override;
+    [[nodiscard]] std::array<cvf::Vec3d, 8> cellCornerVertices( size_t cellIndex ) const override;
+    cvf::Vec3d                              cellCentroid( size_t cellIndex ) const override;
 
     size_t     gridPointIndexFromIJK( size_t i, size_t j, size_t k ) const override;
     cvf::Vec3d gridPointCoordinate( size_t i, size_t j, size_t k ) const override;
@@ -113,6 +117,8 @@ public:
     bool cellIJKNeighbor( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const override;
     void cellIJKNeighborUnguarded( size_t i, size_t j, size_t k, FaceType face, size_t* neighborCellIndex ) const;
 
+    std::vector<size_t> neighborCells( size_t cellIndex, bool ignoreInvalidKLayers = false ) const;
+
 protected:
     size_t m_indexToStartOfCells; ///< Index into the global cell array stored in main-grid where this grids cells starts.
     size_t m_cellCountIJK;
@@ -120,12 +126,12 @@ protected:
 
 private:
     std::string      m_gridName;
-    cvf::Vec3st      m_gridPointDimensions;
-    cvf::Vec3st      m_cellCount;
+    cvf::Vec3st      m_cellCounts;
     size_t           m_gridIndex; ///< The LGR index of this grid. Starts with 1. Main grid has index 0.
     int              m_gridId; ///< The LGR id of this grid. Main grid has id 0.
     RigMainGrid*     m_mainGrid;
     cvf::BoundingBox m_boundingBox;
+    bool             m_isRadial = false;
 
     std::vector<std::array<size_t, 6>> m_coarseningBoxInfo;
 };

@@ -25,14 +25,23 @@
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
+#include "RigEclipseCaseDataTools.h"
 #include "RigEclipseResultAddress.h"
+#include "RigEclipseResultTools.h"
 #include "RigMainGrid.h"
 
+#include "ProjectDataModel/Jobs/RimKeywordBcprop.h"
+#include "RimEclipseCase.h"
 #include "RimEclipseResultDefinition.h"
+#include "RimEclipseView.h"
+#include "RimSimWellInView.h"
+#include "RimSimWellInViewCollection.h"
+#include "Tools/RimEclipseViewTools.h"
 
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiGroup.h"
 #include "cafPdmUiLineEditor.h"
+#include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QDir>
@@ -58,23 +67,14 @@ void RicExportEclipseSectorModelUi::ResultExportOptionsEnum::setUp()
     setDefault( RicExportEclipseSectorModelUi::EXPORT_TO_SEPARATE_FILE_PER_RESULT );
 }
 
-template <>
-void RicExportEclipseSectorModelUi::GridBoxSelectionEnum::setUp()
-{
-    addItem( RicExportEclipseSectorModelUi::VISIBLE_CELLS_BOX, "VISIBLE_CELLS", "Box Containing all Visible Cells" );
-    addItem( RicExportEclipseSectorModelUi::ACTIVE_CELLS_BOX, "ACTIVE_CELLS", "Box Containing all Active Cells" );
-    addItem( RicExportEclipseSectorModelUi::FULL_GRID_BOX, "FULL_GRID", "Full Grid" );
-    addItem( RicExportEclipseSectorModelUi::MANUAL_SELECTION, "MANUAL_SELECTION", "User Defined Selection" );
-
-    setDefault( RicExportEclipseSectorModelUi::VISIBLE_CELLS_BOX );
-}
-
 } // namespace caf
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
+    : m_visibleMin( caf::VecIjk0::ZERO )
+    , m_visibleMax( caf::VecIjk0::ZERO )
 {
     CAF_PDM_InitObject( "Export Visible Cells as Eclipse Input Grid" );
 
@@ -84,6 +84,14 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
     CAF_PDM_InitField( &makeInvisibleCellsInactive, "InvisibleCellActnum", false, "Make Invisible Cells Inactive" );
 
     CAF_PDM_InitFieldNoDefault( &exportGridBox, "GridBoxSelection", "Cells to Export" );
+
+    CAF_PDM_InitField( &m_visibleWellsPadding,
+                       "VisibleWellsPadding",
+                       2,
+                       "Wells Padding (cells)",
+                       "",
+                       "Number of cells to add around visible wells",
+                       "" );
 
     QString minIJKLabel = "Min I, J, K";
     CAF_PDM_InitField( &minI, "MinI", std::numeric_limits<int>::max(), minIJKLabel );
@@ -147,21 +155,23 @@ const QStringList& RicExportEclipseSectorModelUi::tabNames() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicExportEclipseSectorModelUi::setCaseData( RigEclipseCaseData* caseData /*= nullptr*/,
-                                                 const cvf::Vec3i&   visibleMin /*= cvf::Vec3i::ZERO*/,
-                                                 const cvf::Vec3i&   visibleMax /*= cvf::Vec3i::ZERO*/ )
+void RicExportEclipseSectorModelUi::setCaseData( RigEclipseCaseData* caseData,
+                                                 RimEclipseView*     eclipseView,
+                                                 const caf::VecIjk0& visibleMin,
+                                                 const caf::VecIjk0& visibleMax )
 {
-    m_caseData   = caseData;
-    m_visibleMin = visibleMin;
-    m_visibleMax = visibleMax;
+    m_caseData    = caseData;
+    m_eclipseView = eclipseView;
+    m_visibleMin  = visibleMin;
+    m_visibleMax  = visibleMax;
 
-    if ( minI == std::numeric_limits<int>::max() ) minI = m_visibleMin.x() + 1;
-    if ( minJ == std::numeric_limits<int>::max() ) minJ = m_visibleMin.y() + 1;
-    if ( minK == std::numeric_limits<int>::max() ) minK = m_visibleMin.z() + 1;
+    if ( minI == std::numeric_limits<int>::max() ) minI = static_cast<int>( m_visibleMin.x() ) + 1;
+    if ( minJ == std::numeric_limits<int>::max() ) minJ = static_cast<int>( m_visibleMin.y() ) + 1;
+    if ( minK == std::numeric_limits<int>::max() ) minK = static_cast<int>( m_visibleMin.z() ) + 1;
 
-    if ( maxI == -std::numeric_limits<int>::max() ) maxI = m_visibleMax.x() + 1;
-    if ( maxJ == std::numeric_limits<int>::max() ) maxJ = m_visibleMax.y() + 1;
-    if ( maxK == std::numeric_limits<int>::max() ) maxK = m_visibleMax.z() + 1;
+    if ( maxI == std::numeric_limits<int>::max() ) maxI = static_cast<int>( m_visibleMax.x() ) + 1;
+    if ( maxJ == std::numeric_limits<int>::max() ) maxJ = static_cast<int>( m_visibleMax.y() ) + 1;
+    if ( maxK == std::numeric_limits<int>::max() ) maxK = static_cast<int>( m_visibleMax.z() ) + 1;
 
     if ( selectedKeywords.v().empty() )
     {
@@ -192,37 +202,42 @@ void RicExportEclipseSectorModelUi::setCaseData( RigEclipseCaseData* caseData /*
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3i RicExportEclipseSectorModelUi::min() const
+caf::VecIjk0 RicExportEclipseSectorModelUi::min() const
 {
-    return cvf::Vec3i( minI() - 1, minJ() - 1, minK() - 1 );
+    return caf::VecIjk0( minI() - 1, minJ() - 1, minK() - 1 );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::Vec3i RicExportEclipseSectorModelUi::max() const
+caf::VecIjk0 RicExportEclipseSectorModelUi::max() const
 {
-    return cvf::Vec3i( maxI() - 1, maxJ() - 1, maxK() - 1 );
+    return caf::VecIjk0( maxI() - 1, maxJ() - 1, maxK() - 1 );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicExportEclipseSectorModelUi::setMin( const cvf::Vec3i& min )
+void RicExportEclipseSectorModelUi::setMin( const caf::VecIjk0& min )
 {
-    minI = min.x() + 1;
-    minJ = min.y() + 1;
-    minK = min.z() + 1;
+    minI = static_cast<int>( min.x() ) + 1;
+    minJ = static_cast<int>( min.y() ) + 1;
+    minK = static_cast<int>( min.z() ) + 1;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicExportEclipseSectorModelUi::setMax( const cvf::Vec3i& max )
+void RicExportEclipseSectorModelUi::setMax( const caf::VecIjk0& max )
 {
-    maxI = max.x() + 1;
-    maxJ = max.y() + 1;
-    maxK = max.z() + 1;
+    maxI = static_cast<int>( max.x() ) + 1;
+    maxJ = static_cast<int>( max.y() ) + 1;
+    maxK = static_cast<int>( max.z() ) + 1;
+}
+
+cvf::Vec3st RicExportEclipseSectorModelUi::refinement() const
+{
+    return cvf::Vec3st( refinementCountI(), refinementCountJ(), refinementCountK() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -234,8 +249,8 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
 {
     if ( !m_caseData ) return;
 
-    const RigMainGrid* mainGrid = m_caseData->mainGrid();
-    cvf::Vec3i         gridDimensions( int( mainGrid->cellCountI() ), int( mainGrid->cellCountJ() ), int( mainGrid->cellCountK() ) );
+    const RigMainGrid* mainGrid       = m_caseData->mainGrid();
+    const cvf::Vec3st  gridDimensions = mainGrid->cellCounts();
 
     auto* lineEditorAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
 
@@ -254,6 +269,14 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
         if ( myAttr )
         {
             myAttr->heightHint = 280;
+        }
+    }
+    else if ( field == &m_visibleWellsPadding )
+    {
+        if ( lineEditorAttr )
+        {
+            // Wells padding should be between 0 and 100 cells
+            lineEditorAttr->validator = new QIntValidator( 0, 100, nullptr );
         }
     }
     else if ( field == &refinementCountI || field == &refinementCountJ || field == &refinementCountK )
@@ -322,14 +345,21 @@ void RicExportEclipseSectorModelUi::defineUiOrdering( QString uiConfigName, caf:
         gridBoxGroup->add( &maxI, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
         gridBoxGroup->appendToRow( &maxJ );
         gridBoxGroup->appendToRow( &maxK );
+
+        if ( exportGridBox() == RiaModelExportDefines::VISIBLE_WELLS_BOX )
+        {
+            gridBoxGroup->add( &m_visibleWellsPadding, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
+        }
+
         gridBoxGroup->add( &makeInvisibleCellsInactive, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
 
-        minI.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
-        minJ.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
-        minK.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
-        maxI.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
-        maxJ.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
-        maxK.uiCapability()->setUiReadOnly( exportGridBox() != MANUAL_SELECTION );
+        const bool boxReadOnly = ( exportGridBox() != RiaModelExportDefines::MANUAL_SELECTION );
+        minI.uiCapability()->setUiReadOnly( boxReadOnly );
+        minJ.uiCapability()->setUiReadOnly( boxReadOnly );
+        minK.uiCapability()->setUiReadOnly( boxReadOnly );
+        maxI.uiCapability()->setUiReadOnly( boxReadOnly );
+        maxJ.uiCapability()->setUiReadOnly( boxReadOnly );
+        maxK.uiCapability()->setUiReadOnly( boxReadOnly );
 
         caf::PdmUiGroup* gridRefinement = uiOrdering.addNewGroup( "Grid Refinement" );
         gridRefinement->add( &refinementCountI, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
@@ -392,7 +422,7 @@ void RicExportEclipseSectorModelUi::fieldChangedByUi( const caf::PdmFieldHandle*
             updateConnectedEditors();
         }
     }
-    else if ( changedField == &exportGridBox )
+    else if ( changedField == &exportGridBox || changedField == &m_visibleWellsPadding )
     {
         applyBoundaryDefaults();
         updateConnectedEditors();
@@ -513,24 +543,29 @@ QString RicExportEclipseSectorModelUi::defaultFaultsFileName() const
 //--------------------------------------------------------------------------------------------------
 void RicExportEclipseSectorModelUi::applyBoundaryDefaults()
 {
-    if ( exportGridBox == ACTIVE_CELLS_BOX )
+    if ( exportGridBox == RiaModelExportDefines::ACTIVE_CELLS_BOX )
     {
         auto [minActive, maxActive] = m_caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->ijkBoundingBox();
-        setMin( cvf::Vec3i( minActive ) );
-        setMax( cvf::Vec3i( maxActive ) );
+        setMin( minActive );
+        setMax( maxActive );
     }
-    else if ( exportGridBox == VISIBLE_CELLS_BOX )
+    else if ( exportGridBox == RiaModelExportDefines::VISIBLE_CELLS_BOX )
     {
         setMin( m_visibleMin );
         setMax( m_visibleMax );
     }
-    else if ( exportGridBox == FULL_GRID_BOX )
+    else if ( exportGridBox == RiaModelExportDefines::VISIBLE_WELLS_BOX )
+    {
+        auto [minWellCells, maxWellCells] = RimEclipseViewTools::computeVisibleWellCells( m_eclipseView, m_caseData, m_visibleWellsPadding() );
+        setMin( minWellCells );
+        setMax( maxWellCells );
+    }
+    else if ( exportGridBox == RiaModelExportDefines::FULL_GRID_BOX )
     {
         const RigMainGrid* mainGrid = m_caseData->mainGrid();
-        cvf::Vec3i gridDimensions( int( mainGrid->cellCountI() - 1 ), int( mainGrid->cellCountJ() - 1 ), int( mainGrid->cellCountK() - 1 ) );
-
-        setMin( cvf::Vec3i( 0, 0, 0 ) );
-        setMax( gridDimensions );
+        setMin( caf::VecIjk0::ZERO );
+        cvf::Vec3st maxCounts = mainGrid->cellCounts() - cvf::Vec3st( 1, 1, 1 );
+        setMax( caf::VecIjk0( maxCounts.x(), maxCounts.y(), maxCounts.z() ) );
     }
     else
     {

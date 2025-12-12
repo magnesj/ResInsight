@@ -41,15 +41,13 @@ RiuContextMenuLauncher::RiuContextMenuLauncher( QWidget* widget, const caf::CmdF
 ///
 //--------------------------------------------------------------------------------------------------
 RiuContextMenuLauncher::RiuContextMenuLauncher( QWidget* widget, const QStringList& commandIds )
+    : QObject( widget )
 {
-    caf::CmdFeatureMenuBuilder menuBuilder;
-
+    // Build menu directly into m_menuBuilder to avoid unnecessary copy
     for ( const auto& cmd : commandIds )
     {
-        menuBuilder << cmd;
+        m_menuBuilder << cmd;
     }
-
-    m_menuBuilder = menuBuilder;
 
     widget->installEventFilter( this );
 }

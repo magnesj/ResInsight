@@ -22,6 +22,8 @@
 #include "RicfCommandObject.h"
 #include "RifTextDataTableFormatter.h"
 
+#include "CompletionExportCommands/RicWellPathExportCompletionDataFeatureImpl.h"
+
 #include "Well/RigWellPath.h"
 #include "Well/RigWellPathGeometryTools.h"
 
@@ -126,8 +128,8 @@ RimWellPathGeometryDef* RimModeledWellPath::geometryDefinition() const
 //--------------------------------------------------------------------------------------------------
 QString RimModeledWellPath::wellPlanText()
 {
-    QString     planText;
-    QTextStream qtxtStream( &planText );
+    QString     plaintext;
+    QTextStream qtxtStream( &plaintext );
 
     RifTextDataTableFormatter formatter( qtxtStream );
     formatter.setUnlimitedDataRowWidth();
@@ -165,7 +167,7 @@ QString RimModeledWellPath::wellPlanText()
     }
     formatter.tableCompleted();
 
-    return planText;
+    return plaintext;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -267,6 +269,8 @@ void RimModeledWellPath::updateTieInLocationFromParentWell()
         m_geometryDefinition->setIsAttachedToParentWell( false );
         m_geometryDefinition->setFixedWellPathPoints( {} );
         m_geometryDefinition->setFixedMeasuredDepths( {} );
+
+        updateWellPathVisualization();
     }
 }
 
@@ -285,4 +289,14 @@ void RimModeledWellPath::updateReferencePoint()
 
     auto refPoint = topLevelModelledWell->geometryDefinition()->anchorPointXyz();
     m_geometryDefinition->setReferencePointXyz( refPoint );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimModeledWellPath::connectWellPaths( RimWellPath* parentWell, double tieInMeasuredDepth )
+{
+    RimWellPath::connectWellPaths( parentWell, tieInMeasuredDepth );
+
+    updateTieInLocationFromParentWell();
 }

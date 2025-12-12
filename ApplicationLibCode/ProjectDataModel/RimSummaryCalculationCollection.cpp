@@ -61,7 +61,7 @@ void RimSummaryCalculationCollection::updateDataDependingOnCalculations()
         {
             if ( !summaryCase ) continue;
 
-            if ( summaryCase->showVectorItemsInProjectTree() )
+            if ( summaryCase->showTreeNodes() )
             {
                 if ( auto reader = summaryCase->summaryReader() )
                 {

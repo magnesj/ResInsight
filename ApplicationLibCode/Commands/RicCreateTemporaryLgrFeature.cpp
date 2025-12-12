@@ -31,6 +31,7 @@
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigMainGrid.h"
+#include "RigReservoirGridTools.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseView.h"
@@ -47,6 +48,7 @@
 #include <cafUtils.h>
 #include <cafVecIjk.h>
 
+#include <array>
 #include <set>
 
 CAF_CMD_SOURCE_INIT( RicCreateTemporaryLgrFeature, "RicCreateTemporaryLgrFeature" );
@@ -57,65 +59,18 @@ CAF_CMD_SOURCE_INIT( RicCreateTemporaryLgrFeature, "RicCreateTemporaryLgrFeature
 void RicCreateTemporaryLgrFeature::createLgrsForWellPaths( std::vector<RimWellPath*>                          wellPaths,
                                                            RimEclipseCase*                                    eclipseCase,
                                                            size_t                                             timeStep,
-                                                           caf::VecIjk                                        lgrCellCounts,
+                                                           const cvf::Vec3st&                                 refinement,
                                                            Lgr::SplitType                                     splitType,
                                                            const std::set<RigCompletionData::CompletionType>& completionTypes,
                                                            QStringList*                                       wellsIntersectingOtherLgrs )
 {
-    auto               eclipseCaseData        = eclipseCase->eclipseCaseData();
-    RigActiveCellInfo* activeCellInfo         = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    RigActiveCellInfo* fractureActiveCellInfo = eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
-
-    auto lgrs = RicExportLgrFeature::buildLgrsForWellPaths( wellPaths,
-                                                            eclipseCase,
-                                                            timeStep,
-                                                            lgrCellCounts,
-                                                            splitType,
-                                                            completionTypes,
-                                                            wellsIntersectingOtherLgrs );
+    auto lgrs =
+        RicExportLgrFeature::buildLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, wellsIntersectingOtherLgrs );
 
     for ( const auto& lgr : lgrs )
     {
-        createLgr( lgr, eclipseCase->eclipseCaseData()->mainGrid() );
-
-        size_t lgrCellCount = lgr.cellCount();
-
-        activeCellInfo->addLgr( lgrCellCount );
-        if ( fractureActiveCellInfo->reservoirActiveCellCount() > 0 )
-        {
-            fractureActiveCellInfo->addLgr( lgrCellCount );
-        }
+        createLgr( lgr, eclipseCase->eclipseCaseData() );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::updateViews( RimEclipseCase* eclipseCase )
-{
-    RiaGuiApplication* guiApp = nullptr;
-    if ( RiaGuiApplication::isRunning() )
-    {
-        guiApp = RiaGuiApplication::instance();
-    }
-
-    if ( guiApp ) RiaGuiApplication::clearAllSelections();
-
-    deleteAllCachedData( eclipseCase );
-    RimMainPlotCollection::current()->deleteAllCachedData();
-    computeCachedData( eclipseCase );
-
-    for ( auto view : eclipseCase->reservoirViews() )
-    {
-        if ( view && view->gridCollection() )
-        {
-            view->gridCollection()->syncFromMainEclipseGrid();
-        }
-    }
-
-    RimMainPlotCollection::current()->wellLogPlotCollection()->loadDataAndUpdateAllPlots();
-
-    if ( guiApp ) eclipseCase->createDisplayModelAndUpdateAllViews();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -152,7 +107,7 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
     if ( dialogData )
     {
         auto       eclipseCase     = dialogData->caseToApply();
-        auto       lgrCellCounts   = dialogData->lgrCellCount();
+        auto       refinement      = dialogData->refinement();
         size_t     timeStep        = dialogData->timeStep();
         auto       splitType       = dialogData->splitType();
         const auto completionTypes = dialogData->completionTypes();
@@ -161,9 +116,9 @@ void RicCreateTemporaryLgrFeature::onActionTriggered( bool isChecked )
 
         QStringList wellsIntersectingOtherLgrs;
 
-        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, lgrCellCounts, splitType, completionTypes, &wellsIntersectingOtherLgrs );
+        createLgrsForWellPaths( wellPaths, eclipseCase, timeStep, refinement, splitType, completionTypes, &wellsIntersectingOtherLgrs );
 
-        updateViews( eclipseCase );
+        RigReservoirGridTools::refreshEclipseCaseDataAndViews( eclipseCase );
 
         if ( !wellsIntersectingOtherLgrs.empty() )
         {
@@ -187,11 +142,11 @@ void RicCreateTemporaryLgrFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 /// Todo: Guarding, caching LGR corner nodes calculations
 //--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGrid* mainGrid )
+RigGridBase* RicCreateTemporaryLgrFeature::createLgrForGrid( const LgrInfo& lgrInfo, RigMainGrid* mainGrid )
 {
     int    lgrId          = lgrInfo.id;
     size_t totalCellCount = mainGrid->totalCellCount();
-    size_t lgrCellCount   = lgrInfo.cellCount();
+    size_t lgrCellCount   = lgrInfo.lgrCellCount();
 
     // Create local grid and set properties
     RigLocalGrid* localGrid = new RigLocalGrid( mainGrid );
@@ -200,7 +155,7 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
     localGrid->setGridId( lgrId );
     localGrid->setIndexToStartOfCells( totalCellCount );
     localGrid->setGridName( lgrInfo.name.toStdString() );
-    localGrid->setGridPointDimensions( cvf::Vec3st( lgrInfo.sizes.i() + 1, lgrInfo.sizes.j() + 1, lgrInfo.sizes.k() + 1 ) );
+    localGrid->setCellCounts( lgrInfo.lgrCellCounts() );
     mainGrid->addLocalGrid( localGrid );
 
     size_t cellStartIndex = mainGrid->totalCellCount();
@@ -214,21 +169,21 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
         mainGrid->nodes().resize( nodeStartIndex + lgrCellCount * 8, cvf::Vec3d( 0, 0, 0 ) );
     }
 
-    auto   lgrSizePerMainCell = lgrInfo.sizesPerMainGridCell();
+    auto   refinement         = lgrInfo.refinement;
     size_t gridLocalCellIndex = 0;
 
     // Loop through all new LGR cells
-    for ( size_t lgrK = 0; lgrK < lgrInfo.sizes.k(); lgrK++ )
+    for ( size_t lgrK = 0; lgrK < lgrInfo.lgrCellCounts().k(); lgrK++ )
     {
-        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / lgrSizePerMainCell.k();
+        size_t mainK = lgrInfo.mainGridStartCell.k() + lgrK / refinement.k();
 
-        for ( size_t lgrJ = 0; lgrJ < lgrInfo.sizes.j(); lgrJ++ )
+        for ( size_t lgrJ = 0; lgrJ < lgrInfo.lgrCellCounts().j(); lgrJ++ )
         {
-            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / lgrSizePerMainCell.j();
+            size_t mainJ = lgrInfo.mainGridStartCell.j() + lgrJ / refinement.j();
 
-            for ( size_t lgrI = 0; lgrI < lgrInfo.sizes.i(); lgrI++, gridLocalCellIndex++ )
+            for ( size_t lgrI = 0; lgrI < lgrInfo.lgrCellCounts().i(); lgrI++, gridLocalCellIndex++ )
             {
-                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / lgrSizePerMainCell.i();
+                size_t mainI = lgrInfo.mainGridStartCell.i() + lgrI / refinement.i();
 
                 size_t mainCellIndex = mainGrid->cellIndexFromIJK( mainI, mainJ, mainK );
                 auto&  mainGridCell  = mainGrid->cell( mainCellIndex );
@@ -241,17 +196,16 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
                 // Corner coordinates
                 {
                     size_t                    cIdx;
-                    std::array<cvf::Vec3d, 8> vertices;
-                    mainGrid->cellCornerVertices( mainCellIndex, vertices.data() );
+                    std::array<cvf::Vec3d, 8> vertices = mainGrid->cellCornerVertices( mainCellIndex );
 
-                    auto cellCounts = lgrInfo.sizesPerMainGridCell();
-                    auto lgrCoords = RiaCellDividingTools::createHexCornerCoords( vertices, cellCounts.i(), cellCounts.j(), cellCounts.k() );
+                    std::vector<cvf::Vec3d> lgrCoords =
+                        RiaCellDividingTools::createHexCornerCoords( vertices, refinement.i(), refinement.j(), refinement.k() );
 
-                    size_t subI = lgrI % lgrSizePerMainCell.i();
-                    size_t subJ = lgrJ % lgrSizePerMainCell.j();
-                    size_t subK = lgrK % lgrSizePerMainCell.k();
+                    size_t subI = lgrI % refinement.i();
+                    size_t subJ = lgrJ % refinement.j();
+                    size_t subK = lgrK % refinement.k();
 
-                    size_t subIndex = subI + subJ * lgrSizePerMainCell.i() + subK * lgrSizePerMainCell.i() * lgrSizePerMainCell.j();
+                    size_t subIndex = subI + subJ * refinement.i() + subK * refinement.i() * refinement.j();
 
                     for ( cIdx = 0; cIdx < 8; ++cIdx )
                     {
@@ -265,64 +219,55 @@ void RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigMainGri
     }
 
     localGrid->setParentGrid( mainGrid );
+
+    return localGrid;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::deleteAllCachedData( RimEclipseCase* eclipseCase )
+RigGridBase* RicCreateTemporaryLgrFeature::createLgr( const LgrInfo& lgrInfo, RigEclipseCaseData* caseData )
 {
-    if ( eclipseCase )
+    auto mainGrid = caseData->mainGrid();
+
+    auto gridCount         = mainGrid->gridCount();
+    auto mainGridCellCount = mainGrid->totalCellCount();
+
+    auto localGrid = createLgrForGrid( lgrInfo, mainGrid );
+
+    if ( auto activeInfo = caseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL ) )
     {
-        std::vector<RiaDefines::ResultCatType> categoriesToExclude = { RiaDefines::ResultCatType::GENERATED };
+        auto currentReservoirCellCount = activeInfo->reservoirCellCount();
 
-        RigCaseCellResultsData* cellResultsDataMatrix = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        if ( cellResultsDataMatrix )
+        activeInfo->setGridCount( gridCount + 1 );
+        activeInfo->setReservoirCellCount( currentReservoirCellCount + localGrid->cellCount() );
+
+        size_t activeCellCount = 0;
+
+        for ( size_t k = 0; k < localGrid->cellCountK(); k++ )
         {
-            cellResultsDataMatrix->freeAllocatedResultsData( categoriesToExclude, std::nullopt );
+            for ( size_t j = 0; j < localGrid->cellCountJ(); j++ )
+            {
+                for ( size_t i = 0; i < localGrid->cellCountI(); i++ )
+                {
+                    size_t cellIndex = localGrid->cellIndexFromIJK( i, j, k );
+                    auto   gridCell  = localGrid->cell( cellIndex );
+                    if ( gridCell.parentCellIndex() != cvf::UNDEFINED_SIZE_T )
+                    {
+                        auto resultIndex = activeInfo->cellResultIndex( gridCell.parentCellIndex() );
+                        if ( resultIndex != cvf::UNDEFINED_SIZE_T )
+                        {
+                            activeInfo->setCellResultIndex( cellIndex + mainGridCellCount, resultIndex );
+                            activeCellCount++;
+                        }
+                    }
+                }
+            }
         }
 
-        RigCaseCellResultsData* cellResultsDataFracture = eclipseCase->results( RiaDefines::PorosityModelType::FRACTURE_MODEL );
-        if ( cellResultsDataFracture )
-        {
-            cellResultsDataFracture->freeAllocatedResultsData( categoriesToExclude, std::nullopt );
-        }
-
-        RigEclipseCaseData* eclipseCaseData = eclipseCase->eclipseCaseData();
-        if ( eclipseCaseData )
-        {
-            eclipseCaseData->clearWellCellsInGridCache();
-            eclipseCaseData->setVirtualPerforationTransmissibilities( nullptr );
-        }
+        activeInfo->setGridActiveCellCounts( gridCount, activeCellCount );
+        activeInfo->computeDerivedData();
     }
-}
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicCreateTemporaryLgrFeature::computeCachedData( RimEclipseCase* eclipseCase )
-{
-    if ( eclipseCase )
-    {
-        RigCaseCellResultsData* cellResultsDataMatrix   = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        RigCaseCellResultsData* cellResultsDataFracture = eclipseCase->results( RiaDefines::PorosityModelType::FRACTURE_MODEL );
-
-        RigEclipseCaseData* eclipseCaseData = eclipseCase->eclipseCaseData();
-        if ( eclipseCaseData )
-        {
-            eclipseCaseData->mainGrid()->computeCachedData();
-            eclipseCase->computeActiveCellsBoundingBox();
-        }
-
-        if ( cellResultsDataMatrix )
-        {
-            cellResultsDataMatrix->computeDepthRelatedResults();
-            cellResultsDataMatrix->computeCellVolumes();
-        }
-
-        if ( cellResultsDataFracture )
-        {
-            cellResultsDataFracture->computeDepthRelatedResults();
-        }
-    }
+    return localGrid;
 }

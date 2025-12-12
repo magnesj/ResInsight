@@ -172,29 +172,32 @@ std::unique_ptr<RifSummaryReaderInterface> RimFileSummaryCase::findRelatedFilesA
         auto startTime = RiaLogging::currentTime();
 
         std::vector<QString> warnings;
-        std::vector<QString> restartFileNames;
-        if ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON )
+
+        auto findFileCandidates = [&ensembleImportState, &headerFileName, &warnings] -> std::vector<QString>
         {
-            if ( ensembleImportState.useConfigValues() )
+            if ( ( RiaPreferencesSummary::current()->summaryDataReader() == RiaPreferencesSummary::SummaryReaderMode::OPM_COMMON ) &&
+                 ensembleImportState.useConfigValues() )
             {
                 auto realizationNumber = RifOpmSummaryTools::extractRealizationNumber( headerFileName );
                 if ( !realizationNumber.has_value() )
                 {
                     RiaLogging::error( realizationNumber.error() );
-                    return nullptr;
+                    return {};
                 }
+                return ensembleImportState.restartFilesForRealization( realizationNumber.value() );
+            }
 
-                restartFileNames = ensembleImportState.restartFilesForRealization( realizationNumber.value() );
-            }
-            else
-            {
-                // If the restart file names are not provided, we search for them
-                restartFileNames = RifEclipseSummaryTools::getRestartFileNamesOpm( headerFileName, warnings );
-            }
-        }
-        else
+            return RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
+        };
+
+        std::vector<QString> restartFileNames;
+        for ( const auto& fileName : findFileCandidates() )
         {
-            restartFileNames = RifEclipseSummaryTools::getRestartFileNames( headerFileName, warnings );
+            QFileInfo fi( fileName );
+            if ( fi.exists() )
+            {
+                restartFileNames.push_back( fileName );
+            }
         }
 
         bool isLoggingEnabled = RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( "OpmSummaryImport" );

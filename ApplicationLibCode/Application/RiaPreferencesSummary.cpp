@@ -114,7 +114,7 @@ RiaPreferencesSummary::RiaPreferencesSummary()
                        "Cross Plot Addresses [Y-adr X-adr]",
                        "",
                        "Semicolon separated list used to create cross plot curves. Based on selection, the names will be changed to "
-                       "corresponing well or group vector names",
+                       "corresponding well or group vector names",
                        "" );
 
     CAF_PDM_InitField( &m_selectDefaultTemplates, "selectDefaultTemplate", false, "", "", "Select Default Templates" );
@@ -124,6 +124,8 @@ RiaPreferencesSummary::RiaPreferencesSummary()
     m_selectedDefaultTemplates.uiCapability()->setUiReadOnly( true );
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+
+    CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::SNAP_TO_POINT, "Default Readout Mode" );
 
     CAF_PDM_InitField( &m_createEnhancedSummaryDataFile,
                        "createEnhancedSummaryDataFile_v01",
@@ -292,6 +294,7 @@ void RiaPreferencesSummary::appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOr
     }
 
     uiOrdering.add( &m_crossPlotAddressCombinations );
+    uiOrdering.add( &m_summaryReadoutMode );
 
     auto historyCurveGroup = uiOrdering.addNewGroup( "History Vectors" );
 
@@ -558,6 +561,14 @@ RiaDefines::ColumnCount RiaPreferencesSummary::defaultMultiPlotColumnCount() con
 RiaDefines::RowCount RiaPreferencesSummary::defaultMultiPlotRowCount() const
 {
     return m_defaultRowsPerPage();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaDefines::ReadOutType RiaPreferencesSummary::defaultSummaryReadoutMode() const
+{
+    return m_summaryReadoutMode();
 }
 
 //--------------------------------------------------------------------------------------------------

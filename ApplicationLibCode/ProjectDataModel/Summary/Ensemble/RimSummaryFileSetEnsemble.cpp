@@ -27,6 +27,7 @@
 #include "EnsembleFileSet/RimEnsembleFileSetCollection.h"
 #include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 #include "RimSummaryCase.h"
+#include "RimSummaryEnsembleTools.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryFileSetEnsemble, "RimSummaryFileSetEnsemble" );
 
@@ -134,6 +135,8 @@ void RimSummaryFileSetEnsemble::onFileSetChanged( const caf::SignalEmitter* emit
     RiaSummaryTools::updateConnectedPlots( this );
     buildChildNodes();
     updateAllRequiredEditors();
+
+    RimSummaryEnsembleTools::updateDependentDeltaEnsembles( this );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -174,7 +177,7 @@ void RimSummaryFileSetEnsemble::createSummaryCasesFromEnsembleFileSet( bool noti
         // Update name of cases and ensemble after all cases are added
         for ( auto summaryCase : newCases )
         {
-            summaryCase->setShowVectorItemsInProjectTree( false );
+            summaryCase->setShowTreeNodes( false );
             summaryCase->setDisplayNameOption( RimCaseDisplayNameTools::DisplayName::SHORT_CASE_NAME );
             summaryCase->updateAutoShortName();
         }
@@ -213,6 +216,7 @@ void RimSummaryFileSetEnsemble::defineUiOrdering( QString uiConfigName, caf::Pdm
         auto group = uiOrdering.addNewGroup( "Ensemble Definition" );
         m_ensembleFileSet()->uiOrdering( uiConfigName, *group );
     }
+    uiOrdering.add( &m_includeInAutoReload );
 
     auto developersGroup = uiOrdering.addNewGroup( " -- Developers --" );
     developersGroup->setCollapsedByDefault();

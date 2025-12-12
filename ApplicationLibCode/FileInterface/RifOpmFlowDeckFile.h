@@ -18,14 +18,20 @@
 
 #pragma once
 
+#include <ctime>
 #include <memory>
+#include <optional>
+#include <set>
 #include <string>
 #include <vector>
 
+#include "opm/input/eclipse/Deck/FileDeck.hpp"
+
 namespace Opm
 {
-class FileDeck;
+class DeckKeyword;
 class DeckItem;
+class DeckRecord;
 class ParseContext;
 } // namespace Opm
 
@@ -41,23 +47,60 @@ public:
 
     bool loadDeck( std::string filename );
     bool saveDeck( std::string folder, std::string filename );
+    bool saveDeckInline( std::string folder, std::string filename );
 
-    bool mergeWellDeck( int timeStep, std::string filename );
-    bool mergeMswData( std::vector<std::string>& mswFileData );
+    int  mergeKeywordAtPosition( int deckPosition, const Opm::DeckKeyword& keyword );
+    bool mergeKeywordAtTimeStep( int timeStep, const Opm::DeckKeyword& keyword, std::string insertAfterKeyword = "" );
 
-    bool openWellAtTimeStep( int timeStep, std::string openText );
-    bool openWellAtDeckPosition( int deckPosition, std::string openText );
+    bool openWellAtTimeStep( int timeStep, Opm::DeckKeyword& openKeyword );
+    bool openWellAtDeckPosition( int deckPosition, Opm::DeckKeyword& openKeyword );
 
     bool restartAtTimeStep( int timeStep, std::string deckName );
+    bool stopAtTimeStep( int timeStep );
 
-    std::vector<std::string> keywords();
-    bool                     hasDatesKeyword();
+    std::vector<std::string>                                       keywords( bool includeDates = true );
+    std::optional<Opm::DeckKeyword>                                findKeyword( const std::string& keyword );
+    std::vector<Opm::DeckKeyword>                                  findAllKeywords( const std::string& keyword );
+    std::vector<std::pair<Opm::FileDeck::Index, Opm::DeckKeyword>> findAllKeywordsWithIndices( const std::string& keyword );
+    bool                                                           hasDatesKeyword();
+    bool                                                           isRestartFile();
+    std::vector<std::string>                                       dateStrings();
+    std::vector<std::time_t>                                       dates();
+    bool                                                           appendDateKeywords( const std::vector<std::time_t>& dates );
+
+    std::set<std::string> wellGroupsInFile();
+
+    std::vector<int> welldims();
+    bool             setWelldims( int maxWells, int maxConnections, int maxGroups, int maxWellsInGroup );
+
+    std::vector<int> wsegdims();
+    bool             setWsegdims( int maxMSWells, int maxSegmentsPerWell, int maxBranchesPerWell );
+
+    std::vector<int> regdims();
+    bool             setRegdims( int maxRegions,
+                                 int maxRegionDefinitions,
+                                 int maxRegionFlowConnections,
+                                 int maxFIPRegions,
+                                 int maxEtrack,
+                                 int maxCompRegions,
+                                 int maxOperNum );
+    bool             ensureRegdimsKeyword();
+
+    bool addIncludeKeyword( std::string section, std::string keyword, std::string filePath );
+
+    bool addKeyword( const std::string& section, const Opm::DeckKeyword& keyword );
+
+    bool replaceKeywordData( const std::string& keyword, const std::vector<double>& data );
+    bool replaceKeywordData( const std::string& keyword, const std::vector<int>& data );
+
+    bool replaceKeyword( const std::string& section, const Opm::DeckKeyword& keyword );
+    bool replaceAllKeywords( const std::string& keywordName, const std::vector<Opm::DeckKeyword>& keywords );
+    bool replaceKeywordAtIndex( const Opm::FileDeck::Index& index, const Opm::DeckKeyword& keyword );
+
+    void removeKeywords( const std::string& keywordName );
 
 private:
-    Opm::DeckItem            item( std::string name, std::string value );
-    Opm::DeckItem            item( std::string name, int value );
-    Opm::DeckItem            defaultItem( std::string name, int cols );
-    static Opm::ParseContext defaultParseContext();
+    void splitDatesIfNecessary();
 
 private:
     std::unique_ptr<Opm::FileDeck> m_fileDeck;

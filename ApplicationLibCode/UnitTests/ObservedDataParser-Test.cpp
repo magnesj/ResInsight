@@ -254,7 +254,7 @@ TEST( RifColumnBasedAsciiParserTest, ThreeLinesHeader )
     parseOptions.locale               = QLocale::c();
     parseOptions.timeSeriesColumnName = "TIME";
 
-    // The CSV header require at leas one line with header data.
+    // The CSV header require at least one line with header data.
     // Units and object names are optional header lines.
 
     // Example data with three header lines:
@@ -268,8 +268,9 @@ DAYS;BARS;BARS;BARS
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( parseOptions );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( parseOptions );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto timeColumn = parser.columnInfo( 0 );
     ASSERT_TRUE( timeColumn != nullptr );
@@ -298,8 +299,9 @@ DATE       ;VECTOR    ;VALUE ;ERROR
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( {} );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( {} );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto tableData   = parser.tableData();
     auto columnInfos = tableData.columnInfos();
@@ -337,8 +339,9 @@ DATE       ;VECTOR    ;VALUE
 
     QTextStream out( &data );
 
-    RifCsvUserDataPastedTextParser parser = RifCsvUserDataPastedTextParser( data );
-    parser.parse( {} );
+    RifCsvUserDataPastedTextParser parser      = RifCsvUserDataPastedTextParser( data );
+    auto                           parseResult = parser.parse( {} );
+    ASSERT_TRUE( parseResult.has_value() );
 
     auto tableData   = parser.tableData();
     auto columnInfos = tableData.columnInfos();

@@ -31,6 +31,8 @@
 #include "cvfAssert.h"
 #include "cvfBoundingBoxTree.h"
 
+#include <array>
+
 RigMainGrid::RigMainGrid()
     : RigGridBase( this )
 {
@@ -154,26 +156,21 @@ size_t RigMainGrid::reservoirCellIndexByGridAndGridLocalCellIndex( size_t gridId
 //--------------------------------------------------------------------------------------------------
 size_t RigMainGrid::findReservoirCellIndexFromPoint( const cvf::Vec3d& point ) const
 {
-    size_t cellContainingPoint = cvf::UNDEFINED_SIZE_T;
-
     cvf::BoundingBox pointBBox;
     pointBBox.add( point );
 
     std::vector<size_t> cellIndices = m_mainGrid->findIntersectingCells( pointBBox );
 
-    cvf::Vec3d hexCorners[8];
     for ( size_t cellIndex : cellIndices )
     {
-        m_mainGrid->cellCornerVertices( cellIndex, hexCorners );
-
+        std::array<cvf::Vec3d, 8> hexCorners = m_mainGrid->cellCornerVertices( cellIndex );
         if ( RigHexIntersectionTools::isPointInCell( point, hexCorners ) )
         {
-            cellContainingPoint = cellIndex;
-            break;
+            return cellIndex;
         }
     }
 
-    return cellContainingPoint;
+    return cvf::UNDEFINED_SIZE_T;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -182,7 +179,7 @@ size_t RigMainGrid::findReservoirCellIndexFromPoint( const cvf::Vec3d& point ) c
 void RigMainGrid::addLocalGrid( RigLocalGrid* localGrid )
 {
     CVF_ASSERT( localGrid && localGrid->gridId() != cvf::UNDEFINED_INT ); // The grid ID must be set.
-    CVF_ASSERT( localGrid->gridId() >= 0 ); // We cant handle negative ID's if they exist.
+    CVF_ASSERT( localGrid->gridId() >= 0 ); // We can't handle negative ID's if they exist.
 
     m_localGrids.push_back( localGrid );
     localGrid->setGridIndex( m_localGrids.size() ); // Maingrid itself has grid index 0
@@ -303,7 +300,7 @@ const RigGridBase* RigMainGrid::gridByIndex( size_t localGridIndex ) const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Returns the grid with the given name. Main Grid itself could be retreived by using name ""
+/// Returns the grid with the given name. Main Grid itself could be retrieved by using name ""
 //--------------------------------------------------------------------------------------------------
 RigGridBase* RigMainGrid::gridByName( const std::string& name )
 {
@@ -725,9 +722,8 @@ void RigMainGrid::computeFaceNormalsDirection( const std::vector<size_t>& reserv
 
     double ijSize = characteristicIJCellSize();
 
-    double iSize, jSize, kSize = 0.0;
-    characteristicCellSizes( &iSize, &jSize, &kSize );
-    const double characteristicVolume = iSize * jSize * kSize;
+    cvf::Vec3d   cellSize             = characteristicCellSizes();
+    const double characteristicVolume = cellSize.x() * cellSize.y() * cellSize.z();
 
     for ( const auto& index : reservoirCellIndices )
     {
@@ -738,10 +734,10 @@ void RigMainGrid::computeFaceNormalsDirection( const std::vector<size_t>& reserv
             const double cellVolume = cell.volume();
             if ( cellVolume < characteristicVolume * 0.8 ) continue;
 
-            auto [isValid1, direction1] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::NEG_I );
-            auto [isValid2, direction2] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::POS_I );
-            auto [isValid3, direction3] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::NEG_J );
-            auto [isValid4, direction4] = isValidAndFaceNormalDir( ijSize, kSize, cell, cvf::StructGridInterface::FaceType::POS_J );
+            auto [isValid1, direction1] = isValidAndFaceNormalDir( ijSize, cellSize.z(), cell, cvf::StructGridInterface::FaceType::NEG_I );
+            auto [isValid2, direction2] = isValidAndFaceNormalDir( ijSize, cellSize.z(), cell, cvf::StructGridInterface::FaceType::POS_I );
+            auto [isValid3, direction3] = isValidAndFaceNormalDir( ijSize, cellSize.z(), cell, cvf::StructGridInterface::FaceType::NEG_J );
+            auto [isValid4, direction4] = isValidAndFaceNormalDir( ijSize, cellSize.z(), cell, cvf::StructGridInterface::FaceType::POS_J );
 
             if ( !isValid1 || !isValid2 || !isValid3 || !isValid4 ) continue;
 
@@ -1139,7 +1135,7 @@ std::array<double, 6> RigMainGrid::defaultMapAxes()
     const double xPoint[2] = { 1.0, 0.0 };
     const double yPoint[2] = { 0.0, 1.0 };
 
-    // Order (see Elipse Reference Manual for keyword MAPAXES): Y_x, Y_y, O_x, O_y, X_x, X_y
+    // Order (see Reference Manual for keyword MAPAXES): Y_x, Y_y, O_x, O_y, X_x, X_y
     return { yPoint[0], yPoint[1], origin[0], origin[1], xPoint[0], xPoint[1] };
 }
 

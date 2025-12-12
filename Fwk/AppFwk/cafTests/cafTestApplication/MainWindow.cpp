@@ -5,6 +5,7 @@
 
 #include "ApplicationEnum.h"
 #include "CustomObjectEditor.h"
+#include "LabelsAndHyperlinks.h"
 #include "LineEditAndPushButtons.h"
 #include "ManyGroups.h"
 #include "MenuItemProducer.h"
@@ -297,7 +298,7 @@ protected:
 
         uiOrdering.add( &m_doubleField );
         uiOrdering.add( &m_intField );
-        QString dynamicGroupName = QString( "Dynamic Group Text (%1)" ).arg( m_intField );
+        QString dynamicGroupName = QString( "Dynamic Group Text (%1)" ).arg( m_intField() );
 
         caf::PdmUiGroup* group = uiOrdering.addNewGroupWithKeyword( dynamicGroupName, "MyTest" );
         group->add( &m_textField );
@@ -587,7 +588,7 @@ protected:
         uiOrdering.appendToRow( &m_intFieldRight );
         uiOrdering.add( &m_intFieldWideBoth, { .totalColumnSpan = 4, .leftLabelColumnSpan = 2 } );
 
-        QString dynamicGroupName = QString( "Dynamic Group Text (%1)" ).arg( m_intFieldStandard );
+        QString dynamicGroupName = QString( "Dynamic Group Text (%1)" ).arg( m_intFieldStandard() );
 
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Wide Group", { .totalColumnSpan = 4 } );
         group->add( &m_intFieldWideBoth2, { .totalColumnSpan = 6, .leftLabelColumnSpan = 3 } );
@@ -1319,6 +1320,7 @@ void MainWindow::buildTestModel()
     m_testRoot->objects.push_back( singleEditorObj );
 
     m_testRoot->objects.push_back( new LineEditAndPushButtons );
+    m_testRoot->objects.push_back( new LabelsAndHyperlinks );
     m_testRoot->objects.push_back( new OptionalFields );
 
     auto tamComboBox = new TamComboBox;
@@ -1408,6 +1410,25 @@ void MainWindow::setPdmRoot( caf::PdmObjectHandle* pdmRoot )
     }
 
     m_customObjectEditor->updateUi();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void MainWindow::setTreeViewSelection( caf::PdmObjectHandle* obj )
+{
+    if ( auto uiObj = caf::uiObj( obj ) )
+    {
+        m_pdmUiTreeView->selectAsCurrentItem( uiObj );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmObjectHandle* MainWindow::root() const
+{
+    return m_testRoot;
 }
 
 //--------------------------------------------------------------------------------------------------

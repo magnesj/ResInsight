@@ -304,7 +304,7 @@ public:
         RifEclipseRftAddress watRateAddress =
             RifEclipseRftAddress::createAddress( wellNameForRft, m_timeStep, RifEclipseRftAddress::RftWellLogChannelType::WRAT );
 
-        std::vector<caf::VecIjk> rftIndices = eclCase->rftReader()->cellIndices( wellNameForRft, m_timeStep );
+        std::vector<caf::VecIjk0> rftIndices = eclCase->rftReader()->cellIndices( wellNameForRft, m_timeStep );
         if ( rftIndices.empty() ) return;
 
         std::vector<double> gasRates;
@@ -320,8 +320,8 @@ public:
 
         for ( size_t rftCellIdx = 0; rftCellIdx < rftIndices.size(); rftCellIdx++ )
         {
-            caf::VecIjk ijkIndex                       = rftIndices[rftCellIdx];
-            size_t      globalCellIndex                = mainGrid->cellIndexFromIJK( ijkIndex.i(), ijkIndex.j(), ijkIndex.k() );
+            caf::VecIjk0 ijkIndex                      = rftIndices[rftCellIdx];
+            size_t       globalCellIndex               = mainGrid->cellIndexFromIJK( ijkIndex.i(), ijkIndex.j(), ijkIndex.k() );
             globCellIdxToIdxInRftFile[globalCellIndex] = rftCellIdx;
         }
 
@@ -537,8 +537,9 @@ void RimWellPltPlot::syncCurvesFromUiSelection()
 
                     QString curveUnitText = RimWellPlotTools::flowUnitText( RimWellLogLasFile::WELL_FLOW_COND_RESERVOIR, unitSet );
 
-                    const std::vector<double> accFlow = wfTotalAccumulator.accumulatedTracerFlowPrPseudoLength( RIG_FLOW_TOTAL_NAME, 0 );
-                    addStackedCurve( curveName + ", " + RIG_FLOW_TOTAL_NAME + " " + curveUnitText,
+                    const std::vector<double> accFlow =
+                        wfTotalAccumulator.accumulatedTracerFlowPrPseudoLength( RigFlowDiagDefines::flowTotalName(), 0 );
+                    addStackedCurve( curveName + ", " + RigFlowDiagDefines::flowTotalName() + " " + curveUnitText,
                                      depthValues,
                                      accFlow,
                                      plotTrack,
@@ -559,21 +560,24 @@ void RimWellPltPlot::syncCurvesFromUiSelection()
                     std::vector<QString>       tracerNames = wfPhaseAccumulator.tracerNames();
                     for ( const QString& tracerName : tracerNames )
                     {
-                        auto color = tracerName == RIG_FLOW_OIL_NAME     ? cvf::Color3f::DARK_GREEN
-                                     : tracerName == RIG_FLOW_GAS_NAME   ? cvf::Color3f::DARK_RED
-                                     : tracerName == RIG_FLOW_WATER_NAME ? cvf::Color3f::BLUE
-                                                                         : cvf::Color3f::DARK_GRAY;
+                        auto color = tracerName == RigFlowDiagDefines::flowOilName()     ? cvf::Color3f::DARK_GREEN
+                                     : tracerName == RigFlowDiagDefines::flowGasName()   ? cvf::Color3f::DARK_RED
+                                     : tracerName == RigFlowDiagDefines::flowWaterName() ? cvf::Color3f::BLUE
+                                                                                         : cvf::Color3f::DARK_GRAY;
 
-                        if ( ( tracerName == RIG_FLOW_OIL_NAME && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_OIL ) ) ||
-                             ( tracerName == RIG_FLOW_GAS_NAME && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS ) ) ||
-                             ( tracerName == RIG_FLOW_WATER_NAME && selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER ) ) )
+                        if ( ( tracerName == RigFlowDiagDefines::flowOilName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_OIL ) ) ||
+                             ( tracerName == RigFlowDiagDefines::flowGasName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS ) ) ||
+                             ( tracerName == RigFlowDiagDefines::flowWaterName() &&
+                               selectedPhases.count( RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER ) ) )
                         {
                             RimWellPlotTools::FlowPhase flowPhase = RimWellPlotTools::FlowPhase::FLOW_PHASE_NONE;
-                            if ( tracerName == RIG_FLOW_OIL_NAME )
+                            if ( tracerName == RigFlowDiagDefines::flowOilName() )
                                 flowPhase = RimWellPlotTools::FlowPhase::FLOW_PHASE_OIL;
-                            else if ( tracerName == RIG_FLOW_GAS_NAME )
+                            else if ( tracerName == RigFlowDiagDefines::flowGasName() )
                                 flowPhase = RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS;
-                            else if ( tracerName == RIG_FLOW_WATER_NAME )
+                            else if ( tracerName == RigFlowDiagDefines::flowWaterName() )
                                 flowPhase = RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER;
                             QString curveUnitText =
                                 RimWellPlotTools::curveUnitText( RimWellLogLasFile::WELL_FLOW_COND_STANDARD, unitSet, flowPhase );

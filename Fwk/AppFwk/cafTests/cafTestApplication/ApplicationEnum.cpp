@@ -1,6 +1,8 @@
 
 #include "ApplicationEnum.h"
+
 #include "cafPdmUiListEditor.h"
+#include "cafPdmUiRadioButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 template <>
@@ -36,6 +38,12 @@ ApplicationEnum::ApplicationEnum()
     // Enum field displaying a subset of the defined enums using calculateValueOptions()
     CAF_PDM_InitFieldNoDefault( &m_enum3Field, "Enum3Field", "Subset using calculateValueOptions()" );
     m_enum3Field = MyEnumType::T2;
+
+    // Radio button enum field example
+    CAF_PDM_InitField( &m_radioButtonEnumField, "RadioButtonEnumField", MyEnumType::T1, "Radio Button Example" );
+    m_radioButtonEnumField.uiCapability()->setUiEditorTypeName( caf::PdmUiRadioButtonEditor::uiEditorTypeName() );
+
+    CAF_PDM_InitField( &m_integerField, "IntegerField", 2, "Integer Field Example" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -59,4 +67,16 @@ QList<caf::PdmOptionItemInfo> ApplicationEnum::calculateValueOptions( const caf:
     }
 
     return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void ApplicationEnum::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_enumField );
+    uiOrdering.add( &m_enum2Field );
+    uiOrdering.add( &m_radioButtonEnumField );
+    uiOrdering.add( &m_enum3Field );
+    uiOrdering.add( &m_integerField );
 }

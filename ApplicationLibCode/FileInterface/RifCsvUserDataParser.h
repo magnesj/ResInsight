@@ -23,11 +23,12 @@
 #include <QDateTime>
 #include <QFile>
 #include <QLocale>
-#include <QPointer>
 #include <QString>
 #include <QStringList>
 #include <QTextStream>
 
+#include <expected>
+#include <memory>
 #include <vector>
 
 class Column;
@@ -46,13 +47,13 @@ public:
     };
 
 public:
-    RifCsvUserDataParser( QString* errorText = nullptr );
+    RifCsvUserDataParser();
     virtual ~RifCsvUserDataParser();
 
-    bool             parse( const RifAsciiDataParseOptions&                      parseOptions,
-                            const std::map<QString, QString>&                    nameMapping = {},
-                            const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
-    const TableData& tableData() const;
+    std::expected<void, QString> parse( const RifAsciiDataParseOptions&                      parseOptions,
+                                        const std::map<QString, QString>&                    nameMapping = {},
+                                        const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
+    const TableData&             tableData() const;
 
     const Column* columnInfo( size_t columnIndex ) const;
     const Column* dateTimeColumn() const;
@@ -61,7 +62,7 @@ public:
     QString     previewText( int lineCount, const RifAsciiDataParseOptions& parseOptions );
     QStringList timeColumnPreviewData( int lineCount, const RifAsciiDataParseOptions& parseOptions );
 
-    CsvLayout determineCsvLayout();
+    CsvLayout determineCsvLayout( const QString& cellSeparator );
 
     QString tryDetermineCellSeparator();
     QString tryDetermineDecimalSeparator( const QString& cellSeparator );
@@ -69,26 +70,26 @@ public:
     static QLocale localeFromDecimalSeparator( const QString& decimalSeparator );
 
 protected:
-    virtual QTextStream* openDataStream()  = 0;
-    virtual void         closeDataStream() = 0;
+    virtual std::expected<std::unique_ptr<QTextStream>, QString> openDataStream() = 0;
 
 private:
     std::vector<int> parseLineBasedHeader( QStringList headerCols );
 
-    bool             parseColumnInfo( QTextStream*                                         dataStream,
-                                      const RifAsciiDataParseOptions&                      parseOptions,
-                                      std::vector<Column>*                                 columnInfoList,
-                                      const std::map<QString, QString>&                    nameMapping = {},
-                                      const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
-    bool             parseColumnBasedData( const RifAsciiDataParseOptions&                      parseOptions,
-                                           const std::map<QString, QString>&                    nameMapping = {},
-                                           const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
-    bool             parseLineBasedData( const RifAsciiDataParseOptions& parseOptions );
-    static QDateTime tryParseDateTime( const std::string& colData, const QString& format );
+    std::expected<int, QString>  parseColumnInfo( QTextStream&                                         dataStream,
+                                                  const RifAsciiDataParseOptions&                      parseOptions,
+                                                  std::vector<Column>&                                 columnInfoList,
+                                                  const std::map<QString, QString>&                    nameMapping = {},
+                                                  const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
+    std::expected<void, QString> parseColumnBasedData( const RifAsciiDataParseOptions&                      parseOptions,
+                                                       const std::map<QString, QString>&                    nameMapping = {},
+                                                       const std::map<QString, std::pair<QString, double>>& unitMapping = {} );
+    std::expected<void, QString> parseLineBasedData( const RifAsciiDataParseOptions& parseOptions );
+    static QDateTime             tryParseDateTime( const QString& colData, const QString& format );
+    static QDateTime             parseDateTime( const QString& colData, const RifAsciiDataParseOptions& parseOptions );
+    static QString               formatParseError( const QString& message, int lineNumber );
 
 private:
     TableData m_tableData;
-    QString*  m_errorText;
 };
 
 //==================================================================================================
@@ -97,21 +98,15 @@ private:
 class RifCsvUserDataFileParser : public RifCsvUserDataParser
 {
 public:
-    RifCsvUserDataFileParser( const QString& fileName, QString* errorText = nullptr );
-    ~RifCsvUserDataFileParser() override;
+    RifCsvUserDataFileParser( const QString& fileName );
+    ~RifCsvUserDataFileParser() override = default;
 
 protected:
-    QTextStream* openDataStream() override;
-    void         closeDataStream() override;
+    std::expected<std::unique_ptr<QTextStream>, QString> openDataStream() override;
 
 private:
-    bool openFile();
-    void closeFile();
-
-private:
-    QString      m_fileName;
-    QFile*       m_file;
-    QTextStream* m_textStream;
+    QString                m_fileName;
+    std::unique_ptr<QFile> m_file;
 };
 
 //==================================================================================================
@@ -121,14 +116,12 @@ private:
 class RifCsvUserDataPastedTextParser : public RifCsvUserDataParser
 {
 public:
-    RifCsvUserDataPastedTextParser( const QString& text, QString* errorText = nullptr );
-    ~RifCsvUserDataPastedTextParser() override;
+    RifCsvUserDataPastedTextParser( const QString& text );
+    ~RifCsvUserDataPastedTextParser() override = default;
 
 protected:
-    QTextStream* openDataStream() override;
-    void         closeDataStream() override;
+    std::expected<std::unique_ptr<QTextStream>, QString> openDataStream() override;
 
 private:
-    QString      m_text;
-    QTextStream* m_textStream;
+    QString m_text;
 };

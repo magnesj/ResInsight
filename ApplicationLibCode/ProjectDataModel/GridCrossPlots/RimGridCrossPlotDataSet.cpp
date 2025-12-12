@@ -359,6 +359,40 @@ void RimGridCrossPlotDataSet::detachAllCurves()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Minimal update of regression curves without updateConnectedEditors that causes change of input focus
+//--------------------------------------------------------------------------------------------------
+void RimGridCrossPlotDataSet::updateRegressionCurves()
+{
+    if ( !m_case() ) return;
+
+    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( m_case.value() );
+    if ( !eclipseCase ) return;
+
+    std::map<int, cvf::UByteArray> timeStepCellVisibilityMap = calculateCellVisibility( eclipseCase );
+    RigEclipseCrossPlotResult      result                    = RigEclipseCrossPlotDataExtractor::extract( eclipseCase->eclipseCaseData(),
+                                                                                  m_timeStep(),
+                                                                                  *m_xAxisProperty,
+                                                                                  *m_yAxisProperty,
+                                                                                  m_grouping(),
+                                                                                  *m_groupingProperty,
+                                                                                  timeStepCellVisibilityMap );
+
+    if ( m_crossPlotRegressionCurves.size() != m_groupedResults.size() )
+    {
+        destroyRegressionCurves();
+    }
+
+    if ( m_crossPlotRegressionCurves.empty() )
+    {
+        createRegressionCurves( result );
+    }
+    else
+    {
+        fillCurveDataInExistingRegressionCurves( result );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimGridCrossPlotDataSet::detachAllRegressionCurves()
@@ -1607,17 +1641,6 @@ void RimGridCrossPlotDataSet::filterInvalidCurveValues( RigEclipseCrossPlotResul
 void RimGridCrossPlotDataSet::curveAppearanceChanged( const caf::SignalEmitter* emitter )
 {
     triggerPlotNameUpdateAndReplot();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::onChildrenUpdated( caf::PdmChildArrayFieldHandle* childArray, std::vector<caf::PdmObjectHandle*>& updatedObjects )
-{
-    if ( childArray == &m_crossPlotRegressionCurves )
-    {
-        triggerPlotNameUpdateAndReplot();
-    }
 }
 
 CAF_PDM_SOURCE_INIT( RimGridCrossPlotDataSetNameConfig, "RimGridCrossPlotCurveSetNameConfig" );

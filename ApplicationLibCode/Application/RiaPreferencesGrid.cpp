@@ -24,6 +24,8 @@
 #include "RiaPreferencesSummary.h"
 #include "RiaPreferencesSystem.h"
 
+#include "RifReaderSettings.h"
+
 #include "cafPdmUiCheckBoxEditor.h"
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesGrid, "RifReaderSettings" );
@@ -96,6 +98,8 @@ RiaPreferencesGrid::RiaPreferencesGrid()
 
     CAF_PDM_InitField( &m_invalidateLongThinCells, "invalidateLongThinCells", false, "Skip Long, Thin Cells" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_invalidateLongThinCells );
+
+    CAF_PDM_InitFieldNoDefault( &m_radialGridMode, "radialGridMode", "Radial Grid Display Mode" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -150,6 +154,8 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
         egridGrp->add( &m_useResultIndexFile );
     }
 
+    egridGrp->add( &m_radialGridMode );
+
     const bool setFaultImportSettingsReadOnly = !importFaults();
 
     m_includeInactiveCellsInFaultGeometry.uiCapability()->setUiReadOnly( setFaultImportSettingsReadOnly );
@@ -162,20 +168,8 @@ void RiaPreferencesGrid::appendItems( caf::PdmUiOrdering& uiOrdering )
 //--------------------------------------------------------------------------------------------------
 RifReaderSettings RiaPreferencesGrid::gridOnlyReaderSettings()
 {
-    RifReaderSettings rs{
-        // Disable as much as possible
-        false, // import faults
-        false, // import NNCs
-        false, // includeInactiveCellsInFaultGeometry
-        false, // importAdvancedMswData
-        false, // useResultIndexFile
-        true, // skipWellData
-        false, // import summary data
-        "", // include prefix,
-        false, // only active cells
-        true // ignore long thin cells
-    };
-    return rs;
+    // Use the default settings, as they disable most options
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -183,16 +177,19 @@ RifReaderSettings RiaPreferencesGrid::gridOnlyReaderSettings()
 //--------------------------------------------------------------------------------------------------
 RifReaderSettings RiaPreferencesGrid::readerSettings()
 {
-    RifReaderSettings rs{ m_importFaults,
-                          m_importNNCs,
-                          m_includeInactiveCellsInFaultGeometry,
-                          m_importAdvancedMswData,
-                          m_useResultIndexFile,
-                          m_skipWellData,
-                          true, // import summary data
-                          m_includeFileAbsolutePathPrefix,
-                          onlyLoadActiveCells(),
-                          m_invalidateLongThinCells };
+    RifReaderSettings rs{ .importFaults                        = m_importFaults,
+                          .importNNCs                          = m_importNNCs,
+                          .includeInactiveCellsInFaultGeometry = m_includeInactiveCellsInFaultGeometry,
+                          .importAdvancedMswData               = m_importAdvancedMswData,
+                          .skipWellData                        = m_skipWellData,
+                          .importSummaryData                   = true,
+                          .includeFileAbsolutePathPrefix       = m_includeFileAbsolutePathPrefix,
+                          .onlyLoadActiveCells                 = m_onlyLoadActiveCells,
+                          .invalidateLongThinCells             = m_invalidateLongThinCells,
+                          .useCylindricalCoordinates           = m_radialGridMode == RiaGridDefines::RadialGridMode::CYLINDRICAL,
+                          .minimumAngularCellCount             = RiaPreferencesSystem::current()->minimumAngularCellCount()
+
+    };
     return rs;
 }
 
@@ -339,4 +336,11 @@ void RiaPreferencesGrid::setGridModelReaderOverride( const RiaDefines::GridModel
 RiaDefines::GridModelReader RiaPreferencesGrid::gridModelReaderOverride() const
 {
     return m_gridModelReaderOverride;
+}
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaGridDefines::RadialGridMode RiaPreferencesGrid::radialGridMode() const
+{
+    return m_radialGridMode();
 }

@@ -34,11 +34,18 @@ int RimProcess::m_nextProcessId = 1;
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimProcess::RimProcess( bool logStdOutErr /*true*/ )
+RimProcess::RimProcess( bool logStdOutErr /*true*/, RimProcessMonitor* monitor )
     : m_enableLogging( logStdOutErr )
+    , m_qProcess( nullptr )
 {
     int defId = m_nextProcessId++;
-    m_monitor = new RimProcessMonitor( defId, logStdOutErr );
+    if ( monitor == nullptr )
+        m_monitor = new RimProcessMonitor( defId, logStdOutErr );
+    else
+    {
+        m_monitor = monitor;
+        m_monitor->setProcessId( defId );
+    }
 
     CAF_PDM_InitObject( "ResInsight Process", ":/Erase.png" );
 
@@ -60,7 +67,11 @@ RimProcess::RimProcess( bool logStdOutErr /*true*/ )
 //--------------------------------------------------------------------------------------------------
 RimProcess::~RimProcess()
 {
-    delete m_monitor;
+    if ( m_monitor != nullptr )
+    {
+        delete m_monitor;
+        m_monitor = nullptr;
+    }
 }
 
 caf::PdmFieldHandle* RimProcess::userDescriptionField()
@@ -157,51 +168,86 @@ int RimProcess::ID() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimProcess::execute( bool enableStdOut, bool enableStdErr )
+bool RimProcess::start( bool enableStdOut, bool enableStdErr )
 {
     if ( !m_monitor ) return false;
+    if ( m_qProcess != nullptr ) return false;
 
-    QProcess* proc = new QProcess();
-    QString   cmd  = commandLine();
+    m_qProcess  = new QProcess();
+    QString cmd = commandLine();
 
-    if ( m_enableLogging ) RiaLogging::info( QString( "Start process %1: %2" ).arg( m_id ).arg( cmd ) );
+    if ( m_enableLogging ) RiaLogging::info( QString( "Start process %1: %2" ).arg( m_id() ).arg( cmd ) );
 
     m_monitor->clearStdOutErr();
 
-    QObject::connect( proc, SIGNAL( finished( int, QProcess::ExitStatus ) ), m_monitor, SLOT( finished( int, QProcess::ExitStatus ) ) );
-    if ( enableStdOut ) QObject::connect( proc, SIGNAL( readyReadStandardOutput() ), m_monitor, SLOT( readyReadStandardOutput() ) );
-    if ( enableStdErr ) QObject::connect( proc, SIGNAL( readyReadStandardError() ), m_monitor, SLOT( readyReadStandardError() ) );
-    QObject::connect( proc, SIGNAL( started() ), m_monitor, SLOT( started() ) );
-
-    bool retval = false;
+    QObject::connect( m_qProcess, SIGNAL( finished( int, QProcess::ExitStatus ) ), m_monitor, SLOT( finished( int, QProcess::ExitStatus ) ) );
+    if ( enableStdOut ) QObject::connect( m_qProcess, SIGNAL( readyReadStandardOutput() ), m_monitor, SLOT( readyReadStandardOutput() ) );
+    if ( enableStdErr ) QObject::connect( m_qProcess, SIGNAL( readyReadStandardError() ), m_monitor, SLOT( readyReadStandardError() ) );
+    QObject::connect( m_qProcess, SIGNAL( started() ), m_monitor, SLOT( started() ) );
 
     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     for ( auto& [key, val] : m_environmentVariables )
     {
         env.insert( key, val );
     }
-    proc->setProcessEnvironment( env );
+    m_qProcess->setProcessEnvironment( env );
     if ( !m_workDir().isEmpty() )
     {
-        proc->setWorkingDirectory( m_workDir );
+        m_qProcess->setWorkingDirectory( m_workDir );
     }
 
-    proc->start( m_command, m_arguments );
-    auto error = proc->errorString();
-    if ( proc->waitForStarted( -1 ) )
+    m_qProcess->start( m_command, m_arguments );
+    auto error = m_qProcess->errorString();
+    if ( !m_qProcess->waitForStarted( -1 ) )
     {
-        while ( !proc->waitForFinished( 500 ) )
+        RiaLogging::error( QString( "Failed to start process %1. %2." ).arg( m_id() ).arg( error ) );
+        return false;
+    }
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimProcess::cleanUpAfterRun()
+{
+    if ( m_qProcess != nullptr )
+    {
+        m_qProcess->deleteLater();
+        m_qProcess = nullptr;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimProcess::terminate()
+{
+    if ( m_qProcess != nullptr )
+    {
+        if ( m_qProcess->state() == QProcess::Running )
         {
-            QApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
+            m_qProcess->kill();
         }
-        retval = ( proc->exitCode() == 0 );
     }
-    else
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimProcess::execute( bool enableStdOut, bool enableStdErr )
+{
+    if ( !start( enableStdOut, enableStdErr ) ) return false;
+
+    while ( !m_qProcess->waitForFinished( 250 ) )
     {
-        RiaLogging::error( QString( "Failed to start process %1. %2." ).arg( m_id ).arg( error ) );
+        QApplication::processEvents( QEventLoop::ExcludeUserInputEvents );
     }
 
-    proc->deleteLater();
+    bool retval = ( m_qProcess->exitCode() == 0 );
+
+    cleanUpAfterRun();
 
     return retval;
 }

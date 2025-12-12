@@ -24,6 +24,7 @@
 
 #include <QString>
 
+#include <cmath>
 #include <limits>
 
 //==================================================================================================
@@ -39,12 +40,14 @@ RigCompletionData::RigCompletionData( const QString& wellName, const RigCompleti
     , m_skinFactor( std::numeric_limits<double>::infinity() )
     , m_dFactor( std::numeric_limits<double>::infinity() )
     , m_direction( CellDirection::DIR_UNDEF )
-    , m_count( 1 )
     , m_wpimult( std::numeric_limits<double>::infinity() )
     , m_isMainBore( false )
     , m_completionType( CompletionType::CT_UNDEFINED )
     , m_firstOrderingValue( orderingValue )
     , m_secondOrderingValue( std::numeric_limits<double>::infinity() )
+    , m_startMD( std::nullopt )
+    , m_endMD( std::nullopt )
+    , m_completionNumber( std::nullopt )
 {
 }
 
@@ -263,6 +266,17 @@ void RigCompletionData::setDFactor( double dFactor )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RigCompletionData::setPerConnectionDfactor()
+{
+    if ( isDefaultValue( m_dFactor ) ) return;
+
+    // We use per connection dfactors, they have negative values, ref OPM Flow manual - COMPDAT kw
+    m_dFactor = std::abs( m_dFactor ) * -1.0;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RigCompletionData::setKh( double kh )
 {
     m_kh = kh;
@@ -367,17 +381,82 @@ double RigCompletionData::dFactor() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigCompletionData::CellDirection RigCompletionData::direction() const
+std::optional<double> RigCompletionData::startMD() const
 {
-    return m_direction;
+    return m_startMD;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RigCompletionData::count() const
+std::optional<double> RigCompletionData::endMD() const
 {
-    return m_count;
+    return m_endMD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<int> RigCompletionData::completionNumber() const
+{
+    return m_completionNumber;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RigCompletionData::directionStringIJK() const
+{
+    switch ( m_direction )
+    {
+        case CellDirection::DIR_I:
+            return "I";
+        case CellDirection::DIR_J:
+            return "J";
+        case CellDirection::DIR_K:
+            return "K";
+        case CellDirection::DIR_UNDEF:
+        default:
+            return "Undefined";
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RigCompletionData::directionStringXYZ() const
+{
+    switch ( m_direction )
+    {
+        case CellDirection::DIR_I:
+            return "X";
+        case CellDirection::DIR_J:
+            return "Y";
+        case CellDirection::DIR_K:
+        default:
+            return "Z";
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RigCompletionData::metaDataString() const
+{
+    QStringList metadataList;
+    for ( const auto& meta : m_metadata )
+    {
+        metadataList.append( meta.name + ": " + meta.comment );
+    }
+    return metadataList.join( "\n" );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigCompletionData::CellDirection RigCompletionData::direction() const
+{
+    return m_direction;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -436,9 +515,9 @@ const caf::PdmObject* RigCompletionData::sourcePdmObject() const
     return m_sourcePdmObject;
 }
 
-//==================================================================================================
+//--------------------------------------------------------------------------------------------------
 ///
-//==================================================================================================
+//--------------------------------------------------------------------------------------------------
 void RigCompletionData::copy( RigCompletionData& target, const RigCompletionData& from )
 {
     target.m_metadata            = from.m_metadata;
@@ -452,10 +531,29 @@ void RigCompletionData::copy( RigCompletionData& target, const RigCompletionData
     target.m_dFactor             = from.m_dFactor;
     target.m_direction           = from.m_direction;
     target.m_isMainBore          = from.m_isMainBore;
-    target.m_count               = from.m_count;
     target.m_wpimult             = from.m_wpimult;
     target.m_completionType      = from.m_completionType;
+    target.m_startMD             = from.m_startMD;
+    target.m_endMD               = from.m_endMD;
     target.m_firstOrderingValue  = from.m_firstOrderingValue;
     target.m_secondOrderingValue = from.m_secondOrderingValue;
     target.m_sourcePdmObject     = from.m_sourcePdmObject;
+    target.m_completionNumber    = from.m_completionNumber;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigCompletionData::setDepthRange( double startMD, double endMD )
+{
+    m_startMD = startMD;
+    m_endMD   = endMD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigCompletionData::setCompletionNumber( int completionNumber )
+{
+    m_completionNumber = completionNumber;
 }

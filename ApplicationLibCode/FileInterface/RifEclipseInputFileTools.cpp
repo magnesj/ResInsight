@@ -29,9 +29,11 @@
 #include "ExportCommands/RicEclipseCellResultToFileImpl.h"
 
 #include "RifEclipseInputPropertyLoader.h"
+
 #include "RifEclipseKeywordContent.h"
 #include "RifEclipseTextFileReader.h"
 #include "RifReaderEclipseOutput.h"
+#include "RigResdataGridConverter.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -43,6 +45,7 @@
 
 #include "cafProgressInfo.h"
 
+#include <array>
 #include <cmath>
 #include <fstream>
 #include <iostream>
@@ -54,6 +57,7 @@
 #include <QFileInfo>
 #include <QTextStream>
 
+#include "RigCellGeometryTools.h"
 #include "ert/ecl/ecl_box.hpp"
 #include "ert/ecl/ecl_grid.hpp"
 #include "ert/ecl/ecl_kw.h"
@@ -226,156 +230,109 @@ bool RifEclipseInputFileTools::exportGrid( const QString&         fileName,
                                            const cvf::Vec3st&     maxIn,
                                            const cvf::Vec3st&     refinement )
 {
-    if ( !eclipseCase )
-    {
-        return false;
-    }
+    // Use the new native implementation instead of resdata
+    return RigResdataGridConverter::exportGrid( fileName, eclipseCase, exportInLocalCoordinates, cellVisibilityOverrideForActnum, min, maxIn, refinement );
+}
 
-    const RigActiveCellInfo* activeCellInfo = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-
-    CVF_ASSERT( activeCellInfo );
-
-    const RigMainGrid* mainGrid = eclipseCase->mainGrid();
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::expected<std::vector<double>, std::string> RifEclipseInputFileTools::extractKeywordData( RigEclipseCaseData* eclipseCase,
+                                                                                              const QString&      keyword,
+                                                                                              const cvf::Vec3st&  min,
+                                                                                              const cvf::Vec3st&  maxIn,
+                                                                                              const cvf::Vec3st&  refinement )
+{
+    RigCaseCellResultsData* cellResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    RigActiveCellInfo*      activeCells     = cellResultsData->activeCellInfo();
+    RigMainGrid*            mainGrid        = eclipseCase->mainGrid();
 
     cvf::Vec3st max = maxIn;
-    if ( max == cvf::Vec3st::UNDEFINED )
+    if ( max.isUndefined() )
     {
         max = cvf::Vec3st( mainGrid->cellCountI() - 1, mainGrid->cellCountJ() - 1, mainGrid->cellCountK() - 1 );
     }
 
-    int ecl_nx = static_cast<int>( ( max.x() - min.x() + 1 ) * refinement.x() );
-    int ecl_ny = static_cast<int>( ( max.y() - min.y() + 1 ) * refinement.y() );
-    int ecl_nz = static_cast<int>( ( max.z() - min.z() + 1 ) * refinement.z() );
+    auto allResultAddresses = cellResultsData->existingResults();
 
-    CVF_ASSERT( ecl_nx > 0 && ecl_ny > 0 && ecl_nz > 0 );
-
-    size_t cellsPerOriginal = refinement.x() * refinement.y() * refinement.z();
-
-    caf::ProgressInfo progress( mainGrid->cellCount() * 2, "Save Eclipse Grid" );
-    int               cellProgressInterval = 1000;
-
-    std::vector<float*> ecl_corners;
-    ecl_corners.reserve( mainGrid->cellCount() * cellsPerOriginal );
-    std::vector<int*> ecl_coords;
-    ecl_coords.reserve( mainGrid->cellCount() * cellsPerOriginal );
-
-    std::array<float, 6> mapAxes      = mainGrid->mapAxesF();
-    cvf::Mat4d           mapAxisTrans = mainGrid->mapAxisTransform();
-    if ( exportInLocalCoordinates )
+    auto findResultAddress = [&allResultAddresses]( const QString& keyword ) -> RigEclipseResultAddress
     {
-        cvf::Vec3d minPoint3d( mainGrid->boundingBox().min() );
-        cvf::Vec2f minPoint2f( minPoint3d.x(), minPoint3d.y() );
-        cvf::Vec2f origin( mapAxes[2] - minPoint2f.x(), mapAxes[3] - minPoint2f.y() );
-        cvf::Vec2f xPoint = cvf::Vec2f( mapAxes[4], mapAxes[5] ) - minPoint2f;
-        cvf::Vec2f yPoint = cvf::Vec2f( mapAxes[0], mapAxes[1] ) - minPoint2f;
-        mapAxes           = { yPoint.x(), yPoint.y(), origin.x(), origin.y(), xPoint.x(), xPoint.y() };
+        for ( auto it = allResultAddresses.rbegin(); it != allResultAddresses.rend(); ++it )
+        {
+            if ( it->resultName() == keyword )
+            {
+                return *it;
+            }
+        }
+        return {};
+    };
 
-        mapAxisTrans.setTranslation( mapAxisTrans.translation() - minPoint3d );
+    RigEclipseResultAddress resAddr = findResultAddress( keyword );
+    if ( !cellResultsData->hasResultEntry( resAddr ) )
+    {
+        return std::unexpected( "Keyword '" + keyword.toStdString() + "' not found in results" );
     }
 
-    const size_t* cellMappingECLRi = RifReaderEclipseOutput::eclipseCellIndexMapping();
-
-    int outputCellIndex = 0;
-
-    for ( size_t k = 0; k <= max.z() - min.z(); ++k )
+    if ( !cellResultsData->ensureKnownResultLoaded( resAddr ) )
     {
-        for ( size_t j = 0; j <= max.y() - min.y(); ++j )
+        return std::unexpected( "Keyword '" + keyword.toStdString() + "' result not loaded." );
+    }
+
+    if ( cellResultsData->cellScalarResults( resAddr ).empty() )
+    {
+        return std::unexpected( "Keyword '" + keyword.toStdString() + "' result empty." );
+    }
+
+    std::vector<double> resultValues = cellResultsData->cellScalarResults( resAddr )[0];
+    if ( resultValues.empty() )
+    {
+        return std::unexpected( "Keyword '" + keyword.toStdString() + "' has no data" );
+    }
+
+    double defaultExportValue = 0.0;
+    if ( RiaResultNames::isCategoryResult( keyword ) )
+    {
+        defaultExportValue = 1.0;
+    }
+
+    RiaDefines::PorosityModelType porosityModel = RiaDefines::PorosityModelType::MATRIX_MODEL;
+
+    // Create result accessor object for main grid at time step zero (static result data is always at first time step)
+    auto resultAcc = RigResultAccessorFactory::createFromResultAddress( eclipseCase, 0, porosityModel, 0, resAddr );
+
+    std::vector<double> filteredResults;
+    filteredResults.reserve( resultValues.size() );
+
+    cvf::Vec3st refinedMin( min.x() * refinement.x(), min.y() * refinement.y(), min.z() * refinement.z() );
+    cvf::Vec3st refinedMax( ( max.x() + 1 ) * refinement.x(), ( max.y() + 1 ) * refinement.y(), ( max.z() + 1 ) * refinement.z() );
+
+    for ( size_t k = refinedMin.z(); k < refinedMax.z(); ++k )
+    {
+        size_t mainK = k / refinement.z();
+        for ( size_t j = refinedMin.y(); j < refinedMax.y(); ++j )
         {
-            for ( size_t i = 0; i <= max.x() - min.x(); ++i )
+            size_t mainJ = j / refinement.y();
+            for ( size_t i = refinedMin.x(); i < refinedMax.x(); ++i )
             {
-                size_t mainIndex = mainGrid->cellIndexFromIJK( min.x() + i, min.y() + j, min.z() + k );
+                size_t mainI = i / refinement.x();
 
-                int active = activeCellInfo->isActive( mainIndex ) ? 1 : 0;
-                if ( active && cellVisibilityOverrideForActnum )
+                size_t reservoirCellIndex = mainGrid->cellIndexFromIJK( mainI, mainJ, mainK );
+
+                size_t resIndex = activeCells->cellResultIndex( reservoirCellIndex );
+                if ( resIndex != cvf::UNDEFINED_SIZE_T )
                 {
-                    active = ( *cellVisibilityOverrideForActnum )[mainIndex];
+                    auto value = resultAcc->cellScalarGlobIdx( reservoirCellIndex );
+                    filteredResults.push_back( value );
                 }
-                std::array<cvf::Vec3d, 8> cellCorners;
-                mainGrid->cellCornerVertices( mainIndex, cellCorners.data() );
-
-                if ( mainGrid->useMapAxes() )
+                else
                 {
-                    for ( cvf::Vec3d& corner : cellCorners )
-                    {
-                        corner.transformPoint( mapAxisTrans );
-                    }
-                }
-
-                auto refinedCoords = RiaCellDividingTools::createHexCornerCoords( cellCorners, refinement.x(), refinement.y(), refinement.z() );
-
-                for ( size_t subK = 0; subK < refinement.z(); ++subK )
-                {
-                    for ( size_t subJ = 0; subJ < refinement.y(); ++subJ )
-                    {
-                        for ( size_t subI = 0; subI < refinement.x(); ++subI )
-                        {
-                            int* ecl_cell_coords = new int[5];
-                            ecl_cell_coords[0]   = static_cast<int>( i * refinement.x() + subI + 1 );
-                            ecl_cell_coords[1]   = static_cast<int>( j * refinement.y() + subJ + 1 );
-                            ecl_cell_coords[2]   = static_cast<int>( k * refinement.z() + subK + 1 );
-                            ecl_cell_coords[3]   = outputCellIndex++;
-                            ecl_cell_coords[4]   = active;
-                            ecl_coords.push_back( ecl_cell_coords );
-
-                            size_t subIndex = subI + subJ * refinement.x() + subK * refinement.x() * refinement.y();
-
-                            float* ecl_cell_corners = new float[24];
-                            for ( size_t cIdx = 0; cIdx < 8; ++cIdx )
-                            {
-                                const auto cellCorner                            = refinedCoords[subIndex * 8 + cIdx];
-                                ecl_cell_corners[cellMappingECLRi[cIdx] * 3]     = cellCorner[0];
-                                ecl_cell_corners[cellMappingECLRi[cIdx] * 3 + 1] = cellCorner[1];
-                                ecl_cell_corners[cellMappingECLRi[cIdx] * 3 + 2] = -cellCorner[2];
-                            }
-                            ecl_corners.push_back( ecl_cell_corners );
-                        }
-                    }
+                    filteredResults.push_back( defaultExportValue );
                 }
             }
         }
-
-        if ( outputCellIndex % cellProgressInterval == 0 )
-        {
-            progress.setProgress( outputCellIndex / cellsPerOriginal );
-        }
     }
 
-    // Do not perform the transformation (applyMapaxes == false):
-    // The coordinates have been transformed to the map axes coordinate system already.
-    // However, send the map axes data in to resdata so that the coordinate system description is saved.
-    bool           applyMapaxes = false;
-    ecl_grid_type* mainEclGrid =
-        ecl_grid_alloc_GRID_data( (int)ecl_coords.size(), ecl_nx, ecl_ny, ecl_nz, 5, &ecl_coords[0], &ecl_corners[0], applyMapaxes, mapAxes.data() );
-    progress.setProgress( mainGrid->cellCount() );
-
-    for ( float* floatArray : ecl_corners )
-    {
-        delete floatArray;
-    }
-
-    for ( int* intArray : ecl_coords )
-    {
-        delete intArray;
-    }
-
-    FILE* filePtr = util_fopen( RiaStringEncodingTools::toNativeEncoded( fileName ).data(), "w" );
-
-    if ( !filePtr )
-    {
-        return false;
-    }
-
-    ert_ecl_unit_enum ecl_units = ECL_METRIC_UNITS;
-    if ( eclipseCase->unitsType() == RiaDefines::EclipseUnitSystem::UNITS_FIELD )
-        ecl_units = ECL_FIELD_UNITS;
-    else if ( eclipseCase->unitsType() == RiaDefines::EclipseUnitSystem::UNITS_LAB )
-        ecl_units = ECL_LAB_UNITS;
-
-    ecl_grid_fprintf_grdecl2( mainEclGrid, filePtr, ecl_units );
-    ecl_grid_free( mainEclGrid );
-    fclose( filePtr );
-
-    return true;
+    return filteredResults;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -401,87 +358,21 @@ bool RifEclipseInputFileTools::exportKeywords( const QString&              resul
         stream << "NOECHO\n";
     }
 
-    RigCaseCellResultsData* cellResultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    RigActiveCellInfo*      activeCells     = cellResultsData->activeCellInfo();
-    RigMainGrid*            mainGrid        = eclipseCase->mainGrid();
-
-    cvf::Vec3st max = maxIn;
-    if ( max == cvf::Vec3st::UNDEFINED )
-    {
-        max = cvf::Vec3st( mainGrid->cellCountI() - 1, mainGrid->cellCountJ() - 1, mainGrid->cellCountK() - 1 );
-    }
-
     caf::ProgressInfo progress( keywords.size(), "Saving Keywords" );
-
-    auto allResultAddresses = cellResultsData->existingResults();
-
-    auto findResultAddress = [&allResultAddresses]( const QString& keyword ) -> RigEclipseResultAddress
-    {
-        for ( const auto& adr : allResultAddresses )
-        {
-            if ( adr.resultName() == keyword )
-            {
-                return adr;
-            }
-        }
-
-        return {};
-    };
 
     for ( const QString& keyword : keywords )
     {
-        RigEclipseResultAddress resAddr = findResultAddress( keyword );
-        if ( !cellResultsData->hasResultEntry( resAddr ) ) continue;
-
-        cellResultsData->ensureKnownResultLoaded( resAddr );
-        CVF_ASSERT( !cellResultsData->cellScalarResults( resAddr ).empty() );
-
-        std::vector<double> resultValues = cellResultsData->cellScalarResults( resAddr )[0];
-        if ( resultValues.empty() ) continue;
-
-        double defaultExportValue = 0.0;
-        if ( RiaResultNames::isCategoryResult( keyword ) )
+        auto result = extractKeywordData( eclipseCase, keyword, min, maxIn, refinement );
+        if ( !result )
         {
-            defaultExportValue = 1.0;
-        }
-
-        RiaDefines::PorosityModelType porosityModel = RiaDefines::PorosityModelType::MATRIX_MODEL;
-
-        // Create result accessor object for main grid at time step zero (static result date is always at first time step
-        auto resultAcc = RigResultAccessorFactory::createFromResultAddress( eclipseCase, 0, porosityModel, 0, resAddr );
-
-        std::vector<double> filteredResults;
-        filteredResults.reserve( resultValues.size() );
-
-        for ( size_t k = min.z() * refinement.z(); k <= max.z() * refinement.z(); ++k )
-        {
-            size_t mainK = k / refinement.z();
-            for ( size_t j = min.y() * refinement.y(); j <= max.y() * refinement.y(); ++j )
-            {
-                size_t mainJ = j / refinement.y();
-                for ( size_t i = min.x() * refinement.x(); i <= max.x() * refinement.x(); ++i )
-                {
-                    size_t mainI = i / refinement.x();
-
-                    size_t reservoirCellIndex = mainGrid->cellIndexFromIJK( mainI, mainJ, mainK );
-
-                    size_t resIndex = activeCells->cellResultIndex( reservoirCellIndex );
-                    if ( resIndex != cvf::UNDEFINED_SIZE_T )
-                    {
-                        auto value = resultAcc->cellScalarGlobIdx( reservoirCellIndex );
-                        filteredResults.push_back( value );
-                    }
-                    else
-                    {
-                        filteredResults.push_back( defaultExportValue );
-                    }
-                }
-            }
+            RiaLogging::warning( QString::fromStdString( result.error() ) );
+            continue;
         }
 
         // Multiple keywords can be exported to same file, so write ECHO keywords outside the loop
         bool writeEchoKeywordsInExporterObject = false;
-        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, filteredResults );
+        int  valuePerRow                       = 5;
+        RicEclipseCellResultToFileImpl::writeDataToTextFile( &exportFile, writeEchoKeywordsInExporterObject, keyword, result.value(), valuePerRow );
 
         progress.incrementProgress();
     }
@@ -541,6 +432,56 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
         return;
     }
 
+    // Extract fault data using the common method
+    std::vector<RigFault::CellAndFace> faultCellAndFaces = extractFaults( mainGrid, faultFaces, min, maxIn, refinement );
+
+    size_t                             lastI        = std::numeric_limits<size_t>::max();
+    size_t                             lastJ        = std::numeric_limits<size_t>::max();
+    size_t                             lastK        = std::numeric_limits<size_t>::max();
+    size_t                             startK       = std::numeric_limits<size_t>::max();
+    cvf::StructGridInterface::FaceType lastFaceType = cvf::StructGridInterface::FaceType::NO_FACE;
+
+    for ( const RigFault::CellAndFace& faultCellAndFace : faultCellAndFaces )
+    {
+        size_t                             i, j, k;
+        cvf::StructGridInterface::FaceType faceType;
+        std::tie( i, j, k, faceType ) = faultCellAndFace;
+
+        if ( i != lastI || j != lastJ || lastFaceType != faceType || k != lastK + 1 )
+        {
+            // No fault should have no face
+            if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
+            {
+                writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
+            }
+            lastI        = i;
+            lastJ        = j;
+            lastK        = k;
+            lastFaceType = faceType;
+            startK       = k;
+        }
+        else
+        {
+            lastK = k;
+        }
+    }
+
+    // No fault should have no face
+    if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
+    {
+        writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigFault::CellAndFace> RifEclipseInputFileTools::extractFaults( const RigMainGrid*                      mainGrid,
+                                                                            const std::vector<RigFault::FaultFace>& faultFaces,
+                                                                            const cvf::Vec3st& min /*= cvf::Vec3st::ZERO*/,
+                                                                            const cvf::Vec3st& maxIn /*= cvf::Vec3st::UNDEFINED*/,
+                                                                            const cvf::Vec3st& refinement /*= cvf::Vec3st( 1, 1, 1 )*/ )
+{
     std::vector<RigFault::CellAndFace> faultCellAndFaces;
 
     cvf::Vec3st max = maxIn;
@@ -560,21 +501,6 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
         size_t shifted_i = ( i - min.x() ) * refinement.x();
         size_t shifted_j = ( j - min.y() ) * refinement.y();
         size_t shifted_k = ( k - min.z() ) * refinement.z();
-
-        //  2x2 Refinement of Original Cell 0, 0
-        // Y/J  POS_J boundary
-        // ^  _______________
-        // | |       |       |
-        // | |  0,1  |  1,1  |
-        // | |_______|_______|   POS_I boundary
-        // | |       |       |
-        // | |  0,0  |  1,0  |
-        // | |_______|_______|
-        // ---------------------> X/I
-        //       NEG_J boundary
-        //
-        //  POS_J gets shifted 1 index in J direction, NEG_J stays the same in J but spans two I.
-        //  POS_I gets shifted 1 index in I direction, NEG_I stays the same in I but spans two J.
 
         if ( refinement != cvf::Vec3st( 1, 1, 1 ) )
         {
@@ -637,42 +563,7 @@ void RifEclipseInputFileTools::saveFault( QTextStream&                          
     // Sort order: i, j, face then k.
     std::sort( faultCellAndFaces.begin(), faultCellAndFaces.end(), RigFault::ordering );
 
-    size_t                             lastI        = std::numeric_limits<size_t>::max();
-    size_t                             lastJ        = std::numeric_limits<size_t>::max();
-    size_t                             lastK        = std::numeric_limits<size_t>::max();
-    size_t                             startK       = std::numeric_limits<size_t>::max();
-    cvf::StructGridInterface::FaceType lastFaceType = cvf::StructGridInterface::FaceType::NO_FACE;
-
-    for ( const RigFault::CellAndFace& faultCellAndFace : faultCellAndFaces )
-    {
-        size_t                             i, j, k;
-        cvf::StructGridInterface::FaceType faceType;
-        std::tie( i, j, k, faceType ) = faultCellAndFace;
-
-        if ( i != lastI || j != lastJ || lastFaceType != faceType || k != lastK + 1 )
-        {
-            // No fault should have no face
-            if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
-            {
-                writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
-            }
-            lastI        = i;
-            lastJ        = j;
-            lastK        = k;
-            lastFaceType = faceType;
-            startK       = k;
-        }
-        else
-        {
-            lastK = k;
-        }
-    }
-
-    // No fault should have no face
-    if ( lastFaceType != cvf::StructGridInterface::FaceType::NO_FACE )
-    {
-        writeFaultLine( stream, faultName, lastI, lastJ, startK, lastK, lastFaceType );
-    }
+    return faultCellAndFaces;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -763,7 +654,7 @@ void RifEclipseInputFileTools::parseAndReadPathAliasKeyword( const QString&     
     char buf[1024];
 
     QFile data( fileName );
-    data.open( QFile::ReadOnly );
+    if ( !data.open( QFile::ReadOnly ) ) return;
 
     QString line;
 

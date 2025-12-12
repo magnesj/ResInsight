@@ -59,9 +59,12 @@ public:
 
     std::optional<int> threadCount() const;
 
+    int minimumAngularCellCount() const;
+
     EclipseTextFileReaderMode eclipseTextFileReaderMode() const;
 
     bool isLoggingActivatedForKeyword( const QString& keyword ) const;
+    bool isFeatureEnabled( const QString& keyword ) const;
 
 protected:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
@@ -84,12 +87,16 @@ private:
     caf::PdmField<bool>   m_showPdfExportDialog;
     caf::PdmField<double> m_exportScalingFactor;
 
-    caf::PdmField<bool>    m_showProgressBar;
+    caf::PdmField<bool> m_showProgressBar;
+
+    caf::PdmField<int> m_mimimumAngularCellCount;
+
     caf::PdmField<QString> m_gtestFilter;
 
     caf::PdmField<EclipseTextFileReaderModeType> m_eclipseReaderMode;
 
     caf::PdmField<QString> m_keywordsForLogging;
+    caf::PdmField<QString> m_featureKeywords;
 
     caf::PdmField<std::pair<bool, QString>> m_maximumNumberOfThreads;
 };

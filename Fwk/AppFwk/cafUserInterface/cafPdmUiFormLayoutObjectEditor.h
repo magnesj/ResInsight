@@ -42,16 +42,21 @@
 #include <QString>
 
 #include <map>
+#include <vector>
 
 class QMinimizePanel;
 class QGridLayout;
 class QWidget;
 class QVBoxLayout;
+class QLabel;
+class QPushButton;
 
 namespace caf
 {
 class PdmUiFieldEditorHandle;
 class PdmUiGroup;
+class PdmUiLabel;
+class PdmUiButton;
 class PdmUiOrdering;
 
 //==================================================================================================
@@ -103,14 +108,21 @@ private:
                                             std::set<QString>*             fieldKeywordNames,
                                             std::set<QString>*             groupNames );
 
+    QLabel*      createLabel( QWidget* parent, const PdmUiLabel& label, const QString& uiConfigName );
+    QPushButton* createButton( QWidget* parent, const PdmUiButton& button, const QString& uiConfigName );
+
+    void deleteLabelsAndButtons();
+
 private:
     std::map<PdmFieldHandle*, PdmUiFieldEditorHandle*> m_fieldViews;
     std::set<PdmFieldHandle*> m_usedFields; ///< used temporarily to store the new(complete) set of used fields
     std::map<QString, QPointer<QMinimizePanel>> m_groupBoxes;
     std::map<QString, QPointer<QMinimizePanel>> m_newGroupBoxes; ///< used temporarily to store the new(complete) set of
                                                                  ///< group boxes
+    std::vector<QPointer<QLabel>>      m_labels;
+    std::vector<QPointer<QPushButton>> m_buttons;
+
     std::map<QString, std::map<QString, bool>> m_objectKeywordGroupUiNameExpandedState;
-    std::vector<QPointer<QVBoxLayout>>         m_layouts;
 };
 
 } // end namespace caf

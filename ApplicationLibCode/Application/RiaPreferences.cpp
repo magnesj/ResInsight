@@ -490,6 +490,10 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
         m_opmPreferences()->appendItems( uiOrdering );
     }
+    else if ( uiConfigName == RiaPreferences::tabNameOpmFlow() )
+    {
+        m_opmPreferences()->appendItems( uiOrdering );
+    }
 #ifdef USE_ODB_API
     else if ( uiConfigName == RiaPreferences::tabNameGeomech() )
     {
@@ -667,6 +671,14 @@ QString RiaPreferences::tabNameScripting()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RiaPreferences::tabNameOpmFlow()
+{
+    return "OPM Flow";
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QString RiaPreferences::tabNameSystem()
 {
     return "System";
@@ -708,6 +720,7 @@ QStringList RiaPreferences::tabNames()
     names << tabNameSummary();
     names << tabNamePlotting();
     names << tabNameScripting();
+    names << tabNameOpmFlow();
 #ifdef USE_ODB_API
     names << tabNameGeomech();
 #endif

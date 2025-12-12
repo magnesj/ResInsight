@@ -88,6 +88,27 @@ QWidget* PdmUiLineEditor::createEditorWidget( QWidget* parent )
 {
     m_lineEdit = new PdmUiLineEdit( parent, false );
 
+    auto isOptionalField = []( caf::PdmUiFieldHandle* uiFieldHandle )
+    {
+        if ( !uiFieldHandle ) return false;
+
+        if ( auto fieldHandle = uiFieldHandle->fieldHandle() )
+        {
+            const std::type_info& typeInfo = typeid( *fieldHandle );
+            QString               typeName = QString( typeInfo.name() );
+
+            return typeName.contains( "optional", Qt::CaseInsensitive );
+        }
+        return false;
+    };
+
+    if ( isOptionalField( uiField() ) )
+    {
+        auto icon   = UiIconFactory::informationIcon();
+        auto action = m_lineEdit->addAction( icon, QLineEdit::TrailingPosition );
+        action->setToolTip( "This field is optional" );
+    }
+
     connect( m_lineEdit, SIGNAL( editingFinished() ), this, SLOT( slotEditingFinished() ) );
 
     m_placeholder = new QWidget( parent );
@@ -155,7 +176,7 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
 
             if ( uiField()->isAutoValueSupported() )
             {
-                auto icon = UiIconFactory::createTwoStateChainIcon();
+                auto icon = UiIconFactory::twoStateChainIcon();
                 m_autoValueToolButton->setIcon( icon );
 
                 m_autoValueToolButton->setChecked( uiField()->isAutoValueEnabled() );
@@ -310,7 +331,7 @@ void PdmUiLineEditor::slotEditingFinished()
                 {
                     // If the existing value in the field is the same as the completer will hit, we need to echo the
                     // choice into the text field because the field values are equal, so the normal echoing is
-                    // considered unneccessary by the caf system.
+                    // considered unnecessary by the caf system.
                     int currentFieldIndexValue = uiField()->uiValue().toInt();
                     if ( currentRow == currentFieldIndexValue )
                     {

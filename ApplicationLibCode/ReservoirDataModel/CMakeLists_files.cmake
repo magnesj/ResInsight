@@ -4,8 +4,10 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellGrid.h
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellInfo.h
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellLocalGrid.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigTypeSafeIndex.h
     ${CMAKE_CURRENT_LIST_DIR}/RigAllanDiagramData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigBasicPlane.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigBoundingBoxIjk.h
     ${CMAKE_CURRENT_LIST_DIR}/RigCaseCellResultCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigCaseCellResultsData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigCaseRealizationParameters.h
@@ -23,6 +25,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleFractureStatisticsCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.h
@@ -36,7 +39,9 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureGrid.h
@@ -80,6 +85,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFloodingSettings.h
     ${CMAKE_CURRENT_LIST_DIR}/RigHydrocarbonFlowTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigDoglegTools.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigResdataGridConverter.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigGridExportAdapter.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -88,6 +95,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellInfo.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellLocalGrid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigAllanDiagramData.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigBoundingBoxIjk.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigBasicPlane.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigCaseCellResultCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigCaseCellResultsData.cpp
@@ -107,6 +115,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultInfo.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleFractureStatisticsCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.cpp
@@ -114,12 +123,15 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModelGenerator.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResultFrames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagSolverInterface.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagStatCalc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagTimeStepResult.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagVisibleCellsStatCalc.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigFlowDiagDefines.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFormationNames.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureCell.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFractureGrid.cpp
@@ -161,6 +173,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigFloodingSettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigHydrocarbonFlowTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigDoglegTools.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigResdataGridConverter.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigGridExportAdapter.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

@@ -20,11 +20,24 @@
 
 #include "cafCmdFeature.h"
 
+#include "cafVecIjk.h"
+
 #include "cvfArray.h"
 #include "cvfVector3.h"
 
+#include <expected>
+
 class RimEclipseView;
+class RimEclipseCase;
 class RicExportEclipseSectorModelUi;
+class RifOpmFlowDeckFile;
+class RigSimWellData;
+
+namespace Opm
+{
+class DeckRecord;
+class DeckKeyword;
+} // namespace Opm
 
 //==================================================================================================
 ///
@@ -36,8 +49,7 @@ class RicExportEclipseSectorModelFeature : public caf::CmdFeature
 public:
     static void openDialogAndExecuteCommand( RimEclipseView* view );
     static void executeCommand( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings, const QString& logPrefix );
-
-    static std::pair<cvf::Vec3i, cvf::Vec3i> getVisibleCellRange( RimEclipseView* view, const cvf::UByteArray& cellVisibility );
+    static RimEclipseView* selectedView();
 
 protected:
     bool isCommandEnabled() const override;
@@ -45,5 +57,7 @@ protected:
     void setupActionLook( QAction* actionToSetup ) override;
 
 private:
-    RimEclipseView* selectedView() const;
+    static void exportGrid( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void exportFaults( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
+    static void exportParameters( RimEclipseView* view, const RicExportEclipseSectorModelUi& exportSettings );
 };

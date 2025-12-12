@@ -95,7 +95,7 @@ QString RimFlowDiagSolution::userDescription() const
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 {
-    if ( m_flowDiagResults.isNull() )
+    if ( !m_flowDiagResults )
     {
         size_t timeStepCount;
         {
@@ -108,10 +108,10 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
             timeStepCount = eclCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount();
         }
 
-        m_flowDiagResults = new RigFlowDiagResults( this, timeStepCount );
+        m_flowDiagResults = std::make_unique<RigFlowDiagResults>( this, timeStepCount );
     }
 
-    return m_flowDiagResults.p();
+    return m_flowDiagResults.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -119,7 +119,7 @@ RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults()
 //--------------------------------------------------------------------------------------------------
 const RigFlowDiagResults* RimFlowDiagSolution::flowDiagResults() const
 {
-    return m_flowDiagResults.p();
+    return m_flowDiagResults.get();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -326,9 +326,9 @@ cvf::Color3f RimFlowDiagSolution::tracerColor( const QString& tracerName ) const
 {
     QString wellName = removeCrossFlowEnding( tracerName );
 
-    if ( wellName == RIG_FLOW_TOTAL_NAME ) return cvf::Color3f::LIGHT_GRAY;
-    if ( wellName == RIG_RESERVOIR_TRACER_NAME ) return cvf::Color3f::LIGHT_GRAY;
-    if ( wellName == RIG_TINY_TRACER_GROUP_NAME ) return cvf::Color3f::DARK_GRAY;
+    if ( wellName == RigFlowDiagDefines::flowTotalName() ) return cvf::Color3f::LIGHT_GRAY;
+    if ( wellName == RigFlowDiagDefines::reservoirTracerName() ) return cvf::Color3f::LIGHT_GRAY;
+    if ( wellName == RigFlowDiagDefines::tinyTracerGroupName() ) return cvf::Color3f::DARK_GRAY;
 
     auto eclCase = firstAncestorOrThisOfType<RimEclipseResultCase>();
     if ( eclCase )

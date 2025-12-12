@@ -265,7 +265,8 @@ std::expected<caf::PdmObjectHandle*, QString> RimSummaryCase_setSummaryVectorVal
 
         if ( rebuildUserInterface )
         {
-            fileSummaryCase->refreshMetaData();
+            fileSummaryCase->buildTreeNodesIfRequired();
+            fileSummaryCase->updateConnectedEditors();
         }
     }
 

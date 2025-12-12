@@ -166,6 +166,11 @@ std::pair<std::shared_ptr<RigThermalFractureDefinition>, QString> RifThermalFrac
         lineNumber++;
     }
 
+    if ( definition->numTimeSteps() == 0 )
+    {
+        return std::make_pair( nullptr, QString( "No time steps found: %1" ).arg( filePath ) );
+    }
+
     return std::make_pair( definition, "" );
 }
 
@@ -181,6 +186,19 @@ QDateTime RifThermalFractureReader::parseDateTime( const QString& dateString )
     if ( !dateTime.isValid() )
     {
         QString dateFormat = "dd.MM.yyyy";
+        dateTime           = QDateTime::fromString( dateString, dateFormat );
+    }
+
+    // Sometimes the datetime field has different year definition
+    if ( !dateTime.isValid() )
+    {
+        QString dateFormat = "dd-MM-yyyy hh:mm:ss";
+        dateTime           = QDateTime::fromString( dateString, dateFormat );
+    }
+
+    if ( !dateTime.isValid() )
+    {
+        QString dateFormat = "dd-MM-yyyy";
         dateTime           = QDateTime::fromString( dateString, dateFormat );
     }
 

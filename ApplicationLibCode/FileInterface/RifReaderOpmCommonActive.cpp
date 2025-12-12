@@ -62,19 +62,45 @@ bool RifReaderOpmCommonActive::importGrid( RigMainGrid* /* mainGrid*/, RigEclips
 
     Opm::EclIO::EGrid opmGrid( m_gridFileName );
 
+    if ( opmGrid.is_radial() )
+    {
+        QString txt = QString( "Radial grid detected in file '%1'. This grid reader (opm-common with only active cells) does not support "
+                               "radial grids. Adjust grid reader in Preferences. The grid is imported as estimated Cartesian grid." )
+                          .arg( QString::fromStdString( m_gridFileName ) );
+
+        RiaLogging::warning( txt );
+    }
+
     const auto& dims = opmGrid.dimension();
-    activeGrid->setGridPointDimensions( cvf::Vec3st( dims[0] + 1, dims[1] + 1, dims[2] + 1 ) );
+    activeGrid->setCellCounts( cvf::Vec3st( dims[0], dims[1], dims[2] ) );
     activeGrid->setGridName( "Main grid" );
     activeGrid->setDualPorosity( opmGrid.porosity_mode() > 0 );
 
     // assign grid unit, if found (1 = Metric, 2 = Field, 3 = Lab)
+    // Note: Accepts "m" or "M" as abbreviation for "METRES" (METRIC units)
     auto gridUnitStr = RiaStdStringTools::toUpper( opmGrid.grid_unit() );
     if ( gridUnitStr.starts_with( 'M' ) )
+    {
         m_gridUnit = 1;
+        RiaLogging::debug(
+            QString( "Grid unit from EGRID file: '%1' (interpreted as METRIC)" ).arg( QString::fromStdString( opmGrid.grid_unit() ) ) );
+    }
     else if ( gridUnitStr.starts_with( 'F' ) )
+    {
         m_gridUnit = 2;
+        RiaLogging::debug(
+            QString( "Grid unit from EGRID file: '%1' (interpreted as FIELD)" ).arg( QString::fromStdString( opmGrid.grid_unit() ) ) );
+    }
     else if ( gridUnitStr.starts_with( 'C' ) )
+    {
         m_gridUnit = 3;
+        RiaLogging::debug(
+            QString( "Grid unit from EGRID file: '%1' (interpreted as LAB)" ).arg( QString::fromStdString( opmGrid.grid_unit() ) ) );
+    }
+    else if ( !gridUnitStr.empty() )
+    {
+        RiaLogging::warning( QString( "Unknown grid unit from EGRID file: '%1'" ).arg( QString::fromStdString( opmGrid.grid_unit() ) ) );
+    }
 
     auto totalCellCount           = opmGrid.totalNumberOfCells();
     auto totalActiveCellCount     = opmGrid.totalActiveCells();
@@ -97,7 +123,7 @@ bool RifReaderOpmCommonActive::importGrid( RigMainGrid* /* mainGrid*/, RigEclips
         RigActiveCellLocalGrid* localGrid = new RigActiveCellLocalGrid( activeGrid );
 
         const auto& lgrDims = lgrGrids[lgrIdx].dimension();
-        localGrid->setGridPointDimensions( cvf::Vec3st( lgrDims[0] + 1, lgrDims[1] + 1, lgrDims[2] + 1 ) );
+        localGrid->setCellCounts( cvf::Vec3st( lgrDims[0], lgrDims[1], lgrDims[2] ) );
         localGrid->setGridId( lgrIdx + 1 );
         localGrid->setGridName( lgr_names[lgrIdx] );
         localGrid->setIndexToStartOfCells( totalCellCount );
@@ -276,7 +302,7 @@ void RifReaderOpmCommonActive::transferActiveGeometry( Opm::EclIO::EGrid&  opmMa
     std::map<int, int> activeCellMap;
     int                nativeIdx = 0;
 
-    // non-parallell loop to set up and initialize things so that we can run in parallell later
+    // non-parallel loop to set up and initialize things so that we can run in parallel later
     for ( int opmCellIndex = 0; opmCellIndex < static_cast<int>( opmGrid.totalNumberOfCells() ); opmCellIndex++ )
     {
         if ( ( activeMatIndexes[opmCellIndex] < 0 ) && ( activeFracIndexes[opmCellIndex] < 0 ) ) continue;

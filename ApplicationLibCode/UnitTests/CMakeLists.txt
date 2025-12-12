@@ -8,12 +8,19 @@ endif(MSVC)
 set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/cvfGeometryTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/Ert-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigSimulationInputTool-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigBoundingBoxIjk-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifcCommandCore-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifEclipseInputFileTools-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RifOpmFlowDeckFile-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderEclipseOutput-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifReaderEclipseSummary-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigActiveCellInfo-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseDataTools-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigReservoir-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigResdataGridConverter-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigGridExportAdapter-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigStatisticsMath-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellPathIntersectionTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogExtractionCurveImpl-Test.cpp
@@ -113,11 +120,14 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifSurfio-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RifRmsWellPathReader-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RiaAngleUtils-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/cafVecIjk-Test.cpp
 )
 
 if(RESINSIGHT_ENABLE_GRPC)
   list(APPEND SOURCE_UNITTEST_FILES
        ${CMAKE_CURRENT_LIST_DIR}/RiaGrpcInterface-Test.cpp
+       ${CMAKE_CURRENT_LIST_DIR}/RiaGrpcWellPathService-Test.cpp
   )
 endif(RESINSIGHT_ENABLE_GRPC)
 
@@ -135,6 +145,18 @@ FetchContent_Declare(
   GIT_TAG release-1.11.0
 )
 
+set(BUILD_GMOCK
+    OFF
+    CACHE BOOL "" FORCE
+)
+set(BUILD_GTEST
+    ON
+    CACHE BOOL "" FORCE
+)
+set(INSTALL_GTEST
+    OFF
+    CACHE BOOL "" FORCE
+)
 FetchContent_MakeAvailable(googletest)
 
 # ##############################################################################

@@ -23,8 +23,8 @@
 #include "RiaCellDividingTools.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaLogging.h"
-
 #include "RiaStringEncodingTools.h"
+
 #include "RifActiveCellsReader.h"
 #include "RifEclipseInputFileTools.h"
 #include "RifEclipseOutputFileTools.h"
@@ -256,13 +256,7 @@ bool RifReaderEclipseOutput::transferGeometry( const ecl_grid_type* mainEclGrid,
 
     RigMainGrid* mainGrid = eclipseCase->mainGrid();
     CVF_ASSERT( mainGrid );
-    {
-        cvf::Vec3st gridPointDim( 0, 0, 0 );
-        gridPointDim.x() = ecl_grid_get_nx( mainEclGrid ) + 1;
-        gridPointDim.y() = ecl_grid_get_ny( mainEclGrid ) + 1;
-        gridPointDim.z() = ecl_grid_get_nz( mainEclGrid ) + 1;
-        mainGrid->setGridPointDimensions( gridPointDim );
-    }
+    mainGrid->setCellCounts( cvf::Vec3st( ecl_grid_get_nx( mainEclGrid ), ecl_grid_get_ny( mainEclGrid ), ecl_grid_get_nz( mainEclGrid ) ) );
 
     // std::string mainGridName = ecl_grid_get_name(mainEclGrid);
     // ERT returns file path to grid file as name for main grid
@@ -283,18 +277,15 @@ bool RifReaderEclipseOutput::transferGeometry( const ecl_grid_type* mainEclGrid,
         std::string lgrName = ecl_grid_get_name( localEclGrid );
         int         lgrId   = ecl_grid_get_lgr_nr( localEclGrid );
 
-        cvf::Vec3st gridPointDim( 0, 0, 0 );
-        gridPointDim.x() = ecl_grid_get_nx( localEclGrid ) + 1;
-        gridPointDim.y() = ecl_grid_get_ny( localEclGrid ) + 1;
-        gridPointDim.z() = ecl_grid_get_nz( localEclGrid ) + 1;
-
         RigLocalGrid* localGrid = new RigLocalGrid( mainGrid );
         localGrid->setGridId( lgrId );
         mainGrid->addLocalGrid( localGrid );
 
         localGrid->setIndexToStartOfCells( totalCellCount );
         localGrid->setGridName( lgrName );
-        localGrid->setGridPointDimensions( gridPointDim );
+
+        cvf::Vec3st cellCounts( ecl_grid_get_nx( localEclGrid ), ecl_grid_get_ny( localEclGrid ), ecl_grid_get_nz( localEclGrid ) );
+        localGrid->setCellCounts( cellCounts );
 
         totalCellCount += ecl_grid_get_global_size( localEclGrid );
     }
@@ -408,8 +399,12 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
     {
         auto task = progress.task( "Transferring grid geometry", 10 );
         if ( !transferGeometry( mainEclGrid, eclipseCaseData, invalidateLongThinCells() ) ) return false;
+    }
 
-        RifOpmRadialGridTools::importCoordinatesForRadialGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
+    auto iLimitFromEdfm = RifEdfmTools::checkForEdfmLimitI( fileName );
+    if ( iLimitFromEdfm > 0 )
+    {
+        eclipseCaseData->mainGrid()->invalidateCellsAboveI( iLimitFromEdfm - 1 /* zero based index */ );
     }
 
     auto iLimitFromEdfm = RifEdfmTools::checkForEdfmLimitI( fileName );
@@ -437,6 +432,53 @@ bool RifReaderEclipseOutput::open( const QString& fileName, RigEclipseCaseData* 
     {
         auto task = progress.task( "Reading Results Meta data", 25 );
         buildMetaData( mainEclGrid );
+    }
+
+    {
+        RigMainGrid* mainGrid = eclipseCaseData->mainGrid();
+
+        auto isAngularRangeCylindrical = [&]()
+        {
+            // Check if min J coordinate is close to 0.0 and max is close to 360. This is a workaround for import of simulation cases that
+            // has an invalid header and is not possible to import using opm-common
+            if ( !mainGrid->boundingBox().isValid() )
+            {
+                mainGrid->computeBoundingBox();
+            }
+
+            auto         bb      = mainGrid->boundingBox();
+            const double epsilon = 1.0;
+            return ( bb.isValid() && ( std::abs( bb.min().y() ) < epsilon ) && ( std::abs( bb.max().y() - 360.0 ) < epsilon ) );
+        };
+
+        bool isDetectedAsRadial = isAngularRangeCylindrical();
+        if ( isDetectedAsRadial )
+        {
+            if ( !readerSettings().useCylindricalCoordinates )
+            {
+                QString msg = QString( "The grid appears to be a radial grid.\nTo import this grid, open Preferences, and set 'Radial "
+                                       "Grid Display Mode' to 'Show Cells as Cylinder Segments'." );
+                RiaLogging::errorInMessageBox( nullptr, "Potential Radial Grid", msg );
+            }
+
+            if ( readerSettings().useCylindricalCoordinates )
+            {
+                mainGrid->setIsRadial( true );
+
+                size_t minimumAngularCellCount = static_cast<size_t>( readerSettings().minimumAngularCellCount );
+                if ( mainGrid->cellCountJ() < minimumAngularCellCount )
+                {
+                    auto angularRefinement = ( minimumAngularCellCount / mainGrid->cellCountJ() ) + 1;
+
+                    RifOpmRadialGridTools::createAngularGridRefinement( eclipseCaseData, angularRefinement );
+                }
+            }
+        }
+        else
+        {
+            auto isRadial = RifOpmRadialGridTools::tryConvertRadialGridToCartesianGrid( fileName.toStdString(), eclipseCaseData->mainGrid() );
+            mainGrid->setIsRadial( isRadial );
+        }
     }
 
     {
@@ -859,35 +901,45 @@ void RifReaderEclipseOutput::buildMetaData( ecl_grid_type* grid )
 
     // Unit system
     {
-        // Default units type is METRIC
-        RiaDefines::EclipseUnitSystem unitsType = RiaDefines::EclipseUnitSystem::UNITS_METRIC;
-        int                           unitsTypeValue;
+        std::optional<RiaDefines::EclipseUnitSystem> egridUnit;
+        std::optional<RiaDefines::EclipseUnitSystem> initUnit;
+        std::optional<RiaDefines::EclipseUnitSystem> unrstUnit;
 
+        // Read from grid file
+        if ( grid )
+        {
+            egridUnit = RifEclipseOutputFileTools::unitValueToEnum( ecl_grid_get_unit_system( grid ) );
+        }
+
+        // Read from init file
+        if ( m_ecl_init_file )
+        {
+            initUnit = RifEclipseOutputFileTools::unitValueToEnum( RifEclipseOutputFileTools::readUnitsType( m_ecl_init_file ) );
+        }
+
+        // Read from restart file
         if ( m_dynamicResultsAccess.notNull() )
         {
-            unitsTypeValue = m_dynamicResultsAccess->readUnitsType();
-        }
-        else
-        {
-            if ( m_ecl_init_file )
-            {
-                unitsTypeValue = RifEclipseOutputFileTools::readUnitsType( m_ecl_init_file );
-            }
-            else
-            {
-                unitsTypeValue = ecl_grid_get_unit_system( grid );
-            }
+            unrstUnit = RifEclipseOutputFileTools::unitValueToEnum( m_dynamicResultsAccess->readUnitsType() );
         }
 
-        if ( unitsTypeValue == 2 )
-        {
-            unitsType = RiaDefines::EclipseUnitSystem::UNITS_FIELD;
-        }
-        else if ( unitsTypeValue == 3 )
-        {
-            unitsType = RiaDefines::EclipseUnitSystem::UNITS_LAB;
-        }
+        // Determine final unit system using hierarchy (egrid > init > unrst) with warnings
+        RiaDefines::EclipseUnitSystem unitsType = RifEclipseOutputFileTools::determineUnitSystem( egridUnit, initUnit, unrstUnit );
         m_eclipseCaseData->setUnitsType( unitsType );
+    }
+
+    // Set available phases from INIT or UNRST file
+    {
+        std::set<RiaDefines::PhaseType> phases;
+        if ( m_ecl_init_file )
+        {
+            phases = RifEclipseOutputFileTools::findAvailablePhases( m_ecl_init_file );
+        }
+        else if ( m_dynamicResultsAccess.notNull() )
+        {
+            phases = m_dynamicResultsAccess->availablePhases();
+        }
+        m_eclipseCaseData->setAvailablePhases( phases );
     }
 
     progInfo.incrementProgress();

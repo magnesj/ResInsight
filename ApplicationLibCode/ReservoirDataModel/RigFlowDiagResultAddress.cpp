@@ -37,7 +37,8 @@ void RigFlowDiagResultAddress::PhaseSelectionEnum::setUp()
 //--------------------------------------------------------------------------------------------------
 bool RigFlowDiagResultAddress::isNativeResult() const
 {
-    return ( ( ( variableName == RIG_FLD_TOF_RESNAME ) || ( variableName == RIG_FLD_CELL_FRACTION_RESNAME ) ) &&
+    return ( ( ( variableName == RigFlowDiagDefines::tofResultName().toStdString() ) ||
+               ( variableName == RigFlowDiagDefines::cellFractionResultName().toStdString() ) ) &&
              selectedTracerNames.size() <= 1 );
 }
 

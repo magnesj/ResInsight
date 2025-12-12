@@ -77,6 +77,8 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitField( &m_showPdfExportDialog, "showPdfExportDialog", true, "Show PDF Export Dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showPdfExportDialog );
 
+    CAF_PDM_InitField( &m_mimimumAngularCellCount, "mimimumAngularCellCount", 40, "Minimum Angular Cell Count" );
+
     CAF_PDM_InitField( &m_gtestFilter, "gtestFilter", QString(), "Unit Test Filter (gtest)" );
     CAF_PDM_InitField( &m_exportScalingFactor, "exportScalingFactor", -1.0, "Export Scaling Factor (<0 disable)" );
 
@@ -89,6 +91,11 @@ RiaPreferencesSystem::RiaPreferencesSystem()
                        "KeywordsForLogging",
                        QString(),
                        "Keywords to enable debug logging, separated by semicolon.\nType 'enable-all' to enable logging for all objects." );
+
+    CAF_PDM_InitField( &m_featureKeywords,
+                       "FeatureKeywords",
+                       QString(),
+                       "Keywords to enable experimental features separated by semicolon.\nType 'enable-all' for all." );
 
     CAF_PDM_InitField( &m_maximumNumberOfThreads, "maximumNumberOfThreads", std::make_pair( false, QString( "4" ) ), "Maximum Number of Threads" );
     m_maximumNumberOfThreads.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxAndTextEditor::uiEditorTypeName() );
@@ -242,6 +249,14 @@ std::optional<int> RiaPreferencesSystem::threadCount() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+int RiaPreferencesSystem::minimumAngularCellCount() const
+{
+    return m_mimimumAngularCellCount();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RiaPreferencesSystem::EclipseTextFileReaderMode RiaPreferencesSystem::eclipseTextFileReaderMode() const
 {
     return m_eclipseReaderMode();
@@ -255,6 +270,20 @@ bool RiaPreferencesSystem::isLoggingActivatedForKeyword( const QString& keyword 
     if ( keyword.isEmpty() ) return true;
 
     QStringList keywords = m_keywordsForLogging().split( ";" );
+
+    if ( keywords.contains( "enable-all" ) ) return true;
+
+    return keywords.contains( keyword );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaPreferencesSystem::isFeatureEnabled( const QString& keyword ) const
+{
+    if ( keyword.isEmpty() ) return false;
+
+    const QStringList keywords = m_featureKeywords().split( ";", Qt::SkipEmptyParts );
 
     if ( keywords.contains( "enable-all" ) ) return true;
 
@@ -290,8 +319,14 @@ void RiaPreferencesSystem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     uiOrdering.add( &m_eclipseReaderMode );
 
     {
+        caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Radial Grid" );
+        group->add( &m_mimimumAngularCellCount );
+    }
+
+    {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Developer Settings" );
         group->add( &m_keywordsForLogging );
+        group->add( &m_featureKeywords );
         group->add( &m_gtestFilter );
     }
 

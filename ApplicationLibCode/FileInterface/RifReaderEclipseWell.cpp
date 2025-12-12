@@ -40,6 +40,7 @@
 #include "ert/ecl_well/well_segment_collection.h"
 #include "ert/ecl_well/well_state.h"
 
+#include <array>
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
@@ -110,7 +111,6 @@ size_t RifReaderEclipseWell::localGridCellIndexFromErtConnection( const RigGridB
 
     // The K value might also be -1. It is not yet known why, or what it is supposed to mean,
     // but for now we will interpret as 0.
-    // TODO: Ask Joakim Haave regarding this.
     if ( cellK < 0 )
     {
         // cvf::Trace::show("Well Connection for grid " + cvf::String(grid->gridName()) + "\n - Detected negative K
@@ -206,7 +206,7 @@ RigWellResultPoint RifReaderEclipseWell::createWellResultPoint( const RigEclipse
 
         if ( auto ijk = grid->ijkFromCellIndex( gridCellIndex ) )
         {
-            resultPoint.setIjk( ijk->toOneBased() );
+            resultPoint.setIjk( ijk.value() );
         }
     }
 
@@ -651,11 +651,10 @@ void RifReaderEclipseWell::readWellCells( RifEclipseRestartDataAccess* restartDa
                                 well_conn_type*    ert_connection = well_conn_collection_iget( connections, 0 );
                                 RigWellResultPoint point =
                                     RifReaderEclipseWell::createWellResultPoint( eclipseCaseData, grids[gridNr], ert_connection, segment, wellName );
-                                lastConnectionPos = grids[gridNr]->cell( point.cellIndex() ).center();
-                                cvf::Vec3d cellVxes[8];
-                                grids[gridNr]->cellCornerVertices( point.cellIndex(), cellVxes );
-                                lastConnectionCellCorner = cellVxes[0];
-                                lastConnectionCellSize   = ( lastConnectionPos - cellVxes[0] ).length();
+                                lastConnectionPos                  = grids[gridNr]->cell( point.cellIndex() ).center();
+                                std::array<cvf::Vec3d, 8> cellVxes = grids[gridNr]->cellCornerVertices( point.cellIndex() );
+                                lastConnectionCellCorner           = cellVxes[0];
+                                lastConnectionCellSize             = ( lastConnectionPos - cellVxes[0] ).length();
 
                                 lastConnectionSegmentId     = well_segment_get_id( segment );
                                 accLengthFromLastConnection = well_segment_get_length( segment ) / ( connectionCount + 1 );

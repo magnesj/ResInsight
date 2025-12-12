@@ -49,6 +49,7 @@
 #include "RigSoilResultCalculator.h"
 #include "RigStatisticsDataCache.h"
 #include "RigStatisticsMath.h"
+#include "RigSwatResultCalculator.h"
 
 #include "RimCompletionCellIntersectionCalc.h"
 #include "RimEclipseCase.h"
@@ -466,6 +467,8 @@ QStringList RigCaseCellResultsData::resultNames( RiaDefines::ResultCatType resTy
         if ( resultAddress.isDeltaTimeStepActive() || resultAddress.isDeltaCaseActive() || resultAddress.isDivideByCellFaceAreaActive() )
             continue;
 
+        if ( isRadialModel() && ( it->resultName() == "DX" || it->resultName() == "DY" ) ) continue;
+
         if ( it->resultType() == resType )
         {
             varList.push_back( it->resultName() );
@@ -797,7 +800,21 @@ RigEclipseResultAddress RigCaseCellResultsData::defaultResult() const
     if ( maxTimeStepCount() > 0 )
     {
         auto prefs = RiaPreferencesGrid::current();
-        if ( prefs->loadAndShowSoil() ) return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
+        if ( prefs->loadAndShowSoil() && m_ownerCaseData )
+        {
+            const auto phases = m_ownerCaseData->availablePhases();
+            if ( phases.contains( RiaDefines::PhaseType::OIL_PHASE ) )
+            {
+                return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() );
+            }
+
+            if ( phases.contains( RiaDefines::PhaseType::GAS_PHASE ) )
+            {
+                return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() );
+            }
+
+            return RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() );
+        }
 
         auto dynamicResult = std::find_if( allResults.begin(),
                                            allResults.end(),
@@ -965,17 +982,16 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
     bool needsToBeStored = false;
     // SOIL
     {
-        if ( !hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) ) )
-        {
-            if ( hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) ) ||
-                 hasResultEntry( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::sgas() ) ) )
-            {
-                size_t soilIndex = findOrCreateScalarResultIndex( RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE,
-                                                                                           RiaResultNames::soil() ),
-                                                                  needsToBeStored );
-                setMustBeCalculated( soilIndex );
-            }
-        }
+        RigSoilResultCalculator soilCalculator( *this );
+        soilCalculator.checkAndCreatePlaceholderEntry(
+            RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::soil() ) );
+    }
+
+    // SWAT
+    {
+        RigSwatResultCalculator swatCalculator( *this );
+        swatCalculator.checkAndCreatePlaceholderEntry(
+            RigEclipseResultAddress( RiaDefines::ResultCatType::DYNAMIC_NATIVE, RiaResultNames::swat() ) );
     }
 
     // Oil Volume
@@ -1136,8 +1152,10 @@ void RigCaseCellResultsData::createPlaceholderResultEntries()
 
     // I/J/K indexes
     {
-        findOrCreateScalarResultIndex( RiaResultNames::staticIntegerAddress( RiaResultNames::indexIResultName() ), needsToBeStored );
-        findOrCreateScalarResultIndex( RiaResultNames::staticIntegerAddress( RiaResultNames::indexJResultName() ), needsToBeStored );
+        findOrCreateScalarResultIndex( RiaResultNames::staticIntegerAddress( RiaResultNames::indexIResultName( isRadialModel() ) ),
+                                       needsToBeStored );
+        findOrCreateScalarResultIndex( RiaResultNames::staticIntegerAddress( RiaResultNames::indexJResultName( isRadialModel() ) ),
+                                       needsToBeStored );
         findOrCreateScalarResultIndex( RiaResultNames::staticIntegerAddress( RiaResultNames::indexKResultName() ), needsToBeStored );
     }
 
@@ -1378,8 +1396,8 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
             }
             RigAllanUtil::computeAllanResults( this, m_ownerMainGrid, includeInactiveCells );
         }
-        else if ( resultName == RiaResultNames::indexIResultName() || resultName == RiaResultNames::indexJResultName() ||
-                  resultName == RiaResultNames::indexKResultName() )
+        else if ( resultName == RiaResultNames::indexIResultName( isRadialModel() ) ||
+                  resultName == RiaResultNames::indexJResultName( isRadialModel() ) || resultName == RiaResultNames::indexKResultName() )
         {
             computeIndexResults();
         }
@@ -1436,6 +1454,20 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
                 {
                     computeSOILForTimeStep( timeStepIdx );
                 }
+            }
+
+            return scalarResultIndex;
+        }
+    }
+    else if ( resultName == RiaResultNames::swat() )
+    {
+        if ( mustBeCalculated( scalarResultIndex ) )
+        {
+            RigSwatResultCalculator swatCalculator( *this );
+
+            for ( size_t timeStepIdx = 0; timeStepIdx < maxTimeStepCount(); timeStepIdx++ )
+            {
+                swatCalculator.calculate( resVarAddr, timeStepIdx );
             }
 
             return scalarResultIndex;
@@ -1902,6 +1934,7 @@ void RigCaseCellResultsData::computeDepthRelatedResults()
 
         size_t resultIndex = activeCellInfo()->cellResultIndex( cellIdx );
         if ( resultIndex == cvf::UNDEFINED_SIZE_T ) continue;
+        if ( resultIndex >= actCellCount ) continue;
 
         bool isTemporaryGrid = cell.hostGrid()->isTempGrid();
 
@@ -1945,7 +1978,7 @@ void RigCaseCellResultsData::computeDepthRelatedResults()
 //--------------------------------------------------------------------------------------------------
 void RigCaseCellResultsData::computeIndexResults()
 {
-    RigEclipseResultAddress     addr( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::indexIResultName() );
+    RigEclipseResultAddress     addr( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::indexIResultName( isRadialModel() ) );
     RigIndexIjkResultCalculator calculator( *this );
     calculator.calculate( addr, 0 );
 }
@@ -1989,8 +2022,8 @@ void calculateConnectionGeometry( const RigCell&                     c1,
     c1.faceIndices( faceId, &face1 );
     c2.faceIndices( cvf::StructGridInterface::oppositeFace( faceId ), &face2 );
 
-    bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( &polygon,
-                                                                               &intersections,
+    bool foundOverlap = cvf::GeometryTools::calculateOverlapPolygonOfTwoQuads( polygon,
+                                                                               intersections,
                                                                                (cvf::EdgeIntersectStorage<size_t>*)nullptr,
                                                                                cvf::wrapArrayConst( &nodes ),
                                                                                face1.data(),
@@ -3002,6 +3035,16 @@ RigStatisticsDataCache* RigCaseCellResultsData::statistics( const RigEclipseResu
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RigCaseCellResultsData::isRadialModel() const
+{
+    if ( !m_ownerMainGrid ) return false;
+
+    return m_ownerMainGrid->isRadial();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 size_t RigCaseCellResultsData::findScalarResultIndexFromAddress( const RigEclipseResultAddress& resVarAddr ) const
 {
     if ( !resVarAddr.isValid() )
@@ -3081,7 +3124,7 @@ void RigCaseCellResultsData::copyResultsMetaDataFromMainCase( RigEclipseCaseData
         RimEclipseResultCase* rimReservoir = dynamic_cast<RimEclipseResultCase*>( destinationCases[i] );
 
         if ( !rimReservoir ) continue; // Input reservoir
-        if ( mainCaseResultsData == rimReservoir->eclipseCaseData() ) continue; // Do not copy ontop of itself
+        if ( mainCaseResultsData == rimReservoir->eclipseCaseData() ) continue; // Do not copy on top of itself
 
         RigCaseCellResultsData* cellResultsStorage = rimReservoir->results( poroModel );
 

@@ -75,8 +75,8 @@ QString faultReactAssessmentPrefix();
 
 QString completionTypeResultName();
 
-QString                 indexIResultName();
-QString                 indexJResultName();
+QString                 indexIResultName( bool isRadial );
+QString                 indexJResultName( bool isRadial );
 QString                 indexKResultName();
 RigEclipseResultAddress staticIntegerAddress( const QString& resultName );
 
@@ -84,6 +84,7 @@ QString faultDistanceName();
 QString facies();
 
 QString porv();
+QString rockv();
 QString soil();
 QString sgas();
 QString swat();
@@ -92,6 +93,9 @@ QString sowcr();
 QString sogcr();
 QString sgcr();
 QString convergence();
+
+QString opernum();
+QString bordnum();
 
 // Well path derived results
 QString wbsAzimuthResult();
@@ -116,6 +120,9 @@ QString wbsPPInitialResult();
 QString           formationBinaryAllanResultName();
 QString           formationAllanResultName();
 std::set<QString> nncResultNames();
+
+QString satnumResult();
+QString imbnumResult();
 
 // List of well path derived results
 std::vector<QString> wbsAngleResultNames();

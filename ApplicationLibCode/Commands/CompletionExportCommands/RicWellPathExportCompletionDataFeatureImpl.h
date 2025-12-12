@@ -123,6 +123,12 @@ public:
     static std::vector<RigCompletionData>
         computeDynamicCompletionsForWellPath( RimWellPath* wellPath, RimEclipseCase* eclipseCase, size_t timeStepIndex );
 
+    static std::vector<RigCompletionData> completionDataForWellPath( RimWellPath* wellPath, RimEclipseCase* eCase );
+
+    static std::pair<double, cvf::Vec2i> wellPathUpperGridIntersectionIJ( gsl::not_null<const RimEclipseCase*> gridCase,
+                                                                          gsl::not_null<const RimWellPath*>    wellPath,
+                                                                          const QString&                       gridName = "" );
+
 private:
     static std::vector<RigCompletionData> generatePerforationsCompdatValues( gsl::not_null<const RimWellPath*>                 wellPath,
                                                                              const std::vector<const RimPerforationInterval*>& intervals,
@@ -173,16 +179,16 @@ private:
                                                   const QString&                        gridName,
                                                   const std::vector<RigCompletionData>& completionData );
 
+    static void exportComplumpTableUsingFormatter( RifTextDataTableFormatter&            formatter,
+                                                   const QString&                        gridName,
+                                                   const std::vector<RigCompletionData>& completionData );
+
     static void exportWpimultTableUsingFormatter( RifTextDataTableFormatter&            formatter,
                                                   const QString&                        gridName,
                                                   const std::vector<RigCompletionData>& completionData );
 
     static void appendCompletionData( std::map<size_t, std::vector<RigCompletionData>>* completionData,
                                       const std::vector<RigCompletionData>&             data );
-
-    static std::pair<double, cvf::Vec2i> wellPathUpperGridIntersectionIJ( gsl::not_null<const RimEclipseCase*> gridCase,
-                                                                          gsl::not_null<const RimWellPath*>    wellPath,
-                                                                          const QString&                       gridName = "" );
 
     static void exportCarfinForTemporaryLgrs( const RimEclipseCase* sourceCase, const QString& folder );
 

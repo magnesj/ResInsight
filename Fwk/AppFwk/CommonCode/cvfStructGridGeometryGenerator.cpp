@@ -47,6 +47,8 @@
 
 #include "cvfArray.h"
 #include "cvfOutlineEdgeExtractor.h"
+
+#include <array>
 #include <cmath>
 
 namespace cvf
@@ -274,8 +276,7 @@ ref<DrawableGeo> StructGridGeometryGenerator::createMeshDrawableFromSingleCell( 
                                                                                 size_t                     cellIndex,
                                                                                 const cvf::Vec3d& displayModelOffset )
 {
-    cvf::Vec3d cornerVerts[8];
-    grid->cellCornerVertices( cellIndex, cornerVerts );
+    std::array<cvf::Vec3d, 8> cornerVerts = grid->cellCornerVertices( cellIndex );
 
     std::vector<Vec3f> vertices;
 
@@ -413,8 +414,7 @@ void StructGridGeometryGenerator::computeArrays()
 
                 if ( !visibleFaces.empty() )
                 {
-                    cvf::Vec3d cornerVerts[8];
-                    m_grid->cellCornerVertices( cellIndex, cornerVerts );
+                    std::array<cvf::Vec3d, 8> cornerVerts = m_grid->cellCornerVertices( cellIndex );
 
                     size_t idx;
                     for ( idx = 0; idx < visibleFaces.size(); idx++ )
@@ -448,7 +448,7 @@ void StructGridGeometryGenerator::computeArrays()
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Calculates the texture coordinates in a "nearly" one dimentional texture.
+/// Calculates the texture coordinates in a "nearly" one dimensional texture.
 /// Undefined values are coded with a y-texturecoordinate value of 1.0 instead of the normal 0.5
 //--------------------------------------------------------------------------------------------------
 void StructGridGeometryGenerator::textureCoordinates( Vec2fArray*                       textureCoords,

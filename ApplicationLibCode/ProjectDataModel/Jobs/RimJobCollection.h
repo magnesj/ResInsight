@@ -38,9 +38,13 @@ public:
 
     bool isEmpty();
 
+    int numberOfRunningJobs() const;
+
     void deleteAllJobs();
 
     std::vector<RimGenericJob*> jobs() const;
+
+    std::vector<RimGenericJob*> jobsMatchingKeyValue( const QString& key, const QString& value ) const;
 
 protected:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;

@@ -224,10 +224,9 @@ RiuEclipseSelectionItem* RiuCellSelectionTool::createSelectionItemFromInput()
 
         m_cellEdit->clear();
 
-        double iSize, jSize, kSize;
-        mainGrid->characteristicCellSizes( &iSize, &jSize, &kSize );
+        cvf::Vec3d cellSize = mainGrid->characteristicCellSizes();
 
-        auto distance = std::min( { iSize, jSize, kSize } ) * 0.4;
+        auto distance = std::min( { cellSize.x(), cellSize.y(), cellSize.z() } ) * 0.4;
 
         if ( coords.size() == 3 )
         {
@@ -248,10 +247,11 @@ RiuEclipseSelectionItem* RiuCellSelectionTool::createSelectionItemFromInput()
             return nullptr;
         }
 
-        if ( auto ijk = mainGrid->ijkFromCellIndex( cellIndex ) )
+        if ( auto ijk0 = mainGrid->ijkFromCellIndex( cellIndex ) )
         {
             // 1-based for user input
-            m_cellEdit->setText( QString( "%1 %2 %3" ).arg( ijk->i() + 1 ).arg( ijk->j() + 1 ).arg( ijk->k() + 1 ) );
+            auto ijk1 = ijk0->toOneBased();
+            m_cellEdit->setText( QString( "%1 %2 %3" ).arg( ijk1.i() ).arg( ijk1.j() ).arg( ijk1.k() ) );
         }
     }
     else

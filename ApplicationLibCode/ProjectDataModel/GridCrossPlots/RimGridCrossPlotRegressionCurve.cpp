@@ -439,10 +439,10 @@ void RimGridCrossPlotRegressionCurve::fieldChangedByUi( const caf::PdmFieldHandl
 
     if ( &m_minRangeX == changedField || &m_maxRangeX == changedField || &m_minRangeY == changedField || &m_maxRangeY == changedField ||
          &m_minExtrapolationRangeX == changedField || &m_maxExtrapolationRangeX == changedField || &m_regressionType == changedField ||
-         &m_polynomialDegree == changedField || &m_showDataSelectionInPlot == changedField )
+         &m_polynomialDegree == changedField || &m_showDataSelectionInPlot == changedField || &m_showCurve == changedField )
     {
         auto dataSet = firstAncestorOrThisOfTypeAsserted<RimGridCrossPlotDataSet>();
-        dataSet->loadDataAndUpdate( true );
+        dataSet->updateRegressionCurves();
     }
 }
 
@@ -541,8 +541,8 @@ void RimGridCrossPlotRegressionCurve::updateRectAnnotation()
         {
             QString textLines;
             textLines += QString( "<b>Case:</b> %1<br>" ).arg( dataSet->caseNameString() );
-            textLines += QString( "<b>%1:</b> %2 - %3<br>" ).arg( dataSet->xAxisName() ).arg( m_minRangeX ).arg( m_maxRangeX );
-            textLines += QString( "<b>%1:</b> %2 - %3<br>" ).arg( dataSet->yAxisName() ).arg( m_minRangeY ).arg( m_maxRangeY );
+            textLines += QString( "<b>%1:</b> %2 - %3<br>" ).arg( dataSet->xAxisName() ).arg( m_minRangeX() ).arg( m_maxRangeX() );
+            textLines += QString( "<b>%1:</b> %2 - %3<br>" ).arg( dataSet->yAxisName() ).arg( m_minRangeY() ).arg( m_maxRangeY() );
             annotation->setText( textLines );
         }
     }

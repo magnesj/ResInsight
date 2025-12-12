@@ -23,6 +23,7 @@
 #include "RiaApplication.h"
 #include "RiaFieldHandleTools.h"
 #include "RiaLogging.h"
+#include "RiaPhaseTools.h"
 #include "RiaPreferencesGrid.h"
 #include "RiaRegressionTestRunner.h"
 #include "RiaResultNames.h"
@@ -43,6 +44,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigFlowDiagSolverInterface.h"
 #include "RigMainGrid.h"
+#include "RigReservoirGridTools.h"
 
 #include "Formations/RimFormationNames.h"
 #include "Formations/RimFormationTools.h"
@@ -126,6 +128,25 @@ void RimEclipseResultCase::initAfterRead()
         auto folderNames       = RimFormationTools::formationFoldersFromCaseFileName( m_caseFileName().path() );
         m_activeFormationNames = RimFormationTools::loadFormationNamesFromFolder( folderNames );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimEclipseResultCase::phasesAsString() const
+{
+    if ( auto caseData = eclipseCaseData() )
+    {
+        const auto phases = caseData->availablePhases();
+        if ( phases.empty() )
+        {
+            return "No phases available";
+        }
+
+        return RiaPhaseTools::getSystemDescription( phases );
+    }
+
+    return "No data available";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -297,6 +318,13 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
 
         results( RiaDefines::PorosityModelType::MATRIX_MODEL )->computeCellVolumes();
     }
+
+    if ( mainGrid() && mainGrid()->isRadial() )
+    {
+        // This is required to make the generated LGR for radial grids work when loading a project file
+        RigReservoirGridTools::refreshEclipseCaseDataAndViews( this );
+    }
+
     return true;
 }
 
@@ -448,7 +476,7 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
     {
         // Create the mock file interface and and RigSerervoir and set them up.
         mockFileInterface->setWorldCoordinates( cvf::Vec3d( 10, 10, 10 ), cvf::Vec3d( 20, 20, 20 ) );
-        mockFileInterface->setGridPointDimensions( cvf::Vec3st( 4, 5, 6 ) );
+        mockFileInterface->setCellCounts( cvf::Vec3st( 5, 6, 7 ) );
         mockFileInterface->addLocalGridRefinement( cvf::Vec3st( 0, 2, 2 ), cvf::Vec3st( 0, 2, 2 ), cvf::Vec3st( 3, 3, 3 ) );
         mockFileInterface->enableWellData( false );
 
@@ -457,7 +485,7 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
     else if ( modelName == RiaDefines::mockModelBasicWithResults() )
     {
         mockFileInterface->setWorldCoordinates( cvf::Vec3d( 10, 10, 10 ), cvf::Vec3d( -20, -20, -20 ) );
-        mockFileInterface->setGridPointDimensions( cvf::Vec3st( 5, 10, 20 ) );
+        mockFileInterface->setCellCounts( cvf::Vec3st( 6, 11, 21 ) );
         mockFileInterface->addLocalGridRefinement( cvf::Vec3st( 0, 3, 3 ), cvf::Vec3st( 1, 4, 9 ), cvf::Vec3st( 2, 2, 2 ) );
         mockFileInterface->setResultInfo( 3, 10 );
 
@@ -488,7 +516,7 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
 
         mockFileInterface->setWorldCoordinates( cvf::Vec3d( startX + offsetX, startY + offsetY, startZ + offsetZ ),
                                                 cvf::Vec3d( startX + widthX + offsetX, startY + widthY + offsetY, startZ + widthZ + offsetZ ) );
-        mockFileInterface->setGridPointDimensions( cvf::Vec3st( 50, 100, 200 ) );
+        mockFileInterface->setCellCounts( cvf::Vec3st( 51, 101, 201 ) );
         mockFileInterface->addLocalGridRefinement( cvf::Vec3st( 0, 30, 30 ), cvf::Vec3st( 1, 40, 90 ), cvf::Vec3st( 2, 2, 2 ) );
         mockFileInterface->setResultInfo( 3, 10 );
 
@@ -524,8 +552,8 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
 
             mockFileInterface->setWorldCoordinates( cvf::Vec3d( startX + offsetX, startY + offsetY, startZ + offsetZ ),
                                                     cvf::Vec3d( startX + widthX + offsetX, startY + widthY + offsetY, startZ + widthZ + offsetZ ) );
-            mockFileInterface->setGridPointDimensions(
-                cvf::Vec3st( mockModelSettings->cellCountX + 1, mockModelSettings->cellCountY + 1, mockModelSettings->cellCountZ + 1 ) );
+            mockFileInterface->setCellCounts(
+                cvf::Vec3st( mockModelSettings->cellCountX, mockModelSettings->cellCountY, mockModelSettings->cellCountZ ) );
             mockFileInterface->setResultInfo( mockModelSettings->resultCount, mockModelSettings->timeStepCount );
             mockFileInterface->enableWellData( false );
 
@@ -545,8 +573,8 @@ cvf::ref<RifReaderInterface> RimEclipseResultCase::createMockModel( QString mode
 //--------------------------------------------------------------------------------------------------
 RimEclipseResultCase::~RimEclipseResultCase()
 {
-    // Disconnect all comparison views. In debug build on Windows, a crash occurs. The comparison view is also set to zero in the destructor
-    // of Rim3dView()
+    // Disconnect all comparison views. In debug build on Windows, a crash occurs. The comparison view is also set to zero in the
+    // destructor of Rim3dView()
     for ( auto v : reservoirViews() )
     {
         if ( v ) v->setComparisonView( nullptr );
@@ -672,6 +700,10 @@ void RimEclipseResultCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     uiOrdering.add( &m_caseId );
     uiOrdering.add( &m_caseFileName );
     uiOrdering.add( &m_unitSystem );
+
+    QString phaseText = phasesAsString();
+    uiOrdering.addNewLabel( "Phase System" );
+    uiOrdering.addNewLabel( phaseText, { .newRow = false } );
 
     auto group = uiOrdering.addNewGroup( "Case Options" );
     group->add( &m_activeFormationNames );

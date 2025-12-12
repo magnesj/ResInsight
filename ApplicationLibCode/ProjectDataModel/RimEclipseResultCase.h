@@ -90,6 +90,8 @@ private:
     void ensureRftDataIsImported();
     bool showTimeStepFilterGUI();
 
+    QString phasesAsString() const;
+
     cvf::ref<RifReaderInterface> createMockModel( QString modelName );
     void                         defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 

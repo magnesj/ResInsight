@@ -48,6 +48,7 @@
 #include "SummaryPlotCommands/RicSummaryPlotFeatureImpl.h"
 
 #include "Formations/RimFormationNamesCollection.h"
+#include "Jobs/RimJobCollection.h"
 #include "Rim2dIntersectionViewCollection.h"
 #include "RimAnnotationCollection.h"
 #include "RimAnnotationInViewCollection.h"
@@ -285,6 +286,34 @@ bool RiaGuiApplication::saveProjectAs( const QString& fileName )
         QMessageBox::warning( nullptr, "Error when saving project file", errMsg );
         return false;
     }
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaGuiApplication::notifyUserAboutRunningJobs()
+{
+    if ( m_project->jobCollection()->numberOfRunningJobs() > 0 )
+    {
+        QMessageBox::critical( nullptr,
+                               "Active running jobs",
+                               "One or more jobs are still running, you need to stop all jobs before continuing." );
+        return false;
+    }
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RiaGuiApplication::checkWithUserBeforeClose()
+{
+    // check for any running jobs
+    if ( !notifyUserAboutRunningJobs() ) return false;
+    // ask user to save modified project if needed
+    if ( !askUserToSaveModifiedProject() ) return false;
 
     return true;
 }
@@ -1679,7 +1708,7 @@ void RiaGuiApplication::runMultiCaseSnapshots( const QString&       templateProj
 bool RiaGuiApplication::notify( QObject* receiver, QEvent* event )
 {
     // Pre-allocating a memory exhaustion message
-    // Doing som e trickery to avoid deadlock, as creating a messagebox actually triggers a call to this notify method.
+    // Doing some trickery to avoid deadlock, as creating a messagebox actually triggers a call to this notify method.
 
     static QMessageBox* memoryExhaustedBox   = nullptr;
     static bool         allocatingMessageBox = false;

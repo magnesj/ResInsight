@@ -32,3 +32,10 @@ RigEclipseResultCalculator::RigEclipseResultCalculator( RigCaseCellResultsData& 
 RigEclipseResultCalculator::~RigEclipseResultCalculator()
 {
 }
+
+//==================================================================================================
+///
+//==================================================================================================
+void RigEclipseResultCalculator::checkAndCreatePlaceholderEntry( const RigEclipseResultAddress& resVarAddr )
+{
+}

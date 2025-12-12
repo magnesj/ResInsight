@@ -20,8 +20,14 @@
 
 #include "RimNamedObject.h"
 
+#include "cafPdmPointer.h"
+
 #include <QString>
 #include <QStringList>
+
+#include <map>
+
+class RimProcess;
 
 //==================================================================================================
 ///
@@ -36,13 +42,37 @@ public:
     ~RimGenericJob() override;
 
     bool execute();
+    bool setFinished( bool runOk );
+
+    bool isRunning() const;
+    bool stop();
+
+    double            percentageDone() const;
+    const QStringList jobLog() const;
+
+    virtual bool matchesKeyValue( const QString& key, const QString& value ) const;
+
+    virtual void processLogOutput( const QString& logLine ) = 0;
 
 protected:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    void defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
-    virtual QString     title()   = 0;
-    virtual QStringList command() = 0;
-    virtual QString     workingDirectory() const;
-    virtual bool        onPrepare()                 = 0;
-    virtual void        onCompleted( bool success ) = 0;
+    virtual QStringList                command()     = 0;
+    virtual std::map<QString, QString> environment() = 0;
+    virtual QString                    workingDirectory() const;
+    virtual bool                       onPrepare()                         = 0;
+    virtual bool                       onRun()                             = 0;
+    virtual void                       onCompleted( bool success )         = 0;
+    virtual void                       onProgress( double percentageDone ) = 0;
+
+protected:
+    double m_percentageDone;
+    int    m_warningsDetected;
+    int    m_errorsDetected;
+
+private:
+    bool                        m_lastRunFailed;
+    bool                        m_isRunning;
+    caf::PdmPointer<RimProcess> m_process;
 };

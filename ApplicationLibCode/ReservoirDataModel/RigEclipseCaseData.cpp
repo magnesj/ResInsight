@@ -39,6 +39,8 @@
 
 #include <QDebug>
 
+#include <array>
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -399,7 +401,7 @@ class CellRangeBB
 public:
     CellRangeBB()
         : m_min( cvf::UNDEFINED_SIZE_T, cvf::UNDEFINED_SIZE_T, cvf::UNDEFINED_SIZE_T )
-        , m_max( cvf::Vec3st::ZERO )
+        , m_max( 0, 0, 0 )
     {
     }
 
@@ -415,8 +417,8 @@ public:
     }
 
 public:
-    cvf::Vec3st m_min;
-    cvf::Vec3st m_max;
+    caf::VecIjk0 m_min;
+    caf::VecIjk0 m_max;
 };
 
 //--------------------------------------------------------------------------------------------------
@@ -661,12 +663,11 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxSlow()
         }
         else
         {
-            std::array<cvf::Vec3d, 8> hexCorners;
             for ( size_t i = 0; i < m_mainGrid->cellCount(); i++ )
             {
                 if ( activeInfos[acIdx]->isActive( i ) )
                 {
-                    m_mainGrid->cellCornerVertices( i, hexCorners.data() );
+                    std::array<cvf::Vec3d, 8> hexCorners = m_mainGrid->cellCornerVertices( i );
                     for ( const auto& corner : hexCorners )
                     {
                         bb.add( corner );
@@ -729,12 +730,35 @@ void RigEclipseCaseData::computeActiveCellsGeometryBoundingBoxOptimized()
                         {
                             size_t cellIndex = m_mainGrid->cellIndexFromIJK( i, j, k );
 
-                            std::array<cvf::Vec3d, 8> hexCorners;
-                            m_mainGrid->cellCornerVertices( cellIndex, hexCorners.data() );
+                            std::array<cvf::Vec3d, 8> hexCorners = m_mainGrid->cellCornerVertices( cellIndex );
                             for ( const auto& corner : hexCorners )
                             {
                                 bb.add( corner );
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        if ( m_mainGrid->totalTemporaryGridCellCount() > 0 )
+        {
+            // When we have LGRs for radial grids, we must loop over all local grids. The local grids can contain coordinates not present
+            // in the main grid
+
+            for ( size_t i = 0; i < m_mainGrid->gridCount(); i++ )
+            {
+                auto localGrid = m_mainGrid->gridByIndex( i );
+                for ( size_t localCellIndex = 0; localCellIndex < localGrid->cellCount(); localCellIndex++ )
+                {
+                    size_t globalCellIndex = localGrid->reservoirCellIndex( localCellIndex );
+
+                    if ( globalCellIndex < activeInfos[acIdx]->reservoirCellCount() && activeInfos[acIdx]->isActive( globalCellIndex ) )
+                    {
+                        std::array<cvf::Vec3d, 8> hexCorners = localGrid->cellCornerVertices( localCellIndex );
+                        for ( const auto& corner : hexCorners )
+                        {
+                            bb.add( corner );
                         }
                     }
                 }
@@ -830,4 +854,20 @@ const std::vector<double>* RigEclipseCaseData::resultValues( RiaDefines::Porosit
     }
 
     return swatResults;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RiaDefines::PhaseType> RigEclipseCaseData::availablePhases() const
+{
+    return m_availablePhases;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigEclipseCaseData::setAvailablePhases( const std::set<RiaDefines::PhaseType>& phases )
+{
+    m_availablePhases = phases;
 }

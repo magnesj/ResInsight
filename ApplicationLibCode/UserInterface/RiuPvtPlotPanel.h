@@ -19,7 +19,8 @@
 #pragma once
 
 #include "RiaDefines.h"
-#include "RigFlowDiagSolverInterface.h"
+
+#include "RigFlowDiagDefines.h"
 
 #include <QWidget>
 
@@ -65,33 +66,33 @@ public:
     RiuPvtPlotPanel( QWidget* parent );
     ~RiuPvtPlotPanel() override;
 
-    void               setPlotData( RiaDefines::EclipseUnitSystem                            unitSystem,
-                                    const std::vector<RigFlowDiagSolverInterface::PvtCurve>& fvfCurveArr,
-                                    const std::vector<RigFlowDiagSolverInterface::PvtCurve>& viscosityCurveArr,
-                                    const FvfDynProps&                                       fvfDynProps,
-                                    const ViscosityDynProps&                                 viscosityDynProps,
-                                    const CellValues&                                        cellValues,
-                                    const QString&                                           cellReferenceText );
+    void               setPlotData( RiaDefines::EclipseUnitSystem                    unitSystem,
+                                    const std::vector<RigFlowDiagDefines::PvtCurve>& fvfCurveArr,
+                                    const std::vector<RigFlowDiagDefines::PvtCurve>& viscosityCurveArr,
+                                    const FvfDynProps&                               fvfDynProps,
+                                    const ViscosityDynProps&                         viscosityDynProps,
+                                    const CellValues&                                cellValues,
+                                    const QString&                                   cellReferenceText );
     void               clearPlot();
     RiuPvtPlotUpdater* plotUpdater();
     void               applyFontSizes( bool replot );
 
 private:
-    void plotUiSelectedCurves();
-    static QString unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem unitSystem, RigFlowDiagSolverInterface::PvtCurve::Ident curveIdent );
+    void           plotUiSelectedCurves();
+    static QString unitLabelFromCurveIdent( RiaDefines::EclipseUnitSystem unitSystem, RigFlowDiagDefines::PvtCurve::Ident curveIdent );
 
 private slots:
     void slotPhaseComboCurrentIndexChanged( int );
     void showEvent( QShowEvent* event ) override;
 
 private:
-    RiaDefines::EclipseUnitSystem                     m_unitSystem;
-    std::vector<RigFlowDiagSolverInterface::PvtCurve> m_allFvfCurvesArr;
-    std::vector<RigFlowDiagSolverInterface::PvtCurve> m_allViscosityCurvesArr;
-    FvfDynProps                                       m_fvfDynProps;
-    ViscosityDynProps                                 m_viscosityDynProps;
-    CellValues                                        m_cellValues;
-    QString                                           m_cellReferenceText;
+    RiaDefines::EclipseUnitSystem             m_unitSystem;
+    std::vector<RigFlowDiagDefines::PvtCurve> m_allFvfCurvesArr;
+    std::vector<RigFlowDiagDefines::PvtCurve> m_allViscosityCurvesArr;
+    FvfDynProps                               m_fvfDynProps;
+    ViscosityDynProps                         m_viscosityDynProps;
+    CellValues                                m_cellValues;
+    QString                                   m_cellReferenceText;
 
     QComboBox* m_phaseComboBox;
     QLabel*    m_titleLabel;

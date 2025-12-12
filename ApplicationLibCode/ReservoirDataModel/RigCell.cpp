@@ -24,6 +24,7 @@
 #include "cvfPlane.h"
 #include "cvfRay.h"
 
+#include <array>
 #include <cmath>
 
 static size_t undefinedCornersArray[8] = { cvf::UNDEFINED_SIZE_T,
@@ -180,7 +181,7 @@ bool RigCell::isLongPyramidCell( double maxHeightFactor, double nodeNearToleranc
             const cvf::Vec3d& c2opp =  nodes[m_cornerIndices[faceVertexIndices[2]]];
             const cvf::Vec3d& c3opp =  nodes[m_cornerIndices[faceVertexIndices[3]]];
 
-            // Check if any of the opposite face vertexes are also degenerated to the pyramid top
+            // Check if any of the opposite face vertices are also degenerated to the pyramid top
             
             int okVertexCount = 0;
             cvf::Vec3d okVxs[4];
@@ -416,17 +417,17 @@ void RigCell::faceIndices( cvf::StructGridInterface::FaceType face, std::array<s
 //--------------------------------------------------------------------------------------------------
 cvf::BoundingBox RigCell::boundingBox() const
 {
-    cvf::BoundingBox          bb;
-    std::array<cvf::Vec3d, 8> hexCorners;
+    cvf::BoundingBox bb;
 
     if ( m_hostGrid )
     {
-        m_hostGrid->cellCornerVertices( m_gridLocalCellIndex, hexCorners.data() );
+        std::array<cvf::Vec3d, 8> hexCorners = m_hostGrid->cellCornerVertices( m_gridLocalCellIndex );
         for ( const auto& corner : hexCorners )
         {
             bb.add( corner );
         }
     }
+
     return bb;
 }
 

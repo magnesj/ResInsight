@@ -23,7 +23,7 @@
 #include "RiaDefines.h"
 #include "RiaPorosityModel.h"
 
-#include "cvfCollection.h"
+#include "RigStatisticsDataCache.h"
 
 #include <QDateTime>
 
@@ -36,7 +36,6 @@ class RifReaderInterface;
 class RigActiveCellInfo;
 class RigMainGrid;
 class RigEclipseResultInfo;
-class RigStatisticsDataCache;
 class RigEclipseTimeStepInfo;
 class RigEclipseCaseData;
 class RigFormationNames;
@@ -165,6 +164,7 @@ private:
     // All other data access assumes all time steps are loaded at the same time
     friend class RimEclipseStatisticsCaseEvaluator;
     friend class RigSoilResultCalculator;
+    friend class RigSwatResultCalculator;
     friend class RigFaultDistanceResultCalculator;
     friend class RigMobilePoreVolumeResultCalculator;
     friend class RigIndexIjkResultCalculator;
@@ -213,6 +213,8 @@ private:
     void assignValuesToTemporaryLgrs( const QString& resultName, std::vector<double>& values );
 
     RigStatisticsDataCache* statistics( const RigEclipseResultAddress& resVarAddr );
+
+    bool isRadialModel() const;
 
 private:
     cvf::ref<RifReaderInterface>  m_readerInterface;

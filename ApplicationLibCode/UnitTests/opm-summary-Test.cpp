@@ -49,7 +49,7 @@ TEST( OpmSummaryTests, DISABLED_PerformanceReadOfRestartFilename )
     for ( int i = 0; i < N; i++ )
     {
         std::vector<QString> warnings;
-        auto                 restartFileInfos = RifEclipseSummaryTools::getRestartFileNamesOpm( filePath, warnings );
+        auto                 restartFileInfos = RifEclipseSummaryTools::getRestartFileNames( filePath, warnings );
     }
     RiaLogging::logElapsedTime( "Completed opm-common", startTime );
 
@@ -311,14 +311,14 @@ TEST( OpmSummaryTests, OpmComputeSegmentTopology )
 
         RifReaderOpmRft reader( filePath );
 
-        auto adresses = reader.eclipseRftAddresses();
+        auto addresses = reader.eclipseRftAddresses();
 
         std::vector<float> segStartDepth;
         std::vector<float> segEndDepth;
         std::vector<float> segNumber;
 
         std::set<RifEclipseRftAddress> segmentAdresses;
-        for ( const auto& adr : adresses )
+        for ( const auto& adr : addresses )
         {
             if ( adr.wellLogChannel() == RifEclipseRftAddress::RftWellLogChannelType::SEGMENT_VALUES )
             {
@@ -381,4 +381,64 @@ TEST( OpmSummaryTests, DISABLED_ReadOpmRadialGrid )
             }
         }
     }
+}
+
+TEST( OpmSummaryHeaderSearch, NoEsmryRestart )
+{
+    QString SUMMARY_TEST_DATA_DIRECTORY = QString( "%1/summary-header-search/no-esmry-restart/" ).arg( TEST_DATA_DIR );
+    QString filename                    = SUMMARY_TEST_DATA_DIRECTORY + "/realization-18/pred_ref/eclipse/model/DROGON-18.ESMRY";
+
+    const bool           useOpmReader = true;
+    std::vector<QString> warnings;
+    auto                 restartFilenames = RifEclipseSummaryTools::getRestartFileNames( filename, useOpmReader, warnings );
+
+    EXPECT_TRUE( restartFilenames.size() == 1 );
+    auto restartFileName = restartFilenames[0];
+
+    // search for text iter-3
+    EXPECT_TRUE( restartFileName.contains( "iter-3" ) );
+
+    // check that the file does not exist
+    QFile file( restartFileName );
+    EXPECT_FALSE( file.exists() );
+}
+
+TEST( OpmSummaryHeaderSearch, OnlyEsmryFiles )
+{
+    QString SUMMARY_TEST_DATA_DIRECTORY = QString( "%1/summary-header-search/only-esmry/" ).arg( TEST_DATA_DIR );
+    QString filename                    = SUMMARY_TEST_DATA_DIRECTORY + "/realization-18/pred_ref/eclipse/model/DROGON-18.ESMRY";
+
+    const bool           useOpmReader = true;
+    std::vector<QString> warnings;
+    auto                 restartFilenames = RifEclipseSummaryTools::getRestartFileNames( filename, useOpmReader, warnings );
+
+    EXPECT_TRUE( restartFilenames.size() == 1 );
+    auto restartFileName = restartFilenames[0];
+
+    // search for text iter-3
+    EXPECT_TRUE( restartFileName.contains( "iter-3" ) );
+
+    // check that the file exists
+    QFile file( restartFileName );
+    EXPECT_TRUE( file.exists() );
+}
+
+TEST( OpmSummaryHeaderSearch, OnlySmspecFiles )
+{
+    QString SUMMARY_TEST_DATA_DIRECTORY = QString( "%1/summary-header-search/only-smspec/" ).arg( TEST_DATA_DIR );
+    QString filename                    = SUMMARY_TEST_DATA_DIRECTORY + "/realization-18/pred_ref/eclipse/model/DROGON-18.SMSPEC";
+
+    const bool           useOpmReader = true;
+    std::vector<QString> warnings;
+    auto                 restartFilenames = RifEclipseSummaryTools::getRestartFileNames( filename, useOpmReader, warnings );
+
+    EXPECT_TRUE( restartFilenames.size() == 1 );
+    auto restartFileName = restartFilenames[0];
+
+    // search for text iter-3
+    EXPECT_TRUE( restartFileName.contains( "iter-3" ) );
+
+    // check that the file exists
+    QFile file( restartFileName );
+    EXPECT_TRUE( file.exists() );
 }

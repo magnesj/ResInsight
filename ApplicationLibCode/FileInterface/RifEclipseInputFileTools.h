@@ -24,12 +24,13 @@
 #include "cvfObject.h"
 
 #include "RiaDefines.h"
-#include "RifReaderInterface.h"
 #include "RigFault.h"
 
 #include "ert/ecl/ecl_kw.h"
 
+#include <expected>
 #include <map>
+#include <string>
 
 #include <QString>
 
@@ -75,6 +76,12 @@ public:
                                 const cvf::Vec3st&          max        = cvf::Vec3st::UNDEFINED,
                                 const cvf::Vec3st&          refinement = cvf::Vec3st( 1, 1, 1 ) );
 
+    static std::expected<std::vector<double>, std::string> extractKeywordData( RigEclipseCaseData* eclipseCase,
+                                                                               const QString&      keyword,
+                                                                               const cvf::Vec3st&  min        = cvf::Vec3st::ZERO,
+                                                                               const cvf::Vec3st&  max        = cvf::Vec3st::UNDEFINED,
+                                                                               const cvf::Vec3st&  refinement = cvf::Vec3st( 1, 1, 1 ) );
+
     static void saveFault( QString                                 completeFilename,
                            const RigMainGrid*                      mainGrid,
                            const std::vector<RigFault::FaultFace>& faultFaces,
@@ -96,6 +103,12 @@ public:
                             const cvf::Vec3st& min        = cvf::Vec3st::ZERO,
                             const cvf::Vec3st& max        = cvf::Vec3st::UNDEFINED,
                             const cvf::Vec3st& refinement = cvf::Vec3st( 1, 1, 1 ) );
+
+    static std::vector<RigFault::CellAndFace> extractFaults( const RigMainGrid*                      mainGrid,
+                                                             const std::vector<RigFault::FaultFace>& faultFaces,
+                                                             const cvf::Vec3st&                      min        = cvf::Vec3st::ZERO,
+                                                             const cvf::Vec3st&                      max        = cvf::Vec3st::UNDEFINED,
+                                                             const cvf::Vec3st&                      refinement = cvf::Vec3st( 1, 1, 1 ) );
 
     static bool importFaultsFromFile( RigEclipseCaseData* eclipseCase, const QString& fileName );
 
