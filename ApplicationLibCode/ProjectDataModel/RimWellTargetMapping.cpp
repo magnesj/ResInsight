@@ -196,7 +196,9 @@ void RimWellTargetMapping::fieldChangedByUi( const caf::PdmFieldHandle* changedF
     {
         auto hasEnsembleParent = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() != nullptr;
         if ( hasEnsembleParent )
+        {
             generateEnsembleStatistics();
+        }
         else if ( auto eclipseCase = firstCase() )
         {
             generateCandidates( eclipseCase );
@@ -205,6 +207,7 @@ void RimWellTargetMapping::fieldChangedByUi( const caf::PdmFieldHandle* changedF
                 auto eclipseView = views.front();
                 eclipseView->cellResult()->setResultType( RiaDefines::ResultCatType::GENERATED );
                 eclipseView->cellResult()->setResultVariable( RigWellTargetMapping::wellTargetResultName() );
+                eclipseView->cellResult()->updateConnectedEditors();
 
                 if ( eclipseView->eclipsePropertyFilterCollection()->propertyFilters().empty() )
                 {
@@ -573,7 +576,7 @@ std::vector<double> RimWellTargetMapping::getVisibilityFilter() const
     if ( !hasEnsembleParent )
     {
         auto fc = firstCase();
-        if ( m_filterView() && fc )
+        if ( m_filterView() && fc && fc->eclipseCaseData() )
         {
             cvf::ref<cvf::UByteArray> visibility = m_filterView->currentTotalCellVisibility();
 
