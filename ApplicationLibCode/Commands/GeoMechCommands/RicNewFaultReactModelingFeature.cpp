@@ -90,7 +90,8 @@ void RicNewFaultReactModelingFeature::onActionTriggered( bool isChecked )
                 auto normal = cell.faceNormalWithAreaLength( face );
                 normal.z()  = normal.z() / eclView->scaleZ() / eclView->scaleZ();
                 normal.normalize();
-                normal *= eclView->ownerCase()->characteristicCellSize();
+                auto ownerCase = eclView->ownerCase();
+                if ( ownerCase ) normal *= ownerCase->characteristicCellSize();
                 normal *= 3;
 
                 if ( !eclView->mainGrid()->isFaceNormalsOutwards() ) normal = normal * -1.0;
