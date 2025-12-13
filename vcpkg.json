@@ -1,16 +1,17 @@
 {
-    "dependencies": [
-        "arrow",
-        "boost-filesystem",
-        "boost-spirit",
-        "boost-test",
-        "eigen3",
-        "grpc",
-        "type-lite",
-        "fast-float",
-        "spdlog",
-        "pugixml"
-    ],
+  "dependencies": [
+    "arrow",
+    "boost-filesystem",
+    "boost-spirit",
+    "boost-test",
+    "eigen3",
+    "grpc",
+    "type-lite",
+    "fast-float",
+    "spdlog",
+    "pugixml",
+    "opentelemetry-cpp"
+  ],
     "overrides": [
         {
             "name": "fmt",
