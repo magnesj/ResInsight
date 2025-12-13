@@ -24,6 +24,7 @@
 #include "RiaImageFileCompare.h"
 #include "RiaLogging.h"
 #include "RiaPlotWindowRedrawScheduler.h"
+#include "RiaPreferences.h"
 #include "RiaProjectModifier.h"
 #include "RiaRegressionTest.h"
 #include "RiaTextFileCompare.h"
@@ -53,16 +54,11 @@
 #include "cafPdmUiTreeView.h"
 #include "cafUtils.h"
 
-#include <QDateTime>
-#include <QDebug>
 #include <QDesktopServices>
 #include <QDir>
 #include <QElapsedTimer>
-#include <QMdiSubWindow>
 #include <QSettings>
 #include <QStatusBar>
-#include <QString>
-#include <QUrl>
 
 namespace RegTestNames
 {
@@ -202,9 +198,27 @@ void RiaRegressionTestRunner::runRegressionTest()
 
     RiaApplication* app = RiaApplication::instance();
 
+    // Load global preferences from main test folder if available
+    QString globalPrefsFile = testDir.filePath( "preferences.xml" );
+    if ( QFile::exists( globalPrefsFile ) )
+    {
+        RiaPreferences::current()->importPreferenceValuesFromFile( globalPrefsFile );
+        RiaLogging::info( "Loaded global preferences from: " + globalPrefsFile );
+    }
+
     for ( const QFileInfo& folderFileInfo : folderList )
     {
         QDir testCaseFolder( folderFileInfo.filePath() );
+
+        // Save current preferences to string before loading test-specific preferences
+        QString savedPreferences;
+        QString testPrefsFile = findPreferencesConfigFile( testCaseFolder, testDir );
+        if ( !testPrefsFile.isEmpty() )
+        {
+            savedPreferences = RiaPreferences::current()->writeObjectToXmlString();
+            RiaPreferences::current()->importPreferenceValuesFromFile( testPrefsFile );
+            RiaLogging::info( "Loaded test-specific preferences from: " + testPrefsFile );
+        }
 
         bool anyCommandFilesExecuted = findAndExecuteCommandFiles( testCaseFolder, regressionTestConfig, htmlReportFileName );
 
@@ -300,6 +314,13 @@ void RiaRegressionTestRunner::runRegressionTest()
             {
                 qDebug() << "Error comparing :" << imgComparator.errorMessage() << "\n" << imgComparator.errorDetails();
             }
+        }
+
+        // Restore preferences if test-specific preferences were loaded
+        if ( !savedPreferences.isEmpty() )
+        {
+            RiaPreferences::current()->readObjectFromXmlString( savedPreferences, caf::PdmDefaultObjectFactory::instance() );
+            RiaLogging::info( "Restored preferences after test" );
         }
 
         logInfoTextWithTimeInSeconds( timeStamp, "Completed test :" + testCaseFolder.absolutePath() );
@@ -805,4 +826,27 @@ void RiaRegressionTestRunner::updateRegressionTest( const QString& testRootPath 
             QFile::copy( genDir.filePath( fileName ), baseDir.filePath( fileName ) );
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaRegressionTestRunner::findPreferencesConfigFile( const QDir& testCaseFolder, const QDir& mainFolder )
+{
+    // Check test case folder first (for test-specific overrides)
+    QString localConfig = testCaseFolder.filePath( "preferences.xml" );
+    if ( QFile::exists( localConfig ) )
+    {
+        return localConfig;
+    }
+
+    // Check main regression test folder (for global defaults)
+    QString globalConfig = mainFolder.filePath( "preferences.xml" );
+    if ( QFile::exists( globalConfig ) )
+    {
+        return globalConfig;
+    }
+
+    // No config file found
+    return QString();
 }

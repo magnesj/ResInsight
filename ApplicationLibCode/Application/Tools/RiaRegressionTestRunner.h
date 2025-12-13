@@ -68,7 +68,8 @@ private:
     static QString diff2htmlHeaderText( const QString& testRootPath );
     QFileInfoList  subDirectoriesForTestExecution( const QDir& directory );
 
-    static void selectObjectsInProject();
+    static void    selectObjectsInProject();
+    static QString findPreferencesConfigFile( const QDir& testCaseFolder, const QDir& mainFolder );
 
 private:
     QString           m_rootPath;
