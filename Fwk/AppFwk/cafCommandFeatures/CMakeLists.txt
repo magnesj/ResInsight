@@ -53,11 +53,11 @@ set(QRC_FILES
     PARENT_SCOPE
 )
 
-# NOTE! Adding the library as a cmake "STATIC" library.
-# To ensure the linker doesn't prune seemingly unused features and that static
-# initialization based registration of features into the factory is done properly,
-# MSVC uses /WHOLEARCHIVE and GCC/Clang use --whole-archive linker flags.
-# See https://cmake.org/cmake/help/latest/command/add_library.html
+# NOTE! Adding the library as a cmake "STATIC" library. To ensure the linker
+# doesn't prune seemingly unused features and that static initialization based
+# registration of features into the factory is done properly, MSVC uses
+# /WHOLEARCHIVE and GCC/Clang use --whole-archive linker flags. See
+# https://cmake.org/cmake/help/latest/command/add_library.html
 
 add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES} ${MOC_SOURCE_FILES})
 

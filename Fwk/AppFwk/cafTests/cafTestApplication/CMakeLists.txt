@@ -57,9 +57,8 @@ qt_add_executable(
 set(TAP_LINK_LIBRARIES cafUserInterface)
 
 if(USE_COMMAND_FRAMEWORK)
-  set(TAP_LINK_LIBRARIES
-      ${TAP_LINK_LIBRARIES} cafCommand
-      $<LINK_LIBRARY:WHOLE_ARCHIVE,cafCommandFeatures>
+  set(TAP_LINK_LIBRARIES ${TAP_LINK_LIBRARIES} cafCommand
+                         $<LINK_LIBRARY:WHOLE_ARCHIVE,cafCommandFeatures>
   )
 endif(USE_COMMAND_FRAMEWORK)
 
