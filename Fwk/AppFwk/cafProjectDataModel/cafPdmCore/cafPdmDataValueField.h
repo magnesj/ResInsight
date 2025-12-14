@@ -137,8 +137,8 @@ public:
     template <typename T = DataType>
     typename std::enable_if<std::is_arithmetic<T>::value>::type setRange( const DataType& minValue, const DataType& maxValue )
     {
-        m_minValue = minValue;
-        m_maxValue = maxValue;
+        m_minValue = std::min( minValue, maxValue );
+        m_maxValue = std::max( minValue, maxValue );
     }
 
     template <typename T = DataType>
