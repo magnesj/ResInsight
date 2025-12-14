@@ -776,3 +776,118 @@ TEST( BaseTest, FieldRangeValidation )
 
     delete obj;
 }
+
+//--------------------------------------------------------------------------------------------------
+/// Test of object-level validation
+//--------------------------------------------------------------------------------------------------
+TEST( BaseTest, ObjectValidation )
+{
+    class ValidatedObject : public caf::PdmObjectHandle
+    {
+    public:
+        ValidatedObject()
+        {
+            this->addField( &m_age, "age" );
+            this->addField( &m_percentage, "percentage" );
+            this->addField( &m_name, "name" );
+
+            // Set up field validation ranges
+            m_age.setRange( 0, 150 );
+            m_percentage.setRange( 0.0, 100.0 );
+        }
+
+        caf::PdmDataValueField<int>     m_age;
+        caf::PdmDataValueField<double>  m_percentage;
+        caf::PdmDataValueField<QString> m_name;
+    };
+
+    // Custom object with overridden validation
+    class CustomValidatedObject : public ValidatedObject
+    {
+    public:
+        std::map<QString, QString> validate() const override
+        {
+            // First validate all fields using base implementation
+            auto fieldErrors = ValidatedObject::validate();
+
+            // Add custom object-level validation
+            if ( m_name.value().isEmpty() )
+            {
+                fieldErrors["name"] = "Name cannot be empty";
+            }
+
+            if ( m_age.value() < 18 && m_percentage.value() > 50.0 )
+            {
+                fieldErrors["_object"] = "Percentage must be <= 50 for age < 18";
+            }
+
+            return fieldErrors;
+        }
+    };
+
+    // Test basic object validation
+    ValidatedObject* obj = new ValidatedObject;
+
+    obj->m_age.setValue( 25 );
+    obj->m_percentage.setValue( 75.0 );
+    obj->m_name.setValue( "Test" );
+
+    EXPECT_TRUE( obj->isValid() );
+    EXPECT_TRUE( obj->validate().empty() );
+
+    // Test with invalid field
+    obj->m_age.setValue( -5 );
+    EXPECT_FALSE( obj->isValid() );
+
+    auto errors = obj->validate();
+    EXPECT_EQ( 1u, errors.size() );
+    EXPECT_TRUE( errors.find( "age" ) != errors.end() );
+    EXPECT_TRUE( errors["age"].contains( "below minimum" ) );
+
+    // Test with multiple invalid fields
+    obj->m_percentage.setValue( 150.0 );
+    errors = obj->validate();
+    EXPECT_EQ( 2u, errors.size() );
+    EXPECT_TRUE( errors.find( "age" ) != errors.end() );
+    EXPECT_TRUE( errors.find( "percentage" ) != errors.end() );
+
+    // Fix all fields
+    obj->m_age.setValue( 30 );
+    obj->m_percentage.setValue( 50.0 );
+    EXPECT_TRUE( obj->isValid() );
+
+    delete obj;
+
+    // Test custom validation
+    CustomValidatedObject* customObj = new CustomValidatedObject;
+
+    customObj->m_age.setValue( 25 );
+    customObj->m_percentage.setValue( 75.0 );
+    customObj->m_name.setValue( "John" );
+
+    EXPECT_TRUE( customObj->isValid() );
+
+    // Test custom validation: empty name
+    customObj->m_name.setValue( "" );
+    EXPECT_FALSE( customObj->isValid() );
+
+    errors = customObj->validate();
+    EXPECT_TRUE( errors.find( "name" ) != errors.end() );
+    EXPECT_EQ( "Name cannot be empty", errors["name"] );
+
+    // Test custom validation: age < 18 with percentage > 50
+    customObj->m_name.setValue( "Jane" );
+    customObj->m_age.setValue( 15 );
+    customObj->m_percentage.setValue( 60.0 );
+
+    EXPECT_FALSE( customObj->isValid() );
+    errors = customObj->validate();
+    EXPECT_TRUE( errors.find( "_object" ) != errors.end() );
+    EXPECT_EQ( "Percentage must be <= 50 for age < 18", errors["_object"] );
+
+    // Fix the percentage
+    customObj->m_percentage.setValue( 40.0 );
+    EXPECT_TRUE( customObj->isValid() );
+
+    delete customObj;
+}
