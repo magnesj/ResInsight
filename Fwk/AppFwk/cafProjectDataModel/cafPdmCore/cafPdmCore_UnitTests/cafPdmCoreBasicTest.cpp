@@ -635,3 +635,55 @@ TEST( BaseTest, testTypedChildren )
 
     delete ihd1;
 }
+
+//--------------------------------------------------------------------------------------------------
+/// Test of field validation
+//--------------------------------------------------------------------------------------------------
+TEST( BaseTest, FieldValidation )
+{
+    // Custom field class with validation
+    class PositiveDoubleField : public caf::PdmDataValueField<double>
+    {
+    public:
+        QString validate() const override
+        {
+            if ( m_fieldValue < 0.0 )
+            {
+                return "Value must be positive";
+            }
+            return QString();
+        }
+    };
+
+    class TestObject : public caf::PdmObjectHandle
+    {
+    public:
+        TestObject()
+        {
+            this->addField( &m_validatedField, "validatedField" );
+            this->addField( &m_normalField, "normalField" );
+        }
+
+        PositiveDoubleField                 m_validatedField;
+        caf::PdmDataValueField<double>      m_normalField;
+    };
+
+    TestObject* obj = new TestObject;
+
+    // Test valid value
+    obj->m_validatedField.setValue( 10.0 );
+    EXPECT_TRUE( obj->m_validatedField.isValid() );
+    EXPECT_TRUE( obj->m_validatedField.validate().isEmpty() );
+
+    // Test invalid value
+    obj->m_validatedField.setValue( -5.0 );
+    EXPECT_FALSE( obj->m_validatedField.isValid() );
+    EXPECT_EQ( "Value must be positive", obj->m_validatedField.validate() );
+
+    // Test normal field (always valid by default)
+    obj->m_normalField.setValue( -100.0 );
+    EXPECT_TRUE( obj->m_normalField.isValid() );
+    EXPECT_TRUE( obj->m_normalField.validate().isEmpty() );
+
+    delete obj;
+}
