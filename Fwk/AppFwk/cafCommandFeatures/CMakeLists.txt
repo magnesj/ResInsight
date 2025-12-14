@@ -53,15 +53,13 @@ set(QRC_FILES
     PARENT_SCOPE
 )
 
-# NOTE! Adding the library as a cmake "OBJECT" library to make sure the linker
-# is not pruning the seemingly unused features, and to make sure that the static
-# initialization based registration of the features into the factory is done
-# properly see
-# https://gitlab.kitware.com/cmake/community/wikis/doc/tutorials/Object-Library
-# and
-# https://cmake.org/cmake/help/v3.15/command/add_library.html?highlight=add_library#object-libraries
+# NOTE! Adding the library as a cmake "STATIC" library.
+# To ensure the linker doesn't prune seemingly unused features and that static
+# initialization based registration of features into the factory is done properly,
+# MSVC uses /WHOLEARCHIVE and GCC/Clang use --whole-archive linker flags.
+# See https://cmake.org/cmake/help/latest/command/add_library.html
 
-add_library(${PROJECT_NAME} OBJECT ${PROJECT_FILES} ${MOC_SOURCE_FILES})
+add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES} ${MOC_SOURCE_FILES})
 
 target_link_libraries(
   ${PROJECT_NAME} cafCommand cafUserInterface ${QT_LIBRARIES}

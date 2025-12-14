@@ -74,7 +74,7 @@ endforeach(referencedfile)
 find_package(Eigen3 REQUIRED)
 
 add_library(
-  ${PROJECT_NAME} OBJECT
+  ${PROJECT_NAME} STATIC
   ${COMMAND_CODE_SOURCE_FILES} ${COMMAND_CODE_HEADER_FILES}
   ${COMMAND_MOC_SOURCE_FILES}
 )

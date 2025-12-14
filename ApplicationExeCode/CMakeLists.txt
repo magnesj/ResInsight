@@ -231,6 +231,15 @@ endif()
 
 target_link_libraries(ResInsight PRIVATE ${LINK_LIBRARIES})
 
+# Link ApplicationLibCode, cafCommandFeatures, Commands, and GrpcInterface with WHOLE_ARCHIVE
+# to ensure static initialization is not optimized away by the linker
+target_link_libraries(ResInsight PRIVATE
+  $<LINK_LIBRARY:WHOLE_ARCHIVE,ApplicationLibCode>
+  $<LINK_LIBRARY:WHOLE_ARCHIVE,cafCommandFeatures>
+  $<LINK_LIBRARY:WHOLE_ARCHIVE,Commands>
+  $<$<BOOL:${RESINSIGHT_ENABLE_GRPC}>:$<LINK_LIBRARY:WHOLE_ARCHIVE,GrpcInterface>>
+)
+
 if(UNIX AND NOT APPLE)
   target_link_libraries(ResInsight PRIVATE xcb)
 endif()
