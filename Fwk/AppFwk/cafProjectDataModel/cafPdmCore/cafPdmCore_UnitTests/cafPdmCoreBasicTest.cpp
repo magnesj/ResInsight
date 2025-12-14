@@ -687,3 +687,92 @@ TEST( BaseTest, FieldValidation )
 
     delete obj;
 }
+
+//--------------------------------------------------------------------------------------------------
+/// Test of field range validation
+//--------------------------------------------------------------------------------------------------
+TEST( BaseTest, FieldRangeValidation )
+{
+    class TestObject : public caf::PdmObjectHandle
+    {
+    public:
+        TestObject()
+        {
+            this->addField( &m_percentage, "percentage" );
+            this->addField( &m_age, "age" );
+            this->addField( &m_temperature, "temperature" );
+            this->addField( &m_name, "name" );
+        }
+
+        caf::PdmDataValueField<double>  m_percentage;
+        caf::PdmDataValueField<int>     m_age;
+        caf::PdmDataValueField<float>   m_temperature;
+        caf::PdmDataValueField<QString> m_name;
+    };
+
+    TestObject* obj = new TestObject;
+
+    // Test double field with range
+    obj->m_percentage.setRange( 0.0, 100.0 );
+
+    obj->m_percentage.setValue( 50.0 );
+    EXPECT_TRUE( obj->m_percentage.isValid() );
+    EXPECT_TRUE( obj->m_percentage.validate().isEmpty() );
+
+    obj->m_percentage.setValue( 0.0 );
+    EXPECT_TRUE( obj->m_percentage.isValid() );
+
+    obj->m_percentage.setValue( 100.0 );
+    EXPECT_TRUE( obj->m_percentage.isValid() );
+
+    obj->m_percentage.setValue( -10.0 );
+    EXPECT_FALSE( obj->m_percentage.isValid() );
+    EXPECT_FALSE( obj->m_percentage.validate().isEmpty() );
+    EXPECT_TRUE( obj->m_percentage.validate().contains( "below minimum" ) );
+
+    obj->m_percentage.setValue( 150.0 );
+    EXPECT_FALSE( obj->m_percentage.isValid() );
+    EXPECT_TRUE( obj->m_percentage.validate().contains( "exceeds maximum" ) );
+
+    // Test int field with range
+    obj->m_age.setRange( 0, 150 );
+
+    obj->m_age.setValue( 25 );
+    EXPECT_TRUE( obj->m_age.isValid() );
+
+    obj->m_age.setValue( -5 );
+    EXPECT_FALSE( obj->m_age.isValid() );
+
+    obj->m_age.setValue( 200 );
+    EXPECT_FALSE( obj->m_age.isValid() );
+
+    // Test clearing range
+    obj->m_age.clearRange();
+    obj->m_age.setValue( -100 );
+    EXPECT_TRUE( obj->m_age.isValid() );
+
+    obj->m_age.setValue( 1000 );
+    EXPECT_TRUE( obj->m_age.isValid() );
+
+    // Test float field with range
+    obj->m_temperature.setRange( -273.15f, 1000.0f );
+
+    obj->m_temperature.setValue( 20.0f );
+    EXPECT_TRUE( obj->m_temperature.isValid() );
+
+    obj->m_temperature.setValue( -300.0f );
+    EXPECT_FALSE( obj->m_temperature.isValid() );
+
+    obj->m_temperature.setValue( 1500.0f );
+    EXPECT_FALSE( obj->m_temperature.isValid() );
+
+    // QString field should not have setRange method (SFINAE should exclude it)
+    // Uncommenting the following line should cause a compilation error:
+    // obj->m_name.setRange( "A", "Z" );
+
+    // QString field should always be valid (no range checking)
+    obj->m_name.setValue( "Any string value" );
+    EXPECT_TRUE( obj->m_name.isValid() );
+
+    delete obj;
+}
