@@ -61,8 +61,10 @@ set(QRC_FILES
 
 add_library(${PROJECT_NAME} STATIC ${PROJECT_FILES} ${MOC_SOURCE_FILES})
 
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+
 target_link_libraries(
-  ${PROJECT_NAME} cafCommand cafUserInterface ${QT_LIBRARIES}
+  ${PROJECT_NAME} PRIVATE cafCommand cafUserInterface ${QT_LIBRARIES}
 )
 
 if(MSVC)

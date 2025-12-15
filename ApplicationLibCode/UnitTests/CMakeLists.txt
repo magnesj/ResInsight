@@ -233,14 +233,17 @@ if(RESINSIGHT_USE_ODB_API)
   list(APPEND LINK_LIBRARIES RifOdbReader)
 endif()
 
-target_link_libraries(ResInsight-tests PUBLIC ${LINK_LIBRARIES} GTest::gtest)
+# Link libraries with WHOLE_ARCHIVE for ApplicationLibCode, cafCommandFeatures, Commands, and GrpcInterface
+# to ensure static initialization is not optimized away by the linker.
+# Other libraries are linked normally.
+set(FILTERED_LINK_LIBRARIES ${LINK_LIBRARIES})
+list(REMOVE_ITEM FILTERED_LINK_LIBRARIES ApplicationLibCode cafCommandFeatures Commands GrpcInterface)
 
-# Link ApplicationLibCode, cafCommandFeatures, Commands, and GrpcInterface with
-# WHOLE_ARCHIVE to ensure static initialization is not optimized away by the
-# linker
 target_link_libraries(
   ResInsight-tests
   PUBLIC
+    ${FILTERED_LINK_LIBRARIES}
+    GTest::gtest
     $<LINK_LIBRARY:WHOLE_ARCHIVE,ApplicationLibCode>
     $<LINK_LIBRARY:WHOLE_ARCHIVE,cafCommandFeatures>
     $<LINK_LIBRARY:WHOLE_ARCHIVE,Commands>

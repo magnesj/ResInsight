@@ -977,7 +977,7 @@ list(
   CommonCode
   cafVizExtensions
   cafPdmScripting
-  cafCommandFeatures
+  # cafCommandFeatures removed - linked with WHOLE_ARCHIVE in executables
 )
 
 set_property(TARGET ${APP_FWK_LIBRARIES} PROPERTY FOLDER "AppFwk")
