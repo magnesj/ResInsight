@@ -120,4 +120,28 @@ void PdmUiEditorHandle::updateEditorState()
     // Override in derived classes to perform additional updates
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+PdmUiItem* PdmUiEditorHandle::pdmItem()
+{
+    return m_pdmItem;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const PdmUiItem* PdmUiEditorHandle::pdmItem() const
+{
+    return m_pdmItem;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiEditorHandle::setContainingEditor( PdmUiEditorHandle* containingEditor )
+{
+    m_containingEditor = containingEditor;
+}
+
 } // End of namespace caf

@@ -77,11 +77,11 @@ protected:
 protected:
     /// This needs to be called from subclass when connecting to a PdmField or Object
     void             bindToPdmItem( PdmUiItem* item );
-    PdmUiItem*       pdmItem() { return m_pdmItem; }
-    const PdmUiItem* pdmItem() const { return m_pdmItem; }
+    PdmUiItem*       pdmItem();
+    const PdmUiItem* pdmItem() const;
 
 public: // PDM Internal
-    void setContainingEditor( PdmUiEditorHandle* containingEditor ) { m_containingEditor = containingEditor; }
+    void setContainingEditor( PdmUiEditorHandle* containingEditor );
 
 private:
     friend PdmUiItem::~PdmUiItem();
