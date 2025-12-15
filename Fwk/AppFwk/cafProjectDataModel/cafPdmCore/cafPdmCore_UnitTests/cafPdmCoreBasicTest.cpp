@@ -778,6 +778,88 @@ TEST( BaseTest, FieldRangeValidation )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Test of independent min/max value validation
+//--------------------------------------------------------------------------------------------------
+TEST( BaseTest, IndependentMinMaxValidation )
+{
+    class TestObject : public caf::PdmObjectHandle
+    {
+    public:
+        TestObject()
+        {
+            this->addField( &m_minOnly, "minOnly" );
+            this->addField( &m_maxOnly, "maxOnly" );
+            this->addField( &m_both, "both" );
+        }
+
+        caf::PdmDataValueField<double> m_minOnly;
+        caf::PdmDataValueField<double> m_maxOnly;
+        caf::PdmDataValueField<int>    m_both;
+    };
+
+    TestObject* obj = new TestObject;
+
+    // Test minimum value only
+    obj->m_minOnly.setMinValue( 0.0 );
+
+    obj->m_minOnly.setValue( 10.0 );
+    EXPECT_TRUE( obj->m_minOnly.isValid() );
+
+    obj->m_minOnly.setValue( 0.0 );
+    EXPECT_TRUE( obj->m_minOnly.isValid() );
+
+    obj->m_minOnly.setValue( -5.0 );
+    EXPECT_FALSE( obj->m_minOnly.isValid() );
+    EXPECT_TRUE( obj->m_minOnly.validate().contains( "below minimum" ) );
+
+    obj->m_minOnly.setValue( 1000000.0 ); // No maximum set, so any large value is valid
+    EXPECT_TRUE( obj->m_minOnly.isValid() );
+
+    // Test maximum value only
+    obj->m_maxOnly.setMaxValue( 100.0 );
+
+    obj->m_maxOnly.setValue( 50.0 );
+    EXPECT_TRUE( obj->m_maxOnly.isValid() );
+
+    obj->m_maxOnly.setValue( 100.0 );
+    EXPECT_TRUE( obj->m_maxOnly.isValid() );
+
+    obj->m_maxOnly.setValue( 150.0 );
+    EXPECT_FALSE( obj->m_maxOnly.isValid() );
+    EXPECT_TRUE( obj->m_maxOnly.validate().contains( "exceeds maximum" ) );
+
+    obj->m_maxOnly.setValue( -1000000.0 ); // No minimum set, so any small value is valid
+    EXPECT_TRUE( obj->m_maxOnly.isValid() );
+
+    // Test setting min and max independently
+    obj->m_both.setMinValue( 0 );
+    obj->m_both.setValue( -1 );
+    EXPECT_FALSE( obj->m_both.isValid() );
+
+    obj->m_both.setValue( 100 );
+    EXPECT_TRUE( obj->m_both.isValid() ); // No max set yet
+
+    obj->m_both.setMaxValue( 50 );
+    EXPECT_FALSE( obj->m_both.isValid() ); // Now exceeds max
+
+    obj->m_both.setValue( 25 );
+    EXPECT_TRUE( obj->m_both.isValid() );
+
+    // Test clearing individual limits
+    obj->m_both.clearMinValue();
+    obj->m_both.setValue( -100 );
+    EXPECT_TRUE( obj->m_both.isValid() ); // Min cleared, but max still applies
+
+    obj->m_both.setValue( 100 );
+    EXPECT_FALSE( obj->m_both.isValid() ); // Max still active
+
+    obj->m_both.clearMaxValue();
+    EXPECT_TRUE( obj->m_both.isValid() ); // Both limits cleared
+
+    delete obj;
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Test of object-level validation
 //--------------------------------------------------------------------------------------------------
 TEST( BaseTest, ObjectValidation )

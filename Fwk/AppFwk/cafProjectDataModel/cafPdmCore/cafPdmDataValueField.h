@@ -148,6 +148,30 @@ public:
         m_maxValue.reset();
     }
 
+    template <typename T = DataType>
+    typename std::enable_if<std::is_arithmetic<T>::value>::type setMinValue( const DataType& minValue )
+    {
+        m_minValue = minValue;
+    }
+
+    template <typename T = DataType>
+    typename std::enable_if<std::is_arithmetic<T>::value>::type setMaxValue( const DataType& maxValue )
+    {
+        m_maxValue = maxValue;
+    }
+
+    template <typename T = DataType>
+    typename std::enable_if<std::is_arithmetic<T>::value>::type clearMinValue()
+    {
+        m_minValue.reset();
+    }
+
+    template <typename T = DataType>
+    typename std::enable_if<std::is_arithmetic<T>::value>::type clearMaxValue()
+    {
+        m_maxValue.reset();
+    }
+
     // Override validate from PdmFieldHandle
     QString validate() const override;
 
