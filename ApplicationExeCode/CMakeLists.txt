@@ -229,11 +229,13 @@ if(RESINSIGHT_ENABLE_OPENVDS)
   add_definitions(-DUSE_OPENVDS)
 endif()
 
-# Link libraries with WHOLE_ARCHIVE for ApplicationLibCode, cafCommandFeatures, Commands, and GrpcInterface
-# to ensure static initialization is not optimized away by the linker.
-# Other libraries are linked normally.
+# Link libraries with WHOLE_ARCHIVE for ApplicationLibCode, cafCommandFeatures,
+# Commands, and GrpcInterface to ensure static initialization is not optimized
+# away by the linker. Other libraries are linked normally.
 set(FILTERED_LINK_LIBRARIES ${LINK_LIBRARIES})
-list(REMOVE_ITEM FILTERED_LINK_LIBRARIES ApplicationLibCode cafCommandFeatures Commands GrpcInterface)
+list(REMOVE_ITEM FILTERED_LINK_LIBRARIES ApplicationLibCode cafCommandFeatures
+     Commands GrpcInterface
+)
 
 target_link_libraries(
   ResInsight
@@ -248,7 +250,9 @@ target_link_libraries(
 # Add RifGeoMechFileInterface after WHOLE_ARCHIVE to resolve link order issues
 if(UNIX AND NOT APPLE)
   target_link_options(ResInsight PRIVATE "LINKER:--start-group")
-  target_link_libraries(ResInsight PRIVATE RifGeoMechFileInterface RigGeoMechDataModel)
+  target_link_libraries(
+    ResInsight PRIVATE RifGeoMechFileInterface RigGeoMechDataModel
+  )
   target_link_options(ResInsight PRIVATE "LINKER:--end-group")
 else()
   target_link_libraries(ResInsight PRIVATE RifGeoMechFileInterface)
