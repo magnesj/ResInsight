@@ -154,7 +154,7 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
 
         // Try to join with timeout
         std::unique_lock<std::mutex> lock( m_queueMutex );
-        bool                         finished = m_queueCondition.wait_until( lock, deadline, [this]() { return m_eventQueue.empty(); } );
+        m_queueCondition.wait_until( lock, deadline, [this]() { return m_eventQueue.empty(); } );
         lock.unlock();
 
         m_workerThread->join();
