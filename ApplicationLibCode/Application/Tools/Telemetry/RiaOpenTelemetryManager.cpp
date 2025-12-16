@@ -28,18 +28,21 @@
 #include <thread>
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
-#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/sdk/resource/resource.h"
-#include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
-#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
-#include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
+
+// Windows socket headers must be included before CURL
+#ifdef _WIN32
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
+#include <curl/curl.h>
+#include <nlohmann/json.hpp>
+
 namespace sdk      = opentelemetry::sdk;
 namespace resource = opentelemetry::sdk::resource;
-namespace otlp     = opentelemetry::exporter::otlp;
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -443,6 +446,72 @@ static std::map<QString, QString> parseAzureConnectionString( const QString& con
 
     return result;
 }
+
+//--------------------------------------------------------------------------------------------------
+/// CURL write callback
+//--------------------------------------------------------------------------------------------------
+static size_t curlWriteCallback( void* contents, size_t size, size_t nmemb, std::string* userp )
+{
+    userp->append( (char*)contents, size * nmemb );
+    return size * nmemb;
+}
+#endif
+
+//--------------------------------------------------------------------------------------------------
+/// Send telemetry to Azure Application Insights using REST API
+//--------------------------------------------------------------------------------------------------
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+static bool sendToApplicationInsights( const std::string& jsonPayload,
+                                       const QString&     endpoint,
+                                       int                timeoutMs,
+                                       std::string&       errorMessage )
+{
+    CURL*       curl;
+    CURLcode    res;
+    std::string readBuffer;
+
+    curl = curl_easy_init();
+    if ( !curl )
+    {
+        errorMessage = "Failed to initialize CURL";
+        return false;
+    }
+
+    std::string url = endpoint.toStdString() + "/v2/track";
+
+    struct curl_slist* headers = nullptr;
+    headers                    = curl_slist_append( headers, "Content-Type: application/json" );
+    headers                    = curl_slist_append( headers, "Accept: application/json" );
+
+    curl_easy_setopt( curl, CURLOPT_URL, url.c_str() );
+    curl_easy_setopt( curl, CURLOPT_POSTFIELDS, jsonPayload.c_str() );
+    curl_easy_setopt( curl, CURLOPT_HTTPHEADER, headers );
+    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, curlWriteCallback );
+    curl_easy_setopt( curl, CURLOPT_WRITEDATA, &readBuffer );
+    curl_easy_setopt( curl, CURLOPT_TIMEOUT_MS, timeoutMs );
+
+    res = curl_easy_perform( curl );
+
+    long response_code;
+    curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &response_code );
+
+    curl_slist_free_all( headers );
+    curl_easy_cleanup( curl );
+
+    if ( res != CURLE_OK )
+    {
+        errorMessage = std::string( "CURL failed: " ) + curl_easy_strerror( res );
+        return false;
+    }
+
+    if ( response_code != 200 )
+    {
+        errorMessage = "HTTP error: " + std::to_string( response_code ) + " - " + readBuffer;
+        return false;
+    }
+
+    return true;
+}
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -455,85 +524,25 @@ bool RiaOpenTelemetryManager::createExporter()
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
 
-        // Configure OTLP HTTP exporter options
-        otlp::OtlpHttpExporterOptions exporterOptions;
+        // Parse and validate connection string
+        auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
 
         if ( prefs->activeEnvironment() == "production" )
         {
-            // Parse Azure connection string
-            auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
-
-            if ( connectionParams.contains( "IngestionEndpoint" ) )
+            if ( !connectionParams.contains( "InstrumentationKey" ) )
             {
-                QString endpoint = connectionParams["IngestionEndpoint"];
-                // Azure Application Insights OTLP endpoint
-                // The endpoint should be like: https://<region>.in.applicationinsights.azure.com/v2.1/track
-                // For OTLP, we need to use the /v1/traces endpoint
-                if ( endpoint.endsWith( "/v2.1/track" ) )
-                {
-                    endpoint = endpoint.left( endpoint.length() - 12 ); // Remove "/v2.1/track"
-                }
-                endpoint = endpoint + "/v1/traces";
-
-                exporterOptions.url = endpoint.toStdString();
+                handleError( TelemetryError::ConfigurationError, "InstrumentationKey not found in connection string" );
+                return false;
             }
-            else
+
+            if ( !connectionParams.contains( "IngestionEndpoint" ) )
             {
                 handleError( TelemetryError::ConfigurationError, "IngestionEndpoint not found in connection string" );
                 return false;
             }
-
-            // Add instrumentation key as header if available
-            if ( connectionParams.contains( "InstrumentationKey" ) )
-            {
-                exporterOptions.http_headers.insert( { "x-api-key", connectionParams["InstrumentationKey"].toStdString() } );
-            }
-        }
-        else // development or local
-        {
-            // Use local OTLP endpoint
-            QString endpoint = prefs->localEndpoint();
-            if ( !endpoint.endsWith( "/v1/traces" ) )
-            {
-                endpoint = endpoint + "/v1/traces";
-            }
-            exporterOptions.url = endpoint.toStdString();
         }
 
-        // Set timeout from preferences
-        exporterOptions.timeout = std::chrono::milliseconds( prefs->connectionTimeoutMs() );
-
-        // Create OTLP HTTP exporter
-        auto exporter = otlp::OtlpHttpExporterFactory::Create( exporterOptions );
-
-        // Configure batch span processor options
-        sdk::trace::BatchSpanProcessorOptions processorOptions;
-        processorOptions.max_queue_size       = static_cast<size_t>( prefs->maxQueueSize() );
-        processorOptions.schedule_delay_millis = std::chrono::milliseconds( prefs->batchTimeoutMs() );
-        processorOptions.max_export_batch_size = static_cast<size_t>( prefs->maxBatchSize() );
-
-        // Create batch span processor
-        auto processor = sdk::trace::BatchSpanProcessorFactory::Create( std::move( exporter ), processorOptions );
-
-        // Create resource attributes
-        resource::ResourceAttributes attributes;
-        attributes["service.name"]    = prefs->serviceName().toStdString();
-        attributes["service.version"] = prefs->serviceVersion().toStdString();
-        attributes["deployment.environment"] = prefs->activeEnvironment().toStdString();
-
-        auto resourcePtr = resource::Resource::Create( attributes );
-
-        // Create tracer provider with processor and resource
-        m_provider = nostd::shared_ptr<trace::TracerProvider>(
-            sdk::trace::TracerProviderFactory::Create( std::move( processor ), resourcePtr ).release() );
-
-        // Set as global provider
-        trace::Provider::SetTracerProvider( m_provider );
-
-        // Get tracer from provider
-        m_tracer = m_provider->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
-
-        RiaLogging::info( QString( "OpenTelemetry exporter created for %1 environment" ).arg( prefs->activeEnvironment() ) );
+        RiaLogging::info( QString( "Application Insights client configured for %1 environment" ).arg( prefs->activeEnvironment() ) );
 
         return true;
     }
@@ -623,38 +632,66 @@ void RiaOpenTelemetryManager::processEvents()
 void RiaOpenTelemetryManager::processEvent( const Event& event )
 {
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-    if ( !m_tracer )
-    {
-        updateHealthMetrics( false );
-        return;
-    }
-
     try
     {
-        auto span = m_tracer->StartSpan( event.name );
+        auto* prefs = RiaPreferencesOpenTelemetry::current();
 
-        // Set attributes
-        for ( const auto& [key, value] : event.attributes )
+        // Parse connection string
+        auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
+
+        if ( !connectionParams.contains( "InstrumentationKey" ) || !connectionParams.contains( "IngestionEndpoint" ) )
         {
-            span->SetAttribute( key, value );
+            updateHealthMetrics( false );
+            return;
         }
 
-        // Set timestamp
-        span->SetAttribute( "timestamp", std::chrono::duration_cast<std::chrono::milliseconds>( event.timestamp.time_since_epoch() ).count() );
+        // Format timestamp - must match Application Insights format exactly
+        auto time_t = std::chrono::system_clock::to_time_t( event.timestamp );
+        auto ms     = std::chrono::duration_cast<std::chrono::milliseconds>( event.timestamp.time_since_epoch() ) % 1000;
 
-        if ( event.name.find( "crash" ) != std::string::npos )
+        char timeBuffer[100];
+        std::strftime( timeBuffer, sizeof( timeBuffer ), "%Y-%m-%dT%H:%M:%S", std::gmtime( &time_t ) );
+
+        // Pad milliseconds to 3 digits
+        char msBuffer[8];
+        std::snprintf( msBuffer, sizeof( msBuffer ), ".%03dZ", static_cast<int>( ms.count() ) );
+
+        std::string timestamp = std::string( timeBuffer ) + msBuffer;
+
+        // Convert attributes to JSON properties
+        nlohmann::json properties = nlohmann::json::object();
+        for ( const auto& [key, value] : event.attributes )
         {
-            span->SetStatus( trace::StatusCode::kError, "Application crashed" );
+            properties[key] = value;
+        }
+
+        // Create Application Insights telemetry item
+        nlohmann::json telemetryItem = {
+            { "time", timestamp },
+            { "iKey", connectionParams["InstrumentationKey"].toStdString() },
+            { "name", "Microsoft.ApplicationInsights.Event" },
+            { "data",
+              { { "baseType", "EventData" },
+                { "baseData", { { "name", event.name }, { "properties", properties } } } } }
+        };
+
+        // Send to Application Insights
+        std::string errorMessage;
+        bool        success = sendToApplicationInsights( telemetryItem.dump(),
+                                                  connectionParams["IngestionEndpoint"],
+                                                  prefs->connectionTimeoutMs(),
+                                                  errorMessage );
+
+        if ( success )
+        {
+            updateHealthMetrics( true );
+            resetCircuitBreaker();
         }
         else
         {
-            span->SetStatus( trace::StatusCode::kOk );
+            handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
+            updateHealthMetrics( false );
         }
-
-        span->End();
-
-        updateHealthMetrics( true );
-        resetCircuitBreaker();
     }
     catch ( const std::exception& e )
     {
