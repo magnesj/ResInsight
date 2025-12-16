@@ -65,35 +65,35 @@ RiaPreferencesOpenTelemetry* RiaPreferencesOpenTelemetry::current()
 //--------------------------------------------------------------------------------------------------
 void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& keyValuePairs )
 {
-    for ( const auto& pair : keyValuePairs )
+    for ( const auto& [key, value] : keyValuePairs )
     {
-        if ( pair.first == "connection_string" )
+        if ( key == "connection_string" )
         {
-            m_connectionString = pair.second;
+            m_connectionString = value;
         }
-        else if ( pair.first == "batch_timeout_ms" )
+        else if ( key == "batch_timeout_ms" )
         {
-            m_batchTimeoutMs = pair.second.toInt();
+            m_batchTimeoutMs = value.toInt();
         }
-        else if ( pair.first == "max_batch_size" )
+        else if ( key == "max_batch_size" )
         {
-            m_maxBatchSize = pair.second.toInt();
+            m_maxBatchSize = value.toInt();
         }
-        else if ( pair.first == "max_queue_size" )
+        else if ( key == "max_queue_size" )
         {
-            m_maxQueueSize = pair.second.toInt();
+            m_maxQueueSize = value.toInt();
         }
-        else if ( pair.first == "memory_threshold_mb" )
+        else if ( key == "memory_threshold_mb" )
         {
-            m_memoryThresholdMb = pair.second.toInt();
+            m_memoryThresholdMb = value.toInt();
         }
-        else if ( pair.first == "sampling_rate" )
+        else if ( key == "sampling_rate" )
         {
-            m_samplingRate = pair.second.toDouble();
+            m_samplingRate = value.toDouble();
         }
-        else if ( pair.first == "connection_timeout_ms" )
+        else if ( key == "connection_timeout_ms" )
         {
-            m_connectionTimeoutMs = pair.second.toInt();
+            m_connectionTimeoutMs = value.toInt();
         }
     }
 }

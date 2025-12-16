@@ -124,7 +124,23 @@ std::map<QString, QString> RiaConnectorTools::readKeyValuePairs( const QString& 
     std::map<QString, QString> keyValuePairs;
     for ( auto it = obj.begin(); it != obj.end(); ++it )
     {
-        keyValuePairs[it.key()] = it.value().toString();
+        QJsonValue value = it.value();
+        QString    valueStr;
+
+        if ( value.isString() )
+        {
+            valueStr = value.toString();
+        }
+        else if ( value.isDouble() )
+        {
+            valueStr = QString::number( value.toDouble() );
+        }
+        else if ( value.isBool() )
+        {
+            valueStr = value.toBool() ? "true" : "false";
+        }
+
+        keyValuePairs[it.key()] = valueStr;
     }
 
     return keyValuePairs;
@@ -184,139 +200,13 @@ void RiaConnectorTools::readCloudConfigFiles( RiaPreferences* preferences )
     // Load OpenTelemetry configuration
     for ( const auto& filePath : buildConfigFilePathCandidates( "opentelemetry_config.json" ) )
     {
-        if ( RiaConnectorTools::loadOpenTelemetryConfiguration( filePath ) )
+        auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( filePath );
+        if ( !keyValuePairs.empty() )
         {
             RiaLogging::info( QString( "Imported OpenTelemetry configuration from : '%1'" ).arg( filePath ) );
+            RiaPreferencesOpenTelemetry::current()->setData( keyValuePairs );
             RiaPreferencesOpenTelemetry::current()->setFieldsReadOnly();
             break;
         }
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaConnectorTools::loadOpenTelemetryConfiguration( const QString& filePath )
-{
-    auto content = readStringFromFile( filePath );
-    if ( content.isEmpty() )
-    {
-        return false;
-    }
-
-    QJsonDocument doc = QJsonDocument::fromJson( content.toUtf8() );
-    if ( !doc.isObject() )
-    {
-        return false;
-    }
-
-    QJsonObject obj   = doc.object();
-    auto*       prefs = RiaPreferencesOpenTelemetry::current();
-
-    // Build a flat key-value map from the nested JSON structure
-    std::map<QString, QString> keyValuePairs;
-
-    // Handle active_environment
-    if ( obj.contains( "active_environment" ) )
-    {
-        keyValuePairs["active_environment"] = obj["active_environment"].toString();
-    }
-
-    // Handle environments and extract connection settings for active environment
-    if ( obj.contains( "environments" ) )
-    {
-        QJsonObject environments = obj["environments"].toObject();
-        QString     activeEnv    = obj.value( "active_environment" ).toString( "production" );
-
-        if ( environments.contains( activeEnv ) )
-        {
-            QJsonObject envConfig = environments[activeEnv].toObject();
-
-            if ( envConfig.contains( "connection_string" ) )
-            {
-                keyValuePairs["connection_string"] = envConfig["connection_string"].toString();
-            }
-
-            if ( envConfig.contains( "endpoint" ) )
-            {
-                keyValuePairs["local_endpoint"] = envConfig["endpoint"].toString();
-            }
-        }
-    }
-
-    // Handle top-level configuration
-    if ( obj.contains( "batch_timeout_ms" ) )
-    {
-        keyValuePairs["batch_timeout_ms"] = QString::number( obj["batch_timeout_ms"].toInt() );
-    }
-
-    if ( obj.contains( "max_batch_size" ) )
-    {
-        keyValuePairs["max_batch_size"] = QString::number( obj["max_batch_size"].toInt() );
-    }
-
-    if ( obj.contains( "max_queue_size" ) )
-    {
-        keyValuePairs["max_queue_size"] = QString::number( obj["max_queue_size"].toInt() );
-    }
-
-    if ( obj.contains( "connection_timeout_ms" ) )
-    {
-        keyValuePairs["connection_timeout_ms"] = QString::number( obj["connection_timeout_ms"].toInt() );
-    }
-
-    if ( obj.contains( "memory_threshold_mb" ) )
-    {
-        keyValuePairs["memory_threshold_mb"] = QString::number( obj["memory_threshold_mb"].toInt() );
-    }
-
-    if ( obj.contains( "sampling_rate" ) )
-    {
-        keyValuePairs["sampling_rate"] = QString::number( obj["sampling_rate"].toDouble() );
-    }
-
-    // Handle privacy settings
-    if ( obj.contains( "privacy" ) )
-    {
-        QJsonObject privacy = obj["privacy"].toObject();
-
-        if ( privacy.contains( "filter_file_paths" ) )
-        {
-            keyValuePairs["filter_file_paths"] = privacy["filter_file_paths"].toBool() ? "true" : "false";
-        }
-
-        if ( privacy.contains( "filter_user_data" ) )
-        {
-            keyValuePairs["filter_user_data"] = privacy["filter_user_data"].toBool() ? "true" : "false";
-        }
-    }
-
-    // Handle fallback settings
-    if ( obj.contains( "fallback" ) )
-    {
-        QJsonObject fallback = obj["fallback"].toObject();
-
-        if ( fallback.contains( "enable_local_logging" ) )
-        {
-            keyValuePairs["enable_local_logging"] = fallback["enable_local_logging"].toBool() ? "true" : "false";
-        }
-
-        if ( fallback.contains( "failure_threshold" ) )
-        {
-            keyValuePairs["failure_threshold"] = QString::number( fallback["failure_threshold"].toInt() );
-        }
-
-        if ( fallback.contains( "retry_interval_seconds" ) )
-        {
-            keyValuePairs["retry_interval_seconds"] = QString::number( fallback["retry_interval_seconds"].toInt() );
-        }
-    }
-
-    // Apply the configuration using the existing setData method
-    if ( !keyValuePairs.empty() )
-    {
-        prefs->setData( keyValuePairs );
-    }
-
-    return true;
 }
