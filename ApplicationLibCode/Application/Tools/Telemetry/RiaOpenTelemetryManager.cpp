@@ -468,10 +468,7 @@ static size_t curlWriteCallback( void* contents, size_t size, size_t nmemb, std:
 /// Send telemetry to Azure Application Insights using REST API
 //--------------------------------------------------------------------------------------------------
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-static bool sendToApplicationInsights( const std::string& jsonPayload,
-                                       const QString&     endpoint,
-                                       int                timeoutMs,
-                                       std::string&       errorMessage )
+static bool sendToApplicationInsights( const std::string& jsonPayload, const QString& endpoint, int timeoutMs, std::string& errorMessage )
 {
     CURL*       curl;
     CURLcode    res;
@@ -580,7 +577,7 @@ bool RiaOpenTelemetryManager::createExporter()
                 {
                     endpoint = endpoint + "/v1/traces";
                 }
-                exporterOptions.url = endpoint.toStdString();
+                exporterOptions.url     = endpoint.toStdString();
                 exporterOptions.timeout = std::chrono::milliseconds( prefs->connectionTimeoutMs() );
             }
 
@@ -589,9 +586,9 @@ bool RiaOpenTelemetryManager::createExporter()
 
             // Configure batch span processor
             sdk::trace::BatchSpanProcessorOptions processorOptions;
-            processorOptions.max_queue_size            = static_cast<size_t>( prefs->maxQueueSize() );
-            processorOptions.schedule_delay_millis     = std::chrono::milliseconds( prefs->batchTimeoutMs() );
-            processorOptions.max_export_batch_size     = static_cast<size_t>( prefs->maxBatchSize() );
+            processorOptions.max_queue_size        = static_cast<size_t>( prefs->maxQueueSize() );
+            processorOptions.schedule_delay_millis = std::chrono::milliseconds( prefs->batchTimeoutMs() );
+            processorOptions.max_export_batch_size = static_cast<size_t>( prefs->maxBatchSize() );
 
             auto processor = sdk::trace::BatchSpanProcessorFactory::Create( std::move( exporter ), processorOptions );
 
@@ -603,7 +600,8 @@ bool RiaOpenTelemetryManager::createExporter()
             auto resourcePtr                     = resource::Resource::Create( attributes );
 
             // Create tracer provider
-            m_provider = nostd::shared_ptr<trace::TracerProvider>( sdk::trace::TracerProviderFactory::Create( std::move( processor ), resourcePtr ).release() );
+            m_provider = nostd::shared_ptr<trace::TracerProvider>(
+                sdk::trace::TracerProviderFactory::Create( std::move( processor ), resourcePtr ).release() );
             trace::Provider::SetTracerProvider( m_provider );
             m_tracer = m_provider->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
 
@@ -724,7 +722,8 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
             }
 
             // Set timestamp
-            span->SetAttribute( "timestamp", std::chrono::duration_cast<std::chrono::milliseconds>( event.timestamp.time_since_epoch() ).count() );
+            span->SetAttribute( "timestamp",
+                                std::chrono::duration_cast<std::chrono::milliseconds>( event.timestamp.time_since_epoch() ).count() );
 
             if ( event.name.find( "crash" ) != std::string::npos )
             {
@@ -772,14 +771,12 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
             }
 
             // Create Application Insights telemetry item
-            nlohmann::json telemetryItem = {
-                { "time", timestamp },
-                { "iKey", connectionParams["InstrumentationKey"].toStdString() },
-                { "name", "Microsoft.ApplicationInsights.Event" },
-                { "data",
-                  { { "baseType", "EventData" },
-                    { "baseData", { { "name", event.name }, { "properties", properties } } } } }
-            };
+            nlohmann::json telemetryItem = { { "time", timestamp },
+                                             { "iKey", connectionParams["InstrumentationKey"].toStdString() },
+                                             { "name", "Microsoft.ApplicationInsights.Event" },
+                                             { "data",
+                                               { { "baseType", "EventData" },
+                                                 { "baseData", { { "name", event.name }, { "properties", properties } } } } } };
 
             // Send to Application Insights
             std::string errorMessage;
@@ -795,7 +792,8 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
             }
             else
             {
-                handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
+                handleError( TelemetryError::NetworkError,
+                             QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
                 updateHealthMetrics( false );
             }
         }
