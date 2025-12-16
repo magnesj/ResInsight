@@ -243,15 +243,6 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
 
   list(APPEND CPP_SOURCES ${OPENTELEMETRY_FILES})
 
-  # Optional: Add lock-free data structures library
-  find_package(moodycamel-concurrentqueue CONFIG QUIET)
-  if(moodycamel-concurrentqueue_FOUND)
-    list(APPEND OPENTELEMETRY_LIBRARIES
-         moodycamel-concurrentqueue::concurrentqueue
-    )
-    add_definitions(-DRESINSIGHT_USE_LOCKFREE_QUEUE)
-  endif()
-
   list(APPEND EXTERNAL_LINK_LIBRARIES ${OPENTELEMETRY_LIBRARIES})
 endif()
 
