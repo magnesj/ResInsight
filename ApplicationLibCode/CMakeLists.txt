@@ -235,6 +235,8 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
     opentelemetry-cpp::sdk
     opentelemetry-cpp::trace
     opentelemetry-cpp::resources
+    opentelemetry-cpp::otlp_http_exporter
+    opentelemetry-cpp::http_client_curl
     CURL::libcurl
     nlohmann_json::nlohmann_json
     Threads::Threads

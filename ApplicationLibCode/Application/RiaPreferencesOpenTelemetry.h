@@ -52,6 +52,7 @@ public:
     QString activeEnvironment() const;
     QString connectionString() const;
     QString localEndpoint() const;
+    QString protocol() const;
     int     batchTimeoutMs() const;
     int     maxBatchSize() const;
     int     maxQueueSize() const;
@@ -75,12 +76,14 @@ public:
     bool             testConnection() const;
 
 protected:
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void                              fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
     caf::PdmField<QString> m_activeEnvironment;
     caf::PdmField<QString> m_connectionString;
     caf::PdmField<QString> m_localEndpoint;
+    caf::PdmField<QString> m_protocol;
     caf::PdmField<int>     m_batchTimeoutMs;
     caf::PdmField<int>     m_maxBatchSize;
     caf::PdmField<int>     m_maxQueueSize;
