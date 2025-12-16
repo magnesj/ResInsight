@@ -123,13 +123,13 @@ public:
 
     bool storeBackupOfProjectFiles() const;
 
-    RiaPreferencesGeoMech*        geoMechPreferences() const;
-    RiaPreferencesSummary*        summaryPreferences() const;
-    RiaPreferencesSystem*         systemPreferences() const;
-    RiaPreferencesOsdu*           osduPreferences() const;
-    RiaPreferencesSumo*           sumoPreferences() const;
-    RiaPreferencesGrid*           gridPreferences() const;
-    RiaPreferencesOpm*            opmPreferences() const;
+    RiaPreferencesGeoMech*       geoMechPreferences() const;
+    RiaPreferencesSummary*       summaryPreferences() const;
+    RiaPreferencesSystem*        systemPreferences() const;
+    RiaPreferencesOsdu*          osduPreferences() const;
+    RiaPreferencesSumo*          sumoPreferences() const;
+    RiaPreferencesGrid*          gridPreferences() const;
+    RiaPreferencesOpm*           opmPreferences() const;
     RiaPreferencesOpenTelemetry* openTelemetryPreferences() const;
 
     void importPreferenceValuesFromFile( const QString& fileName );
