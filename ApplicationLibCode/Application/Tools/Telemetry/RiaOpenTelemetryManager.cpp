@@ -666,10 +666,8 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
 
         // Send to Application Insights
         std::string errorMessage;
-        bool        success = sendToApplicationInsights( telemetryItem.dump(),
-                                                  connectionParams["IngestionEndpoint"],
-                                                  prefs->connectionTimeoutMs(),
-                                                  errorMessage );
+        bool        success =
+            sendToApplicationInsights( telemetryItem.dump(), connectionParams["IngestionEndpoint"], prefs->connectionTimeoutMs(), errorMessage );
 
         if ( success )
         {
@@ -678,8 +676,7 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         }
         else
         {
-            handleError( TelemetryError::NetworkError,
-                         QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
+            handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
             updateHealthMetrics( false );
         }
     }
