@@ -18,6 +18,8 @@
 
 #include "RiaPreferencesOpenTelemetry.h"
 
+#include "RiaApplication.h"
+#include "RiaPreferences.h"
 #include "RiaVersionInfo.h"
 
 #include "cafPdmUiComboBoxEditor.h"
@@ -25,11 +27,6 @@
 #include "cafPdmUiTextEditor.h"
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesOpenTelemetry, "RiaPreferencesOpenTelemetry" );
-
-namespace
-{
-RiaPreferencesOpenTelemetry* openTelemetryPrefs = nullptr;
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -79,11 +76,7 @@ RiaPreferencesOpenTelemetry::~RiaPreferencesOpenTelemetry()
 //--------------------------------------------------------------------------------------------------
 RiaPreferencesOpenTelemetry* RiaPreferencesOpenTelemetry::current()
 {
-    if ( !openTelemetryPrefs )
-    {
-        openTelemetryPrefs = new RiaPreferencesOpenTelemetry;
-    }
-    return openTelemetryPrefs;
+    return RiaApplication::instance()->preferences()->openTelemetryPreferences();
 }
 
 //--------------------------------------------------------------------------------------------------
