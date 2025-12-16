@@ -28,10 +28,6 @@
 #include "RiaFilePathTools.h"
 #include "RiaFontCache.h"
 #include "RiaImportEclipseCaseTools.h"
-
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "RiaOpenTelemetryManager.h"
-#endif
 #include "RiaLogging.h"
 #include "RiaPlotWindowRedrawScheduler.h"
 #include "RiaPreferences.h"
@@ -43,6 +39,10 @@
 #include "RiaVersionInfo.h"
 #include "RiaViewRedrawScheduler.h"
 #include "Summary/RiaSummaryTools.h"
+
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+#include "RiaOpenTelemetryManager.h"
+#endif
 
 #include "ExportCommands/RicSnapshotAllPlotsToFileFeature.h"
 #include "ExportCommands/RicSnapshotAllViewsToFileFeature.h"

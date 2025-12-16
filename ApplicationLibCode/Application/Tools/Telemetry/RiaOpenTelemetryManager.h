@@ -28,12 +28,9 @@
 #include <memory>
 #include <mutex>
 #include <queue>
+#include <stacktrace>
 #include <string>
 #include <thread>
-
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include <stacktrace>
-#endif
 
 class QString;
 

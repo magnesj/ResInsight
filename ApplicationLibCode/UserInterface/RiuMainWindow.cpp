@@ -28,12 +28,6 @@
 #include "RiaRegressionTest.h"
 #include "RiaRegressionTestRunner.h"
 
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "RiaOpenTelemetryManager.h"
-#include <QDateTime>
-#include <stacktrace>
-#endif
-
 #include "RicGridCalculatorDialog.h"
 
 #include "ContourMap/RimEclipseContourMapView.h"
@@ -98,6 +92,12 @@
 
 #include "DockAreaWidget.h"
 #include "DockManager.h"
+
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+#include "RiaOpenTelemetryManager.h"
+#include <QDateTime>
+#include <stacktrace>
+#endif
 
 #include <QAction>
 #include <QActionGroup>

@@ -27,7 +27,6 @@
 #include <sstream>
 #include <thread>
 
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 // Windows socket headers must be included before CURL
 #ifdef _WIN32
 #include <winsock2.h>
@@ -36,7 +35,6 @@
 
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>
-#endif
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -91,7 +89,6 @@ RiaOpenTelemetryManager::~RiaOpenTelemetryManager()
 //--------------------------------------------------------------------------------------------------
 bool RiaOpenTelemetryManager::initialize()
 {
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     std::lock_guard<std::mutex> lock( m_configMutex );
 
     if ( m_initialized.load() )
@@ -99,13 +96,7 @@ bool RiaOpenTelemetryManager::initialize()
         return true;
     }
 
-    auto* prefs      = RiaPreferencesOpenTelemetry::current();
-    auto  validation = prefs->validate();
-    if ( !validation.isValid )
-    {
-        handleError( TelemetryError::ConfigurationError, validation.errorMessage );
-        return false;
-    }
+    auto* prefs = RiaPreferencesOpenTelemetry::current();
 
     if ( !initializeProvider() )
     {
@@ -128,10 +119,6 @@ bool RiaOpenTelemetryManager::initialize()
     }
 
     return true;
-#else
-    RiaLogging::warning( "OpenTelemetry not enabled at compile time" );
-    return false;
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -395,7 +382,6 @@ void RiaOpenTelemetryManager::enableHealthMonitoring( bool enable )
 //--------------------------------------------------------------------------------------------------
 bool RiaOpenTelemetryManager::initializeProvider()
 {
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     try
     {
         if ( !createExporter() )
@@ -411,16 +397,12 @@ bool RiaOpenTelemetryManager::initializeProvider()
         handleError( TelemetryError::InternalError, QString( "Failed to initialize provider: %1" ).arg( e.what() ) );
         return false;
     }
-#else
-    return false;
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
 /// Parse Azure Application Insights connection string
 /// Format: InstrumentationKey=<key>;IngestionEndpoint=<endpoint>;...
 //--------------------------------------------------------------------------------------------------
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 static std::map<QString, QString> parseAzureConnectionString( const QString& connectionString )
 {
     std::map<QString, QString> result;
@@ -448,12 +430,10 @@ static size_t curlWriteCallback( void* contents, size_t size, size_t nmemb, std:
     userp->append( (char*)contents, size * nmemb );
     return size * nmemb;
 }
-#endif
 
 //--------------------------------------------------------------------------------------------------
 /// Send telemetry to Azure Application Insights using REST API
 //--------------------------------------------------------------------------------------------------
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 static bool sendToApplicationInsights( const std::string& jsonPayload, const QString& endpoint, int timeoutMs, std::string& errorMessage )
 {
     CURL*       curl;
@@ -502,38 +482,32 @@ static bool sendToApplicationInsights( const std::string& jsonPayload, const QSt
 
     return true;
 }
-#endif
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RiaOpenTelemetryManager::createExporter()
 {
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     try
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
 
         // Parse and validate connection string
         auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
-
-        if ( prefs->activeEnvironment() == "production" )
+        if ( !connectionParams.contains( "InstrumentationKey" ) )
         {
-            if ( !connectionParams.contains( "InstrumentationKey" ) )
-            {
-                handleError( TelemetryError::ConfigurationError, "InstrumentationKey not found in connection string" );
-                return false;
-            }
+            handleError( TelemetryError::ConfigurationError, "InstrumentationKey not found in connection string" );
+            return false;
+        }
 
-            if ( !connectionParams.contains( "IngestionEndpoint" ) )
-            {
-                handleError( TelemetryError::ConfigurationError, "IngestionEndpoint not found in connection string" );
-                return false;
-            }
+        if ( !connectionParams.contains( "IngestionEndpoint" ) )
+        {
+            handleError( TelemetryError::ConfigurationError, "IngestionEndpoint not found in connection string" );
+            return false;
         }
 
         // Using Application Insights REST API for telemetry
-        RiaLogging::info( QString( "Application Insights REST API configured for %1 environment" ).arg( prefs->activeEnvironment() ) );
+        RiaLogging::info( QString( "Application Insights REST API configured for production environment" ) );
 
         return true;
     }
@@ -542,9 +516,6 @@ bool RiaOpenTelemetryManager::createExporter()
         handleError( TelemetryError::NetworkError, QString( "Failed to create exporter: %1" ).arg( e.what() ) );
         return false;
     }
-#else
-    return false;
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -552,10 +523,8 @@ bool RiaOpenTelemetryManager::createExporter()
 //--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::setupResourceAttributes()
 {
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     // Resource attributes are typically set during provider creation
     // This would be expanded with system information, process details, etc.
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -622,7 +591,6 @@ void RiaOpenTelemetryManager::processEvents()
 //--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::processEvent( const Event& event )
 {
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
     try
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
@@ -685,7 +653,6 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         handleError( TelemetryError::InternalError, QString( "Failed to process event: %1" ).arg( e.what() ) );
         updateHealthMetrics( false );
     }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------

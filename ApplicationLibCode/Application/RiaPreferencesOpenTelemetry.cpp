@@ -35,9 +35,7 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
 {
     CAF_PDM_InitObject( "OpenTelemetry Configuration", "", "", "Configuration for OpenTelemetry crash reporting and telemetry" );
 
-    CAF_PDM_InitField( &m_activeEnvironment, "activeEnvironment", QString( "production" ), "Active Environment" );
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
-    CAF_PDM_InitField( &m_localEndpoint, "localEndpoint", QString( "http://localhost:4317" ), "Local OTLP Endpoint" );
 
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
 
@@ -84,17 +82,9 @@ void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& key
 {
     for ( const auto& pair : keyValuePairs )
     {
-        if ( pair.first == "active_environment" )
-        {
-            m_activeEnvironment = pair.second;
-        }
-        else if ( pair.first == "connection_string" )
+        if ( pair.first == "connection_string" )
         {
             m_connectionString = pair.second;
-        }
-        else if ( pair.first == "local_endpoint" )
-        {
-            m_localEndpoint = pair.second;
         }
         else if ( pair.first == "batch_timeout_ms" )
         {
@@ -166,25 +156,9 @@ QString RiaPreferencesOpenTelemetry::serviceVersion() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RiaPreferencesOpenTelemetry::activeEnvironment() const
-{
-    return m_activeEnvironment;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QString RiaPreferencesOpenTelemetry::connectionString() const
 {
     return m_connectionString;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RiaPreferencesOpenTelemetry::localEndpoint() const
-{
-    return m_localEndpoint;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -273,83 +247,4 @@ int RiaPreferencesOpenTelemetry::failureThreshold() const
 int RiaPreferencesOpenTelemetry::retryIntervalSeconds() const
 {
     return m_retryIntervalSeconds;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RiaPreferencesOpenTelemetry::ValidationResult RiaPreferencesOpenTelemetry::validate() const
-{
-    ValidationResult result;
-    result.isValid = true;
-
-    if ( activeEnvironment() == "production" )
-    {
-        if ( connectionString().isEmpty() )
-        {
-            result.isValid      = false;
-            result.errorMessage = "Connection string is required for production environment";
-            return result;
-        }
-
-        if ( !connectionString().contains( "InstrumentationKey" ) )
-        {
-            result.warnings.push_back( "Connection string may be invalid - missing InstrumentationKey" );
-        }
-    }
-    else if ( activeEnvironment() == "development" )
-    {
-        if ( localEndpoint().isEmpty() )
-        {
-            result.isValid      = false;
-            result.errorMessage = "Local endpoint is required for development environment";
-            return result;
-        }
-    }
-
-    if ( samplingRate() < 0.0 || samplingRate() > 1.0 )
-    {
-        result.isValid      = false;
-        result.errorMessage = "Sampling rate must be between 0.0 and 1.0";
-        return result;
-    }
-
-    if ( batchTimeoutMs() < 100 || batchTimeoutMs() > 60000 )
-    {
-        result.warnings.push_back( "Batch timeout should be between 100ms and 60000ms" );
-    }
-
-    return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaPreferencesOpenTelemetry::testConnection() const
-{
-    // TODO: Implement actual connection test
-    // This would attempt to send a test span to the configured endpoint
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaPreferencesOpenTelemetry::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
-{
-    // Validate configuration when fields change
-    ValidationResult validation = validate();
-    if ( !validation.isValid )
-    {
-        // Could show warning to user here
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QList<caf::PdmOptionItemInfo> RiaPreferencesOpenTelemetry::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
-{
-    QList<caf::PdmOptionItemInfo> options;
-    return options;
 }

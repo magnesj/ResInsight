@@ -22,6 +22,7 @@
 #include "cafPdmObject.h"
 
 #include <QString>
+
 #include <map>
 #include <vector>
 
@@ -49,9 +50,7 @@ public:
     QString serviceVersion() const; // Read from ResInsightVersion.cmake
 
     // Getters for configuration values
-    QString activeEnvironment() const;
     QString connectionString() const;
-    QString localEndpoint() const;
     int     batchTimeoutMs() const;
     int     maxBatchSize() const;
     int     maxQueueSize() const;
@@ -64,24 +63,8 @@ public:
     int     failureThreshold() const;
     int     retryIntervalSeconds() const;
 
-    // Configuration validation
-    struct ValidationResult
-    {
-        bool                 isValid;
-        QString              errorMessage;
-        std::vector<QString> warnings;
-    };
-    ValidationResult validate() const;
-    bool             testConnection() const;
-
-protected:
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
-
 private:
-    caf::PdmField<QString> m_activeEnvironment;
     caf::PdmField<QString> m_connectionString;
-    caf::PdmField<QString> m_localEndpoint;
     caf::PdmField<int>     m_batchTimeoutMs;
     caf::PdmField<int>     m_maxBatchSize;
     caf::PdmField<int>     m_maxQueueSize;
