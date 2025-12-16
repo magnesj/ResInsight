@@ -146,64 +146,51 @@ void RiaConnectorTools::readCloudConfigFiles( RiaPreferences* preferences )
     // location_of_resinsight_executable/../../share/cloud_services/*_config.json
     //
 
+    auto buildConfigFilePathCandidates = []( const QString& fileName ) -> QStringList
     {
-        QStringList osduFilePathCandidates;
-        osduFilePathCandidates << QDir::homePath() + "/.resinsight/osdu_config.json";
-        osduFilePathCandidates << QCoreApplication::applicationDirPath() + "/../share/cloud_services/osdu_config.json";
-        osduFilePathCandidates << QCoreApplication::applicationDirPath() + "/../../share/cloud_services/osdu_config.json";
+        QStringList candidates;
+        candidates << QDir::homePath() + "/.resinsight/" + fileName;
+        candidates << QCoreApplication::applicationDirPath() + "/../share/cloud_services/" + fileName;
+        candidates << QCoreApplication::applicationDirPath() + "/../../share/cloud_services/" + fileName;
+        return candidates;
+    };
 
-        for ( const auto& osduFileCandidate : osduFilePathCandidates )
+    // Load OSDU configuration
+    for ( const auto& filePath : buildConfigFilePathCandidates( "osdu_config.json" ) )
+    {
+        auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( filePath );
+        if ( !keyValuePairs.empty() )
         {
-            auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( osduFileCandidate );
-            if ( !keyValuePairs.empty() )
-            {
-                RiaLogging::info( QString( "Imported OSDU configuration from : '%1'" ).arg( osduFileCandidate ) );
-
-                preferences->osduPreferences()->setData( keyValuePairs );
-                preferences->osduPreferences()->setFieldsReadOnly();
-                break;
-            }
+            RiaLogging::info( QString( "Imported OSDU configuration from : '%1'" ).arg( filePath ) );
+            preferences->osduPreferences()->setData( keyValuePairs );
+            preferences->osduPreferences()->setFieldsReadOnly();
+            break;
         }
     }
 
+    // Load SUMO configuration
+    for ( const auto& filePath : buildConfigFilePathCandidates( "sumo_config.json" ) )
     {
-        QStringList sumoFilePathCandidates;
-        sumoFilePathCandidates << QDir::homePath() + "/.resinsight/sumo_config.json";
-        sumoFilePathCandidates << QCoreApplication::applicationDirPath() + "/../share/cloud_services/sumo_config.json";
-        sumoFilePathCandidates << QCoreApplication::applicationDirPath() + "/../../share/cloud_services/sumo_config.json";
-
-        for ( const auto& sumoFileCandidate : sumoFilePathCandidates )
+        auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( filePath );
+        if ( !keyValuePairs.empty() )
         {
-            auto keyValuePairs = RiaConnectorTools::readKeyValuePairs( sumoFileCandidate );
-            if ( !keyValuePairs.empty() )
-            {
-                RiaLogging::info( QString( "Imported SUMO configuration from : '%1'" ).arg( sumoFileCandidate ) );
-
-                preferences->sumoPreferences()->setData( keyValuePairs );
-                preferences->sumoPreferences()->setFieldsReadOnly();
-                break;
-            }
+            RiaLogging::info( QString( "Imported SUMO configuration from : '%1'" ).arg( filePath ) );
+            preferences->sumoPreferences()->setData( keyValuePairs );
+            preferences->sumoPreferences()->setFieldsReadOnly();
+            break;
         }
     }
 
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+    // Load OpenTelemetry configuration
+    for ( const auto& filePath : buildConfigFilePathCandidates( "opentelemetry_config.json" ) )
     {
-        QStringList otelFilePathCandidates;
-        otelFilePathCandidates << QDir::homePath() + "/.resinsight/opentelemetry_config.json";
-        otelFilePathCandidates << QCoreApplication::applicationDirPath() + "/../share/cloud_services/opentelemetry_config.json";
-        otelFilePathCandidates << QCoreApplication::applicationDirPath() + "/../../share/cloud_services/opentelemetry_config.json";
-
-        for ( const auto& otelFileCandidate : otelFilePathCandidates )
+        if ( RiaConnectorTools::loadOpenTelemetryConfiguration( filePath ) )
         {
-            if ( RiaConnectorTools::loadOpenTelemetryConfiguration( otelFileCandidate ) )
-            {
-                RiaLogging::info( QString( "Imported OpenTelemetry configuration from : '%1'" ).arg( otelFileCandidate ) );
-                RiaPreferencesOpenTelemetry::current()->setFieldsReadOnly();
-                break;
-            }
+            RiaLogging::info( QString( "Imported OpenTelemetry configuration from : '%1'" ).arg( filePath ) );
+            RiaPreferencesOpenTelemetry::current()->setFieldsReadOnly();
+            break;
         }
     }
-#endif
 }
 
 //--------------------------------------------------------------------------------------------------
