@@ -11,10 +11,8 @@
     "spdlog",
     "pugixml",
     "nlohmann-json",
-    {
-      "name": "opentelemetry-cpp",
-      "features": [ "otlp-http" ]
-    }
+    "opentelemetry-cpp",
+    "curl"
   ],
     "overrides": [
         {
