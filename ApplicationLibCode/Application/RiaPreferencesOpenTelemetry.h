@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024- Equinor ASA
+//  Copyright (C) 2025- Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -57,11 +57,6 @@ public:
     int     memoryThresholdMb() const;
     double  samplingRate() const;
     int     connectionTimeoutMs() const;
-    bool    filterFilePaths() const;
-    bool    filterUserData() const;
-    bool    enableLocalLogging() const;
-    int     failureThreshold() const;
-    int     retryIntervalSeconds() const;
 
 private:
     caf::PdmField<QString> m_connectionString;
@@ -71,9 +66,4 @@ private:
     caf::PdmField<int>     m_memoryThresholdMb;
     caf::PdmField<double>  m_samplingRate;
     caf::PdmField<int>     m_connectionTimeoutMs;
-    caf::PdmField<bool>    m_filterFilePaths;
-    caf::PdmField<bool>    m_filterUserData;
-    caf::PdmField<bool>    m_enableLocalLogging;
-    caf::PdmField<int>     m_failureThreshold;
-    caf::PdmField<int>     m_retryIntervalSeconds;
 };

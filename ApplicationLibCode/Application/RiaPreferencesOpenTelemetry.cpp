@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2024- Equinor ASA
+//  Copyright (C) 2025- Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -38,26 +38,11 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
 
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
-
     CAF_PDM_InitField( &m_maxBatchSize, "maxBatchSize", 512, "Max Batch Size" );
-
     CAF_PDM_InitField( &m_maxQueueSize, "maxQueueSize", 10000, "Max Queue Size" );
-
     CAF_PDM_InitField( &m_memoryThresholdMb, "memoryThresholdMb", 50, "Memory Threshold (MB)" );
-
     CAF_PDM_InitField( &m_samplingRate, "samplingRate", 1.0, "Sampling Rate" );
-
     CAF_PDM_InitField( &m_connectionTimeoutMs, "connectionTimeoutMs", 10000, "Connection Timeout (ms)" );
-
-    // Privacy settings
-    CAF_PDM_InitField( &m_filterFilePaths, "filterFilePaths", true, "Filter File Paths" );
-    CAF_PDM_InitField( &m_filterUserData, "filterUserData", true, "Filter User Data" );
-
-    // Fallback settings
-    CAF_PDM_InitField( &m_enableLocalLogging, "enableLocalLogging", true, "Enable Local Logging Fallback" );
-    CAF_PDM_InitField( &m_failureThreshold, "failureThreshold", 3, "Failure Threshold" );
-
-    CAF_PDM_InitField( &m_retryIntervalSeconds, "retryIntervalSeconds", 300, "Retry Interval (seconds)" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -109,26 +94,6 @@ void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& key
         else if ( pair.first == "connection_timeout_ms" )
         {
             m_connectionTimeoutMs = pair.second.toInt();
-        }
-        else if ( pair.first == "filter_file_paths" )
-        {
-            m_filterFilePaths = ( pair.second.toLower() == "true" );
-        }
-        else if ( pair.first == "filter_user_data" )
-        {
-            m_filterUserData = ( pair.second.toLower() == "true" );
-        }
-        else if ( pair.first == "enable_local_logging" )
-        {
-            m_enableLocalLogging = ( pair.second.toLower() == "true" );
-        }
-        else if ( pair.first == "failure_threshold" )
-        {
-            m_failureThreshold = pair.second.toInt();
-        }
-        else if ( pair.first == "retry_interval_seconds" )
-        {
-            m_retryIntervalSeconds = pair.second.toInt();
         }
     }
 }
@@ -207,44 +172,4 @@ double RiaPreferencesOpenTelemetry::samplingRate() const
 int RiaPreferencesOpenTelemetry::connectionTimeoutMs() const
 {
     return m_connectionTimeoutMs;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaPreferencesOpenTelemetry::filterFilePaths() const
-{
-    return m_filterFilePaths;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaPreferencesOpenTelemetry::filterUserData() const
-{
-    return m_filterUserData;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaPreferencesOpenTelemetry::enableLocalLogging() const
-{
-    return m_enableLocalLogging;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RiaPreferencesOpenTelemetry::failureThreshold() const
-{
-    return m_failureThreshold;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RiaPreferencesOpenTelemetry::retryIntervalSeconds() const
-{
-    return m_retryIntervalSeconds;
 }
