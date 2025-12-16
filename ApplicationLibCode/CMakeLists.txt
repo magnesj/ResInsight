@@ -222,21 +222,14 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   message(STATUS "OpenTelemetry support enabled")
   add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
 
-  # Find dependencies required by OpenTelemetry OTLP HTTP exporter
+  # Find dependencies for Azure Application Insights REST API
   find_package(nlohmann_json CONFIG REQUIRED)
   find_package(CURL REQUIRED)
-  find_package(opentelemetry-cpp CONFIG REQUIRED)
   find_package(Threads REQUIRED)
 
   list(
     APPEND
     OPENTELEMETRY_LIBRARIES
-    opentelemetry-cpp::api
-    opentelemetry-cpp::sdk
-    opentelemetry-cpp::trace
-    opentelemetry-cpp::resources
-    opentelemetry-cpp::otlp_http_exporter
-    opentelemetry-cpp::http_client_curl
     CURL::libcurl
     nlohmann_json::nlohmann_json
     Threads::Threads

@@ -38,8 +38,6 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitField( &m_activeEnvironment, "activeEnvironment", QString( "production" ), "Active Environment" );
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
     CAF_PDM_InitField( &m_localEndpoint, "localEndpoint", QString( "http://localhost:4317" ), "Local OTLP Endpoint" );
-    CAF_PDM_InitField( &m_protocol, "protocol", QString( "rest" ), "Protocol" );
-    m_protocol.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
 
@@ -97,10 +95,6 @@ void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& key
         else if ( pair.first == "local_endpoint" )
         {
             m_localEndpoint = pair.second;
-        }
-        else if ( pair.first == "protocol" )
-        {
-            m_protocol = pair.second;
         }
         else if ( pair.first == "batch_timeout_ms" )
         {
@@ -191,14 +185,6 @@ QString RiaPreferencesOpenTelemetry::connectionString() const
 QString RiaPreferencesOpenTelemetry::localEndpoint() const
 {
     return m_localEndpoint;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RiaPreferencesOpenTelemetry::protocol() const
-{
-    return m_protocol;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -365,12 +351,5 @@ void RiaPreferencesOpenTelemetry::fieldChangedByUi( const caf::PdmFieldHandle* c
 QList<caf::PdmOptionItemInfo> RiaPreferencesOpenTelemetry::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     QList<caf::PdmOptionItemInfo> options;
-
-    if ( fieldNeedingOptions == &m_protocol )
-    {
-        options.push_back( caf::PdmOptionItemInfo( "REST API (Recommended)", "rest" ) );
-        options.push_back( caf::PdmOptionItemInfo( "OTLP", "otlp" ) );
-    }
-
     return options;
 }
