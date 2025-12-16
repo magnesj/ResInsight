@@ -227,12 +227,8 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   find_package(CURL REQUIRED)
   find_package(Threads REQUIRED)
 
-  list(
-    APPEND
-    OPENTELEMETRY_LIBRARIES
-    CURL::libcurl
-    nlohmann_json::nlohmann_json
-    Threads::Threads
+  list(APPEND OPENTELEMETRY_LIBRARIES CURL::libcurl
+       nlohmann_json::nlohmann_json Threads::Threads
   )
 
   # Create telemetry source files list
