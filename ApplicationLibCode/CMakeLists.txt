@@ -222,6 +222,9 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   message(STATUS "OpenTelemetry support enabled")
   add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
 
+  # Find dependencies required by OpenTelemetry OTLP HTTP exporter
+  find_package(nlohmann_json CONFIG REQUIRED)
+  find_package(CURL REQUIRED)
   find_package(opentelemetry-cpp CONFIG REQUIRED)
   find_package(Threads REQUIRED)
 
@@ -233,6 +236,8 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
     opentelemetry-cpp::ext
     opentelemetry-cpp::trace
     opentelemetry-cpp::resources
+    opentelemetry-cpp::otlp_http_exporter
+    opentelemetry-cpp::http_client_curl
     Threads::Threads
   )
 

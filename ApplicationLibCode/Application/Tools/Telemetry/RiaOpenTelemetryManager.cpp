@@ -28,12 +28,18 @@
 #include <thread>
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_factory.h"
+#include "opentelemetry/exporters/otlp/otlp_http_exporter_options.h"
 #include "opentelemetry/sdk/resource/resource.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_factory.h"
+#include "opentelemetry/sdk/trace/batch_span_processor_options.h"
 #include "opentelemetry/sdk/trace/exporter.h"
 #include "opentelemetry/sdk/trace/tracer_provider.h"
+#include "opentelemetry/sdk/trace/tracer_provider_factory.h"
 #include "opentelemetry/trace/provider.h"
 namespace sdk      = opentelemetry::sdk;
 namespace resource = opentelemetry::sdk::resource;
+namespace otlp     = opentelemetry::exporter::otlp;
 #endif
 
 //--------------------------------------------------------------------------------------------------
@@ -142,7 +148,7 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
         return;
     }
 
-    RiaLogging::info( "Shutting down OpenTelemetry" );
+    // RiaLogging::info( "Shutting down OpenTelemetry" );
 
     m_isShuttingDown = true;
     m_enabled        = false;
@@ -167,12 +173,12 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
 
         if ( !finished && !m_eventQueue.empty() )
         {
-            RiaLogging::warning( QString( "OpenTelemetry shutdown timeout: %1 events lost" ).arg( m_eventQueue.size() ) );
+            // RiaLogging::warning( QString( "OpenTelemetry shutdown timeout: %1 events lost" ).arg( m_eventQueue.size() ) );
         }
     }
 
     m_initialized = false;
-    RiaLogging::info( "OpenTelemetry shutdown complete" );
+    // RiaLogging::info( "OpenTelemetry shutdown complete" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -415,6 +421,31 @@ bool RiaOpenTelemetryManager::initializeProvider()
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Parse Azure Application Insights connection string
+/// Format: InstrumentationKey=<key>;IngestionEndpoint=<endpoint>;...
+//--------------------------------------------------------------------------------------------------
+#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
+static std::map<QString, QString> parseAzureConnectionString( const QString& connectionString )
+{
+    std::map<QString, QString> result;
+    QStringList                parts = connectionString.split( ';', Qt::SkipEmptyParts );
+
+    for ( const QString& part : parts )
+    {
+        int equalPos = part.indexOf( '=' );
+        if ( equalPos > 0 )
+        {
+            QString key   = part.left( equalPos ).trimmed();
+            QString value = part.mid( equalPos + 1 ).trimmed();
+            result[key]   = value;
+        }
+    }
+
+    return result;
+}
+#endif
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RiaOpenTelemetryManager::createExporter()
@@ -424,9 +455,85 @@ bool RiaOpenTelemetryManager::createExporter()
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
 
-        // For now, disable span processor creation to avoid crash
-        // Use the default global tracer provider which is safe
-        m_tracer = trace::Provider::GetTracerProvider()->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
+        // Configure OTLP HTTP exporter options
+        otlp::OtlpHttpExporterOptions exporterOptions;
+
+        if ( prefs->activeEnvironment() == "production" )
+        {
+            // Parse Azure connection string
+            auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
+
+            if ( connectionParams.contains( "IngestionEndpoint" ) )
+            {
+                QString endpoint = connectionParams["IngestionEndpoint"];
+                // Azure Application Insights OTLP endpoint
+                // The endpoint should be like: https://<region>.in.applicationinsights.azure.com/v2.1/track
+                // For OTLP, we need to use the /v1/traces endpoint
+                if ( endpoint.endsWith( "/v2.1/track" ) )
+                {
+                    endpoint = endpoint.left( endpoint.length() - 12 ); // Remove "/v2.1/track"
+                }
+                endpoint = endpoint + "/v1/traces";
+
+                exporterOptions.url = endpoint.toStdString();
+            }
+            else
+            {
+                handleError( TelemetryError::ConfigurationError, "IngestionEndpoint not found in connection string" );
+                return false;
+            }
+
+            // Add instrumentation key as header if available
+            if ( connectionParams.contains( "InstrumentationKey" ) )
+            {
+                exporterOptions.http_headers.insert( { "x-api-key", connectionParams["InstrumentationKey"].toStdString() } );
+            }
+        }
+        else // development or local
+        {
+            // Use local OTLP endpoint
+            QString endpoint = prefs->localEndpoint();
+            if ( !endpoint.endsWith( "/v1/traces" ) )
+            {
+                endpoint = endpoint + "/v1/traces";
+            }
+            exporterOptions.url = endpoint.toStdString();
+        }
+
+        // Set timeout from preferences
+        exporterOptions.timeout = std::chrono::milliseconds( prefs->connectionTimeoutMs() );
+
+        // Create OTLP HTTP exporter
+        auto exporter = otlp::OtlpHttpExporterFactory::Create( exporterOptions );
+
+        // Configure batch span processor options
+        sdk::trace::BatchSpanProcessorOptions processorOptions;
+        processorOptions.max_queue_size       = static_cast<size_t>( prefs->maxQueueSize() );
+        processorOptions.schedule_delay_millis = std::chrono::milliseconds( prefs->batchTimeoutMs() );
+        processorOptions.max_export_batch_size = static_cast<size_t>( prefs->maxBatchSize() );
+
+        // Create batch span processor
+        auto processor = sdk::trace::BatchSpanProcessorFactory::Create( std::move( exporter ), processorOptions );
+
+        // Create resource attributes
+        resource::ResourceAttributes attributes;
+        attributes["service.name"]    = prefs->serviceName().toStdString();
+        attributes["service.version"] = prefs->serviceVersion().toStdString();
+        attributes["deployment.environment"] = prefs->activeEnvironment().toStdString();
+
+        auto resourcePtr = resource::Resource::Create( attributes );
+
+        // Create tracer provider with processor and resource
+        m_provider = nostd::shared_ptr<trace::TracerProvider>(
+            sdk::trace::TracerProviderFactory::Create( std::move( processor ), resourcePtr ).release() );
+
+        // Set as global provider
+        trace::Provider::SetTracerProvider( m_provider );
+
+        // Get tracer from provider
+        m_tracer = m_provider->GetTracer( prefs->serviceName().toStdString(), prefs->serviceVersion().toStdString() );
+
+        RiaLogging::info( QString( "OpenTelemetry exporter created for %1 environment" ).arg( prefs->activeEnvironment() ) );
 
         return true;
     }
