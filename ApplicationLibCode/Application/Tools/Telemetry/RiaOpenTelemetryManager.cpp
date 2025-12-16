@@ -92,6 +92,14 @@ bool RiaOpenTelemetryManager::initialize()
 {
     std::lock_guard<std::mutex> lock( m_configMutex );
 
+    // Check if OpenTelemetry is disabled in preferences
+    auto* prefs = RiaPreferencesOpenTelemetry::current();
+    if ( prefs && prefs->loggingState() == RiaPreferencesOpenTelemetry::LoggingState::DISABLED )
+    {
+        RiaLogging::info( "OpenTelemetry is disabled in preferences" );
+        return false;
+    }
+
     if ( m_initialized.load() )
     {
         return true;
@@ -130,8 +138,6 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
         return;
     }
 
-    RiaLogging::info( "Shutting down OpenTelemetry" );
-
     m_isShuttingDown = true;
     m_enabled        = false;
 
@@ -152,15 +158,9 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
         lock.unlock();
 
         m_workerThread->join();
-
-        if ( !finished && !m_eventQueue.empty() )
-        {
-            RiaLogging::warning( QString( "OpenTelemetry shutdown timeout: %1 events lost" ).arg( m_eventQueue.size() ) );
-        }
     }
 
     m_initialized = false;
-    RiaLogging::info( "OpenTelemetry shutdown complete" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -682,24 +682,6 @@ void RiaOpenTelemetryManager::handleError( TelemetryError error, const QString& 
     }
 
     RiaLogging::warning( QString( "OpenTelemetry error: %1" ).arg( context ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::escalateError( TelemetryError error, int severity )
-{
-    // Could implement escalation logic here
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::switchToOfflineMode()
-{
-    // Switch to local logging fallback
-    m_enabled = false;
-    RiaLogging::info( "Switched to offline mode - telemetry will be logged locally" );
 }
 
 //--------------------------------------------------------------------------------------------------

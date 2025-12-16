@@ -25,6 +25,18 @@
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 
+namespace caf
+{
+template <>
+void RiaPreferencesOpenTelemetry::LoggingStateType::setUp()
+{
+    addItem( RiaPreferencesOpenTelemetry::LoggingState::DISABLED, "DISABLED", "Disabled" );
+    addItem( RiaPreferencesOpenTelemetry::LoggingState::DEFAULT, "DEFAULT", "Default" );
+    addItem( RiaPreferencesOpenTelemetry::LoggingState::ALL, "ALL", "All" );
+    setDefault( RiaPreferencesOpenTelemetry::LoggingState::DEFAULT );
+}
+} // namespace caf
+
 CAF_PDM_SOURCE_INIT( RiaPreferencesOpenTelemetry, "RiaPreferencesOpenTelemetry" );
 
 //--------------------------------------------------------------------------------------------------
@@ -34,6 +46,7 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
 {
     CAF_PDM_InitObject( "OpenTelemetry Configuration", "", "", "Configuration for OpenTelemetry crash reporting and telemetry" );
 
+    CAF_PDM_InitField( &m_loggingState, "loggingState", LoggingStateType( LoggingState::DISABLED ), "Logging State" );
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
     m_connectionString.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
@@ -106,7 +119,32 @@ void RiaPreferencesOpenTelemetry::setFieldsReadOnly()
     std::vector<caf::PdmFieldHandle*> fields = this->fields();
     for ( auto field : fields )
     {
+        // Keep logging state editable
+        if ( field == &m_loggingState )
+        {
+            continue;
+        }
         field->uiCapability()->setUiReadOnly( true );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RiaPreferencesOpenTelemetry::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_loggingState );
+
+    // Only show configuration fields if not disabled
+    if ( m_loggingState() != LoggingState::DISABLED )
+    {
+        uiOrdering.add( &m_connectionString );
+        uiOrdering.add( &m_batchTimeoutMs );
+        uiOrdering.add( &m_maxBatchSize );
+        uiOrdering.add( &m_maxQueueSize );
+        uiOrdering.add( &m_memoryThresholdMb );
+        uiOrdering.add( &m_samplingRate );
+        uiOrdering.add( &m_connectionTimeoutMs );
     }
 }
 
@@ -180,4 +218,12 @@ double RiaPreferencesOpenTelemetry::samplingRate() const
 int RiaPreferencesOpenTelemetry::connectionTimeoutMs() const
 {
     return m_connectionTimeoutMs;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesOpenTelemetry::LoggingState RiaPreferencesOpenTelemetry::loggingState() const
+{
+    return m_loggingState();
 }

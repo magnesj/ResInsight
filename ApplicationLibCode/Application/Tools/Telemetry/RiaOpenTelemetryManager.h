@@ -139,8 +139,6 @@ private:
 
     // Circuit breaker and resilience
     void handleError( TelemetryError error, const QString& context );
-    void escalateError( TelemetryError error, int severity );
-    void switchToOfflineMode();
     void attemptReconnection();
     bool isCircuitBreakerOpen() const;
     void resetCircuitBreaker();
