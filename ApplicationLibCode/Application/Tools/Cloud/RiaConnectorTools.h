@@ -34,9 +34,6 @@ QString readStringFromFile( const QString& filePath );
 std::map<QString, QString> readKeyValuePairs( const QString& filePath );
 
 void readCloudConfigFiles( RiaPreferences* preferences );
-
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 bool loadOpenTelemetryConfiguration( const QString& filePath );
-#endif
 
 } // namespace RiaConnectorTools

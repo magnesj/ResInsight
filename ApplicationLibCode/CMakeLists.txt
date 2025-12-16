@@ -233,8 +233,6 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
 
   # Create telemetry source files list
   set(OPENTELEMETRY_FILES
-      Application/RiaPreferencesOpenTelemetry.h
-      Application/RiaPreferencesOpenTelemetry.cpp
       Application/Tools/Telemetry/RiaOpenTelemetryManager.h
       Application/Tools/Telemetry/RiaOpenTelemetryManager.cpp
       Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.h
@@ -245,6 +243,13 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
 
   list(APPEND EXTERNAL_LINK_LIBRARIES ${OPENTELEMETRY_LIBRARIES})
 endif()
+
+# Always include OpenTelemetry preferences
+list(APPEND CPP_SOURCES
+    Application/RiaPreferencesOpenTelemetry.h
+    Application/RiaPreferencesOpenTelemetry.cpp
+)
+
 
 qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
 

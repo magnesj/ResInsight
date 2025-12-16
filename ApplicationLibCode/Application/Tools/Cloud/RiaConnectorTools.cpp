@@ -20,12 +20,9 @@
 
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
+#include "RiaPreferencesOpenTelemetry.h"
 #include "RiaPreferencesOsdu.h"
 #include "RiaPreferencesSumo.h"
-
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "RiaPreferencesOpenTelemetry.h"
-#endif
 
 #include <QDir>
 #include <QFile>
@@ -209,7 +206,6 @@ void RiaConnectorTools::readCloudConfigFiles( RiaPreferences* preferences )
 #endif
 }
 
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -337,4 +333,3 @@ bool RiaConnectorTools::loadOpenTelemetryConfiguration( const QString& filePath 
 
     return true;
 }
-#endif
