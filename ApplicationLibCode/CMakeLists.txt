@@ -245,11 +245,9 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
 endif()
 
 # Always include OpenTelemetry preferences
-list(APPEND CPP_SOURCES
-    Application/RiaPreferencesOpenTelemetry.h
-    Application/RiaPreferencesOpenTelemetry.cpp
+list(APPEND CPP_SOURCES Application/RiaPreferencesOpenTelemetry.h
+     Application/RiaPreferencesOpenTelemetry.cpp
 )
-
 
 qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
 
