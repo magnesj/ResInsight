@@ -18,8 +18,6 @@
 
 #pragma once
 
-#include "RiaOpenTelemetryPrivacyFilter.h"
-
 #include <atomic>
 #include <chrono>
 #include <condition_variable>

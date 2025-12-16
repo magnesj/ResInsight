@@ -97,8 +97,6 @@ bool RiaOpenTelemetryManager::initialize()
         return true;
     }
 
-    auto* prefs = RiaPreferencesOpenTelemetry::current();
-
     if ( !initializeProvider() )
     {
         return false;
@@ -132,7 +130,7 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
         return;
     }
 
-    // RiaLogging::info( "Shutting down OpenTelemetry" );
+    RiaLogging::info( "Shutting down OpenTelemetry" );
 
     m_isShuttingDown = true;
     m_enabled        = false;
@@ -157,12 +155,12 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
 
         if ( !finished && !m_eventQueue.empty() )
         {
-            // RiaLogging::warning( QString( "OpenTelemetry shutdown timeout: %1 events lost" ).arg( m_eventQueue.size() ) );
+            RiaLogging::warning( QString( "OpenTelemetry shutdown timeout: %1 events lost" ).arg( m_eventQueue.size() ) );
         }
     }
 
     m_initialized = false;
-    // RiaLogging::info( "OpenTelemetry shutdown complete" );
+    RiaLogging::info( "OpenTelemetry shutdown complete" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -209,26 +207,18 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
         ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":" << entry.source_line() << "\n";
     }
 
-    std::string rawStackTrace       = ss.str();
-    std::string sanitizedStackTrace = RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( rawStackTrace );
+    std::string rawStackTrace = ss.str();
 
     std::map<std::string, std::string> attributes;
     attributes["crash.signal"]      = std::to_string( signalCode );
     attributes["crash.thread_id"]   = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
-    attributes["crash.stack_trace"] = sanitizedStackTrace;
+    attributes["crash.stack_trace"] = rawStackTrace;
     attributes["service.name"]      = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
     attributes["service.version"]   = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
-    // Filter attributes through privacy filter
-    RiaOpenTelemetryPrivacyFilter::FilterRules rules;
-    rules.filterFilePaths = true;
-    rules.filterUserData  = true;
-
-    auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
-
     // Report with high priority (bypass sampling)
     std::unique_lock<std::mutex> lock( m_queueMutex );
-    m_eventQueue.emplace( "crash.signal_handler", filteredAttributes );
+    m_eventQueue.emplace( "crash.signal_handler", attributes );
     m_healthMetrics.eventsQueued++;
     lock.unlock();
     m_queueCondition.notify_one();
@@ -254,24 +244,16 @@ void RiaOpenTelemetryManager::reportTestCrash( const std::stacktrace& trace )
         ss << "  [" << frame++ << "] " << entry.description() << " at " << entry.source_file() << ":" << entry.source_line() << "\n";
     }
 
-    std::string rawStackTrace       = ss.str();
-    std::string sanitizedStackTrace = RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( rawStackTrace );
+    std::string rawStackTrace = ss.str();
 
     std::map<std::string, std::string> attributes;
     attributes["test.type"]        = "manual_stack_trace";
     attributes["test.thread_id"]   = std::to_string( std::hash<std::thread::id>{}( std::this_thread::get_id() ) );
-    attributes["test.stack_trace"] = sanitizedStackTrace;
+    attributes["test.stack_trace"] = rawStackTrace;
     attributes["service.name"]     = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
     attributes["service.version"]  = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
-    // Filter attributes through privacy filter
-    RiaOpenTelemetryPrivacyFilter::FilterRules rules;
-    rules.filterFilePaths = true;
-    rules.filterUserData  = true;
-
-    auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
-
-    reportEventAsync( "test.stack_trace", filteredAttributes );
+    reportEventAsync( "test.stack_trace", attributes );
 
     RiaLogging::info( "Test stack trace reported to OpenTelemetry" );
 }

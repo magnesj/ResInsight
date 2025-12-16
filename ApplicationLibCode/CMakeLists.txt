@@ -235,8 +235,6 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   set(OPENTELEMETRY_FILES
       Application/Tools/Telemetry/RiaOpenTelemetryManager.h
       Application/Tools/Telemetry/RiaOpenTelemetryManager.cpp
-      Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.h
-      Application/Tools/Telemetry/RiaOpenTelemetryPrivacyFilter.cpp
   )
 
   list(APPEND CPP_SOURCES ${OPENTELEMETRY_FILES})
