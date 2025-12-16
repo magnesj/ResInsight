@@ -52,7 +52,6 @@ public:
     QString activeEnvironment() const;
     QString connectionString() const;
     QString localEndpoint() const;
-    QString protocol() const;
     int     batchTimeoutMs() const;
     int     maxBatchSize() const;
     int     maxQueueSize() const;
@@ -83,7 +82,6 @@ private:
     caf::PdmField<QString> m_activeEnvironment;
     caf::PdmField<QString> m_connectionString;
     caf::PdmField<QString> m_localEndpoint;
-    caf::PdmField<QString> m_protocol;
     caf::PdmField<int>     m_batchTimeoutMs;
     caf::PdmField<int>     m_maxBatchSize;
     caf::PdmField<int>     m_maxQueueSize;

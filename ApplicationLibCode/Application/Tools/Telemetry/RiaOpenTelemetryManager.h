@@ -32,16 +32,7 @@
 #include <thread>
 
 #ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-#include "opentelemetry/nostd/shared_ptr.h"
-#include "opentelemetry/sdk/trace/batch_span_processor.h"
-#include "opentelemetry/sdk/trace/simple_processor.h"
-#include "opentelemetry/sdk/trace/tracer_provider.h"
-#include "opentelemetry/trace/provider.h"
-#include "opentelemetry/trace/tracer.h"
 #include <stacktrace>
-namespace trace = opentelemetry::trace;
-namespace sdk   = opentelemetry::sdk;
-namespace nostd = opentelemetry::nostd;
 #endif
 
 class QString;
@@ -192,10 +183,4 @@ private:
     // Health monitoring
     mutable HealthMetrics m_healthMetrics;
     bool                  m_healthMonitoringEnabled{ true };
-
-#ifdef RESINSIGHT_OPENTELEMETRY_ENABLED
-    // OpenTelemetry objects
-    nostd::shared_ptr<trace::TracerProvider> m_provider;
-    nostd::shared_ptr<trace::Tracer>         m_tracer;
-#endif
 };
