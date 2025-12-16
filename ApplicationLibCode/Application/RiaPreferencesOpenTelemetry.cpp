@@ -22,7 +22,6 @@
 #include "RiaPreferences.h"
 #include "RiaVersionInfo.h"
 
-#include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 
@@ -36,6 +35,7 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitObject( "OpenTelemetry Configuration", "", "", "Configuration for OpenTelemetry crash reporting and telemetry" );
 
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
+    m_connectionString.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_batchTimeoutMs, "batchTimeoutMs", 5000, "Batch Timeout (ms)" );
     CAF_PDM_InitField( &m_maxBatchSize, "maxBatchSize", 512, "Max Batch Size" );
@@ -108,6 +108,14 @@ void RiaPreferencesOpenTelemetry::setFieldsReadOnly()
     {
         field->uiCapability()->setUiReadOnly( true );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RiaPreferencesOpenTelemetry::serviceName() const
+{
+    return QStringLiteral( "ResInsight" );
 }
 
 //--------------------------------------------------------------------------------------------------

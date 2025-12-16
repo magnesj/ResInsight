@@ -47,23 +47,11 @@ RiaOpenTelemetryPrivacyFilter::FilterRules::FilterRules()
 //--------------------------------------------------------------------------------------------------
 std::string RiaOpenTelemetryPrivacyFilter::sanitizeStackTrace( const std::string& stackTrace, const FilterRules& rules )
 {
-    if ( !rules.filterFilePaths && !rules.filterUserData )
-    {
-        return stackTrace;
-    }
-
     std::string sanitized = stackTrace;
 
-    if ( rules.filterFilePaths )
-    {
-        sanitized = removePersonalPaths( sanitized );
-    }
-
-    if ( rules.filterUserData )
-    {
-        sanitized = removeUsernames( sanitized );
-        sanitized = removeEnvironmentVariables( sanitized );
-    }
+    sanitized = removePersonalPaths( sanitized );
+    sanitized = removeUsernames( sanitized );
+    sanitized = removeEnvironmentVariables( sanitized );
 
     return sanitized;
 }

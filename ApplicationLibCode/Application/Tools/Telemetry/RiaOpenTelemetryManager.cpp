@@ -22,6 +22,7 @@
 #include "RiaPreferencesOpenTelemetry.h"
 
 #include <QString>
+
 #include <algorithm>
 #include <random>
 #include <sstream>
@@ -220,8 +221,8 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
 
     // Filter attributes through privacy filter
     RiaOpenTelemetryPrivacyFilter::FilterRules rules;
-    rules.filterFilePaths = RiaPreferencesOpenTelemetry::current()->filterFilePaths();
-    rules.filterUserData  = RiaPreferencesOpenTelemetry::current()->filterUserData();
+    rules.filterFilePaths = true;
+    rules.filterUserData  = true;
 
     auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
 
@@ -265,8 +266,8 @@ void RiaOpenTelemetryManager::reportTestCrash( const std::stacktrace& trace )
 
     // Filter attributes through privacy filter
     RiaOpenTelemetryPrivacyFilter::FilterRules rules;
-    rules.filterFilePaths = RiaPreferencesOpenTelemetry::current()->filterFilePaths();
-    rules.filterUserData  = RiaPreferencesOpenTelemetry::current()->filterUserData();
+    rules.filterFilePaths = true;
+    rules.filterUserData  = true;
 
     auto filteredAttributes = RiaOpenTelemetryPrivacyFilter::filterAttributes( attributes, rules );
 

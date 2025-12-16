@@ -46,7 +46,7 @@ public:
     void setFieldsReadOnly();
 
     // Service name and version are hardcoded, not configurable
-    QString serviceName() const { return "ResInsight"; }
+    QString serviceName() const;
     QString serviceVersion() const; // Read from ResInsightVersion.cmake
 
     // Getters for configuration values
