@@ -146,6 +146,7 @@ void RiaPreferencesOpenTelemetry::defineUiOrdering( QString uiConfigName, caf::P
         uiOrdering.add( &m_samplingRate );
         uiOrdering.add( &m_connectionTimeoutMs );
     }
+    uiOrdering.skipRemainingFields();
 }
 
 //--------------------------------------------------------------------------------------------------
