@@ -222,9 +222,6 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   message(STATUS "OpenTelemetry support enabled")
   add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
 
-  # OpenTelemetry now uses Qt networking (QNetworkAccessManager) instead of CURL
-  # No additional dependencies needed beyond Qt
-
   # Create telemetry source files list
   set(OPENTELEMETRY_FILES
       Application/Tools/Telemetry/RiaOpenTelemetryManager.h

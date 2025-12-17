@@ -414,6 +414,11 @@ bool RiaOpenTelemetryManager::createExporter()
     try
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
+        if ( !prefs )
+        {
+            handleError( TelemetryError::ConfigurationError, "Failed to get OpenTelemetry Preferences" );
+            return false;
+        }
 
         // Parse and validate connection string
         auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
