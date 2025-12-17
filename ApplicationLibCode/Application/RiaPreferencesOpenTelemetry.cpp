@@ -19,10 +19,10 @@
 #include "RiaPreferencesOpenTelemetry.h"
 
 #include "RiaApplication.h"
+#include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaVersionInfo.h"
 
-#include "cafPdmUiLineEditor.h"
 #include "cafPdmUiTextEditor.h"
 
 namespace caf
