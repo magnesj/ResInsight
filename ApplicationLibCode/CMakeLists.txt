@@ -222,12 +222,8 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   message(STATUS "OpenTelemetry support enabled")
   add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
 
-  # Find dependencies for Azure Application Insights REST API
-  find_package(CURL REQUIRED)
-  find_package(Threads REQUIRED)
-
-  list(APPEND OPENTELEMETRY_LIBRARIES CURL::libcurl Threads::Threads
-  )
+  # OpenTelemetry now uses Qt networking (QNetworkAccessManager) instead of CURL
+  # No additional dependencies needed beyond Qt
 
   # Create telemetry source files list
   set(OPENTELEMETRY_FILES
@@ -236,8 +232,6 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   )
 
   list(APPEND CPP_SOURCES ${OPENTELEMETRY_FILES})
-
-  list(APPEND EXTERNAL_LINK_LIBRARIES ${OPENTELEMETRY_LIBRARIES})
 endif()
 
 # Always include OpenTelemetry preferences

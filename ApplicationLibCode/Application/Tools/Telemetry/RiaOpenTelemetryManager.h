@@ -18,9 +18,10 @@
 
 #pragma once
 
+#include <QObject>
+
 #include <atomic>
 #include <chrono>
-#include <condition_variable>
 #include <functional>
 #include <map>
 #include <memory>
@@ -28,9 +29,10 @@
 #include <queue>
 #include <stacktrace>
 #include <string>
-#include <thread>
 
 class QString;
+class QNetworkAccessManager;
+class QTimer;
 
 //==================================================================================================
 //
@@ -38,7 +40,7 @@ class QString;
 // Handles async telemetry reporting with privacy filtering and resilience
 //
 //==================================================================================================
-class RiaOpenTelemetryManager
+class RiaOpenTelemetryManager : public QObject
 {
 public:
     // Error handling
@@ -131,11 +133,12 @@ private:
     void setupResourceAttributes();
 
     // Event processing
-    void workerThread();
     void processEvents();
     void processEvent( const Event& event );
     bool shouldSampleEvent() const;
     void flushPendingEvents();
+    void onProcessEventTimer();
+    void onNetworkReplyFinished();
 
     // Circuit breaker and resilience
     void handleError( TelemetryError error, const QString& context );
@@ -148,10 +151,9 @@ private:
     void sendHealthSpan();
 
     // Thread safety
-    mutable std::mutex      m_configMutex;
-    mutable std::mutex      m_queueMutex;
-    std::condition_variable m_queueCondition;
-    std::queue<Event>       m_eventQueue;
+    mutable std::mutex m_configMutex;
+    mutable std::mutex m_queueMutex;
+    std::queue<Event>  m_eventQueue;
 
     // State
     std::atomic<bool> m_initialized{ false };
@@ -159,8 +161,10 @@ private:
     std::atomic<bool> m_isShuttingDown{ false };
     std::atomic<bool> m_circuitBreakerOpen{ false };
 
-    // Worker thread
-    std::unique_ptr<std::thread> m_workerThread;
+    // Qt networking and timer
+    QNetworkAccessManager* m_networkAccessManager{ nullptr };
+    QTimer*                m_processTimer{ nullptr };
+    QTimer*                m_healthTimer{ nullptr };
 
     // Configuration
     size_t m_maxQueueSize{ 10000 };

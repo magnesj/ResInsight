@@ -22,20 +22,15 @@
 #include "RiaPreferencesOpenTelemetry.h"
 #include "RifJsonEncodeDecode.h"
 
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QString>
+#include <QTimer>
 
 #include <algorithm>
 #include <random>
 #include <sstream>
-#include <thread>
-
-// Windows socket headers must be included before CURL
-#ifdef _WIN32
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#endif
-
-#include <curl/curl.h>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -72,9 +67,20 @@ RiaOpenTelemetryManager& RiaOpenTelemetryManager::instance()
 ///
 //--------------------------------------------------------------------------------------------------
 RiaOpenTelemetryManager::RiaOpenTelemetryManager()
+    : QObject( nullptr )
 {
     m_healthMetrics.systemStartTime    = std::chrono::steady_clock::now();
     m_healthMetrics.lastSuccessfulSend = m_healthMetrics.systemStartTime;
+
+    // Initialize Qt networking components
+    m_networkAccessManager = new QNetworkAccessManager( this );
+
+    // Initialize timers
+    m_processTimer = new QTimer( this );
+    connect( m_processTimer, &QTimer::timeout, this, &RiaOpenTelemetryManager::onProcessEventTimer );
+
+    m_healthTimer = new QTimer( this );
+    connect( m_healthTimer, &QTimer::timeout, this, &RiaOpenTelemetryManager::sendHealthSpan );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -110,20 +116,21 @@ bool RiaOpenTelemetryManager::initialize()
         return false;
     }
 
-    // Start worker thread
+    // Start event processing timer (100ms interval for responsive processing)
     m_isShuttingDown = false;
-    m_workerThread   = std::make_unique<std::thread>( &RiaOpenTelemetryManager::workerThread, this );
+    m_processTimer->start( 100 );
+
+    // Start health monitoring timer (5 minutes interval)
+    if ( m_healthMonitoringEnabled )
+    {
+        m_healthTimer->start( 5 * 60 * 1000 ); // 5 minutes in milliseconds
+        sendHealthSpan();
+    }
 
     m_initialized = true;
     m_enabled     = true;
 
     RiaLogging::info( "OpenTelemetry initialized successfully" );
-
-    // Send initial health span
-    if ( m_healthMonitoringEnabled )
-    {
-        sendHealthSpan();
-    }
 
     return true;
 }
@@ -138,29 +145,26 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
         return;
     }
 
+    RiaLogging::info( "Shutting down OpenTelemetry" );
+
     m_isShuttingDown = true;
     m_enabled        = false;
+
+    // Stop timers
+    if ( m_processTimer )
+    {
+        m_processTimer->stop();
+    }
+    if ( m_healthTimer )
+    {
+        m_healthTimer->stop();
+    }
 
     // Flush pending events
     flushPendingEvents();
 
-    // Wake up worker thread
-    m_queueCondition.notify_all();
-
-    // Wait for worker thread to finish with timeout
-    if ( m_workerThread && m_workerThread->joinable() )
-    {
-        auto deadline = std::chrono::steady_clock::now() + timeout;
-
-        // Try to join with timeout
-        std::unique_lock<std::mutex> lock( m_queueMutex );
-        m_queueCondition.wait_until( lock, deadline, [this]() { return m_eventQueue.empty(); } );
-        lock.unlock();
-
-        m_workerThread->join();
-    }
-
     m_initialized = false;
+    RiaLogging::info( "OpenTelemetry shutdown complete" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -184,9 +188,6 @@ void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, co
 
     m_eventQueue.emplace( eventName, attributes );
     m_healthMetrics.eventsQueued++;
-
-    lock.unlock();
-    m_queueCondition.notify_one();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -221,7 +222,6 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
     m_eventQueue.emplace( "crash.signal_handler", attributes );
     m_healthMetrics.eventsQueued++;
     lock.unlock();
-    m_queueCondition.notify_one();
 
     RiaLogging::error( QString( "Crash reported to OpenTelemetry (signal: %1)" ).arg( signalCode ) );
 }
@@ -406,67 +406,6 @@ static std::map<QString, QString> parseAzureConnectionString( const QString& con
 }
 
 //--------------------------------------------------------------------------------------------------
-/// CURL write callback
-//--------------------------------------------------------------------------------------------------
-static size_t curlWriteCallback( void* contents, size_t size, size_t nmemb, std::string* userp )
-{
-    userp->append( (char*)contents, size * nmemb );
-    return size * nmemb;
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Send telemetry to Azure Application Insights using REST API
-//--------------------------------------------------------------------------------------------------
-static bool sendToApplicationInsights( const std::string& jsonPayload, const QString& endpoint, int timeoutMs, std::string& errorMessage )
-{
-    CURL*       curl;
-    CURLcode    res;
-    std::string readBuffer;
-
-    curl = curl_easy_init();
-    if ( !curl )
-    {
-        errorMessage = "Failed to initialize CURL";
-        return false;
-    }
-
-    std::string url = endpoint.toStdString() + "/v2/track";
-
-    struct curl_slist* headers = nullptr;
-    headers                    = curl_slist_append( headers, "Content-Type: application/json" );
-    headers                    = curl_slist_append( headers, "Accept: application/json" );
-
-    curl_easy_setopt( curl, CURLOPT_URL, url.c_str() );
-    curl_easy_setopt( curl, CURLOPT_POSTFIELDS, jsonPayload.c_str() );
-    curl_easy_setopt( curl, CURLOPT_HTTPHEADER, headers );
-    curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, curlWriteCallback );
-    curl_easy_setopt( curl, CURLOPT_WRITEDATA, &readBuffer );
-    curl_easy_setopt( curl, CURLOPT_TIMEOUT_MS, timeoutMs );
-
-    res = curl_easy_perform( curl );
-
-    long response_code;
-    curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, &response_code );
-
-    curl_slist_free_all( headers );
-    curl_easy_cleanup( curl );
-
-    if ( res != CURLE_OK )
-    {
-        errorMessage = std::string( "CURL failed: " ) + curl_easy_strerror( res );
-        return false;
-    }
-
-    if ( response_code != 200 )
-    {
-        errorMessage = "HTTP error: " + std::to_string( response_code ) + " - " + readBuffer;
-        return false;
-    }
-
-    return true;
-}
-
-//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RiaOpenTelemetryManager::createExporter()
@@ -513,23 +452,11 @@ void RiaOpenTelemetryManager::setupResourceAttributes()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::workerThread()
+void RiaOpenTelemetryManager::onProcessEventTimer()
 {
-    while ( !m_isShuttingDown.load() )
+    if ( !m_isShuttingDown.load() )
     {
         processEvents();
-
-        // Health monitoring
-        if ( m_healthMonitoringEnabled )
-        {
-            static auto lastHealthCheck = std::chrono::steady_clock::now();
-            auto        now             = std::chrono::steady_clock::now();
-            if ( now - lastHealthCheck > std::chrono::minutes( 5 ) )
-            {
-                sendHealthSpan();
-                lastHealthCheck = now;
-            }
-        }
     }
 }
 
@@ -539,9 +466,6 @@ void RiaOpenTelemetryManager::workerThread()
 void RiaOpenTelemetryManager::processEvents()
 {
     std::unique_lock<std::mutex> lock( m_queueMutex );
-
-    // Wait for events or shutdown signal
-    m_queueCondition.wait( lock, [this]() { return !m_eventQueue.empty() || m_isShuttingDown.load(); } );
 
     if ( m_eventQueue.empty() )
     {
@@ -625,23 +549,36 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         // Convert to JSON string
         QString jsonPayload = ResInsightInternalJson::Json::encode( telemetryItem, false );
 
-        // Send to Application Insights
-        std::string errorMessage;
-        bool        success = sendToApplicationInsights( jsonPayload.toStdString(),
-                                                  connectionParams["IngestionEndpoint"],
-                                                  prefs->connectionTimeoutMs(),
-                                                  errorMessage );
+        // Send to Application Insights using QNetworkAccessManager
+        QString url = connectionParams["IngestionEndpoint"] + "/v2/track";
 
-        if ( success )
-        {
-            updateHealthMetrics( true );
-            resetCircuitBreaker();
-        }
-        else
-        {
-            handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( QString::fromStdString( errorMessage ) ) );
-            updateHealthMetrics( false );
-        }
+        QNetworkRequest request;
+        request.setUrl( QUrl( url ) );
+        request.setHeader( QNetworkRequest::ContentTypeHeader, "application/json" );
+        request.setHeader( QNetworkRequest::KnownHeaders( QNetworkRequest::UserAgentHeader ), "ResInsight-OpenTelemetry" );
+        request.setTransferTimeout( prefs->connectionTimeoutMs() );
+
+        QNetworkReply* reply = m_networkAccessManager->post( request, jsonPayload.toUtf8() );
+
+        // Handle response asynchronously
+        connect( reply,
+                 &QNetworkReply::finished,
+                 this,
+                 [this, reply]()
+                 {
+                     if ( reply->error() == QNetworkReply::NoError )
+                     {
+                         updateHealthMetrics( true );
+                         resetCircuitBreaker();
+                     }
+                     else
+                     {
+                         QString errorMsg = QString( "HTTP %1: %2" ).arg( reply->attribute( QNetworkRequest::HttpStatusCodeAttribute ).toInt() ).arg( reply->errorString() );
+                         handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( errorMsg ) );
+                         updateHealthMetrics( false );
+                     }
+                     reply->deleteLater();
+                 } );
     }
     catch ( const std::exception& e )
     {
