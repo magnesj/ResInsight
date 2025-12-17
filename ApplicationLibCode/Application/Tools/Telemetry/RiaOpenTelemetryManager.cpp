@@ -573,7 +573,9 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
                      }
                      else
                      {
-                         QString errorMsg = QString( "HTTP %1: %2" ).arg( reply->attribute( QNetworkRequest::HttpStatusCodeAttribute ).toInt() ).arg( reply->errorString() );
+                         QString errorMsg = QString( "HTTP %1: %2" )
+                                                .arg( reply->attribute( QNetworkRequest::HttpStatusCodeAttribute ).toInt() )
+                                                .arg( reply->errorString() );
                          handleError( TelemetryError::NetworkError, QString( "Failed to send telemetry: %1" ).arg( errorMsg ) );
                          updateHealthMetrics( false );
                      }
