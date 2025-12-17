@@ -88,13 +88,13 @@ public:
     PdmDataValueField& operator=( const PdmDataValueField& other )
     {
         CAF_ASSERT( isInitializedByInitFieldMacro() );
-        m_fieldValue = other.m_fieldValue;
+        m_fieldValue = clampValue( other.m_fieldValue );
         return *this;
     }
     PdmDataValueField& operator=( const DataType& fieldValue )
     {
         CAF_ASSERT( isInitializedByInitFieldMacro() );
-        m_fieldValue = fieldValue;
+        m_fieldValue = clampValue( fieldValue );
         return *this;
     }
 
