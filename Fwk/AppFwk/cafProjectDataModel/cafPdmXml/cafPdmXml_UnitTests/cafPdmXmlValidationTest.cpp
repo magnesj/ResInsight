@@ -68,9 +68,9 @@ TEST( XmlValidationTest, ClampValuesOnLoad )
 
     // Verify values are clamped to valid ranges
     EXPECT_EQ( -273.15, testObj.m_temperature() ); // Clamped to min
-    EXPECT_EQ( 150, testObj.m_age() );             // Clamped to max
-    EXPECT_EQ( 0, testObj.m_count() );             // Clamped to min
-    EXPECT_EQ( 100.0, testObj.m_percentage() );    // Clamped to max
+    EXPECT_EQ( 150, testObj.m_age() ); // Clamped to max
+    EXPECT_EQ( 0, testObj.m_count() ); // Clamped to min
+    EXPECT_EQ( 100.0, testObj.m_percentage() ); // Clamped to max
 }
 
 //--------------------------------------------------------------------------------------------------
