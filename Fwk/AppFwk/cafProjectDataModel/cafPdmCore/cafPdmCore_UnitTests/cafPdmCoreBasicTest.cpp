@@ -825,8 +825,8 @@ TEST( BaseTest, IndependentMinMaxValidation )
     EXPECT_EQ( 0.0, obj->m_minOnly.value() );
 
     obj->m_minOnly.setValue( -5.0 );
-    EXPECT_TRUE( obj->m_minOnly.isValid() );       // Clamped, so valid
-    EXPECT_EQ( 0.0, obj->m_minOnly.value() );      // Clamped to minimum
+    EXPECT_TRUE( obj->m_minOnly.isValid() ); // Clamped, so valid
+    EXPECT_EQ( 0.0, obj->m_minOnly.value() ); // Clamped to minimum
 
     obj->m_minOnly.setValue( 1000000.0 ); // No maximum set, so any large value is valid
     EXPECT_TRUE( obj->m_minOnly.isValid() );
@@ -844,8 +844,8 @@ TEST( BaseTest, IndependentMinMaxValidation )
     EXPECT_EQ( 100.0, obj->m_maxOnly.value() );
 
     obj->m_maxOnly.setValue( 150.0 );
-    EXPECT_TRUE( obj->m_maxOnly.isValid() );      // Clamped, so valid
-    EXPECT_EQ( 100.0, obj->m_maxOnly.value() );   // Clamped to maximum
+    EXPECT_TRUE( obj->m_maxOnly.isValid() ); // Clamped, so valid
+    EXPECT_EQ( 100.0, obj->m_maxOnly.value() ); // Clamped to maximum
 
     obj->m_maxOnly.setValue( -1000000.0 ); // No minimum set, so any small value is valid
     EXPECT_TRUE( obj->m_maxOnly.isValid() );
@@ -854,20 +854,20 @@ TEST( BaseTest, IndependentMinMaxValidation )
     // Test setting min and max independently
     obj->m_both.setMinValue( 0 );
     obj->m_both.setValue( -1 );
-    EXPECT_TRUE( obj->m_both.isValid() );    // Clamped, so valid
-    EXPECT_EQ( 0, obj->m_both.value() );     // Clamped to minimum
+    EXPECT_TRUE( obj->m_both.isValid() ); // Clamped, so valid
+    EXPECT_EQ( 0, obj->m_both.value() ); // Clamped to minimum
 
     obj->m_both.setValue( 100 );
     EXPECT_TRUE( obj->m_both.isValid() ); // No max set yet
     EXPECT_EQ( 100, obj->m_both.value() );
 
     obj->m_both.setMaxValue( 50 );
-    EXPECT_TRUE( obj->m_both.isValid() );   // Value is still valid (wasn't re-set)
-    EXPECT_EQ( 100, obj->m_both.value() );  // Value hasn't changed yet
+    EXPECT_TRUE( obj->m_both.isValid() ); // Value is still valid (wasn't re-set)
+    EXPECT_EQ( 100, obj->m_both.value() ); // Value hasn't changed yet
 
     obj->m_both.setValue( 100 ); // Re-set the value, now it will be clamped
     EXPECT_TRUE( obj->m_both.isValid() );
-    EXPECT_EQ( 50, obj->m_both.value() );   // Clamped to new maximum
+    EXPECT_EQ( 50, obj->m_both.value() ); // Clamped to new maximum
 
     obj->m_both.setValue( 25 );
     EXPECT_TRUE( obj->m_both.isValid() );
@@ -880,8 +880,8 @@ TEST( BaseTest, IndependentMinMaxValidation )
     EXPECT_EQ( -100, obj->m_both.value() ); // Can go below 0 now
 
     obj->m_both.setValue( 100 );
-    EXPECT_TRUE( obj->m_both.isValid() );  // But max still applies
-    EXPECT_EQ( 50, obj->m_both.value() );  // Clamped to max
+    EXPECT_TRUE( obj->m_both.isValid() ); // But max still applies
+    EXPECT_EQ( 50, obj->m_both.value() ); // Clamped to max
 
     obj->m_both.clearMaxValue();
     obj->m_both.setValue( 100 );
@@ -967,13 +967,13 @@ TEST( BaseTest, ObjectValidation )
 
     // Test with out-of-range field - values are now clamped
     obj->m_age.setValue( -5 );
-    EXPECT_TRUE( obj->isValid() );      // Value is clamped, so it's valid
+    EXPECT_TRUE( obj->isValid() ); // Value is clamped, so it's valid
     EXPECT_EQ( 0, obj->m_age.value() ); // Clamped to minimum
 
     // Test with multiple out-of-range fields - both are clamped
     obj->m_percentage.setValue( 150.0 );
-    EXPECT_TRUE( obj->isValid() );             // Values are clamped, so valid
-    EXPECT_EQ( 0, obj->m_age.value() );        // Still clamped
+    EXPECT_TRUE( obj->isValid() ); // Values are clamped, so valid
+    EXPECT_EQ( 0, obj->m_age.value() ); // Still clamped
     EXPECT_EQ( 100.0, obj->m_percentage.value() ); // Clamped to maximum
 
     // All fields are valid now
