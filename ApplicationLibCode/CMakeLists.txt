@@ -223,12 +223,10 @@ if(RESINSIGHT_ENABLE_OPENTELEMETRY)
   add_definitions(-DRESINSIGHT_OPENTELEMETRY_ENABLED)
 
   # Find dependencies for Azure Application Insights REST API
-  find_package(nlohmann_json CONFIG REQUIRED)
   find_package(CURL REQUIRED)
   find_package(Threads REQUIRED)
 
-  list(APPEND OPENTELEMETRY_LIBRARIES CURL::libcurl
-       nlohmann_json::nlohmann_json Threads::Threads
+  list(APPEND OPENTELEMETRY_LIBRARIES CURL::libcurl Threads::Threads
   )
 
   # Create telemetry source files list

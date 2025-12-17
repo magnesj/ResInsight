@@ -10,7 +10,6 @@
     "fast-float",
     "spdlog",
     "pugixml",
-    "nlohmann-json",
     "curl"
   ],
     "overrides": [
