@@ -110,9 +110,7 @@ void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& key
         }
         else
         {
-            RiaLogging::warning(
-                QString( "Unknown OpenTelemetry config key: '%1'" ).arg( key )
-            );
+            RiaLogging::warning( QString( "Unknown OpenTelemetry config key: '%1'" ).arg( key ) );
         }
     }
 }
