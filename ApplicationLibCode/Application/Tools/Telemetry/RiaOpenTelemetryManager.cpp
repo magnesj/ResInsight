@@ -501,6 +501,12 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
     try
     {
         auto* prefs = RiaPreferencesOpenTelemetry::current();
+        if ( !prefs )
+        {
+            handleError( TelemetryError::InternalError, QString( "Failed to access Open Telemetry Preferences." ) );
+            updateHealthMetrics( false );
+            return;
+        }
 
         // Use Application Insights REST API
         auto connectionParams = parseAzureConnectionString( prefs->connectionString() );
