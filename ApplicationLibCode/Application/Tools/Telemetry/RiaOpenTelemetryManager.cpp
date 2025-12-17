@@ -26,6 +26,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QString>
+#include <QSysInfo>
 #include <QTimer>
 
 #include <algorithm>
@@ -536,6 +537,11 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         {
             properties[QString::fromStdString( key )] = QString::fromStdString( value );
         }
+
+        // Add system information
+        properties["os.type"]    = QSysInfo::productType();
+        properties["os.version"] = QSysInfo::productVersion();
+        properties["os.name"]    = QSysInfo::prettyProductName();
 
         // Create Application Insights telemetry item
         QMap<QString, QVariant> baseData;
