@@ -104,7 +104,7 @@ public:
     void     setValue( const DataType& fieldValue )
     {
         CAF_ASSERT( isInitializedByInitFieldMacro() );
-        m_fieldValue = fieldValue;
+        m_fieldValue = clampValue( fieldValue );
     }
     void setValueWithFieldChanged( const DataType& fieldValue );
 
@@ -118,7 +118,9 @@ public:
     void setFromQVariant( const QVariant& variant ) override
     {
         CAF_ASSERT( isInitializedByInitFieldMacro() );
-        PdmValueFieldSpecialization<DataType>::setFromVariant( variant, m_fieldValue );
+        DataType tempValue;
+        PdmValueFieldSpecialization<DataType>::setFromVariant( variant, tempValue );
+        m_fieldValue = clampValue( tempValue );
     }
     bool isReadOnly() const override { return false; }
 
@@ -176,6 +178,28 @@ public:
     QString validate() const override;
 
 protected:
+    // Clamp value to range if defined
+    DataType clampValue( const DataType& value ) const
+    {
+        if constexpr ( std::is_arithmetic<DataType>::value )
+        {
+            DataType clampedValue = value;
+            if ( m_minValue.has_value() && clampedValue < m_minValue.value() )
+            {
+                clampedValue = m_minValue.value();
+            }
+            if ( m_maxValue.has_value() && clampedValue > m_maxValue.value() )
+            {
+                clampedValue = m_maxValue.value();
+            }
+            return clampedValue;
+        }
+        else
+        {
+            return value;
+        }
+    }
+
     DataType m_fieldValue;
 
     // Default value stuff.
@@ -202,12 +226,14 @@ void caf::PdmDataValueField<DataType>::setValueWithFieldChanged( const DataType&
 {
     CAF_ASSERT( isInitializedByInitFieldMacro() );
 
+    DataType clampedValue = clampValue( fieldValue );
+
     PdmUiFieldHandleInterface* uiFieldHandleInterface = capability<PdmUiFieldHandleInterface>();
     if ( uiFieldHandleInterface )
     {
         QVariant oldValue = uiFieldHandleInterface->toUiBasedQVariant();
 
-        m_fieldValue = fieldValue;
+        m_fieldValue = clampedValue;
 
         QVariant newUiBasedQVariant = uiFieldHandleInterface->toUiBasedQVariant();
 
@@ -215,7 +241,7 @@ void caf::PdmDataValueField<DataType>::setValueWithFieldChanged( const DataType&
     }
     else
     {
-        m_fieldValue = fieldValue;
+        m_fieldValue = clampedValue;
     }
 }
 
