@@ -712,59 +712,73 @@ TEST( BaseTest, FieldRangeValidation )
 
     TestObject* obj = new TestObject;
 
-    // Test double field with range
+    // Test double field with range - values are now clamped when set
     obj->m_percentage.setRange( 0.0, 100.0 );
 
     obj->m_percentage.setValue( 50.0 );
     EXPECT_TRUE( obj->m_percentage.isValid() );
     EXPECT_TRUE( obj->m_percentage.validate().isEmpty() );
+    EXPECT_EQ( 50.0, obj->m_percentage.value() );
 
     obj->m_percentage.setValue( 0.0 );
     EXPECT_TRUE( obj->m_percentage.isValid() );
+    EXPECT_EQ( 0.0, obj->m_percentage.value() );
 
     obj->m_percentage.setValue( 100.0 );
     EXPECT_TRUE( obj->m_percentage.isValid() );
+    EXPECT_EQ( 100.0, obj->m_percentage.value() );
 
+    // Values below minimum are clamped to minimum
     obj->m_percentage.setValue( -10.0 );
-    EXPECT_FALSE( obj->m_percentage.isValid() );
-    EXPECT_FALSE( obj->m_percentage.validate().isEmpty() );
-    EXPECT_TRUE( obj->m_percentage.validate().contains( "below minimum" ) );
+    EXPECT_TRUE( obj->m_percentage.isValid() );
+    EXPECT_EQ( 0.0, obj->m_percentage.value() ); // Clamped to minimum
 
+    // Values above maximum are clamped to maximum
     obj->m_percentage.setValue( 150.0 );
-    EXPECT_FALSE( obj->m_percentage.isValid() );
-    EXPECT_TRUE( obj->m_percentage.validate().contains( "exceeds maximum" ) );
+    EXPECT_TRUE( obj->m_percentage.isValid() );
+    EXPECT_EQ( 100.0, obj->m_percentage.value() ); // Clamped to maximum
 
     // Test int field with range
     obj->m_age.setRange( 0, 150 );
 
     obj->m_age.setValue( 25 );
     EXPECT_TRUE( obj->m_age.isValid() );
+    EXPECT_EQ( 25, obj->m_age.value() );
 
+    // Values are clamped when out of range
     obj->m_age.setValue( -5 );
-    EXPECT_FALSE( obj->m_age.isValid() );
+    EXPECT_TRUE( obj->m_age.isValid() );
+    EXPECT_EQ( 0, obj->m_age.value() ); // Clamped to minimum
 
     obj->m_age.setValue( 200 );
-    EXPECT_FALSE( obj->m_age.isValid() );
+    EXPECT_TRUE( obj->m_age.isValid() );
+    EXPECT_EQ( 150, obj->m_age.value() ); // Clamped to maximum
 
-    // Test clearing range
+    // Test clearing range - no clamping after range is cleared
     obj->m_age.clearRange();
     obj->m_age.setValue( -100 );
     EXPECT_TRUE( obj->m_age.isValid() );
+    EXPECT_EQ( -100, obj->m_age.value() );
 
     obj->m_age.setValue( 1000 );
     EXPECT_TRUE( obj->m_age.isValid() );
+    EXPECT_EQ( 1000, obj->m_age.value() );
 
     // Test float field with range
     obj->m_temperature.setRange( -273.15f, 1000.0f );
 
     obj->m_temperature.setValue( 20.0f );
     EXPECT_TRUE( obj->m_temperature.isValid() );
+    EXPECT_EQ( 20.0f, obj->m_temperature.value() );
 
+    // Values are clamped when out of range
     obj->m_temperature.setValue( -300.0f );
-    EXPECT_FALSE( obj->m_temperature.isValid() );
+    EXPECT_TRUE( obj->m_temperature.isValid() );
+    EXPECT_EQ( -273.15f, obj->m_temperature.value() ); // Clamped to minimum
 
     obj->m_temperature.setValue( 1500.0f );
-    EXPECT_FALSE( obj->m_temperature.isValid() );
+    EXPECT_TRUE( obj->m_temperature.isValid() );
+    EXPECT_EQ( 1000.0f, obj->m_temperature.value() ); // Clamped to maximum
 
     // QString field should not have setRange method (SFINAE should exclude it)
     // Uncommenting the following line should cause a compilation error:
@@ -799,62 +813,80 @@ TEST( BaseTest, IndependentMinMaxValidation )
 
     TestObject* obj = new TestObject;
 
-    // Test minimum value only
+    // Test minimum value only - values are now clamped
     obj->m_minOnly.setMinValue( 0.0 );
 
     obj->m_minOnly.setValue( 10.0 );
     EXPECT_TRUE( obj->m_minOnly.isValid() );
+    EXPECT_EQ( 10.0, obj->m_minOnly.value() );
 
     obj->m_minOnly.setValue( 0.0 );
     EXPECT_TRUE( obj->m_minOnly.isValid() );
+    EXPECT_EQ( 0.0, obj->m_minOnly.value() );
 
     obj->m_minOnly.setValue( -5.0 );
-    EXPECT_FALSE( obj->m_minOnly.isValid() );
-    EXPECT_TRUE( obj->m_minOnly.validate().contains( "below minimum" ) );
+    EXPECT_TRUE( obj->m_minOnly.isValid() );       // Clamped, so valid
+    EXPECT_EQ( 0.0, obj->m_minOnly.value() );      // Clamped to minimum
 
     obj->m_minOnly.setValue( 1000000.0 ); // No maximum set, so any large value is valid
     EXPECT_TRUE( obj->m_minOnly.isValid() );
+    EXPECT_EQ( 1000000.0, obj->m_minOnly.value() );
 
     // Test maximum value only
     obj->m_maxOnly.setMaxValue( 100.0 );
 
     obj->m_maxOnly.setValue( 50.0 );
     EXPECT_TRUE( obj->m_maxOnly.isValid() );
+    EXPECT_EQ( 50.0, obj->m_maxOnly.value() );
 
     obj->m_maxOnly.setValue( 100.0 );
     EXPECT_TRUE( obj->m_maxOnly.isValid() );
+    EXPECT_EQ( 100.0, obj->m_maxOnly.value() );
 
     obj->m_maxOnly.setValue( 150.0 );
-    EXPECT_FALSE( obj->m_maxOnly.isValid() );
-    EXPECT_TRUE( obj->m_maxOnly.validate().contains( "exceeds maximum" ) );
+    EXPECT_TRUE( obj->m_maxOnly.isValid() );      // Clamped, so valid
+    EXPECT_EQ( 100.0, obj->m_maxOnly.value() );   // Clamped to maximum
 
     obj->m_maxOnly.setValue( -1000000.0 ); // No minimum set, so any small value is valid
     EXPECT_TRUE( obj->m_maxOnly.isValid() );
+    EXPECT_EQ( -1000000.0, obj->m_maxOnly.value() );
 
     // Test setting min and max independently
     obj->m_both.setMinValue( 0 );
     obj->m_both.setValue( -1 );
-    EXPECT_FALSE( obj->m_both.isValid() );
+    EXPECT_TRUE( obj->m_both.isValid() );    // Clamped, so valid
+    EXPECT_EQ( 0, obj->m_both.value() );     // Clamped to minimum
 
     obj->m_both.setValue( 100 );
     EXPECT_TRUE( obj->m_both.isValid() ); // No max set yet
+    EXPECT_EQ( 100, obj->m_both.value() );
 
     obj->m_both.setMaxValue( 50 );
-    EXPECT_FALSE( obj->m_both.isValid() ); // Now exceeds max
+    EXPECT_TRUE( obj->m_both.isValid() );   // Value is still valid (wasn't re-set)
+    EXPECT_EQ( 100, obj->m_both.value() );  // Value hasn't changed yet
+
+    obj->m_both.setValue( 100 ); // Re-set the value, now it will be clamped
+    EXPECT_TRUE( obj->m_both.isValid() );
+    EXPECT_EQ( 50, obj->m_both.value() );   // Clamped to new maximum
 
     obj->m_both.setValue( 25 );
     EXPECT_TRUE( obj->m_both.isValid() );
+    EXPECT_EQ( 25, obj->m_both.value() );
 
     // Test clearing individual limits
     obj->m_both.clearMinValue();
     obj->m_both.setValue( -100 );
-    EXPECT_TRUE( obj->m_both.isValid() ); // Min cleared, but max still applies
+    EXPECT_TRUE( obj->m_both.isValid() ); // Min cleared
+    EXPECT_EQ( -100, obj->m_both.value() ); // Can go below 0 now
 
     obj->m_both.setValue( 100 );
-    EXPECT_FALSE( obj->m_both.isValid() ); // Max still active
+    EXPECT_TRUE( obj->m_both.isValid() );  // But max still applies
+    EXPECT_EQ( 50, obj->m_both.value() );  // Clamped to max
 
     obj->m_both.clearMaxValue();
+    obj->m_both.setValue( 100 );
     EXPECT_TRUE( obj->m_both.isValid() ); // Both limits cleared
+    EXPECT_EQ( 100, obj->m_both.value() );
 
     delete obj;
 }
@@ -933,23 +965,21 @@ TEST( BaseTest, ObjectValidation )
     EXPECT_TRUE( obj->isValid() );
     EXPECT_TRUE( obj->validate().empty() );
 
-    // Test with invalid field
+    // Test with out-of-range field - values are now clamped
     obj->m_age.setValue( -5 );
-    EXPECT_FALSE( obj->isValid() );
+    EXPECT_TRUE( obj->isValid() );      // Value is clamped, so it's valid
+    EXPECT_EQ( 0, obj->m_age.value() ); // Clamped to minimum
 
-    auto errors = obj->validate();
-    EXPECT_EQ( 1u, errors.size() );
-    EXPECT_TRUE( errors.find( "age" ) != errors.end() );
-    EXPECT_TRUE( errors["age"].contains( "below minimum" ) );
-
-    // Test with multiple invalid fields
+    // Test with multiple out-of-range fields - both are clamped
     obj->m_percentage.setValue( 150.0 );
-    errors = obj->validate();
-    EXPECT_EQ( 2u, errors.size() );
-    EXPECT_TRUE( errors.find( "age" ) != errors.end() );
-    EXPECT_TRUE( errors.find( "percentage" ) != errors.end() );
+    EXPECT_TRUE( obj->isValid() );             // Values are clamped, so valid
+    EXPECT_EQ( 0, obj->m_age.value() );        // Still clamped
+    EXPECT_EQ( 100.0, obj->m_percentage.value() ); // Clamped to maximum
 
-    // Fix all fields
+    // All fields are valid now
+    EXPECT_TRUE( obj->isValid() );
+
+    // Set valid values
     obj->m_age.setValue( 30 );
     obj->m_percentage.setValue( 50.0 );
     EXPECT_TRUE( obj->isValid() );
