@@ -20,6 +20,7 @@
 
 #include "RiaLogging.h"
 #include "RiaPreferencesOpenTelemetry.h"
+#include "RifJsonEncodeDecode.h"
 
 #include <QString>
 
@@ -35,7 +36,6 @@
 #endif
 
 #include <curl/curl.h>
-#include <nlohmann/json.hpp>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -601,24 +601,36 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         std::string timestamp = std::string( timeBuffer ) + msBuffer;
 
         // Convert attributes to JSON properties
-        nlohmann::json properties = nlohmann::json::object();
+        QMap<QString, QVariant> properties;
         for ( const auto& [key, value] : event.attributes )
         {
-            properties[key] = value;
+            properties[QString::fromStdString( key )] = QString::fromStdString( value );
         }
 
         // Create Application Insights telemetry item
-        nlohmann::json telemetryItem = { { "time", timestamp },
-                                         { "iKey", connectionParams["InstrumentationKey"].toStdString() },
-                                         { "name", "Microsoft.ApplicationInsights.Event" },
-                                         { "data",
-                                           { { "baseType", "EventData" },
-                                             { "baseData", { { "name", event.name }, { "properties", properties } } } } } };
+        QMap<QString, QVariant> baseData;
+        baseData["name"]       = QString::fromStdString( event.name );
+        baseData["properties"] = properties;
+
+        QMap<QString, QVariant> data;
+        data["baseType"] = "EventData";
+        data["baseData"] = baseData;
+
+        QMap<QString, QVariant> telemetryItem;
+        telemetryItem["time"] = QString::fromStdString( timestamp );
+        telemetryItem["iKey"] = connectionParams["InstrumentationKey"];
+        telemetryItem["name"] = "Microsoft.ApplicationInsights.Event";
+        telemetryItem["data"] = data;
+
+        // Convert to JSON string
+        QString jsonPayload = ResInsightInternalJson::Json::encode( telemetryItem, false );
 
         // Send to Application Insights
         std::string errorMessage;
-        bool        success =
-            sendToApplicationInsights( telemetryItem.dump(), connectionParams["IngestionEndpoint"], prefs->connectionTimeoutMs(), errorMessage );
+        bool        success = sendToApplicationInsights( jsonPayload.toStdString(),
+                                                  connectionParams["IngestionEndpoint"],
+                                                  prefs->connectionTimeoutMs(),
+                                                  errorMessage );
 
         if ( success )
         {
