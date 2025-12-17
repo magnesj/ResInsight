@@ -29,6 +29,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <map>
+
 class RimKeywordBcprop;
 class RimEclipseCase;
 class RimEclipseView;
@@ -77,8 +79,19 @@ protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    std::map<QString, QString> validate( const QString& configName ) const override;
 
 private:
+    enum WizardPageEnum : unsigned int
+    {
+        ExportSettings     = 0,
+        GridBoxSelection   = 1,
+        GridRefinement     = 2,
+        BoundaryConditions = 3,
+        SimulationJob      = 4,
+        TotalPages         = 5
+    };
+
     void           applyBoundaryDefaults();
     static QString defaultFolder();
 
