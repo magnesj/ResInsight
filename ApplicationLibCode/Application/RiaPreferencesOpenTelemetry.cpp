@@ -108,6 +108,12 @@ void RiaPreferencesOpenTelemetry::setData( const std::map<QString, QString>& key
         {
             m_connectionTimeoutMs = value.toInt();
         }
+        else
+        {
+            RiaLogging::warning(
+                QString( "Unknown OpenTelemetry config key: '%1'" ).arg( key )
+            );
+        }
     }
 }
 
