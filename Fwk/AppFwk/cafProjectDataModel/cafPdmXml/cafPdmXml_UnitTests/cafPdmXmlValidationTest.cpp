@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 
 #include "cafPdmDataValueField.h"
+#include "cafPdmDefaultObjectFactory.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmXmlObjectHandle.h"
 #include "cafPdmXmlObjectHandleMacros.h"
@@ -34,10 +35,10 @@ public:
         m_percentage.setMaxValue( 100.0 );
     }
 
-    caf::PdmField<double> m_temperature;
-    caf::PdmField<int>    m_age;
-    caf::PdmField<int>    m_count;
-    caf::PdmField<double> m_percentage;
+    caf::PdmDataValueField<double> m_temperature;
+    caf::PdmDataValueField<int>    m_age;
+    caf::PdmDataValueField<int>    m_count;
+    caf::PdmDataValueField<double> m_percentage;
 };
 
 CAF_PDM_XML_SOURCE_INIT( ValidationTestObjectXml, "ValidationTestObjectXml" );
@@ -64,7 +65,7 @@ TEST( XmlValidationTest, ClampValuesOnLoad )
     xmlStream.readNext(); // Read root element
 
     ValidationTestObjectXml testObj;
-    testObj.readFields( xmlStream );
+    testObj.readFields( xmlStream, caf::PdmDefaultObjectFactory::instance(), false );
 
     // Verify values are clamped to valid ranges
     EXPECT_EQ( -273.15, testObj.m_temperature() ); // Clamped to min
@@ -95,7 +96,7 @@ TEST( XmlValidationTest, PreserveValidValuesOnLoad )
     xmlStream.readNext(); // Read root element
 
     ValidationTestObjectXml testObj;
-    testObj.readFields( xmlStream );
+    testObj.readFields( xmlStream, caf::PdmDefaultObjectFactory::instance(), false );
 
     // Verify values are preserved
     EXPECT_EQ( 25.0, testObj.m_temperature() );
