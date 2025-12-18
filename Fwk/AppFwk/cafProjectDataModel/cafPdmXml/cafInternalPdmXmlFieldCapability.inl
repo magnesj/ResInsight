@@ -1,7 +1,6 @@
 
 #include "cafAssert.h"
 #include "cafInternalPdmFieldIoHelper.h"
-#include "cafPdmDataValueField.h"
 #include "cafPdmObjectFactory.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmReferenceHelper.h"
@@ -10,9 +9,23 @@
 #include <QStringList>
 
 #include <iostream>
+#include <type_traits>
 
 namespace caf
 {
+// SFINAE helper to detect if a field type has a clampValue method
+template <typename T, typename DataType>
+class has_clamp_value
+{
+    template <typename U>
+    static auto test( int ) -> decltype( std::declval<U>().clampValue( std::declval<DataType>() ), std::true_type{} );
+
+    template <typename>
+    static std::false_type test( ... );
+
+public:
+    static constexpr bool value = decltype( test<T>( 0 ) )::value;
+};
 //==================================================================================================
 /// XML Implementation for PdmFieldXmlCap<> methods
 ///
@@ -39,8 +52,8 @@ std::vector<QString> caf::PdmFieldXmlCap<FieldType>::readFieldData( QXmlStreamRe
     typename FieldType::FieldDataType value;
     PdmFieldReader<typename FieldType::FieldDataType>::readFieldData( value, xmlStream, m_field );
 
-    // Clamp value if the field is a PdmDataValueField
-    if constexpr ( std::is_base_of_v<PdmDataValueField<typename FieldType::FieldDataType>, FieldType> )
+    // Clamp value if the field has a clampValue method
+    if constexpr ( has_clamp_value<FieldType, typename FieldType::FieldDataType>::value )
     {
         value = m_field->clampValue( value );
     }
