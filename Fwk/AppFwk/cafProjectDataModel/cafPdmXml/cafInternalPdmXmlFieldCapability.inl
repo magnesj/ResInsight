@@ -1,6 +1,7 @@
 
 #include "cafAssert.h"
 #include "cafInternalPdmFieldIoHelper.h"
+#include "cafPdmDataValueField.h"
 #include "cafPdmObjectFactory.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmReferenceHelper.h"
@@ -37,6 +38,13 @@ std::vector<QString> caf::PdmFieldXmlCap<FieldType>::readFieldData( QXmlStreamRe
     this->assertValid();
     typename FieldType::FieldDataType value;
     PdmFieldReader<typename FieldType::FieldDataType>::readFieldData( value, xmlStream, m_field );
+
+    // Clamp value if the field is a PdmDataValueField
+    if constexpr ( std::is_base_of_v<PdmDataValueField<typename FieldType::FieldDataType>, FieldType> )
+    {
+        value = m_field->clampValue( value );
+    }
+
     m_field->setValue( value );
     return {};
 }

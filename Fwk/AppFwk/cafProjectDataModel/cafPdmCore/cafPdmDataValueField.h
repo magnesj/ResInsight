@@ -175,7 +175,6 @@ public:
     // Override validate from PdmFieldHandle
     QString validate() const override;
 
-protected:
     // Clamp value to range if defined
     DataType clampValue( const DataType& value ) const
     {
@@ -198,6 +197,7 @@ protected:
         }
     }
 
+protected:
     DataType m_fieldValue;
 
     // Default value stuff.
