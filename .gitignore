@@ -69,6 +69,7 @@ CMakeUserPresets.json
 # Tool files
 .vscode
 .claude
+nul
 
 # Temp files
 *.temp
@@ -81,3 +82,4 @@ CMakeUserPresets.json
 
 #Python
 *.pyc
+/build/
