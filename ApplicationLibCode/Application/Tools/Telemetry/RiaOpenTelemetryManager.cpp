@@ -139,7 +139,7 @@ bool RiaOpenTelemetryManager::initialize()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
+void RiaOpenTelemetryManager::shutdown()
 {
     if ( !m_initialized.load() )
     {
