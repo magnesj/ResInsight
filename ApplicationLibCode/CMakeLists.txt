@@ -217,7 +217,6 @@ endif()
 #
 # OpenTelemetry
 #
-# 
 set(OPENTELEMETRY_FILES
     Application/RiaPreferencesOpenTelemetry.h
     Application/RiaPreferencesOpenTelemetry.cpp
