@@ -308,6 +308,15 @@ void RiaOpenTelemetryManager::setErrorCallback( ErrorCallback callback )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaOpenTelemetryManager::setUsername( const std::string& username )
+{
+    std::lock_guard<std::mutex> lock( m_configMutex );
+    m_username = username;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::setMaxQueueSize( size_t maxEvents )
 {
     std::lock_guard<std::mutex> lock( m_configMutex );
@@ -559,6 +568,15 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         properties["os.type"]    = QSysInfo::productType();
         properties["os.version"] = QSysInfo::productVersion();
         properties["os.name"]    = QSysInfo::prettyProductName();
+
+        // Add username if configured
+        {
+            std::lock_guard<std::mutex> lock( m_configMutex );
+            if ( !m_username.empty() )
+            {
+                properties["user.name"] = QString::fromStdString( m_username );
+            }
+        }
 
         // Create Application Insights telemetry item
         QMap<QString, QVariant> baseData;
