@@ -168,6 +168,15 @@ void RiaOpenTelemetryManager::shutdown()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RiaOpenTelemetryManager::reinitialize()
+{
+    shutdown();
+    return initialize();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, const std::map<std::string, std::string>& attributes )
 {
     if ( !isEnabled() || isCircuitBreakerOpen() || !shouldSampleEvent() )
