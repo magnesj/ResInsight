@@ -80,6 +80,7 @@ public:
     };
 
     static RiaOpenTelemetryManager& instance();
+    static QString                  getSystemUsername();
 
     bool initialize();
     void shutdown();

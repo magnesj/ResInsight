@@ -482,7 +482,17 @@ void RiaGuiApplication::initialize()
     auto& otelManager = RiaOpenTelemetryManager::instance();
     if ( otelManager.initialize() )
     {
-        RiaLogging::info( "OpenTelemetry initialized successfully" );
+        // Set system username for telemetry tracking
+        QString username = RiaOpenTelemetryManager::getSystemUsername();
+        if ( !username.isEmpty() )
+        {
+            otelManager.setUsername( username.toStdString() );
+            RiaLogging::info( QString( "OpenTelemetry initialized successfully with username: %1" ).arg( username ) );
+        }
+        else
+        {
+            RiaLogging::info( "OpenTelemetry initialized successfully" );
+        }
     }
     else
     {

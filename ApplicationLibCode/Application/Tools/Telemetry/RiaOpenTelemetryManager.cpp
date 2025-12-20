@@ -25,6 +25,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QProcessEnvironment>
 #include <QString>
 #include <QSysInfo>
 #include <QTimer>
@@ -62,6 +63,32 @@ RiaOpenTelemetryManager& RiaOpenTelemetryManager::instance()
 {
     static RiaOpenTelemetryManager instance;
     return instance;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Get system username in a cross-platform way
+/// Returns username from environment variables (USERNAME on Windows, USER on Linux)
+//--------------------------------------------------------------------------------------------------
+QString RiaOpenTelemetryManager::getSystemUsername()
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    // Try Windows environment variable first
+    QString username = env.value( "USERNAME" );
+    if ( !username.isEmpty() )
+    {
+        return username;
+    }
+
+    // Try Linux/Unix environment variable
+    username = env.value( "USER" );
+    if ( !username.isEmpty() )
+    {
+        return username;
+    }
+
+    // Fallback
+    return QString();
 }
 
 //--------------------------------------------------------------------------------------------------
