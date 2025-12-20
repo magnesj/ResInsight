@@ -82,7 +82,7 @@ public:
     static RiaOpenTelemetryManager& instance();
 
     bool initialize();
-    void shutdown( std::chrono::seconds timeout = std::chrono::seconds( 30 ) );
+    void shutdown();
 
     // Event reporting
     void reportEventAsync( const std::string& eventName, const std::map<std::string, std::string>& attributes );
