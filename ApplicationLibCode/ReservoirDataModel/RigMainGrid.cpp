@@ -810,6 +810,28 @@ const RigFault* RigMainGrid::findFaultFromCellIndexAndCellFace( size_t reservoir
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Returns the name of the closest fault, the distance to the fault, and the face type of the closest face
+//--------------------------------------------------------------------------------------------------
+std::tuple<QString, double, cvf::StructGridInterface::FaceType> RigMainGrid::minimumDistanceFaultToPoint( const cvf::Vec3d& point ) const
+{
+    double                             minDistance = std::numeric_limits<double>::max();
+    cvf::StructGridInterface::FaceType minFace     = cvf::StructGridInterface::FaceType::NO_FACE;
+    QString                            minFaultName;
+    for ( const auto& fault : m_faults )
+    {
+        auto [faultMinDistance, faultMinFace] = fault->minimumDistanceToPoint( point, this );
+
+        if ( faultMinDistance < minDistance )
+        {
+            minDistance  = faultMinDistance;
+            minFace      = faultMinFace;
+            minFaultName = fault->name();
+        }
+    }
+    return { minFaultName, minDistance, minFace };
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<size_t> RigMainGrid::findIntersectingCells( const cvf::BoundingBox& inputBB ) const

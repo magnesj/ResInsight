@@ -27,6 +27,8 @@
 #include "cvfBoundingBox.h"
 #include "cvfCollection.h"
 
+#include <QString>
+
 #include <vector>
 
 class RigActiveCellInfo;
@@ -116,6 +118,8 @@ public:
     // invalidate all cells with I > iLimit (0 based index)
     void invalidateCellsAboveI( size_t iLimit );
 
+    std::tuple<QString, double, cvf::StructGridInterface::FaceType> minimumDistanceFaultToPoint( const cvf::Vec3d& point ) const;
+
 protected: // only for use by file readers and internal services. TODO: replace with a better API
     friend class RigGridBase;
     friend class RigReservoirBuilder;
@@ -124,7 +128,7 @@ protected: // only for use by file readers and internal services. TODO: replace 
     friend class RifReaderEclipseOutput;
     friend class RifReaderOpmCommon;
     friend class RiaGrpcCaseService;
-    friend class RiaActiveCellInfoStateHandler;
+    friend class RiaGrpcActiveCellInfoStateHandler;
     friend class RicCreateTemporaryLgrFeature;
     friend class RimCornerPointCase;
     std::vector<RigCell>&       reservoirCells();
