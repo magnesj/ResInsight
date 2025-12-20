@@ -83,6 +83,7 @@ public:
 
     bool initialize();
     void shutdown();
+    bool reinitialize();
 
     // Event reporting
     void reportEventAsync( const std::string& eventName, const std::map<std::string, std::string>& attributes );
