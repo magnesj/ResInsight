@@ -180,5 +180,5 @@ private:
 
     // Health monitoring
     mutable HealthMetrics m_healthMetrics;
-    bool                  m_healthMonitoringEnabled{ true };
+    bool                  m_healthMonitoringEnabled{ false };
 };
