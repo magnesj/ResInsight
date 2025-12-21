@@ -1645,25 +1645,6 @@ void RiaApplication::initialize()
     RiaCafLoggingManager::initializeCafLogging();
 
     initializeDataLoadController();
-
-    RiaConnectorTools::readCloudConfigFiles( m_preferences.get() );
-
-    // Initialize OpenTelemetry after configuration is loaded
-    auto& otelManager = RiaOpenTelemetryManager::instance();
-    if ( otelManager.initialize() )
-    {
-        // Set system username for telemetry tracking
-        QString username = RiaOpenTelemetryManager::getSystemUsername();
-        if ( !username.isEmpty() )
-        {
-            otelManager.setUsername( username.toStdString() );
-        }
-        RiaLogging::info( "OpenTelemetry initialized successfully" );
-    }
-    else
-    {
-        RiaLogging::debug( "OpenTelemetry initialization failed or not configured" );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
