@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RiaStatisticsTools.h"
+#include "RigStatisticsTools.h"
 
 #include <cmath>
 #include <cstddef>
@@ -107,7 +107,7 @@ public:
 
     void addValue( double value )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( value ) )
+        if ( RigStatisticsTools::isValidNumber<double>( value ) )
         {
             if ( value < min )
             {
@@ -186,7 +186,7 @@ public:
 
     void addValue( double value )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( value ) )
+        if ( RigStatisticsTools::isValidNumber<double>( value ) )
         {
             if ( value < pos && value > 0 )
             {
@@ -231,7 +231,7 @@ public:
 
     void addValue( double value )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( value ) )
+        if ( RigStatisticsTools::isValidNumber<double>( value ) )
         {
             valueSum += value;
             ++sampleCount;
@@ -265,7 +265,7 @@ public:
 
     void addValue( double value )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( value ) )
+        if ( RigStatisticsTools::isValidNumber<double>( value ) )
         {
             uniqueValues.insert( static_cast<int>( value ) );
         }

@@ -50,7 +50,7 @@ void RigStatisticsMath::calculateBasicStatistics( const std::vector<double>& val
     for ( size_t i = 0; i < values.size(); i++ )
     {
         double val = values[i];
-        if ( RiaStatisticsTools::isInvalidNumber<double>( val ) ) continue;
+        if ( RigStatisticsTools::isInvalidNumber<double>( val ) ) continue;
 
         validValueCount++;
 
@@ -110,7 +110,7 @@ void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& va
 
     sortedValues.erase( std::remove_if( sortedValues.begin(),
                                         sortedValues.end(),
-                                        []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
+                                        []( double x ) { return !RigStatisticsTools::isValidNumber( x ); } ),
                         sortedValues.end() );
 
     std::sort( sortedValues.begin(), sortedValues.end() );
@@ -174,7 +174,7 @@ std::vector<double> RigStatisticsMath::calculateNearestRankPercentiles( const st
 
     for ( size_t i = 0; i < inputValues.size(); ++i )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( inputValues[i] ) )
+        if ( RigStatisticsTools::isValidNumber<double>( inputValues[i] ) )
         {
             sortedValues.push_back( inputValues[i] );
         }
@@ -218,7 +218,7 @@ std::vector<double> RigStatisticsMath::calculateInterpolatedPercentiles( const s
 
     for ( size_t i = 0; i < inputValues.size(); ++i )
     {
-        if ( RiaStatisticsTools::isValidNumber<double>( inputValues[i] ) )
+        if ( RigStatisticsTools::isValidNumber<double>( inputValues[i] ) )
         {
             sortedValues.push_back( inputValues[i] );
         }
@@ -290,7 +290,7 @@ RigHistogramCalculator::RigHistogramCalculator( double min, double max, size_t n
 //--------------------------------------------------------------------------------------------------
 void RigHistogramCalculator::addValue( double value )
 {
-    if ( RiaStatisticsTools::isInvalidNumber<double>( value ) ) return;
+    if ( RigStatisticsTools::isInvalidNumber<double>( value ) ) return;
 
     size_t index = 0;
 
