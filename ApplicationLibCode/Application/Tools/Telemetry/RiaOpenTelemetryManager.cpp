@@ -265,11 +265,8 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
     attributes["service.name"]      = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
     attributes["service.version"]   = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
-    // Report with high priority (bypass sampling)
-    std::unique_lock<std::mutex> lock( m_queueMutex );
-    m_eventQueue.emplace( "crash.signal_handler", attributes );
-    m_healthMetrics.eventsQueued++;
-    lock.unlock();
+    reportEventAsync( "crash.signal_handler", attributes );
+    flushPendingEvents();
 
     RiaLogging::error( QString( "Crash reported to OpenTelemetry (signal: %1)" ).arg( signalCode ) );
 }
