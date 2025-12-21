@@ -54,17 +54,13 @@ set(PROJECT_FILES
 
 qt_add_executable(
   ${PROJECT_NAME} ${PROJECT_FILES} ${MOC_SOURCE_FILES} ${QRC_FILES}
-  $<TARGET_OBJECTS:cafCommandFeatures> # Needed for cmake version < 3.12. Remove
-  # when we can use target_link_libraries with OBJECT libraries
 )
 
 set(TAP_LINK_LIBRARIES cafUserInterface)
 
 if(USE_COMMAND_FRAMEWORK)
-  set(TAP_LINK_LIBRARIES
-      ${TAP_LINK_LIBRARIES} cafCommand
-      # cafCommandFeatures # Not possible using cmake version < 3.12. Use when
-      # we can use target_link_libraries with OBJECT libraries
+  set(TAP_LINK_LIBRARIES ${TAP_LINK_LIBRARIES} cafCommand
+                         $<LINK_LIBRARY:WHOLE_ARCHIVE,cafCommandFeatures>
   )
 endif(USE_COMMAND_FRAMEWORK)
 

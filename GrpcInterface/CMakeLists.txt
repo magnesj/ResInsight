@@ -128,10 +128,10 @@ set(_LINK_LIBRARIES
     LibCore
     CommonCode
     cafCommand
-    cafCommandFeatures
+    # cafCommandFeatures and ApplicationLibCode removed - linked with WHOLE_ARCHIVE in executables
     cafProjectDataModel
     cafPdmScripting
-    ApplicationLibCode)
+    )
 
 # Proto files
 file(GLOB GRPC_PROTO_FILES GrpcProtos/*.proto)
@@ -223,7 +223,7 @@ list(
 list(APPEND GRPC_PYTHON_SOURCES ${GRPC_PYTHON_GENERATED_SOURCES})
 
 add_library(
-  ${PROJECT_NAME} OBJECT
+  ${PROJECT_NAME} STATIC
   ${SOURCE_GROUP_HEADER_FILES} ${SOURCE_GROUP_SOURCE_FILES}
   ${GRPC_HEADER_FILES} ${GRPC_CPP_SOURCES})
 
@@ -232,6 +232,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   PRIVATE
   ${GRPC_INCLUDE_DIRS}
   ${CMAKE_BINARY_DIR}/Generated
+  $<TARGET_PROPERTY:ApplicationLibCode,INTERFACE_INCLUDE_DIRECTORIES>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${_LINK_LIBRARIES})

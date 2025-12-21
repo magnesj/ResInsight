@@ -110,7 +110,8 @@ add_library(
   RigFemAddressDefines.cpp
 )
 
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
+                                                  PRIVATE $<TARGET_PROPERTY:ApplicationLibCode,INTERFACE_INCLUDE_DIRECTORIES>)
 
 target_link_libraries(
   RigGeoMechDataModel PUBLIC LibCore cafPdmCvf cafTensor cafUserInterface
