@@ -17,6 +17,7 @@ qt_standard_project_setup()
 set(PROJECT_FILES
     cafAssert.h
     cafAppEnum.h
+    cafAppEnumMapper.h
     cafClassTypeName.h
     cafPdmBase.h
     cafPdmChildArrayField.h

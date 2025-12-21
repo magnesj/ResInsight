@@ -42,6 +42,7 @@
 #include <QString>
 #include <QStringList>
 
+#include "cafAppEnumMapper.h"
 #include <map>
 #include <vector>
 
@@ -123,7 +124,7 @@ template <class T>
 class AppEnum : public AppEnumInterface
 {
 public:
-    AppEnum() { m_value = EnumMapper::instance()->defaultValue(); }
+    AppEnum() { m_value = AppEnumMapper<T>::instance()->defaultValue(); }
     AppEnum( T value )
         : m_value( value )
     {
@@ -145,59 +146,60 @@ public:
     operator T() const { return m_value; }
 
     T       value() const { return m_value; }
-    size_t  index() const { return EnumMapper::instance()->index( m_value ); }
-    QString text() const { return EnumMapper::instance()->text( m_value ); }
-    QString uiText() const { return EnumMapper::instance()->uiText( m_value ); }
+    size_t  index() const { return AppEnumMapper<T>::instance()->index( m_value ); }
+    QString text() const { return AppEnumMapper<T>::instance()->text( m_value ); }
+    QString uiText() const { return AppEnumMapper<T>::instance()->uiText( m_value ); }
 
     AppEnum& operator=( T value )
     {
         m_value = value;
         return *this;
     }
-    bool setFromText( const QString& text ) { return EnumMapper::instance()->enumVal( m_value, text ); }
-    bool setFromIndex( size_t index ) { return EnumMapper::instance()->enumVal( m_value, index ); }
+    bool setFromText( const QString& text ) { return AppEnumMapper<T>::instance()->enumVal( m_value, text ); }
+    bool setFromIndex( size_t index ) { return AppEnumMapper<T>::instance()->enumVal( m_value, index ); }
 
     QString textForSerialization() const override { return text(); }
     void    setTextForSerialization( const QString& text ) override { setFromText( text ); }
 
     // Static interface to access the properties of the enum definition
 
-    static bool   isValid( const QString& text ) { return EnumMapper::instance()->isValid( text ); }
-    static bool   isValid( size_t index ) { return index < EnumMapper::instance()->size(); }
-    static size_t size() { return EnumMapper::instance()->size(); }
+    static bool   isValid( const QString& text ) { return AppEnumMapper<T>::instance()->isValid( text ); }
+    static bool   isValid( size_t index ) { return index < AppEnumMapper<T>::instance()->size(); }
+    static size_t size() { return AppEnumMapper<T>::instance()->size(); }
 
-    static QStringList uiTexts() { return EnumMapper::instance()->uiTexts(); }
+    static QStringList uiTexts() { return AppEnumMapper<T>::instance()->uiTexts(); }
     static T           fromIndex( size_t idx )
     {
         T val;
-        EnumMapper::instance()->enumVal( val, idx );
+        AppEnumMapper<T>::instance()->enumVal( val, idx );
         return val;
     }
     static T fromText( const QString& text )
     {
         T val;
-        EnumMapper::instance()->enumVal( val, text );
+        AppEnumMapper<T>::instance()->enumVal( val, text );
         return val;
     }
-    static size_t  index( T enumValue ) { return EnumMapper::instance()->index( enumValue ); }
-    static QString text( T enumValue ) { return EnumMapper::instance()->text( enumValue ); }
+    static size_t  index( T enumValue ) { return AppEnumMapper<T>::instance()->index( enumValue ); }
+    static QString text( T enumValue ) { return AppEnumMapper<T>::instance()->text( enumValue ); }
     static QString textFromIndex( size_t idx ) { return text( fromIndex( idx ) ); }
-    static QString uiText( T enumValue ) { return EnumMapper::instance()->uiText( enumValue ); }
+    static QString uiText( T enumValue ) { return AppEnumMapper<T>::instance()->uiText( enumValue ); }
     static QString uiTextFromIndex( size_t idx ) { return uiText( fromIndex( idx ) ); }
 
-private:
     //==================================================================================================
     /// The setup method is supposed to be specialized for each and every type instantiation of this class,
     /// and is supposed to set up the mapping between enum values, text and ui-text using the \m addItem
     /// method. It may also set a default value using \m setDefault
     //==================================================================================================
     static void setUp();
+
+private:
     static void addItem( T enumVal, const QString& text, const QString& uiText, const QStringList& aliases = {} )
     {
-        EnumMapper::instance()->addItem( enumVal, text, uiText, aliases );
+        AppEnumMapper<T>::instance()->addItem( enumVal, text, uiText, aliases );
     }
 
-    static void setDefault( T defaultEnumValue ) { EnumMapper::instance()->setDefault( defaultEnumValue ); }
+    static void setDefault( T defaultEnumValue ) { AppEnumMapper<T>::instance()->setDefault( defaultEnumValue ); }
 
     T m_value;
 
@@ -209,176 +211,6 @@ private:
     /// but AppEnum implementation gets nicer this way.
     /// The real core of this class is the vector map member and the static instance method
     //==================================================================================================
-
-    class EnumMapper
-    {
-    private:
-        class EnumData
-        {
-        public:
-            EnumData( T enumVal, const QString& text, const QString& uiText, const QStringList& aliases )
-                : m_enumVal( enumVal )
-                , m_text( text )
-                , m_uiText( uiText )
-                , m_aliases( aliases )
-            {
-            }
-
-            bool isMatching( const QString& text ) const { return ( text == m_text || m_aliases.contains( text ) ); }
-
-            T           m_enumVal;
-            QString     m_text;
-            QString     m_uiText;
-            QStringList m_aliases;
-        };
-
-    public:
-        void addItem( T enumVal, const QString& text, QString uiText, const QStringList& aliases )
-        {
-            // Make sure the alias text is unique for enum
-            for ( const auto& alias : aliases )
-            {
-                for ( const auto& enumData : instance()->m_mapping )
-                {
-                    CAF_ASSERT( !enumData.isMatching( alias ) );
-                }
-            }
-
-            // Make sure the text is trimmed, as this text is streamed to XML and will be trimmed when read back
-            // from XML text https://github.com/OPM/ResInsight/issues/7829
-            instance()->m_mapping.push_back( EnumData( enumVal, text.trimmed(), uiText, aliases ) );
-        }
-
-        static EnumMapper* instance()
-        {
-            static EnumMapper storedInstance;
-            static bool       isInitialized = false;
-            if ( !isInitialized )
-            {
-                isInitialized = true;
-                AppEnum<T>::setUp();
-            }
-            return &storedInstance;
-        }
-
-        void setDefault( T defaultEnumValue )
-        {
-            m_defaultValue      = defaultEnumValue;
-            m_defaultValueIsSet = true;
-        }
-
-        T defaultValue() const
-        {
-            if ( m_defaultValueIsSet )
-            {
-                return m_defaultValue;
-            }
-            else
-            {
-                // CAF_ASSERT(m_mapping.size());
-                return m_mapping[0].m_enumVal;
-            }
-        }
-
-        bool isValid( const QString& text ) const
-        {
-            size_t idx;
-            for ( idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                if ( text == m_mapping[idx].m_text ) return true;
-            }
-
-            return false;
-        }
-
-        size_t size() const { return m_mapping.size(); }
-
-        bool enumVal( T& value, const QString& text ) const
-        {
-            value = defaultValue();
-
-            QString trimmedText = text.trimmed();
-
-            for ( size_t idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                // Make sure the text parsed from a text stream is trimmed
-                // https://github.com/OPM/ResInsight/issues/7829
-                if ( m_mapping[idx].isMatching( trimmedText ) )
-                {
-                    value = m_mapping[idx].m_enumVal;
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        bool enumVal( T& value, size_t index ) const
-        {
-            value = defaultValue();
-            if ( index < m_mapping.size() )
-            {
-                value = m_mapping[index].m_enumVal;
-                return true;
-            }
-            else
-                return false;
-        }
-
-        size_t index( T enumValue ) const
-        {
-            size_t idx;
-            for ( idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                if ( enumValue == m_mapping[idx].m_enumVal ) return idx;
-            }
-
-            return idx;
-        }
-
-        QString uiText( T value ) const
-        {
-            size_t idx;
-            for ( idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                if ( value == m_mapping[idx].m_enumVal ) return m_mapping[idx].m_uiText;
-            }
-            return "";
-        }
-
-        QStringList uiTexts() const
-        {
-            QStringList uiTextList;
-            size_t      idx;
-            for ( idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                uiTextList.append( m_mapping[idx].m_uiText );
-            }
-            return uiTextList;
-        }
-
-        QString text( T value ) const
-        {
-            size_t idx;
-            for ( idx = 0; idx < m_mapping.size(); ++idx )
-            {
-                if ( value == m_mapping[idx].m_enumVal ) return m_mapping[idx].m_text;
-            }
-            return "";
-        }
-
-    private:
-        EnumMapper()
-            : m_defaultValue( T() )
-            , m_defaultValueIsSet( false )
-        {
-        }
-
-        friend class AppEnum<T>;
-
-        std::vector<EnumData> m_mapping;
-        T                     m_defaultValue;
-        bool                  m_defaultValueIsSet;
-    };
 };
 
 template <class T>
