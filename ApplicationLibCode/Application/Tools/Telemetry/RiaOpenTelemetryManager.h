@@ -101,7 +101,6 @@ public:
     void   setMaxQueueSize( size_t maxEvents );
     void   enableBackpressure( bool enable );
     void   setMemoryThreshold( size_t maxMemoryMB );
-    void   setSamplingRate( double rate );
     size_t getCurrentQueueSize() const;
 
     // Health monitoring
@@ -138,10 +137,8 @@ private:
     // Event processing
     void processEvents();
     void processEvent( const Event& event );
-    bool shouldSampleEvent() const;
     void flushPendingEvents();
     void onProcessEventTimer();
-    void onNetworkReplyFinished();
 
     // Circuit breaker and resilience
     void handleError( TelemetryError error, const QString& context );
@@ -173,7 +170,6 @@ private:
     size_t      m_maxQueueSize{ 10000 };
     bool        m_backpressureEnabled{ true };
     size_t      m_memoryThresholdMB{ 50 };
-    double      m_samplingRate{ 1.0 };
     std::string m_username;
 
     // Error handling

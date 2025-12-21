@@ -206,7 +206,7 @@ bool RiaOpenTelemetryManager::reinitialize()
 //--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, const std::map<std::string, std::string>& attributes )
 {
-    if ( !isEnabled() || isCircuitBreakerOpen() || !shouldSampleEvent() )
+    if ( !isEnabled() || isCircuitBreakerOpen() )
     {
         return;
     }
@@ -366,15 +366,6 @@ void RiaOpenTelemetryManager::setMemoryThreshold( size_t maxMemoryMB )
 {
     std::lock_guard<std::mutex> lock( m_configMutex );
     m_memoryThresholdMB = maxMemoryMB;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::setSamplingRate( double rate )
-{
-    std::lock_guard<std::mutex> lock( m_configMutex );
-    m_samplingRate = std::clamp( rate, 0.0, 1.0 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -661,22 +652,6 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         handleError( TelemetryError::InternalError, QString( "Failed to process event: %1" ).arg( e.what() ) );
         updateHealthMetrics( false );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaOpenTelemetryManager::shouldSampleEvent() const
-{
-    if ( m_samplingRate >= 1.0 )
-    {
-        return true;
-    }
-
-    static thread_local std::mt19937                           gen( std::random_device{}() );
-    static thread_local std::uniform_real_distribution<double> dis( 0.0, 1.0 );
-
-    return dis( gen ) < m_samplingRate;
 }
 
 //--------------------------------------------------------------------------------------------------
