@@ -250,12 +250,9 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
                                                            QString                    uiConfigName,
                                                            caf::PdmUiEditorAttribute* attribute )
 {
-    auto* lineEditorAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-
     if ( field == &m_exportParametersFilename || field == &m_exportGridFilename || field == &m_exportFaultsFilename )
     {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
         {
             myAttr->m_selectSaveFileName  = true;
             myAttr->m_fileSelectionFilter = "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)";
@@ -263,8 +260,7 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
     }
     else if ( field == &selectedKeywords )
     {
-        auto myAttr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( myAttr )
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
         {
             myAttr->heightHint = 280;
         }
@@ -272,8 +268,7 @@ void RicExportEclipseSectorModelUi::defineEditorAttribute( const caf::PdmFieldHa
 
     if ( field == &m_exportFolder )
     {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
+        if ( auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
         {
             myAttr->m_selectDirectory = true;
         }
