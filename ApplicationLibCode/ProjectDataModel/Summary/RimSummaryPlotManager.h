@@ -57,7 +57,7 @@ private:
 
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
-    void onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) override;
+    void onSelectionManagerSelectionChanged() override;
 
     // Override eventFilter to be able to track key events from QWidget
     bool eventFilter( QObject* obj, QEvent* event ) override;

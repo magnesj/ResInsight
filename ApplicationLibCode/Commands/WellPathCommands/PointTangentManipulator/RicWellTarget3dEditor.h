@@ -49,7 +49,7 @@ protected:
 
 private slots:
     void slotUpdated( const cvf::Vec3d& origin, const cvf::Vec3d& tangent );
-    void slotSelectedIn3D();
+    void slotSelectedIn3D( bool selected, int selectionLevel );
     void slotDragFinished();
 
 private:

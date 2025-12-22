@@ -35,7 +35,7 @@ CAF_CMD_SOURCE_INIT( RicNewWellPathAttributeFeature, "RicNewWellPathAttributeFea
 bool RicNewWellPathAttributeFeature::isCommandEnabled() const
 {
     {
-        const auto objects = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>( caf::SelectionManager::FIRST_LEVEL );
+        const auto objects = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
         if ( !objects.empty() )
         {
             return true;
@@ -58,17 +58,17 @@ bool RicNewWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathAttributeFeature::onActionTriggered( bool isChecked )
 {
-    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>( caf::SelectionManager::FIRST_LEVEL );
+    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
     RimWellPathAttribute* attribute = nullptr;
     if ( attributes.size() == 1u )
     {
-        auto attributeCollection = attributes[0]->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();
+        auto attributeCollection = ( *attributes.begin() )->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();
 
         attribute = new RimWellPathAttribute;
 
         auto wellPath = attributeCollection->firstAncestorOrThisOfType<RimWellPath>();
         attribute->setDepthsFromWellPath( wellPath );
-        attributeCollection->insertAttribute( attributes[0], attribute );
+        attributeCollection->insertAttribute( ( *attributes.begin() ), attribute );
 
         attributeCollection->updateAllRequiredEditors();
     }
@@ -105,7 +105,7 @@ void RicNewWellPathAttributeFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathAttributeFeature::setupActionLook( QAction* actionToSetup )
 {
-    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>( caf::SelectionManager::FIRST_LEVEL );
+    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
     if ( attributes.size() == 1u )
     {
         actionToSetup->setText( QString( "Insert New Attribute before %1" ).arg( attributes[0]->componentTypeLabel() ) );

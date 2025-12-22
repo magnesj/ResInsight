@@ -144,21 +144,7 @@ void PdmUiTableView::enableHeaderText( bool enable )
     m_listViewEditor->enableHeaderText( enable );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTableView::setTableSelectionLevel( int selectionLevel )
-{
-    m_listViewEditor->setTableSelectionLevel( selectionLevel );
-}
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTableView::setRowSelectionLevel( int selectionLevel )
-{
-    m_listViewEditor->setRowSelectionLevel( selectionLevel );
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

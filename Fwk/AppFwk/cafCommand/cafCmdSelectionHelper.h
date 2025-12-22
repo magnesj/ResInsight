@@ -46,9 +46,8 @@ class PdmObjectHandle;
 class CmdSelectionHelper
 {
 public:
-    static void executeSelectionCommand( const std::vector<PdmObjectHandle*>& selection, int selectionLevel );
-    static CmdSelectionChangeExec* createSelectionCommand( const std::vector<PdmObjectHandle*>& selection,
-                                                           int                                  selectionLevel );
+    static void executeSelectionCommand( const std::vector<PdmObjectHandle*>& selection );
+    static CmdSelectionChangeExec* createSelectionCommand( const std::vector<PdmObjectHandle*>& selection );
 };
 
 } // end namespace caf

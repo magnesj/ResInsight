@@ -99,7 +99,7 @@ protected:
 
     QString fullName() const override;
 
-    void onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) override;
+    void onSelectionManagerSelectionChanged() override;
 
 private:
     void updateCells();

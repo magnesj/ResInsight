@@ -367,7 +367,7 @@ bool PdmUiLineEditor::isMultipleFieldsWithSameKeywordSelected( PdmFieldHandle* e
     fieldsToUpdate.push_back( editorField );
 
     // For current selection, find all fields with same keyword
-    const auto items = SelectionManager::instance()->selectedItems( SelectionManager::FIRST_LEVEL );
+    const auto items = SelectionManager::instance()->selectedItems();
 
     for ( size_t i = 0; i < items.size(); i++ )
     {

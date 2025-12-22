@@ -56,46 +56,34 @@ class PdmChildArrayFieldHandle;
 class SelectionManager
 {
 public:
-    enum SelectionLevel
-    {
-        UNDEFINED    = -1,
-        BASE_LEVEL   = 0,
-        FIRST_LEVEL  = 1,
-        SECOND_LEVEL = 2
-    };
-
-public:
     static SelectionManager* instance();
 
-    PdmUiItem*              selectedItem( int selectionLevel = 0 ) const;
-    std::vector<PdmUiItem*> selectedItems( int selectionLevel = 0 ) const;
+    PdmUiItem*              selectedItem() const;
+    std::vector<PdmUiItem*> selectedItems() const;
 
     void setSelectedItem( PdmUiItem* item );
-    void setSelectedItemAtLevel( PdmUiItem* item, int selectionLevel );
 
     bool setSelectedItems( const std::vector<PdmUiItem*>& items );
-    void setSelectedItemsAtLevel( const std::vector<PdmUiItem*>& items, int selectionLevel = 0 );
 
     struct SelectionItem
     {
         PdmUiItem* item;
-        int        selectionLevel;
     };
     void setSelection( const std::vector<SelectionItem> completeSelection );
 
-    std::vector<QString> selectionAsReferences( int selectionLevel = 0 ) const;
-    void setSelectionAtLevelFromReferences( const std::vector<QString>& referenceList, int selectionLevel );
+    std::vector<QString> selectionAsReferences() const;
+    void setSelectionFromReferences( const std::vector<QString>& referenceList );
 
-    bool isSelected( PdmUiItem* item, int selectionLevel ) const;
+    bool isSelected( PdmUiItem* item ) const;
 
     void clearAll();
-    void clear( int selectionLevel );
+    void clear();
     void removeObjectFromAllSelections( PdmObjectHandle* pdmObject );
 
     template <typename T>
-    std::vector<T*> objectsByType( int selectionLevel = 0 ) const
+    std::vector<T*> objectsByType() const
     {
-        std::vector<PdmUiItem*> items = selectedItems( selectionLevel );
+        std::vector<PdmUiItem*> items = selectedItems();
 
         std::vector<T*> typedObjects;
         for ( size_t i = 0; i < items.size(); i++ )
@@ -110,9 +98,9 @@ public:
     /// Returns the selected objects of the requested type if _all_ the selected objects are of the requested type
 
     template <typename T>
-    std::vector<T*> objectsByTypeStrict( int selectionLevel = 0 ) const
+    std::vector<T*> objectsByTypeStrict() const
     {
-        std::vector<PdmUiItem*> items = selectedItems( selectionLevel );
+        std::vector<PdmUiItem*> items = selectedItems();
 
         std::vector<T*> typedObjects;
         for ( size_t i = 0; i < items.size(); i++ )
@@ -128,9 +116,9 @@ public:
     }
 
     template <typename T>
-    T* selectedItemOfType( int selectionLevel = 0 ) const
+    T* selectedItemOfType() const
     {
-        std::vector<T*> typedObjects = objectsByType<T>( selectionLevel );
+        std::vector<T*> typedObjects = objectsByType<T>();
         if ( !typedObjects.empty() )
         {
             return typedObjects.front();
@@ -139,9 +127,9 @@ public:
     }
 
     template <typename T>
-    T* selectedItemAncestorOfType( int selectionLevel = 0 ) const
+    T* selectedItemAncestorOfType() const
     {
-        PdmUiItem*       item           = this->selectedItem( selectionLevel );
+        PdmUiItem*       item           = this->selectedItem();
         PdmObjectHandle* selectedObject = dynamic_cast<PdmObjectHandle*>( item );
         if ( selectedObject )
         {
@@ -167,9 +155,9 @@ private:
         const std::vector<PdmUiItem*>&                                   items,
         std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>* internalSelectionItems );
 
-    void          notifySelectionChanged( const std::set<int>& changedSelectionLevels );
-    std::set<int> findChangedLevels(
-        const std::map<int, std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>>& newCompleteSelectionMap ) const;
+    void          notifySelectionChanged();
+    bool hasChanged(
+        const std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>& newCompleteSelection) const;
 
     friend class SelectionChangedReceiver;
     void registerSelectionChangedReceiver( SelectionChangedReceiver* receiver )
@@ -182,7 +170,7 @@ private:
     }
 
 private:
-    std::map<int, std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>> m_selectionPrLevel;
+    std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>> m_selection;
 
     PdmChildArrayFieldHandle*   m_activeChildArrayFieldHandle;
     PdmPointer<PdmObjectHandle> m_rootObject;

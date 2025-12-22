@@ -1007,15 +1007,13 @@ void RimPolygonFilter::onObjectChanged( const caf::SignalEmitter* emitter )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPolygonFilter::onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels )
+void RimPolygonFilter::onSelectionManagerSelectionChanged()
 {
-    bool selectedState  = m_isSelected;
-    auto selectedFilter = dynamic_cast<RimPolygonFilter*>( caf::SelectionManager::instance()->selectedItem() );
-    m_isSelected        = ( selectedFilter == this );
-
-    if ( selectedState != m_isSelected )
+    bool newIsSelected = caf::SelectionManager::instance()->isSelected( this );
+    if ( newIsSelected != m_isSelected )
     {
-        filterChanged.send();
+        m_isSelected = newIsSelected;
+        updateConnectedEditors();
     }
 }
 

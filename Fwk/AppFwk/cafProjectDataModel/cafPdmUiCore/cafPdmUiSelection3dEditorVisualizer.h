@@ -65,7 +65,7 @@ public:
     void updateVisibleEditors();
 
 private:
-    void onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) override;
+    void onSelectionManagerSelectionChanged() override;
 
     std::vector<QPointer<PdmUi3dObjectEditorHandle>> m_active3DEditors;
     QPointer<QWidget>                                m_ownerViewer;

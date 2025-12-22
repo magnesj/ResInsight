@@ -150,15 +150,20 @@ void RicPolylineTarget3dEditor::slotUpdated( const cvf::Vec3d& origin, const cvf
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicPolylineTarget3dEditor::slotSelectedIn3D()
+void RicPolylineTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLevel )
 {
-    auto* target = dynamic_cast<RimPolylineTarget*>( pdmObject() );
-    if ( !target )
+    if ( selected )
     {
-        return;
+        caf::SelectionManager::instance()->setSelectedItem(
+            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
+            selectionLevel );
     }
-
-    caf::SelectionManager::instance()->setSelectedItemAtLevel( target, caf::SelectionManager::FIRST_LEVEL );
+    else
+    {
+        caf::SelectionManager::instance()->removeItem(
+            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
+            selectionLevel );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -143,7 +143,7 @@ void RimSummaryPlotManager::resetDataSourceSelection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryPlotManager::onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels )
+void RimSummaryPlotManager::onSelectionManagerSelectionChanged()
 {
     updateUiFromSelection();
 }

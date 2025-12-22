@@ -325,15 +325,18 @@ void RicWellTarget3dEditor::slotUpdated( const cvf::Vec3d& origin, const cvf::Ve
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicWellTarget3dEditor::slotSelectedIn3D()
+void RicWellTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLevel )
 {
-    auto* target = dynamic_cast<RimWellPathTarget*>( pdmObject() );
-    if ( !target )
+    if ( selected )
     {
-        return;
+        caf::SelectionManager::instance()->setSelectedItem(
+            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
     }
-
-    caf::SelectionManager::instance()->setSelectedItemAtLevel( target, caf::SelectionManager::FIRST_LEVEL );
+    else
+    {
+        caf::SelectionManager::instance()->removeObjectFromAllSelections(
+            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

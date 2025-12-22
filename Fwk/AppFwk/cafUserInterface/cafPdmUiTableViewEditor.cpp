@@ -108,8 +108,6 @@ PdmUiTableViewEditor::PdmUiTableViewEditor()
 
     m_checkboxDelegate = new PdmUiCheckBoxDelegate();
 
-    m_tableSelectionLevel               = SelectionManager::BASE_LEVEL;
-    m_rowSelectionLevel                 = SelectionManager::FIRST_LEVEL;
     m_isBlockingSelectionManagerChanged = false;
     m_isUpdatingSelectionQModel         = false;
 }
@@ -189,8 +187,6 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         childArrayFH->ownerObject()->uiCapability()->editorAttribute( childArrayFH, uiConfigName, &editorAttrib );
         editorAttribLoaded = true;
 
-        this->setTableSelectionLevel( editorAttrib.tableSelectionLevel );
-        this->setRowSelectionLevel( editorAttrib.rowSelectionLevel );
         this->enableHeaderText( editorAttrib.enableHeaderText );
 
         QString styleSheetTable;
@@ -339,33 +335,19 @@ void PdmUiTableViewEditor::enableHeaderText( bool enable )
     m_tableHeadingIcon->setVisible( enable );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTableViewEditor::setTableSelectionLevel( int selectionLevel )
-{
-    m_tableSelectionLevel = selectionLevel;
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiTableViewEditor::setRowSelectionLevel( int selectionLevel )
-{
-    m_rowSelectionLevel = selectionLevel;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmUiTableViewEditor::onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels )
+void PdmUiTableViewEditor::onSelectionManagerSelectionChanged()
 {
     if ( !m_tableView->isVisible() || m_isBlockingSelectionManagerChanged ) return;
 
-    if ( isSelectionRoleDefined() && ( changedSelectionLevels.count( m_rowSelectionLevel ) ) )
+    if ( isSelectionRoleDefined() )
     {
         QItemSelection totalSelection;
-        for ( auto item : SelectionManager::instance()->selectedItems( m_rowSelectionLevel ) )
+        for ( auto item : SelectionManager::instance()->selectedItems() )
         {
             PdmObject*     pdmObj        = dynamic_cast<PdmObject*>( item );
             QItemSelection itemSelection = m_tableModelPdm->modelIndexFromPdmObject( pdmObj );
@@ -405,7 +387,7 @@ void PdmUiTableViewEditor::slotSelectionChanged( const QItemSelection& selected,
 //--------------------------------------------------------------------------------------------------
 bool PdmUiTableViewEditor::isSelectionRoleDefined() const
 {
-    return m_rowSelectionLevel != SelectionManager::UNDEFINED;
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -428,7 +410,7 @@ void PdmUiTableViewEditor::updateSelectionManagerFromTableSelection()
 {
     if ( isSelectionRoleDefined() )
     {
-        std::set<PdmUiItem*> selectedRowObjects;
+        std::vector<PdmUiItem*> selectedRowObjects;
         QModelIndexList      modelIndexList = m_tableView->selectionModel()->selectedIndexes();
         for ( const QModelIndex& mi : modelIndexList )
         {
@@ -436,25 +418,12 @@ void PdmUiTableViewEditor::updateSelectionManagerFromTableSelection()
 
             if ( obj && obj->uiCapability() )
             {
-                selectedRowObjects.insert( obj->uiCapability() );
+                selectedRowObjects.push_back( obj->uiCapability() );
             }
         }
 
-        std::vector<SelectionManager::SelectionItem> newCompleteSelection;
-
-        for ( auto item : selectedRowObjects )
-        {
-            newCompleteSelection.push_back( { item, m_rowSelectionLevel } );
-        }
-
-        if ( childArrayFieldHandle() && childArrayFieldHandle()->ownerObject() )
-        {
-            newCompleteSelection.push_back(
-                { childArrayFieldHandle()->ownerObject()->uiCapability(), m_tableSelectionLevel } );
-        }
-
         m_isBlockingSelectionManagerChanged = true;
-        SelectionManager::instance()->setSelection( newCompleteSelection );
+        SelectionManager::instance()->setSelectedItems( selectedRowObjects );
         m_isBlockingSelectionManagerChanged = false;
     }
 }

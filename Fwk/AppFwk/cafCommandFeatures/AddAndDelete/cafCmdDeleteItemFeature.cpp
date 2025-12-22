@@ -63,7 +63,7 @@ CmdExecuteCommand* CmdDeleteItemFeature::createExecuteCommand()
 
     caf::PdmObjectHandle* currentPdmObject = nullptr;
 
-    const auto selectedItems = caf::SelectionManager::instance()->selectedItems( SelectionManager::FIRST_LEVEL );
+    const auto selectedItems = caf::SelectionManager::instance()->selectedItems();
     for ( size_t i = 0; i < selectedItems.size(); i++ )
     {
         if ( dynamic_cast<caf::PdmUiObjectHandle*>( selectedItems[i] ) )
@@ -104,7 +104,7 @@ CmdExecuteCommand* CmdDeleteItemFeature::createExecuteCommand()
 bool CmdDeleteItemFeature::isCommandEnabled() const
 {
     caf::PdmObject* currentPdmObject = dynamic_cast<caf::PdmObject*>(
-        caf::SelectionManager::instance()->selectedItem( caf::SelectionManager::FIRST_LEVEL ) );
+        caf::SelectionManager::instance()->selectedItem() );
     if ( !currentPdmObject ) return false;
 
     caf::PdmChildArrayFieldHandle* childArrayFieldHandle =

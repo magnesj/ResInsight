@@ -37,7 +37,7 @@ CAF_CMD_SOURCE_INIT( RicDeleteDiameterRoughnessIntervalFeature, "RicDeleteDiamet
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteDiameterRoughnessIntervalFeature::isCommandEnabled() const
 {
-    if ( caf::SelectionManager::instance()->selectedItemOfType<RimDiameterRoughnessInterval>( caf::SelectionManager::FIRST_LEVEL ) )
+    if ( caf::SelectionManager::instance()->selectedItemOfType<RimDiameterRoughnessInterval>() )
     {
         return true;
     }
@@ -75,7 +75,7 @@ bool RicDeleteDiameterRoughnessIntervalFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteDiameterRoughnessIntervalFeature::onActionTriggered( bool isChecked )
 {
-    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimDiameterRoughnessInterval>( caf::SelectionManager::FIRST_LEVEL );
+    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimDiameterRoughnessInterval>();
     RimDiameterRoughnessIntervalCollection* intervalCollection = nullptr;
 
     if ( !intervals.empty() )
@@ -143,7 +143,7 @@ void RicDeleteDiameterRoughnessIntervalFeature::onActionTriggered( bool isChecke
 //--------------------------------------------------------------------------------------------------
 void RicDeleteDiameterRoughnessIntervalFeature::setupActionLook( QAction* actionToSetup )
 {
-    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimDiameterRoughnessInterval>( caf::SelectionManager::FIRST_LEVEL );
+    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimDiameterRoughnessInterval>();
     if ( !intervals.empty() )
     {
         if ( intervals.size() == 1 )

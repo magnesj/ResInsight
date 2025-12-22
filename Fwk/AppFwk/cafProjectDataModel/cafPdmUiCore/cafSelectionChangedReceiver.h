@@ -48,7 +48,7 @@ public:
 protected:
     friend class SelectionManager;
     /// Called whenever caf::SelectionManager's selection changes
-    virtual void onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) = 0;
+    virtual void onSelectionManagerSelectionChanged() = 0;
 };
 
 } // namespace caf
