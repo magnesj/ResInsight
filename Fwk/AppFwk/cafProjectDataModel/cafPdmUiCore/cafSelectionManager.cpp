@@ -97,9 +97,8 @@ bool SelectionManager::setSelectedItems( const std::vector<PdmUiItem*>& items )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void SelectionManager::extractInternalSelectionItems(
-    const std::vector<PdmUiItem*>&                                   items,
-    std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>* newSelection )
+void SelectionManager::extractInternalSelectionItems( const std::vector<PdmUiItem*>& items,
+                                                      std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>* newSelection )
 {
     for ( size_t i = 0; i < items.size(); i++ )
     {
@@ -137,8 +136,7 @@ void SelectionManager::setSelection( const std::vector<SelectionItem> completeSe
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool SelectionManager::hasChanged(
-    const std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>& newSelection ) const
+bool SelectionManager::hasChanged( const std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>& newSelection ) const
 {
     return m_selection != newSelection;
 }
@@ -283,15 +281,16 @@ void SelectionManager::removeObjectFromAllSelections( PdmObjectHandle* pdmObject
 {
     bool changed = false;
     m_selection.erase( std::remove_if( m_selection.begin(),
-                                      m_selection.end(),
-                                      [&]( const std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>& selection ) {
-                                          if ( selection.first.p() == pdmObject )
-                                          {
-                                              changed = true;
-                                              return true;
-                                          }
-                                          return false;
-                                      } ),
+                                       m_selection.end(),
+                                       [&]( const std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>& selection )
+                                       {
+                                           if ( selection.first.p() == pdmObject )
+                                           {
+                                               changed = true;
+                                               return true;
+                                           }
+                                           return false;
+                                       } ),
                        m_selection.end() );
 
     if ( changed )

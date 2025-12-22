@@ -37,12 +37,11 @@ CAF_CMD_SOURCE_INIT( RicNewWellPathListTargetFeature, "RicNewWellPathListTargetF
 //--------------------------------------------------------------------------------------------------
 bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 {
-    auto selectedTargets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( selectedTargets.size() == 1 )
     {
         auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
-        auto wellPath = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        auto wellPath    = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
         if ( firstTarget->parent() != wellPath->wellPathGeometry() )
         {
             return false;
@@ -53,12 +52,11 @@ bool RicNewWellPathListTargetFeature::isCommandEnabled() const
         return false;
     }
 
-    auto geomDefs =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+    auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
-        auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        auto wellPath    = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
         if ( wellGeomDef->wellPath() == wellPath )
         {
             return true;
@@ -73,23 +71,21 @@ bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathListTargetFeature::onActionTriggered( bool )
 {
-    auto selectedTargets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !selectedTargets.empty() )
     {
-        auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
+        auto                    firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
         RimWellPathGeometryDef* wellGeomDef = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPathGeometryDef>();
-        auto cmd = new RimcWellPathNewTarget( wellGeomDef );
+        auto                    cmd         = new RimcWellPathNewTarget( wellGeomDef );
         cmd->execute();
     }
     else
     {
-        auto geomDefs =
-            caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+        auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
         if ( !geomDefs.empty() )
         {
             auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
-            auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+            auto wellPath    = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
             if ( wellGeomDef->wellPath() == wellPath )
             {
                 auto cmd = new RimcWellPathNewTarget( wellGeomDef );
@@ -106,12 +102,11 @@ void RicNewWellPathListTargetFeature::setupActionLook( QAction* action )
 {
     action->setEnabled( true );
 
-    auto selectedTargets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( selectedTargets.size() == 1 )
     {
         auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
-        auto wellPath = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        auto wellPath    = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
         if ( firstTarget->parent() == wellPath->wellPathGeometry() )
         {
             action->setEnabled( false );
@@ -119,12 +114,11 @@ void RicNewWellPathListTargetFeature::setupActionLook( QAction* action )
         }
     }
 
-    auto geomDefs =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+    auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
-        auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        auto wellPath    = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
         if ( wellGeomDef->wellPath() == wellPath )
         {
         }

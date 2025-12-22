@@ -66,7 +66,6 @@ public:
     void setUiConfigurationName( QString uiConfigName );
     void enableHeaderText( bool enable );
 
-
     PdmObjectHandle* pdmObjectFromModelIndex( const QModelIndex& mi );
 
     QTableView* tableView();

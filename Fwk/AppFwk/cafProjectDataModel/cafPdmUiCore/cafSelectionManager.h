@@ -73,7 +73,7 @@ public:
     void setSelection( const std::vector<SelectionItem> completeSelection );
 
     std::vector<QString> selectionAsReferences() const;
-    void setSelectionFromReferences( const std::vector<QString>& referenceList );
+    void                 setSelectionFromReferences( const std::vector<QString>& referenceList );
 
     bool isSelected( PdmUiItem* item ) const;
 
@@ -156,9 +156,8 @@ private:
         const std::vector<PdmUiItem*>&                                   items,
         std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>* internalSelectionItems );
 
-    void          notifySelectionChanged();
-    bool hasChanged(
-        const std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>& newCompleteSelection) const;
+    void notifySelectionChanged();
+    bool hasChanged( const std::vector<std::pair<PdmPointer<PdmObjectHandle>, PdmUiItem*>>& newCompleteSelection ) const;
 
     friend class SelectionChangedReceiver;
     void registerSelectionChangedReceiver( SelectionChangedReceiver* receiver )

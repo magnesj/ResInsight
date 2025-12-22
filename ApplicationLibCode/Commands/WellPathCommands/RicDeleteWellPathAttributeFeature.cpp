@@ -17,9 +17,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include "RicDeleteWellPathAttributeFeature.h"
 
-#include "ProjectDataModelCommands/RimcWellPath.h"
 #include "ProjectDataModel/WellPath/RimWellPath.h"
 #include "ProjectDataModel/WellPath/RimWellPathAttribute.h"
+#include "ProjectDataModelCommands/RimcWellPath.h"
 
 #include "cafPdmUiTree.h"
 #include "cafPdmUiTreeView.h"
@@ -34,15 +34,13 @@ CAF_CMD_HEADER_INIT( RicDeleteWellPathAttributeFeature );
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 {
-    auto attributes =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
     if ( attributes.size() == 1 )
     {
         return true;
     }
 
-    auto attributeCollections =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathAttributeCollection>();
+    auto attributeCollections = caf::SelectionManager::instance()->objectsByType<RimWellPathAttributeCollection>();
     if ( attributeCollections.size() == 1 )
     {
         return true;
@@ -56,8 +54,7 @@ bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteWellPathAttributeFeature::onActionTriggered( bool )
 {
-    auto attributes =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
 
     if ( attributes.empty() )
     {
@@ -65,14 +62,13 @@ void RicDeleteWellPathAttributeFeature::onActionTriggered( bool )
     }
 
     auto firstAttribute = static_cast<RimWellPathAttribute*>( ( *attributes.begin() )->pdmObject() );
-    auto wellPath = firstAttribute->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+    auto wellPath       = firstAttribute->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
 
     auto cmd = new RimcWellPathDeleteAttribute( wellPath );
 
     for ( auto attributeUiItem : attributes )
     {
-        cmd->addWellPathAttribute(
-            static_cast<RimWellPathAttribute*>( attributeUiItem->pdmObject() ) );
+        cmd->addWellPathAttribute( static_cast<RimWellPathAttribute*>( attributeUiItem->pdmObject() ) );
     }
     cmd->execute();
 }

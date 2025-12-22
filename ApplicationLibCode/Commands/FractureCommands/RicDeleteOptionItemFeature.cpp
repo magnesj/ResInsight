@@ -32,13 +32,12 @@ CAF_CMD_SOURCE_INIT( RicDeleteOptionItemFeature, "RicDeleteOptionItemFeature" );
 //--------------------------------------------------------------------------------------------------
 void RicDeleteOptionItemFeature::onActionTriggered( bool isChecked )
 {
-    const auto optionItems =
-        caf::SelectionManager::instance()->objectsByType<RicCreateMultipleFracturesOptionItemUi>();
+    const auto optionItems = caf::SelectionManager::instance()->objectsByType<RicCreateMultipleFracturesOptionItemUi>();
 
     if ( !optionItems.empty() )
     {
-        RiuCreateMultipleFractionsUi* multipleFractionUi = ( *optionItems.begin() )
-                                                               ->firstAncestorOrThisOfTypeAsserted<RiuCreateMultipleFractionsUi>();
+        RiuCreateMultipleFractionsUi* multipleFractionUi =
+            ( *optionItems.begin() )->firstAncestorOrThisOfTypeAsserted<RiuCreateMultipleFractionsUi>();
 
         for ( auto optionItem : optionItems )
         {
@@ -63,8 +62,7 @@ void RicDeleteOptionItemFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteOptionItemFeature::isCommandEnabled() const
 {
-    const auto optionItems =
-        caf::SelectionManager::instance()->objectsByType<RicCreateMultipleFracturesOptionItemUi>();
+    const auto optionItems = caf::SelectionManager::instance()->objectsByType<RicCreateMultipleFracturesOptionItemUi>();
 
     return !optionItems.empty();
 }
