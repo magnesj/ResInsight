@@ -22,8 +22,6 @@
 #include <memory>
 #include <string>
 
-// TODO: Add OpenTelemetry SDK forward declarations when SDK integration is complete
-
 //==================================================================================================
 //
 // Azure OpenTelemetry Client
@@ -95,7 +93,9 @@ private:
     std::string parseEndpointFromConnectionString( const std::string& connectionString );
     std::string parseInstrumentationKey( const std::string& connectionString );
 
-    // TODO: Add OpenTelemetry SDK provider members when SDK integration is complete
+    // Pimpl pattern to hide OpenTelemetry SDK types
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 
     // Configuration
     AzureConfig m_config;

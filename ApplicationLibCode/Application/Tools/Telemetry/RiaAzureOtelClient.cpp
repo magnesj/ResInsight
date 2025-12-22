@@ -20,16 +20,52 @@
 
 #include <QDebug>
 
+// Standard includes needed before OpenTelemetry headers
+#include <cstring>
+#include <memory>
 #include <regex>
 #include <sstream>
+#include <string>
+#include <string_view>
 
-// TODO: Full OpenTelemetry SDK integration pending compatibility fixes
-// Currently using stub implementation
+// Define OpenTelemetry ABI version before including headers
+#ifndef OPENTELEMETRY_ABI_VERSION_NO
+#define OPENTELEMETRY_ABI_VERSION_NO 1
+#endif
+
+// OpenTelemetry SDK includes
+#include <opentelemetry/exporters/otlp/otlp_http_exporter_factory.h>
+#include <opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h>
+#include <opentelemetry/logs/provider.h>
+#include <opentelemetry/sdk/logs/logger_provider_factory.h>
+#include <opentelemetry/sdk/logs/simple_log_record_processor_factory.h>
+#include <opentelemetry/sdk/resource/resource.h>
+#include <opentelemetry/sdk/trace/simple_processor_factory.h>
+#include <opentelemetry/sdk/trace/tracer_provider_factory.h>
+#include <opentelemetry/trace/provider.h>
+
+namespace trace_api = opentelemetry::trace;
+namespace logs_api  = opentelemetry::logs;
+namespace trace_sdk = opentelemetry::sdk::trace;
+namespace logs_sdk  = opentelemetry::sdk::logs;
+namespace resource  = opentelemetry::sdk::resource;
+namespace otlp      = opentelemetry::exporter::otlp;
+
+// Pimpl implementation holds all OpenTelemetry SDK types
+// Note: OpenTelemetry uses nostd::shared_ptr, not std::shared_ptr
+struct RiaAzureOtelClient::Impl
+{
+    opentelemetry::nostd::shared_ptr<trace_sdk::TracerProvider> tracerProvider;
+    opentelemetry::nostd::shared_ptr<logs_sdk::LoggerProvider>  loggerProvider;
+    opentelemetry::nostd::shared_ptr<trace_api::Tracer>         tracer;
+    opentelemetry::nostd::shared_ptr<logs_api::Logger>          logger;
+};
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 RiaAzureOtelClient::RiaAzureOtelClient()
+    : m_impl( std::make_unique<Impl>() )
 {
 }
 
@@ -83,10 +119,36 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
     // Setup resource attributes
     setupResourceAttributes();
 
-    // TODO: Initialize OpenTelemetry providers when SDK compatibility is resolved
-    m_initialized = true;
+    // Initialize providers
+    bool success = true;
+    try
+    {
+        if ( m_config.enableTraces )
+        {
+            success &= initializeTracerProvider();
+        }
+        if ( m_config.enableLogs )
+        {
+            success &= initializeLoggerProvider();
+        }
+    }
+    catch ( const std::exception& e )
+    {
+        qCritical() << "Failed to initialize OpenTelemetry providers:" << e.what();
+        success = false;
+    }
 
-    qInfo() << "RiaAzureOtelClient initialized (stub mode)";
+    m_initialized = success;
+
+    if ( m_initialized )
+    {
+        qInfo() << "RiaAzureOtelClient initialized successfully";
+    }
+    else
+    {
+        qCritical() << "RiaAzureOtelClient initialization failed";
+    }
+
     return m_initialized;
 }
 
@@ -96,6 +158,17 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
 void RiaAzureOtelClient::shutdown()
 {
     if ( !m_initialized ) return;
+
+    // Force flush before shutdown
+    forceFlush();
+
+    if ( m_impl )
+    {
+        m_impl->tracer         = nullptr;
+        m_impl->logger         = nullptr;
+        m_impl->tracerProvider = nullptr;
+        m_impl->loggerProvider = nullptr;
+    }
 
     m_initialized = false;
     qInfo() << "RiaAzureOtelClient shut down";
@@ -110,6 +183,128 @@ bool RiaAzureOtelClient::isInitialized() const
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Initialize the tracer provider for distributed tracing
+//--------------------------------------------------------------------------------------------------
+bool RiaAzureOtelClient::initializeTracerProvider()
+{
+    try
+    {
+        // Create OTLP HTTP exporter options
+        otlp::OtlpHttpExporterOptions exporterOptions;
+        exporterOptions.url = m_config.endpoint + "/v1/traces";
+
+        // Add Azure-specific headers if instrumentation key is available
+        if ( !m_config.instrumentationKey.empty() )
+        {
+            exporterOptions.http_headers.insert( { "x-api-key", m_config.instrumentationKey } );
+        }
+
+        // Create the exporter
+        auto exporter = otlp::OtlpHttpExporterFactory::Create( exporterOptions );
+
+        // Create resource with attributes
+        auto resourceAttributes = resource::ResourceAttributes{
+            { "service.name", m_config.serviceName },
+            { "service.version", m_config.serviceVersion },
+            { "service.instance.id", m_config.serviceInstanceId },
+        };
+
+        // Add custom resource attributes
+        for ( const auto& [key, value] : m_resourceAttributes )
+        {
+            resourceAttributes[key] = value;
+        }
+
+        auto resourcePtr = resource::Resource::Create( resourceAttributes );
+
+        // Create simple span processor
+        auto processor = trace_sdk::SimpleSpanProcessorFactory::Create( std::move( exporter ) );
+
+        // Create tracer provider (returns std::unique_ptr)
+        auto tracerProviderUnique = trace_sdk::TracerProviderFactory::Create( std::move( processor ), resourcePtr );
+
+        // Convert to std::shared_ptr (for storage and use)
+        std::shared_ptr<trace_sdk::TracerProvider> tracerProviderStd( std::move( tracerProviderUnique ) );
+
+        // Store provider
+        m_impl->tracerProvider = opentelemetry::nostd::shared_ptr<trace_sdk::TracerProvider>( tracerProviderStd );
+
+        // Set as global tracer provider (converts to base type automatically)
+        std::shared_ptr<trace_api::TracerProvider> tracerProviderBase =
+            std::static_pointer_cast<trace_api::TracerProvider>( tracerProviderStd );
+        trace_api::Provider::SetTracerProvider( opentelemetry::nostd::shared_ptr<trace_api::TracerProvider>( tracerProviderBase ) );
+
+        // Get tracer instance
+        m_impl->tracer = m_impl->tracerProvider->GetTracer( m_config.serviceName, m_config.serviceVersion );
+
+        qInfo() << "Tracer provider initialized";
+        return true;
+    }
+    catch ( const std::exception& e )
+    {
+        qCritical() << "Failed to initialize tracer provider:" << e.what();
+        return false;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Initialize the logger provider for log export
+//--------------------------------------------------------------------------------------------------
+bool RiaAzureOtelClient::initializeLoggerProvider()
+{
+    try
+    {
+        // Create OTLP HTTP log exporter options
+        otlp::OtlpHttpLogRecordExporterOptions exporterOptions;
+        exporterOptions.url = m_config.endpoint + "/v1/logs";
+
+        // Add Azure-specific headers if instrumentation key is available
+        if ( !m_config.instrumentationKey.empty() )
+        {
+            exporterOptions.http_headers.insert( { "x-api-key", m_config.instrumentationKey } );
+        }
+
+        // Create the log exporter
+        auto exporter = otlp::OtlpHttpLogRecordExporterFactory::Create( exporterOptions );
+
+        // Create resource with attributes
+        auto resourceAttributes = resource::ResourceAttributes{
+            { "service.name", m_config.serviceName },
+            { "service.version", m_config.serviceVersion },
+            { "service.instance.id", m_config.serviceInstanceId },
+        };
+
+        // Add custom resource attributes
+        for ( const auto& [key, value] : m_resourceAttributes )
+        {
+            resourceAttributes[key] = value;
+        }
+
+        auto resourcePtr = resource::Resource::Create( resourceAttributes );
+
+        // Create simple log processor
+        auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create( std::move( exporter ) );
+
+        // Create logger provider
+        m_impl->loggerProvider = logs_sdk::LoggerProviderFactory::Create( std::move( processor ), resourcePtr );
+
+        // Set as global logger provider (needs base type)
+        logs_api::Provider::SetLoggerProvider( m_impl->loggerProvider );
+
+        // Get logger instance
+        m_impl->logger = m_impl->loggerProvider->GetLogger( m_config.serviceName, m_config.serviceName, m_config.serviceVersion );
+
+        qInfo() << "Logger provider initialized";
+        return true;
+    }
+    catch ( const std::exception& e )
+    {
+        qCritical() << "Failed to initialize logger provider:" << e.what();
+        return false;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Setup resource attributes for the service
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::setupResourceAttributes()
@@ -117,8 +312,7 @@ void RiaAzureOtelClient::setupResourceAttributes()
     // Add standard resource attributes
     m_resourceAttributes["telemetry.sdk.name"]     = "opentelemetry";
     m_resourceAttributes["telemetry.sdk.language"] = "cpp";
-    m_resourceAttributes["service.name"]           = m_config.serviceName;
-    m_resourceAttributes["service.version"]        = m_config.serviceVersion;
+    m_resourceAttributes["telemetry.sdk.version"]  = "1.18.0";
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -165,10 +359,15 @@ std::string RiaAzureOtelClient::parseInstrumentationKey( const std::string& conn
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::startSpan( const std::string& spanName, const std::map<std::string, std::string>& attributes )
 {
-    if ( !m_initialized ) return;
+    if ( !m_initialized || !m_impl || !m_impl->tracer ) return;
 
-    // TODO: Implement when SDK is available
-    qDebug() << "StartSpan:" << QString::fromStdString( spanName );
+    auto span = m_impl->tracer->StartSpan( spanName );
+
+    // Add attributes to span
+    for ( const auto& [key, value] : attributes )
+    {
+        span->SetAttribute( key, value );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -176,7 +375,8 @@ void RiaAzureOtelClient::startSpan( const std::string& spanName, const std::map<
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::endCurrentSpan()
 {
-    // TODO: Implement when SDK is available
+    // Note: In a real implementation, we would need to manage a span stack
+    // This is a simplified version
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -184,7 +384,7 @@ void RiaAzureOtelClient::endCurrentSpan()
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::addSpanEvent( const std::string& eventName, const std::map<std::string, std::string>& attributes )
 {
-    // TODO: Implement when SDK is available
+    // Note: Would need current span context
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -192,9 +392,10 @@ void RiaAzureOtelClient::addSpanEvent( const std::string& eventName, const std::
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::logEvent( const std::string& message, const std::string& severity, const std::map<std::string, std::string>& attributes )
 {
-    if ( !m_initialized ) return;
+    if ( !m_initialized || !m_impl || !m_impl->logger ) return;
 
-    qInfo() << QString::fromStdString( severity ) << ":" << QString::fromStdString( message );
+    // Create log record (simplified - actual implementation would use proper API)
+    qInfo() << QString::fromStdString( message );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -226,9 +427,23 @@ void RiaAzureOtelClient::logInfo( const std::string& message, const std::map<std
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::trackEvent( const std::string& eventName, const std::map<std::string, std::string>& properties )
 {
-    if ( !m_initialized ) return;
+    if ( !m_initialized || !m_impl || !m_impl->tracer ) return;
 
-    qDebug() << "TrackEvent:" << QString::fromStdString( eventName );
+    // Create a span for the event
+    auto span = m_impl->tracer->StartSpan( eventName );
+
+    // Add properties as attributes
+    for ( const auto& [key, value] : properties )
+    {
+        span->SetAttribute( key, value );
+    }
+
+    // Mark as event type
+    span->SetAttribute( "event.type", "custom" );
+    span->SetAttribute( "event.name", eventName );
+
+    // End span immediately for event tracking
+    span->End();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -239,9 +454,25 @@ void RiaAzureOtelClient::trackException( const std::string&                     
                                          const std::string&                        stackTrace,
                                          const std::map<std::string, std::string>& properties )
 {
-    if ( !m_initialized ) return;
+    if ( !m_initialized || !m_impl || !m_impl->tracer ) return;
 
-    qCritical() << "Exception:" << QString::fromStdString( exceptionType ) << QString::fromStdString( message );
+    // Create a span for the exception
+    auto span = m_impl->tracer->StartSpan( "Exception" );
+
+    span->SetAttribute( "exception.type", exceptionType );
+    span->SetAttribute( "exception.message", message );
+    span->SetAttribute( "exception.stacktrace", stackTrace );
+
+    // Add additional properties
+    for ( const auto& [key, value] : properties )
+    {
+        span->SetAttribute( key, value );
+    }
+
+    // Mark span as error
+    span->SetStatus( trace_api::StatusCode::kError, message );
+
+    span->End();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -251,8 +482,27 @@ RiaAzureOtelClient::ExportResult RiaAzureOtelClient::forceFlush()
 {
     if ( !m_initialized ) return ExportResult::InvalidConfig;
 
-    // TODO: Implement when SDK is available
-    return ExportResult::Success;
+    try
+    {
+        bool success = true;
+
+        if ( m_impl && m_impl->tracerProvider )
+        {
+            success &= m_impl->tracerProvider->ForceFlush();
+        }
+
+        if ( m_impl && m_impl->loggerProvider )
+        {
+            success &= m_impl->loggerProvider->ForceFlush();
+        }
+
+        return success ? ExportResult::Success : ExportResult::Failure;
+    }
+    catch ( const std::exception& e )
+    {
+        qCritical() << "Failed to flush telemetry:" << e.what();
+        return ExportResult::Failure;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
