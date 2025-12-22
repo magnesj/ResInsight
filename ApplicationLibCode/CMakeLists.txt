@@ -228,37 +228,8 @@ set(OPENTELEMETRY_APP_FILES
 )
 list(APPEND CPP_SOURCES ${OPENTELEMETRY_APP_FILES})
 
-# Azure OTEL client goes into separate library to isolate opentelemetry-cpp dependency
-set(OPENTELEMETRY_CLIENT_FILES
-    Application/Tools/Telemetry/RiaAzureOtelClient.h
-    Application/Tools/Telemetry/RiaAzureOtelClient.cpp
-)
-
-# Create a separate library for Azure OTEL client
-add_library(ApplicationLibCode_OpenTelemetry STATIC ${OPENTELEMETRY_CLIENT_FILES})
-
-# Enable Qt MOC for this library
-set_target_properties(ApplicationLibCode_OpenTelemetry PROPERTIES AUTOMOC ON)
-
-# Link opentelemetry-cpp ONLY to this library
-target_link_libraries(ApplicationLibCode_OpenTelemetry
-    PRIVATE
-        opentelemetry-cpp::api
-        opentelemetry-cpp::sdk
-        opentelemetry-cpp::ext
-        opentelemetry-cpp::logs
-)
-
-# Make necessary includes available to this library
-target_include_directories(ApplicationLibCode_OpenTelemetry
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/Application
-        ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools
-        ${CMAKE_CURRENT_SOURCE_DIR}/Application/Tools/Telemetry
-        ${CMAKE_CURRENT_SOURCE_DIR}/FileInterface
-        ${CMAKE_BINARY_DIR}/Generated
-)
+# Azure OTEL client in separate subdirectory to isolate opentelemetry-cpp dependency
+add_subdirectory(AzureOtelClient)
 
 qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
 
@@ -382,7 +353,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 target_link_libraries(
-  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES} ApplicationLibCode_OpenTelemetry
+  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES} AzureOtelClient
 )
 target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
 
