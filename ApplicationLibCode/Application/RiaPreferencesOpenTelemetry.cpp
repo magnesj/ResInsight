@@ -23,6 +23,7 @@
 #include "RiaPreferences.h"
 #include "RiaVersionInfo.h"
 
+#include "cafAppEnum.h"
 #include "cafPdmUiTextEditor.h"
 
 namespace caf

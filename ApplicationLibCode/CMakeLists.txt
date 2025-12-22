@@ -219,21 +219,23 @@ endif()
 #
 find_package(opentelemetry-cpp CONFIG REQUIRED)
 
-# Preferences stay in main ApplicationLibCode
-set(OPENTELEMETRY_PREFS_FILES
+# Preferences and Manager stay in main ApplicationLibCode
+set(OPENTELEMETRY_APP_FILES
     Application/RiaPreferencesOpenTelemetry.h
     Application/RiaPreferencesOpenTelemetry.cpp
-)
-list(APPEND CPP_SOURCES ${OPENTELEMETRY_PREFS_FILES})
-
-# Manager goes into separate library to isolate opentelemetry-cpp dependency
-set(OPENTELEMETRY_MANAGER_FILES
     Application/Tools/Telemetry/RiaOpenTelemetryManager.h
     Application/Tools/Telemetry/RiaOpenTelemetryManager.cpp
 )
+list(APPEND CPP_SOURCES ${OPENTELEMETRY_APP_FILES})
 
-# Create a separate library for OpenTelemetry manager
-add_library(ApplicationLibCode_OpenTelemetry STATIC ${OPENTELEMETRY_MANAGER_FILES})
+# Azure OTEL client goes into separate library to isolate opentelemetry-cpp dependency
+set(OPENTELEMETRY_CLIENT_FILES
+    Application/Tools/Telemetry/RiaAzureOtelClient.h
+    Application/Tools/Telemetry/RiaAzureOtelClient.cpp
+)
+
+# Create a separate library for Azure OTEL client
+add_library(ApplicationLibCode_OpenTelemetry STATIC ${OPENTELEMETRY_CLIENT_FILES})
 
 # Enable Qt MOC for this library
 set_target_properties(ApplicationLibCode_OpenTelemetry PROPERTIES AUTOMOC ON)
@@ -247,7 +249,6 @@ target_link_libraries(ApplicationLibCode_OpenTelemetry
         opentelemetry-cpp::logs
         Qt6::Core
         Qt6::Network
-        ${APP_FWK_LIBRARIES}
 )
 
 # Make necessary includes available to this library

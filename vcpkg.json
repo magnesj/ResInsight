@@ -10,7 +10,10 @@
     "fast-float",
     "spdlog",
     "pugixml",
-    "opentelemetry-cpp"
+    {
+      "name": "opentelemetry-cpp",
+      "features": ["otlp-http"]
+    }
   ],
     "overrides": [
         {
