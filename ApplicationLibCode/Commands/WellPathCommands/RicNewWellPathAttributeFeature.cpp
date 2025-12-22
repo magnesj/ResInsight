@@ -58,8 +58,8 @@ bool RicNewWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathAttributeFeature::onActionTriggered( bool isChecked )
 {
-    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
-    RimWellPathAttribute* attribute = nullptr;
+    const auto            attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    RimWellPathAttribute* attribute  = nullptr;
     if ( attributes.size() == 1u )
     {
         auto attributeCollection = ( *attributes.begin() )->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();

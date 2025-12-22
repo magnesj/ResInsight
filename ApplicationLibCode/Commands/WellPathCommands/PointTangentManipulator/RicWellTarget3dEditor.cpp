@@ -329,13 +329,12 @@ void RicWellTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLevel 
 {
     if ( selected )
     {
-        caf::SelectionManager::instance()->setSelectedItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
+        caf::SelectionManager::instance()->setSelectedItem( static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ) );
     }
     else
     {
         caf::SelectionManager::instance()->removeObjectFromAllSelections(
-            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
+            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ) );
     }
 }
 

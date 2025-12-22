@@ -69,7 +69,7 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
     const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !selectedTargets.empty() )
     {
-        auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
+        auto                    firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
         RimWellPathGeometryDef* wellGeomDef = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPathGeometryDef>();
 
         auto afterBeforePair = wellGeomDef->findActiveTargetsAroundInsertionPoint( firstTarget );
@@ -138,8 +138,7 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
         return;
     }
 
-    const auto geomDefs =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+    const auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
@@ -155,8 +154,7 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicNewWellPathListTargetFeature::setupActionLook( QAction* actionToSetup )
 {
-    const auto selectedTargets =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( selectedTargets.size() == 1 )
     {
         auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
@@ -167,8 +165,7 @@ void RicNewWellPathListTargetFeature::setupActionLook( QAction* actionToSetup )
         }
     }
 
-    const auto geomDefs =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+    const auto geomDefs = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );

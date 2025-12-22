@@ -154,15 +154,13 @@ void RicPolylineTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLe
 {
     if ( selected )
     {
-        caf::SelectionManager::instance()->setSelectedItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
-            selectionLevel );
+        caf::SelectionManager::instance()->setSelectedItem( static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
+                                                            selectionLevel );
     }
     else
     {
-        caf::SelectionManager::instance()->removeItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
-            selectionLevel );
+        caf::SelectionManager::instance()->removeItem( static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
+                                                       selectionLevel );
     }
 }
 

@@ -335,8 +335,6 @@ void PdmUiTableViewEditor::enableHeaderText( bool enable )
     m_tableHeadingIcon->setVisible( enable );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -411,7 +409,7 @@ void PdmUiTableViewEditor::updateSelectionManagerFromTableSelection()
     if ( isSelectionRoleDefined() )
     {
         std::vector<PdmUiItem*> selectedRowObjects;
-        QModelIndexList      modelIndexList = m_tableView->selectionModel()->selectedIndexes();
+        QModelIndexList         modelIndexList = m_tableView->selectionModel()->selectedIndexes();
         for ( const QModelIndex& mi : modelIndexList )
         {
             PdmObjectHandle* obj = m_tableModelPdm->pdmObjectForRow( mi.row() );

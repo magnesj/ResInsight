@@ -132,7 +132,6 @@ public:
 
     void enableHeaderText( bool enable );
 
-
     PdmObjectHandle* pdmObjectFromModelIndex( const QModelIndex& mi );
     QTableView*      tableView();
 

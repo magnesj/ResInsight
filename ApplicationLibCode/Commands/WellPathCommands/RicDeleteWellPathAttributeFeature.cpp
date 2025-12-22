@@ -50,18 +50,15 @@ bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteWellPathAttributeFeature::onActionTriggered( bool isChecked )
 {
-    const auto attributes =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    const auto                      attributes                  = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
     RimWellPathAttributeCollection* wellPathAttributeCollection = nullptr;
     if ( !attributes.empty() )
     {
-        wellPathAttributeCollection =
-            static_cast<RimWellPathAttribute*>((*attributes.begin())->pdmObject())
-                ->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();
+        wellPathAttributeCollection = static_cast<RimWellPathAttribute*>( ( *attributes.begin() )->pdmObject() )
+                                          ->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();
         for ( auto attributeToDelete : attributes )
         {
-            wellPathAttributeCollection->deleteAttribute(
-                static_cast<RimWellPathAttribute*>( attributeToDelete->pdmObject() ) );
+            wellPathAttributeCollection->deleteAttribute( static_cast<RimWellPathAttribute*>( attributeToDelete->pdmObject() ) );
         }
         wellPathAttributeCollection->updateAllRequiredEditors();
     }
