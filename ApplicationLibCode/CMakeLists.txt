@@ -231,7 +231,8 @@ set(OPENTELEMETRY_APP_FILES
 )
 list(APPEND CPP_SOURCES ${OPENTELEMETRY_APP_FILES})
 
-# Azure OTEL client in separate subdirectory to isolate opentelemetry-cpp dependency
+# Azure OTEL client in separate subdirectory to isolate opentelemetry-cpp
+# dependency
 add_subdirectory(AzureOtelClient)
 
 qt_add_resources(QRC_FILES Application/Resources/ApplicationLibCode.qrc)
@@ -356,7 +357,8 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 endif()
 
 target_link_libraries(
-  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES} AzureOtelClient
+  ApplicationLibCode PUBLIC ${LINK_LIBRARIES} ${EXTERNAL_LINK_LIBRARIES}
+                            AzureOtelClient
 )
 target_link_libraries(ApplicationLibCode PRIVATE ResInsightCommonSettings)
 
