@@ -48,8 +48,8 @@ public:
 
     enum class TelemetryBackend
     {
-        AZURE_REST_API,  // Original HTTP REST API implementation
-        AZURE_OTLP       // OpenTelemetry Protocol via SDK
+        AZURE_REST_API, // Original HTTP REST API implementation
+        AZURE_OTLP // OpenTelemetry Protocol via SDK
     };
     using TelemetryBackendType = caf::AppEnum<TelemetryBackend>;
 
@@ -66,27 +66,27 @@ public:
     QString serviceVersion() const; // Read from ResInsightVersion.cmake
 
     // Getters for configuration values
-    QString           connectionString() const;
-    int               batchTimeoutMs() const;
-    int               maxBatchSize() const;
-    int               maxQueueSize() const;
-    int               memoryThresholdMb() const;
-    double            samplingRate() const;
-    int               connectionTimeoutMs() const;
-    LoggingState      loggingState() const;
-    TelemetryBackend  telemetryBackend() const;
+    QString          connectionString() const;
+    int              batchTimeoutMs() const;
+    int              maxBatchSize() const;
+    int              maxQueueSize() const;
+    int              memoryThresholdMb() const;
+    double           samplingRate() const;
+    int              connectionTimeoutMs() const;
+    LoggingState     loggingState() const;
+    TelemetryBackend telemetryBackend() const;
 
 protected:
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
 private:
-    caf::PdmField<LoggingStateType>       m_loggingState;
-    caf::PdmField<TelemetryBackendType>   m_telemetryBackend;
-    caf::PdmField<QString>                m_connectionString;
-    caf::PdmField<int>                    m_batchTimeoutMs;
-    caf::PdmField<int>                    m_maxBatchSize;
-    caf::PdmField<int>                    m_maxQueueSize;
-    caf::PdmField<int>                    m_memoryThresholdMb;
-    caf::PdmField<double>                 m_samplingRate;
-    caf::PdmField<int>                    m_connectionTimeoutMs;
+    caf::PdmField<LoggingStateType>     m_loggingState;
+    caf::PdmField<TelemetryBackendType> m_telemetryBackend;
+    caf::PdmField<QString>              m_connectionString;
+    caf::PdmField<int>                  m_batchTimeoutMs;
+    caf::PdmField<int>                  m_maxBatchSize;
+    caf::PdmField<int>                  m_maxQueueSize;
+    caf::PdmField<int>                  m_memoryThresholdMb;
+    caf::PdmField<double>               m_samplingRate;
+    caf::PdmField<int>                  m_connectionTimeoutMs;
 };
