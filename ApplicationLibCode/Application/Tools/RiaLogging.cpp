@@ -289,7 +289,7 @@ void RiaLogging::warning( const QString& message, const QString logKeyword )
 //--------------------------------------------------------------------------------------------------
 void RiaLogging::info( const QString& message, const QString logKeyword )
 {
-    if ( !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
+    if ( RiaPreferencesSystem::current() && !RiaPreferencesSystem::current()->isLoggingActivatedForKeyword( logKeyword ) ) return;
 
     if ( isSameMessage( message ) ) return;
 

@@ -35,6 +35,7 @@
 #include <opentelemetry/exporters/otlp/otlp_http_exporter_factory.h>
 #include <opentelemetry/exporters/otlp/otlp_http_log_record_exporter_factory.h>
 #include <opentelemetry/logs/provider.h>
+#include <opentelemetry/logs/severity.h>
 #include <opentelemetry/sdk/logs/logger_provider_factory.h>
 #include <opentelemetry/sdk/logs/simple_log_record_processor_factory.h>
 #include <opentelemetry/sdk/resource/resource.h>
@@ -48,6 +49,7 @@ namespace trace_sdk = opentelemetry::sdk::trace;
 namespace logs_sdk  = opentelemetry::sdk::logs;
 namespace resource  = opentelemetry::sdk::resource;
 namespace otlp      = opentelemetry::exporter::otlp;
+namespace common    = opentelemetry::common;
 
 // Pimpl implementation holds all OpenTelemetry SDK types
 // Note: OpenTelemetry uses nostd::shared_ptr, not std::shared_ptr
@@ -169,7 +171,6 @@ void RiaAzureOtelClient::shutdown()
     }
 
     m_initialized = false;
-    log( LogLevel::Info, "RiaAzureOtelClient shut down" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -191,11 +192,23 @@ bool RiaAzureOtelClient::initializeTracerProvider()
         otlp::OtlpHttpExporterOptions exporterOptions;
         exporterOptions.url = m_config.endpoint + "/v1/traces";
 
-        // Add Azure-specific headers if instrumentation key is available
-        if ( !m_config.instrumentationKey.empty() )
+        // Azure Application Insights OTLP requires specific headers
+        // The connection string should be passed in the Authorization header
+        if ( !m_config.connectionString.empty() )
         {
-            exporterOptions.http_headers.insert( { "x-api-key", m_config.instrumentationKey } );
+            // Azure Monitor OTLP expects the connection string in a specific format
+            exporterOptions.http_headers.insert( { "Authorization", "Bearer " + m_config.connectionString } );
         }
+        else if ( !m_config.instrumentationKey.empty() )
+        {
+            // Fallback: try with instrumentation key
+            exporterOptions.http_headers.insert( { "x-ms-instrumentation-key", m_config.instrumentationKey } );
+        }
+
+        // Enable console debug for OTLP exporter (helps diagnose issues)
+        exporterOptions.console_debug = true;
+
+        log( LogLevel::Info, std::string( "Initializing tracer with endpoint: " ) + exporterOptions.url );
 
         // Create the exporter
         auto exporter = otlp::OtlpHttpExporterFactory::Create( exporterOptions );
@@ -256,11 +269,20 @@ bool RiaAzureOtelClient::initializeLoggerProvider()
         otlp::OtlpHttpLogRecordExporterOptions exporterOptions;
         exporterOptions.url = m_config.endpoint + "/v1/logs";
 
-        // Add Azure-specific headers if instrumentation key is available
-        if ( !m_config.instrumentationKey.empty() )
+        // Azure Application Insights OTLP requires specific headers
+        if ( !m_config.connectionString.empty() )
         {
-            exporterOptions.http_headers.insert( { "x-api-key", m_config.instrumentationKey } );
+            exporterOptions.http_headers.insert( { "Authorization", "Bearer " + m_config.connectionString } );
         }
+        else if ( !m_config.instrumentationKey.empty() )
+        {
+            exporterOptions.http_headers.insert( { "x-ms-instrumentation-key", m_config.instrumentationKey } );
+        }
+
+        // Enable console debug
+        exporterOptions.console_debug = true;
+
+        log( LogLevel::Info, std::string( "Initializing logger with endpoint: " ) + exporterOptions.url );
 
         // Create the log exporter
         auto exporter = otlp::OtlpHttpLogRecordExporterFactory::Create( exporterOptions );
@@ -393,14 +415,44 @@ void RiaAzureOtelClient::addSpanEvent( const std::string& eventName, const std::
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Convert severity string to OpenTelemetry severity level
+//--------------------------------------------------------------------------------------------------
+static logs_api::Severity getSeverityLevel( const std::string& severity )
+{
+    if ( severity == "TRACE" ) return logs_api::Severity::kTrace;
+    if ( severity == "DEBUG" ) return logs_api::Severity::kDebug;
+    if ( severity == "INFO" ) return logs_api::Severity::kInfo;
+    if ( severity == "WARN" || severity == "WARNING" ) return logs_api::Severity::kWarn;
+    if ( severity == "ERROR" ) return logs_api::Severity::kError;
+    if ( severity == "FATAL" ) return logs_api::Severity::kFatal;
+
+    // Default to info
+    return logs_api::Severity::kInfo;
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Log an event with custom severity
 //--------------------------------------------------------------------------------------------------
 void RiaAzureOtelClient::logEvent( const std::string& message, const std::string& severity, const std::map<std::string, std::string>& attributes )
 {
     if ( !m_initialized || !m_impl || !m_impl->logger ) return;
 
-    // Create log record (simplified - actual implementation would use proper API)
-    // Note: This is a stub implementation. Full logging API integration is pending.
+    log( LogLevel::Debug, std::string( "Logging event [" ) + severity + "]: " + message );
+
+    // Convert severity string to enum
+    auto severityLevel = getSeverityLevel( severity );
+
+    // Emit log record using OpenTelemetry API
+    // Note: The Logger::EmitLogRecord API uses a variadic template
+    m_impl->logger->EmitLogRecord( severityLevel, message );
+
+    // Force immediate flush
+    log( LogLevel::Debug, "Flushing logger after event" );
+    if ( m_impl->loggerProvider )
+    {
+        bool flushed = m_impl->loggerProvider->ForceFlush();
+        log( LogLevel::Debug, flushed ? "Log flush succeeded" : "Log flush failed" );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -434,6 +486,8 @@ void RiaAzureOtelClient::trackEvent( const std::string& eventName, const std::ma
 {
     if ( !m_initialized || !m_impl || !m_impl->tracer ) return;
 
+    log( LogLevel::Debug, std::string( "Tracking event: " ) + eventName );
+
     // Create a span for the event
     auto span = m_impl->tracer->StartSpan( eventName );
 
@@ -449,6 +503,14 @@ void RiaAzureOtelClient::trackEvent( const std::string& eventName, const std::ma
 
     // End span immediately for event tracking
     span->End();
+
+    // Force immediate flush to ensure data is sent
+    log( LogLevel::Debug, "Flushing tracer after event" );
+    if ( m_impl->tracerProvider )
+    {
+        bool flushed = m_impl->tracerProvider->ForceFlush();
+        log( LogLevel::Debug, flushed ? "Flush succeeded" : "Flush failed" );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

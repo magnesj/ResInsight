@@ -467,13 +467,13 @@ bool RiaOpenTelemetryManager::initializeAzureOtelClient()
 
     // Create Azure OTEL client configuration
     RiaAzureOtelClient::AzureConfig config;
-    config.connectionString   = prefs->connectionString().toStdString();
-    config.serviceName        = prefs->serviceName().toStdString();
-    config.serviceVersion     = prefs->serviceVersion().toStdString();
-    config.serviceInstanceId  = m_username.empty() ? "unknown" : m_username;
-    config.enableTraces       = true;
-    config.enableLogs         = true;
-    config.exportIntervalMs   = prefs->batchTimeoutMs();
+    config.connectionString  = prefs->connectionString().toStdString();
+    config.serviceName       = prefs->serviceName().toStdString();
+    config.serviceVersion    = prefs->serviceVersion().toStdString();
+    config.serviceInstanceId = m_username.empty() ? "unknown" : m_username;
+    config.enableTraces      = true;
+    config.enableLogs        = true;
+    config.exportIntervalMs  = prefs->batchTimeoutMs();
 
     // Setup logging callback to route Azure client logs through RiaLogging
     config.logCallback = []( RiaAzureOtelClient::LogLevel level, const std::string& message )
@@ -810,17 +810,9 @@ void RiaOpenTelemetryManager::flushPendingEvents()
     processEvents();
 
     // Flush the Azure OTEL client if using OTLP backend
-    auto* prefs = RiaPreferencesOpenTelemetry::current();
-    if ( prefs && prefs->telemetryBackend() == RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_OTLP )
+    if ( m_azureClient && m_azureClient->isInitialized() )
     {
-        if ( m_azureClient && m_azureClient->isInitialized() )
-        {
-            auto result = m_azureClient->forceFlush();
-            if ( result != RiaAzureOtelClient::ExportResult::Success )
-            {
-                RiaLogging::warning( "Failed to flush Azure OTEL client" );
-            }
-        }
+        m_azureClient->forceFlush();
     }
 }
 
