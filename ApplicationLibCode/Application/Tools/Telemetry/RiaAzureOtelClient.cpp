@@ -285,11 +285,18 @@ bool RiaAzureOtelClient::initializeLoggerProvider()
         // Create simple log processor
         auto processor = logs_sdk::SimpleLogRecordProcessorFactory::Create( std::move( exporter ) );
 
-        // Create logger provider
-        m_impl->loggerProvider = logs_sdk::LoggerProviderFactory::Create( std::move( processor ), resourcePtr );
+        // Create logger provider (returns std::unique_ptr)
+        auto loggerProviderUnique = logs_sdk::LoggerProviderFactory::Create( std::move( processor ), resourcePtr );
 
-        // Set as global logger provider (needs base type)
-        logs_api::Provider::SetLoggerProvider( m_impl->loggerProvider );
+        // Convert to std::shared_ptr (for storage and use)
+        std::shared_ptr<logs_sdk::LoggerProvider> loggerProviderStd( std::move( loggerProviderUnique ) );
+
+        // Store provider
+        m_impl->loggerProvider = opentelemetry::nostd::shared_ptr<logs_sdk::LoggerProvider>( loggerProviderStd );
+
+        // Set as global logger provider (converts to base type automatically)
+        std::shared_ptr<logs_api::LoggerProvider> loggerProviderBase = std::static_pointer_cast<logs_api::LoggerProvider>( loggerProviderStd );
+        logs_api::Provider::SetLoggerProvider( opentelemetry::nostd::shared_ptr<logs_api::LoggerProvider>( loggerProviderBase ) );
 
         // Get logger instance
         m_impl->logger = m_impl->loggerProvider->GetLogger( m_config.serviceName, m_config.serviceName, m_config.serviceVersion );
