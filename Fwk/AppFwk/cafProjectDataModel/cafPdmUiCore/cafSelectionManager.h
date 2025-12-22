@@ -61,6 +61,7 @@ public:
     PdmUiItem*              selectedItem() const;
     std::vector<PdmUiItem*> selectedItems() const;
 
+    void setSelectedItem( PdmUiItem* item, int selectionLevel );
     void setSelectedItem( PdmUiItem* item );
 
     bool setSelectedItems( const std::vector<PdmUiItem*>& items );

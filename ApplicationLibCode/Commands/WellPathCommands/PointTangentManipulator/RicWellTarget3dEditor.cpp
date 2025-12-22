@@ -18,7 +18,13 @@
 
 #include "RicWellTarget3dEditor.h"
 
+#include <QApplication>
+
 #include "RicPointTangentManipulator.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+
+#include <QAction>
 
 #include "Well/RigWellPath.h"
 
@@ -35,12 +41,22 @@
 
 #include "cafDisplayCoordTransform.h"
 #include "cafPdmUiCommandSystemProxy.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
 #include "cafSelectionManager.h"
 
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"
-
-#include <QApplication>
 
 CAF_PDM_UI_3D_OBJECT_EDITOR_SOURCE_INIT( RicWellTarget3dEditor );
 
@@ -329,13 +345,11 @@ void RicWellTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLevel 
 {
     if ( selected )
     {
-        caf::SelectionManager::instance()->setSelectedItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
+        caf::SelectionManager::instance()->setSelectedItem( pdmObject()->uiCapability(), selectionLevel );
     }
     else
     {
-        caf::SelectionManager::instance()->removeObjectFromAllSelections(
-            static_cast<caf::PdmUiItem*>( const_cast<RicWellTarget3dEditor*>( this ) ));
+        caf::SelectionManager::instance()->removeObjectFromAllSelections( pdmObject() );
     }
 }
 

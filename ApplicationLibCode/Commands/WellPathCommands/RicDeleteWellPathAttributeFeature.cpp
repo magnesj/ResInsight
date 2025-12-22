@@ -17,27 +17,33 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include "RicDeleteWellPathAttributeFeature.h"
 
-#include "RimProject.h"
-#include "RimWellPath.h"
-#include "RimWellPathAttribute.h"
-#include "RimWellPathAttributeCollection.h"
-#include "Riu3DMainWindowTools.h"
+#include "ProjectDataModelCommands/RimcWellPath.h"
+#include "ProjectDataModel/WellPath/RimWellPath.h"
+#include "ProjectDataModel/WellPath/RimWellPathAttribute.h"
 
+#include "cafPdmUiTree.h"
+#include "cafPdmUiTreeView.h"
 #include "cafSelectionManager.h"
-#include <QAction>
 
-CAF_CMD_SOURCE_INIT( RicDeleteWellPathAttributeFeature, "RicDeleteWellPathAttributeFeature" );
+#include <QPointer>
+
+CAF_CMD_HEADER_INIT( RicDeleteWellPathAttributeFeature );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 {
-    if ( caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttributeCollection>() )
+    auto attributes =
+        caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    if ( attributes.size() == 1 )
     {
         return true;
     }
-    if ( caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttributeCollection>() )
+
+    auto attributeCollections =
+        caf::SelectionManager::instance()->objectsByType<RimWellPathAttributeCollection>();
+    if ( attributeCollections.size() == 1 )
     {
         return true;
     }
@@ -48,65 +54,57 @@ bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicDeleteWellPathAttributeFeature::onActionTriggered( bool isChecked )
+void RicDeleteWellPathAttributeFeature::onActionTriggered( bool )
 {
-    const auto attributes =
+    auto attributes =
         caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
-    RimWellPathAttributeCollection* wellPathAttributeCollection = nullptr;
-    if ( !attributes.empty() )
+
+    if ( attributes.empty() )
     {
-        wellPathAttributeCollection =
-            static_cast<RimWellPathAttribute*>((*attributes.begin())->pdmObject())
-                ->firstAncestorOrThisOfTypeAsserted<RimWellPathAttributeCollection>();
-        for ( auto attributeToDelete : attributes )
-        {
-            wellPathAttributeCollection->deleteAttribute(
-                static_cast<RimWellPathAttribute*>( attributeToDelete->pdmObject() ) );
-        }
-        wellPathAttributeCollection->updateAllRequiredEditors();
-    }
-    else
-    {
-        wellPathAttributeCollection = caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttributeCollection>();
-        if ( wellPathAttributeCollection )
-        {
-            wellPathAttributeCollection->deleteAllAttributes();
-        }
+        return;
     }
 
-    if ( wellPathAttributeCollection )
-    {
-        if ( wellPathAttributeCollection->attributes().empty() )
-        {
-            auto wellPath = wellPathAttributeCollection->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
-            wellPath->updateConnectedEditors();
-            Riu3DMainWindowTools::selectAsCurrentItem( wellPath );
-        }
+    auto firstAttribute = static_cast<RimWellPathAttribute*>( ( *attributes.begin() )->pdmObject() );
+    auto wellPath = firstAttribute->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
 
-        RimProject* proj = RimProject::current();
-        if ( proj )
-        {
-            proj->scheduleCreateDisplayModelAndRedrawAllViews();
-        }
+    auto cmd = new RimcWellPathDeleteAttribute( wellPath );
+
+    for ( auto attributeUiItem : attributes )
+    {
+        cmd->addWellPathAttribute(
+            static_cast<RimWellPathAttribute*>( attributeUiItem->pdmObject() ) );
     }
+    cmd->execute();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicDeleteWellPathAttributeFeature::setupActionLook( QAction* actionToSetup )
+void RicDeleteWellPathAttributeFeature::setupActionLook( QAction* action )
 {
-    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
-    if ( !attributes.empty() )
+    action->setEnabled( isCommandEnabled() );
+}
+
+void RicDeleteWellPathAttributeFeature::execute( const caf::PdmObjectHandle& object )
+{
+    if ( !object.isSubObject() )
     {
-        actionToSetup->setText( "Delete Attribute" );
-        actionToSetup->setIcon( QIcon( ":/Erase.svg" ) );
-        applyShortcutWithHintToAction( actionToSetup, QKeySequence::Delete );
+        return;
     }
-    else if ( caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttributeCollection>() )
+
+    auto wellPathAttribute = object.object<RimWellPathAttribute>();
+    if ( !wellPathAttribute )
     {
-        actionToSetup->setText( "Delete Casing Design" );
-        actionToSetup->setIcon( QIcon( ":/Erase.svg" ) );
-        applyShortcutWithHintToAction( actionToSetup, QKeySequence::Delete );
+        return;
     }
+
+    auto wellPath = wellPathAttribute->wellPath();
+    if ( !wellPath )
+    {
+        return;
+    }
+
+    auto cmd = new RimcWellPathDeleteAttribute( wellPath );
+    cmd->addWellPathAttribute( wellPathAttribute );
+    cmd->submit();
 }

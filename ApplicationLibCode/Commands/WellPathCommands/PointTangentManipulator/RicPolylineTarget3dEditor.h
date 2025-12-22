@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Ric3dObjectEditorHandle.h"
+#include "cafPdmUiItem.h"
 
 class RicPointTangentManipulator;
 

@@ -164,6 +164,11 @@ PdmUiItem* SelectionManager::selectedItem() const
 //--------------------------------------------------------------------------------------------------
 void SelectionManager::setSelectedItem( PdmUiItem* item )
 {
+    setSelectedItem( item, 0 );
+}
+
+void SelectionManager::setSelectedItem( PdmUiItem* item, int )
+{
     std::vector<PdmUiItem*> singleSelection;
     if ( item )
     {

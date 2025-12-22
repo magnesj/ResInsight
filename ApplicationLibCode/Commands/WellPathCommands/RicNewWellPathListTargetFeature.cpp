@@ -17,45 +17,52 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include "RicNewWellPathListTargetFeature.h"
 
-CAF_CMD_SOURCE_INIT( RicNewWellPathListTargetFeature, "RicNewWellPathListTargetFeature" );
+#include "ProjectDataModel/WellPath/RimWellPath.h"
+#include "ProjectDataModel/WellPath/RimWellPathGeometryDef.h"
+#include "ProjectDataModel/WellPath/RimWellPathTarget.h"
+#include "ProjectDataModelCommands/RimcWellPath.h"
 
-#include "RimModeledWellPath.h"
-#include "RimWellPathGeometryDef.h"
-#include "RimWellPathTarget.h"
+#include "cafPdmUiItem.h"
+#include <cafPdmUiTree.h>
+#include <cafPdmUiTreeView.h>
+#include <cafSelectionManager.h>
 
-#include "RiaOffshoreSphericalCoords.h"
-
-#include "cafSelectionManager.h"
 #include <QAction>
+#include <QMenu>
+
+CAF_CMD_SOURCE_INIT( RicNewWellPathListTargetFeature, "RicNewWellPathListTargetFeature" );
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 {
+    auto selectedTargets =
+        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    if ( selectedTargets.size() == 1 )
     {
-        const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
-        if ( !attributes.empty() )
+        auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
+        auto wellPath = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        if ( firstTarget->parent() != wellPath->wellPathGeometry() )
         {
             return false;
         }
     }
+    else if ( selectedTargets.size() > 1 )
     {
-        const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
-        if ( selectedTargets.size() == 1 )
-        {
-            auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
-            if ( firstTarget->parent() != m_wellPath->wellPathTargetCollection() )
-            {
-                return false;
-            }
-        }
-        else if ( selectedTargets.size() > 1 )
-        {
-            return false;
-        }
+        return false;
+    }
 
-        return true;
+    auto geomDefs =
+        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+    if ( !geomDefs.empty() )
+    {
+        auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
+        auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        if ( wellGeomDef->wellPath() == wellPath )
+        {
+            return true;
+        }
     }
 
     return false;
@@ -64,88 +71,30 @@ bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
+void RicNewWellPathListTargetFeature::onActionTriggered( bool )
 {
-    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    auto selectedTargets =
+        caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( !selectedTargets.empty() )
     {
         auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
         RimWellPathGeometryDef* wellGeomDef = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPathGeometryDef>();
-
-        auto afterBeforePair = wellGeomDef->findActiveTargetsAroundInsertionPoint( firstTarget );
-
-        cvf::Vec3d newPos = cvf::Vec3d::ZERO;
-
-        bool isSeaLevelTarget = false;
-
-        if ( !afterBeforePair.first && afterBeforePair.second )
-        {
-            if ( afterBeforePair.second->targetPointXYZ().z() == -wellGeomDef->anchorPointXyz().z() )
-            {
-                return; // We already have a target at sealevel.
-            }
-
-            cvf::Vec3d targetTangent = afterBeforePair.second->tangent();
-            double     radius        = afterBeforePair.second->radius1();
-
-            cvf::Vec3d tangentInHorizontalPlane = targetTangent;
-            tangentInHorizontalPlane[2]         = 0.0;
-            tangentInHorizontalPlane.normalize();
-
-            RiaOffshoreSphericalCoords sphTangent( targetTangent );
-            double                     inc                        = sphTangent.inc();
-            double                     horizontalLengthFromTarget = radius - radius * cvf::Math::cos( inc );
-
-            newPos     = afterBeforePair.second->targetPointXYZ() - horizontalLengthFromTarget * tangentInHorizontalPlane;
-            newPos.z() = -wellGeomDef->anchorPointXyz().z();
-
-            isSeaLevelTarget = true;
-        }
-        else if ( afterBeforePair.first && afterBeforePair.second )
-        {
-            newPos = 0.5 * ( afterBeforePair.first->targetPointXYZ() + afterBeforePair.second->targetPointXYZ() );
-        }
-        else if ( afterBeforePair.first && !afterBeforePair.second )
-        {
-            std::vector<RimWellPathTarget*> activeTargets = wellGeomDef->activeWellTargets();
-            size_t                          targetCount   = activeTargets.size();
-            if ( targetCount > 1 )
-            {
-                newPos                    = activeTargets[targetCount - 1]->targetPointXYZ();
-                cvf::Vec3d nextLastToLast = newPos - activeTargets[targetCount - 2]->targetPointXYZ();
-                newPos += 0.5 * nextLastToLast;
-            }
-            else
-            {
-                newPos = afterBeforePair.first->targetPointXYZ() + cvf::Vec3d( 0, 0, 200 );
-            }
-        }
-
-        RimWellPathTarget* newTarget = new RimWellPathTarget;
-        if ( isSeaLevelTarget )
-        {
-            newTarget->setAsPointXYZAndTangentTarget( { newPos[0], newPos[1], newPos[2] }, 0, 0 );
-        }
-        else
-        {
-            newTarget->setAsPointTargetXYD( { newPos[0], newPos[1], -newPos[2] } );
-        }
-
-        wellGeomDef->insertTarget( firstTarget, newTarget );
-        wellGeomDef->updateConnectedEditors();
-        wellGeomDef->updateWellPathVisualization( false );
-
-        return;
+        auto cmd = new RimcWellPathNewTarget( wellGeomDef );
+        cmd->execute();
     }
-
-    const auto geomDefs =
-        caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
-    if ( !geomDefs.empty() )
+    else
     {
-        auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
-        if ( wellGeomDef->wellPath() == m_wellPath )
+        auto geomDefs =
+            caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
+        if ( !geomDefs.empty() )
         {
-            return true;
+            auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
+            auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+            if ( wellGeomDef->wellPath() == wellPath )
+            {
+                auto cmd = new RimcWellPathNewTarget( wellGeomDef );
+                cmd->execute();
+            }
         }
     }
 }
@@ -153,28 +102,64 @@ void RicNewWellPathListTargetFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicNewWellPathListTargetFeature::setupActionLook( QAction* actionToSetup )
+void RicNewWellPathListTargetFeature::setupActionLook( QAction* action )
 {
-    const auto selectedTargets =
+    action->setEnabled( true );
+
+    auto selectedTargets =
         caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
     if ( selectedTargets.size() == 1 )
     {
         auto firstTarget = static_cast<RimWellPathTarget*>( ( *selectedTargets.begin() )->pdmObject() );
-        if ( firstTarget->parent() == m_wellPath->wellPathTargetCollection() )
+        auto wellPath = firstTarget->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        if ( firstTarget->parent() == wellPath->wellPathGeometry() )
         {
-            actionToSetup->setEnabled( false );
-            actionToSetup->setToolTip( "Cannot add a new target when a target is selected" );
+            action->setEnabled( false );
+            action->setToolTip( "Cannot add a new target when a target is selected" );
         }
     }
 
-    const auto geomDefs =
+    auto geomDefs =
         caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
     if ( !geomDefs.empty() )
     {
         auto wellGeomDef = static_cast<RimWellPathGeometryDef*>( ( *geomDefs.begin() )->pdmObject() );
-        if ( wellGeomDef->wellPath() == m_wellPath )
+        auto wellPath = wellGeomDef->firstAncestorOrThisOfTypeAsserted<RimWellPath>();
+        if ( wellGeomDef->wellPath() == wellPath )
         {
-            return true;
         }
     }
+}
+
+void RicNewWellPathListTargetFeature::execute( const caf::PdmObjectHandle& object )
+{
+    auto wellPath = object.object<RimWellPath>();
+    if ( !wellPath )
+    {
+        return;
+    }
+
+    std::vector<caf::PdmObjectHandle> targets;
+    if ( object.isSubObject() )
+    {
+        auto firstTarget = object.object<RimWellPathTarget>();
+        if ( firstTarget->parent() != wellPath->wellPathGeometry() )
+        {
+            return;
+        }
+
+        auto treeView = caf::PdmUiTree::instance()->treeView();
+        auto objects  = treeView->selection()->selectedObjects();
+        for ( const auto& obj : objects )
+        {
+            if ( obj.object<RimWellPathTarget>() )
+            {
+                targets.push_back( obj );
+            }
+        }
+    }
+
+    auto cmd = new RimcWellPathNewTarget( wellPath );
+    cmd->addWellPathTargets( targets );
+    cmd->submit();
 }

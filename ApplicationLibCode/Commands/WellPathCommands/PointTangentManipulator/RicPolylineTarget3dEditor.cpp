@@ -19,6 +19,10 @@
 #include "RicPolylineTarget3dEditor.h"
 
 #include "RicPointTangentManipulator.h"
+#include "cafPdmObjectHandle.h"
+#include "cafPdmUiObjectHandle.h"
+
+#include <QAction>
 
 #include "Rim3dView.h"
 #include "RimPolylinePickerInterface.h"
@@ -154,15 +158,11 @@ void RicPolylineTarget3dEditor::slotSelectedIn3D( bool selected, int selectionLe
 {
     if ( selected )
     {
-        caf::SelectionManager::instance()->setSelectedItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
-            selectionLevel );
+        caf::SelectionManager::instance()->setSelectedItem( pdmObject()->uiCapability(), selectionLevel );
     }
     else
     {
-        caf::SelectionManager::instance()->removeItem(
-            static_cast<caf::PdmUiItem*>( const_cast<RicPolylineTarget3dEditor*>( this ) ),
-            selectionLevel );
+        caf::SelectionManager::instance()->removeObjectFromAllSelections( pdmObject() );
     }
 }
 

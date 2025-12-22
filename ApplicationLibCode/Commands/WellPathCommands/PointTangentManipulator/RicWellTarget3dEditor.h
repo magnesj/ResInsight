@@ -19,6 +19,7 @@
 #pragma once
 
 #include "Ric3dObjectEditorHandle.h"
+#include "cafPdmUiItem.h"
 
 #include "cvfObject.h"
 #include "cvfVector3.h"
