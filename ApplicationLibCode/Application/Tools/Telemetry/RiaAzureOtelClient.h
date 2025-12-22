@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <functional>
 #include <map>
 #include <memory>
 #include <string>
@@ -31,6 +32,16 @@
 class RiaAzureOtelClient
 {
 public:
+    // Logging callback for diagnostic messages
+    enum class LogLevel
+    {
+        Debug,
+        Info,
+        Warning,
+        Error
+    };
+    using LogCallback = std::function<void( LogLevel level, const std::string& message )>;
+
     struct AzureConfig
     {
         std::string connectionString; // Azure Application Insights connection string
@@ -42,6 +53,7 @@ public:
         bool        enableTraces     = true; // Enable trace export
         bool        enableLogs       = true; // Enable log export
         int         exportIntervalMs = 5000; // Export interval in milliseconds
+        LogCallback logCallback      = nullptr; // Optional logging callback
     };
 
     enum class ExportResult
@@ -92,6 +104,7 @@ private:
     void        setupResourceAttributes();
     std::string parseEndpointFromConnectionString( const std::string& connectionString );
     std::string parseInstrumentationKey( const std::string& connectionString );
+    void        log( LogLevel level, const std::string& message ) const;
 
     // Pimpl pattern to hide OpenTelemetry SDK types
     struct Impl;

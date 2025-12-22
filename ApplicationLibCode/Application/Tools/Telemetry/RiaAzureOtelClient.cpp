@@ -18,8 +18,6 @@
 
 #include "RiaAzureOtelClient.h"
 
-#include <QDebug>
-
 // Standard includes needed before OpenTelemetry headers
 #include <cstring>
 #include <memory>
@@ -84,7 +82,7 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
 {
     if ( m_initialized )
     {
-        qWarning() << "RiaAzureOtelClient already initialized";
+        log( LogLevel::Warning, "RiaAzureOtelClient already initialized" );
         return true;
     }
 
@@ -106,13 +104,13 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
     // Validate configuration
     if ( m_config.endpoint.empty() )
     {
-        qCritical() << "RiaAzureOtelClient: endpoint is required";
+        log( LogLevel::Error, "RiaAzureOtelClient: endpoint is required" );
         return false;
     }
 
     if ( m_config.serviceName.empty() )
     {
-        qCritical() << "RiaAzureOtelClient: serviceName is required";
+        log( LogLevel::Error, "RiaAzureOtelClient: serviceName is required" );
         return false;
     }
 
@@ -134,7 +132,7 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
     }
     catch ( const std::exception& e )
     {
-        qCritical() << "Failed to initialize OpenTelemetry providers:" << e.what();
+        log( LogLevel::Error, std::string( "Failed to initialize OpenTelemetry providers: " ) + e.what() );
         success = false;
     }
 
@@ -142,11 +140,11 @@ bool RiaAzureOtelClient::initialize( const AzureConfig& config )
 
     if ( m_initialized )
     {
-        qInfo() << "RiaAzureOtelClient initialized successfully";
+        log( LogLevel::Info, "RiaAzureOtelClient initialized successfully" );
     }
     else
     {
-        qCritical() << "RiaAzureOtelClient initialization failed";
+        log( LogLevel::Error, "RiaAzureOtelClient initialization failed" );
     }
 
     return m_initialized;
@@ -171,7 +169,7 @@ void RiaAzureOtelClient::shutdown()
     }
 
     m_initialized = false;
-    qInfo() << "RiaAzureOtelClient shut down";
+    log( LogLevel::Info, "RiaAzureOtelClient shut down" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -237,12 +235,12 @@ bool RiaAzureOtelClient::initializeTracerProvider()
         // Get tracer instance
         m_impl->tracer = m_impl->tracerProvider->GetTracer( m_config.serviceName, m_config.serviceVersion );
 
-        qInfo() << "Tracer provider initialized";
+        log( LogLevel::Info, "Tracer provider initialized" );
         return true;
     }
     catch ( const std::exception& e )
     {
-        qCritical() << "Failed to initialize tracer provider:" << e.what();
+        log( LogLevel::Error, std::string( "Failed to initialize tracer provider: " ) + e.what() );
         return false;
     }
 }
@@ -301,12 +299,12 @@ bool RiaAzureOtelClient::initializeLoggerProvider()
         // Get logger instance
         m_impl->logger = m_impl->loggerProvider->GetLogger( m_config.serviceName, m_config.serviceName, m_config.serviceVersion );
 
-        qInfo() << "Logger provider initialized";
+        log( LogLevel::Info, "Logger provider initialized" );
         return true;
     }
     catch ( const std::exception& e )
     {
-        qCritical() << "Failed to initialize logger provider:" << e.what();
+        log( LogLevel::Error, std::string( "Failed to initialize logger provider: " ) + e.what() );
         return false;
     }
 }
@@ -402,7 +400,7 @@ void RiaAzureOtelClient::logEvent( const std::string& message, const std::string
     if ( !m_initialized || !m_impl || !m_impl->logger ) return;
 
     // Create log record (simplified - actual implementation would use proper API)
-    qInfo() << QString::fromStdString( message );
+    // Note: This is a stub implementation. Full logging API integration is pending.
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -507,7 +505,7 @@ RiaAzureOtelClient::ExportResult RiaAzureOtelClient::forceFlush()
     }
     catch ( const std::exception& e )
     {
-        qCritical() << "Failed to flush telemetry:" << e.what();
+        log( LogLevel::Error, std::string( "Failed to flush telemetry: " ) + e.what() );
         return ExportResult::Failure;
     }
 }
@@ -518,4 +516,15 @@ RiaAzureOtelClient::ExportResult RiaAzureOtelClient::forceFlush()
 std::string RiaAzureOtelClient::getEndpoint() const
 {
     return m_config.endpoint;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Log a message using the callback if configured
+//--------------------------------------------------------------------------------------------------
+void RiaAzureOtelClient::log( LogLevel level, const std::string& message ) const
+{
+    if ( m_config.logCallback )
+    {
+        m_config.logCallback( level, message );
+    }
 }

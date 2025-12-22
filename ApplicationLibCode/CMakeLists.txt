@@ -247,8 +247,6 @@ target_link_libraries(ApplicationLibCode_OpenTelemetry
         opentelemetry-cpp::sdk
         opentelemetry-cpp::ext
         opentelemetry-cpp::logs
-        Qt6::Core
-        Qt6::Network
 )
 
 # Make necessary includes available to this library
