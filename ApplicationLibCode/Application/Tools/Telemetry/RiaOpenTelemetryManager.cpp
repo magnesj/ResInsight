@@ -18,6 +18,7 @@
 
 #include "RiaOpenTelemetryManager.h"
 
+#include "RiaAzureOtelClient.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesOpenTelemetry.h"
 #include "RifJsonEncodeDecode.h"
@@ -188,6 +189,13 @@ void RiaOpenTelemetryManager::shutdown()
 
     // Flush pending events
     flushPendingEvents();
+
+    // Shutdown Azure OTEL client if initialized
+    if ( m_azureClient )
+    {
+        m_azureClient->shutdown();
+        m_azureClient.reset();
+    }
 
     m_initialized = false;
 }
@@ -413,9 +421,26 @@ bool RiaOpenTelemetryManager::initializeProvider()
 {
     try
     {
-        if ( !createExporter() )
+        auto* prefs = RiaPreferencesOpenTelemetry::current();
+        if ( !prefs )
         {
             return false;
+        }
+
+        // Initialize based on selected backend
+        if ( prefs->telemetryBackend() == RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_OTLP )
+        {
+            if ( !initializeAzureOtelClient() )
+            {
+                return false;
+            }
+        }
+        else
+        {
+            if ( !createExporter() )
+            {
+                return false;
+            }
         }
 
         setupResourceAttributes();
@@ -426,6 +451,62 @@ bool RiaOpenTelemetryManager::initializeProvider()
         handleError( TelemetryError::InternalError, QString( "Failed to initialize provider: %1" ).arg( e.what() ) );
         return false;
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Initialize Azure OTEL client using OpenTelemetry SDK
+//--------------------------------------------------------------------------------------------------
+bool RiaOpenTelemetryManager::initializeAzureOtelClient()
+{
+    auto* prefs = RiaPreferencesOpenTelemetry::current();
+    if ( !prefs )
+    {
+        handleError( TelemetryError::ConfigurationError, "Failed to access preferences" );
+        return false;
+    }
+
+    // Create Azure OTEL client configuration
+    RiaAzureOtelClient::AzureConfig config;
+    config.connectionString   = prefs->connectionString().toStdString();
+    config.serviceName        = prefs->serviceName().toStdString();
+    config.serviceVersion     = prefs->serviceVersion().toStdString();
+    config.serviceInstanceId  = m_username.empty() ? "unknown" : m_username;
+    config.enableTraces       = true;
+    config.enableLogs         = true;
+    config.exportIntervalMs   = prefs->batchTimeoutMs();
+
+    // Setup logging callback to route Azure client logs through RiaLogging
+    config.logCallback = []( RiaAzureOtelClient::LogLevel level, const std::string& message )
+    {
+        QString qmsg = QString::fromStdString( message );
+        switch ( level )
+        {
+            case RiaAzureOtelClient::LogLevel::Debug:
+                RiaLogging::debug( qmsg );
+                break;
+            case RiaAzureOtelClient::LogLevel::Info:
+                RiaLogging::info( qmsg );
+                break;
+            case RiaAzureOtelClient::LogLevel::Warning:
+                RiaLogging::warning( qmsg );
+                break;
+            case RiaAzureOtelClient::LogLevel::Error:
+                RiaLogging::error( qmsg );
+                break;
+        }
+    };
+
+    // Create and initialize client
+    m_azureClient = std::make_unique<RiaAzureOtelClient>();
+    if ( !m_azureClient->initialize( config ) )
+    {
+        handleError( TelemetryError::ConfigurationError, "Failed to initialize Azure OTEL client" );
+        m_azureClient.reset();
+        return false;
+    }
+
+    RiaLogging::info( "Azure OTEL client initialized successfully" );
+    return true;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -545,9 +626,33 @@ void RiaOpenTelemetryManager::processEvents()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Route event to appropriate backend based on configuration
 //--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::processEvent( const Event& event )
+{
+    auto* prefs = RiaPreferencesOpenTelemetry::current();
+    if ( !prefs )
+    {
+        handleError( TelemetryError::InternalError, QString( "Failed to access Open Telemetry Preferences." ) );
+        updateHealthMetrics( false );
+        return;
+    }
+
+    // Route to appropriate backend
+    if ( prefs->telemetryBackend() == RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_OTLP )
+    {
+        processEventViaOtlp( event );
+    }
+    else
+    {
+        processEventViaRestApi( event );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Process event using Azure REST API (original implementation)
+//--------------------------------------------------------------------------------------------------
+void RiaOpenTelemetryManager::processEventViaRestApi( const Event& event )
 {
     try
     {
@@ -652,12 +757,71 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Process event using Azure OTLP via OpenTelemetry SDK
+//--------------------------------------------------------------------------------------------------
+void RiaOpenTelemetryManager::processEventViaOtlp( const Event& event )
+{
+    if ( !m_azureClient || !m_azureClient->isInitialized() )
+    {
+        handleError( TelemetryError::ConfigurationError, "Azure OTEL client not initialized" );
+        updateHealthMetrics( false );
+        return;
+    }
+
+    try
+    {
+        // Convert attributes to std::map<std::string, std::string>
+        std::map<std::string, std::string> properties = event.attributes;
+
+        // Add system information
+        properties["os.type"]    = QSysInfo::productType().toStdString();
+        properties["os.version"] = QSysInfo::productVersion().toStdString();
+        properties["os.name"]    = QSysInfo::prettyProductName().toStdString();
+
+        // Add username if configured
+        {
+            std::lock_guard<std::mutex> lock( m_configMutex );
+            if ( !m_username.empty() )
+            {
+                properties["user.name"] = m_username;
+            }
+        }
+
+        // Use Azure client to track event
+        m_azureClient->trackEvent( event.name, properties );
+
+        updateHealthMetrics( true );
+        m_consecutiveFailures = 0;
+        resetCircuitBreaker();
+    }
+    catch ( const std::exception& e )
+    {
+        handleError( TelemetryError::InternalError, QString( "Failed to process event via OTLP: %1" ).arg( e.what() ) );
+        updateHealthMetrics( false );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::flushPendingEvents()
 {
     // Process remaining events in the queue
     processEvents();
+
+    // Flush the Azure OTEL client if using OTLP backend
+    auto* prefs = RiaPreferencesOpenTelemetry::current();
+    if ( prefs && prefs->telemetryBackend() == RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_OTLP )
+    {
+        if ( m_azureClient && m_azureClient->isInitialized() )
+        {
+            auto result = m_azureClient->forceFlush();
+            if ( result != RiaAzureOtelClient::ExportResult::Success )
+            {
+                RiaLogging::warning( "Failed to flush Azure OTEL client" );
+            }
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -36,6 +36,14 @@ void RiaPreferencesOpenTelemetry::LoggingStateType::setUp()
     addItem( RiaPreferencesOpenTelemetry::LoggingState::ALL, "ALL", "All" );
     setDefault( RiaPreferencesOpenTelemetry::LoggingState::DEFAULT );
 }
+
+template <>
+void RiaPreferencesOpenTelemetry::TelemetryBackendType::setUp()
+{
+    addItem( RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_REST_API, "AZURE_REST_API", "Azure REST API" );
+    addItem( RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_OTLP, "AZURE_OTLP", "Azure OTLP (OpenTelemetry SDK)" );
+    setDefault( RiaPreferencesOpenTelemetry::TelemetryBackend::AZURE_REST_API );
+}
 } // namespace caf
 
 CAF_PDM_SOURCE_INIT( RiaPreferencesOpenTelemetry, "RiaPreferencesOpenTelemetry" );
@@ -48,6 +56,7 @@ RiaPreferencesOpenTelemetry::RiaPreferencesOpenTelemetry()
     CAF_PDM_InitObject( "OpenTelemetry Configuration", "", "", "Configuration for OpenTelemetry crash reporting and telemetry" );
 
     CAF_PDM_InitField( &m_loggingState, "loggingState", LoggingStateType( LoggingState::DISABLED ), "Logging State" );
+    CAF_PDM_InitField( &m_telemetryBackend, "telemetryBackend", TelemetryBackendType( TelemetryBackend::AZURE_REST_API ), "Telemetry Backend" );
     CAF_PDM_InitField( &m_connectionString, "connectionString", QString(), "Azure Connection String" );
     m_connectionString.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
 
@@ -124,11 +133,9 @@ void RiaPreferencesOpenTelemetry::setFieldsReadOnly()
     std::vector<caf::PdmFieldHandle*> fields = this->fields();
     for ( auto field : fields )
     {
-        // Keep logging state editable
-        if ( field != &m_loggingState )
-        {
-            field->uiCapability()->setUiReadOnly( true );
-        }
+        if ( field == &m_loggingState || field == &m_telemetryBackend ) continue;
+
+        field->uiCapability()->setUiReadOnly( true );
     }
 }
 
@@ -142,6 +149,7 @@ void RiaPreferencesOpenTelemetry::defineUiOrdering( QString uiConfigName, caf::P
     // Only show configuration fields if not disabled
     if ( m_loggingState() != LoggingState::DISABLED )
     {
+        uiOrdering.add( &m_telemetryBackend );
         uiOrdering.add( &m_connectionString );
         uiOrdering.add( &m_batchTimeoutMs );
         uiOrdering.add( &m_maxBatchSize );
@@ -231,4 +239,12 @@ int RiaPreferencesOpenTelemetry::connectionTimeoutMs() const
 RiaPreferencesOpenTelemetry::LoggingState RiaPreferencesOpenTelemetry::loggingState() const
 {
     return m_loggingState();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaPreferencesOpenTelemetry::TelemetryBackend RiaPreferencesOpenTelemetry::telemetryBackend() const
+{
+    return m_telemetryBackend();
 }

@@ -33,6 +33,7 @@
 class QString;
 class QNetworkAccessManager;
 class QTimer;
+class RiaAzureOtelClient;
 
 //==================================================================================================
 //
@@ -131,12 +132,15 @@ private:
 
     // Initialization
     bool initializeProvider();
+    bool initializeAzureOtelClient();
     bool createExporter();
     void setupResourceAttributes();
 
     // Event processing
     void processEvents();
     void processEvent( const Event& event );
+    void processEventViaRestApi( const Event& event );
+    void processEventViaOtlp( const Event& event );
     void flushPendingEvents();
     void onProcessEventTimer();
 
@@ -165,6 +169,9 @@ private:
     QNetworkAccessManager* m_networkAccessManager{ nullptr };
     QTimer*                m_processTimer{ nullptr };
     QTimer*                m_healthTimer{ nullptr };
+
+    // Azure OTEL client (for OTLP backend)
+    std::unique_ptr<RiaAzureOtelClient> m_azureClient;
 
     // Configuration
     size_t      m_maxQueueSize{ 10000 };

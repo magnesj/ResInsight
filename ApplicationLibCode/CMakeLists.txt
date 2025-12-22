@@ -217,6 +217,9 @@ endif()
 #
 # OpenTelemetry
 #
+# Find dependencies for opentelemetry-cpp
+find_package(nlohmann_json CONFIG REQUIRED)
+find_package(CURL REQUIRED)
 find_package(opentelemetry-cpp CONFIG REQUIRED)
 
 # Preferences and Manager stay in main ApplicationLibCode

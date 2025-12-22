@@ -10,6 +10,7 @@
     "fast-float",
     "spdlog",
     "pugixml",
+    "nlohmann-json",
     {
       "name": "opentelemetry-cpp",
       "features": ["otlp-http"]
