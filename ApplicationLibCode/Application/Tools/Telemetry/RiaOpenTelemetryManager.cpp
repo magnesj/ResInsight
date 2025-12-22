@@ -25,6 +25,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
+#include <QProcessEnvironment>
 #include <QString>
 #include <QSysInfo>
 #include <QTimer>
@@ -62,6 +63,32 @@ RiaOpenTelemetryManager& RiaOpenTelemetryManager::instance()
 {
     static RiaOpenTelemetryManager instance;
     return instance;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Get system username in a cross-platform way
+/// Returns username from environment variables (USERNAME on Windows, USER on Linux)
+//--------------------------------------------------------------------------------------------------
+QString RiaOpenTelemetryManager::getSystemUsername()
+{
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    // Try Windows environment variable first
+    QString username = env.value( "USERNAME" );
+    if ( !username.isEmpty() )
+    {
+        return username;
+    }
+
+    // Try Linux/Unix environment variable
+    username = env.value( "USER" );
+    if ( !username.isEmpty() )
+    {
+        return username;
+    }
+
+    // Fallback
+    return QString();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -139,7 +166,7 @@ bool RiaOpenTelemetryManager::initialize()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
+void RiaOpenTelemetryManager::shutdown()
 {
     if ( !m_initialized.load() )
     {
@@ -168,9 +195,18 @@ void RiaOpenTelemetryManager::shutdown( std::chrono::seconds timeout )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RiaOpenTelemetryManager::reinitialize()
+{
+    shutdown();
+    return initialize();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::reportEventAsync( const std::string& eventName, const std::map<std::string, std::string>& attributes )
 {
-    if ( !isEnabled() || isCircuitBreakerOpen() || !shouldSampleEvent() )
+    if ( !isEnabled() || isCircuitBreakerOpen() )
     {
         return;
     }
@@ -229,11 +265,8 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
     attributes["service.name"]      = RiaPreferencesOpenTelemetry::current()->serviceName().toStdString();
     attributes["service.version"]   = RiaPreferencesOpenTelemetry::current()->serviceVersion().toStdString();
 
-    // Report with high priority (bypass sampling)
-    std::unique_lock<std::mutex> lock( m_queueMutex );
-    m_eventQueue.emplace( "crash.signal_handler", attributes );
-    m_healthMetrics.eventsQueued++;
-    lock.unlock();
+    reportEventAsync( "crash.signal_handler", attributes );
+    flushPendingEvents();
 
     RiaLogging::error( QString( "Crash reported to OpenTelemetry (signal: %1)" ).arg( signalCode ) );
 }
@@ -299,6 +332,15 @@ void RiaOpenTelemetryManager::setErrorCallback( ErrorCallback callback )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RiaOpenTelemetryManager::setUsername( const std::string& username )
+{
+    std::lock_guard<std::mutex> lock( m_configMutex );
+    m_username = username;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RiaOpenTelemetryManager::setMaxQueueSize( size_t maxEvents )
 {
     std::lock_guard<std::mutex> lock( m_configMutex );
@@ -321,15 +363,6 @@ void RiaOpenTelemetryManager::setMemoryThreshold( size_t maxMemoryMB )
 {
     std::lock_guard<std::mutex> lock( m_configMutex );
     m_memoryThresholdMB = maxMemoryMB;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaOpenTelemetryManager::setSamplingRate( double rate )
-{
-    std::lock_guard<std::mutex> lock( m_configMutex );
-    m_samplingRate = std::clamp( rate, 0.0, 1.0 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -551,6 +584,15 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         properties["os.version"] = QSysInfo::productVersion();
         properties["os.name"]    = QSysInfo::prettyProductName();
 
+        // Add username if configured
+        {
+            std::lock_guard<std::mutex> lock( m_configMutex );
+            if ( !m_username.empty() )
+            {
+                properties["user.name"] = QString::fromStdString( m_username );
+            }
+        }
+
         // Create Application Insights telemetry item
         QMap<QString, QVariant> baseData;
         baseData["name"]       = QString::fromStdString( event.name );
@@ -607,22 +649,6 @@ void RiaOpenTelemetryManager::processEvent( const Event& event )
         handleError( TelemetryError::InternalError, QString( "Failed to process event: %1" ).arg( e.what() ) );
         updateHealthMetrics( false );
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RiaOpenTelemetryManager::shouldSampleEvent() const
-{
-    if ( m_samplingRate >= 1.0 )
-    {
-        return true;
-    }
-
-    static thread_local std::mt19937                           gen( std::random_device{}() );
-    static thread_local std::uniform_real_distribution<double> dis( 0.0, 1.0 );
-
-    return dis( gen ) < m_samplingRate;
 }
 
 //--------------------------------------------------------------------------------------------------
