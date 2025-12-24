@@ -124,7 +124,8 @@ bool RicCreateWellTargetsPickEventHandler::handle3dPickEvent( const Ric3dPickEve
             cvf::Vec3d domainRayOrigin = rimView->displayCoordTransform()->transformToDomainCoord( firstPickItem.globalRayOrigin() );
 
             auto         rayVector        = ( targetPointInDomain - domainRayOrigin );
-            const double minimumRayLength = rimView->ownerCase()->characteristicCellSize() * 2;
+            auto         ownerCase        = rimView->ownerCase();
+            const double minimumRayLength = ownerCase ? ownerCase->characteristicCellSize() * 2 : 1.0;
             if ( rayVector.length() < minimumRayLength )
             {
                 rayVector = rayVector.getNormalized() * minimumRayLength;
