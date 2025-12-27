@@ -81,45 +81,62 @@ ProgressTask::~ProgressTask()
 //==================================================================================================
 ///
 /// \class caf::ProgressInfo
-/// This class provides a simple frontend to the Qt progressbar, allowing distributed
-/// progress calculation.
 ///
-/// Create an instance of this object in the method/function that needs progress information
-/// Then call incrementProgress() or setProgress() at proper times in your method.
-/// When the method returns, the ProgressInfo destructor will clean up and finish.
-/// The real beauty is that this class will magically interact with possible ProgressInfo instances
-/// in functions that your method calls, providing a complete, consistent and detailed progress bar
+/// Provides a hierarchical progress tracking system with Qt dialog integration.
 ///
+/// This class provides a simple frontend to the Qt progress dialog, allowing distributed
+/// progress calculation across nested function calls.
+///
+/// ## Basic Usage
+///
+/// Create an instance of this object in the method/function that needs progress information.
+/// Call incrementProgress() or setProgress() at appropriate times in your method.
+/// When the method returns, the ProgressInfo destructor will automatically clean up.
+///
+/// \code
 /// caf::ProgressInfo progInfo(3, "Open File");
 /// progInfo.setProgressDescription("Reading");
-/// ...readFile()
+/// readFile();
 /// progInfo.incrementProgress();
 /// progInfo.setProgressDescription("Validating");
-/// ... validateData();
+/// validateData();
 /// progInfo.incrementProgress();
 /// progInfo.setProgressDescription("Building geometry");
-///  ... buildGeometry();
-/// progInfo.incrementProgress(); // not needed really, because the destructor will send the progress to top.
+/// buildGeometry();
+/// progInfo.incrementProgress(); // Not strictly needed as destructor completes progress
+/// \endcode
 ///
-/// There are one particular limitation: The progress will not work correctly if the higher level
-/// ProgressInfo object does not increment progress between the creation and operation of two (or more)
-/// independent lower level ProgressInfo objects. If not, the progress will restart (within its limits)
-/// for each progress object that is operating.
+/// ## Nested Progress
 ///
+/// The system supports nested progress tracking. Inner ProgressInfo objects automatically
+/// contribute to their parent's progress. However, you must call incrementProgress() on
+/// the parent between independent nested operations:
+///
+/// \code
 /// caf::ProgressInfo progInfoHighLevel(3, "Open File");
-///
 /// {
 ///     caf::ProgressInfo progInfoLowLevel(10, "");
+///     // ... work
 /// }
-/// // NEEDS progInfoHighLevel.incrementProgress() here !!
+/// progInfoHighLevel.incrementProgress(); // REQUIRED between nested operations
 /// {
 ///     caf::ProgressInfo progInfoLowLevel(10, "");
+///     // ... work
 /// }
+/// \endcode
 ///
-/// It is not allowed to have several ProgressInfo objects in the same scope level
+/// ## Limitations
 ///
-/// caf::ProgressInfo progInfo1(10, "");
-/// caf::ProgressInfo progInfo2(10, ""); //<-- Will not work well
+/// - Multiple ProgressInfo objects in the same scope are not supported
+/// - All progress updates must occur on the UI thread
+/// - Nested progress requires proper incrementProgress() calls between siblings
+///
+/// ## Modern Alternatives
+///
+/// For simpler usage, consider the helper classes:
+/// - ProgressScope: RAII-based progress with automatic increment
+/// - ProgressPercentage: Percentage-based progress (0-100)
+///
 //==================================================================================================
 
 //--------------------------------------------------------------------------------------------------
@@ -706,7 +723,17 @@ void ProgressInfoStatic::setEnabled( bool enable )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Check if progress updates are possible
 ///
+/// Progress updates are only possible when:
+/// 1. Progress is not globally disabled
+/// 2. We're running in a QApplication (not QCoreApplication)
+/// 3. We're on the UI thread (same thread as the progress dialog)
+///
+/// Thread Safety Note:
+/// The current implementation uses static state without mutex protection. All progress
+/// operations must occur on the UI thread. For background thread progress reporting,
+/// consider using signals/slots or QMetaObject::invokeMethod to marshal updates to the UI thread.
 //--------------------------------------------------------------------------------------------------
 bool ProgressInfoStatic::isUpdatePossible()
 {
