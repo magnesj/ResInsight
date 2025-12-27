@@ -214,7 +214,7 @@ public:
     static void setNextProgressIncrement( size_t nextStepSize );
     static bool isRunning();
     static void finished();
-    
+
     /// Enable or disable all progress reporting globally
     static void setEnabled( bool enable );
 

@@ -310,4 +310,3 @@ TEST( ProgressPercentageTest, BoundaryValues )
 
     caf::ProgressInfoStatic::setEnabled( true );
 }
-
