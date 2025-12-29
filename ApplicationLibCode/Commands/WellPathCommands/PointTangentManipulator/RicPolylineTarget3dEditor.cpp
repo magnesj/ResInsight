@@ -158,7 +158,7 @@ void RicPolylineTarget3dEditor::slotSelectedIn3D()
         return;
     }
 
-    caf::SelectionManager::instance()->setSelectedItemAtLevel( target, caf::SelectionManager::FIRST_LEVEL );
+    caf::SelectionManager::instance()->setSelectedItem( target );
 }
 
 //--------------------------------------------------------------------------------------------------
