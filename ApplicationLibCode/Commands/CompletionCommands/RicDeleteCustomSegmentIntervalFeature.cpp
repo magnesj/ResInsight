@@ -37,7 +37,7 @@ CAF_CMD_SOURCE_INIT( RicDeleteCustomSegmentIntervalFeature, "RicDeleteCustomSegm
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteCustomSegmentIntervalFeature::isCommandEnabled() const
 {
-    if ( caf::SelectionManager::instance()->selectedItemOfType<RimCustomSegmentInterval>( caf::SelectionManager::FIRST_LEVEL ) )
+    if ( caf::SelectionManager::instance()->selectedItemOfType<RimCustomSegmentInterval>() )
     {
         return true;
     }
@@ -75,7 +75,7 @@ bool RicDeleteCustomSegmentIntervalFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteCustomSegmentIntervalFeature::onActionTriggered( bool isChecked )
 {
-    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>( caf::SelectionManager::FIRST_LEVEL );
+    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>();
     RimCustomSegmentIntervalCollection* intervalCollection = nullptr;
 
     if ( !intervals.empty() )
@@ -143,7 +143,7 @@ void RicDeleteCustomSegmentIntervalFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicDeleteCustomSegmentIntervalFeature::setupActionLook( QAction* actionToSetup )
 {
-    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>( caf::SelectionManager::FIRST_LEVEL );
+    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>();
     if ( !intervals.empty() )
     {
         if ( intervals.size() == 1 )

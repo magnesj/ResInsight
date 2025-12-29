@@ -98,9 +98,7 @@ public:
     };
 
     PdmUiTableViewEditorAttribute()
-        : tableSelectionLevel( 0 )
-        , rowSelectionLevel( 1 )
-        , enableHeaderText( true )
+        : enableHeaderText( true )
         , minimumHeight( -1 )
         , heightHint( -1 )
         , alwaysEnforceResizePolicy( false )
@@ -109,8 +107,6 @@ public:
     {
     }
 
-    int              tableSelectionLevel;
-    int              rowSelectionLevel;
     bool             enableHeaderText;
     std::vector<int> columnWidths;
     int              minimumHeight; ///< Not used if If < 0
@@ -135,8 +131,6 @@ public:
     ~PdmUiTableViewEditor() override;
 
     void enableHeaderText( bool enable );
-    void setTableSelectionLevel( int selectionLevel );
-    void setRowSelectionLevel( int selectionLevel );
 
     PdmObjectHandle* pdmObjectFromModelIndex( const QModelIndex& mi );
     QTableView*      tableView();
@@ -173,8 +167,6 @@ private:
     PdmUiCheckBoxDelegate*  m_checkboxDelegate;
 
     bool m_useDefaultContextMenu;
-    int  m_tableSelectionLevel;
-    int  m_rowSelectionLevel;
     bool m_isBlockingSelectionManagerChanged;
     bool m_isUpdatingSelectionQModel;
 

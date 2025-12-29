@@ -94,14 +94,9 @@ void PdmUiSelection3dEditorVisualizer::onSelectionManagerSelectionChanged( const
 
     if ( !m_ownerViewer ) return;
 
-    std::set<PdmUiItem*> totalSelection;
-    for ( int selLevel : changedSelectionLevels )
-    {
-        auto items = caf::SelectionManager::instance()->selectedItems( selLevel );
-        totalSelection.insert( items.begin(), items.end() );
-    }
+    auto items = caf::SelectionManager::instance()->selectedItems();
 
-    for ( PdmUiItem* item : totalSelection )
+    for ( PdmUiItem* item : items )
     {
         QString editor3dTypeName = item->ui3dEditorTypeName( m_configName );
         if ( !editor3dTypeName.isEmpty() )
