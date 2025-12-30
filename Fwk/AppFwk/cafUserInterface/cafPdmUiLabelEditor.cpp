@@ -72,6 +72,32 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
     }
 
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        if ( auto val = uiItem->getAttributeBool( "useWordWrap", uiConfigName ) )
+        {
+            attributes.m_useWordWrap = *val;
+        }
+
+        if ( auto val = uiItem->getAttributeBool( "useSingleWidgetInsteadOfLabelAndEditorWidget", uiConfigName ) )
+        {
+            attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = *val;
+        }
+
+        if ( auto val = uiItem->getAttributeString( "linkText", uiConfigName ) )
+        {
+            attributes.m_linkText = *val;
+        }
+
+        QVariant callbackVariant = uiItem->getAttribute( "linkActivatedCallback", uiConfigName );
+        if ( callbackVariant.isValid() && callbackVariant.canConvert<std::function<void( const QString& )>>() )
+        {
+            attributes.m_linkActivatedCallback = callbackVariant.value<std::function<void( const QString& )>>();
+        }
+    }
+
     if ( !attributes.m_linkText.isEmpty() )
     {
         // Configure rich text and hyper link support
