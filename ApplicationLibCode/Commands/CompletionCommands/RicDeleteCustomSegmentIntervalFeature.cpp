@@ -75,7 +75,7 @@ bool RicDeleteCustomSegmentIntervalFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteCustomSegmentIntervalFeature::onActionTriggered( bool isChecked )
 {
-    const auto intervals = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>();
+    const auto                          intervals          = caf::SelectionManager::instance()->objectsByType<RimCustomSegmentInterval>();
     RimCustomSegmentIntervalCollection* intervalCollection = nullptr;
 
     if ( !intervals.empty() )

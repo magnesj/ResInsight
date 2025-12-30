@@ -50,7 +50,7 @@ bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicDeleteWellPathAttributeFeature::onActionTriggered( bool isChecked )
 {
-    const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
+    const auto                      attributes                  = caf::SelectionManager::instance()->objectsByType<RimWellPathAttribute>();
     RimWellPathAttributeCollection* wellPathAttributeCollection = nullptr;
     if ( !attributes.empty() )
     {
