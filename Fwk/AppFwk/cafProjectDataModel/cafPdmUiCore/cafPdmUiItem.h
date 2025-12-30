@@ -39,7 +39,10 @@
 #include "cafIconProvider.h"
 #include "cafPdmUiFieldSpecialization.h"
 
+#include <map>
+#include <optional>
 #include <set>
+#include <string>
 #include <type_traits>
 
 namespace caf
@@ -293,6 +296,22 @@ public:
 
     virtual bool isUiGroup() const;
 
+    // Map-based attribute system
+    void     setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName = "" );
+    QVariant getAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
+    bool     hasAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
+
+    // Type-safe helpers
+    void setAttributeInt( const std::string& key, int value, const QString& uiConfigName = "" );
+    void setAttributeBool( const std::string& key, bool value, const QString& uiConfigName = "" );
+    void setAttributeString( const std::string& key, const QString& value, const QString& uiConfigName = "" );
+    void setAttributeDouble( const std::string& key, double value, const QString& uiConfigName = "" );
+
+    std::optional<int>     getAttributeInt( const std::string& key, const QString& uiConfigName = "" ) const;
+    std::optional<bool>    getAttributeBool( const std::string& key, const QString& uiConfigName = "" ) const;
+    std::optional<QString> getAttributeString( const std::string& key, const QString& uiConfigName = "" ) const;
+    std::optional<double>  getAttributeDouble( const std::string& key, const QString& uiConfigName = "" ) const;
+
     /// Intended to be called when fields in an object has been changed
     void updateConnectedEditors() const;
     void scheduleUpdateConnectedEditors() const;
@@ -330,6 +349,9 @@ private:
 
     PdmUiItemInfo*                   m_staticItemInfo;
     std::map<QString, PdmUiItemInfo> m_configItemInfos;
+
+    // Map-based attributes: uiConfigName -> (attributeKey -> value)
+    std::map<QString, std::map<std::string, QVariant>> m_attributeMaps;
 
     static bool sm_showExtraDebugText;
 };

@@ -74,6 +74,67 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
     }
 
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        QVariant val;
+
+        val = uiItem->getAttribute( "adjustWidthToContents", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.adjustWidthToContents = val.toBool();
+        }
+
+        val = uiItem->getAttribute( "showPreviousAndNextButtons", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.showPreviousAndNextButtons = val.toBool();
+        }
+
+        val = uiItem->getAttribute( "minimumContentsLength", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.minimumContentsLength = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "maximumMenuContentsLength", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.maximumMenuContentsLength = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "enableEditableContent", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.enableEditableContent = val.toBool();
+        }
+
+        val = uiItem->getAttribute( "enableAutoComplete", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.enableAutoComplete = val.toBool();
+        }
+
+        val = uiItem->getAttribute( "iconSize", uiConfigName );
+        if ( val.isValid() && val.canConvert<QSize>() )
+        {
+            m_attributes.iconSize = val.toSize();
+        }
+
+        val = uiItem->getAttribute( "placeholderText", uiConfigName );
+        if ( val.isValid() && val.canConvert<QString>() )
+        {
+            m_attributes.placeholderText = val.toString();
+        }
+
+        val = uiItem->getAttribute( "notifyWhenTextIsEdited", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.notifyWhenTextIsEdited = val.toBool();
+        }
+    }
+
     if ( !m_comboBox.isNull() )
     {
         m_comboBox->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );

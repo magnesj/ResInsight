@@ -86,6 +86,21 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
         }
     }
 
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        if ( auto val = uiItem->getAttributeInt( "decimals", uiConfigName ) )
+        {
+            m_attributes.m_decimals = *val;
+        }
+
+        if ( auto val = uiItem->getAttributeInt( "numberFormat", uiConfigName ) )
+        {
+            m_attributes.m_numberFormat = static_cast<PdmUiDoubleValueEditorAttribute::NumberFormat>( *val );
+        }
+    }
+
     bool    valueOk = false;
     double  value   = uiField()->uiValue().toDouble( &valueOk );
     QString textValue;

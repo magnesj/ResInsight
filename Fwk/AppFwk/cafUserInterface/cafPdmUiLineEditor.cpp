@@ -159,6 +159,55 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
                 uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &leab );
             }
 
+            // Override with map-based attributes if present (new system takes precedence)
+            PdmUiItem* uiItem = uiField();
+            if ( uiItem )
+            {
+                QVariant val;
+
+                val = uiItem->getAttribute( "maximumWidth", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.maximumWidth = val.toInt();
+                }
+
+                val = uiItem->getAttribute( "selectAllOnFocusEvent", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.selectAllOnFocusEvent = val.toBool();
+                }
+
+                val = uiItem->getAttribute( "placeholderText", uiConfigName );
+                if ( val.isValid() && val.canConvert<QString>() )
+                {
+                    leab.placeholderText = val.toString();
+                }
+
+                val = uiItem->getAttribute( "avoidSendingEnterEvent", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.avoidSendingEnterEventToParentWidget = val.toBool();
+                }
+
+                val = uiItem->getAttribute( "completerCaseSensitivity", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.completerCaseSensitivity = static_cast<Qt::CaseSensitivity>( val.toInt() );
+                }
+
+                val = uiItem->getAttribute( "completerFilterMode", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.completerFilterMode = static_cast<Qt::MatchFlags>( val.toInt() );
+                }
+
+                val = uiItem->getAttribute( "notifyWhenTextIsEdited", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.notifyWhenTextIsEdited = val.toBool();
+                }
+            }
+
             if ( uiField()->isAutoValueEnabled() )
             {
                 QString highlightColor = UiAppearanceSettings::instance()->autoValueEditorColor();
