@@ -37,6 +37,7 @@
 #include "cafPdmUiToolButtonEditor.h"
 
 #include "cafPdmFieldHandle.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiObjectHandle.h"
@@ -71,6 +72,36 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         pdmUiOjectHandle->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
     }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<std::string> supportedAttributes = { "checkable" };
+
+        QVariant val;
+
+        val = uiItem->getAttribute( "checkable", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            attributes.m_checkable = val.toBool();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiToolButtonEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: checkable" )
+                        .arg( QString::fromStdString( key ) ) );
+            }
+        }
+    }
+
     bool isCheckable = attributes.m_checkable;
     m_toolButton->setCheckable( isCheckable );
     m_toolButton->setSizePolicy( attributes.m_sizePolicy );

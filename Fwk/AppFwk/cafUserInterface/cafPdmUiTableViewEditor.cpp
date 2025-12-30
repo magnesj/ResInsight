@@ -37,6 +37,7 @@
 
 #include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiCheckBoxDelegate.h"
 #include "cafPdmUiEditorHandle.h"
@@ -188,6 +189,77 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         childArrayFH->ownerObject()->uiCapability()->editorAttribute( childArrayFH, uiConfigName, &editorAttrib );
         editorAttribLoaded = true;
+
+        // Override with map-based attributes if present (new system takes precedence)
+        if ( auto uiItem = childArrayFH->uiCapability() )
+        {
+            // List of supported attributes for validation
+            static const std::set<std::string> supportedAttributes = { "tableSelectionLevel",
+                                                                       "rowSelectionLevel",
+                                                                       "enableHeaderText",
+                                                                       "minimumHeight",
+                                                                       "heightHint",
+                                                                       "alwaysEnforceResizePolicy",
+                                                                       "enableDropTarget" };
+
+            QVariant val;
+
+            val = uiItem->getAttribute( "tableSelectionLevel", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.tableSelectionLevel = val.toInt();
+            }
+
+            val = uiItem->getAttribute( "rowSelectionLevel", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.rowSelectionLevel = val.toInt();
+            }
+
+            val = uiItem->getAttribute( "enableHeaderText", uiConfigName );
+            if ( val.isValid() && val.canConvert<bool>() )
+            {
+                editorAttrib.enableHeaderText = val.toBool();
+            }
+
+            val = uiItem->getAttribute( "minimumHeight", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.minimumHeight = val.toInt();
+            }
+
+            val = uiItem->getAttribute( "heightHint", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.heightHint = val.toInt();
+            }
+
+            val = uiItem->getAttribute( "alwaysEnforceResizePolicy", uiConfigName );
+            if ( val.isValid() && val.canConvert<bool>() )
+            {
+                editorAttrib.alwaysEnforceResizePolicy = val.toBool();
+            }
+
+            val = uiItem->getAttribute( "enableDropTarget", uiConfigName );
+            if ( val.isValid() && val.canConvert<bool>() )
+            {
+                editorAttrib.enableDropTarget = val.toBool();
+            }
+
+            // Validate: warn about unsupported attributes
+            auto allAttributes = uiItem->getAttributes( uiConfigName );
+            for ( const auto& [key, value] : allAttributes )
+            {
+                if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                {
+                    CAF_PDM_LOG_WARNING(
+                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
+                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
+                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, enableDropTarget" )
+                            .arg( QString::fromStdString( key ) ) );
+                }
+            }
+        }
 
         this->setTableSelectionLevel( editorAttrib.tableSelectionLevel );
         this->setRowSelectionLevel( editorAttrib.rowSelectionLevel );
