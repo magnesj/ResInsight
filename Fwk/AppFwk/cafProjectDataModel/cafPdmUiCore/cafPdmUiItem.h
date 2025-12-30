@@ -297,9 +297,10 @@ public:
     virtual bool isUiGroup() const;
 
     // Map-based attribute system
-    void     setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName = "" );
-    QVariant getAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
-    bool     hasAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
+    void                                setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName = "" );
+    QVariant                            getAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
+    bool                                hasAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
+    std::map<std::string, QVariant>     getAttributes( const QString& uiConfigName = "" ) const;
 
     // Type-safe helpers
     void setAttributeInt( const std::string& key, int value, const QString& uiConfigName = "" );

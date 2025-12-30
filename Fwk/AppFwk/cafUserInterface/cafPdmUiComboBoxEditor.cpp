@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafUiAppearanceSettings.h"
@@ -78,6 +79,17 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
+        // List of supported attributes for validation
+        static const std::set<std::string> supportedAttributes = { "adjustWidthToContents",
+                                                                   "showPreviousAndNextButtons",
+                                                                   "minimumContentsLength",
+                                                                   "maximumMenuContentsLength",
+                                                                   "enableEditableContent",
+                                                                   "enableAutoComplete",
+                                                                   "iconSize",
+                                                                   "placeholderText",
+                                                                   "notifyWhenTextIsEdited" };
+
         QVariant val;
 
         val = uiItem->getAttribute( "adjustWidthToContents", uiConfigName );
@@ -132,6 +144,21 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
         if ( val.isValid() && val.canConvert<bool>() )
         {
             m_attributes.notifyWhenTextIsEdited = val.toBool();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiComboBoxEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: adjustWidthToContents, showPreviousAndNextButtons, "
+                             "minimumContentsLength, maximumMenuContentsLength, enableEditableContent, "
+                             "enableAutoComplete, iconSize, placeholderText, notifyWhenTextIsEdited" )
+                        .arg( QString::fromStdString( key ) ) );
+            }
         }
     }
 

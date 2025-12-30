@@ -825,6 +825,36 @@ bool PdmUiItem::hasAttribute( const std::string& key, const QString& uiConfigNam
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::map<std::string, QVariant> PdmUiItem::getAttributes( const QString& uiConfigName ) const
+{
+    std::map<std::string, QVariant> result;
+
+    // Start with default config attributes
+    auto defaultIt = m_attributeMaps.find( "" );
+    if ( defaultIt != m_attributeMaps.end() )
+    {
+        result = defaultIt->second;
+    }
+
+    // Override with config-specific attributes
+    if ( !uiConfigName.isEmpty() )
+    {
+        auto configIt = m_attributeMaps.find( uiConfigName );
+        if ( configIt != m_attributeMaps.end() )
+        {
+            for ( const auto& [key, value] : configIt->second )
+            {
+                result[key] = value;
+            }
+        }
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void PdmUiItem::setAttributeInt( const std::string& key, int value, const QString& uiConfigName )
 {
     setAttribute( key, QVariant( value ), uiConfigName );

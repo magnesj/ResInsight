@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -163,6 +164,15 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             PdmUiItem* uiItem = uiField();
             if ( uiItem )
             {
+                // List of supported attributes for validation
+                static const std::set<std::string> supportedAttributes = { "maximumWidth",
+                                                                           "selectAllOnFocusEvent",
+                                                                           "placeholderText",
+                                                                           "avoidSendingEnterEvent",
+                                                                           "completerCaseSensitivity",
+                                                                           "completerFilterMode",
+                                                                           "notifyWhenTextIsEdited" };
+
                 QVariant val;
 
                 val = uiItem->getAttribute( "maximumWidth", uiConfigName );
@@ -205,6 +215,21 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
                 if ( val.isValid() && val.canConvert<bool>() )
                 {
                     leab.notifyWhenTextIsEdited = val.toBool();
+                }
+
+                // Validate: warn about unsupported attributes
+                auto allAttributes = uiItem->getAttributes( uiConfigName );
+                for ( const auto& [key, value] : allAttributes )
+                {
+                    if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                    {
+                        CAF_PDM_LOG_WARNING(
+                            QString( "PdmUiLineEditor: Unsupported attribute '%1' set on field. Supported "
+                                     "attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, "
+                                     "avoidSendingEnterEvent, completerCaseSensitivity, completerFilterMode, "
+                                     "notifyWhenTextIsEdited" )
+                                .arg( QString::fromStdString( key ) ) );
+                    }
                 }
             }
 
