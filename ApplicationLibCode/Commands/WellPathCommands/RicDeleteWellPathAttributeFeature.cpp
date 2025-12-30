@@ -33,7 +33,7 @@ CAF_CMD_SOURCE_INIT( RicDeleteWellPathAttributeFeature, "RicDeleteWellPathAttrib
 //--------------------------------------------------------------------------------------------------
 bool RicDeleteWellPathAttributeFeature::isCommandEnabled() const
 {
-    if ( caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttributeCollection>() )
+    if ( caf::SelectionManager::instance()->selectedItemOfType<RimWellPathAttribute>() )
     {
         return true;
     }
