@@ -161,10 +161,9 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {
-                CAF_PDM_LOG_WARNING(
-                    QString( "PdmUiTextEditor: Unsupported attribute '%1' set on field. Supported "
-                             "attributes are: textMode, showSaveButton, wrapMode, heightHint" )
-                        .arg( QString::fromStdString( key ) ) );
+                CAF_PDM_LOG_WARNING( QString( "PdmUiTextEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: textMode, showSaveButton, wrapMode, heightHint" )
+                                         .arg( QString::fromStdString( key ) ) );
             }
         }
     }
