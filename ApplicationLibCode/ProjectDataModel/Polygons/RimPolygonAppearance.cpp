@@ -36,43 +36,6 @@ CAF_PDM_SOURCE_INIT( RimPolygonAppearance, "RimPolygonAppearance" );
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-class ThicknessValidator : public QValidator
-{
-public:
-    State validate( QString& input, int& pos ) const override
-    {
-        if ( input.isEmpty() ) return State::Intermediate;
-
-        int val = RiaStdStringTools::toInt( input.toStdString() );
-        if ( val > 0 && val < 8 )
-            return State::Acceptable;
-        else
-            return State::Invalid;
-    }
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-class RadiusValidator : public QValidator
-{
-public:
-    State validate( QString& input, int& pos ) const override
-    {
-        if ( input.isEmpty() ) return State::Intermediate;
-
-        double val = 0.0;
-        RiaStdStringTools::toDouble( input.toStdString(), val );
-        if ( val > 0.001 && val <= 2.0 )
-            return State::Acceptable;
-        else
-            return State::Invalid;
-    }
-};
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimPolygonAppearance::RimPolygonAppearance()
     : objectChanged( this )
 
@@ -183,6 +146,25 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
 //--------------------------------------------------------------------------------------------------
 void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
+    // Validate line thickness: must be between 1 and 7 (inclusive)
+    if ( changedField == &m_lineThickness )
+    {
+        int val = m_lineThickness();
+        if ( val < 1 || val > 7 )
+        {
+            m_lineThickness = std::max( 1, std::min( 7, val ) );
+        }
+    }
+    // Validate sphere radius factor: must be between 0.001 and 2.0
+    else if ( changedField == &m_sphereRadiusFactor )
+    {
+        double val = m_sphereRadiusFactor();
+        if ( val < 0.001 || val > 2.0 )
+        {
+            m_sphereRadiusFactor = std::max( 0.001, std::min( 2.0, val ) );
+        }
+    }
+
     objectChanged.send();
 }
 
@@ -191,21 +173,8 @@ void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedF
 //--------------------------------------------------------------------------------------------------
 void RimPolygonAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_lineThickness )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
-        {
-            myAttr->validator = new ThicknessValidator();
-        }
-    }
-    else if ( field == &m_lineThickness )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
-        {
-            myAttr->validator = new RadiusValidator();
-        }
-    }
-    else if ( field == &m_polygonPlaneDepth )
+    // Dynamic slider attributes for polygon plane depth based on runtime state
+    if ( field == &m_polygonPlaneDepth )
     {
         if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
