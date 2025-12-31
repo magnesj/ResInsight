@@ -41,15 +41,19 @@ RicUserDefinedCalculatorUi::RicUserDefinedCalculatorUi()
 
     CAF_PDM_InitFieldNoDefault( &m_newCalculation, "NewCalculation", "New Calculation" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_newCalculation );
+    m_newCalculation.uiCapability()->setAttributeString( "m_buttonText", "New Calculation" );
 
     CAF_PDM_InitFieldNoDefault( &m_deleteCalculation, "DeleteCalculation", "Delete Calculation" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_deleteCalculation );
+    m_deleteCalculation.uiCapability()->setAttributeString( "m_buttonText", "Delete Calculation" );
 
     CAF_PDM_InitFieldNoDefault( &m_importCalculations, "ImportCalculations", "Import Calculations" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_importCalculations );
+    m_importCalculations.uiCapability()->setAttributeString( "m_buttonText", "Import Calculations" );
 
     CAF_PDM_InitFieldNoDefault( &m_exportCalculations, "ExportCalculations", "Export Calculations" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_exportCalculations );
+    m_exportCalculations.uiCapability()->setAttributeString( "m_buttonText", "Export Calculations" );
 
     m_calcContextMenuMgr = std::make_unique<RiuCalculationsContextMenuManager>();
 }
@@ -244,26 +248,6 @@ bool RicUserDefinedCalculatorUi::calculate() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicUserDefinedCalculatorUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_newCalculation == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "New Calculation" );
-    }
-    else if ( &m_deleteCalculation == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Delete Calculation" );
-    }
-    else if ( &m_importCalculations == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Import Calculations" );
-    }
-    else if ( &m_exportCalculations == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Export Calculations" );
-    }
-}
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
