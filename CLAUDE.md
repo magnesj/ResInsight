@@ -322,6 +322,98 @@ interval = completions_settings.add_diameter_roughness_interval(start_md=100, en
 print(f"Start: {interval.start_md}, End: {interval.end_md}")
 ```
 
+## PDM UI Attribute System
+
+### Migrating from defineEditorAttribute (Deprecated)
+
+The `defineEditorAttribute()` method is deprecated in favor of a map-based attribute system. The new approach sets attributes once in constructors rather than repeatedly on every UI refresh.
+
+#### Old Pattern (Deprecated - Avoid in New Code)
+
+```cpp
+// In header
+void defineEditorAttribute( const caf::PdmFieldHandle* field,
+                            QString                    uiConfigName,
+                            caf::PdmUiEditorAttribute* attribute ) override;
+
+// In cpp
+void MyObject::defineEditorAttribute( const caf::PdmFieldHandle* field,
+                                      QString                    uiConfigName,
+                                      caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_myField )
+    {
+        auto* attr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
+        if ( attr )
+        {
+            attr->maximumWidth = 200;
+            attr->placeholderText = "Enter value...";
+        }
+    }
+}
+```
+
+#### New Pattern (Recommended)
+
+```cpp
+MyObject::MyObject()
+{
+    CAF_PDM_InitField(&m_myField, "myField", defaultValue, "My Field");
+
+    // Set attributes once in constructor using map-based system
+    m_myField.uiCapability()->setAttributeInt("maximumWidth", 200);
+    m_myField.uiCapability()->setAttributeString("placeholderText", "Enter value...");
+}
+```
+
+#### Migration Benefits
+
+- ✅ **Performance**: Set once, not on every UI refresh
+- ✅ **Type Safety**: Type-safe helpers (setAttributeInt, setAttributeBool, setAttributeString, setAttributeDouble)
+- ✅ **Validation**: Runtime warnings for unsupported attributes via PdmLogger
+- ✅ **Maintainability**: Cleaner code, attributes near field initialization
+- ✅ **Discoverability**: All attributes visible in one place
+
+#### Config-Specific Attributes
+
+For different UI configurations:
+
+```cpp
+// In defineUiOrdering() for dynamic/config-specific attributes
+void MyObject::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    if ( uiConfigName == "CompactView" )
+    {
+        m_myField.uiCapability()->setAttributeInt("maximumWidth", 100, "CompactView");
+    }
+
+    uiOrdering.add(&m_myField);
+}
+```
+
+#### Finding Supported Attributes
+
+Each editor validates attributes at runtime. If you set an unsupported attribute, you'll get a warning:
+
+```
+PdmUiLineEditor: Unsupported attribute 'maxWidth' set on field.
+Supported attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, ...
+```
+
+To find supported attributes for a specific editor:
+1. Check the editor's header file (e.g., `cafPdmUiLineEditor.h`) for the attribute class members
+2. Check validation code in the editor's cpp file for the `supportedAttributes` set
+3. Trigger a warning by setting a dummy attribute and reading the error message
+
+#### When to Keep defineEditorAttribute
+
+Keep `defineEditorAttribute()` only for:
+- Complex attributes that cannot be stored in QVariant (e.g., field pointers, validators)
+- Dynamic attributes that depend on complex runtime state
+- Special cases like `currentIndexFieldHandle` in tree selection editors
+
+For 95% of cases, use the map-based system.
+
 ## Development Notes
 
 - **Version**: Current version defined in `ResInsightVersion.cmake` (2025.04.4-dev)
