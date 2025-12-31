@@ -90,9 +90,8 @@ protected:
     ///             Example: field.uiCapability()->setAttributeInt("maximumWidth", 200);
     ///             See CLAUDE.md for migration guide and supported attributes by editor.
     [[deprecated( "Use field.uiCapability()->setAttribute() instead. See CLAUDE.md for migration guide." )]]
-    virtual void defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                        QString                    uiConfigName,
-                                        caf::PdmUiEditorAttribute* attribute )
+    virtual void
+        defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
     {
     }
 
