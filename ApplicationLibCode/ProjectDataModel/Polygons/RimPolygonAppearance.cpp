@@ -47,7 +47,9 @@ RimPolygonAppearance::RimPolygonAppearance()
     CAF_PDM_InitField( &m_showSpheres, "ShowSpheres", false, "Show Spheres" );
 
     CAF_PDM_InitField( &m_lineThickness, "LineThickness", 3, "Line Thickness" );
+    m_lineThickness.setRange( 1, 7 );
     CAF_PDM_InitField( &m_sphereRadiusFactor, "SphereRadiusFactor", 0.15, "Sphere Radius Factor" );
+    m_sphereRadiusFactor.setRange( 0.001, 2.0 );
 
     CAF_PDM_InitField( &m_lineColor, "LineColor", cvf::Color3f( cvf::Color3f::ORANGE ), "Line Color" );
     CAF_PDM_InitField( &m_sphereColor, "SphereColor", cvf::Color3f( cvf::Color3f::ORANGE ), "Sphere Color" );
@@ -146,25 +148,6 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
 //--------------------------------------------------------------------------------------------------
 void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    // Validate line thickness: must be between 1 and 7 (inclusive)
-    if ( changedField == &m_lineThickness )
-    {
-        int val = m_lineThickness();
-        if ( val < 1 || val > 7 )
-        {
-            m_lineThickness = std::max( 1, std::min( 7, val ) );
-        }
-    }
-    // Validate sphere radius factor: must be between 0.001 and 2.0
-    else if ( changedField == &m_sphereRadiusFactor )
-    {
-        double val = m_sphereRadiusFactor();
-        if ( val < 0.001 || val > 2.0 )
-        {
-            m_sphereRadiusFactor = std::max( 0.001, std::min( 2.0, val ) );
-        }
-    }
-
     objectChanged.send();
 }
 

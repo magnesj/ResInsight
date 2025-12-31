@@ -48,6 +48,7 @@ RimAnnotationLineAppearance::RimAnnotationLineAppearance()
     CAF_PDM_InitField( &m_lineFieldsHidden, "LineFieldsHidden", false, "Line Fields Hidden" );
     CAF_PDM_InitField( &m_color, "Color", cvf::Color3f( cvf::Color3f::DARK_GRAY ), "Line Color" );
     CAF_PDM_InitField( &m_thickness, "Thickness", 2, "Line Thickness" );
+    m_thickness.setRange( 1, 7 );
 
     // Stippling not yet supported. Needs new stuff in VizFwk
     CAF_PDM_InitField( &m_style, "Style", LineStyle(), "Style" );
@@ -131,17 +132,6 @@ void RimAnnotationLineAppearance::defineUiOrdering( QString uiConfigName, caf::P
 //--------------------------------------------------------------------------------------------------
 void RimAnnotationLineAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    // Validate thickness: must be between 1 and 7 (inclusive)
-    if ( changedField == &m_thickness )
-    {
-        int val = m_thickness();
-        if ( val < 1 || val > 7 )
-        {
-            // Clamp to valid range
-            m_thickness = std::max( 1, std::min( 7, val ) );
-        }
-    }
-
     auto annColl = firstAncestorOrThisOfType<RimAnnotationCollection>();
     if ( annColl ) annColl->scheduleRedrawOfRelevantViews();
 
