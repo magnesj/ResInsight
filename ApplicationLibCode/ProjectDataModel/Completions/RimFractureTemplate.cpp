@@ -141,6 +141,7 @@ RimFractureTemplate::RimFractureTemplate()
 
     CAF_PDM_InitField( &m_perforationEfficiency, "PerforationEfficiency", 1.0, "Perforation Efficiency" );
     m_perforationEfficiency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_perforationEfficiency.setRange( 0.0, 1.0 );
 
     CAF_PDM_InitField( &m_wellDiameter, "WellDiameter", 0.216, "Well Diameter at Fracture" );
     CAF_PDM_InitScriptableField( &m_conductivityType,
@@ -199,6 +200,8 @@ RimFractureTemplate::RimFractureTemplate()
     m_dFactorSummaryText.uiCapability()->setUiReadOnly( true );
     m_dFactorSummaryText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_dFactorSummaryText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosType::TOP );
+    m_dFactorSummaryText.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_dFactorSummaryText.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_dFactorSummaryText.xmlCapability()->disableIO();
 
     CAF_PDM_InitScriptableField( &m_heightScaleFactor, "HeightScaleFactor", 1.0, "Height" );
@@ -212,6 +215,7 @@ RimFractureTemplate::RimFractureTemplate()
                                  "The conductivity values read from file will be scaled with this parameters",
                                  "" );
     CAF_PDM_InitField( &m_scaleApplyButton, "ScaleApplyButton", false, "Apply" );
+    m_scaleApplyButton.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
 
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_scaleApplyButton );
 }
@@ -421,38 +425,7 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 //--------------------------------------------------------------------------------------------------
 void RimFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_perforationEfficiency )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = 1.0;
-        }
-    }
-
-    if ( field == &m_dFactorSummaryText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-
-            QFont font( "Monospace", 10 );
-            myAttr->font     = font;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-
-    if ( field == &m_scaleApplyButton )
-    {
-        auto* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
-
+    // Dynamic slider range based on well path depth
     if ( field == &m_wellPathDepthAtFracture )
     {
         auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );

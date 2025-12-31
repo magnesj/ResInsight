@@ -229,6 +229,7 @@ RimWellLogTrack::RimWellLogTrack()
 
     CAF_PDM_InitField( &m_colorShadingTransparency, "ColorShadingTransparency", 50, "Color Transparency" );
     m_colorShadingTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_colorShadingTransparency.setRange( 0, 100 );
 
     CAF_PDM_InitField( &m_showRegionLabels, "ShowFormationLabels", true, "Show Labels" );
 
@@ -2115,22 +2116,6 @@ void RimWellLogTrack::initAfterRead()
     for ( auto curve : m_curves )
     {
         connectCurveSignals( curve );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_colorShadingTransparency )
-    {
-        auto sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( sliderAttrib )
-        {
-            sliderAttrib->m_minimum = 0;
-            sliderAttrib->m_maximum = 100;
-        }
     }
 }
 
