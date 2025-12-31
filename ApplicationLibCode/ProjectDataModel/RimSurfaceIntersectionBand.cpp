@@ -53,9 +53,11 @@ RimSurfaceIntersectionBand::RimSurfaceIntersectionBand()
     CAF_PDM_InitField( &m_bandColor, "BandColor", cvf::Color3f( cvf::Color3f::BLACK ), "Band Color" );
     CAF_PDM_InitField( &m_bandOpacity, "BandOpacity", 0.8, "Band Opacity" );
     m_bandOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_bandOpacity.setRange( 0.0, 1.0 );
 
     CAF_PDM_InitField( &m_bandPolygonOffsetUnit, "BandPolygonOffsetUnit", -5.0, "Depth Offset", "", "Larger Value Closer to Camera", "" );
     m_bandPolygonOffsetUnit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_bandPolygonOffsetUnit.setRange( 0.0, 1.0 );
 
     CAF_PDM_InitFieldNoDefault( &m_surfaces, "Surfaces", "Band Surfaces" );
     m_surfaces.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -204,28 +206,7 @@ QList<caf::PdmOptionItemInfo> RimSurfaceIntersectionBand::calculateValueOptions(
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSurfaceIntersectionBand::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_bandPolygonOffsetUnit )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = 1.0;
-        }
-    }
-    else if ( field == &m_bandOpacity )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0.0;
-            myAttr->m_maximum = 1.0;
-        }
-    }
-}
-
+void RimSurfaceIntersectionBand::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
