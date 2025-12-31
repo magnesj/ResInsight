@@ -35,6 +35,8 @@ public:
     static void expandUiTree( PdmUiTreeOrdering* root, const QString& uiConfigName = "" );
 
     /// For a specific field, return editor specific parameters used to customize the editor behavior.
+    /// @deprecated Internal method called by editors. Use map-based attributes instead.
+    [[deprecated( "Internal use only. Use field.uiCapability()->setAttribute() for setting attributes." )]]
     void editorAttribute( const PdmFieldHandle* field, const QString& uiConfigName, PdmUiEditorAttribute* attribute );
 
     /// Return object editor specific parameters used to customize the editor behavior.
