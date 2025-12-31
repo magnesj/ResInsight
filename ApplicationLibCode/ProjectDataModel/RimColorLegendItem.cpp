@@ -40,6 +40,8 @@ RimColorLegendItem::RimColorLegendItem()
 
     CAF_PDM_InitField( &m_categoryValue, "CategoryValue", 0, "Category Number" );
     m_categoryValue.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_categoryValue.uiCapability()->setAttributeInt( "m_minimum", 0 );
+    m_categoryValue.uiCapability()->setAttributeInt( "m_maximum", 100 );
 
     CAF_PDM_InitField( &m_categoryName, "CategoryName", QString( "" ), "Category Name" );
 
@@ -138,19 +140,6 @@ void RimColorLegendItem::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 caf::PdmFieldHandle* RimColorLegendItem::userDescriptionField()
 {
     return &m_nameProxy;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimColorLegendItem::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-    if ( myAttr )
-    {
-        myAttr->m_minimum = 0;
-        myAttr->m_maximum = 100;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
