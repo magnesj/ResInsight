@@ -36,7 +36,4 @@ public:
     caf::PdmField<QString> eclipseKeyword;
     caf::PdmField<double>  undefinedValue;
     caf::PdmField<bool>    writeEchoInGrdeclFiles;
-
-protected:
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 };
