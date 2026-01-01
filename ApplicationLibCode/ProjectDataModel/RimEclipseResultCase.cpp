@@ -99,6 +99,7 @@ RimEclipseResultCase::RimEclipseResultCase()
 
     CAF_PDM_InitFieldNoDefault( &m_sourSimFileName, "SourSimFileName", "SourSim File Name" );
     m_sourSimFileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_sourSimFileName.uiCapability()->setAttributeString( "m_fileSelectionFilter", "SourSim (*.sourres)" );
 #ifndef USE_HDF5
     m_sourSimFileName.uiCapability()->setUiHidden( true );
 #endif
@@ -752,8 +753,7 @@ void RimEclipseResultCase::defineEditorAttribute( const caf::PdmFieldHandle* fie
         auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
         if ( myAttr )
         {
-            myAttr->m_fileSelectionFilter = "SourSim (*.sourres)";
-            myAttr->m_defaultPath         = QFileInfo( gridFileName() ).absolutePath();
+            myAttr->m_defaultPath = QFileInfo( gridFileName() ).absolutePath();
         }
     }
 }

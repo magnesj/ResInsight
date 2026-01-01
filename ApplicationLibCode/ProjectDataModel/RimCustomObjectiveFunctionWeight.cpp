@@ -201,23 +201,6 @@ void RimCustomObjectiveFunctionWeight::defineUiOrdering( QString uiConfigName, c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimCustomObjectiveFunctionWeight::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                              QString                    uiConfigName,
-                                                              caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "...";
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 caf::PdmFieldHandle* RimCustomObjectiveFunctionWeight::userDescriptionField()
 {
     return &m_title;

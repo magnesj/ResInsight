@@ -39,6 +39,7 @@ Rim3dWellLogCurveCollection::Rim3dWellLogCurveCollection()
 
     CAF_PDM_InitField( &m_planeWidthScaling, "PlaneWidthScaling", 1.0f, "Width Scaling" );
     m_planeWidthScaling.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_planeWidthScaling.setRange( 0.25, 2.5 );
     CAF_PDM_InitField( &m_showGrid, "Show3dWellLogGrid", true, "Show Grid" );
     CAF_PDM_InitField( &m_showBackground, "Show3dWellLogBackground", false, "Show Background" );
     CAF_PDM_InitFieldNoDefault( &m_3dWellLogCurves, "ArrayOf3dWellLogCurves", "" );
