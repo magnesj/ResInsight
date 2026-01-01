@@ -134,6 +134,8 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     m_statisticsTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_statisticsTable.uiCapability()->setUiReadOnly( true );
     m_statisticsTable.xmlCapability()->disableIO();
+    m_statisticsTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_statisticsTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitFieldNoDefault( &m_meshAlignmentType, "MeshAlignmentType", "Mesh Alignment" );
     CAF_PDM_InitFieldNoDefault( &m_meshType, "MeshType", "Mesh Type" );
@@ -157,6 +159,9 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     CAF_PDM_InitField( &m_selectedStatisticsType, "SelectedStatisticsType", defaultStatisticsTypes, "Statistics Type" );
     m_selectedStatisticsType.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_selectedStatisticsType.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
+    m_selectedStatisticsType.uiCapability()->setAttributeBool( "showTextFilter", false );
+    m_selectedStatisticsType.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
+    m_selectedStatisticsType.uiCapability()->setAttributeBool( "singleSelectionMode", false );
 
     CAF_PDM_InitFieldNoDefault( &m_computeStatistics, "ComputeStatistics", "Compute Templates" );
     m_computeStatistics.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
@@ -215,33 +220,6 @@ QList<caf::PdmOptionItemInfo> RimEnsembleFractureStatistics::calculateValueOptio
     return options;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleFractureStatistics::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                           QString                    uiConfigName,
-                                                           caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_selectedStatisticsType )
-    {
-        caf::PdmUiTreeSelectionEditorAttribute* attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->showTextFilter        = false;
-            attrib->showToggleAllCheckbox = false;
-            attrib->singleSelectionMode   = false;
-        }
-    }
-    else if ( field == &m_statisticsTable )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
