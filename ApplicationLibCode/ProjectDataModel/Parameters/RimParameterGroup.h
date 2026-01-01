@@ -72,7 +72,6 @@ public:
     double               parameterDoubleValue( QString name, double defaultValue ) const;
 
 private:
-
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
     caf::PdmFieldHandle* userDescriptionField() override;

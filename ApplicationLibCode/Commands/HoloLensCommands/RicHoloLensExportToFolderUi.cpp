@@ -84,4 +84,3 @@ QList<caf::PdmOptionItemInfo> RicHoloLensExportToFolderUi::calculateValueOptions
 
     return options;
 }
-

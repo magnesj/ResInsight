@@ -52,4 +52,3 @@ QList<caf::PdmOptionItemInfo> RicCaseAndFileExportSettingsUi::calculateValueOpti
 
     return options;
 }
-
