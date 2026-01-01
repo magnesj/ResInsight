@@ -90,6 +90,7 @@ RimEclipseStatisticsCase::RimEclipseStatisticsCase()
     m_selectionSummary.uiCapability()->setUiReadOnly( true );
     m_selectionSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_selectionSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_selectionSummary.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitFieldNoDefault( &m_dataSourceForStatistics, "DataSourceForStatistics", "Data Source" );
 
@@ -861,15 +862,6 @@ void RimEclipseStatisticsCase::updateSelectionSummaryLabel()
 //--------------------------------------------------------------------------------------------------
 void RimEclipseStatisticsCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( &m_selectionSummary == field )
-    {
-        caf::PdmUiTextEditorAttribute* textEditAttrib = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( textEditAttrib )
-        {
-            textEditAttrib->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-
     if ( &m_calculateEditCommand == field )
     {
         caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
