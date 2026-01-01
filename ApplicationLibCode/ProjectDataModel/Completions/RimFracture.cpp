@@ -102,10 +102,12 @@ RimFracture::RimFracture()
     CAF_PDM_InitField( &m_createEllipseFractureTemplate, "CreateEllipseTemplate", false, "No Fracture Templates Found." );
     m_createEllipseFractureTemplate.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_createEllipseFractureTemplate.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
+    m_createEllipseFractureTemplate.uiCapability()->setAttributeString( "m_buttonText", "Ellipse Template" );
 
     CAF_PDM_InitField( &m_createStimPlanFractureTemplate, "CreateStimPlanTemplate", false, "Create New Template?" );
     m_createStimPlanFractureTemplate.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_createStimPlanFractureTemplate.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
+    m_createStimPlanFractureTemplate.uiCapability()->setAttributeString( "m_buttonText", "StimPlan Template" );
 
     CAF_PDM_InitField( &m_autoUpdateWellPathDepthAtFractureFromTemplate,
                        "AutoUpdateWellPathDepthAtFractureFromTemplate",
@@ -126,10 +128,12 @@ RimFracture::RimFracture()
 
     CAF_PDM_InitField( &m_azimuth, "Azimuth", 0.0, "Azimuth" );
     m_azimuth.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_azimuth.setRange( 0.0, 360.0 );
 
     CAF_PDM_InitField( &m_perforationLength, "PerforationLength", 1.0, "Perforation Length" );
     CAF_PDM_InitField( &m_perforationEfficiency, "PerforationEfficiency", 1.0, "Perforation Efficiency" );
     m_perforationEfficiency.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_perforationEfficiency.setRange( 0.0, 1.0 );
 
     CAF_PDM_InitField( &m_wellDiameter, "WellDiameter", 0.216, "Well Diameter at Fracture" );
     CAF_PDM_InitField( &m_dip, "Dip", 0.0, "Dip" );
@@ -787,26 +791,7 @@ void RimFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& ui
 //--------------------------------------------------------------------------------------------------
 void RimFracture::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_azimuth )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = 360;
-        }
-    }
-
-    if ( field == &m_perforationEfficiency )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = 1.0;
-        }
-    }
-
+    // Dynamic slider range based on fracture template
     if ( field == &m_wellPathDepthAtFracture )
     {
         caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
@@ -819,18 +804,6 @@ void RimFracture::defineEditorAttribute( const caf::PdmFieldHandle* field, QStri
                 myAttr->m_maximum       = maximum;
             }
         }
-    }
-
-    if ( field == &m_createEllipseFractureTemplate )
-    {
-        auto myAttr          = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        myAttr->m_buttonText = "Ellipse Template";
-    }
-
-    if ( field == &m_createStimPlanFractureTemplate )
-    {
-        auto myAttr          = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        myAttr->m_buttonText = "StimPlan Template";
     }
 }
 
