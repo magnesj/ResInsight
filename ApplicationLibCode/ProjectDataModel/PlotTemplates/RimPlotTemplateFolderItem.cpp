@@ -197,21 +197,6 @@ void RimPlotTemplateFolderItem::searchForFileAndFolderNames( int levelsLeft )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPlotTemplateFolderItem::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_folderName )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimPlotTemplateFolderItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     if ( !m_folderName().path().isEmpty() )

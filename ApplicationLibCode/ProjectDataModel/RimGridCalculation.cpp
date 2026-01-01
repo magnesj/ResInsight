@@ -106,6 +106,7 @@ RimGridCalculation::RimGridCalculation()
     m_nonVisibleResultAddress = new RimEclipseResultAddress;
 
     CAF_PDM_InitField( &m_editNonVisibleResultAddress, "EditNonVisibleResultAddress", false, "Edit" );
+    m_editNonVisibleResultAddress.uiCapability()->setAttributeString( "m_buttonText", "Edit" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_editNonVisibleResultAddress );
 
     CAF_PDM_InitFieldNoDefault( &m_nonVisibleResultText, "NonVisibleResultText", "" );
@@ -532,13 +533,7 @@ void RimGridCalculation::defineEditorAttribute( const caf::PdmFieldHandle* field
 {
     RimUserDefinedCalculation::defineEditorAttribute( field, uiConfigName, attribute );
 
-    if ( field == &m_editNonVisibleResultAddress )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Edit";
-        }
-    }
+
 }
 
 //--------------------------------------------------------------------------------------------------
