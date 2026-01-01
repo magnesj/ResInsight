@@ -71,6 +71,7 @@ RimDeltaSummaryEnsemble::RimDeltaSummaryEnsemble()
 
     CAF_PDM_InitField( &m_swapEnsemblesButton, "SwapEnsembles", false, "SwapEnsembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_swapEnsemblesButton );
+    m_swapEnsemblesButton.uiCapability()->setAttributeString( "buttonText", "Swap Ensembles" );
 
     CAF_PDM_InitField( &m_caseCount, "CaseCount", QString( "" ), "Matching Cases" );
     m_caseCount.uiCapability()->setUiReadOnly( true );
@@ -88,6 +89,8 @@ RimDeltaSummaryEnsemble::RimDeltaSummaryEnsemble()
     CAF_PDM_InitField( &m_fixedTimeStepIndex, "FixedTimeStepIndex", 0, "Time Step" );
     m_fixedTimeStepIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_fixedTimeStepIndex.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "singleSelectionMode", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "showTextFilter", true );
 
     setNameTemplate( "Delta Ensemble" );
 
@@ -425,29 +428,6 @@ void RimDeltaSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chang
     }
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimDeltaSummaryEnsemble::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_swapEnsemblesButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Swap Ensembles";
-        }
-    }
-    if ( &m_fixedTimeStepIndex == field )
-    {
-        auto a = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( a )
-        {
-            a->singleSelectionMode = true;
-            a->showTextFilter      = true;
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

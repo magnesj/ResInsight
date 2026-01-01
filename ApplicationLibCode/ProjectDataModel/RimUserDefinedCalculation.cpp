@@ -52,9 +52,11 @@ RimUserDefinedCalculation::RimUserDefinedCalculation()
 
     CAF_PDM_InitField( &m_expression, "Expression", QString( "" ), "" );
     m_expression.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
+    m_expression.uiCapability()->setAttributeInt( "heightHint", -1 );
 
     CAF_PDM_InitFieldNoDefault( &m_helpButton, "HelpButton", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_helpButton );
+    m_helpButton.uiCapability()->setAttributeString( "buttonText", "Open Help Page" );
 
     CAF_PDM_InitFieldNoDefault( &m_helpText,
                                 "Label",
@@ -63,11 +65,13 @@ RimUserDefinedCalculation::RimUserDefinedCalculation()
     m_helpText.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
     m_helpText.xmlCapability()->disableIO();
     m_helpText = "Use the right-click menu inside the text area for quick access to operators and functions.";
+    m_helpText.uiCapability()->setAttributeBool( "useWordWrap", true );
 
     CAF_PDM_InitField( &m_unit, "Unit", QString( "" ), "Unit" );
     m_unit.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_variables, "Variables", "Variables" );
+    m_variables.uiCapability()->setAttributeBool( "enableDropTarget", true );
 
     CAF_PDM_InitField( &m_id, "Id", -1, "Id" );
     m_id.uiCapability()->setUiHidden( true );
@@ -376,45 +380,6 @@ QString RimUserDefinedCalculation::buildCalculationName() const
     }
 
     return name;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimUserDefinedCalculation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_expression )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->heightHint = -1;
-        }
-    }
-    else if ( field == &m_variables )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->enableDropTarget = true;
-        }
-    }
-    else if ( field == &m_helpButton )
-    {
-        auto* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Open Help Page";
-        }
-    }
-    else if ( field == &m_helpText )
-    {
-        auto* attrib = dynamic_cast<caf::PdmUiLabelEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_useWordWrap = true;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

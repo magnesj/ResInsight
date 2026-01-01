@@ -72,9 +72,8 @@ private:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
-    void                              setAllCasesNotInUse();
+    void setAllCasesNotInUse();
     void                              deleteCasesNoInUse();
     RimDeltaSummaryCase*              firstCaseNotInUse();
     std::vector<RimDeltaSummaryCase*> allDerivedCases( bool activeOnly ) const;
