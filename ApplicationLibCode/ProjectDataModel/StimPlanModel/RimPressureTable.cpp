@@ -38,6 +38,9 @@ RimPressureTable::RimPressureTable()
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_pressureTableItems, "Items", "Pressure Table Items" );
     m_pressureTableItems.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_pressureTableItems.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_pressureTableItems.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_pressureTableItems.uiCapability()->setAttributeInt( "minimumHeight", 300 );
     m_pressureTableItems.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_pressureTableItems.uiCapability()->setCustomContextMenuEnabled( true );
 
@@ -110,23 +113,6 @@ void RimPressureTable::defineCustomContextMenu( const caf::PdmFieldHandle* field
     menuBuilder << "RicDeletePressureTableItemFeature";
 
     menuBuilder.appendToMenu( menu );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPressureTable::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_pressureTableItems )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 300;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
