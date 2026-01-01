@@ -107,7 +107,6 @@ RimPlotDataFilterItem::RimPlotDataFilterItem()
     CAF_PDM_InitFieldNoDefault( &m_filterOperation, "FilterOperation", "is" );
     CAF_PDM_InitField( &m_topBottomN, "MinTopN", 20, "N" );
     m_topBottomN.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_topBottomN.uiCapability()->setAttributeInt( "maximumWidth", QFontMetrics( QFont() ).boundingRect( "XXXX" ).width() );
 
     CAF_PDM_InitField( &m_max, "Max", m_upperLimit, "Max" );
     m_max.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -398,6 +397,19 @@ void RimPlotDataFilterItem::defineEditorAttribute( const caf::PdmFieldHandle* fi
         myAttr->m_minimum                       = m_lowerLimit;
         myAttr->m_maximum                       = m_upperLimit;
         myAttr->m_delaySliderUpdateUntilRelease = true;
+    }
+    else if ( field == &m_topBottomN )
+    {
+        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
+
+        if ( !myAttr ) return;
+
+        // NOTE: QFontMetrics requires Qt to be initialized and cannot be called in the constructor.
+        // During Python generation (--generate flag), PDM objects are instantiated before Qt GUI is set up.
+        // Creating QFontMetrics in the constructor causes a silent crash during Python generation.
+        QFontMetrics fm = QFontMetrics( QFont() );
+
+        myAttr->maximumWidth = fm.boundingRect( "XXXX" ).width();
     }
 }
 
