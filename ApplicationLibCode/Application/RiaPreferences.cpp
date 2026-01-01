@@ -325,8 +325,6 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
 {
     m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
 
-
-
     if ( field == &defaultSceneFontSize || field == &defaultWellLabelFontSize || field == &defaultAnnotationFontSize ||
          field == &defaultPlotFontSize )
     {
