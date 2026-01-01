@@ -57,9 +57,11 @@ RimPerforationInterval::RimPerforationInterval()
 
     CAF_PDM_InitField( &m_useCustomStartDate, "UseCustomStartDate", false, "Custom Start Date" );
     CAF_PDM_InitField( &m_startDate, "StartDate", QDateTime::currentDateTime(), "Start Date" );
+    m_startDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_useCustomEndDate, "UseCustomEndDate", false, "Custom End Date" );
     CAF_PDM_InitField( &m_endDate, "EndDate", QDateTime::currentDateTime(), "End Date" );
+    m_endDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_valves, "Valves", "Valves" );
 
@@ -399,15 +401,7 @@ void RimPerforationInterval::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 //--------------------------------------------------------------------------------------------------
 void RimPerforationInterval::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_startDate || field == &m_endDate )
-    {
-        caf::PdmUiDateEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->dateFormat = "dd MMM yyyy";
-        }
-    }
-    else if ( field == &m_startMD || field == &m_endMD )
+    if ( field == &m_startMD || field == &m_endMD )
     {
         caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
 

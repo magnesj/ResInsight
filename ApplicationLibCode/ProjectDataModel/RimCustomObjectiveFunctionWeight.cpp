@@ -56,6 +56,7 @@ RimCustomObjectiveFunctionWeight::RimCustomObjectiveFunctionWeight()
     m_objectiveValuesSelectSummaryAddressPushButton = false;
 
     CAF_PDM_InitField( &m_weightValue, "WeightValue", 1.0, "Weight" );
+    m_weightValue.setRange( 0.0, 9999.0 );
     m_weightValue.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveFunction, "ObjectiveFunction", "Objective Function" );
@@ -204,17 +205,7 @@ void RimCustomObjectiveFunctionWeight::defineEditorAttribute( const caf::PdmFiel
                                                               QString                    uiConfigName,
                                                               caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_weightValue )
-    {
-        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( !myAttr )
-        {
-            return;
-        }
-
-        myAttr->validator = new QDoubleValidator( 0.0, 9999.0, 2 );
-    }
-    else if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
+    if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
     {
         caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
         if ( attrib )

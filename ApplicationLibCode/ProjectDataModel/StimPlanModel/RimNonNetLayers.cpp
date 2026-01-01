@@ -89,21 +89,6 @@ QList<caf::PdmOptionItemInfo> RimNonNetLayers::calculateValueOptions( const caf:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimNonNetLayers::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_cutOff )
-    {
-        auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.0, 1.0, 2 );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimNonNetLayers::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     caf::PdmUiGroup* resultDefinitionGroup = uiOrdering.addNewGroup( "Facies Definition" );

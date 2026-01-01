@@ -124,6 +124,8 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     m_filePathsTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_filePathsTable.uiCapability()->setUiReadOnly( true );
     m_filePathsTable.xmlCapability()->disableIO();
+    m_filePathsTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_filePathsTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitField( &m_excludeZeroWidthFractures, "ExcludeZeroWidthFractures", true, "Exclude Zero Width Fractures" );
 
@@ -220,16 +222,7 @@ void RimEnsembleFractureStatistics::defineEditorAttribute( const caf::PdmFieldHa
                                                            QString                    uiConfigName,
                                                            caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_filePathsTable )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-    else if ( field == &m_selectedStatisticsType )
+    if ( field == &m_selectedStatisticsType )
     {
         caf::PdmUiTreeSelectionEditorAttribute* attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
         if ( attrib )
