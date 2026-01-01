@@ -102,6 +102,10 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &scriptDirectories, "scriptDirectory", "Shared Script Folder(s)" );
     scriptDirectories.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    scriptDirectories.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    scriptDirectories.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
+    scriptDirectories.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    scriptDirectories.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
 
     // TODO: This only currently works for installed ResInsight.
     scriptDirectories = QCoreApplication::applicationDirPath() + "/Python/rips/PythonExamples";
@@ -216,6 +220,10 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateFolders, "plotTemplateFolders", "Plot Template Folder(s)" );
     m_plotTemplateFolders.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
+    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
     CAF_PDM_InitField( &m_maxPlotTemplateFoldersDepth, "MaxPlotTemplateFoldersDepth", 2, "Maximum Plot Template Folder Search Depth" );
 
     CAF_PDM_InitFieldNoDefault( &m_lastUsedPlotTemplate, "defaultPlotTemplate", "Default Plot Template" );
@@ -317,21 +325,7 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
 {
     m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
 
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            if ( field == &scriptDirectories || field == &m_plotTemplateFolders )
-            {
-                myAttr->m_selectDirectory              = true;
-                myAttr->m_appendUiSelectedFolderToText = true;
-            }
-            else if ( field == &m_gridCalculationExpressionFolder || field == &m_summaryCalculationExpressionFolder )
-            {
-                myAttr->m_selectDirectory = true;
-            }
-        }
-    }
+
 
     if ( field == &defaultSceneFontSize || field == &defaultWellLabelFontSize || field == &defaultAnnotationFontSize ||
          field == &defaultPlotFontSize )

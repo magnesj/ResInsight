@@ -118,6 +118,8 @@ RiaPreferencesSummary::RiaPreferencesSummary()
                        "" );
 
     CAF_PDM_InitField( &m_selectDefaultTemplates, "selectDefaultTemplate", false, "", "", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectDefaultTemplates );
 
     CAF_PDM_InitFieldNoDefault( &m_selectedDefaultTemplates, "defaultSummaryTemplates", "Select Summary Plot Templates" );
@@ -461,14 +463,7 @@ void RiaPreferencesSummary::defineEditorAttribute( const caf::PdmFieldHandle* fi
             myattr->iconSize = QSize( 24, 16 );
         }
     }
-    else if ( field == &m_selectDefaultTemplates )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Select Default Templates";
-        }
-    }
+
     else if ( field == &m_selectedDefaultTemplates )
     {
         auto attrib = dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute );

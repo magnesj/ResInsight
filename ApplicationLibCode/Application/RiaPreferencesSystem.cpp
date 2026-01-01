@@ -67,6 +67,8 @@ RiaPreferencesSystem::RiaPreferencesSystem()
     CAF_PDM_InitFieldNoDefault( &m_holoLensExportFolder, "holoLensExportFolder", "HoloLens Export Folder" );
     m_holoLensExportFolder.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_holoLensExportFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_holoLensExportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_holoLensExportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitField( &m_showProjectChangedDialog, "showProjectChangedDialog", true, "Show 'Project has changed' dialog" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showProjectChangedDialog );

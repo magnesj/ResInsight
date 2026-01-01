@@ -352,29 +352,6 @@ void RiaMemoryCleanup::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaMemoryCleanup::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_performDelete )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Clear Checked Data From Memory";
-        }
-    }
-    if ( field == &m_showMemoryReport )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Show Memory Report";
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::pair<QString, QString> RiaMemoryCleanup::createMemoryReport()
 {
     QString details;

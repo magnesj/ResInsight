@@ -1332,11 +1332,6 @@ QList<caf::PdmOptionItemInfo> RimCustomVfpPlot::calculateValueOptions( const caf
 //--------------------------------------------------------------------------------------------------
 void RimCustomVfpPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( auto attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
-    {
-        attrib->showTextFilter = false;
-    }
-
     if ( field == &m_mainDataSource )
     {
         RiuTools::enableUpDownArrowsForComboBox( attribute );
