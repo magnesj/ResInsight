@@ -97,6 +97,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveValuesSelectSummaryAddressPushButton, "SelectObjectiveSummaryAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_objectiveValuesSelectSummaryAddressPushButton );
+    m_objectiveValuesSelectSummaryAddressPushButton.uiCapability()->setAttributeString( "buttonText", "..." );
     m_objectiveValuesSelectSummaryAddressPushButton = false;
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveFunction, "ObjectiveFunction", "Objective Function" );
@@ -572,14 +573,8 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attr->m_buttonText = "...";
-        }
-    }
-    else if ( field == &m_valueRange )
+    // Dynamic slider attributes based on runtime limits
+    if ( field == &m_valueRange )
     {
         if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
