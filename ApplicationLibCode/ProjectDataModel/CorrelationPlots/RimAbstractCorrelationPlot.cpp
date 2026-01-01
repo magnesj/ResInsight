@@ -68,6 +68,7 @@ RimAbstractCorrelationPlot::RimAbstractCorrelationPlot()
 
     CAF_PDM_InitFieldNoDefault( &m_pushButtonSelectSummaryAddress, "SelectAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonSelectSummaryAddress );
+    m_pushButtonSelectSummaryAddress.uiCapability()->setAttributeString( "m_buttonText", "..." );
     m_pushButtonSelectSummaryAddress = false;
 
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilter, "TimeStepFilter", "Available Time Steps" );
@@ -225,18 +226,6 @@ void RimAbstractCorrelationPlot::fieldChangedByUi( const caf::PdmFieldHandle* ch
                 RiuPlotMainWindowTools::selectAsCurrentItem( firstFilter );
             }
         }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimAbstractCorrelationPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-    if ( attrib )
-    {
-        attrib->m_buttonText = "...";
     }
 }
 
