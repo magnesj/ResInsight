@@ -206,10 +206,6 @@ QList<caf::PdmOptionItemInfo> RimSurfaceIntersectionBand::calculateValueOptions(
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSurfaceIntersectionBand::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimSurfaceIntersectionBand::onObjectChanged( const caf::SignalEmitter* emitter )
 {
     objectChanged.send();
