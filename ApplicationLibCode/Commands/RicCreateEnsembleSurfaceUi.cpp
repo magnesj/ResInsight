@@ -34,6 +34,8 @@ RicCreateEnsembleSurfaceUi::RicCreateEnsembleSurfaceUi()
     CAF_PDM_InitObject( "Export Multiple Surfaces" );
 
     CAF_PDM_InitFieldNoDefault( &m_layers, "Layers", "Layers" );
+    m_layers.uiCapability()->setAttributeInt( "heightHint", 280 );
+    
     CAF_PDM_InitField( &m_autoCreateEnsembleSurfaces, "AutoCreateEnsembleSurfaces", false, "Create Ensemble Surfaces From Exported Files" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_autoCreateEnsembleSurfaces );
 
@@ -70,17 +72,7 @@ void RicCreateEnsembleSurfaceUi::setLayersMinMax( int minLayer, int maxLayer )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleSurfaceUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_layers )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->heightHint = 280;
-        }
-    }
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///

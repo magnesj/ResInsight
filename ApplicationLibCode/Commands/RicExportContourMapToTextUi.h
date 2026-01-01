@@ -38,7 +38,6 @@ public:
     bool    excludeUndefinedValues() const;
 
 protected:
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
 private:
     caf::PdmField<QString> m_exportFileName;

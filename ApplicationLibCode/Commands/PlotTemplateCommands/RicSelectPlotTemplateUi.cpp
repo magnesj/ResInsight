@@ -43,6 +43,7 @@ RicSelectPlotTemplateUi::RicSelectPlotTemplateUi()
     CAF_PDM_InitFieldNoDefault( &m_selectedPlotTemplates, "SelectedPlotTemplates", "Plot Templates" );
     m_selectedPlotTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_selectedPlotTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    // Note: singleSelectionMode is dynamic based on m_useMultiSelect, kept in defineEditorAttribute
 }
 
 //--------------------------------------------------------------------------------------------------

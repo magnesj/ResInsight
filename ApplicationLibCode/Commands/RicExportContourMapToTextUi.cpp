@@ -13,6 +13,7 @@ RicExportContourMapToTextUi::RicExportContourMapToTextUi()
 
     CAF_PDM_InitField( &m_exportFileName, "ExportFileName", QString(), "Export File Name" );
     m_exportFileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_exportFileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
 
     CAF_PDM_InitField( &m_exportLocalCoordinates, "ExportLocalCoordinates", false, "Export Local Coordinates" );
     CAF_PDM_InitField( &m_undefinedValueLabel, "UndefinedValueLabel", QString( "NaN" ), "Undefined Value Label" );
@@ -59,19 +60,3 @@ bool RicExportContourMapToTextUi::excludeUndefinedValues() const
     return m_excludeUndefinedValues;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicExportContourMapToTextUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                         QString                    uiConfigName,
-                                                         caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_exportFileName )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectSaveFileName = true;
-        }
-    }
-}
