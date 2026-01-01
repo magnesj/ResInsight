@@ -532,8 +532,6 @@ void RimGridCalculation::fieldChangedByUi( const caf::PdmFieldHandle* changedFie
 void RimGridCalculation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     RimUserDefinedCalculation::defineEditorAttribute( field, uiConfigName, attribute );
-
-
 }
 
 //--------------------------------------------------------------------------------------------------
