@@ -109,19 +109,3 @@ void RiaRegressionTest::readSettingsFromApplicationStore()
 {
     caf::PdmSettings::readFieldsFromApplicationStore( this );
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaRegressionTest::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &folderContainingDiffTool || field == &folderContainingCompareTool || field == &regressionTestFolder ||
-         field == &folderContainingGitTool )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-}

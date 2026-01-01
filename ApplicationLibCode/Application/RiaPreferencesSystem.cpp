@@ -344,18 +344,3 @@ QList<caf::PdmOptionItemInfo> RiaPreferencesSystem::calculateValueOptions( const
 
     return options;
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaPreferencesSystem::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_holoLensExportFolder )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-}

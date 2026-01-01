@@ -416,18 +416,3 @@ QStringList RimOpmFlowJobSettings::commandLineOptions( QString resInsightWorkDir
 
     return options;
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimOpmFlowJobSettings::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_ignoreKeywords )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->heightHint = 40;
-        }
-    }
-}

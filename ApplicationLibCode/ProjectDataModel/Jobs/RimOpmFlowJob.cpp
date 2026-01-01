@@ -250,31 +250,6 @@ bool RimOpmFlowJob::matchesKeyValue( const QString& key, const QString& value ) 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimOpmFlowJob::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_workDir )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( field == &m_wellGroupName )
-    {
-        auto attr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->enableEditableContent  = true;
-            attr->enableAutoComplete     = false;
-            attr->adjustWidthToContents  = true;
-            attr->notifyWhenTextIsEdited = false;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimOpmFlowJob::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     if ( isRunning() )
