@@ -91,6 +91,7 @@ RimWellIASettings::RimWellIASettings()
     CAF_PDM_InitField( &m_showBox, "showBox", false, "Show model box" );
 
     CAF_PDM_InitFieldNoDefault( &m_geostaticDate, "startDate", "Start Date (geostatic):" );
+    m_geostaticDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_boxValid, "boxValid", false, "Model box is valid" );
     m_boxValid.uiCapability()->setUiHidden( true );
@@ -217,14 +218,6 @@ void RimWellIASettings::defineEditorAttribute( const caf::PdmFieldHandle* field,
 
             myAttr->m_minimum = wellPath->uniqueStartMD();
             myAttr->m_maximum = wellPath->uniqueEndMD();
-        }
-    }
-    else if ( field == &m_geostaticDate )
-    {
-        caf::PdmUiDateEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->dateFormat = "dd MMM yyyy";
         }
     }
 }
