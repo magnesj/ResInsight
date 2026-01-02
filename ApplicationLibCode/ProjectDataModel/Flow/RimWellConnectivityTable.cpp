@@ -144,14 +144,17 @@ RimWellConnectivityTable::RimWellConnectivityTable()
     m_timeSampleValueType.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_selectedTimeStep, "TimeStep", "Time Step" );
     m_selectedTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
 
     // Time step range configuration
     CAF_PDM_InitFieldNoDefault( &m_timeRangeValueType, "TimeRangeValueType", "Value Type" );
     m_timeRangeValueType.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_selectedFromTimeStep, "FromTimeStep", "From Time Step" );
     m_selectedFromTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedFromTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_selectedToTimeStep, "ToTimeStep", "To Time Step" );
     m_selectedToTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedToTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilterMode, "TimeStepRangeFilterMode", "Filter" );
     m_timeStepFilterMode.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_timeStepCount, "TimeStepCount", m_initialNumberOfTimeSteps, "Number of Time Steps" );
@@ -532,7 +535,11 @@ void RimWellConnectivityTable::defineEditorAttribute( const caf::PdmFieldHandle*
     // Combobox navigation icons - uses QIcon which can't be stored as QVariant attributes
     if ( field == &m_selectedTimeStep || field == &m_selectedFromTimeStep || field == &m_selectedToTimeStep )
     {
-        RiuTools::enableUpDownArrowsForComboBox( attribute );
+        if ( auto attrib = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute ) )
+        {
+            attrib->nextIcon     = QIcon( ":/ComboBoxDown.svg" );
+            attrib->previousIcon = QIcon( ":/ComboBoxUp.svg" );
+        }
     }
 }
 
