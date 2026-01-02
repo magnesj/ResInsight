@@ -133,7 +133,7 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "textMode", "showSaveButton", "wrapMode", "heightHint" };
+        static const std::set<std::string> supportedAttributes = { "textMode", "showSaveButton", "wrapMode", "font", "heightHint" };
 
         if ( auto val = uiItem->getAttributeInt( "textMode", uiConfigName ) )
         {
@@ -155,6 +155,12 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
             leab.heightHint = *val;
         }
 
+        QVariant val = uiItem->getAttribute( "font", uiConfigName );
+        if ( val.isValid() && val.canConvert<QFont>() )
+        {
+            leab.font = val.value<QFont>();
+        }
+
         // Validate: warn about unsupported attributes
         auto allAttributes = uiItem->getAttributes( uiConfigName );
         for ( const auto& [key, value] : allAttributes )
@@ -162,7 +168,7 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiTextEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: textMode, showSaveButton, wrapMode, heightHint" )
+                                              "attributes are: textMode, showSaveButton, wrapMode, font, heightHint" )
                                          .arg( QString::fromStdString( key ) ) );
             }
         }

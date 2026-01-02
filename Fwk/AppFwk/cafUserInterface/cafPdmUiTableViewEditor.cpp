@@ -201,6 +201,8 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                                                                        "heightHint",
                                                                        "alwaysEnforceResizePolicy",
                                                                        "resizePolicy",
+                                                                       "columnWidths",
+                                                                       "baseColor",
                                                                        "enableDropTarget" };
 
             QVariant val;
@@ -253,19 +255,44 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 editorAttrib.enableDropTarget = val.toBool();
             }
 
+            val = uiItem->getAttribute( "resizePolicy", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.toInt() );
+            }
+
+            val = uiItem->getAttribute( "columnWidths", uiConfigName );
+            if ( val.isValid() && val.canConvert<QVariantList>() )
+            {
+                QVariantList list = val.toList();
+                editorAttrib.columnWidths.clear();
+                for ( const QVariant& item : list )
+                {
+                    if ( item.canConvert<int>() )
+                    {
+                        editorAttrib.columnWidths.push_back( item.toInt() );
+                    }
+                }
+            }
+
+            val = uiItem->getAttribute( "baseColor", uiConfigName );
+            if ( val.isValid() && val.canConvert<QColor>() )
+            {
+                editorAttrib.baseColor = val.value<QColor>();
+            }
+
             // Validate: warn about unsupported attributes
             auto allAttributes = uiItem->getAttributes( uiConfigName );
             for ( const auto& [key, value] : allAttributes )
             {
                 if ( supportedAttributes.find( key ) == supportedAttributes.end() )
                 {
-                    CAF_PDM_LOG_WARNING(
-                        QString(
-                            "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
-                            "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
-                            "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, enableDropTarget" )
-                            .arg( QString::fromStdString( key ) ) );
-                }
+                                    CAF_PDM_LOG_WARNING(
+                                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
+                                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
+                                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
+                                                 "columnWidths, baseColor, enableDropTarget" )
+                                            .arg( QString::fromStdString( key ) ) );                }
             }
         }
 
