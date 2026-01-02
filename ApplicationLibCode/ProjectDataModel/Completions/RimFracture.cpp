@@ -735,6 +735,11 @@ void RimFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& ui
 
         m_wellPathDepthAtFracture.uiCapability()->setUiName( fractureTemplate()->wellPathDepthAtFractureUiName() );
 
+        // Dynamic slider range based on fracture template
+        auto [minimum, maximum] = fractureTemplate()->wellPathDepthAtFractureRange();
+        m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "m_minimum", minimum );
+        m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "m_maximum", maximum );
+
         if ( fractureTemplate()->orientationType() == RimFractureTemplate::ALONG_WELL_PATH ||
              fractureTemplate()->orientationType() == RimFractureTemplate::TRANSVERSE_WELL_PATH )
         {
@@ -786,26 +791,7 @@ void RimFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& ui
     }
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFracture::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Dynamic slider range based on fracture template
-    if ( field == &m_wellPathDepthAtFracture )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            if ( fractureTemplate() )
-            {
-                auto [minimum, maximum] = fractureTemplate()->wellPathDepthAtFractureRange();
-                myAttr->m_minimum       = minimum;
-                myAttr->m_maximum       = maximum;
-            }
-        }
-    }
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///
