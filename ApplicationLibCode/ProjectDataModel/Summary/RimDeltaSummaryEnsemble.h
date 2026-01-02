@@ -73,7 +73,7 @@ private:
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
-    void setAllCasesNotInUse();
+    void                              setAllCasesNotInUse();
     void                              deleteCasesNoInUse();
     RimDeltaSummaryCase*              firstCaseNotInUse();
     std::vector<RimDeltaSummaryCase*> allDerivedCases( bool activeOnly ) const;

@@ -59,4 +59,3 @@ bool RicExportContourMapToTextUi::excludeUndefinedValues() const
 {
     return m_excludeUndefinedValues;
 }
-

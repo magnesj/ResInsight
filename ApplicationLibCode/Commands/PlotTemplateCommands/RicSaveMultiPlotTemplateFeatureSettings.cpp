@@ -29,7 +29,7 @@ RicSaveMultiPlotTemplateFeatureSettings::RicSaveMultiPlotTemplateFeatureSettings
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
     m_filePath.uiCapability()->setAttributeBool( "m_selectDirectory", true );
-    
+
     CAF_PDM_InitFieldNoDefault( &m_name, "Name", "Name" );
 
     CAF_PDM_InitField( &m_persistObjectNameForWells, "PersistObjectNameWells", false, "Wells" );
@@ -113,4 +113,3 @@ void RicSaveMultiPlotTemplateFeatureSettings::defineUiOrdering( QString uiConfig
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-

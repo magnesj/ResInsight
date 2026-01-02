@@ -38,7 +38,6 @@ public:
     bool    excludeUndefinedValues() const;
 
 protected:
-
 private:
     caf::PdmField<QString> m_exportFileName;
     caf::PdmField<bool>    m_exportLocalCoordinates;
