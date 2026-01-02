@@ -718,6 +718,7 @@ void RimEclipseResultCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         auto group1 = uiOrdering.addNewGroup( "Time Step Filter" );
         group1->setCollapsedByDefault();
         m_timeStepFilter->uiOrdering( uiConfigName, *group1 );
+    m_sourSimFileName.uiCapability()->setAttributeString( "defaultPath", QFileInfo( gridFileName() ).absolutePath() );
     }
 }
 
@@ -743,20 +744,7 @@ void RimEclipseResultCase::fieldChangedByUi( const caf::PdmFieldHandle* changedF
     return RimEclipseCase::fieldChangedByUi( changedField, oldValue, newValue );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseResultCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_sourSimFileName )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_defaultPath = QFileInfo( gridFileName() ).absolutePath();
-        }
-    }
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///
