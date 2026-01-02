@@ -1498,7 +1498,6 @@ void RimEclipseResultDefinition::defineUiOrdering( QString uiConfigName, caf::Pd
             injectorGroup->add( &m_syncInjectorToProducerSelection );
             m_syncInjectorToProducerSelection.uiCapability()->setAttributeInt( "horizontalSizePolicy", QSizePolicy::MinimumExpanding );
 
-
             caf::PdmUiGroup* producerGroup = selectionGroup->addNewGroup( "Producers", { .newRow = false } );
             producerGroup->add( &m_selectedProducerTracersUiField );
             producerGroup->add( &m_syncProducerToInjectorSelection );
@@ -1583,7 +1582,6 @@ void RimEclipseResultDefinition::defineUiOrdering( QString uiConfigName, caf::Pd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-
 
 //--------------------------------------------------------------------------------------------------
 ///

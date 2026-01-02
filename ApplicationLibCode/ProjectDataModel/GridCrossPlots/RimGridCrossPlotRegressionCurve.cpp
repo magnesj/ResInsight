@@ -72,12 +72,14 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
     CAF_PDM_InitFieldNoDefault( &m_minExtrapolationRangeX, "MinExtrapolationRangeX", "Min" );
     m_minExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat", static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+                                                              static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitFieldNoDefault( &m_maxExtrapolationRangeX, "MaxExtrapolationRangeX", "Max" );
     m_maxExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat", static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+                                                              static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitField( &m_polynomialDegree, "PolynomialDegree", 3, "Degree" );
     m_polynomialDegree.setRange( 1, 50 );
@@ -338,20 +340,36 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
 
     caf::PdmUiGroup* dataSelectionGroup = uiOrdering.addNewGroup( "Data Selection" );
     dataSelectionGroup->add( &m_minRangeX );
-    m_minRangeX.uiCapability()->setAttributeDouble( "minimum", RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ), uiConfigName );
-    m_minRangeX.uiCapability()->setAttributeDouble( "maximum", RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ), uiConfigName );
+    m_minRangeX.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
+                                                    uiConfigName );
+    m_minRangeX.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
+                                                    uiConfigName );
     m_minRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeX );
-    m_maxRangeX.uiCapability()->setAttributeDouble( "minimum", RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ), uiConfigName );
-    m_maxRangeX.uiCapability()->setAttributeDouble( "maximum", RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ), uiConfigName );
+    m_maxRangeX.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
+                                                    uiConfigName );
+    m_maxRangeX.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
+                                                    uiConfigName );
     m_maxRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_minRangeY );
-    m_minRangeY.uiCapability()->setAttributeDouble( "minimum", RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ), uiConfigName );
-    m_minRangeY.uiCapability()->setAttributeDouble( "maximum", RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ), uiConfigName );
+    m_minRangeY.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
+                                                    uiConfigName );
+    m_minRangeY.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
+                                                    uiConfigName );
     m_minRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeY );
-    m_maxRangeY.uiCapability()->setAttributeDouble( "minimum", RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ), uiConfigName );
-    m_maxRangeY.uiCapability()->setAttributeDouble( "maximum", RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ), uiConfigName );
+    m_maxRangeY.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
+                                                    uiConfigName );
+    m_maxRangeY.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
+                                                    uiConfigName );
     m_maxRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_showDataSelectionInPlot );
 

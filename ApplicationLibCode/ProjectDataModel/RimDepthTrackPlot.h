@@ -194,8 +194,8 @@ protected:
 
     void initAfterRead() override;
 
-    void onLoadDataAndUpdate() override;
-    void updatePlots();
+    void                 onLoadDataAndUpdate() override;
+    void                 updatePlots();
     caf::PdmFieldHandle* userDescriptionField() override;
 
     void uiOrderingForFonts( const QString& uiConfigName, caf::PdmUiOrdering& uiOrdering );

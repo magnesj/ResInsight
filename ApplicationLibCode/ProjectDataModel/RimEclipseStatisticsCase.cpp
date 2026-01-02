@@ -492,7 +492,9 @@ void RimEclipseStatisticsCase::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_caseUserDescription );
     uiOrdering.add( &m_caseId );
 
-    m_calculateEditCommand.uiCapability()->setAttributeString( "buttonText", hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute", uiConfigName );
+    m_calculateEditCommand.uiCapability()->setAttributeString( "buttonText",
+                                                               hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute",
+                                                               uiConfigName );
     uiOrdering.add( &m_calculateEditCommand );
 
     {
@@ -857,8 +859,6 @@ void RimEclipseStatisticsCase::updateSelectionSummaryLabel()
 
     m_selectionSummary = html;
 }
-
-
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -402,8 +402,6 @@ void RimGeoMechContourMapProjection::defineUiOrdering( QString uiConfigName, caf
     m_paddingAroundPorePressureRegion.uiCapability()->setUiReadOnly( !m_limitToPorePressureRegions() );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

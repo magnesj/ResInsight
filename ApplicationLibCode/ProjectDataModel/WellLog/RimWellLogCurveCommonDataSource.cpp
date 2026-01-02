@@ -1092,8 +1092,8 @@ void RimWellLogCurveCommonDataSource::defineUiOrdering( QString uiConfigName, ca
 ///
 //--------------------------------------------------------------------------------------------------
 void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
+                                                             QString                    uiConfigName,
+                                                             caf::PdmUiEditorAttribute* attribute )
 {
     auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
     if ( myAttr )
@@ -1106,15 +1106,15 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
             myAttr->nextButtonText = "Next (" + nextText + ")";
             myAttr->prevButtonText = "Previous (" + prevText + ")";
 
-            myAttr->nextIcon                   = QIcon( ":/ComboBoxDown.svg" );
-            myAttr->previousIcon               = QIcon( ":/ComboBoxUp.svg" );
+            myAttr->nextIcon     = QIcon( ":/ComboBoxDown.svg" );
+            myAttr->previousIcon = QIcon( ":/ComboBoxUp.svg" );
         }
 
         QString modifierText;
 
         if ( field == &m_case )
         {
-            modifierText                  = ( "(Shift+" );
+            modifierText = ( "(Shift+" );
         }
         else if ( field == &m_wellPath || field == &m_simWellName )
         {
@@ -1122,7 +1122,7 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
         }
         else if ( field == &m_timeStep )
         {
-            modifierText                  = ( "(" );
+            modifierText = ( "(" );
         }
 
         if ( !modifierText.isEmpty() )
