@@ -466,6 +466,20 @@ void RimIntersectionCollection::updateIntersectionBoxGeometry()
 //--------------------------------------------------------------------------------------------------
 void RimIntersectionCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on grid bounding box
+    RimEclipseView* eclView = eclipseView();
+    if ( eclView && eclView->mainGrid() )
+    {
+        const cvf::BoundingBox bb        = eclView->mainGrid()->boundingBox();
+        double                 minDepth  = -1.0 * bb.max().z();
+        double                 maxDepth  = -1.0 * bb.min().z();
+
+        m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", minDepth, uiConfigName );
+        m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", maxDepth, uiConfigName );
+        m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", minDepth, uiConfigName );
+        m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", maxDepth, uiConfigName );
+    }
+
     caf::PdmUiGroup* genGroup = uiOrdering.addNewGroup( "General" );
     genGroup->add( &m_applyCellFilters );
 
@@ -517,26 +531,13 @@ void RimIntersectionCollection::defineUiOrdering( QString uiConfigName, caf::Pdm
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The defineEditorAttribute function is no longer needed as its logic has been moved to defineUiOrdering.
+/// It is intentionally left empty.
 //--------------------------------------------------------------------------------------------------
 void RimIntersectionCollection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    auto* doubleSliderAttrib = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-    if ( doubleSliderAttrib )
-    {
-        if ( ( field == &m_depthUpperThreshold ) || ( field == &m_depthLowerThreshold ) )
-        {
-            RimEclipseView* eclView = eclipseView();
-
-            if ( eclView && eclView->mainGrid() )
-            {
-                const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
-
-                doubleSliderAttrib->m_minimum = -1.0 * bb.max().z();
-                doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
-            }
-        }
-    }
+    // This function's logic was moved to defineUiOrdering for better performance and maintainability.
+    // Dynamic slider min/max attributes are now set using the map-based system in defineUiOrdering.
 }
 
 //--------------------------------------------------------------------------------------------------
