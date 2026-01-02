@@ -179,6 +179,16 @@ void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
     uiOrdering.add( &m_isReadOnly );
     uiOrdering.add( &m_editPolygonButton );
 
+    // Set dynamic button text based on read-only state
+    if ( m_isReadOnly() )
+    {
+        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Select in Active View" );
+    }
+    else
+    {
+        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit in Active View" );
+    }
+
     auto groupPoints = uiOrdering.addNewGroup( "Points" );
     groupPoints->setCollapsedByDefault();
     groupPoints->add( &m_pointsInDomainCoords );
@@ -218,26 +228,6 @@ void RimPolygon::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildF
     objectChanged.send();
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygon::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_editPolygonButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            if ( m_isReadOnly() )
-            {
-                attrib->m_buttonText = "Select in Active View";
-            }
-            else
-            {
-                attrib->m_buttonText = "Edit in Active View";
-            }
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
