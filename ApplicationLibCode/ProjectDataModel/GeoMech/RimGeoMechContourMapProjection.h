@@ -79,7 +79,6 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
-
 protected:
     caf::PdmField<bool>       m_limitToPorePressureRegions;
     caf::PdmField<bool>       m_applyPPRegionLimitVertically;

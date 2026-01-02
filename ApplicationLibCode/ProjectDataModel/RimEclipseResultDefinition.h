@@ -155,7 +155,6 @@ protected:
     void initAfterRead() override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
-
 protected:
     caf::PdmField<caf::AppEnum<RiaDefines::ResultCatType>>     m_resultType;
     caf::PdmField<caf::AppEnum<RiaDefines::PorosityModelType>> m_porosityModel;

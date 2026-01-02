@@ -102,7 +102,6 @@ private:
 
     void loadSimulationWellDataFromSourceCase();
 
-
     void initializeSelectedTimeSteps();
 
     static QList<caf::PdmOptionItemInfo> toOptionList( const QStringList& varList );

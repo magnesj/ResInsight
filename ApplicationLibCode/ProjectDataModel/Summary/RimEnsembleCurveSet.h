@@ -200,7 +200,6 @@ private:
     caf::PdmFieldHandle* userDescriptionField() override;
     caf::PdmFieldHandle* objectToggleField() override;
 
-
     QList<caf::PdmOptionItemInfo>          calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     std::set<time_t>                       allAvailableTimeSteps() const;
     std::set<RimSummaryCase*>              timestepDefiningSourceCases();
