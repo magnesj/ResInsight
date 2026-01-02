@@ -68,6 +68,7 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
     setNotifyAllFieldsInMultiFieldChangedEvents( true );
 
     CAF_PDM_InitFieldNoDefault( &m_stepDimension, "StepDimension", "Step Dimension" );
+    m_stepDimension.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", false );
 
     CAF_PDM_InitFieldNoDefault( &m_summaryCase, "CurveCase", "Case" );
 
@@ -975,11 +976,7 @@ void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHan
     auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
     if ( myAttr )
     {
-        if ( field == &m_stepDimension )
-        {
-            myAttr->showPreviousAndNextButtons = false;
-        }
-        else
+        if ( field != &m_stepDimension )
         {
             RiuTools::enableUpDownArrowsForComboBox( attribute );
 

@@ -75,6 +75,10 @@ RimSummaryPlotManager::RimSummaryPlotManager()
     CAF_PDM_InitFieldNoDefault( &m_summaryPlot, "SummaryPlot", "Summary Plot" );
     CAF_PDM_InitFieldNoDefault( &m_filterText, "FilterText", "Filter Text" );
     m_filterText.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_filterText.uiCapability()->setAttributeBool( "enableEditableContent", true );
+    m_filterText.uiCapability()->setAttributeBool( "enableAutoComplete", false );
+    m_filterText.uiCapability()->setAttributeBool( "adjustWidthToContents", true );
+    m_filterText.uiCapability()->setAttributeBool( "notifyWhenTextIsEdited", true );
 
     CAF_PDM_InitFieldNoDefault( &m_addressCandidates, "AddressCandidates", "Vectors" );
     m_addressCandidates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
@@ -315,18 +319,6 @@ void RimSummaryPlotManager::defineEditorAttribute( const caf::PdmFieldHandle* fi
             {
                 attr->m_buttonText = "Append Curves \n(Shift + Enter)";
             }
-        }
-    }
-
-    if ( field == &m_filterText )
-    {
-        auto attr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->enableEditableContent  = true;
-            attr->enableAutoComplete     = false;
-            attr->adjustWidthToContents  = true;
-            attr->notifyWhenTextIsEdited = true;
         }
     }
 }
