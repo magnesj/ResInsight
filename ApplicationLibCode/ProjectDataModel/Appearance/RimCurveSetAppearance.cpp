@@ -270,6 +270,12 @@ void RimCurveSetAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     else if ( m_colorMode() == RimEnsembleCurveSetColorManager::ColorMode::SINGLE_COLOR_WITH_ALPHA )
     {
         uiOrdering.add( &m_mainEnsembleColor );
+
+        // Set static slider attributes for opacity
+        m_colorOpacity.uiCapability()->setAttributeDouble( "minimum", 0.001 );
+        m_colorOpacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+        m_colorOpacity.uiCapability()->setAttributeInt( "decimals", 2 );
+
         uiOrdering.add( &m_colorOpacity );
     }
     else if ( m_colorMode == ColorMode::BY_ENSEMBLE_PARAM )
@@ -341,18 +347,3 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
     return options;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimCurveSetAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_colorOpacity )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum  = 0.001;
-            myAttr->m_maximum  = 1.0;
-            myAttr->m_decimals = 2;
-        }
-    }
-}

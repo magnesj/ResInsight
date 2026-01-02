@@ -574,11 +574,19 @@ void RimStreamlineInViewCollection::defineUiOrdering( QString uiConfigName, caf:
 
     if ( m_visualizationMode() == VisualizationMode::ANIMATION )
     {
+        // Set static slider range for animation speed
+        m_animationSpeed.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_animationSpeed.uiCapability()->setAttributeInt( "maximum", 100 );
+
         visualizationGroup->add( &m_animationSpeed );
         visualizationGroup->add( &m_tracerLength );
     }
     else if ( m_visualizationMode() == VisualizationMode::MANUAL )
     {
+        // Set dynamic slider range for animation index
+        m_animationIndex.uiCapability()->setAttributeInt( "minimum", 0 );
+        m_animationIndex.uiCapability()->setAttributeInt( "maximum", static_cast<int>( m_maxAnimationIndex ) );
+
         visualizationGroup->add( &m_animationIndex );
     }
 
