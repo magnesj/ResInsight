@@ -136,6 +136,33 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     if ( m_lockPolygonToPlane )
     {
         uiOrdering.add( &m_polygonPlaneDepth );
+
+        // Dynamic slider attributes for polygon plane depth based on runtime state
+        auto allCases = RimProject::current()->allGridCases();
+        if ( allCases.empty() )
+        {
+            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_minimum", 0.0 );
+            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_maximum", 10000.0 );
+        }
+        else
+        {
+            double min = std::numeric_limits<double>::max();
+            double max = -std::numeric_limits<double>::max();
+
+            for ( auto gridCase : allCases )
+            {
+                auto bb = gridCase->allCellsBoundingBox();
+
+                min = std::min( min, bb.min().z() );
+                max = std::max( max, bb.max().z() );
+            }
+
+            auto adjustedMin = RiaNumericalTools::roundToNumSignificantDigitsFloor( -min, 2 );
+            auto adjustedMax = RiaNumericalTools::roundToNumSignificantDigitsCeil( -max, 2 );
+
+            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_minimum", adjustedMax );
+            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_maximum", adjustedMin );
+        }
     }
 
     uiOrdering.add( &m_isClosed );
@@ -151,41 +178,4 @@ void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedF
     objectChanged.send();
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygonAppearance::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Dynamic slider attributes for polygon plane depth based on runtime state
-    if ( field == &m_polygonPlaneDepth )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto allCases = RimProject::current()->allGridCases();
-            if ( allCases.empty() )
-            {
-                attr->m_minimum = 0;
-                attr->m_maximum = 10000.0;
-            }
-            else
-            {
-                double min = std::numeric_limits<double>::max();
-                double max = -std::numeric_limits<double>::max();
 
-                for ( auto gridCase : allCases )
-                {
-                    auto bb = gridCase->allCellsBoundingBox();
-
-                    min = std::min( min, bb.min().z() );
-                    max = std::max( max, bb.max().z() );
-                }
-
-                auto adjustedMin = RiaNumericalTools::roundToNumSignificantDigitsFloor( -min, 2 );
-                auto adjustedMax = RiaNumericalTools::roundToNumSignificantDigitsCeil( -max, 2 );
-
-                attr->m_minimum = adjustedMax;
-                attr->m_maximum = adjustedMin;
-            }
-        }
-    }
-}
