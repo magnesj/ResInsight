@@ -532,7 +532,8 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimWellConnectivityTable::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    // Combobox navigation icons - uses QIcon which can't be stored as QVariant attributes
+    // Retained for complex QIcon attributes that cannot be migrated to map-based system,
+    // as per CLAUDE.md guidance.
     if ( field == &m_selectedTimeStep || field == &m_selectedFromTimeStep || field == &m_selectedToTimeStep )
     {
         if ( auto attrib = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute ) )
