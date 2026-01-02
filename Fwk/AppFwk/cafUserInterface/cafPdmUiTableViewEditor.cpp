@@ -200,6 +200,7 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                                                                        "minimumHeight",
                                                                        "heightHint",
                                                                        "alwaysEnforceResizePolicy",
+                                                                       "resizePolicy",
                                                                        "enableDropTarget" };
 
             QVariant val;
@@ -240,6 +241,12 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 editorAttrib.alwaysEnforceResizePolicy = val.toBool();
             }
 
+            val = uiItem->getAttribute( "resizePolicy", uiConfigName );
+            if ( val.isValid() && val.canConvert<int>() )
+            {
+                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.toInt() );
+            }
+
             val = uiItem->getAttribute( "enableDropTarget", uiConfigName );
             if ( val.isValid() && val.canConvert<bool>() )
             {
@@ -253,9 +260,10 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 if ( supportedAttributes.find( key ) == supportedAttributes.end() )
                 {
                     CAF_PDM_LOG_WARNING(
-                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
-                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
-                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, enableDropTarget" )
+                        QString(
+                            "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
+                            "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
+                            "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, enableDropTarget" )
                             .arg( QString::fromStdString( key ) ) );
                 }
             }

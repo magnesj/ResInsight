@@ -81,6 +81,8 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
     m_wellTargets.uiCapability()->setUiTreeChildrenHidden( true );
     m_wellTargets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_wellTargets.uiCapability()->setCustomContextMenuEnabled( true );
+    m_wellTargets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_wellTargets.uiCapability()->setAttributeInt( "heightHint", 1000 );
 
     CAF_PDM_InitField( &m_showAbsolutePosForWellTargets, "ShowAbsolutePosForWellTargets", false, "Show UTM Coords" );
     CAF_PDM_InitField( &m_useTopLevelWellReferencePoint, "UseTopLevelWellReferencePoint", false, "Use Top Level Well Reference Point" );
@@ -750,12 +752,10 @@ void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* f
 
     if ( field == &m_wellTargets )
     {
+        // Dynamic attributes based on picking state
         auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
         if ( tvAttribute )
         {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-            tvAttribute->heightHint   = 1000;
-
             if ( m_pickPointsEnabled )
             {
                 tvAttribute->baseColor.setRgb( 255, 220, 255 );

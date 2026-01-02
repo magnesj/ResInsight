@@ -58,6 +58,7 @@ RimUserDefinedPolylinesAnnotation::RimUserDefinedPolylinesAnnotation()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
+    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
 }
@@ -301,11 +302,10 @@ void RimUserDefinedPolylinesAnnotation::defineEditorAttribute( const caf::PdmFie
 
     if ( field == &m_targets )
     {
+        // Dynamic attributes based on picking state
         auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
         if ( tvAttribute )
         {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
             if ( m_enablePicking )
             {
                 tvAttribute->baseColor.setRgb( 255, 220, 255 );

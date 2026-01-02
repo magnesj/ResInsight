@@ -76,6 +76,9 @@ RimPolygonInView::RimPolygonInView()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
+    m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_targets.uiCapability()->setAttributeInt( "heightHint", 1000 );
+    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
     m_targets.xmlCapability()->disableIO();
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
@@ -483,16 +486,13 @@ void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, 
 
     if ( field == &m_targets )
     {
+        // Dynamic attribute based on picking state
         if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
         {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
             if ( m_enablePicking )
             {
                 tvAttribute->baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
             }
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->heightHint                = 1000;
         }
     }
 }
