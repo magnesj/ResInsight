@@ -65,8 +65,6 @@ RimSurface::RimSurface()
     m_opacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     m_opacity.uiCapability()->setAttributeDouble( "minimum", 0.0 );
     m_opacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
-    m_opacity.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-    m_opacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
 
     CAF_PDM_InitScriptableField( &m_depthOffset, "DepthOffset", 0.0, "Depth Offset" );
     m_depthOffset.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
