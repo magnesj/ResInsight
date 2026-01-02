@@ -574,16 +574,6 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The defineEditorAttribute function is no longer needed as its logic has been moved.
-/// Static attributes are now in the constructor, dynamic attributes in defineUiOrdering.
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Static attribute (sliderTickCount) moved to constructor for better performance.
-    // Dynamic attributes (minimum, maximum) moved to defineUiOrdering using map-based system.
-}
-
-//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<RimSummaryCase*> RimEnsembleCurveFilter::applyFilter( const std::vector<RimSummaryCase*>& allSumCases )

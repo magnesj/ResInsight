@@ -240,12 +240,3 @@ void RimPlotCellPropertyFilter::defineUiOrdering( QString uiConfigName, caf::Pdm
     RimPlotCellFilter::defineUiOrdering( uiConfigName, uiOrdering );
 }
 
-//--------------------------------------------------------------------------------------------------
-/// The defineEditorAttribute function is no longer needed as its logic has been moved to defineUiOrdering.
-/// It is intentionally left empty.
-//--------------------------------------------------------------------------------------------------
-void RimPlotCellPropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // This function's logic was moved to defineUiOrdering for better performance and maintainability.
-    // Dynamic slider min/max attributes are now set using the map-based system in defineUiOrdering.
-}

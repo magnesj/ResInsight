@@ -227,18 +227,6 @@ QList<caf::PdmOptionItemInfo> RimParameterResultCrossPlot::calculateValueOptions
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The defineEditorAttribute function is no longer needed as its logic has been moved.
-/// Static attributes are now in the constructor, dynamic attributes in defineUiOrdering.
-//--------------------------------------------------------------------------------------------------
-void RimParameterResultCrossPlot::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                         QString                    uiConfigName,
-                                                         caf::PdmUiEditorAttribute* attribute )
-{
-    // Static attributes (decimals, sliderTickCount) moved to constructor for better performance.
-    // Dynamic attributes (minimum, maximum) moved to defineUiOrdering using map-based system.
-}
-
-//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimParameterResultCrossPlot::onLoadDataAndUpdate()

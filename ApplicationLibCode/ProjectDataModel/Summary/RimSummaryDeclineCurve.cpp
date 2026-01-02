@@ -402,17 +402,6 @@ void RimSummaryDeclineCurve::fieldChangedByUi( const caf::PdmFieldHandle* change
 }
 
 //--------------------------------------------------------------------------------------------------
-/// The defineEditorAttribute function logic has been moved to the constructor.
-/// Static slider attributes are now set using the map-based system for better performance.
-//--------------------------------------------------------------------------------------------------
-void RimSummaryDeclineCurve::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
-
-    // All static slider attributes (minimum, maximum, decimals, showSpinBox) moved to constructor.
-}
-
-//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 void RimSummaryDeclineCurve::setDeclineCurveType( DeclineCurveType declineCurveType )
