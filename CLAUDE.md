@@ -405,14 +405,10 @@ To find supported attributes for a specific editor:
 2. Check validation code in the editor's cpp file for the `supportedAttributes` set
 3. Trigger a warning by setting a dummy attribute and reading the error message
 
-#### When to Keep defineEditorAttribute
+#### Move dynamic attributes to defineUiOrdering()
 
-Keep `defineEditorAttribute()` only for:
-- Complex attributes that cannot be stored in QVariant (e.g., field pointers, validators)
-- Dynamic attributes that depend on complex runtime state
-- Special cases like `currentIndexFieldHandle` in tree selection editors
+If an attribute needs to change based on UI configuration or runtime state, set it in `defineUiOrdering()` instead of the constructor.
 
-For 95% of cases, use the map-based system.
 
 ## Development Notes
 
