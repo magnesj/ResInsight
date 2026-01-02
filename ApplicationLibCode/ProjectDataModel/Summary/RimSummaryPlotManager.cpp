@@ -301,31 +301,6 @@ std::vector<QString> RimSummaryPlotManager::dataSourceDisplayNames() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryPlotManager::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    {
-        auto attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            if ( field == &m_pushButtonReplace )
-            {
-                attr->m_buttonText = "Replace Curves \n(Ctrl + Enter)";
-            }
-            if ( field == &m_pushButtonNewPlot )
-            {
-                attr->m_buttonText = "Create New Plot \n(Enter)";
-            }
-            if ( field == &m_pushButtonAppend )
-            {
-                attr->m_buttonText = "Append Curves \n(Shift + Enter)";
-            }
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimSummaryPlotManager::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_summaryPlot );
@@ -341,9 +316,15 @@ void RimSummaryPlotManager::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     uiOrdering.add( &m_individualPlotPerObject );
     uiOrdering.appendToRow( &m_createMultiPlot );
 
+    m_pushButtonAppend.uiCapability()->setAttributeString( "buttonText", "Append Curves \n(Shift + Enter)" );
     uiOrdering.add( &m_pushButtonAppend );
+
+    m_pushButtonReplace.uiCapability()->setAttributeString( "buttonText", "Replace Curves \n(Ctrl + Enter)" );
     uiOrdering.appendToRow( &m_pushButtonReplace );
+
     uiOrdering.appendToRow( &m_labelB );
+
+    m_pushButtonNewPlot.uiCapability()->setAttributeString( "buttonText", "Create New Plot \n(Enter)" );
     uiOrdering.appendToRow( &m_pushButtonNewPlot );
 }
 

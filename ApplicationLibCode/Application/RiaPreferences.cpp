@@ -345,28 +345,6 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
             myAttr->validator = new QDoubleValidator( 0.000001, 100000.0, 6 );
         }
     }
-    else if ( ( field == &m_deleteOsduToken ) || ( field == &m_deleteSumoToken ) )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Delete Token";
-        }
-    }
-    else if ( field == &m_importPreferences )
-    {
-        if ( auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            pbAttribute->m_buttonText = "Import Preferences";
-        }
-    }
-    else if ( field == &m_exportPreferences )
-    {
-        if ( auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            pbAttribute->m_buttonText = "Export Preferences";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -409,6 +387,10 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
         caf::PdmUiGroup* importExportGroup = uiOrdering.addNewGroup( "Import and Export" );
         importExportGroup->setCollapsedByDefault();
+
+        m_importPreferences.uiCapability()->setAttributeString( "buttonText", "Import Preferences" );
+        m_exportPreferences.uiCapability()->setAttributeString( "buttonText", "Export Preferences" );
+
         importExportGroup->add( &m_importPreferences, { .newRow = false, .totalColumnSpan = 1 } );
         importExportGroup->add( &m_exportPreferences, { .newRow = false, .totalColumnSpan = 1 } );
     }
@@ -507,11 +489,15 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         caf::PdmUiGroup* osduGroup = uiOrdering.addNewGroup( "OSDU" );
         osduGroup->setCollapsedByDefault();
         m_osduPreferences()->uiOrdering( uiConfigName, *osduGroup );
+
+        m_deleteOsduToken.uiCapability()->setAttributeString( "buttonText", "Delete Token" );
         osduGroup->add( &m_deleteOsduToken );
 
         caf::PdmUiGroup* sumoGroup = uiOrdering.addNewGroup( "SUMO" );
         sumoGroup->setCollapsedByDefault();
         m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
+
+        m_deleteSumoToken.uiCapability()->setAttributeString( "buttonText", "Delete Token" );
         sumoGroup->add( &m_deleteSumoToken );
 
         caf::PdmUiGroup* openTelemetryGroup = uiOrdering.addNewGroup( "OpenTelemetry" );

@@ -360,6 +360,8 @@ void RimSummaryAddressSelector::defineUiOrdering( QString uiConfigName, caf::Pdm
     m_summaryAddressUiField = m_summaryAddress->address();
 
     uiOrdering.add( &m_summaryAddressUiField, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
+
+    m_pushButtonSelectSummaryAddress.uiCapability()->setAttributeString( "buttonText", "..." );
     uiOrdering.add( &m_pushButtonSelectSummaryAddress, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
     if ( m_showResampling )
@@ -373,21 +375,6 @@ void RimSummaryAddressSelector::defineUiOrdering( QString uiConfigName, caf::Pdm
     }
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryAddressSelector::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_pushButtonSelectSummaryAddress == field )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "...";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
