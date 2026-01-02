@@ -136,6 +136,7 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitFieldNoDefault( &m_yPushButtonSelectSummaryAddress, "SelectAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_yPushButtonSelectSummaryAddress );
+    m_yPushButtonSelectSummaryAddress.uiCapability()->setAttributeString( "buttonText", "..." );
     m_yPushButtonSelectSummaryAddress = false;
 
     CAF_PDM_InitFieldNoDefault( &m_resampling, "Resampling", "Resampling" );
@@ -160,6 +161,9 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     CAF_PDM_InitField( &m_mainEnsembleColor, "MainEnsembleColor", RiaColorTools::textColor3f(), "Color" );
     CAF_PDM_InitField( &m_colorOpacity, "ColorTransparency", 0.8, "Opacity [0..1]" );
     m_colorOpacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_colorOpacity.uiCapability()->setAttributeDouble( "minimum", 0.001 );
+    m_colorOpacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_colorOpacity.uiCapability()->setAttributeInt( "decimals", 2 );
 
     CAF_PDM_InitField( &m_ensembleParameter, "EnsembleParameter", QString( "" ), "Parameter" );
     m_ensembleParameter.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -189,6 +193,7 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveValuesSelectSummaryAddressPushButton, "SelectObjectiveSummaryAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_objectiveValuesSelectSummaryAddressPushButton );
+    m_objectiveValuesSelectSummaryAddressPushButton.uiCapability()->setAttributeString( "buttonText", "..." );
     m_objectiveValuesSelectSummaryAddressPushButton = false;
 
     CAF_PDM_InitFieldNoDefault( &m_customObjectiveFunction, "CustomObjectiveFunction", "Objective Function" );
@@ -203,12 +208,18 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 0, "" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     CAF_PDM_InitFieldNoDefault( &m_maxDateRange, "MaxDateRange", "To", "", formatString );
     m_maxDateRange.uiCapability()->setUiEditorTypeName( caf::PdmUiDateEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     // Time Step Selection
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilter, "TimeStepFilter", "Available Time Steps" );
@@ -569,6 +580,10 @@ void RimEnsembleCurveSet::appendTimeGroup( caf::PdmUiOrdering& uiOrdering )
 
     if ( showTimeRangeFields )
     {
+        QString formatString = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() );
+        m_minDateRange.uiCapability()->setAttributeString( "dateFormat", formatString );
+        m_maxDateRange.uiCapability()->setAttributeString( "dateFormat", formatString );
+
         timeFields.push_back( &m_minDateRange );
         timeFields.push_back( &m_minTimeSliderPosition );
         timeFields.push_back( &m_maxDateRange );
@@ -1519,44 +1534,7 @@ caf::PdmFieldHandle* RimEnsembleCurveSet::objectToggleField()
     return &m_showCurves;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveSet::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( auto* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-    {
-        attrib->m_buttonText = "...";
-    }
 
-    if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
-        }
-    }
-    if ( field == &m_colorOpacity )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum  = 0.001;
-            myAttr->m_maximum  = 1.0;
-            myAttr->m_decimals = 2;
-        }
-    }
-
-    if ( field == &m_minDateRange || field == &m_maxDateRange )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute ) )
-        {
-            QString formatString = RiaQDateTimeTools::dateFormatString( RiaPreferences::current()->dateFormat() );
-            attrib->dateFormat   = formatString;
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
