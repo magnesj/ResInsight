@@ -194,7 +194,6 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
-
     std::vector<RimFracture*> fracturesUsingThisTemplate() const;
     virtual void              onLoadDataAndUpdateGeometryHasChanged() = 0;
 

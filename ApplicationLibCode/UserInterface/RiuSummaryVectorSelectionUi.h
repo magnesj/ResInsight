@@ -79,7 +79,7 @@ private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    [[deprecated("Retained for complex attribute currentIndexFieldHandle that cannot be migrated to map-based system.")]]
+    [[deprecated( "Retained for complex attribute currentIndexFieldHandle that cannot be migrated to map-based system." )]]
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     std::set<RifEclipseSummaryAddress> findPossibleSummaryAddresses( const std::vector<SummarySource*>& selectedSources,

@@ -363,8 +363,8 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 
     // Set dynamic slider range for m_wellPathDepthAtFracture
     auto [minimum, maximum] = wellPathDepthAtFractureRange();
-    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble("minimum", minimum);
-    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble("maximum", maximum);
+    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "minimum", minimum );
+    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "maximum", maximum );
 
     {
         auto group = uiOrdering.addNewGroup( "Sensitivity Scale Factors" );
@@ -424,8 +424,6 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     uiOrdering.add( &m_fractureTemplateUnit );
     uiOrdering.skipRemainingFields( true );
 }
-
-
 
 //--------------------------------------------------------------------------------------------------
 ///
