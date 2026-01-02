@@ -328,6 +328,9 @@ print(f"Start: {interval.start_md}, End: {interval.end_md}")
 
 The `defineEditorAttribute()` method is deprecated in favor of a map-based attribute system. The new approach sets attributes once in constructors rather than repeatedly on every UI refresh.
 
+- static attributes should be set in the constructor
+- dynamic/config-specific attributes can be set in `defineUiOrdering()`
+
 #### Old Pattern (Deprecated - Avoid in New Code)
 
 ```cpp
