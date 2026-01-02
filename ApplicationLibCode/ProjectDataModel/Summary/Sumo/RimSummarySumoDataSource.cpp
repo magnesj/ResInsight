@@ -45,6 +45,9 @@ RimSummarySumoDataSource::RimSummarySumoDataSource()
 
     CAF_PDM_InitFieldNoDefault( &m_vectorNames, "VectorNames", "Vector Names" );
     m_vectorNames.uiCapability()->setUiReadOnly( true );
+    m_vectorNames.uiCapability()->setAttributeBool( "showCheckBoxes", false );
+    m_vectorNames.uiCapability()->setAttributeBool( "showContextMenu", false );
+    m_vectorNames.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
 
     setDeletable( true );
 }
@@ -151,22 +154,6 @@ void RimSummarySumoDataSource::updateName()
 void RimSummarySumoDataSource::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder.addCmdFeature( "RicCreateSumoEnsembleFeature" );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummarySumoDataSource::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_vectorNames )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
-        {
-            attr->showCheckBoxes        = false;
-            attr->showContextMenu       = false;
-            attr->showToggleAllCheckbox = false;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
