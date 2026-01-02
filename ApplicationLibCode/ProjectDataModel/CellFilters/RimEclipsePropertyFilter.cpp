@@ -250,6 +250,20 @@ void RimEclipsePropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     group2.add( &m_rangeLabelText );
 
+    // Set dynamic slider attributes based on result value range
+    if ( m_minimumResultValue != cvf::UNDEFINED_DOUBLE && m_maximumResultValue != cvf::UNDEFINED_DOUBLE )
+    {
+        m_lowerBound.uiCapability()->setAttributeDouble( "minimum", m_minimumResultValue, uiConfigName );
+        m_lowerBound.uiCapability()->setAttributeDouble( "maximum", m_maximumResultValue, uiConfigName );
+        m_upperBound.uiCapability()->setAttributeDouble( "minimum", m_minimumResultValue, uiConfigName );
+        m_upperBound.uiCapability()->setAttributeDouble( "maximum", m_maximumResultValue, uiConfigName );
+
+        m_integerLowerBound.uiCapability()->setAttributeInt( "minimum", static_cast<int>( m_minimumResultValue ), uiConfigName );
+        m_integerLowerBound.uiCapability()->setAttributeInt( "maximum", static_cast<int>( m_maximumResultValue ), uiConfigName );
+        m_integerUpperBound.uiCapability()->setAttributeInt( "minimum", static_cast<int>( m_minimumResultValue ), uiConfigName );
+        m_integerUpperBound.uiCapability()->setAttributeInt( "maximum", static_cast<int>( m_maximumResultValue ), uiConfigName );
+    }
+
     if ( m_resultDefinition->hasCategoryResult() )
     {
         group2.add( &m_useCategorySelection );
@@ -399,32 +413,13 @@ void RimEclipsePropertyFilter::updateActiveState()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The defineEditorAttribute function is no longer needed as its logic has been moved to defineUiOrdering.
+/// It is intentionally left empty.
 //--------------------------------------------------------------------------------------------------
 void RimEclipsePropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( m_minimumResultValue == cvf::UNDEFINED_DOUBLE || m_maximumResultValue == cvf::UNDEFINED_DOUBLE )
-    {
-        return;
-    }
-
-    if ( field == &m_lowerBound || field == &m_upperBound )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum = m_minimumResultValue;
-            doubleAttributes->m_maximum = m_maximumResultValue;
-        }
-    }
-
-    if ( field == &m_integerLowerBound || field == &m_integerUpperBound )
-    {
-        if ( auto integerAttributes = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            integerAttributes->m_minimum = m_minimumResultValue;
-            integerAttributes->m_maximum = m_maximumResultValue;
-        }
-    }
+    // This function's logic was moved to defineUiOrdering for better performance and maintainability.
+    // Dynamic slider min/max attributes are now set using the map-based system in defineUiOrdering.
 }
 
 //--------------------------------------------------------------------------------------------------

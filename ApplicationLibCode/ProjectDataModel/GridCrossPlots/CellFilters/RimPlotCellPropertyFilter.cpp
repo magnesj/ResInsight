@@ -224,22 +224,28 @@ void RimPlotCellPropertyFilter::updateCellVisibilityFromFilter( size_t timeStepI
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimPlotCellPropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    // Set dynamic slider attributes based on result value range
+    double minimumValue = 0.0;
+    double maximumValue = 0.0;
+    findOrComputeMinMaxResultValues( minimumValue, maximumValue );
+
+    m_lowerBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
+    m_lowerBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
+
+    // Call base class to handle standard UI ordering
+    RimPlotCellFilter::defineUiOrdering( uiConfigName, uiOrdering );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// The defineEditorAttribute function is no longer needed as its logic has been moved to defineUiOrdering.
+/// It is intentionally left empty.
+//--------------------------------------------------------------------------------------------------
 void RimPlotCellPropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_lowerBound || field == &m_upperBound )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( !myAttr )
-        {
-            return;
-        }
-
-        double minimumValue = 0.0;
-        double maximumValue = 0.0;
-
-        findOrComputeMinMaxResultValues( minimumValue, maximumValue );
-
-        myAttr->m_minimum = minimumValue;
-        myAttr->m_maximum = maximumValue;
-    }
+    // This function's logic was moved to defineUiOrdering for better performance and maintainability.
+    // Dynamic slider min/max attributes are now set using the map-based system in defineUiOrdering.
 }
