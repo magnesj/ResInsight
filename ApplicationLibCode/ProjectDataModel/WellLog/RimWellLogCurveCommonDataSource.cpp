@@ -47,6 +47,7 @@
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
+#include "RimSummaryPlotControls.h"
 #include "RiuTools.h"
 
 #include "cafPdmUiCheckBoxEditor.h"
@@ -84,12 +85,17 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitObject( "Change Data Source" );
 
     CAF_PDM_InitFieldNoDefault( &m_case, "CurveCase", "Case" );
+    m_case.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_case.uiCapability()->setAttributeInt( "minimumContentsLength", 14 );
     CAF_PDM_InitFieldNoDefault( &m_summaryCase, "SummaryCase", "Summary Case" );
+    m_summaryCase.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_trajectoryType, "TrajectoryType", "Trajectory Type" );
 
     CAF_PDM_InitFieldNoDefault( &m_wellPath, "CurveWellPath", "Well Path" );
+    m_wellPath.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
 
     CAF_PDM_InitFieldNoDefault( &m_simWellName, "SimulationWellName", "Well Name" );
+    m_simWellName.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_branchDetection,
                                 "BranchDetection",
                                 "Branch Detection",
@@ -104,6 +110,8 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitField( &m_branchIndex, "Branch", -1, "Branch Index" );
 
     CAF_PDM_InitField( &m_timeStep, "CurveTimeStep", -1, "Time Step" );
+    m_timeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_timeStep.uiCapability()->setAttributeInt( "minimumContentsLength", 12 );
 
     CAF_PDM_InitFieldNoDefault( &m_wbsSmoothing, "WBSSmoothing", "Smooth Curves" );
     m_wbsSmoothing.uiCapability()->setUiEditorTypeName( caf::PdmUiCheckBoxTristateEditor::uiEditorTypeName() );
@@ -114,8 +122,11 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitField( &m_maximumCurvePointInterval, "MaximumCurvePointInterval", std::make_pair( true, 10.0 ), "Maximum Curve Point Interval" );
 
     CAF_PDM_InitFieldNoDefault( &m_rftTimeStep, "RftTimeStep", "RFT Time Step" );
+    m_rftTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_rftWellName, "RftWellName", "RFT Well Name" );
+    m_rftWellName.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_rftSegmentBranchIndex, "SegmentBranchIndex", "RFT Branch" );
+    m_rftSegmentBranchIndex.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
     CAF_PDM_InitFieldNoDefault( &m_rftSegmentBranchType, "SegmentBranchType", "RFT Completion" );
 
     m_case     = nullptr;
@@ -1081,8 +1092,8 @@ void RimWellLogCurveCommonDataSource::defineUiOrdering( QString uiConfigName, ca
 ///
 //--------------------------------------------------------------------------------------------------
 void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                             QString                    uiConfigName,
-                                                             caf::PdmUiEditorAttribute* attribute )
+                                                          QString                    uiConfigName,
+                                                          caf::PdmUiEditorAttribute* attribute )
 {
     auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
     if ( myAttr )
@@ -1090,7 +1101,13 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
         if ( field == &m_case || field == &m_summaryCase || field == &m_simWellName || field == &m_wellPath || field == &m_timeStep ||
              field == &m_rftTimeStep || field == &m_rftSegmentBranchIndex || field == &m_rftWellName )
         {
-            RiuTools::enableUpDownArrowsForComboBox( attribute );
+            QString nextText       = RimSummaryPlotControls::nextStepKeyText();
+            QString prevText       = RimSummaryPlotControls::prevStepKeyText();
+            myAttr->nextButtonText = "Next (" + nextText + ")";
+            myAttr->prevButtonText = "Previous (" + prevText + ")";
+
+            myAttr->nextIcon                   = QIcon( ":/ComboBoxDown.svg" );
+            myAttr->previousIcon               = QIcon( ":/ComboBoxUp.svg" );
         }
 
         QString modifierText;
@@ -1098,7 +1115,6 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
         if ( field == &m_case )
         {
             modifierText                  = ( "(Shift+" );
-            myAttr->minimumContentsLength = 14;
         }
         else if ( field == &m_wellPath || field == &m_simWellName )
         {
@@ -1107,7 +1123,6 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
         else if ( field == &m_timeStep )
         {
             modifierText                  = ( "(" );
-            myAttr->minimumContentsLength = 12;
         }
 
         if ( !modifierText.isEmpty() )
@@ -1130,7 +1145,6 @@ void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmField
         uiDisplayStringAttr->m_displayString = displayString;
     }
 }
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
