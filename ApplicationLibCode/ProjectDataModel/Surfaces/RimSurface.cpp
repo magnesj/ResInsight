@@ -325,8 +325,6 @@ void RimSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
     caf::PdmObject::defineUiOrdering( uiConfigName, uiOrdering );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

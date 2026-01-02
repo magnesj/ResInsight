@@ -346,4 +346,3 @@ QList<caf::PdmOptionItemInfo> RimCurveSetAppearance::calculateValueOptions( cons
 
     return options;
 }
-

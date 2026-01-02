@@ -399,7 +399,6 @@ void RimBoxIntersection::updateBoxManipulatorGeometry()
     m_boxManipulator->setSize( transForm->scaleToDisplaySize( boxSize() ) );
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
