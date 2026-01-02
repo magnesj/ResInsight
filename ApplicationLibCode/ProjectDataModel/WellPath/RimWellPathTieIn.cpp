@@ -172,6 +172,19 @@ void RimWellPathTieIn::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     tieInGroup->add( &m_parentWell );
     if ( m_parentWell() != nullptr )
     {
+        // Set dynamic slider range based on parent well path geometry
+        if ( parentWell() )
+        {
+            auto wellPathGeo = parentWell()->wellPathGeometry();
+            if ( wellPathGeo )
+            {
+                double minimumValue = wellPathGeo->measuredDepths().front();
+                double maximumValue = wellPathGeo->measuredDepths().back();
+                m_tieInMeasuredDepth.uiCapability()->setAttributeDouble( "minimum", minimumValue );
+                m_tieInMeasuredDepth.uiCapability()->setAttributeDouble( "maximum", maximumValue );
+            }
+        }
+
         tieInGroup->add( &m_tieInMeasuredDepth );
         tieInGroup->add( &m_addValveAtConnection );
 
@@ -238,29 +251,3 @@ QList<caf::PdmOptionItemInfo> RimWellPathTieIn::calculateValueOptions( const caf
     return options;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellPathTieIn::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_tieInMeasuredDepth )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-
-        if ( myAttr && parentWell() )
-        {
-            double minimumValue = 0.0, maximumValue = 0.0;
-
-            auto wellPathGeo = parentWell()->wellPathGeometry();
-
-            if ( wellPathGeo )
-            {
-                minimumValue = wellPathGeo->measuredDepths().front();
-                maximumValue = wellPathGeo->measuredDepths().back();
-
-                myAttr->m_minimum = minimumValue;
-                myAttr->m_maximum = maximumValue;
-            }
-        }
-    }
-}
