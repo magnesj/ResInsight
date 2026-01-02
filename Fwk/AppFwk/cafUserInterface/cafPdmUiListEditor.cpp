@@ -180,7 +180,7 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "heightHint", "allowHorizontalScrollBar" };
+        static const std::set<std::string> supportedAttributes = { "qssState", "heightHint", "allowHorizontalScrollBar" };
 
         QVariant val;
 
@@ -188,6 +188,11 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
         if ( val.isValid() && val.canConvert<int>() )
         {
             attributes.heightHint = val.toInt();
+        }
+
+        if ( auto qssState = uiItem->getAttributeString( "qssState", uiConfigName ) )
+        {
+            attributes.qssState = *qssState;
         }
 
         val = uiItem->getAttribute( "allowHorizontalScrollBar", uiConfigName );
@@ -203,7 +208,7 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiListEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: heightHint, allowHorizontalScrollBar" )
+                                              "attributes are: qssState, heightHint, allowHorizontalScrollBar" )
                                          .arg( QString::fromStdString( key ) ) );
             }
         }

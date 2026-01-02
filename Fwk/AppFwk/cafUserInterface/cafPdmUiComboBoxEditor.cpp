@@ -87,7 +87,12 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
                                                                    "enableEditableContent",
                                                                    "enableAutoComplete",
                                                                    "iconSize",
+                                                                   "minimumWidth",
                                                                    "placeholderText",
+                                                                   "nextButtonText",
+                                                                   "prevButtonText",
+                                                                   "nextIcon",
+                                                                   "previousIcon",
                                                                    "notifyWhenTextIsEdited" };
 
         QVariant val;
@@ -146,6 +151,36 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
             m_attributes.notifyWhenTextIsEdited = val.toBool();
         }
 
+        val = uiItem->getAttribute( "minimumWidth", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.minimumWidth = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "nextButtonText", uiConfigName );
+        if ( val.isValid() && val.canConvert<QString>() )
+        {
+            m_attributes.nextButtonText = val.toString();
+        }
+
+        val = uiItem->getAttribute( "prevButtonText", uiConfigName );
+        if ( val.isValid() && val.canConvert<QString>() )
+        {
+            m_attributes.prevButtonText = val.toString();
+        }
+
+        val = uiItem->getAttribute( "nextIcon", uiConfigName );
+        if ( val.isValid() && val.canConvert<QIcon>() )
+        {
+            m_attributes.nextIcon = val.value<QIcon>();
+        }
+
+        val = uiItem->getAttribute( "previousIcon", uiConfigName );
+        if ( val.isValid() && val.canConvert<QIcon>() )
+        {
+            m_attributes.previousIcon = val.value<QIcon>();
+        }
+
         // Validate: warn about unsupported attributes
         auto allAttributes = uiItem->getAttributes( uiConfigName );
         for ( const auto& [key, value] : allAttributes )
@@ -156,7 +191,9 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
                     QString( "PdmUiComboBoxEditor: Unsupported attribute '%1' set on field. Supported "
                              "attributes are: adjustWidthToContents, showPreviousAndNextButtons, "
                              "minimumContentsLength, maximumMenuContentsLength, enableEditableContent, "
-                             "enableAutoComplete, iconSize, placeholderText, notifyWhenTextIsEdited" )
+                             "enableAutoComplete, iconSize, minimumWidth, placeholderText, "
+                             "nextButtonText, prevButtonText, nextIcon, previousIcon, "
+                             "notifyWhenTextIsEdited" )
                         .arg( QString::fromStdString( key ) ) );
             }
         }
