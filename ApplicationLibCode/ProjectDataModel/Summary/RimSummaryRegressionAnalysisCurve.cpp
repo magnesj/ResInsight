@@ -118,9 +118,15 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     CAF_PDM_InitFieldNoDefault( &m_timeRangeSelection, "TimeRangeSelection", "Time Range" );
     CAF_PDM_InitFieldNoDefault( &m_minTimeSliderPosition, "MinTimeSliderPosition", "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     CAF_PDM_InitFieldNoDefault( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", false, "Show In Plot" );
 
@@ -133,10 +139,14 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     CAF_PDM_InitFieldNoDefault( &m_xRangeSelection, "XRangeSelection", "X Value Range" );
     CAF_PDM_InitField( &m_valueRangeX, "ValueRangeX", std::make_pair( 0.0, 0.0 ), "Value Range X" );
     m_valueRangeX.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_valueRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_valueRangeX.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_yRangeSelection, "YRangeSelection", "Y Value Range" );
     CAF_PDM_InitField( &m_valueRangeY, "ValueRangeY", std::make_pair( 0.0, 0.0 ), "Value Range Y" );
     m_valueRangeY.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_valueRangeY.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_valueRangeY.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -450,6 +460,23 @@ std::tuple<std::vector<time_t>, std::vector<double>, QString>
 //--------------------------------------------------------------------------------------------------
 void RimSummaryRegressionAnalysisCurve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on runtime values
+    if ( !m_sourceValuesX.empty() )
+    {
+        double minX = *std::min_element( m_sourceValuesX.begin(), m_sourceValuesX.end() );
+        double maxX = *std::max_element( m_sourceValuesX.begin(), m_sourceValuesX.end() );
+        m_valueRangeX.uiCapability()->setAttributeDouble( "minimum", minX, uiConfigName );
+        m_valueRangeX.uiCapability()->setAttributeDouble( "maximum", maxX, uiConfigName );
+    }
+
+    if ( !m_sourceValuesY.empty() )
+    {
+        double minY = *std::min_element( m_sourceValuesY.begin(), m_sourceValuesY.end() );
+        double maxY = *std::max_element( m_sourceValuesY.begin(), m_sourceValuesY.end() );
+        m_valueRangeY.uiCapability()->setAttributeDouble( "minimum", minY, uiConfigName );
+        m_valueRangeY.uiCapability()->setAttributeDouble( "maximum", maxY, uiConfigName );
+    }
+
     RimPlotCurve::updateFieldUiState();
 
     if ( m_dataSourceForRegression() == DataSource::ENSEMBLE )
@@ -553,16 +580,9 @@ void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFie
 {
     RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
 
-    if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
-        }
-    }
-    else if ( field == &m_expressionText )
+    // Text editor attributes use enum types and QFont objects which cannot be easily represented
+    // in the map-based system, so they remain here
+    if ( field == &m_expressionText )
     {
         auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
         if ( myAttr )
@@ -576,36 +596,10 @@ void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFie
             myAttr->font = font;
         }
     }
-    else if ( field == &m_valueRangeX )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 2;
-            attr->m_sliderTickCount = 100;
 
-            auto values = m_sourceValuesX;
-            if ( !values.empty() )
-            {
-                attr->m_minimum = *std::min_element( values.begin(), values.end() );
-                attr->m_maximum = *std::max_element( values.begin(), values.end() );
-            }
-        }
-    }
-    else if ( field == &m_valueRangeY )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 2;
-            attr->m_sliderTickCount = 100;
-
-            auto values = m_sourceValuesY;
-            if ( !values.empty() )
-            {
-                attr->m_minimum = *std::min_element( values.begin(), values.end() );
-                attr->m_maximum = *std::max_element( values.begin(), values.end() );
-            }
-        }
-    }
+    // Slider attributes (minimum, maximum, decimals, sliderTickCount, showSpinBox) migrated:
+    // - Static attributes moved to constructor
+    // - Dynamic min/max moved to defineUiOrdering
 }
 
 //--------------------------------------------------------------------------------------------------
