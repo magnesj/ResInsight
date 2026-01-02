@@ -177,5 +177,3 @@ void RimPolygonAppearance::fieldChangedByUi( const caf::PdmFieldHandle* changedF
 {
     objectChanged.send();
 }
-
-

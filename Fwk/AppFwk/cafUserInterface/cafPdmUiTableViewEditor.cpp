@@ -287,12 +287,13 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 if ( supportedAttributes.find( key ) == supportedAttributes.end() )
                 {
-                                    CAF_PDM_LOG_WARNING(
-                                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
-                                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
-                                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
-                                                 "columnWidths, baseColor, enableDropTarget" )
-                                            .arg( QString::fromStdString( key ) ) );                }
+                    CAF_PDM_LOG_WARNING(
+                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
+                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
+                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
+                                 "columnWidths, baseColor, enableDropTarget" )
+                            .arg( QString::fromStdString( key ) ) );
+                }
             }
         }
 
