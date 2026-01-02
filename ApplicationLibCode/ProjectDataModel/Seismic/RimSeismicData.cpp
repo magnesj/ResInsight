@@ -74,6 +74,7 @@ RimSeismicData::RimSeismicData()
     m_metadata.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_metadata.uiCapability()->setUiTreeChildrenHidden( true );
     m_metadata.uiCapability()->setUiReadOnly( true );
+    m_metadata.uiCapability()->setAttributeInt( "minimumHeight", 400 );
     m_metadata.xmlCapability()->disableIO();
 
     setDeletable( true );
@@ -308,6 +309,7 @@ void RimSeismicData::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrderin
 //--------------------------------------------------------------------------------------------------
 void RimSeismicData::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
+    // Note: resizePolicy and alwaysEnforceResizePolicy not yet supported in map-based attribute system
     if ( field == &m_metadata )
     {
         auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
@@ -315,7 +317,6 @@ void RimSeismicData::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
         {
             tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
             tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 400;
         }
     }
     else if ( field == &m_userClipValue )
