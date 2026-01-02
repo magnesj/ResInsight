@@ -296,8 +296,6 @@ void RicExportSectorModelUi::setEclipseView( RimEclipseView* view )
     if ( m_exportFolder().path().isEmpty() ) m_exportFolder = defaultFolder();
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
