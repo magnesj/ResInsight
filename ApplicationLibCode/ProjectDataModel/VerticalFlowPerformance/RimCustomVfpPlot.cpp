@@ -77,6 +77,7 @@ RimCustomVfpPlot::RimCustomVfpPlot()
     m_plotTitle.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_mainDataSource, "MainDataSouce", "Main VFP Data Source" );
+    m_mainDataSource.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
 
     CAF_PDM_InitFieldNoDefault( &m_comparisonTables, "ComparisonTables", "Comparison Tables" );
     m_comparisonTables.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -1334,7 +1335,11 @@ void RimCustomVfpPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, 
 {
     if ( field == &m_mainDataSource )
     {
-        RiuTools::enableUpDownArrowsForComboBox( attribute );
+        if ( auto attrib = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute ) )
+        {
+            attrib->nextIcon     = QIcon( ":/ComboBoxDown.svg" );
+            attrib->previousIcon = QIcon( ":/ComboBoxUp.svg" );
+        }
     }
 }
 
