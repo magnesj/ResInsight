@@ -118,6 +118,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitField( &m_valueRange, "ValueRange", std::pair( 0.0, 0.0 ), "Value Range" );
     m_valueRange.uiCapability()->setUiEditorTypeName( caf::PdmUiValueRangeEditor::uiEditorTypeName() );
+    m_valueRange.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_categories, "Categories", "Categories" );
 
@@ -513,6 +514,10 @@ void RimEnsembleCurveFilter::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on runtime limits
+    m_valueRange.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
+    m_valueRange.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
+
     auto eParam = selectedEnsembleParameter();
 
     uiOrdering.add( &m_active );
@@ -569,21 +574,13 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The defineEditorAttribute function is no longer needed as its logic has been moved.
+/// Static attributes are now in the constructor, dynamic attributes in defineUiOrdering.
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    // Dynamic slider attributes based on runtime limits
-    if ( field == &m_valueRange )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_sliderTickCount = 100;
-
-            attr->m_minimum = m_lowerLimit;
-            attr->m_maximum = m_upperLimit;
-        }
-    }
+    // Static attribute (sliderTickCount) moved to constructor for better performance.
+    // Dynamic attributes (minimum, maximum) moved to defineUiOrdering using map-based system.
 }
 
 //--------------------------------------------------------------------------------------------------

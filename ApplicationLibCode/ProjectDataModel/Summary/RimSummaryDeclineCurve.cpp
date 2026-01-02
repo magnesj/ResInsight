@@ -63,12 +63,22 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
 
     CAF_PDM_InitField( &m_hyperbolicDeclineConstant, "HyperbolicDeclineConstant", 0.5, "Decline Constant" );
     m_hyperbolicDeclineConstant.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    // Hyperbolic decline constant must be larger than 0 to avoid calculation issues
+    m_hyperbolicDeclineConstant.uiCapability()->setAttributeDouble( "minimum", 0.001 );
+    m_hyperbolicDeclineConstant.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_hyperbolicDeclineConstant.uiCapability()->setAttributeInt( "decimals", 2 );
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 75, "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", true, "Show In Plot" );
 }
@@ -392,31 +402,14 @@ void RimSummaryDeclineCurve::fieldChangedByUi( const caf::PdmFieldHandle* change
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// The defineEditorAttribute function logic has been moved to the constructor.
+/// Static slider attributes are now set using the map-based system for better performance.
 //--------------------------------------------------------------------------------------------------
 void RimSummaryDeclineCurve::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
 
-    if ( field == &m_hyperbolicDeclineConstant )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            // Hyperbolic decline constant must be larger than 0 to avoid calculation issues.
-            myAttr->m_minimum  = 0.001;
-            myAttr->m_maximum  = 1.0;
-            myAttr->m_decimals = 2;
-        }
-    }
-    else if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum     = 0;
-            myAttr->m_maximum     = 100;
-            myAttr->m_showSpinBox = false;
-        }
-    }
+    // All static slider attributes (minimum, maximum, decimals, showSpinBox) moved to constructor.
 }
 
 //--------------------------------------------------------------------------------------------------
