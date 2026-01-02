@@ -455,7 +455,7 @@ void RimMeshFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUi
     uiOrdering.add( &m_id );
 
     // Set dynamic file selection filter for m_stimPlanFileName
-    m_stimPlanFileName.uiCapability()->setAttributeString("fileSelectionFilter", getFileSelectionFilter(), uiConfigName);
+    m_stimPlanFileName.uiCapability()->setAttributeString( "fileSelectionFilter", getFileSelectionFilter(), uiConfigName );
 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Input" );
@@ -496,20 +496,6 @@ void RimMeshFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUi
     }
 
     RimFractureTemplate::defineUiOrdering( uiConfigName, uiOrdering );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-// The defineEditorAttribute function is no longer needed as its logic has been moved to defineUiOrdering.
-// It is intentionally left empty.
-//--------------------------------------------------------------------------------------------------
-void RimMeshFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimFractureTemplate::defineEditorAttribute( field, uiConfigName, attribute );
-
-    // This function's logic was moved to defineUiOrdering.
-    // The call to the base class is still here in case it has un-migrated logic.
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -693,16 +693,6 @@ QString RimStimPlanFractureTemplate::getFileSelectionFilter() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimStimPlanFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                         QString                    uiConfigName,
-                                                         caf::PdmUiEditorAttribute* attribute )
-{
-    RimMeshFractureTemplate::defineEditorAttribute( field, uiConfigName, attribute );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimStimPlanFractureTemplate::initAfterRead()
 {
     if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2020.10.0" ) )
