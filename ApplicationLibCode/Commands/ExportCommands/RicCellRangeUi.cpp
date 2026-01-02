@@ -102,37 +102,6 @@ QString RicCellRangeUi::gridName() const
     return RigReservoirGridTools::gridName( m_case, m_gridIndex() );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicCellRangeUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-    if ( !myAttr )
-    {
-        return;
-    }
-
-    const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
-    if ( grid )
-    {
-        if ( field == &m_startIndexI || field == &m_cellCountI )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = static_cast<int>( grid->cellCountI() );
-        }
-        else if ( field == &m_startIndexJ || field == &m_cellCountJ )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = static_cast<int>( grid->cellCountJ() );
-        }
-        else if ( field == &m_startIndexK || field == &m_cellCountK )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = static_cast<int>( grid->cellCountK() );
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -297,6 +266,26 @@ void RicCellRangeUi::updateLegendText()
 void RicCellRangeUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_gridIndex );
+
+    // Set dynamic slider ranges based on grid dimensions
+    const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
+    if ( grid )
+    {
+        m_startIndexI.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_startIndexI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
+        m_cellCountI.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_cellCountI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
+
+        m_startIndexJ.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_startIndexJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
+        m_cellCountJ.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_cellCountJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
+
+        m_startIndexK.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_startIndexK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
+        m_cellCountK.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_cellCountK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
+    }
 
     uiOrdering.add( &m_startIndexI );
     uiOrdering.add( &m_cellCountI );
