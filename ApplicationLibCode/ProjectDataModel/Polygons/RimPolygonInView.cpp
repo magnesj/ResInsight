@@ -65,6 +65,7 @@ RimPolygonInView::RimPolygonInView()
 
     CAF_PDM_InitField( &m_selectPolygon, "SelectPolygon", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectPolygon );
+    m_selectPolygon.uiCapability()->setAttributeString( "buttonText", "Go to Polygon" );
 
     CAF_PDM_InitField( &m_showLabel, "ShowLabel", false, "Show Label" );
 
@@ -463,6 +464,7 @@ double RimPolygonInView::scalingFactorForTarget() const
 //--------------------------------------------------------------------------------------------------
 void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
+    // Dynamic button text based on picking state
     if ( field == &m_enablePicking )
     {
         auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
@@ -476,15 +478,6 @@ void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, 
             {
                 pbAttribute->m_buttonText = "Stop Picking Points";
             }
-        }
-    }
-
-    if ( field == &m_selectPolygon )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Go to Polygon";
         }
     }
 
