@@ -361,6 +361,11 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 {
     prepareFieldsForUiDisplay();
 
+    // Set dynamic slider range for m_wellPathDepthAtFracture
+    auto [minimum, maximum] = wellPathDepthAtFractureRange();
+    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble("minimum", minimum);
+    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble("maximum", maximum);
+
     {
         auto group = uiOrdering.addNewGroup( "Sensitivity Scale Factors" );
         group->setCollapsedByDefault();
@@ -420,23 +425,7 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     uiOrdering.skipRemainingFields( true );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Dynamic slider range based on well path depth
-    if ( field == &m_wellPathDepthAtFracture )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            auto [minimum, maximum] = wellPathDepthAtFractureRange();
-            myAttr->m_minimum       = minimum;
-            myAttr->m_maximum       = maximum;
-        }
-    }
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///
