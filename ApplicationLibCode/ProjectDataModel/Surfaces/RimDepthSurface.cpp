@@ -45,8 +45,15 @@ RimDepthSurface::RimDepthSurface()
 
     CAF_PDM_InitField( &m_depthLowerLimit, "DepthLowerLimit", 0.0, "Lower Limit" );
     m_depthLowerLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_depthLowerLimit.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_depthLowerLimit.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+
     CAF_PDM_InitField( &m_depthUpperLimit, "DepthUpperLimit", 100000.0, "Upper Limit" );
     m_depthUpperLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_depthUpperLimit.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_depthUpperLimit.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     m_minX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     m_maxX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -143,19 +150,6 @@ void RimDepthSurface::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 
     auto surfColl = firstAncestorOrThisOfTypeAsserted<RimSurfaceCollection>();
     surfColl->updateViews( { this } );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimDepthSurface::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimSurface::defineEditorAttribute( field, uiConfigName, attribute );
-
-    // Utility function to set decimal precision on double value editors
-    caf::PdmUiDoubleValueEditorAttribute::testAndSetFixedWithTwoDecimals( attribute );
-
-    // Slider min/max attributes migrated to defineUiOrdering for better performance
 }
 
 //--------------------------------------------------------------------------------------------------
