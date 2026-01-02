@@ -569,6 +569,9 @@ void RimContourMapProjection::fieldChangedByUi( const caf::PdmFieldHandle* chang
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimContourMapProjection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     // This method is now empty as all attributes have been moved.
