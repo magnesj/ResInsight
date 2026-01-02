@@ -173,8 +173,8 @@ RiuSummaryVectorSelectionUi::RiuSummaryVectorSelectionUi()
 
     CAF_PDM_InitFieldNoDefault( &m_currentSummaryCategory, "CurrentSummaryCategory", "Current Summary Category" );
     CAF_PDM_InitFieldNoDefault( &m_selectedSummaryCategories, "SelectedSummaryCategories", "Summary Categories" );
-    m_selectedSummaryCategories.uiCapability()->setAttributeBool("showTextFilter", false);
-    m_selectedSummaryCategories.uiCapability()->setAttributeBool("showToggleAllCheckbox", false);
+    m_selectedSummaryCategories.uiCapability()->setAttributeBool( "showTextFilter", false );
+    m_selectedSummaryCategories.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
 
     CAF_PDM_InitFieldNoDefault( m_identifierFieldsMap[SummaryCategory::SUMMARY_FIELD][0]->pdmField(), "FieldVectors", "Field vectors" );
     CAF_PDM_InitFieldNoDefault( m_identifierFieldsMap[SummaryCategory::SUMMARY_FIELD][1]->pdmField(), "FieldCalculationIds", "Calculation Ids" );
@@ -845,15 +845,15 @@ QList<caf::PdmOptionItemInfo> RiuSummaryVectorSelectionUi::calculateValueOptions
 void RiuSummaryVectorSelectionUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     // Set singleSelectionMode for m_selectedSources and m_selectedSummaryCategories
-    m_selectedSources.uiCapability()->setAttributeBool("singleSelectionMode", !m_multiSelectionMode, uiConfigName);
-    m_selectedSummaryCategories.uiCapability()->setAttributeBool("singleSelectionMode", !m_multiSelectionMode, uiConfigName);
+    m_selectedSources.uiCapability()->setAttributeBool( "singleSelectionMode", !m_multiSelectionMode, uiConfigName );
+    m_selectedSummaryCategories.uiCapability()->setAttributeBool( "singleSelectionMode", !m_multiSelectionMode, uiConfigName );
 
     // Iterate through m_identifierFieldsMap and set singleSelectionMode for each pdmField()
     for ( const auto& itemTypes : m_identifierFieldsMap )
     {
         for ( const auto& itemInputType : itemTypes.second )
         {
-            itemInputType->pdmField()->uiCapability()->setAttributeBool("singleSelectionMode", !m_multiSelectionMode, uiConfigName);
+            itemInputType->pdmField()->uiCapability()->setAttributeBool( "singleSelectionMode", !m_multiSelectionMode, uiConfigName );
         }
     }
 

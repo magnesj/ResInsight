@@ -146,8 +146,6 @@ private:
 
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
-
-
     RimSimWellInViewCollection* simulationWellCollection() const;
     void                        updateAzimuthLine();
     void                        addExtents( std::vector<cvf::Vec3d>& polyLine ) const;

@@ -470,9 +470,9 @@ void RimIntersectionCollection::defineUiOrdering( QString uiConfigName, caf::Pdm
     RimEclipseView* eclView = eclipseView();
     if ( eclView && eclView->mainGrid() )
     {
-        const cvf::BoundingBox bb        = eclView->mainGrid()->boundingBox();
-        double                 minDepth  = -1.0 * bb.max().z();
-        double                 maxDepth  = -1.0 * bb.min().z();
+        const cvf::BoundingBox bb       = eclView->mainGrid()->boundingBox();
+        double                 minDepth = -1.0 * bb.max().z();
+        double                 maxDepth = -1.0 * bb.min().z();
 
         m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", minDepth, uiConfigName );
         m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", maxDepth, uiConfigName );

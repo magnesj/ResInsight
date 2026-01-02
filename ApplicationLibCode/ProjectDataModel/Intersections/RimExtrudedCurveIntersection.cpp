@@ -222,15 +222,15 @@ RimExtrudedCurveIntersection::RimExtrudedCurveIntersection()
 
     CAF_PDM_InitField( &m_azimuthAngle, "AzimuthAngle", 0.0, "Azimuth" );
     m_azimuthAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_azimuthAngle.uiCapability()->setAttributeInt("minimum", 0);
-    m_azimuthAngle.uiCapability()->setAttributeInt("maximum", 360);
-    m_azimuthAngle.uiCapability()->setAttributeInt("sliderTickCount", 360);
+    m_azimuthAngle.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_azimuthAngle.uiCapability()->setAttributeInt( "maximum", 360 );
+    m_azimuthAngle.uiCapability()->setAttributeInt( "sliderTickCount", 360 );
 
     CAF_PDM_InitField( &m_dipAngle, "DipAngle", 90.0, "Dip" );
     m_dipAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_dipAngle.uiCapability()->setAttributeInt("minimum", 0);
-    m_dipAngle.uiCapability()->setAttributeInt("maximum", 180);
-    m_dipAngle.uiCapability()->setAttributeInt("sliderTickCount", 180);
+    m_dipAngle.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_dipAngle.uiCapability()->setAttributeInt( "maximum", 180 );
+    m_dipAngle.uiCapability()->setAttributeInt( "sliderTickCount", 180 );
 
     CAF_PDM_InitFieldNoDefault( &m_customExtrusionPoints, "CustomExtrusionPoints", "" );
     CAF_PDM_InitFieldNoDefault( &m_twoAzimuthPoints,
@@ -565,9 +565,12 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     else if ( m_type() == CrossSectionEnum::CS_POLYLINE )
     {
         geometryGroup->add( &m_userPolylineXydForUi );
-        m_userPolylineXydForUi.uiCapability()->setAttributeString( "qssState", m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
+        m_userPolylineXydForUi.uiCapability()->setAttributeString( "qssState",
+                                                                   m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputPolylineFromViewerEnabled );
-        m_inputPolylineFromViewerEnabled.uiCapability()->setAttributeString( "buttonText", m_inputPolylineFromViewerEnabled() ? "Stop picking points" : "Start picking points" );
+        m_inputPolylineFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                             m_inputPolylineFromViewerEnabled() ? "Stop picking points"
+                                                                                                                : "Start picking points" );
     }
     else if ( m_type() == CrossSectionEnum::CS_POLYGON )
     {
@@ -578,9 +581,13 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     else if ( m_type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {
         geometryGroup->add( &m_twoAzimuthPoints );
-        m_twoAzimuthPoints.uiCapability()->setAttributeString( "qssState", m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
+        m_twoAzimuthPoints.uiCapability()->setAttributeString( "qssState",
+                                                               m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputTwoAzimuthPointsFromViewerEnabled );
-        m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText", m_inputTwoAzimuthPointsFromViewerEnabled() ? "Stop picking points" : "Start picking points" );
+        m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                                     m_inputTwoAzimuthPointsFromViewerEnabled()
+                                                                                         ? "Stop picking points"
+                                                                                         : "Start picking points" );
         geometryGroup->add( &m_azimuthAngle );
         geometryGroup->add( &m_dipAngle );
     }
@@ -602,9 +609,13 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     if ( m_direction() == CrossSectionDirEnum::CS_TWO_POINTS )
     {
         optionsGroup->add( &m_customExtrusionPoints );
-        m_customExtrusionPoints.uiCapability()->setAttributeString( "qssState", m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput" : QString() );
+        m_customExtrusionPoints.uiCapability()->setAttributeString( "qssState",
+                                                                    m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         optionsGroup->add( &m_inputExtrusionPointsFromViewerEnabled );
-        m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText", m_inputExtrusionPointsFromViewerEnabled() ? "Stop picking points" : "Start picking points" );
+        m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                                    m_inputExtrusionPointsFromViewerEnabled()
+                                                                                        ? "Stop picking points"
+                                                                                        : "Start picking points" );
     }
 
     optionsGroup->add( &m_showInactiveCells );
@@ -1044,10 +1055,6 @@ int RimExtrudedCurveIntersection::branchIndex() const
 
     return m_branchIndex;
 }
-
-
-
-
 
 //--------------------------------------------------------------------------------------------------
 ///

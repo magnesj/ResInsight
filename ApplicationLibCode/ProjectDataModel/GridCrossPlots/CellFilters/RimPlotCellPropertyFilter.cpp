@@ -239,4 +239,3 @@ void RimPlotCellPropertyFilter::defineUiOrdering( QString uiConfigName, caf::Pdm
     // Call base class to handle standard UI ordering
     RimPlotCellFilter::defineUiOrdering( uiConfigName, uiOrdering );
 }
-

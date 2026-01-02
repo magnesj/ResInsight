@@ -80,11 +80,11 @@ public:
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
-    caf::PdmFieldHandle* userDescriptionField() override;
-    caf::PdmFieldHandle* objectToggleField() override;
-    void                 childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
-    void                 appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
-    void                 initAfterRead() override;
+    caf::PdmFieldHandle*          userDescriptionField() override;
+    caf::PdmFieldHandle*          objectToggleField() override;
+    void                          childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
+    void                          appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
+    void                          initAfterRead() override;
 
     void onObjectionFunctionChanged( const caf::SignalEmitter* emitter );
 
