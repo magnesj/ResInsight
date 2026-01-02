@@ -119,5 +119,3 @@ QList<caf::PdmOptionItemInfo> RicSelectPlotTemplateUi::calculateValueOptions( co
 
     return options;
 }
-
-

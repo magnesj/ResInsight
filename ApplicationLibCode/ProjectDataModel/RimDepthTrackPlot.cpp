@@ -123,12 +123,14 @@ RimDepthTrackPlot::RimDepthTrackPlot()
     CAF_PDM_InitScriptableField( &m_minVisibleDepth, "MinimumDepth", 0.0, "Min" );
     m_minVisibleDepth.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_minVisibleDepth.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_minVisibleDepth.uiCapability()->setAttributeInt( "numberFormat", static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+    m_minVisibleDepth.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_maxVisibleDepth, "MaximumDepth", 1000.0, "Max" );
     m_maxVisibleDepth.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_maxVisibleDepth.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_maxVisibleDepth.uiCapability()->setAttributeInt( "numberFormat", static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+    m_maxVisibleDepth.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_depthAxisGridVisibility, "ShowDepthGridLines", "Show Grid Lines" );
     CAF_PDM_InitScriptableField( &m_isAutoScaleDepthEnabled, "AutoScaleDepthEnabled", true, "Auto Scale" );
@@ -1221,8 +1223,6 @@ void RimDepthTrackPlot::initAfterRead()
 
     performAutoNameUpdate();
 }
-
-
 
 //--------------------------------------------------------------------------------------------------
 ///

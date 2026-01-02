@@ -250,4 +250,3 @@ QList<caf::PdmOptionItemInfo> RimWellPathTieIn::calculateValueOptions( const caf
 
     return options;
 }
-

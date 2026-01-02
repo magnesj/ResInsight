@@ -233,7 +233,6 @@ void RimAnnotationInViewCollection::fieldChangedByUi( const caf::PdmFieldHandle*
     scheduleRedrawOfRelevantViews();
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

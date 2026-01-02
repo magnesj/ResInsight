@@ -575,7 +575,6 @@ void RimWellPathValve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     uiOrdering.skipRemainingFields( true );
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
