@@ -178,11 +178,15 @@ RiaPreferences::RiaPreferences()
     CAF_PDM_InitField( &m_defaultScaleFactorZ, "defaultScaleFactorZ", 5.0, "Default Z Scale Factor" );
 
     CAF_PDM_InitFieldNoDefault( &defaultSceneFontSize, "defaultSceneFontSizePt", "Viewer Font Size" );
+    defaultSceneFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
     CAF_PDM_InitFieldNoDefault( &defaultAnnotationFontSize, "defaultAnnotationFontSizePt", "Annotation Font Size" );
+    defaultAnnotationFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
     CAF_PDM_InitFieldNoDefault( &defaultWellLabelFontSize, "defaultWellLabelFontSizePt", "Well Label Font Size" );
+    defaultWellLabelFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
 
     auto defaultValue = FontSizeEnum( RiaFontCache::FontSize::FONT_SIZE_10 );
     CAF_PDM_InitField( &defaultPlotFontSize, "defaultPlotFontSizePt", defaultValue, "Plot Font Size" );
+    defaultPlotFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
 
     CAF_PDM_InitField( &m_showLegendBackground, "showLegendBackground", true, "Show Box around Legends" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showLegendBackground );
@@ -325,16 +329,7 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
 {
     m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
 
-    if ( field == &defaultSceneFontSize || field == &defaultWellLabelFontSize || field == &defaultAnnotationFontSize ||
-         field == &defaultPlotFontSize )
-    {
-        caf::PdmUiComboBoxEditorAttribute* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->minimumContentsLength = 2;
-        }
-    }
-    else if ( field == &m_multiLateralWellPattern )
+    if ( field == &m_multiLateralWellPattern )
     {
         caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
         if ( myAttr )
