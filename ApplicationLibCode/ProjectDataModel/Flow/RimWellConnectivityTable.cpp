@@ -534,8 +534,6 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.skipRemainingFields( true );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

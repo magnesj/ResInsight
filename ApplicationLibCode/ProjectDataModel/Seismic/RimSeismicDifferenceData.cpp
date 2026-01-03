@@ -267,7 +267,6 @@ void RimSeismicDifferenceData::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiT
     uiTreeOrdering.skipRemainingChildren();
 }
 
-
 //--------------------------------------------------------------------------------------------------
 /// Keep this function for validator on pair field
 //--------------------------------------------------------------------------------------------------

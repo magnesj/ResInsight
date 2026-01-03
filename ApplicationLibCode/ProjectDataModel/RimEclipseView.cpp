@@ -2114,8 +2114,6 @@ QList<caf::PdmOptionItemInfo> RimEclipseView::calculateValueOptions( const caf::
     return RimGridView::calculateValueOptions( fieldNeedingOptions );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------

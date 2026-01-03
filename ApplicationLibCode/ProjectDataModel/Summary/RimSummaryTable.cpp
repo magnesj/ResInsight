@@ -351,9 +351,8 @@ void RimSummaryTable::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     {
         dateFormat = "yyyy";
     }
-    else if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::MONTH ||
-                m_resamplingSelection() == RiaDefines::DateTimePeriod::QUARTER ||
-                m_resamplingSelection() == RiaDefines::DateTimePeriod::HALFYEAR )
+    else if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::MONTH || m_resamplingSelection() == RiaDefines::DateTimePeriod::QUARTER ||
+              m_resamplingSelection() == RiaDefines::DateTimePeriod::HALFYEAR )
     {
         dateFormat = "yyyy-MM";
     }
@@ -381,7 +380,6 @@ void RimSummaryTable::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-
 
 //--------------------------------------------------------------------------------------------------
 ///

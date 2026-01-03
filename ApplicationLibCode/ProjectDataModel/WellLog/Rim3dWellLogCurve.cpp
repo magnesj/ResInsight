@@ -242,8 +242,6 @@ void Rim3dWellLogCurve::configurationUiOrdering( caf::PdmUiOrdering& uiOrdering 
     configurationGroup->add( &m_minCurveUIValue );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
