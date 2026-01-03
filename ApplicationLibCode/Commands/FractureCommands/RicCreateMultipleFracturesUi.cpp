@@ -94,6 +94,7 @@ RiuCreateMultipleFractionsUi::RiuCreateMultipleFractionsUi()
     m_options.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_options.uiCapability()->setCustomContextMenuEnabled( true );
     m_options.uiCapability()->setAttributeInt( "minimumHeight", 130 );
+    m_options.uiCapability()->setAttribute( "columnWidths", QVariant::fromValue( QList<int>{ 90, 90, 400, 70 } ) );
 
     CAF_PDM_InitFieldNoDefault( &m_fractureCreationSummary, "FractureCreationSummary", "Generated Fractures" );
     m_fractureCreationSummary.registerGetMethod( this, &RiuCreateMultipleFractionsUi::summaryText );
@@ -278,7 +279,7 @@ QString RiuCreateMultipleFractionsUi::summaryText() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Keep this function, migration to attribute framework is not supported
+/// Keep this function for QFont attribute
 //--------------------------------------------------------------------------------------------------
 void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                           QString                    uiConfigName,
@@ -291,14 +292,6 @@ void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHan
         {
             QFont font( "Courier", 8 );
             attr->font = font;
-        }
-    }
-    else if ( field == &m_options )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->columnWidths = { 90, 90, 400, 70 };
         }
     }
 }
