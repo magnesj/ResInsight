@@ -573,7 +573,7 @@ void RimWellPathGeometryDef::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     // Set dynamic table view attributes based on picking state
     if ( m_pickPointsEnabled )
     {
-        m_wellTargets.uiCapability()->setAttributeInt( "baseColor", QColor( 255, 220, 255 ).rgb(), uiConfigName );
+        m_wellTargets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
         m_wellTargets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 

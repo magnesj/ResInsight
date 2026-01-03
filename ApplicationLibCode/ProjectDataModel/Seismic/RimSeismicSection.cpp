@@ -176,7 +176,7 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     // Set dynamic table view attributes based on picking state
     if ( m_enablePicking )
     {
-        m_targets.uiCapability()->setAttributeInt( "baseColor", QColor( 255, 220, 255 ).rgb(), uiConfigName );
+        m_targets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
         m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 

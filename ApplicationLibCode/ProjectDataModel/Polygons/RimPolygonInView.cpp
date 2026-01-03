@@ -328,7 +328,7 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     if ( m_enablePicking )
     {
         QColor baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
-        m_targets.uiCapability()->setAttributeInt( "baseColor", baseColor.rgb(), uiConfigName );
+        m_targets.uiCapability()->setAttribute( "baseColor", QVariant( baseColor ), uiConfigName );
     }
 
     uiOrdering.skipRemainingFields();
