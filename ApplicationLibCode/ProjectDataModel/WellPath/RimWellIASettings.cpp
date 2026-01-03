@@ -183,6 +183,10 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
             m_startMD.uiCapability()->setUiName( "Start MD [ft]" );
             m_endMD.uiCapability()->setUiName( "End MD [ft]" );
         }
+
+        // Set dynamic slider ranges based on well path
+        m_startMD.setRange( wellPath->uniqueStartMD(), wellPath->uniqueEndMD() );
+        m_endMD.setRange( wellPath->uniqueStartMD(), wellPath->uniqueEndMD() );
     }
 
     auto generalGroup = uiOrdering.addNewGroup( "General" );
@@ -200,26 +204,6 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     modelGroup->add( &m_showBox );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellIASettings::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_startMD || field == &m_endMD )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-
-        if ( myAttr )
-        {
-            auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
-            if ( !wellPath ) return;
-
-            myAttr->m_minimum = wellPath->uniqueStartMD();
-            myAttr->m_maximum = wellPath->uniqueEndMD();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
