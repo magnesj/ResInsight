@@ -177,7 +177,7 @@ void RimWellPathAicdParameters::defineUiOrdering( QString uiConfigName, caf::Pdm
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RimWellPathAicdParameters::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
