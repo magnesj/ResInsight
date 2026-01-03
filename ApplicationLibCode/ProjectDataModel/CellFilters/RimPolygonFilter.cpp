@@ -224,7 +224,7 @@ void RimPolygonFilter::initAfterRead()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for complex picking attributes
 //--------------------------------------------------------------------------------------------------
 void RimPolygonFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {

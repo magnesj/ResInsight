@@ -1089,7 +1089,7 @@ void RimWellLogCurveCommonDataSource::defineUiOrdering( QString uiConfigName, ca
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for complex button text logic and displayString
 //--------------------------------------------------------------------------------------------------
 void RimWellLogCurveCommonDataSource::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                              QString                    uiConfigName,

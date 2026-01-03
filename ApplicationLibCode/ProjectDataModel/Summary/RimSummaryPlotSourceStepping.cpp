@@ -967,7 +967,7 @@ RimSummaryDataSourceStepping* RimSummaryPlotSourceStepping::dataSourceSteppingOb
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for complex RiuTools calls and config-specific attributes
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                           QString                    uiConfigName,

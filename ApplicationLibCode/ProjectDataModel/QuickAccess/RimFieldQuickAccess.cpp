@@ -99,7 +99,7 @@ void RimFieldQuickAccess::onRemoveObjectButton()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for callback setters
 //--------------------------------------------------------------------------------------------------
 void RimFieldQuickAccess::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {

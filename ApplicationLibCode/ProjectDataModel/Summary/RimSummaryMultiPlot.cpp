@@ -547,7 +547,7 @@ void RimSummaryMultiPlot::childFieldChangedByUi( const caf::PdmFieldHandle* chan
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for link callback lambda
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {

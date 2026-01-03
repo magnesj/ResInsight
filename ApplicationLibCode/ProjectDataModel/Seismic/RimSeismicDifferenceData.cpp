@@ -267,8 +267,9 @@ void RimSeismicDifferenceData::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiT
     uiTreeOrdering.skipRemainingChildren();
 }
 
+
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for validator on pair field
 //--------------------------------------------------------------------------------------------------
 void RimSeismicDifferenceData::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
