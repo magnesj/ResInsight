@@ -72,6 +72,8 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_airGap.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_airGap.setRange( 0.0, std::numeric_limits<double>::max() );
 
     CAF_PDM_InitScriptableField( &m_mdAtFirstTarget, "MdAtFirstTarget", 0.0, "MD at First Target" );
     m_mdAtFirstTarget.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
@@ -558,6 +560,23 @@ void RimWellPathGeometryDef::fieldChangedByUi( const caf::PdmFieldHandle* change
 //--------------------------------------------------------------------------------------------------
 void RimWellPathGeometryDef::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic button text based on picking state
+    if ( !m_pickPointsEnabled )
+    {
+        m_pickPointsEnabled.uiCapability()->setAttributeString( "buttonText", "Start Picking Targets", uiConfigName );
+    }
+    else
+    {
+        m_pickPointsEnabled.uiCapability()->setAttributeString( "buttonText", "Stop Picking Targets", uiConfigName );
+    }
+
+    // Set dynamic table view attributes based on picking state
+    if ( m_pickPointsEnabled )
+    {
+        m_wellTargets.uiCapability()->setAttributeInt( "baseColor", QColor( 255, 220, 255 ).rgb(), uiConfigName );
+        m_wellTargets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
+    }
+
     uiOrdering.add( &m_referencePointUtmXyd );
     m_referencePointUtmXyd.uiCapability()->setUiReadOnly( m_useTopLevelWellReferencePoint );
 
@@ -730,40 +749,10 @@ void RimWellPathGeometryDef::defineCustomContextMenu( const caf::PdmFieldHandle*
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Display string attribute not yet migrated to map-based system, kept here temporarily
 //--------------------------------------------------------------------------------------------------
 void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_pickPointsEnabled )
-    {
-        caf::PdmUiPushButtonEditorAttribute* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_pickPointsEnabled )
-            {
-                pbAttribute->m_buttonText = "Start Picking Targets";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Targets";
-            }
-        }
-    }
-
-    if ( field == &m_wellTargets )
-    {
-        // Dynamic attributes based on picking state
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            if ( m_pickPointsEnabled )
-            {
-                tvAttribute->baseColor.setRgb( 255, 220, 255 );
-                tvAttribute->alwaysEnforceResizePolicy = true;
-            }
-        }
-    }
-
     if ( field == &m_referencePointUtmXyd )
     {
         auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
@@ -773,16 +762,6 @@ void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* f
             uiDisplayStringAttr->m_displayString = QString::number( m_referencePointUtmXyd()[0], 'f', 2 ) + " " +
                                                    QString::number( m_referencePointUtmXyd()[1], 'f', 2 ) + " " +
                                                    QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
-        }
-    }
-
-    if ( field == &m_airGap )
-    {
-        auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_decimals  = 2;
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.0, std::numeric_limits<double>::max(), 2 );
         }
     }
 }
