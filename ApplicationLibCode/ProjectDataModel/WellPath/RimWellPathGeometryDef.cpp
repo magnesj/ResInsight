@@ -577,6 +577,12 @@ void RimWellPathGeometryDef::defineUiOrdering( QString uiConfigName, caf::PdmUiO
         m_wellTargets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 
+    // Set display string for reference point
+    QString displayString = QString::number( m_referencePointUtmXyd()[0], 'f', 2 ) + " " +
+                            QString::number( m_referencePointUtmXyd()[1], 'f', 2 ) + " " +
+                            QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
+    m_referencePointUtmXyd.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+
     uiOrdering.add( &m_referencePointUtmXyd );
     m_referencePointUtmXyd.uiCapability()->setUiReadOnly( m_useTopLevelWellReferencePoint );
 
@@ -746,24 +752,6 @@ void RimWellPathGeometryDef::defineCustomContextMenu( const caf::PdmFieldHandle*
     menuBuilder << "RicDeleteWellPathTargetFeature";
 
     menuBuilder.appendToMenu( menu );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Display string attribute not yet migrated to map-based system, kept here temporarily
-//--------------------------------------------------------------------------------------------------
-void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_referencePointUtmXyd )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_referencePointUtmXyd()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_referencePointUtmXyd()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
