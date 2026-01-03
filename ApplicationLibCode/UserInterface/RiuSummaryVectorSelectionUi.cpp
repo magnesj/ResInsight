@@ -1322,7 +1322,7 @@ void RiuSummaryVectorSelectionUi::buildAddressListForCategoryRecursively(
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RiuSummaryVectorSelectionUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                          QString                    uiConfigName,

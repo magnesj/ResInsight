@@ -393,7 +393,7 @@ void RimGridCrossPlotRegressionCurve::defineObjectEditorAttribute( QString uiCon
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RimGridCrossPlotRegressionCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                              QString                    uiConfigName,

@@ -572,7 +572,7 @@ void RimSummaryRegressionAnalysisCurve::fieldChangedByUi( const caf::PdmFieldHan
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                                QString                    uiConfigName,
