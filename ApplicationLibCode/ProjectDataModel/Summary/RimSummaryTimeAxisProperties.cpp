@@ -966,4 +966,3 @@ void RimSummaryTimeAxisProperties::fieldChangedByUi( const caf::PdmFieldHandle* 
 
     settingsChanged.send();
 }
-
