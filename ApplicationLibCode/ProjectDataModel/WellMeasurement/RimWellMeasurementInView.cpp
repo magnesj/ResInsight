@@ -82,6 +82,8 @@ RimWellMeasurementInView::RimWellMeasurementInView()
 
     CAF_PDM_InitField( &m_radiusScaleFactor, "RadiusScaleFactor", 2.5, "Radius Scale" );
     m_radiusScaleFactor.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_radiusScaleFactor.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_radiusScaleFactor.setRange( 0.001, 100.0 );
 
     setName( "Well Measurement" );
 
@@ -113,6 +115,13 @@ void RimWellMeasurementInView::defineUiOrdering( QString uiConfigName, caf::PdmU
 {
     RimCheckableNamedObject::defineUiOrdering( uiConfigName, uiOrdering );
 
+    // Set dynamic slider ranges based on result values
+    if ( m_minimumResultValue != cvf::UNDEFINED_DOUBLE && m_maximumResultValue != cvf::UNDEFINED_DOUBLE )
+    {
+        m_lowerBound.setRange( m_minimumResultValue, m_maximumResultValue );
+        m_upperBound.setRange( m_minimumResultValue, m_maximumResultValue );
+    }
+
     if ( !hasCategoryResult() )
     {
         caf::PdmUiGroup& filterGroup = *( uiOrdering.addNewGroup( "Value Filter Settings" ) );
@@ -125,37 +134,6 @@ void RimWellMeasurementInView::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_radiusScaleFactor );
 
     uiOrdering.skipRemainingFields();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellMeasurementInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( m_minimumResultValue == cvf::UNDEFINED_DOUBLE || m_maximumResultValue == cvf::UNDEFINED_DOUBLE )
-    {
-        return;
-    }
-
-    if ( field == &m_lowerBound || field == &m_upperBound )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = m_minimumResultValue;
-            myAttr->m_maximum = m_maximumResultValue;
-        }
-    }
-
-    if ( field == &m_radiusScaleFactor )
-    {
-        caf::PdmUiDoubleValueEditorAttribute* uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_decimals  = 2;
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.001, 100.0, 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
