@@ -346,6 +346,20 @@ void RimSummaryTable::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     m_startDate.uiCapability()->setUiReadOnly( !m_filterTimeSteps() );
     m_endDate.uiCapability()->setUiReadOnly( !m_filterTimeSteps() );
 
+    QString dateFormat = "yyyy-MM-dd";
+    if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::DECADE || m_resamplingSelection() == RiaDefines::DateTimePeriod::YEAR )
+    {
+        dateFormat = "yyyy";
+    }
+    else if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::MONTH ||
+                m_resamplingSelection() == RiaDefines::DateTimePeriod::QUARTER ||
+                m_resamplingSelection() == RiaDefines::DateTimePeriod::HALFYEAR )
+    {
+        dateFormat = "yyyy-MM";
+    }
+    m_startDate.uiCapability()->setAttributeString( "dateFormat", dateFormat );
+    m_endDate.uiCapability()->setAttributeString( "dateFormat", dateFormat );
+
     caf::PdmUiGroup* tableSettingsGroup = uiOrdering.addNewGroup( "Table Settings" );
     tableSettingsGroup->add( &m_showValueLabels );
     m_legendConfig->uiOrdering( "FlagAndColorsOnly", *tableSettingsGroup );
@@ -367,28 +381,7 @@ void RimSummaryTable::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryTable::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_startDate || field == &m_endDate )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute ) )
-        {
-            QString dateFormat = "yyyy-MM-dd";
-            if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::DECADE || m_resamplingSelection() == RiaDefines::DateTimePeriod::YEAR )
-            {
-                dateFormat = "yyyy";
-            }
-            else if ( m_resamplingSelection() == RiaDefines::DateTimePeriod::MONTH ||
-                      m_resamplingSelection() == RiaDefines::DateTimePeriod::QUARTER ||
-                      m_resamplingSelection() == RiaDefines::DateTimePeriod::HALFYEAR )
-            {
-                dateFormat = "yyyy-MM";
-            }
 
-            myAttr->dateFormat = dateFormat;
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
