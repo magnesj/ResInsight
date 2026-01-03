@@ -419,35 +419,6 @@ void RimWellPathTarget::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellPathTarget::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_targetPointXYD )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_targetPointXYD()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointXYD()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointXYD()[2], 'f', 2 );
-        }
-    }
-    else if ( field == &m_targetPointForDisplay )
-    {
-        auto uiDisplayStringAttr = dynamic_cast<caf::PdmUiLineEditorAttributeUiDisplayString*>( attribute );
-
-        if ( uiDisplayStringAttr )
-        {
-            uiDisplayStringAttr->m_displayString = QString::number( m_targetPointForDisplay()[0], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointForDisplay()[1], 'f', 2 ) + " " +
-                                                   QString::number( m_targetPointForDisplay()[2], 'f', 2 );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 cvf::Vec3d RimWellPathTarget::targetPointForDisplayXYD() const
 {
     auto geoDef = geometryDefinition();
@@ -547,5 +518,19 @@ void RimWellPathTarget::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
         }
 
         m_targetPointForDisplay.uiCapability()->setUiHidden( !showAbsCoords );
+    }
+
+    // Set display strings for target point coordinates
+    {
+        QString displayString = QString::number( m_targetPointXYD()[0], 'f', 2 ) + " " + QString::number( m_targetPointXYD()[1], 'f', 2 ) +
+                                " " + QString::number( m_targetPointXYD()[2], 'f', 2 );
+        m_targetPointXYD.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+    }
+
+    {
+        QString displayString = QString::number( m_targetPointForDisplay()[0], 'f', 2 ) + " " +
+                                QString::number( m_targetPointForDisplay()[1], 'f', 2 ) + " " +
+                                QString::number( m_targetPointForDisplay()[2], 'f', 2 );
+        m_targetPointForDisplay.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
     }
 }
