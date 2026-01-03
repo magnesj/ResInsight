@@ -188,6 +188,8 @@ RicPasteAsciiDataToSummaryPlotFeatureUi::RicPasteAsciiDataToSummaryPlotFeatureUi
     m_previewText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_previewText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_previewText.uiCapability()->setUiReadOnly( true );
+    m_previewText.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_previewText.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_previewText.xmlCapability()->disableIO();
 
     m_uiMode = UI_MODE_NONE;
@@ -445,24 +447,6 @@ QList<caf::PdmOptionItemInfo> RicPasteAsciiDataToSummaryPlotFeatureUi::calculate
         }
     }
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Keep this function for enum attributes (wrapMode, textMode)
-//--------------------------------------------------------------------------------------------------
-void RicPasteAsciiDataToSummaryPlotFeatureUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                                     QString                    uiConfigName,
-                                                                     caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_previewText )
-    {
-        caf::PdmUiTextEditorAttribute* attrib = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            attrib->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

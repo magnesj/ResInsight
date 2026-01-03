@@ -134,6 +134,8 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     m_expressionText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_expressionText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_expressionText.uiCapability()->setUiReadOnly( true );
+    m_expressionText.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_expressionText.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_expressionText.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_xRangeSelection, "XRangeSelection", "X Value Range" );
@@ -573,31 +575,6 @@ void RimSummaryRegressionAnalysisCurve::fieldChangedByUi( const caf::PdmFieldHan
 
     auto plot = firstAncestorOrThisOfTypeAsserted<RimSummaryPlot>();
     if ( plot ) plot->zoomAll();
-}
-
-//--------------------------------------------------------------------------------------------------
-// Keep this function for enum attributes (wrapMode, textMode)
-//--------------------------------------------------------------------------------------------------
-void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                               QString                    uiConfigName,
-                                                               caf::PdmUiEditorAttribute* attribute )
-{
-    RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
-
-    // Text editor attributes use enum types which cannot be easily represented in the map-based system
-    if ( field == &m_expressionText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-
-    // Slider attributes (minimum, maximum, decimals, sliderTickCount, showSpinBox) migrated:
-    // - Static attributes moved to constructor
-    // - Dynamic min/max moved to defineUiOrdering
 }
 
 //--------------------------------------------------------------------------------------------------
