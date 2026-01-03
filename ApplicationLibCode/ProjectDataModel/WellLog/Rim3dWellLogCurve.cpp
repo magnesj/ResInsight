@@ -230,6 +230,11 @@ void Rim3dWellLogCurve::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
 //--------------------------------------------------------------------------------------------------
 void Rim3dWellLogCurve::configurationUiOrdering( caf::PdmUiOrdering& uiOrdering )
 {
+    if ( m_minCurveDataValue == -std::numeric_limits<float>::infinity() && m_maxCurveDataValue == std::numeric_limits<float>::infinity() )
+    {
+        resetMinMaxValues();
+    }
+
     caf::PdmUiGroup* configurationGroup = uiOrdering.addNewGroup( "Curve Appearance" );
     configurationGroup->add( &m_drawPlane );
     configurationGroup->add( &m_color );
@@ -237,16 +242,7 @@ void Rim3dWellLogCurve::configurationUiOrdering( caf::PdmUiOrdering& uiOrdering 
     configurationGroup->add( &m_minCurveUIValue );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void Rim3dWellLogCurve::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( m_minCurveDataValue == -std::numeric_limits<float>::infinity() && m_maxCurveDataValue == std::numeric_limits<float>::infinity() )
-    {
-        resetMinMaxValues();
-    }
-}
+
 
 //--------------------------------------------------------------------------------------------------
 ///
