@@ -279,21 +279,12 @@ QString RiuCreateMultipleFractionsUi::summaryText() const
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Keep this function for QFont attribute
+///
 //--------------------------------------------------------------------------------------------------
-void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
+void RiuCreateMultipleFractionsUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    if ( field == &m_fractureCreationSummary )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            QFont font( "Courier", 8 );
-            attr->font = font;
-        }
-    }
+    QFont font( "Courier", 8 );
+    m_fractureCreationSummary.uiCapability()->setAttribute( "font", QVariant( font ) );
 }
 
 //--------------------------------------------------------------------------------------------------
