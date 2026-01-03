@@ -418,6 +418,8 @@ void RicPasteAsciiDataToSummaryPlotFeatureUi::defineUiOrdering( QString uiConfig
             uiOrdering.addNewGroup( QString( "Preview - First %1 lines, Pretty Print" ).arg( QString::number( PREVIEW_TEXT_LINE_COUNT ) ) );
 
         previewGroup->add( &m_previewText );
+        QFont font( "Monospace", 7 );
+        m_previewText.uiCapability()->setAttribute( "font", QVariant( font ), uiConfigName );
     }
 
     uiOrdering.skipRemainingFields();
@@ -446,7 +448,7 @@ QList<caf::PdmOptionItemInfo> RicPasteAsciiDataToSummaryPlotFeatureUi::calculate
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Keep this function, migration to attribute framework is not supported
+/// Keep this function for enum attributes (wrapMode, textMode)
 //--------------------------------------------------------------------------------------------------
 void RicPasteAsciiDataToSummaryPlotFeatureUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                                      QString                    uiConfigName,
@@ -458,9 +460,6 @@ void RicPasteAsciiDataToSummaryPlotFeatureUi::defineEditorAttribute( const caf::
         if ( attrib )
         {
             attrib->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-
-            QFont font( "Monospace", 7 );
-            attrib->font     = font;
             attrib->textMode = caf::PdmUiTextEditorAttribute::HTML;
         }
     }

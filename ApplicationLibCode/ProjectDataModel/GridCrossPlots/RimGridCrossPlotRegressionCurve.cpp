@@ -337,6 +337,10 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
     }
 
     regressionCurveGroup->add( &m_expressionText );
+    QFont font;
+    auto  pointSize = font.pointSize();
+    font.setPointSize( pointSize + 2 );
+    m_expressionText.uiCapability()->setAttribute( "font", QVariant( font ), uiConfigName );
 
     caf::PdmUiGroup* dataSelectionGroup = uiOrdering.addNewGroup( "Data Selection" );
     dataSelectionGroup->add( &m_minRangeX );
@@ -390,26 +394,6 @@ void RimGridCrossPlotRegressionCurve::defineObjectEditorAttribute( QString uiCon
 {
     // Implement an empty method to avoid the base class implementation in RimPlotCurve
     // The color tag is not used for Grid Cross Plot Curves
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Keep this function, migration to attribute framework is not supported
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotRegressionCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                             QString                    uiConfigName,
-                                                             caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_expressionText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            QFont font;
-            auto  pointSize = font.pointSize();
-            font.setPointSize( pointSize + 2 );
-            myAttr->font = font;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -494,6 +494,10 @@ void RimSummaryRegressionAnalysisCurve::defineUiOrdering( QString uiConfigName, 
     }
 
     regressionCurveGroup->add( &m_expressionText );
+    QFont font;
+    auto  pointSize = font.pointSize();
+    font.setPointSize( pointSize + 2 );
+    m_expressionText.uiCapability()->setAttribute( "font", QVariant( font ), uiConfigName );
 
     caf::PdmUiGroup* valueRangeYGroup = uiOrdering.addNewGroup( "Value Range Y" );
     valueRangeYGroup->add( &m_yRangeSelection );
@@ -572,7 +576,7 @@ void RimSummaryRegressionAnalysisCurve::fieldChangedByUi( const caf::PdmFieldHan
 }
 
 //--------------------------------------------------------------------------------------------------
-// Keep this function, migration to attribute framework is not supported
+// Keep this function for enum attributes (wrapMode, textMode)
 //--------------------------------------------------------------------------------------------------
 void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                                QString                    uiConfigName,
@@ -580,8 +584,7 @@ void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFie
 {
     RimSummaryCurve::defineEditorAttribute( field, uiConfigName, attribute );
 
-    // Text editor attributes use enum types and QFont objects which cannot be easily represented
-    // in the map-based system, so they remain here
+    // Text editor attributes use enum types which cannot be easily represented in the map-based system
     if ( field == &m_expressionText )
     {
         auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
@@ -589,11 +592,6 @@ void RimSummaryRegressionAnalysisCurve::defineEditorAttribute( const caf::PdmFie
         {
             myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
             myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-
-            QFont font;
-            auto  pointSize = font.pointSize();
-            font.setPointSize( pointSize + 2 );
-            myAttr->font = font;
         }
     }
 
