@@ -193,8 +193,11 @@ RiaPreferencesSummary::RiaPreferencesSummary()
 
     CAF_PDM_InitFieldNoDefault( &m_defaultColumnCount, "DefaultNumberOfColumns", "Columns" );
     m_defaultColumnCount = RiaDefines::ColumnCount::COLUMNS_2;
+    m_defaultColumnCount.uiCapability()->setAttribute( "iconSize", QVariant( QSize( 24, 16 ) ) );
+
     CAF_PDM_InitFieldNoDefault( &m_defaultRowsPerPage, "DefaultRowsPerPage", "Rows per Page" );
     m_defaultRowsPerPage = RiaDefines::RowCount::ROWS_2;
+    m_defaultRowsPerPage.uiCapability()->setAttribute( "iconSize", QVariant( QSize( 24, 16 ) ) );
 
     CAF_PDM_InitField( &m_curveColorByPhase, "curveColorByPhase", true, "Curve Color By Phase" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_curveColorByPhase );
@@ -449,21 +452,6 @@ void RiaPreferencesSummary::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     }
 
     uiOrdering.skipRemainingFields();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaPreferencesSummary::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_defaultRowsPerPage || field == &m_defaultColumnCount )
-    {
-        auto myattr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( myattr )
-        {
-            myattr->iconSize = QSize( 24, 16 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
