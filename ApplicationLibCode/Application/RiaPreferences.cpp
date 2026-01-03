@@ -324,12 +324,10 @@ RiaPreferences* RiaPreferences::current()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    m_summaryPreferences->defineEditorAttribute( field, uiConfigName, attribute );
-
     if ( field == &m_multiLateralWellPattern )
     {
         caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
@@ -338,7 +336,6 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
             myAttr->validator = new RiaValidRegExpValidator( RiaPreferences::defaultMultiLateralWellNamePattern() );
         }
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------

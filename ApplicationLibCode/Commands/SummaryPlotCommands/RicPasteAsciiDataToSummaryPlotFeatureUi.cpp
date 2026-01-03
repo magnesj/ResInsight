@@ -446,7 +446,7 @@ QList<caf::PdmOptionItemInfo> RicPasteAsciiDataToSummaryPlotFeatureUi::calculate
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RicPasteAsciiDataToSummaryPlotFeatureUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                                      QString                    uiConfigName,

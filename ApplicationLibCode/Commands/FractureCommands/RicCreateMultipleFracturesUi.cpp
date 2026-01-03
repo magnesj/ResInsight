@@ -278,7 +278,7 @@ QString RiuCreateMultipleFractionsUi::summaryText() const
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function, migration to attribute framework is not supported
 //--------------------------------------------------------------------------------------------------
 void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                           QString                    uiConfigName,
