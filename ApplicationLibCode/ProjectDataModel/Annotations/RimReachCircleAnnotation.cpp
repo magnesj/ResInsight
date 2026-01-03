@@ -129,6 +129,13 @@ void RimReachCircleAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_name );
     uiOrdering.add( &m_centerPointXyd );
     uiOrdering.appendToRow( &m_centerPointPickEnabled );
+
+    // Set dynamic button text based on picking state
+    if ( m_centerPointPickEnabled )
+        m_centerPointPickEnabled.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+    else
+        m_centerPointPickEnabled.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+
     uiOrdering.add( &m_radius );
 
     auto appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
@@ -173,7 +180,7 @@ caf::PdmFieldHandle* RimReachCircleAnnotation::objectToggleField()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for complex picking attributes
 //--------------------------------------------------------------------------------------------------
 void RimReachCircleAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
@@ -187,22 +194,6 @@ void RimReachCircleAnnotation::defineEditorAttribute( const caf::PdmFieldHandle*
             if ( m_centerPointXyd().isZero() )
             {
                 attr->enablePicking = true;
-            }
-        }
-    }
-
-    if ( field == &m_centerPointPickEnabled )
-    {
-        auto* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            if ( m_centerPointPickEnabled )
-            {
-                attr->m_buttonText = "Stop";
-            }
-            else
-            {
-                attr->m_buttonText = "Pick";
             }
         }
     }
