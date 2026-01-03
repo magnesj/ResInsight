@@ -319,6 +319,18 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
         uiOrdering.add( &m_selectPolygon );
     }
 
+    // Set dynamic UI attributes
+    if ( !m_enablePicking )
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+    else
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+
+    if ( m_enablePicking )
+    {
+        QColor baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
+        m_targets.uiCapability()->setAttributeInt( "baseColor", baseColor.rgb(), uiConfigName );
+    }
+
     uiOrdering.skipRemainingFields();
 }
 
@@ -460,41 +472,6 @@ void RimPolygonInView::initAfterRead()
 double RimPolygonInView::scalingFactorForTarget() const
 {
     return m_handleScalingFactor();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Dynamic button text based on picking state
-    if ( field == &m_enablePicking )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_enablePicking )
-            {
-                pbAttribute->m_buttonText = "Start Picking Points";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Points";
-            }
-        }
-    }
-
-    if ( field == &m_targets )
-    {
-        // Dynamic attribute based on picking state
-        if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
-        {
-            if ( m_enablePicking )
-            {
-                tvAttribute->baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
