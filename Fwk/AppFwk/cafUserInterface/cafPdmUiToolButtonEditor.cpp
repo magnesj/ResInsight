@@ -77,15 +77,12 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "checkable", "sizePolicy" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "checkable", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::CHECKABLE, uiConfigName ) )
         {
             attributes.m_checkable = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QSizePolicy>( "sizePolicy", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QSizePolicy>( Keys::SIZE_POLICY, uiConfigName ) )
         {
             attributes.m_sizePolicy = val.value();
         }
@@ -94,12 +91,13 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiToolButtonEditor: Unsupported attribute '%1' set on field. Supported "
-                             "attributes are: checkable, sizePolicy" )
-                        .arg( key ) );
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }

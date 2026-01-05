@@ -81,44 +81,36 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "selectSaveFileName",
-                                                               "fileSelectionFilter",
-                                                               "defaultPath",
-                                                               "selectDirectory",
-                                                               "appendUiSelectedFolderToText",
-                                                               "multipleItemSeparator" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "selectSaveFileName", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_SAVE_FILE_NAME, uiConfigName ) )
         {
             m_attributes.m_selectSaveFileName = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "fileSelectionFilter", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::FILE_SELECTION_FILTER, uiConfigName ) )
         {
             m_attributes.m_fileSelectionFilter = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "defaultPath", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::DEFAULT_PATH, uiConfigName ) )
         {
             m_attributes.m_defaultPath = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "selectDirectory", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_DIRECTORY, uiConfigName ) )
         {
             m_attributes.m_selectDirectory = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "appendUiSelectedFolderToText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::APPEND_UI_SELECTED_FOLDER_TO_TEXT, uiConfigName ) )
         {
             m_attributes.m_appendUiSelectedFolderToText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "multipleItemSeparator", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::MULTIPLE_ITEM_SEPARATOR, uiConfigName ) )
         {
-            if ( !val->isEmpty() )
+            if ( !val.value().isEmpty() )
             {
-                m_attributes.m_multipleItemSeparator = val->at( 0 );
+                m_attributes.m_multipleItemSeparator = val.value().at( 0 );
             }
         }
 
@@ -126,12 +118,12 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiFilePathEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: selectSaveFileName, fileSelectionFilter, defaultPath, "
-                                              "selectDirectory, appendUiSelectedFolderToText, multipleItemSeparator" )
-                                         .arg( key ) );
+                                              "attributes are: %2" )
+                                         .arg( key )
+                                         .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }

@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) 2011-2013 Ceetron AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -78,15 +78,12 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "buttonIcon", "buttonText" };
-
-        if ( auto val = uiItem->getAttribute<QString>( "buttonText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::BUTTON_TEXT, uiConfigName ) )
         {
             attributes.m_buttonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( "buttonIcon", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QIcon>( Keys::BUTTON_ICON, uiConfigName ) )
         {
             attributes.m_buttonIcon = val.value();
         }
@@ -95,12 +92,13 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiPushButtonEditor: Unsupported attribute '%1' set on field. Supported "
-                             "attributes are: buttonIcon, buttonText" )
-                        .arg( key ) );
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }

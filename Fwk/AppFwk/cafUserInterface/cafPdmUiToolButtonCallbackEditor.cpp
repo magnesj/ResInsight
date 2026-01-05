@@ -66,7 +66,7 @@ void PdmUiToolButtonCallbackEditor::configureAndUpdateUi( const QString& uiConfi
     // First try to get callback from the map-based attribute system
     auto uiItem = uiField()->fieldHandle()->uiCapability();
 
-    if ( auto callbackVariant = uiItem->getAttribute<std::function<void()>>( "callback", uiConfigName ) )
+    if ( auto callbackVariant = uiItem->getAttribute<std::function<void()>>( Keys::CALLBACK, uiConfigName ) )
     {
         m_attributes.m_onClickedCallback = callbackVariant.value();
     }
