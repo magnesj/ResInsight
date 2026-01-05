@@ -125,6 +125,7 @@ RimPolygonFilter::RimPolygonFilter()
 
     CAF_PDM_InitField( &m_editPolygonButton, "EditPolygonButton", false, "Edit" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_editPolygonButton );
+    m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit" );
 
     CAF_PDM_InitFieldNoDefault( &m_OBSOLETE_targets, "Targets", "Targets" );
     m_OBSOLETE_targets.uiCapability()->setUiTreeChildrenHidden( true );
@@ -232,14 +233,6 @@ void RimPolygonFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, 
     {
         attrib->pickEventHandler = m_pickTargetsEventHandler;
         attrib->enablePicking    = m_polygonEditor->pickingEnabled();
-    }
-
-    if ( field == &m_editPolygonButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Edit";
-        }
     }
 }
 
