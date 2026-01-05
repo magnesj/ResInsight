@@ -96,15 +96,12 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "showAlpha", "showLabel" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "showAlpha", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_ALPHA, uiConfigName ) )
         {
             m_attributes.showAlpha = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showLabel", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_LABEL, uiConfigName ) )
         {
             m_attributes.showLabel = val.value();
         }
@@ -113,11 +110,12 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiColorEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: showAlpha, showLabel" )
-                                         .arg( key ) );
+                                              "attributes are: %2" )
+                                         .arg( key )
+                                         .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
