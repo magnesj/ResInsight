@@ -33,7 +33,8 @@ LineEditAndPushButtons::LineEditAndPushButtons()
                                 "" );
     m_labelLongTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
     m_labelLongTextField.uiCapability()->setAttribute<bool>( caf::PdmUiLabelEditor::Keys::USE_WORD_WRAP, true );
-    m_labelLongTextField.uiCapability()->setAttribute<bool>( caf::PdmUiLabelEditor::Keys::USE_SINGLE_WIDGET_INSTEAD_OF_LABEL_AND_EDITOR_WIDGET, true );
+    m_labelLongTextField.uiCapability()
+        ->setAttribute<bool>( caf::PdmUiLabelEditor::Keys::USE_SINGLE_WIDGET_INSTEAD_OF_LABEL_AND_EDITOR_WIDGET, true );
 
     CAF_PDM_InitFieldNoDefault( &m_textListField, "TextListField", "Text List Field", "", "", "" );
     m_textListField.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
@@ -45,15 +46,18 @@ LineEditAndPushButtons::LineEditAndPushButtons()
 
     CAF_PDM_InitFieldNoDefault( &m_pushButtonReplace, "PushButtonB", "Replace (CTRL + Enter)", "", "", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonReplace );
-    m_pushButtonReplace.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT, "Replace (Ctrl + Enter)" );
+    m_pushButtonReplace.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT,
+                                                               "Replace (Ctrl + Enter)" );
 
     CAF_PDM_InitFieldNoDefault( &m_pushButtonClear, "PushButtonC", "Clear (Alt + Enter)", "", "", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonClear );
-    m_pushButtonClear.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT, "Clear (Alt + Enter)" );
+    m_pushButtonClear.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT,
+                                                             "Clear (Alt + Enter)" );
 
     CAF_PDM_InitFieldNoDefault( &m_pushButtonAppend, "PushButtonD", "Append (Shift + Enter)", "", "", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonAppend );
-    m_pushButtonAppend.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT, "Append (Shift + Enter)" );
+    m_pushButtonAppend.uiCapability()->setAttribute<QString>( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT,
+                                                              "Append (Shift + Enter)" );
 
     std::vector<QString> items;
     items.push_back( "sldkfj" );

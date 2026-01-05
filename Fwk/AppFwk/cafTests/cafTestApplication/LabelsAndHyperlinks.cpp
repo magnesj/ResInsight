@@ -41,7 +41,8 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
         }
     };
 
-    m_hyperlinkTextField.uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::LINK_ACTIVATED_CALLBACK, QVariant::fromValue( callback ) );
+    m_hyperlinkTextField.uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::LINK_ACTIVATED_CALLBACK,
+                                                       QVariant::fromValue( callback ) );
 
     CAF_PDM_InitField( &m_showButton, "ShowButton", true, "Show Fieldless Button" );
 }
