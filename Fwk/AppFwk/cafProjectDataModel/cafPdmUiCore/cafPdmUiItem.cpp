@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) 2011-2013 Ceetron AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -35,189 +35,14 @@
 //##################################################################################################
 
 #include "cafPdmUiItem.h"
+#include "cafPdmOptionItemInfo.h"
+#include "cafPdmUiItemInfo.h"
 #include "cafPdmUiEditorHandle.h"
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafUpdateEditorsScheduler.h"
 
 namespace caf
 {
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-PdmUiItemInfo::PdmUiItemInfo( const QString& uiName,
-                              IconProvider   iconProvider /*= IconProvider() */,
-                              QString        toolTip /*= ""*/,
-                              QString        whatsThis /*= ""*/,
-                              QString        extraDebugText /*= ""*/ )
-    : m_uiName( uiName )
-    , m_iconProvider( iconProvider )
-    , m_toolTip( toolTip )
-    , m_whatsThis( whatsThis )
-    , m_extraDebugText( extraDebugText )
-    , m_editorTypeName( "" )
-    , m_isHidden( false )
-    , m_isTreeHidden( false )
-    , m_isTreeChildrenHidden( false )
-    , m_isReadOnly( false )
-    , m_labelAlignment( LEFT )
-    , m_isCustomContextMenuEnabled( false )
-    , m_notifyAllFieldsInMultiFieldChangedEvents( -1 )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-PdmUiItemInfo::PdmUiItemInfo( const QString& uiName,
-                              QString        iconResourceLocation /*= ""*/,
-                              QString        toolTip /*= ""*/,
-                              QString        whatsThis /*= ""*/,
-                              QString        extraDebugText /*= ""*/ )
-    : m_uiName( uiName )
-    , m_iconProvider( iconResourceLocation )
-    , m_toolTip( toolTip )
-    , m_whatsThis( whatsThis )
-    , m_extraDebugText( extraDebugText )
-    , m_editorTypeName( "" )
-    , m_isHidden( false )
-    , m_isTreeHidden( false )
-    , m_isTreeChildrenHidden( false )
-    , m_isReadOnly( false )
-    , m_labelAlignment( LEFT )
-    , m_isCustomContextMenuEnabled( false )
-    , m_notifyAllFieldsInMultiFieldChangedEvents( -1 )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<QIcon> PdmUiItemInfo::icon() const
-{
-    return m_iconProvider.icon();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const IconProvider& PdmUiItemInfo::iconProvider() const
-{
-    return m_iconProvider;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-PdmOptionItemInfo::PdmOptionItemInfo( const QString&      anOptionUiText,
-                                      const QVariant&     aValue,
-                                      bool                isReadOnly /* = false */,
-                                      const IconProvider& anIcon /* = IconProvider()*/ )
-    : m_optionUiText( anOptionUiText )
-    , m_value( aValue )
-    , m_isReadOnly( isReadOnly )
-    , m_iconProvider( anIcon )
-    , m_level( 0 )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-PdmOptionItemInfo::PdmOptionItemInfo( const QString&        anOptionUiText,
-                                      caf::PdmObjectHandle* obj,
-                                      bool                  isReadOnly /*= false*/,
-                                      const IconProvider&   anIcon /*= IconProvider()*/ )
-    : m_optionUiText( anOptionUiText )
-    , m_isReadOnly( isReadOnly )
-    , m_iconProvider( anIcon )
-    , m_level( 0 )
-{
-    m_value = QVariant::fromValue( caf::PdmPointer<caf::PdmObjectHandle>( obj ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-PdmOptionItemInfo PdmOptionItemInfo::createHeader( const QString&      anOptionUiText,
-                                                   bool                isReadOnly /*= false*/,
-                                                   const IconProvider& anIcon /*= IconProvider()*/ )
-{
-    PdmOptionItemInfo header( anOptionUiText, QVariant(), isReadOnly, anIcon );
-
-    return header;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void PdmOptionItemInfo::setLevel( int level )
-{
-    m_level = level;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const QString PdmOptionItemInfo::optionUiText() const
-{
-    return m_optionUiText;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-const QVariant PdmOptionItemInfo::value() const
-{
-    return m_value;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool PdmOptionItemInfo::isReadOnly() const
-{
-    return m_isReadOnly;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool PdmOptionItemInfo::isHeading() const
-{
-    return !m_value.isValid();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::unique_ptr<QIcon> PdmOptionItemInfo::icon() const
-{
-    return m_iconProvider.icon();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int PdmOptionItemInfo::level() const
-{
-    return m_level;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QStringList PdmOptionItemInfo::extractUiTexts( const QList<PdmOptionItemInfo>& optionList )
-{
-    QStringList texts;
-
-    for ( const auto& option : optionList )
-    {
-        texts.push_back( option.optionUiText() );
-    }
-
-    return texts;
-}
-
 //==================================================================================================
 /// PdmUiItem
 //==================================================================================================
