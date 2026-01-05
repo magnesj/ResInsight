@@ -41,10 +41,14 @@ RimFieldQuickAccess::RimFieldQuickAccess()
     CAF_PDM_InitFieldNoDefault( &m_selectObjectButton, "SelectObject", "...", ":/Select.svg", "Select Object in Property Editor" );
     m_selectObjectButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonCallbackEditor::uiEditorTypeName() );
     m_selectObjectButton.xmlCapability()->disableIO();
+    m_selectObjectButton.uiCapability()->setAttribute( "callback",
+                                                       QVariant::fromValue( std::function<void()>( [this]() { onSelectObjectButton(); } ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_removeItemButton, "RemoveItem", "...", ":/pinned-remove.svg", "Remove Quick Access" );
     m_removeItemButton.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonCallbackEditor::uiEditorTypeName() );
     m_removeItemButton.xmlCapability()->disableIO();
+    m_removeItemButton.uiCapability()->setAttribute( "callback",
+                                                     QVariant::fromValue( std::function<void()>( [this]() { onRemoveObjectButton(); } ) ) );
 
     m_markedForRemoval = false;
 }
@@ -96,27 +100,6 @@ void RimFieldQuickAccess::onRemoveObjectButton()
     m_markedForRemoval = true;
 
     RiaQuickAccessScheduler::instance()->scheduleDisplayModelUpdateAndRedraw();
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Keep this function for callback setters
-//--------------------------------------------------------------------------------------------------
-void RimFieldQuickAccess::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_selectObjectButton )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiToolButtonCallbackEditorAttribute*>( attribute ) )
-        {
-            attr->setCallback( std::bind( &RimFieldQuickAccess::onSelectObjectButton, this ) );
-        }
-    }
-    else if ( field == &m_removeItemButton )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiToolButtonCallbackEditorAttribute*>( attribute ) )
-        {
-            attr->setCallback( std::bind( &RimFieldQuickAccess::onRemoveObjectButton, this ) );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
