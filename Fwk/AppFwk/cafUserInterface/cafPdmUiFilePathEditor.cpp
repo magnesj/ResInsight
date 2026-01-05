@@ -83,11 +83,11 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "selectSaveFileName",
-                                                                   "fileSelectionFilter",
-                                                                   "defaultPath",
-                                                                   "selectDirectory",
-                                                                   "appendUiSelectedFolderToText",
-                                                                   "multipleItemSeparator" };
+                                                               "fileSelectionFilter",
+                                                               "defaultPath",
+                                                               "selectDirectory",
+                                                               "appendUiSelectedFolderToText",
+                                                               "multipleItemSeparator" };
 
         if ( auto val = uiItem->getAttribute<bool>( "selectSaveFileName", uiConfigName ) )
         {

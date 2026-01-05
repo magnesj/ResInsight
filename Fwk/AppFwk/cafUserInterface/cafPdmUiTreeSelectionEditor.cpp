@@ -215,11 +215,11 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "showTextFilter",
-                                                                   "showToggleAllCheckbox",
-                                                                   "singleSelectionMode",
-                                                                   "showCheckBoxes",
-                                                                   "showContextMenu",
-                                                                   "heightHint" };
+                                                               "showToggleAllCheckbox",
+                                                               "singleSelectionMode",
+                                                               "showCheckBoxes",
+                                                               "showContextMenu",
+                                                               "heightHint" };
 
         QVariant val;
 
