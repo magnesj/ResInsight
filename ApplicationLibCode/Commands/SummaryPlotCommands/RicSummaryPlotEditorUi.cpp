@@ -86,7 +86,7 @@ RicSummaryPlotEditorUi::RicSummaryPlotEditorUi()
     : m_plotContainer( nullptr )
 {
     CAF_PDM_InitFieldNoDefault( &m_targetPlot, "TargetPlot", "Target Plot" );
-    m_targetPlot.uiCapability()->setAttributeBool( "adjustWidthToContents", true );
+    m_targetPlot.uiCapability()->setAttribute<bool>( "adjustWidthToContents", true );
 
     m_previewPlot = std::make_unique<RimSummaryPlot>();
     m_previewPlot->setLegendPosition( RiuPlotWidget::Legend::TOP );
@@ -95,19 +95,19 @@ RicSummaryPlotEditorUi::RicSummaryPlotEditorUi()
     m_applyButtonField = false;
     m_applyButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_applyButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_applyButtonField.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
+    m_applyButtonField.uiCapability()->setAttribute<QString>( "m_buttonText", "Apply" );
 
     CAF_PDM_InitFieldNoDefault( &m_closeButtonField, "Close", "" );
     m_closeButtonField = false;
     m_closeButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_closeButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_closeButtonField.uiCapability()->setAttributeString( "m_buttonText", "Cancel" );
+    m_closeButtonField.uiCapability()->setAttribute<QString>( "m_buttonText", "Cancel" );
 
     CAF_PDM_InitFieldNoDefault( &m_okButtonField, "OK", "" );
     m_okButtonField = false;
     m_okButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_okButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_okButtonField.uiCapability()->setAttributeString( "m_buttonText", "OK" );
+    m_okButtonField.uiCapability()->setAttribute<QString>( "m_buttonText", "OK" );
 
     m_summaryCurveSelectionEditor = std::make_unique<RiuSummaryVectorSelectionWidgetCreator>();
 

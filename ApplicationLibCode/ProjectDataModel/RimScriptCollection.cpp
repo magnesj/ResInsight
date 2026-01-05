@@ -40,7 +40,7 @@ RimScriptCollection::RimScriptCollection()
     CAF_PDM_InitFieldNoDefault( &directory, "ScriptDirectory", "Folder" );
     directory.uiCapability()->setUiReadOnly( true );
     directory.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    directory.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    directory.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &calcScripts, "CalcScripts", "" );
     CAF_PDM_InitFieldNoDefault( &subDirectories, "SubDirectories", "" );

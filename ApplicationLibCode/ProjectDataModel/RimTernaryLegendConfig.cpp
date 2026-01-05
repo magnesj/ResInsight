@@ -59,17 +59,17 @@ RimTernaryLegendConfig::RimTernaryLegendConfig()
                        "" );
 
     CAF_PDM_InitFieldNoDefault( &applyLocalMinMax, "m_applyLocalMinMax", "" );
-    applyLocalMinMax.uiCapability()->setAttributeString( "buttonText", "Apply local min/max values" );
+    applyLocalMinMax.uiCapability()->setAttribute<QString>( "buttonText", "Apply local min/max values" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyLocalMinMax );
     applyLocalMinMax = false;
 
     CAF_PDM_InitFieldNoDefault( &applyGlobalMinMax, "m_applyGlobalMinMax", "" );
-    applyGlobalMinMax.uiCapability()->setAttributeString( "buttonText", "Apply global min/max values" );
+    applyGlobalMinMax.uiCapability()->setAttribute<QString>( "buttonText", "Apply global min/max values" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyGlobalMinMax );
     applyGlobalMinMax = false;
 
     CAF_PDM_InitFieldNoDefault( &applyFullRangeMinMax, "m_applyFullRangeMinMax", "" );
-    applyFullRangeMinMax.uiCapability()->setAttributeString( "buttonText", "Apply full range" );
+    applyFullRangeMinMax.uiCapability()->setAttribute<QString>( "buttonText", "Apply full range" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyFullRangeMinMax );
     applyFullRangeMinMax = false;
 

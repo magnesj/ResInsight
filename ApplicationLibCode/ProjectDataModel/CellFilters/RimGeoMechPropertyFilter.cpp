@@ -191,10 +191,10 @@ void RimGeoMechPropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmU
     // Set dynamic slider attributes based on result value range
     if ( m_minimumResultValue != cvf::UNDEFINED_DOUBLE && m_maximumResultValue != cvf::UNDEFINED_DOUBLE )
     {
-        m_lowerBound.uiCapability()->setAttributeDouble( "minimum", m_minimumResultValue, uiConfigName );
-        m_lowerBound.uiCapability()->setAttributeDouble( "maximum", m_maximumResultValue, uiConfigName );
-        m_upperBound.uiCapability()->setAttributeDouble( "minimum", m_minimumResultValue, uiConfigName );
-        m_upperBound.uiCapability()->setAttributeDouble( "maximum", m_maximumResultValue, uiConfigName );
+        m_lowerBound.uiCapability()->setAttribute<double>( "minimum", m_minimumResultValue, uiConfigName );
+        m_lowerBound.uiCapability()->setAttribute<double>( "maximum", m_maximumResultValue, uiConfigName );
+        m_upperBound.uiCapability()->setAttribute<double>( "minimum", m_minimumResultValue, uiConfigName );
+        m_upperBound.uiCapability()->setAttribute<double>( "maximum", m_maximumResultValue, uiConfigName );
     }
 
     if ( m_resultDefinition->hasCategoryResult() )

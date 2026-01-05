@@ -93,7 +93,7 @@ RimTensorResults::RimTensorResults()
 
     m_resultFieldNameUiField.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_resultFieldNameUiField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-    m_resultFieldNameUiField.uiCapability()->setAttributeInt( "heightHint", 50 );
+    m_resultFieldNameUiField.uiCapability()->setAttribute<int>( "heightHint", 50 );
 }
 
 //--------------------------------------------------------------------------------------------------

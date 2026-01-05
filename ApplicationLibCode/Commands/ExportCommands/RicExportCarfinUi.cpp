@@ -40,7 +40,7 @@ RicExportCarfinUi::RicExportCarfinUi()
 
     CAF_PDM_InitFieldNoDefault( &m_exportFileName, "ExportFileName", "Export Filename" );
     m_exportFileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    m_exportFileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
+    m_exportFileName.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
 
     CAF_PDM_InitFieldNoDefault( &m_caseToApply, "CaseToApply", "Source Case" );
 

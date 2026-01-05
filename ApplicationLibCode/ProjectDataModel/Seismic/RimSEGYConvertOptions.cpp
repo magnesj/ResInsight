@@ -34,7 +34,7 @@ RimSEGYConvertOptions::RimSEGYConvertOptions()
 
     CAF_PDM_InitFieldNoDefault( &m_inputFilename, "InputFilename", "Input SEG-Y File" );
     CAF_PDM_InitFieldNoDefault( &m_outputFilename, "OutputFilename", "Output VDS File" );
-    m_outputFilename.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
+    m_outputFilename.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
 
     CAF_PDM_InitField( &m_sampleStartOverride, "SampleStartOverride", std::make_pair( false, 0.0 ), "Depth (Z) Offset Override" );
     CAF_PDM_InitField( &m_sampleUnit, "SampleUnit", QString( "m" ), "Depth (Z) Unit" );

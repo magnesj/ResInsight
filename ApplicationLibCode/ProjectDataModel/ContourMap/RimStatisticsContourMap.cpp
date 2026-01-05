@@ -161,7 +161,7 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
 
     uiOrdering.add( nameField() );
 
-    m_computeStatisticsButton.uiCapability()->setAttributeString( "buttonText", "Compute" );
+    m_computeStatisticsButton.uiCapability()->setAttribute<QString>( "buttonText", "Compute" );
     uiOrdering.add( &m_computeStatisticsButton );
     m_computeStatisticsButton.uiCapability()->setUiReadOnly( !computeOK );
     if ( computeOK )
@@ -184,10 +184,10 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
             genGrp->add( &m_oilFloodingType );
             if ( m_oilFloodingType() == RigFloodingSettings::FloodingType::USER_DEFINED )
             {
-                m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-                m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "maximum", 1.0 );
-                m_userDefinedFloodingOil.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
-                m_userDefinedFloodingOil.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true );
+                m_userDefinedFloodingOil.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+                m_userDefinedFloodingOil.uiCapability()->setAttribute<double>( "maximum", 1.0 );
+                m_userDefinedFloodingOil.uiCapability()->setAttribute<int>( "sliderTickCount", 20 );
+                m_userDefinedFloodingOil.uiCapability()->setAttribute<bool>( "delaySliderUpdateUntilRelease", true );
                 genGrp->add( &m_userDefinedFloodingOil );
             }
         }
@@ -196,10 +196,10 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
             genGrp->add( &m_gasFloodingType );
             if ( m_gasFloodingType() == RigFloodingSettings::FloodingType::USER_DEFINED )
             {
-                m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-                m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "maximum", 1.0 );
-                m_userDefinedFloodingGas.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
-                m_userDefinedFloodingGas.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true );
+                m_userDefinedFloodingGas.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+                m_userDefinedFloodingGas.uiCapability()->setAttribute<double>( "maximum", 1.0 );
+                m_userDefinedFloodingGas.uiCapability()->setAttribute<int>( "sliderTickCount", 20 );
+                m_userDefinedFloodingGas.uiCapability()->setAttribute<bool>( "delaySliderUpdateUntilRelease", true );
                 genGrp->add( &m_userDefinedFloodingGas );
             }
         }

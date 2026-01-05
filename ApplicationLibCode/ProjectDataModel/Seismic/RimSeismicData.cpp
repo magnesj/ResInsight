@@ -74,9 +74,9 @@ RimSeismicData::RimSeismicData()
     m_metadata.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_metadata.uiCapability()->setUiTreeChildrenHidden( true );
     m_metadata.uiCapability()->setUiReadOnly( true );
-    m_metadata.uiCapability()->setAttributeInt( "minimumHeight", 400 );
-    m_metadata.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_metadata.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_metadata.uiCapability()->setAttribute<int>( "minimumHeight", 400 );
+    m_metadata.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_metadata.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
     m_metadata.xmlCapability()->disableIO();
 
     setDeletable( true );

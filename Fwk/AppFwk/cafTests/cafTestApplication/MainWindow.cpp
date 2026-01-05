@@ -694,7 +694,7 @@ public:
                            "",
                            "Toggle Field tooltip",
                            " Toggle Field whatsthis" );
-        m_toggleField.uiCapability()->setAttributeBool( "wordWrap", true );
+        m_toggleField.uiCapability()->setAttribute<bool>( "wordWrap", true );
 
         CAF_PDM_InitField( &m_pushButtonField, "Push", false, "Button Field", "", "", " " );
         CAF_PDM_InitField( &m_doubleField,
@@ -725,7 +725,7 @@ public:
         m_proxyEnumField.registerSetMethod( this, &SmallDemoPdmObjectA::setEnumMember );
         m_proxyEnumField.registerGetMethod( this, &SmallDemoPdmObjectA::enumMember );
         m_proxyEnumMember = TestEnumType::T2;
-        m_proxyEnumField.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+        m_proxyEnumField.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
 
         CAF_PDM_InitFieldNoDefault( &m_multipleAppEnum, "MultipleAppEnumValue", "MultipleAppEnumValue", "", "", "" );
         m_multipleAppEnum.capability<caf::PdmUiFieldHandle>()->setUiEditorTypeName(
@@ -920,11 +920,11 @@ public:
 
         CAF_PDM_InitField( &m_applyAutoOnChildObjectFields, "ApplyAutoValue", false, "Apply Auto Values" );
         m_applyAutoOnChildObjectFields.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-        m_applyAutoOnChildObjectFields.uiCapability()->setAttributeString( "buttonText", "Apply Auto Values" );
+        m_applyAutoOnChildObjectFields.uiCapability()->setAttribute<QString>( "buttonText", "Apply Auto Values" );
 
         CAF_PDM_InitField( &m_updateAutoValues, "UpdateAutoValue", false, "Update Auto Values" );
         m_updateAutoValues.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-        m_updateAutoValues.uiCapability()->setAttributeString( "buttonText", "Update Auto Values" );
+        m_updateAutoValues.uiCapability()->setAttribute<QString>( "buttonText", "Update Auto Values" );
 
         CAF_PDM_InitField( &m_doubleField,
                            "BigNumber",

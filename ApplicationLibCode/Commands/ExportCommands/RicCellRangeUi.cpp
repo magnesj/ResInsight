@@ -270,20 +270,20 @@ void RicCellRangeUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     const cvf::StructGridInterface* grid = RigReservoirGridTools::gridByIndex( m_case, m_gridIndex() );
     if ( grid )
     {
-        m_startIndexI.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_startIndexI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
-        m_cellCountI.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_cellCountI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
+        m_startIndexI.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_startIndexI.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountI() ) );
+        m_cellCountI.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_cellCountI.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountI() ) );
 
-        m_startIndexJ.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_startIndexJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
-        m_cellCountJ.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_cellCountJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
+        m_startIndexJ.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_startIndexJ.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountJ() ) );
+        m_cellCountJ.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_cellCountJ.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountJ() ) );
 
-        m_startIndexK.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_startIndexK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
-        m_cellCountK.uiCapability()->setAttributeInt( "minimum", 1 );
-        m_cellCountK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
+        m_startIndexK.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_startIndexK.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountK() ) );
+        m_cellCountK.uiCapability()->setAttribute<int>( "minimum", 1 );
+        m_cellCountK.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountK() ) );
     }
 
     uiOrdering.add( &m_startIndexI );

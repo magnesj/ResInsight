@@ -231,10 +231,10 @@ void RimPlotCellPropertyFilter::defineUiOrdering( QString uiConfigName, caf::Pdm
     double maximumValue = 0.0;
     findOrComputeMinMaxResultValues( minimumValue, maximumValue );
 
-    m_lowerBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
-    m_lowerBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
-    m_upperBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
-    m_upperBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
+    m_lowerBound.uiCapability()->setAttribute<double>( "minimum", minimumValue, uiConfigName );
+    m_lowerBound.uiCapability()->setAttribute<double>( "maximum", maximumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttribute<double>( "minimum", minimumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttribute<double>( "maximum", maximumValue, uiConfigName );
 
     // Call base class to handle standard UI ordering
     RimPlotCellFilter::defineUiOrdering( uiConfigName, uiOrdering );

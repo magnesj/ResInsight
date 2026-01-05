@@ -54,7 +54,7 @@ RicExportLgrUi::RicExportLgrUi()
 
     CAF_PDM_InitFieldNoDefault( &m_exportFolder, "ExportFolder", "Export Folder" );
     m_exportFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    m_exportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_exportFolder.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &m_caseToApply, "CaseToApply", "Source Case" );
     CAF_PDM_InitFieldNoDefault( &m_timeStep, "TimeStepIndex", "Time Step" );

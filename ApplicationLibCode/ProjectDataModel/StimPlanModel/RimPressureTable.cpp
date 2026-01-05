@@ -38,9 +38,9 @@ RimPressureTable::RimPressureTable()
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_pressureTableItems, "Items", "Pressure Table Items" );
     m_pressureTableItems.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
-    m_pressureTableItems.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
-    m_pressureTableItems.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_pressureTableItems.uiCapability()->setAttributeInt( "minimumHeight", 300 );
+    m_pressureTableItems.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_pressureTableItems.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_pressureTableItems.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
     m_pressureTableItems.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_pressureTableItems.uiCapability()->setCustomContextMenuEnabled( true );
 

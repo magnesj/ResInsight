@@ -159,8 +159,8 @@ RimSummaryMultiPlot::RimSummaryMultiPlot()
     CAF_PDM_InitFieldNoDefault( &m_goToCommonSettings, "GoToCommonSettings", "" );
     m_goToCommonSettings.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
     m_goToCommonSettings.xmlCapability()->disableIO();
-    m_goToCommonSettings.uiCapability()->setAttributeBool( "useWordWrap", true );
-    m_goToCommonSettings.uiCapability()->setAttributeString( "linkText",
+    m_goToCommonSettings.uiCapability()->setAttribute<bool>( "useWordWrap", true );
+    m_goToCommonSettings.uiCapability()->setAttribute<QString>( "linkText",
                                                              "Select <a href=\"dummy\">Summary Plots</a> to edit Common Readout "
                                                              "Settings." );
     m_goToCommonSettings.uiCapability()->setAttribute( "linkActivatedCallback",

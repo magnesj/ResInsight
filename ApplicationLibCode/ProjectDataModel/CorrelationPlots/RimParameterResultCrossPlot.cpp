@@ -72,12 +72,12 @@ RimParameterResultCrossPlot::RimParameterResultCrossPlot()
 
     CAF_PDM_InitField( &m_useParameterFilter, "UseParameterFilter", false, "Use Parameter Filter" );
     CAF_PDM_InitField( &m_summaryFilterRange, "SummaryFilterRange", std::make_pair( 0.0, 0.0 ), "Summary Value Range", "", "", "" );
-    m_summaryFilterRange.uiCapability()->setAttributeInt( "decimals", 4 );
-    m_summaryFilterRange.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
+    m_summaryFilterRange.uiCapability()->setAttribute<int>( "decimals", 4 );
+    m_summaryFilterRange.uiCapability()->setAttribute<int>( "sliderTickCount", 20 );
 
     CAF_PDM_InitField( &m_parameterFilterRange, "ParameterFilterRange", std::make_pair( 0.0, 0.0 ), "Parameter Value Range", "", "", "" );
-    m_parameterFilterRange.uiCapability()->setAttributeInt( "decimals", 4 );
-    m_parameterFilterRange.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
+    m_parameterFilterRange.uiCapability()->setAttribute<int>( "decimals", 4 );
+    m_parameterFilterRange.uiCapability()->setAttribute<int>( "sliderTickCount", 20 );
 
     CAF_PDM_InitFieldNoDefault( &m_excludedCasesText, "ExcludedCasesText", "Excluded Cases" );
     m_excludedCasesText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
@@ -181,10 +181,10 @@ void RimParameterResultCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* c
 void RimParameterResultCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     // Set dynamic slider attributes based on value ranges
-    m_summaryFilterRange.uiCapability()->setAttributeDouble( "minimum", m_yValueRange.first, uiConfigName );
-    m_summaryFilterRange.uiCapability()->setAttributeDouble( "maximum", m_yValueRange.second, uiConfigName );
-    m_parameterFilterRange.uiCapability()->setAttributeDouble( "minimum", m_xValueRange.first, uiConfigName );
-    m_parameterFilterRange.uiCapability()->setAttributeDouble( "maximum", m_xValueRange.second, uiConfigName );
+    m_summaryFilterRange.uiCapability()->setAttribute<double>( "minimum", m_yValueRange.first, uiConfigName );
+    m_summaryFilterRange.uiCapability()->setAttribute<double>( "maximum", m_yValueRange.second, uiConfigName );
+    m_parameterFilterRange.uiCapability()->setAttribute<double>( "minimum", m_xValueRange.first, uiConfigName );
+    m_parameterFilterRange.uiCapability()->setAttribute<double>( "maximum", m_xValueRange.second, uiConfigName );
 
     appendDataSourceFields( uiConfigName, uiOrdering );
 

@@ -50,8 +50,8 @@ RimFaciesProperties::RimFaciesProperties()
     m_propertiesTable.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_propertiesTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_propertiesTable.uiCapability()->setUiReadOnly( true );
-    m_propertiesTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_propertiesTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_propertiesTable.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_propertiesTable.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_propertiesTable.xmlCapability()->disableIO();
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_faciesDefinition, "FaciesDefinition", "" );

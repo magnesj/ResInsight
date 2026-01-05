@@ -73,8 +73,8 @@ RimSummaryEnsemble::RimSummaryEnsemble()
     QString defaultText = RiaDefines::key1VariableName() + "-" + RiaDefines::key2VariableName();
     QString tooltipText = QString( "Variables in template is supported, and will be replaced to create name. Example '%1'" ).arg( defaultText );
     CAF_PDM_InitField( &m_nameTemplateString, "NameTemplateString", defaultText, "Name Template", "", tooltipText );
-    m_nameTemplateString.uiCapability()->setAttributeString( "placeholderText", defaultText );
-    m_nameTemplateString.uiCapability()->setAttributeBool( "notifyWhenTextIsEdited", true );
+    m_nameTemplateString.uiCapability()->setAttribute<QString>( "placeholderText", defaultText );
+    m_nameTemplateString.uiCapability()->setAttribute<bool>( "notifyWhenTextIsEdited", true );
 
     CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
 

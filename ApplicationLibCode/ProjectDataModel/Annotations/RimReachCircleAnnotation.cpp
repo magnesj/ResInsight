@@ -132,9 +132,9 @@ void RimReachCircleAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     // Set dynamic button text based on picking state
     if ( m_centerPointPickEnabled )
-        m_centerPointPickEnabled.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+        m_centerPointPickEnabled.uiCapability()->setAttribute<QString>( "buttonText", "Stop", uiConfigName );
     else
-        m_centerPointPickEnabled.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+        m_centerPointPickEnabled.uiCapability()->setAttribute<QString>( "buttonText", "Pick", uiConfigName );
 
     uiOrdering.add( &m_radius );
 

@@ -28,7 +28,7 @@ RicSaveMultiPlotTemplateFeatureSettings::RicSaveMultiPlotTemplateFeatureSettings
     CAF_PDM_InitObject( "Save Summary Plot", ":/CrossSection16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
-    m_filePath.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_filePath.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &m_name, "Name", "Name" );
 

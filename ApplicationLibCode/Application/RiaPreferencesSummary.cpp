@@ -118,15 +118,15 @@ RiaPreferencesSummary::RiaPreferencesSummary()
                        "" );
 
     CAF_PDM_InitField( &m_selectDefaultTemplates, "selectDefaultTemplate", false, "", "", "Select Default Templates" );
-    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
-    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttribute<QString>( "m_buttonText", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttribute<QString>( "m_buttonText", "Select Default Templates" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectDefaultTemplates );
 
     CAF_PDM_InitFieldNoDefault( &m_selectedDefaultTemplates, "defaultSummaryTemplates", "Select Summary Plot Templates" );
     m_selectedDefaultTemplates.uiCapability()->setUiReadOnly( true );
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_selectedDefaultTemplates.uiCapability()->setAttributeInt( "heightHint", 30 );
+    m_selectedDefaultTemplates.uiCapability()->setAttribute<int>( "heightHint", 30 );
 
     CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::SNAP_TO_POINT, "Default Readout Mode" );
 

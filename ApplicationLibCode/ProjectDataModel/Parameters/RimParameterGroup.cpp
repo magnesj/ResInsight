@@ -46,9 +46,9 @@ RimParameterGroup::RimParameterGroup()
     m_parameters.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_parameters.uiCapability()->setCustomContextMenuEnabled( true );
     m_parameters.uiCapability()->setUiTreeChildrenHidden( true );
-    m_parameters.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
-    m_parameters.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_parameters.uiCapability()->setAttributeInt( "minimumHeight", 300 );
+    m_parameters.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_parameters.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_parameters.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
 
     CAF_PDM_InitFieldNoDefault( &m_name, "Name", "Name" );
     m_name.uiCapability()->setUiHidden( true );

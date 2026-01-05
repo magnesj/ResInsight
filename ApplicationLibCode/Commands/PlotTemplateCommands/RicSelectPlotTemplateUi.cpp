@@ -81,7 +81,7 @@ void RicSelectPlotTemplateUi::setInitialSelection( const std::vector<QString>& s
 //--------------------------------------------------------------------------------------------------
 void RicSelectPlotTemplateUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    m_selectedPlotTemplates.uiCapability()->setAttributeBool( "singleSelectionMode", !m_useMultiSelect, uiConfigName );
+    m_selectedPlotTemplates.uiCapability()->setAttribute<bool>( "singleSelectionMode", !m_useMultiSelect, uiConfigName );
     uiOrdering.add( &m_selectedPlotTemplates );
 }
 

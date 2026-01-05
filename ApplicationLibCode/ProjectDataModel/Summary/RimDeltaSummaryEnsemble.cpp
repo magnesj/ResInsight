@@ -71,7 +71,7 @@ RimDeltaSummaryEnsemble::RimDeltaSummaryEnsemble()
 
     CAF_PDM_InitField( &m_swapEnsemblesButton, "SwapEnsembles", false, "SwapEnsembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_swapEnsemblesButton );
-    m_swapEnsemblesButton.uiCapability()->setAttributeString( "buttonText", "Swap Ensembles" );
+    m_swapEnsemblesButton.uiCapability()->setAttribute<QString>( "buttonText", "Swap Ensembles" );
 
     CAF_PDM_InitField( &m_caseCount, "CaseCount", QString( "" ), "Matching Cases" );
     m_caseCount.uiCapability()->setUiReadOnly( true );
@@ -89,8 +89,8 @@ RimDeltaSummaryEnsemble::RimDeltaSummaryEnsemble()
     CAF_PDM_InitField( &m_fixedTimeStepIndex, "FixedTimeStepIndex", 0, "Time Step" );
     m_fixedTimeStepIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_fixedTimeStepIndex.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "singleSelectionMode", true );
-    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "showTextFilter", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttribute<bool>( "singleSelectionMode", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttribute<bool>( "showTextFilter", true );
 
     setNameTemplate( "Delta Ensemble" );
 

@@ -97,7 +97,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveValuesSelectSummaryAddressPushButton, "SelectObjectiveSummaryAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_objectiveValuesSelectSummaryAddressPushButton );
-    m_objectiveValuesSelectSummaryAddressPushButton.uiCapability()->setAttributeString( "buttonText", "..." );
+    m_objectiveValuesSelectSummaryAddressPushButton.uiCapability()->setAttribute<QString>( "buttonText", "..." );
     m_objectiveValuesSelectSummaryAddressPushButton = false;
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveFunction, "ObjectiveFunction", "Objective Function" );
@@ -118,7 +118,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitField( &m_valueRange, "ValueRange", std::pair( 0.0, 0.0 ), "Value Range" );
     m_valueRange.uiCapability()->setUiEditorTypeName( caf::PdmUiValueRangeEditor::uiEditorTypeName() );
-    m_valueRange.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
+    m_valueRange.uiCapability()->setAttribute<int>( "sliderTickCount", 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_categories, "Categories", "Categories" );
 
@@ -515,8 +515,8 @@ void RimEnsembleCurveFilter::initAfterRead()
 void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     // Set dynamic slider attributes based on runtime limits
-    m_valueRange.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
-    m_valueRange.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
+    m_valueRange.uiCapability()->setAttribute<double>( "minimum", m_lowerLimit, uiConfigName );
+    m_valueRange.uiCapability()->setAttribute<double>( "maximum", m_upperLimit, uiConfigName );
 
     auto eParam = selectedEnsembleParameter();
 

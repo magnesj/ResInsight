@@ -344,12 +344,12 @@ void RimPlotDataFilterItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         uiOrdering.add( &m_filterQuantityUiField, { .leftLabelColumnSpan = 1 } );
         // uiOrdering.add( &m_filterQuantitySelectButton, {false, 1, 0} );
     }
-    m_min.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
-    m_min.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
-    m_min.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true, uiConfigName );
-    m_max.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
-    m_max.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
-    m_max.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true, uiConfigName );
+    m_min.uiCapability()->setAttribute<double>( "minimum", m_lowerLimit, uiConfigName );
+    m_min.uiCapability()->setAttribute<double>( "maximum", m_upperLimit, uiConfigName );
+    m_min.uiCapability()->setAttribute<bool>( "delaySliderUpdateUntilRelease", true, uiConfigName );
+    m_max.uiCapability()->setAttribute<double>( "minimum", m_lowerLimit, uiConfigName );
+    m_max.uiCapability()->setAttribute<double>( "maximum", m_upperLimit, uiConfigName );
+    m_max.uiCapability()->setAttribute<bool>( "delaySliderUpdateUntilRelease", true, uiConfigName );
     if ( m_filterTarget() != ENSEMBLE_CASE )
     {
         uiOrdering.add( &m_consideredTimestepsType, { .leftLabelColumnSpan = 1 } );
@@ -383,7 +383,7 @@ void RimPlotDataFilterItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
             // Set maximum width based on font metrics
             // NOTE: QFontMetrics requires Qt to be initialized and cannot be called in the constructor
             QFontMetrics fm = QFontMetrics( QFont() );
-            m_topBottomN.uiCapability()->setAttributeInt( "maximumWidth", fm.boundingRect( "XXXX" ).width(), uiConfigName );
+            m_topBottomN.uiCapability()->setAttribute<int>( "maximumWidth", fm.boundingRect( "XXXX" ).width(), uiConfigName );
 
             uiOrdering.appendToRow( &m_topBottomN );
         }

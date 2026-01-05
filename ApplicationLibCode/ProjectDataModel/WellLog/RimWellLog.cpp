@@ -46,7 +46,7 @@ RimWellLog::RimWellLog()
     CAF_PDM_InitObject( "Well File Info", ":/LasFile16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_date, "Date", "Date" );
-    m_date.uiCapability()->setAttributeString( "dateFormat", RiaQDateTimeTools::dateFormatString() );
+    m_date.uiCapability()->setAttribute<QString>( "dateFormat", RiaQDateTimeTools::dateFormatString() );
 
     CAF_PDM_InitFieldNoDefault( &m_wellLogChannels, "WellLogChannels", "" );
     m_wellLogChannels.registerKeywordAlias( "WellLogFileChannels" );

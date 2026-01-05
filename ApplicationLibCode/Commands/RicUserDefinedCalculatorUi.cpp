@@ -41,19 +41,19 @@ RicUserDefinedCalculatorUi::RicUserDefinedCalculatorUi()
 
     CAF_PDM_InitFieldNoDefault( &m_newCalculation, "NewCalculation", "New Calculation" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_newCalculation );
-    m_newCalculation.uiCapability()->setAttributeString( "m_buttonText", "New Calculation" );
+    m_newCalculation.uiCapability()->setAttribute<QString>( "m_buttonText", "New Calculation" );
 
     CAF_PDM_InitFieldNoDefault( &m_deleteCalculation, "DeleteCalculation", "Delete Calculation" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_deleteCalculation );
-    m_deleteCalculation.uiCapability()->setAttributeString( "m_buttonText", "Delete Calculation" );
+    m_deleteCalculation.uiCapability()->setAttribute<QString>( "m_buttonText", "Delete Calculation" );
 
     CAF_PDM_InitFieldNoDefault( &m_importCalculations, "ImportCalculations", "Import Calculations" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_importCalculations );
-    m_importCalculations.uiCapability()->setAttributeString( "m_buttonText", "Import Calculations" );
+    m_importCalculations.uiCapability()->setAttribute<QString>( "m_buttonText", "Import Calculations" );
 
     CAF_PDM_InitFieldNoDefault( &m_exportCalculations, "ExportCalculations", "Export Calculations" );
     RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_exportCalculations );
-    m_exportCalculations.uiCapability()->setAttributeString( "m_buttonText", "Export Calculations" );
+    m_exportCalculations.uiCapability()->setAttribute<QString>( "m_buttonText", "Export Calculations" );
 
     m_calcContextMenuMgr = std::make_unique<RiuCalculationsContextMenuManager>();
 }

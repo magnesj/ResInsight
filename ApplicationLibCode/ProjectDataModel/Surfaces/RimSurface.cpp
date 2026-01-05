@@ -63,8 +63,8 @@ RimSurface::RimSurface()
     CAF_PDM_InitField( &m_enableOpacity, "EnableOpacity", false, "Enable Opacity" );
     CAF_PDM_InitField( &m_opacity, "Opacity", 0.6, "Opacity Value [0..1]" );
     m_opacity.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_opacity.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-    m_opacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_opacity.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+    m_opacity.uiCapability()->setAttribute<double>( "maximum", 1.0 );
 
     CAF_PDM_InitScriptableField( &m_depthOffset, "DepthOffset", 0.0, "Depth Offset" );
     m_depthOffset.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -319,8 +319,8 @@ void RimSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
 
     double minimumExtent = std::max( 1000.0, extentFromCase );
 
-    m_depthOffset.uiCapability()->setAttributeDouble( "minimum", -minimumExtent, uiConfigName );
-    m_depthOffset.uiCapability()->setAttributeDouble( "maximum", minimumExtent, uiConfigName );
+    m_depthOffset.uiCapability()->setAttribute<double>( "minimum", -minimumExtent, uiConfigName );
+    m_depthOffset.uiCapability()->setAttribute<double>( "maximum", minimumExtent, uiConfigName );
 
     caf::PdmObject::defineUiOrdering( uiConfigName, uiOrdering );
 }

@@ -58,7 +58,7 @@ RimUserDefinedPolylinesAnnotation::RimUserDefinedPolylinesAnnotation()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
-    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_targets.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
 }
@@ -216,14 +216,14 @@ void RimUserDefinedPolylinesAnnotation::defineUiOrdering( QString uiConfigName, 
 
     // Set dynamic UI attributes
     if ( !m_enablePicking )
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Start Picking Points", uiConfigName );
     else
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Stop Picking Points", uiConfigName );
 
     if ( m_enablePicking )
     {
         m_targets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
-        m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
+        m_targets.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 
     uiOrdering.skipRemainingFields( true );

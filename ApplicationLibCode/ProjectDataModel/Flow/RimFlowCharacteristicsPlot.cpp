@@ -79,7 +79,7 @@ RimFlowCharacteristicsPlot::RimFlowCharacteristicsPlot()
     CAF_PDM_InitFieldNoDefault( &m_selectedTimeStepsUi, "SelectedTimeStepsUi", "" );
     CAF_PDM_InitFieldNoDefault( &m_applyTimeSteps, "ApplyTimeSteps", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyTimeSteps );
-    m_applyTimeSteps.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
+    m_applyTimeSteps.uiCapability()->setAttribute<QString>( "m_buttonText", "Apply" );
 
     CAF_PDM_InitField( &m_maxPvFraction,
                        "CellPVThreshold",
@@ -99,7 +99,7 @@ RimFlowCharacteristicsPlot::RimFlowCharacteristicsPlot()
     CAF_PDM_InitFieldNoDefault( &m_selectedTracerNames, "SelectedTracerNames", " " );
     CAF_PDM_InitFieldNoDefault( &m_showRegion, "ShowRegion", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_showRegion );
-    m_showRegion.uiCapability()->setAttributeString( "m_buttonText", "Show Region" );
+    m_showRegion.uiCapability()->setAttribute<QString>( "m_buttonText", "Show Region" );
 
     CAF_PDM_InitField( &m_minCommunication, "MinCommunication", 0.0, "Min Communication" );
     CAF_PDM_InitField( &m_maxTof, "MaxTof", 146000, "Max Time of Flight [days]" );

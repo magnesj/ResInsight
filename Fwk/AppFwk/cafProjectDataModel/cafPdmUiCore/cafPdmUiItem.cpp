@@ -36,8 +36,8 @@
 
 #include "cafPdmUiItem.h"
 #include "cafPdmOptionItemInfo.h"
-#include "cafPdmUiItemInfo.h"
 #include "cafPdmUiEditorHandle.h"
+#include "cafPdmUiItemInfo.h"
 #include "cafPdmUiObjectEditorHandle.h"
 #include "cafUpdateEditorsScheduler.h"
 
@@ -675,38 +675,6 @@ std::map<QString, QVariant> PdmUiItem::getAttributes( const QString& uiConfigNam
     }
 
     return result;
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Backward compatibility helper for setAttribute
-//--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeInt( const QString& key, int value, const QString& uiConfigName )
-{
-    setAttribute<int>( key, value, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Backward compatibility helper for setAttribute
-//--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeBool( const QString& key, bool value, const QString& uiConfigName )
-{
-    setAttribute<bool>( key, value, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Backward compatibility helper for setAttribute
-//--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeString( const QString& key, const QString& value, const QString& uiConfigName )
-{
-    setAttribute<QString>( key, value, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Backward compatibility helper for setAttribute
-//--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeDouble( const QString& key, double value, const QString& uiConfigName )
-{
-    setAttribute<double>( key, value, uiConfigName );
 }
 
 } // End of namespace caf

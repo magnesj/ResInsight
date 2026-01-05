@@ -68,7 +68,7 @@ RimAbstractCorrelationPlot::RimAbstractCorrelationPlot()
 
     CAF_PDM_InitFieldNoDefault( &m_pushButtonSelectSummaryAddress, "SelectAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonSelectSummaryAddress );
-    m_pushButtonSelectSummaryAddress.uiCapability()->setAttributeString( "m_buttonText", "..." );
+    m_pushButtonSelectSummaryAddress.uiCapability()->setAttribute<QString>( "m_buttonText", "..." );
     m_pushButtonSelectSummaryAddress = false;
 
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilter, "TimeStepFilter", "Available Time Steps" );

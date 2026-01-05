@@ -416,15 +416,15 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     // Set dynamic slider ranges for X coordinates
     {
-        m_minXCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().x() );
-        m_minXCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().x() );
+        m_minXCoord.uiCapability()->setAttribute<double>( "minimum", cellsBoundingBox.min().x() );
+        m_minXCoord.uiCapability()->setAttribute<double>( "maximum", cellsBoundingBox.max().x() );
         int xRange     = cellsBoundingBox.extent().x();
         int xTickCount = xRange / m_xySliderStepSize;
-        m_minXCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( xTickCount ) );
+        m_minXCoord.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( xTickCount ) );
 
-        m_maxXCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().x() );
-        m_maxXCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().x() );
-        m_maxXCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( xTickCount ) );
+        m_maxXCoord.uiCapability()->setAttribute<double>( "minimum", cellsBoundingBox.min().x() );
+        m_maxXCoord.uiCapability()->setAttribute<double>( "maximum", cellsBoundingBox.max().x() );
+        m_maxXCoord.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( xTickCount ) );
 
         caf::PdmUiGroup* group = uiOrdering.addNewGroup(
             "X Coordinates " + QString( " [%1  %2]" ).arg( cellsBoundingBox.min().x() ).arg( cellsBoundingBox.max().x() ) );
@@ -434,15 +434,15 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     // Set dynamic slider ranges for Y coordinates
     {
-        m_minYCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().y() );
-        m_minYCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().y() );
+        m_minYCoord.uiCapability()->setAttribute<double>( "minimum", cellsBoundingBox.min().y() );
+        m_minYCoord.uiCapability()->setAttribute<double>( "maximum", cellsBoundingBox.max().y() );
         int yRange     = cellsBoundingBox.extent().y();
         int yTickCount = yRange / m_xySliderStepSize;
-        m_minYCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( yTickCount ) );
+        m_minYCoord.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( yTickCount ) );
 
-        m_maxYCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().y() );
-        m_maxYCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().y() );
-        m_maxYCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( yTickCount ) );
+        m_maxYCoord.uiCapability()->setAttribute<double>( "minimum", cellsBoundingBox.min().y() );
+        m_maxYCoord.uiCapability()->setAttribute<double>( "maximum", cellsBoundingBox.max().y() );
+        m_maxYCoord.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( yTickCount ) );
 
         caf::PdmUiGroup* group = uiOrdering.addNewGroup(
             "Y Coordinates" + QString( " [%1  %2]" ).arg( cellsBoundingBox.min().y() ).arg( cellsBoundingBox.max().y() ) );
@@ -452,15 +452,15 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
 
     // Set dynamic slider ranges for depth
     {
-        m_minDepth.uiCapability()->setAttributeDouble( "minimum", -cellsBoundingBox.max().z() );
-        m_minDepth.uiCapability()->setAttributeDouble( "maximum", -cellsBoundingBox.min().z() );
+        m_minDepth.uiCapability()->setAttribute<double>( "minimum", -cellsBoundingBox.max().z() );
+        m_minDepth.uiCapability()->setAttribute<double>( "maximum", -cellsBoundingBox.min().z() );
         int zRange     = cellsBoundingBox.extent().z();
         int zTickCount = zRange / m_depthSliderStepSize;
-        m_minDepth.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( zTickCount ) );
+        m_minDepth.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( zTickCount ) );
 
-        m_maxDepth.uiCapability()->setAttributeDouble( "minimum", -cellsBoundingBox.max().z() );
-        m_maxDepth.uiCapability()->setAttributeDouble( "maximum", -cellsBoundingBox.min().z() );
-        m_maxDepth.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( zTickCount ) );
+        m_maxDepth.uiCapability()->setAttribute<double>( "minimum", -cellsBoundingBox.max().z() );
+        m_maxDepth.uiCapability()->setAttribute<double>( "maximum", -cellsBoundingBox.min().z() );
+        m_maxDepth.uiCapability()->setAttribute<int>( "sliderTickCount", cvf::Math::abs( zTickCount ) );
 
         caf::PdmUiGroup* group =
             uiOrdering.addNewGroup( "Depth" + QString( " [%1  %2]" ).arg( -cellsBoundingBox.max().z() ).arg( -cellsBoundingBox.min().z() ) );
@@ -477,11 +477,11 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     // Set dynamic button text
     if ( m_show3DManipulator )
     {
-        m_show3DManipulator.uiCapability()->setAttributeString( "buttonText", "Hide 3D manipulator" );
+        m_show3DManipulator.uiCapability()->setAttribute<QString>( "buttonText", "Hide 3D manipulator" );
     }
     else
     {
-        m_show3DManipulator.uiCapability()->setAttributeString( "buttonText", "Show 3D manipulator" );
+        m_show3DManipulator.uiCapability()->setAttribute<QString>( "buttonText", "Show 3D manipulator" );
     }
     uiOrdering.add( &m_show3DManipulator );
 

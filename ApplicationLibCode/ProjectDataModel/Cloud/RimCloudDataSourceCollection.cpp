@@ -1,4 +1,4 @@
-﻿/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
 //
 //  Copyright (C) 2024     Equinor ASA
 //
@@ -43,7 +43,7 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_authenticate, "Authenticate", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_authenticate );
-    m_authenticate.uiCapability()->setAttributeString( "m_buttonText", "Authenticate" );
+    m_authenticate.uiCapability()->setAttribute<QString>( "m_buttonText", "Authenticate" );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoFieldName, "SumoFieldId", "Field Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
@@ -54,11 +54,11 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_addDataSources, "AddDataSources", "", "", "Add Data Sources without Ensembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addDataSources );
-    m_addDataSources.uiCapability()->setAttributeString( "m_buttonText", "Add Data Sources(s)" );
+    m_addDataSources.uiCapability()->setAttribute<QString>( "m_buttonText", "Add Data Sources(s)" );
 
     CAF_PDM_InitFieldNoDefault( &m_addEnsembles, "AddEnsembles", "", "", "Add Data Sources and Create Summary Ensemble Plots" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsembles );
-    m_addEnsembles.uiCapability()->setAttributeString( "m_buttonText", "Add Ensemble(s)" );
+    m_addEnsembles.uiCapability()->setAttribute<QString>( "m_buttonText", "Add Ensemble(s)" );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSources, "SumoDataSources", "Sumo Data Sources" );
 

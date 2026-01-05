@@ -186,8 +186,8 @@ RimDeltaSummaryCase::RimDeltaSummaryCase()
     CAF_PDM_InitField( &m_inUse, "InUse", false, "In Use" );
     m_fixedTimeStepIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_fixedTimeStepIndex.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "singleSelectionMode", true );
-    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "showTextFilter", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttribute<bool>( "singleSelectionMode", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttribute<bool>( "showTextFilter", true );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -455,7 +455,7 @@ void RimMeshFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUi
     uiOrdering.add( &m_id );
 
     // Set dynamic file selection filter for m_stimPlanFileName
-    m_stimPlanFileName.uiCapability()->setAttributeString( "fileSelectionFilter", getFileSelectionFilter(), uiConfigName );
+    m_stimPlanFileName.uiCapability()->setAttribute<QString>( "fileSelectionFilter", getFileSelectionFilter(), uiConfigName );
 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Input" );

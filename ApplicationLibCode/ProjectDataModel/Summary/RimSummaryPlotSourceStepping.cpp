@@ -68,7 +68,7 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
     setNotifyAllFieldsInMultiFieldChangedEvents( true );
 
     CAF_PDM_InitFieldNoDefault( &m_stepDimension, "StepDimension", "Step Dimension" );
-    m_stepDimension.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", false );
+    m_stepDimension.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", false );
 
     CAF_PDM_InitFieldNoDefault( &m_summaryCase, "CurveCase", "Case" );
 
@@ -107,9 +107,9 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
 
     for ( auto* field : steppingFields )
     {
-        field->uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-        field->uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
-        field->uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+        field->uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+        field->uiCapability()->setAttribute<QString>( "nextButtonText", "Next (" + nextText + ")" );
+        field->uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (" + prevText + ")" );
     }
 
     CAF_PDM_InitFieldNoDefault( &m_placeholderForLabel, "Placeholder", "" );
@@ -185,7 +185,7 @@ void RimSummaryPlotSourceStepping::defineUiOrdering( QString uiConfigName, caf::
 
         for ( auto* field : steppingFields )
         {
-            field->uiCapability()->setAttributeInt( "minimumWidth", 120, uiConfigName );
+            field->uiCapability()->setAttribute<int>( "minimumWidth", 120, uiConfigName );
         }
     }
 

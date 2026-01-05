@@ -33,8 +33,8 @@ RimBinaryExportSettings::RimBinaryExportSettings()
 
     CAF_PDM_InitFieldNoDefault( &fileName, "Filename", "Export Filename" );
     fileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    fileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
-    fileName.uiCapability()->setAttributeString( "m_fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    fileName.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
+    fileName.uiCapability()->setAttribute<QString>( "m_fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
     CAF_PDM_InitFieldNoDefault( &eclipseKeyword, "EclipseKeyword", "Eclipse Keyword" );
     CAF_PDM_InitField( &undefinedValue, "UndefinedValue", 0.0, "Undefined Value" );
 

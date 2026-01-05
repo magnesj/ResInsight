@@ -40,8 +40,8 @@ RimColorLegendItem::RimColorLegendItem()
 
     CAF_PDM_InitField( &m_categoryValue, "CategoryValue", 0, "Category Number" );
     m_categoryValue.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
-    m_categoryValue.uiCapability()->setAttributeInt( "m_minimum", 0 );
-    m_categoryValue.uiCapability()->setAttributeInt( "m_maximum", 100 );
+    m_categoryValue.uiCapability()->setAttribute<int>( "m_minimum", 0 );
+    m_categoryValue.uiCapability()->setAttribute<int>( "m_maximum", 100 );
 
     CAF_PDM_InitField( &m_categoryName, "CategoryName", QString( "" ), "Category Name" );
 

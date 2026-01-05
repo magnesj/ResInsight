@@ -55,10 +55,10 @@ RimGeoMechContourMapProjection::RimGeoMechContourMapProjection()
     CAF_PDM_InitField( &m_applyPPRegionLimitVertically, "VerticalLimit", false, "Apply Limit Vertically" );
     CAF_PDM_InitField( &m_paddingAroundPorePressureRegion, "PaddingAroundPorRegion", 0.0, "Horizontal Padding around PP regions" );
     m_paddingAroundPorePressureRegion.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_paddingAroundPorePressureRegion.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-    m_paddingAroundPorePressureRegion.uiCapability()->setAttributeDouble( "maximum", 2.0 );
-    m_paddingAroundPorePressureRegion.uiCapability()->setAttributeInt( "sliderTickCount", 4 );
-    m_paddingAroundPorePressureRegion.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true );
+    m_paddingAroundPorePressureRegion.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+    m_paddingAroundPorePressureRegion.uiCapability()->setAttribute<double>( "maximum", 2.0 );
+    m_paddingAroundPorePressureRegion.uiCapability()->setAttribute<int>( "sliderTickCount", 4 );
+    m_paddingAroundPorePressureRegion.uiCapability()->setAttribute<bool>( "delaySliderUpdateUntilRelease", true );
     setName( "Map Projection" );
     nameField()->uiCapability()->setUiReadOnly( true );
 }

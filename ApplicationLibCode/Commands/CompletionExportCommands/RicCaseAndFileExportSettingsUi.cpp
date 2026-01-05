@@ -33,7 +33,7 @@ RicCaseAndFileExportSettingsUi::RicCaseAndFileExportSettingsUi()
 
     CAF_PDM_InitFieldNoDefault( &folder, "Folder", "Export Folder" );
     folder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    folder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    folder.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &caseToApply, "CaseToApply", "Case to Apply" );
 }

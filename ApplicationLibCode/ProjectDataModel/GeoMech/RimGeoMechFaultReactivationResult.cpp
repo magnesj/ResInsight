@@ -158,7 +158,7 @@ void RimGeoMechFaultReactivationResult::defineUiOrdering( QString uiConfigName, 
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Fault Reactivation Result" );
     group->add( &m_distanceFromFault );
 
-    m_createFaultReactivationPlot.uiCapability()->setAttributeString( "buttonText", "Create Plot" );
+    m_createFaultReactivationPlot.uiCapability()->setAttribute<QString>( "buttonText", "Create Plot" );
     group->add( &m_createFaultReactivationPlot );
 
     uiOrdering.skipRemainingFields( true );

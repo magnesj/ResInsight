@@ -128,8 +128,8 @@ void RimGridCaseSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         const cvf::StructGridInterface* grid = RigReservoirGridTools::mainGrid( m_case );
         if ( grid )
         {
-            m_oneBasedSliceIndex.uiCapability()->setAttributeInt( "minimum", 1, uiConfigName );
-            m_oneBasedSliceIndex.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ), uiConfigName );
+            m_oneBasedSliceIndex.uiCapability()->setAttribute<int>( "minimum", 1, uiConfigName );
+            m_oneBasedSliceIndex.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountK() ), uiConfigName );
         }
     }
 }

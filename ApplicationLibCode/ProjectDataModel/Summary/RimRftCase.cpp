@@ -98,7 +98,7 @@ void RimRftCase::fieldChangedByUi( const caf::PdmFieldHandle* changedField, cons
 //--------------------------------------------------------------------------------------------------
 void RimRftCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    m_dataDeckFilePath.uiCapability()->setAttributeString( "defaultPath", rftFilePath() );
+    m_dataDeckFilePath.uiCapability()->setAttribute<QString>( "defaultPath", rftFilePath() );
 
     uiOrdering.add( &m_rftFilePath );
     uiOrdering.add( &m_dataDeckFilePath );

@@ -59,7 +59,7 @@ RicExportToLasFileResampleUi::RicExportToLasFileResampleUi()
 
     CAF_PDM_InitField( &exportFolder, "ExportFolder", QString(), "Export Folder" );
     exportFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    exportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    exportFolder.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
     CAF_PDM_InitField( &filePrefix, "FilePrefix", QString( "" ), "File Prefix" );
     CAF_PDM_InitField( &capitalizeFileName, "CapitalizeFileName", false, "Capitalize File Name" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &capitalizeFileName );

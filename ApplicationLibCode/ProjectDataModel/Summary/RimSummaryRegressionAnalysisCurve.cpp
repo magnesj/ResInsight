@@ -118,15 +118,15 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     CAF_PDM_InitFieldNoDefault( &m_timeRangeSelection, "TimeRangeSelection", "Time Range" );
     CAF_PDM_InitFieldNoDefault( &m_minTimeSliderPosition, "MinTimeSliderPosition", "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
-    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
-    m_minTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<int>( "maximum", 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<bool>( "showSpinBox", false );
 
     CAF_PDM_InitFieldNoDefault( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<int>( "maximum", 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<bool>( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", false, "Show In Plot" );
 
@@ -134,21 +134,21 @@ RimSummaryRegressionAnalysisCurve::RimSummaryRegressionAnalysisCurve()
     m_expressionText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_expressionText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_expressionText.uiCapability()->setUiReadOnly( true );
-    m_expressionText.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_expressionText.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_expressionText.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_expressionText.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_expressionText.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_xRangeSelection, "XRangeSelection", "X Value Range" );
     CAF_PDM_InitField( &m_valueRangeX, "ValueRangeX", std::make_pair( 0.0, 0.0 ), "Value Range X" );
     m_valueRangeX.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_valueRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_valueRangeX.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
+    m_valueRangeX.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_valueRangeX.uiCapability()->setAttribute<int>( "sliderTickCount", 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_yRangeSelection, "YRangeSelection", "Y Value Range" );
     CAF_PDM_InitField( &m_valueRangeY, "ValueRangeY", std::make_pair( 0.0, 0.0 ), "Value Range Y" );
     m_valueRangeY.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_valueRangeY.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_valueRangeY.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
+    m_valueRangeY.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_valueRangeY.uiCapability()->setAttribute<int>( "sliderTickCount", 100 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -467,16 +467,16 @@ void RimSummaryRegressionAnalysisCurve::defineUiOrdering( QString uiConfigName, 
     {
         double minX = *std::min_element( m_sourceValuesX.begin(), m_sourceValuesX.end() );
         double maxX = *std::max_element( m_sourceValuesX.begin(), m_sourceValuesX.end() );
-        m_valueRangeX.uiCapability()->setAttributeDouble( "minimum", minX, uiConfigName );
-        m_valueRangeX.uiCapability()->setAttributeDouble( "maximum", maxX, uiConfigName );
+        m_valueRangeX.uiCapability()->setAttribute<double>( "minimum", minX, uiConfigName );
+        m_valueRangeX.uiCapability()->setAttribute<double>( "maximum", maxX, uiConfigName );
     }
 
     if ( !m_sourceValuesY.empty() )
     {
         double minY = *std::min_element( m_sourceValuesY.begin(), m_sourceValuesY.end() );
         double maxY = *std::max_element( m_sourceValuesY.begin(), m_sourceValuesY.end() );
-        m_valueRangeY.uiCapability()->setAttributeDouble( "minimum", minY, uiConfigName );
-        m_valueRangeY.uiCapability()->setAttributeDouble( "maximum", maxY, uiConfigName );
+        m_valueRangeY.uiCapability()->setAttribute<double>( "minimum", minY, uiConfigName );
+        m_valueRangeY.uiCapability()->setAttribute<double>( "maximum", maxY, uiConfigName );
     }
 
     RimPlotCurve::updateFieldUiState();

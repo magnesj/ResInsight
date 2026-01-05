@@ -33,8 +33,8 @@ RimExportInputSettings::RimExportInputSettings()
 
     CAF_PDM_InitFieldNoDefault( &fileName, "Filename", "Export Filename" );
     fileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    fileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
-    fileName.uiCapability()->setAttributeString( "m_fileSelectionFilter", "Text files (*.txt);;All files (*.*)" );
+    fileName.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
+    fileName.uiCapability()->setAttribute<QString>( "m_fileSelectionFilter", "Text files (*.txt);;All files (*.*)" );
     CAF_PDM_InitFieldNoDefault( &eclipseKeyword, "Keyword", "Eclipse Keyword" );
 
     CAF_PDM_InitField( &writeEchoInGrdeclFiles,

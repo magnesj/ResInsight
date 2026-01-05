@@ -71,14 +71,14 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
 
     CAF_PDM_InitFieldNoDefault( &m_minExtrapolationRangeX, "MinExtrapolationRangeX", "Min" );
     m_minExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+    m_minExtrapolationRangeX.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_minExtrapolationRangeX.uiCapability()->setAttribute<int>( "numberFormat",
                                                               static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitFieldNoDefault( &m_maxExtrapolationRangeX, "MaxExtrapolationRangeX", "Max" );
     m_maxExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+    m_maxExtrapolationRangeX.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_maxExtrapolationRangeX.uiCapability()->setAttribute<int>( "numberFormat",
                                                               static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitField( &m_polynomialDegree, "PolynomialDegree", 3, "Degree" );
@@ -102,8 +102,8 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
     m_expressionText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_expressionText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_expressionText.uiCapability()->setUiReadOnly( true );
-    m_expressionText.uiCapability()->setAttributeInt( "wrapMode", static_cast<int>( caf::PdmUiTextEditorAttribute::NoWrap ) );
-    m_expressionText.uiCapability()->setAttributeInt( "textMode", static_cast<int>( caf::PdmUiTextEditorAttribute::HTML ) );
+    m_expressionText.uiCapability()->setAttribute<int>( "wrapMode", static_cast<int>( caf::PdmUiTextEditorAttribute::NoWrap ) );
+    m_expressionText.uiCapability()->setAttribute<int>( "textMode", static_cast<int>( caf::PdmUiTextEditorAttribute::HTML ) );
     m_expressionText.xmlCapability()->disableIO();
 
     setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
@@ -344,37 +344,37 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
 
     caf::PdmUiGroup* dataSelectionGroup = uiOrdering.addNewGroup( "Data Selection" );
     dataSelectionGroup->add( &m_minRangeX );
-    m_minRangeX.uiCapability()->setAttributeDouble( "minimum",
+    m_minRangeX.uiCapability()->setAttribute<double>( "minimum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
                                                     uiConfigName );
-    m_minRangeX.uiCapability()->setAttributeDouble( "maximum",
+    m_minRangeX.uiCapability()->setAttribute<double>( "maximum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
                                                     uiConfigName );
-    m_minRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    m_minRangeX.uiCapability()->setAttribute<int>( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeX );
-    m_maxRangeX.uiCapability()->setAttributeDouble( "minimum",
+    m_maxRangeX.uiCapability()->setAttribute<double>( "minimum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
                                                     uiConfigName );
-    m_maxRangeX.uiCapability()->setAttributeDouble( "maximum",
+    m_maxRangeX.uiCapability()->setAttribute<double>( "maximum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
                                                     uiConfigName );
-    m_maxRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    m_maxRangeX.uiCapability()->setAttribute<int>( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_minRangeY );
-    m_minRangeY.uiCapability()->setAttributeDouble( "minimum",
+    m_minRangeY.uiCapability()->setAttribute<double>( "minimum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
                                                     uiConfigName );
-    m_minRangeY.uiCapability()->setAttributeDouble( "maximum",
+    m_minRangeY.uiCapability()->setAttribute<double>( "maximum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
                                                     uiConfigName );
-    m_minRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    m_minRangeY.uiCapability()->setAttribute<int>( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeY );
-    m_maxRangeY.uiCapability()->setAttributeDouble( "minimum",
+    m_maxRangeY.uiCapability()->setAttribute<double>( "minimum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
                                                     uiConfigName );
-    m_maxRangeY.uiCapability()->setAttributeDouble( "maximum",
+    m_maxRangeY.uiCapability()->setAttribute<double>( "maximum",
                                                     RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
                                                     uiConfigName );
-    m_maxRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    m_maxRangeY.uiCapability()->setAttribute<int>( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_showDataSelectionInPlot );
 
     caf::PdmUiGroup* forecastingGroup = uiOrdering.addNewGroup( "Extrapolation" );

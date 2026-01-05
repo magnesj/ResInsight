@@ -49,8 +49,8 @@ RicSaveEclipseInputVisibleCellsUi::RicSaveEclipseInputVisibleCellsUi()
 
     CAF_PDM_InitField( &exportFilename, "ExportFilename", QString(), "Export Filename" );
     exportFilename.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    exportFilename.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
-    exportFilename.uiCapability()->setAttributeString( "m_fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    exportFilename.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
+    exportFilename.uiCapability()->setAttribute<QString>( "m_fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
     CAF_PDM_InitFieldNoDefault( &exportKeyword, "ExportKeyword", "Export Keyword" );
     CAF_PDM_InitField( &visibleActiveCellsValue, "VisibleActiveCellsValue", 1, "Visible Active Cells Value" );
     CAF_PDM_InitField( &hiddenActiveCellsValue, "HiddenActiveCellsValue", 0, "Hidden Active Cells Value" );

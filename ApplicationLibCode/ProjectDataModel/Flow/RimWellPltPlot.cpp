@@ -132,8 +132,8 @@ RimWellPltPlot::RimWellPltPlot()
                                                                          RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS,
                                                                          RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER } );
     m_phases.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_phases.uiCapability()->setAttributeBool( "showTextFilter", false );
-    m_phases.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
+    m_phases.uiCapability()->setAttribute<bool>( "showTextFilter", false );
+    m_phases.uiCapability()->setAttribute<bool>( "showToggleAllCheckbox", false );
 
     m_nameConfig->setCustomName( "PLT Plot" );
     setNamingMethod( RiaDefines::ObjectNamingMethod::CUSTOM );

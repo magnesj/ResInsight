@@ -259,8 +259,8 @@ void RimWellPathFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
     if ( wellPath )
     {
-        m_measuredDepth.uiCapability()->setAttributeDouble( "minimum", wellPath->uniqueStartMD(), uiConfigName );
-        m_measuredDepth.uiCapability()->setAttributeDouble( "maximum", wellPath->uniqueEndMD(), uiConfigName );
+        m_measuredDepth.uiCapability()->setAttribute<double>( "minimum", wellPath->uniqueStartMD(), uiConfigName );
+        m_measuredDepth.uiCapability()->setAttribute<double>( "maximum", wellPath->uniqueEndMD(), uiConfigName );
     }
 
     RimFracture::defineUiOrdering( uiConfigName, uiOrdering );

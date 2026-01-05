@@ -79,8 +79,8 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
 
     CAF_PDM_InitField( &exportGrid, "ExportGrid", true, "Export Grid Data", "", "Includes COORD, ZCORN and ACTNUM", "" );
     CAF_PDM_InitField( &m_exportGridFilename, "ExportGridFilename", QString(), "Grid File Name" );
-    m_exportGridFilename.uiCapability()->setAttributeBool( "selectSaveFileName", true );
-    m_exportGridFilename.uiCapability()->setAttributeString( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    m_exportGridFilename.uiCapability()->setAttribute<bool>( "selectSaveFileName", true );
+    m_exportGridFilename.uiCapability()->setAttribute<QString>( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
     CAF_PDM_InitField( &exportInLocalCoordinates, "ExportInLocalCoords", false, "Export in Local Coordinates", "", "Remove UTM location on export", "" );
     CAF_PDM_InitField( &makeInvisibleCellsInactive, "InvisibleCellActnum", false, "Make Invisible Cells Inactive" );
 
@@ -112,8 +112,8 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
     exportFaults = EXPORT_TO_SINGLE_SEPARATE_FILE;
 
     CAF_PDM_InitField( &m_exportFaultsFilename, "ExportFaultsFilename", QString(), "Faults File Name" );
-    m_exportFaultsFilename.uiCapability()->setAttributeBool( "selectSaveFileName", true );
-    m_exportFaultsFilename.uiCapability()->setAttributeString( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    m_exportFaultsFilename.uiCapability()->setAttribute<bool>( "selectSaveFileName", true );
+    m_exportFaultsFilename.uiCapability()->setAttribute<QString>( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
 
     QString ijkLabel = "Cell Count I, J, K";
     CAF_PDM_InitField( &refinementCountI, "RefinementCountI", 1, ijkLabel );
@@ -125,11 +125,11 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
 
     CAF_PDM_InitFieldNoDefault( &exportParameters, "ExportParams", "Export Parameters" );
     CAF_PDM_InitField( &m_exportParametersFilename, "ExportParamsFilename", QString(), "File Name" );
-    m_exportParametersFilename.uiCapability()->setAttributeBool( "selectSaveFileName", true );
-    m_exportParametersFilename.uiCapability()->setAttributeString( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    m_exportParametersFilename.uiCapability()->setAttribute<bool>( "selectSaveFileName", true );
+    m_exportParametersFilename.uiCapability()->setAttribute<QString>( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
 
     CAF_PDM_InitFieldNoDefault( &selectedKeywords, "ExportMainKeywords", "Keywords to Export" );
-    selectedKeywords.uiCapability()->setAttributeInt( "heightHint", 280 );
+    selectedKeywords.uiCapability()->setAttribute<int>( "heightHint", 280 );
 
     CAF_PDM_InitField( &m_writeEchoInGrdeclFiles,
                        "WriteEchoInGrdeclFiles",
@@ -137,7 +137,7 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
                        "Write NOECHO and ECHO" );
 
     CAF_PDM_InitFieldNoDefault( &m_exportFolder, "ExportFolder", "Export Folder" );
-    m_exportFolder.uiCapability()->setAttributeBool( "selectDirectory", true );
+    m_exportFolder.uiCapability()->setAttribute<bool>( "selectDirectory", true );
     m_exportFolder = defaultFolder();
 
     m_exportGridFilename       = defaultGridFileName();

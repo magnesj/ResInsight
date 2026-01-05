@@ -351,20 +351,20 @@ void RimCellRangeFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     // Set dynamic slider ranges based on grid dimensions
     if ( grid )
     {
-        startIndexI.uiCapability()->setAttributeInt( "minimum", 1 );
-        startIndexI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
-        cellCountI.uiCapability()->setAttributeInt( "minimum", 1 );
-        cellCountI.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountI() ) );
+        startIndexI.uiCapability()->setAttribute<int>( "minimum", 1 );
+        startIndexI.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountI() ) );
+        cellCountI.uiCapability()->setAttribute<int>( "minimum", 1 );
+        cellCountI.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountI() ) );
 
-        startIndexJ.uiCapability()->setAttributeInt( "minimum", 1 );
-        startIndexJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
-        cellCountJ.uiCapability()->setAttributeInt( "minimum", 1 );
-        cellCountJ.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountJ() ) );
+        startIndexJ.uiCapability()->setAttribute<int>( "minimum", 1 );
+        startIndexJ.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountJ() ) );
+        cellCountJ.uiCapability()->setAttribute<int>( "minimum", 1 );
+        cellCountJ.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountJ() ) );
 
-        startIndexK.uiCapability()->setAttributeInt( "minimum", 1 );
-        startIndexK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
-        cellCountK.uiCapability()->setAttributeInt( "minimum", 1 );
-        cellCountK.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ) );
+        startIndexK.uiCapability()->setAttribute<int>( "minimum", 1 );
+        startIndexK.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountK() ) );
+        cellCountK.uiCapability()->setAttribute<int>( "minimum", 1 );
+        cellCountK.uiCapability()->setAttribute<int>( "maximum", static_cast<int>( grid->cellCountK() ) );
     }
 
     auto group = uiOrdering.addNewGroup( "Range Selection" );

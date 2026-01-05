@@ -91,7 +91,7 @@ RimWellIASettings::RimWellIASettings()
     CAF_PDM_InitField( &m_showBox, "showBox", false, "Show model box" );
 
     CAF_PDM_InitFieldNoDefault( &m_geostaticDate, "startDate", "Start Date (geostatic):" );
-    m_geostaticDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
+    m_geostaticDate.uiCapability()->setAttribute<QString>( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_boxValid, "boxValid", false, "Model box is valid" );
     m_boxValid.uiCapability()->setUiHidden( true );

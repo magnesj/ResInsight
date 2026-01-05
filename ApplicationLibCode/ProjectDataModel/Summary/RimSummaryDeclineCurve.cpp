@@ -64,21 +64,21 @@ RimSummaryDeclineCurve::RimSummaryDeclineCurve()
     CAF_PDM_InitField( &m_hyperbolicDeclineConstant, "HyperbolicDeclineConstant", 0.5, "Decline Constant" );
     m_hyperbolicDeclineConstant.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     // Hyperbolic decline constant must be larger than 0 to avoid calculation issues
-    m_hyperbolicDeclineConstant.uiCapability()->setAttributeDouble( "minimum", 0.001 );
-    m_hyperbolicDeclineConstant.uiCapability()->setAttributeDouble( "maximum", 1.0 );
-    m_hyperbolicDeclineConstant.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_hyperbolicDeclineConstant.uiCapability()->setAttribute<double>( "minimum", 0.001 );
+    m_hyperbolicDeclineConstant.uiCapability()->setAttribute<double>( "maximum", 1.0 );
+    m_hyperbolicDeclineConstant.uiCapability()->setAttribute<int>( "decimals", 2 );
 
     CAF_PDM_InitField( &m_minTimeSliderPosition, "MinTimeSliderPosition", 75, "From" );
     m_minTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
-    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_minTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
-    m_minTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<int>( "maximum", 100 );
+    m_minTimeSliderPosition.uiCapability()->setAttribute<bool>( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_maxTimeSliderPosition, "MaxTimeSliderPosition", 100, "To" );
     m_maxTimeSliderPosition.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeInt( "maximum", 100 );
-    m_maxTimeSliderPosition.uiCapability()->setAttributeBool( "showSpinBox", false );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<int>( "maximum", 100 );
+    m_maxTimeSliderPosition.uiCapability()->setAttribute<bool>( "showSpinBox", false );
 
     CAF_PDM_InitField( &m_showTimeSelectionInPlot, "ShowTimeSelectionInPlot", true, "Show In Plot" );
 }

@@ -124,8 +124,8 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     m_filePathsTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_filePathsTable.uiCapability()->setUiReadOnly( true );
     m_filePathsTable.xmlCapability()->disableIO();
-    m_filePathsTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_filePathsTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_filePathsTable.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_filePathsTable.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitField( &m_excludeZeroWidthFractures, "ExcludeZeroWidthFractures", true, "Exclude Zero Width Fractures" );
 
@@ -134,8 +134,8 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     m_statisticsTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_statisticsTable.uiCapability()->setUiReadOnly( true );
     m_statisticsTable.xmlCapability()->disableIO();
-    m_statisticsTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_statisticsTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_statisticsTable.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_statisticsTable.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitFieldNoDefault( &m_meshAlignmentType, "MeshAlignmentType", "Mesh Alignment" );
     CAF_PDM_InitFieldNoDefault( &m_meshType, "MeshType", "Mesh Type" );
@@ -159,9 +159,9 @@ RimEnsembleFractureStatistics::RimEnsembleFractureStatistics()
     CAF_PDM_InitField( &m_selectedStatisticsType, "SelectedStatisticsType", defaultStatisticsTypes, "Statistics Type" );
     m_selectedStatisticsType.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_selectedStatisticsType.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-    m_selectedStatisticsType.uiCapability()->setAttributeBool( "showTextFilter", false );
-    m_selectedStatisticsType.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
-    m_selectedStatisticsType.uiCapability()->setAttributeBool( "singleSelectionMode", false );
+    m_selectedStatisticsType.uiCapability()->setAttribute<bool>( "showTextFilter", false );
+    m_selectedStatisticsType.uiCapability()->setAttribute<bool>( "showToggleAllCheckbox", false );
+    m_selectedStatisticsType.uiCapability()->setAttribute<bool>( "singleSelectionMode", false );
 
     CAF_PDM_InitFieldNoDefault( &m_computeStatistics, "ComputeStatistics", "Compute Templates" );
     m_computeStatistics.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );

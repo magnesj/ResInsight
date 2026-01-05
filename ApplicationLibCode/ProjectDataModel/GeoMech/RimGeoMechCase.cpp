@@ -118,15 +118,15 @@ RimGeoMechCase::RimGeoMechCase()
 
     CAF_PDM_InitField( &m_importElementPropertyFileCommand, "importElementPropertyFileCommad", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_importElementPropertyFileCommand );
-    m_importElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Import New Element Property" );
+    m_importElementPropertyFileCommand.uiCapability()->setAttribute<QString>( "m_buttonText", "Import New Element Property" );
 
     CAF_PDM_InitField( &m_closeElementPropertyFileCommand, "closeElementPropertyFileCommad", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_closeElementPropertyFileCommand );
-    m_closeElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Close Selected Properties" );
+    m_closeElementPropertyFileCommand.uiCapability()->setAttribute<QString>( "m_buttonText", "Close Selected Properties" );
 
     CAF_PDM_InitField( &m_reloadElementPropertyFileCommand, "reloadElementPropertyFileCommand", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_reloadElementPropertyFileCommand );
-    m_reloadElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Reload Selected Properties" );
+    m_reloadElementPropertyFileCommand.uiCapability()->setAttribute<QString>( "m_buttonText", "Reload Selected Properties" );
 
     caf::AppEnum<BiotCoefficientType> defaultBiotCoefficientType = RimGeoMechCase::BiotCoefficientType::BIOT_NONE;
     CAF_PDM_InitField( &m_biotCoefficientType, "BiotCoefficientType", defaultBiotCoefficientType, "Biot Coefficient" );

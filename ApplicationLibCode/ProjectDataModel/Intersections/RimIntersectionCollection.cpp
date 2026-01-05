@@ -474,10 +474,10 @@ void RimIntersectionCollection::defineUiOrdering( QString uiConfigName, caf::Pdm
         double                 minDepth = -1.0 * bb.max().z();
         double                 maxDepth = -1.0 * bb.min().z();
 
-        m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", minDepth, uiConfigName );
-        m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", maxDepth, uiConfigName );
-        m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", minDepth, uiConfigName );
-        m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", maxDepth, uiConfigName );
+        m_depthUpperThreshold.uiCapability()->setAttribute<double>( "minimum", minDepth, uiConfigName );
+        m_depthUpperThreshold.uiCapability()->setAttribute<double>( "maximum", maxDepth, uiConfigName );
+        m_depthLowerThreshold.uiCapability()->setAttribute<double>( "minimum", minDepth, uiConfigName );
+        m_depthLowerThreshold.uiCapability()->setAttribute<double>( "maximum", maxDepth, uiConfigName );
     }
 
     caf::PdmUiGroup* genGroup = uiOrdering.addNewGroup( "General" );

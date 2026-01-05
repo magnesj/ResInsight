@@ -125,7 +125,7 @@ RimPolygonFilter::RimPolygonFilter()
 
     CAF_PDM_InitField( &m_editPolygonButton, "EditPolygonButton", false, "Edit" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_editPolygonButton );
-    m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit" );
+    m_editPolygonButton.uiCapability()->setAttribute<QString>( "buttonText", "Edit" );
 
     CAF_PDM_InitFieldNoDefault( &m_OBSOLETE_targets, "Targets", "Targets" );
     m_OBSOLETE_targets.uiCapability()->setUiTreeChildrenHidden( true );

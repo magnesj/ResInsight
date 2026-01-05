@@ -77,8 +77,8 @@ RimStimPlanFractureTemplate::RimStimPlanFractureTemplate()
     m_propertiesTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_propertiesTable.uiCapability()->setUiReadOnly( true );
     m_propertiesTable.xmlCapability()->disableIO();
-    m_propertiesTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_propertiesTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_propertiesTable.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_propertiesTable.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitField( &m_showStimPlanMesh_OBSOLETE, "ShowStimPlanMesh", true, "" );
     m_showStimPlanMesh_OBSOLETE.uiCapability()->setUiHidden( true );

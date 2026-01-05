@@ -73,7 +73,7 @@ RimTimeStepFilter::RimTimeStepFilter()
 
     CAF_PDM_InitField( &m_interval, "Interval", 1, "Interval" );
     m_interval.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
-    m_interval.uiCapability()->setAttributeBool( "avoidSendingEnterEventToParentWidget", true );
+    m_interval.uiCapability()->setAttribute<bool>( "avoidSendingEnterEventToParentWidget", true );
 
     CAF_PDM_InitField( &m_timeStepNamesFromFile, "TimeStepsFromFile", std::vector<QString>(), "TimeSteps From File" );
     m_timeStepNamesFromFile.xmlCapability()->disableIO();
@@ -91,7 +91,7 @@ RimTimeStepFilter::RimTimeStepFilter()
 
     CAF_PDM_InitFieldNoDefault( &m_applyReloadOfCase, "ApplyReloadOfCase", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyReloadOfCase );
-    m_applyReloadOfCase.uiCapability()->setAttributeString( "m_buttonText", "Reload Case" );
+    m_applyReloadOfCase.uiCapability()->setAttribute<QString>( "m_buttonText", "Reload Case" );
 }
 
 //--------------------------------------------------------------------------------------------------

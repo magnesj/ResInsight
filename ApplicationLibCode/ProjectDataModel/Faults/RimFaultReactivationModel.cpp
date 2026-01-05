@@ -81,7 +81,7 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     CAF_PDM_InitField( &m_userDescription, "UserDescription", QString( "Model" ), "Name" );
     CAF_PDM_InitFieldNoDefault( &m_geomechCase, "GeoMechCase", "Global GeoMech Model" );
     CAF_PDM_InitFieldNoDefault( &m_baseDir, "BaseDirectory", "Working Folder" );
-    m_baseDir.uiCapability()->setAttributeBool( "selectDirectory", true );
+    m_baseDir.uiCapability()->setAttribute<bool>( "selectDirectory", true );
 
     CAF_PDM_InitField( &m_modelThickness, "ModelThickness", 100.0, "Model Cell Thickness" );
 
@@ -142,7 +142,7 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( false );
-    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_targets.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     CAF_PDM_InitFieldNoDefault( &m_materialParameters, "MaterialParameters", "Materials", ":/Bullet.png" );
 
@@ -441,17 +441,17 @@ void RimFaultReactivationModel::defineUiOrdering( QString uiConfigName, caf::Pdm
     {
         auto   bb   = eclCase->allCellsBoundingBox();
         double diff = bb.max().z() - bb.min().z();
-        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
-        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "maximum", diff, uiConfigName );
-        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
-        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "maximum", diff, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttribute<double>( "minimum", 0.0, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttribute<double>( "maximum", diff, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttribute<double>( "minimum", 0.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttribute<double>( "maximum", diff, uiConfigName );
     }
     else
     {
-        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
-        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "maximum", 1000.0, uiConfigName );
-        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
-        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "maximum", 1000.0, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttribute<double>( "minimum", 0.0, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttribute<double>( "maximum", 1000.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttribute<double>( "minimum", 0.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttribute<double>( "maximum", 1000.0, uiConfigName );
     }
 
     auto genGrp = uiOrdering.addNewGroup( "General" );

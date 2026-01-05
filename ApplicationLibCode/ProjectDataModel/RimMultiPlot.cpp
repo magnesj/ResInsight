@@ -63,10 +63,10 @@ RimMultiPlot::RimMultiPlot()
     RiaPreferencesSummary* sumPrefs = RiaPreferencesSummary::current();
     CAF_PDM_InitFieldNoDefault( &m_columnCount, "NumberOfColumns", "Number of Columns" );
     m_columnCount = sumPrefs->defaultMultiPlotColumnCount();
-    m_columnCount.uiCapability()->setAttributeInt( "iconSize", 24 ); // Width for QSize
+    m_columnCount.uiCapability()->setAttribute<int>( "iconSize", 24 ); // Width for QSize
     CAF_PDM_InitFieldNoDefault( &m_rowsPerPage, "RowsPerPage", "Rows per Page" );
     m_rowsPerPage = sumPrefs->defaultMultiPlotRowCount();
-    m_rowsPerPage.uiCapability()->setAttributeInt( "iconSize", 24 ); // Width for QSize
+    m_rowsPerPage.uiCapability()->setAttribute<int>( "iconSize", 24 ); // Width for QSize
 
     CAF_PDM_InitField( &m_showIndividualPlotTitles, "ShowPlotTitles", true, "Show Sub Plot Titles" );
     CAF_PDM_InitFieldNoDefault( &m_majorTickmarkCount, "MajorTickmarkCount", "Major Tickmark Count" );

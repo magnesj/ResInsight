@@ -85,34 +85,34 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitObject( "Change Data Source" );
 
     CAF_PDM_InitFieldNoDefault( &m_case, "CurveCase", "Case" );
-    m_case.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_case.uiCapability()->setAttributeInt( "minimumContentsLength", 14 );
-    m_case.uiCapability()->setAttributeString( "nextButtonText", "Next (Shift+PgDown)" );
-    m_case.uiCapability()->setAttributeString( "prevButtonText", "Previous (Shift+PgUp)" );
+    m_case.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_case.uiCapability()->setAttribute<int>( "minimumContentsLength", 14 );
+    m_case.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (Shift+PgDown)" );
+    m_case.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (Shift+PgUp)" );
     m_case.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_case.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_summaryCase, "SummaryCase", "Summary Case" );
-    m_summaryCase.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_summaryCase.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
     QString nextText = RimSummaryPlotControls::nextStepKeyText();
     QString prevText = RimSummaryPlotControls::prevStepKeyText();
-    m_summaryCase.uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
-    m_summaryCase.uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    m_summaryCase.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (" + nextText + ")" );
+    m_summaryCase.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (" + prevText + ")" );
     m_summaryCase.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_summaryCase.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_trajectoryType, "TrajectoryType", "Trajectory Type" );
 
     CAF_PDM_InitFieldNoDefault( &m_wellPath, "CurveWellPath", "Well Path" );
-    m_wellPath.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_wellPath.uiCapability()->setAttributeString( "nextButtonText", "Next (Ctrl+PgDown)" );
-    m_wellPath.uiCapability()->setAttributeString( "prevButtonText", "Previous (Ctrl+PgUp)" );
+    m_wellPath.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_wellPath.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (Ctrl+PgDown)" );
+    m_wellPath.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (Ctrl+PgUp)" );
     m_wellPath.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_wellPath.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_simWellName, "SimulationWellName", "Well Name" );
-    m_simWellName.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_simWellName.uiCapability()->setAttributeString( "nextButtonText", "Next (Ctrl+PgDown)" );
-    m_simWellName.uiCapability()->setAttributeString( "prevButtonText", "Previous (Ctrl+PgUp)" );
+    m_simWellName.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_simWellName.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (Ctrl+PgDown)" );
+    m_simWellName.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (Ctrl+PgUp)" );
     m_simWellName.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_simWellName.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_branchDetection,
@@ -129,10 +129,10 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitField( &m_branchIndex, "Branch", -1, "Branch Index" );
 
     CAF_PDM_InitField( &m_timeStep, "CurveTimeStep", -1, "Time Step" );
-    m_timeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_timeStep.uiCapability()->setAttributeInt( "minimumContentsLength", 12 );
-    m_timeStep.uiCapability()->setAttributeString( "nextButtonText", "Next (PgDown)" );
-    m_timeStep.uiCapability()->setAttributeString( "prevButtonText", "Previous (PgUp)" );
+    m_timeStep.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_timeStep.uiCapability()->setAttribute<int>( "minimumContentsLength", 12 );
+    m_timeStep.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (PgDown)" );
+    m_timeStep.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (PgUp)" );
     m_timeStep.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_timeStep.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
@@ -145,23 +145,23 @@ RimWellLogCurveCommonDataSource::RimWellLogCurveCommonDataSource()
     CAF_PDM_InitField( &m_maximumCurvePointInterval, "MaximumCurvePointInterval", std::make_pair( true, 10.0 ), "Maximum Curve Point Interval" );
 
     CAF_PDM_InitFieldNoDefault( &m_rftTimeStep, "RftTimeStep", "RFT Time Step" );
-    m_rftTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_rftTimeStep.uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
-    m_rftTimeStep.uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    m_rftTimeStep.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_rftTimeStep.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (" + nextText + ")" );
+    m_rftTimeStep.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (" + prevText + ")" );
     m_rftTimeStep.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_rftTimeStep.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_rftWellName, "RftWellName", "RFT Well Name" );
-    m_rftWellName.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_rftWellName.uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
-    m_rftWellName.uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    m_rftWellName.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_rftWellName.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (" + nextText + ")" );
+    m_rftWellName.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (" + prevText + ")" );
     m_rftWellName.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_rftWellName.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_rftSegmentBranchIndex, "SegmentBranchIndex", "RFT Branch" );
-    m_rftSegmentBranchIndex.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
-    m_rftSegmentBranchIndex.uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
-    m_rftSegmentBranchIndex.uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    m_rftSegmentBranchIndex.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
+    m_rftSegmentBranchIndex.uiCapability()->setAttribute<QString>( "nextButtonText", "Next (" + nextText + ")" );
+    m_rftSegmentBranchIndex.uiCapability()->setAttribute<QString>( "prevButtonText", "Previous (" + prevText + ")" );
     m_rftSegmentBranchIndex.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_rftSegmentBranchIndex.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_rftSegmentBranchType, "SegmentBranchType", "RFT Completion" );
@@ -1124,7 +1124,7 @@ void RimWellLogCurveCommonDataSource::defineUiOrdering( QString uiConfigName, ca
                 auto minmax_it = std::minmax_element( m_uniqueWbsSmoothingThreshold.begin(), m_uniqueWbsSmoothingThreshold.end() );
                 displayString += QString( " [%1, %2]" ).arg( *( minmax_it.first ) ).arg( *( minmax_it.second ) );
             }
-            m_wbsSmoothingThreshold.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+            m_wbsSmoothingThreshold.uiCapability()->setAttribute<QString>( "displayString", displayString, uiConfigName );
         }
 
         group->add( &m_maximumCurvePointInterval );

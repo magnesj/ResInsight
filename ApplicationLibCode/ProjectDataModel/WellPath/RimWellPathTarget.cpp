@@ -524,13 +524,13 @@ void RimWellPathTarget::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     {
         QString displayString = QString::number( m_targetPointXYD()[0], 'f', 2 ) + " " + QString::number( m_targetPointXYD()[1], 'f', 2 ) +
                                 " " + QString::number( m_targetPointXYD()[2], 'f', 2 );
-        m_targetPointXYD.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+        m_targetPointXYD.uiCapability()->setAttribute<QString>( "displayString", displayString, uiConfigName );
     }
 
     {
         QString displayString = QString::number( m_targetPointForDisplay()[0], 'f', 2 ) + " " +
                                 QString::number( m_targetPointForDisplay()[1], 'f', 2 ) + " " +
                                 QString::number( m_targetPointForDisplay()[2], 'f', 2 );
-        m_targetPointForDisplay.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+        m_targetPointForDisplay.uiCapability()->setAttribute<QString>( "displayString", displayString, uiConfigName );
     }
 }

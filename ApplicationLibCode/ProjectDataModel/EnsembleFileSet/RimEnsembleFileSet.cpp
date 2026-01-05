@@ -61,17 +61,17 @@ RimEnsembleFileSet::RimEnsembleFileSet()
     CAF_PDM_InitObject( "Ensemble", ":/SummaryEnsemble.svg", "", "" );
 
     CAF_PDM_InitField( &m_pathPattern, "PathPattern", QString(), "Path Pattern", "", "", "" );
-    m_pathPattern.uiCapability()->setAttributeString( "placeholderText", "Enter path pattern..." );
+    m_pathPattern.uiCapability()->setAttribute<QString>( "placeholderText", "Enter path pattern..." );
 
     CAF_PDM_InitField( &m_realizationSubSet, "RealizationSubSet", QString(), "Realization Filter", "", "", "" );
-    m_realizationSubSet.uiCapability()->setAttributeString( "placeholderText", "E.g. 0,1,4-6. Use '*' for all." );
+    m_realizationSubSet.uiCapability()->setAttribute<QString>( "placeholderText", "E.g. 0,1,4-6. Use '*' for all." );
 
     CAF_PDM_InitFieldNoDefault( &m_ensembleInfo, "EnsembleInfo", "Info" );
     m_ensembleInfo.registerGetMethod( this, &RimEnsembleFileSet::ensembleInfo );
     m_ensembleInfo.uiCapability()->setUiReadOnly( true );
     m_ensembleInfo.xmlCapability()->disableIO();
     m_ensembleInfo.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
-    m_ensembleInfo.uiCapability()->setAttributeInt( "heightHint", -1 );
+    m_ensembleInfo.uiCapability()->setAttribute<int>( "heightHint", -1 );
 
     CAF_PDM_InitFieldNoDefault( &m_groupingMode, "GroupingMode", "Grouping Mode" );
 

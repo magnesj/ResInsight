@@ -829,13 +829,13 @@ void RimSummaryTimeAxisProperties::defineUiOrdering( QString uiConfigName, caf::
         // Set dynamic date and time format attributes
         QString dateFormatString =
             RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY );
-        m_visibleDateRangeMin.uiCapability()->setAttributeString( "dateFormat", dateFormatString, uiConfigName );
-        m_visibleDateRangeMax.uiCapability()->setAttributeString( "dateFormat", dateFormatString, uiConfigName );
+        m_visibleDateRangeMin.uiCapability()->setAttribute<QString>( "dateFormat", dateFormatString, uiConfigName );
+        m_visibleDateRangeMax.uiCapability()->setAttribute<QString>( "dateFormat", dateFormatString, uiConfigName );
 
         QString timeFormatString =
             RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND );
-        m_visibleTimeRangeMin.uiCapability()->setAttributeString( "timeFormat", timeFormatString, uiConfigName );
-        m_visibleTimeRangeMax.uiCapability()->setAttributeString( "timeFormat", timeFormatString, uiConfigName );
+        m_visibleTimeRangeMin.uiCapability()->setAttribute<QString>( "timeFormat", timeFormatString, uiConfigName );
+        m_visibleTimeRangeMax.uiCapability()->setAttribute<QString>( "timeFormat", timeFormatString, uiConfigName );
 
         timeGroup->add( &m_visibleDateRangeMax );
         timeGroup->appendToRow( &m_visibleTimeRangeMax );

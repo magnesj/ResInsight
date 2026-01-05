@@ -200,8 +200,8 @@ RimFractureTemplate::RimFractureTemplate()
     m_dFactorSummaryText.uiCapability()->setUiReadOnly( true );
     m_dFactorSummaryText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_dFactorSummaryText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosType::TOP );
-    m_dFactorSummaryText.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
-    m_dFactorSummaryText.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_dFactorSummaryText.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_dFactorSummaryText.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_dFactorSummaryText.xmlCapability()->disableIO();
 
     CAF_PDM_InitScriptableField( &m_heightScaleFactor, "HeightScaleFactor", 1.0, "Height" );
@@ -215,7 +215,7 @@ RimFractureTemplate::RimFractureTemplate()
                                  "The conductivity values read from file will be scaled with this parameters",
                                  "" );
     CAF_PDM_InitField( &m_scaleApplyButton, "ScaleApplyButton", false, "Apply" );
-    m_scaleApplyButton.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
+    m_scaleApplyButton.uiCapability()->setAttribute<QString>( "m_buttonText", "Apply" );
 
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_scaleApplyButton );
 }
@@ -363,8 +363,8 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 
     // Set dynamic slider range for m_wellPathDepthAtFracture
     auto [minimum, maximum] = wellPathDepthAtFractureRange();
-    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "minimum", minimum );
-    m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "maximum", maximum );
+    m_wellPathDepthAtFracture.uiCapability()->setAttribute<double>( "minimum", minimum );
+    m_wellPathDepthAtFracture.uiCapability()->setAttribute<double>( "maximum", maximum );
 
     {
         auto group = uiOrdering.addNewGroup( "Sensitivity Scale Factors" );

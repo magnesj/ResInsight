@@ -217,8 +217,8 @@ RimStimPlanModel::RimStimPlanModel()
     CAF_PDM_InitScriptableField( &m_formationDip, "FormationDip", 0.0, "Formation Dip" );
     m_formationDip.uiCapability()->setUiReadOnly( true );
     m_formationDip.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_formationDip.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_formationDip.uiCapability()->setAttributeInt( "numberFormat",
+    m_formationDip.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_formationDip.uiCapability()->setAttribute<int>( "numberFormat",
                                                     static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_autoComputeBarrier, "AutoComputeBarrier", true, "Auto Compute Barrier" );
@@ -226,15 +226,15 @@ RimStimPlanModel::RimStimPlanModel()
     CAF_PDM_InitScriptableField( &m_distanceToBarrier, "DistanceToBarrier", 0.0, "Distance To Barrier [m]" );
     m_distanceToBarrier.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_distanceToBarrier.uiCapability()->setUiReadOnly( true );
-    m_distanceToBarrier.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_distanceToBarrier.uiCapability()->setAttributeInt( "numberFormat",
+    m_distanceToBarrier.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_distanceToBarrier.uiCapability()->setAttribute<int>( "numberFormat",
                                                          static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_barrierDip, "BarrierDip", 0.0, "Barrier Dip" );
     m_barrierDip.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_barrierDip.uiCapability()->setUiReadOnly( true );
-    m_barrierDip.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_barrierDip.uiCapability()->setAttributeInt( "numberFormat",
+    m_barrierDip.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_barrierDip.uiCapability()->setAttribute<int>( "numberFormat",
                                                   static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
     CAF_PDM_InitScriptableField( &m_wellPenetrationLayer, "WellPenetrationLayer", 2, "Well Penetration Layer" );
 
@@ -844,8 +844,8 @@ void RimStimPlanModel::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     // Set dynamic slider attributes based on wellPath extents
     if ( wellPath() )
     {
-        m_MD.uiCapability()->setAttributeDouble( "minimum", wellPath()->startMD(), uiConfigName );
-        m_MD.uiCapability()->setAttributeDouble( "maximum", wellPath()->endMD(), uiConfigName );
+        m_MD.uiCapability()->setAttribute<double>( "minimum", wellPath()->startMD(), uiConfigName );
+        m_MD.uiCapability()->setAttribute<double>( "maximum", wellPath()->endMD(), uiConfigName );
     }
 
     m_thicknessDirectionWellPath.uiCapability()->setUiHidden( true );

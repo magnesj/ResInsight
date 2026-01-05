@@ -180,8 +180,8 @@ void RimWellPathTieIn::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
             {
                 double minimumValue = wellPathGeo->measuredDepths().front();
                 double maximumValue = wellPathGeo->measuredDepths().back();
-                m_tieInMeasuredDepth.uiCapability()->setAttributeDouble( "minimum", minimumValue );
-                m_tieInMeasuredDepth.uiCapability()->setAttributeDouble( "maximum", maximumValue );
+                m_tieInMeasuredDepth.uiCapability()->setAttribute<double>( "minimum", minimumValue );
+                m_tieInMeasuredDepth.uiCapability()->setAttribute<double>( "maximum", maximumValue );
             }
         }
 

@@ -75,10 +75,10 @@ RimSummaryPlotManager::RimSummaryPlotManager()
     CAF_PDM_InitFieldNoDefault( &m_summaryPlot, "SummaryPlot", "Summary Plot" );
     CAF_PDM_InitFieldNoDefault( &m_filterText, "FilterText", "Filter Text" );
     m_filterText.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
-    m_filterText.uiCapability()->setAttributeBool( "enableEditableContent", true );
-    m_filterText.uiCapability()->setAttributeBool( "enableAutoComplete", false );
-    m_filterText.uiCapability()->setAttributeBool( "adjustWidthToContents", true );
-    m_filterText.uiCapability()->setAttributeBool( "notifyWhenTextIsEdited", true );
+    m_filterText.uiCapability()->setAttribute<bool>( "enableEditableContent", true );
+    m_filterText.uiCapability()->setAttribute<bool>( "enableAutoComplete", false );
+    m_filterText.uiCapability()->setAttribute<bool>( "adjustWidthToContents", true );
+    m_filterText.uiCapability()->setAttribute<bool>( "notifyWhenTextIsEdited", true );
 
     CAF_PDM_InitFieldNoDefault( &m_addressCandidates, "AddressCandidates", "Vectors" );
     m_addressCandidates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
@@ -316,15 +316,15 @@ void RimSummaryPlotManager::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     uiOrdering.add( &m_individualPlotPerObject );
     uiOrdering.appendToRow( &m_createMultiPlot );
 
-    m_pushButtonAppend.uiCapability()->setAttributeString( "buttonText", "Append Curves \n(Shift + Enter)" );
+    m_pushButtonAppend.uiCapability()->setAttribute<QString>( "buttonText", "Append Curves \n(Shift + Enter)" );
     uiOrdering.add( &m_pushButtonAppend );
 
-    m_pushButtonReplace.uiCapability()->setAttributeString( "buttonText", "Replace Curves \n(Ctrl + Enter)" );
+    m_pushButtonReplace.uiCapability()->setAttribute<QString>( "buttonText", "Replace Curves \n(Ctrl + Enter)" );
     uiOrdering.appendToRow( &m_pushButtonReplace );
 
     uiOrdering.appendToRow( &m_labelB );
 
-    m_pushButtonNewPlot.uiCapability()->setAttributeString( "buttonText", "Create New Plot \n(Enter)" );
+    m_pushButtonNewPlot.uiCapability()->setAttribute<QString>( "buttonText", "Create New Plot \n(Enter)" );
     uiOrdering.appendToRow( &m_pushButtonNewPlot );
 }
 

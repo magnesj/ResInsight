@@ -361,7 +361,7 @@ void RimSummaryAddressSelector::defineUiOrdering( QString uiConfigName, caf::Pdm
 
     uiOrdering.add( &m_summaryAddressUiField, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
 
-    m_pushButtonSelectSummaryAddress.uiCapability()->setAttributeString( "buttonText", "..." );
+    m_pushButtonSelectSummaryAddress.uiCapability()->setAttribute<QString>( "buttonText", "..." );
     uiOrdering.add( &m_pushButtonSelectSummaryAddress, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
     if ( m_showResampling )

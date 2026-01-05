@@ -205,13 +205,13 @@ void RimAnnotationInViewCollection::defineUiOrdering( QString uiConfigName, caf:
             if ( auto rimCase = view->ownerCase() )
             {
                 auto bb = rimCase->allCellsBoundingBox();
-                m_annotationPlaneDepth.uiCapability()->setAttributeDouble( "minimum", -bb.max().z() );
-                m_annotationPlaneDepth.uiCapability()->setAttributeDouble( "maximum", -bb.min().z() );
+                m_annotationPlaneDepth.uiCapability()->setAttribute<double>( "minimum", -bb.max().z() );
+                m_annotationPlaneDepth.uiCapability()->setAttribute<double>( "maximum", -bb.min().z() );
             }
             else
             {
-                m_annotationPlaneDepth.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-                m_annotationPlaneDepth.uiCapability()->setAttributeDouble( "maximum", 10000.0 );
+                m_annotationPlaneDepth.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+                m_annotationPlaneDepth.uiCapability()->setAttribute<double>( "maximum", 10000.0 );
             }
         }
 

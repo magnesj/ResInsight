@@ -53,7 +53,7 @@ RicExportSectorModelUi::RicExportSectorModelUi()
     CAF_PDM_InitObject( "Export Sector Model for Simulation Input" );
 
     CAF_PDM_InitFieldNoDefault( &m_exportFolder, "ExportFolder", "Export Folder" );
-    m_exportFolder.uiCapability()->setAttributeBool( "selectDirectory", true );
+    m_exportFolder.uiCapability()->setAttribute<bool>( "selectDirectory", true );
     CAF_PDM_InitFieldNoDefault( &m_exportDeckName, "ExportDeckName", "Sector Model Name" );
     CAF_PDM_InitField( &m_porvMultiplier, "PorvMultiplier", 1.0e6, "PORV Multiplier" );
     CAF_PDM_InitFieldNoDefault( &m_boundaryCondition, "BoundaryCondition", "Boundary Condition Type:" );
@@ -96,13 +96,13 @@ RicExportSectorModelUi::RicExportSectorModelUi()
     CAF_PDM_InitFieldNoDefault( &m_bcpropKeywords, "BcpropKeywords", "BCPROP Keywords" );
     m_bcpropKeywords.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_bcpropKeywords.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_bcpropKeywords.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_bcpropKeywords.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_bcpropKeywords.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_bcpropKeywords.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
 
     CAF_PDM_InitField( &m_createSimulationJob, "CreateSimulationJob", false, "Create New Simulation Job" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_createSimulationJob );
     CAF_PDM_InitFieldNoDefault( &m_simulationJobFolder, "SimulationJobFolder", "Working Folder" );
-    m_simulationJobFolder.uiCapability()->setAttributeBool( "selectDirectory", true );
+    m_simulationJobFolder.uiCapability()->setAttribute<bool>( "selectDirectory", true );
     CAF_PDM_InitFieldNoDefault( &m_simulationJobName, "SimulationJobName", "Job Name" );
     CAF_PDM_InitField( &m_startSimulationJobAfterExport,
                        "StartSimulationJobAfterExport",

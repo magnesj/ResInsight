@@ -138,12 +138,6 @@ public:
         return std::nullopt;
     }
 
-    // Backward compatibility helpers for setAttribute (keep for now)
-    void setAttributeInt( const QString& key, int value, const QString& uiConfigName = "" );
-    void setAttributeBool( const QString& key, bool value, const QString& uiConfigName = "" );
-    void setAttributeString( const QString& key, const QString& value, const QString& uiConfigName = "" );
-    void setAttributeDouble( const QString& key, double value, const QString& uiConfigName = "" );
-
     /// Intended to be called when fields in an object has been changed
     void updateConnectedEditors() const;
     void scheduleUpdateConnectedEditors() const;

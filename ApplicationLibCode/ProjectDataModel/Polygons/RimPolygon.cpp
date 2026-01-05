@@ -182,11 +182,11 @@ void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
     // Set dynamic button text based on read-only state
     if ( m_isReadOnly() )
     {
-        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Select in Active View" );
+        m_editPolygonButton.uiCapability()->setAttribute<QString>( "buttonText", "Select in Active View" );
     }
     else
     {
-        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit in Active View" );
+        m_editPolygonButton.uiCapability()->setAttribute<QString>( "buttonText", "Edit in Active View" );
     }
 
     auto groupPoints = uiOrdering.addNewGroup( "Points" );

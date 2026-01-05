@@ -45,9 +45,9 @@ RimSummarySumoDataSource::RimSummarySumoDataSource()
 
     CAF_PDM_InitFieldNoDefault( &m_vectorNames, "VectorNames", "Vector Names" );
     m_vectorNames.uiCapability()->setUiReadOnly( true );
-    m_vectorNames.uiCapability()->setAttributeBool( "showCheckBoxes", false );
-    m_vectorNames.uiCapability()->setAttributeBool( "showContextMenu", false );
-    m_vectorNames.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
+    m_vectorNames.uiCapability()->setAttribute<bool>( "showCheckBoxes", false );
+    m_vectorNames.uiCapability()->setAttribute<bool>( "showContextMenu", false );
+    m_vectorNames.uiCapability()->setAttribute<bool>( "showToggleAllCheckbox", false );
 
     setDeletable( true );
 }

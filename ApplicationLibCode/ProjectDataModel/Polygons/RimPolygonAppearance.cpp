@@ -141,8 +141,8 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         auto allCases = RimProject::current()->allGridCases();
         if ( allCases.empty() )
         {
-            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_minimum", 0.0 );
-            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_maximum", 10000.0 );
+            m_polygonPlaneDepth.uiCapability()->setAttribute<double>( "m_minimum", 0.0 );
+            m_polygonPlaneDepth.uiCapability()->setAttribute<double>( "m_maximum", 10000.0 );
         }
         else
         {
@@ -160,8 +160,8 @@ void RimPolygonAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
             auto adjustedMin = RiaNumericalTools::roundToNumSignificantDigitsFloor( -min, 2 );
             auto adjustedMax = RiaNumericalTools::roundToNumSignificantDigitsCeil( -max, 2 );
 
-            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_minimum", adjustedMax );
-            m_polygonPlaneDepth.uiCapability()->setAttributeDouble( "m_maximum", adjustedMin );
+            m_polygonPlaneDepth.uiCapability()->setAttribute<double>( "m_minimum", adjustedMax );
+            m_polygonPlaneDepth.uiCapability()->setAttribute<double>( "m_maximum", adjustedMin );
         }
     }
 

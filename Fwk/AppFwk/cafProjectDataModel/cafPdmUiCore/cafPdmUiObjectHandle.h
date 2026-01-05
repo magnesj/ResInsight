@@ -89,7 +89,7 @@ protected:
     /// Override to provide editor specific data for the field and uiConfigName
     /// @deprecated Use map-based attributes via field.uiCapability()->setAttribute() in constructor
     ///             or defineUiOrdering() instead. Set attributes once rather than on every UI refresh.
-    ///             Example: field.uiCapability()->setAttributeInt("maximumWidth", 200);
+    ///             Example: field.uiCapability()->setAttribute<int>("maximumWidth", 200);
     ///             See CLAUDE.md for migration guide and supported attributes by editor.
     [[deprecated( "Use field.uiCapability()->setAttribute() instead. See CLAUDE.md for migration guide." )]]
     virtual void

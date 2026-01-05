@@ -39,7 +39,7 @@ RicHoloLensExportToFolderUi::RicHoloLensExportToFolderUi()
 
     CAF_PDM_InitField( &m_exportFolder, "ExportFolder", QString(), "Export Folder" );
     m_exportFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    m_exportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    m_exportFolder.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
 }
 
 //--------------------------------------------------------------------------------------------------

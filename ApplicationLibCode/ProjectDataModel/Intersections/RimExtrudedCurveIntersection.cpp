@@ -222,15 +222,15 @@ RimExtrudedCurveIntersection::RimExtrudedCurveIntersection()
 
     CAF_PDM_InitField( &m_azimuthAngle, "AzimuthAngle", 0.0, "Azimuth" );
     m_azimuthAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_azimuthAngle.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_azimuthAngle.uiCapability()->setAttributeInt( "maximum", 360 );
-    m_azimuthAngle.uiCapability()->setAttributeInt( "sliderTickCount", 360 );
+    m_azimuthAngle.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_azimuthAngle.uiCapability()->setAttribute<int>( "maximum", 360 );
+    m_azimuthAngle.uiCapability()->setAttribute<int>( "sliderTickCount", 360 );
 
     CAF_PDM_InitField( &m_dipAngle, "DipAngle", 90.0, "Dip" );
     m_dipAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_dipAngle.uiCapability()->setAttributeInt( "minimum", 0 );
-    m_dipAngle.uiCapability()->setAttributeInt( "maximum", 180 );
-    m_dipAngle.uiCapability()->setAttributeInt( "sliderTickCount", 180 );
+    m_dipAngle.uiCapability()->setAttribute<int>( "minimum", 0 );
+    m_dipAngle.uiCapability()->setAttribute<int>( "maximum", 180 );
+    m_dipAngle.uiCapability()->setAttribute<int>( "sliderTickCount", 180 );
 
     CAF_PDM_InitFieldNoDefault( &m_customExtrusionPoints, "CustomExtrusionPoints", "" );
     CAF_PDM_InitFieldNoDefault( &m_twoAzimuthPoints,
@@ -565,10 +565,10 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     else if ( m_type() == CrossSectionEnum::CS_POLYLINE )
     {
         geometryGroup->add( &m_userPolylineXydForUi );
-        m_userPolylineXydForUi.uiCapability()->setAttributeString( "qssState",
+        m_userPolylineXydForUi.uiCapability()->setAttribute<QString>( "qssState",
                                                                    m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputPolylineFromViewerEnabled );
-        m_inputPolylineFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+        m_inputPolylineFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
                                                                              m_inputPolylineFromViewerEnabled() ? "Stop picking points"
                                                                                                                 : "Start picking points" );
     }
@@ -576,15 +576,15 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     {
         geometryGroup->add( &m_projectPolygon );
         geometryGroup->add( &m_editPolygonButton, { .newRow = false } );
-        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit" );
+        m_editPolygonButton.uiCapability()->setAttribute<QString>( "buttonText", "Edit" );
     }
     else if ( m_type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {
         geometryGroup->add( &m_twoAzimuthPoints );
-        m_twoAzimuthPoints.uiCapability()->setAttributeString( "qssState",
+        m_twoAzimuthPoints.uiCapability()->setAttribute<QString>( "qssState",
                                                                m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputTwoAzimuthPointsFromViewerEnabled );
-        m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+        m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
                                                                                      m_inputTwoAzimuthPointsFromViewerEnabled()
                                                                                          ? "Stop picking points"
                                                                                          : "Start picking points" );
@@ -609,10 +609,10 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     if ( m_direction() == CrossSectionDirEnum::CS_TWO_POINTS )
     {
         optionsGroup->add( &m_customExtrusionPoints );
-        m_customExtrusionPoints.uiCapability()->setAttributeString( "qssState",
+        m_customExtrusionPoints.uiCapability()->setAttribute<QString>( "qssState",
                                                                     m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         optionsGroup->add( &m_inputExtrusionPointsFromViewerEnabled );
-        m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+        m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
                                                                                     m_inputExtrusionPointsFromViewerEnabled()
                                                                                         ? "Stop picking points"
                                                                                         : "Start picking points" );
@@ -641,19 +641,19 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
         if ( eclView && eclView->mainGrid() )
         {
             const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
-            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
-            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
-            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
-            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+            m_depthUpperThreshold.uiCapability()->setAttribute<double>( "minimum", -1.0 * bb.max().z() );
+            m_depthUpperThreshold.uiCapability()->setAttribute<double>( "maximum", -1.0 * bb.min().z() );
+            m_depthLowerThreshold.uiCapability()->setAttribute<double>( "minimum", -1.0 * bb.max().z() );
+            m_depthLowerThreshold.uiCapability()->setAttribute<double>( "maximum", -1.0 * bb.min().z() );
         }
         RimGeoMechView* geomView = firstAncestorOrThisOfType<RimGeoMechView>();
         if ( geomView )
         {
             const cvf::BoundingBox bb = geomView->domainBoundingBox();
-            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
-            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
-            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
-            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+            m_depthUpperThreshold.uiCapability()->setAttribute<double>( "minimum", -1.0 * bb.max().z() );
+            m_depthUpperThreshold.uiCapability()->setAttribute<double>( "maximum", -1.0 * bb.min().z() );
+            m_depthLowerThreshold.uiCapability()->setAttribute<double>( "minimum", -1.0 * bb.max().z() );
+            m_depthLowerThreshold.uiCapability()->setAttribute<double>( "maximum", -1.0 * bb.min().z() );
         }
 
         filterGroup->add( &m_depthFilterType );

@@ -37,9 +37,9 @@ RimCustomSegmentIntervalCollection::RimCustomSegmentIntervalCollection()
     CAF_PDM_InitObject( "Custom Segment Intervals", ":/WellPathComponent16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_intervals, "Intervals", "Intervals" );
-    m_intervals.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
-    m_intervals.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_intervals.uiCapability()->setAttributeInt( "minimumHeight", 300 );
+    m_intervals.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_intervals.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_intervals.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -45,14 +45,14 @@ RimDepthSurface::RimDepthSurface()
 
     CAF_PDM_InitField( &m_depthLowerLimit, "DepthLowerLimit", 0.0, "Lower Limit" );
     m_depthLowerLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_depthLowerLimit.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_depthLowerLimit.uiCapability()->setAttributeInt( "numberFormat",
+    m_depthLowerLimit.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_depthLowerLimit.uiCapability()->setAttribute<int>( "numberFormat",
                                                        static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitField( &m_depthUpperLimit, "DepthUpperLimit", 100000.0, "Upper Limit" );
     m_depthUpperLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_depthUpperLimit.uiCapability()->setAttributeInt( "decimals", 2 );
-    m_depthUpperLimit.uiCapability()->setAttributeInt( "numberFormat",
+    m_depthUpperLimit.uiCapability()->setAttribute<int>( "decimals", 2 );
+    m_depthUpperLimit.uiCapability()->setAttribute<int>( "numberFormat",
                                                        static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     m_minX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -158,18 +158,18 @@ void RimDepthSurface::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 void RimDepthSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     // Set dynamic slider attributes based on runtime limits
-    m_depth.uiCapability()->setAttributeDouble( "minimum", m_depthLowerLimit, uiConfigName );
-    m_depth.uiCapability()->setAttributeDouble( "maximum", m_depthUpperLimit, uiConfigName );
+    m_depth.uiCapability()->setAttribute<double>( "minimum", m_depthLowerLimit, uiConfigName );
+    m_depth.uiCapability()->setAttribute<double>( "maximum", m_depthUpperLimit, uiConfigName );
 
-    m_minX.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().x(), uiConfigName );
-    m_minX.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().x(), uiConfigName );
-    m_maxX.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().x(), uiConfigName );
-    m_maxX.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().x(), uiConfigName );
+    m_minX.uiCapability()->setAttribute<double>( "minimum", m_areaOfInterestMin().x(), uiConfigName );
+    m_minX.uiCapability()->setAttribute<double>( "maximum", m_areaOfInterestMax().x(), uiConfigName );
+    m_maxX.uiCapability()->setAttribute<double>( "minimum", m_areaOfInterestMin().x(), uiConfigName );
+    m_maxX.uiCapability()->setAttribute<double>( "maximum", m_areaOfInterestMax().x(), uiConfigName );
 
-    m_minY.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().y(), uiConfigName );
-    m_minY.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().y(), uiConfigName );
-    m_maxY.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().y(), uiConfigName );
-    m_maxY.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().y(), uiConfigName );
+    m_minY.uiCapability()->setAttribute<double>( "minimum", m_areaOfInterestMin().y(), uiConfigName );
+    m_minY.uiCapability()->setAttribute<double>( "maximum", m_areaOfInterestMax().y(), uiConfigName );
+    m_maxY.uiCapability()->setAttribute<double>( "minimum", m_areaOfInterestMin().y(), uiConfigName );
+    m_maxY.uiCapability()->setAttribute<double>( "maximum", m_areaOfInterestMax().y(), uiConfigName );
 
     uiOrdering.add( &m_depth );
 

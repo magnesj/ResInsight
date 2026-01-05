@@ -72,7 +72,7 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_airGap.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_airGap.uiCapability()->setAttribute<int>( "decimals", 2 );
     m_airGap.setRange( 0.0, std::numeric_limits<double>::max() );
 
     CAF_PDM_InitScriptableField( &m_mdAtFirstTarget, "MdAtFirstTarget", 0.0, "MD at First Target" );
@@ -83,8 +83,8 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
     m_wellTargets.uiCapability()->setUiTreeChildrenHidden( true );
     m_wellTargets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_wellTargets.uiCapability()->setCustomContextMenuEnabled( true );
-    m_wellTargets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
-    m_wellTargets.uiCapability()->setAttributeInt( "heightHint", 1000 );
+    m_wellTargets.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_wellTargets.uiCapability()->setAttribute<int>( "heightHint", 1000 );
 
     CAF_PDM_InitField( &m_showAbsolutePosForWellTargets, "ShowAbsolutePosForWellTargets", false, "Show UTM Coords" );
     CAF_PDM_InitField( &m_useTopLevelWellReferencePoint, "UseTopLevelWellReferencePoint", false, "Use Top Level Well Reference Point" );
@@ -563,25 +563,25 @@ void RimWellPathGeometryDef::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     // Set dynamic button text based on picking state
     if ( !m_pickPointsEnabled )
     {
-        m_pickPointsEnabled.uiCapability()->setAttributeString( "buttonText", "Start Picking Targets", uiConfigName );
+        m_pickPointsEnabled.uiCapability()->setAttribute<QString>( "buttonText", "Start Picking Targets", uiConfigName );
     }
     else
     {
-        m_pickPointsEnabled.uiCapability()->setAttributeString( "buttonText", "Stop Picking Targets", uiConfigName );
+        m_pickPointsEnabled.uiCapability()->setAttribute<QString>( "buttonText", "Stop Picking Targets", uiConfigName );
     }
 
     // Set dynamic table view attributes based on picking state
     if ( m_pickPointsEnabled )
     {
         m_wellTargets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
-        m_wellTargets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
+        m_wellTargets.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 
     // Set display string for reference point
     QString displayString = QString::number( m_referencePointUtmXyd()[0], 'f', 2 ) + " " +
                             QString::number( m_referencePointUtmXyd()[1], 'f', 2 ) + " " +
                             QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
-    m_referencePointUtmXyd.uiCapability()->setAttributeString( "displayString", displayString, uiConfigName );
+    m_referencePointUtmXyd.uiCapability()->setAttribute<QString>( "displayString", displayString, uiConfigName );
 
     uiOrdering.add( &m_referencePointUtmXyd );
     m_referencePointUtmXyd.uiCapability()->setUiReadOnly( m_useTopLevelWellReferencePoint );

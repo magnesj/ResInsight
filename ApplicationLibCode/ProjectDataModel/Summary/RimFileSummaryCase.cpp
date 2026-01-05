@@ -63,7 +63,7 @@ RimFileSummaryCase::RimFileSummaryCase()
 
     CAF_PDM_InitFieldNoDefault( &m_additionalSummaryFilePath, "AdditionalSummaryFilePath", "Additional File Path (set invisible when ready)" );
     m_additionalSummaryFilePath.uiCapability()->setUiHidden( true );
-    m_additionalSummaryFilePath.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
+    m_additionalSummaryFilePath.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
 
     CAF_PDM_InitFieldNoDefault( &m_rftCase, "RftCase", "RFT Data" );
     m_rftCase = new RimRftCase;

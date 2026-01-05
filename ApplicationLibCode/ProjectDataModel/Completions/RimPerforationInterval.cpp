@@ -57,11 +57,11 @@ RimPerforationInterval::RimPerforationInterval()
 
     CAF_PDM_InitField( &m_useCustomStartDate, "UseCustomStartDate", false, "Custom Start Date" );
     CAF_PDM_InitField( &m_startDate, "StartDate", QDateTime::currentDateTime(), "Start Date" );
-    m_startDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
+    m_startDate.uiCapability()->setAttribute<QString>( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_useCustomEndDate, "UseCustomEndDate", false, "Custom End Date" );
     CAF_PDM_InitField( &m_endDate, "EndDate", QDateTime::currentDateTime(), "End Date" );
-    m_endDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
+    m_endDate.uiCapability()->setAttribute<QString>( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_valves, "Valves", "Valves" );
 
@@ -377,10 +377,10 @@ void RimPerforationInterval::defineUiOrdering( QString uiConfigName, caf::PdmUiO
             }
 
             // Set dynamic slider range based on well path
-            m_startMD.uiCapability()->setAttributeDouble( "minimum", wellPath->uniqueStartMD() );
-            m_startMD.uiCapability()->setAttributeDouble( "maximum", wellPath->uniqueEndMD() );
-            m_endMD.uiCapability()->setAttributeDouble( "minimum", wellPath->uniqueStartMD() );
-            m_endMD.uiCapability()->setAttributeDouble( "maximum", wellPath->uniqueEndMD() );
+            m_startMD.uiCapability()->setAttribute<double>( "minimum", wellPath->uniqueStartMD() );
+            m_startMD.uiCapability()->setAttribute<double>( "maximum", wellPath->uniqueEndMD() );
+            m_endMD.uiCapability()->setAttribute<double>( "minimum", wellPath->uniqueStartMD() );
+            m_endMD.uiCapability()->setAttribute<double>( "maximum", wellPath->uniqueEndMD() );
         }
     }
 

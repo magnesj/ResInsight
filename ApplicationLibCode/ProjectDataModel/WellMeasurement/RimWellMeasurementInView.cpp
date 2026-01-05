@@ -82,7 +82,7 @@ RimWellMeasurementInView::RimWellMeasurementInView()
 
     CAF_PDM_InitField( &m_radiusScaleFactor, "RadiusScaleFactor", 2.5, "Radius Scale" );
     m_radiusScaleFactor.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_radiusScaleFactor.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_radiusScaleFactor.uiCapability()->setAttribute<int>( "decimals", 2 );
     m_radiusScaleFactor.setRange( 0.001, 100.0 );
 
     setName( "Well Measurement" );

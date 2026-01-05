@@ -153,14 +153,14 @@ void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 
     // Set dynamic button text based on picking state
     if ( m_anchorPointPickEnabledButtonField )
-        m_anchorPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+        m_anchorPointPickEnabledButtonField.uiCapability()->setAttribute<QString>( "buttonText", "Stop", uiConfigName );
     else
-        m_anchorPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+        m_anchorPointPickEnabledButtonField.uiCapability()->setAttribute<QString>( "buttonText", "Pick", uiConfigName );
 
     if ( m_labelPointPickEnabledButtonField )
-        m_labelPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+        m_labelPointPickEnabledButtonField.uiCapability()->setAttribute<QString>( "buttonText", "Stop", uiConfigName );
     else
-        m_labelPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+        m_labelPointPickEnabledButtonField.uiCapability()->setAttribute<QString>( "buttonText", "Pick", uiConfigName );
 
     uiOrdering.add( &m_text );
 

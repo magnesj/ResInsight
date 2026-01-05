@@ -93,14 +93,14 @@ RiuCreateMultipleFractionsUi::RiuCreateMultipleFractionsUi()
     m_options.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_options.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_options.uiCapability()->setCustomContextMenuEnabled( true );
-    m_options.uiCapability()->setAttributeInt( "minimumHeight", 130 );
+    m_options.uiCapability()->setAttribute<int>( "minimumHeight", 130 );
     m_options.uiCapability()->setAttribute( "columnWidths", QVariant::fromValue( QList<int>{ 90, 90, 400, 70 } ) );
 
     CAF_PDM_InitFieldNoDefault( &m_fractureCreationSummary, "FractureCreationSummary", "Generated Fractures" );
     m_fractureCreationSummary.registerGetMethod( this, &RiuCreateMultipleFractionsUi::summaryText );
     m_fractureCreationSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_fractureCreationSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
-    m_fractureCreationSummary.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_fractureCreationSummary.uiCapability()->setAttribute<int>( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
 }
 
 //--------------------------------------------------------------------------------------------------

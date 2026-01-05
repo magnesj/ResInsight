@@ -356,8 +356,8 @@ void RimSummaryTable::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     {
         dateFormat = "yyyy-MM";
     }
-    m_startDate.uiCapability()->setAttributeString( "dateFormat", dateFormat );
-    m_endDate.uiCapability()->setAttributeString( "dateFormat", dateFormat );
+    m_startDate.uiCapability()->setAttribute<QString>( "dateFormat", dateFormat );
+    m_endDate.uiCapability()->setAttribute<QString>( "dateFormat", dateFormat );
 
     caf::PdmUiGroup* tableSettingsGroup = uiOrdering.addNewGroup( "Table Settings" );
     tableSettingsGroup->add( &m_showValueLabels );

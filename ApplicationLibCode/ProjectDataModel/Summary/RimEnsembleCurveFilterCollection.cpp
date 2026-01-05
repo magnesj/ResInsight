@@ -128,7 +128,7 @@ void RimEnsembleCurveFilterCollection::defineUiOrdering( QString uiConfigName, c
 {
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Filters" );
 
-    m_newFilterButton.uiCapability()->setAttributeString( "buttonText", "Add Ensemble Curve Filter" );
+    m_newFilterButton.uiCapability()->setAttribute<QString>( "buttonText", "Add Ensemble Curve Filter" );
     group->add( &m_newFilterButton );
 
     for ( auto& filter : m_filters )

@@ -95,7 +95,7 @@ RimSeismicSection::RimSeismicSection()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
-    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_targets.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     CAF_PDM_InitField( &m_inlineIndex, "InlineIndex", -1, "Inline" );
     m_inlineIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
@@ -163,36 +163,36 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     // Set dynamic button text based on picking state
     if ( !m_enablePicking )
     {
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Start Picking Points", uiConfigName );
     }
     else
     {
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Stop Picking Points", uiConfigName );
     }
 
     // Static button text
-    m_showImage.uiCapability()->setAttributeString( "buttonText", "Show Image", uiConfigName );
+    m_showImage.uiCapability()->setAttribute<QString>( "buttonText", "Show Image", uiConfigName );
 
     // Set dynamic table view attributes based on picking state
     if ( m_enablePicking )
     {
         m_targets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
-        m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
+        m_targets.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true, uiConfigName );
     }
 
     // Set dynamic slider ranges based on seismic data
     if ( ( m_seismicData != nullptr ) && m_seismicData->boundingBox()->isValid() )
     {
         // Inline index
-        m_inlineIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_inlineIndex.uiCapability()->setAttribute<bool>( "showSpinBox", true, uiConfigName );
         m_inlineIndex.setRange( m_seismicData->inlineMin(), m_seismicData->inlineMax() );
 
         // Xline index
-        m_xlineIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_xlineIndex.uiCapability()->setAttribute<bool>( "showSpinBox", true, uiConfigName );
         m_xlineIndex.setRange( m_seismicData->xlineMin(), m_seismicData->xlineMax() );
 
         // Depth index
-        m_depthIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_depthIndex.uiCapability()->setAttribute<bool>( "showSpinBox", true, uiConfigName );
         m_depthIndex.setRange( m_seismicData->zMin(), m_seismicData->zMax() );
 
         // Z threshold sliders

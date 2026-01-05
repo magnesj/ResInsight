@@ -102,10 +102,10 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &scriptDirectories, "scriptDirectory", "Shared Script Folder(s)" );
     scriptDirectories.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    scriptDirectories.uiCapability()->setAttributeBool( "m_selectDirectory", true );
-    scriptDirectories.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
-    scriptDirectories.uiCapability()->setAttributeBool( "m_selectDirectory", true );
-    scriptDirectories.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
+    scriptDirectories.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
+    scriptDirectories.uiCapability()->setAttribute<bool>( "m_appendUiSelectedFolderToText", true );
+    scriptDirectories.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
+    scriptDirectories.uiCapability()->setAttribute<bool>( "m_appendUiSelectedFolderToText", true );
 
     // TODO: This only currently works for installed ResInsight.
     scriptDirectories = QCoreApplication::applicationDirPath() + "/Python/rips/PythonExamples";
@@ -179,15 +179,15 @@ RiaPreferences::RiaPreferences()
     m_defaultScaleFactorZ.setRange( 0.000001, 100000.0 );
 
     CAF_PDM_InitFieldNoDefault( &defaultSceneFontSize, "defaultSceneFontSizePt", "Viewer Font Size" );
-    defaultSceneFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
+    defaultSceneFontSize.uiCapability()->setAttribute<int>( "minimumContentsLength", 2 );
     CAF_PDM_InitFieldNoDefault( &defaultAnnotationFontSize, "defaultAnnotationFontSizePt", "Annotation Font Size" );
-    defaultAnnotationFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
+    defaultAnnotationFontSize.uiCapability()->setAttribute<int>( "minimumContentsLength", 2 );
     CAF_PDM_InitFieldNoDefault( &defaultWellLabelFontSize, "defaultWellLabelFontSizePt", "Well Label Font Size" );
-    defaultWellLabelFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
+    defaultWellLabelFontSize.uiCapability()->setAttribute<int>( "minimumContentsLength", 2 );
 
     auto defaultValue = FontSizeEnum( RiaFontCache::FontSize::FONT_SIZE_10 );
     CAF_PDM_InitField( &defaultPlotFontSize, "defaultPlotFontSizePt", defaultValue, "Plot Font Size" );
-    defaultPlotFontSize.uiCapability()->setAttributeInt( "minimumContentsLength", 2 );
+    defaultPlotFontSize.uiCapability()->setAttribute<int>( "minimumContentsLength", 2 );
 
     CAF_PDM_InitField( &m_showLegendBackground, "showLegendBackground", true, "Show Box around Legends" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_showLegendBackground );
@@ -225,10 +225,10 @@ RiaPreferences::RiaPreferences()
 
     CAF_PDM_InitFieldNoDefault( &m_plotTemplateFolders, "plotTemplateFolders", "Plot Template Folder(s)" );
     m_plotTemplateFolders.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_selectDirectory", true );
-    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
-    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_selectDirectory", true );
-    m_plotTemplateFolders.uiCapability()->setAttributeBool( "m_appendUiSelectedFolderToText", true );
+    m_plotTemplateFolders.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
+    m_plotTemplateFolders.uiCapability()->setAttribute<bool>( "m_appendUiSelectedFolderToText", true );
+    m_plotTemplateFolders.uiCapability()->setAttribute<bool>( "m_selectDirectory", true );
+    m_plotTemplateFolders.uiCapability()->setAttribute<bool>( "m_appendUiSelectedFolderToText", true );
     CAF_PDM_InitField( &m_maxPlotTemplateFoldersDepth, "MaxPlotTemplateFoldersDepth", 2, "Maximum Plot Template Folder Search Depth" );
 
     CAF_PDM_InitFieldNoDefault( &m_lastUsedPlotTemplate, "defaultPlotTemplate", "Default Plot Template" );
@@ -379,8 +379,8 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         caf::PdmUiGroup* importExportGroup = uiOrdering.addNewGroup( "Import and Export" );
         importExportGroup->setCollapsedByDefault();
 
-        m_importPreferences.uiCapability()->setAttributeString( "buttonText", "Import Preferences" );
-        m_exportPreferences.uiCapability()->setAttributeString( "buttonText", "Export Preferences" );
+        m_importPreferences.uiCapability()->setAttribute<QString>( "buttonText", "Import Preferences" );
+        m_exportPreferences.uiCapability()->setAttribute<QString>( "buttonText", "Export Preferences" );
 
         importExportGroup->add( &m_importPreferences, { .newRow = false, .totalColumnSpan = 1 } );
         importExportGroup->add( &m_exportPreferences, { .newRow = false, .totalColumnSpan = 1 } );
@@ -481,14 +481,14 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         osduGroup->setCollapsedByDefault();
         m_osduPreferences()->uiOrdering( uiConfigName, *osduGroup );
 
-        m_deleteOsduToken.uiCapability()->setAttributeString( "buttonText", "Delete Token" );
+        m_deleteOsduToken.uiCapability()->setAttribute<QString>( "buttonText", "Delete Token" );
         osduGroup->add( &m_deleteOsduToken );
 
         caf::PdmUiGroup* sumoGroup = uiOrdering.addNewGroup( "SUMO" );
         sumoGroup->setCollapsedByDefault();
         m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
 
-        m_deleteSumoToken.uiCapability()->setAttributeString( "buttonText", "Delete Token" );
+        m_deleteSumoToken.uiCapability()->setAttribute<QString>( "buttonText", "Delete Token" );
         sumoGroup->add( &m_deleteSumoToken );
 
         caf::PdmUiGroup* openTelemetryGroup = uiOrdering.addNewGroup( "OpenTelemetry" );

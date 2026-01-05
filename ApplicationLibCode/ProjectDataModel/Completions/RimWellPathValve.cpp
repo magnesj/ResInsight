@@ -553,8 +553,8 @@ void RimWellPathValve::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
                     minimumValue = wellPath->startMD();
                     maximumValue = wellPath->endMD();
                 }
-                m_measuredDepth.uiCapability()->setAttributeDouble( "minimum", minimumValue );
-                m_measuredDepth.uiCapability()->setAttributeDouble( "maximum", maximumValue );
+                m_measuredDepth.uiCapability()->setAttribute<double>( "minimum", minimumValue );
+                m_measuredDepth.uiCapability()->setAttribute<double>( "maximum", maximumValue );
 
                 uiOrdering.add( &m_measuredDepth, { .totalColumnSpan = 3, .leftLabelColumnSpan = 1 } );
             }

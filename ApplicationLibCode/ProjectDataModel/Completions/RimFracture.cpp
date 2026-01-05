@@ -102,12 +102,12 @@ RimFracture::RimFracture()
     CAF_PDM_InitField( &m_createEllipseFractureTemplate, "CreateEllipseTemplate", false, "No Fracture Templates Found." );
     m_createEllipseFractureTemplate.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_createEllipseFractureTemplate.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-    m_createEllipseFractureTemplate.uiCapability()->setAttributeString( "m_buttonText", "Ellipse Template" );
+    m_createEllipseFractureTemplate.uiCapability()->setAttribute<QString>( "m_buttonText", "Ellipse Template" );
 
     CAF_PDM_InitField( &m_createStimPlanFractureTemplate, "CreateStimPlanTemplate", false, "Create New Template?" );
     m_createStimPlanFractureTemplate.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
     m_createStimPlanFractureTemplate.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-    m_createStimPlanFractureTemplate.uiCapability()->setAttributeString( "m_buttonText", "StimPlan Template" );
+    m_createStimPlanFractureTemplate.uiCapability()->setAttribute<QString>( "m_buttonText", "StimPlan Template" );
 
     CAF_PDM_InitField( &m_autoUpdateWellPathDepthAtFractureFromTemplate,
                        "AutoUpdateWellPathDepthAtFractureFromTemplate",
@@ -737,8 +737,8 @@ void RimFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& ui
 
         // Dynamic slider range based on fracture template
         auto [minimum, maximum] = fractureTemplate()->wellPathDepthAtFractureRange();
-        m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "m_minimum", minimum );
-        m_wellPathDepthAtFracture.uiCapability()->setAttributeDouble( "m_maximum", maximum );
+        m_wellPathDepthAtFracture.uiCapability()->setAttribute<double>( "m_minimum", minimum );
+        m_wellPathDepthAtFracture.uiCapability()->setAttribute<double>( "m_maximum", maximum );
 
         if ( fractureTemplate()->orientationType() == RimFractureTemplate::ALONG_WELL_PATH ||
              fractureTemplate()->orientationType() == RimFractureTemplate::TRANSVERSE_WELL_PATH )

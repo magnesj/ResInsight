@@ -14,10 +14,10 @@ TamComboBox::TamComboBox()
 
     CAF_PDM_InitField( &m_name, "UserDescription", QString( "Filter Name" ), "Name", "", "", "" );
     m_name.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
-    m_name.uiCapability()->setAttributeBool( "enableEditableContent", true );
-    m_name.uiCapability()->setAttributeBool( "enableAutoComplete", false );
-    m_name.uiCapability()->setAttributeBool( "adjustWidthToContents", true );
-    m_name.uiCapability()->setAttributeBool( "notifyWhenTextIsEdited", false );
+    m_name.uiCapability()->setAttribute<bool>( "enableEditableContent", true );
+    m_name.uiCapability()->setAttribute<bool>( "enableAutoComplete", false );
+    m_name.uiCapability()->setAttribute<bool>( "adjustWidthToContents", true );
+    m_name.uiCapability()->setAttribute<bool>( "notifyWhenTextIsEdited", false );
 }
 
 //--------------------------------------------------------------------------------------------------

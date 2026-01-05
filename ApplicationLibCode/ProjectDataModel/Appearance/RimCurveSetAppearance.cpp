@@ -272,9 +272,9 @@ void RimCurveSetAppearance::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         uiOrdering.add( &m_mainEnsembleColor );
 
         // Set static slider attributes for opacity
-        m_colorOpacity.uiCapability()->setAttributeDouble( "minimum", 0.001 );
-        m_colorOpacity.uiCapability()->setAttributeDouble( "maximum", 1.0 );
-        m_colorOpacity.uiCapability()->setAttributeInt( "decimals", 2 );
+        m_colorOpacity.uiCapability()->setAttribute<double>( "minimum", 0.001 );
+        m_colorOpacity.uiCapability()->setAttribute<double>( "maximum", 1.0 );
+        m_colorOpacity.uiCapability()->setAttribute<int>( "decimals", 2 );
 
         uiOrdering.add( &m_colorOpacity );
     }

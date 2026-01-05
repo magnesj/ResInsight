@@ -65,7 +65,7 @@ RimPolygonInView::RimPolygonInView()
 
     CAF_PDM_InitField( &m_selectPolygon, "SelectPolygon", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectPolygon );
-    m_selectPolygon.uiCapability()->setAttributeString( "buttonText", "Go to Polygon" );
+    m_selectPolygon.uiCapability()->setAttribute<QString>( "buttonText", "Go to Polygon" );
 
     CAF_PDM_InitField( &m_showLabel, "ShowLabel", false, "Show Label" );
 
@@ -76,9 +76,9 @@ RimPolygonInView::RimPolygonInView()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
-    m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_targets.uiCapability()->setAttributeInt( "heightHint", 1000 );
-    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
+    m_targets.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_targets.uiCapability()->setAttribute<int>( "heightHint", 1000 );
+    m_targets.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
     m_targets.xmlCapability()->disableIO();
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
@@ -321,9 +321,9 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 
     // Set dynamic UI attributes
     if ( !m_enablePicking )
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Start Picking Points", uiConfigName );
     else
-        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+        m_enablePicking.uiCapability()->setAttribute<QString>( "buttonText", "Stop Picking Points", uiConfigName );
 
     if ( m_enablePicking )
     {

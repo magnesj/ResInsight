@@ -42,9 +42,9 @@ RimWellMeasurementCollection::RimWellMeasurementCollection()
     CAF_PDM_InitFieldNoDefault( &m_measurements, "Measurements", "Well Measurements" );
     m_measurements.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_measurements.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
-    m_measurements.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
-    m_measurements.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_measurements.uiCapability()->setAttributeInt( "minimumHeight", 300 );
+    m_measurements.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_measurements.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_measurements.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
 
     CAF_PDM_InitFieldNoDefault( &m_importedFiles, "ImportedFiles", "Imported Files" );
 }

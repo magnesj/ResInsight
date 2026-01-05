@@ -79,7 +79,7 @@ RimCustomVfpPlot::RimCustomVfpPlot()
     m_plotTitle.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_mainDataSource, "MainDataSouce", "Main VFP Data Source" );
-    m_mainDataSource.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_mainDataSource.uiCapability()->setAttribute<bool>( "showPreviousAndNextButtons", true );
     m_mainDataSource.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
     m_mainDataSource.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 

@@ -38,9 +38,9 @@ RimWellPathAttributeCollection::RimWellPathAttributeCollection()
     m_attributes.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_attributes.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_attributes.uiCapability()->setCustomContextMenuEnabled( true );
-    m_attributes.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
-    m_attributes.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
-    m_attributes.uiCapability()->setAttributeInt( "minimumHeight", 300 );
+    m_attributes.uiCapability()->setAttribute<int>( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_attributes.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
+    m_attributes.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
     setName( "Casing Design" );
 }
 

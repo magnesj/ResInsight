@@ -24,7 +24,7 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
     m_hyperlinkTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
 
     // Set attributes using new map-based system
-    m_hyperlinkTextField.uiCapability()->setAttributeString( "linkText",
+    m_hyperlinkTextField.uiCapability()->setAttribute<QString>( "linkText",
                                                              "Click <a href=\"dummy\">link</a> to select the "
                                                              "<b>Optional Field</b> object." );
 

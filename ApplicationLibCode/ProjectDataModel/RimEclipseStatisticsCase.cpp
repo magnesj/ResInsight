@@ -90,7 +90,7 @@ RimEclipseStatisticsCase::RimEclipseStatisticsCase()
     m_selectionSummary.uiCapability()->setUiReadOnly( true );
     m_selectionSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_selectionSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    m_selectionSummary.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
+    m_selectionSummary.uiCapability()->setAttribute<int>( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitFieldNoDefault( &m_dataSourceForStatistics, "DataSourceForStatistics", "Data Source" );
 
@@ -492,7 +492,7 @@ void RimEclipseStatisticsCase::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_caseUserDescription );
     uiOrdering.add( &m_caseId );
 
-    m_calculateEditCommand.uiCapability()->setAttributeString( "buttonText",
+    m_calculateEditCommand.uiCapability()->setAttribute<QString>( "buttonText",
                                                                hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute",
                                                                uiConfigName );
     uiOrdering.add( &m_calculateEditCommand );

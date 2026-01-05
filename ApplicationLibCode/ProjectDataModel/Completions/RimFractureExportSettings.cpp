@@ -34,7 +34,7 @@ RimFractureExportSettings::RimFractureExportSettings()
 
     CAF_PDM_InitFieldNoDefault( &fileName, "Filename", "Export Filename" );
     fileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
-    fileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
+    fileName.uiCapability()->setAttribute<bool>( "m_selectSaveFileName", true );
 
     CAF_PDM_InitFieldNoDefault( &caseToApply, "CaseToApply", "Case to Apply" );
 }

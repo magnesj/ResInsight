@@ -51,8 +51,8 @@ RimRegularSurface::RimRegularSurface()
     CAF_PDM_InitScriptableField( &m_originY, "OriginY", 0.0, "Origin Y" );
     CAF_PDM_InitScriptableField( &m_depth, "Depth", 0.0, "Depth" );
     m_depth.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_depth.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-    m_depth.uiCapability()->setAttributeDouble( "maximum", 10000.0 );
+    m_depth.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+    m_depth.uiCapability()->setAttribute<double>( "maximum", 10000.0 );
 
     CAF_PDM_InitScriptableField( &m_nx, "Nx", 10, "Nx" );
     CAF_PDM_InitScriptableField( &m_ny, "Ny", 10, "Ny" );
@@ -63,8 +63,8 @@ RimRegularSurface::RimRegularSurface()
 
     CAF_PDM_InitScriptableField( &m_depthProperty, "DepthProperty", internal::fixedDepth(), "Depth Property" );
     m_rotation.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
-    m_rotation.uiCapability()->setAttributeDouble( "minimum", 0.0 );
-    m_rotation.uiCapability()->setAttributeDouble( "maximum", 360.0 );
+    m_rotation.uiCapability()->setAttribute<double>( "minimum", 0.0 );
+    m_rotation.uiCapability()->setAttribute<double>( "maximum", 360.0 );
 }
 
 //--------------------------------------------------------------------------------------------------
