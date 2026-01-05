@@ -167,6 +167,28 @@ std::vector<caf::PdmFieldHandle*> RimSummaryPlotSourceStepping::fieldsToShowInTo
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlotSourceStepping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set minimumWidth for toolbar configuration
+    if ( uiConfigName == caf::PdmUiToolBarEditor::uiEditorConfigName() )
+    {
+        std::vector<caf::PdmFieldHandle*> steppingFields = { &m_summaryCase,
+                                                             &m_wellName,
+                                                             &m_groupName,
+                                                             &m_networkName,
+                                                             &m_region,
+                                                             &m_vectorName,
+                                                             &m_cellBlock,
+                                                             &m_wellSegment,
+                                                             &m_connection,
+                                                             &m_aquifer,
+                                                             &m_wellCompletionNumber,
+                                                             &m_ensemble };
+
+        for ( auto* field : steppingFields )
+        {
+            field->uiCapability()->setAttributeInt( "minimumWidth", 120, uiConfigName );
+        }
+    }
+
     auto visible = activeFieldsForDataSourceStepping();
     if ( visible.empty() )
     {
@@ -988,20 +1010,6 @@ std::vector<RimSummaryCase*> RimSummaryPlotSourceStepping::summaryCasesForSource
 RimSummaryDataSourceStepping* RimSummaryPlotSourceStepping::dataSourceSteppingObject() const
 {
     return dynamic_cast<RimSummaryDataSourceStepping*>( m_objectForSourceStepping.p() );
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Keep this function for config-specific attributes
-//--------------------------------------------------------------------------------------------------
-void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-    if ( myAttr && ( uiConfigName == caf::PdmUiToolBarEditor::uiEditorConfigName() ) )
-    {
-        myAttr->minimumWidth = 120;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
