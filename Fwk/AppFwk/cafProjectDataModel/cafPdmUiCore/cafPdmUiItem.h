@@ -303,6 +303,24 @@ public:
     std::map<std::string, QVariant> getAttributes( const QString& uiConfigName = "" ) const;
 
     // Type-safe helpers
+    template <typename T>
+    void setAttribute( const std::string& key, const T& value, const QString& uiConfigName = "" )
+    {
+        setAttribute( key, QVariant::fromValue( value ), uiConfigName );
+    }
+
+    template <typename T>
+    std::optional<T> getAttribute( const std::string& key, const QString& uiConfigName = "" ) const
+    {
+        QVariant value = getAttribute( key, uiConfigName );
+        if ( value.isValid() && value.canConvert<T>() )
+        {
+            return value.value<T>();
+        }
+        return std::nullopt;
+    }
+
+    // Backward compatibility helpers
     void setAttributeInt( const std::string& key, int value, const QString& uiConfigName = "" );
     void setAttributeBool( const std::string& key, bool value, const QString& uiConfigName = "" );
     void setAttributeString( const std::string& key, const QString& value, const QString& uiConfigName = "" );
