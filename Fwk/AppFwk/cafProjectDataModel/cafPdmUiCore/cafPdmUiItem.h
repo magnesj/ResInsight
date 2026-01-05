@@ -135,6 +135,7 @@ public:
     }
 
     std::list<QString> attributeNames( const QString& uiConfigName = "" ) const;
+
     /// Intended to be called when fields in an object has been changed
     void updateConnectedEditors() const;
     void scheduleUpdateConnectedEditors() const;
