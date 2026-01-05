@@ -77,19 +77,17 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString HEIGHT_HINT = QStringLiteral("heightHint");
-        static inline const QString BASE_COLOR = QStringLiteral("baseColor");
-        static inline const QString QSS_STATE = QStringLiteral("qssState");
-        static inline const QString ALLOW_HORIZONTAL_SCROLL_BAR = QStringLiteral("allowHorizontalScrollBar");
+        static inline const QString HEIGHT_HINT                 = QStringLiteral( "heightHint" );
+        static inline const QString BASE_COLOR                  = QStringLiteral( "baseColor" );
+        static inline const QString QSS_STATE                   = QStringLiteral( "qssState" );
+        static inline const QString ALLOW_HORIZONTAL_SCROLL_BAR = QStringLiteral( "allowHorizontalScrollBar" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::HEIGHT_HINT,
-        Keys::BASE_COLOR,
-        Keys::QSS_STATE,
-        Keys::ALLOW_HORIZONTAL_SCROLL_BAR
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::HEIGHT_HINT,
+                                                                   Keys::BASE_COLOR,
+                                                                   Keys::QSS_STATE,
+                                                                   Keys::ALLOW_HORIZONTAL_SCROLL_BAR };
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

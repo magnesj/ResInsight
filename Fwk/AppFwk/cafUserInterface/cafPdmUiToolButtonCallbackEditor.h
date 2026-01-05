@@ -74,13 +74,11 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString CALLBACK = QStringLiteral("callback");
+        static inline const QString CALLBACK = QStringLiteral( "callback" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::CALLBACK
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::CALLBACK };
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

@@ -112,10 +112,11 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
         {
             if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
-                CAF_PDM_LOG_WARNING( QString( "PdmUiColorEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: %2" )
-                                         .arg( key )
-                                         .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiColorEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }

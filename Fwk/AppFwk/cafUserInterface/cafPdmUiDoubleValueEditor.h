@@ -102,15 +102,12 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString DECIMALS = QStringLiteral("decimals");
-        static inline const QString NUMBER_FORMAT = QStringLiteral("numberFormat");
+        static inline const QString DECIMALS      = QStringLiteral( "decimals" );
+        static inline const QString NUMBER_FORMAT = QStringLiteral( "numberFormat" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::DECIMALS,
-        Keys::NUMBER_FORMAT
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DECIMALS, Keys::NUMBER_FORMAT };
 
 protected:
     void     configureAndUpdateUi( const QString& uiConfigName ) override;

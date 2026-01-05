@@ -66,15 +66,12 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString CHECKABLE = QStringLiteral("checkable");
-        static inline const QString SIZE_POLICY = QStringLiteral("sizePolicy");
+        static inline const QString CHECKABLE   = QStringLiteral( "checkable" );
+        static inline const QString SIZE_POLICY = QStringLiteral( "sizePolicy" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::CHECKABLE,
-        Keys::SIZE_POLICY
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::CHECKABLE, Keys::SIZE_POLICY };
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

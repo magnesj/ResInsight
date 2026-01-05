@@ -73,13 +73,11 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString DATE_FORMAT = QStringLiteral("dateFormat");
+        static inline const QString DATE_FORMAT = QStringLiteral( "dateFormat" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::DATE_FORMAT
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::DATE_FORMAT };
 
 protected:
     QWidget* createEditorWidget( QWidget* parent ) override;

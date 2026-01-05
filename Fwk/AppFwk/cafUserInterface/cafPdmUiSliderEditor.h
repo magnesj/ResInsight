@@ -81,19 +81,17 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString MINIMUM = QStringLiteral("minimum");
-        static inline const QString MAXIMUM = QStringLiteral("maximum");
-        static inline const QString SHOW_SPIN_BOX = QStringLiteral("showSpinBox");
-        static inline const QString STEP = QStringLiteral("step");
+        static inline const QString MINIMUM       = QStringLiteral( "minimum" );
+        static inline const QString MAXIMUM       = QStringLiteral( "maximum" );
+        static inline const QString SHOW_SPIN_BOX = QStringLiteral( "showSpinBox" );
+        static inline const QString STEP          = QStringLiteral( "step" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::MINIMUM,
-        Keys::MAXIMUM,
-        Keys::SHOW_SPIN_BOX,
-        Keys::STEP
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::MINIMUM,
+                                                                   Keys::MAXIMUM,
+                                                                   Keys::SHOW_SPIN_BOX,
+                                                                   Keys::STEP };
 
 protected:
     void     configureAndUpdateUi( const QString& uiConfigName ) override;

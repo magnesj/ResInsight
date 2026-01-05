@@ -165,7 +165,6 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( uiItem )
             {
                 // List of supported attributes for validation
-                
 
                 if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM_WIDTH, uiConfigName ) )
                 {

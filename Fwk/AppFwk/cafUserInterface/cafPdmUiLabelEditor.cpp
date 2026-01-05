@@ -82,7 +82,8 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
             attributes.m_useWordWrap = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::USE_SINGLE_WIDGET_INSTEAD_OF_LABEL_AND_EDITOR_WIDGET, uiConfigName ) )
+        if ( auto val =
+                 uiItem->getAttribute<bool>( Keys::USE_SINGLE_WIDGET_INSTEAD_OF_LABEL_AND_EDITOR_WIDGET, uiConfigName ) )
         {
             attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = val.value();
         }
@@ -92,7 +93,8 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
             attributes.m_linkText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<std::function<void( const QString& )>>( Keys::LINK_ACTIVATED_CALLBACK, uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<std::function<void( const QString& )>>( Keys::LINK_ACTIVATED_CALLBACK,
+                                                                                     uiConfigName ) )
         {
             attributes.m_linkActivatedCallback = val.value();
         }

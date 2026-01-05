@@ -74,13 +74,11 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString ENABLE_PICKING = QStringLiteral("enablePicking");
+        static inline const QString ENABLE_PICKING = QStringLiteral( "enablePicking" );
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = {
-        Keys::ENABLE_PICKING
-    };
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::ENABLE_PICKING };
 
 protected:
     void configureAndUpdateUi( const QString& uiConfigName ) override;
