@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) 2011-2013 Ceetron AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -165,45 +165,39 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( uiItem )
             {
                 // List of supported attributes for validation
-                static const std::set<QString> supportedAttributes = { "maximumWidth",
-                                                                       "selectAllOnFocusEvent",
-                                                                       "placeholderText",
-                                                                       "avoidSendingEnterEvent",
-                                                                       "completerCaseSensitivity",
-                                                                       "completerFilterMode",
-                                                                       "notifyWhenTextIsEdited" };
+                
 
-                if ( auto val = uiItem->getAttribute<int>( "maximumWidth", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM_WIDTH, uiConfigName ) )
                 {
                     leab.maximumWidth = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( "selectAllOnFocusEvent", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_ALL_ON_FOCUS_EVENT, uiConfigName ) )
                 {
                     leab.selectAllOnFocusEvent = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
                 {
                     leab.placeholderText = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( "avoidSendingEnterEvent", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<bool>( Keys::AVOID_SENDING_ENTER_EVENT, uiConfigName ) )
                 {
                     leab.avoidSendingEnterEventToParentWidget = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<Qt::CaseSensitivity>( "completerCaseSensitivity", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<Qt::CaseSensitivity>( Keys::COMPLETER_CASE_SENSITIVITY, uiConfigName ) )
                 {
                     leab.completerCaseSensitivity = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<Qt::MatchFlags>( "completerFilterMode", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<Qt::MatchFlags>( Keys::COMPLETER_FILTER_MODE, uiConfigName ) )
                 {
                     leab.completerFilterMode = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
+                if ( auto val = uiItem->getAttribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
                 {
                     leab.notifyWhenTextIsEdited = val.value();
                 }
@@ -212,14 +206,13 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
                 auto allAttributeNames = uiItem->attributeNames( uiConfigName );
                 for ( const auto& key : allAttributeNames )
                 {
-                    if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                    if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
                     {
                         CAF_PDM_LOG_WARNING(
                             QString( "PdmUiLineEditor: Unsupported attribute '%1' set on field. Supported "
-                                     "attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, "
-                                     "avoidSendingEnterEvent, completerCaseSensitivity, completerFilterMode, "
-                                     "notifyWhenTextIsEdited" )
-                                .arg( key ) );
+                                     "attributes are: %2" )
+                                .arg( key )
+                                .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
                     }
                 }
             }

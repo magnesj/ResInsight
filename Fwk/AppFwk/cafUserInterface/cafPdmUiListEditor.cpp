@@ -179,20 +179,17 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "qssState", "heightHint", "allowHorizontalScrollBar" };
-
-        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
         {
             attributes.heightHint = val.value();
         }
 
-        if ( auto qssState = uiItem->getAttribute<QString>( "qssState", uiConfigName ) )
+        if ( auto qssState = uiItem->getAttribute<QString>( Keys::QSS_STATE, uiConfigName ) )
         {
-            attributes.qssState = *qssState;
+            attributes.qssState = qssState.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "allowHorizontalScrollBar", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::ALLOW_HORIZONTAL_SCROLL_BAR, uiConfigName ) )
         {
             attributes.allowHorizontalScrollBar = val.value();
         }
@@ -201,11 +198,12 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiListEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: qssState, heightHint, allowHorizontalScrollBar" )
-                                         .arg( key ) );
+                                              "attributes are: %2" )
+                                         .arg( key )
+                                         .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
