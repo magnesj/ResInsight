@@ -37,62 +37,13 @@
 #include "cafPdmUiToolButtonCallbackEditor.h"
 
 #include "cafPdmFieldHandle.h"
-#include "cafPdmLogger.h"
 #include "cafPdmObjectHandle.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiObjectHandle.h"
 
-#include <QVariant>
-
-#include <set>
-
 namespace caf
 {
 CAF_PDM_UI_FIELD_EDITOR_SOURCE_INIT( PdmUiToolButtonCallbackEditor );
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-static std::set<QString> supportedAttributes()
-{
-    return { "callback" };
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-static void validateAttributes( const std::map<QString, QVariant>& attributes )
-{
-    for ( const auto& [key, value] : attributes )
-    {
-        if ( supportedAttributes().find( key ) == supportedAttributes().end() )
-        {
-            PdmLogger::warning(
-                QString( "PdmUiToolButtonCallbackEditor: Unsupported attribute '%1' set on field.\n"
-                         "Supported attributes are: %2" )
-                    .arg( key )
-                    .arg( QStringList( supportedAttributes().begin(), supportedAttributes().end() ).join( ", " ) ) );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-static void extractAttributes( const std::map<QString, QVariant>&      attributes,
-                               PdmUiToolButtonCallbackEditorAttribute* targetAttr )
-{
-    validateAttributes( attributes );
-
-    auto it = attributes.find( "callback" );
-    if ( it != attributes.end() )
-    {
-        if ( it->second.canConvert<std::function<void()>>() )
-        {
-            targetAttr->m_onClickedCallback = it->second.value<std::function<void()>>();
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -112,12 +63,15 @@ void PdmUiToolButtonCallbackEditor::configureAndUpdateUi( const QString& uiConfi
     m_toolButton->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
     m_toolButton->setToolTip( uiField()->uiToolTip( uiConfigName ) );
 
-    // First try to get attributes from the map-based system
-    auto attributes = uiField()->fieldHandle()->uiCapability()->attributes( uiConfigName );
-    extractAttributes( attributes, &m_attributes );
-
+    // First try to get callback from the map-based attribute system
+    auto     uiItem          = uiField()->fieldHandle()->uiCapability();
+    QVariant callbackVariant = uiItem->getAttribute( "callback", uiConfigName );
+    if ( callbackVariant.isValid() && callbackVariant.canConvert<std::function<void()>>() )
+    {
+        m_attributes.m_onClickedCallback = callbackVariant.value<std::function<void()>>();
+    }
     // Fall back to old defineEditorAttribute method if callback not set via map
-    if ( !m_attributes.m_onClickedCallback )
+    else if ( !m_attributes.m_onClickedCallback )
     {
         if ( auto pdmUiOjectHandle = uiObj( uiField()->fieldHandle()->ownerObject() ) )
         {
