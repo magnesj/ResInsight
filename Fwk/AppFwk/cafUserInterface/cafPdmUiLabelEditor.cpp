@@ -83,17 +83,17 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
                                                                    "linkText",
                                                                    "linkActivatedCallback" };
 
-        if ( auto val = uiItem->getAttributeBool( "useWordWrap", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "useWordWrap", uiConfigName ) )
         {
             attributes.m_useWordWrap = *val;
         }
 
-        if ( auto val = uiItem->getAttributeBool( "useSingleWidgetInsteadOfLabelAndEditorWidget", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "useSingleWidgetInsteadOfLabelAndEditorWidget", uiConfigName ) )
         {
             attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = *val;
         }
 
-        if ( auto val = uiItem->getAttributeString( "linkText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( "linkText", uiConfigName ) )
         {
             attributes.m_linkText = *val;
         }

@@ -678,7 +678,7 @@ std::map<QString, QVariant> PdmUiItem::getAttributes( const QString& uiConfigNam
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Backward compatibility wrappers that use the template versions
+/// Backward compatibility helper for setAttribute
 //--------------------------------------------------------------------------------------------------
 void PdmUiItem::setAttributeInt( const QString& key, int value, const QString& uiConfigName )
 {
@@ -686,7 +686,7 @@ void PdmUiItem::setAttributeInt( const QString& key, int value, const QString& u
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Backward compatibility helper for setAttribute
 //--------------------------------------------------------------------------------------------------
 void PdmUiItem::setAttributeBool( const QString& key, bool value, const QString& uiConfigName )
 {
@@ -694,7 +694,7 @@ void PdmUiItem::setAttributeBool( const QString& key, bool value, const QString&
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Backward compatibility helper for setAttribute
 //--------------------------------------------------------------------------------------------------
 void PdmUiItem::setAttributeString( const QString& key, const QString& value, const QString& uiConfigName )
 {
@@ -702,43 +702,11 @@ void PdmUiItem::setAttributeString( const QString& key, const QString& value, co
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Backward compatibility helper for setAttribute
 //--------------------------------------------------------------------------------------------------
 void PdmUiItem::setAttributeDouble( const QString& key, double value, const QString& uiConfigName )
 {
     setAttribute<double>( key, value, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<int> PdmUiItem::getAttributeInt( const QString& key, const QString& uiConfigName ) const
-{
-    return getAttribute<int>( key, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<bool> PdmUiItem::getAttributeBool( const QString& key, const QString& uiConfigName ) const
-{
-    return getAttribute<bool>( key, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<QString> PdmUiItem::getAttributeString( const QString& key, const QString& uiConfigName ) const
-{
-    return getAttribute<QString>( key, uiConfigName );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::optional<double> PdmUiItem::getAttributeDouble( const QString& key, const QString& uiConfigName ) const
-{
-    return getAttribute<double>( key, uiConfigName );
 }
 
 } // End of namespace caf

@@ -190,7 +190,7 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
             attributes.heightHint = val.toInt();
         }
 
-        if ( auto qssState = uiItem->getAttributeString( "qssState", uiConfigName ) )
+        if ( auto qssState = uiItem->getAttribute<QString>( "qssState", uiConfigName ) )
         {
             attributes.qssState = *qssState;
         }

@@ -94,12 +94,12 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "decimals", "numberFormat" };
 
-        if ( auto val = uiItem->getAttributeInt( "decimals", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( "decimals", uiConfigName ) )
         {
             m_attributes.m_decimals = *val;
         }
 
-        if ( auto val = uiItem->getAttributeInt( "numberFormat", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( "numberFormat", uiConfigName ) )
         {
             m_attributes.m_numberFormat = static_cast<PdmUiDoubleValueEditorAttribute::NumberFormat>( *val );
         }

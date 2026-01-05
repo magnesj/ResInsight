@@ -89,32 +89,32 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
                                                                    "appendUiSelectedFolderToText",
                                                                    "multipleItemSeparator" };
 
-        if ( auto val = uiItem->getAttributeBool( "selectSaveFileName", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "selectSaveFileName", uiConfigName ) )
         {
             m_attributes.m_selectSaveFileName = *val;
         }
 
-        if ( auto val = uiItem->getAttributeString( "fileSelectionFilter", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( "fileSelectionFilter", uiConfigName ) )
         {
             m_attributes.m_fileSelectionFilter = *val;
         }
 
-        if ( auto val = uiItem->getAttributeString( "defaultPath", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( "defaultPath", uiConfigName ) )
         {
             m_attributes.m_defaultPath = *val;
         }
 
-        if ( auto val = uiItem->getAttributeBool( "selectDirectory", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "selectDirectory", uiConfigName ) )
         {
             m_attributes.m_selectDirectory = *val;
         }
 
-        if ( auto val = uiItem->getAttributeBool( "appendUiSelectedFolderToText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "appendUiSelectedFolderToText", uiConfigName ) )
         {
             m_attributes.m_appendUiSelectedFolderToText = *val;
         }
 
-        if ( auto val = uiItem->getAttributeString( "multipleItemSeparator", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( "multipleItemSeparator", uiConfigName ) )
         {
             if ( !val->isEmpty() )
             {

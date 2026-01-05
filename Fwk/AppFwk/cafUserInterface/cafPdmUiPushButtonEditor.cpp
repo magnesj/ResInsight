@@ -81,7 +81,7 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "buttonIcon", "buttonText" };
 
-        if ( auto val = uiItem->getAttributeString( "buttonText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( "buttonText", uiConfigName ) )
         {
             attributes.m_buttonText = *val;
         }

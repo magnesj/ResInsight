@@ -135,22 +135,22 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "textMode", "showSaveButton", "wrapMode", "font", "heightHint" };
 
-        if ( auto val = uiItem->getAttributeInt( "textMode", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( "textMode", uiConfigName ) )
         {
             leab.textMode = static_cast<PdmUiTextEditorAttribute::TextMode>( *val );
         }
 
-        if ( auto val = uiItem->getAttributeBool( "showSaveButton", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( "showSaveButton", uiConfigName ) )
         {
             leab.showSaveButton = *val;
         }
 
-        if ( auto val = uiItem->getAttributeInt( "wrapMode", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( "wrapMode", uiConfigName ) )
         {
             leab.wrapMode = static_cast<PdmUiTextEditorAttribute::WrapMode>( *val );
         }
 
-        if ( auto val = uiItem->getAttributeInt( "heightHint", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
         {
             leab.heightHint = *val;
         }
