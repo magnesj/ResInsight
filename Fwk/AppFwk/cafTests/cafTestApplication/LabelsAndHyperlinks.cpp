@@ -24,7 +24,7 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
     m_hyperlinkTextField.uiCapability()->setUiEditorTypeName( caf::PdmUiLabelEditor::uiEditorTypeName() );
 
     // Set attributes using new map-based system
-    m_hyperlinkTextField.uiCapability()->setAttribute<QString>( "linkText",
+    m_hyperlinkTextField.uiCapability()->setAttribute<QString>( caf::PdmUiLabelEditor::Keys::LINK_TEXT,
                                                                 "Click <a href=\"dummy\">link</a> to select the "
                                                                 "<b>Optional Field</b> object." );
 
@@ -41,7 +41,7 @@ LabelsAndHyperlinks::LabelsAndHyperlinks()
         }
     };
 
-    m_hyperlinkTextField.uiCapability()->setAttribute( "linkActivatedCallback", QVariant::fromValue( callback ) );
+    m_hyperlinkTextField.uiCapability()->setAttribute( caf::PdmUiLabelEditor::Keys::LINK_ACTIVATED_CALLBACK, QVariant::fromValue( callback ) );
 
     CAF_PDM_InitField( &m_showButton, "ShowButton", true, "Show Fieldless Button" );
 }
