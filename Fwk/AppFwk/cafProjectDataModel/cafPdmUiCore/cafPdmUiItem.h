@@ -40,6 +40,7 @@
 #include "cafPdmOptionItemInfo.h"
 #include "cafPdmUiItemInfo.h"
 
+#include <list>
 #include <map>
 #include <optional>
 #include <set>
@@ -115,16 +116,11 @@ public:
     virtual bool isUiGroup() const;
 
     // Map-based attribute system
-    void     setAttribute( const QString& key, const QVariant& value, const QString& uiConfigName = "" );
-    QVariant getAttribute( const QString& key, const QString& uiConfigName = "" ) const;
-    bool     hasAttribute( const QString& key, const QString& uiConfigName = "" ) const;
-    std::map<QString, QVariant> getAttributes( const QString& uiConfigName = "" ) const;
 
-    // Type-safe helpers
     template <typename T>
     void setAttribute( const QString& key, const T& value, const QString& uiConfigName = "" )
     {
-        setAttribute( key, QVariant::fromValue( value ), uiConfigName );
+        m_attributeMaps[uiConfigName][key] = QVariant::fromValue( value );
     }
 
     template <typename T>
@@ -138,6 +134,7 @@ public:
         return std::nullopt;
     }
 
+    std::list<QString> attributeNames( const QString& uiConfigName = "" ) const;
     /// Intended to be called when fields in an object has been changed
     void updateConnectedEditors() const;
     void scheduleUpdateConnectedEditors() const;
@@ -168,6 +165,9 @@ public: // Pdm-Private only
 
 protected:
     std::set<PdmUiEditorHandle*> m_editors;
+
+private:
+    QVariant getAttribute( const QString& key, const QString& uiConfigName = "" ) const;
 
 private:
     const PdmUiItemInfo* defaultInfo() const;

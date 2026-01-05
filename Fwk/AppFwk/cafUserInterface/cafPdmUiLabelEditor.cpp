@@ -79,34 +79,33 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "useWordWrap",
-                                                                   "useSingleWidgetInsteadOfLabelAndEditorWidget",
-                                                                   "linkText",
-                                                                   "linkActivatedCallback" };
+                                                               "useSingleWidgetInsteadOfLabelAndEditorWidget",
+                                                               "linkText",
+                                                               "linkActivatedCallback" };
 
         if ( auto val = uiItem->getAttribute<bool>( "useWordWrap", uiConfigName ) )
         {
-            attributes.m_useWordWrap = *val;
+            attributes.m_useWordWrap = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<bool>( "useSingleWidgetInsteadOfLabelAndEditorWidget", uiConfigName ) )
         {
-            attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = *val;
+            attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<QString>( "linkText", uiConfigName ) )
         {
-            attributes.m_linkText = *val;
+            attributes.m_linkText = val.value();
         }
 
-        QVariant callbackVariant = uiItem->getAttribute( "linkActivatedCallback", uiConfigName );
-        if ( callbackVariant.isValid() && callbackVariant.canConvert<std::function<void( const QString& )>>() )
+        if ( auto val = uiItem->getAttribute<std::function<void( const QString& )>>( "linkActivatedCallback", uiConfigName ) )
         {
-            attributes.m_linkActivatedCallback = callbackVariant.value<std::function<void( const QString& )>>();
+            attributes.m_linkActivatedCallback = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

@@ -88,46 +88,39 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "minimum",
-                                                                   "maximum",
-                                                                   "decimals",
-                                                                   "sliderTickCount",
-                                                                   "delaySliderUpdateUntilRelease" };
+                                                               "maximum",
+                                                               "decimals",
+                                                               "sliderTickCount",
+                                                               "delaySliderUpdateUntilRelease" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "minimum", uiConfigName );
-        if ( val.isValid() && val.canConvert<double>() )
+        if ( auto val = uiItem->getAttribute<double>( "minimum", uiConfigName ) )
         {
-            m_attributes.m_minimum = val.toDouble();
+            m_attributes.m_minimum = val.value();
         }
 
-        val = uiItem->getAttribute( "maximum", uiConfigName );
-        if ( val.isValid() && val.canConvert<double>() )
+        if ( auto val = uiItem->getAttribute<double>( "maximum", uiConfigName ) )
         {
-            m_attributes.m_maximum = val.toDouble();
+            m_attributes.m_maximum = val.value();
         }
 
-        val = uiItem->getAttribute( "decimals", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "decimals", uiConfigName ) )
         {
-            m_attributes.m_decimals = val.toInt();
+            m_attributes.m_decimals = val.value();
         }
 
-        val = uiItem->getAttribute( "sliderTickCount", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "sliderTickCount", uiConfigName ) )
         {
-            m_attributes.m_sliderTickCount = val.toInt();
+            m_attributes.m_sliderTickCount = val.value();
         }
 
-        val = uiItem->getAttribute( "delaySliderUpdateUntilRelease", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "delaySliderUpdateUntilRelease", uiConfigName ) )
         {
-            m_attributes.m_delaySliderUpdateUntilRelease = val.toBool();
+            m_attributes.m_delaySliderUpdateUntilRelease = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

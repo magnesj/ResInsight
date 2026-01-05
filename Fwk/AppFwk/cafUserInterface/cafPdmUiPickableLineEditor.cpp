@@ -75,17 +75,15 @@ void caf::PdmUiPickableLineEditor::configureAndUpdateUi( const QString& uiConfig
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "enablePicking" };
 
-        QVariant val;
+        if ( auto val = uiItem->getAttribute<bool>( "enablePicking", uiConfigName ) )
 
-        val = uiItem->getAttribute( "enablePicking", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
         {
-            m_attribute.enablePicking = val.toBool();
+            m_attribute.enablePicking = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

@@ -96,7 +96,7 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->getAttribute<int>( "decimals", uiConfigName ) )
         {
-            m_attributes.m_decimals = *val;
+            m_attributes.m_decimals = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<int>( "numberFormat", uiConfigName ) )
@@ -105,8 +105,8 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

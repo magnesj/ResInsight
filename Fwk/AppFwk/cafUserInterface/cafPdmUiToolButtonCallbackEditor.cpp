@@ -64,11 +64,11 @@ void PdmUiToolButtonCallbackEditor::configureAndUpdateUi( const QString& uiConfi
     m_toolButton->setToolTip( uiField()->uiToolTip( uiConfigName ) );
 
     // First try to get callback from the map-based attribute system
-    auto     uiItem          = uiField()->fieldHandle()->uiCapability();
-    QVariant callbackVariant = uiItem->getAttribute( "callback", uiConfigName );
-    if ( callbackVariant.isValid() && callbackVariant.canConvert<std::function<void()>>() )
+    auto uiItem = uiField()->fieldHandle()->uiCapability();
+
+    if ( auto callbackVariant = uiItem->getAttribute<std::function<void()>>( "callback", uiConfigName ) )
     {
-        m_attributes.m_onClickedCallback = callbackVariant.value<std::function<void()>>();
+        m_attributes.m_onClickedCallback = callbackVariant.value();
     }
     // Fall back to old defineEditorAttribute method if callback not set via map
     else if ( !m_attributes.m_onClickedCallback )

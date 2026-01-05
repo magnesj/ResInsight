@@ -80,23 +80,19 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "checkable", "sizePolicy" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "checkable", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "checkable", uiConfigName ) )
         {
-            attributes.m_checkable = val.toBool();
+            attributes.m_checkable = val.value();
         }
 
-        val = uiItem->getAttribute( "sizePolicy", uiConfigName );
-        if ( val.isValid() && val.canConvert<QSizePolicy>() )
+        if ( auto val = uiItem->getAttribute<QSizePolicy>( "sizePolicy", uiConfigName ) )
         {
-            attributes.m_sizePolicy = val.value<QSizePolicy>();
+            attributes.m_sizePolicy = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

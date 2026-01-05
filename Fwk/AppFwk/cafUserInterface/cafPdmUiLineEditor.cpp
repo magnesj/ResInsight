@@ -166,60 +166,51 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 // List of supported attributes for validation
                 static const std::set<QString> supportedAttributes = { "maximumWidth",
-                                                                           "selectAllOnFocusEvent",
-                                                                           "placeholderText",
-                                                                           "avoidSendingEnterEvent",
-                                                                           "completerCaseSensitivity",
-                                                                           "completerFilterMode",
-                                                                           "notifyWhenTextIsEdited" };
+                                                                       "selectAllOnFocusEvent",
+                                                                       "placeholderText",
+                                                                       "avoidSendingEnterEvent",
+                                                                       "completerCaseSensitivity",
+                                                                       "completerFilterMode",
+                                                                       "notifyWhenTextIsEdited" };
 
-                QVariant val;
-
-                val = uiItem->getAttribute( "maximumWidth", uiConfigName );
-                if ( val.isValid() && val.canConvert<int>() )
+                if ( auto val = uiItem->getAttribute<int>( "maximumWidth", uiConfigName ) )
                 {
-                    leab.maximumWidth = val.toInt();
+                    leab.maximumWidth = val.value();
                 }
 
-                val = uiItem->getAttribute( "selectAllOnFocusEvent", uiConfigName );
-                if ( val.isValid() && val.canConvert<bool>() )
+                if ( auto val = uiItem->getAttribute<bool>( "selectAllOnFocusEvent", uiConfigName ) )
                 {
-                    leab.selectAllOnFocusEvent = val.toBool();
+                    leab.selectAllOnFocusEvent = val.value();
                 }
 
-                val = uiItem->getAttribute( "placeholderText", uiConfigName );
-                if ( val.isValid() && val.canConvert<QString>() )
+                if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
                 {
-                    leab.placeholderText = val.toString();
+                    leab.placeholderText = val.value();
                 }
 
-                val = uiItem->getAttribute( "avoidSendingEnterEvent", uiConfigName );
-                if ( val.isValid() && val.canConvert<bool>() )
+                if ( auto val = uiItem->getAttribute<bool>( "avoidSendingEnterEvent", uiConfigName ) )
                 {
-                    leab.avoidSendingEnterEventToParentWidget = val.toBool();
+                    leab.avoidSendingEnterEventToParentWidget = val.value();
                 }
 
-                val = uiItem->getAttribute( "completerCaseSensitivity", uiConfigName );
-                if ( val.isValid() && val.canConvert<int>() )
+                if ( auto val = uiItem->getAttribute<Qt::CaseSensitivity>( "completerCaseSensitivity", uiConfigName ) )
                 {
-                    leab.completerCaseSensitivity = static_cast<Qt::CaseSensitivity>( val.toInt() );
+                    leab.completerCaseSensitivity = val.value();
                 }
 
-                val = uiItem->getAttribute( "completerFilterMode", uiConfigName );
-                if ( val.isValid() && val.canConvert<int>() )
+                if ( auto val = uiItem->getAttribute<Qt::MatchFlags>( "completerFilterMode", uiConfigName ) )
                 {
-                    leab.completerFilterMode = static_cast<Qt::MatchFlags>( val.toInt() );
+                    leab.completerFilterMode = val.value();
                 }
 
-                val = uiItem->getAttribute( "notifyWhenTextIsEdited", uiConfigName );
-                if ( val.isValid() && val.canConvert<bool>() )
+                if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
                 {
-                    leab.notifyWhenTextIsEdited = val.toBool();
+                    leab.notifyWhenTextIsEdited = val.value();
                 }
 
                 // Validate: warn about unsupported attributes
-                auto allAttributes = uiItem->getAttributes( uiConfigName );
-                for ( const auto& [key, value] : allAttributes )
+                auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+                for ( const auto& key : allAttributeNames )
                 {
                     if ( supportedAttributes.find( key ) == supportedAttributes.end() )
                     {

@@ -82,17 +82,14 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "timeFormat" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "timeFormat", uiConfigName );
-        if ( val.isValid() && val.canConvert<QString>() )
+        if ( auto val = uiItem->getAttribute<QString>( "timeFormat", uiConfigName ) )
         {
-            m_attributes.timeFormat = val.toString();
+            m_attributes.timeFormat = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

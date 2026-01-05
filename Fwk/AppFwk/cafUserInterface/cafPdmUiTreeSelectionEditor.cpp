@@ -215,53 +215,45 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "showTextFilter",
-                                                                   "showToggleAllCheckbox",
-                                                                   "singleSelectionMode",
-                                                                   "showCheckBoxes",
-                                                                   "showContextMenu",
-                                                                   "heightHint" };
+                                                               "showToggleAllCheckbox",
+                                                               "singleSelectionMode",
+                                                               "showCheckBoxes",
+                                                               "showContextMenu",
+                                                               "heightHint" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "showTextFilter", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showTextFilter", uiConfigName ) )
         {
-            m_attributes.showTextFilter = val.toBool();
+            m_attributes.showTextFilter = val.value();
         }
 
-        val = uiItem->getAttribute( "showToggleAllCheckbox", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showToggleAllCheckbox", uiConfigName ) )
         {
-            m_attributes.showToggleAllCheckbox = val.toBool();
+            m_attributes.showToggleAllCheckbox = val.value();
         }
 
-        val = uiItem->getAttribute( "singleSelectionMode", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "singleSelectionMode", uiConfigName ) )
         {
-            m_attributes.singleSelectionMode = val.toBool();
+            m_attributes.singleSelectionMode = val.value();
         }
 
-        val = uiItem->getAttribute( "showCheckBoxes", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showCheckBoxes", uiConfigName ) )
         {
-            m_attributes.showCheckBoxes = val.toBool();
+            m_attributes.showCheckBoxes = val.value();
         }
 
-        val = uiItem->getAttribute( "showContextMenu", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showContextMenu", uiConfigName ) )
         {
-            m_attributes.showContextMenu = val.toBool();
+            m_attributes.showContextMenu = val.value();
         }
 
-        val = uiItem->getAttribute( "heightHint", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
         {
-            m_attributes.heightHint = val.toInt();
+            m_attributes.heightHint = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

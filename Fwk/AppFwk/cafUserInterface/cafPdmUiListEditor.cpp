@@ -182,12 +182,10 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "qssState", "heightHint", "allowHorizontalScrollBar" };
 
-        QVariant val;
+        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
 
-        val = uiItem->getAttribute( "heightHint", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
         {
-            attributes.heightHint = val.toInt();
+            attributes.heightHint = val.value();
         }
 
         if ( auto qssState = uiItem->getAttribute<QString>( "qssState", uiConfigName ) )
@@ -195,15 +193,15 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
             attributes.qssState = *qssState;
         }
 
-        val = uiItem->getAttribute( "allowHorizontalScrollBar", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "allowHorizontalScrollBar", uiConfigName ) )
+
         {
-            attributes.allowHorizontalScrollBar = val.toBool();
+            attributes.allowHorizontalScrollBar = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

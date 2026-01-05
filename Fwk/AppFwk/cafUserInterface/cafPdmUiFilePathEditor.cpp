@@ -91,27 +91,27 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->getAttribute<bool>( "selectSaveFileName", uiConfigName ) )
         {
-            m_attributes.m_selectSaveFileName = *val;
+            m_attributes.m_selectSaveFileName = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<QString>( "fileSelectionFilter", uiConfigName ) )
         {
-            m_attributes.m_fileSelectionFilter = *val;
+            m_attributes.m_fileSelectionFilter = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<QString>( "defaultPath", uiConfigName ) )
         {
-            m_attributes.m_defaultPath = *val;
+            m_attributes.m_defaultPath = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<bool>( "selectDirectory", uiConfigName ) )
         {
-            m_attributes.m_selectDirectory = *val;
+            m_attributes.m_selectDirectory = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<bool>( "appendUiSelectedFolderToText", uiConfigName ) )
         {
-            m_attributes.m_appendUiSelectedFolderToText = *val;
+            m_attributes.m_appendUiSelectedFolderToText = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<QString>( "multipleItemSeparator", uiConfigName ) )
@@ -123,8 +123,8 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

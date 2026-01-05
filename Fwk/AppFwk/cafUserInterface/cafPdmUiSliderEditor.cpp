@@ -79,35 +79,33 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "minimum", "maximum", "showSpinBox", "step" };
 
-        QVariant val;
+        if ( auto val = uiItem->getAttribute<int>( "minimum", uiConfigName ) )
 
-        val = uiItem->getAttribute( "minimum", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
         {
-            m_attributes.m_minimum = val.toInt();
+            m_attributes.m_minimum = val.value();
         }
 
-        val = uiItem->getAttribute( "maximum", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "maximum", uiConfigName ) )
+
         {
-            m_attributes.m_maximum = val.toInt();
+            m_attributes.m_maximum = val.value();
         }
 
-        val = uiItem->getAttribute( "showSpinBox", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showSpinBox", uiConfigName ) )
+
         {
-            m_attributes.m_showSpinBox = val.toBool();
+            m_attributes.m_showSpinBox = val.value();
         }
 
-        val = uiItem->getAttribute( "step", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "step", uiConfigName ) )
+
         {
-            m_attributes.m_step = val.toInt();
+            m_attributes.m_step = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

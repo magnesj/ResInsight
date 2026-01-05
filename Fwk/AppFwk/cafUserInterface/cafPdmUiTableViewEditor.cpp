@@ -195,78 +195,61 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         {
             // List of supported attributes for validation
             static const std::set<QString> supportedAttributes = { "tableSelectionLevel",
-                                                                    "rowSelectionLevel",
-                                                                    "enableHeaderText",
-                                                                    "minimumHeight",
-                                                                    "heightHint",
-                                                                    "alwaysEnforceResizePolicy",
-                                                                    "resizePolicy",
-                                                                    "columnWidths",
-                                                                    "baseColor",
-                                                                    "enableDropTarget" };
+                                                                   "rowSelectionLevel",
+                                                                   "enableHeaderText",
+                                                                   "minimumHeight",
+                                                                   "heightHint",
+                                                                   "alwaysEnforceResizePolicy",
+                                                                   "resizePolicy",
+                                                                   "columnWidths",
+                                                                   "baseColor",
+                                                                   "enableDropTarget" };
 
-            QVariant val;
-
-            val = uiItem->getAttribute( "tableSelectionLevel", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<int>( "tableSelectionLevel", uiConfigName ) )
             {
-                editorAttrib.tableSelectionLevel = val.toInt();
+                editorAttrib.tableSelectionLevel = val.value();
             }
 
-            val = uiItem->getAttribute( "rowSelectionLevel", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<int>( "rowSelectionLevel", uiConfigName ) )
             {
-                editorAttrib.rowSelectionLevel = val.toInt();
+                editorAttrib.rowSelectionLevel = val.value();
             }
 
-            val = uiItem->getAttribute( "enableHeaderText", uiConfigName );
-            if ( val.isValid() && val.canConvert<bool>() )
+            if ( auto val = uiItem->getAttribute<bool>( "enableHeaderText", uiConfigName ) )
             {
-                editorAttrib.enableHeaderText = val.toBool();
+                editorAttrib.enableHeaderText = val.value();
             }
 
-            val = uiItem->getAttribute( "minimumHeight", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<int>( "minimumHeight", uiConfigName ) )
+
             {
-                editorAttrib.minimumHeight = val.toInt();
+                editorAttrib.minimumHeight = val.value();
             }
 
-            val = uiItem->getAttribute( "heightHint", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
             {
-                editorAttrib.heightHint = val.toInt();
+                editorAttrib.heightHint = val.value();
             }
 
-            val = uiItem->getAttribute( "alwaysEnforceResizePolicy", uiConfigName );
-            if ( val.isValid() && val.canConvert<bool>() )
+            if ( auto val = uiItem->getAttribute<bool>( "alwaysEnforceResizePolicy", uiConfigName ) )
             {
-                editorAttrib.alwaysEnforceResizePolicy = val.toBool();
+                editorAttrib.alwaysEnforceResizePolicy = val.value();
             }
 
-            val = uiItem->getAttribute( "resizePolicy", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<int>( "resizePolicy", uiConfigName ) )
             {
-                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.toInt() );
+                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( *val );
             }
 
-            val = uiItem->getAttribute( "enableDropTarget", uiConfigName );
-            if ( val.isValid() && val.canConvert<bool>() )
+            if ( auto val = uiItem->getAttribute<bool>( "enableDropTarget", uiConfigName ) )
             {
-                editorAttrib.enableDropTarget = val.toBool();
+                editorAttrib.enableDropTarget = val.value();
             }
 
-            val = uiItem->getAttribute( "resizePolicy", uiConfigName );
-            if ( val.isValid() && val.canConvert<int>() )
+            if ( auto val = uiItem->getAttribute<QVariantList>( "columnWidths", uiConfigName ) )
             {
-                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.toInt() );
-            }
-
-            val = uiItem->getAttribute( "columnWidths", uiConfigName );
-            if ( val.isValid() && val.canConvert<QVariantList>() )
-            {
-                QVariantList list = val.toList();
                 editorAttrib.columnWidths.clear();
-                for ( const QVariant& item : list )
+                for ( const QVariant& item : *val )
                 {
                     if ( item.canConvert<int>() )
                     {
@@ -275,15 +258,14 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 }
             }
 
-            val = uiItem->getAttribute( "baseColor", uiConfigName );
-            if ( val.isValid() && val.canConvert<QColor>() )
+            if ( auto val = uiItem->getAttribute<QColor>( "baseColor", uiConfigName ) )
             {
-                editorAttrib.baseColor = val.value<QColor>();
+                editorAttrib.baseColor = val.value();
             }
 
             // Validate: warn about unsupported attributes
-            auto allAttributes = uiItem->getAttributes( uiConfigName );
-            for ( const auto& [key, value] : allAttributes )
+            auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+            for ( const auto& key : allAttributeNames )
             {
                 if ( supportedAttributes.find( key ) == supportedAttributes.end() )
                 {

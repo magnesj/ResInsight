@@ -99,23 +99,19 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "showAlpha", "showLabel" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "showAlpha", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showAlpha", uiConfigName ) )
         {
-            m_attributes.showAlpha = val.toBool();
+            m_attributes.showAlpha = val.value();
         }
 
-        val = uiItem->getAttribute( "showLabel", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showLabel", uiConfigName ) )
         {
-            m_attributes.showLabel = val.toBool();
+            m_attributes.showLabel = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

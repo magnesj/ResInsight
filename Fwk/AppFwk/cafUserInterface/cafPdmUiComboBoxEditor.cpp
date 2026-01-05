@@ -81,109 +81,93 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "adjustWidthToContents",
-                                                                   "showPreviousAndNextButtons",
-                                                                   "minimumContentsLength",
-                                                                   "maximumMenuContentsLength",
-                                                                   "enableEditableContent",
-                                                                   "enableAutoComplete",
-                                                                   "iconSize",
-                                                                   "minimumWidth",
-                                                                   "placeholderText",
-                                                                   "nextButtonText",
-                                                                   "prevButtonText",
-                                                                   "nextIcon",
-                                                                   "previousIcon",
-                                                                   "notifyWhenTextIsEdited" };
+                                                               "showPreviousAndNextButtons",
+                                                               "minimumContentsLength",
+                                                               "maximumMenuContentsLength",
+                                                               "enableEditableContent",
+                                                               "enableAutoComplete",
+                                                               "iconSize",
+                                                               "minimumWidth",
+                                                               "placeholderText",
+                                                               "nextButtonText",
+                                                               "prevButtonText",
+                                                               "nextIcon",
+                                                               "previousIcon",
+                                                               "notifyWhenTextIsEdited" };
 
-        QVariant val;
-
-        val = uiItem->getAttribute( "adjustWidthToContents", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "adjustWidthToContents", uiConfigName ) )
         {
-            m_attributes.adjustWidthToContents = val.toBool();
+            m_attributes.adjustWidthToContents = val.value();
         }
 
-        val = uiItem->getAttribute( "showPreviousAndNextButtons", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "showPreviousAndNextButtons", uiConfigName ) )
         {
-            m_attributes.showPreviousAndNextButtons = val.toBool();
+            m_attributes.showPreviousAndNextButtons = val.value();
         }
 
-        val = uiItem->getAttribute( "minimumContentsLength", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "minimumContentsLength", uiConfigName ) )
         {
-            m_attributes.minimumContentsLength = val.toInt();
+            m_attributes.minimumContentsLength = val.value();
         }
 
-        val = uiItem->getAttribute( "maximumMenuContentsLength", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "maximumMenuContentsLength", uiConfigName ) )
         {
-            m_attributes.maximumMenuContentsLength = val.toInt();
+            m_attributes.maximumMenuContentsLength = val.value();
         }
 
-        val = uiItem->getAttribute( "enableEditableContent", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "enableEditableContent", uiConfigName ) )
         {
-            m_attributes.enableEditableContent = val.toBool();
+            m_attributes.enableEditableContent = val.value();
         }
 
-        val = uiItem->getAttribute( "enableAutoComplete", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "enableAutoComplete", uiConfigName ) )
         {
-            m_attributes.enableAutoComplete = val.toBool();
+            m_attributes.enableAutoComplete = val.value();
         }
 
-        val = uiItem->getAttribute( "iconSize", uiConfigName );
-        if ( val.isValid() && val.canConvert<QSize>() )
+        if ( auto val = uiItem->getAttribute<QSize>( "iconSize", uiConfigName ) )
         {
-            m_attributes.iconSize = val.toSize();
+            m_attributes.iconSize = val.value();
         }
 
-        val = uiItem->getAttribute( "placeholderText", uiConfigName );
-        if ( val.isValid() && val.canConvert<QString>() )
+        if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
         {
-            m_attributes.placeholderText = val.toString();
+            m_attributes.placeholderText = val.value();
         }
 
-        val = uiItem->getAttribute( "notifyWhenTextIsEdited", uiConfigName );
-        if ( val.isValid() && val.canConvert<bool>() )
+        if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
         {
-            m_attributes.notifyWhenTextIsEdited = val.toBool();
+            m_attributes.notifyWhenTextIsEdited = val.value();
         }
 
-        val = uiItem->getAttribute( "minimumWidth", uiConfigName );
-        if ( val.isValid() && val.canConvert<int>() )
+        if ( auto val = uiItem->getAttribute<int>( "minimumWidth", uiConfigName ) )
         {
-            m_attributes.minimumWidth = val.toInt();
+            m_attributes.minimumWidth = val.value();
         }
 
-        val = uiItem->getAttribute( "nextButtonText", uiConfigName );
-        if ( val.isValid() && val.canConvert<QString>() )
+        if ( auto val = uiItem->getAttribute<QString>( "nextButtonText", uiConfigName ) )
         {
-            m_attributes.nextButtonText = val.toString();
+            m_attributes.nextButtonText = val.value();
         }
 
-        val = uiItem->getAttribute( "prevButtonText", uiConfigName );
-        if ( val.isValid() && val.canConvert<QString>() )
+        if ( auto val = uiItem->getAttribute<QString>( "prevButtonText", uiConfigName ) )
         {
-            m_attributes.prevButtonText = val.toString();
+            m_attributes.prevButtonText = val.value();
         }
 
-        val = uiItem->getAttribute( "nextIcon", uiConfigName );
-        if ( val.isValid() && val.canConvert<QIcon>() )
+        if ( auto val = uiItem->getAttribute<QIcon>( "nextIcon", uiConfigName ) )
         {
-            m_attributes.nextIcon = val.value<QIcon>();
+            m_attributes.nextIcon = val.value();
         }
 
-        val = uiItem->getAttribute( "previousIcon", uiConfigName );
-        if ( val.isValid() && val.canConvert<QIcon>() )
+        if ( auto val = uiItem->getAttribute<QIcon>( "previousIcon", uiConfigName ) )
         {
-            m_attributes.previousIcon = val.value<QIcon>();
+            m_attributes.previousIcon = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

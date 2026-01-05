@@ -601,14 +601,6 @@ void PdmUiItem::addFieldEditor( PdmUiEditorHandle* fieldView )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttribute( const QString& key, const QVariant& value, const QString& uiConfigName )
-{
-    m_attributeMaps[uiConfigName][key] = value;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 QVariant PdmUiItem::getAttribute( const QString& key, const QString& uiConfigName ) const
 {
     // Check config-specific attributes first
@@ -642,26 +634,21 @@ QVariant PdmUiItem::getAttribute( const QString& key, const QString& uiConfigNam
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool PdmUiItem::hasAttribute( const QString& key, const QString& uiConfigName ) const
+std::list<QString> PdmUiItem::attributeNames( const QString& uiConfigName ) const
 {
-    return getAttribute( key, uiConfigName ).isValid();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::map<QString, QVariant> PdmUiItem::getAttributes( const QString& uiConfigName ) const
-{
-    std::map<QString, QVariant> result;
+    std::list<QString> result;
 
     // Start with default config attributes
     auto defaultIt = m_attributeMaps.find( "" );
     if ( defaultIt != m_attributeMaps.end() )
     {
-        result = defaultIt->second;
+        for ( const auto& [key, value] : defaultIt->second )
+        {
+            result.push_back( key );
+        }
     }
 
-    // Override with config-specific attributes
+    // Add config-specific attributes (avoid duplicates)
     if ( !uiConfigName.isEmpty() )
     {
         auto configIt = m_attributeMaps.find( uiConfigName );
@@ -669,7 +656,11 @@ std::map<QString, QVariant> PdmUiItem::getAttributes( const QString& uiConfigNam
         {
             for ( const auto& [key, value] : configIt->second )
             {
-                result[key] = value;
+                // Check if key already exists in result
+                if ( std::find( result.begin(), result.end(), key ) == result.end() )
+                {
+                    result.push_back( key );
+                }
             }
         }
     }

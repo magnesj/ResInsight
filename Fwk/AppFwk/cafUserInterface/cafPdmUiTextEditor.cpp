@@ -142,7 +142,7 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->getAttribute<bool>( "showSaveButton", uiConfigName ) )
         {
-            leab.showSaveButton = *val;
+            leab.showSaveButton = val.value();
         }
 
         if ( auto val = uiItem->getAttribute<int>( "wrapMode", uiConfigName ) )
@@ -152,18 +152,17 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
         {
-            leab.heightHint = *val;
+            leab.heightHint = val.value();
         }
 
-        QVariant val = uiItem->getAttribute( "font", uiConfigName );
-        if ( val.isValid() && val.canConvert<QFont>() )
+        if ( auto val = uiItem->getAttribute<QFont>( "font", uiConfigName ) )
         {
-            leab.font = val.value<QFont>();
+            leab.font = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {

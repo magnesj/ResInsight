@@ -83,18 +83,17 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->getAttribute<QString>( "buttonText", uiConfigName ) )
         {
-            attributes.m_buttonText = *val;
+            attributes.m_buttonText = val.value();
         }
 
-        QVariant val = uiItem->getAttribute( "buttonIcon", uiConfigName );
-        if ( val.isValid() && val.canConvert<QIcon>() )
+        if ( auto val = uiItem->getAttribute<QIcon>( "buttonIcon", uiConfigName ) )
         {
-            attributes.m_buttonIcon = val.value<QIcon>();
+            attributes.m_buttonIcon = val.value();
         }
 
         // Validate: warn about unsupported attributes
-        auto allAttributes = uiItem->getAttributes( uiConfigName );
-        for ( const auto& [key, value] : allAttributes )
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
         {
             if ( supportedAttributes.find( key ) == supportedAttributes.end() )
             {
