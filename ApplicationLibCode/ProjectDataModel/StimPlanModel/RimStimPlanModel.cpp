@@ -219,7 +219,7 @@ RimStimPlanModel::RimStimPlanModel()
     m_formationDip.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_formationDip.uiCapability()->setAttribute<int>( "decimals", 2 );
     m_formationDip.uiCapability()->setAttribute<int>( "numberFormat",
-                                                    static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+                                                      static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_autoComputeBarrier, "AutoComputeBarrier", true, "Auto Compute Barrier" );
     CAF_PDM_InitScriptableField( &m_hasBarrier, "Barrier", true, "Barrier" );
@@ -228,14 +228,14 @@ RimStimPlanModel::RimStimPlanModel()
     m_distanceToBarrier.uiCapability()->setUiReadOnly( true );
     m_distanceToBarrier.uiCapability()->setAttribute<int>( "decimals", 2 );
     m_distanceToBarrier.uiCapability()->setAttribute<int>( "numberFormat",
-                                                         static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+                                                           static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_barrierDip, "BarrierDip", 0.0, "Barrier Dip" );
     m_barrierDip.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_barrierDip.uiCapability()->setUiReadOnly( true );
     m_barrierDip.uiCapability()->setAttribute<int>( "decimals", 2 );
     m_barrierDip.uiCapability()->setAttribute<int>( "numberFormat",
-                                                  static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+                                                    static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
     CAF_PDM_InitScriptableField( &m_wellPenetrationLayer, "WellPenetrationLayer", 2, "Well Penetration Layer" );
 
     CAF_PDM_InitScriptableField( &m_showOnlyBarrierFault, "ShowOnlyBarrierFault", false, "Show Only Barrier Fault" );

@@ -566,11 +566,12 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     {
         geometryGroup->add( &m_userPolylineXydForUi );
         m_userPolylineXydForUi.uiCapability()->setAttribute<QString>( "qssState",
-                                                                   m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
+                                                                      m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputPolylineFromViewerEnabled );
         m_inputPolylineFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
-                                                                             m_inputPolylineFromViewerEnabled() ? "Stop picking points"
-                                                                                                                : "Start picking points" );
+                                                                                m_inputPolylineFromViewerEnabled()
+                                                                                    ? "Stop picking points"
+                                                                                    : "Start picking points" );
     }
     else if ( m_type() == CrossSectionEnum::CS_POLYGON )
     {
@@ -582,12 +583,12 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     {
         geometryGroup->add( &m_twoAzimuthPoints );
         m_twoAzimuthPoints.uiCapability()->setAttribute<QString>( "qssState",
-                                                               m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
+                                                                  m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputTwoAzimuthPointsFromViewerEnabled );
         m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
-                                                                                     m_inputTwoAzimuthPointsFromViewerEnabled()
-                                                                                         ? "Stop picking points"
-                                                                                         : "Start picking points" );
+                                                                                        m_inputTwoAzimuthPointsFromViewerEnabled()
+                                                                                            ? "Stop picking points"
+                                                                                            : "Start picking points" );
         geometryGroup->add( &m_azimuthAngle );
         geometryGroup->add( &m_dipAngle );
     }
@@ -610,12 +611,13 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     {
         optionsGroup->add( &m_customExtrusionPoints );
         m_customExtrusionPoints.uiCapability()->setAttribute<QString>( "qssState",
-                                                                    m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput" : QString() );
+                                                                       m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput"
+                                                                                                                 : QString() );
         optionsGroup->add( &m_inputExtrusionPointsFromViewerEnabled );
         m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttribute<QString>( "buttonText",
-                                                                                    m_inputExtrusionPointsFromViewerEnabled()
-                                                                                        ? "Stop picking points"
-                                                                                        : "Start picking points" );
+                                                                                       m_inputExtrusionPointsFromViewerEnabled()
+                                                                                           ? "Stop picking points"
+                                                                                           : "Start picking points" );
     }
 
     optionsGroup->add( &m_showInactiveCells );

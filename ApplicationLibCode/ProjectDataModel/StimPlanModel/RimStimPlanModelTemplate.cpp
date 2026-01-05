@@ -138,7 +138,7 @@ RimStimPlanModelTemplate::RimStimPlanModelTemplate()
     m_faciesInitialPressureConfigs.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_faciesInitialPressureConfigs.uiCapability()->setUiTreeChildrenHidden( true );
     m_faciesInitialPressureConfigs.uiCapability()->setAttribute<int>( "resizePolicy",
-                                                                    caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+                                                                      caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
     m_faciesInitialPressureConfigs.uiCapability()->setAttribute<bool>( "alwaysEnforceResizePolicy", true );
     m_faciesInitialPressureConfigs.uiCapability()->setAttribute<int>( "minimumHeight", 300 );
 

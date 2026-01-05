@@ -161,8 +161,8 @@ RimSummaryMultiPlot::RimSummaryMultiPlot()
     m_goToCommonSettings.xmlCapability()->disableIO();
     m_goToCommonSettings.uiCapability()->setAttribute<bool>( "useWordWrap", true );
     m_goToCommonSettings.uiCapability()->setAttribute<QString>( "linkText",
-                                                             "Select <a href=\"dummy\">Summary Plots</a> to edit Common Readout "
-                                                             "Settings." );
+                                                                "Select <a href=\"dummy\">Summary Plots</a> to edit Common Readout "
+                                                                "Settings." );
     m_goToCommonSettings.uiCapability()->setAttribute( "linkActivatedCallback",
                                                        QVariant::fromValue( std::function<void( const QString& )>(
                                                            []( const QString& link )

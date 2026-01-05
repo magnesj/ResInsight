@@ -126,7 +126,8 @@ RicExportEclipseSectorModelUi::RicExportEclipseSectorModelUi()
     CAF_PDM_InitFieldNoDefault( &exportParameters, "ExportParams", "Export Parameters" );
     CAF_PDM_InitField( &m_exportParametersFilename, "ExportParamsFilename", QString(), "File Name" );
     m_exportParametersFilename.uiCapability()->setAttribute<bool>( "selectSaveFileName", true );
-    m_exportParametersFilename.uiCapability()->setAttribute<QString>( "fileSelectionFilter", "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
+    m_exportParametersFilename.uiCapability()->setAttribute<QString>( "fileSelectionFilter",
+                                                                      "GRDECL files (*.grdecl *.GRDECL);;All files (*.*)" );
 
     CAF_PDM_InitFieldNoDefault( &selectedKeywords, "ExportMainKeywords", "Keywords to Export" );
     selectedKeywords.uiCapability()->setAttribute<int>( "heightHint", 280 );

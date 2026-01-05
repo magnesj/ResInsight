@@ -79,9 +79,9 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "useWordWrap",
-                                                                   "useSingleWidgetInsteadOfLabelAndEditorWidget",
-                                                                   "linkText",
-                                                                   "linkActivatedCallback" };
+                                                               "useSingleWidgetInsteadOfLabelAndEditorWidget",
+                                                               "linkText",
+                                                               "linkActivatedCallback" };
 
         if ( auto val = uiItem->getAttribute<bool>( "useWordWrap", uiConfigName ) )
         {

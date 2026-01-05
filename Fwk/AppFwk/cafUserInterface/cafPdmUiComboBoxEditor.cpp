@@ -81,19 +81,19 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "adjustWidthToContents",
-                                                                   "showPreviousAndNextButtons",
-                                                                   "minimumContentsLength",
-                                                                   "maximumMenuContentsLength",
-                                                                   "enableEditableContent",
-                                                                   "enableAutoComplete",
-                                                                   "iconSize",
-                                                                   "minimumWidth",
-                                                                   "placeholderText",
-                                                                   "nextButtonText",
-                                                                   "prevButtonText",
-                                                                   "nextIcon",
-                                                                   "previousIcon",
-                                                                   "notifyWhenTextIsEdited" };
+                                                               "showPreviousAndNextButtons",
+                                                               "minimumContentsLength",
+                                                               "maximumMenuContentsLength",
+                                                               "enableEditableContent",
+                                                               "enableAutoComplete",
+                                                               "iconSize",
+                                                               "minimumWidth",
+                                                               "placeholderText",
+                                                               "nextButtonText",
+                                                               "prevButtonText",
+                                                               "nextIcon",
+                                                               "previousIcon",
+                                                               "notifyWhenTextIsEdited" };
 
         QVariant val;
 

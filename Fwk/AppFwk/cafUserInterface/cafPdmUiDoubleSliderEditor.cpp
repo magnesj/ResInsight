@@ -88,10 +88,10 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     {
         // List of supported attributes for validation
         static const std::set<QString> supportedAttributes = { "minimum",
-                                                                   "maximum",
-                                                                   "decimals",
-                                                                   "sliderTickCount",
-                                                                   "delaySliderUpdateUntilRelease" };
+                                                               "maximum",
+                                                               "decimals",
+                                                               "sliderTickCount",
+                                                               "delaySliderUpdateUntilRelease" };
 
         QVariant val;
 

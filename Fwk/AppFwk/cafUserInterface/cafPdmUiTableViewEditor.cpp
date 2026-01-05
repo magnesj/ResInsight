@@ -195,15 +195,15 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         {
             // List of supported attributes for validation
             static const std::set<QString> supportedAttributes = { "tableSelectionLevel",
-                                                                    "rowSelectionLevel",
-                                                                    "enableHeaderText",
-                                                                    "minimumHeight",
-                                                                    "heightHint",
-                                                                    "alwaysEnforceResizePolicy",
-                                                                    "resizePolicy",
-                                                                    "columnWidths",
-                                                                    "baseColor",
-                                                                    "enableDropTarget" };
+                                                                   "rowSelectionLevel",
+                                                                   "enableHeaderText",
+                                                                   "minimumHeight",
+                                                                   "heightHint",
+                                                                   "alwaysEnforceResizePolicy",
+                                                                   "resizePolicy",
+                                                                   "columnWidths",
+                                                                   "baseColor",
+                                                                   "enableDropTarget" };
 
             QVariant val;
 

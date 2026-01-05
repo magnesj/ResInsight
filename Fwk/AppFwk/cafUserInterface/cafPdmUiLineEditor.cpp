@@ -166,12 +166,12 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 // List of supported attributes for validation
                 static const std::set<QString> supportedAttributes = { "maximumWidth",
-                                                                           "selectAllOnFocusEvent",
-                                                                           "placeholderText",
-                                                                           "avoidSendingEnterEvent",
-                                                                           "completerCaseSensitivity",
-                                                                           "completerFilterMode",
-                                                                           "notifyWhenTextIsEdited" };
+                                                                       "selectAllOnFocusEvent",
+                                                                       "placeholderText",
+                                                                       "avoidSendingEnterEvent",
+                                                                       "completerCaseSensitivity",
+                                                                       "completerFilterMode",
+                                                                       "notifyWhenTextIsEdited" };
 
                 QVariant val;
 
