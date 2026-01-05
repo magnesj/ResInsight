@@ -73,7 +73,7 @@ void caf::PdmUiPickableLineEditor::configureAndUpdateUi( const QString& uiConfig
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "enablePicking" };
+        static const std::set<QString> supportedAttributes = { "enablePicking" };
 
         QVariant val;
 
@@ -92,7 +92,7 @@ void caf::PdmUiPickableLineEditor::configureAndUpdateUi( const QString& uiConfig
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiPickableLineEditor: Unsupported attribute '%1' set on field. Supported "
                              "attributes are: enablePicking" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

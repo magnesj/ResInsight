@@ -115,20 +115,20 @@ public:
     virtual bool isUiGroup() const;
 
     // Map-based attribute system
-    void     setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName = "" );
-    QVariant getAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
-    bool     hasAttribute( const std::string& key, const QString& uiConfigName = "" ) const;
-    std::map<std::string, QVariant> getAttributes( const QString& uiConfigName = "" ) const;
+    void     setAttribute( const QString& key, const QVariant& value, const QString& uiConfigName = "" );
+    QVariant getAttribute( const QString& key, const QString& uiConfigName = "" ) const;
+    bool     hasAttribute( const QString& key, const QString& uiConfigName = "" ) const;
+    std::map<QString, QVariant> getAttributes( const QString& uiConfigName = "" ) const;
 
     // Type-safe helpers
     template <typename T>
-    void setAttribute( const std::string& key, const T& value, const QString& uiConfigName = "" )
+    void setAttribute( const QString& key, const T& value, const QString& uiConfigName = "" )
     {
         setAttribute( key, QVariant::fromValue( value ), uiConfigName );
     }
 
     template <typename T>
-    std::optional<T> getAttribute( const std::string& key, const QString& uiConfigName = "" ) const
+    std::optional<T> getAttribute( const QString& key, const QString& uiConfigName = "" ) const
     {
         QVariant value = getAttribute( key, uiConfigName );
         if ( value.isValid() && value.canConvert<T>() )
@@ -139,15 +139,15 @@ public:
     }
 
     // Backward compatibility helpers
-    void setAttributeInt( const std::string& key, int value, const QString& uiConfigName = "" );
-    void setAttributeBool( const std::string& key, bool value, const QString& uiConfigName = "" );
-    void setAttributeString( const std::string& key, const QString& value, const QString& uiConfigName = "" );
-    void setAttributeDouble( const std::string& key, double value, const QString& uiConfigName = "" );
+    void setAttributeInt( const QString& key, int value, const QString& uiConfigName = "" );
+    void setAttributeBool( const QString& key, bool value, const QString& uiConfigName = "" );
+    void setAttributeString( const QString& key, const QString& value, const QString& uiConfigName = "" );
+    void setAttributeDouble( const QString& key, double value, const QString& uiConfigName = "" );
 
-    std::optional<int>     getAttributeInt( const std::string& key, const QString& uiConfigName = "" ) const;
-    std::optional<bool>    getAttributeBool( const std::string& key, const QString& uiConfigName = "" ) const;
-    std::optional<QString> getAttributeString( const std::string& key, const QString& uiConfigName = "" ) const;
-    std::optional<double>  getAttributeDouble( const std::string& key, const QString& uiConfigName = "" ) const;
+    std::optional<int>     getAttributeInt( const QString& key, const QString& uiConfigName = "" ) const;
+    std::optional<bool>    getAttributeBool( const QString& key, const QString& uiConfigName = "" ) const;
+    std::optional<QString> getAttributeString( const QString& key, const QString& uiConfigName = "" ) const;
+    std::optional<double>  getAttributeDouble( const QString& key, const QString& uiConfigName = "" ) const;
 
     /// Intended to be called when fields in an object has been changed
     void updateConnectedEditors() const;
@@ -188,7 +188,7 @@ private:
     std::map<QString, PdmUiItemInfo> m_configItemInfos;
 
     // Map-based attributes: uiConfigName -> (attributeKey -> value)
-    std::map<QString, std::map<std::string, QVariant>> m_attributeMaps;
+    std::map<QString, std::map<QString, QVariant>> m_attributeMaps;
 
     static bool sm_showExtraDebugText;
 };

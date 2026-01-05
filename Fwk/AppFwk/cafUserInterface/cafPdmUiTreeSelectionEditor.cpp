@@ -214,7 +214,7 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "showTextFilter",
+        static const std::set<QString> supportedAttributes = { "showTextFilter",
                                                                    "showToggleAllCheckbox",
                                                                    "singleSelectionMode",
                                                                    "showCheckBoxes",
@@ -269,7 +269,7 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
                     QString( "PdmUiTreeSelectionEditor: Unsupported attribute '%1' set on field. Supported "
                              "attributes are: showTextFilter, showToggleAllCheckbox, singleSelectionMode, "
                              "showCheckBoxes, showContextMenu, heightHint" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

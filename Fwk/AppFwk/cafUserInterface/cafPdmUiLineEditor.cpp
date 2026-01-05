@@ -165,7 +165,7 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( uiItem )
             {
                 // List of supported attributes for validation
-                static const std::set<std::string> supportedAttributes = { "maximumWidth",
+                static const std::set<QString> supportedAttributes = { "maximumWidth",
                                                                            "selectAllOnFocusEvent",
                                                                            "placeholderText",
                                                                            "avoidSendingEnterEvent",
@@ -228,7 +228,7 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
                                      "attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, "
                                      "avoidSendingEnterEvent, completerCaseSensitivity, completerFilterMode, "
                                      "notifyWhenTextIsEdited" )
-                                .arg( QString::fromStdString( key ) ) );
+                                .arg( key ) );
                     }
                 }
             }

@@ -82,7 +82,7 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "selectSaveFileName",
+        static const std::set<QString> supportedAttributes = { "selectSaveFileName",
                                                                    "fileSelectionFilter",
                                                                    "defaultPath",
                                                                    "selectDirectory",
@@ -131,7 +131,7 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
                 CAF_PDM_LOG_WARNING( QString( "PdmUiFilePathEditor: Unsupported attribute '%1' set on field. Supported "
                                               "attributes are: selectSaveFileName, fileSelectionFilter, defaultPath, "
                                               "selectDirectory, appendUiSelectedFolderToText, multipleItemSeparator" )
-                                         .arg( QString::fromStdString( key ) ) );
+                                         .arg( key ) );
             }
         }
     }

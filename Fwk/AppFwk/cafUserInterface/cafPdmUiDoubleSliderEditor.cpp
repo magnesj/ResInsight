@@ -87,7 +87,7 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "minimum",
+        static const std::set<QString> supportedAttributes = { "minimum",
                                                                    "maximum",
                                                                    "decimals",
                                                                    "sliderTickCount",
@@ -135,7 +135,7 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
                     QString(
                         "PdmUiDoubleSliderEditor: Unsupported attribute '%1' set on field. Supported "
                         "attributes are: minimum, maximum, decimals, sliderTickCount, delaySliderUpdateUntilRelease" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

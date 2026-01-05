@@ -77,7 +77,7 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "minimum", "maximum", "showSpinBox", "step" };
+        static const std::set<QString> supportedAttributes = { "minimum", "maximum", "showSpinBox", "step" };
 
         QVariant val;
 
@@ -113,7 +113,7 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiSliderEditor: Unsupported attribute '%1' set on field. Supported "
                                               "attributes are: minimum, maximum, showSpinBox, step" )
-                                         .arg( QString::fromStdString( key ) ) );
+                                         .arg( key ) );
             }
         }
     }

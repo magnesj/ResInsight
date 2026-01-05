@@ -79,7 +79,7 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "buttonIcon", "buttonText" };
+        static const std::set<QString> supportedAttributes = { "buttonIcon", "buttonText" };
 
         if ( auto val = uiItem->getAttributeString( "buttonText", uiConfigName ) )
         {
@@ -101,7 +101,7 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiPushButtonEditor: Unsupported attribute '%1' set on field. Supported "
                              "attributes are: buttonIcon, buttonText" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

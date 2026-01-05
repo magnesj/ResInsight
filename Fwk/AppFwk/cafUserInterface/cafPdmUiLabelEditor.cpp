@@ -78,7 +78,7 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "useWordWrap",
+        static const std::set<QString> supportedAttributes = { "useWordWrap",
                                                                    "useSingleWidgetInsteadOfLabelAndEditorWidget",
                                                                    "linkText",
                                                                    "linkActivatedCallback" };
@@ -114,7 +114,7 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
                     QString( "PdmUiLabelEditor: Unsupported attribute '%1' set on field. Supported attributes "
                              "are: useWordWrap, useSingleWidgetInsteadOfLabelAndEditorWidget, linkText, "
                              "linkActivatedCallback" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

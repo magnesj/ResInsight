@@ -92,7 +92,7 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "decimals", "numberFormat" };
+        static const std::set<QString> supportedAttributes = { "decimals", "numberFormat" };
 
         if ( auto val = uiItem->getAttributeInt( "decimals", uiConfigName ) )
         {
@@ -113,7 +113,7 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiDoubleValueEditor: Unsupported attribute '%1' set on field. Supported "
                              "attributes are: decimals, numberFormat" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

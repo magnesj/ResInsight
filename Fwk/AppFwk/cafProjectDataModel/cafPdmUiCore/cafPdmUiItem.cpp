@@ -601,7 +601,7 @@ void PdmUiItem::addFieldEditor( PdmUiEditorHandle* fieldView )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName )
+void PdmUiItem::setAttribute( const QString& key, const QVariant& value, const QString& uiConfigName )
 {
     m_attributeMaps[uiConfigName][key] = value;
 }
@@ -609,7 +609,7 @@ void PdmUiItem::setAttribute( const std::string& key, const QVariant& value, con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QVariant PdmUiItem::getAttribute( const std::string& key, const QString& uiConfigName ) const
+QVariant PdmUiItem::getAttribute( const QString& key, const QString& uiConfigName ) const
 {
     // Check config-specific attributes first
     if ( !uiConfigName.isEmpty() )
@@ -642,7 +642,7 @@ QVariant PdmUiItem::getAttribute( const std::string& key, const QString& uiConfi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool PdmUiItem::hasAttribute( const std::string& key, const QString& uiConfigName ) const
+bool PdmUiItem::hasAttribute( const QString& key, const QString& uiConfigName ) const
 {
     return getAttribute( key, uiConfigName ).isValid();
 }
@@ -650,9 +650,9 @@ bool PdmUiItem::hasAttribute( const std::string& key, const QString& uiConfigNam
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::map<std::string, QVariant> PdmUiItem::getAttributes( const QString& uiConfigName ) const
+std::map<QString, QVariant> PdmUiItem::getAttributes( const QString& uiConfigName ) const
 {
-    std::map<std::string, QVariant> result;
+    std::map<QString, QVariant> result;
 
     // Start with default config attributes
     auto defaultIt = m_attributeMaps.find( "" );
@@ -680,7 +680,7 @@ std::map<std::string, QVariant> PdmUiItem::getAttributes( const QString& uiConfi
 //--------------------------------------------------------------------------------------------------
 /// Backward compatibility wrappers that use the template versions
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeInt( const std::string& key, int value, const QString& uiConfigName )
+void PdmUiItem::setAttributeInt( const QString& key, int value, const QString& uiConfigName )
 {
     setAttribute<int>( key, value, uiConfigName );
 }
@@ -688,7 +688,7 @@ void PdmUiItem::setAttributeInt( const std::string& key, int value, const QStrin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeBool( const std::string& key, bool value, const QString& uiConfigName )
+void PdmUiItem::setAttributeBool( const QString& key, bool value, const QString& uiConfigName )
 {
     setAttribute<bool>( key, value, uiConfigName );
 }
@@ -696,7 +696,7 @@ void PdmUiItem::setAttributeBool( const std::string& key, bool value, const QStr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeString( const std::string& key, const QString& value, const QString& uiConfigName )
+void PdmUiItem::setAttributeString( const QString& key, const QString& value, const QString& uiConfigName )
 {
     setAttribute<QString>( key, value, uiConfigName );
 }
@@ -704,7 +704,7 @@ void PdmUiItem::setAttributeString( const std::string& key, const QString& value
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void PdmUiItem::setAttributeDouble( const std::string& key, double value, const QString& uiConfigName )
+void PdmUiItem::setAttributeDouble( const QString& key, double value, const QString& uiConfigName )
 {
     setAttribute<double>( key, value, uiConfigName );
 }
@@ -712,7 +712,7 @@ void PdmUiItem::setAttributeDouble( const std::string& key, double value, const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<int> PdmUiItem::getAttributeInt( const std::string& key, const QString& uiConfigName ) const
+std::optional<int> PdmUiItem::getAttributeInt( const QString& key, const QString& uiConfigName ) const
 {
     return getAttribute<int>( key, uiConfigName );
 }
@@ -720,7 +720,7 @@ std::optional<int> PdmUiItem::getAttributeInt( const std::string& key, const QSt
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<bool> PdmUiItem::getAttributeBool( const std::string& key, const QString& uiConfigName ) const
+std::optional<bool> PdmUiItem::getAttributeBool( const QString& key, const QString& uiConfigName ) const
 {
     return getAttribute<bool>( key, uiConfigName );
 }
@@ -728,7 +728,7 @@ std::optional<bool> PdmUiItem::getAttributeBool( const std::string& key, const Q
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<QString> PdmUiItem::getAttributeString( const std::string& key, const QString& uiConfigName ) const
+std::optional<QString> PdmUiItem::getAttributeString( const QString& key, const QString& uiConfigName ) const
 {
     return getAttribute<QString>( key, uiConfigName );
 }
@@ -736,7 +736,7 @@ std::optional<QString> PdmUiItem::getAttributeString( const std::string& key, co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<double> PdmUiItem::getAttributeDouble( const std::string& key, const QString& uiConfigName ) const
+std::optional<double> PdmUiItem::getAttributeDouble( const QString& key, const QString& uiConfigName ) const
 {
     return getAttribute<double>( key, uiConfigName );
 }

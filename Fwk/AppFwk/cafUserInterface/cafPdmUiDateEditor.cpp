@@ -81,7 +81,7 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "dateFormat" };
+        static const std::set<QString> supportedAttributes = { "dateFormat" };
 
         QVariant val;
 
@@ -99,7 +99,7 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiDateEditor: Unsupported attribute '%1' set on field. Supported "
                                               "attributes are: dateFormat" )
-                                         .arg( QString::fromStdString( key ) ) );
+                                         .arg( key ) );
             }
         }
     }

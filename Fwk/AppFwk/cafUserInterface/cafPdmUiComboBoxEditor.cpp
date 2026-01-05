@@ -80,7 +80,7 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "adjustWidthToContents",
+        static const std::set<QString> supportedAttributes = { "adjustWidthToContents",
                                                                    "showPreviousAndNextButtons",
                                                                    "minimumContentsLength",
                                                                    "maximumMenuContentsLength",
@@ -194,7 +194,7 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
                              "enableAutoComplete, iconSize, minimumWidth, placeholderText, "
                              "nextButtonText, prevButtonText, nextIcon, previousIcon, "
                              "notifyWhenTextIsEdited" )
-                        .arg( QString::fromStdString( key ) ) );
+                        .arg( key ) );
             }
         }
     }

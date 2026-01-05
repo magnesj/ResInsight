@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) Ceetron Solutions AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -194,16 +194,16 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         if ( auto uiItem = childArrayFH->uiCapability() )
         {
             // List of supported attributes for validation
-            static const std::set<std::string> supportedAttributes = { "tableSelectionLevel",
-                                                                       "rowSelectionLevel",
-                                                                       "enableHeaderText",
-                                                                       "minimumHeight",
-                                                                       "heightHint",
-                                                                       "alwaysEnforceResizePolicy",
-                                                                       "resizePolicy",
-                                                                       "columnWidths",
-                                                                       "baseColor",
-                                                                       "enableDropTarget" };
+            static const std::set<QString> supportedAttributes = { "tableSelectionLevel",
+                                                                    "rowSelectionLevel",
+                                                                    "enableHeaderText",
+                                                                    "minimumHeight",
+                                                                    "heightHint",
+                                                                    "alwaysEnforceResizePolicy",
+                                                                    "resizePolicy",
+                                                                    "columnWidths",
+                                                                    "baseColor",
+                                                                    "enableDropTarget" };
 
             QVariant val;
 
@@ -292,7 +292,7 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                                  "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
                                  "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
                                  "columnWidths, baseColor, enableDropTarget" )
-                            .arg( QString::fromStdString( key ) ) );
+                            .arg( key ) );
                 }
             }
         }

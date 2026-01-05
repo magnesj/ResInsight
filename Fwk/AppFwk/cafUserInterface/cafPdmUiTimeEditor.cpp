@@ -80,7 +80,7 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiItem )
     {
         // List of supported attributes for validation
-        static const std::set<std::string> supportedAttributes = { "timeFormat" };
+        static const std::set<QString> supportedAttributes = { "timeFormat" };
 
         QVariant val;
 
@@ -98,7 +98,7 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiTimeEditor: Unsupported attribute '%1' set on field. Supported "
                                               "attributes are: timeFormat" )
-                                         .arg( QString::fromStdString( key ) ) );
+                                         .arg( key ) );
             }
         }
     }
