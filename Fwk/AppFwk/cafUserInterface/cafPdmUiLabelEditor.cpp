@@ -77,28 +77,22 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "useWordWrap",
-                                                               "useSingleWidgetInsteadOfLabelAndEditorWidget",
-                                                               "linkText",
-                                                               "linkActivatedCallback" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "useWordWrap", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::USE_WORD_WRAP, uiConfigName ) )
         {
             attributes.m_useWordWrap = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "useSingleWidgetInsteadOfLabelAndEditorWidget", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::USE_SINGLE_WIDGET_INSTEAD_OF_LABEL_AND_EDITOR_WIDGET, uiConfigName ) )
         {
             attributes.m_useSingleWidgetInsteadOfLabelAndEditorWidget = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "linkText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::LINK_TEXT, uiConfigName ) )
         {
             attributes.m_linkText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<std::function<void( const QString& )>>( "linkActivatedCallback", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<std::function<void( const QString& )>>( Keys::LINK_ACTIVATED_CALLBACK, uiConfigName ) )
         {
             attributes.m_linkActivatedCallback = val.value();
         }
@@ -107,13 +101,13 @@ void PdmUiLabelEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiLabelEditor: Unsupported attribute '%1' set on field. Supported attributes "
-                             "are: useWordWrap, useSingleWidgetInsteadOfLabelAndEditorWidget, linkText, "
-                             "linkActivatedCallback" )
-                        .arg( key ) );
+                             "are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
