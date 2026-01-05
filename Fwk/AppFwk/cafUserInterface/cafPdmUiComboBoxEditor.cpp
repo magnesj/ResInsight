@@ -79,88 +79,72 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "adjustWidthToContents",
-                                                               "showPreviousAndNextButtons",
-                                                               "minimumContentsLength",
-                                                               "maximumMenuContentsLength",
-                                                               "enableEditableContent",
-                                                               "enableAutoComplete",
-                                                               "iconSize",
-                                                               "minimumWidth",
-                                                               "placeholderText",
-                                                               "nextButtonText",
-                                                               "prevButtonText",
-                                                               "nextIcon",
-                                                               "previousIcon",
-                                                               "notifyWhenTextIsEdited" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "adjustWidthToContents", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::ADJUST_WIDTH_TO_CONTENTS, uiConfigName ) )
         {
             m_attributes.adjustWidthToContents = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showPreviousAndNextButtons", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_PREVIOUS_AND_NEXT_BUTTONS, uiConfigName ) )
         {
             m_attributes.showPreviousAndNextButtons = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "minimumContentsLength", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_CONTENTS_LENGTH, uiConfigName ) )
         {
             m_attributes.minimumContentsLength = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "maximumMenuContentsLength", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM_MENU_CONTENTS_LENGTH, uiConfigName ) )
         {
             m_attributes.maximumMenuContentsLength = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "enableEditableContent", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_EDITABLE_CONTENT, uiConfigName ) )
         {
             m_attributes.enableEditableContent = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "enableAutoComplete", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_AUTO_COMPLETE, uiConfigName ) )
         {
             m_attributes.enableAutoComplete = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QSize>( "iconSize", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QSize>( Keys::ICON_SIZE, uiConfigName ) )
         {
             m_attributes.iconSize = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
         {
             m_attributes.placeholderText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
         {
             m_attributes.notifyWhenTextIsEdited = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "minimumWidth", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_WIDTH, uiConfigName ) )
         {
             m_attributes.minimumWidth = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "nextButtonText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::NEXT_BUTTON_TEXT, uiConfigName ) )
         {
             m_attributes.nextButtonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( "prevButtonText", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::PREV_BUTTON_TEXT, uiConfigName ) )
         {
             m_attributes.prevButtonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( "nextIcon", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QIcon>( Keys::NEXT_ICON, uiConfigName ) )
         {
             m_attributes.nextIcon = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( "previousIcon", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QIcon>( Keys::PREVIOUS_ICON, uiConfigName ) )
         {
             m_attributes.previousIcon = val.value();
         }
@@ -169,16 +153,13 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiComboBoxEditor: Unsupported attribute '%1' set on field. Supported "
-                             "attributes are: adjustWidthToContents, showPreviousAndNextButtons, "
-                             "minimumContentsLength, maximumMenuContentsLength, enableEditableContent, "
-                             "enableAutoComplete, iconSize, minimumWidth, placeholderText, "
-                             "nextButtonText, prevButtonText, nextIcon, previousIcon, "
-                             "notifyWhenTextIsEdited" )
-                        .arg( key ) );
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
