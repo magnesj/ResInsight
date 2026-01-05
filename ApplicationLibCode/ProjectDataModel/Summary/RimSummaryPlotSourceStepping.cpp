@@ -107,6 +107,7 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
 
     for ( auto* field : steppingFields )
     {
+        field->uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
         field->uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
         field->uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
     }
@@ -990,21 +991,13 @@ RimSummaryDataSourceStepping* RimSummaryPlotSourceStepping::dataSourceSteppingOb
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Keep this function for complex RiuTools calls and config-specific attributes
+/// Keep this function for config-specific attributes
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHandle* field,
                                                           QString                    uiConfigName,
                                                           caf::PdmUiEditorAttribute* attribute )
 {
     auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-    if ( myAttr )
-    {
-        if ( field != &m_stepDimension )
-        {
-            RiuTools::enableUpDownArrowsForComboBox( attribute );
-        }
-    }
-
     if ( myAttr && ( uiConfigName == caf::PdmUiToolBarEditor::uiEditorConfigName() ) )
     {
         myAttr->minimumWidth = 120;
