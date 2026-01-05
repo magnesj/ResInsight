@@ -76,25 +76,22 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "minimum", "maximum", "showSpinBox", "step" };
-
-        if ( auto val = uiItem->getAttribute<int>( "minimum", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM, uiConfigName ) )
         {
             m_attributes.m_minimum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "maximum", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM, uiConfigName ) )
         {
             m_attributes.m_maximum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showSpinBox", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_SPIN_BOX, uiConfigName ) )
         {
             m_attributes.m_showSpinBox = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "step", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::STEP, uiConfigName ) )
         {
             m_attributes.m_step = val.value();
         }
@@ -103,11 +100,12 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiSliderEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: minimum, maximum, showSpinBox, step" )
-                                         .arg( key ) );
+                                              "attributes are: %2" )
+                                         .arg( key )
+                                         .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
