@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -157,6 +158,70 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( uiObject )
             {
                 uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &leab );
+            }
+
+            // Override with map-based attributes if present (new system takes precedence)
+            PdmUiItem* uiItem = uiField();
+            if ( uiItem )
+            {
+                // List of supported attributes for validation
+                static const std::set<QString> supportedAttributes = { "maximumWidth",
+                                                                       "selectAllOnFocusEvent",
+                                                                       "placeholderText",
+                                                                       "avoidSendingEnterEvent",
+                                                                       "completerCaseSensitivity",
+                                                                       "completerFilterMode",
+                                                                       "notifyWhenTextIsEdited" };
+
+                if ( auto val = uiItem->getAttribute<int>( "maximumWidth", uiConfigName ) )
+                {
+                    leab.maximumWidth = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<bool>( "selectAllOnFocusEvent", uiConfigName ) )
+                {
+                    leab.selectAllOnFocusEvent = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
+                {
+                    leab.placeholderText = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<bool>( "avoidSendingEnterEvent", uiConfigName ) )
+                {
+                    leab.avoidSendingEnterEventToParentWidget = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<Qt::CaseSensitivity>( "completerCaseSensitivity", uiConfigName ) )
+                {
+                    leab.completerCaseSensitivity = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<Qt::MatchFlags>( "completerFilterMode", uiConfigName ) )
+                {
+                    leab.completerFilterMode = val.value();
+                }
+
+                if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
+                {
+                    leab.notifyWhenTextIsEdited = val.value();
+                }
+
+                // Validate: warn about unsupported attributes
+                auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+                for ( const auto& key : allAttributeNames )
+                {
+                    if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                    {
+                        CAF_PDM_LOG_WARNING(
+                            QString( "PdmUiLineEditor: Unsupported attribute '%1' set on field. Supported "
+                                     "attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, "
+                                     "avoidSendingEnterEvent, completerCaseSensitivity, completerFilterMode, "
+                                     "notifyWhenTextIsEdited" )
+                                .arg( key ) );
+                    }
+                }
             }
 
             if ( uiField()->isAutoValueEnabled() )

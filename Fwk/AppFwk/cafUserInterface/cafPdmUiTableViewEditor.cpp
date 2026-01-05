@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) Ceetron Solutions AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -37,6 +37,7 @@
 
 #include "cafPdmChildArrayField.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiCheckBoxDelegate.h"
 #include "cafPdmUiEditorHandle.h"
@@ -188,6 +189,95 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
     {
         childArrayFH->ownerObject()->uiCapability()->editorAttribute( childArrayFH, uiConfigName, &editorAttrib );
         editorAttribLoaded = true;
+
+        // Override with map-based attributes if present (new system takes precedence)
+        if ( auto uiItem = childArrayFH->uiCapability() )
+        {
+            // List of supported attributes for validation
+            static const std::set<QString> supportedAttributes = { "tableSelectionLevel",
+                                                                   "rowSelectionLevel",
+                                                                   "enableHeaderText",
+                                                                   "minimumHeight",
+                                                                   "heightHint",
+                                                                   "alwaysEnforceResizePolicy",
+                                                                   "resizePolicy",
+                                                                   "columnWidths",
+                                                                   "baseColor",
+                                                                   "enableDropTarget" };
+
+            if ( auto val = uiItem->getAttribute<int>( "tableSelectionLevel", uiConfigName ) )
+            {
+                editorAttrib.tableSelectionLevel = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<int>( "rowSelectionLevel", uiConfigName ) )
+            {
+                editorAttrib.rowSelectionLevel = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<bool>( "enableHeaderText", uiConfigName ) )
+            {
+                editorAttrib.enableHeaderText = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<int>( "minimumHeight", uiConfigName ) )
+
+            {
+                editorAttrib.minimumHeight = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
+            {
+                editorAttrib.heightHint = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<bool>( "alwaysEnforceResizePolicy", uiConfigName ) )
+            {
+                editorAttrib.alwaysEnforceResizePolicy = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<int>( "resizePolicy", uiConfigName ) )
+            {
+                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( *val );
+            }
+
+            if ( auto val = uiItem->getAttribute<bool>( "enableDropTarget", uiConfigName ) )
+            {
+                editorAttrib.enableDropTarget = val.value();
+            }
+
+            if ( auto val = uiItem->getAttribute<QVariantList>( "columnWidths", uiConfigName ) )
+            {
+                editorAttrib.columnWidths.clear();
+                for ( const QVariant& item : *val )
+                {
+                    if ( item.canConvert<int>() )
+                    {
+                        editorAttrib.columnWidths.push_back( item.toInt() );
+                    }
+                }
+            }
+
+            if ( auto val = uiItem->getAttribute<QColor>( "baseColor", uiConfigName ) )
+            {
+                editorAttrib.baseColor = val.value();
+            }
+
+            // Validate: warn about unsupported attributes
+            auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+            for ( const auto& key : allAttributeNames )
+            {
+                if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                {
+                    CAF_PDM_LOG_WARNING(
+                        QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
+                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
+                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
+                                 "columnWidths, baseColor, enableDropTarget" )
+                            .arg( key ) );
+                }
+            }
+        }
 
         this->setTableSelectionLevel( editorAttrib.tableSelectionLevel );
         this->setRowSelectionLevel( editorAttrib.rowSelectionLevel );

@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -72,6 +73,31 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "timeFormat" };
+
+        if ( auto val = uiItem->getAttribute<QString>( "timeFormat", uiConfigName ) )
+        {
+            m_attributes.timeFormat = val.value();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING( QString( "PdmUiTimeEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: timeFormat" )
+                                         .arg( key ) );
+            }
+        }
     }
 
     if ( !m_attributes.timeFormat.isEmpty() )

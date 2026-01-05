@@ -37,6 +37,7 @@
 #include "cafPdmUiTextEditor.h"
 
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -125,6 +126,51 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &leab );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "textMode", "showSaveButton", "wrapMode", "font", "heightHint" };
+
+        if ( auto val = uiItem->getAttribute<int>( "textMode", uiConfigName ) )
+        {
+            leab.textMode = static_cast<PdmUiTextEditorAttribute::TextMode>( *val );
+        }
+
+        if ( auto val = uiItem->getAttribute<bool>( "showSaveButton", uiConfigName ) )
+        {
+            leab.showSaveButton = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<int>( "wrapMode", uiConfigName ) )
+        {
+            leab.wrapMode = static_cast<PdmUiTextEditorAttribute::WrapMode>( *val );
+        }
+
+        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
+        {
+            leab.heightHint = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QFont>( "font", uiConfigName ) )
+        {
+            leab.font = val.value();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING( QString( "PdmUiTextEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: textMode, showSaveButton, wrapMode, font, heightHint" )
+                                         .arg( key ) );
+            }
+        }
     }
 
     m_textMode = leab.textMode;

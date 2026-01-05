@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiFieldEditorHandle.h"
 #include "cafUiAppearanceSettings.h"
@@ -72,6 +73,114 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "adjustWidthToContents",
+                                                               "showPreviousAndNextButtons",
+                                                               "minimumContentsLength",
+                                                               "maximumMenuContentsLength",
+                                                               "enableEditableContent",
+                                                               "enableAutoComplete",
+                                                               "iconSize",
+                                                               "minimumWidth",
+                                                               "placeholderText",
+                                                               "nextButtonText",
+                                                               "prevButtonText",
+                                                               "nextIcon",
+                                                               "previousIcon",
+                                                               "notifyWhenTextIsEdited" };
+
+        if ( auto val = uiItem->getAttribute<bool>( "adjustWidthToContents", uiConfigName ) )
+        {
+            m_attributes.adjustWidthToContents = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<bool>( "showPreviousAndNextButtons", uiConfigName ) )
+        {
+            m_attributes.showPreviousAndNextButtons = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<int>( "minimumContentsLength", uiConfigName ) )
+        {
+            m_attributes.minimumContentsLength = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<int>( "maximumMenuContentsLength", uiConfigName ) )
+        {
+            m_attributes.maximumMenuContentsLength = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<bool>( "enableEditableContent", uiConfigName ) )
+        {
+            m_attributes.enableEditableContent = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<bool>( "enableAutoComplete", uiConfigName ) )
+        {
+            m_attributes.enableAutoComplete = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QSize>( "iconSize", uiConfigName ) )
+        {
+            m_attributes.iconSize = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QString>( "placeholderText", uiConfigName ) )
+        {
+            m_attributes.placeholderText = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<bool>( "notifyWhenTextIsEdited", uiConfigName ) )
+        {
+            m_attributes.notifyWhenTextIsEdited = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<int>( "minimumWidth", uiConfigName ) )
+        {
+            m_attributes.minimumWidth = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QString>( "nextButtonText", uiConfigName ) )
+        {
+            m_attributes.nextButtonText = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QString>( "prevButtonText", uiConfigName ) )
+        {
+            m_attributes.prevButtonText = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QIcon>( "nextIcon", uiConfigName ) )
+        {
+            m_attributes.nextIcon = val.value();
+        }
+
+        if ( auto val = uiItem->getAttribute<QIcon>( "previousIcon", uiConfigName ) )
+        {
+            m_attributes.previousIcon = val.value();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributeNames = uiItem->attributeNames( uiConfigName );
+        for ( const auto& key : allAttributeNames )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiComboBoxEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: adjustWidthToContents, showPreviousAndNextButtons, "
+                             "minimumContentsLength, maximumMenuContentsLength, enableEditableContent, "
+                             "enableAutoComplete, iconSize, minimumWidth, placeholderText, "
+                             "nextButtonText, prevButtonText, nextIcon, previousIcon, "
+                             "notifyWhenTextIsEdited" )
+                        .arg( key ) );
+            }
+        }
     }
 
     if ( !m_comboBox.isNull() )
