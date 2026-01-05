@@ -86,34 +86,27 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "minimum",
-                                                               "maximum",
-                                                               "decimals",
-                                                               "sliderTickCount",
-                                                               "delaySliderUpdateUntilRelease" };
-
-        if ( auto val = uiItem->getAttribute<double>( "minimum", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<double>( Keys::MINIMUM, uiConfigName ) )
         {
             m_attributes.m_minimum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<double>( "maximum", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<double>( Keys::MAXIMUM, uiConfigName ) )
         {
             m_attributes.m_maximum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "decimals", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::DECIMALS, uiConfigName ) )
         {
             m_attributes.m_decimals = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "sliderTickCount", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::SLIDER_TICK_COUNT, uiConfigName ) )
         {
             m_attributes.m_sliderTickCount = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "delaySliderUpdateUntilRelease", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::DELAY_SLIDER_UPDATE_UNTIL_RELEASE, uiConfigName ) )
         {
             m_attributes.m_delaySliderUpdateUntilRelease = val.value();
         }
@@ -122,13 +115,13 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
-                    QString(
-                        "PdmUiDoubleSliderEditor: Unsupported attribute '%1' set on field. Supported "
-                        "attributes are: minimum, maximum, decimals, sliderTickCount, delaySliderUpdateUntilRelease" )
-                        .arg( key ) );
+                    QString( "PdmUiDoubleSliderEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }

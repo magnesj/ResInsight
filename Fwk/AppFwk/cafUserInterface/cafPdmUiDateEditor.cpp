@@ -3,7 +3,7 @@
 //   Custom Visualization Core library
 //   Copyright (C) 2017 Ceetron Solutions AS
 //
-//   This library may be used under the terms of either the GNU General Public License or
+//   This library may be used under the terms of the GNU General Public License or
 //   the GNU Lesser General Public License as follows:
 //
 //   GNU General Public License Usage
@@ -80,10 +80,7 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "dateFormat" };
-
-        if ( auto val = uiItem->getAttribute<QString>( "dateFormat", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<QString>( Keys::DATE_FORMAT, uiConfigName ) )
         {
             m_attributes.dateFormat = val.value();
         }
@@ -92,11 +89,12 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING( QString( "PdmUiDateEditor: Unsupported attribute '%1' set on field. Supported "
-                                              "attributes are: dateFormat" )
-                                         .arg( key ) );
+                                              "attributes are: %2" )
+                                     .arg( key )
+                                     .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
