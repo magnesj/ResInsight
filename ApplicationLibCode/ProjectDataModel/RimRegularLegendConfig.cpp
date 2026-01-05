@@ -205,6 +205,8 @@ RimRegularLegendConfig::RimRegularLegendConfig()
 
     CAF_PDM_InitField( &m_resetUserDefinedValuesButton, "ResetDefaultValues", false, "Reset Default Values" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_resetUserDefinedValuesButton );
+    m_resetUserDefinedValuesButton.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName(),
+                                                                        { { "buttonText", "Reset User Defined Values" } } );
 
     CAF_PDM_InitField( &m_centerLegendAroundZero, "CenterLegendAroundZero", false, "Center Legend Around Zero" );
 
@@ -679,21 +681,6 @@ void RimRegularLegendConfig::initAfterRead()
 caf::PdmFieldHandle* RimRegularLegendConfig::objectToggleField()
 {
     return &m_showLegend;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimRegularLegendConfig::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_resetUserDefinedValuesButton == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Reset User Defined Values";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

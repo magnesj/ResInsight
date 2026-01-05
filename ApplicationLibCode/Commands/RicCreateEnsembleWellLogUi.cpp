@@ -63,6 +63,8 @@ RicCreateEnsembleWellLogUi::RicCreateEnsembleWellLogUi()
     CAF_PDM_InitFieldNoDefault( &m_wellPathSource, "WellPathSource", "Well Path Source" );
     CAF_PDM_InitFieldNoDefault( &m_wellPath, "WellPath", "Well Path" );
     CAF_PDM_InitFieldNoDefault( &m_wellFilePath, "WellFilePath", "Well File Path" );
+    m_wellFilePath.uiCapability()->setAttributeString( "m_fileSelectionFilter", "Well Path Files(*.dev);;All Files (*.*)" );
+
     CAF_PDM_InitFieldNoDefault( &m_selectedKeywords, "SelectedProperties", "Selected Properties" );
 
     m_tabNames << "Well" << "Properties";
@@ -156,17 +158,6 @@ QList<caf::PdmOptionItemInfo> RicCreateEnsembleWellLogUi::calculateValueOptions(
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicCreateEnsembleWellLogUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_wellFilePath )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_fileSelectionFilter = "Well Path Files(*.dev);;All Files (*.*)";
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -106,6 +106,8 @@ RimGeoMechResultDefinition::RimGeoMechResultDefinition()
     CAF_PDM_InitField( &m_normalizeByHydrostaticPressure, "NormalizeByHSP", false, "Normalize by Hydrostatic Pressure" );
     CAF_PDM_InitField( &m_normalizationAirGap, "NormalizationAirGap", 0.0, "Air Gap" );
     m_normalizationAirGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_normalizationAirGap.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_normalizationAirGap.setRange( 0.0, std::numeric_limits<double>::max() );
 
     CAF_PDM_InitField( &m_compactionRefLayerUiField,
                        "CompactionRefLayerUi",
@@ -542,22 +544,6 @@ void RimGeoMechResultDefinition::initAfterRead()
     m_compactionRefLayerUiField = m_compactionRefLayer;
 
     m_timeLapseBaseTimestep.uiCapability()->setUiReadOnly( resultPositionType() == RIG_WELLPATH_DERIVED );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGeoMechResultDefinition::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_normalizationAirGap )
-    {
-        auto attr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->m_decimals  = 2;
-            attr->m_validator = new QDoubleValidator( 0.0, std::numeric_limits<double>::max(), 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

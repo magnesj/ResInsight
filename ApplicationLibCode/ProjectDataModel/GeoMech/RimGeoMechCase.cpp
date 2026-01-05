@@ -118,16 +118,20 @@ RimGeoMechCase::RimGeoMechCase()
 
     CAF_PDM_InitField( &m_importElementPropertyFileCommand, "importElementPropertyFileCommad", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_importElementPropertyFileCommand );
+    m_importElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Import New Element Property" );
 
     CAF_PDM_InitField( &m_closeElementPropertyFileCommand, "closeElementPropertyFileCommad", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_closeElementPropertyFileCommand );
+    m_closeElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Close Selected Properties" );
 
     CAF_PDM_InitField( &m_reloadElementPropertyFileCommand, "reloadElementPropertyFileCommand", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_reloadElementPropertyFileCommand );
+    m_reloadElementPropertyFileCommand.uiCapability()->setAttributeString( "m_buttonText", "Reload Selected Properties" );
 
     caf::AppEnum<BiotCoefficientType> defaultBiotCoefficientType = RimGeoMechCase::BiotCoefficientType::BIOT_NONE;
     CAF_PDM_InitField( &m_biotCoefficientType, "BiotCoefficientType", defaultBiotCoefficientType, "Biot Coefficient" );
     CAF_PDM_InitField( &m_biotFixedCoefficient, "BiotFixedCoefficient", 1.0, "Fixed Coefficient" );
+    m_biotFixedCoefficient.setRange( 0.0, 1.0 );
     m_biotFixedCoefficient.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_biotResultAddress, "BiotResultAddress", QString( "" ), "Value" );
@@ -1111,35 +1115,6 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     caf::PdmUiGroup* timeStepFilterGroup = uiOrdering.addNewGroup( "Time Step Filter" );
     timeStepFilterGroup->setCollapsedByDefault();
     m_timeStepFilter->uiOrdering( uiConfigName, *timeStepFilterGroup );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGeoMechCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_importElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Import New Element Property";
-    }
-    if ( field == &m_reloadElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Reload Selected Properties";
-    }
-    if ( field == &m_closeElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Close Selected Properties";
-    }
-
-    if ( field == &m_biotFixedCoefficient )
-    {
-        auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_decimals  = 2;
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.0, 1.0, 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -81,6 +81,8 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     CAF_PDM_InitField( &m_userDescription, "UserDescription", QString( "Model" ), "Name" );
     CAF_PDM_InitFieldNoDefault( &m_geomechCase, "GeoMechCase", "Global GeoMech Model" );
     CAF_PDM_InitFieldNoDefault( &m_baseDir, "BaseDirectory", "Working Folder" );
+    m_baseDir.uiCapability()->setAttributeBool( "selectDirectory", true );
+
     CAF_PDM_InitField( &m_modelThickness, "ModelThickness", 100.0, "Model Cell Thickness" );
 
     CAF_PDM_InitField( &m_modelExtentFromAnchor, "ModelExtentFromAnchor", 1000.0, "Horz. Extent from Anchor" );
@@ -140,6 +142,7 @@ RimFaultReactivationModel::RimFaultReactivationModel()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( false );
+    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     CAF_PDM_InitFieldNoDefault( &m_materialParameters, "MaterialParameters", "Materials", ":/Bullet.png" );
 
@@ -432,6 +435,25 @@ bool RimFaultReactivationModel::showModel() const
 //--------------------------------------------------------------------------------------------------
 void RimFaultReactivationModel::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on eclipse case bounding box
+    auto eclCase = eclipseCase();
+    if ( eclCase )
+    {
+        auto   bb   = eclCase->allCellsBoundingBox();
+        double diff = bb.max().z() - bb.min().z();
+        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "maximum", diff, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "maximum", diff, uiConfigName );
+    }
+    else
+    {
+        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
+        m_faultExtendUpwards.uiCapability()->setAttributeDouble( "maximum", 1000.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "minimum", 0.0, uiConfigName );
+        m_faultExtendDownwards.uiCapability()->setAttributeDouble( "maximum", 1000.0, uiConfigName );
+    }
+
     auto genGrp = uiOrdering.addNewGroup( "General" );
     genGrp->add( &m_userDescription );
     genGrp->add( &m_fault );
@@ -551,46 +573,6 @@ void RimFaultReactivationModel::fieldChangedByUi( const caf::PdmFieldHandle* cha
         }
 
         updateVisualization();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFaultReactivationModel::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_targets )
-    {
-        if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-        }
-    }
-    else if ( field == &m_baseDir )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
-    else if ( ( field == &m_faultExtendUpwards ) || ( field == &m_faultExtendDownwards ) )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto eclCase = eclipseCase();
-            if ( eclCase )
-            {
-                auto   bb       = eclCase->allCellsBoundingBox();
-                double diff     = bb.max().z() - bb.min().z();
-                attr->m_minimum = 0;
-                attr->m_maximum = diff;
-            }
-            else
-            {
-                attr->m_minimum = 0;
-                attr->m_maximum = 1000;
-            }
-        }
     }
 }
 

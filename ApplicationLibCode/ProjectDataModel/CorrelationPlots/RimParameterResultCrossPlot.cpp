@@ -72,7 +72,12 @@ RimParameterResultCrossPlot::RimParameterResultCrossPlot()
 
     CAF_PDM_InitField( &m_useParameterFilter, "UseParameterFilter", false, "Use Parameter Filter" );
     CAF_PDM_InitField( &m_summaryFilterRange, "SummaryFilterRange", std::make_pair( 0.0, 0.0 ), "Summary Value Range", "", "", "" );
+    m_summaryFilterRange.uiCapability()->setAttributeInt( "decimals", 4 );
+    m_summaryFilterRange.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
+
     CAF_PDM_InitField( &m_parameterFilterRange, "ParameterFilterRange", std::make_pair( 0.0, 0.0 ), "Parameter Value Range", "", "", "" );
+    m_parameterFilterRange.uiCapability()->setAttributeInt( "decimals", 4 );
+    m_parameterFilterRange.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
 
     CAF_PDM_InitFieldNoDefault( &m_excludedCasesText, "ExcludedCasesText", "Excluded Cases" );
     m_excludedCasesText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
@@ -175,6 +180,12 @@ void RimParameterResultCrossPlot::fieldChangedByUi( const caf::PdmFieldHandle* c
 //--------------------------------------------------------------------------------------------------
 void RimParameterResultCrossPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on value ranges
+    m_summaryFilterRange.uiCapability()->setAttributeDouble( "minimum", m_yValueRange.first, uiConfigName );
+    m_summaryFilterRange.uiCapability()->setAttributeDouble( "maximum", m_yValueRange.second, uiConfigName );
+    m_parameterFilterRange.uiCapability()->setAttributeDouble( "minimum", m_xValueRange.first, uiConfigName );
+    m_parameterFilterRange.uiCapability()->setAttributeDouble( "maximum", m_xValueRange.second, uiConfigName );
+
     appendDataSourceFields( uiConfigName, uiOrdering );
 
     caf::PdmUiGroup* crossPlotGroup = uiOrdering.addNewGroup( "Cross Plot Parameters" );
@@ -213,37 +224,6 @@ QList<caf::PdmOptionItemInfo> RimParameterResultCrossPlot::calculateValueOptions
         }
     }
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimParameterResultCrossPlot::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                         QString                    uiConfigName,
-                                                         caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_summaryFilterRange )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 4;
-            attr->m_sliderTickCount = 20;
-
-            attr->m_minimum = m_yValueRange.first;
-            attr->m_maximum = m_yValueRange.second;
-        }
-    }
-    else if ( field == &m_parameterFilterRange )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_decimals        = 4;
-            attr->m_sliderTickCount = 20;
-
-            attr->m_minimum = m_xValueRange.first;
-            attr->m_maximum = m_xValueRange.second;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

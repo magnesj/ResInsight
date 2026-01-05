@@ -132,6 +132,8 @@ RimWellPltPlot::RimWellPltPlot()
                                                                          RimWellPlotTools::FlowPhase::FLOW_PHASE_GAS,
                                                                          RimWellPlotTools::FlowPhase::FLOW_PHASE_WATER } );
     m_phases.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_phases.uiCapability()->setAttributeBool( "showTextFilter", false );
+    m_phases.uiCapability()->setAttributeBool( "showToggleAllCheckbox", false );
 
     m_nameConfig->setCustomName( "PLT Plot" );
     setNamingMethod( RiaDefines::ObjectNamingMethod::CUSTOM );
@@ -941,19 +943,6 @@ void RimWellPltPlot::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
     }
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellPltPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_phases )
-    {
-        caf::PdmUiTreeSelectionEditorAttribute* attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        attrib->showTextFilter                         = false;
-        attrib->showToggleAllCheckbox                  = false;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

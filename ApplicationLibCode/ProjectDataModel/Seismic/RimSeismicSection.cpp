@@ -95,6 +95,7 @@ RimSeismicSection::RimSeismicSection()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
+    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
 
     CAF_PDM_InitField( &m_inlineIndex, "InlineIndex", -1, "Inline" );
     m_inlineIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
@@ -158,6 +159,50 @@ caf::PdmFieldHandle* RimSeismicSection::userDescriptionField()
 void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     initSliceRanges();
+
+    // Set dynamic button text based on picking state
+    if ( !m_enablePicking )
+    {
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+    }
+    else
+    {
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+    }
+
+    // Static button text
+    m_showImage.uiCapability()->setAttributeString( "buttonText", "Show Image", uiConfigName );
+
+    // Set dynamic table view attributes based on picking state
+    if ( m_enablePicking )
+    {
+        m_targets.uiCapability()->setAttribute( "baseColor", QVariant( QColor( 255, 220, 255 ) ), uiConfigName );
+        m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true, uiConfigName );
+    }
+
+    // Set dynamic slider ranges based on seismic data
+    if ( ( m_seismicData != nullptr ) && m_seismicData->boundingBox()->isValid() )
+    {
+        // Inline index
+        m_inlineIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_inlineIndex.setRange( m_seismicData->inlineMin(), m_seismicData->inlineMax() );
+
+        // Xline index
+        m_xlineIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_xlineIndex.setRange( m_seismicData->xlineMin(), m_seismicData->xlineMax() );
+
+        // Depth index
+        m_depthIndex.uiCapability()->setAttributeBool( "showSpinBox", true, uiConfigName );
+        m_depthIndex.setRange( m_seismicData->zMin(), m_seismicData->zMax() );
+
+        // Z threshold sliders
+        auto bb = m_seismicData->boundingBox();
+        if ( bb->isValid() )
+        {
+            m_zUpperThreshold.setRange( -1 * bb->max().z(), -1 * bb->min().z() );
+            m_zLowerThreshold.setRange( -1 * bb->max().z(), -1 * bb->min().z() );
+        }
+    }
 
     auto genGrp = uiOrdering.addNewGroup( "General" );
 
@@ -248,94 +293,6 @@ void RimSeismicSection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 void RimSeismicSection::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName /*= "" */ )
 {
     uiTreeOrdering.skipRemainingChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSeismicSection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_enablePicking )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_enablePicking )
-            {
-                pbAttribute->m_buttonText = "Start Picking Points";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Points";
-            }
-        }
-    }
-    else if ( field == &m_showImage )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Show Image";
-        }
-    }
-    else if ( field == &m_targets )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
-            if ( m_enablePicking )
-            {
-                tvAttribute->baseColor.setRgb( 255, 220, 255 );
-                tvAttribute->alwaysEnforceResizePolicy = true;
-            }
-        }
-    }
-    else if ( ( field == &m_depthIndex ) || ( field == &m_inlineIndex ) || ( field == &m_xlineIndex ) )
-    {
-        if ( ( m_seismicData != nullptr ) && m_seismicData->boundingBox()->isValid() )
-        {
-            auto* sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-            if ( sliderAttrib != nullptr )
-            {
-                sliderAttrib->m_showSpinBox = true;
-                int minVal                  = m_seismicData->inlineMin();
-                int maxVal                  = m_seismicData->inlineMax();
-                int stepVal                 = m_seismicData->inlineStep();
-
-                if ( field == &m_xlineIndex )
-                {
-                    minVal  = m_seismicData->xlineMin();
-                    maxVal  = m_seismicData->xlineMax();
-                    stepVal = m_seismicData->xlineStep();
-                }
-                else if ( field == &m_depthIndex )
-                {
-                    minVal  = m_seismicData->zMin();
-                    maxVal  = m_seismicData->zMax();
-                    stepVal = m_seismicData->zStep();
-                }
-                sliderAttrib->m_maximum = maxVal;
-                sliderAttrib->m_minimum = minVal;
-                sliderAttrib->m_step    = stepVal;
-            }
-        }
-    }
-    else if ( ( field == &m_zUpperThreshold ) || ( field == &m_zLowerThreshold ) )
-    {
-        auto* sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( ( sliderAttrib ) && ( m_seismicData != nullptr ) )
-        {
-            auto bb = m_seismicData->boundingBox();
-            if ( bb->isValid() )
-            {
-                sliderAttrib->m_minimum = -1 * bb->max().z();
-                sliderAttrib->m_maximum = -1 * bb->min().z();
-                sliderAttrib->m_step    = (int)m_seismicData->zStep();
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

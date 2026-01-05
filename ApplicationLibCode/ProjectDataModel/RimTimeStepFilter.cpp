@@ -73,6 +73,7 @@ RimTimeStepFilter::RimTimeStepFilter()
 
     CAF_PDM_InitField( &m_interval, "Interval", 1, "Interval" );
     m_interval.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+    m_interval.uiCapability()->setAttributeBool( "avoidSendingEnterEventToParentWidget", true );
 
     CAF_PDM_InitField( &m_timeStepNamesFromFile, "TimeStepsFromFile", std::vector<QString>(), "TimeSteps From File" );
     m_timeStepNamesFromFile.xmlCapability()->disableIO();
@@ -90,6 +91,7 @@ RimTimeStepFilter::RimTimeStepFilter()
 
     CAF_PDM_InitFieldNoDefault( &m_applyReloadOfCase, "ApplyReloadOfCase", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyReloadOfCase );
+    m_applyReloadOfCase.uiCapability()->setAttributeString( "m_buttonText", "Reload Case" );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -342,29 +344,6 @@ QList<caf::PdmOptionItemInfo> RimTimeStepFilter::calculateValueOptions( const ca
     }
 
     return optionItems;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimTimeStepFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_applyReloadOfCase )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Reload Case";
-        }
-    }
-    else if ( field == &m_interval )
-    {
-        caf::PdmUiLineEditorAttribute* attrib = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->avoidSendingEnterEventToParentWidget = true;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

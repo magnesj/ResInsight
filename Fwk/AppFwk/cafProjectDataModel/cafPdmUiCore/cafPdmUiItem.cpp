@@ -773,4 +773,167 @@ void PdmUiItem::addFieldEditor( PdmUiEditorHandle* fieldView )
     m_editors.insert( fieldView );
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiItem::setAttribute( const std::string& key, const QVariant& value, const QString& uiConfigName )
+{
+    m_attributeMaps[uiConfigName][key] = value;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QVariant PdmUiItem::getAttribute( const std::string& key, const QString& uiConfigName ) const
+{
+    // Check config-specific attributes first
+    if ( !uiConfigName.isEmpty() )
+    {
+        auto configIt = m_attributeMaps.find( uiConfigName );
+        if ( configIt != m_attributeMaps.end() )
+        {
+            auto attrIt = configIt->second.find( key );
+            if ( attrIt != configIt->second.end() )
+            {
+                return attrIt->second;
+            }
+        }
+    }
+
+    // Fall back to default config ("")
+    auto defaultIt = m_attributeMaps.find( "" );
+    if ( defaultIt != m_attributeMaps.end() )
+    {
+        auto attrIt = defaultIt->second.find( key );
+        if ( attrIt != defaultIt->second.end() )
+        {
+            return attrIt->second;
+        }
+    }
+
+    return QVariant(); // Return invalid QVariant if not found
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool PdmUiItem::hasAttribute( const std::string& key, const QString& uiConfigName ) const
+{
+    return getAttribute( key, uiConfigName ).isValid();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::map<std::string, QVariant> PdmUiItem::getAttributes( const QString& uiConfigName ) const
+{
+    std::map<std::string, QVariant> result;
+
+    // Start with default config attributes
+    auto defaultIt = m_attributeMaps.find( "" );
+    if ( defaultIt != m_attributeMaps.end() )
+    {
+        result = defaultIt->second;
+    }
+
+    // Override with config-specific attributes
+    if ( !uiConfigName.isEmpty() )
+    {
+        auto configIt = m_attributeMaps.find( uiConfigName );
+        if ( configIt != m_attributeMaps.end() )
+        {
+            for ( const auto& [key, value] : configIt->second )
+            {
+                result[key] = value;
+            }
+        }
+    }
+
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiItem::setAttributeInt( const std::string& key, int value, const QString& uiConfigName )
+{
+    setAttribute( key, QVariant( value ), uiConfigName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiItem::setAttributeBool( const std::string& key, bool value, const QString& uiConfigName )
+{
+    setAttribute( key, QVariant( value ), uiConfigName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiItem::setAttributeString( const std::string& key, const QString& value, const QString& uiConfigName )
+{
+    setAttribute( key, QVariant( value ), uiConfigName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void PdmUiItem::setAttributeDouble( const std::string& key, double value, const QString& uiConfigName )
+{
+    setAttribute( key, QVariant( value ), uiConfigName );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<int> PdmUiItem::getAttributeInt( const std::string& key, const QString& uiConfigName ) const
+{
+    QVariant value = getAttribute( key, uiConfigName );
+    if ( value.isValid() && value.canConvert<int>() )
+    {
+        return value.toInt();
+    }
+    return std::nullopt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<bool> PdmUiItem::getAttributeBool( const std::string& key, const QString& uiConfigName ) const
+{
+    QVariant value = getAttribute( key, uiConfigName );
+    if ( value.isValid() && value.canConvert<bool>() )
+    {
+        return value.toBool();
+    }
+    return std::nullopt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<QString> PdmUiItem::getAttributeString( const std::string& key, const QString& uiConfigName ) const
+{
+    QVariant value = getAttribute( key, uiConfigName );
+    if ( value.isValid() && value.canConvert<QString>() )
+    {
+        return value.toString();
+    }
+    return std::nullopt;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::optional<double> PdmUiItem::getAttributeDouble( const std::string& key, const QString& uiConfigName ) const
+{
+    QVariant value = getAttribute( key, uiConfigName );
+    if ( value.isValid() && value.canConvert<double>() )
+    {
+        return value.toDouble();
+    }
+    return std::nullopt;
+}
+
 } // End of namespace caf

@@ -43,6 +43,7 @@ RicSelectPlotTemplateUi::RicSelectPlotTemplateUi()
     CAF_PDM_InitFieldNoDefault( &m_selectedPlotTemplates, "SelectedPlotTemplates", "Plot Templates" );
     m_selectedPlotTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_selectedPlotTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    // Note: singleSelectionMode is dynamic based on m_useMultiSelect, kept in defineEditorAttribute
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -78,6 +79,15 @@ void RicSelectPlotTemplateUi::setInitialSelection( const std::vector<QString>& s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicSelectPlotTemplateUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    m_selectedPlotTemplates.uiCapability()->setAttributeBool( "singleSelectionMode", !m_useMultiSelect, uiConfigName );
+    uiOrdering.add( &m_selectedPlotTemplates );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::vector<RimPlotTemplateFileItem*> RicSelectPlotTemplateUi::selectedPlotTemplates()
 {
     std::vector<RimPlotTemplateFileItem*> objs;
@@ -108,19 +118,4 @@ QList<caf::PdmOptionItemInfo> RicSelectPlotTemplateUi::calculateValueOptions( co
     }
 
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicSelectPlotTemplateUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_selectedPlotTemplates == field )
-    {
-        auto a = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( a )
-        {
-            a->singleSelectionMode = !m_useMultiSelect;
-        }
-    }
 }

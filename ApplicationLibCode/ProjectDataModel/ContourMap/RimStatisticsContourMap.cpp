@@ -160,6 +160,8 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     computeOK      = computeOK && !selectedTimeSteps().empty();
 
     uiOrdering.add( nameField() );
+
+    m_computeStatisticsButton.uiCapability()->setAttributeString( "buttonText", "Compute" );
     uiOrdering.add( &m_computeStatisticsButton );
     m_computeStatisticsButton.uiCapability()->setUiReadOnly( !computeOK );
     if ( computeOK )
@@ -182,6 +184,10 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
             genGrp->add( &m_oilFloodingType );
             if ( m_oilFloodingType() == RigFloodingSettings::FloodingType::USER_DEFINED )
             {
+                m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+                m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+                m_userDefinedFloodingOil.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
+                m_userDefinedFloodingOil.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true );
                 genGrp->add( &m_userDefinedFloodingOil );
             }
         }
@@ -190,6 +196,10 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
             genGrp->add( &m_gasFloodingType );
             if ( m_gasFloodingType() == RigFloodingSettings::FloodingType::USER_DEFINED )
             {
+                m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+                m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+                m_userDefinedFloodingGas.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
+                m_userDefinedFloodingGas.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true );
                 genGrp->add( &m_userDefinedFloodingGas );
             }
         }
@@ -387,30 +397,6 @@ QList<caf::PdmOptionItemInfo> RimStatisticsContourMap::calculateValueOptions( co
     }
 
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimStatisticsContourMap::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_computeStatisticsButton == field )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Compute";
-        }
-    }
-    else if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum                       = 0.0;
-            myAttr->m_maximum                       = 1.0;
-            myAttr->m_sliderTickCount               = 20;
-            myAttr->m_delaySliderUpdateUntilRelease = true;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

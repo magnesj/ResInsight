@@ -38,6 +38,9 @@ RimWellPathAttributeCollection::RimWellPathAttributeCollection()
     m_attributes.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_attributes.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_attributes.uiCapability()->setCustomContextMenuEnabled( true );
+    m_attributes.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_attributes.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_attributes.uiCapability()->setAttributeInt( "minimumHeight", 300 );
     setName( "Casing Design" );
 }
 
@@ -126,25 +129,7 @@ void RimWellPathAttributeCollection::defineCustomContextMenu( const caf::PdmFiel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellPathAttributeCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                            QString                    uiConfigName,
-                                                            caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_attributes )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 300;
-        }
-    }
-}
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimWellPathAttributeCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_attributes );

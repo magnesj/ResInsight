@@ -454,6 +454,9 @@ void RimMeshFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUi
     uiOrdering.add( &m_name );
     uiOrdering.add( &m_id );
 
+    // Set dynamic file selection filter for m_stimPlanFileName
+    m_stimPlanFileName.uiCapability()->setAttributeString( "fileSelectionFilter", getFileSelectionFilter(), uiConfigName );
+
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Input" );
         group->add( &m_stimPlanFileName );
@@ -493,23 +496,6 @@ void RimMeshFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUi
     }
 
     RimFractureTemplate::defineUiOrdering( uiConfigName, uiOrdering );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimMeshFractureTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimFractureTemplate::defineEditorAttribute( field, uiConfigName, attribute );
-
-    if ( field == &m_stimPlanFileName )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_fileSelectionFilter = getFileSelectionFilter();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

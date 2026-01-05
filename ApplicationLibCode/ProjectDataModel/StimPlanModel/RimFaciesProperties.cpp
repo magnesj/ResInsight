@@ -50,6 +50,8 @@ RimFaciesProperties::RimFaciesProperties()
     m_propertiesTable.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_propertiesTable.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_propertiesTable.uiCapability()->setUiReadOnly( true );
+    m_propertiesTable.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
+    m_propertiesTable.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
     m_propertiesTable.xmlCapability()->disableIO();
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_faciesDefinition, "FaciesDefinition", "" );
@@ -129,22 +131,6 @@ void RimFaciesProperties::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
 
     caf::PdmUiGroup* faciesDefinitionGroup = uiOrdering.addNewGroup( "Facies Definition" );
     m_faciesDefinition->uiOrdering( uiConfigName, *faciesDefinitionGroup );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimFaciesProperties::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_propertiesTable )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -38,6 +38,9 @@ RimDiameterRoughnessIntervalCollection::RimDiameterRoughnessIntervalCollection()
     CAF_PDM_InitObject( "Diameter Roughness Intervals", ":/WellPathComponent16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_intervals, "Intervals", "Intervals" );
+    m_intervals.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_intervals.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_intervals.uiCapability()->setAttributeInt( "minimumHeight", 300 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -415,25 +418,6 @@ void RimDiameterRoughnessIntervalCollection::fieldChangedByUi( const caf::PdmFie
 void RimDiameterRoughnessIntervalCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_intervals );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimDiameterRoughnessIntervalCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                                    QString                    uiConfigName,
-                                                                    caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_intervals )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 300;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

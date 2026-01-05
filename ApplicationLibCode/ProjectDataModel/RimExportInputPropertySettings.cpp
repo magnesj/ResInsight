@@ -33,26 +33,12 @@ RimExportInputSettings::RimExportInputSettings()
 
     CAF_PDM_InitFieldNoDefault( &fileName, "Filename", "Export Filename" );
     fileName.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    fileName.uiCapability()->setAttributeBool( "m_selectSaveFileName", true );
+    fileName.uiCapability()->setAttributeString( "m_fileSelectionFilter", "Text files (*.txt);;All files (*.*)" );
     CAF_PDM_InitFieldNoDefault( &eclipseKeyword, "Keyword", "Eclipse Keyword" );
 
     CAF_PDM_InitField( &writeEchoInGrdeclFiles,
                        "WriteEchoInGrdeclFiles",
                        RiaPreferences::current()->writeEchoInGrdeclFiles(),
                        "Write NOECHO and ECHO" );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimExportInputSettings::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &fileName )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectSaveFileName  = true;
-            myAttr->m_fileSelectionFilter = "Text files (*.txt);;All files (*.*)";
-        }
-    }
 }

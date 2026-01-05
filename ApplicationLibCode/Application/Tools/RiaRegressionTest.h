@@ -50,5 +50,4 @@ public:
     caf::PdmField<bool> exportSnapshotsPlots;
 
 protected:
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 };

@@ -53,6 +53,7 @@
 
 #include "cvfScalarMapper.h"
 
+#include <QIcon>
 #include <QPainter>
 
 CAF_PDM_SOURCE_INIT( RimWellConnectivityTable, "RimWellConnectivityTable" );
@@ -144,14 +145,23 @@ RimWellConnectivityTable::RimWellConnectivityTable()
     m_timeSampleValueType.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_selectedTimeStep, "TimeStep", "Time Step" );
     m_selectedTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_selectedTimeStep.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
+    m_selectedTimeStep.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     // Time step range configuration
     CAF_PDM_InitFieldNoDefault( &m_timeRangeValueType, "TimeRangeValueType", "Value Type" );
     m_timeRangeValueType.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_selectedFromTimeStep, "FromTimeStep", "From Time Step" );
     m_selectedFromTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedFromTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_selectedFromTimeStep.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
+    m_selectedFromTimeStep.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_selectedToTimeStep, "ToTimeStep", "To Time Step" );
     m_selectedToTimeStep.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_selectedToTimeStep.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_selectedToTimeStep.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
+    m_selectedToTimeStep.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilterMode, "TimeStepRangeFilterMode", "Filter" );
     m_timeStepFilterMode.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_timeStepCount, "TimeStepCount", m_initialNumberOfTimeSteps, "Number of Time Steps" );
@@ -159,6 +169,7 @@ RimWellConnectivityTable::RimWellConnectivityTable()
     m_excludeTimeSteps.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_applyTimeStepSelections, "ApplyTimeStepSelections", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyTimeStepSelections );
+    m_applyTimeStepSelections.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
 
     // Producer/Injector tracer configuration
     CAF_PDM_InitFieldNoDefault( &m_selectedProducerTracersUiField, "SelectedProducerTracers", "Producer Tracers" );
@@ -171,6 +182,7 @@ RimWellConnectivityTable::RimWellConnectivityTable()
     m_syncSelectedProducersFromInjectorSelection.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_applySelectedInectorProducerTracers, "ApplySelectedInectorProducerTracers", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applySelectedInectorProducerTracers );
+    m_applySelectedInectorProducerTracers.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
 
     // Table settings
     CAF_PDM_InitField( &m_showValueLabels, "ShowValueLabels", false, "Show Value Labels" );
@@ -520,25 +532,6 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
     fontGroup->add( &m_valueLabelFontSize );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellConnectivityTable::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_applyTimeStepSelections || field == &m_applySelectedInectorProducerTracers )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
-    if ( field == &m_selectedTimeStep || field == &m_selectedFromTimeStep || field == &m_selectedToTimeStep )
-    {
-        RiuTools::enableUpDownArrowsForComboBox( attribute );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

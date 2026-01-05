@@ -129,6 +129,7 @@
 #include "cvfqtUtils.h"
 
 #include <QApplication>
+#include <QIcon>
 
 #include <climits>
 
@@ -165,6 +166,9 @@ RimEclipseView::RimEclipseView()
     CAF_PDM_InitFieldNoDefault( &m_customEclipseCase_OBSOLETE, "CustomEclipseCase", "Custom Case" );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_eclipseCase, "EclipseCase", "Eclipse Case" );
+    m_eclipseCase.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_eclipseCase.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
+    m_eclipseCase.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
     CAF_PDM_InitFieldNoDefault( &m_caseChangeBehaviour, "CaseChangeBehaviour", "Zoom Operation When Changing Case" );
 
     CAF_PDM_InitScriptableFieldWithScriptKeywordNoDefault( &m_cellResult, "GridCellResult", "CellResult", "Cell Result", ":/CellResult.png" );
@@ -2108,17 +2112,6 @@ QList<caf::PdmOptionItemInfo> RimEclipseView::calculateValueOptions( const caf::
     }
 
     return RimGridView::calculateValueOptions( fieldNeedingOptions );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_eclipseCase )
-    {
-        RiuTools::enableUpDownArrowsForComboBox( attribute );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

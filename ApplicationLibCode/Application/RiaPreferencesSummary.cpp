@@ -118,12 +118,15 @@ RiaPreferencesSummary::RiaPreferencesSummary()
                        "" );
 
     CAF_PDM_InitField( &m_selectDefaultTemplates, "selectDefaultTemplate", false, "", "", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
+    m_selectDefaultTemplates.uiCapability()->setAttributeString( "m_buttonText", "Select Default Templates" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectDefaultTemplates );
 
     CAF_PDM_InitFieldNoDefault( &m_selectedDefaultTemplates, "defaultSummaryTemplates", "Select Summary Plot Templates" );
     m_selectedDefaultTemplates.uiCapability()->setUiReadOnly( true );
     m_selectedDefaultTemplates.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
     m_selectedDefaultTemplates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_selectedDefaultTemplates.uiCapability()->setAttributeInt( "heightHint", 30 );
 
     CAF_PDM_InitField( &m_summaryReadoutMode, "summaryReadoutMode", RiaDefines::ReadOutType::SNAP_TO_POINT, "Default Readout Mode" );
 
@@ -190,8 +193,11 @@ RiaPreferencesSummary::RiaPreferencesSummary()
 
     CAF_PDM_InitFieldNoDefault( &m_defaultColumnCount, "DefaultNumberOfColumns", "Columns" );
     m_defaultColumnCount = RiaDefines::ColumnCount::COLUMNS_2;
+    m_defaultColumnCount.uiCapability()->setAttribute( "iconSize", QVariant( QSize( 24, 16 ) ) );
+
     CAF_PDM_InitFieldNoDefault( &m_defaultRowsPerPage, "DefaultRowsPerPage", "Rows per Page" );
     m_defaultRowsPerPage = RiaDefines::RowCount::ROWS_2;
+    m_defaultRowsPerPage.uiCapability()->setAttribute( "iconSize", QVariant( QSize( 24, 16 ) ) );
 
     CAF_PDM_InitField( &m_curveColorByPhase, "curveColorByPhase", true, "Curve Color By Phase" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_curveColorByPhase );
@@ -446,37 +452,6 @@ void RiaPreferencesSummary::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     }
 
     uiOrdering.skipRemainingFields();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaPreferencesSummary::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_defaultRowsPerPage || field == &m_defaultColumnCount )
-    {
-        auto myattr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( myattr )
-        {
-            myattr->iconSize = QSize( 24, 16 );
-        }
-    }
-    else if ( field == &m_selectDefaultTemplates )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Select Default Templates";
-        }
-    }
-    else if ( field == &m_selectedDefaultTemplates )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->heightHint = 30;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

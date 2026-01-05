@@ -43,6 +43,7 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_authenticate, "Authenticate", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_authenticate );
+    m_authenticate.uiCapability()->setAttributeString( "m_buttonText", "Authenticate" );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoFieldName, "SumoFieldId", "Field Id" );
     CAF_PDM_InitFieldNoDefault( &m_sumoCaseId, "SumoCaseId", "Case Id" );
@@ -53,9 +54,11 @@ RimCloudDataSourceCollection::RimCloudDataSourceCollection()
 
     CAF_PDM_InitFieldNoDefault( &m_addDataSources, "AddDataSources", "", "", "Add Data Sources without Ensembles" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addDataSources );
+    m_addDataSources.uiCapability()->setAttributeString( "m_buttonText", "Add Data Sources(s)" );
 
     CAF_PDM_InitFieldNoDefault( &m_addEnsembles, "AddEnsembles", "", "", "Add Data Sources and Create Summary Ensemble Plots" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_addEnsembles );
+    m_addEnsembles.uiCapability()->setAttributeString( "m_buttonText", "Add Ensemble(s)" );
 
     CAF_PDM_InitFieldNoDefault( &m_sumoDataSources, "SumoDataSources", "Sumo Data Sources" );
 
@@ -219,36 +222,6 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_addEnsembles, layout );
     }
     uiOrdering.skipRemainingFields();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimCloudDataSourceCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_authenticate )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Authenticate";
-        }
-    }
-    else if ( field == &m_addDataSources )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Add Data Sources(s)";
-        }
-    }
-    else if ( field == &m_addEnsembles )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Add Ensemble(s)";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

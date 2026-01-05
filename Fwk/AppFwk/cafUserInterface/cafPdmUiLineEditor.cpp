@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -157,6 +158,79 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             if ( uiObject )
             {
                 uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &leab );
+            }
+
+            // Override with map-based attributes if present (new system takes precedence)
+            PdmUiItem* uiItem = uiField();
+            if ( uiItem )
+            {
+                // List of supported attributes for validation
+                static const std::set<std::string> supportedAttributes = { "maximumWidth",
+                                                                           "selectAllOnFocusEvent",
+                                                                           "placeholderText",
+                                                                           "avoidSendingEnterEvent",
+                                                                           "completerCaseSensitivity",
+                                                                           "completerFilterMode",
+                                                                           "notifyWhenTextIsEdited" };
+
+                QVariant val;
+
+                val = uiItem->getAttribute( "maximumWidth", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.maximumWidth = val.toInt();
+                }
+
+                val = uiItem->getAttribute( "selectAllOnFocusEvent", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.selectAllOnFocusEvent = val.toBool();
+                }
+
+                val = uiItem->getAttribute( "placeholderText", uiConfigName );
+                if ( val.isValid() && val.canConvert<QString>() )
+                {
+                    leab.placeholderText = val.toString();
+                }
+
+                val = uiItem->getAttribute( "avoidSendingEnterEvent", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.avoidSendingEnterEventToParentWidget = val.toBool();
+                }
+
+                val = uiItem->getAttribute( "completerCaseSensitivity", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.completerCaseSensitivity = static_cast<Qt::CaseSensitivity>( val.toInt() );
+                }
+
+                val = uiItem->getAttribute( "completerFilterMode", uiConfigName );
+                if ( val.isValid() && val.canConvert<int>() )
+                {
+                    leab.completerFilterMode = static_cast<Qt::MatchFlags>( val.toInt() );
+                }
+
+                val = uiItem->getAttribute( "notifyWhenTextIsEdited", uiConfigName );
+                if ( val.isValid() && val.canConvert<bool>() )
+                {
+                    leab.notifyWhenTextIsEdited = val.toBool();
+                }
+
+                // Validate: warn about unsupported attributes
+                auto allAttributes = uiItem->getAttributes( uiConfigName );
+                for ( const auto& [key, value] : allAttributes )
+                {
+                    if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                    {
+                        CAF_PDM_LOG_WARNING(
+                            QString( "PdmUiLineEditor: Unsupported attribute '%1' set on field. Supported "
+                                     "attributes are: maximumWidth, selectAllOnFocusEvent, placeholderText, "
+                                     "avoidSendingEnterEvent, completerCaseSensitivity, completerFilterMode, "
+                                     "notifyWhenTextIsEdited" )
+                                .arg( QString::fromStdString( key ) ) );
+                    }
+                }
             }
 
             if ( uiField()->isAutoValueEnabled() )

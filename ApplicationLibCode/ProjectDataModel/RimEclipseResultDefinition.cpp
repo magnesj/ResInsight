@@ -1496,10 +1496,12 @@ void RimEclipseResultDefinition::defineUiOrdering( QString uiConfigName, caf::Pd
             caf::PdmUiGroup* injectorGroup = selectionGroup->addNewGroup( "Injectors" );
             injectorGroup->add( &m_selectedInjectorTracersUiField );
             injectorGroup->add( &m_syncInjectorToProducerSelection );
+            m_syncInjectorToProducerSelection.uiCapability()->setAttributeInt( "horizontalSizePolicy", QSizePolicy::MinimumExpanding );
 
             caf::PdmUiGroup* producerGroup = selectionGroup->addNewGroup( "Producers", { .newRow = false } );
             producerGroup->add( &m_selectedProducerTracersUiField );
             producerGroup->add( &m_syncProducerToInjectorSelection );
+            m_syncProducerToInjectorSelection.uiCapability()->setAttributeInt( "horizontalSizePolicy", QSizePolicy::MinimumExpanding );
         }
 
         uiOrdering.add( &m_phaseSelection );
@@ -1580,20 +1582,6 @@ void RimEclipseResultDefinition::defineUiOrdering( QString uiConfigName, caf::Pd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseResultDefinition::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( m_resultTypeUiField() == RiaDefines::ResultCatType::FLOW_DIAGNOSTICS )
-    {
-        if ( field == &m_syncInjectorToProducerSelection || field == &m_syncProducerToInjectorSelection )
-        {
-            caf::PdmUiToolButtonEditorAttribute* toolButtonAttr = dynamic_cast<caf::PdmUiToolButtonEditorAttribute*>( attribute );
-            if ( toolButtonAttr )
-            {
-                toolButtonAttr->m_sizePolicy.setHorizontalPolicy( QSizePolicy::MinimumExpanding );
-            }
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

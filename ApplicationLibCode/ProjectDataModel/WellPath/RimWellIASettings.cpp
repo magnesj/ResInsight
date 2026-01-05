@@ -91,6 +91,7 @@ RimWellIASettings::RimWellIASettings()
     CAF_PDM_InitField( &m_showBox, "showBox", false, "Show model box" );
 
     CAF_PDM_InitFieldNoDefault( &m_geostaticDate, "startDate", "Start Date (geostatic):" );
+    m_geostaticDate.uiCapability()->setAttributeString( "dateFormat", "dd MMM yyyy" );
 
     CAF_PDM_InitField( &m_boxValid, "boxValid", false, "Model box is valid" );
     m_boxValid.uiCapability()->setUiHidden( true );
@@ -182,6 +183,10 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
             m_startMD.uiCapability()->setUiName( "Start MD [ft]" );
             m_endMD.uiCapability()->setUiName( "End MD [ft]" );
         }
+
+        // Set dynamic slider ranges based on well path
+        m_startMD.setRange( wellPath->uniqueStartMD(), wellPath->uniqueEndMD() );
+        m_endMD.setRange( wellPath->uniqueStartMD(), wellPath->uniqueEndMD() );
     }
 
     auto generalGroup = uiOrdering.addNewGroup( "General" );
@@ -199,34 +204,6 @@ void RimWellIASettings::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     modelGroup->add( &m_showBox );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellIASettings::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_startMD || field == &m_endMD )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-
-        if ( myAttr )
-        {
-            auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
-            if ( !wellPath ) return;
-
-            myAttr->m_minimum = wellPath->uniqueStartMD();
-            myAttr->m_maximum = wellPath->uniqueEndMD();
-        }
-    }
-    else if ( field == &m_geostaticDate )
-    {
-        caf::PdmUiDateEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->dateFormat = "dd MMM yyyy";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

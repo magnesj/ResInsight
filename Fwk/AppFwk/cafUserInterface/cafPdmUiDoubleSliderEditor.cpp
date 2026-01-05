@@ -37,6 +37,7 @@
 #include "cafPdmUiDoubleSliderEditor.h"
 
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiObjectHandle.h"
 
@@ -79,6 +80,64 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<std::string> supportedAttributes = { "minimum",
+                                                                   "maximum",
+                                                                   "decimals",
+                                                                   "sliderTickCount",
+                                                                   "delaySliderUpdateUntilRelease" };
+
+        QVariant val;
+
+        val = uiItem->getAttribute( "minimum", uiConfigName );
+        if ( val.isValid() && val.canConvert<double>() )
+        {
+            m_attributes.m_minimum = val.toDouble();
+        }
+
+        val = uiItem->getAttribute( "maximum", uiConfigName );
+        if ( val.isValid() && val.canConvert<double>() )
+        {
+            m_attributes.m_maximum = val.toDouble();
+        }
+
+        val = uiItem->getAttribute( "decimals", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.m_decimals = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "sliderTickCount", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.m_sliderTickCount = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "delaySliderUpdateUntilRelease", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.m_delaySliderUpdateUntilRelease = val.toBool();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString(
+                        "PdmUiDoubleSliderEditor: Unsupported attribute '%1' set on field. Supported "
+                        "attributes are: minimum, maximum, decimals, sliderTickCount, delaySliderUpdateUntilRelease" )
+                        .arg( QString::fromStdString( key ) ) );
+            }
+        }
     }
 
     double  doubleValue = uiField()->uiValue().toDouble();

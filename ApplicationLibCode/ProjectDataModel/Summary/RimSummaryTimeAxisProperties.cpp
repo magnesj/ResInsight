@@ -826,6 +826,17 @@ void RimSummaryTimeAxisProperties::defineUiOrdering( QString uiConfigName, caf::
     timeGroup->add( &m_timeMode );
     if ( m_timeMode() == DATE )
     {
+        // Set dynamic date and time format attributes
+        QString dateFormatString =
+            RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY );
+        m_visibleDateRangeMin.uiCapability()->setAttributeString( "dateFormat", dateFormatString, uiConfigName );
+        m_visibleDateRangeMax.uiCapability()->setAttributeString( "dateFormat", dateFormatString, uiConfigName );
+
+        QString timeFormatString =
+            RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND );
+        m_visibleTimeRangeMin.uiCapability()->setAttributeString( "timeFormat", timeFormatString, uiConfigName );
+        m_visibleTimeRangeMax.uiCapability()->setAttributeString( "timeFormat", timeFormatString, uiConfigName );
+
         timeGroup->add( &m_visibleDateRangeMax );
         timeGroup->appendToRow( &m_visibleTimeRangeMax );
         timeGroup->add( &m_visibleDateRangeMin );
@@ -954,31 +965,4 @@ void RimSummaryTimeAxisProperties::fieldChangedByUi( const caf::PdmFieldHandle* 
     }
 
     settingsChanged.send();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryTimeAxisProperties::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_visibleDateRangeMin || field == &m_visibleDateRangeMax )
-    {
-        auto dateAttrib = dynamic_cast<caf::PdmUiDateEditorAttribute*>( attribute );
-        if ( dateAttrib )
-        {
-            dateAttrib->dateFormat =
-                RiaQDateTimeTools::dateFormatString( m_dateFormat(), RiaDefines::DateFormatComponents::DATE_FORMAT_YEAR_MONTH_DAY );
-        }
-    }
-    else if ( field == &m_visibleTimeRangeMin || field == &m_visibleTimeRangeMax )
-    {
-        auto timeAttrib = dynamic_cast<caf::PdmUiTimeEditorAttribute*>( attribute );
-        if ( timeAttrib )
-        {
-            timeAttrib->timeFormat =
-                RiaQDateTimeTools::timeFormatString( m_timeFormat(), RiaDefines::TimeFormatComponents::TIME_FORMAT_HOUR_MINUTE_SECOND );
-        }
-    }
 }

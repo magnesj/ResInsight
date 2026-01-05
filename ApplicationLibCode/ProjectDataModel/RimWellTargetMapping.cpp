@@ -105,6 +105,9 @@ RimWellTargetMapping::RimWellTargetMapping()
     m_oilFloodingType.setValue( RigFloodingSettings::FloodingType::WATER_FLOODING );
     CAF_PDM_InitField( &m_userDefinedFloodingOil, "UserDefinedFloodingOil", 0.0, "" );
     m_userDefinedFloodingOil.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
 
     CAF_PDM_InitField( &m_gasFloodingType, "GasFloodingType", RigFloodingSettings::FloodingType::GAS_FLOODING, "Residual Oil-in-Gas Given By" );
     caf::AppEnum<RigFloodingSettings::FloodingType>::setEnumSubset( &m_gasFloodingType,
@@ -113,6 +116,9 @@ RimWellTargetMapping::RimWellTargetMapping()
 
     CAF_PDM_InitField( &m_userDefinedFloodingGas, "UserDefinedFloodingGas", 0.0, "" );
     m_userDefinedFloodingGas.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
 
     CAF_PDM_InitField( &m_saturationOil, "SaturationOil", 0.0, "Saturation Oil" );
     m_saturationOil.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -131,6 +137,7 @@ RimWellTargetMapping::RimWellTargetMapping()
 
     CAF_PDM_InitField( &m_resetDefaultButton, "ResetDefaultButton", true, "Reset to Default" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_resetDefaultButton );
+    m_resetDefaultButton.uiCapability()->setAttributeString( "buttonText", "Reset to Default" );
     m_resetDefaultButton.xmlCapability()->disableIO();
 
     CAF_PDM_InitField( &m_maxIterations, "Iterations", 100000, "Max Iterations" );
@@ -149,6 +156,7 @@ RimWellTargetMapping::RimWellTargetMapping()
 
     CAF_PDM_InitField( &m_generateButton, "GenerateButton", true, "Generate" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_generateButton );
+    m_generateButton.uiCapability()->setAttributeString( "buttonText", "Generate" );
     m_generateButton.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_filterView, "FilterView", "Filter By View" );
@@ -332,89 +340,6 @@ void RimWellTargetMapping::updateAllBoundaries()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellTargetMapping::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-
-{
-    if ( field == &m_saturationOil && m_minimumSaturationOil != cvf::UNDEFINED_DOUBLE && m_maximumSaturationOil != cvf::UNDEFINED_DOUBLE )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum  = m_minimumSaturationOil;
-            doubleAttributes->m_maximum  = m_maximumSaturationOil;
-            doubleAttributes->m_decimals = 3;
-        }
-    }
-
-    if ( field == &m_saturationGas && m_minimumSaturationGas != cvf::UNDEFINED_DOUBLE && m_maximumSaturationGas != cvf::UNDEFINED_DOUBLE )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum  = m_minimumSaturationGas;
-            doubleAttributes->m_maximum  = m_maximumSaturationGas;
-            doubleAttributes->m_decimals = 3;
-        }
-    }
-
-    if ( field == &m_pressure && m_minimumPressure != cvf::UNDEFINED_DOUBLE && m_maximumPressure != cvf::UNDEFINED_DOUBLE )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum  = m_minimumPressure;
-            doubleAttributes->m_maximum  = m_maximumPressure;
-            doubleAttributes->m_decimals = 3;
-        }
-    }
-
-    if ( field == &m_permeability && m_minimumPermeability != cvf::UNDEFINED_DOUBLE && m_maximumPermeability != cvf::UNDEFINED_DOUBLE )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum  = m_minimumPermeability;
-            doubleAttributes->m_maximum  = m_maximumPermeability;
-            doubleAttributes->m_decimals = 3;
-        }
-    }
-
-    if ( field == &m_transmissibility && m_minimumTransmissibility != cvf::UNDEFINED_DOUBLE && m_maximumTransmissibility != cvf::UNDEFINED_DOUBLE )
-    {
-        if ( auto doubleAttributes = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            doubleAttributes->m_minimum  = m_minimumTransmissibility;
-            doubleAttributes->m_maximum  = m_maximumTransmissibility;
-            doubleAttributes->m_decimals = 3;
-        }
-    }
-
-    if ( field == &m_generateButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Generate";
-        }
-    }
-
-    if ( field == &m_resetDefaultButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Reset to Default";
-        }
-    }
-
-    if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum         = 0.0;
-            myAttr->m_maximum         = 1.0;
-            myAttr->m_sliderTickCount = 20;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 cvf::Vec3st RimWellTargetMapping::getResultGridCellCount() const
 {
     return cvf::Vec3st( m_cellCountI, m_cellCountJ, m_cellCountK );
@@ -521,11 +446,32 @@ void RimWellTargetMapping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     if ( !hasEnsembleParent ) uiOrdering.add( &m_filterView );
 
     caf::PdmUiGroup* minimumCellValuesGroup = uiOrdering.addNewGroup( "Minimum Cell Values" );
-    if ( showOilOptions ) minimumCellValuesGroup->add( &m_saturationOil );
-    if ( showGasOptions ) minimumCellValuesGroup->add( &m_saturationGas );
+    if ( showOilOptions )
+    {
+        minimumCellValuesGroup->add( &m_saturationOil );
+        m_saturationOil.uiCapability()->setAttributeDouble( "minimum", m_minimumSaturationOil, uiConfigName );
+        m_saturationOil.uiCapability()->setAttributeDouble( "maximum", m_maximumSaturationOil, uiConfigName );
+        m_saturationOil.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    }
+    if ( showGasOptions )
+    {
+        minimumCellValuesGroup->add( &m_saturationGas );
+        m_saturationGas.uiCapability()->setAttributeDouble( "minimum", m_minimumSaturationGas, uiConfigName );
+        m_saturationGas.uiCapability()->setAttributeDouble( "maximum", m_maximumSaturationGas, uiConfigName );
+        m_saturationGas.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
+    }
     minimumCellValuesGroup->add( &m_pressure );
+    m_pressure.uiCapability()->setAttributeDouble( "minimum", m_minimumPressure, uiConfigName );
+    m_pressure.uiCapability()->setAttributeDouble( "maximum", m_maximumPressure, uiConfigName );
+    m_pressure.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     minimumCellValuesGroup->add( &m_permeability );
+    m_permeability.uiCapability()->setAttributeDouble( "minimum", m_minimumPermeability, uiConfigName );
+    m_permeability.uiCapability()->setAttributeDouble( "maximum", m_maximumPermeability, uiConfigName );
+    m_permeability.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     minimumCellValuesGroup->add( &m_transmissibility );
+    m_transmissibility.uiCapability()->setAttributeDouble( "minimum", m_minimumTransmissibility, uiConfigName );
+    m_transmissibility.uiCapability()->setAttributeDouble( "maximum", m_maximumTransmissibility, uiConfigName );
+    m_transmissibility.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     minimumCellValuesGroup->add( &m_resetDefaultButton );
 
     if ( hasEnsembleParent )

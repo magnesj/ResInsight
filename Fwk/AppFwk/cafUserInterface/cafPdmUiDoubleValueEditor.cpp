@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -83,6 +84,37 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
         if ( m_attributes.m_validator )
         {
             m_lineEdit->setValidator( m_attributes.m_validator );
+        }
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<std::string> supportedAttributes = { "decimals", "numberFormat" };
+
+        if ( auto val = uiItem->getAttributeInt( "decimals", uiConfigName ) )
+        {
+            m_attributes.m_decimals = *val;
+        }
+
+        if ( auto val = uiItem->getAttributeInt( "numberFormat", uiConfigName ) )
+        {
+            m_attributes.m_numberFormat = static_cast<PdmUiDoubleValueEditorAttribute::NumberFormat>( *val );
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiDoubleValueEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: decimals, numberFormat" )
+                        .arg( QString::fromStdString( key ) ) );
+            }
         }
     }
 

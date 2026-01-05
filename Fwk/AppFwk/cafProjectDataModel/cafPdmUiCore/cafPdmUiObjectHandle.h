@@ -35,6 +35,8 @@ public:
     static void expandUiTree( PdmUiTreeOrdering* root, const QString& uiConfigName = "" );
 
     /// For a specific field, return editor specific parameters used to customize the editor behavior.
+    /// @deprecated Internal method called by editors. Use map-based attributes instead.
+    [[deprecated( "Internal use only. Use field.uiCapability()->setAttribute() for setting attributes." )]]
     void editorAttribute( const PdmFieldHandle* field, const QString& uiConfigName, PdmUiEditorAttribute* attribute );
 
     /// Return object editor specific parameters used to customize the editor behavior.
@@ -85,9 +87,13 @@ protected:
     virtual void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) {}
 
     /// Override to provide editor specific data for the field and uiConfigName
-    virtual void defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                        QString                    uiConfigName,
-                                        caf::PdmUiEditorAttribute* attribute )
+    /// @deprecated Use map-based attributes via field.uiCapability()->setAttribute() in constructor
+    ///             or defineUiOrdering() instead. Set attributes once rather than on every UI refresh.
+    ///             Example: field.uiCapability()->setAttributeInt("maximumWidth", 200);
+    ///             See CLAUDE.md for migration guide and supported attributes by editor.
+    [[deprecated( "Use field.uiCapability()->setAttribute() instead. See CLAUDE.md for migration guide." )]]
+    virtual void
+        defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
     {
     }
 

@@ -151,6 +151,17 @@ void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
     uiOrdering.add( &m_labelPointXyd );
     uiOrdering.appendToRow( &m_labelPointPickEnabledButtonField );
 
+    // Set dynamic button text based on picking state
+    if ( m_anchorPointPickEnabledButtonField )
+        m_anchorPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+    else
+        m_anchorPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+
+    if ( m_labelPointPickEnabledButtonField )
+        m_labelPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Stop", uiConfigName );
+    else
+        m_labelPointPickEnabledButtonField.uiCapability()->setAttributeString( "buttonText", "Pick", uiConfigName );
+
     uiOrdering.add( &m_text );
 
     auto appearanceGroup = uiOrdering.addNewGroup( "Text Appearance" );
@@ -242,7 +253,7 @@ caf::PdmFieldHandle* RimTextAnnotation::objectToggleField()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Keep this function for complex picking attributes
 //--------------------------------------------------------------------------------------------------
 void RimTextAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
@@ -257,23 +268,6 @@ void RimTextAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field,
     {
         attr->pickEventHandler = m_labelPointPickEventHandler;
         attr->enablePicking    = m_labelPointPickEnabledButtonField;
-    }
-
-    if ( field == &m_anchorPointPickEnabledButtonField || field == &m_labelPointPickEnabledButtonField )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            auto boolField = static_cast<const caf::PdmField<bool>*>( field );
-            if ( boolField->v() )
-            {
-                pbAttribute->m_buttonText = "Stop";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Pick";
-            }
-        }
     }
 }
 

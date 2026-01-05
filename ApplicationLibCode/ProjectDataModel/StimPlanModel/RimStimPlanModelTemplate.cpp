@@ -137,6 +137,10 @@ RimStimPlanModelTemplate::RimStimPlanModelTemplate()
     m_faciesInitialPressureConfigs.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_faciesInitialPressureConfigs.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_faciesInitialPressureConfigs.uiCapability()->setUiTreeChildrenHidden( true );
+    m_faciesInitialPressureConfigs.uiCapability()->setAttributeInt( "resizePolicy",
+                                                                    caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_faciesInitialPressureConfigs.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_faciesInitialPressureConfigs.uiCapability()->setAttributeInt( "minimumHeight", 300 );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_pressureTable, "PressureTable", "Pressure Table" );
     setPressureTable( new RimPressureTable );
@@ -298,28 +302,6 @@ void RimStimPlanModelTemplate::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiT
     if ( m_nonNetLayers ) uiTreeOrdering.add( m_nonNetLayers );
 
     uiTreeOrdering.skipRemainingChildren( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimStimPlanModelTemplate::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_stressDepth || field == &m_verticalStress )
-    {
-        caf::PdmUiDoubleValueEditorAttribute::testAndSetFixedWithTwoDecimals( attribute );
-    }
-
-    if ( field == &m_faciesInitialPressureConfigs )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 300;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -28,6 +28,8 @@ RicSaveMultiPlotTemplateFeatureSettings::RicSaveMultiPlotTemplateFeatureSettings
     CAF_PDM_InitObject( "Save Summary Plot", ":/CrossSection16x16.png" );
 
     CAF_PDM_InitFieldNoDefault( &m_filePath, "FilePath", "File Path" );
+    m_filePath.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+
     CAF_PDM_InitFieldNoDefault( &m_name, "Name", "Name" );
 
     CAF_PDM_InitField( &m_persistObjectNameForWells, "PersistObjectNameWells", false, "Wells" );
@@ -111,16 +113,3 @@ void RicSaveMultiPlotTemplateFeatureSettings::defineUiOrdering( QString uiConfig
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicSaveMultiPlotTemplateFeatureSettings::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                                     QString                    uiConfigName,
-                                                                     caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_filePath )
-    {
-        auto attr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->m_selectDirectory = true;
-        }
-    }
-}

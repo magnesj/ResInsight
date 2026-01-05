@@ -57,6 +57,8 @@
 
 #include "qwt_plot_panner.h"
 
+#include <QIcon>
+
 //==================================================================================================
 //
 //
@@ -77,6 +79,9 @@ RimCustomVfpPlot::RimCustomVfpPlot()
     m_plotTitle.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_mainDataSource, "MainDataSouce", "Main VFP Data Source" );
+    m_mainDataSource.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+    m_mainDataSource.uiCapability()->setAttribute( "nextIcon", QVariant::fromValue( QIcon( ":/ComboBoxDown.svg" ) ) );
+    m_mainDataSource.uiCapability()->setAttribute( "previousIcon", QVariant::fromValue( QIcon( ":/ComboBoxUp.svg" ) ) );
 
     CAF_PDM_InitFieldNoDefault( &m_comparisonTables, "ComparisonTables", "Comparison Tables" );
     m_comparisonTables.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -1325,22 +1330,6 @@ QList<caf::PdmOptionItemInfo> RimCustomVfpPlot::calculateValueOptions( const caf
     }
 
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimCustomVfpPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( auto attrib = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute ) )
-    {
-        attrib->showTextFilter = false;
-    }
-
-    if ( field == &m_mainDataSource )
-    {
-        RiuTools::enableUpDownArrowsForComboBox( attribute );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

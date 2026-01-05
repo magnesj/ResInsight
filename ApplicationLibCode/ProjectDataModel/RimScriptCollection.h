@@ -50,7 +50,4 @@ public:
 
 public:
     void readContentFromDisc( int folderLevelsLeft );
-
-protected:
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 };

@@ -65,6 +65,7 @@ RimPolygonInView::RimPolygonInView()
 
     CAF_PDM_InitField( &m_selectPolygon, "SelectPolygon", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_selectPolygon );
+    m_selectPolygon.uiCapability()->setAttributeString( "buttonText", "Go to Polygon" );
 
     CAF_PDM_InitField( &m_showLabel, "ShowLabel", false, "Show Label" );
 
@@ -75,6 +76,9 @@ RimPolygonInView::RimPolygonInView()
     m_targets.uiCapability()->setUiTreeChildrenHidden( true );
     m_targets.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_targets.uiCapability()->setCustomContextMenuEnabled( true );
+    m_targets.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_targets.uiCapability()->setAttributeInt( "heightHint", 1000 );
+    m_targets.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT );
     m_targets.xmlCapability()->disableIO();
 
     setUi3dEditorTypeName( RicPolyline3dEditor::uiEditorTypeName() );
@@ -315,6 +319,18 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
         uiOrdering.add( &m_selectPolygon );
     }
 
+    // Set dynamic UI attributes
+    if ( !m_enablePicking )
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Start Picking Points", uiConfigName );
+    else
+        m_enablePicking.uiCapability()->setAttributeString( "buttonText", "Stop Picking Points", uiConfigName );
+
+    if ( m_enablePicking )
+    {
+        QColor baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
+        m_targets.uiCapability()->setAttribute( "baseColor", QVariant( baseColor ), uiConfigName );
+    }
+
     uiOrdering.skipRemainingFields();
 }
 
@@ -456,52 +472,6 @@ void RimPolygonInView::initAfterRead()
 double RimPolygonInView::scalingFactorForTarget() const
 {
     return m_handleScalingFactor();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_enablePicking )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_enablePicking )
-            {
-                pbAttribute->m_buttonText = "Start Picking Points";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Points";
-            }
-        }
-    }
-
-    if ( field == &m_selectPolygon )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            pbAttribute->m_buttonText = "Go to Polygon";
-        }
-    }
-
-    if ( field == &m_targets )
-    {
-        if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
-        {
-            tvAttribute->resizePolicy = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FIT_CONTENT;
-
-            if ( m_enablePicking )
-            {
-                tvAttribute->baseColor = RiuGuiTheme::getColorByVariableName( "externalInputColor" );
-            }
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->heightHint                = 1000;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

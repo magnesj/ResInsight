@@ -55,19 +55,3 @@ QString RimWellLogFile::fileName() const
 {
     return m_fileName().path();
 }
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogFile::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
-{
-    RimWellLog::fieldChangedByUi( changedField, oldValue, newValue );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogFile::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimWellLog::defineEditorAttribute( field, uiConfigName, attribute );
-}

@@ -119,18 +119,18 @@ QList<caf::PdmOptionItemInfo> RimGridCaseSurface::calculateValueOptions( const c
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCaseSurface::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+void RimGridCaseSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    RimSurface::defineEditorAttribute( field, uiConfigName, attribute );
+    RimSurface::defineUiOrdering( uiConfigName, uiOrdering );
 
-    auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-    if ( myAttr && m_case )
+    if ( m_case )
     {
         const cvf::StructGridInterface* grid = RigReservoirGridTools::mainGrid( m_case );
-        if ( !grid ) return;
-
-        myAttr->m_minimum = 1;
-        myAttr->m_maximum = static_cast<int>( grid->cellCountK() );
+        if ( grid )
+        {
+            m_oneBasedSliceIndex.uiCapability()->setAttributeInt( "minimum", 1, uiConfigName );
+            m_oneBasedSliceIndex.uiCapability()->setAttributeInt( "maximum", static_cast<int>( grid->cellCountK() ), uiConfigName );
+        }
     }
 }
 

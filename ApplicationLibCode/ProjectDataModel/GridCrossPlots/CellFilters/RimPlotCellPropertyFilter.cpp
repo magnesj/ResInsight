@@ -224,22 +224,18 @@ void RimPlotCellPropertyFilter::updateCellVisibilityFromFilter( size_t timeStepI
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPlotCellPropertyFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+void RimPlotCellPropertyFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    if ( field == &m_lowerBound || field == &m_upperBound )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( !myAttr )
-        {
-            return;
-        }
+    // Set dynamic slider attributes based on result value range
+    double minimumValue = 0.0;
+    double maximumValue = 0.0;
+    findOrComputeMinMaxResultValues( minimumValue, maximumValue );
 
-        double minimumValue = 0.0;
-        double maximumValue = 0.0;
+    m_lowerBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
+    m_lowerBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttributeDouble( "minimum", minimumValue, uiConfigName );
+    m_upperBound.uiCapability()->setAttributeDouble( "maximum", maximumValue, uiConfigName );
 
-        findOrComputeMinMaxResultValues( minimumValue, maximumValue );
-
-        myAttr->m_minimum = minimumValue;
-        myAttr->m_maximum = maximumValue;
-    }
+    // Call base class to handle standard UI ordering
+    RimPlotCellFilter::defineUiOrdering( uiConfigName, uiOrdering );
 }

@@ -97,6 +97,9 @@ RimContourMapProjection::RimContourMapProjection()
     m_oilFloodingType.setValue( RigFloodingSettings::FloodingType::WATER_FLOODING );
     CAF_PDM_InitField( &m_userDefinedFloodingOil, "UserDefinedFloodingOil", 0.0, "" );
     m_userDefinedFloodingOil.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_userDefinedFloodingOil.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
 
     CAF_PDM_InitField( &m_gasFloodingType, "GasFloodingType", RigFloodingSettings::FloodingType::GAS_FLOODING, "Residual Oil-in-Gas Given By" );
     caf::AppEnum<RigFloodingSettings::FloodingType>::setEnumSubset( &m_gasFloodingType,
@@ -105,6 +108,9 @@ RimContourMapProjection::RimContourMapProjection()
 
     CAF_PDM_InitField( &m_userDefinedFloodingGas, "UserDefinedFloodingGas", 0.0, "" );
     m_userDefinedFloodingGas.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeDouble( "maximum", 1.0 );
+    m_userDefinedFloodingGas.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
 
     CAF_PDM_InitField( &m_showContourLines, "ContourLines", true, "Show Contour Lines" );
     CAF_PDM_InitField( &m_showContourLabels, "ContourLabels", true, "Show Contour Labels" );
@@ -563,31 +569,6 @@ void RimContourMapProjection::fieldChangedByUi( const caf::PdmFieldHandle* chang
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimContourMapProjection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_lowerThreshold == field || &m_upperThreshold == field )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum         = m_minResultAllTimeSteps;
-            myAttr->m_maximum         = m_maxResultAllTimeSteps;
-            myAttr->m_sliderTickCount = 20;
-        }
-    }
-    else if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
-    {
-        if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            myAttr->m_minimum         = 0.0;
-            myAttr->m_maximum         = 1.0;
-            myAttr->m_sliderTickCount = 20;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimContourMapProjection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     caf::PdmUiGroup* mainGroup = uiOrdering.addNewGroup( "Projection Settings" );
@@ -646,18 +627,30 @@ void RimContourMapProjection::appendValueFilterGroup( caf::PdmUiOrdering& uiOrde
     {
         case RimIntersectionFilterEnum::INTERSECT_FILTER_BELOW:
             m_upperThreshold.uiCapability()->setUiName( "Threshold" );
+            m_upperThreshold.uiCapability()->setAttributeDouble( "minimum", m_minResultAllTimeSteps );
+            m_upperThreshold.uiCapability()->setAttributeDouble( "maximum", m_maxResultAllTimeSteps );
+            m_upperThreshold.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
             valueFilterGroup->add( &m_upperThreshold );
             break;
 
         case RimIntersectionFilterEnum::INTERSECT_FILTER_BETWEEN:
             m_lowerThreshold.uiCapability()->setUiName( "Lower Threshold" );
+            m_lowerThreshold.uiCapability()->setAttributeDouble( "minimum", m_minResultAllTimeSteps );
+            m_lowerThreshold.uiCapability()->setAttributeDouble( "maximum", m_maxResultAllTimeSteps );
+            m_lowerThreshold.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
             valueFilterGroup->add( &m_lowerThreshold );
             m_upperThreshold.uiCapability()->setUiName( "Upper Threshold" );
+            m_upperThreshold.uiCapability()->setAttributeDouble( "minimum", m_minResultAllTimeSteps );
+            m_upperThreshold.uiCapability()->setAttributeDouble( "maximum", m_maxResultAllTimeSteps );
+            m_upperThreshold.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
             valueFilterGroup->add( &m_upperThreshold );
             break;
 
         case RimIntersectionFilterEnum::INTERSECT_FILTER_ABOVE:
             m_lowerThreshold.uiCapability()->setUiName( "Threshold" );
+            m_lowerThreshold.uiCapability()->setAttributeDouble( "minimum", m_minResultAllTimeSteps );
+            m_lowerThreshold.uiCapability()->setAttributeDouble( "maximum", m_maxResultAllTimeSteps );
+            m_lowerThreshold.uiCapability()->setAttributeInt( "sliderTickCount", 20 );
             valueFilterGroup->add( &m_lowerThreshold );
             break;
 

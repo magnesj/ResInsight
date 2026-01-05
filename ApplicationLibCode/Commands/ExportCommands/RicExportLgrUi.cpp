@@ -54,6 +54,7 @@ RicExportLgrUi::RicExportLgrUi()
 
     CAF_PDM_InitFieldNoDefault( &m_exportFolder, "ExportFolder", "Export Folder" );
     m_exportFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    m_exportFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &m_caseToApply, "CaseToApply", "Source Case" );
     CAF_PDM_InitFieldNoDefault( &m_timeStep, "TimeStepIndex", "Time Step" );
@@ -236,19 +237,4 @@ void RicExportLgrUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
     //    uiOrdering.add(&m_wellPathsInfo);
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicExportLgrUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_exportFolder )
-    {
-        caf::PdmUiFilePathEditorAttribute* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
 }

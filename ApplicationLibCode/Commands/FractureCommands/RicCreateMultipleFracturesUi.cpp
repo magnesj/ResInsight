@@ -93,11 +93,14 @@ RiuCreateMultipleFractionsUi::RiuCreateMultipleFractionsUi()
     m_options.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
     m_options.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_options.uiCapability()->setCustomContextMenuEnabled( true );
+    m_options.uiCapability()->setAttributeInt( "minimumHeight", 130 );
+    m_options.uiCapability()->setAttribute( "columnWidths", QVariant::fromValue( QList<int>{ 90, 90, 400, 70 } ) );
 
     CAF_PDM_InitFieldNoDefault( &m_fractureCreationSummary, "FractureCreationSummary", "Generated Fractures" );
     m_fractureCreationSummary.registerGetMethod( this, &RiuCreateMultipleFractionsUi::summaryText );
     m_fractureCreationSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_fractureCreationSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
+    m_fractureCreationSummary.uiCapability()->setAttributeInt( "wrapMode", caf::PdmUiTextEditorAttribute::NoWrap );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -278,30 +281,10 @@ QString RiuCreateMultipleFractionsUi::summaryText() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuCreateMultipleFractionsUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
+void RiuCreateMultipleFractionsUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    if ( field == &m_fractureCreationSummary )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            QFont font( "Courier", 8 );
-
-            attr->font     = font;
-            attr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-        }
-    }
-    else if ( field == &m_options )
-    {
-        auto attr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->minimumHeight = 130;
-            attr->columnWidths  = { 90, 90, 400, 70 };
-        }
-    }
+    QFont font( "Courier", 8 );
+    m_fractureCreationSummary.uiCapability()->setAttribute( "font", QVariant( font ) );
 }
 
 //--------------------------------------------------------------------------------------------------

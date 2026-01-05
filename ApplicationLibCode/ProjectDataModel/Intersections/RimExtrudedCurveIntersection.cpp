@@ -222,9 +222,15 @@ RimExtrudedCurveIntersection::RimExtrudedCurveIntersection()
 
     CAF_PDM_InitField( &m_azimuthAngle, "AzimuthAngle", 0.0, "Azimuth" );
     m_azimuthAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_azimuthAngle.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_azimuthAngle.uiCapability()->setAttributeInt( "maximum", 360 );
+    m_azimuthAngle.uiCapability()->setAttributeInt( "sliderTickCount", 360 );
 
     CAF_PDM_InitField( &m_dipAngle, "DipAngle", 90.0, "Dip" );
     m_dipAngle.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_dipAngle.uiCapability()->setAttributeInt( "minimum", 0 );
+    m_dipAngle.uiCapability()->setAttributeInt( "maximum", 180 );
+    m_dipAngle.uiCapability()->setAttributeInt( "sliderTickCount", 180 );
 
     CAF_PDM_InitFieldNoDefault( &m_customExtrusionPoints, "CustomExtrusionPoints", "" );
     CAF_PDM_InitFieldNoDefault( &m_twoAzimuthPoints,
@@ -556,20 +562,32 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
             }
         }
     }
-    else if ( type() == CrossSectionEnum::CS_POLYLINE )
+    else if ( m_type() == CrossSectionEnum::CS_POLYLINE )
     {
         geometryGroup->add( &m_userPolylineXydForUi );
+        m_userPolylineXydForUi.uiCapability()->setAttributeString( "qssState",
+                                                                   m_inputPolylineFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputPolylineFromViewerEnabled );
+        m_inputPolylineFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                             m_inputPolylineFromViewerEnabled() ? "Stop picking points"
+                                                                                                                : "Start picking points" );
     }
-    else if ( type() == CrossSectionEnum::CS_POLYGON )
+    else if ( m_type() == CrossSectionEnum::CS_POLYGON )
     {
         geometryGroup->add( &m_projectPolygon );
         geometryGroup->add( &m_editPolygonButton, { .newRow = false } );
+        m_editPolygonButton.uiCapability()->setAttributeString( "buttonText", "Edit" );
     }
-    else if ( type() == CrossSectionEnum::CS_AZIMUTHLINE )
+    else if ( m_type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {
         geometryGroup->add( &m_twoAzimuthPoints );
+        m_twoAzimuthPoints.uiCapability()->setAttributeString( "qssState",
+                                                               m_inputTwoAzimuthPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         geometryGroup->add( &m_inputTwoAzimuthPointsFromViewerEnabled );
+        m_inputTwoAzimuthPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                                     m_inputTwoAzimuthPointsFromViewerEnabled()
+                                                                                         ? "Stop picking points"
+                                                                                         : "Start picking points" );
         geometryGroup->add( &m_azimuthAngle );
         geometryGroup->add( &m_dipAngle );
     }
@@ -588,10 +606,16 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
         optionsGroup->add( &m_extentLength );
     }
 
-    if ( direction() == CrossSectionDirEnum::CS_TWO_POINTS )
+    if ( m_direction() == CrossSectionDirEnum::CS_TWO_POINTS )
     {
         optionsGroup->add( &m_customExtrusionPoints );
+        m_customExtrusionPoints.uiCapability()->setAttributeString( "qssState",
+                                                                    m_inputExtrusionPointsFromViewerEnabled() ? "ExternalInput" : QString() );
         optionsGroup->add( &m_inputExtrusionPointsFromViewerEnabled );
+        m_inputExtrusionPointsFromViewerEnabled.uiCapability()->setAttributeString( "buttonText",
+                                                                                    m_inputExtrusionPointsFromViewerEnabled()
+                                                                                        ? "Stop picking points"
+                                                                                        : "Start picking points" );
     }
 
     optionsGroup->add( &m_showInactiveCells );
@@ -612,6 +636,26 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     }
     else
     {
+        // Add dynamic min/max for depth thresholds
+        RimEclipseView* eclView = eclipseView();
+        if ( eclView && eclView->mainGrid() )
+        {
+            const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
+            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
+            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
+            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+        }
+        RimGeoMechView* geomView = firstAncestorOrThisOfType<RimGeoMechView>();
+        if ( geomView )
+        {
+            const cvf::BoundingBox bb = geomView->domainBoundingBox();
+            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
+            m_depthUpperThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "minimum", -1.0 * bb.max().z() );
+            m_depthLowerThreshold.uiCapability()->setAttributeDouble( "maximum", -1.0 * bb.min().z() );
+        }
+
         filterGroup->add( &m_depthFilterType );
 
         switch ( m_depthFilterType() )
@@ -1010,114 +1054,6 @@ int RimExtrudedCurveIntersection::branchIndex() const
     }
 
     return m_branchIndex;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimExtrudedCurveIntersection::setPushButtonText( bool buttonEnable, caf::PdmUiPushButtonEditorAttribute* attribute )
-{
-    if ( attribute )
-    {
-        if ( buttonEnable )
-        {
-            attribute->m_buttonText = "Stop picking points";
-        }
-        else
-        {
-            attribute->m_buttonText = "Start picking points";
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimExtrudedCurveIntersection::setBaseColor( bool enable, caf::PdmUiListEditorAttribute* attribute )
-{
-    if ( attribute )
-    {
-        attribute->qssState = enable ? "ExternalInput" : QString();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimExtrudedCurveIntersection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    auto* doubleSliderAttrib = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-    if ( doubleSliderAttrib )
-    {
-        if ( field == &m_azimuthAngle )
-        {
-            doubleSliderAttrib->m_minimum         = 0;
-            doubleSliderAttrib->m_maximum         = 360;
-            doubleSliderAttrib->m_sliderTickCount = 360;
-        }
-        else if ( field == &m_dipAngle )
-        {
-            doubleSliderAttrib->m_minimum         = 0;
-            doubleSliderAttrib->m_maximum         = 180;
-            doubleSliderAttrib->m_sliderTickCount = 180;
-        }
-        else if ( ( field == &m_depthUpperThreshold ) || ( field == &m_depthLowerThreshold ) )
-        {
-            RimEclipseView* eclView = eclipseView();
-
-            if ( eclView && eclView->mainGrid() )
-            {
-                const cvf::BoundingBox bb = eclView->mainGrid()->boundingBox();
-
-                doubleSliderAttrib->m_minimum = -1.0 * bb.max().z();
-                doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
-            }
-
-            RimGeoMechView* geomView = firstAncestorOrThisOfType<RimGeoMechView>();
-
-            if ( geomView )
-            {
-                const cvf::BoundingBox bb = geomView->domainBoundingBox();
-
-                doubleSliderAttrib->m_minimum = -1.0 * bb.max().z();
-                doubleSliderAttrib->m_maximum = -1.0 * bb.min().z();
-            }
-        }
-    }
-    else if ( field == &m_inputPolylineFromViewerEnabled )
-    {
-        setPushButtonText( m_inputPolylineFromViewerEnabled, dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_userPolylineXydForUi )
-    {
-        setBaseColor( m_inputPolylineFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_inputTwoAzimuthPointsFromViewerEnabled )
-    {
-        setPushButtonText( m_inputTwoAzimuthPointsFromViewerEnabled, dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_twoAzimuthPoints )
-    {
-        setBaseColor( m_inputTwoAzimuthPointsFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_inputExtrusionPointsFromViewerEnabled )
-    {
-        setPushButtonText( m_inputExtrusionPointsFromViewerEnabled, dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) );
-    }
-    else if ( field == &m_customExtrusionPoints )
-    {
-        setBaseColor( m_inputExtrusionPointsFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-
-    if ( field == &m_editPolygonButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Edit";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

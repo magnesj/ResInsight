@@ -37,6 +37,7 @@
 #include "cafPdmUiListEditor.h"
 
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -172,17 +173,56 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
+    }
 
-        m_listView->setHeightHint( attributes.heightHint );
-        if ( !attributes.allowHorizontalScrollBar )
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<std::string> supportedAttributes = { "qssState", "heightHint", "allowHorizontalScrollBar" };
+
+        QVariant val;
+
+        val = uiItem->getAttribute( "heightHint", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
         {
-            m_listView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+            attributes.heightHint = val.toInt();
         }
 
-        m_listView->setProperty( "state", attributes.qssState );
-        m_listView->style()->unpolish( m_listView );
-        m_listView->style()->polish( m_listView );
+        if ( auto qssState = uiItem->getAttributeString( "qssState", uiConfigName ) )
+        {
+            attributes.qssState = *qssState;
+        }
+
+        val = uiItem->getAttribute( "allowHorizontalScrollBar", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            attributes.allowHorizontalScrollBar = val.toBool();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING( QString( "PdmUiListEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: qssState, heightHint, allowHorizontalScrollBar" )
+                                         .arg( QString::fromStdString( key ) ) );
+            }
+        }
     }
+
+    m_listView->setHeightHint( attributes.heightHint );
+    if ( !attributes.allowHorizontalScrollBar )
+    {
+        m_listView->setHorizontalScrollBarPolicy( Qt::ScrollBarAlwaysOff );
+    }
+
+    m_listView->setProperty( "state", attributes.qssState );
+    m_listView->style()->unpolish( m_listView );
+    m_listView->style()->polish( m_listView );
 
     MyStringListModel* strListModel = dynamic_cast<MyStringListModel*>( m_model.data() );
 

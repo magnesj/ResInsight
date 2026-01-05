@@ -574,11 +574,24 @@ void RimStreamlineInViewCollection::defineUiOrdering( QString uiConfigName, caf:
 
     if ( m_visualizationMode() == VisualizationMode::ANIMATION )
     {
+        // Set static slider range for animation speed
+        m_animationSpeed.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_animationSpeed.uiCapability()->setAttributeInt( "maximum", 100 );
+
         visualizationGroup->add( &m_animationSpeed );
+
+        // Set static slider range for tracer length
+        m_tracerLength.uiCapability()->setAttributeInt( "minimum", 1 );
+        m_tracerLength.uiCapability()->setAttributeInt( "maximum", 1000 );
+
         visualizationGroup->add( &m_tracerLength );
     }
     else if ( m_visualizationMode() == VisualizationMode::MANUAL )
     {
+        // Set dynamic slider range for animation index
+        m_animationIndex.uiCapability()->setAttributeInt( "minimum", 0 );
+        m_animationIndex.uiCapability()->setAttributeInt( "maximum", static_cast<int>( m_maxAnimationIndex ) );
+
         visualizationGroup->add( &m_animationIndex );
     }
 
@@ -592,51 +605,6 @@ void RimStreamlineInViewCollection::defineUiTreeOrdering( caf::PdmUiTreeOrdering
 {
     uiTreeOrdering.add( &m_legendConfig );
     uiTreeOrdering.skipRemainingChildren();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimStreamlineInViewCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                           QString                    uiConfigName,
-                                                           caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_animationSpeed )
-    {
-        caf::PdmUiSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = 100;
-        }
-    }
-    else if ( field == &m_animationIndex )
-    {
-        caf::PdmUiSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0;
-            myAttr->m_maximum = static_cast<int>( m_maxAnimationIndex );
-        }
-    }
-    else if ( field == &m_tracerLength )
-    {
-        caf::PdmUiSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 1;
-            myAttr->m_maximum = static_cast<int>( 1000 );
-        }
-    }
-    else if ( field == &m_scaleFactor )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_minimum = 0.1;
-            myAttr->m_maximum = 10000.0;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

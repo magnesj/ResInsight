@@ -59,14 +59,17 @@ RimTernaryLegendConfig::RimTernaryLegendConfig()
                        "" );
 
     CAF_PDM_InitFieldNoDefault( &applyLocalMinMax, "m_applyLocalMinMax", "" );
+    applyLocalMinMax.uiCapability()->setAttributeString( "buttonText", "Apply local min/max values" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyLocalMinMax );
     applyLocalMinMax = false;
 
     CAF_PDM_InitFieldNoDefault( &applyGlobalMinMax, "m_applyGlobalMinMax", "" );
+    applyGlobalMinMax.uiCapability()->setAttributeString( "buttonText", "Apply global min/max values" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyGlobalMinMax );
     applyGlobalMinMax = false;
 
     CAF_PDM_InitFieldNoDefault( &applyFullRangeMinMax, "m_applyFullRangeMinMax", "" );
+    applyFullRangeMinMax.uiCapability()->setAttributeString( "buttonText", "Apply full range" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &applyFullRangeMinMax );
     applyFullRangeMinMax = false;
 
@@ -303,37 +306,6 @@ bool RimTernaryLegendConfig::showLegend() const
 void RimTernaryLegendConfig::setTitle( const QString& title )
 {
     m_legend->setTitle( cvfqt::Utils::toString( title ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimTernaryLegendConfig::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &applyLocalMinMax == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply local min/max values";
-        }
-    }
-    else if ( &applyGlobalMinMax == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply global min/max values";
-        }
-    }
-    else if ( &applyFullRangeMinMax == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply full range";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

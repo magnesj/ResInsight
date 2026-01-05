@@ -402,65 +402,6 @@ void RimBoxIntersection::updateBoxManipulatorGeometry()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimBoxIntersection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-    if ( myAttr )
-    {
-        cvf::BoundingBox cellsBoundingBox = currentCellBoundingBox();
-        if ( field == &m_minXCoord || field == &m_maxXCoord )
-        {
-            myAttr->m_minimum = cellsBoundingBox.min().x();
-            myAttr->m_maximum = cellsBoundingBox.max().x();
-
-            int range     = cellsBoundingBox.extent().x();
-            int tickCount = range / m_xySliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-        else if ( field == &m_minYCoord || field == &m_maxYCoord )
-        {
-            myAttr->m_minimum = cellsBoundingBox.min().y();
-            myAttr->m_maximum = cellsBoundingBox.max().y();
-
-            int range     = cellsBoundingBox.extent().y();
-            int tickCount = range / m_xySliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-        else if ( field == &m_minDepth || field == &m_maxDepth )
-        {
-            myAttr->m_minimum = -cellsBoundingBox.max().z();
-            myAttr->m_maximum = -cellsBoundingBox.min().z();
-
-            int range     = cellsBoundingBox.extent().z();
-            int tickCount = range / m_depthSliderStepSize;
-
-            myAttr->m_sliderTickCount = cvf::Math::abs( tickCount );
-        }
-    }
-
-    if ( field == &m_show3DManipulator )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-
-        if ( attrib )
-        {
-            if ( m_show3DManipulator )
-            {
-                attrib->m_buttonText = "Hide 3D manipulator";
-            }
-            else
-            {
-                attrib->m_buttonText = "Show 3D manipulator";
-            }
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_name );
@@ -472,21 +413,55 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
     }
 
     cvf::BoundingBox cellsBoundingBox = currentCellBoundingBox();
+
+    // Set dynamic slider ranges for X coordinates
     {
+        m_minXCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().x() );
+        m_minXCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().x() );
+        int xRange     = cellsBoundingBox.extent().x();
+        int xTickCount = xRange / m_xySliderStepSize;
+        m_minXCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( xTickCount ) );
+
+        m_maxXCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().x() );
+        m_maxXCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().x() );
+        m_maxXCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( xTickCount ) );
+
         caf::PdmUiGroup* group = uiOrdering.addNewGroup(
             "X Coordinates " + QString( " [%1  %2]" ).arg( cellsBoundingBox.min().x() ).arg( cellsBoundingBox.max().x() ) );
         group->add( &m_minXCoord );
         group->add( &m_maxXCoord );
     }
 
+    // Set dynamic slider ranges for Y coordinates
     {
+        m_minYCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().y() );
+        m_minYCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().y() );
+        int yRange     = cellsBoundingBox.extent().y();
+        int yTickCount = yRange / m_xySliderStepSize;
+        m_minYCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( yTickCount ) );
+
+        m_maxYCoord.uiCapability()->setAttributeDouble( "minimum", cellsBoundingBox.min().y() );
+        m_maxYCoord.uiCapability()->setAttributeDouble( "maximum", cellsBoundingBox.max().y() );
+        m_maxYCoord.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( yTickCount ) );
+
         caf::PdmUiGroup* group = uiOrdering.addNewGroup(
             "Y Coordinates" + QString( " [%1  %2]" ).arg( cellsBoundingBox.min().y() ).arg( cellsBoundingBox.max().y() ) );
         group->add( &m_minYCoord );
         group->add( &m_maxYCoord );
     }
 
+    // Set dynamic slider ranges for depth
     {
+        m_minDepth.uiCapability()->setAttributeDouble( "minimum", -cellsBoundingBox.max().z() );
+        m_minDepth.uiCapability()->setAttributeDouble( "maximum", -cellsBoundingBox.min().z() );
+        int zRange     = cellsBoundingBox.extent().z();
+        int zTickCount = zRange / m_depthSliderStepSize;
+        m_minDepth.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( zTickCount ) );
+
+        m_maxDepth.uiCapability()->setAttributeDouble( "minimum", -cellsBoundingBox.max().z() );
+        m_maxDepth.uiCapability()->setAttributeDouble( "maximum", -cellsBoundingBox.min().z() );
+        m_maxDepth.uiCapability()->setAttributeInt( "sliderTickCount", cvf::Math::abs( zTickCount ) );
+
         caf::PdmUiGroup* group =
             uiOrdering.addNewGroup( "Depth" + QString( " [%1  %2]" ).arg( -cellsBoundingBox.max().z() ).arg( -cellsBoundingBox.min().z() ) );
         group->add( &m_minDepth );
@@ -499,6 +474,15 @@ void RimBoxIntersection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrder
         group->add( &m_depthSliderStepSize );
     }
 
+    // Set dynamic button text
+    if ( m_show3DManipulator )
+    {
+        m_show3DManipulator.uiCapability()->setAttributeString( "buttonText", "Hide 3D manipulator" );
+    }
+    else
+    {
+        m_show3DManipulator.uiCapability()->setAttributeString( "buttonText", "Show 3D manipulator" );
+    }
     uiOrdering.add( &m_show3DManipulator );
 
     defineSeparateDataSourceUi( uiConfigName, uiOrdering );

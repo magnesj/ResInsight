@@ -186,6 +186,8 @@ RimDeltaSummaryCase::RimDeltaSummaryCase()
     CAF_PDM_InitField( &m_inUse, "InUse", false, "In Use" );
     m_fixedTimeStepIndex.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     m_fixedTimeStepIndex.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "singleSelectionMode", true );
+    m_fixedTimeStepIndex.uiCapability()->setAttributeBool( "showTextFilter", true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -689,22 +691,6 @@ void RimDeltaSummaryCase::fieldChangedByUi( const caf::PdmFieldHandle* changedFi
         for ( auto p : plotsToUpdate )
         {
             p->loadDataAndUpdate();
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimDeltaSummaryCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_fixedTimeStepIndex == field )
-    {
-        auto a = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
-        if ( a )
-        {
-            a->singleSelectionMode = true;
-            a->showTextFilter      = true;
         }
     }
 }

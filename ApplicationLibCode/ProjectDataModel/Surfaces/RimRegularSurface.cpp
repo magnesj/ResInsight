@@ -51,6 +51,8 @@ RimRegularSurface::RimRegularSurface()
     CAF_PDM_InitScriptableField( &m_originY, "OriginY", 0.0, "Origin Y" );
     CAF_PDM_InitScriptableField( &m_depth, "Depth", 0.0, "Depth" );
     m_depth.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_depth.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_depth.uiCapability()->setAttributeDouble( "maximum", 10000.0 );
 
     CAF_PDM_InitScriptableField( &m_nx, "Nx", 10, "Nx" );
     CAF_PDM_InitScriptableField( &m_ny, "Ny", 10, "Ny" );
@@ -61,6 +63,8 @@ RimRegularSurface::RimRegularSurface()
 
     CAF_PDM_InitScriptableField( &m_depthProperty, "DepthProperty", internal::fixedDepth(), "Depth Property" );
     m_rotation.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
+    m_rotation.uiCapability()->setAttributeDouble( "minimum", 0.0 );
+    m_rotation.uiCapability()->setAttributeDouble( "maximum", 360.0 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -99,32 +103,6 @@ void RimRegularSurface::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
 
     auto surfColl = firstAncestorOrThisOfTypeAsserted<RimSurfaceCollection>();
     surfColl->updateViews( { this } );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimRegularSurface::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimSurface::defineEditorAttribute( field, uiConfigName, attribute );
-
-    if ( field == &m_rotation )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_minimum = 0.0;
-            attr->m_maximum = 360.0;
-        }
-    }
-
-    if ( field == &m_depth )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_minimum = 0.0;
-            attr->m_maximum = 10000.0;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

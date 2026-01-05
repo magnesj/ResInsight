@@ -255,6 +255,14 @@ void RimWellPathFracture::updatePositionFromMeasuredDepth()
 //--------------------------------------------------------------------------------------------------
 void RimWellPathFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on well path range
+    auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
+    if ( wellPath )
+    {
+        m_measuredDepth.uiCapability()->setAttributeDouble( "minimum", wellPath->uniqueStartMD(), uiConfigName );
+        m_measuredDepth.uiCapability()->setAttributeDouble( "maximum", wellPath->uniqueEndMD(), uiConfigName );
+    }
+
     RimFracture::defineUiOrdering( uiConfigName, uiOrdering );
 
     if ( m_fractureTemplate() )
@@ -303,28 +311,6 @@ void RimWellPathFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     m_wellPathDepthAtFracture.uiCapability()->setUiReadOnly( m_autoUpdateWellPathDepthAtFractureFromTemplate() );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellPathFracture::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimFracture::defineEditorAttribute( field, uiConfigName, attribute );
-
-    if ( field == &m_measuredDepth )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-
-        if ( myAttr )
-        {
-            auto wellPath = firstAncestorOrThisOfType<RimWellPath>();
-            if ( !wellPath ) return;
-
-            myAttr->m_minimum = wellPath->uniqueStartMD();
-            myAttr->m_maximum = wellPath->uniqueEndMD();
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

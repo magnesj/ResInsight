@@ -344,6 +344,12 @@ void RimPlotDataFilterItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         uiOrdering.add( &m_filterQuantityUiField, { .leftLabelColumnSpan = 1 } );
         // uiOrdering.add( &m_filterQuantitySelectButton, {false, 1, 0} );
     }
+    m_min.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
+    m_min.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
+    m_min.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true, uiConfigName );
+    m_max.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
+    m_max.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
+    m_max.uiCapability()->setAttributeBool( "delaySliderUpdateUntilRelease", true, uiConfigName );
     if ( m_filterTarget() != ENSEMBLE_CASE )
     {
         uiOrdering.add( &m_consideredTimestepsType, { .leftLabelColumnSpan = 1 } );
@@ -374,40 +380,16 @@ void RimPlotDataFilterItem::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
         }
         else if ( m_filterOperation == TOP_N || m_filterOperation == BOTTOM_N )
         {
+            // Set maximum width based on font metrics
+            // NOTE: QFontMetrics requires Qt to be initialized and cannot be called in the constructor
+            QFontMetrics fm = QFontMetrics( QFont() );
+            m_topBottomN.uiCapability()->setAttributeInt( "maximumWidth", fm.boundingRect( "XXXX" ).width(), uiConfigName );
+
             uiOrdering.appendToRow( &m_topBottomN );
         }
     }
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimPlotDataFilterItem::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_min || field == &m_max )
-    {
-        caf::PdmUiDoubleSliderEditorAttribute* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute );
-        if ( !myAttr )
-        {
-            return;
-        }
-
-        myAttr->m_minimum                       = m_lowerLimit;
-        myAttr->m_maximum                       = m_upperLimit;
-        myAttr->m_delaySliderUpdateUntilRelease = true;
-    }
-    else if ( field == &m_topBottomN )
-    {
-        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-
-        if ( !myAttr ) return;
-
-        QFontMetrics fm = QFontMetrics( QFont() );
-
-        myAttr->maximumWidth = fm.boundingRect( "XXXX" ).width();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

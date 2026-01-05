@@ -68,6 +68,7 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
     setNotifyAllFieldsInMultiFieldChangedEvents( true );
 
     CAF_PDM_InitFieldNoDefault( &m_stepDimension, "StepDimension", "Step Dimension" );
+    m_stepDimension.uiCapability()->setAttributeBool( "showPreviousAndNextButtons", false );
 
     CAF_PDM_InitFieldNoDefault( &m_summaryCase, "CurveCase", "Case" );
 
@@ -86,6 +87,30 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
     CAF_PDM_InitFieldNoDefault( &m_wellCompletionNumber, "WellCompletion", "Well Completion" );
 
     CAF_PDM_InitFieldNoDefault( &m_ensemble, "Ensemble", "Ensemble" );
+
+    // Set button text attributes for all stepping fields
+    QString nextText = RimSummaryPlotControls::nextStepKeyText();
+    QString prevText = RimSummaryPlotControls::prevStepKeyText();
+
+    std::vector<caf::PdmFieldHandle*> steppingFields = { &m_summaryCase,
+                                                         &m_wellName,
+                                                         &m_groupName,
+                                                         &m_networkName,
+                                                         &m_region,
+                                                         &m_vectorName,
+                                                         &m_cellBlock,
+                                                         &m_wellSegment,
+                                                         &m_connection,
+                                                         &m_aquifer,
+                                                         &m_wellCompletionNumber,
+                                                         &m_ensemble };
+
+    for ( auto* field : steppingFields )
+    {
+        field->uiCapability()->setAttributeBool( "showPreviousAndNextButtons", true );
+        field->uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
+        field->uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    }
 
     CAF_PDM_InitFieldNoDefault( &m_placeholderForLabel, "Placeholder", "" );
     m_placeholderForLabel = "No common identifiers detected";
@@ -142,6 +167,28 @@ std::vector<caf::PdmFieldHandle*> RimSummaryPlotSourceStepping::fieldsToShowInTo
 //--------------------------------------------------------------------------------------------------
 void RimSummaryPlotSourceStepping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set minimumWidth for toolbar configuration
+    if ( uiConfigName == caf::PdmUiToolBarEditor::uiEditorConfigName() )
+    {
+        std::vector<caf::PdmFieldHandle*> steppingFields = { &m_summaryCase,
+                                                             &m_wellName,
+                                                             &m_groupName,
+                                                             &m_networkName,
+                                                             &m_region,
+                                                             &m_vectorName,
+                                                             &m_cellBlock,
+                                                             &m_wellSegment,
+                                                             &m_connection,
+                                                             &m_aquifer,
+                                                             &m_wellCompletionNumber,
+                                                             &m_ensemble };
+
+        for ( auto* field : steppingFields )
+        {
+            field->uiCapability()->setAttributeInt( "minimumWidth", 120, uiConfigName );
+        }
+    }
+
     auto visible = activeFieldsForDataSourceStepping();
     if ( visible.empty() )
     {
@@ -963,37 +1010,6 @@ std::vector<RimSummaryCase*> RimSummaryPlotSourceStepping::summaryCasesForSource
 RimSummaryDataSourceStepping* RimSummaryPlotSourceStepping::dataSourceSteppingObject() const
 {
     return dynamic_cast<RimSummaryDataSourceStepping*>( m_objectForSourceStepping.p() );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                          QString                    uiConfigName,
-                                                          caf::PdmUiEditorAttribute* attribute )
-{
-    auto* myAttr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-    if ( myAttr )
-    {
-        if ( field == &m_stepDimension )
-        {
-            myAttr->showPreviousAndNextButtons = false;
-        }
-        else
-        {
-            RiuTools::enableUpDownArrowsForComboBox( attribute );
-
-            QString nextText       = RimSummaryPlotControls::nextStepKeyText();
-            QString prevText       = RimSummaryPlotControls::prevStepKeyText();
-            myAttr->nextButtonText = "Next (" + nextText + ")";
-            myAttr->prevButtonText = "Previous (" + prevText + ")";
-        }
-    }
-
-    if ( myAttr && ( uiConfigName == caf::PdmUiToolBarEditor::uiEditorConfigName() ) )
-    {
-        myAttr->minimumWidth = 120;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

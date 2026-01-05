@@ -117,6 +117,7 @@ RimWellAllocationOverTimePlot::RimWellAllocationOverTimePlot()
     m_excludeTimeSteps.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
     CAF_PDM_InitFieldNoDefault( &m_applyTimeStepSelections, "ApplyTimeStepSelections", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyTimeStepSelections );
+    m_applyTimeStepSelections.uiCapability()->setAttributeString( "m_buttonText", "Apply" );
 
     CAF_PDM_InitFieldNoDefault( &m_flowDiagSolution, "FlowDiagSolution", "Plot Type" );
     CAF_PDM_InitFieldNoDefault( &m_flowValueType, "FlowValueType", "Value Type" );
@@ -601,23 +602,6 @@ void RimWellAllocationOverTimePlot::defineUiOrdering( QString uiConfigName, caf:
     fontGroup->add( &m_axisValueFontSize );
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellAllocationOverTimePlot::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                           QString                    uiConfigName,
-                                                           caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_applyTimeStepSelections )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

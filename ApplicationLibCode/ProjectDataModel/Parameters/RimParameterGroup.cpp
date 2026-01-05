@@ -46,6 +46,9 @@ RimParameterGroup::RimParameterGroup()
     m_parameters.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_parameters.uiCapability()->setCustomContextMenuEnabled( true );
     m_parameters.uiCapability()->setUiTreeChildrenHidden( true );
+    m_parameters.uiCapability()->setAttributeInt( "resizePolicy", caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER );
+    m_parameters.uiCapability()->setAttributeBool( "alwaysEnforceResizePolicy", true );
+    m_parameters.uiCapability()->setAttributeInt( "minimumHeight", 300 );
 
     CAF_PDM_InitFieldNoDefault( &m_name, "Name", "Name" );
     m_name.uiCapability()->setUiHidden( true );
@@ -168,19 +171,6 @@ void RimParameterGroup::appendParametersToList( std::list<RimGenericParameter*>&
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimParameterGroup::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_parameters )
-    {
-        auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
-        if ( tvAttribute )
-        {
-            tvAttribute->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
-            tvAttribute->alwaysEnforceResizePolicy = true;
-            tvAttribute->minimumHeight             = 300;
-        }
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -36,6 +36,8 @@ RiaRegressionTest::RiaRegressionTest()
                                 "Location of compare tool from Image Magic suite",
                                 "" );
     folderContainingCompareTool.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    folderContainingCompareTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    folderContainingCompareTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &folderContainingDiffTool,
                                 "folderContainingDiffTool",
@@ -44,6 +46,8 @@ RiaRegressionTest::RiaRegressionTest()
                                 "Location of diff tool used for text compare",
                                 "" );
     folderContainingDiffTool.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    folderContainingDiffTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    folderContainingDiffTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &folderContainingGitTool,
                                 "folderContainingGitTool",
@@ -52,9 +56,13 @@ RiaRegressionTest::RiaRegressionTest()
                                 "Location of git tool used for text compare",
                                 "" );
     folderContainingGitTool.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    folderContainingGitTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    folderContainingGitTool.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitFieldNoDefault( &regressionTestFolder, "regressionTestFolder", "Regression Test Folder" );
     regressionTestFolder.uiCapability()->setUiEditorTypeName( caf::PdmUiFilePathEditor::uiEditorTypeName() );
+    regressionTestFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
+    regressionTestFolder.uiCapability()->setAttributeBool( "m_selectDirectory", true );
 
     CAF_PDM_InitField( &showInteractiveDiffImages, "showInteractiveDiffImages", false, "Interactive Diff Images" );
     CAF_PDM_InitField( &useOpenMPForGeometryCreation, "useOpenMPForGeometryCreation", true, "Use OpenMP For Geometry Creation" );
@@ -100,20 +108,4 @@ void RiaRegressionTest::writeSettingsToApplicationStore() const
 void RiaRegressionTest::readSettingsFromApplicationStore()
 {
     caf::PdmSettings::readFieldsFromApplicationStore( this );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RiaRegressionTest::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &folderContainingDiffTool || field == &folderContainingCompareTool || field == &regressionTestFolder ||
-         field == &folderContainingGitTool )
-    {
-        auto* myAttr = dynamic_cast<caf::PdmUiFilePathEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->m_selectDirectory = true;
-        }
-    }
 }

@@ -97,6 +97,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveValuesSelectSummaryAddressPushButton, "SelectObjectiveSummaryAddress", "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_objectiveValuesSelectSummaryAddressPushButton );
+    m_objectiveValuesSelectSummaryAddressPushButton.uiCapability()->setAttributeString( "buttonText", "..." );
     m_objectiveValuesSelectSummaryAddressPushButton = false;
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveFunction, "ObjectiveFunction", "Objective Function" );
@@ -117,6 +118,7 @@ RimEnsembleCurveFilter::RimEnsembleCurveFilter()
 
     CAF_PDM_InitField( &m_valueRange, "ValueRange", std::pair( 0.0, 0.0 ), "Value Range" );
     m_valueRange.uiCapability()->setUiEditorTypeName( caf::PdmUiValueRangeEditor::uiEditorTypeName() );
+    m_valueRange.uiCapability()->setAttributeInt( "sliderTickCount", 100 );
 
     CAF_PDM_InitFieldNoDefault( &m_categories, "Categories", "Categories" );
 
@@ -512,6 +514,10 @@ void RimEnsembleCurveFilter::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on runtime limits
+    m_valueRange.uiCapability()->setAttributeDouble( "minimum", m_lowerLimit, uiConfigName );
+    m_valueRange.uiCapability()->setAttributeDouble( "maximum", m_upperLimit, uiConfigName );
+
     auto eParam = selectedEnsembleParameter();
 
     uiOrdering.add( &m_active );
@@ -565,30 +571,6 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     }
 
     uiOrdering.skipRemainingFields( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attr->m_buttonText = "...";
-        }
-    }
-    else if ( field == &m_valueRange )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_sliderTickCount = 100;
-
-            attr->m_minimum = m_lowerLimit;
-            attr->m_maximum = m_upperLimit;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

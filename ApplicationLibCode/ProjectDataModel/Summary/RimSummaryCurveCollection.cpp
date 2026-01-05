@@ -58,6 +58,7 @@ RimSummaryCurveCollection::RimSummaryCurveCollection()
 
     CAF_PDM_InitField( &m_editPlot, "EditPlot", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_editPlot );
+    m_editPlot.uiCapability()->setAttributeString( "m_buttonText", "Edit Plot" );
 
     CAF_PDM_InitFieldNoDefault( &m_ySourceStepping, "YSourceStepping", "" );
     m_ySourceStepping = new RimSummaryPlotSourceStepping;
@@ -372,21 +373,6 @@ void RimSummaryCurveCollection::fieldChangedByUi( const caf::PdmFieldHandle* cha
             RicEditSummaryPlotFeature::editSummaryPlot( plot );
         }
         m_editPlot = false;
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimSummaryCurveCollection::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_editPlot == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Edit Plot";
-        }
     }
 }
 

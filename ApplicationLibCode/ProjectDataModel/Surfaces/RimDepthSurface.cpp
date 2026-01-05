@@ -45,8 +45,15 @@ RimDepthSurface::RimDepthSurface()
 
     CAF_PDM_InitField( &m_depthLowerLimit, "DepthLowerLimit", 0.0, "Lower Limit" );
     m_depthLowerLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_depthLowerLimit.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_depthLowerLimit.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
+
     CAF_PDM_InitField( &m_depthUpperLimit, "DepthUpperLimit", 100000.0, "Upper Limit" );
     m_depthUpperLimit.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_depthUpperLimit.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_depthUpperLimit.uiCapability()->setAttributeInt( "numberFormat",
+                                                       static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     m_minX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
     m_maxX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleSliderEditor::uiEditorTypeName() );
@@ -148,45 +155,22 @@ void RimDepthSurface::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimDepthSurface::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    RimSurface::defineEditorAttribute( field, uiConfigName, attribute );
-
-    caf::PdmUiDoubleValueEditorAttribute::testAndSetFixedWithTwoDecimals( attribute );
-
-    if ( field == &m_depth )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_minimum = m_depthLowerLimit;
-            attr->m_maximum = m_depthUpperLimit;
-        }
-    }
-
-    if ( field == &m_minX || field == &m_maxX )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_minimum = m_areaOfInterestMin().x();
-            attr->m_maximum = m_areaOfInterestMax().x();
-        }
-    }
-
-    if ( field == &m_minY || field == &m_maxY )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            attr->m_minimum = m_areaOfInterestMin().y();
-            attr->m_maximum = m_areaOfInterestMax().y();
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimDepthSurface::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    // Set dynamic slider attributes based on runtime limits
+    m_depth.uiCapability()->setAttributeDouble( "minimum", m_depthLowerLimit, uiConfigName );
+    m_depth.uiCapability()->setAttributeDouble( "maximum", m_depthUpperLimit, uiConfigName );
+
+    m_minX.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().x(), uiConfigName );
+    m_minX.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().x(), uiConfigName );
+    m_maxX.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().x(), uiConfigName );
+    m_maxX.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().x(), uiConfigName );
+
+    m_minY.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().y(), uiConfigName );
+    m_minY.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().y(), uiConfigName );
+    m_maxY.uiCapability()->setAttributeDouble( "minimum", m_areaOfInterestMin().y(), uiConfigName );
+    m_maxY.uiCapability()->setAttributeDouble( "maximum", m_areaOfInterestMax().y(), uiConfigName );
+
     uiOrdering.add( &m_depth );
 
     {

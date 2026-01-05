@@ -71,9 +71,15 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
 
     CAF_PDM_InitFieldNoDefault( &m_minExtrapolationRangeX, "MinExtrapolationRangeX", "Min" );
     m_minExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_minExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+                                                              static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitFieldNoDefault( &m_maxExtrapolationRangeX, "MaxExtrapolationRangeX", "Max" );
     m_maxExtrapolationRangeX.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "decimals", 2 );
+    m_maxExtrapolationRangeX.uiCapability()->setAttributeInt( "numberFormat",
+                                                              static_cast<int>( caf::PdmUiDoubleValueEditorAttribute::NumberFormat::FIXED ) );
 
     CAF_PDM_InitField( &m_polynomialDegree, "PolynomialDegree", 3, "Degree" );
     m_polynomialDegree.setRange( 1, 50 );
@@ -96,6 +102,8 @@ RimGridCrossPlotRegressionCurve::RimGridCrossPlotRegressionCurve()
     m_expressionText.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_expressionText.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_expressionText.uiCapability()->setUiReadOnly( true );
+    m_expressionText.uiCapability()->setAttributeInt( "wrapMode", static_cast<int>( caf::PdmUiTextEditorAttribute::NoWrap ) );
+    m_expressionText.uiCapability()->setAttributeInt( "textMode", static_cast<int>( caf::PdmUiTextEditorAttribute::HTML ) );
     m_expressionText.xmlCapability()->disableIO();
 
     setLineStyle( RiuQwtPlotCurveDefines::LineStyleEnum::STYLE_SOLID );
@@ -329,12 +337,44 @@ void RimGridCrossPlotRegressionCurve::defineUiOrdering( QString uiConfigName, ca
     }
 
     regressionCurveGroup->add( &m_expressionText );
+    QFont font;
+    auto  pointSize = font.pointSize();
+    font.setPointSize( pointSize + 2 );
+    m_expressionText.uiCapability()->setAttribute( "font", QVariant( font ), uiConfigName );
 
     caf::PdmUiGroup* dataSelectionGroup = uiOrdering.addNewGroup( "Data Selection" );
     dataSelectionGroup->add( &m_minRangeX );
+    m_minRangeX.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
+                                                    uiConfigName );
+    m_minRangeX.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
+                                                    uiConfigName );
+    m_minRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeX );
+    m_maxRangeX.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeX.first, 2 ),
+                                                    uiConfigName );
+    m_maxRangeX.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeX.second, 2 ),
+                                                    uiConfigName );
+    m_maxRangeX.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_minRangeY );
+    m_minRangeY.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
+                                                    uiConfigName );
+    m_minRangeY.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
+                                                    uiConfigName );
+    m_minRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_maxRangeY );
+    m_maxRangeY.uiCapability()->setAttributeDouble( "minimum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsFloor( m_dataRangeY.first, 2 ),
+                                                    uiConfigName );
+    m_maxRangeY.uiCapability()->setAttributeDouble( "maximum",
+                                                    RiaNumericalTools::roundToNumSignificantDigitsCeil( m_dataRangeY.second, 2 ),
+                                                    uiConfigName );
+    m_maxRangeY.uiCapability()->setAttributeInt( "decimals", 3, uiConfigName );
     dataSelectionGroup->add( &m_showDataSelectionInPlot );
 
     caf::PdmUiGroup* forecastingGroup = uiOrdering.addNewGroup( "Extrapolation" );
@@ -354,54 +394,6 @@ void RimGridCrossPlotRegressionCurve::defineObjectEditorAttribute( QString uiCon
 {
     // Implement an empty method to avoid the base class implementation in RimPlotCurve
     // The color tag is not used for Grid Cross Plot Curves
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotRegressionCurve::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                             QString                    uiConfigName,
-                                                             caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_minRangeX || field == &m_maxRangeX )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto [min, max]    = m_dataRangeX;
-            myAttr->m_minimum  = RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 );
-            myAttr->m_maximum  = RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 );
-            myAttr->m_decimals = 3;
-        }
-    }
-    else if ( field == &m_minRangeY || field == &m_maxRangeY )
-    {
-        if ( auto* myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
-        {
-            auto [min, max]    = m_dataRangeY;
-            myAttr->m_minimum  = RiaNumericalTools::roundToNumSignificantDigitsFloor( min, 2 );
-            myAttr->m_maximum  = RiaNumericalTools::roundToNumSignificantDigitsCeil( max, 2 );
-            myAttr->m_decimals = 3;
-        }
-    }
-    else if ( field == &m_minExtrapolationRangeX || field == &m_maxExtrapolationRangeX )
-    {
-        caf::PdmUiDoubleValueEditorAttribute::testAndSetFixedWithTwoDecimals( attribute );
-    }
-
-    else if ( field == &m_expressionText )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->wrapMode = caf::PdmUiTextEditorAttribute::NoWrap;
-            myAttr->textMode = caf::PdmUiTextEditorAttribute::HTML;
-
-            QFont font;
-            auto  pointSize = font.pointSize();
-            font.setPointSize( pointSize + 2 );
-            myAttr->font = font;
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

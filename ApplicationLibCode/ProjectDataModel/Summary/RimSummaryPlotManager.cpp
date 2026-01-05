@@ -75,6 +75,10 @@ RimSummaryPlotManager::RimSummaryPlotManager()
     CAF_PDM_InitFieldNoDefault( &m_summaryPlot, "SummaryPlot", "Summary Plot" );
     CAF_PDM_InitFieldNoDefault( &m_filterText, "FilterText", "Filter Text" );
     m_filterText.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
+    m_filterText.uiCapability()->setAttributeBool( "enableEditableContent", true );
+    m_filterText.uiCapability()->setAttributeBool( "enableAutoComplete", false );
+    m_filterText.uiCapability()->setAttributeBool( "adjustWidthToContents", true );
+    m_filterText.uiCapability()->setAttributeBool( "notifyWhenTextIsEdited", true );
 
     CAF_PDM_InitFieldNoDefault( &m_addressCandidates, "AddressCandidates", "Vectors" );
     m_addressCandidates.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
@@ -297,43 +301,6 @@ std::vector<QString> RimSummaryPlotManager::dataSourceDisplayNames() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryPlotManager::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    {
-        auto attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            if ( field == &m_pushButtonReplace )
-            {
-                attr->m_buttonText = "Replace Curves \n(Ctrl + Enter)";
-            }
-            if ( field == &m_pushButtonNewPlot )
-            {
-                attr->m_buttonText = "Create New Plot \n(Enter)";
-            }
-            if ( field == &m_pushButtonAppend )
-            {
-                attr->m_buttonText = "Append Curves \n(Shift + Enter)";
-            }
-        }
-    }
-
-    if ( field == &m_filterText )
-    {
-        auto attr = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
-        if ( attr )
-        {
-            attr->enableEditableContent  = true;
-            attr->enableAutoComplete     = false;
-            attr->adjustWidthToContents  = true;
-            attr->notifyWhenTextIsEdited = true;
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimSummaryPlotManager::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_summaryPlot );
@@ -349,9 +316,15 @@ void RimSummaryPlotManager::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
     uiOrdering.add( &m_individualPlotPerObject );
     uiOrdering.appendToRow( &m_createMultiPlot );
 
+    m_pushButtonAppend.uiCapability()->setAttributeString( "buttonText", "Append Curves \n(Shift + Enter)" );
     uiOrdering.add( &m_pushButtonAppend );
+
+    m_pushButtonReplace.uiCapability()->setAttributeString( "buttonText", "Replace Curves \n(Ctrl + Enter)" );
     uiOrdering.appendToRow( &m_pushButtonReplace );
+
     uiOrdering.appendToRow( &m_labelB );
+
+    m_pushButtonNewPlot.uiCapability()->setAttributeString( "buttonText", "Create New Plot \n(Enter)" );
     uiOrdering.appendToRow( &m_pushButtonNewPlot );
 }
 

@@ -157,6 +157,8 @@ void RimGeoMechFaultReactivationResult::defineUiOrdering( QString uiConfigName, 
 {
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Fault Reactivation Result" );
     group->add( &m_distanceFromFault );
+
+    m_createFaultReactivationPlot.uiCapability()->setAttributeString( "buttonText", "Create Plot" );
     group->add( &m_createFaultReactivationPlot );
 
     uiOrdering.skipRemainingFields( true );
@@ -177,23 +179,6 @@ void RimGeoMechFaultReactivationResult::fieldChangedByUi( const caf::PdmFieldHan
     {
         createWellGeometry();
         createWellLogCurves();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimGeoMechFaultReactivationResult::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                               QString                    uiConfigName,
-                                                               caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_createFaultReactivationPlot )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Create Plot";
-        }
     }
 }
 

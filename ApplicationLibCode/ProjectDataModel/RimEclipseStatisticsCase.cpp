@@ -90,6 +90,7 @@ RimEclipseStatisticsCase::RimEclipseStatisticsCase()
     m_selectionSummary.uiCapability()->setUiReadOnly( true );
     m_selectionSummary.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
     m_selectionSummary.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
+    m_selectionSummary.uiCapability()->setAttributeInt( "textMode", caf::PdmUiTextEditorAttribute::HTML );
 
     CAF_PDM_InitFieldNoDefault( &m_dataSourceForStatistics, "DataSourceForStatistics", "Data Source" );
 
@@ -491,6 +492,9 @@ void RimEclipseStatisticsCase::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( &m_caseUserDescription );
     uiOrdering.add( &m_caseId );
 
+    m_calculateEditCommand.uiCapability()->setAttributeString( "buttonText",
+                                                               hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute",
+                                                               uiConfigName );
     uiOrdering.add( &m_calculateEditCommand );
 
     {
@@ -854,30 +858,6 @@ void RimEclipseStatisticsCase::updateSelectionSummaryLabel()
     }
 
     m_selectionSummary = html;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseStatisticsCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    if ( &m_selectionSummary == field )
-    {
-        caf::PdmUiTextEditorAttribute* textEditAttrib = dynamic_cast<caf::PdmUiTextEditorAttribute*>( attribute );
-        if ( textEditAttrib )
-        {
-            textEditAttrib->textMode = caf::PdmUiTextEditorAttribute::HTML;
-        }
-    }
-
-    if ( &m_calculateEditCommand == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
