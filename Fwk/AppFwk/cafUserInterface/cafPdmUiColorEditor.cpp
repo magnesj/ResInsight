@@ -40,6 +40,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiFieldEditorHandle.h"
 
@@ -89,15 +90,49 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+    }
 
-        if ( m_attributes.showLabel )
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "showAlpha", "showLabel" };
+
+        QVariant val;
+
+        val = uiItem->getAttribute( "showAlpha", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
         {
-            m_colorTextLabel->show();
+            m_attributes.showAlpha = val.toBool();
         }
-        else
+
+        val = uiItem->getAttribute( "showLabel", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
         {
-            m_colorTextLabel->hide();
+            m_attributes.showLabel = val.toBool();
         }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING( QString( "PdmUiColorEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: showAlpha, showLabel" )
+                                         .arg( key ) );
+            }
+        }
+    }
+
+    if ( m_attributes.showLabel )
+    {
+        m_colorTextLabel->show();
+    }
+    else
+    {
+        m_colorTextLabel->hide();
     }
 
     bool isReadOnly = uiField()->isUiReadOnly( uiConfigName );

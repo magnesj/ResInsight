@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -71,6 +72,38 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &attributes );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "buttonIcon", "buttonText" };
+
+        if ( auto val = uiItem->getAttribute<QString>( "buttonText", uiConfigName ) )
+        {
+            attributes.m_buttonText = *val;
+        }
+
+        QVariant val = uiItem->getAttribute( "buttonIcon", uiConfigName );
+        if ( val.isValid() && val.canConvert<QIcon>() )
+        {
+            attributes.m_buttonIcon = val.value<QIcon>();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING(
+                    QString( "PdmUiPushButtonEditor: Unsupported attribute '%1' set on field. Supported "
+                             "attributes are: buttonIcon, buttonText" )
+                        .arg( key ) );
+            }
+        }
     }
 
     QVariant variantFieldValue = uiField()->uiValue();

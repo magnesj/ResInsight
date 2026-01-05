@@ -38,6 +38,7 @@
 
 #include "cafFactory.h"
 #include "cafPdmField.h"
+#include "cafPdmLogging.h"
 #include "cafPdmObject.h"
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
@@ -69,6 +70,52 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
     if ( uiObject )
     {
         uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
+    }
+
+    // Override with map-based attributes if present (new system takes precedence)
+    PdmUiItem* uiItem = uiField();
+    if ( uiItem )
+    {
+        // List of supported attributes for validation
+        static const std::set<QString> supportedAttributes = { "minimum", "maximum", "showSpinBox", "step" };
+
+        QVariant val;
+
+        val = uiItem->getAttribute( "minimum", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.m_minimum = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "maximum", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.m_maximum = val.toInt();
+        }
+
+        val = uiItem->getAttribute( "showSpinBox", uiConfigName );
+        if ( val.isValid() && val.canConvert<bool>() )
+        {
+            m_attributes.m_showSpinBox = val.toBool();
+        }
+
+        val = uiItem->getAttribute( "step", uiConfigName );
+        if ( val.isValid() && val.canConvert<int>() )
+        {
+            m_attributes.m_step = val.toInt();
+        }
+
+        // Validate: warn about unsupported attributes
+        auto allAttributes = uiItem->getAttributes( uiConfigName );
+        for ( const auto& [key, value] : allAttributes )
+        {
+            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            {
+                CAF_PDM_LOG_WARNING( QString( "PdmUiSliderEditor: Unsupported attribute '%1' set on field. Supported "
+                                              "attributes are: minimum, maximum, showSpinBox, step" )
+                                         .arg( key ) );
+            }
+        }
     }
 
     {
