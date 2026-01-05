@@ -76,7 +76,6 @@ void caf::PdmUiPickableLineEditor::configureAndUpdateUi( const QString& uiConfig
         static const std::set<QString> supportedAttributes = { "enablePicking" };
 
         if ( auto val = uiItem->getAttribute<bool>( "enablePicking", uiConfigName ) )
-
         {
             m_attribute.enablePicking = val.value();
         }

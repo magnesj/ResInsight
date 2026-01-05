@@ -183,7 +183,6 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
         static const std::set<QString> supportedAttributes = { "qssState", "heightHint", "allowHorizontalScrollBar" };
 
         if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
-
         {
             attributes.heightHint = val.value();
         }
@@ -194,7 +193,6 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
         }
 
         if ( auto val = uiItem->getAttribute<bool>( "allowHorizontalScrollBar", uiConfigName ) )
-
         {
             attributes.allowHorizontalScrollBar = val.value();
         }
