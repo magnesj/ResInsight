@@ -193,63 +193,50 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         // Override with map-based attributes if present (new system takes precedence)
         if ( auto uiItem = childArrayFH->uiCapability() )
         {
-            // List of supported attributes for validation
-            static const std::set<QString> supportedAttributes = { "tableSelectionLevel",
-                                                                   "rowSelectionLevel",
-                                                                   "enableHeaderText",
-                                                                   "minimumHeight",
-                                                                   "heightHint",
-                                                                   "alwaysEnforceResizePolicy",
-                                                                   "resizePolicy",
-                                                                   "columnWidths",
-                                                                   "baseColor",
-                                                                   "enableDropTarget" };
-
-            if ( auto val = uiItem->getAttribute<int>( "tableSelectionLevel", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<int>( Keys::TABLE_SELECTION_LEVEL, uiConfigName ) )
             {
                 editorAttrib.tableSelectionLevel = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( "rowSelectionLevel", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<int>( Keys::ROW_SELECTION_LEVEL, uiConfigName ) )
             {
                 editorAttrib.rowSelectionLevel = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( "enableHeaderText", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_HEADER_TEXT, uiConfigName ) )
             {
                 editorAttrib.enableHeaderText = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( "minimumHeight", uiConfigName ) )
-
+            if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_HEIGHT, uiConfigName ) )
             {
                 editorAttrib.minimumHeight = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
             {
                 editorAttrib.heightHint = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( "alwaysEnforceResizePolicy", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<bool>( Keys::ALWAYS_ENFORCE_RESIZE_POLICY, uiConfigName ) )
             {
                 editorAttrib.alwaysEnforceResizePolicy = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( "resizePolicy", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<int>( Keys::RESIZE_POLICY, uiConfigName ) )
             {
-                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( *val );
+                editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.value() );
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( "enableDropTarget", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_DROP_TARGET, uiConfigName ) )
             {
                 editorAttrib.enableDropTarget = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<QVariantList>( "columnWidths", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<QVariantList>( Keys::COLUMN_WIDTHS, uiConfigName ) )
             {
                 editorAttrib.columnWidths.clear();
-                for ( const QVariant& item : *val )
+                for ( const QVariant& item : val.value() )
                 {
                     if ( item.canConvert<int>() )
                     {
@@ -258,7 +245,7 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 }
             }
 
-            if ( auto val = uiItem->getAttribute<QColor>( "baseColor", uiConfigName ) )
+            if ( auto val = uiItem->getAttribute<QColor>( Keys::BASE_COLOR, uiConfigName ) )
             {
                 editorAttrib.baseColor = val.value();
             }
@@ -267,14 +254,13 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
             auto allAttributeNames = uiItem->attributeNames( uiConfigName );
             for ( const auto& key : allAttributeNames )
             {
-                if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+                if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
                 {
                     CAF_PDM_LOG_WARNING(
                         QString( "PdmUiTableViewEditor: Unsupported attribute '%1' set on field. Supported "
-                                 "attributes are: tableSelectionLevel, rowSelectionLevel, enableHeaderText, "
-                                 "minimumHeight, heightHint, alwaysEnforceResizePolicy, resizePolicy, "
-                                 "columnWidths, baseColor, enableDropTarget" )
-                            .arg( key ) );
+                                 "attributes are: %2" )
+                            .arg( key )
+                            .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
                 }
             }
         }
