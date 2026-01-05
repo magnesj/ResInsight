@@ -88,6 +88,29 @@ RimSummaryPlotSourceStepping::RimSummaryPlotSourceStepping()
 
     CAF_PDM_InitFieldNoDefault( &m_ensemble, "Ensemble", "Ensemble" );
 
+    // Set button text attributes for all stepping fields
+    QString nextText = RimSummaryPlotControls::nextStepKeyText();
+    QString prevText = RimSummaryPlotControls::prevStepKeyText();
+
+    std::vector<caf::PdmFieldHandle*> steppingFields = { &m_summaryCase,
+                                                         &m_wellName,
+                                                         &m_groupName,
+                                                         &m_networkName,
+                                                         &m_region,
+                                                         &m_vectorName,
+                                                         &m_cellBlock,
+                                                         &m_wellSegment,
+                                                         &m_connection,
+                                                         &m_aquifer,
+                                                         &m_wellCompletionNumber,
+                                                         &m_ensemble };
+
+    for ( auto* field : steppingFields )
+    {
+        field->uiCapability()->setAttributeString( "nextButtonText", "Next (" + nextText + ")" );
+        field->uiCapability()->setAttributeString( "prevButtonText", "Previous (" + prevText + ")" );
+    }
+
     CAF_PDM_InitFieldNoDefault( &m_placeholderForLabel, "Placeholder", "" );
     m_placeholderForLabel = "No common identifiers detected";
     m_placeholderForLabel.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
@@ -979,11 +1002,6 @@ void RimSummaryPlotSourceStepping::defineEditorAttribute( const caf::PdmFieldHan
         if ( field != &m_stepDimension )
         {
             RiuTools::enableUpDownArrowsForComboBox( attribute );
-
-            QString nextText       = RimSummaryPlotControls::nextStepKeyText();
-            QString prevText       = RimSummaryPlotControls::prevStepKeyText();
-            myAttr->nextButtonText = "Next (" + nextText + ")";
-            myAttr->prevButtonText = "Previous (" + prevText + ")";
         }
     }
 
