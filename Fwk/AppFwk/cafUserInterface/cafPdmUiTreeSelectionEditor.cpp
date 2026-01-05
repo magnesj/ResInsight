@@ -213,40 +213,32 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        // List of supported attributes for validation
-        static const std::set<QString> supportedAttributes = { "showTextFilter",
-                                                               "showToggleAllCheckbox",
-                                                               "singleSelectionMode",
-                                                               "showCheckBoxes",
-                                                               "showContextMenu",
-                                                               "heightHint" };
-
-        if ( auto val = uiItem->getAttribute<bool>( "showTextFilter", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_TEXT_FILTER, uiConfigName ) )
         {
             m_attributes.showTextFilter = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showToggleAllCheckbox", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_TOGGLE_ALL_CHECKBOX, uiConfigName ) )
         {
             m_attributes.showToggleAllCheckbox = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "singleSelectionMode", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SINGLE_SELECTION_MODE, uiConfigName ) )
         {
             m_attributes.singleSelectionMode = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showCheckBoxes", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_CHECK_BOXES, uiConfigName ) )
         {
             m_attributes.showCheckBoxes = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( "showContextMenu", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_CONTEXT_MENU, uiConfigName ) )
         {
             m_attributes.showContextMenu = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( "heightHint", uiConfigName ) )
+        if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
         {
             m_attributes.heightHint = val.value();
         }
@@ -255,13 +247,13 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
         auto allAttributeNames = uiItem->attributeNames( uiConfigName );
         for ( const auto& key : allAttributeNames )
         {
-            if ( supportedAttributes.find( key ) == supportedAttributes.end() )
+            if ( SUPPORTED_ATTRIBUTES.find( key ) == SUPPORTED_ATTRIBUTES.end() )
             {
                 CAF_PDM_LOG_WARNING(
                     QString( "PdmUiTreeSelectionEditor: Unsupported attribute '%1' set on field. Supported "
-                             "attributes are: showTextFilter, showToggleAllCheckbox, singleSelectionMode, "
-                             "showCheckBoxes, showContextMenu, heightHint" )
-                        .arg( key ) );
+                             "attributes are: %2" )
+                        .arg( key )
+                        .arg( QStringList( SUPPORTED_ATTRIBUTES.begin(), SUPPORTED_ATTRIBUTES.end() ).join( ", " ) ) );
             }
         }
     }
