@@ -157,20 +157,12 @@ RimWellConnectivityTable::RimWellConnectivityTable()
     CAF_PDM_InitField( &m_timeStepCount, "TimeStepCount", m_initialNumberOfTimeSteps, "Number of Time Steps" );
     CAF_PDM_InitFieldNoDefault( &m_excludeTimeSteps, "ExcludeTimeSteps", "" );
     m_excludeTimeSteps.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
-    CAF_PDM_InitFieldNoDefault( &m_applyTimeStepSelections, "ApplyTimeStepSelections", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applyTimeStepSelections );
 
     // Producer/Injector tracer configuration
     CAF_PDM_InitFieldNoDefault( &m_selectedProducerTracersUiField, "SelectedProducerTracers", "Producer Tracers" );
     m_selectedProducerTracersUiField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     CAF_PDM_InitFieldNoDefault( &m_selectedInjectorTracersUiField, "SelectedInjectorTracers", "Injector Tracers" );
     m_selectedInjectorTracersUiField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-    CAF_PDM_InitField( &m_syncSelectedInjectorsFromProducerSelection, "SyncSelectedProdInj", false, "Synch Communicators ->" );
-    m_syncSelectedInjectorsFromProducerSelection.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    CAF_PDM_InitField( &m_syncSelectedProducersFromInjectorSelection, "SyncSelectedInjProd", false, "<- Synch Communicators" );
-    m_syncSelectedProducersFromInjectorSelection.uiCapability()->setUiEditorTypeName( caf::PdmUiToolButtonEditor::uiEditorTypeName() );
-    CAF_PDM_InitFieldNoDefault( &m_applySelectedInectorProducerTracers, "ApplySelectedInectorProducerTracers", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_applySelectedInectorProducerTracers );
 
     // Table settings
     CAF_PDM_InitField( &m_showValueLabels, "ShowValueLabels", false, "Show Value Labels" );
@@ -348,14 +340,6 @@ void RimWellConnectivityTable::fieldChangedByUi( const caf::PdmFieldHandle* chan
         setWellSelectionFromViewFilter();
         onLoadDataAndUpdate();
     }
-    else if ( changedField == &m_syncSelectedInjectorsFromProducerSelection )
-    {
-        syncSelectedInjectorsFromProducerSelection();
-    }
-    else if ( changedField == &m_syncSelectedProducersFromInjectorSelection )
-    {
-        syncSelectedProducersFromInjectorSelection();
-    }
     else if ( m_matrixPlotWidget && changedField == &m_showValueLabels )
     {
         m_matrixPlotWidget->setShowValueLabel( m_showValueLabels );
@@ -401,11 +385,6 @@ void RimWellConnectivityTable::fieldChangedByUi( const caf::PdmFieldHandle* chan
         {
             setWellSelectionFromViewFilter();
         }
-    }
-    else if ( changedField == &m_applyTimeStepSelections || changedField == &m_applySelectedInectorProducerTracers )
-    {
-        // For time step range - depends on apply buttons to prevent unwanted loading of large amount of data
-        onLoadDataAndUpdate();
     }
     else if ( changedField == &m_timeStepCount && m_timeStepFilterMode == TimeStepRangeFilterMode::TIME_STEP_COUNT )
     {
@@ -492,18 +471,34 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
         caf::PdmUiGroup& excludeTimeStepGroup = *flowDiagConfigGroup.addNewGroup( "Exclude Time Steps" );
         excludeTimeStepGroup.add( &m_excludeTimeSteps );
         excludeTimeStepGroup.setCollapsedByDefault();
-        flowDiagConfigGroup.add( &m_applyTimeStepSelections );
+        flowDiagConfigGroup.addNewButton( "Apply",
+                                         [this]()
+                                         {
+                                             onLoadDataAndUpdate();
+                                         } );
     }
 
     caf::PdmUiGroup* selectionGroup = uiOrdering.addNewGroup( "Tracer Selection" );
     caf::PdmUiGroup* producerGroup  = selectionGroup->addNewGroup( "Producers" );
     producerGroup->add( &m_selectedProducerTracersUiField );
-    producerGroup->add( &m_syncSelectedInjectorsFromProducerSelection );
+    producerGroup->addNewButton( "Synch Communicators ->",
+                                [this]()
+                                {
+                                    syncSelectedInjectorsFromProducerSelection();
+                                } );
     caf::PdmUiGroup* injectorGroup = selectionGroup->addNewGroup( "Injectors", { .newRow = false } );
     injectorGroup->add( &m_selectedInjectorTracersUiField );
-    injectorGroup->add( &m_syncSelectedProducersFromInjectorSelection );
+    injectorGroup->addNewButton( "<- Synch Communicators",
+                                [this]()
+                                {
+                                    syncSelectedProducersFromInjectorSelection();
+                                } );
 
-    selectionGroup->add( &m_applySelectedInectorProducerTracers );
+    selectionGroup->addNewButton( "Apply",
+                                 [this]()
+                                 {
+                                     onLoadDataAndUpdate();
+                                 } );
 
     caf::PdmUiGroup* tableSettingsGroup = uiOrdering.addNewGroup( "Table Settings" );
     tableSettingsGroup->add( &m_showValueLabels );
@@ -527,14 +522,6 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimWellConnectivityTable::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_applyTimeStepSelections || field == &m_applySelectedInectorProducerTracers )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
     if ( field == &m_selectedTimeStep || field == &m_selectedFromTimeStep || field == &m_selectedToTimeStep )
     {
         RiuTools::enableUpDownArrowsForComboBox( attribute );
