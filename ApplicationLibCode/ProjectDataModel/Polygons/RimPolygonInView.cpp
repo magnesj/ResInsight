@@ -39,7 +39,6 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafDisplayCoordTransform.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 
@@ -52,6 +51,7 @@ CAF_PDM_SOURCE_INIT( RimPolygonInView, "RimPolygonInView" );
 //--------------------------------------------------------------------------------------------------
 RimPolygonInView::RimPolygonInView()
     : m_pickTargetsEventHandler( new RicPolylineTargetsPickEventHandler( this ) )
+    , m_enablePicking( false )
 {
     CAF_PDM_InitObject( "Polygon", ":/PolylinesFromFile16x16.png" );
 
@@ -59,9 +59,6 @@ RimPolygonInView::RimPolygonInView()
     m_polygon.uiCapability()->setUiReadOnly( true );
 
     nameField()->uiCapability()->setUiReadOnly( true );
-
-    CAF_PDM_InitField( &m_enablePicking, "EnablePicking", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_enablePicking );
 
     CAF_PDM_InitField( &m_showLabel, "ShowLabel", false, "Show Label" );
 
@@ -300,7 +297,12 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 
     if ( enableEdit )
     {
-        uiOrdering.add( &m_enablePicking );
+        uiOrdering.addNewButton( m_enablePicking ? "Stop Picking" : "Start Picking",
+                                [this]()
+                                {
+                                    m_enablePicking = !m_enablePicking;
+                                    updateConnectedEditors();
+                                } );
         uiOrdering.add( &m_targets );
         uiOrdering.add( &m_handleScalingFactor );
     }
@@ -320,11 +322,6 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 //--------------------------------------------------------------------------------------------------
 void RimPolygonInView::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_enablePicking )
-    {
-        updateConnectedEditors();
-    }
-
     updateVisualization();
 }
 
@@ -380,7 +377,12 @@ void RimPolygonInView::defineObjectEditorAttribute( QString uiConfigName, caf::P
 //--------------------------------------------------------------------------------------------------
 void RimPolygonInView::uiOrderingForLocalPolygon( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.add( &m_enablePicking );
+    uiOrdering.addNewButton( m_enablePicking ? "Stop Picking" : "Start Picking",
+                            [this]()
+                            {
+                                m_enablePicking = !m_enablePicking;
+                                updateConnectedEditors();
+                            } );
     uiOrdering.add( &m_targets );
     uiOrdering.add( &m_handleScalingFactor );
 }
@@ -455,22 +457,6 @@ double RimPolygonInView::scalingFactorForTarget() const
 //--------------------------------------------------------------------------------------------------
 void RimPolygonInView::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_enablePicking )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            if ( !m_enablePicking )
-            {
-                pbAttribute->m_buttonText = "Start Picking Points";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Stop Picking Points";
-            }
-        }
-    }
-
     if ( field == &m_targets )
     {
         if ( auto tvAttribute = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute ) )
