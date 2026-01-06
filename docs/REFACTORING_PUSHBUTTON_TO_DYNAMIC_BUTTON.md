@@ -182,6 +182,8 @@ void RiaPreferencesSummary::appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOr
 
 **Note:** When capturing `this`, ensure the method is non-const if you need to modify state.
 
+**Note:** Avoid long lambda functions. Consider refactoring into separate member functions if needed.
+
 ### Layout Options
 Buttons support the same layout options as fields:
 
