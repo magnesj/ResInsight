@@ -80,7 +80,7 @@ void PdmUiDateEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<QString>( Keys::DATE_FORMAT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::DATE_FORMAT, uiConfigName ) )
         {
             m_attributes.dateFormat = val.value();
         }

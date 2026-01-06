@@ -124,9 +124,9 @@ public:
     }
 
     template <typename T>
-    std::optional<T> getAttribute( const QString& key, const QString& uiConfigName = "" ) const
+    std::optional<T> attribute( const QString& key, const QString& uiConfigName = "" ) const
     {
-        QVariant value = getAttribute( key, uiConfigName );
+        QVariant value = attributeVariant( key, uiConfigName );
         if ( value.isValid() && value.canConvert<T>() )
         {
             return value.value<T>();
@@ -168,7 +168,7 @@ protected:
     std::set<PdmUiEditorHandle*> m_editors;
 
 private:
-    QVariant getAttribute( const QString& key, const QString& uiConfigName = "" ) const;
+    QVariant attributeVariant( const QString& key, const QString& uiConfigName = "" ) const;
 
 private:
     const PdmUiItemInfo* defaultInfo() const;

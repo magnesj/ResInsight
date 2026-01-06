@@ -77,12 +77,12 @@ void PdmUiToolButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::CHECKABLE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::CHECKABLE, uiConfigName ) )
         {
             attributes.m_checkable = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QSizePolicy>( Keys::SIZE_POLICY, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QSizePolicy>( Keys::SIZE_POLICY, uiConfigName ) )
         {
             attributes.m_sizePolicy = val.value();
         }

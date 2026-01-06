@@ -213,32 +213,32 @@ void PdmUiTreeSelectionEditor::configureAndUpdateUi( const QString& uiConfigName
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_TEXT_FILTER, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_TEXT_FILTER, uiConfigName ) )
         {
             m_attributes.showTextFilter = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_TOGGLE_ALL_CHECKBOX, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_TOGGLE_ALL_CHECKBOX, uiConfigName ) )
         {
             m_attributes.showToggleAllCheckbox = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SINGLE_SELECTION_MODE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SINGLE_SELECTION_MODE, uiConfigName ) )
         {
             m_attributes.singleSelectionMode = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_CHECK_BOXES, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_CHECK_BOXES, uiConfigName ) )
         {
             m_attributes.showCheckBoxes = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_CONTEXT_MENU, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_CONTEXT_MENU, uiConfigName ) )
         {
             m_attributes.showContextMenu = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
         {
             m_attributes.heightHint = val.value();
         }

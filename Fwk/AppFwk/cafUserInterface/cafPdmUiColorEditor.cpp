@@ -96,12 +96,12 @@ void PdmUiColorEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_ALPHA, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_ALPHA, uiConfigName ) )
         {
             m_attributes.showAlpha = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_LABEL, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_LABEL, uiConfigName ) )
         {
             m_attributes.showLabel = val.value();
         }

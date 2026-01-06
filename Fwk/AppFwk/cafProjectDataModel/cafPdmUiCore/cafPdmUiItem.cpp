@@ -601,7 +601,7 @@ void PdmUiItem::addFieldEditor( PdmUiEditorHandle* fieldView )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QVariant PdmUiItem::getAttribute( const QString& key, const QString& uiConfigName ) const
+QVariant PdmUiItem::attributeVariant( const QString& key, const QString& uiConfigName ) const
 {
     // Check config-specific attributes first
     if ( !uiConfigName.isEmpty() )

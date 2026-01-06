@@ -78,12 +78,12 @@ void PdmUiPushButtonEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<QString>( Keys::BUTTON_TEXT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::BUTTON_TEXT, uiConfigName ) )
         {
             attributes.m_buttonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( Keys::BUTTON_ICON, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QIcon>( Keys::BUTTON_ICON, uiConfigName ) )
         {
             attributes.m_buttonIcon = val.value();
         }

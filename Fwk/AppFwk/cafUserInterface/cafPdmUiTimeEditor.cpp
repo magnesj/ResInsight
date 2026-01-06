@@ -79,7 +79,7 @@ void PdmUiTimeEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<QString>( Keys::TIME_FORMAT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::TIME_FORMAT, uiConfigName ) )
         {
             m_attributes.timeFormat = val.value();
         }

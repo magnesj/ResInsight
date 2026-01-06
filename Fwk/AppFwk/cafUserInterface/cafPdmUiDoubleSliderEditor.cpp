@@ -86,27 +86,27 @@ void PdmUiDoubleSliderEditor::configureAndUpdateUi( const QString& uiConfigName 
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<double>( Keys::MINIMUM, uiConfigName ) )
+        if ( auto val = uiItem->attribute<double>( Keys::MINIMUM, uiConfigName ) )
         {
             m_attributes.m_minimum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<double>( Keys::MAXIMUM, uiConfigName ) )
+        if ( auto val = uiItem->attribute<double>( Keys::MAXIMUM, uiConfigName ) )
         {
             m_attributes.m_maximum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::DECIMALS, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::DECIMALS, uiConfigName ) )
         {
             m_attributes.m_decimals = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::SLIDER_TICK_COUNT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::SLIDER_TICK_COUNT, uiConfigName ) )
         {
             m_attributes.m_sliderTickCount = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::DELAY_SLIDER_UPDATE_UNTIL_RELEASE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::DELAY_SLIDER_UPDATE_UNTIL_RELEASE, uiConfigName ) )
         {
             m_attributes.m_delaySliderUpdateUntilRelease = val.value();
         }

@@ -72,7 +72,7 @@ void caf::PdmUiPickableLineEditor::configureAndUpdateUi( const QString& uiConfig
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_PICKING, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_PICKING, uiConfigName ) )
         {
             m_attribute.enablePicking = val.value();
         }

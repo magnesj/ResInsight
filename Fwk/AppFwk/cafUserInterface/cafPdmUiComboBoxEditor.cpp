@@ -79,72 +79,72 @@ void PdmUiComboBoxEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::ADJUST_WIDTH_TO_CONTENTS, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::ADJUST_WIDTH_TO_CONTENTS, uiConfigName ) )
         {
             m_attributes.adjustWidthToContents = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_PREVIOUS_AND_NEXT_BUTTONS, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_PREVIOUS_AND_NEXT_BUTTONS, uiConfigName ) )
         {
             m_attributes.showPreviousAndNextButtons = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_CONTENTS_LENGTH, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::MINIMUM_CONTENTS_LENGTH, uiConfigName ) )
         {
             m_attributes.minimumContentsLength = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM_MENU_CONTENTS_LENGTH, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::MAXIMUM_MENU_CONTENTS_LENGTH, uiConfigName ) )
         {
             m_attributes.maximumMenuContentsLength = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_EDITABLE_CONTENT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_EDITABLE_CONTENT, uiConfigName ) )
         {
             m_attributes.enableEditableContent = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_AUTO_COMPLETE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_AUTO_COMPLETE, uiConfigName ) )
         {
             m_attributes.enableAutoComplete = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QSize>( Keys::ICON_SIZE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QSize>( Keys::ICON_SIZE, uiConfigName ) )
         {
             m_attributes.iconSize = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
         {
             m_attributes.placeholderText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
         {
             m_attributes.notifyWhenTextIsEdited = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_WIDTH, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::MINIMUM_WIDTH, uiConfigName ) )
         {
             m_attributes.minimumWidth = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::NEXT_BUTTON_TEXT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::NEXT_BUTTON_TEXT, uiConfigName ) )
         {
             m_attributes.nextButtonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::PREV_BUTTON_TEXT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::PREV_BUTTON_TEXT, uiConfigName ) )
         {
             m_attributes.prevButtonText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( Keys::NEXT_ICON, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QIcon>( Keys::NEXT_ICON, uiConfigName ) )
         {
             m_attributes.nextIcon = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QIcon>( Keys::PREVIOUS_ICON, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QIcon>( Keys::PREVIOUS_ICON, uiConfigName ) )
         {
             m_attributes.previousIcon = val.value();
         }

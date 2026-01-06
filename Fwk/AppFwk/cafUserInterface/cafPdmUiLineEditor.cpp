@@ -166,37 +166,37 @@ void PdmUiLineEditor::configureAndUpdateUi( const QString& uiConfigName )
             {
                 // List of supported attributes for validation
 
-                if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM_WIDTH, uiConfigName ) )
+                if ( auto val = uiItem->attribute<int>( Keys::MAXIMUM_WIDTH, uiConfigName ) )
                 {
                     leab.maximumWidth = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_ALL_ON_FOCUS_EVENT, uiConfigName ) )
+                if ( auto val = uiItem->attribute<bool>( Keys::SELECT_ALL_ON_FOCUS_EVENT, uiConfigName ) )
                 {
                     leab.selectAllOnFocusEvent = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
+                if ( auto val = uiItem->attribute<QString>( Keys::PLACEHOLDER_TEXT, uiConfigName ) )
                 {
                     leab.placeholderText = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( Keys::AVOID_SENDING_ENTER_EVENT, uiConfigName ) )
+                if ( auto val = uiItem->attribute<bool>( Keys::AVOID_SENDING_ENTER_EVENT, uiConfigName ) )
                 {
                     leab.avoidSendingEnterEventToParentWidget = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<Qt::CaseSensitivity>( Keys::COMPLETER_CASE_SENSITIVITY, uiConfigName ) )
+                if ( auto val = uiItem->attribute<Qt::CaseSensitivity>( Keys::COMPLETER_CASE_SENSITIVITY, uiConfigName ) )
                 {
                     leab.completerCaseSensitivity = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<Qt::MatchFlags>( Keys::COMPLETER_FILTER_MODE, uiConfigName ) )
+                if ( auto val = uiItem->attribute<Qt::MatchFlags>( Keys::COMPLETER_FILTER_MODE, uiConfigName ) )
                 {
                     leab.completerFilterMode = val.value();
                 }
 
-                if ( auto val = uiItem->getAttribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
+                if ( auto val = uiItem->attribute<bool>( Keys::NOTIFY_WHEN_TEXT_IS_EDITED, uiConfigName ) )
                 {
                     leab.notifyWhenTextIsEdited = val.value();
                 }

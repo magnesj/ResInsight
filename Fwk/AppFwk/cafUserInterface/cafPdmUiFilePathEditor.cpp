@@ -81,32 +81,32 @@ void PdmUiFilePathEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_SAVE_FILE_NAME, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SELECT_SAVE_FILE_NAME, uiConfigName ) )
         {
             m_attributes.m_selectSaveFileName = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::FILE_SELECTION_FILTER, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::FILE_SELECTION_FILTER, uiConfigName ) )
         {
             m_attributes.m_fileSelectionFilter = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::DEFAULT_PATH, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::DEFAULT_PATH, uiConfigName ) )
         {
             m_attributes.m_defaultPath = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SELECT_DIRECTORY, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SELECT_DIRECTORY, uiConfigName ) )
         {
             m_attributes.m_selectDirectory = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::APPEND_UI_SELECTED_FOLDER_TO_TEXT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::APPEND_UI_SELECTED_FOLDER_TO_TEXT, uiConfigName ) )
         {
             m_attributes.m_appendUiSelectedFolderToText = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QString>( Keys::MULTIPLE_ITEM_SEPARATOR, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QString>( Keys::MULTIPLE_ITEM_SEPARATOR, uiConfigName ) )
         {
             if ( !val.value().isEmpty() )
             {

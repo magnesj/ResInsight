@@ -193,47 +193,47 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         // Override with map-based attributes if present (new system takes precedence)
         if ( auto uiItem = childArrayFH->uiCapability() )
         {
-            if ( auto val = uiItem->getAttribute<int>( Keys::TABLE_SELECTION_LEVEL, uiConfigName ) )
+            if ( auto val = uiItem->attribute<int>( Keys::TABLE_SELECTION_LEVEL, uiConfigName ) )
             {
                 editorAttrib.tableSelectionLevel = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( Keys::ROW_SELECTION_LEVEL, uiConfigName ) )
+            if ( auto val = uiItem->attribute<int>( Keys::ROW_SELECTION_LEVEL, uiConfigName ) )
             {
                 editorAttrib.rowSelectionLevel = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_HEADER_TEXT, uiConfigName ) )
+            if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_HEADER_TEXT, uiConfigName ) )
             {
                 editorAttrib.enableHeaderText = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM_HEIGHT, uiConfigName ) )
+            if ( auto val = uiItem->attribute<int>( Keys::MINIMUM_HEIGHT, uiConfigName ) )
             {
                 editorAttrib.minimumHeight = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
+            if ( auto val = uiItem->attribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
             {
                 editorAttrib.heightHint = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( Keys::ALWAYS_ENFORCE_RESIZE_POLICY, uiConfigName ) )
+            if ( auto val = uiItem->attribute<bool>( Keys::ALWAYS_ENFORCE_RESIZE_POLICY, uiConfigName ) )
             {
                 editorAttrib.alwaysEnforceResizePolicy = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<int>( Keys::RESIZE_POLICY, uiConfigName ) )
+            if ( auto val = uiItem->attribute<int>( Keys::RESIZE_POLICY, uiConfigName ) )
             {
                 editorAttrib.resizePolicy = static_cast<PdmUiTableViewEditorAttribute::ResizePolicy>( val.value() );
             }
 
-            if ( auto val = uiItem->getAttribute<bool>( Keys::ENABLE_DROP_TARGET, uiConfigName ) )
+            if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_DROP_TARGET, uiConfigName ) )
             {
                 editorAttrib.enableDropTarget = val.value();
             }
 
-            if ( auto val = uiItem->getAttribute<QVariantList>( Keys::COLUMN_WIDTHS, uiConfigName ) )
+            if ( auto val = uiItem->attribute<QVariantList>( Keys::COLUMN_WIDTHS, uiConfigName ) )
             {
                 editorAttrib.columnWidths.clear();
                 for ( const QVariant& item : val.value() )
@@ -245,7 +245,7 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
                 }
             }
 
-            if ( auto val = uiItem->getAttribute<QColor>( Keys::BASE_COLOR, uiConfigName ) )
+            if ( auto val = uiItem->attribute<QColor>( Keys::BASE_COLOR, uiConfigName ) )
             {
                 editorAttrib.baseColor = val.value();
             }

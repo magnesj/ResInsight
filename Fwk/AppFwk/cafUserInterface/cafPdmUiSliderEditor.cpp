@@ -76,22 +76,22 @@ void PdmUiSliderEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<int>( Keys::MINIMUM, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::MINIMUM, uiConfigName ) )
         {
             m_attributes.m_minimum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::MAXIMUM, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::MAXIMUM, uiConfigName ) )
         {
             m_attributes.m_maximum = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_SPIN_BOX, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_SPIN_BOX, uiConfigName ) )
         {
             m_attributes.m_showSpinBox = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::STEP, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::STEP, uiConfigName ) )
         {
             m_attributes.m_step = val.value();
         }

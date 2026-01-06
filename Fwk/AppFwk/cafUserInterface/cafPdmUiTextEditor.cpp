@@ -132,27 +132,27 @@ void PdmUiTextEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<int>( Keys::TEXT_MODE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::TEXT_MODE, uiConfigName ) )
         {
             leab.textMode = static_cast<PdmUiTextEditorAttribute::TextMode>( val.value() );
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::SHOW_SAVE_BUTTON, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::SHOW_SAVE_BUTTON, uiConfigName ) )
         {
             leab.showSaveButton = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::WRAP_MODE, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::WRAP_MODE, uiConfigName ) )
         {
             leab.wrapMode = static_cast<PdmUiTextEditorAttribute::WrapMode>( val.value() );
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
         {
             leab.heightHint = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<QFont>( Keys::FONT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<QFont>( Keys::FONT, uiConfigName ) )
         {
             leab.font = val.value();
         }

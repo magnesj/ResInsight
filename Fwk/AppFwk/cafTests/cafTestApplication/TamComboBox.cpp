@@ -13,10 +13,10 @@ TamComboBox::TamComboBox()
 
     CAF_PDM_InitField( &m_name, "UserDescription", QString( "Filter Name" ), "Name", "", "", "" );
     m_name.uiCapability()->setUiEditorTypeName( caf::PdmUiComboBoxEditor::uiEditorTypeName() );
-    m_name.uiCapability()->setAttribute<bool>( caf::PdmUiComboBoxEditor::Keys::ENABLE_EDITABLE_CONTENT, true );
-    m_name.uiCapability()->setAttribute<bool>( caf::PdmUiComboBoxEditor::Keys::ENABLE_AUTO_COMPLETE, false );
-    m_name.uiCapability()->setAttribute<bool>( caf::PdmUiComboBoxEditor::Keys::ADJUST_WIDTH_TO_CONTENTS, true );
-    m_name.uiCapability()->setAttribute<bool>( caf::PdmUiComboBoxEditor::Keys::NOTIFY_WHEN_TEXT_IS_EDITED, false );
+    m_name.uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::ENABLE_EDITABLE_CONTENT, true );
+    m_name.uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::ENABLE_AUTO_COMPLETE, false );
+    m_name.uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::ADJUST_WIDTH_TO_CONTENTS, true );
+    m_name.uiCapability()->setAttribute( caf::PdmUiComboBoxEditor::Keys::NOTIFY_WHEN_TEXT_IS_EDITED, false );
 }
 
 //--------------------------------------------------------------------------------------------------

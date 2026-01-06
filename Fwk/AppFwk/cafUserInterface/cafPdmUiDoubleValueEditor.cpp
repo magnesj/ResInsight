@@ -91,12 +91,12 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<int>( Keys::DECIMALS, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::DECIMALS, uiConfigName ) )
         {
             m_attributes.m_decimals = val.value();
         }
 
-        if ( auto val = uiItem->getAttribute<int>( Keys::NUMBER_FORMAT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::NUMBER_FORMAT, uiConfigName ) )
         {
             m_attributes.m_numberFormat = static_cast<PdmUiDoubleValueEditorAttribute::NumberFormat>( val.value() );
         }

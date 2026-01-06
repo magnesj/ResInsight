@@ -179,17 +179,17 @@ void PdmUiListEditor::configureAndUpdateUi( const QString& uiConfigName )
     PdmUiItem* uiItem = uiField();
     if ( uiItem )
     {
-        if ( auto val = uiItem->getAttribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
+        if ( auto val = uiItem->attribute<int>( Keys::HEIGHT_HINT, uiConfigName ) )
         {
             attributes.heightHint = val.value();
         }
 
-        if ( auto qssState = uiItem->getAttribute<QString>( Keys::QSS_STATE, uiConfigName ) )
+        if ( auto qssState = uiItem->attribute<QString>( Keys::QSS_STATE, uiConfigName ) )
         {
             attributes.qssState = qssState.value();
         }
 
-        if ( auto val = uiItem->getAttribute<bool>( Keys::ALLOW_HORIZONTAL_SCROLL_BAR, uiConfigName ) )
+        if ( auto val = uiItem->attribute<bool>( Keys::ALLOW_HORIZONTAL_SCROLL_BAR, uiConfigName ) )
         {
             attributes.allowHorizontalScrollBar = val.value();
         }
