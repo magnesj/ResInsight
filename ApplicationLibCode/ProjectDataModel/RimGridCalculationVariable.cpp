@@ -36,7 +36,6 @@
 #include "RiuDragDrop.h"
 
 #include "cafPdmUiPropertyViewDialog.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimGridCalculationVariable, "RimGridCalculationVariable" );
@@ -60,9 +59,6 @@ RimGridCalculationVariable::RimGridCalculationVariable()
     CAF_PDM_InitField( &m_resultVariable, "ResultVariable", RiaResultNames::undefinedResultName(), "Variable" );
     CAF_PDM_InitFieldNoDefault( &m_eclipseCase, "EclipseGridCase", "Grid Case" );
     CAF_PDM_InitField( &m_timeStep, "TimeStep", allTimeStepsValue(), "Time Step" );
-
-    CAF_PDM_InitFieldNoDefault( &m_button, "PushButton", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_button );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -96,7 +92,29 @@ void RimGridCalculationVariable::defineUiOrdering( QString uiConfigName, caf::Pd
     uiOrdering.add( &m_resultType );
     uiOrdering.add( &m_resultVariable );
     uiOrdering.add( &m_timeStep );
-    uiOrdering.add( &m_button );
+    
+    uiOrdering.addNewButton( "Edit",
+                            [this]()
+                            {
+                                auto eclipseCase = m_eclipseCase();
+                                if ( !eclipseCase )
+                                {
+                                    auto cases = RimEclipseCaseTools::eclipseCases();
+                                    if ( !cases.empty() )
+                                    {
+                                        eclipseCase = cases.front();
+                                    }
+                                }
+                                
+                                RimResultSelectionUi selectionUi;
+                                selectionUi.setEclipseResultAddress( eclipseCase, m_resultType(), m_resultVariable );
+                                
+                                caf::PdmUiPropertyViewDialog propertyDialog( Riu3DMainWindowTools::mainWindowWidget(), &selectionUi, "Select Result", "" );
+                                if ( propertyDialog.exec() == QDialog::Accepted )
+                                {
+                                    setEclipseResultAddress( selectionUi.eclipseCase(), selectionUi.resultType(), selectionUi.resultVariable() );
+                                }
+                            } );
 
     uiOrdering.skipRemainingFields();
 
@@ -109,11 +127,6 @@ void RimGridCalculationVariable::defineUiOrdering( QString uiConfigName, caf::Pd
 //--------------------------------------------------------------------------------------------------
 void RimGridCalculationVariable::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    auto attr = dynamic_cast<caf::PdmUiTableViewPushButtonEditorAttribute*>( attribute );
-    if ( attr )
-    {
-        attr->registerPushButtonTextForFieldKeyword( m_button.keyword(), "Edit" );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -121,27 +134,6 @@ void RimGridCalculationVariable::defineObjectEditorAttribute( QString uiConfigNa
 //--------------------------------------------------------------------------------------------------
 void RimGridCalculationVariable::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_button )
-    {
-        auto eclipseCase = m_eclipseCase();
-        if ( !eclipseCase )
-        {
-            auto cases = RimEclipseCaseTools::eclipseCases();
-            if ( !cases.empty() )
-            {
-                eclipseCase = cases.front();
-            }
-        }
-
-        RimResultSelectionUi selectionUi;
-        selectionUi.setEclipseResultAddress( eclipseCase, m_resultType(), m_resultVariable );
-
-        caf::PdmUiPropertyViewDialog propertyDialog( Riu3DMainWindowTools::mainWindowWidget(), &selectionUi, "Select Result", "" );
-        if ( propertyDialog.exec() == QDialog::Accepted )
-        {
-            setEclipseResultAddress( selectionUi.eclipseCase(), selectionUi.resultType(), selectionUi.resultVariable() );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

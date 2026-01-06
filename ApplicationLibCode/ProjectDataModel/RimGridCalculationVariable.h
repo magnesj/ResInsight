@@ -74,5 +74,4 @@ private:
     caf::PdmField<caf::AppEnum<RiaDefines::ResultCatType>> m_resultType;
     caf::PdmField<QString>                                 m_resultVariable;
     caf::PdmField<int>                                     m_timeStep;
-    caf::PdmField<bool>                                    m_button;
 };
