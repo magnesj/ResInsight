@@ -59,7 +59,6 @@ LineEditAndPushButtons::LineEditAndPushButtons()
     m_pushButtonAppend.uiCapability()->setAttribute( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT,
                                                      QString( "Append (Shift + Enter)" ) );
 
-
     std::vector<QString> items;
     items.push_back( "sldkfj" );
     items.push_back( "annet sldkfj" );
