@@ -33,19 +33,10 @@ CAF_CMD_SOURCE_INIT( RicNewWellPathListTargetFeature, "RicNewWellPathListTargetF
 //--------------------------------------------------------------------------------------------------
 bool RicNewWellPathListTargetFeature::isCommandEnabled() const
 {
+    const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
+    if ( !selectedTargets.empty() )
     {
-        const auto attributes = caf::SelectionManager::instance()->objectsByType<RimWellPathGeometryDef>();
-        if ( !attributes.empty() )
-        {
-            return false;
-        }
-    }
-    {
-        const auto selectedTargets = caf::SelectionManager::instance()->objectsByType<RimWellPathTarget>();
-        if ( !selectedTargets.empty() )
-        {
-            return true;
-        }
+        return true;
     }
 
     return false;
