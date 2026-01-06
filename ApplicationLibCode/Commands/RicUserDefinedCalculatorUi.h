@@ -60,21 +60,12 @@ protected:
     virtual void exportCalculations() = 0;
     virtual void importCalculations() = 0;
 
-    // TODO : Move to a common caf helper class
-    static void assignPushButtonEditor( caf::PdmFieldHandle* fieldHandle );
-    static void assignPushButtonEditorText( caf::PdmUiEditorAttribute* attribute, const QString& text );
-
 private:
     void onVariableUpdated( const SignalEmitter* emitter );
     void connectSignals( RimUserDefinedCalculation* calculation );
 
 private:
     caf::PdmPtrField<RimUserDefinedCalculation*> m_currentCalculation;
-
-    caf::PdmField<bool> m_newCalculation;
-    caf::PdmField<bool> m_deleteCalculation;
-    caf::PdmField<bool> m_exportCalculations;
-    caf::PdmField<bool> m_importCalculations;
 
     std::unique_ptr<RiuCalculationsContextMenuManager> m_calcContextMenuMgr;
 };
