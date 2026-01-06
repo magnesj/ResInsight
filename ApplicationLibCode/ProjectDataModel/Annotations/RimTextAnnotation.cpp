@@ -144,24 +144,24 @@ const QString& RimTextAnnotation::text() const
 void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_anchorPointXyd );
-    
+
     uiOrdering.addNewButton( m_anchorPointPickEnabled ? "Stop" : "Pick",
-                            [this]()
-                            {
-                                m_anchorPointPickEnabled = !m_anchorPointPickEnabled;
-                                updateConnectedEditors();
-                            },
-                            { .newRow = false } );
-    
+                             [this]()
+                             {
+                                 m_anchorPointPickEnabled = !m_anchorPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false } );
+
     uiOrdering.add( &m_labelPointXyd );
-    
+
     uiOrdering.addNewButton( m_labelPointPickEnabled ? "Stop" : "Pick",
-                            [this]()
-                            {
-                                m_labelPointPickEnabled = !m_labelPointPickEnabled;
-                                updateConnectedEditors();
-                            },
-                            { .newRow = false } );
+                             [this]()
+                             {
+                                 m_labelPointPickEnabled = !m_labelPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false } );
 
     uiOrdering.add( &m_text );
 

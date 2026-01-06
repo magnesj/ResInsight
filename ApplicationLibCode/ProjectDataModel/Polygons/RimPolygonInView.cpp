@@ -298,11 +298,11 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     if ( enableEdit )
     {
         uiOrdering.addNewButton( m_enablePicking ? "Stop Picking" : "Start Picking",
-                                [this]()
-                                {
-                                    m_enablePicking = !m_enablePicking;
-                                    updateConnectedEditors();
-                                } );
+                                 [this]()
+                                 {
+                                     m_enablePicking = !m_enablePicking;
+                                     updateConnectedEditors();
+                                 } );
         uiOrdering.add( &m_targets );
         uiOrdering.add( &m_handleScalingFactor );
     }
@@ -378,11 +378,11 @@ void RimPolygonInView::defineObjectEditorAttribute( QString uiConfigName, caf::P
 void RimPolygonInView::uiOrderingForLocalPolygon( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.addNewButton( m_enablePicking ? "Stop Picking" : "Start Picking",
-                            [this]()
-                            {
-                                m_enablePicking = !m_enablePicking;
-                                updateConnectedEditors();
-                            } );
+                             [this]()
+                             {
+                                 m_enablePicking = !m_enablePicking;
+                                 updateConnectedEditors();
+                             } );
     uiOrdering.add( &m_targets );
     uiOrdering.add( &m_handleScalingFactor );
 }

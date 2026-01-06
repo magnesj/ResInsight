@@ -126,15 +126,15 @@ void RimReachCircleAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmU
 {
     uiOrdering.add( &m_name );
     uiOrdering.add( &m_centerPointXyd );
-    
+
     uiOrdering.addNewButton( m_centerPointPickEnabled ? "Stop" : "Pick",
-                            [this]()
-                            {
-                                m_centerPointPickEnabled = !m_centerPointPickEnabled;
-                                updateConnectedEditors();
-                            },
-                            { .newRow = false } );
-    
+                             [this]()
+                             {
+                                 m_centerPointPickEnabled = !m_centerPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false } );
+
     uiOrdering.add( &m_radius );
 
     auto appearanceGroup = uiOrdering.addNewGroup( "Appearance" );
@@ -153,7 +153,7 @@ void RimReachCircleAnnotation::fieldChangedByUi( const caf::PdmFieldHandle* chan
         m_centerPointPickEnabled = false;
         updateConnectedEditors();
     }
-    
+
     auto annColl = firstAncestorOrThisOfTypeAsserted<RimAnnotationCollection>();
 
     annColl->scheduleRedrawOfRelevantViews();

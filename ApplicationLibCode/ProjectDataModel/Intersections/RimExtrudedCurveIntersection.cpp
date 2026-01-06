@@ -553,11 +553,8 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     {
         geometryGroup->add( &m_projectPolygon );
         geometryGroup->addNewButton( "Edit",
-                                    [this]()
-                                    {
-                                        RimPolygonTools::activate3dEditOfPolygonInView( m_projectPolygon(), this );
-                                    },
-                                    { .newRow = false } );
+                                     [this]() { RimPolygonTools::activate3dEditOfPolygonInView( m_projectPolygon(), this ); },
+                                     { .newRow = false } );
     }
     else if ( type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {

@@ -127,46 +127,46 @@ void RimSummaryCalculationVariable::defineUiOrdering( QString uiConfigName, caf:
 {
     uiOrdering.add( &m_name );
     uiOrdering.add( &m_addressUi );
-    
+
     uiOrdering.addNewButton( "Edit",
-                            [this]()
-                            {
-                                bool updateContainingEditor = false;
-                                {
-                                    RiuSummaryVectorSelectionDialog dlg( nullptr );
-                                    dlg.hideEnsembles();
-                                    dlg.hideCalculationIncompatibleCategories();
-                                    
-                                    readDataFromApplicationStore( &dlg );
-                                    
-                                    if ( dlg.exec() == QDialog::Accepted )
-                                    {
-                                        std::vector<RiaSummaryCurveDefinition> curveSelection = dlg.curveSelection();
-                                        if ( !curveSelection.empty() )
-                                        {
-                                            m_case = curveSelection[0].summaryCaseY();
-                                            m_summaryAddress->setAddress( curveSelection[0].summaryAddressY() );
-                                            
-                                            writeDataToApplicationStore();
-                                            
-                                            updateContainingEditor = true;
-                                        }
-                                    }
-                                }
-                                
-                                if ( updateContainingEditor )
-                                {
-                                    auto rimCalculation = firstAncestorOrThisOfTypeAsserted<RimSummaryCalculation>();
-                                    
-                                    // RimCalculation is pointed to by RicSummaryCurveCalculator in a PtrField
-                                    // Update editors connected to RicSummaryCurveCalculator
-                                    std::vector<caf::PdmObjectHandle*> referringObjects = rimCalculation->objectsWithReferringPtrFields();
-                                    for ( auto o : referringObjects )
-                                    {
-                                        o->uiCapability()->updateConnectedEditors();
-                                    }
-                                }
-                            } );
+                             [this]()
+                             {
+                                 bool updateContainingEditor = false;
+                                 {
+                                     RiuSummaryVectorSelectionDialog dlg( nullptr );
+                                     dlg.hideEnsembles();
+                                     dlg.hideCalculationIncompatibleCategories();
+
+                                     readDataFromApplicationStore( &dlg );
+
+                                     if ( dlg.exec() == QDialog::Accepted )
+                                     {
+                                         std::vector<RiaSummaryCurveDefinition> curveSelection = dlg.curveSelection();
+                                         if ( !curveSelection.empty() )
+                                         {
+                                             m_case = curveSelection[0].summaryCaseY();
+                                             m_summaryAddress->setAddress( curveSelection[0].summaryAddressY() );
+
+                                             writeDataToApplicationStore();
+
+                                             updateContainingEditor = true;
+                                         }
+                                     }
+                                 }
+
+                                 if ( updateContainingEditor )
+                                 {
+                                     auto rimCalculation = firstAncestorOrThisOfTypeAsserted<RimSummaryCalculation>();
+
+                                     // RimCalculation is pointed to by RicSummaryCurveCalculator in a PtrField
+                                     // Update editors connected to RicSummaryCurveCalculator
+                                     std::vector<caf::PdmObjectHandle*> referringObjects = rimCalculation->objectsWithReferringPtrFields();
+                                     for ( auto o : referringObjects )
+                                     {
+                                         o->uiCapability()->updateConnectedEditors();
+                                     }
+                                 }
+                             } );
 
     uiOrdering.skipRemainingFields();
 }

@@ -92,29 +92,32 @@ void RimGridCalculationVariable::defineUiOrdering( QString uiConfigName, caf::Pd
     uiOrdering.add( &m_resultType );
     uiOrdering.add( &m_resultVariable );
     uiOrdering.add( &m_timeStep );
-    
+
     uiOrdering.addNewButton( "Edit",
-                            [this]()
-                            {
-                                auto eclipseCase = m_eclipseCase();
-                                if ( !eclipseCase )
-                                {
-                                    auto cases = RimEclipseCaseTools::eclipseCases();
-                                    if ( !cases.empty() )
-                                    {
-                                        eclipseCase = cases.front();
-                                    }
-                                }
-                                
-                                RimResultSelectionUi selectionUi;
-                                selectionUi.setEclipseResultAddress( eclipseCase, m_resultType(), m_resultVariable );
-                                
-                                caf::PdmUiPropertyViewDialog propertyDialog( Riu3DMainWindowTools::mainWindowWidget(), &selectionUi, "Select Result", "" );
-                                if ( propertyDialog.exec() == QDialog::Accepted )
-                                {
-                                    setEclipseResultAddress( selectionUi.eclipseCase(), selectionUi.resultType(), selectionUi.resultVariable() );
-                                }
-                            } );
+                             [this]()
+                             {
+                                 auto eclipseCase = m_eclipseCase();
+                                 if ( !eclipseCase )
+                                 {
+                                     auto cases = RimEclipseCaseTools::eclipseCases();
+                                     if ( !cases.empty() )
+                                     {
+                                         eclipseCase = cases.front();
+                                     }
+                                 }
+
+                                 RimResultSelectionUi selectionUi;
+                                 selectionUi.setEclipseResultAddress( eclipseCase, m_resultType(), m_resultVariable );
+
+                                 caf::PdmUiPropertyViewDialog propertyDialog( Riu3DMainWindowTools::mainWindowWidget(),
+                                                                              &selectionUi,
+                                                                              "Select Result",
+                                                                              "" );
+                                 if ( propertyDialog.exec() == QDialog::Accepted )
+                                 {
+                                     setEclipseResultAddress( selectionUi.eclipseCase(), selectionUi.resultType(), selectionUi.resultVariable() );
+                                 }
+                             } );
 
     uiOrdering.skipRemainingFields();
 
