@@ -361,11 +361,7 @@ void RimFractureTemplate::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         group->add( &m_dFactorScaleFactor );
         group->add( &m_conductivityScaleFactor );
 
-        group->addNewButton( "Apply",
-                            [this]()
-                            {
-                                onLoadDataAndUpdateGeometryHasChanged();
-                            } );
+        group->addNewButton( "Apply", [this]() { onLoadDataAndUpdateGeometryHasChanged(); } );
     }
 
     auto nonDarcyFlowGroup = uiOrdering.addNewGroup( "Non-Darcy Flow" );

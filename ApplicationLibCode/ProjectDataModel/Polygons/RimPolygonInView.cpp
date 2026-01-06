@@ -309,11 +309,7 @@ void RimPolygonInView::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 
     if ( m_polygon() )
     {
-        uiOrdering.addNewButton( "Go to Polygon",
-                                [this]()
-                                {
-                                    Riu3DMainWindowTools::selectAsCurrentItem( m_polygon() );
-                                } );
+        uiOrdering.addNewButton( "Go to Polygon", [this]() { Riu3DMainWindowTools::selectAsCurrentItem( m_polygon() ); } );
     }
 
     uiOrdering.skipRemainingFields();

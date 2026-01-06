@@ -176,12 +176,12 @@ void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
 
     // Add dynamic button based on read-only state
     QString buttonText = m_isReadOnly() ? "Select in Active View" : "Edit in Active View";
-    uiOrdering.addNewButton( buttonText, 
-                            [this]()
-                            {
-                                auto activeView = RiaApplication::instance()->activeReservoirView();
-                                RimPolygonTools::activate3dEditOfPolygonInView( this, activeView );
-                            } );
+    uiOrdering.addNewButton( buttonText,
+                             [this]()
+                             {
+                                 auto activeView = RiaApplication::instance()->activeReservoirView();
+                                 RimPolygonTools::activate3dEditOfPolygonInView( this, activeView );
+                             } );
 
     auto groupPoints = uiOrdering.addNewGroup( "Points" );
     groupPoints->setCollapsedByDefault();

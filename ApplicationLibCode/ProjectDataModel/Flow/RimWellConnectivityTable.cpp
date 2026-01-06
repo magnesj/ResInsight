@@ -471,34 +471,18 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
         caf::PdmUiGroup& excludeTimeStepGroup = *flowDiagConfigGroup.addNewGroup( "Exclude Time Steps" );
         excludeTimeStepGroup.add( &m_excludeTimeSteps );
         excludeTimeStepGroup.setCollapsedByDefault();
-        flowDiagConfigGroup.addNewButton( "Apply",
-                                         [this]()
-                                         {
-                                             onLoadDataAndUpdate();
-                                         } );
+        flowDiagConfigGroup.addNewButton( "Apply", [this]() { onLoadDataAndUpdate(); } );
     }
 
     caf::PdmUiGroup* selectionGroup = uiOrdering.addNewGroup( "Tracer Selection" );
     caf::PdmUiGroup* producerGroup  = selectionGroup->addNewGroup( "Producers" );
     producerGroup->add( &m_selectedProducerTracersUiField );
-    producerGroup->addNewButton( "Synch Communicators ->",
-                                [this]()
-                                {
-                                    syncSelectedInjectorsFromProducerSelection();
-                                } );
+    producerGroup->addNewButton( "Synch Communicators ->", [this]() { syncSelectedInjectorsFromProducerSelection(); } );
     caf::PdmUiGroup* injectorGroup = selectionGroup->addNewGroup( "Injectors", { .newRow = false } );
     injectorGroup->add( &m_selectedInjectorTracersUiField );
-    injectorGroup->addNewButton( "<- Synch Communicators",
-                                [this]()
-                                {
-                                    syncSelectedProducersFromInjectorSelection();
-                                } );
+    injectorGroup->addNewButton( "<- Synch Communicators", [this]() { syncSelectedProducersFromInjectorSelection(); } );
 
-    selectionGroup->addNewButton( "Apply",
-                                 [this]()
-                                 {
-                                     onLoadDataAndUpdate();
-                                 } );
+    selectionGroup->addNewButton( "Apply", [this]() { onLoadDataAndUpdate(); } );
 
     caf::PdmUiGroup* tableSettingsGroup = uiOrdering.addNewGroup( "Table Settings" );
     tableSettingsGroup->add( &m_showValueLabels );
