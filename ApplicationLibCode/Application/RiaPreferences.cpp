@@ -389,25 +389,25 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         caf::PdmUiGroup* importExportGroup = uiOrdering.addNewGroup( "Import and Export" );
         importExportGroup->setCollapsedByDefault();
         importExportGroup->addNewButton( "Import Preferences",
-                                        [this]()
-                                        {
-                                            QString filePath = RiuFileDialogTools::getOpenFileName( nullptr,
-                                                                                                   "Import Preferences",
-                                                                                                   "",
-                                                                                                   "XML files (*.xml);;All files(*.*)" );
-                                            importPreferenceValuesFromFile( filePath );
-                                        },
-                                        { .newRow = false, .totalColumnSpan = 1 } );
+                                         [this]()
+                                         {
+                                             QString filePath = RiuFileDialogTools::getOpenFileName( nullptr,
+                                                                                                     "Import Preferences",
+                                                                                                     "",
+                                                                                                     "XML files (*.xml);;All files(*.*)" );
+                                             importPreferenceValuesFromFile( filePath );
+                                         },
+                                         { .newRow = false, .totalColumnSpan = 1 } );
         importExportGroup->addNewButton( "Export Preferences",
-                                        [this]()
-                                        {
-                                            QString filePath = RiuFileDialogTools::getSaveFileName( nullptr,
-                                                                                                   "Export Preferences",
-                                                                                                   "",
-                                                                                                   "XML files (*.xml);;All files(*.*)" );
-                                            exportPreferenceValuesToFile( filePath );
-                                        },
-                                        { .newRow = false, .totalColumnSpan = 1 } );
+                                         [this]()
+                                         {
+                                             QString filePath = RiuFileDialogTools::getSaveFileName( nullptr,
+                                                                                                     "Export Preferences",
+                                                                                                     "",
+                                                                                                     "XML files (*.xml);;All files(*.*)" );
+                                             exportPreferenceValuesToFile( filePath );
+                                         },
+                                         { .newRow = false, .totalColumnSpan = 1 } );
     }
     else if ( uiConfigName == RiaPreferences::tabNameGrid() )
     {
@@ -504,20 +504,12 @@ void RiaPreferences::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
         caf::PdmUiGroup* osduGroup = uiOrdering.addNewGroup( "OSDU" );
         osduGroup->setCollapsedByDefault();
         m_osduPreferences()->uiOrdering( uiConfigName, *osduGroup );
-        osduGroup->addNewButton( "Delete OSDU Token",
-                                []()
-                                {
-                                    RicDeleteOsduTokenFeature::deleteUserToken();
-                                } );
+        osduGroup->addNewButton( "Delete OSDU Token", []() { RicDeleteOsduTokenFeature::deleteUserToken(); } );
 
         caf::PdmUiGroup* sumoGroup = uiOrdering.addNewGroup( "SUMO" );
         sumoGroup->setCollapsedByDefault();
         m_sumoPreferences()->uiOrdering( uiConfigName, *sumoGroup );
-        sumoGroup->addNewButton( "Delete SUMO Token",
-                                []()
-                                {
-                                    RicDeleteSumoTokenFeature::deleteUserToken();
-                                } );
+        sumoGroup->addNewButton( "Delete SUMO Token", []() { RicDeleteSumoTokenFeature::deleteUserToken(); } );
 
         caf::PdmUiGroup* openTelemetryGroup = uiOrdering.addNewGroup( "OpenTelemetry" );
         openTelemetryGroup->setCollapsedByDefault();
