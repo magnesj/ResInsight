@@ -133,7 +133,7 @@ void RimAbstractCorrelationPlot::setTimeStep( std::time_t timeStep )
 void RimAbstractCorrelationPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
-    
+
     if ( changedField == &m_timeStep )
     {
         loadDataAndUpdate();

@@ -173,7 +173,7 @@ void RimPolygon::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiO
 {
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_isReadOnly );
-    
+
     // Add dynamic button based on read-only state
     QString buttonText = m_isReadOnly() ? "Select in Active View" : "Edit in Active View";
     uiOrdering.addNewButton( buttonText, 
@@ -214,8 +214,6 @@ void RimPolygon::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildF
     objectChanged.send();
 }
 
-//--------------------------------------------------------------------------------------------------
-///
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
