@@ -61,8 +61,6 @@ private:
     void writeDataToApplicationStore() const;
 
 private:
-    caf::PdmField<bool> m_button;
-
     caf::PdmPtrField<RimSummaryCase*>      m_case;
     caf::PdmChildField<RimSummaryAddress*> m_summaryAddress;
 };

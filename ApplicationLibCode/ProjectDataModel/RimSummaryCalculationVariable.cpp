@@ -34,7 +34,6 @@
 #include "RiuDragDrop.h"
 #include "RiuSummaryVectorSelectionDialog.h"
 
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableViewEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimSummaryCalculationVariable, "RimSummaryCalculationVariable" );
@@ -45,9 +44,6 @@ CAF_PDM_SOURCE_INIT( RimSummaryCalculationVariable, "RimSummaryCalculationVariab
 RimSummaryCalculationVariable::RimSummaryCalculationVariable()
 {
     CAF_PDM_InitObject( "RimSummaryCalculationVariable", ":/octave.png" );
-
-    CAF_PDM_InitFieldNoDefault( &m_button, "PushButton", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_button );
 
     CAF_PDM_InitFieldNoDefault( &m_case, "SummaryCase", "Summary Case" );
     CAF_PDM_InitFieldNoDefault( &m_summaryAddress, "SummaryAddress", "Summary Address" );
@@ -60,45 +56,6 @@ RimSummaryCalculationVariable::RimSummaryCalculationVariable()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationVariable::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_button )
-    {
-        bool updateContainingEditor = false;
-
-        {
-            RiuSummaryVectorSelectionDialog dlg( nullptr );
-            dlg.hideEnsembles();
-            dlg.hideCalculationIncompatibleCategories();
-
-            readDataFromApplicationStore( &dlg );
-
-            if ( dlg.exec() == QDialog::Accepted )
-            {
-                std::vector<RiaSummaryCurveDefinition> curveSelection = dlg.curveSelection();
-                if ( !curveSelection.empty() )
-                {
-                    m_case = curveSelection[0].summaryCaseY();
-                    m_summaryAddress->setAddress( curveSelection[0].summaryAddressY() );
-
-                    writeDataToApplicationStore();
-
-                    updateContainingEditor = true;
-                }
-            }
-        }
-
-        if ( updateContainingEditor )
-        {
-            auto rimCalculation = firstAncestorOrThisOfTypeAsserted<RimSummaryCalculation>();
-
-            // RimCalculation is pointed to by RicSummaryCurveCalculator in a PtrField
-            // Update editors connected to RicSummaryCurveCalculator
-            std::vector<caf::PdmObjectHandle*> referringObjects = rimCalculation->objectsWithReferringPtrFields();
-            for ( auto o : referringObjects )
-            {
-                o->uiCapability()->updateConnectedEditors();
-            }
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -170,7 +127,46 @@ void RimSummaryCalculationVariable::defineUiOrdering( QString uiConfigName, caf:
 {
     uiOrdering.add( &m_name );
     uiOrdering.add( &m_addressUi );
-    uiOrdering.add( &m_button );
+    
+    uiOrdering.addNewButton( "Edit",
+                            [this]()
+                            {
+                                bool updateContainingEditor = false;
+                                {
+                                    RiuSummaryVectorSelectionDialog dlg( nullptr );
+                                    dlg.hideEnsembles();
+                                    dlg.hideCalculationIncompatibleCategories();
+                                    
+                                    readDataFromApplicationStore( &dlg );
+                                    
+                                    if ( dlg.exec() == QDialog::Accepted )
+                                    {
+                                        std::vector<RiaSummaryCurveDefinition> curveSelection = dlg.curveSelection();
+                                        if ( !curveSelection.empty() )
+                                        {
+                                            m_case = curveSelection[0].summaryCaseY();
+                                            m_summaryAddress->setAddress( curveSelection[0].summaryAddressY() );
+                                            
+                                            writeDataToApplicationStore();
+                                            
+                                            updateContainingEditor = true;
+                                        }
+                                    }
+                                }
+                                
+                                if ( updateContainingEditor )
+                                {
+                                    auto rimCalculation = firstAncestorOrThisOfTypeAsserted<RimSummaryCalculation>();
+                                    
+                                    // RimCalculation is pointed to by RicSummaryCurveCalculator in a PtrField
+                                    // Update editors connected to RicSummaryCurveCalculator
+                                    std::vector<caf::PdmObjectHandle*> referringObjects = rimCalculation->objectsWithReferringPtrFields();
+                                    for ( auto o : referringObjects )
+                                    {
+                                        o->uiCapability()->updateConnectedEditors();
+                                    }
+                                }
+                            } );
 
     uiOrdering.skipRemainingFields();
 }
@@ -180,11 +176,6 @@ void RimSummaryCalculationVariable::defineUiOrdering( QString uiConfigName, caf:
 //--------------------------------------------------------------------------------------------------
 void RimSummaryCalculationVariable::defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    caf::PdmUiTableViewPushButtonEditorAttribute* attr = dynamic_cast<caf::PdmUiTableViewPushButtonEditorAttribute*>( attribute );
-    if ( attr )
-    {
-        attr->registerPushButtonTextForFieldKeyword( m_button.keyword(), "Edit" );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
