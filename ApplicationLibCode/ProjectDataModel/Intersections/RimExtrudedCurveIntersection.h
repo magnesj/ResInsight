@@ -185,7 +185,6 @@ private:
     caf::PdmPtrField<RimSimWellInView*> m_simulationWell;
 
     caf::PdmPtrField<RimPolygon*> m_projectPolygon;
-    caf::PdmField<bool>           m_editPolygonButton;
 
     caf::PdmField<bool> m_inputPolylineFromViewerEnabled;
     caf::PdmField<bool> m_inputExtrusionPointsFromViewerEnabled;
