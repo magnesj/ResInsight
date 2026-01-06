@@ -77,7 +77,6 @@ private:
 
 private:
     caf::PdmField<bool>                       m_isReadOnly;
-    caf::PdmField<bool>                       m_editPolygonButton;
     caf::PdmField<std::vector<cvf::Vec3d>>    m_pointsInDomainCoords;
     caf::PdmChildField<RimPolygonAppearance*> m_appearance;
 };
