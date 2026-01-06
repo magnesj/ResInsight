@@ -96,7 +96,7 @@ public:
     void                   removeFromDefaultPlotTemplates( QString filename );
 
     void appendRestartFileGroup( caf::PdmUiOrdering& uiOrdering ) const;
-    void appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOrdering ) const;
+    void appendItemsToPlottingGroup( caf::PdmUiOrdering& uiOrdering );
 
     bool showSummaryTimeAsLongString() const;
     bool useMultipleThreadsWhenLoadingSummaryData() const;
@@ -134,7 +134,6 @@ protected:
 
 private:
     caf::PdmField<DefaultSummaryPlotEnum> m_defaultSummaryPlot;
-    caf::PdmField<bool>                   m_selectDefaultTemplates;
     caf::PdmField<std::vector<QString>>   m_selectedDefaultTemplates;
 
     caf::PdmField<bool>                              m_summaryRestartFilesShowImportDialog;
