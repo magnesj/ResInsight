@@ -333,7 +333,20 @@ void RicWellTarget3dEditor::slotSelectedIn3D()
         return;
     }
 
-    caf::SelectionManager::instance()->setSelectedItem( target );
+    auto items = caf::SelectionManager::instance()->selectedItems();
+
+    std::vector<caf::PdmUiItem*> updatedSelection;
+    for ( auto item : items )
+    {
+        if ( dynamic_cast<RimWellPathTarget*>( item ) )
+        {
+            continue;
+        }
+        updatedSelection.push_back( item );
+    }
+    updatedSelection.push_back( target );
+
+    caf::SelectionManager::instance()->setSelectedItems( updatedSelection );
 }
 
 //--------------------------------------------------------------------------------------------------
