@@ -106,6 +106,6 @@ private:
     std::unique_ptr<RiuSummaryVectorSelectionWidgetCreator> m_summaryCurveSelectionEditor;
 
     caf::PdmPointer<RimSummaryMultiPlot> m_plotContainer;
-    
+
     bool m_closeButtonPressed = false;
 };
