@@ -79,9 +79,9 @@ private:
     QString extractNameFromText() const;
 
     caf::PdmField<Vec3d>   m_anchorPointXyd;
-    caf::PdmField<bool>    m_anchorPointPickEnabledButtonField;
+    bool                   m_anchorPointPickEnabled;
     caf::PdmField<Vec3d>   m_labelPointXyd;
-    caf::PdmField<bool>    m_labelPointPickEnabledButtonField;
+    bool                   m_labelPointPickEnabled;
     caf::PdmField<QString> m_text;
     caf::PdmField<bool>    m_isActive;
 

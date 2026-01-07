@@ -60,6 +60,7 @@ RimPolygonInView::RimPolygonInView()
 
     nameField()->uiCapability()->setUiReadOnly( true );
 
+    // Keep PdmUiPushButtonEditor
     CAF_PDM_InitField( &m_enablePicking, "EnablePicking", false, "" );
     caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_enablePicking );
 

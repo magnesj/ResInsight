@@ -274,11 +274,6 @@ void RimCorrelationMatrixPlot::fieldChangedByUi( const caf::PdmFieldHandle* chan
         sendSelectedSignal = true;
     }
 
-    if ( changedField == &m_pushButtonSelectSummaryAddress )
-    {
-        sendSelectedSignal = true;
-    }
-
     if ( sendSelectedSignal )
     {
         auto curves     = curveDefinitions();
