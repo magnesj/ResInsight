@@ -127,10 +127,6 @@ RimStatisticsContourMap::RimStatisticsContourMap()
                                 "Eclipse Case used for wells and faults shown in views, initializing available result list, timesteps, "
                                 "etc." );
 
-    CAF_PDM_InitFieldNoDefault( &m_computeStatisticsButton, "ComputeStatisticsButton", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_computeStatisticsButton );
-    m_computeStatisticsButton = false;
-
     CAF_PDM_InitFieldNoDefault( &m_views, "ContourMapViews", "Contour Maps", ":/CrossSection16x16.png" );
 
     CAF_PDM_InitField( &m_enableFormationFilter, "EnableFormationFilter", false, "Enable Formation Filter" );
@@ -160,16 +156,36 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     computeOK      = computeOK && !selectedTimeSteps().empty();
 
     uiOrdering.add( nameField() );
-    uiOrdering.add( &m_computeStatisticsButton );
-    m_computeStatisticsButton.uiCapability()->setUiReadOnly( !computeOK );
-    if ( computeOK )
-    {
-        m_computeStatisticsButton.uiCapability()->setUiToolTip( "Start statistics computations." );
-    }
-    else
-    {
-        m_computeStatisticsButton.uiCapability()->setUiToolTip( "Please check your time step and/or formation filter selections." );
-    }
+    
+    QString buttonText = "Compute";
+    QString toolTip    = computeOK ? "Start statistics computations." : "Please check your time step and/or formation filter selections.";
+    
+    uiOrdering.addNewButton( buttonText,
+                            [this]()
+                            {
+                                computeStatistics();
+
+                                if ( m_views.empty() )
+                                {
+                                    auto view = RicNewStatisticsContourMapViewFeature::createAndAddView( this );
+                                    updateConnectedEditors();
+                                    Riu3DMainWindowTools::selectAsCurrentItem( view );
+                                    Riu3DMainWindowTools::setExpanded( this );
+                                    Riu3DMainWindowTools::setExpanded( view );
+                                }
+                                else
+                                {
+                                    for ( auto& view : m_views )
+                                    {
+                                        auto proj = dynamic_cast<RimStatisticsContourMapProjection*>( view->contourMapProjection() );
+                                        if ( proj != nullptr )
+                                            proj->clearGridMappingAndRedraw();
+                                        else
+                                            view->scheduleCreateDisplayModelAndRedraw();
+                                    }
+                                }
+                            },
+                            { .enabledState = computeOK, .tooltip = toolTip } );
 
     auto genGrp = uiOrdering.addNewGroup( "General" );
 
@@ -270,32 +286,7 @@ RimEclipseCaseEnsemble* RimStatisticsContourMap::ensemble() const
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( &m_computeStatisticsButton == changedField )
-    {
-        computeStatistics();
-        m_computeStatisticsButton = false;
-
-        if ( m_views.empty() )
-        {
-            auto view = RicNewStatisticsContourMapViewFeature::createAndAddView( this );
-            updateConnectedEditors();
-            Riu3DMainWindowTools::selectAsCurrentItem( view );
-            Riu3DMainWindowTools::setExpanded( this );
-            Riu3DMainWindowTools::setExpanded( view );
-        }
-        else
-        {
-            for ( auto& view : m_views )
-            {
-                auto proj = dynamic_cast<RimStatisticsContourMapProjection*>( view->contourMapProjection() );
-                if ( proj != nullptr )
-                    proj->clearGridMappingAndRedraw();
-                else
-                    view->scheduleCreateDisplayModelAndRedraw();
-            }
-        }
-    }
-    else if ( &m_primaryCase == changedField )
+    if ( &m_primaryCase == changedField )
     {
         switchToSelectedSourceCase();
 
@@ -394,14 +385,7 @@ QList<caf::PdmOptionItemInfo> RimStatisticsContourMap::calculateValueOptions( co
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( &m_computeStatisticsButton == field )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Compute";
-        }
-    }
-    else if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
+    if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
     {
         if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
