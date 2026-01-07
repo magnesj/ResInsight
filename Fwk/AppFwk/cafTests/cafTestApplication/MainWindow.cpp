@@ -38,7 +38,6 @@
 #include "cafPdmUiItem.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiPropertyView.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableView.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTextEditor.h"
@@ -932,12 +931,6 @@ public:
 
         CAF_PDM_InitField( &m_toggleField, "Toggle", false, "Toggle Field", "", "Toggle Field tooltip", " Toggle Field whatsthis" );
 
-        CAF_PDM_InitField( &m_applyAutoOnChildObjectFields, "ApplyAutoValue", false, "Apply Auto Values" );
-        m_applyAutoOnChildObjectFields.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-
-        CAF_PDM_InitField( &m_updateAutoValues, "UpdateAutoValue", false, "Update Auto Values" );
-        m_updateAutoValues.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-
         CAF_PDM_InitField( &m_doubleField,
                            "BigNumber",
                            0.0,
@@ -991,8 +984,8 @@ public:
     //--------------------------------------------------------------------------------------------------
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override
     {
-        uiOrdering.add( &m_applyAutoOnChildObjectFields );
-        uiOrdering.add( &m_updateAutoValues );
+        uiOrdering.addNewButton( "Apply Auto Values", [this]() { applyAutoValuesOnChildObjects(); } );
+        uiOrdering.addNewButton( "Update Auto Values", [this]() { updateAutoValuesOnChildObjects(); } );
 
         uiOrdering.add( &m_minMaxSlider );
 
@@ -1063,50 +1056,50 @@ public:
     caf::PdmPtrField<SmallDemoPdmObjectA*>         m_ptrField;
 
     caf::PdmField<bool> m_toggleField;
-    caf::PdmField<bool> m_applyAutoOnChildObjectFields;
-    caf::PdmField<bool> m_updateAutoValues;
 
     MenuItemProducer* m_menuItemProducer;
 
     caf::PdmFieldHandle* objectToggleField() override { return &m_toggleField; }
 
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override
+    void applyAutoValuesOnChildObjects()
     {
-        if ( changedField == &m_toggleField )
-        {
-            std::cout << "Toggle Field changed" << std::endl;
-        }
-
         static int counter = 0;
         counter++;
         double doubleValue = 1.23456 + counter;
         int    intValue    = -1213141516 + counter;
         auto   enumValue   = SmallDemoPdmObjectA::TestEnumType::T2;
 
-        if ( changedField == &m_applyAutoOnChildObjectFields )
+        auto objs = descendantsIncludingThisOfType<SmallDemoPdmObjectA>();
+        for ( auto obj : objs )
         {
-            auto objs = descendantsIncludingThisOfType<SmallDemoPdmObjectA>();
-            for ( auto obj : objs )
-            {
-                obj->enableAutoValueForDouble( doubleValue );
-                obj->enableAutoValueForInt( intValue );
-                obj->enableAutoValueForTestEnum( enumValue );
-            }
-
-            m_applyAutoOnChildObjectFields = false;
+            obj->enableAutoValueForDouble( doubleValue );
+            obj->enableAutoValueForInt( intValue );
+            obj->enableAutoValueForTestEnum( enumValue );
         }
+    }
 
-        if ( changedField == &m_updateAutoValues )
+    void updateAutoValuesOnChildObjects()
+    {
+        static int counter = 0;
+        counter++;
+        double doubleValue = 1.23456 + counter;
+        int    intValue    = -1213141516 + counter;
+        auto   enumValue   = SmallDemoPdmObjectA::TestEnumType::T2;
+
+        auto objs = descendantsIncludingThisOfType<SmallDemoPdmObjectA>();
+        for ( auto obj : objs )
         {
-            auto objs = descendantsIncludingThisOfType<SmallDemoPdmObjectA>();
-            for ( auto obj : objs )
-            {
-                obj->setAutoValueForDouble( doubleValue );
-                obj->setAutoValueForInt( intValue );
-                obj->setAutoValueForTestEnum( enumValue );
-            }
+            obj->setAutoValueForDouble( doubleValue );
+            obj->setAutoValueForInt( intValue );
+            obj->setAutoValueForTestEnum( enumValue );
+        }
+    }
 
-            m_updateAutoValues = false;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override
+    {
+        if ( changedField == &m_toggleField )
+        {
+            std::cout << "Toggle Field changed" << std::endl;
         }
     }
 
@@ -1153,22 +1146,6 @@ protected:
                                 QString                    uiConfigName,
                                 caf::PdmUiEditorAttribute* attribute ) override
     {
-        if ( field == &m_applyAutoOnChildObjectFields )
-        {
-            auto* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-            if ( attr )
-            {
-                attr->m_buttonText = "Apply Auto Values";
-            }
-        }
-        if ( field == &m_updateAutoValues )
-        {
-            auto* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-            if ( attr )
-            {
-                attr->m_buttonText = "Update Auto Values";
-            }
-        }
     }
 };
 
