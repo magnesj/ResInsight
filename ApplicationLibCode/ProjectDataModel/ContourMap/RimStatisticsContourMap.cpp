@@ -52,6 +52,7 @@
 #include "Riu3DMainWindowTools.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
@@ -159,32 +160,33 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     QString buttonText = "Compute";
     QString toolTip    = computeOK ? "Start statistics computations." : "Please check your time step and/or formation filter selections.";
 
-    uiOrdering.addNewButton( buttonText,
-                             [this]()
-                             {
-                                 computeStatistics();
+    auto button = uiOrdering.addNewButton( buttonText,
+                                           [this]()
+                                           {
+                                               computeStatistics();
 
-                                 if ( m_views.empty() )
-                                 {
-                                     auto view = RicNewStatisticsContourMapViewFeature::createAndAddView( this );
-                                     updateConnectedEditors();
-                                     Riu3DMainWindowTools::selectAsCurrentItem( view );
-                                     Riu3DMainWindowTools::setExpanded( this );
-                                     Riu3DMainWindowTools::setExpanded( view );
-                                 }
-                                 else
-                                 {
-                                     for ( auto& view : m_views )
-                                     {
-                                         auto proj = dynamic_cast<RimStatisticsContourMapProjection*>( view->contourMapProjection() );
-                                         if ( proj != nullptr )
-                                             proj->clearGridMappingAndRedraw();
-                                         else
-                                             view->scheduleCreateDisplayModelAndRedraw();
-                                     }
-                                 }
-                             },
-                             { .enabledState = computeOK, .tooltip = toolTip } );
+                                               if ( m_views.empty() )
+                                               {
+                                                   auto view = RicNewStatisticsContourMapViewFeature::createAndAddView( this );
+                                                   updateConnectedEditors();
+                                                   Riu3DMainWindowTools::selectAsCurrentItem( view );
+                                                   Riu3DMainWindowTools::setExpanded( this );
+                                                   Riu3DMainWindowTools::setExpanded( view );
+                                               }
+                                               else
+                                               {
+                                                   for ( auto& view : m_views )
+                                                   {
+                                                       auto proj =
+                                                           dynamic_cast<RimStatisticsContourMapProjection*>( view->contourMapProjection() );
+                                                       if ( proj != nullptr )
+                                                           proj->clearGridMappingAndRedraw();
+                                                       else
+                                                           view->scheduleCreateDisplayModelAndRedraw();
+                                                   }
+                                               }
+                                           } );
+    button->setUiToolTip( toolTip );
 
     auto genGrp = uiOrdering.addNewGroup( "General" );
 
@@ -478,8 +480,6 @@ void RimStatisticsContourMap::doStatisticsCalculation( std::map<size_t, std::vec
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::computeStatistics()
 {
-    if ( m_computeStatisticsButton.isReadOnly() ) return;
-
     RiaLogging::info( "Computing statistics" );
     auto ensemble = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>();
     if ( !ensemble ) return;

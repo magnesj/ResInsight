@@ -1290,7 +1290,7 @@ void RimRegularLegendConfig::defineUiOrdering( QString uiConfigName, caf::PdmUiO
                                  [this]()
                                  {
                                      resetUserDefinedValues();
-                                     changed.send( ChangeType::ALL );
+                                     changed.send( RimLegendConfigChangeType::ALL );
                                  } );
     }
 

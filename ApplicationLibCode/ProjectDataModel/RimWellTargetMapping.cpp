@@ -342,22 +342,6 @@ void RimWellTargetMapping::defineEditorAttribute( const caf::PdmFieldHandle* fie
         }
     }
 
-    if ( field == &m_generateButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Generate";
-        }
-    }
-
-    if ( field == &m_resetDefaultButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Reset to Default";
-        }
-    }
-
     if ( ( &m_userDefinedFloodingOil == field ) || ( &m_userDefinedFloodingGas == field ) )
     {
         if ( auto myAttr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
@@ -483,11 +467,7 @@ void RimWellTargetMapping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     minimumCellValuesGroup->add( &m_pressure );
     minimumCellValuesGroup->add( &m_permeability );
     minimumCellValuesGroup->add( &m_transmissibility );
-    minimumCellValuesGroup->addNewButton( "Reset to Default",
-                                          [this]()
-                                          {
-                                              resetMinimumCellValuesToDefault();
-                                          } );
+    minimumCellValuesGroup->addNewButton( "Reset to Default", [this]() { resetMinimumCellValuesToDefault(); } );
 
     if ( hasEnsembleParent )
     {
@@ -502,36 +482,36 @@ void RimWellTargetMapping::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
     advancedGroup->setCollapsedByDefault();
 
     uiOrdering.addNewButton( "Generate",
-                            [this]()
-                            {
-                                auto hasEnsembleParent = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() != nullptr;
-                                if ( hasEnsembleParent )
-                                {
-                                    generateEnsembleStatistics();
-                                }
-                                else if ( auto eclipseCase = firstCase() )
-                                {
-                                    generateCandidates( eclipseCase );
-                                    if ( auto views = eclipseCase->reservoirViews(); !views.empty() )
-                                    {
-                                        auto eclipseView = views.front();
-                                        eclipseView->cellResult()->setResultType( RiaDefines::ResultCatType::GENERATED );
-                                        eclipseView->cellResult()->setResultVariable( RigWellTargetMapping::wellTargetResultName() );
-                                        eclipseView->cellResult()->updateConnectedEditors();
+                             [this]()
+                             {
+                                 auto hasEnsembleParent = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() != nullptr;
+                                 if ( hasEnsembleParent )
+                                 {
+                                     generateEnsembleStatistics();
+                                 }
+                                 else if ( auto eclipseCase = firstCase() )
+                                 {
+                                     generateCandidates( eclipseCase );
+                                     if ( auto views = eclipseCase->reservoirViews(); !views.empty() )
+                                     {
+                                         auto eclipseView = views.front();
+                                         eclipseView->cellResult()->setResultType( RiaDefines::ResultCatType::GENERATED );
+                                         eclipseView->cellResult()->setResultVariable( RigWellTargetMapping::wellTargetResultName() );
+                                         eclipseView->cellResult()->updateConnectedEditors();
 
-                                        if ( eclipseView->eclipsePropertyFilterCollection()->propertyFilters().empty() )
-                                        {
-                                            eclipseView->eclipsePropertyFilterCollection()->addFilterLinkedToCellResult();
-                                            eclipseView->eclipsePropertyFilterCollection()->updateConnectedEditors();
-                                        }
+                                         if ( eclipseView->eclipsePropertyFilterCollection()->propertyFilters().empty() )
+                                         {
+                                             eclipseView->eclipsePropertyFilterCollection()->addFilterLinkedToCellResult();
+                                             eclipseView->eclipsePropertyFilterCollection()->updateConnectedEditors();
+                                         }
 
-                                        if ( RiaGuiApplication::isRunning() || RiuMainWindow::instance() )
-                                        {
-                                            RiuMainWindow::instance()->selectAsCurrentItem( eclipseView->cellResult() );
-                                        }
-                                    }
-                                }
-                            } );
+                                         if ( RiaGuiApplication::isRunning() || RiuMainWindow::instance() )
+                                         {
+                                             RiuMainWindow::instance()->selectAsCurrentItem( eclipseView->cellResult() );
+                                         }
+                                     }
+                                 }
+                             } );
 
     uiOrdering.skipRemainingFields();
 
