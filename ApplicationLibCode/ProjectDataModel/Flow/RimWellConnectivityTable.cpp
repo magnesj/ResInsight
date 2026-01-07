@@ -47,7 +47,6 @@
 #include "RiuTools.h"
 
 #include "cafPdmUiComboBoxEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

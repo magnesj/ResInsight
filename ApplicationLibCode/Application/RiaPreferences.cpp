@@ -50,7 +50,6 @@
 #include "cafPdmUiFieldHandle.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 
 #include <QCoreApplication>
 #include <QDate>

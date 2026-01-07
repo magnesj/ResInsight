@@ -30,7 +30,6 @@
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiListEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 
 #include <algorithm>
 #include <vector>
