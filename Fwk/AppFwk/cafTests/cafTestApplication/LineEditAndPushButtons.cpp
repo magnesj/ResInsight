@@ -115,7 +115,6 @@ void LineEditAndPushButtons::defineEditorAttribute( const caf::PdmFieldHandle* f
         }
     }
 }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
