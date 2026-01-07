@@ -31,7 +31,6 @@
 #include "RimSummaryEnsemble.h"
 
 #include "cafPdmUiCheckBoxEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QDateTime>
@@ -348,12 +347,12 @@ void RimDeltaSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUi
     caseGroup->add( &m_operator );
     caseGroup->add( &m_ensemble2 );
     caseGroup->addNewButton( "Swap Ensembles",
-                            [this]()
-                            {
-                                auto temp   = m_ensemble1();
-                                m_ensemble1 = m_ensemble2();
-                                m_ensemble2 = temp;
-                            } );
+                             [this]()
+                             {
+                                 auto temp   = m_ensemble1();
+                                 m_ensemble1 = m_ensemble2();
+                                 m_ensemble2 = temp;
+                             } );
 
     caseGroup->add( &m_useFixedTimeStep );
     if ( m_useFixedTimeStep() != RimDeltaSummaryEnsemble::FixedTimeStepMode::FIXED_TIME_STEP_NONE )

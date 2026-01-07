@@ -72,7 +72,6 @@
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiSliderEditor.h"
 #include "cafPdmUiTreeAttributes.h"
 #include "cafPdmUiTreeOrdering.h"
@@ -1151,11 +1150,8 @@ void RimEnsembleCurveSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         curveDataGroup->add( &m_yValuesSummaryEnsemble );
         curveDataGroup->add( &m_yValuesSummaryAddressUiField );
         curveDataGroup->addNewButton( "...",
-                                     [this]()
-                                     {
-                                         selectSummaryAddress();
-                                     },
-                                     { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+                                      [this]() { selectSummaryAddress(); },
+                                      { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
         if ( !isXAxisSummaryVector() )
         {
@@ -1362,11 +1358,8 @@ void RimEnsembleCurveSet::appendColorGroup( caf::PdmUiOrdering& uiOrdering )
         {
             colorsGroup->add( &m_objectiveValuesSummaryAddressesUiField );
             colorsGroup->addNewButton( "...",
-                                      [this]()
-                                      {
-                                          selectObjectiveSummaryAddress();
-                                      },
-                                      { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+                                       [this]() { selectObjectiveSummaryAddress(); },
+                                       { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
             {
                 auto equationGroup = colorsGroup->addNewGroup( "Equation" );

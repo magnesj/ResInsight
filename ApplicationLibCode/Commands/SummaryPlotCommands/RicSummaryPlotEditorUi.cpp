@@ -52,7 +52,6 @@
 #include "RiuTools.h"
 
 #include "cafPdmUiComboBoxEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 
 #include <QInputDialog>
 #include <QMessageBox>
@@ -218,51 +217,49 @@ QList<caf::PdmOptionItemInfo> RicSummaryPlotEditorUi::calculateValueOptions( con
 void RicSummaryPlotEditorUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_targetPlot );
-    
+
     uiOrdering.addNewButton( "OK",
-                            [this]()
-                            {
-                                if ( m_targetPlot == nullptr )
-                                {
-                                    createNewPlot();
-                                }
+                             [this]()
+                             {
+                                 if ( m_targetPlot == nullptr )
+                                 {
+                                     createNewPlot();
+                                 }
 
-                                updateTargetPlot();
-                                m_closeButtonPressed = true;
+                                 updateTargetPlot();
+                                 m_closeButtonPressed = true;
 
-                                RiuPlotMainWindowTools::showPlotMainWindow();
-                                RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
-                                RiuPlotMainWindowTools::setExpanded( m_targetPlot );
+                                 RiuPlotMainWindowTools::showPlotMainWindow();
+                                 RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
+                                 RiuPlotMainWindowTools::setExpanded( m_targetPlot );
 
-                                caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
-                                field->setValueWithFieldChanged( true );
+                                 caf::PdmField<bool>* field =
+                                     dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+                                 field->setValueWithFieldChanged( true );
 
-                                RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
-                                mainPlotWindow->updateMultiPlotToolBar();
-                            } );
-    
+                                 RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+                                 mainPlotWindow->updateMultiPlotToolBar();
+                             } );
+
     uiOrdering.addNewButton( "Apply",
-                            [this]()
-                            {
-                                if ( m_targetPlot == nullptr )
-                                {
-                                    createNewPlot();
-                                }
+                             [this]()
+                             {
+                                 if ( m_targetPlot == nullptr )
+                                 {
+                                     createNewPlot();
+                                 }
 
-                                updateTargetPlot();
+                                 updateTargetPlot();
 
-                                caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
-                                field->setValueWithFieldChanged( true );
+                                 caf::PdmField<bool>* field =
+                                     dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+                                 field->setValueWithFieldChanged( true );
 
-                                RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
-                                mainPlotWindow->updateMultiPlotToolBar();
-                            } );
-    
-    uiOrdering.addNewButton( "Cancel",
-                            [this]()
-                            {
-                                m_closeButtonPressed = true;
-                            } );
+                                 RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+                                 mainPlotWindow->updateMultiPlotToolBar();
+                             } );
+
+    uiOrdering.addNewButton( "Cancel", [this]() { m_closeButtonPressed = true; } );
 
     uiOrdering.skipRemainingFields( true );
 

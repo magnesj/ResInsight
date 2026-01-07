@@ -50,7 +50,6 @@
 
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
-#include "cafPdmUiPushButtonEditor.h"
 
 #include "cvfBoundingBox.h"
 
@@ -155,11 +154,11 @@ void RimGeoMechFaultReactivationResult::defineUiOrdering( QString uiConfigName, 
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Fault Reactivation Result" );
     group->add( &m_distanceFromFault );
     group->addNewButton( "Create Plot",
-                        [this]()
-                        {
-                            createWellGeometry();
-                            createWellLogCurves();
-                        } );
+                         [this]()
+                         {
+                             createWellGeometry();
+                             createWellLogCurves();
+                         } );
 
     uiOrdering.skipRemainingFields( true );
 }

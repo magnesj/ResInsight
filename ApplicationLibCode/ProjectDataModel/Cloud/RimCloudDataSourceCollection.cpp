@@ -30,7 +30,6 @@
 
 #include "RiuPlotMainWindowTools.h"
 
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimCloudDataSourceCollection, "RimCloudDataSourceCollection" );
@@ -171,7 +170,7 @@ QList<caf::PdmOptionItemInfo> RimCloudDataSourceCollection::calculateValueOption
 void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     auto authGroup = uiOrdering.addNewGroup( "Authentication" );
-    
+
     bool    isGranted = m_sumoConnector && m_sumoConnector->isGranted();
     QString text      = "Authentication Status: ";
     text += isGranted ? "<font color='#228B22'>✔ Granted</font>" : "<font color='#FFA500'>❌ Not Granted</font>";
@@ -179,13 +178,13 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
     if ( !isGranted )
     {
         authGroup->addNewButton( text,
-                                [this]()
-                                {
-                                    if ( m_sumoConnector )
-                                    {
-                                        m_sumoConnector->requestTokenWithCancelButton();
-                                    }
-                                } );
+                                 [this]()
+                                 {
+                                     if ( m_sumoConnector )
+                                     {
+                                         m_sumoConnector->requestTokenWithCancelButton();
+                                     }
+                                 } );
     }
 
     if ( isGranted )
@@ -195,19 +194,9 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_sumoCaseId, layout );
         uiOrdering.add( &m_sumoEnsembleNames, layout );
 
-        uiOrdering.addNewButton( "Add Data Sources(s)",
-                                [this]()
-                                {
-                                    addDataSources();
-                                },
-                                layout );
-        
-        uiOrdering.addNewButton( "Add Ensemble(s)",
-                                [this]()
-                                {
-                                    addEnsembles();
-                                },
-                                layout );
+        uiOrdering.addNewButton( "Add Data Sources(s)", [this]() { addDataSources(); }, layout );
+
+        uiOrdering.addNewButton( "Add Ensemble(s)", [this]() { addEnsembles(); }, layout );
     }
     uiOrdering.skipRemainingFields();
 }

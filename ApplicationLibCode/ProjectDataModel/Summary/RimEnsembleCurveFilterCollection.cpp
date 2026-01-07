@@ -24,7 +24,6 @@
 
 #include "RiuTextContentFrame.h"
 
-#include <cafPdmUiPushButtonEditor.h>
 #include <cafPdmUiTreeOrdering.h>
 
 CAF_PDM_SOURCE_INIT( RimEnsembleCurveFilterCollection, "RimEnsembleCurveFilterCollection" );
@@ -117,13 +116,13 @@ void RimEnsembleCurveFilterCollection::defineUiOrdering( QString uiConfigName, c
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Filters" );
 
     group->addNewButton( "Add Ensemble Curve Filter",
-                        [this]()
-                        {
-                            addFilter();
-                            updateConnectedEditors();
-                            auto curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>();
-                            if ( curveSet ) curveSet->updateAllCurves();
-                        } );
+                         [this]()
+                         {
+                             addFilter();
+                             updateConnectedEditors();
+                             auto curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>();
+                             if ( curveSet ) curveSet->updateAllCurves();
+                         } );
 
     for ( auto& filter : m_filters )
     {
