@@ -41,10 +41,6 @@ RimEnsembleCurveFilterCollection::RimEnsembleCurveFilterCollection()
     CAF_PDM_InitFieldNoDefault( &m_filters, "CurveFilters", "" );
     m_filters.uiCapability()->setUiTreeChildrenHidden( true );
     m_filters.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-
-    CAF_PDM_InitFieldNoDefault( &m_newFilterButton, "NewEnsembleFilter", "New Filter" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_newFilterButton );
-    m_newFilterButton = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -111,14 +107,6 @@ void RimEnsembleCurveFilterCollection::fieldChangedByUi( const caf::PdmFieldHand
     {
         curveSet->updateAllCurves();
     }
-    else if ( changedField == &m_newFilterButton )
-    {
-        m_newFilterButton = false;
-
-        addFilter();
-        updateConnectedEditors();
-        curveSet->updateAllCurves();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -128,7 +116,14 @@ void RimEnsembleCurveFilterCollection::defineUiOrdering( QString uiConfigName, c
 {
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Filters" );
 
-    group->add( &m_newFilterButton );
+    group->addNewButton( "Add Ensemble Curve Filter",
+                        [this]()
+                        {
+                            addFilter();
+                            updateConnectedEditors();
+                            auto curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>();
+                            if ( curveSet ) curveSet->updateAllCurves();
+                        } );
 
     for ( auto& filter : m_filters )
     {
@@ -202,13 +197,6 @@ void RimEnsembleCurveFilterCollection::defineEditorAttribute( const caf::PdmFiel
                                                               QString                    uiConfigName,
                                                               caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_newFilterButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( !attr ) return;
-
-        attr->m_buttonText = "Add Ensemble Curve Filter";
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
