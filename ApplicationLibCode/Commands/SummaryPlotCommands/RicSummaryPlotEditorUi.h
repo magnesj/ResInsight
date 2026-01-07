@@ -103,11 +103,9 @@ private:
 
     std::unique_ptr<RimSummaryPlot> m_previewPlot;
 
-    caf::PdmField<bool> m_okButtonField;
-    caf::PdmField<bool> m_applyButtonField;
-    caf::PdmField<bool> m_closeButtonField;
-
     std::unique_ptr<RiuSummaryVectorSelectionWidgetCreator> m_summaryCurveSelectionEditor;
 
     caf::PdmPointer<RimSummaryMultiPlot> m_plotContainer;
+
+    bool m_closeButtonPressed = false;
 };

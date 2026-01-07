@@ -32,7 +32,6 @@
 #include "RimGeoMechResultDefinition.h"
 #include "RimProject.h"
 
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QDialog>
@@ -57,12 +56,6 @@ RiaMemoryCleanup::RiaMemoryCleanup()
     CAF_PDM_InitFieldNoDefault( &m_resultsToDelete, "ResultsToDelete", "Results In Memory" );
     m_resultsToDelete.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::TOP );
     m_resultsToDelete.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
-
-    CAF_PDM_InitFieldNoDefault( &m_performDelete, "ClearSelectedData", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_performDelete );
-
-    CAF_PDM_InitFieldNoDefault( &m_showMemoryReport, "ShowMemoryReport", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_showMemoryReport );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -238,18 +231,6 @@ void RiaMemoryCleanup::fieldChangedByUi( const caf::PdmFieldHandle* changedField
     {
         m_resultsToDelete.uiCapability()->updateConnectedEditors();
     }
-    else if ( changedField == &m_performDelete )
-    {
-        clearSelectedResultsFromMemory();
-        m_resultsToDelete.uiCapability()->updateConnectedEditors();
-        m_performDelete = false;
-    }
-    else if ( changedField == &m_showMemoryReport )
-    {
-        m_showMemoryReport = false;
-
-        showMemoryReport();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -346,7 +327,15 @@ void RiaMemoryCleanup::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 {
     uiOrdering.add( &m_case );
     uiOrdering.add( &m_resultsToDelete );
-    uiOrdering.add( &m_performDelete );
+
+    uiOrdering.addNewButton( "Clear Checked Data From Memory",
+                             [this]()
+                             {
+                                 clearSelectedResultsFromMemory();
+                                 m_resultsToDelete.uiCapability()->updateConnectedEditors();
+                             } );
+
+    uiOrdering.addNewButton( "Show Memory Report", [this]() { showMemoryReport(); } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -354,22 +343,6 @@ void RiaMemoryCleanup::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 //--------------------------------------------------------------------------------------------------
 void RiaMemoryCleanup::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_performDelete )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Clear Checked Data From Memory";
-        }
-    }
-    if ( field == &m_showMemoryReport )
-    {
-        auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Show Memory Report";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
