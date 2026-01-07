@@ -109,27 +109,27 @@ void RicUserDefinedCalculatorUi::defineUiOrdering( QString uiConfigName, caf::Pd
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroupWithKeyword( "Calculations", calculationsGroupName() );
         group->add( &m_currentCalculation );
-        
-        group->addNewButton( "New Calculation", 
-                            [this]()
-                            {
-                                m_currentCalculation = calculationCollection()->addCalculation();
-                                connectSignals( m_currentCalculation );
-                                updateConnectedEditors();
-                            } );
-        
-        group->addNewButton( "Delete Calculation", 
-                            [this]()
-                            {
-                                if ( m_currentCalculation() )
-                                {
-                                    calculationCollection()->deleteCalculation( m_currentCalculation() );
-                                    m_currentCalculation = nullptr;
-                                    updateConnectedEditors();
-                                    caf::PdmUiObjectEditorHandle::updateUiAllObjectEditors();
-                                }
-                            },
-                            { .newRow = false } );
+
+        group->addNewButton( "New Calculation",
+                             [this]()
+                             {
+                                 m_currentCalculation = calculationCollection()->addCalculation();
+                                 connectSignals( m_currentCalculation );
+                                 updateConnectedEditors();
+                             } );
+
+        group->addNewButton( "Delete Calculation",
+                             [this]()
+                             {
+                                 if ( m_currentCalculation() )
+                                 {
+                                     calculationCollection()->deleteCalculation( m_currentCalculation() );
+                                     m_currentCalculation = nullptr;
+                                     updateConnectedEditors();
+                                     caf::PdmUiObjectEditorHandle::updateUiAllObjectEditors();
+                                 }
+                             },
+                             { .newRow = false } );
     }
 
     {
@@ -143,18 +143,9 @@ void RicUserDefinedCalculatorUi::defineUiOrdering( QString uiConfigName, caf::Pd
     caf::PdmUiGroup* group = uiOrdering.findGroup( calculationsGroupName() );
     if ( group )
     {
-        group->addNewButton( "Import Calculations",
-                            [this]()
-                            {
-                                importCalculations();
-                            } );
-        
-        group->addNewButton( "Export Calculations",
-                            [this]()
-                            {
-                                exportCalculations();
-                            },
-                            { .newRow = false } );
+        group->addNewButton( "Import Calculations", [this]() { importCalculations(); } );
+
+        group->addNewButton( "Export Calculations", [this]() { exportCalculations(); }, { .newRow = false } );
     }
 }
 
