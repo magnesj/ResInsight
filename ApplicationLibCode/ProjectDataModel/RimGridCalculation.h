@@ -137,6 +137,7 @@ protected:
 private:
     void onVariableUpdated( const SignalEmitter* emitter );
     bool allSourceCasesAreEqualToDestinationCase() const;
+    void onEditNonVisibleResultAddressButtonPressed();
 
     static std::pair<bool, QStringList> createStatisticsText( const std::vector<std::vector<double>>& values );
 
@@ -154,7 +155,6 @@ private:
 
     caf::PdmProxyValueField<QString>             m_nonVisibleResultText;
     caf::PdmChildField<RimEclipseResultAddress*> m_nonVisibleResultAddress;
-    caf::PdmField<bool>                          m_editNonVisibleResultAddress;
 
     caf::PdmField<bool> m_applyToAllCases_OBSOLETE;
 

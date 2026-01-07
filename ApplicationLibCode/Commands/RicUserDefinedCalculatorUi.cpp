@@ -21,10 +21,8 @@
 #include "RimUserDefinedCalculation.h"
 #include "RimUserDefinedCalculationCollection.h"
 
-#include "cafAssert.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiObjectEditorHandle.h"
-#include "cafPdmUiPushButtonEditor.h"
 
 CAF_PDM_ABSTRACT_SOURCE_INIT( RicUserDefinedCalculatorUi, "RicUserDefinedCalculator" );
 
@@ -38,18 +36,6 @@ RicUserDefinedCalculatorUi::RicUserDefinedCalculatorUi()
     CAF_PDM_InitFieldNoDefault( &m_currentCalculation, "CurrentCalculation", "" );
     m_currentCalculation.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
     m_currentCalculation.uiCapability()->setUiEditorTypeName( caf::PdmUiListEditor::uiEditorTypeName() );
-
-    CAF_PDM_InitFieldNoDefault( &m_newCalculation, "NewCalculation", "New Calculation" );
-    RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_newCalculation );
-
-    CAF_PDM_InitFieldNoDefault( &m_deleteCalculation, "DeleteCalculation", "Delete Calculation" );
-    RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_deleteCalculation );
-
-    CAF_PDM_InitFieldNoDefault( &m_importCalculations, "ImportCalculations", "Import Calculations" );
-    RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_importCalculations );
-
-    CAF_PDM_InitFieldNoDefault( &m_exportCalculations, "ExportCalculations", "Export Calculations" );
-    RicUserDefinedCalculatorUi::assignPushButtonEditor( &m_exportCalculations );
 
     m_calcContextMenuMgr = std::make_unique<RiuCalculationsContextMenuManager>();
 }
@@ -104,41 +90,9 @@ bool RicUserDefinedCalculatorUi::parseExpression() const
 //--------------------------------------------------------------------------------------------------
 void RicUserDefinedCalculatorUi::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_newCalculation )
-    {
-        m_newCalculation = false;
-
-        m_currentCalculation = calculationCollection()->addCalculation();
-        connectSignals( m_currentCalculation );
-
-        updateConnectedEditors();
-    }
-    else if ( changedField == &m_deleteCalculation )
-    {
-        m_deleteCalculation = false;
-
-        if ( m_currentCalculation() )
-        {
-            calculationCollection()->deleteCalculation( m_currentCalculation() );
-            m_currentCalculation = nullptr;
-
-            updateConnectedEditors();
-            caf::PdmUiObjectEditorHandle::updateUiAllObjectEditors();
-        }
-    }
-    else if ( changedField == &m_currentCalculation && m_currentCalculation() )
+    if ( changedField == &m_currentCalculation && m_currentCalculation() )
     {
         connectSignals( m_currentCalculation() );
-    }
-    else if ( changedField == &m_importCalculations )
-    {
-        importCalculations();
-        m_importCalculations = false;
-    }
-    else if ( changedField == &m_exportCalculations )
-    {
-        exportCalculations();
-        m_exportCalculations = false;
     }
 }
 
@@ -155,8 +109,27 @@ void RicUserDefinedCalculatorUi::defineUiOrdering( QString uiConfigName, caf::Pd
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroupWithKeyword( "Calculations", calculationsGroupName() );
         group->add( &m_currentCalculation );
-        group->add( &m_newCalculation );
-        group->appendToRow( &m_deleteCalculation );
+        
+        group->addNewButton( "New Calculation", 
+                            [this]()
+                            {
+                                m_currentCalculation = calculationCollection()->addCalculation();
+                                connectSignals( m_currentCalculation );
+                                updateConnectedEditors();
+                            } );
+        
+        group->addNewButton( "Delete Calculation", 
+                            [this]()
+                            {
+                                if ( m_currentCalculation() )
+                                {
+                                    calculationCollection()->deleteCalculation( m_currentCalculation() );
+                                    m_currentCalculation = nullptr;
+                                    updateConnectedEditors();
+                                    caf::PdmUiObjectEditorHandle::updateUiAllObjectEditors();
+                                }
+                            },
+                            { .newRow = false } );
     }
 
     {
@@ -170,8 +143,18 @@ void RicUserDefinedCalculatorUi::defineUiOrdering( QString uiConfigName, caf::Pd
     caf::PdmUiGroup* group = uiOrdering.findGroup( calculationsGroupName() );
     if ( group )
     {
-        group->add( &m_importCalculations );
-        group->appendToRow( &m_exportCalculations );
+        group->addNewButton( "Import Calculations",
+                            [this]()
+                            {
+                                importCalculations();
+                            } );
+        
+        group->addNewButton( "Export Calculations",
+                            [this]()
+                            {
+                                exportCalculations();
+                            },
+                            { .newRow = false } );
     }
 }
 
@@ -190,29 +173,6 @@ QList<caf::PdmOptionItemInfo> RicUserDefinedCalculatorUi::calculateValueOptions(
     }
 
     return options;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicUserDefinedCalculatorUi::assignPushButtonEditor( caf::PdmFieldHandle* fieldHandle )
-{
-    CAF_ASSERT( fieldHandle );
-    CAF_ASSERT( fieldHandle->uiCapability() );
-
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( fieldHandle );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicUserDefinedCalculatorUi::assignPushButtonEditorText( caf::PdmUiEditorAttribute* attribute, const QString& text )
-{
-    auto* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-    if ( attrib )
-    {
-        attrib->m_buttonText = text;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -246,22 +206,6 @@ bool RicUserDefinedCalculatorUi::calculate() const
 //--------------------------------------------------------------------------------------------------
 void RicUserDefinedCalculatorUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( &m_newCalculation == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "New Calculation" );
-    }
-    else if ( &m_deleteCalculation == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Delete Calculation" );
-    }
-    else if ( &m_importCalculations == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Import Calculations" );
-    }
-    else if ( &m_exportCalculations == field )
-    {
-        RicUserDefinedCalculatorUi::assignPushButtonEditorText( attribute, "Export Calculations" );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
