@@ -93,7 +93,6 @@ private:
     caf::PdmPtrField<RimSummaryEnsemble*>               m_ensemble1;
     caf::PdmPtrField<RimSummaryEnsemble*>               m_ensemble2;
     caf::PdmField<caf::AppEnum<DerivedSummaryOperator>> m_operator;
-    caf::PdmField<bool>                                 m_swapEnsemblesButton;
     caf::PdmField<QString>                              m_caseCount;
     caf::PdmField<bool>                                 m_matchOnParameters;
     caf::PdmField<bool>                                 m_discardMissingOrIncompleteRealizations;

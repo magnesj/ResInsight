@@ -69,9 +69,6 @@ RimDeltaSummaryEnsemble::RimDeltaSummaryEnsemble()
 
     CAF_PDM_InitFieldNoDefault( &m_operator, "Operator", "Operator" );
 
-    CAF_PDM_InitField( &m_swapEnsemblesButton, "SwapEnsembles", false, "SwapEnsembles" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_swapEnsemblesButton );
-
     CAF_PDM_InitField( &m_caseCount, "CaseCount", QString( "" ), "Matching Cases" );
     m_caseCount.uiCapability()->setUiReadOnly( true );
 
@@ -350,7 +347,13 @@ void RimDeltaSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUi
     caseGroup->add( &m_ensemble1 );
     caseGroup->add( &m_operator );
     caseGroup->add( &m_ensemble2 );
-    caseGroup->add( &m_swapEnsemblesButton );
+    caseGroup->addNewButton( "Swap Ensembles",
+                            [this]()
+                            {
+                                auto temp   = m_ensemble1();
+                                m_ensemble1 = m_ensemble2();
+                                m_ensemble2 = temp;
+                            } );
 
     caseGroup->add( &m_useFixedTimeStep );
     if ( m_useFixedTimeStep() != RimDeltaSummaryEnsemble::FixedTimeStepMode::FIXED_TIME_STEP_NONE )
@@ -388,17 +391,6 @@ void RimDeltaSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chang
         doUpdateCases = true;
         doShowDialog  = false;
     }
-    else if ( changedField == &m_swapEnsemblesButton )
-    {
-        m_swapEnsemblesButton = false;
-        auto temp             = m_ensemble1();
-        m_ensemble1           = m_ensemble2();
-        m_ensemble2           = temp;
-
-        doUpdate      = true;
-        doUpdateCases = true;
-        doShowDialog  = false;
-    }
 
     if ( doUpdate )
     {
@@ -430,14 +422,6 @@ void RimDeltaSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chang
 //--------------------------------------------------------------------------------------------------
 void RimDeltaSummaryEnsemble::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_swapEnsemblesButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Swap Ensembles";
-        }
-    }
     if ( &m_fixedTimeStepIndex == field )
     {
         auto a = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
