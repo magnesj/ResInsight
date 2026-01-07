@@ -53,7 +53,6 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafFontTools.h"
 #include "cafPdmUiComboBoxEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include "qwt_scale_draw.h"
@@ -583,11 +582,7 @@ void RimWellAllocationOverTimePlot::defineUiOrdering( QString uiConfigName, caf:
     excludeTimeStepGroup.add( &m_excludeTimeSteps );
     excludeTimeStepGroup.setCollapsedByDefault();
 
-    timeStepGroup.addNewButton( "Apply",
-                                [this]()
-                                {
-                                    onLoadDataAndUpdate();
-                                } );
+    timeStepGroup.addNewButton( "Apply", [this]() { onLoadDataAndUpdate(); } );
 
     caf::PdmUiGroup& optionGroup = *uiOrdering.addNewGroup( "Options" );
     optionGroup.add( &m_flowDiagSolution );

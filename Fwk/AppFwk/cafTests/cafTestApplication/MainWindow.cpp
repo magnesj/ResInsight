@@ -38,7 +38,6 @@
 #include "cafPdmUiItem.h"
 #include "cafPdmUiListEditor.h"
 #include "cafPdmUiPropertyView.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTableView.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTextEditor.h"
@@ -985,16 +984,8 @@ public:
     //--------------------------------------------------------------------------------------------------
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override
     {
-        uiOrdering.addNewButton( "Apply Auto Values",
-                                [this]()
-                                {
-                                    applyAutoValuesOnChildObjects();
-                                } );
-        uiOrdering.addNewButton( "Update Auto Values",
-                                [this]()
-                                {
-                                    updateAutoValuesOnChildObjects();
-                                } );
+        uiOrdering.addNewButton( "Apply Auto Values", [this]() { applyAutoValuesOnChildObjects(); } );
+        uiOrdering.addNewButton( "Update Auto Values", [this]() { updateAutoValuesOnChildObjects(); } );
 
         uiOrdering.add( &m_minMaxSlider );
 

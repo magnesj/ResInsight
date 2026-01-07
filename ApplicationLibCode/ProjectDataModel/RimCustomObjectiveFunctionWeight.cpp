@@ -29,7 +29,6 @@
 #include "RiuSummaryVectorSelectionDialog.h"
 
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 CAF_PDM_SOURCE_INIT( RimCustomObjectiveFunctionWeight, "RimCustomObjectiveFunctionWeight" );
@@ -154,12 +153,7 @@ void RimCustomObjectiveFunctionWeight::fieldChangedByUi( const caf::PdmFieldHand
 void RimCustomObjectiveFunctionWeight::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_objectiveValuesSummaryAddressesUiField );
-    uiOrdering.addNewButton( "...",
-                            [this]()
-                            {
-                                selectSummaryAddress();
-                            },
-                            { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+    uiOrdering.addNewButton( "...", [this]() { selectSummaryAddress(); }, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
     uiOrdering.add( &m_weightValue );
     uiOrdering.add( &m_objectiveFunction );
 

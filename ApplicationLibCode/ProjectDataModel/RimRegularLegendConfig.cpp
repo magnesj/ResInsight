@@ -61,7 +61,6 @@
 #include "cafPdmFieldCvfMat4d.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 
 #include "cvfMath.h"
@@ -1288,11 +1287,11 @@ void RimRegularLegendConfig::defineUiOrdering( QString uiConfigName, caf::PdmUiO
         mappingGr->add( &m_centerLegendAroundZero );
 
         uiOrdering.addNewButton( "Reset User Defined Values",
-                                [this]()
-                                {
-                                    resetUserDefinedValues();
-                                    changed.send( ChangeType::ALL );
-                                } );
+                                 [this]()
+                                 {
+                                     resetUserDefinedValues();
+                                     changed.send( ChangeType::ALL );
+                                 } );
     }
 
     updateFieldVisibility();

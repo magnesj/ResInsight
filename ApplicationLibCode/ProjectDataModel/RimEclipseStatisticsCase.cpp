@@ -45,7 +45,6 @@
 #include "RiuMainWindow.h"
 
 #include "cafPdmFieldScriptingCapability.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
@@ -489,17 +488,17 @@ void RimEclipseStatisticsCase::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     QString buttonText = hasComputedStatistics() ? "Edit (Will DELETE current results)" : "Compute";
     uiOrdering.addNewButton( buttonText,
-                            [this]()
-                            {
-                                if ( hasComputedStatistics() )
-                                {
-                                    clearComputedStatistics();
-                                }
-                                else
-                                {
-                                    computeStatisticsAndUpdateViews();
-                                }
-                            } );
+                             [this]()
+                             {
+                                 if ( hasComputedStatistics() )
+                                 {
+                                     clearComputedStatistics();
+                                 }
+                                 else
+                                 {
+                                     computeStatisticsAndUpdateViews();
+                                 }
+                             } );
 
     {
         caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Summary of Calculation Setup" );

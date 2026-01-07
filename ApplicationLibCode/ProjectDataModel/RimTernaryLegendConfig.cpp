@@ -32,7 +32,6 @@
 #include "RivTernarySaturationOverlayItem.h"
 #include "RivTernaryScalarMapper.h"
 
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
 
 #include "cvfqtUtils.h"
@@ -231,35 +230,35 @@ void RimTernaryLegendConfig::defineUiOrdering( QString uiConfigName, caf::PdmUiO
         }
 
         ternaryGroupContainer->addNewButton( "Apply local min/max values",
-                                            [this]()
-                                            {
-                                                userDefinedMaxValueSoil = m_localAutoMax[TERNARY_SOIL_IDX];
-                                                userDefinedMinValueSoil = m_localAutoMin[TERNARY_SOIL_IDX];
-                                                userDefinedMaxValueSgas = m_localAutoMax[TERNARY_SGAS_IDX];
-                                                userDefinedMinValueSgas = m_localAutoMin[TERNARY_SGAS_IDX];
-                                                userDefinedMaxValueSwat = m_localAutoMax[TERNARY_SWAT_IDX];
-                                                userDefinedMinValueSwat = m_localAutoMin[TERNARY_SWAT_IDX];
-                                            } );
+                                             [this]()
+                                             {
+                                                 userDefinedMaxValueSoil = m_localAutoMax[TERNARY_SOIL_IDX];
+                                                 userDefinedMinValueSoil = m_localAutoMin[TERNARY_SOIL_IDX];
+                                                 userDefinedMaxValueSgas = m_localAutoMax[TERNARY_SGAS_IDX];
+                                                 userDefinedMinValueSgas = m_localAutoMin[TERNARY_SGAS_IDX];
+                                                 userDefinedMaxValueSwat = m_localAutoMax[TERNARY_SWAT_IDX];
+                                                 userDefinedMinValueSwat = m_localAutoMin[TERNARY_SWAT_IDX];
+                                             } );
         ternaryGroupContainer->addNewButton( "Apply global min/max values",
-                                            [this]()
-                                            {
-                                                userDefinedMaxValueSoil = m_globalAutoMax[TERNARY_SOIL_IDX];
-                                                userDefinedMinValueSoil = m_globalAutoMin[TERNARY_SOIL_IDX];
-                                                userDefinedMaxValueSgas = m_globalAutoMax[TERNARY_SGAS_IDX];
-                                                userDefinedMinValueSgas = m_globalAutoMin[TERNARY_SGAS_IDX];
-                                                userDefinedMaxValueSwat = m_globalAutoMax[TERNARY_SWAT_IDX];
-                                                userDefinedMinValueSwat = m_globalAutoMin[TERNARY_SWAT_IDX];
-                                            } );
+                                             [this]()
+                                             {
+                                                 userDefinedMaxValueSoil = m_globalAutoMax[TERNARY_SOIL_IDX];
+                                                 userDefinedMinValueSoil = m_globalAutoMin[TERNARY_SOIL_IDX];
+                                                 userDefinedMaxValueSgas = m_globalAutoMax[TERNARY_SGAS_IDX];
+                                                 userDefinedMinValueSgas = m_globalAutoMin[TERNARY_SGAS_IDX];
+                                                 userDefinedMaxValueSwat = m_globalAutoMax[TERNARY_SWAT_IDX];
+                                                 userDefinedMinValueSwat = m_globalAutoMin[TERNARY_SWAT_IDX];
+                                             } );
         ternaryGroupContainer->addNewButton( "Apply full range",
-                                            [this]()
-                                            {
-                                                userDefinedMaxValueSoil = 1.0;
-                                                userDefinedMinValueSoil = 0.0;
-                                                userDefinedMaxValueSgas = 1.0;
-                                                userDefinedMinValueSgas = 0.0;
-                                                userDefinedMaxValueSwat = 1.0;
-                                                userDefinedMinValueSwat = 0.0;
-                                            } );
+                                             [this]()
+                                             {
+                                                 userDefinedMaxValueSoil = 1.0;
+                                                 userDefinedMinValueSoil = 0.0;
+                                                 userDefinedMaxValueSgas = 1.0;
+                                                 userDefinedMinValueSgas = 0.0;
+                                                 userDefinedMaxValueSwat = 1.0;
+                                                 userDefinedMinValueSwat = 0.0;
+                                             } );
     }
     else
     {

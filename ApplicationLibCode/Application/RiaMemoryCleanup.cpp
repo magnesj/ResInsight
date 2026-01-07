@@ -32,7 +32,6 @@
 #include "RimGeoMechResultDefinition.h"
 #include "RimProject.h"
 
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QDialog>
@@ -328,13 +327,13 @@ void RiaMemoryCleanup::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
 {
     uiOrdering.add( &m_case );
     uiOrdering.add( &m_resultsToDelete );
-    
+
     uiOrdering.addNewButton( "Clear Checked Data From Memory",
-                            [this]()
-                            {
-                                clearSelectedResultsFromMemory();
-                                m_resultsToDelete.uiCapability()->updateConnectedEditors();
-                            } );
+                             [this]()
+                             {
+                                 clearSelectedResultsFromMemory();
+                                 m_resultsToDelete.uiCapability()->updateConnectedEditors();
+                             } );
 }
 
 //--------------------------------------------------------------------------------------------------

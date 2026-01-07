@@ -42,7 +42,6 @@
 #include "RiuMainWindow.h"
 
 #include "cafPdmUiCheckBoxEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafUtils.h"
 
 #include <QDateTime>
@@ -413,18 +412,18 @@ void RimFlowCharacteristicsPlot::defineUiOrdering( QString uiConfigName, caf::Pd
         {
             timeStepsGroup->add( &m_selectedTimeStepsUi );
             timeStepsGroup->addNewButton( "Apply",
-                                         [this]()
-                                         {
-                                             if ( m_flowDiagSolution )
-                                             {
-                                                 // Compute any missing time steps from selected
-                                                 for ( int tsIdx : m_selectedTimeStepsUi() )
-                                                 {
-                                                     m_flowDiagSolution()->flowDiagResults()->maxAbsPairFlux( tsIdx );
-                                                 }
-                                                 m_selectedTimeSteps = m_selectedTimeStepsUi;
-                                             }
-                                         } );
+                                          [this]()
+                                          {
+                                              if ( m_flowDiagSolution )
+                                              {
+                                                  // Compute any missing time steps from selected
+                                                  for ( int tsIdx : m_selectedTimeStepsUi() )
+                                                  {
+                                                      m_flowDiagSolution()->flowDiagResults()->maxAbsPairFlux( tsIdx );
+                                                  }
+                                                  m_selectedTimeSteps = m_selectedTimeStepsUi;
+                                              }
+                                          } );
         }
     }
 
@@ -436,11 +435,7 @@ void RimFlowCharacteristicsPlot::defineUiOrdering( QString uiConfigName, caf::Pd
         {
             regionGroup->add( &m_tracerFilter );
             regionGroup->add( &m_selectedTracerNames );
-            regionGroup->addNewButton( "Show Region",
-                                      [this]()
-                                      {
-                                          showRegionInView();
-                                      } );
+            regionGroup->addNewButton( "Show Region", [this]() { showRegionInView(); } );
         }
         else if ( m_cellFilter() == RigFlowDiagResults::CELLS_VISIBLE )
         {
@@ -797,20 +792,17 @@ QWidget* RimFlowCharacteristicsPlot::createViewWidget( QWidget* mainWindowParent
 void RimFlowCharacteristicsPlot::showRegionInView()
 {
     if ( !m_case ) return;
-    
+
     if ( m_cellFilter() == RigFlowDiagResults::CELLS_ACTIVE ) return;
-    
-    RimEclipseView* view = RicSelectOrCreateViewFeatureImpl::showViewSelection( m_case,
-                                                                                "FlowCharacteristicsLastUsedView",
-                                                                                "RegionView",
-                                                                                "Show Region in View" );
+
+    RimEclipseView* view =
+        RicSelectOrCreateViewFeatureImpl::showViewSelection( m_case, "FlowCharacteristicsLastUsedView", "RegionView", "Show Region in View" );
 
     if ( view == nullptr ) return;
 
     view->faultCollection()->setActive( false );
     view->cellResult()->setResultType( RiaDefines::ResultCatType::FLOW_DIAGNOSTICS );
-    view->cellResult()->setFlowDiagTracerSelectionType(
-        RimEclipseResultDefinition::FlowTracerSelectionType::FLOW_TR_BY_SELECTION );
+    view->cellResult()->setFlowDiagTracerSelectionType( RimEclipseResultDefinition::FlowTracerSelectionType::FLOW_TR_BY_SELECTION );
     view->cellResult()->setSelectedTracers( m_selectedTracerNames );
 
     if ( m_cellFilter() == RigFlowDiagResults::CELLS_COMMUNICATION )
@@ -827,8 +819,7 @@ void RimFlowCharacteristicsPlot::showRegionInView()
     {
         if ( m_flowDiagSolution )
         {
-            std::vector<int> timeSteps =
-                m_flowDiagSolution()->flowDiagResults()->calculatedTimeSteps( RigFlowDiagResultAddress::PHASE_ALL );
+            std::vector<int> timeSteps = m_flowDiagSolution()->flowDiagResults()->calculatedTimeSteps( RigFlowDiagResultAddress::PHASE_ALL );
             if ( !timeSteps.empty() )
             {
                 timeStep = timeSteps[0];

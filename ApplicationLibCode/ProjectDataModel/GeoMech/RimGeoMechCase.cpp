@@ -57,7 +57,6 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiPropertyViewDialog.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafUtils.h"
 
@@ -1039,7 +1038,7 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
     caf::PdmUiGroup* elmPropGroup = uiOrdering.addNewGroup( "Element Properties" );
     elmPropGroup->add( &m_elementPropertyFileNameIndexUiSelection );
-    
+
     elmPropGroup->addNewButton( "Import New Element Property",
                                 [this]()
                                 {
@@ -1052,7 +1051,7 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
                                     updateConnectedEditors();
                                     updateConnectedViews();
                                 } );
-    
+
     elmPropGroup->addNewButton( "Reload Selected Properties",
                                 [this]()
                                 {
@@ -1065,7 +1064,7 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
                                     updateConnectedEditors();
                                     updateConnectedViews();
                                 } );
-    
+
     elmPropGroup->addNewButton( "Close Selected Properties",
                                 [this]()
                                 {

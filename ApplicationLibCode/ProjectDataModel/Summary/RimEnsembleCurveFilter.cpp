@@ -39,7 +39,6 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafPdmUiValueRangeEditor.h"
 
@@ -490,11 +489,8 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     {
         uiOrdering.add( &m_objectiveValuesSummaryAddressesUiField );
         uiOrdering.addNewButton( "...",
-                                [this]()
-                                {
-                                    selectObjectiveSummaryAddress();
-                                },
-                                { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+                                 [this]() { selectObjectiveSummaryAddress(); },
+                                 { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
         {
             auto equationGroup = uiOrdering.addNewGroup( "Equation" );
             m_objectiveFunction->uiOrdering( "", *equationGroup );

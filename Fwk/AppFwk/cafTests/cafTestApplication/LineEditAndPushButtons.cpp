@@ -4,7 +4,6 @@
 #include "cafPdmUiLabelEditor.h"
 #include "cafPdmUiLineEditor.h"
 #include "cafPdmUiListEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QGuiApplication>
@@ -77,26 +76,10 @@ void LineEditAndPushButtons::fieldChangedByUi( const caf::PdmFieldHandle* change
 //--------------------------------------------------------------------------------------------------
 void LineEditAndPushButtons::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    uiOrdering.addNewButton( "&Push Me",
-                            [this]()
-                            {
-                                rotateContent();
-                            } );
-    uiOrdering.addNewButton( "Replace (Ctrl + Enter)",
-                            [this]()
-                            {
-                                replaceText();
-                            } );
-    uiOrdering.addNewButton( "Clear (Alt + Enter)",
-                            [this]()
-                            {
-                                clearText();
-                            } );
-    uiOrdering.addNewButton( "Append (Shift + Enter)",
-                            [this]()
-                            {
-                                appendText();
-                            } );
+    uiOrdering.addNewButton( "&Push Me", [this]() { rotateContent(); } );
+    uiOrdering.addNewButton( "Replace (Ctrl + Enter)", [this]() { replaceText(); } );
+    uiOrdering.addNewButton( "Clear (Alt + Enter)", [this]() { clearText(); } );
+    uiOrdering.addNewButton( "Append (Shift + Enter)", [this]() { appendText(); } );
 }
 
 //--------------------------------------------------------------------------------------------------
