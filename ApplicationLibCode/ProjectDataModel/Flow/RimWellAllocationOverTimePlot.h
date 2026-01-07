@@ -131,7 +131,6 @@ private:
     caf::PdmField<caf::AppEnum<TimeStepFilterMode>> m_timeStepFilterMode;
     caf::PdmField<int>                              m_timeStepCount;
     caf::PdmField<std::vector<QDateTime>>           m_excludeTimeSteps;
-    caf::PdmField<bool>                             m_applyTimeStepSelections;
 
     caf::PdmPtrField<RimFlowDiagSolution*>     m_flowDiagSolution;
     caf::PdmField<caf::AppEnum<FlowValueType>> m_flowValueType;

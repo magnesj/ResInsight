@@ -27,10 +27,8 @@
 #include "RimSummaryCase.h"
 #include "RimSummaryEnsemble.h"
 
-#include "cafPdmUiActionPushButtonEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
 #include <QFontMetrics>
@@ -102,7 +100,6 @@ RimPlotDataFilterItem::RimPlotDataFilterItem()
     m_filterQuantityUiField.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_filterQuantitySelectButton, "SelectAddress", false, "..." );
-    caf::PdmUiActionPushButtonEditor::configureEditorForField( &m_filterQuantitySelectButton );
 
     CAF_PDM_InitFieldNoDefault( &m_filterOperation, "FilterOperation", "is" );
     CAF_PDM_InitField( &m_topBottomN, "MinTopN", 20, "N" );

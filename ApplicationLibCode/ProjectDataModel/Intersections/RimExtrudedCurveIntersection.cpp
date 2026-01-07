@@ -53,7 +53,6 @@
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiListEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cvfBoundingBox.h"
 #include "cvfGeometryTools.h"
@@ -211,8 +210,6 @@ RimExtrudedCurveIntersection::RimExtrudedCurveIntersection()
     CAF_PDM_InitScriptableFieldNoDefault( &m_simulationWell, "SimulationWell", "Simulation Well" );
 
     CAF_PDM_InitFieldNoDefault( &m_projectPolygon, "ProjectPolygon", "Project Polygon" );
-    CAF_PDM_InitField( &m_editPolygonButton, "EditPolygonButton", false, "Edit" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_editPolygonButton );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_userPolylineXyz, "Points", "Points", "", "Use Ctrl-C for copy and Ctrl-V for paste", "" );
 
@@ -519,15 +516,6 @@ void RimExtrudedCurveIntersection::fieldChangedByUi( const caf::PdmFieldHandle* 
     {
         rebuildGeometryAndScheduleCreateDisplayModel();
     }
-
-    if ( changedField == &m_editPolygonButton )
-    {
-        RimPolygonTools::activate3dEditOfPolygonInView( m_projectPolygon(), this );
-
-        m_editPolygonButton = false;
-
-        return;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -564,7 +552,9 @@ void RimExtrudedCurveIntersection::defineUiOrdering( QString uiConfigName, caf::
     else if ( type() == CrossSectionEnum::CS_POLYGON )
     {
         geometryGroup->add( &m_projectPolygon );
-        geometryGroup->add( &m_editPolygonButton, { .newRow = false } );
+        geometryGroup->addNewButton( "Edit",
+                                     [this]() { RimPolygonTools::activate3dEditOfPolygonInView( m_projectPolygon(), this ); },
+                                     { .newRow = false } );
     }
     else if ( type() == CrossSectionEnum::CS_AZIMUTHLINE )
     {
@@ -1109,14 +1099,6 @@ void RimExtrudedCurveIntersection::defineEditorAttribute( const caf::PdmFieldHan
     else if ( field == &m_customExtrusionPoints )
     {
         setBaseColor( m_inputExtrusionPointsFromViewerEnabled, dynamic_cast<caf::PdmUiListEditorAttribute*>( attribute ) );
-    }
-
-    if ( field == &m_editPolygonButton )
-    {
-        if ( auto attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attrib->m_buttonText = "Edit";
-        }
     }
 }
 

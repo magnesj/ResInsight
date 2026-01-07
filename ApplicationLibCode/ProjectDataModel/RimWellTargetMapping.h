@@ -88,7 +88,6 @@ private:
     caf::PdmField<double> m_pressure;
     caf::PdmField<double> m_permeability;
     caf::PdmField<double> m_transmissibility;
-    caf::PdmField<bool>   m_resetDefaultButton;
 
     caf::PdmField<int> m_maxIterations;
     caf::PdmField<int> m_maxNumTargets;
@@ -98,8 +97,6 @@ private:
     caf::PdmField<int> m_cellCountI;
     caf::PdmField<int> m_cellCountJ;
     caf::PdmField<int> m_cellCountK;
-
-    caf::PdmField<bool> m_generateButton;
 
     caf::PdmPtrField<RimEclipseView*> m_filterView;
 

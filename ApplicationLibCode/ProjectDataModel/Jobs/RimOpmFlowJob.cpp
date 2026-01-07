@@ -63,7 +63,6 @@
 #include "cafPdmUiCheckBoxEditor.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiFilePathEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafProgressInfo.h"
 
 #include "opm/input/eclipse/Deck/DeckKeyword.hpp"
