@@ -195,13 +195,6 @@ bool RicUserDefinedCalculatorUi::calculate() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicUserDefinedCalculatorUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RicUserDefinedCalculatorUi::onEditorWidgetsCreated()
 {
     if ( m_currentCalculation() != nullptr )

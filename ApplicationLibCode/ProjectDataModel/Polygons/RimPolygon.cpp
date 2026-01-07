@@ -217,14 +217,6 @@ void RimPolygon::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildF
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimPolygon::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
-{
-    // Button handling removed - now done with dynamic button
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimPolygon::onColorTagClicked( const SignalEmitter* emitter, size_t index )
 {
     QColor sourceColor = RiaColorTools::toQColor( color() );

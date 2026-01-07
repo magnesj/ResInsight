@@ -570,13 +570,6 @@ cvf::Color3f RiaPreferencesSummary::historyCurveContrastColor() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaPreferencesSummary::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
-{
-} // namespace caf
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RiaPreferencesSummary::DefaultSummaryPlotType RiaPreferencesSummary::defaultSummaryPlotType() const
 {
     return m_defaultSummaryPlot();

@@ -179,15 +179,6 @@ void RimGeoMechFaultReactivationResult::fieldChangedByUi( const caf::PdmFieldHan
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGeoMechFaultReactivationResult::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                               QString                    uiConfigName,
-                                                               caf::PdmUiEditorAttribute* attribute )
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimGeoMechFaultReactivationResult::createWellGeometry()
 {
     if ( !m_bHaveValidData ) return;
