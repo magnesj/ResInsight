@@ -90,21 +90,6 @@ RicSummaryPlotEditorUi::RicSummaryPlotEditorUi()
     m_previewPlot = std::make_unique<RimSummaryPlot>();
     m_previewPlot->setLegendPosition( RiuPlotWidget::Legend::TOP );
 
-    CAF_PDM_InitFieldNoDefault( &m_applyButtonField, "ApplySelection", "" );
-    m_applyButtonField = false;
-    m_applyButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-    m_applyButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-
-    CAF_PDM_InitFieldNoDefault( &m_closeButtonField, "Close", "" );
-    m_closeButtonField = false;
-    m_closeButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-    m_closeButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-
-    CAF_PDM_InitFieldNoDefault( &m_okButtonField, "OK", "" );
-    m_okButtonField = false;
-    m_okButtonField.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-    m_okButtonField.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::HIDDEN );
-
     m_summaryCurveSelectionEditor = std::make_unique<RiuSummaryVectorSelectionWidgetCreator>();
 
     m_summaryCurveSelectionEditor->summaryAddressSelection()->setFieldChangedHandler( [this]() { selectionEditorFieldChanged(); } );
@@ -187,7 +172,7 @@ QWidget* RicSummaryPlotEditorUi::addressSelectionWidget( QWidget* parent )
 //--------------------------------------------------------------------------------------------------
 bool RicSummaryPlotEditorUi::isCloseButtonPressed() const
 {
-    return m_closeButtonField();
+    return m_closeButtonPressed;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -195,7 +180,7 @@ bool RicSummaryPlotEditorUi::isCloseButtonPressed() const
 //--------------------------------------------------------------------------------------------------
 void RicSummaryPlotEditorUi::clearCloseButton()
 {
-    m_closeButtonField = false;
+    m_closeButtonPressed = false;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -203,33 +188,6 @@ void RicSummaryPlotEditorUi::clearCloseButton()
 //--------------------------------------------------------------------------------------------------
 void RicSummaryPlotEditorUi::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_applyButtonField || changedField == &m_okButtonField )
-    {
-        if ( m_targetPlot == nullptr )
-        {
-            createNewPlot();
-        }
-
-        updateTargetPlot();
-
-        if ( changedField == &m_okButtonField )
-        {
-            m_closeButtonField = true;
-
-            RiuPlotMainWindowTools::showPlotMainWindow();
-            RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
-            RiuPlotMainWindowTools::setExpanded( m_targetPlot );
-        }
-
-        m_applyButtonField = false;
-        m_okButtonField    = false;
-
-        caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
-        field->setValueWithFieldChanged( true );
-
-        RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
-        mainPlotWindow->updateMultiPlotToolBar();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -260,9 +218,51 @@ QList<caf::PdmOptionItemInfo> RicSummaryPlotEditorUi::calculateValueOptions( con
 void RicSummaryPlotEditorUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_targetPlot );
-    uiOrdering.add( &m_okButtonField );
-    uiOrdering.add( &m_applyButtonField );
-    uiOrdering.add( &m_closeButtonField );
+    
+    uiOrdering.addNewButton( "OK",
+                            [this]()
+                            {
+                                if ( m_targetPlot == nullptr )
+                                {
+                                    createNewPlot();
+                                }
+
+                                updateTargetPlot();
+                                m_closeButtonPressed = true;
+
+                                RiuPlotMainWindowTools::showPlotMainWindow();
+                                RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
+                                RiuPlotMainWindowTools::setExpanded( m_targetPlot );
+
+                                caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+                                field->setValueWithFieldChanged( true );
+
+                                RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+                                mainPlotWindow->updateMultiPlotToolBar();
+                            } );
+    
+    uiOrdering.addNewButton( "Apply",
+                            [this]()
+                            {
+                                if ( m_targetPlot == nullptr )
+                                {
+                                    createNewPlot();
+                                }
+
+                                updateTargetPlot();
+
+                                caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+                                field->setValueWithFieldChanged( true );
+
+                                RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+                                mainPlotWindow->updateMultiPlotToolBar();
+                            } );
+    
+    uiOrdering.addNewButton( "Cancel",
+                            [this]()
+                            {
+                                m_closeButtonPressed = true;
+                            } );
 
     uiOrdering.skipRemainingFields( true );
 
@@ -499,31 +499,7 @@ void RicSummaryPlotEditorUi::updatePreviewCurvesFromCurveDefinitions( const std:
 //--------------------------------------------------------------------------------------------------
 void RicSummaryPlotEditorUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( &m_applyButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
-    else if ( &m_closeButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Cancel";
-        }
-    }
-    else if ( &m_okButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "OK";
-        }
-    }
-    else if ( &m_targetPlot == field )
+    if ( &m_targetPlot == field )
     {
         caf::PdmUiComboBoxEditorAttribute* attrib = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
         if ( attrib )
