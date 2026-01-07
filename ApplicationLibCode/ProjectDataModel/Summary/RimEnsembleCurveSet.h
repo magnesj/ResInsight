@@ -213,6 +213,9 @@ private:
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    
+    void selectSummaryAddress();
+    void selectObjectiveSummaryAddress();
     void defineObjectEditorAttribute( QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
 
@@ -254,7 +257,6 @@ private:
     caf::PdmPtrField<RimSummaryEnsemble*>         m_yValuesSummaryEnsemble;
     caf::PdmChildField<RimSummaryAddress*>        m_yValuesSummaryAddress;
     caf::PdmField<RifEclipseSummaryAddress>       m_yValuesSummaryAddressUiField;
-    caf::PdmField<bool>                           m_yPushButtonSelectSummaryAddress;
     caf::PdmField<RiaDefines::DateTimePeriodEnum> m_resampling;
 
     caf::PdmField<caf::AppEnum<RiaDefines::HorizontalAxisType>> m_xAxisType;
@@ -279,7 +281,6 @@ private:
 
     caf::PdmChildArrayField<RimSummaryAddress*>   m_objectiveValuesSummaryAddresses;
     caf::PdmField<QString>                        m_objectiveValuesSummaryAddressesUiField;
-    caf::PdmField<bool>                           m_objectiveValuesSelectSummaryAddressPushButton;
     caf::PdmPtrField<RimCustomObjectiveFunction*> m_customObjectiveFunction;
     caf::PdmField<int>                            m_minTimeSliderPosition;
     caf::PdmField<int>                            m_maxTimeSliderPosition;
