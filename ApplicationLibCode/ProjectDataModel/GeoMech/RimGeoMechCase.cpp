@@ -116,15 +116,6 @@ RimGeoMechCase::RimGeoMechCase()
     CAF_PDM_InitFieldNoDefault( &m_elementPropertyFileNameIndexUiSelection, "ElementPropertyFileNameIndexUiSelection", "" );
     m_elementPropertyFileNameIndexUiSelection.xmlCapability()->disableIO();
 
-    CAF_PDM_InitField( &m_importElementPropertyFileCommand, "importElementPropertyFileCommad", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_importElementPropertyFileCommand );
-
-    CAF_PDM_InitField( &m_closeElementPropertyFileCommand, "closeElementPropertyFileCommad", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_closeElementPropertyFileCommand );
-
-    CAF_PDM_InitField( &m_reloadElementPropertyFileCommand, "reloadElementPropertyFileCommand", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelLeft( &m_reloadElementPropertyFileCommand );
-
     caf::AppEnum<BiotCoefficientType> defaultBiotCoefficientType = RimGeoMechCase::BiotCoefficientType::BIOT_NONE;
     CAF_PDM_InitField( &m_biotCoefficientType, "BiotCoefficientType", defaultBiotCoefficientType, "Biot Coefficient" );
     CAF_PDM_InitField( &m_biotFixedCoefficient, "BiotFixedCoefficient", 1.0, "Fixed Coefficient" );
@@ -838,39 +829,6 @@ void RimGeoMechCase::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
         rigCaseData->femPartResults()->setWaterDensityShearSlipIndicator( m_waterDensityShearSlipIndicator );
         updateConnectedViews();
     }
-    else if ( changedField == &m_reloadElementPropertyFileCommand )
-    {
-        m_reloadElementPropertyFileCommand = false;
-        reloadSelectedElementPropertyFiles();
-        if ( rigCaseData && rigCaseData->femPartResults() )
-        {
-            rigCaseData->femPartResults()->deleteAllScalarResults();
-        }
-        updateConnectedEditors();
-        updateConnectedViews();
-    }
-    else if ( changedField == &m_closeElementPropertyFileCommand )
-    {
-        m_closeElementPropertyFileCommand = false;
-        closeSelectedElementPropertyFiles();
-        if ( rigCaseData && rigCaseData->femPartResults() )
-        {
-            rigCaseData->femPartResults()->deleteAllScalarResults();
-        }
-        updateConnectedEditors();
-        updateConnectedViews();
-    }
-    else if ( changedField == &m_importElementPropertyFileCommand )
-    {
-        m_importElementPropertyFileCommand = false;
-        importElementPropertyFile();
-        if ( rigCaseData && rigCaseData->femPartResults() )
-        {
-            rigCaseData->femPartResults()->deleteAllScalarResults();
-        }
-        updateConnectedEditors();
-        updateConnectedViews();
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1081,9 +1039,45 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 
     caf::PdmUiGroup* elmPropGroup = uiOrdering.addNewGroup( "Element Properties" );
     elmPropGroup->add( &m_elementPropertyFileNameIndexUiSelection );
-    elmPropGroup->add( &m_importElementPropertyFileCommand );
-    elmPropGroup->add( &m_reloadElementPropertyFileCommand );
-    elmPropGroup->add( &m_closeElementPropertyFileCommand );
+    
+    elmPropGroup->addNewButton( "Import New Element Property",
+                                [this]()
+                                {
+                                    importElementPropertyFile();
+                                    auto rigCaseData = geoMechData();
+                                    if ( rigCaseData && rigCaseData->femPartResults() )
+                                    {
+                                        rigCaseData->femPartResults()->deleteAllScalarResults();
+                                    }
+                                    updateConnectedEditors();
+                                    updateConnectedViews();
+                                } );
+    
+    elmPropGroup->addNewButton( "Reload Selected Properties",
+                                [this]()
+                                {
+                                    reloadSelectedElementPropertyFiles();
+                                    auto rigCaseData = geoMechData();
+                                    if ( rigCaseData && rigCaseData->femPartResults() )
+                                    {
+                                        rigCaseData->femPartResults()->deleteAllScalarResults();
+                                    }
+                                    updateConnectedEditors();
+                                    updateConnectedViews();
+                                } );
+    
+    elmPropGroup->addNewButton( "Close Selected Properties",
+                                [this]()
+                                {
+                                    closeSelectedElementPropertyFiles();
+                                    auto rigCaseData = geoMechData();
+                                    if ( rigCaseData && rigCaseData->femPartResults() )
+                                    {
+                                        rigCaseData->femPartResults()->deleteAllScalarResults();
+                                    }
+                                    updateConnectedEditors();
+                                    updateConnectedViews();
+                                } );
 
     caf::PdmUiGroup* biotGroup = uiOrdering.addNewGroup( "Biot Coefficient" );
     biotGroup->add( &m_biotCoefficientType );
@@ -1118,19 +1112,6 @@ void RimGeoMechCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering&
 //--------------------------------------------------------------------------------------------------
 void RimGeoMechCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_importElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Import New Element Property";
-    }
-    if ( field == &m_reloadElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Reload Selected Properties";
-    }
-    if ( field == &m_closeElementPropertyFileCommand )
-    {
-        dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Close Selected Properties";
-    }
-
     if ( field == &m_biotFixedCoefficient )
     {
         auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
