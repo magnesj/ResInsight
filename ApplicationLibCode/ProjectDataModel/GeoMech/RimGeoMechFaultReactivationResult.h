@@ -68,8 +68,6 @@ private:
     RimGeoMechCase* geoMechCase() const;
 
 private:
-    caf::PdmField<bool> m_createFaultReactivationPlot;
-
     caf::PdmField<double> m_distanceFromFault;
 
     caf::PdmField<cvf::Vec3d> m_faultNormal;
