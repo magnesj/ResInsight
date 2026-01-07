@@ -57,13 +57,10 @@ private:
     void                                   addEnsembles();
 
 private:
-    caf::PdmField<bool>                 m_authenticate;
     caf::PdmField<QString>              m_sumoFieldName;
     caf::PdmField<QString>              m_sumoCaseId;
     caf::PdmField<std::vector<QString>> m_sumoEnsembleNames;
 
-    caf::PdmField<bool>                                m_addDataSources;
-    caf::PdmField<bool>                                m_addEnsembles;
     caf::PdmChildArrayField<RimSummarySumoDataSource*> m_sumoDataSources;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
