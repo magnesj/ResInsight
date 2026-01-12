@@ -191,13 +191,22 @@ jobs:
           setup-python: false
           modules: "qtnetworkauth"
 
+      - name: Get vcpkg submodule SHA
+        id: vcpkg-sha
+        shell: bash
+        run: |
+          VCPKG_SHA=$(git submodule status ThirdParty/vcpkg | awk '{print $1}' | sed 's/^-//')
+          echo "sha=${VCPKG_SHA}" >> $GITHUB_OUTPUT
+          echo "vcpkg submodule SHA: ${VCPKG_SHA}"
+
       - name: Cache vcpkg binary cache (First level, second level is using Azure)
         id: cache-vcpkg
         uses: actions/cache@v5
         with:
           path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
-          key: ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ hashFiles('vcpkg.json', 'ThirdParty/vcpkg_custom_ports/**') }}-v02
+          key: ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ steps.vcpkg-sha.outputs.sha }}-${{ hashFiles('vcpkg.json', 'ThirdParty/vcpkg_custom_ports/**') }}-v03
           restore-keys: |
+            ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ steps.vcpkg-sha.outputs.sha }}-
             ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-
 
       - name: Create vcpkg binary cache directory
