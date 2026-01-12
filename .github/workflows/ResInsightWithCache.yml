@@ -80,6 +80,7 @@ jobs:
       BUILD_TYPE: Release
       BUILDCACHE_DIR: ${{ github.workspace }}/buildcache_dir
       BUILDCACHE_ACCURACY: SLOPPY
+      VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}/vcpkg_binary_cache
 
     steps:
       - name: Checkout
@@ -190,17 +191,28 @@ jobs:
           setup-python: false
           modules: "qtnetworkauth"
 
-      - name: Cache vcpkg packages (First level, second level is using Azure)
+      - name: Cache vcpkg binary cache (First level, second level is using Azure)
         id: cache-vcpkg
         uses: actions/cache@v5
         with:
-          path: |
-            ThirdParty/vcpkg/installed
-            ThirdParty/vcpkg/packages
-            ThirdParty/vcpkg/downloads
-          key: ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ hashFiles('vcpkg.json', 'ThirdParty/vcpkg_custom_ports/**') }}-v01
+          path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
+          key: ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ hashFiles('vcpkg.json', 'ThirdParty/vcpkg_custom_ports/**') }}-v02
           restore-keys: |
             ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-
+
+      - name: Create vcpkg binary cache directory
+        run: New-Item ${{ env.VCPKG_DEFAULT_BINARY_CACHE }} -ItemType "directory" -Force
+        shell: pwsh
+
+      - name: Check vcpkg cache status
+        shell: bash
+        run: |
+          if [ "${{ steps.cache-vcpkg.outputs.cache-hit }}" == "true" ]; then
+            echo "✓ vcpkg binary cache restored from GitHub Actions cache"
+            echo "Cache contains $(find ${{ env.VCPKG_DEFAULT_BINARY_CACHE }} -type f 2>/dev/null | wc -l) cached packages"
+          else
+            echo "✗ vcpkg binary cache not found, will populate from Azure"
+          fi
 
       - name: vcpkg bootstrap
         run: |
@@ -234,7 +246,7 @@ jobs:
         shell: bash
         env:
           VCPKG_FEATURE_FLAGS: "binarycaching"
-          VCPKG_BINARY_SOURCES: "clear;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
+          VCPKG_BINARY_SOURCES: "clear;files,${{ env.VCPKG_DEFAULT_BINARY_CACHE }},readwrite;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
         run: >
