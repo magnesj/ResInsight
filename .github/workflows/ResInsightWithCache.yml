@@ -190,6 +190,18 @@ jobs:
           setup-python: false
           modules: "qtnetworkauth"
 
+      - name: Cache vcpkg packages (First level, second level is using Azure)
+        id: cache-vcpkg
+        uses: actions/cache@v5
+        with:
+          path: |
+            ThirdParty/vcpkg/installed
+            ThirdParty/vcpkg/packages
+            ThirdParty/vcpkg/downloads
+          key: ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-${{ hashFiles('vcpkg.json', 'ThirdParty/vcpkg_custom_ports/**') }}-v01
+          restore-keys: |
+            ${{ matrix.config.os }}-${{ matrix.config.cc }}-vcpkg-
+
       - name: vcpkg bootstrap
         run: |
           ThirdParty/vcpkg/${{ matrix.config.vcpkg-bootstrap }}
