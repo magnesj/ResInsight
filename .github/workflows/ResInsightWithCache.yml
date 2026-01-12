@@ -204,7 +204,7 @@ jobs:
         run: New-Item ${{ env.VCPKG_DEFAULT_BINARY_CACHE }} -ItemType "directory" -Force
         shell: pwsh
 
-      - name: Check vcpkg cache status
+      - name: Check vcpkg cache status and setup binary sources
         shell: bash
         run: |
           if [ "${{ steps.cache-vcpkg.outputs.cache-hit }}" == "true" ]; then
@@ -213,6 +213,8 @@ jobs:
           else
             echo "✗ vcpkg binary cache not found, will populate from Azure"
           fi
+          echo "VCPKG_BINARY_SOURCES=clear;files,${{ env.VCPKG_DEFAULT_BINARY_CACHE }},readwrite;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite" >> $GITHUB_ENV
+          echo "VCPKG_FEATURE_FLAGS=binarycaching" >> $GITHUB_ENV
 
       - name: vcpkg bootstrap
         run: |
@@ -242,11 +244,16 @@ jobs:
           fi
           echo "All required vcpkg secrets are present"
 
+      - name: Display vcpkg binary cache configuration
+        shell: bash
+        run: |
+          echo "VCPKG_DEFAULT_BINARY_CACHE=$VCPKG_DEFAULT_BINARY_CACHE"
+          echo "VCPKG_BINARY_SOURCES=$VCPKG_BINARY_SOURCES"
+          echo "VCPKG_FEATURE_FLAGS=$VCPKG_FEATURE_FLAGS"
+
       - name: Configure
         shell: bash
         env:
-          VCPKG_FEATURE_FLAGS: "binarycaching"
-          VCPKG_BINARY_SOURCES: "clear;files,${{ env.VCPKG_DEFAULT_BINARY_CACHE }},readwrite;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
         run: >
