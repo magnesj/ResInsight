@@ -191,16 +191,6 @@ void PdmUiTableViewEditor::configureAndUpdateUi( const QString& uiConfigName )
         // Override with map-based attributes if present (new system takes precedence)
         if ( auto uiItem = childArrayFH->uiCapability() )
         {
-            if ( auto val = uiItem->attribute<int>( Keys::TABLE_SELECTION_LEVEL, uiConfigName ) )
-            {
-                editorAttrib.tableSelectionLevel = val.value();
-            }
-
-            if ( auto val = uiItem->attribute<int>( Keys::ROW_SELECTION_LEVEL, uiConfigName ) )
-            {
-                editorAttrib.rowSelectionLevel = val.value();
-            }
-
             if ( auto val = uiItem->attribute<bool>( Keys::ENABLE_HEADER_TEXT, uiConfigName ) )
             {
                 editorAttrib.enableHeaderText = val.value();

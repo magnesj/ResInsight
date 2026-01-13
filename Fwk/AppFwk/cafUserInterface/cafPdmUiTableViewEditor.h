@@ -133,8 +133,6 @@ public:
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
     {
-        static inline const QString TABLE_SELECTION_LEVEL        = QStringLiteral( "tableSelectionLevel" );
-        static inline const QString ROW_SELECTION_LEVEL          = QStringLiteral( "rowSelectionLevel" );
         static inline const QString ENABLE_HEADER_TEXT           = QStringLiteral( "enableHeaderText" );
         static inline const QString MINIMUM_HEIGHT               = QStringLiteral( "minimumHeight" );
         static inline const QString HEIGHT_HINT                  = QStringLiteral( "heightHint" );
@@ -146,9 +144,7 @@ public:
     };
 
     // Set of all supported attributes for validation
-    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::TABLE_SELECTION_LEVEL,
-                                                                   Keys::ROW_SELECTION_LEVEL,
-                                                                   Keys::ENABLE_HEADER_TEXT,
+    inline static const std::set<QString> SUPPORTED_ATTRIBUTES = { Keys::ENABLE_HEADER_TEXT,
                                                                    Keys::MINIMUM_HEIGHT,
                                                                    Keys::HEIGHT_HINT,
                                                                    Keys::ALWAYS_ENFORCE_RESIZE_POLICY,
