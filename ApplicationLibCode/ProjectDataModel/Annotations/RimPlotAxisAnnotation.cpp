@@ -42,9 +42,9 @@ RimPlotAxisAnnotation::RimPlotAxisAnnotation()
     m_annotationType = AnnotationType::LINE;
     CAF_PDM_InitObject( "Plot Axis Annotation", ":/LeftAxis16x16.png" );
 
-    // Register keyword aliases for backward compatibility
+    // Register keyword alias for backward compatibility (old keyword was "Active", base uses "IsChecked")
     m_isChecked.registerKeywordAlias( "Active" );
-    nameField()->registerKeywordAlias( "Name" );
+    // No alias needed for name - old keyword "Name" matches base class
 
     CAF_PDM_InitFieldNoDefault( &m_value, "Value", "Value" );
 

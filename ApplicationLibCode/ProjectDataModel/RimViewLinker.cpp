@@ -58,8 +58,7 @@ RimViewLinker::RimViewLinker()
 {
     CAF_PDM_InitObject( "Linked Views" );
 
-    // Register keyword alias for backward compatibility
-    nameField()->registerKeywordAlias( "Name" );
+    // No keyword alias needed - old keyword "Name" matches base class
 
     // Set default name
     setName( "View Group Name" );

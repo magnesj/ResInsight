@@ -63,8 +63,7 @@ RimViewController::RimViewController()
 {
     CAF_PDM_InitObject( "View Link" );
 
-    // Register keyword aliases for backward compatibility
-    nameField()->registerKeywordAlias( "Name" );
+    // Register keyword alias for backward compatibility (old keyword was "Active", base uses "IsChecked")
     m_isChecked.registerKeywordAlias( "Active" );
 
     // Set default name
