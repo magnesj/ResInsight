@@ -80,9 +80,15 @@ void PdmFieldScriptingCapabilityIOHandler<QString>::writeToField( QString&      
                     accumulatedFieldValue += currentChar;
                 }
             }
+            else if ( stringsAreQuoted && currentChar == QChar( '\\' ) )
+            {
+                // Only process escape sequences when strings are quoted
+                currentChar = errorMessageContainer->readCharWithLineNumberCount( inputStream );
+                accumulatedFieldValue += currentChar;
+            }
             else
             {
-                currentChar = errorMessageContainer->readCharWithLineNumberCount( inputStream );
+                // When strings are not quoted, backslash is a regular character
                 accumulatedFieldValue += currentChar;
             }
         }
