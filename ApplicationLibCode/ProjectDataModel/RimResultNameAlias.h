@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2022-     Equinor ASA
+//  Copyright (C) 2026 - Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,32 +18,34 @@
 
 #pragma once
 
-#include "RimEclipseCase.h"
-
-#include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
+#include <QString>
+
 //==================================================================================================
-//
-//
-//
+///
+///
 //==================================================================================================
-class RimRoffCase : public RimEclipseCase
+class RimResultNameAlias : public caf::PdmObject
 {
     CAF_PDM_HEADER_INIT;
 
 public:
-    RimRoffCase();
-    ~RimRoffCase() override;
+    RimResultNameAlias();
+    ~RimResultNameAlias() override;
 
-    bool openEclipseGridFile() override;
+    void setResultNameAndAlias( const QString& resultName, const QString& aliasName );
 
-    bool importAsciiInputProperties( const QStringList& fileNames ) override;
-
-    QString locationOnDisc() const override;
+    QString resultName() const { return m_resultName; }
+    QString aliasName() const { return m_aliasName; }
 
 protected:
-    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+    void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+
+private:
+    caf::PdmField<QString> m_resultName;
+    caf::PdmField<QString> m_aliasName;
 };

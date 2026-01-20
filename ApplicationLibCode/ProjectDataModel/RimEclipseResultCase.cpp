@@ -58,12 +58,14 @@
 #include "RimMockModelSettings.h"
 #include "RimProject.h"
 #include "RimReservoirCellResultsStorage.h"
+#include "RimResultNameAlias.h"
 #include "RimTimeStepFilter.h"
 #include "RimTools.h"
 
 #include "cafPdmUiCheckBoxAndTextEditor.h"
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiPropertyViewDialog.h"
+#include "cafPdmUiTableViewEditor.h"
 #include "cafProgressInfo.h"
 #include "cafUtils.h"
 
@@ -718,6 +720,8 @@ void RimEclipseResultCase::defineUiOrdering( QString uiConfigName, caf::PdmUiOrd
         group1->setCollapsedByDefault();
         m_timeStepFilter->uiOrdering( uiConfigName, *group1 );
     }
+
+    resultAliasUiOrdering( uiOrdering );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -729,8 +733,7 @@ void RimEclipseResultCase::fieldChangedByUi( const caf::PdmFieldHandle* changedF
     {
         loadAndUpdateSourSimData();
     }
-
-    if ( changedField == &m_mswMergeThreshold )
+    else if ( changedField == &m_mswMergeThreshold )
     {
         for ( auto resView : reservoirViews() )
         {
@@ -754,6 +757,15 @@ void RimEclipseResultCase::defineEditorAttribute( const caf::PdmFieldHandle* fie
         {
             myAttr->m_fileSelectionFilter = "SourSim (*.sourres)";
             myAttr->m_defaultPath         = QFileInfo( gridFileName() ).absolutePath();
+        }
+    }
+    else if ( field == &m_resultAliasList )
+    {
+        auto* tvAttr = dynamic_cast<caf::PdmUiTableViewEditorAttribute*>( attribute );
+        if ( tvAttr )
+        {
+            tvAttr->resizePolicy              = caf::PdmUiTableViewEditorAttribute::RESIZE_TO_FILL_CONTAINER;
+            tvAttr->alwaysEnforceResizePolicy = true;
         }
     }
 }

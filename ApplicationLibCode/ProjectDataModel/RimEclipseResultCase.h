@@ -25,6 +25,7 @@
 #include "RimEclipseCase.h"
 
 #include "cafFilePath.h"
+#include "cafPdmChildArrayField.h"
 #include "cafPdmProxyValueField.h"
 
 #include <memory>
@@ -38,6 +39,7 @@ class RigMainGrid;
 class RimEclipseInputProperty;
 class RimEclipseInputPropertyCollection;
 class RimFlowDiagSolution;
+class RimResultNameAlias;
 
 //==================================================================================================
 //
@@ -82,6 +84,8 @@ public:
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
+    void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          initAfterRead() override;
 
@@ -93,7 +97,6 @@ private:
     QString phasesAsString() const;
 
     cvf::ref<RifReaderInterface> createMockModel( QString modelName );
-    void                         defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
 
 private:
     std::unique_ptr<RigFlowDiagSolverInterface> m_flowDagSolverInterface;

@@ -55,6 +55,7 @@ class RimIdenticalGridCaseGroup;
 class RimReservoirCellResultsStorage;
 class RimEclipseResultAddressCollection;
 class RimEclipseViewCollection;
+class RimResultNameAlias;
 
 //==================================================================================================
 //
@@ -137,12 +138,19 @@ public:
 
     void setReservoirData( RigEclipseCaseData* eclipseCase );
 
+    void addResultAlias( const QString& resultName, const QString& aliasName );
+    void clearResultAliases();
+
 protected:
     void initAfterRead() override;
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField ) override;
     void defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, QString uiConfigName = "" ) override;
 
+    void resultAliasUiOrdering( caf::PdmUiOrdering& uiOrdering );
+
     void updateFormationNamesData() override;
+    void syncResultAliases();
 
     // Internal methods
 protected:
@@ -162,6 +170,8 @@ protected:
     caf::PdmField<bool>                                    m_flipXAxis;
     caf::PdmField<bool>                                    m_flipYAxis;
     caf::PdmChildField<RimEclipseInputPropertyCollection*> m_inputPropertyCollection;
+
+    caf::PdmChildArrayField<RimResultNameAlias*> m_resultAliasList;
 
     RifReaderSettings m_readerSettings;
 

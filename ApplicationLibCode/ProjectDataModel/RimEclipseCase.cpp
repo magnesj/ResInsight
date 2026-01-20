@@ -69,6 +69,7 @@
 #include "RimProject.h"
 #include "RimReloadCaseTools.h"
 #include "RimReservoirCellResultsStorage.h"
+#include "RimResultNameAlias.h"
 #include "RimStimPlanColors.h"
 #include "RimWellLogPlotCollection.h"
 #include "RimWellPath.h"
@@ -78,6 +79,7 @@
 #include "cafPdmDocument.h"
 #include "cafPdmFieldScriptingCapability.h"
 #include "cafPdmObjectScriptingCapability.h"
+#include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafProgressInfo.h"
 
@@ -122,6 +124,10 @@ RimEclipseCase::RimEclipseCase()
     m_viewCollection = new RimEclipseViewCollection;
 
     CAF_PDM_InitFieldNoDefault( &m_wellTargetMappings, "WellTargetMappings", "Well Target Mappings" );
+
+    CAF_PDM_InitFieldNoDefault( &m_resultAliasList, "ResultAliasNames", "Result Name Aliases" );
+    m_resultAliasList.uiCapability()->setUiEditorTypeName( caf::PdmUiTableViewEditor::uiEditorTypeName() );
+    m_resultAliasList.uiCapability()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
     // Init
 
@@ -296,6 +302,47 @@ void RimEclipseCase::initAfterRead()
     }
 
     m_contourMapCollection_OBSOLETE->clearWithoutDelete();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseCase::syncResultAliases()
+{
+    if ( auto ecData = eclipseCaseData() )
+    {
+        if ( auto results = ecData->results( RiaDefines::PorosityModelType::MATRIX_MODEL ) )
+        {
+            results->clearAllResultAliases();
+            for ( const auto& alias : m_resultAliasList )
+            {
+                results->addResultAlias( alias->resultName(), alias->aliasName() );
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseCase::addResultAlias( const QString& resultName, const QString& aliasName )
+{
+    if ( resultName.trimmed().isEmpty() ) return;
+    if ( aliasName.trimmed().isEmpty() ) return;
+
+    auto resultAlias = new RimResultNameAlias();
+    resultAlias->setResultNameAndAlias( resultName, aliasName );
+    m_resultAliasList.push_back( resultAlias );
+    syncResultAliases();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseCase::clearResultAliases()
+{
+    m_resultAliasList.deleteChildren();
+    syncResultAliases();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -484,6 +531,21 @@ void RimEclipseCase::fieldChangedByUi( const caf::PdmFieldHandle* changedField, 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimEclipseCase::childFieldChangedByUi( const caf::PdmFieldHandle* changedChildField )
+{
+    if ( changedChildField == &m_resultAliasList )
+    {
+        syncResultAliases();
+        for ( auto resView : reservoirViews() )
+        {
+            resView->scheduleCreateDisplayModelAndRedraw();
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimEclipseCase::updateFormationNamesData()
 {
     RigEclipseCaseData* rigEclipseCase = eclipseCaseData();
@@ -542,6 +604,35 @@ void RimEclipseCase::updateFormationNamesData()
             }
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseCase::resultAliasUiOrdering( caf::PdmUiOrdering& uiOrdering )
+{
+    auto aGrp = uiOrdering.addNewGroup( "Result Name Aliases" );
+    aGrp->setCollapsedByDefault();
+    aGrp->add( &m_resultAliasList );
+
+    aGrp->addNewButton( "Add Result Alias",
+                        [this]()
+                        {
+                            m_resultAliasList.push_back( new RimResultNameAlias() );
+                            updateConnectedEditors();
+                        } );
+    aGrp->addNewButton( "Reset Result Aliases",
+                        [this]()
+                        {
+                            m_resultAliasList.deleteChildren();
+                            syncResultAliases();
+                            updateConnectedEditors();
+                            for ( auto resView : reservoirViews() )
+                            {
+                                resView->scheduleCreateDisplayModelAndRedraw();
+                            }
+                        },
+                        { .newRow = false, .totalColumnSpan = 1 } );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -797,6 +888,7 @@ void RimEclipseCase::setReservoirData( RigEclipseCaseData* eclipseCase )
     {
         m_fractureModelResults()->setCellResults( eclipseCaseData()->results( RiaDefines::PorosityModelType::FRACTURE_MODEL ) );
         m_matrixModelResults()->setCellResults( eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
+        syncResultAliases();
     }
     else
     {
