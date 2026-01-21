@@ -353,7 +353,13 @@ void RiaLogging::errorInMessageBox( QWidget* parent, const QString& title, const
 {
     if ( RiaGuiApplication::isRunning() && !RiaRegressionTestRunner::instance()->isRunningRegressionTests() )
     {
-        QMessageBox::warning( parent, title, text );
+        if ( parent == nullptr )
+        {
+            parent = RiaGuiApplication::widgetToUseAsParent();
+        }
+        QMessageBox dlg( QMessageBox::Critical, title, text, QMessageBox::Ok, parent );
+        dlg.setWindowFlags( dlg.windowFlags() | Qt::WindowStaysOnTopHint );
+        dlg.exec();
     }
 
     RiaLogging::error( text );

@@ -246,7 +246,7 @@ bool RiaGuiApplication::askUserToSaveModifiedProject()
 {
     if ( RiaPreferencesSystem::current()->showProjectChangedDialog() && caf::PdmUiModelChangeDetector::instance()->isModelChanged() )
     {
-        QMessageBox msgBox;
+        QMessageBox msgBox( activeMainWindow() );
         msgBox.setIcon( QMessageBox::Question );
 
         QString questionText;
@@ -284,7 +284,7 @@ bool RiaGuiApplication::saveProjectAs( const QString& fileName )
     QString errMsg;
     if ( !RiaApplication::saveProjectAs( fileName, &errMsg ) )
     {
-        QMessageBox::warning( nullptr, "Error when saving project file", errMsg );
+        QMessageBox::warning( activeMainWindow(), "Error when saving project file", errMsg );
         return false;
     }
 
@@ -298,7 +298,7 @@ bool RiaGuiApplication::notifyUserAboutRunningJobs()
 {
     if ( m_project->jobCollection()->numberOfRunningJobs() > 0 )
     {
-        QMessageBox::critical( nullptr,
+        QMessageBox::critical( activeMainWindow(),
                                "Active running jobs",
                                "One or more jobs are still running, you need to stop all jobs before continuing." );
         return false;
@@ -1135,7 +1135,29 @@ RiuMainWindowBase* RiaGuiApplication::activeMainWindow()
     QWidget*           mainWindowWidget = RiaGuiApplication::activeWindow();
     RiuMainWindowBase* mainWindow       = dynamic_cast<RiuMainWindowBase*>( mainWindowWidget );
 
+    // If another window/app than ResInsight is active, mainWindow will be nullptr
+    // In that case, return a visible RI main window
+    if ( mainWindow == nullptr )
+    {
+        if ( instance()->isMain3dWindowVisible() )
+        {
+            mainWindow = instance()->m_mainWindow.get();
+        }
+        else if ( instance()->isMainPlotWindowVisible() )
+        {
+            mainWindow = instance()->m_mainPlotWindow.get();
+        }
+    }
+
     return mainWindow;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QWidget* RiaGuiApplication::widgetToUseAsParent()
+{
+    return dynamic_cast<QWidget*>( activeMainWindow() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1188,7 +1210,7 @@ void RiaGuiApplication::clearAllSelections()
 void RiaGuiApplication::showFormattedTextInMessageBoxOrConsole( const QString& text )
 {
     // Create a message dialog with cut/paste friendly text
-    QDialog dlg;
+    QDialog dlg( widgetToUseAsParent() );
     dlg.setModal( true );
 
     QGridLayout* layout = new QGridLayout;

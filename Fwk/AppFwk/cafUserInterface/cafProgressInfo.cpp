@@ -256,16 +256,33 @@ QString createMemoryLabelText()
 static QProgressDialog* progressDialog()
 {
     static QPointer<QProgressDialog> progDialog;
-    if ( progDialog.isNull() && dynamic_cast<QApplication*>( QCoreApplication::instance() ) )
+
+    auto app = dynamic_cast<QApplication*>( QCoreApplication::instance() );
+
+    QWidget* parent = app != nullptr ? app->activeWindow() : nullptr;
+
+    // Check if the current prog dialog (if any) has a proper parent.
+    // If not, re-create it, to make sure it is positioned in the correct main window
+    if ( !progDialog.isNull() && ( progDialog->parent() != parent ) && ( parent != nullptr ) )
     {
-        progDialog =
-            new QProgressDialog( nullptr, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowStaysOnTopHint );
+        // Thread check, we can only modify the progDialog if we are in the same thread as it belongs
+        if ( QThread::currentThread() == progDialog->thread() )
+        {
+            progDialog->deleteLater();
+            progDialog = nullptr;
+        }
+    }
+
+    if ( progDialog.isNull() )
+    {
+        progDialog = new QProgressDialog( parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint );
 
         progDialog->hide();
         progDialog->setAutoClose( false );
         progDialog->setAutoReset( false );
         progDialog->setMinimumWidth( 400 );
     }
+
     return progDialog;
 }
 

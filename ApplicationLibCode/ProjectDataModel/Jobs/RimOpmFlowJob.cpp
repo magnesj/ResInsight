@@ -18,6 +18,7 @@
 
 #include "RimOpmFlowJob.h"
 
+#include "RiaGuiApplication.h"
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesOpm.h"
@@ -887,7 +888,9 @@ bool RimOpmFlowJob::onRun()
         infoText += " \"" + workingDirectory() + "\"\n";
         infoText += "\nClick OK to run the Opm Flow simulation.";
 
-        auto reply = QMessageBox::information( nullptr, "Opm Flow simulation", infoText, QMessageBox::Ok | QMessageBox::Cancel );
+        auto parent = RiaGuiApplication::widgetToUseAsParent();
+
+        auto reply = QMessageBox::information( parent, "Opm Flow simulation", infoText, QMessageBox::Ok | QMessageBox::Cancel );
 
         if ( reply != QMessageBox::Ok ) return false;
     }
@@ -1182,7 +1185,10 @@ void RimOpmFlowJob::selectOpenWellPosition()
         kwVec.push_back( std::make_pair( i++, QString::fromStdString( kw ) ) );
     }
 
-    m_openWellDeckPosition = RimDeckPositionDlg::askForPosition( nullptr, kwVec, "--- Open New Well HERE ---", m_openWellDeckPosition );
+    m_openWellDeckPosition = RimDeckPositionDlg::askForPosition( RiaGuiApplication::widgetToUseAsParent(),
+                                                                 kwVec,
+                                                                 "--- Open New Well HERE ---",
+                                                                 m_openWellDeckPosition );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1190,8 +1196,10 @@ void RimOpmFlowJob::selectOpenWellPosition()
 //--------------------------------------------------------------------------------------------------
 void RimOpmFlowJob::resetEnsembleRunId()
 {
-    if ( QMessageBox::information( nullptr, "Opm Flow Job", "Do you want to reset the ensemble run ID to 0?", QMessageBox::Yes | QMessageBox::No ) ==
-         QMessageBox::Yes )
+    if ( QMessageBox::information( RiaGuiApplication::widgetToUseAsParent(),
+                                   "Opm Flow Job",
+                                   "Do you want to reset the ensemble run ID to 0?",
+                                   QMessageBox::Yes | QMessageBox::No ) == QMessageBox::Yes )
     {
         m_currentRunId = 0;
     }
