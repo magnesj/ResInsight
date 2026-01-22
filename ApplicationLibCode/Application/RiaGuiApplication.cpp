@@ -534,28 +534,10 @@ RiaApplication::ApplicationStatus RiaGuiApplication::handleArguments( gsl::not_n
         }
     }
 
-    if ( cvf::Option o = progOpt->option( "loglevel" ) )
+    ApplicationStatus parseStatus = parseAndSetLogLevelFromCommandLine( progOpt );
+    if ( parseStatus != ApplicationStatus::KEEP_GOING )
     {
-        if ( o.valueCount() == 1 )
-        {
-            QString                   logLevelString = cvfqt::Utils::toQString( o.value( 0 ) );
-            std::optional<RILogLevel> logLevel       = RiaLogging::parseLogLevelString( logLevelString );
-            if ( logLevel.has_value() )
-            {
-                m_logLevelFromCommandLine = int( logLevel.value() );
-            }
-            else
-            {
-                RiaLogging::error( QString( "Error: Invalid value for --loglevel: '%1'. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." )
-                                       .arg( logLevelString ) );
-                return RiaApplication::ApplicationStatus::EXIT_WITH_ERROR;
-            }
-        }
-        else
-        {
-            RiaLogging::error( "Error: --loglevel option requires a value. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." );
-            return RiaApplication::ApplicationStatus::EXIT_WITH_ERROR;
-        }
+        return parseStatus;
     }
 
     // Code generation

@@ -233,6 +233,8 @@ protected:
 protected:
     void initializeDataLoadController();
 
+    ApplicationStatus parseAndSetLogLevelFromCommandLine( cvf::ProgramOptions* progOpt );
+
     cvf::ref<cvf::Font> m_defaultSceneFont;
     cvf::ref<cvf::Font> m_defaultAnnotationFont;
     cvf::ref<cvf::Font> m_defaultWellLabelFont;
