@@ -264,6 +264,7 @@ protected:
     bool m_runningWorkerProcess;
 
     std::optional<int> m_threadCountFromCommandLine;
+    std::optional<int> m_logLevelFromCommandLine;
 
 private:
     static RiaApplication*     s_riaApplication;
