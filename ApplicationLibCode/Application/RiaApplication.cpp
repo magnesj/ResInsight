@@ -131,6 +131,9 @@
 #include "cafUiProcess.h"
 #include "cafUtils.h"
 
+#include "cvfProgramOptions.h"
+#include "cvfqtUtils.h"
+
 #include <QCoreApplication>
 
 #include <memory>
@@ -1537,6 +1540,37 @@ void RiaApplication::setStartDir( const QString& startDir )
 void RiaApplication::setCommandLineHelpText( const QString& commandLineHelpText )
 {
     m_commandLineHelpText = commandLineHelpText;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RiaApplication::ApplicationStatus RiaApplication::parseAndSetLogLevelFromCommandLine( cvf::ProgramOptions* progOpt )
+{
+    if ( cvf::Option o = progOpt->option( "loglevel" ) )
+    {
+        if ( o.valueCount() == 1 )
+        {
+            QString                   logLevelString = cvfqt::Utils::toQString( o.value( 0 ) );
+            std::optional<RILogLevel> logLevel       = RiaLogging::parseLogLevelString( logLevelString );
+            if ( logLevel.has_value() )
+            {
+                m_logLevelFromCommandLine = int( logLevel.value() );
+            }
+            else
+            {
+                RiaLogging::error( QString( "Error: Invalid value for --loglevel: '%1'. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." )
+                                       .arg( logLevelString ) );
+                return ApplicationStatus::EXIT_WITH_ERROR;
+            }
+        }
+        else
+        {
+            RiaLogging::error( "Error: --loglevel option requires a value. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." );
+            return ApplicationStatus::EXIT_WITH_ERROR;
+        }
+    }
+    return ApplicationStatus::KEEP_GOING;
 }
 
 //--------------------------------------------------------------------------------------------------
