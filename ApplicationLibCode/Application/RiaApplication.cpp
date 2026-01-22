@@ -1562,8 +1562,9 @@ RiaApplication::ApplicationStatus RiaApplication::parseAndSetLogLevelFromCommand
             }
             else
             {
-                RiaLogging::error( QString( "Error: Invalid value for --loglevel: '%1'. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." )
-                                       .arg( logLevelString ) );
+                RiaLogging::error(
+                    QString( "Error: Invalid value for --loglevel: '%1'. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." )
+                        .arg( logLevelString ) );
                 return ApplicationStatus::EXIT_WITH_ERROR;
             }
         }

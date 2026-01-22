@@ -462,7 +462,7 @@ void RiaGuiApplication::initialize()
         auto logger = std::make_unique<RiuMessagePanelLogger>();
         logger->addMessagePanel( m_mainWindow->messagePanel() );
         logger->addMessagePanel( m_mainPlotWindow->messagePanel() );
-        
+
         // Use command line log level if provided, otherwise use preference-based level
         if ( m_logLevelFromCommandLine.has_value() )
         {

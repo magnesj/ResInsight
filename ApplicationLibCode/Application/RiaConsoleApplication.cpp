@@ -106,7 +106,7 @@ void RiaConsoleApplication::initialize()
     RiaApplication::initialize();
 
     auto logger = std::make_unique<RiaStdOutLogger>();
-    
+
     // Use command line log level if provided, otherwise use preference-based level
     if ( m_logLevelFromCommandLine.has_value() )
     {
@@ -116,7 +116,7 @@ void RiaConsoleApplication::initialize()
     {
         logger->setLevel( int( RiaLogging::logLevelBasedOnPreferences() ) );
     }
-    
+
     RiaLogging::appendLoggerInstance( std::move( logger ) );
 
     m_socketServer = new RiaSocketServer( this );
