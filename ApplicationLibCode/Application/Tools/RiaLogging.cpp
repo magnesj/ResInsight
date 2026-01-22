@@ -243,7 +243,10 @@ RILogLevel RiaLogging::logLevelBasedOnPreferences()
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Parse a log level string and return the corresponding enum value
+/// @param logLevelString The string to parse (case-insensitive, whitespace is trimmed)
+/// @return The corresponding RILogLevel enum value, or std::nullopt if the string is invalid
+/// Valid values are: DISABLED, ERROR, WARNING, INFO, DEBUG
 //--------------------------------------------------------------------------------------------------
 std::optional<RILogLevel> RiaLogging::parseLogLevelString( const QString& logLevelString )
 {
