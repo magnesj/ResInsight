@@ -1543,7 +1543,10 @@ void RiaApplication::setCommandLineHelpText( const QString& commandLineHelpText 
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Parse and set the log level from command line arguments
+/// @param progOpt The program options containing command line arguments
+/// @return KEEP_GOING if parsing succeeded or option not present, EXIT_WITH_ERROR if validation failed
+/// Validates the --loglevel argument and sets m_logLevelFromCommandLine if valid
 //--------------------------------------------------------------------------------------------------
 RiaApplication::ApplicationStatus RiaApplication::parseAndSetLogLevelFromCommandLine( cvf::ProgramOptions* progOpt )
 {
