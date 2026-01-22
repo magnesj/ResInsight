@@ -66,6 +66,7 @@ public:
     static void                    appendLoggerInstance( std::unique_ptr<RiaLogger> loggerInstance );
 
     static RILogLevel logLevelBasedOnPreferences();
+    static RILogLevel parseLogLevelString( const QString& logLevelString );
 
     static void error( const QString& message, const QString logKeyword = "" );
     static void warning( const QString& message, const QString logKeyword = "" );
