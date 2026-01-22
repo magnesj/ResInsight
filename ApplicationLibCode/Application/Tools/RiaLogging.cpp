@@ -245,20 +245,18 @@ RILogLevel RiaLogging::logLevelBasedOnPreferences()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RILogLevel RiaLogging::parseLogLevelString( const QString& logLevelString )
+std::optional<RILogLevel> RiaLogging::parseLogLevelString( const QString& logLevelString )
 {
     QString upperString = logLevelString.toUpper().trimmed();
 
-    // DISABLED means don't log anything - return a value less than RI_LL_ERROR
-    // We'll cast 0 to RILogLevel, which means nothing will be logged
-    if ( upperString == "DISABLED" ) return static_cast<RILogLevel>( 0 );
+    if ( upperString == "DISABLED" ) return RILogLevel::RI_LL_DISABLED;
     if ( upperString == "ERROR" ) return RILogLevel::RI_LL_ERROR;
     if ( upperString == "WARNING" ) return RILogLevel::RI_LL_WARNING;
     if ( upperString == "INFO" ) return RILogLevel::RI_LL_INFO;
     if ( upperString == "DEBUG" ) return RILogLevel::RI_LL_DEBUG;
 
-    // Default to INFO if invalid
-    return RILogLevel::RI_LL_INFO;
+    // Return nullopt for invalid input
+    return std::nullopt;
 }
 
 //--------------------------------------------------------------------------------------------------

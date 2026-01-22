@@ -174,8 +174,23 @@ RiaApplication::ApplicationStatus RiaConsoleApplication::handleArguments( gsl::n
     {
         if ( o.valueCount() == 1 )
         {
-            QString logLevelString = cvfqt::Utils::toQString( o.value( 0 ) );
-            m_logLevelFromCommandLine  = int( RiaLogging::parseLogLevelString( logLevelString ) );
+            QString                   logLevelString = cvfqt::Utils::toQString( o.value( 0 ) );
+            std::optional<RILogLevel> logLevel       = RiaLogging::parseLogLevelString( logLevelString );
+            if ( logLevel.has_value() )
+            {
+                m_logLevelFromCommandLine = int( logLevel.value() );
+            }
+            else
+            {
+                RiaLogging::error( QString( "Error: Invalid value for --loglevel: '%1'. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." )
+                                       .arg( logLevelString ) );
+                return RiaApplication::ApplicationStatus::EXIT_WITH_ERROR;
+            }
+        }
+        else
+        {
+            RiaLogging::error( "Error: --loglevel option requires a value. Valid values are DISABLED, ERROR, WARNING, INFO, DEBUG." );
+            return RiaApplication::ApplicationStatus::EXIT_WITH_ERROR;
         }
     }
 
