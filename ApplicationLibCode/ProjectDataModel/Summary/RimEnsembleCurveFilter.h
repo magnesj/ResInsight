@@ -87,6 +87,7 @@ private:
     void                 appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
     void                 initAfterRead() override;
 
+    void selectObjectiveSummaryAddress();
     void onObjectionFunctionChanged( const caf::SignalEmitter* emitter );
 
     RimEnsembleCurveFilterCollection* parentCurveFilterCollection() const;
@@ -104,7 +105,6 @@ private:
 
     caf::PdmChildArrayField<RimSummaryAddress*>   m_objectiveValuesSummaryAddresses;
     caf::PdmField<QString>                        m_objectiveValuesSummaryAddressesUiField;
-    caf::PdmField<bool>                           m_objectiveValuesSelectSummaryAddressPushButton;
     caf::PdmChildField<RimObjectiveFunction*>     m_objectiveFunction;
     caf::PdmPtrField<RimCustomObjectiveFunction*> m_customObjectiveFunction;
 

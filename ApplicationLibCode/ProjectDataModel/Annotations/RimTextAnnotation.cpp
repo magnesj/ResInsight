@@ -31,7 +31,6 @@
 #include "cafCmdFeatureManager.h"
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiPickableLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiTreeOrdering.h"
 
@@ -45,19 +44,17 @@ CAF_PDM_SOURCE_INIT( RimTextAnnotation, "TextAnnotation", "RimTextAnnotation" );
 ///
 //--------------------------------------------------------------------------------------------------
 RimTextAnnotation::RimTextAnnotation()
+    : m_anchorPointPickEnabled( false )
+    , m_labelPointPickEnabled( false )
 {
     CAF_PDM_InitScriptableObject( "TextAnnotation", ":/TextAnnotation16x16.png" );
     setUi3dEditorTypeName( RicTextAnnotation3dEditor::uiEditorTypeName() );
 
     CAF_PDM_InitField( &m_anchorPointXyd, "AnchorPointXyd", Vec3d::ZERO, "Anchor Point" );
     m_anchorPointXyd.uiCapability()->setUiEditorTypeName( caf::PdmUiPickableLineEditor::uiEditorTypeName() );
-    CAF_PDM_InitField( &m_anchorPointPickEnabledButtonField, "AnchorPointPick", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_anchorPointPickEnabledButtonField );
 
     CAF_PDM_InitField( &m_labelPointXyd, "LabelPointXyd", Vec3d::ZERO, "Label Point" );
     m_labelPointXyd.uiCapability()->setUiEditorTypeName( caf::PdmUiPickableLineEditor::uiEditorTypeName() );
-    CAF_PDM_InitField( &m_labelPointPickEnabledButtonField, "LabelPointPick", false, "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_labelPointPickEnabledButtonField );
 
     CAF_PDM_InitField( &m_text, "Text", QString( "(New text)" ), "Text" );
     m_text.uiCapability()->setUiEditorTypeName( caf::PdmUiTextEditor::uiEditorTypeName() );
@@ -146,9 +143,24 @@ const QString& RimTextAnnotation::text() const
 void RimTextAnnotation::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_anchorPointXyd );
-    uiOrdering.appendToRow( &m_anchorPointPickEnabledButtonField );
+
+    uiOrdering.addNewButton( m_anchorPointPickEnabled ? "Stop" : "Pick",
+                             [this]()
+                             {
+                                 m_anchorPointPickEnabled = !m_anchorPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false } );
+
     uiOrdering.add( &m_labelPointXyd );
-    uiOrdering.appendToRow( &m_labelPointPickEnabledButtonField );
+
+    uiOrdering.addNewButton( m_labelPointPickEnabled ? "Stop" : "Pick",
+                             [this]()
+                             {
+                                 m_labelPointPickEnabled = !m_labelPointPickEnabled;
+                                 updateConnectedEditors();
+                             },
+                             { .newRow = false } );
 
     uiOrdering.add( &m_text );
 
@@ -165,7 +177,7 @@ void RimTextAnnotation::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
 {
     if ( changedField == &m_anchorPointXyd )
     {
-        m_anchorPointPickEnabledButtonField = false;
+        m_anchorPointPickEnabled = false;
         if ( m_labelPointXyd().isZero() )
         {
             m_labelPointXyd = m_anchorPointXyd;
@@ -174,11 +186,7 @@ void RimTextAnnotation::fieldChangedByUi( const caf::PdmFieldHandle* changedFiel
     }
     if ( changedField == &m_labelPointXyd )
     {
-        m_labelPointPickEnabledButtonField = false;
-        updateConnectedEditors();
-    }
-    if ( changedField == &m_anchorPointPickEnabledButtonField || changedField == &m_labelPointPickEnabledButtonField )
-    {
+        m_labelPointPickEnabled = false;
         updateConnectedEditors();
     }
 
@@ -221,7 +229,7 @@ bool RimTextAnnotation::isVisible() const
 //--------------------------------------------------------------------------------------------------
 void RimTextAnnotation::enablePicking( bool enable )
 {
-    m_anchorPointPickEnabledButtonField = enable;
+    m_anchorPointPickEnabled = enable;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -250,29 +258,12 @@ void RimTextAnnotation::defineEditorAttribute( const caf::PdmFieldHandle* field,
     if ( attr && field == &m_anchorPointXyd )
     {
         attr->pickEventHandler = m_anchorPointPickEventHandler;
-        attr->enablePicking    = m_anchorPointPickEnabledButtonField;
+        attr->enablePicking    = m_anchorPointPickEnabled;
     }
     else if ( attr && field == &m_labelPointXyd )
     {
         attr->pickEventHandler = m_labelPointPickEventHandler;
-        attr->enablePicking    = m_labelPointPickEnabledButtonField;
-    }
-
-    if ( field == &m_anchorPointPickEnabledButtonField || field == &m_labelPointPickEnabledButtonField )
-    {
-        auto* pbAttribute = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( pbAttribute )
-        {
-            auto boolField = static_cast<const caf::PdmField<bool>*>( field );
-            if ( boolField->v() )
-            {
-                pbAttribute->m_buttonText = "Stop";
-            }
-            else
-            {
-                pbAttribute->m_buttonText = "Pick";
-            }
-        }
+        attr->enablePicking    = m_labelPointPickEnabled;
     }
 }
 

@@ -147,9 +147,6 @@ private:
     caf::PdmField<double>                     m_frictionAngleDeg;
     caf::PdmField<std::vector<caf::FilePath>> m_elementPropertyFileNames;
     caf::PdmField<std::vector<int>>           m_elementPropertyFileNameIndexUiSelection;
-    caf::PdmField<bool>                       m_importElementPropertyFileCommand;
-    caf::PdmField<bool>                       m_closeElementPropertyFileCommand;
-    caf::PdmField<bool>                       m_reloadElementPropertyFileCommand;
 
     caf::PdmField<caf::AppEnum<BiotCoefficientType>> m_biotCoefficientType;
     caf::PdmField<double>                            m_biotFixedCoefficient;

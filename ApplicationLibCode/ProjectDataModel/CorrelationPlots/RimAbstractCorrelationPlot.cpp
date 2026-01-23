@@ -43,7 +43,6 @@
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiLineEditor.h"
-#include "cafPdmUiPushButtonEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 
 #include "qwt_plot.h"
@@ -66,10 +65,6 @@ RimAbstractCorrelationPlot::RimAbstractCorrelationPlot()
 
     CAF_PDM_InitFieldNoDefault( &m_dataSources, "AnalysisPlotData", "" );
     m_dataSources.uiCapability()->setUiTreeChildrenHidden( true );
-
-    CAF_PDM_InitFieldNoDefault( &m_pushButtonSelectSummaryAddress, "SelectAddress", "" );
-    caf::PdmUiPushButtonEditor::configureEditorLabelHidden( &m_pushButtonSelectSummaryAddress );
-    m_pushButtonSelectSummaryAddress = false;
 
     CAF_PDM_InitFieldNoDefault( &m_timeStepFilter, "TimeStepFilter", "Available Time Steps" );
 
@@ -139,40 +134,8 @@ void RimAbstractCorrelationPlot::setTimeStep( std::time_t timeStep )
 void RimAbstractCorrelationPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     RimPlot::fieldChangedByUi( changedField, oldValue, newValue );
-    if ( changedField == &m_pushButtonSelectSummaryAddress )
-    {
-        RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
 
-        if ( m_selectMultipleVectors )
-        {
-            dlg.enableMultiSelect( true );
-        }
-
-        dlg.hideSummaryCases();
-        dlg.setCurveSelection( curveDefinitions() );
-
-        if ( dlg.exec() == QDialog::Accepted )
-        {
-            auto curveSelection = dlg.curveSelection();
-            if ( !curveSelection.empty() )
-            {
-                std::vector<RiaSummaryCurveDefinition> summaryVectorDefinitions = dlg.curveSelection();
-                m_dataSources.deleteChildren();
-                for ( const RiaSummaryCurveDefinition& vectorDef : summaryVectorDefinitions )
-                {
-                    auto plotEntry = new RimAnalysisPlotDataEntry();
-                    plotEntry->setFromCurveDefinition( vectorDef );
-                    m_dataSources.push_back( plotEntry );
-                }
-                connectAllCaseSignals();
-                loadDataAndUpdate();
-                updateConnectedEditors();
-            }
-        }
-
-        m_pushButtonSelectSummaryAddress = false;
-    }
-    else if ( changedField == &m_timeStep )
+    if ( changedField == &m_timeStep )
     {
         loadDataAndUpdate();
         updateConnectedEditors();
@@ -234,11 +197,7 @@ void RimAbstractCorrelationPlot::fieldChangedByUi( const caf::PdmFieldHandle* ch
 //--------------------------------------------------------------------------------------------------
 void RimAbstractCorrelationPlot::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-    if ( attrib )
-    {
-        attrib->m_buttonText = "...";
-    }
+    // Button handling removed - now done with dynamic button
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -767,7 +726,39 @@ void RimAbstractCorrelationPlot::appendDataSourceFields( QString uiConfigName, c
     m_selectedVarsUiField = selectedVectorNamesText();
 
     curveDataGroup->add( &m_selectedVarsUiField );
-    curveDataGroup->add( &m_pushButtonSelectSummaryAddress, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+    curveDataGroup->addNewButton( "...",
+                                  [this]()
+                                  {
+                                      RiuSummaryVectorSelectionDialog dlg( nullptr );
+
+                                      if ( m_selectMultipleVectors )
+                                      {
+                                          dlg.enableMultiSelect( true );
+                                      }
+
+                                      dlg.hideSummaryCases();
+                                      dlg.setCurveSelection( curveDefinitions() );
+
+                                      if ( dlg.exec() == QDialog::Accepted )
+                                      {
+                                          auto curveSelection = dlg.curveSelection();
+                                          if ( !curveSelection.empty() )
+                                          {
+                                              std::vector<RiaSummaryCurveDefinition> summaryVectorDefinitions = dlg.curveSelection();
+                                              m_dataSources.deleteChildren();
+                                              for ( const RiaSummaryCurveDefinition& vectorDef : summaryVectorDefinitions )
+                                              {
+                                                  auto plotEntry = new RimAnalysisPlotDataEntry();
+                                                  plotEntry->setFromCurveDefinition( vectorDef );
+                                                  m_dataSources.push_back( plotEntry );
+                                              }
+                                              connectAllCaseSignals();
+                                              loadDataAndUpdate();
+                                              updateConnectedEditors();
+                                          }
+                                      }
+                                  },
+                                  { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
     curveDataGroup->add( &m_timeStepFilter );
     curveDataGroup->add( &m_timeStep );
     curveDataGroup->add( &m_useCaseFilter );

@@ -26,6 +26,7 @@
 #include "cafPdmChildField.h"
 #include "cafPdmFieldCvfVec3d.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmUiPushButtonEditor.h"
 
 #include "cvfVector3.h"
 
@@ -188,7 +189,6 @@ private:
     caf::PdmPtrField<RimSimWellInView*> m_simulationWell;
 
     caf::PdmPtrField<RimPolygon*> m_projectPolygon;
-    caf::PdmField<bool>           m_editPolygonButton;
 
     caf::PdmField<bool> m_inputPolylineFromViewerEnabled;
     caf::PdmField<bool> m_inputExtrusionPointsFromViewerEnabled;
