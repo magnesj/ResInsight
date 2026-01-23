@@ -59,7 +59,11 @@ class RimEclipseResultDefinition;
 class RimColorLegend;
 class RimEnsembleWellLogCurveSet;
 class RiuPlotAnnotationTool;
+class RimWellLogTrackRegionAnnotations;
 
+//--------------------------------------------------------------------------------------------------
+/// Data structure for curve sampling points
+//--------------------------------------------------------------------------------------------------
 struct CurveSamplingPointData
 {
     std::vector<double> data;
@@ -184,10 +188,23 @@ public:
     void setShowBothSidesOfWell( bool on );
     void setWellPathAttributesSource( RimWellPath* wellPath );
 
-    void setOverburdenHeight( double overburdenHeight );
-    void setUnderburdenHeight( double underburdenHeight );
+    void   setOverburdenHeight( double overburdenHeight );
+    void   setUnderburdenHeight( double underburdenHeight );
+    double overburdenHeight() const;
+    double underburdenHeight() const;
 
     RimWellPath* wellPathAttributeSource() const;
+
+    // Accessors for region annotation helper class
+    FormationSource                       formationSource() const;
+    RimWellPath*                          formationWellPathForSourceWellPath() const;
+    RigWellPathFormations::FormationLevel formationLevel() const;
+    bool                                  showFormationFluids() const;
+    int                                   colorShadingTransparency() const;
+    bool                                  showRegionLabels() const;
+    RimColorLegend*                       colorShadingLegend() const;
+    RimEclipseResultDefinition*           resultDefinition() const;
+    caf::FontTools::RelativeSize          regionLabelFontSize() const;
 
     void setLogarithmicScale( bool enable );
     bool isLogarithmicScale() const;
@@ -287,9 +304,6 @@ private:
     void setFormationFieldsUiReadOnly( bool readOnly = true );
 
     void updateRegionAnnotationsOnPlot();
-    void updateFormationNamesOnPlot();
-    void updateResultPropertyNamesOnPlot();
-    void updateCurveDataRegionsOnPlot();
     void updateWellPathAttributesOnPlot();
     void removeRegionAnnotations();
     void updateAxisScaleEngine();
@@ -304,9 +318,6 @@ private:
 
     void handleWheelEvent( QWheelEvent* event ) override;
     void doUpdateLayout() override;
-
-    std::vector<std::pair<double, double>> waterAndRockRegions( RiaDefines::DepthTypeEnum         depthType,
-                                                                const RigGeoMechWellLogExtractor* extractor ) const;
 
     void connectCurveSignals( RimWellLogCurve* curve );
     bool isEmptyVisiblePropertyRange() const;
@@ -369,8 +380,8 @@ private:
 
     bool m_formationsForCaseWithSimWellOnly;
 
-    QPointer<RiuWellLogTrack>              m_plotWidget;
-    std::unique_ptr<RiuPlotAnnotationTool> m_annotationTool;
+    QPointer<RiuWellLogTrack>                          m_plotWidget;
+    std::unique_ptr<RimWellLogTrackRegionAnnotations> m_regionAnnotations;
 
     QString m_propertyValueAxisTitle;
     double  m_availablePropertyValueRangeMin;

@@ -19,6 +19,9 @@
 
 #include "RimWellLogTrack.h"
 
+#include "RimWellLogTrackRegionAnnotations.h"
+#include "RimWellLogTrackTools.h"
+
 #include "RiaColorTables.h"
 #include "RiaExtractionTools.h"
 #include "RiaGuiApplication.h"
@@ -293,6 +296,7 @@ RimWellLogTrack::RimWellLogTrack()
 RimWellLogTrack::~RimWellLogTrack()
 {
     m_curves.deleteChildren();
+    m_regionAnnotations.reset();
 
     deleteViewWidget();
 }
@@ -318,23 +322,7 @@ void RimWellLogTrack::setDescription( const QString& description )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::simWellOptionItems( QList<caf::PdmOptionItemInfo>* options, RimCase* rimCase )
 {
-    CVF_ASSERT( options );
-    if ( !options ) return;
-
-    std::set<QString> sortedWellNames;
-
-    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( rimCase );
-
-    if ( eclipseCase && eclipseCase->eclipseCaseData() )
-    {
-        sortedWellNames = eclipseCase->eclipseCaseData()->findSortedWellNames();
-    }
-
-    caf::IconProvider simWellIcon( ":/Well.svg" );
-    for ( const QString& wname : sortedWellNames )
-    {
-        options->push_back( caf::PdmOptionItemInfo( wname, wname, false, simWellIcon ) );
-    }
+    RimWellLogTrackTools::simWellOptionItems( options, rimCase );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -416,12 +404,12 @@ void RimWellLogTrack::calculatePropertyValueZoomRange()
     }
     else if ( m_minorTickIntervalPropertyAxis() != 0.0 )
     {
-        std::tie( minValue, maxValue ) = adjustXRange( minValue, maxValue, m_minorTickIntervalPropertyAxis() );
+        std::tie( minValue, maxValue ) = RimWellLogTrackTools::adjustXRange( minValue, maxValue, m_minorTickIntervalPropertyAxis() );
     }
     else
     {
         double adjustmentFactor         = 0.1;
-        auto [adjustedMin, adjustedMax] = extendMinMaxRange( minValue, maxValue, adjustmentFactor );
+        auto [adjustedMin, adjustedMax] = RimWellLogTrackTools::extendMinMaxRange( minValue, maxValue, adjustmentFactor );
 
         minValue = adjustedMin;
         maxValue = adjustedMax;
@@ -480,7 +468,7 @@ void RimWellLogTrack::calculateDepthZoomRange()
     }
 
     double adjustmentFactor         = 0.02;
-    auto [adjustedMin, adjustedMax] = extendMinMaxRange( minDepth, maxDepth, adjustmentFactor );
+    auto [adjustedMin, adjustedMax] = RimWellLogTrackTools::extendMinMaxRange( minDepth, maxDepth, adjustmentFactor );
 
     m_availableDepthRangeMin = adjustedMin;
     m_availableDepthRangeMax = adjustedMax;
@@ -677,7 +665,7 @@ void RimWellLogTrack::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
     else if ( changedField == &m_formationCase )
     {
         QList<caf::PdmOptionItemInfo> options;
-        RimWellLogTrack::simWellOptionItems( &options, m_formationCase );
+        RimWellLogTrackTools::simWellOptionItems( &options, m_formationCase );
 
         if ( options.isEmpty() || m_formationCase == nullptr )
         {
@@ -1126,7 +1114,7 @@ QList<caf::PdmOptionItemInfo> RimWellLogTrack::calculateValueOptions( const caf:
     }
     else if ( fieldNeedingOptions == &m_formationSimWellName )
     {
-        RimWellLogTrack::simWellOptionItems( &options, m_formationCase );
+        RimWellLogTrackTools::simWellOptionItems( &options, m_formationCase );
     }
     else if ( fieldNeedingOptions == &m_formationBranchIndex )
     {
@@ -2206,11 +2194,7 @@ void RimWellLogTrack::updateAxisScaleEngine()
 //--------------------------------------------------------------------------------------------------
 std::pair<double, double> RimWellLogTrack::adjustXRange( double minValue, double maxValue, double tickInterval )
 {
-    double minRemainder = std::fmod( minValue, tickInterval );
-    double maxRemainder = std::fmod( maxValue, tickInterval );
-    double adjustedMin  = minValue - minRemainder;
-    double adjustedMax  = maxValue + ( tickInterval - maxRemainder );
-    return std::make_pair( adjustedMin, adjustedMax );
+    return RimWellLogTrackTools::adjustXRange( minValue, maxValue, tickInterval );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2218,42 +2202,7 @@ std::pair<double, double> RimWellLogTrack::adjustXRange( double minValue, double
 //--------------------------------------------------------------------------------------------------
 std::pair<double, double> RimWellLogTrack::extendMinMaxRange( double minValue, double maxValue, double factor )
 {
-    if ( minValue == std::numeric_limits<double>::infinity() || maxValue == std::numeric_limits<double>::infinity() )
-    {
-        return { minValue, maxValue };
-    }
-
-    auto modifiedMin = minValue;
-    auto modifiedMax = maxValue;
-
-    auto range = std::fabs( maxValue - minValue );
-    if ( range < 1e-6 )
-    {
-        // If min and max are equal, the curve is not visible. Make sure the range is larger than zero.
-        if ( maxValue != 0.0 )
-        {
-            range = maxValue * 0.01;
-        }
-        else
-        {
-            range = 1.0;
-        }
-    }
-
-    modifiedMax += factor * range;
-
-    auto candidateMinValue = minValue - factor * range;
-    if ( std::signbit( minValue ) == std::signbit( candidateMinValue ) )
-    {
-        modifiedMin = candidateMinValue;
-    }
-    else
-    {
-        // If the sign of the adjusted minimum changes, set minimum to zero to make sure that zero is located properly
-        modifiedMin = 0.0;
-    }
-
-    return { modifiedMin, modifiedMax };
+    return RimWellLogTrackTools::extendMinMaxRange( minValue, maxValue, factor );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2319,45 +2268,6 @@ void RimWellLogTrack::handleWheelEvent( QWheelEvent* wheelEvent )
             wellLogPlot->setDepthAxisRangeByPanDepth( wheelEvent->angleDelta().y() < 0 ? RI_SCROLLWHEEL_PANFACTOR : -RI_SCROLLWHEEL_PANFACTOR );
         }
     }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<std::pair<double, double>> RimWellLogTrack::waterAndRockRegions( RiaDefines::DepthTypeEnum         depthType,
-                                                                             const RigGeoMechWellLogExtractor* extractor ) const
-{
-    double waterEndTVD = extractor->waterDepth();
-    if ( waterEndTVD == std::numeric_limits<double>::infinity() )
-    {
-        waterEndTVD = extractor->estimateWaterDepth();
-    }
-
-    if ( depthType == RiaDefines::DepthTypeEnum::MEASURED_DEPTH )
-    {
-        double waterStartMD = 0.0;
-        if ( extractor->wellPathGeometry()->rkbDiff() != std::numeric_limits<double>::infinity() )
-        {
-            waterStartMD += extractor->wellPathGeometry()->rkbDiff();
-        }
-        double waterEndMD = extractor->cellIntersectionMDs().front();
-        double rockEndMD  = extractor->cellIntersectionMDs().back();
-        return { { waterStartMD, waterEndMD }, { waterEndMD, rockEndMD } };
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH )
-    {
-        double waterStartTVD = 0.0;
-        double rockEndTVD    = extractor->cellIntersectionTVDs().back();
-        return { { waterStartTVD, waterEndTVD }, { waterEndTVD, rockEndTVD } };
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-    {
-        double waterStartTVDRKB = extractor->wellPathGeometry()->rkbDiff();
-        double waterEndTVDRKB   = waterEndTVD + extractor->wellPathGeometry()->rkbDiff();
-        double rockEndTVDRKB    = extractor->cellIntersectionTVDs().back() + extractor->wellPathGeometry()->rkbDiff();
-        return { { waterStartTVDRKB, waterEndTVDRKB }, { waterEndTVDRKB, rockEndTVDRKB } };
-    }
-    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2545,21 +2455,7 @@ RigEclipseWellLogExtractor* RimWellLogTrack::createSimWellExtractor( RimWellLogP
                                                                      int                       branchIndex,
                                                                      bool                      useBranchDetection )
 {
-    if ( !wellLogCollection ) return nullptr;
-
-    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( rimCase );
-    if ( !eclipseCase ) return nullptr;
-
-    std::vector<const RigWellPath*> wellPaths = RiaSimWellBranchTools::simulationWellBranches( simWellName, useBranchDetection );
-
-    if ( wellPaths.empty() ) return nullptr;
-
-    CVF_ASSERT( branchIndex >= 0 && branchIndex < static_cast<int>( wellPaths.size() ) );
-
-    return ( wellLogCollection->findOrCreateSimWellExtractor( simWellName,
-                                                              QString( "Find or create sim well extractor" ),
-                                                              wellPaths[branchIndex],
-                                                              eclipseCase->eclipseCaseData() ) );
+    return RimWellLogTrackTools::createSimWellExtractor( wellLogCollection, rimCase, simWellName, branchIndex, useBranchDetection );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2567,15 +2463,7 @@ RigEclipseWellLogExtractor* RimWellLogTrack::createSimWellExtractor( RimWellLogP
 //--------------------------------------------------------------------------------------------------
 CurveSamplingPointData RimWellLogTrack::curveSamplingPointData( RigEclipseWellLogExtractor* extractor, RigResultAccessor* resultAccessor )
 {
-    CurveSamplingPointData curveData;
-
-    curveData.md      = extractor->cellIntersectionMDs();
-    curveData.tvd     = extractor->cellIntersectionTVDs();
-    curveData.rkbDiff = extractor->wellPathGeometry()->rkbDiff();
-
-    extractor->curveData( resultAccessor, &curveData.data );
-
-    return curveData;
+    return RimWellLogTrackTools::curveSamplingPointData( extractor, resultAccessor );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2583,14 +2471,7 @@ CurveSamplingPointData RimWellLogTrack::curveSamplingPointData( RigEclipseWellLo
 //--------------------------------------------------------------------------------------------------
 CurveSamplingPointData RimWellLogTrack::curveSamplingPointData( RigGeoMechWellLogExtractor* extractor, const RigFemResultAddress& resultAddress )
 {
-    CurveSamplingPointData curveData;
-
-    curveData.md      = extractor->cellIntersectionMDs();
-    curveData.tvd     = extractor->cellIntersectionTVDs();
-    curveData.rkbDiff = extractor->wellPathGeometry()->rkbDiff();
-
-    extractor->curveData( resultAddress, 0, 0, &curveData.data );
-    return curveData;
+    return RimWellLogTrackTools::curveSamplingPointData( extractor, resultAddress );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2602,70 +2483,7 @@ void RimWellLogTrack::findRegionNamesToPlot( const CurveSamplingPointData&      
                                              std::vector<QString>*                   regionNamesToPlot,
                                              std::vector<std::pair<double, double>>* yValues )
 {
-    if ( regionNamesVector.empty() ) return;
-
-    std::vector<size_t> regionNameIndicesFromCurve;
-
-    for ( double nameIdx : curveData.data )
-    {
-        if ( nameIdx != std::numeric_limits<double>::infinity() )
-        {
-            regionNameIndicesFromCurve.push_back( static_cast<size_t>( round( nameIdx ) ) );
-        }
-        else
-        {
-            regionNameIndicesFromCurve.push_back( std::numeric_limits<size_t>::max() );
-        }
-    }
-
-    if ( regionNameIndicesFromCurve.empty() ) return;
-
-    std::vector<double> depthVector;
-
-    if ( depthType == RiaDefines::DepthTypeEnum::MEASURED_DEPTH || depthType == RiaDefines::DepthTypeEnum::PSEUDO_LENGTH )
-    {
-        depthVector = curveData.md;
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH || depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-    {
-        depthVector = curveData.tvd;
-        if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-        {
-            for ( double& depthValue : depthVector )
-            {
-                depthValue += curveData.rkbDiff;
-            }
-        }
-    }
-
-    if ( depthVector.empty() ) return;
-
-    double currentYStart = depthVector[0];
-    size_t prevNameIndex = regionNameIndicesFromCurve[0];
-    size_t currentNameIndex;
-
-    for ( size_t i = 1; i < regionNameIndicesFromCurve.size(); i++ )
-    {
-        currentNameIndex = regionNameIndicesFromCurve[i];
-        if ( currentNameIndex != std::numeric_limits<size_t>::max() && currentNameIndex != prevNameIndex )
-        {
-            if ( prevNameIndex < regionNamesVector.size() )
-            {
-                regionNamesToPlot->push_back( regionNamesVector[prevNameIndex] );
-                yValues->push_back( std::make_pair( currentYStart, depthVector[i - 1] ) );
-            }
-
-            currentYStart = depthVector[i];
-            prevNameIndex = currentNameIndex;
-        }
-    }
-
-    size_t lastFormationIdx = regionNameIndicesFromCurve.back();
-    if ( lastFormationIdx < regionNamesVector.size() )
-    {
-        regionNamesToPlot->push_back( regionNamesVector[lastFormationIdx] );
-        yValues->push_back( std::make_pair( currentYStart, depthVector.back() ) );
-    }
+    RimWellLogTrackTools::findRegionNamesToPlot( curveData, regionNamesVector, depthType, regionNamesToPlot, yValues );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2673,19 +2491,7 @@ void RimWellLogTrack::findRegionNamesToPlot( const CurveSamplingPointData&      
 //--------------------------------------------------------------------------------------------------
 std::vector<QString> RimWellLogTrack::formationNamesVector( RimCase* rimCase )
 {
-    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( rimCase );
-    RimGeoMechCase* geoMechCase = dynamic_cast<RimGeoMechCase*>( rimCase );
-
-    if ( eclipseCase )
-    {
-        return eclipseCase->eclipseCaseData()->formationNames();
-    }
-    else if ( geoMechCase )
-    {
-        return geoMechCase->geoMechData()->femPartResults()->formationNames();
-    }
-
-    return std::vector<QString>();
+    return RimWellLogTrackTools::formationNamesVector( rimCase );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2824,435 +2630,11 @@ void RimWellLogTrack::setFormationFieldsUiReadOnly( bool readOnly /*= true*/ )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateRegionAnnotationsOnPlot()
 {
-    removeRegionAnnotations();
-
-    if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::NO_ANNOTATIONS ) return;
-
-    if ( m_annotationTool == nullptr )
+    if ( !m_regionAnnotations )
     {
-        m_annotationTool = std::make_unique<RiuPlotAnnotationTool>();
+        m_regionAnnotations = std::make_unique<RimWellLogTrackRegionAnnotations>( this );
     }
-
-    if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS )
-    {
-        updateFormationNamesOnPlot();
-    }
-    else if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
-    {
-        updateResultPropertyNamesOnPlot();
-    }
-    else
-    {
-        updateCurveDataRegionsOnPlot();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::updateFormationNamesOnPlot()
-{
-    RimDepthTrackPlot* plot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-
-    RiaDefines::DepthUnitType fromDepthUnit = plot->caseDepthUnit();
-    RiaDefines::DepthUnitType toDepthUnit   = plot->depthUnit();
-
-    auto orientation = plot->depthOrientation();
-
-    if ( m_formationSource() == FormationSource::WELL_PICK_FILTER )
-    {
-        if ( m_formationWellPathForSourceWellPath == nullptr ) return;
-
-        if ( plot->depthType() != RiaDefines::DepthTypeEnum::MEASURED_DEPTH &&
-             plot->depthType() != RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH &&
-             plot->depthType() != RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-        {
-            return;
-        }
-
-        std::vector<double> yValues;
-
-        const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
-        if ( !formations ) return;
-
-        std::vector<QString> formationNamesToPlot;
-        formations->depthAndFormationNamesUpToLevel( m_formationLevel(),
-                                                     &formationNamesToPlot,
-                                                     &yValues,
-                                                     m_showformationFluids(),
-                                                     plot->depthType() );
-
-        if ( plot->depthType() == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-        {
-            for ( double& depthValue : yValues )
-            {
-                depthValue += m_formationWellPathForSourceWellPath->wellPathGeometry()->rkbDiff();
-            }
-        }
-
-        std::vector<double> convertedYValues = RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-        m_annotationTool->attachWellPicks( m_plotWidget->qwtPlot(), formationNamesToPlot, convertedYValues );
-    }
-    else
-    {
-        RimMainPlotCollection* mainPlotCollection = firstAncestorOrThisOfTypeAsserted<RimMainPlotCollection>();
-
-        RimWellLogPlotCollection* wellLogCollection = mainPlotCollection->wellLogPlotCollection();
-
-        CurveSamplingPointData curveData;
-
-        RigEclipseWellLogExtractor* eclWellLogExtractor     = nullptr;
-        RigGeoMechWellLogExtractor* geoMechWellLogExtractor = nullptr;
-
-        if ( m_formationTrajectoryType == SIMULATION_WELL )
-        {
-            eclWellLogExtractor = RimWellLogTrack::createSimWellExtractor( wellLogCollection,
-                                                                           m_formationCase,
-                                                                           m_formationSimWellName,
-                                                                           m_formationBranchIndex,
-                                                                           m_formationBranchDetection );
-        }
-        else
-        {
-            eclWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor( m_formationWellPathForSourceCase,
-                                                                                    dynamic_cast<RimEclipseCase*>( m_formationCase() ) );
-        }
-
-        if ( eclWellLogExtractor )
-        {
-            RimEclipseCase*             eclipseCase = dynamic_cast<RimEclipseCase*>( m_formationCase() );
-            cvf::ref<RigResultAccessor> resultAccessor =
-                RigResultAccessorFactory::createFromResultAddress( eclipseCase->eclipseCaseData(),
-                                                                   0,
-                                                                   RiaDefines::PorosityModelType::MATRIX_MODEL,
-                                                                   0,
-                                                                   RigEclipseResultAddress( RiaDefines::ResultCatType::FORMATION_NAMES,
-                                                                                            RiaResultNames::activeFormationNamesResultName() ) );
-
-            if ( resultAccessor.notNull() )
-            {
-                curveData = RimWellLogTrack::curveSamplingPointData( eclWellLogExtractor, resultAccessor.p() );
-            }
-        }
-        else
-        {
-            geoMechWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor( m_formationWellPathForSourceCase,
-                                                                                        dynamic_cast<RimGeoMechCase*>( m_formationCase() ) );
-            if ( !geoMechWellLogExtractor ) return;
-
-            std::string activeFormationNamesResultName = RiaResultNames::activeFormationNamesResultName().toStdString();
-            curveData =
-                RimWellLogTrack::curveSamplingPointData( geoMechWellLogExtractor,
-                                                         RigFemResultAddress( RIG_FORMATION_NAMES, activeFormationNamesResultName, "" ) );
-        }
-
-        if ( geoMechWellLogExtractor )
-        {
-            // Attach water and rock base formations
-
-            const caf::ColorTable                        waterAndRockColors = RiaColorTables::waterAndRockPaletteColors();
-            const std::vector<std::pair<double, double>> waterAndRockIntervals =
-                waterAndRockRegions( plot->depthType(), geoMechWellLogExtractor );
-
-            const std::vector<std::pair<double, double>> convertedYValues =
-                RiaWellLogUnitTools<double>::convertDepths( waterAndRockIntervals, fromDepthUnit, toDepthUnit );
-
-            m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                                  { "Sea Level", "" },
-                                                  orientation,
-                                                  convertedYValues,
-                                                  m_regionAnnotationDisplay(),
-                                                  waterAndRockColors,
-                                                  ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                                  m_showRegionLabels(),
-                                                  RiaDefines::TrackSpan::LEFT_COLUMN,
-                                                  { Qt::SolidPattern, Qt::Dense6Pattern } );
-        }
-
-        if ( m_formationSource == FormationSource::CASE && m_plotWidget )
-        {
-            if ( ( m_formationSimWellName == QString( "None" ) && m_formationWellPathForSourceCase == nullptr ) || m_formationCase == nullptr )
-                return;
-
-            std::vector<QString> formationNamesVector = RimWellLogTrack::formationNamesVector( m_formationCase );
-
-            if ( m_overburdenHeight > 0.0 )
-            {
-                addOverburden( formationNamesVector, curveData, m_overburdenHeight );
-            }
-
-            if ( m_underburdenHeight > 0.0 )
-            {
-                addUnderburden( formationNamesVector, curveData, m_underburdenHeight );
-            }
-
-            std::vector<std::pair<double, double>> yValues;
-
-            std::vector<QString> formationNamesToPlot;
-            RimWellLogTrack::findRegionNamesToPlot( curveData, formationNamesVector, plot->depthType(), &formationNamesToPlot, &yValues );
-
-            std::vector<std::pair<double, double>> convertedYValues =
-                RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-            caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
-            m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                                  formationNamesToPlot,
-                                                  orientation,
-                                                  convertedYValues,
-                                                  m_regionAnnotationDisplay(),
-                                                  colorTable,
-                                                  ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                                  m_showRegionLabels() );
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::updateResultPropertyNamesOnPlot()
-{
-    RimDepthTrackPlot* plot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-
-    RiaDefines::DepthUnitType fromDepthUnit = plot->caseDepthUnit();
-    RiaDefines::DepthUnitType toDepthUnit   = plot->depthUnit();
-
-    auto orientation = plot->depthOrientation();
-
-    RigEclipseWellLogExtractor* eclWellLogExtractor =
-        RiaExtractionTools::findOrCreateWellLogExtractor( m_formationWellPathForSourceCase, dynamic_cast<RimEclipseCase*>( m_formationCase() ) );
-
-    if ( !eclWellLogExtractor )
-    {
-        RiaLogging::error( "No well log extractor found for case." );
-        return;
-    }
-
-    RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( m_formationCase() );
-
-    m_resultDefinition->loadResult();
-
-    size_t                      m_timeStep = 0;
-    cvf::ref<RigResultAccessor> resultAccessor =
-        RigResultAccessorFactory::createFromResultDefinition( eclipseCase->eclipseCaseData(), 0, m_timeStep, m_resultDefinition );
-    if ( !resultAccessor.notNull() )
-    {
-        QString resultTypeStr = caf::AppEnum<RiaDefines::ResultCatType>( m_resultDefinition->resultType() ).uiText();
-        RiaLogging::error( QString( "Unable to find result for region annotation for '%1' track. Tried '%2' (%3) on case: '%4'" )
-                               .arg( m_description() )
-                               .arg( m_resultDefinition->resultVariable() )
-                               .arg( resultTypeStr )
-                               .arg( eclipseCase->caseUserDescription() ) );
-        return;
-    }
-
-    CurveSamplingPointData curveData = RimWellLogTrack::curveSamplingPointData( eclWellLogExtractor, resultAccessor.p() );
-
-    // Attach water and rock base formations
-
-    if ( m_formationSource == FormationSource::CASE )
-    {
-        if ( ( m_formationSimWellName == QString( "None" ) && m_formationWellPathForSourceCase == nullptr ) || m_formationCase == nullptr )
-            return;
-
-        std::vector<cvf::Color3ub> colors;
-
-        // Find the largest category number.
-        int maxCategoryValue = std::numeric_limits<int>::min();
-        for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
-        {
-            maxCategoryValue = std::max( maxCategoryValue, legendItem->categoryValue() );
-        }
-
-        // Insert each name at index matching the category number.
-        std::vector<QString> namesVector( maxCategoryValue + 1 );
-        for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
-        {
-            namesVector[legendItem->categoryValue()] = legendItem->categoryName();
-        }
-
-        if ( m_overburdenHeight > 0.0 )
-        {
-            addOverburden( namesVector, curveData, m_overburdenHeight );
-        }
-
-        if ( m_underburdenHeight > 0.0 )
-        {
-            addUnderburden( namesVector, curveData, m_underburdenHeight );
-        }
-
-        std::vector<QString>                   namesToPlot;
-        std::vector<std::pair<double, double>> yValues;
-        RimWellLogTrack::findRegionNamesToPlot( curveData, namesVector, plot->depthType(), &namesToPlot, &yValues );
-
-        // convert to plot depth unit
-        std::vector<std::pair<double, double>> convertedYValues =
-            RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-        // TODO: unnecessarily messy!
-        // Need to map colors to names (since a category can be used several times)
-        for ( QString nameToPlot : namesToPlot )
-        {
-            bool isFound = false;
-            for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
-            {
-                if ( legendItem->categoryName() == nameToPlot )
-                {
-                    colors.push_back( cvf::Color3ub( legendItem->color() ) );
-                    isFound = true;
-                }
-            }
-
-            if ( !isFound )
-            {
-                colors.push_back( cvf::Color3ub( RiaColorTables::undefinedCellColor() ) );
-            }
-        }
-
-        if ( colors.empty() )
-        {
-            RiaLogging::error( "No colors found." );
-            return;
-        }
-
-        caf::ColorTable colorTable( colors );
-
-        int fontSize = caf::FontTools::absolutePointSize( RiaPreferences::current()->defaultPlotFontSize(), m_regionLabelFontSize() );
-
-        m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                              namesToPlot,
-                                              orientation,
-                                              convertedYValues,
-                                              m_regionAnnotationDisplay(),
-                                              colorTable,
-                                              ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                              m_showRegionLabels(),
-                                              RiaDefines::TrackSpan::FULL_WIDTH,
-                                              {},
-                                              fontSize );
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::updateCurveDataRegionsOnPlot()
-{
-    RimWellBoreStabilityPlot* wellBoreStabilityPlot = firstAncestorOrThisOfType<RimWellBoreStabilityPlot>();
-    if ( wellBoreStabilityPlot )
-    {
-        RiaDefines::DepthUnitType fromDepthUnit = wellBoreStabilityPlot->caseDepthUnit();
-        RiaDefines::DepthUnitType toDepthUnit   = wellBoreStabilityPlot->depthUnit();
-
-        auto orientation = wellBoreStabilityPlot->depthOrientation();
-
-        wellBoreStabilityPlot->updateCommonDataSource();
-        RimGeoMechCase* geoMechCase = dynamic_cast<RimGeoMechCase*>( wellBoreStabilityPlot->commonDataSource()->caseToApply() );
-        RimWellPath*    wellPath    = wellBoreStabilityPlot->commonDataSource()->wellPathToApply();
-        int             timeStep    = wellBoreStabilityPlot->commonDataSource()->timeStepToApply();
-        if ( geoMechCase && wellPath && timeStep >= 0 )
-        {
-            auto [stepIdx, frameIdx] = geoMechCase->geoMechData()->femPartResults()->stepListIndexToTimeStepAndDataFrameIndex( timeStep );
-
-            RigGeoMechWellLogExtractor* geoMechWellLogExtractor = nullptr;
-            geoMechWellLogExtractor =
-                RiaExtractionTools::findOrCreateWellLogExtractor( wellPath, dynamic_cast<RimGeoMechCase*>( geoMechCase ) );
-            if ( !geoMechWellLogExtractor ) return;
-
-            CurveSamplingPointData curveData;
-            curveData.md  = geoMechWellLogExtractor->cellIntersectionMDs();
-            curveData.tvd = geoMechWellLogExtractor->cellIntersectionTVDs();
-
-            RimWellLogExtractionCurve::findAndLoadWbsParametersFromFiles( wellPath, geoMechWellLogExtractor );
-            RimWellBoreStabilityPlot* wbsPlot = firstAncestorOrThisOfType<RimWellBoreStabilityPlot>();
-            if ( wbsPlot )
-            {
-                wbsPlot->applyWbsParametersToExtractor( geoMechWellLogExtractor );
-            }
-
-            std::vector<double> ppSourceRegions      = geoMechWellLogExtractor->porePressureSourceRegions( stepIdx, frameIdx );
-            std::vector<double> poissonSourceRegions = geoMechWellLogExtractor->poissonSourceRegions( stepIdx, frameIdx );
-            std::vector<double> ucsSourceRegions     = geoMechWellLogExtractor->ucsSourceRegions( stepIdx, frameIdx );
-
-            {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
-
-                std::vector<QString> sourceNames =
-                    RigWbsParameter::PP_Reservoir().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::PP_NonReservoir() ) );
-                curveData.data = ppSourceRegions;
-
-                std::vector<QString>                   sourceNamesToPlot;
-                std::vector<std::pair<double, double>> yValues;
-                RimWellLogTrack::findRegionNamesToPlot( curveData, sourceNames, wellBoreStabilityPlot->depthType(), &sourceNamesToPlot, &yValues );
-
-                // convert to plot depth unit
-                std::vector<std::pair<double, double>> convertedYValues =
-                    RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-                m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                                      sourceNamesToPlot,
-                                                      orientation,
-                                                      convertedYValues,
-                                                      m_regionAnnotationDisplay(),
-                                                      colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
-                                                      RiaDefines::TrackSpan::LEFT_COLUMN );
-            }
-            {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
-
-                std::vector<QString> sourceNames =
-                    RigWbsParameter::poissonRatio().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::poissonRatio() ) );
-                curveData.data = poissonSourceRegions;
-
-                std::vector<QString>                   sourceNamesToPlot;
-                std::vector<std::pair<double, double>> yValues;
-                RimWellLogTrack::findRegionNamesToPlot( curveData, sourceNames, wellBoreStabilityPlot->depthType(), &sourceNamesToPlot, &yValues );
-
-                // convert to plot depth unit
-                std::vector<std::pair<double, double>> convertedYValues =
-                    RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-                m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                                      sourceNamesToPlot,
-                                                      orientation,
-                                                      convertedYValues,
-                                                      m_regionAnnotationDisplay(),
-                                                      colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
-                                                      RiaDefines::TrackSpan::CENTRE_COLUMN );
-            }
-            {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
-
-                std::vector<QString> sourceNames =
-                    RigWbsParameter::UCS().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::UCS() ) );
-
-                curveData.data = ucsSourceRegions;
-
-                std::vector<QString>                   sourceNamesToPlot;
-                std::vector<std::pair<double, double>> yValues;
-                RimWellLogTrack::findRegionNamesToPlot( curveData, sourceNames, wellBoreStabilityPlot->depthType(), &sourceNamesToPlot, &yValues );
-
-                // convert to plot depth unit
-                std::vector<std::pair<double, double>> convertedYValues =
-                    RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
-
-                m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
-                                                      sourceNamesToPlot,
-                                                      orientation,
-                                                      convertedYValues,
-                                                      m_regionAnnotationDisplay(),
-                                                      colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
-                                                      RiaDefines::TrackSpan::RIGHT_COLUMN );
-            }
-        }
-    }
+    m_regionAnnotations->updateRegionAnnotationsOnPlot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -3348,9 +2730,9 @@ void RimWellLogTrack::updateWellPathAttributesOnPlot()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::removeRegionAnnotations()
 {
-    if ( m_annotationTool )
+    if ( m_regionAnnotations )
     {
-        m_annotationTool->detachAllAnnotations();
+        m_regionAnnotations->removeRegionAnnotations();
     }
 }
 
@@ -3393,25 +2775,97 @@ void RimWellLogTrack::setUnderburdenHeight( double underburdenHeight )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+double RimWellLogTrack::overburdenHeight() const
+{
+    return m_overburdenHeight;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimWellLogTrack::underburdenHeight() const
+{
+    return m_underburdenHeight;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellLogTrack::FormationSource RimWellLogTrack::formationSource() const
+{
+    return m_formationSource();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellPath* RimWellLogTrack::formationWellPathForSourceWellPath() const
+{
+    return m_formationWellPathForSourceWellPath;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RigWellPathFormations::FormationLevel RimWellLogTrack::formationLevel() const
+{
+    return m_formationLevel();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::showFormationFluids() const
+{
+    return m_showformationFluids;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+int RimWellLogTrack::colorShadingTransparency() const
+{
+    return m_colorShadingTransparency;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::showRegionLabels() const
+{
+    return m_showRegionLabels;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimColorLegend* RimWellLogTrack::colorShadingLegend() const
+{
+    return m_colorShadingLegend;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimEclipseResultDefinition* RimWellLogTrack::resultDefinition() const
+{
+    return m_resultDefinition;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::FontTools::RelativeSize RimWellLogTrack::regionLabelFontSize() const
+{
+    return m_regionLabelFontSize();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::addOverburden( std::vector<QString>& namesVector, CurveSamplingPointData& curveData, double height )
 {
-    if ( !curveData.data.empty() )
-    {
-        namesVector.push_back( "Overburden" );
-
-        // Prepend the new "fake" depth for start of overburden
-        double tvdTop = curveData.tvd[0];
-        curveData.tvd.insert( curveData.tvd.begin(), tvdTop );
-        curveData.tvd.insert( curveData.tvd.begin(), tvdTop - height );
-
-        // TODO: this is not always correct
-        double mdTop = curveData.md[0];
-        curveData.md.insert( curveData.md.begin(), mdTop );
-        curveData.md.insert( curveData.md.begin(), mdTop - height );
-
-        curveData.data.insert( curveData.data.begin(), namesVector.size() - 1 );
-        curveData.data.insert( curveData.data.begin(), namesVector.size() - 1 );
-    }
+    RimWellLogTrackTools::addOverburden( namesVector, curveData, height );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -3419,25 +2873,7 @@ void RimWellLogTrack::addOverburden( std::vector<QString>& namesVector, CurveSam
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::addUnderburden( std::vector<QString>& namesVector, CurveSamplingPointData& curveData, double height )
 {
-    if ( !curveData.data.empty() )
-    {
-        namesVector.push_back( "Underburden" );
-
-        size_t lastIndex = curveData.tvd.size() - 1;
-
-        // Append the new "fake" depth for start of underburden
-        double tvdBottom = curveData.tvd[lastIndex];
-        curveData.tvd.push_back( tvdBottom );
-        curveData.tvd.push_back( tvdBottom + height );
-
-        // TODO: this is not always correct
-        double mdBottom = curveData.md[lastIndex];
-        curveData.md.push_back( mdBottom );
-        curveData.md.push_back( mdBottom + height );
-
-        curveData.data.push_back( namesVector.size() - 1 );
-        curveData.data.push_back( namesVector.size() - 1 );
-    }
+    RimWellLogTrackTools::addUnderburden( namesVector, curveData, height );
 }
 
 //--------------------------------------------------------------------------------------------------
