@@ -21,7 +21,9 @@
 
 #include "RimWellLogTrackPropertyAxis.h"
 #include "RimWellLogTrackRegionAnnotations.h"
+#include "RimWellLogTrackStackedCurves.h"
 #include "RimWellLogTrackTools.h"
+#include "RimWellLogTrackWellPathComponents.h"
 
 #include "RiaColorTables.h"
 #include "RiaExtractionTools.h"
@@ -290,7 +292,9 @@ RimWellLogTrack::RimWellLogTrack()
 
     m_formationsForCaseWithSimWellOnly = false;
 
-    m_propertyAxis = std::make_unique<RimWellLogTrackPropertyAxis>( this );
+    m_propertyAxis       = std::make_unique<RimWellLogTrackPropertyAxis>( this );
+    m_stackedCurves      = std::make_unique<RimWellLogTrackStackedCurves>( this );
+    m_wellPathComponents = std::make_unique<RimWellLogTrackWellPathComponents>( this );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -301,6 +305,8 @@ RimWellLogTrack::~RimWellLogTrack()
     m_curves.deleteChildren();
     m_regionAnnotations.reset();
     m_propertyAxis.reset();
+    m_stackedCurves.reset();
+    m_wellPathComponents.reset();
 
     deleteViewWidget();
 }
@@ -351,10 +357,7 @@ void RimWellLogTrack::detachAllPlotItems()
     {
         curve->detach();
     }
-    for ( auto& plotObjects : m_wellPathAttributePlotObjects )
-    {
-        plotObjects->detachFromQwt();
-    }
+    m_wellPathComponents->detachAllPlotItems();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -394,21 +397,18 @@ void RimWellLogTrack::calculateDepthZoomRange()
 
     if ( m_showWellPathAttributes || m_showWellPathCompletions )
     {
-        for ( const std::unique_ptr<RiuWellPathComponentPlotItem>& plotObject : m_wellPathAttributePlotObjects )
+        double minObjectDepth = HUGE_VAL;
+        double maxObjectDepth = -HUGE_VAL;
+        if ( m_wellPathComponents->depthValueRange( &minObjectDepth, &maxObjectDepth ) )
         {
-            double minObjectDepth = HUGE_VAL;
-            double maxObjectDepth = -HUGE_VAL;
-            if ( plotObject->depthValueRange( &minObjectDepth, &maxObjectDepth ) )
+            if ( minObjectDepth < minDepth )
             {
-                if ( minObjectDepth < minDepth )
-                {
-                    minDepth = minObjectDepth;
-                }
+                minDepth = minObjectDepth;
+            }
 
-                if ( maxObjectDepth > maxDepth )
-                {
-                    maxDepth = maxObjectDepth;
-                }
+            if ( maxObjectDepth > maxDepth )
+            {
+                maxDepth = maxObjectDepth;
             }
         }
     }
@@ -728,147 +728,7 @@ void RimWellLogTrack::updateLegend()
 //--------------------------------------------------------------------------------------------------
 QString RimWellLogTrack::asciiDataForPlotExport() const
 {
-    QString out = "\n" + description() + "\n";
-
-    std::vector<QString>             curveNames;
-    std::vector<double>              curveDepths;
-    std::vector<std::vector<double>> curvesPlotXValues;
-
-    auto depthType             = parentWellLogPlot()->depthType();
-    auto depthUnit             = parentWellLogPlot()->depthUnit();
-    bool isWellAllocInflowPlot = false;
-    {
-        auto wapl = parentWellLogPlot()->firstAncestorOfType<RimWellAllocationPlot>();
-        if ( wapl )
-        {
-            isWellAllocInflowPlot = ( wapl->flowType() == RimWellAllocationPlot::INFLOW );
-        }
-    }
-
-    RiaWellLogCurveMerger curveMerger;
-    bool                  foundNonMatchingDepths = false;
-
-    for ( RimWellLogCurve* curve : m_curves() )
-    {
-        if ( !curve->isChecked() ) continue;
-
-        const RigWellLogCurveData* curveData = curve->curveData();
-        if ( !curveData ) continue;
-        curveNames.push_back( curve->curveName() );
-
-        if ( curveNames.size() == 1 )
-        {
-            curveDepths = curveData->depthValuesByIntervals( depthType, depthUnit );
-        }
-
-        std::vector<double> xPlotValues = curveData->propertyValuesByIntervals();
-        if ( xPlotValues.empty() )
-        {
-            curveNames.pop_back();
-
-            if ( curveNames.empty() )
-            {
-                curveDepths.clear();
-            }
-            continue;
-        }
-
-        if ( curveDepths.size() != xPlotValues.size() )
-        {
-            foundNonMatchingDepths = true;
-        }
-
-        std::vector<double> depths = curveData->depthValuesByIntervals( depthType, depthUnit );
-        curveMerger.addCurveData( depths, xPlotValues );
-
-        curvesPlotXValues.push_back( xPlotValues );
-    }
-
-    // Header
-
-    if ( depthType == RiaDefines::DepthTypeEnum::CONNECTION_NUMBER )
-    {
-        out += "Connection";
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::MEASURED_DEPTH )
-    {
-        out += "MD   ";
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::PSEUDO_LENGTH )
-    {
-        out += "PL   ";
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH )
-    {
-        out += "TVDMSL  ";
-    }
-    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
-    {
-        out += "TVDRKB  ";
-    }
-
-    for ( QString name : curveNames )
-    {
-        out += "  \t" + name;
-    }
-    out += "\n";
-
-    // Resample when curves have different depth
-    if ( foundNonMatchingDepths )
-    {
-        curvesPlotXValues.clear();
-        curveDepths.clear();
-
-        curveMerger.computeLookupValues();
-
-        const std::vector<double>& allDepths = curveMerger.allXValues();
-        curveDepths                          = allDepths;
-        for ( size_t curveIdx = 0; curveIdx < curveMerger.curveCount(); ++curveIdx )
-        {
-            const std::vector<double>& curveValues = curveMerger.lookupYValuesForAllXValues( curveIdx );
-            curvesPlotXValues.push_back( curveValues );
-        }
-    }
-
-    for ( size_t dIdx = 0; dIdx < curveDepths.size(); ++dIdx )
-    {
-        size_t i          = dIdx;
-        double curveDepth = curveDepths[i];
-
-        if ( depthType == RiaDefines::DepthTypeEnum::CONNECTION_NUMBER )
-        {
-            if ( dIdx == 0 )
-                continue; // Skip the first line. (shallow depth, which is last)
-                          // as it is a fictitious value added to make
-                          // the plot easier to read
-
-            i = curveDepths.size() - 1 - dIdx; // Reverse the order, since the connections are coming bottom to top
-
-            if ( i == 0 )
-            {
-                if ( curveDepths.size() > 1 && curveDepths[i] == curveDepths[i + 1] )
-                {
-                    continue; // Skip double depth at last connection
-                }
-            }
-
-            curveDepth = curveDepths[i];
-
-            if ( isWellAllocInflowPlot )
-            {
-                curveDepth -= 0.5; // To shift the values that was shifted to get the numbers between the changes
-            }
-        }
-
-        out += QString::number( curveDepth, 'f', 3 );
-        for ( std::vector<double> plotVector : curvesPlotXValues )
-        {
-            out += QString( " \t%1" ).arg( QString::number( plotVector[i], 'f', 3 ), 12 );
-        }
-        out += "\n";
-    }
-
-    return out;
+    return RimWellLogTrackTools::asciiDataForPlotExport( description(), parentWellLogPlot(), m_curves.childrenByType() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1525,10 +1385,7 @@ void RimWellLogTrack::reattachAllCurves()
         curve->reattach();
     }
 
-    for ( auto& plotObjects : m_wellPathAttributePlotObjects )
-    {
-        plotObjects->reattachToQwt();
-    }
+    m_wellPathComponents->reattachAllPlotItems();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1966,16 +1823,7 @@ std::pair<double, double> RimWellLogTrack::extendMinMaxRange( double minValue, d
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateWellPathAttributesCollection()
 {
-    m_wellPathAttributeCollection = nullptr;
-    if ( m_wellPathComponentSource )
-    {
-        std::vector<RimWellPathAttributeCollection*> attributeCollection =
-            m_wellPathComponentSource->descendantsIncludingThisOfType<RimWellPathAttributeCollection>();
-        if ( !attributeCollection.empty() )
-        {
-            m_wellPathAttributeCollection = attributeCollection.front();
-        }
-    }
+    m_wellPathComponents->updateWellPathAttributesCollection();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2070,24 +1918,7 @@ bool RimWellLogTrack::isLogarithmicScale() const
 //--------------------------------------------------------------------------------------------------
 std::map<int, std::vector<RimWellLogCurve*>> RimWellLogTrack::visibleStackedCurves()
 {
-    std::map<int, std::vector<RimWellLogCurve*>> stackedCurves;
-    for ( RimWellLogCurve* curve : m_curves )
-    {
-        if ( curve && curve->isChecked() )
-        {
-            RimWellFlowRateCurve* wfrCurve = dynamic_cast<RimWellFlowRateCurve*>( curve );
-            if ( wfrCurve != nullptr ) // Flow rate curves are always stacked
-            {
-                stackedCurves[wfrCurve->groupId()].push_back( wfrCurve );
-            }
-            else if ( curve->isStacked() )
-            {
-                stackedCurves[-1].push_back( curve );
-            }
-        }
-    }
-
-    return stackedCurves;
+    return m_stackedCurves->visibleStackedCurves();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2238,111 +2069,7 @@ std::vector<QString> RimWellLogTrack::formationNamesVector( RimCase* rimCase )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateStackedCurveData()
 {
-    // See RimSummaryPlot::updateStackedCurveDataForAxis() horizontal plots
-
-    RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-
-    RimWellLogPlot::DepthTypeEnum depthType   = wellLogPlot->depthType();
-    RiaDefines::DepthUnitType     displayUnit = wellLogPlot->depthUnit();
-    if ( depthType == RiaDefines::DepthTypeEnum::CONNECTION_NUMBER )
-    {
-        displayUnit = RiaDefines::DepthUnitType::UNIT_NONE;
-    }
-
-    std::map<RiaDefines::PhaseType, size_t> curvePhaseCount;
-
-    // Stack the curves that are meant to be stacked
-    std::map<int, std::vector<RimWellLogCurve*>> stackedCurves = visibleStackedCurves();
-
-    // Reset all stacked curves
-    for ( auto groupCurvePair : stackedCurves )
-    {
-        const std::vector<RimWellLogCurve*>& stackedCurvesInGroup = groupCurvePair.second;
-        for ( auto curve : stackedCurvesInGroup )
-        {
-            curve->loadDataAndUpdate( false );
-            curvePhaseCount[curve->phaseType()]++;
-        }
-    }
-
-    for ( auto groupCurvePair : stackedCurves )
-    {
-        int                                  groupId              = groupCurvePair.first;
-        const std::vector<RimWellLogCurve*>& stackedCurvesInGroup = groupCurvePair.second;
-        if ( stackedCurvesInGroup.empty() ) continue;
-
-        // Z-position of curve, to draw them in correct order
-        double zPos = -10000.0 + 100.0 * static_cast<double>( groupId );
-
-        // We use the depths from the curve with the largest depth range.
-        // Trying to merge them is difficult since they may not be in order.
-        std::pair<double, double> maxDepthRange;
-        std::vector<double>       allDepthValues;
-
-        for ( auto curve : stackedCurvesInGroup )
-        {
-            auto depths = curve->curveData()->depths( depthType );
-            if ( depths.empty() ) continue;
-
-            if ( allDepthValues.empty() )
-            {
-                auto minmaxit = std::minmax_element( depths.begin(), depths.end() );
-                maxDepthRange = std::make_pair( *minmaxit.first, *minmaxit.second );
-                allDepthValues.insert( allDepthValues.end(), depths.begin(), depths.end() );
-            }
-            else
-            {
-                auto                      minmaxit   = std::minmax_element( depths.begin(), depths.end() );
-                std::pair<double, double> depthRange = std::make_pair( *minmaxit.first, *minmaxit.second );
-                if ( std::fabs( depthRange.second - depthRange.first ) > std::fabs( maxDepthRange.second - maxDepthRange.first ) )
-                {
-                    maxDepthRange  = depthRange;
-                    allDepthValues = depths;
-                }
-            }
-        }
-
-        if ( allDepthValues.empty() ) continue;
-
-        size_t              stackIndex = 0u;
-        std::vector<double> allStackedValues( allDepthValues.size(), 0.0 );
-        for ( auto curve : stackedCurvesInGroup )
-        {
-            auto interpolatedCurveValues = curve->curveData()->calculateResampledCurveData( depthType, allDepthValues );
-            auto xValues                 = interpolatedCurveValues->propertyValues();
-            for ( size_t i = 0; i < xValues.size(); ++i )
-            {
-                if ( xValues[i] != HUGE_VAL )
-                {
-                    allStackedValues[i] += xValues[i];
-                }
-            }
-
-            RigWellLogCurveData tempCurveData;
-            tempCurveData.setValuesAndDepths( allStackedValues, allDepthValues, depthType, 0.0, displayUnit, false, m_isPropertyLogarithmicScaleEnabled );
-
-            auto plotDepthValues          = tempCurveData.depths( depthType );
-            auto polyLineStartStopIndices = tempCurveData.polylineStartStopIndices();
-
-            curve->setOverrideCurveData( allStackedValues, plotDepthValues, polyLineStartStopIndices );
-            curve->setZOrder( zPos );
-
-            if ( !dynamic_cast<RimWellFlowRateCurve*>( curve ) )
-            {
-                // Apply a area filled style if it isn't already set
-                if ( curve->fillStyle() == Qt::NoBrush )
-                {
-                    curve->setFillStyle( Qt::SolidPattern );
-                }
-
-                if ( curve->isStackedWithPhaseColors() )
-                {
-                    curve->assignStackColor( stackIndex, curvePhaseCount[curve->phaseType()] );
-                }
-            }
-            zPos -= 1.0;
-        }
-    }
+    m_stackedCurves->updateStackedCurveData();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2381,87 +2108,7 @@ void RimWellLogTrack::updateRegionAnnotationsOnPlot()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateWellPathAttributesOnPlot()
 {
-    m_wellPathAttributePlotObjects.clear();
-
-    if ( wellPathAttributeSource() )
-    {
-        std::vector<const RimWellPathComponentInterface*> allWellPathComponents;
-
-        if ( wellPathAttributeSource()->wellPathGeometry() && ( m_showWellPathAttributes || m_showWellPathCompletions ) )
-        {
-            m_wellPathAttributePlotObjects.push_back( std::make_unique<RiuWellPathComponentPlotItem>( wellPathAttributeSource() ) );
-        }
-
-        if ( m_showWellPathAttributes )
-        {
-            if ( m_wellPathAttributeCollection )
-            {
-                std::vector<RimWellPathAttribute*> attributes = m_wellPathAttributeCollection->attributes();
-                for ( const RimWellPathAttribute* attribute : attributes )
-                {
-                    if ( attribute->isEnabled() )
-                    {
-                        allWellPathComponents.push_back( attribute );
-                    }
-                }
-            }
-        }
-        if ( m_showWellPathCompletions )
-        {
-            const RimWellPathCompletions*                     completionsCollection = wellPathAttributeSource()->completions();
-            std::vector<const RimWellPathComponentInterface*> allCompletions        = completionsCollection->allCompletions();
-
-            for ( const RimWellPathComponentInterface* completion : allCompletions )
-            {
-                if ( completion->isEnabled() )
-                {
-                    allWellPathComponents.push_back( completion );
-                }
-            }
-        }
-
-        const std::map<RiaDefines::WellPathComponentType, int> sortIndices = { { RiaDefines::WellPathComponentType::WELL_PATH, 0 },
-                                                                               { RiaDefines::WellPathComponentType::CASING, 1 },
-                                                                               { RiaDefines::WellPathComponentType::LINER, 2 },
-                                                                               { RiaDefines::WellPathComponentType::PERFORATION_INTERVAL, 3 },
-                                                                               { RiaDefines::WellPathComponentType::FISHBONES, 4 },
-                                                                               { RiaDefines::WellPathComponentType::FRACTURE, 5 },
-                                                                               { RiaDefines::WellPathComponentType::PACKER, 6 },
-                                                                               { RiaDefines::WellPathComponentType::ICD, 7 },
-                                                                               { RiaDefines::WellPathComponentType::AICD, 8 },
-                                                                               { RiaDefines::WellPathComponentType::ICV, 9 },
-                                                                               { RiaDefines::WellPathComponentType::MSW_SEGMENT, 10 } };
-
-        std::stable_sort( allWellPathComponents.begin(),
-                          allWellPathComponents.end(),
-                          [&sortIndices]( const RimWellPathComponentInterface* lhs, const RimWellPathComponentInterface* rhs )
-                          { return sortIndices.at( lhs->componentType() ) < sortIndices.at( rhs->componentType() ); } );
-
-        std::set<QString> completionsAssignedToLegend;
-        for ( const RimWellPathComponentInterface* component : allWellPathComponents )
-        {
-            std::unique_ptr<RiuWellPathComponentPlotItem> plotItem( new RiuWellPathComponentPlotItem( wellPathAttributeSource(), component ) );
-            QString legendTitle        = plotItem->legendTitle();
-            bool    contributeToLegend = m_wellPathCompletionsInLegend() && !completionsAssignedToLegend.count( legendTitle );
-            plotItem->setContributeToLegend( contributeToLegend );
-            m_wellPathAttributePlotObjects.push_back( std::move( plotItem ) );
-            completionsAssignedToLegend.insert( legendTitle );
-        }
-
-        RimDepthTrackPlot*            wellLogPlot      = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-        RimWellLogPlot::DepthTypeEnum depthType        = wellLogPlot->depthType();
-        auto                          depthOrientation = wellLogPlot->depthOrientation();
-
-        for ( auto& attributePlotObject : m_wellPathAttributePlotObjects )
-        {
-            attributePlotObject->setDepthType( depthType );
-            attributePlotObject->setDepthOrientation( depthOrientation );
-            attributePlotObject->setShowLabel( m_showWellPathComponentLabels() );
-            attributePlotObject->loadDataAndUpdate( false );
-            attributePlotObject->setParentPlotNoReplot( m_plotWidget->qwtPlot() );
-        }
-    }
-    updatePropertyValueZoom();
+    m_wellPathComponents->updateWellPathAttributesOnPlot();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2739,4 +2386,36 @@ bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
 {
     return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
            1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::showWellPathCompletions() const
+{
+    return m_showWellPathCompletions();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::wellPathCompletionsInLegend() const
+{
+    return m_wellPathCompletionsInLegend();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellPathAttributeCollection* RimWellLogTrack::wellPathAttributeCollection() const
+{
+    return m_wellPathAttributeCollection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellLogTrack::setWellPathAttributeCollection( RimWellPathAttributeCollection* attributeCollection )
+{
+    m_wellPathAttributeCollection = attributeCollection;
 }

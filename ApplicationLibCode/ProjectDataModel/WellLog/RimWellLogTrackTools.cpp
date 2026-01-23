@@ -32,9 +32,16 @@
 #include "Well/RigWellPath.h"
 
 #include "RimCase.h"
+#include "RimDepthTrackPlot.h"
 #include "RimEclipseCase.h"
 #include "RimGeoMechCase.h"
+#include "RimWellAllocationPlot.h"
+#include "RimWellLogCurve.h"
 #include "RimWellLogPlotCollection.h"
+
+#include "RiaWellLogCurveMerger.h"
+
+#include "Well/RigWellLogCurveData.h"
 
 #include "cafPdmUiItem.h"
 
@@ -324,4 +331,154 @@ std::pair<double, double> RimWellLogTrackTools::extendMinMaxRange( double minVal
     }
 
     return { modifiedMin, modifiedMax };
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimWellLogTrackTools::asciiDataForPlotExport( const QString&                       trackDescription,
+                                                       RimDepthTrackPlot*                   depthTrackPlot,
+                                                       const std::vector<RimWellLogCurve*>& curves )
+{
+    QString out = "\n" + trackDescription + "\n";
+
+    std::vector<QString>             curveNames;
+    std::vector<double>              curveDepths;
+    std::vector<std::vector<double>> curvesPlotXValues;
+
+    auto depthType             = depthTrackPlot->depthType();
+    auto depthUnit             = depthTrackPlot->depthUnit();
+    bool isWellAllocInflowPlot = false;
+    {
+        auto wapl = depthTrackPlot->firstAncestorOfType<RimWellAllocationPlot>();
+        if ( wapl )
+        {
+            isWellAllocInflowPlot = ( wapl->flowType() == RimWellAllocationPlot::INFLOW );
+        }
+    }
+
+    RiaWellLogCurveMerger curveMerger;
+    bool                  foundNonMatchingDepths = false;
+
+    for ( RimWellLogCurve* curve : curves )
+    {
+        if ( !curve->isChecked() ) continue;
+
+        const RigWellLogCurveData* curveData = curve->curveData();
+        if ( !curveData ) continue;
+        curveNames.push_back( curve->curveName() );
+
+        if ( curveNames.size() == 1 )
+        {
+            curveDepths = curveData->depthValuesByIntervals( depthType, depthUnit );
+        }
+
+        std::vector<double> xPlotValues = curveData->propertyValuesByIntervals();
+        if ( xPlotValues.empty() )
+        {
+            curveNames.pop_back();
+
+            if ( curveNames.empty() )
+            {
+                curveDepths.clear();
+            }
+            continue;
+        }
+
+        if ( curveDepths.size() != xPlotValues.size() )
+        {
+            foundNonMatchingDepths = true;
+        }
+
+        std::vector<double> depths = curveData->depthValuesByIntervals( depthType, depthUnit );
+        curveMerger.addCurveData( depths, xPlotValues );
+
+        curvesPlotXValues.push_back( xPlotValues );
+    }
+
+    // Header
+
+    if ( depthType == RiaDefines::DepthTypeEnum::CONNECTION_NUMBER )
+    {
+        out += "Connection";
+    }
+    else if ( depthType == RiaDefines::DepthTypeEnum::MEASURED_DEPTH )
+    {
+        out += "MD   ";
+    }
+    else if ( depthType == RiaDefines::DepthTypeEnum::PSEUDO_LENGTH )
+    {
+        out += "PL   ";
+    }
+    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH )
+    {
+        out += "TVDMSL  ";
+    }
+    else if ( depthType == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
+    {
+        out += "TVDRKB  ";
+    }
+
+    for ( QString name : curveNames )
+    {
+        out += "  \t" + name;
+    }
+    out += "\n";
+
+    // Resample when curves have different depth
+    if ( foundNonMatchingDepths )
+    {
+        curvesPlotXValues.clear();
+        curveDepths.clear();
+
+        curveMerger.computeLookupValues();
+
+        const std::vector<double>& allDepths = curveMerger.allXValues();
+        curveDepths                          = allDepths;
+        for ( size_t curveIdx = 0; curveIdx < curveMerger.curveCount(); ++curveIdx )
+        {
+            const std::vector<double>& curveValues = curveMerger.lookupYValuesForAllXValues( curveIdx );
+            curvesPlotXValues.push_back( curveValues );
+        }
+    }
+
+    for ( size_t dIdx = 0; dIdx < curveDepths.size(); ++dIdx )
+    {
+        size_t i          = dIdx;
+        double curveDepth = curveDepths[i];
+
+        if ( depthType == RiaDefines::DepthTypeEnum::CONNECTION_NUMBER )
+        {
+            if ( dIdx == 0 )
+                continue; // Skip the first line. (shallow depth, which is last)
+                          // as it is a fictitious value added to make
+                          // the plot easier to read
+
+            i = curveDepths.size() - 1 - dIdx; // Reverse the order, since the connections are coming bottom to top
+
+            if ( i == 0 )
+            {
+                if ( curveDepths.size() > 1 && curveDepths[i] == curveDepths[i + 1] )
+                {
+                    continue; // Skip double depth at last connection
+                }
+            }
+
+            curveDepth = curveDepths[i];
+
+            if ( isWellAllocInflowPlot )
+            {
+                curveDepth -= 0.5; // To shift the values that was shifted to get the numbers between the changes
+            }
+        }
+
+        out += QString::number( curveDepth, 'f', 3 );
+        for ( std::vector<double> plotVector : curvesPlotXValues )
+        {
+            out += QString( " \t%1" ).arg( QString::number( plotVector[i], 'f', 3 ), 12 );
+        }
+        out += "\n";
+    }
+
+    return out;
 }

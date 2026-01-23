@@ -37,6 +37,8 @@ class RigGeoMechWellLogExtractor;
 class RigResultAccessor;
 class RigFemResultAddress;
 class RimCase;
+class RimDepthTrackPlot;
+class RimWellLogCurve;
 class RimWellLogPlotCollection;
 
 struct CurveSamplingPointData;
@@ -72,4 +74,9 @@ public:
     // Axis range utility functions
     static std::pair<double, double> adjustXRange( double minValue, double maxValue, double tickInterval );
     static std::pair<double, double> extendMinMaxRange( double minValue, double maxValue, double factor );
+
+    // ASCII export
+    static QString asciiDataForPlotExport( const QString&                        trackDescription,
+                                           RimDepthTrackPlot*                    depthTrackPlot,
+                                           const std::vector<RimWellLogCurve*>& curves );
 };

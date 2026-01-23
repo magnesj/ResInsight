@@ -17,6 +17,8 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPlot.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrack.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackPropertyAxis.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackStackedCurves.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackWellPathComponents.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackRegionAnnotations.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogLasCurve.h
@@ -46,6 +48,8 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPlot.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrack.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackPropertyAxis.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackStackedCurves.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackWellPathComponents.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrackRegionAnnotations.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogCurve.cpp

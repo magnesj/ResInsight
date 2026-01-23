@@ -61,6 +61,8 @@ class RimEnsembleWellLogCurveSet;
 class RiuPlotAnnotationTool;
 class RimWellLogTrackRegionAnnotations;
 class RimWellLogTrackPropertyAxis;
+class RimWellLogTrackStackedCurves;
+class RimWellLogTrackWellPathComponents;
 
 //--------------------------------------------------------------------------------------------------
 /// Data structure for curve sampling points
@@ -226,6 +228,14 @@ public:
     RiuPlotAxis depthAxis() const;
     RiuPlotAxis valueAxis() const;
 
+    // Well path component accessors for helper class
+    bool                            showWellPathCompletions() const;
+    bool                            wellPathCompletionsInLegend() const;
+    RimWellPathAttributeCollection* wellPathAttributeCollection() const;
+    void                            setWellPathAttributeCollection( RimWellPathAttributeCollection* attributeCollection );
+
+    void updatePropertyValueZoom();
+
     std::map<int, std::vector<RimWellLogCurve*>> visibleStackedCurves();
 
     std::vector<RimWellLogCurve*> curves() const;
@@ -285,8 +295,6 @@ private:
     void detachAllPlotItems();
     void calculatePropertyValueZoomRange();
     void calculateDepthZoomRange();
-
-    void updatePropertyValueZoom();
     void updateDepthZoom();
 
     int axisFontSize() const;
@@ -389,13 +397,13 @@ private:
 
     caf::PdmField<bool> m_autoCheckStateBasedOnCurveData;
 
-    std::vector<std::unique_ptr<RiuWellPathComponentPlotItem>> m_wellPathAttributePlotObjects;
-
     bool m_formationsForCaseWithSimWellOnly;
 
-    QPointer<RiuWellLogTrack>                          m_plotWidget;
-    std::unique_ptr<RimWellLogTrackRegionAnnotations> m_regionAnnotations;
-    std::unique_ptr<RimWellLogTrackPropertyAxis>      m_propertyAxis;
+    QPointer<RiuWellLogTrack>                             m_plotWidget;
+    std::unique_ptr<RimWellLogTrackRegionAnnotations>    m_regionAnnotations;
+    std::unique_ptr<RimWellLogTrackPropertyAxis>         m_propertyAxis;
+    std::unique_ptr<RimWellLogTrackStackedCurves>        m_stackedCurves;
+    std::unique_ptr<RimWellLogTrackWellPathComponents>   m_wellPathComponents;
 
     QString m_propertyValueAxisTitle;
     double  m_availablePropertyValueRangeMin;
