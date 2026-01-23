@@ -19,6 +19,7 @@
 
 #include "RimWellLogTrack.h"
 
+#include "RimWellLogTrackPropertyAxis.h"
 #include "RimWellLogTrackRegionAnnotations.h"
 #include "RimWellLogTrackTools.h"
 
@@ -288,6 +289,8 @@ RimWellLogTrack::RimWellLogTrack()
     CAF_PDM_InitFieldNoDefault( &m_ensembleWellLogCurveSet, "EnsembleWellLogCurveSet", "Ensemble Well Logs Curve Set" );
 
     m_formationsForCaseWithSimWellOnly = false;
+
+    m_propertyAxis = std::make_unique<RimWellLogTrackPropertyAxis>( this );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -297,6 +300,7 @@ RimWellLogTrack::~RimWellLogTrack()
 {
     m_curves.deleteChildren();
     m_regionAnnotations.reset();
+    m_propertyAxis.reset();
 
     deleteViewWidget();
 }
@@ -358,65 +362,7 @@ void RimWellLogTrack::detachAllPlotItems()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::calculatePropertyValueZoomRange()
 {
-    updateStackedCurveData();
-
-    double minValue = HUGE_VAL;
-    double maxValue = -HUGE_VAL;
-
-    size_t topologyCurveCount = 0;
-    for ( const auto& curve : m_curves )
-    {
-        double minCurveValue = HUGE_VAL;
-        double maxCurveValue = -HUGE_VAL;
-
-        if ( curve->isChecked() )
-        {
-            if ( curve->propertyValueRangeInData( &minCurveValue, &maxCurveValue ) )
-            {
-                if ( minCurveValue < minValue )
-                {
-                    minValue = minCurveValue;
-                }
-
-                if ( maxCurveValue > maxValue )
-                {
-                    maxValue = maxCurveValue;
-                }
-            }
-        }
-
-        if ( dynamic_cast<RimRftTopologyCurve*>( curve.p() ) ) topologyCurveCount++;
-    }
-
-    if ( topologyCurveCount == m_curves.size() )
-    {
-        // The topology track is quite narrow, and to be able to show the curves we add extra space for min/max values
-        const double range = maxValue - minValue;
-        maxValue += range * 0.5;
-        minValue -= range * 0.5;
-    }
-
-    if ( minValue == HUGE_VAL )
-    {
-        // Empty axis when there are no sensible visible curves
-        minValue = 0;
-        maxValue = 0;
-    }
-    else if ( m_minorTickIntervalPropertyAxis() != 0.0 )
-    {
-        std::tie( minValue, maxValue ) = RimWellLogTrackTools::adjustXRange( minValue, maxValue, m_minorTickIntervalPropertyAxis() );
-    }
-    else
-    {
-        double adjustmentFactor         = 0.1;
-        auto [adjustedMin, adjustedMax] = RimWellLogTrackTools::extendMinMaxRange( minValue, maxValue, adjustmentFactor );
-
-        minValue = adjustedMin;
-        maxValue = adjustedMax;
-    }
-
-    m_availablePropertyValueRangeMin = minValue;
-    m_availablePropertyValueRangeMax = maxValue;
+    m_propertyAxis->calculatePropertyValueZoomRange();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -479,52 +425,7 @@ void RimWellLogTrack::calculateDepthZoomRange()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updatePropertyValueZoom()
 {
-    if ( !m_plotWidget ) return;
-
-    calculatePropertyValueZoomRange();
-
-    if ( m_isAutoScalePropertyValuesEnabled )
-    {
-        m_visiblePropertyValueRangeMin = m_availablePropertyValueRangeMin;
-        m_visiblePropertyValueRangeMax = m_availablePropertyValueRangeMax;
-
-        if ( !visibleStackedCurves().empty() && !m_isPropertyLogarithmicScaleEnabled )
-        {
-            // Try to ensure we include the base line whether the values are negative or positive.
-            m_visiblePropertyValueRangeMin = std::min( m_visiblePropertyValueRangeMin(), 0.0 );
-            m_visiblePropertyValueRangeMax = std::max( m_visiblePropertyValueRangeMax(), 0.0 );
-        }
-        computeAndSetPropertyValueRangeMinForLogarithmicScale();
-        updateEditors();
-    }
-
-    updatePropertyValueAxisAndGridTickIntervals();
-
-    // Attribute range. Fixed range where well components are positioned [-1, 1].
-    // Set an extended range here to allow for some label space.
-    double componentRangeMax = 2.0 / ( static_cast<double>( colSpan() ) );
-    double componentRangeMin = -0.25;
-    if ( m_showWellPathComponentsBothSides )
-    {
-        componentRangeMin = -1.5;
-        componentRangeMax *= 2.0;
-    }
-    if ( m_showWellPathComponentLabels )
-    {
-        componentRangeMax *= 1.5;
-    }
-
-    RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-
-    // Attribute components use the opposite axis to the property values
-    if ( wellLogPlot->depthOrientation() == RiaDefines::Orientation::VERTICAL )
-    {
-        m_plotWidget->setAxisRange( RiuPlotAxis::defaultBottom(), componentRangeMin, componentRangeMax );
-    }
-    else
-    {
-        m_plotWidget->setAxisRange( RiuPlotAxis::defaultRight(), componentRangeMin, componentRangeMax );
-    }
+    m_propertyAxis->updatePropertyValueZoom();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -807,100 +708,7 @@ void RimWellLogTrack::curveStackingChanged( const caf::SignalEmitter* emitter, b
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updatePropertyValueAxisAndGridTickIntervals()
 {
-    if ( !m_plotWidget ) return;
-
-    bool emptyRange = isEmptyVisiblePropertyRange();
-    if ( emptyRange )
-    {
-        m_plotWidget->enableGridLines( valueAxis(), false, false );
-        m_plotWidget->setAxisRange( valueAxis(), 0.0, 1.0 );
-        m_plotWidget->setAxisLabelsAndTicksEnabled( valueAxis(), false, false );
-    }
-    else
-    {
-        m_plotWidget->setAxisLabelsAndTicksEnabled( valueAxis(), true, true );
-
-        auto rangeBoundaryA = m_visiblePropertyValueRangeMin();
-        auto rangeBoundaryB = m_visiblePropertyValueRangeMax();
-        if ( m_invertPropertyValueAxis() ) std::swap( rangeBoundaryA, rangeBoundaryB );
-
-        if ( m_propertyAxisMinAndMaxTicksOnly )
-        {
-            auto roundToDigits = []( double value, int numberOfDigits, bool useFloor )
-            {
-                if ( value == 0.0 ) return 0.0;
-
-                double factor = std::pow( 10.0, numberOfDigits - std::ceil( std::log10( std::fabs( value ) ) ) );
-
-                if ( useFloor )
-                {
-                    // Use floor for maximum value to ensure we get a value inside the complete range
-                    return std::floor( value * factor ) / factor;
-                }
-
-                // Use ceil for minimum value to ensure we get a value inside the complete range
-                return std::ceil( value * factor ) / factor;
-            };
-
-            auto div = QwtScaleDiv( rangeBoundaryA, rangeBoundaryB );
-
-            QList<double> majorTicks;
-
-            auto min = roundToDigits( rangeBoundaryA, 2, false );
-            auto max = roundToDigits( rangeBoundaryB, 2, true );
-            if ( min == max )
-            {
-                min = roundToDigits( rangeBoundaryA, 3, false );
-                max = roundToDigits( rangeBoundaryB, 3, true );
-            }
-
-            majorTicks.push_back( min );
-            majorTicks.push_back( max );
-
-            div.setTicks( QwtScaleDiv::TickType::MajorTick, majorTicks );
-
-            RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
-            if ( wellLogPlot->depthOrientation() == RiaDefines::Orientation::VERTICAL )
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleDiv( QwtAxis::XTop, div );
-            }
-            else
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleDiv( QwtAxis::YLeft, div );
-            }
-        }
-        else if ( m_explicitTickIntervalsPropertyValueAxis )
-        {
-            m_plotWidget->setMajorAndMinorTickIntervals( valueAxis(),
-                                                         m_majorTickIntervalPropertyAxis(),
-                                                         m_minorTickIntervalPropertyAxis(),
-                                                         rangeBoundaryA,
-                                                         rangeBoundaryB );
-        }
-        else
-        {
-            int majorTickIntervals = 5;
-            int minorTickIntervals = 10;
-            m_plotWidget->setAutoTickIntervalCounts( valueAxis(), majorTickIntervals, minorTickIntervals );
-            m_plotWidget->setAxisRange( valueAxis(), rangeBoundaryA, rangeBoundaryB );
-        }
-
-        m_plotWidget->enableGridLines( valueAxis(),
-                                       m_propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MAJOR,
-                                       m_propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MINOR );
-    }
-
-    RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfType<RimDepthTrackPlot>();
-    if ( wellLogPlot )
-    {
-        m_plotWidget->enableGridLines( depthAxis(),
-                                       wellLogPlot->depthAxisGridLinesEnabled() & RimWellLogPlot::AXIS_GRID_MAJOR,
-                                       wellLogPlot->depthAxisGridLinesEnabled() & RimWellLogPlot::AXIS_GRID_MINOR );
-    }
-
-    m_plotWidget->enableAxisNumberLabels( valueAxis(), m_isPropertyAxisEnabled() );
-
-    m_plotWidget->scheduleReplot();
+    m_propertyAxis->updatePropertyValueAxisAndGridTickIntervals();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1258,15 +1066,6 @@ void RimWellLogTrack::visibleDepthRange( double* minDepth, double* maxDepth )
     CAF_ASSERT( minDepth && maxDepth );
     *minDepth = m_visibleDepthRangeMin;
     *maxDepth = m_visibleDepthRangeMax;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
-{
-    return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
-           1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2143,50 +1942,7 @@ size_t RimWellLogTrack::curveIndex( RimWellLogCurve* curve )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateAxisScaleEngine()
 {
-    if ( !m_plotWidget ) return;
-
-    auto wellLogPlot = firstAncestorOrThisOfType<RimDepthTrackPlot>();
-    if ( wellLogPlot )
-    {
-        if ( wellLogPlot->depthOrientation() == RiaDefines::Orientation::VERTICAL )
-        {
-            m_plotWidget->setAxisInverted( RiuPlotAxis::defaultLeft(), true );
-
-            if ( m_isPropertyLogarithmicScaleEnabled )
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::XTop, new QwtLogScaleEngine );
-
-                // NB! Must assign scale engine to bottom in order to make QwtPlotGrid work
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::XBottom, new QwtLogScaleEngine );
-            }
-            else
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::XTop, new RiuQwtLinearScaleEngine );
-
-                // NB! Must assign scale engine to bottom in order to make QwtPlotGrid work
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::XBottom, new RiuQwtLinearScaleEngine );
-            }
-        }
-        else
-        {
-            m_plotWidget->setAxisInverted( RiuPlotAxis::defaultLeft(), false );
-
-            if ( m_isPropertyLogarithmicScaleEnabled )
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::YLeft, new QwtLogScaleEngine );
-
-                // NB! Must assign scale engine to bottom in order to make QwtPlotGrid work
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::YRight, new QwtLogScaleEngine );
-            }
-            else
-            {
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::YLeft, new RiuQwtLinearScaleEngine );
-
-                // NB! Must assign scale engine to bottom in order to make QwtPlotGrid work
-                m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::YRight, new RiuQwtLinearScaleEngine );
-            }
-        }
-    }
+    m_propertyAxis->updateAxisScaleEngine();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2287,24 +2043,7 @@ void RimWellLogTrack::connectCurveSignals( RimWellLogCurve* curve )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::computeAndSetPropertyValueRangeMinForLogarithmicScale()
 {
-    if ( m_isAutoScalePropertyValuesEnabled && m_isPropertyLogarithmicScaleEnabled )
-    {
-        double pos = HUGE_VAL;
-        double neg = -HUGE_VAL;
-
-        for ( const auto& curve : m_curves )
-        {
-            if ( curve->isChecked() && curve->curveData() )
-            {
-                RigStatisticsCalculator::posNegClosestToZero( curve->curveData()->propertyValuesByIntervals(), pos, neg );
-            }
-        }
-
-        if ( pos != HUGE_VAL )
-        {
-            m_visiblePropertyValueRangeMin = pos;
-        }
-    }
+    m_propertyAxis->computeAndSetPropertyValueRangeMinForLogarithmicScale();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2910,4 +2649,94 @@ RiuPlotAxis RimWellLogTrack::valueAxis() const
     RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
 
     return wellLogPlot->valueAxis();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimWellLogTrack::minorTickIntervalPropertyAxis() const
+{
+    return m_minorTickIntervalPropertyAxis();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RimWellLogTrack::majorTickIntervalPropertyAxis() const
+{
+    return m_majorTickIntervalPropertyAxis();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellLogTrack::setAvailablePropertyValueRange( double minValue, double maxValue )
+{
+    m_availablePropertyValueRangeMin = minValue;
+    m_availablePropertyValueRangeMax = maxValue;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::isAutoScalePropertyValuesEnabled() const
+{
+    return m_isAutoScalePropertyValuesEnabled();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::isPropertyValueAxisInverted() const
+{
+    return m_invertPropertyValueAxis();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::isPropertyAxisMinAndMaxTicksOnly() const
+{
+    return m_propertyAxisMinAndMaxTicksOnly();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::isExplicitTickIntervalsPropertyValueAxis() const
+{
+    return m_explicitTickIntervalsPropertyValueAxis();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+int RimWellLogTrack::propertyValueAxisGridVisibility() const
+{
+    return m_propertyValueAxisGridVisibility();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::showWellPathComponentsBothSides() const
+{
+    return m_showWellPathComponentsBothSides();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::showWellPathComponentLabels() const
+{
+    return m_showWellPathComponentLabels();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
+{
+    return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
+           1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
 }

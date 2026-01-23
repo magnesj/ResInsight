@@ -60,6 +60,7 @@ class RimColorLegend;
 class RimEnsembleWellLogCurveSet;
 class RiuPlotAnnotationTool;
 class RimWellLogTrackRegionAnnotations;
+class RimWellLogTrackPropertyAxis;
 
 //--------------------------------------------------------------------------------------------------
 /// Data structure for curve sampling points
@@ -209,6 +210,22 @@ public:
     void setLogarithmicScale( bool enable );
     bool isLogarithmicScale() const;
 
+    // Property axis accessors for helper class
+    double minorTickIntervalPropertyAxis() const;
+    double majorTickIntervalPropertyAxis() const;
+    void   setAvailablePropertyValueRange( double minValue, double maxValue );
+    bool   isAutoScalePropertyValuesEnabled() const;
+    bool   isPropertyValueAxisInverted() const;
+    bool   isPropertyAxisMinAndMaxTicksOnly() const;
+    bool   isExplicitTickIntervalsPropertyValueAxis() const;
+    int    propertyValueAxisGridVisibility() const;
+    bool   showWellPathComponentsBothSides() const;
+    bool   showWellPathComponentLabels() const;
+    bool   isEmptyVisiblePropertyRange() const;
+
+    RiuPlotAxis depthAxis() const;
+    RiuPlotAxis valueAxis() const;
+
     std::map<int, std::vector<RimWellLogCurve*>> visibleStackedCurves();
 
     std::vector<RimWellLogCurve*> curves() const;
@@ -272,9 +289,6 @@ private:
     void updatePropertyValueZoom();
     void updateDepthZoom();
 
-    RiuPlotAxis depthAxis() const;
-    RiuPlotAxis valueAxis() const;
-
     int axisFontSize() const;
 
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
@@ -320,7 +334,6 @@ private:
     void doUpdateLayout() override;
 
     void connectCurveSignals( RimWellLogCurve* curve );
-    bool isEmptyVisiblePropertyRange() const;
 
 private:
     caf::PdmField<QString>                    m_description;
@@ -382,6 +395,7 @@ private:
 
     QPointer<RiuWellLogTrack>                          m_plotWidget;
     std::unique_ptr<RimWellLogTrackRegionAnnotations> m_regionAnnotations;
+    std::unique_ptr<RimWellLogTrackPropertyAxis>      m_propertyAxis;
 
     QString m_propertyValueAxisTitle;
     double  m_availablePropertyValueRangeMin;
