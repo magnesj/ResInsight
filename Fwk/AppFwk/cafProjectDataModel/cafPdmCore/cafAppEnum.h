@@ -132,7 +132,7 @@ public:
     static void setEnumSubset( caf::PdmFieldHandle* fieldHandle, std::vector<T> subset )
     {
         if ( !fieldHandle ) return;
-        QString key = createEnumSubsetKey( fieldHandle );
+        QString key       = createEnumSubsetKey( fieldHandle );
         m_enumSubset[key] = subset;
     }
     static std::vector<T> enumSubset( caf::PdmFieldHandle* fieldHandle )
@@ -149,7 +149,7 @@ private:
     static QString createEnumSubsetKey( caf::PdmFieldHandle* fieldHandle )
     {
         if ( !fieldHandle ) return QString();
-        
+
         // Create a unique key by combining the owner class name with the field keyword
         // This prevents collisions when different object types use the same field keyword
         QString ownerClass = fieldHandle->ownerClass();
@@ -157,7 +157,6 @@ private:
     }
 
 public:
-
     operator T() const { return m_value; }
 
     T       value() const { return m_value; }
