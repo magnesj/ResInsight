@@ -69,7 +69,7 @@ public:
     }
 
     /// Methods to get a list of options for a field, specialized for AppEnum
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const cvf::Mat3d& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const cvf::Mat3d& )
     {
         return QList<PdmOptionItemInfo>();
     }

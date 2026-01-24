@@ -42,7 +42,7 @@ public:
         return variantValue.value<PdmPointer<PdmObjectHandle>>() == variantValue2.value<PdmPointer<PdmObjectHandle>>();
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const PdmPointer<T>& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const PdmPointer<T>& )
     {
         return QList<PdmOptionItemInfo>();
     }
@@ -86,7 +86,7 @@ public:
         return PdmValueFieldSpecialization<T>::isEqual( variantValue, variantValue2 );
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::list<T>& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const std::list<T>& )
     {
         return QList<PdmOptionItemInfo>();
     }
@@ -117,7 +117,7 @@ public:
         return PdmValueFieldSpecialization<T>::isEqual( variantValue, variantValue2 );
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::vector<T>& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const std::vector<T>& )
     {
         return QList<PdmOptionItemInfo>();
     }
@@ -152,12 +152,12 @@ public:
         return variantValue == variantValue2;
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const caf::AppEnum<T>& appEnum )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const caf::AppEnum<T>& appEnum )
     {
         QList<PdmOptionItemInfo> optionList;
 
         // If a subset of the enum is defined, use that subset
-        auto enumValues = caf::AppEnum<T>::enumSubset( keyword );
+        auto enumValues = caf::AppEnum<T>::enumSubset( fieldHandle );
         if ( enumValues.empty() )
         {
             // If no subset is defined, use all values
@@ -201,7 +201,7 @@ public:
         return variantValue == variantValue2;
     }
 
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::pair<T, U>& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const std::pair<T, U>& )
     {
         QList<PdmOptionItemInfo> optionList;
 
@@ -254,7 +254,7 @@ public:
     }
 
     /// Methods to get a list of options for a field, specialized for std::optional<T>
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const std::optional<T>& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const std::optional<T>& )
     {
         QList<PdmOptionItemInfo> optionList;
 
@@ -293,7 +293,7 @@ public:
     }
 
     /// Methods to get a list of options for a field, specialized for caf::FilePath
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const caf::FilePath& )
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const caf::FilePath& )
     {
         return QList<PdmOptionItemInfo>();
     }
