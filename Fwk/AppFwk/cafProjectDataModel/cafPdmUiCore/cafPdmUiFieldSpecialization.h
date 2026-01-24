@@ -11,6 +11,7 @@ template <typename T>
 class PdmDataValueField;
 class PdmOptionItemInfo;
 class PdmObjectHandle;
+class PdmFieldHandle;
 
 //==================================================================================================
 /// A proxy class that implements the Gui interface of fields
@@ -50,7 +51,10 @@ public:
     }
 
     /// Methods to get a list of options for a field
-    static QList<PdmOptionItemInfo> valueOptions( QString keyword, const T& ) { return QList<PdmOptionItemInfo>(); }
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const T& )
+    {
+        return QList<PdmOptionItemInfo>();
+    }
 
     /// Methods to retrieve the possible PdmObject pointed to by a field
     static void childObjects( const PdmDataValueField<T>&, std::vector<PdmObjectHandle*>* ) {}
