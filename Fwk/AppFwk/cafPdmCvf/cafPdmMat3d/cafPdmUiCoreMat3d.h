@@ -38,35 +38,7 @@
 
 #include "cafPdmCoreMat3d.h"
 
-#include "cafInternalPdmValueFieldSpecializations.h"
-#include "cafPdmUiFieldSpecialization.h"
 #include "cafPdmUiItem.h"
 
 #include "cvfBase.h"
 #include "cvfMatrix3.h"
-
-namespace caf
-{
-template <>
-class PdmUiFieldSpecialization<cvf::Mat3d> : public PdmUiFieldSpecializationDefaults
-{
-public:
-    /// Convert the field value into a QVariant
-    static QVariant convert( const cvf::Mat3d& value )
-    {
-        return PdmValueFieldSpecialization<cvf::Mat3d>::convert( value );
-    }
-
-    /// Set the field value from a QVariant
-    static void setFromVariant( const QVariant& variantValue, cvf::Mat3d& value )
-    {
-        PdmValueFieldSpecialization<cvf::Mat3d>::setFromVariant( variantValue, value );
-    }
-
-    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
-    {
-        return PdmValueFieldSpecialization<cvf::Mat3d>::isEqual( variantValue, variantValue2 );
-    }
-};
-
-} // end namespace caf

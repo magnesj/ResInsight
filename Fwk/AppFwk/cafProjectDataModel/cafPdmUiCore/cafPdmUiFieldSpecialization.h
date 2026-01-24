@@ -15,10 +15,15 @@ class PdmFieldHandle;
 
 //==================================================================================================
 /// Base class providing default implementations for PdmUiFieldSpecialization methods.
-/// Specializations can inherit from this to avoid repeating empty implementations.
+/// Specializations can inherit from this to avoid repeating empty/simple implementations.
 //==================================================================================================
 struct PdmUiFieldSpecializationDefaults
 {
+    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
+    {
+        return variantValue == variantValue2;
+    }
+
     template <typename T>
     static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle*, const T& )
     {
@@ -40,36 +45,14 @@ struct PdmUiFieldSpecializationDefaults
 ///
 /// When introducing a new type in a PdmField, you might need to implement a (partial)specialization
 /// of this class.
+///
+/// The primary template delegates to PdmValueFieldSpecialization<T>, so types with custom
+/// PdmValueFieldSpecialization will automatically get the correct behavior without needing
+/// an explicit PdmUiFieldSpecialization.
 //==================================================================================================
 
 template <typename T>
-class PdmUiFieldSpecialization : public PdmUiFieldSpecializationDefaults
-{
-public:
-    /// Convert the field value into a QVariant
-    static QVariant convert( const T& value ) { return QVariant::fromValue( value ); }
-
-    /// Set the field value from a QVariant
-    static void setFromVariant( const QVariant& variantValue, T& value ) { value = variantValue.value<T>(); }
-
-    /// Check equality between QVariants that carries a Field Value.
-    /// The == operator will normally work, but does not support custom types in the QVariant
-    /// See http://qt-project.org/doc/qt-4.8/qvariant.html#operator-eq-eq-64
-    /// This is needed for the lookup regarding OptionValues
-    static bool isDataElementEqual( const QVariant& variantValue, const QVariant& variantValue2 )
-    {
-        if ( variantValue.typeId() > QMetaType::User )
-        {
-            return ( variantValue.value<T>() == variantValue2.value<T>() );
-        }
-        else
-        {
-            return variantValue == variantValue2;
-        }
-    }
-
-    // valueOptions and childObjects are inherited from PdmUiFieldSpecializationDefaults
-};
+class PdmUiFieldSpecialization;  // Forward declaration, defined in cafInternalPdmFieldTypeSpecializations.h
 } // End of namespace caf
 
 #include "cafInternalPdmFieldTypeSpecializations.h"
