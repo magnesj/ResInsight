@@ -52,7 +52,7 @@ struct PdmUiFieldSpecializationDefaults
 //==================================================================================================
 
 template <typename T>
-class PdmUiFieldSpecialization;  // Forward declaration, defined in cafInternalPdmFieldTypeSpecializations.h
+class PdmUiFieldSpecialization; // Forward declaration, defined in cafInternalPdmFieldTypeSpecializations.h
 } // End of namespace caf
 
 #include "cafInternalPdmFieldTypeSpecializations.h"
