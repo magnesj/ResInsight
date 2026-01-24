@@ -48,7 +48,7 @@
 namespace caf
 {
 template <>
-class PdmUiFieldSpecialization<cvf::Mat4d>
+class PdmUiFieldSpecialization<cvf::Mat4d> : public PdmUiFieldSpecializationDefaults
 {
 public:
     /// Convert the field value into a QVariant
@@ -67,15 +67,6 @@ public:
     {
         return PdmValueFieldSpecialization<cvf::Mat4d>::isEqual( variantValue, variantValue2 );
     }
-
-    /// Methods to get a list of options for a field, specialized for AppEnum
-    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const cvf::Mat4d& )
-    {
-        return QList<PdmOptionItemInfo>();
-    }
-
-    /// Methods to retrieve the possible PdmObject pointed to by a field
-    static void childObjects( const PdmDataValueField<cvf::Mat4d>&, std::vector<PdmObjectHandle*>* ) {}
 };
 
 } // end namespace caf

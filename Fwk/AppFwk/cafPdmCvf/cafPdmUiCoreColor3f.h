@@ -48,7 +48,7 @@
 namespace caf
 {
 template <>
-class PdmUiFieldSpecialization<cvf::Color3f>
+class PdmUiFieldSpecialization<cvf::Color3f> : public PdmUiFieldSpecializationDefaults
 {
 public:
     /// Convert the field value into a QVariant
@@ -67,15 +67,6 @@ public:
     {
         return PdmValueFieldSpecialization<cvf::Color3f>::isEqual( variantValue, variantValue2 );
     }
-
-    /// Methods to get a list of options for a field, specialized for AppEnum
-    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const cvf::Color3f& )
-    {
-        return QList<PdmOptionItemInfo>();
-    }
-
-    /// Methods to retrieve the possible PdmObject pointed to by a field
-    static void childObjects( const PdmDataValueField<cvf::Color3f>&, std::vector<PdmObjectHandle*>* ) {}
 };
 
 } // end namespace caf

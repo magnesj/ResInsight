@@ -14,6 +14,24 @@ class PdmObjectHandle;
 class PdmFieldHandle;
 
 //==================================================================================================
+/// Base class providing default implementations for PdmUiFieldSpecialization methods.
+/// Specializations can inherit from this to avoid repeating empty implementations.
+//==================================================================================================
+struct PdmUiFieldSpecializationDefaults
+{
+    template <typename T>
+    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle*, const T& )
+    {
+        return QList<PdmOptionItemInfo>();
+    }
+
+    template <typename T>
+    static void childObjects( const PdmDataValueField<T>&, std::vector<PdmObjectHandle*>* )
+    {
+    }
+};
+
+//==================================================================================================
 /// A proxy class that implements the Gui interface of fields
 ///
 /// This class collects methods that need specialization when introducing a new type in a PdmField.
@@ -25,7 +43,7 @@ class PdmFieldHandle;
 //==================================================================================================
 
 template <typename T>
-class PdmUiFieldSpecialization
+class PdmUiFieldSpecialization : public PdmUiFieldSpecializationDefaults
 {
 public:
     /// Convert the field value into a QVariant
@@ -50,14 +68,7 @@ public:
         }
     }
 
-    /// Methods to get a list of options for a field
-    static QList<PdmOptionItemInfo> valueOptions( PdmFieldHandle* fieldHandle, const T& )
-    {
-        return QList<PdmOptionItemInfo>();
-    }
-
-    /// Methods to retrieve the possible PdmObject pointed to by a field
-    static void childObjects( const PdmDataValueField<T>&, std::vector<PdmObjectHandle*>* ) {}
+    // valueOptions and childObjects are inherited from PdmUiFieldSpecializationDefaults
 };
 } // End of namespace caf
 
