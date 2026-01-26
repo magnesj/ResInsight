@@ -102,9 +102,9 @@ void RimWellLogTrackPropertyAxis::calculatePropertyValueZoomRange()
         minValue = 0;
         maxValue = 0;
     }
-    else if ( m_track->minorTickIntervalPropertyAxis() != 0.0 )
+    else if ( m_track->m_minorTickIntervalPropertyAxis != 0.0 )
     {
-        std::tie( minValue, maxValue ) = RimWellLogTrackTools::adjustXRange( minValue, maxValue, m_track->minorTickIntervalPropertyAxis() );
+        std::tie( minValue, maxValue ) = RimWellLogTrackTools::adjustXRange( minValue, maxValue, m_track->m_minorTickIntervalPropertyAxis );
     }
     else
     {
@@ -115,7 +115,8 @@ void RimWellLogTrackPropertyAxis::calculatePropertyValueZoomRange()
         maxValue = adjustedMax;
     }
 
-    m_track->setAvailablePropertyValueRange( minValue, maxValue );
+    m_track->m_availablePropertyValueRangeMin = minValue;
+    m_track->m_availablePropertyValueRangeMax = maxValue;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -132,7 +133,7 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueZoom()
     double availableMax = 0.0;
     m_track->availablePropertyValueRange( &availableMin, &availableMax );
 
-    if ( m_track->isAutoScalePropertyValuesEnabled() )
+    if ( m_track->m_isAutoScalePropertyValuesEnabled )
     {
         double visibleMin = availableMin;
         double visibleMax = availableMax;
@@ -157,12 +158,12 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueZoom()
     // Set an extended range here to allow for some label space.
     double componentRangeMax = 2.0 / ( static_cast<double>( m_track->colSpan() ) );
     double componentRangeMin = -0.25;
-    if ( m_track->showWellPathComponentsBothSides() )
+    if ( m_track->m_showWellPathComponentsBothSides )
     {
         componentRangeMin = -1.5;
         componentRangeMax *= 2.0;
     }
-    if ( m_track->showWellPathComponentLabels() )
+    if ( m_track->m_showWellPathComponentLabels )
     {
         componentRangeMax *= 1.5;
     }
@@ -191,7 +192,9 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueAxisAndGridTickIntervals()
     RiuPlotAxis valueAxis = m_track->valueAxis();
     RiuPlotAxis depthAxis = m_track->depthAxis();
 
-    bool emptyRange = m_track->isEmptyVisiblePropertyRange();
+    bool emptyRange =
+        std::abs( m_track->m_visiblePropertyValueRangeMax - m_track->m_visiblePropertyValueRangeMin ) <
+        1.0e-6 * std::max( 1.0, std::max( m_track->m_visiblePropertyValueRangeMax.value(), m_track->m_visiblePropertyValueRangeMin.value() ) );
     if ( emptyRange )
     {
         plotWidget->enableGridLines( valueAxis, false, false );
@@ -208,9 +211,9 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueAxisAndGridTickIntervals()
 
         auto rangeBoundaryA = visibleMin;
         auto rangeBoundaryB = visibleMax;
-        if ( m_track->isPropertyValueAxisInverted() ) std::swap( rangeBoundaryA, rangeBoundaryB );
+        if ( m_track->m_invertPropertyValueAxis ) std::swap( rangeBoundaryA, rangeBoundaryB );
 
-        if ( m_track->isPropertyAxisMinAndMaxTicksOnly() )
+        if ( m_track->m_propertyAxisMinAndMaxTicksOnly )
         {
             auto roundToDigits = []( double value, int numberOfDigits, bool useFloor )
             {
@@ -255,11 +258,11 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueAxisAndGridTickIntervals()
                 plotWidget->qwtPlot()->setAxisScaleDiv( QwtAxis::YLeft, div );
             }
         }
-        else if ( m_track->isExplicitTickIntervalsPropertyValueAxis() )
+        else if ( m_track->m_explicitTickIntervalsPropertyValueAxis )
         {
             plotWidget->setMajorAndMinorTickIntervals( valueAxis,
-                                                       m_track->majorTickIntervalPropertyAxis(),
-                                                       m_track->minorTickIntervalPropertyAxis(),
+                                                       m_track->m_majorTickIntervalPropertyAxis,
+                                                       m_track->m_minorTickIntervalPropertyAxis,
                                                        rangeBoundaryA,
                                                        rangeBoundaryB );
         }
@@ -272,8 +275,8 @@ void RimWellLogTrackPropertyAxis::updatePropertyValueAxisAndGridTickIntervals()
         }
 
         plotWidget->enableGridLines( valueAxis,
-                                     m_track->propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MAJOR,
-                                     m_track->propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MINOR );
+                                     m_track->m_propertyValueAxisGridVisibility.value() & RimWellLogPlot::AXIS_GRID_MAJOR,
+                                     m_track->m_propertyValueAxisGridVisibility.value() & RimWellLogPlot::AXIS_GRID_MINOR );
     }
 
     RimDepthTrackPlot* wellLogPlot = m_track->firstAncestorOrThisOfType<RimDepthTrackPlot>();
@@ -346,7 +349,7 @@ void RimWellLogTrackPropertyAxis::updateAxisScaleEngine()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrackPropertyAxis::computeAndSetPropertyValueRangeMinForLogarithmicScale()
 {
-    if ( m_track->isAutoScalePropertyValuesEnabled() && m_track->isLogarithmicScale() )
+    if ( m_track->m_isAutoScalePropertyValuesEnabled && m_track->isLogarithmicScale() )
     {
         double pos = HUGE_VAL;
         double neg = -HUGE_VAL;

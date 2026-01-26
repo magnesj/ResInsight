@@ -84,6 +84,11 @@ class RimWellLogTrack : public RimPlot
 {
     CAF_PDM_HEADER_INIT;
 
+    friend class RimWellLogTrackPropertyAxis;
+    friend class RimWellLogTrackRegionAnnotations;
+    friend class RimWellLogTrackStackedCurves;
+    friend class RimWellLogTrackWellPathComponents;
+
 public:
     enum TrajectoryType
     {
@@ -198,41 +203,11 @@ public:
 
     RimWellPath* wellPathAttributeSource() const;
 
-    // Accessors for region annotation helper class
-    FormationSource                       formationSource() const;
-    RimWellPath*                          formationWellPathForSourceWellPath() const;
-    RigWellPathFormations::FormationLevel formationLevel() const;
-    bool                                  showFormationFluids() const;
-    int                                   colorShadingTransparency() const;
-    bool                                  showRegionLabels() const;
-    RimColorLegend*                       colorShadingLegend() const;
-    RimEclipseResultDefinition*           resultDefinition() const;
-    caf::FontTools::RelativeSize          regionLabelFontSize() const;
-
     void setLogarithmicScale( bool enable );
     bool isLogarithmicScale() const;
 
-    // Property axis accessors for helper class
-    double minorTickIntervalPropertyAxis() const;
-    double majorTickIntervalPropertyAxis() const;
-    void   setAvailablePropertyValueRange( double minValue, double maxValue );
-    bool   isAutoScalePropertyValuesEnabled() const;
-    bool   isPropertyValueAxisInverted() const;
-    bool   isPropertyAxisMinAndMaxTicksOnly() const;
-    bool   isExplicitTickIntervalsPropertyValueAxis() const;
-    int    propertyValueAxisGridVisibility() const;
-    bool   showWellPathComponentsBothSides() const;
-    bool   showWellPathComponentLabels() const;
-    bool   isEmptyVisiblePropertyRange() const;
-
     RiuPlotAxis depthAxis() const;
     RiuPlotAxis valueAxis() const;
-
-    // Well path component accessors for helper class
-    bool                            showWellPathCompletions() const;
-    bool                            wellPathCompletionsInLegend() const;
-    RimWellPathAttributeCollection* wellPathAttributeCollection() const;
-    void                            setWellPathAttributeCollection( RimWellPathAttributeCollection* attributeCollection );
 
     void updatePropertyValueZoom();
 
@@ -342,6 +317,8 @@ private:
     void doUpdateLayout() override;
 
     void connectCurveSignals( RimWellLogCurve* curve );
+
+    bool isEmptyVisiblePropertyRange() const;
 
 private:
     caf::PdmField<QString>                    m_description;

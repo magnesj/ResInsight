@@ -64,14 +64,14 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesOnPlot()
     {
         std::vector<const RimWellPathComponentInterface*> allWellPathComponents;
 
-        if ( wellPathAttributeSource->wellPathGeometry() && ( m_track->showWellPathAttributes() || m_track->showWellPathCompletions() ) )
+        if ( wellPathAttributeSource->wellPathGeometry() && ( m_track->showWellPathAttributes() || m_track->m_showWellPathCompletions.value() ) )
         {
             m_wellPathAttributePlotObjects.push_back( std::make_unique<RiuWellPathComponentPlotItem>( wellPathAttributeSource ) );
         }
 
         if ( m_track->showWellPathAttributes() )
         {
-            RimWellPathAttributeCollection* attributeCollection = m_track->wellPathAttributeCollection();
+            RimWellPathAttributeCollection* attributeCollection = m_track->m_wellPathAttributeCollection();
             if ( attributeCollection )
             {
                 std::vector<RimWellPathAttribute*> attributes = attributeCollection->attributes();
@@ -84,7 +84,7 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesOnPlot()
                 }
             }
         }
-        if ( m_track->showWellPathCompletions() )
+        if ( m_track->m_showWellPathCompletions.value() )
         {
             const RimWellPathCompletions*                     completionsCollection = wellPathAttributeSource->completions();
             std::vector<const RimWellPathComponentInterface*> allCompletions        = completionsCollection->allCompletions();
@@ -119,8 +119,8 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesOnPlot()
         for ( const RimWellPathComponentInterface* component : allWellPathComponents )
         {
             std::unique_ptr<RiuWellPathComponentPlotItem> plotItem( new RiuWellPathComponentPlotItem( wellPathAttributeSource, component ) );
-            QString legendTitle        = plotItem->legendTitle();
-            bool    contributeToLegend = m_track->wellPathCompletionsInLegend() && !completionsAssignedToLegend.count( legendTitle );
+            QString legendTitle     = plotItem->legendTitle();
+            bool contributeToLegend = m_track->m_wellPathCompletionsInLegend.value() && !completionsAssignedToLegend.count( legendTitle );
             plotItem->setContributeToLegend( contributeToLegend );
             m_wellPathAttributePlotObjects.push_back( std::move( plotItem ) );
             completionsAssignedToLegend.insert( legendTitle );
@@ -136,7 +136,7 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesOnPlot()
         {
             attributePlotObject->setDepthType( depthType );
             attributePlotObject->setDepthOrientation( depthOrientation );
-            attributePlotObject->setShowLabel( m_track->showWellPathComponentLabels() );
+            attributePlotObject->setShowLabel( m_track->m_showWellPathComponentLabels.value() );
             attributePlotObject->loadDataAndUpdate( false );
             attributePlotObject->setParentPlotNoReplot( plotWidget->qwtPlot() );
         }
@@ -149,7 +149,7 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesOnPlot()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrackWellPathComponents::updateWellPathAttributesCollection()
 {
-    m_track->setWellPathAttributeCollection( nullptr );
+    m_track->m_wellPathAttributeCollection = nullptr;
 
     RimWellPath* wellPathComponentSource = m_track->wellPathAttributeSource();
     if ( wellPathComponentSource )
@@ -158,7 +158,7 @@ void RimWellLogTrackWellPathComponents::updateWellPathAttributesCollection()
             wellPathComponentSource->descendantsIncludingThisOfType<RimWellPathAttributeCollection>();
         if ( !attributeCollection.empty() )
         {
-            m_track->setWellPathAttributeCollection( attributeCollection.front() );
+            m_track->m_wellPathAttributeCollection = attributeCollection.front();
         }
     }
 }

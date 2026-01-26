@@ -180,9 +180,9 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
     // Get formation source settings from track fields through public methods
     // Note: Some private members need accessor methods added to RimWellLogTrack
 
-    if ( m_track->formationSource() == RimWellLogTrack::FormationSource::WELL_PICK_FILTER )
+    if ( m_track->m_formationSource() == RimWellLogTrack::FormationSource::WELL_PICK_FILTER )
     {
-        formationWellPathForSourceWellPath = m_track->formationWellPathForSourceWellPath();
+        formationWellPathForSourceWellPath = m_track->m_formationWellPathForSourceWellPath;
         if ( formationWellPathForSourceWellPath == nullptr ) return;
 
         if ( plot->depthType() != RiaDefines::DepthTypeEnum::MEASURED_DEPTH &&
@@ -198,10 +198,10 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
         if ( !formations ) return;
 
         std::vector<QString> formationNamesToPlot;
-        formations->depthAndFormationNamesUpToLevel( m_track->formationLevel(),
+        formations->depthAndFormationNamesUpToLevel( m_track->m_formationLevel(),
                                                      &formationNamesToPlot,
                                                      &yValues,
-                                                     m_track->showFormationFluids(),
+                                                     m_track->m_showformationFluids,
                                                      plot->depthType() );
 
         if ( plot->depthType() == RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
@@ -286,13 +286,13 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
                                                   convertedYValues,
                                                   m_track->annotationDisplay(),
                                                   waterAndRockColors,
-                                                  ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100,
-                                                  m_track->showRegionLabels(),
+                                                  ( ( 100 - m_track->m_colorShadingTransparency ) * 255 ) / 100,
+                                                  m_track->m_showRegionLabels,
                                                   RiaDefines::TrackSpan::LEFT_COLUMN,
                                                   { Qt::SolidPattern, Qt::Dense6Pattern } );
         }
 
-        if ( m_track->formationSource() == RimWellLogTrack::FormationSource::CASE && plotWidget )
+        if ( m_track->m_formationSource() == RimWellLogTrack::FormationSource::CASE && plotWidget )
         {
             if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr )
                 return;
@@ -317,15 +317,15 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
             std::vector<std::pair<double, double>> convertedYValues =
                 RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
 
-            caf::ColorTable colorTable( m_track->colorShadingLegend()->colorArray() );
+            caf::ColorTable colorTable( m_track->m_colorShadingLegend->colorArray() );
             m_annotationTool->attachNamedRegions( plotWidget->qwtPlot(),
                                                   formationNamesToPlot,
                                                   orientation,
                                                   convertedYValues,
                                                   m_track->annotationDisplay(),
                                                   colorTable,
-                                                  ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100,
-                                                  m_track->showRegionLabels() );
+                                                  ( ( 100 - m_track->m_colorShadingTransparency.value() ) * 255 ) / 100,
+                                                  m_track->m_showRegionLabels.value() );
         }
     }
 }
@@ -360,7 +360,7 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
 
     RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( formationCase );
 
-    RimEclipseResultDefinition* resultDefinition = m_track->resultDefinition();
+    RimEclipseResultDefinition* resultDefinition = m_track->m_resultDefinition;
     resultDefinition->loadResult();
 
     size_t                      timeStep = 0;
@@ -381,14 +381,14 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
 
     // Attach water and rock base formations
 
-    if ( m_track->formationSource() == RimWellLogTrack::FormationSource::CASE )
+    if ( m_track->m_formationSource() == RimWellLogTrack::FormationSource::CASE )
     {
         if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr )
             return;
 
         std::vector<cvf::Color3ub> colors;
 
-        RimColorLegend* colorShadingLegend = m_track->colorShadingLegend();
+        RimColorLegend* colorShadingLegend = m_track->m_colorShadingLegend;
 
         // Find the largest category number.
         int maxCategoryValue = std::numeric_limits<int>::min();
@@ -450,7 +450,7 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
 
         caf::ColorTable colorTable( colors );
 
-        int fontSize = caf::FontTools::absolutePointSize( RiaPreferences::current()->defaultPlotFontSize(), m_track->regionLabelFontSize() );
+        int fontSize = caf::FontTools::absolutePointSize( RiaPreferences::current()->defaultPlotFontSize(), m_track->m_regionLabelFontSize() );
 
         m_annotationTool->attachNamedRegions( plotWidget->qwtPlot(),
                                               namesToPlot,
@@ -458,8 +458,8 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
                                               convertedYValues,
                                               m_track->annotationDisplay(),
                                               colorTable,
-                                              ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100,
-                                              m_track->showRegionLabels(),
+                                              ( ( 100 - m_track->m_colorShadingTransparency.value() ) * 255 ) / 100,
+                                              m_track->m_showRegionLabels.value(),
                                               RiaDefines::TrackSpan::FULL_WIDTH,
                                               {},
                                               fontSize );
@@ -508,7 +508,7 @@ void RimWellLogTrackRegionAnnotations::updateCurveDataRegionsOnPlot()
             std::vector<double> ucsSourceRegions     = geoMechWellLogExtractor->ucsSourceRegions( stepIdx, frameIdx );
 
             RiuQwtPlotWidget* plotWidget         = m_track->viewer();
-            RimColorLegend*   colorShadingLegend = m_track->colorShadingLegend();
+            RimColorLegend*   colorShadingLegend = m_track->m_colorShadingLegend;
 
             {
                 caf::ColorTable colorTable( colorShadingLegend->colorArray() );
@@ -531,8 +531,8 @@ void RimWellLogTrackRegionAnnotations::updateCurveDataRegionsOnPlot()
                                                       convertedYValues,
                                                       m_track->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
-                                                      m_track->showRegionLabels(),
+                                                      ( ( ( 100 - m_track->m_colorShadingTransparency.value() ) * 255 ) / 100 ) / 3,
+                                                      m_track->m_showRegionLabels.value(),
                                                       RiaDefines::TrackSpan::LEFT_COLUMN );
             }
             {
@@ -556,8 +556,8 @@ void RimWellLogTrackRegionAnnotations::updateCurveDataRegionsOnPlot()
                                                       convertedYValues,
                                                       m_track->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
-                                                      m_track->showRegionLabels(),
+                                                      ( ( ( 100 - m_track->m_colorShadingTransparency.value() ) * 255 ) / 100 ) / 3,
+                                                      m_track->m_showRegionLabels.value(),
                                                       RiaDefines::TrackSpan::CENTRE_COLUMN );
             }
             {
@@ -582,8 +582,8 @@ void RimWellLogTrackRegionAnnotations::updateCurveDataRegionsOnPlot()
                                                       convertedYValues,
                                                       m_track->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_track->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
-                                                      m_track->showRegionLabels(),
+                                                      ( ( ( 100 - m_track->m_colorShadingTransparency.value() ) * 255 ) / 100 ) / 3,
+                                                      m_track->m_showRegionLabels.value(),
                                                       RiaDefines::TrackSpan::RIGHT_COLUMN );
             }
         }

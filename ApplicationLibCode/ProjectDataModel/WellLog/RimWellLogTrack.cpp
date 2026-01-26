@@ -357,7 +357,7 @@ void RimWellLogTrack::detachAllPlotItems()
     {
         curve->detach();
     }
-    m_wellPathComponents->detachAllPlotItems();
+    if ( m_wellPathComponents ) m_wellPathComponents->detachAllPlotItems();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2177,73 +2177,10 @@ double RimWellLogTrack::underburdenHeight() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimWellLogTrack::FormationSource RimWellLogTrack::formationSource() const
+bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
 {
-    return m_formationSource();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimWellPath* RimWellLogTrack::formationWellPathForSourceWellPath() const
-{
-    return m_formationWellPathForSourceWellPath;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigWellPathFormations::FormationLevel RimWellLogTrack::formationLevel() const
-{
-    return m_formationLevel();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::showFormationFluids() const
-{
-    return m_showformationFluids;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RimWellLogTrack::colorShadingTransparency() const
-{
-    return m_colorShadingTransparency;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::showRegionLabels() const
-{
-    return m_showRegionLabels;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimColorLegend* RimWellLogTrack::colorShadingLegend() const
-{
-    return m_colorShadingLegend;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseResultDefinition* RimWellLogTrack::resultDefinition() const
-{
-    return m_resultDefinition;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::FontTools::RelativeSize RimWellLogTrack::regionLabelFontSize() const
-{
-    return m_regionLabelFontSize();
+    return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
+           1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2296,126 +2233,4 @@ RiuPlotAxis RimWellLogTrack::valueAxis() const
     RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfTypeAsserted<RimDepthTrackPlot>();
 
     return wellLogPlot->valueAxis();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-double RimWellLogTrack::minorTickIntervalPropertyAxis() const
-{
-    return m_minorTickIntervalPropertyAxis();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-double RimWellLogTrack::majorTickIntervalPropertyAxis() const
-{
-    return m_majorTickIntervalPropertyAxis();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::setAvailablePropertyValueRange( double minValue, double maxValue )
-{
-    m_availablePropertyValueRangeMin = minValue;
-    m_availablePropertyValueRangeMax = maxValue;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isAutoScalePropertyValuesEnabled() const
-{
-    return m_isAutoScalePropertyValuesEnabled();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isPropertyValueAxisInverted() const
-{
-    return m_invertPropertyValueAxis();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isPropertyAxisMinAndMaxTicksOnly() const
-{
-    return m_propertyAxisMinAndMaxTicksOnly();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isExplicitTickIntervalsPropertyValueAxis() const
-{
-    return m_explicitTickIntervalsPropertyValueAxis();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-int RimWellLogTrack::propertyValueAxisGridVisibility() const
-{
-    return m_propertyValueAxisGridVisibility();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::showWellPathComponentsBothSides() const
-{
-    return m_showWellPathComponentsBothSides();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::showWellPathComponentLabels() const
-{
-    return m_showWellPathComponentLabels();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
-{
-    return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
-           1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::showWellPathCompletions() const
-{
-    return m_showWellPathCompletions();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RimWellLogTrack::wellPathCompletionsInLegend() const
-{
-    return m_wellPathCompletionsInLegend();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimWellPathAttributeCollection* RimWellLogTrack::wellPathAttributeCollection() const
-{
-    return m_wellPathAttributeCollection();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::setWellPathAttributeCollection( RimWellPathAttributeCollection* attributeCollection )
-{
-    m_wellPathAttributeCollection = attributeCollection;
 }
