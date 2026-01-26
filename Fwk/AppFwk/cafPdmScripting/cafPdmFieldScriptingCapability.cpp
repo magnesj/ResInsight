@@ -67,7 +67,7 @@ void PdmFieldScriptingCapabilityIOHandler<QString>::writeToField( QString&      
         while ( !inputStream.atEnd() )
         {
             currentChar = errorMessageContainer->readCharWithLineNumberCount( inputStream );
-            
+
             if ( currentChar.isNull() )
             {
                 // Null character - add as is
