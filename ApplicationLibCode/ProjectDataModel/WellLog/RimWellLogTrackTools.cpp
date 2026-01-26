@@ -71,7 +71,7 @@ CurveSamplingPointData RimWellLogTrackTools::curveSamplingPointData( RigEclipseW
 ///
 //--------------------------------------------------------------------------------------------------
 CurveSamplingPointData RimWellLogTrackTools::curveSamplingPointData( RigGeoMechWellLogExtractor* extractor,
-                                                                      const RigFemResultAddress&  resultAddress )
+                                                                     const RigFemResultAddress&  resultAddress )
 {
     CurveSamplingPointData curveData;
 
@@ -87,10 +87,10 @@ CurveSamplingPointData RimWellLogTrackTools::curveSamplingPointData( RigGeoMechW
 ///
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrackTools::findRegionNamesToPlot( const CurveSamplingPointData&           curveData,
-                                                   const std::vector<QString>&             regionNamesVector,
-                                                   RimWellLogPlot::DepthTypeEnum           depthType,
-                                                   std::vector<QString>*                   regionNamesToPlot,
-                                                   std::vector<std::pair<double, double>>* yValues )
+                                                  const std::vector<QString>&             regionNamesVector,
+                                                  RimWellLogPlot::DepthTypeEnum           depthType,
+                                                  std::vector<QString>*                   regionNamesToPlot,
+                                                  std::vector<std::pair<double, double>>* yValues )
 {
     if ( regionNamesVector.empty() ) return;
 
@@ -256,10 +256,10 @@ void RimWellLogTrackTools::simWellOptionItems( QList<caf::PdmOptionItemInfo>* op
 ///
 //--------------------------------------------------------------------------------------------------
 RigEclipseWellLogExtractor* RimWellLogTrackTools::createSimWellExtractor( RimWellLogPlotCollection* wellLogCollection,
-                                                                           RimCase*                  rimCase,
-                                                                           const QString&            simWellName,
-                                                                           int                       branchIndex,
-                                                                           bool                      useBranchDetection )
+                                                                          RimCase*                  rimCase,
+                                                                          const QString&            simWellName,
+                                                                          int                       branchIndex,
+                                                                          bool                      useBranchDetection )
 {
     if ( !wellLogCollection ) return nullptr;
 
@@ -337,8 +337,8 @@ std::pair<double, double> RimWellLogTrackTools::extendMinMaxRange( double minVal
 ///
 //--------------------------------------------------------------------------------------------------
 QString RimWellLogTrackTools::asciiDataForPlotExport( const QString&                       trackDescription,
-                                                       RimDepthTrackPlot*                   depthTrackPlot,
-                                                       const std::vector<RimWellLogCurve*>& curves )
+                                                      RimDepthTrackPlot*                   depthTrackPlot,
+                                                      const std::vector<RimWellLogCurve*>& curves )
 {
     QString out = "\n" + trackDescription + "\n";
 

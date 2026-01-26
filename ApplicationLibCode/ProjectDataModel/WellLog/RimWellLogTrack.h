@@ -399,11 +399,11 @@ private:
 
     bool m_formationsForCaseWithSimWellOnly;
 
-    QPointer<RiuWellLogTrack>                             m_plotWidget;
-    std::unique_ptr<RimWellLogTrackRegionAnnotations>    m_regionAnnotations;
-    std::unique_ptr<RimWellLogTrackPropertyAxis>         m_propertyAxis;
-    std::unique_ptr<RimWellLogTrackStackedCurves>        m_stackedCurves;
-    std::unique_ptr<RimWellLogTrackWellPathComponents>   m_wellPathComponents;
+    QPointer<RiuWellLogTrack>                          m_plotWidget;
+    std::unique_ptr<RimWellLogTrackRegionAnnotations>  m_regionAnnotations;
+    std::unique_ptr<RimWellLogTrackPropertyAxis>       m_propertyAxis;
+    std::unique_ptr<RimWellLogTrackStackedCurves>      m_stackedCurves;
+    std::unique_ptr<RimWellLogTrackWellPathComponents> m_wellPathComponents;
 
     QString m_propertyValueAxisTitle;
     double  m_availablePropertyValueRangeMin;

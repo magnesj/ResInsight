@@ -118,8 +118,8 @@ void RimWellLogTrackRegionAnnotations::removeRegionAnnotations()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<std::pair<double, double>>
-    RimWellLogTrackRegionAnnotations::waterAndRockRegions( RiaDefines::DepthTypeEnum depthType, const RigGeoMechWellLogExtractor* extractor ) const
+std::vector<std::pair<double, double>> RimWellLogTrackRegionAnnotations::waterAndRockRegions( RiaDefines::DepthTypeEnum depthType,
+                                                                                              const RigGeoMechWellLogExtractor* extractor ) const
 {
     double waterEndTVD = extractor->waterDepth();
     if ( waterEndTVD == std::numeric_limits<double>::infinity() )
@@ -169,13 +169,13 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
     RiuQwtPlotWidget* plotWidget = m_track->viewer();
     if ( !plotWidget ) return;
 
-    RimWellPath*              formationWellPathForSourceCase     = m_track->formationWellPath();
-    RimWellPath*              formationWellPathForSourceWellPath = nullptr;
-    RimCase*                  formationCase                      = m_track->formationNamesCase();
-    QString                   formationSimWellName               = m_track->formationSimWellName();
-    int                       formationBranchIndex               = m_track->formationBranchIndex();
-    bool                      formationBranchDetection           = m_track->formationBranchDetection();
-    RimWellLogTrack::TrajectoryType formationTrajectoryType      = m_track->formationTrajectoryType();
+    RimWellPath*                    formationWellPathForSourceCase     = m_track->formationWellPath();
+    RimWellPath*                    formationWellPathForSourceWellPath = nullptr;
+    RimCase*                        formationCase                      = m_track->formationNamesCase();
+    QString                         formationSimWellName               = m_track->formationSimWellName();
+    int                             formationBranchIndex               = m_track->formationBranchIndex();
+    bool                            formationBranchDetection           = m_track->formationBranchDetection();
+    RimWellLogTrack::TrajectoryType formationTrajectoryType            = m_track->formationTrajectoryType();
 
     // Get formation source settings from track fields through public methods
     // Note: Some private members need accessor methods added to RimWellLogTrack
@@ -185,7 +185,8 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
         formationWellPathForSourceWellPath = m_track->formationWellPathForSourceWellPath();
         if ( formationWellPathForSourceWellPath == nullptr ) return;
 
-        if ( plot->depthType() != RiaDefines::DepthTypeEnum::MEASURED_DEPTH && plot->depthType() != RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH &&
+        if ( plot->depthType() != RiaDefines::DepthTypeEnum::MEASURED_DEPTH &&
+             plot->depthType() != RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH &&
              plot->depthType() != RiaDefines::DepthTypeEnum::TRUE_VERTICAL_DEPTH_RKB )
         {
             return;
@@ -229,15 +230,15 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
         if ( formationTrajectoryType == RimWellLogTrack::SIMULATION_WELL )
         {
             eclWellLogExtractor = RimWellLogTrackTools::createSimWellExtractor( wellLogCollection,
-                                                                                 formationCase,
-                                                                                 formationSimWellName,
-                                                                                 formationBranchIndex,
-                                                                                 formationBranchDetection );
+                                                                                formationCase,
+                                                                                formationSimWellName,
+                                                                                formationBranchIndex,
+                                                                                formationBranchDetection );
         }
         else
         {
-            eclWellLogExtractor =
-                RiaExtractionTools::findOrCreateWellLogExtractor( formationWellPathForSourceCase, dynamic_cast<RimEclipseCase*>( formationCase ) );
+            eclWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor( formationWellPathForSourceCase,
+                                                                                    dynamic_cast<RimEclipseCase*>( formationCase ) );
         }
 
         if ( eclWellLogExtractor )
@@ -258,13 +259,14 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
         }
         else
         {
-            geoMechWellLogExtractor =
-                RiaExtractionTools::findOrCreateWellLogExtractor( formationWellPathForSourceCase, dynamic_cast<RimGeoMechCase*>( formationCase ) );
+            geoMechWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor( formationWellPathForSourceCase,
+                                                                                        dynamic_cast<RimGeoMechCase*>( formationCase ) );
             if ( !geoMechWellLogExtractor ) return;
 
             std::string activeFormationNamesResultName = RiaResultNames::activeFormationNamesResultName().toStdString();
-            curveData = RimWellLogTrackTools::curveSamplingPointData( geoMechWellLogExtractor,
-                                                                       RigFemResultAddress( RIG_FORMATION_NAMES, activeFormationNamesResultName, "" ) );
+            curveData =
+                RimWellLogTrackTools::curveSamplingPointData( geoMechWellLogExtractor,
+                                                              RigFemResultAddress( RIG_FORMATION_NAMES, activeFormationNamesResultName, "" ) );
         }
 
         if ( geoMechWellLogExtractor )
@@ -292,7 +294,8 @@ void RimWellLogTrackRegionAnnotations::updateFormationNamesOnPlot()
 
         if ( m_track->formationSource() == RimWellLogTrack::FormationSource::CASE && plotWidget )
         {
-            if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr ) return;
+            if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr )
+                return;
 
             std::vector<QString> formationNamesVector = RimWellLogTrackTools::formationNamesVector( formationCase );
 
@@ -380,7 +383,8 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
 
     if ( m_track->formationSource() == RimWellLogTrack::FormationSource::CASE )
     {
-        if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr ) return;
+        if ( ( formationSimWellName == QString( "None" ) && formationWellPathForSourceCase == nullptr ) || formationCase == nullptr )
+            return;
 
         std::vector<cvf::Color3ub> colors;
 
@@ -415,7 +419,8 @@ void RimWellLogTrackRegionAnnotations::updateResultPropertyNamesOnPlot()
         RimWellLogTrackTools::findRegionNamesToPlot( curveData, namesVector, plot->depthType(), &namesToPlot, &yValues );
 
         // convert to plot depth unit
-        std::vector<std::pair<double, double>> convertedYValues = RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
+        std::vector<std::pair<double, double>> convertedYValues =
+            RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
 
         // TODO: unnecessarily messy!
         // Need to map colors to names (since a category can be used several times)
@@ -483,7 +488,8 @@ void RimWellLogTrackRegionAnnotations::updateCurveDataRegionsOnPlot()
             auto [stepIdx, frameIdx] = geoMechCase->geoMechData()->femPartResults()->stepListIndexToTimeStepAndDataFrameIndex( timeStep );
 
             RigGeoMechWellLogExtractor* geoMechWellLogExtractor = nullptr;
-            geoMechWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor( wellPath, dynamic_cast<RimGeoMechCase*>( geoMechCase ) );
+            geoMechWellLogExtractor =
+                RiaExtractionTools::findOrCreateWellLogExtractor( wellPath, dynamic_cast<RimGeoMechCase*>( geoMechCase ) );
             if ( !geoMechWellLogExtractor ) return;
 
             CurveSamplingPointData curveData;

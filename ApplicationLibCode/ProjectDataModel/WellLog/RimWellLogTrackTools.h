@@ -76,7 +76,7 @@ public:
     static std::pair<double, double> extendMinMaxRange( double minValue, double maxValue, double factor );
 
     // ASCII export
-    static QString asciiDataForPlotExport( const QString&                        trackDescription,
-                                           RimDepthTrackPlot*                    depthTrackPlot,
+    static QString asciiDataForPlotExport( const QString&                       trackDescription,
+                                           RimDepthTrackPlot*                   depthTrackPlot,
                                            const std::vector<RimWellLogCurve*>& curves );
 };
