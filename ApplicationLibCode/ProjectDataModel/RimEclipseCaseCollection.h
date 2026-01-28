@@ -34,6 +34,7 @@ class RimEclipseCase;
 class RimIdenticalGridCaseGroup;
 class RimWellPathCollection;
 class RimEclipseCaseEnsemble;
+class RimReservoirGridEnsemble;
 
 //==================================================================================================
 ///
@@ -47,9 +48,10 @@ public:
     RimEclipseCaseCollection();
     ~RimEclipseCaseCollection() override;
 
-    caf::PdmChildArrayField<RimEclipseCase*>            cases;
-    caf::PdmChildArrayField<RimIdenticalGridCaseGroup*> caseGroups;
-    caf::PdmChildArrayField<RimEclipseCaseEnsemble*>    caseEnsembles;
+    caf::PdmChildArrayField<RimEclipseCase*>              cases;
+    caf::PdmChildArrayField<RimIdenticalGridCaseGroup*>   caseGroups;
+    caf::PdmChildArrayField<RimEclipseCaseEnsemble*>      caseEnsembles;
+    caf::PdmChildArrayField<RimReservoirGridEnsemble*>    reservoirGridEnsembles;
 
     void close();
 

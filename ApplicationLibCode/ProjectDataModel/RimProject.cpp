@@ -67,6 +67,7 @@
 #include "RimGridView.h"
 #include "RimIdenticalGridCaseGroup.h"
 #include "RimMainPlotCollection.h"
+#include "RimReservoirGridEnsemble.h"
 #include "RimMeasurement.h"
 #include "RimMultiPlotCollection.h"
 #include "RimObservedDataCollection.h"
@@ -713,6 +714,30 @@ void RimProject::assignIdToCaseGroup( RimIdenticalGridCaseGroup* caseGroup )
         }
 
         caseGroup->groupId = m_nextValidCaseGroupId++;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimProject::assignIdToCaseGroup( RimReservoirGridEnsemble* gridEnsemble )
+{
+    if ( gridEnsemble )
+    {
+        std::vector<RimIdenticalGridCaseGroup*> identicalCaseGroups = descendantsIncludingThisOfType<RimIdenticalGridCaseGroup>();
+        std::vector<RimReservoirGridEnsemble*>  gridEnsembles       = descendantsIncludingThisOfType<RimReservoirGridEnsemble>();
+
+        for ( RimIdenticalGridCaseGroup* existingCaseGroup : identicalCaseGroups )
+        {
+            m_nextValidCaseGroupId = std::max( m_nextValidCaseGroupId, existingCaseGroup->groupId() + 1 );
+        }
+
+        for ( RimReservoirGridEnsemble* existingEnsemble : gridEnsembles )
+        {
+            m_nextValidCaseGroupId = std::max( m_nextValidCaseGroupId, existingEnsemble->groupId() + 1 );
+        }
+
+        gridEnsemble->setGroupId( m_nextValidCaseGroupId++ );
     }
 }
 
@@ -1507,6 +1532,7 @@ void RimProject::defineUiTreeOrdering( caf::PdmUiTreeOrdering& uiTreeOrdering, Q
         {
             if ( oilField->analysisModels() ) uiTreeOrdering.add( oilField->analysisModels() );
         }
+        uiTreeOrdering.add( &m_ensembleFileSetCollection );
     }
     else
     {
