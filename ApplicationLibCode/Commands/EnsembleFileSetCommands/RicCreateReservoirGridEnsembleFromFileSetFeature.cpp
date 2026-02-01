@@ -21,11 +21,10 @@
 #include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
 
-#include "RigGridManager.h"
+#include "RifReaderOpmCommon.h"
 
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "RimEclipseCaseCollection.h"
-#include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimIdenticalGridCaseGroup.h"
 #include "RimOilField.h"
@@ -93,9 +92,9 @@ void RicCreateReservoirGridEnsembleFromFileSetFeature::onActionTriggered( bool i
         }
 
         // Read grid dimensions from all files to determine if they are identical
-        bool                                       allGridsIdentical = true;
-        std::vector<std::vector<int>>              mainCaseGridDimensions;
-        std::vector<std::vector<std::vector<int>>> allGridDimensions;
+        bool                                            allGridsIdentical = true;
+        RifReaderOpmCommon::GridDimensions              firstGridDimensions;
+        std::vector<RifReaderOpmCommon::GridDimensions> allGridDimensions;
 
         {
             caf::ProgressInfo progress( gridFiles.size(), QString( "Reading grid dimensions for %1 files" ).arg( gridFiles.size() ) );
@@ -104,27 +103,22 @@ void RicCreateReservoirGridEnsembleFromFileSetFeature::onActionTriggered( bool i
             {
                 progress.setProgressDescription( QString( "Reading dimensions: %1" ).arg( gridFiles[i] ) );
 
-                RimEclipseResultCase*         tempCase = new RimEclipseResultCase();
-                std::vector<std::vector<int>> gridDimensions;
-
-                QFileInfo gridFileName( gridFiles[i] );
-                tempCase->setCaseInfo( gridFileName.completeBaseName(), gridFiles[i] );
-                tempCase->readGridDimensions( gridDimensions );
+                auto gridDimensions = RifReaderOpmCommon::readGridDimensions( gridFiles[i] );
 
                 if ( i == 0 )
                 {
-                    mainCaseGridDimensions = gridDimensions;
+                    firstGridDimensions = gridDimensions;
                 }
                 else
                 {
-                    if ( !RigGridManager::isGridDimensionsEqual( mainCaseGridDimensions, gridDimensions ) )
+                    if ( gridDimensions.i != firstGridDimensions.i || gridDimensions.j != firstGridDimensions.j ||
+                         gridDimensions.k != firstGridDimensions.k )
                     {
                         allGridsIdentical = false;
                     }
                 }
 
                 allGridDimensions.push_back( gridDimensions );
-                delete tempCase;
 
                 progress.incrementProgress();
             }
