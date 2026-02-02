@@ -25,9 +25,9 @@ jobs:
               os: windows-2022,
               cc: "cl",
               cxx: "cl",
-              build-python-module: false,
+              build-python-module: true,
               execute-unit-tests: true,
-              execute-pytests: false,
+              execute-pytests: true,
               unity-build: true,
               publish-to-pypi: false,
               vcpkg-bootstrap: bootstrap-vcpkg.bat,
@@ -273,10 +273,18 @@ jobs:
           cd GrpcInterface/Python/rips
           ${{ steps.python-path.outputs.PYTHON_EXECUTABLE }} -m mypy *.py generated/generated_classes.py
 
-      - name: Run pytest
-        if: matrix.config.execute-pytests
+      - name: Run pytest (Linux)
+        if: matrix.config.execute-pytests && runner.os != 'Windows'
         env:
           RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ResInsight
+        run: |
+          cd GrpcInterface/Python/rips
+          ${{ steps.python-path.outputs.PYTHON_EXECUTABLE }} -m pytest --console
+
+      - name: Run pytest (Windows)
+        if: matrix.config.execute-pytests && runner.os == 'Windows'
+        env:
+          RESINSIGHT_EXECUTABLE: ${{ runner.workspace }}/ResInsight/cmakebuild/ResInsight.exe
         run: |
           cd GrpcInterface/Python/rips
           ${{ steps.python-path.outputs.PYTHON_EXECUTABLE }} -m pytest --console
