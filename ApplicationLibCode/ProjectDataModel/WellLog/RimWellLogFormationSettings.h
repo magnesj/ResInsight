@@ -84,18 +84,18 @@ public:
     void uiOrdering( const QString& uiConfigName, caf::PdmUiOrdering& uiOrdering, bool formationsForCaseWithSimWellOnly );
 
 protected:
-    void                          fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
-    caf::PdmField<int>                                             m_formationSource;
-    caf::PdmPtrField<RimCase*>                                     m_formationCase;
-    caf::PdmField<int>                                             m_formationTrajectoryType;
-    caf::PdmPtrField<RimWellPath*>                                 m_formationWellPathForSourceCase;
-    caf::PdmPtrField<RimWellPath*>                                 m_formationWellPathForSourceWellPath;
-    caf::PdmField<QString>                                         m_formationSimWellName;
-    caf::PdmField<int>                                             m_formationBranchIndex;
-    caf::PdmField<bool>                                            m_formationBranchDetection;
+    caf::PdmField<int>                                                 m_formationSource;
+    caf::PdmPtrField<RimCase*>                                         m_formationCase;
+    caf::PdmField<int>                                                 m_formationTrajectoryType;
+    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase;
+    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceWellPath;
+    caf::PdmField<QString>                                             m_formationSimWellName;
+    caf::PdmField<int>                                                 m_formationBranchIndex;
+    caf::PdmField<bool>                                                m_formationBranchDetection;
     caf::PdmField<caf::AppEnum<RigWellPathFormations::FormationLevel>> m_formationLevel;
-    caf::PdmField<bool>                                            m_showFormationFluids;
+    caf::PdmField<bool>                                                m_showFormationFluids;
 };

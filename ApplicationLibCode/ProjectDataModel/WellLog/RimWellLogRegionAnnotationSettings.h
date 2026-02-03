@@ -74,10 +74,10 @@ protected:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
 private:
-    caf::PdmField<RegionAnnotationTypeEnum>               m_regionAnnotationType;
-    caf::PdmField<RegionAnnotationDisplayEnum>            m_regionAnnotationDisplay;
-    caf::PdmPtrField<RimColorLegend*>                     m_colorShadingLegend;
-    caf::PdmField<int>                                    m_colorShadingTransparency;
-    caf::PdmField<bool>                                   m_showRegionLabels;
+    caf::PdmField<RegionAnnotationTypeEnum>                   m_regionAnnotationType;
+    caf::PdmField<RegionAnnotationDisplayEnum>                m_regionAnnotationDisplay;
+    caf::PdmPtrField<RimColorLegend*>                         m_colorShadingLegend;
+    caf::PdmField<int>                                        m_colorShadingTransparency;
+    caf::PdmField<bool>                                       m_showRegionLabels;
     caf::PdmField<caf::AppEnum<caf::FontTools::RelativeSize>> m_regionLabelFontSize;
 };

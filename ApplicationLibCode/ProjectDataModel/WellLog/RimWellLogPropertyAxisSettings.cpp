@@ -225,8 +225,8 @@ double RimWellLogPropertyAxisSettings::minorTickInterval() const
 //--------------------------------------------------------------------------------------------------
 void RimWellLogPropertyAxisSettings::setTickIntervals( double majorInterval, double minorInterval )
 {
-    m_majorTickInterval = majorInterval;
-    m_minorTickInterval = minorInterval;
+    m_majorTickInterval     = majorInterval;
+    m_minorTickInterval     = minorInterval;
     m_explicitTickIntervals = true;
 }
 
@@ -265,9 +265,7 @@ void RimWellLogPropertyAxisSettings::uiOrdering( const QString& uiConfigName, ca
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogPropertyAxisSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                                       const QVariant&            oldValue,
-                                                       const QVariant&            newValue )
+void RimWellLogPropertyAxisSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     auto track = firstAncestorOrThisOfType<RimWellLogTrack>();
     if ( track )
@@ -288,9 +286,8 @@ void RimWellLogPropertyAxisSettings::fieldChangedByUi( const caf::PdmFieldHandle
             track->updatePlotWidgetFromAxisRanges();
             track->updateConnectedEditors();
         }
-        else if ( changedField == &m_gridVisibility || changedField == &m_explicitTickIntervals ||
-                  changedField == &m_majorTickInterval || changedField == &m_minorTickInterval ||
-                  changedField == &m_minAndMaxTicksOnly )
+        else if ( changedField == &m_gridVisibility || changedField == &m_explicitTickIntervals || changedField == &m_majorTickInterval ||
+                  changedField == &m_minorTickInterval || changedField == &m_minAndMaxTicksOnly )
         {
             track->updatePropertyValueAxisAndGridTickIntervals();
             track->updateConnectedEditors();

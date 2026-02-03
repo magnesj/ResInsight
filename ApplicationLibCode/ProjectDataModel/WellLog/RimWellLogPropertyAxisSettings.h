@@ -78,15 +78,15 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
 
 private:
-    caf::PdmField<bool>                         m_isEnabled;
-    caf::PdmField<double>                       m_visibleRangeMin;
-    caf::PdmField<double>                       m_visibleRangeMax;
-    caf::PdmField<bool>                         m_isAutoScaleEnabled;
-    caf::PdmField<bool>                         m_isLogarithmicScaleEnabled;
-    caf::PdmField<bool>                         m_isAxisInverted;
+    caf::PdmField<bool>                            m_isEnabled;
+    caf::PdmField<double>                          m_visibleRangeMin;
+    caf::PdmField<double>                          m_visibleRangeMax;
+    caf::PdmField<bool>                            m_isAutoScaleEnabled;
+    caf::PdmField<bool>                            m_isLogarithmicScaleEnabled;
+    caf::PdmField<bool>                            m_isAxisInverted;
     caf::PdmField<RimDepthTrackPlot::AxisGridEnum> m_gridVisibility;
-    caf::PdmField<bool>                         m_minAndMaxTicksOnly;
-    caf::PdmField<bool>                         m_explicitTickIntervals;
-    caf::PdmField<double>                       m_majorTickInterval;
-    caf::PdmField<double>                       m_minorTickInterval;
+    caf::PdmField<bool>                            m_minAndMaxTicksOnly;
+    caf::PdmField<bool>                            m_explicitTickIntervals;
+    caf::PdmField<double>                          m_majorTickInterval;
+    caf::PdmField<double>                          m_minorTickInterval;
 };

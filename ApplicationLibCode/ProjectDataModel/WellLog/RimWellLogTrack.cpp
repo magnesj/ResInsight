@@ -2725,7 +2725,13 @@ void RimWellLogTrack::updateStackedCurveData()
             }
 
             RigWellLogCurveData tempCurveData;
-            tempCurveData.setValuesAndDepths( allStackedValues, allDepthValues, depthType, 0.0, displayUnit, false, m_propertyAxisSettings->isLogarithmicScaleEnabled() );
+            tempCurveData.setValuesAndDepths( allStackedValues,
+                                              allDepthValues,
+                                              depthType,
+                                              0.0,
+                                              displayUnit,
+                                              false,
+                                              m_propertyAxisSettings->isLogarithmicScaleEnabled() );
 
             auto plotDepthValues          = tempCurveData.depths( depthType );
             auto polyLineStartStopIndices = tempCurveData.polylineStartStopIndices();
