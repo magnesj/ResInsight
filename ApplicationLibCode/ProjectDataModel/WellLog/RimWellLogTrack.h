@@ -30,6 +30,7 @@
 #include "RiuPlotAxis.h"
 
 #include "cafPdmChildArrayField.h"
+#include "cafPdmChildField.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 #include "cafPdmPtrField.h"
@@ -58,6 +59,7 @@ class RigWellLogExtractor;
 class RimEclipseResultDefinition;
 class RimColorLegend;
 class RimEnsembleWellLogCurveSet;
+class RimWellLogPropertyAxisSettings;
 class RiuPlotAnnotationTool;
 
 struct CurveSamplingPointData
@@ -315,18 +317,21 @@ private:
     caf::PdmField<QString>                    m_description;
     caf::PdmChildArrayField<RimWellLogCurve*> m_curves;
 
-    // Property value axis
-    caf::PdmField<bool>                         m_isPropertyAxisEnabled;
-    caf::PdmField<double>                       m_visiblePropertyValueRangeMin;
-    caf::PdmField<double>                       m_visiblePropertyValueRangeMax;
-    caf::PdmField<bool>                         m_isAutoScalePropertyValuesEnabled;
-    caf::PdmField<bool>                         m_isPropertyLogarithmicScaleEnabled;
-    caf::PdmField<bool>                         m_invertPropertyValueAxis;
-    caf::PdmField<RimWellLogPlot::AxisGridEnum> m_propertyValueAxisGridVisibility;
-    caf::PdmField<bool>                         m_propertyAxisMinAndMaxTicksOnly;
-    caf::PdmField<bool>                         m_explicitTickIntervalsPropertyValueAxis;
-    caf::PdmField<double>                       m_majorTickIntervalPropertyAxis;
-    caf::PdmField<double>                       m_minorTickIntervalPropertyAxis;
+    // Property value axis settings
+    caf::PdmChildField<RimWellLogPropertyAxisSettings*> m_propertyAxisSettings;
+
+    // OBSOLETE: Property value axis fields (migrated to RimWellLogPropertyAxisSettings)
+    caf::PdmField<bool>                         m_isPropertyAxisEnabled_OBSOLETE;
+    caf::PdmField<double>                       m_visiblePropertyValueRangeMin_OBSOLETE;
+    caf::PdmField<double>                       m_visiblePropertyValueRangeMax_OBSOLETE;
+    caf::PdmField<bool>                         m_isAutoScalePropertyValuesEnabled_OBSOLETE;
+    caf::PdmField<bool>                         m_isPropertyLogarithmicScaleEnabled_OBSOLETE;
+    caf::PdmField<bool>                         m_invertPropertyValueAxis_OBSOLETE;
+    caf::PdmField<RimWellLogPlot::AxisGridEnum> m_propertyValueAxisGridVisibility_OBSOLETE;
+    caf::PdmField<bool>                         m_propertyAxisMinAndMaxTicksOnly_OBSOLETE;
+    caf::PdmField<bool>                         m_explicitTickIntervalsPropertyValueAxis_OBSOLETE;
+    caf::PdmField<double>                       m_majorTickIntervalPropertyAxis_OBSOLETE;
+    caf::PdmField<double>                       m_minorTickIntervalPropertyAxis_OBSOLETE;
 
     // Depth axis
     caf::PdmField<double> m_visibleDepthRangeMin;
