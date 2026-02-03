@@ -69,6 +69,7 @@
 #include "RimWellLogCurveCommonDataSource.h"
 #include "RimWellLogExtractionCurve.h"
 #include "RimWellLogPlotCollection.h"
+#include "RimWellLogPropertyAxisSettings.h"
 #include "RimWellPath.h"
 #include "RimWellPathAttribute.h"
 #include "RimWellPathAttributeCollection.h"
@@ -191,10 +192,16 @@ RimWellLogTrack::RimWellLogTrack()
     auto reorderability = caf::PdmFieldReorderCapability::addToField( &m_curves );
     reorderability->orderChanged.connect( this, &RimWellLogTrack::curveDataChanged );
 
-    CAF_PDM_InitField( &m_visiblePropertyValueRangeMin, "VisibleXRangeMin", RI_LOGPLOTTRACK_MINX_DEFAULT, "Min" );
-    m_visiblePropertyValueRangeMin.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    CAF_PDM_InitField( &m_visiblePropertyValueRangeMax, "VisibleXRangeMax", RI_LOGPLOTTRACK_MAXX_DEFAULT, "Max" );
-    m_visiblePropertyValueRangeMax.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    // Property axis settings
+    CAF_PDM_InitFieldNoDefault( &m_propertyAxisSettings, "PropertyAxisSettings", "" );
+    m_propertyAxisSettings = new RimWellLogPropertyAxisSettings();
+    m_propertyAxisSettings.uiCapability()->setUiTreeChildrenHidden( true );
+
+    // OBSOLETE property axis fields - kept for migration from older project files
+    CAF_PDM_InitField( &m_visiblePropertyValueRangeMin_OBSOLETE, "VisibleXRangeMin", RI_LOGPLOTTRACK_MINX_DEFAULT, "Min" );
+    m_visiblePropertyValueRangeMin_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_visiblePropertyValueRangeMax_OBSOLETE, "VisibleXRangeMax", RI_LOGPLOTTRACK_MAXX_DEFAULT, "Max" );
+    m_visiblePropertyValueRangeMax_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitField( &m_visibleDepthRangeMin, "VisibleYRangeMin", RI_LOGPLOTTRACK_MINX_DEFAULT, "Min" );
     CAF_PDM_InitField( &m_visibleDepthRangeMax, "VisibleYRangeMax", RI_LOGPLOTTRACK_MAXX_DEFAULT, "Max" );
@@ -203,21 +210,27 @@ RimWellLogTrack::RimWellLogTrack()
     m_visibleDepthRangeMax.uiCapability()->setUiHidden( true );
     m_visibleDepthRangeMax.xmlCapability()->disableIO();
 
-    CAF_PDM_InitField( &m_isAutoScalePropertyValuesEnabled, "AutoScaleX", true, "Auto Scale" );
-    m_isAutoScalePropertyValuesEnabled.uiCapability()->setUiHidden( true );
+    CAF_PDM_InitField( &m_isAutoScalePropertyValuesEnabled_OBSOLETE, "AutoScaleX", true, "Auto Scale" );
+    m_isAutoScalePropertyValuesEnabled_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitField( &m_isPropertyLogarithmicScaleEnabled, "LogarithmicScaleX", false, "Logarithmic Scale" );
-    CAF_PDM_InitField( &m_invertPropertyValueAxis, "InvertPropertyValueAxis", false, "Invert Axis Range" );
-    CAF_PDM_InitField( &m_isPropertyAxisEnabled, "IsPropertyAxisEnabled", true, "Show Axis" );
+    CAF_PDM_InitField( &m_isPropertyLogarithmicScaleEnabled_OBSOLETE, "LogarithmicScaleX", false, "Logarithmic Scale" );
+    m_isPropertyLogarithmicScaleEnabled_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_invertPropertyValueAxis_OBSOLETE, "InvertPropertyValueAxis", false, "Invert Axis Range" );
+    m_invertPropertyValueAxis_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_isPropertyAxisEnabled_OBSOLETE, "IsPropertyAxisEnabled", true, "Show Axis" );
+    m_isPropertyAxisEnabled_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitFieldNoDefault( &m_propertyValueAxisGridVisibility, "ShowXGridLines", "Show Grid Lines" );
+    CAF_PDM_InitFieldNoDefault( &m_propertyValueAxisGridVisibility_OBSOLETE, "ShowXGridLines", "Show Grid Lines" );
+    m_propertyValueAxisGridVisibility_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitField( &m_explicitTickIntervalsPropertyValueAxis, "ExplicitTickIntervals", false, "Manually Set Tick Intervals" );
-    CAF_PDM_InitField( &m_propertyAxisMinAndMaxTicksOnly, "MinAndMaxTicksOnly", false, "Show Ticks at Min and Max" );
-    CAF_PDM_InitField( &m_majorTickIntervalPropertyAxis, "MajorTickIntervals", 0.0, "Major Tick Interval" );
-    CAF_PDM_InitField( &m_minorTickIntervalPropertyAxis, "MinorTickIntervals", 0.0, "Minor Tick Interval" );
-    m_majorTickIntervalPropertyAxis.uiCapability()->setUiHidden( true );
-    m_minorTickIntervalPropertyAxis.uiCapability()->setUiHidden( true );
+    CAF_PDM_InitField( &m_explicitTickIntervalsPropertyValueAxis_OBSOLETE, "ExplicitTickIntervals", false, "Manually Set Tick Intervals" );
+    m_explicitTickIntervalsPropertyValueAxis_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_propertyAxisMinAndMaxTicksOnly_OBSOLETE, "MinAndMaxTicksOnly", false, "Show Ticks at Min and Max" );
+    m_propertyAxisMinAndMaxTicksOnly_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_majorTickIntervalPropertyAxis_OBSOLETE, "MajorTickIntervals", 0.0, "Major Tick Interval" );
+    m_majorTickIntervalPropertyAxis_OBSOLETE.xmlCapability()->setIOWritable( false );
+    CAF_PDM_InitField( &m_minorTickIntervalPropertyAxis_OBSOLETE, "MinorTickIntervals", 0.0, "Minor Tick Interval" );
+    m_minorTickIntervalPropertyAxis_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitFieldNoDefault( &m_axisFontSize, "AxisFontSize", "Axis Font Size" );
 
@@ -414,9 +427,9 @@ void RimWellLogTrack::calculatePropertyValueZoomRange()
         minValue = 0;
         maxValue = 0;
     }
-    else if ( m_minorTickIntervalPropertyAxis() != 0.0 )
+    else if ( m_propertyAxisSettings->minorTickInterval() != 0.0 )
     {
-        std::tie( minValue, maxValue ) = adjustXRange( minValue, maxValue, m_minorTickIntervalPropertyAxis() );
+        std::tie( minValue, maxValue ) = adjustXRange( minValue, maxValue, m_propertyAxisSettings->minorTickInterval() );
     }
     else
     {
@@ -495,17 +508,18 @@ void RimWellLogTrack::updatePropertyValueZoom()
 
     calculatePropertyValueZoomRange();
 
-    if ( m_isAutoScalePropertyValuesEnabled )
+    if ( m_propertyAxisSettings->isAutoScaleEnabled() )
     {
-        m_visiblePropertyValueRangeMin = m_availablePropertyValueRangeMin;
-        m_visiblePropertyValueRangeMax = m_availablePropertyValueRangeMax;
+        double rangeMin = m_availablePropertyValueRangeMin;
+        double rangeMax = m_availablePropertyValueRangeMax;
 
-        if ( !visibleStackedCurves().empty() && !m_isPropertyLogarithmicScaleEnabled )
+        if ( !visibleStackedCurves().empty() && !m_propertyAxisSettings->isLogarithmicScaleEnabled() )
         {
             // Try to ensure we include the base line whether the values are negative or positive.
-            m_visiblePropertyValueRangeMin = std::min( m_visiblePropertyValueRangeMin(), 0.0 );
-            m_visiblePropertyValueRangeMax = std::max( m_visiblePropertyValueRangeMax(), 0.0 );
+            rangeMin = std::min( rangeMin, 0.0 );
+            rangeMax = std::max( rangeMax, 0.0 );
         }
+        m_propertyAxisSettings->setVisibleRange( rangeMin, rangeMax );
         computeAndSetPropertyValueRangeMinForLogarithmicScale();
         updateEditors();
     }
@@ -589,64 +603,6 @@ void RimWellLogTrack::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
     else if ( changedField == &m_description )
     {
         updateParentLayout();
-    }
-    else if ( changedField == &m_explicitTickIntervalsPropertyValueAxis )
-    {
-        if ( m_plotWidget )
-        {
-            m_majorTickIntervalPropertyAxis = m_plotWidget->majorTickInterval( valueAxis() );
-            m_minorTickIntervalPropertyAxis = m_plotWidget->minorTickInterval( valueAxis() );
-        }
-        m_majorTickIntervalPropertyAxis.uiCapability()->setUiHidden( !m_explicitTickIntervalsPropertyValueAxis() );
-        m_minorTickIntervalPropertyAxis.uiCapability()->setUiHidden( !m_explicitTickIntervalsPropertyValueAxis() );
-        if ( !m_explicitTickIntervalsPropertyValueAxis() )
-        {
-            updatePropertyValueAxisAndGridTickIntervals();
-        }
-    }
-    else if ( changedField == &m_isPropertyAxisEnabled )
-    {
-        updatePropertyValueAxisAndGridTickIntervals();
-        updateParentLayout();
-    }
-    else if ( changedField == &m_propertyValueAxisGridVisibility || changedField == &m_majorTickIntervalPropertyAxis ||
-              changedField == &m_minorTickIntervalPropertyAxis || changedField == &m_propertyAxisMinAndMaxTicksOnly ||
-              changedField == &m_invertPropertyValueAxis )
-    {
-        updatePropertyValueAxisAndGridTickIntervals();
-    }
-    else if ( changedField == &m_visiblePropertyValueRangeMin || changedField == &m_visiblePropertyValueRangeMax )
-    {
-        bool emptyRange = isEmptyVisiblePropertyRange();
-        m_explicitTickIntervalsPropertyValueAxis.uiCapability()->setUiReadOnly( emptyRange );
-        m_propertyValueAxisGridVisibility.uiCapability()->setUiReadOnly( emptyRange );
-
-        m_isAutoScalePropertyValuesEnabled = false;
-
-        updatePropertyValueZoom();
-        m_plotWidget->scheduleReplot();
-
-        updateEditors();
-    }
-    else if ( changedField == &m_isAutoScalePropertyValuesEnabled )
-    {
-        if ( m_isAutoScalePropertyValuesEnabled() )
-        {
-            updatePropertyValueZoom();
-            m_plotWidget->scheduleReplot();
-        }
-    }
-    else if ( changedField == &m_isPropertyLogarithmicScaleEnabled )
-    {
-        updateAxisScaleEngine();
-        if ( m_isPropertyLogarithmicScaleEnabled() )
-        {
-            m_explicitTickIntervalsPropertyValueAxis = false;
-        }
-        m_explicitTickIntervalsPropertyValueAxis.uiCapability()->setUiHidden( m_isPropertyLogarithmicScaleEnabled() );
-
-        updatePropertyValueZoom();
-        loadDataAndUpdate();
     }
     else if ( changedField == &m_regionAnnotationType || changedField == &m_regionAnnotationDisplay || changedField == &m_formationSource ||
               changedField == &m_colorShadingTransparency || changedField == &m_colorShadingLegend )
@@ -809,7 +765,7 @@ void RimWellLogTrack::curveStackingChanged( const caf::SignalEmitter* emitter, b
 {
     updateStackedCurveData();
 
-    m_isAutoScalePropertyValuesEnabled = true;
+    m_propertyAxisSettings->setAutoScaleEnabled( true );
     updatePropertyValueZoom();
     m_plotWidget->scheduleReplot();
 }
@@ -832,11 +788,11 @@ void RimWellLogTrack::updatePropertyValueAxisAndGridTickIntervals()
     {
         m_plotWidget->setAxisLabelsAndTicksEnabled( valueAxis(), true, true );
 
-        auto rangeBoundaryA = m_visiblePropertyValueRangeMin();
-        auto rangeBoundaryB = m_visiblePropertyValueRangeMax();
-        if ( m_invertPropertyValueAxis() ) std::swap( rangeBoundaryA, rangeBoundaryB );
+        auto rangeBoundaryA = m_propertyAxisSettings->visibleRangeMin();
+        auto rangeBoundaryB = m_propertyAxisSettings->visibleRangeMax();
+        if ( m_propertyAxisSettings->isAxisInverted() ) std::swap( rangeBoundaryA, rangeBoundaryB );
 
-        if ( m_propertyAxisMinAndMaxTicksOnly )
+        if ( m_propertyAxisSettings->isMinAndMaxTicksOnly() )
         {
             auto roundToDigits = []( double value, int numberOfDigits, bool useFloor )
             {
@@ -881,11 +837,11 @@ void RimWellLogTrack::updatePropertyValueAxisAndGridTickIntervals()
                 m_plotWidget->qwtPlot()->setAxisScaleDiv( QwtAxis::YLeft, div );
             }
         }
-        else if ( m_explicitTickIntervalsPropertyValueAxis )
+        else if ( m_propertyAxisSettings->isExplicitTickIntervals() )
         {
             m_plotWidget->setMajorAndMinorTickIntervals( valueAxis(),
-                                                         m_majorTickIntervalPropertyAxis(),
-                                                         m_minorTickIntervalPropertyAxis(),
+                                                         m_propertyAxisSettings->majorTickInterval(),
+                                                         m_propertyAxisSettings->minorTickInterval(),
                                                          rangeBoundaryA,
                                                          rangeBoundaryB );
         }
@@ -898,8 +854,8 @@ void RimWellLogTrack::updatePropertyValueAxisAndGridTickIntervals()
         }
 
         m_plotWidget->enableGridLines( valueAxis(),
-                                       m_propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MAJOR,
-                                       m_propertyValueAxisGridVisibility() & RimWellLogPlot::AXIS_GRID_MINOR );
+                                       m_propertyAxisSettings->gridVisibility() & RimWellLogPlot::AXIS_GRID_MAJOR,
+                                       m_propertyAxisSettings->gridVisibility() & RimWellLogPlot::AXIS_GRID_MINOR );
     }
 
     RimDepthTrackPlot* wellLogPlot = firstAncestorOrThisOfType<RimDepthTrackPlot>();
@@ -910,7 +866,7 @@ void RimWellLogTrack::updatePropertyValueAxisAndGridTickIntervals()
                                        wellLogPlot->depthAxisGridLinesEnabled() & RimWellLogPlot::AXIS_GRID_MINOR );
     }
 
-    m_plotWidget->enableAxisNumberLabels( valueAxis(), m_isPropertyAxisEnabled() );
+    m_plotWidget->enableAxisNumberLabels( valueAxis(), m_propertyAxisSettings->isEnabled() );
 
     m_plotWidget->scheduleReplot();
 }
@@ -1083,10 +1039,9 @@ void RimWellLogTrack::updateAxisRangesFromPlotWidget()
     auto [xIntervalMin, xIntervalMax]         = m_plotWidget->axisRange( valueAxis() );
     auto [depthIntervalMin, depthIntervalMax] = m_plotWidget->axisRange( depthAxis() );
 
-    m_visiblePropertyValueRangeMin = xIntervalMin;
-    m_visiblePropertyValueRangeMax = xIntervalMax;
-    m_visibleDepthRangeMin         = depthIntervalMin;
-    m_visibleDepthRangeMax         = depthIntervalMax;
+    m_propertyAxisSettings->setVisibleRange( xIntervalMin, xIntervalMax );
+    m_visibleDepthRangeMin = depthIntervalMin;
+    m_visibleDepthRangeMax = depthIntervalMax;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1258,8 +1213,8 @@ void RimWellLogTrack::availableDepthRange( double* minimumDepth, double* maximum
 void RimWellLogTrack::visiblePropertyValueRange( double* minX, double* maxX )
 {
     CAF_ASSERT( minX && maxX );
-    *minX = m_visiblePropertyValueRangeMin;
-    *maxX = m_visiblePropertyValueRangeMax;
+    *minX = m_propertyAxisSettings->visibleRangeMin();
+    *maxX = m_propertyAxisSettings->visibleRangeMax();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1277,8 +1232,8 @@ void RimWellLogTrack::visibleDepthRange( double* minDepth, double* maxDepth )
 //--------------------------------------------------------------------------------------------------
 bool RimWellLogTrack::isEmptyVisiblePropertyRange() const
 {
-    return std::abs( m_visiblePropertyValueRangeMax() - m_visiblePropertyValueRangeMin ) <
-           1.0e-6 * std::max( 1.0, std::max( m_visiblePropertyValueRangeMax(), m_visiblePropertyValueRangeMin() ) );
+    return std::abs( m_propertyAxisSettings->visibleRangeMax() - m_propertyAxisSettings->visibleRangeMin() ) <
+           1.0e-6 * std::max( 1.0, std::max( m_propertyAxisSettings->visibleRangeMax(), m_propertyAxisSettings->visibleRangeMin() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1440,13 +1395,6 @@ void RimWellLogTrack::onLoadDataAndUpdate()
     }
 
     updatePropertyValueAxisAndGridTickIntervals();
-    m_majorTickIntervalPropertyAxis.uiCapability()->setUiHidden( !m_explicitTickIntervalsPropertyValueAxis() );
-    m_minorTickIntervalPropertyAxis.uiCapability()->setUiHidden( !m_explicitTickIntervalsPropertyValueAxis() );
-
-    bool emptyRange = isEmptyVisiblePropertyRange();
-    m_explicitTickIntervalsPropertyValueAxis.uiCapability()->setUiReadOnly( emptyRange );
-    m_propertyValueAxisGridVisibility.uiCapability()->setUiReadOnly( emptyRange );
-
     updateDepthZoom();
 
     updateLegend();
@@ -1524,7 +1472,7 @@ void RimWellLogTrack::setAutoScaleYEnabled( bool enabled )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAutoScalePropertyValuesEnabled( bool enabled )
 {
-    m_isAutoScalePropertyValuesEnabled = enabled;
+    m_propertyAxisSettings->setAutoScaleEnabled( enabled );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1546,16 +1494,16 @@ void RimWellLogTrack::setAutoScalePropertyValuesIfNecessary()
 {
     // Avoid resetting if visible range has set to empty by user
     bool emptyRange = isEmptyVisiblePropertyRange();
-    if ( !m_isAutoScalePropertyValuesEnabled && emptyRange ) return;
+    if ( !m_propertyAxisSettings->isAutoScaleEnabled() && emptyRange ) return;
 
     const double eps = 1.0e-8;
     calculatePropertyValueZoomRange();
 
-    double maxRange = std::max( m_visiblePropertyValueRangeMax - m_visiblePropertyValueRangeMin,
+    double maxRange = std::max( m_propertyAxisSettings->visibleRangeMax() - m_propertyAxisSettings->visibleRangeMin(),
                                 m_availablePropertyValueRangeMax - m_availablePropertyValueRangeMin );
 
-    double maxLow  = std::max( m_visiblePropertyValueRangeMin(), m_availablePropertyValueRangeMin );
-    double minHigh = std::min( m_visiblePropertyValueRangeMax(), m_availablePropertyValueRangeMax );
+    double maxLow  = std::max( m_propertyAxisSettings->visibleRangeMin(), m_availablePropertyValueRangeMin );
+    double minHigh = std::min( m_propertyAxisSettings->visibleRangeMax(), m_availablePropertyValueRangeMax );
     double overlap = minHigh - maxLow;
 
     if ( maxRange < eps || overlap < eps * maxRange )
@@ -1775,8 +1723,7 @@ void RimWellLogTrack::updateEditors()
 void RimWellLogTrack::setVisiblePropertyValueRange( double minValue, double maxValue )
 {
     setAutoScalePropertyValuesEnabled( false );
-    m_visiblePropertyValueRangeMin = minValue;
-    m_visiblePropertyValueRangeMax = maxValue;
+    m_propertyAxisSettings->setVisibleRange( minValue, maxValue );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1803,9 +1750,7 @@ void RimWellLogTrack::updatePlotWidgetFromAxisRanges()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setTickIntervals( double majorTickInterval, double minorTickInterval )
 {
-    m_explicitTickIntervalsPropertyValueAxis = true;
-    m_majorTickIntervalPropertyAxis          = majorTickInterval;
-    m_minorTickIntervalPropertyAxis          = minorTickInterval;
+    m_propertyAxisSettings->setTickIntervals( majorTickInterval, minorTickInterval );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1813,7 +1758,7 @@ void RimWellLogTrack::setTickIntervals( double majorTickInterval, double minorTi
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setMinAndMaxTicksOnly( bool enable )
 {
-    m_propertyAxisMinAndMaxTicksOnly = enable;
+    m_propertyAxisSettings->setMinAndMaxTicksOnly( enable );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1821,7 +1766,7 @@ void RimWellLogTrack::setMinAndMaxTicksOnly( bool enable )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setPropertyValueAxisGridVisibility( RimWellLogPlot::AxisGridVisibility gridLines )
 {
-    m_propertyValueAxisGridVisibility = gridLines;
+    m_propertyAxisSettings->setGridVisibility( gridLines );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2107,9 +2052,28 @@ void RimWellLogTrack::initAfterRead()
         m_resultDefinition->setEclipseCase( dynamic_cast<RimEclipseCase*>( eclipseCase ) );
     }
 
-    if ( m_propertyValueAxisGridVisibility() == RimWellLogPlot::AXIS_GRID_MINOR )
+    // Migrate property axis settings from obsolete fields (pre-2026.04)
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2026.04" ) )
     {
-        m_propertyValueAxisGridVisibility = RimWellLogPlot::AXIS_GRID_MAJOR_AND_MINOR;
+        m_propertyAxisSettings->setEnabled( m_isPropertyAxisEnabled_OBSOLETE() );
+        m_propertyAxisSettings->setVisibleRange( m_visiblePropertyValueRangeMin_OBSOLETE(), m_visiblePropertyValueRangeMax_OBSOLETE() );
+        m_propertyAxisSettings->setAutoScaleEnabled( m_isAutoScalePropertyValuesEnabled_OBSOLETE() );
+        m_propertyAxisSettings->setLogarithmicScaleEnabled( m_isPropertyLogarithmicScaleEnabled_OBSOLETE() );
+        m_propertyAxisSettings->setAxisInverted( m_invertPropertyValueAxis_OBSOLETE() );
+
+        auto gridVisibility = m_propertyValueAxisGridVisibility_OBSOLETE();
+        if ( gridVisibility == RimWellLogPlot::AXIS_GRID_MINOR )
+        {
+            gridVisibility = RimWellLogPlot::AXIS_GRID_MAJOR_AND_MINOR;
+        }
+        m_propertyAxisSettings->setGridVisibility( gridVisibility );
+
+        m_propertyAxisSettings->setMinAndMaxTicksOnly( m_propertyAxisMinAndMaxTicksOnly_OBSOLETE() );
+        m_propertyAxisSettings->setExplicitTickIntervals( m_explicitTickIntervalsPropertyValueAxis_OBSOLETE() );
+        if ( m_explicitTickIntervalsPropertyValueAxis_OBSOLETE() )
+        {
+            m_propertyAxisSettings->setTickIntervals( m_majorTickIntervalPropertyAxis_OBSOLETE(), m_minorTickIntervalPropertyAxis_OBSOLETE() );
+        }
     }
 
     for ( auto curve : m_curves )
@@ -2164,7 +2128,7 @@ void RimWellLogTrack::updateAxisScaleEngine()
         {
             m_plotWidget->setAxisInverted( RiuPlotAxis::defaultLeft(), true );
 
-            if ( m_isPropertyLogarithmicScaleEnabled )
+            if ( m_propertyAxisSettings->isLogarithmicScaleEnabled() )
             {
                 m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::XTop, new QwtLogScaleEngine );
 
@@ -2183,7 +2147,7 @@ void RimWellLogTrack::updateAxisScaleEngine()
         {
             m_plotWidget->setAxisInverted( RiuPlotAxis::defaultLeft(), false );
 
-            if ( m_isPropertyLogarithmicScaleEnabled )
+            if ( m_propertyAxisSettings->isLogarithmicScaleEnabled() )
             {
                 m_plotWidget->qwtPlot()->setAxisScaleEngine( QwtAxis::YLeft, new QwtLogScaleEngine );
 
@@ -2377,7 +2341,7 @@ void RimWellLogTrack::connectCurveSignals( RimWellLogCurve* curve )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::computeAndSetPropertyValueRangeMinForLogarithmicScale()
 {
-    if ( m_isAutoScalePropertyValuesEnabled && m_isPropertyLogarithmicScaleEnabled )
+    if ( m_propertyAxisSettings->isAutoScaleEnabled() && m_propertyAxisSettings->isLogarithmicScaleEnabled() )
     {
         double pos = HUGE_VAL;
         double neg = -HUGE_VAL;
@@ -2392,7 +2356,7 @@ void RimWellLogTrack::computeAndSetPropertyValueRangeMinForLogarithmicScale()
 
         if ( pos != HUGE_VAL )
         {
-            m_visiblePropertyValueRangeMin = pos;
+            m_propertyAxisSettings->setVisibleRange( pos, m_propertyAxisSettings->visibleRangeMax() );
         }
     }
 }
@@ -2402,7 +2366,7 @@ void RimWellLogTrack::computeAndSetPropertyValueRangeMinForLogarithmicScale()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setLogarithmicScale( bool enable )
 {
-    m_isPropertyLogarithmicScaleEnabled = enable;
+    m_propertyAxisSettings->setLogarithmicScaleEnabled( enable );
 
     updateAxisScaleEngine();
     computeAndSetPropertyValueRangeMinForLogarithmicScale();
@@ -2413,7 +2377,7 @@ void RimWellLogTrack::setLogarithmicScale( bool enable )
 //--------------------------------------------------------------------------------------------------
 bool RimWellLogTrack::isLogarithmicScale() const
 {
-    return m_isPropertyLogarithmicScaleEnabled;
+    return m_propertyAxisSettings->isLogarithmicScaleEnabled();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2496,20 +2460,7 @@ void RimWellLogTrack::uiOrderingForRftPltFormations( caf::PdmUiOrdering& uiOrder
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::uiOrderingForPropertyAxisSettings( caf::PdmUiOrdering& uiOrdering )
 {
-    caf::PdmUiGroup* gridGroup = uiOrdering.addNewGroup( "Property Axis Settings" );
-    gridGroup->add( &m_isPropertyAxisEnabled );
-    gridGroup->add( &m_isPropertyLogarithmicScaleEnabled );
-    gridGroup->add( &m_visiblePropertyValueRangeMin );
-    gridGroup->add( &m_visiblePropertyValueRangeMax );
-    gridGroup->add( &m_invertPropertyValueAxis );
-    gridGroup->add( &m_propertyValueAxisGridVisibility );
-    gridGroup->add( &m_propertyAxisMinAndMaxTicksOnly );
-
-    // TODO Revisit if these settings are required
-    // See issue https://github.com/OPM/ResInsight/issues/4367
-    //     gridGroup->add( &m_explicitTickIntervals );
-    //     gridGroup->add( &m_majorTickInterval );
-    //     gridGroup->add( &m_minorTickInterval );
+    m_propertyAxisSettings->uiOrdering( "", uiOrdering );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2517,7 +2468,7 @@ void RimWellLogTrack::uiOrderingForPropertyAxisSettings( caf::PdmUiOrdering& uiO
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::enablePropertyAxis( bool enable )
 {
-    m_isPropertyAxisEnabled = enable;
+    m_propertyAxisSettings->setEnabled( enable );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2525,7 +2476,7 @@ void RimWellLogTrack::enablePropertyAxis( bool enable )
 //--------------------------------------------------------------------------------------------------
 bool RimWellLogTrack::isPropertyAxisEnabled() const
 {
-    return m_isPropertyAxisEnabled();
+    return m_propertyAxisSettings->isEnabled();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2774,7 +2725,7 @@ void RimWellLogTrack::updateStackedCurveData()
             }
 
             RigWellLogCurveData tempCurveData;
-            tempCurveData.setValuesAndDepths( allStackedValues, allDepthValues, depthType, 0.0, displayUnit, false, m_isPropertyLogarithmicScaleEnabled );
+            tempCurveData.setValuesAndDepths( allStackedValues, allDepthValues, depthType, 0.0, displayUnit, false, m_propertyAxisSettings->isLogarithmicScaleEnabled() );
 
             auto plotDepthValues          = tempCurveData.depths( depthType );
             auto polyLineStartStopIndices = tempCurveData.polylineStartStopIndices();

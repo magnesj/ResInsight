@@ -3,6 +3,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/Rim3dWellLogFileCurve.h
     ${CMAKE_CURRENT_LIST_DIR}/Rim3dWellLogExtractionCurve.h
     ${CMAKE_CURRENT_LIST_DIR}/Rim3dWellLogRftCurve.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPropertyAxisSettings.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPlotNameConfig.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogExtractionCurveNameConfig.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogFileCurveNameConfig.h
@@ -41,6 +42,7 @@ set(SOURCE_GROUP_HEADER_FILES
 set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPlotCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPlot.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimWellLogPropertyAxisSettings.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogTrack.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogCurve.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellLogExtractionCurve.cpp
