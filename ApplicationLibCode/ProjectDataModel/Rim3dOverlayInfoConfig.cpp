@@ -340,16 +340,18 @@ QString Rim3dOverlayInfoConfig::caseInfoText( RimEclipseView* eclipseView )
         }
         else if ( eclipseView->mainGrid() )
         {
-            auto    mainGrid          = eclipseView->mainGrid();
-            size_t  cellCount         = mainGrid->totalCellCount();
+            auto   mainGrid  = eclipseView->mainGrid();
+            size_t cellCount = mainGrid->totalCellCount();
             if ( mainGrid->isRadial() )
             {
                 cellCount -= mainGrid->totalTemporaryGridCellCount();
             }
             QString totCellCount = localeWithSpaceAsGroupSeparator.toString( static_cast<int>( cellCount ) );
 
-            auto activeCellInfoMatrix   = eclipseView->eclipseCase()->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-            auto activeCellInfoFracture = eclipseView->eclipseCase()->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
+            auto activeCellInfoMatrix =
+                eclipseView->eclipseCase()->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+            auto activeCellInfoFracture =
+                eclipseView->eclipseCase()->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
 
             size_t mxActCellCount = activeCellInfoMatrix->reservoirActiveCellCount();
             size_t frActCellCount = activeCellInfoFracture->reservoirActiveCellCount();
