@@ -1,0 +1,374 @@
+{
+    "NCPUNSL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "CPU time per network solve"
+    },
+    "NCPUNSLT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Total CPU time per network solve"
+    },
+    "NELAPNSL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Elapsed time per network solve"
+    },
+    "NELPNSLT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Total elapsed time per network solve"
+    },
+    "NFAILS": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Solve fails per network"
+    },
+    "NJALL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction all properties"
+    },
+    "NJGFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas flow rate"
+    },
+    "NJGIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas injection rate"
+    },
+    "NJGLFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas lift flow rate"
+    },
+    "NJGLR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas-liquid ratio"
+    },
+    "NJGOR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas-oil ratio"
+    },
+    "NJGPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas production rate"
+    },
+    "NJGWR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction gas-water ratio"
+    },
+    "NJLGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction liquid-gas ratio"
+    },
+    "NJLPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction liquid production rate"
+    },
+    "NJMR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction molar rate"
+    },
+    "NJOFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction oil flow rate"
+    },
+    "NJOGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction oil-gas ratio"
+    },
+    "NJOPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction oil production rate"
+    },
+    "NJPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction pressure"
+    },
+    "NJWCT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction water cut"
+    },
+    "NJWFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction water flow rate"
+    },
+    "NJWGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction water-gas ratio"
+    },
+    "NJWIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction water injection rate"
+    },
+    "NJWPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Junction water production rate"
+    },
+    "NNEWT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Newtons per network solve"
+    },
+    "NNEWTTOT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Cumulated newtons per network solve"
+    },
+    "NPALL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe all properties"
+    },
+    "NPGFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe gas flow rate"
+    },
+    "NPGLFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe gas lift flow rate"
+    },
+    "NPMR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe molar rate"
+    },
+    "NPOFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe oil flow rate"
+    },
+    "NPPRD": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe pressure drop"
+    },
+    "NPWFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Pipe water flow rate"
+    },
+    "NSCGFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source gas flow rate"
+    },
+    "NSCGIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source gas injection rate"
+    },
+    "NSCGPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source gas production rate"
+    },
+    "NSCLPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source liquid production rate"
+    },
+    "NSCOFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source oil flow rate"
+    },
+    "NSCOPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source oil production rate"
+    },
+    "NSCPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source pressure"
+    },
+    "NSCWFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source water flow rate"
+    },
+    "NSCWIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source water injection rate"
+    },
+    "NSCWPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Source water production rate"
+    },
+    "NSKGFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink gas flow rate"
+    },
+    "NSKGIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink gas injection rate"
+    },
+    "NSKGLFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink gas lift flow rate"
+    },
+    "NSKGPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink gas production rate"
+    },
+    "NSKLPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink liquid production rate"
+    },
+    "NSKMR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink molar rate"
+    },
+    "NSKOFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink oil flow rate"
+    },
+    "NSKOPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink oil production rate"
+    },
+    "NSKPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink pressure"
+    },
+    "NSKWFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink water flow rate"
+    },
+    "NSKWIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink water injection rate"
+    },
+    "NSKWPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Sink water production rate"
+    },
+    "NSOLVES": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Solve attempts per network"
+    },
+    "NWALL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well all properties"
+    },
+    "NWERRG": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas flow rate coupling error"
+    },
+    "NWERRL": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well liquid flow rate coupling error"
+    },
+    "NWERRM": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well molar rate coupling error"
+    },
+    "NWERRO": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil flow rate coupling error"
+    },
+    "NWERRP": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well pressure coupling error"
+    },
+    "NWERRW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water flow rate coupling error"
+    },
+    "NWGFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas flow rate"
+    },
+    "NWGIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas injection rate"
+    },
+    "NWGIRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas injection rate of coupled well"
+    },
+    "NWGLFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas lift flow rate"
+    },
+    "NWGLR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas-liquid ratio"
+    },
+    "NWGOR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas-oil ratio"
+    },
+    "NWGPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas production rate"
+    },
+    "NWGPRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas production rate of coupled well"
+    },
+    "NWGWR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well gas-water ratio"
+    },
+    "NWLFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well liquid flow rate"
+    },
+    "NWLGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well liquid-gas ratio"
+    },
+    "NWLPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well liquid production rate"
+    },
+    "NWLPRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well liquid production of coupled well"
+    },
+    "NWMR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well molar rate"
+    },
+    "NWMRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well molar rate of coupled well"
+    },
+    "NWOFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil flow rate"
+    },
+    "NWOGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil-gas ratio"
+    },
+    "NWOIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil injection rate"
+    },
+    "NWOPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil production rate"
+    },
+    "NWOPRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well oil production rate of coupled well"
+    },
+    "NWPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well pressure"
+    },
+    "NWPRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well pressure of coupled well"
+    },
+    "NWWCT": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water cut"
+    },
+    "NWWFR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water flow rate"
+    },
+    "NWWGR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water-gas ratio"
+    },
+    "NWWIR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water injection rate"
+    },
+    "NWWIRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water injection rate of coupled well"
+    },
+    "NWWPR": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water production rate"
+    },
+    "NWWPRCW": {
+        "category": "SUMMARY_NETWORK",
+        "description": "Well water production rate of coupled well"
+    }
+}
