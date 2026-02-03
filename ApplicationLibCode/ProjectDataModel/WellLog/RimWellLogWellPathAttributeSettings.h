@@ -74,18 +74,18 @@ public:
     void   setUnderburdenHeight( double height );
 
 protected:
-    void                          fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
-    caf::PdmField<bool>                                m_showWellPathAttributes;
-    caf::PdmField<bool>                                m_showWellPathCompletions;
-    caf::PdmField<bool>                                m_showWellPathComponentsBothSides;
-    caf::PdmField<bool>                                m_showWellPathComponentLabels;
-    caf::PdmField<bool>                                m_wellPathAttributesInLegend;
-    caf::PdmField<bool>                                m_wellPathCompletionsInLegend;
-    caf::PdmPtrField<RimWellPath*>                     m_wellPathComponentSource;
-    caf::PdmPtrField<RimWellPathAttributeCollection*>  m_wellPathAttributeCollection;
-    caf::PdmField<double>                              m_overburdenHeight;
-    caf::PdmField<double>                              m_underburdenHeight;
+    caf::PdmField<bool>                               m_showWellPathAttributes;
+    caf::PdmField<bool>                               m_showWellPathCompletions;
+    caf::PdmField<bool>                               m_showWellPathComponentsBothSides;
+    caf::PdmField<bool>                               m_showWellPathComponentLabels;
+    caf::PdmField<bool>                               m_wellPathAttributesInLegend;
+    caf::PdmField<bool>                               m_wellPathCompletionsInLegend;
+    caf::PdmPtrField<RimWellPath*>                    m_wellPathComponentSource;
+    caf::PdmPtrField<RimWellPathAttributeCollection*> m_wellPathAttributeCollection;
+    caf::PdmField<double>                             m_overburdenHeight;
+    caf::PdmField<double>                             m_underburdenHeight;
 };

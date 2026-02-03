@@ -282,9 +282,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                                    const QVariant&            oldValue,
-                                                    const QVariant&            newValue )
+void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( changedField == &m_formationSource && m_formationSource() == static_cast<int>( RimWellLogTrack::WELL_PICK_FILTER ) )
     {
