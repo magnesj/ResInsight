@@ -27,6 +27,13 @@
 #include <QRegularExpression>
 #include <algorithm>
 
+namespace
+{
+constexpr int MIN_PERCENTILE      = 0;
+constexpr int MAX_PERCENTILE      = 100;
+const std::vector<int> DEFAULT_PERCENTILES = { 10, 90 };
+} // namespace
+
 CAF_PDM_SOURCE_INIT( RimEnsembleStatistics, "RimEnsembleStatistics" );
 
 //--------------------------------------------------------------------------------------------------
@@ -66,6 +73,7 @@ RimEnsembleStatistics::RimEnsembleStatistics( RimEnsembleCurveSetInterface* pare
 
     CAF_PDM_InitField( &m_percentileTextString, "PercentileTextString", QString( "" ), "Custom Percentiles" );
     m_percentileTextString.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+    m_percentileTextString.uiCapability()->setUiToolTip( "Enter custom percentiles separated by comma, semicolon or space (e.g., \"25, 35, 75, 95\")" );
 
     CAF_PDM_InitField( &m_showCurveLabels, "ShowCurveLabels", true, "Show Curve Labels" );
     CAF_PDM_InitField( &m_includeIncompleteCurves, "IncludeIncompleteCurves", false, "Include Incomplete Curves" );
@@ -399,7 +407,7 @@ void RimEnsembleStatistics::parsePercentileString()
     {
         bool ok    = false;
         int  value = token.toInt( &ok );
-        if ( ok && value >= 0 && value <= 100 )
+        if ( ok && value >= MIN_PERCENTILE && value <= MAX_PERCENTILE )
         {
             percentiles.push_back( value );
         }
@@ -443,10 +451,10 @@ void RimEnsembleStatistics::initAfterRead()
         if ( m_showP50Curve() ) percentiles.push_back( 50 );
         if ( m_showP90Curve() ) percentiles.push_back( 90 );
 
-        // If no percentiles were set from old flags, use default P10, P90
+        // If no percentiles were set from old flags, use defaults
         if ( percentiles.empty() )
         {
-            percentiles = { 10, 90 };
+            percentiles = DEFAULT_PERCENTILES;
         }
 
         m_selectedPercentiles = percentiles;

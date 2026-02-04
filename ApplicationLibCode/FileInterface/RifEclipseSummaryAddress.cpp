@@ -645,6 +645,9 @@ int RifEclipseSummaryAddress::id() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::uiText() const
 {
+    constexpr int MIN_PERCENTILE = 0;
+    constexpr int MAX_PERCENTILE = 100;
+
     std::string text;
 
     if ( m_isErrorResult ) text += "ERR:";
@@ -661,7 +664,7 @@ std::string RifEclipseSummaryAddress::uiText() const
     {
         std::string prefix;
         // Check for custom percentile (type NONE with id encoding percentile value)
-        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::NONE && m_id >= 0 && m_id <= 100 )
+        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::NONE && m_id >= MIN_PERCENTILE && m_id <= MAX_PERCENTILE )
         {
             prefix = "P" + std::to_string( m_id );
         }

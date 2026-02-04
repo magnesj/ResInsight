@@ -2279,6 +2279,18 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
         {
             RifEclipseSummaryAddress dataAddressY = m_yValuesSummaryAddress->address();
 
+            auto getPercentileStatisticsType = []( int percentile ) -> RifEclipseSummaryAddressDefines::StatisticsType
+            {
+                if ( percentile == 10 )
+                    return RifEclipseSummaryAddressDefines::StatisticsType::P10;
+                else if ( percentile == 50 )
+                    return RifEclipseSummaryAddressDefines::StatisticsType::P50;
+                else if ( percentile == 90 )
+                    return RifEclipseSummaryAddressDefines::StatisticsType::P90;
+                else
+                    return RifEclipseSummaryAddressDefines::StatisticsType::NONE;
+            };
+
             auto getStatisticsAddress = []( RifEclipseSummaryAddressDefines::StatisticsType statisticsType,
                                             const RifEclipseSummaryAddress&                 addrY,
                                             int                                             percentile = -1 ) -> RiaSummaryCurveAddress
@@ -2296,15 +2308,7 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
             {
                 if ( m_ensembleStatCaseY->hasPercentileData( p ) )
                 {
-                    // Map common percentiles to their enum values, use NONE for custom percentiles
-                    RifEclipseSummaryAddressDefines::StatisticsType statType = RifEclipseSummaryAddressDefines::StatisticsType::NONE;
-                    if ( p == 10 )
-                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P10;
-                    else if ( p == 50 )
-                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P50;
-                    else if ( p == 90 )
-                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P90;
-
+                    RifEclipseSummaryAddressDefines::StatisticsType statType = getPercentileStatisticsType( p );
                     addresses.push_back( getStatisticsAddress( statType, dataAddressY, p ) );
                 }
             }

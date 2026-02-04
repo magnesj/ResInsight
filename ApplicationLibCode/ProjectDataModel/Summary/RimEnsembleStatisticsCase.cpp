@@ -73,6 +73,11 @@ bool RimEnsembleStatisticsCase::hasMeanData() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatisticsCase::hasPercentileData( int percentile ) const
 {
+    constexpr int MIN_PERCENTILE = 0;
+    constexpr int MAX_PERCENTILE = 100;
+
+    if ( percentile < MIN_PERCENTILE || percentile > MAX_PERCENTILE ) return false;
+
     auto it = m_percentileData.find( percentile );
     return it != m_percentileData.end() && !it->second.empty();
 }
@@ -96,9 +101,12 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
             return { true, m_meanData };
         default:
         {
+            constexpr int MIN_PERCENTILE = 0;
+            constexpr int MAX_PERCENTILE = 100;
+
             // Try to find custom percentile using id field
             int id = resultAddress.id();
-            if ( id >= 0 && id <= 100 )
+            if ( id >= MIN_PERCENTILE && id <= MAX_PERCENTILE )
             {
                 auto it = m_percentileData.find( id );
                 if ( it != m_percentileData.end() )
