@@ -20,6 +20,7 @@
 
 #include "RimColorLegend.h"
 #include "RimRegularLegendConfig.h"
+#include "RimTools.h"
 #include "RimWellLogTrack.h"
 
 #include "cafPdmUiSliderEditor.h"
@@ -162,6 +163,30 @@ bool RimWellLogRegionAnnotationSettings::showFormations() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimWellLogRegionAnnotationSettings::uiOrdering( const QString& uiConfigName, caf::PdmUiOrdering& uiOrdering )
+{
+    uiOrdering.add( &m_regionAnnotationType );
+    uiOrdering.add( &m_regionAnnotationDisplay );
+    uiOrdering.add( &m_showRegionLabels );
+    
+    if ( m_regionAnnotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
+    {
+        uiOrdering.add( &m_regionLabelFontSize );
+    }
+
+    if ( m_regionAnnotationDisplay() & RiaDefines::COLOR_SHADING || m_regionAnnotationDisplay() & RiaDefines::COLORED_LINES )
+    {
+        uiOrdering.add( &m_colorShadingLegend );
+        if ( m_regionAnnotationDisplay() & RiaDefines::COLOR_SHADING )
+        {
+            uiOrdering.add( &m_colorShadingTransparency );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellLogRegionAnnotationSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
                                                            const QVariant&            oldValue,
                                                            const QVariant&            newValue )
@@ -190,4 +215,19 @@ void RimWellLogRegionAnnotationSettings::defineEditorAttribute( const caf::PdmFi
             sliderAttrib->m_maximum = 100;
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimWellLogRegionAnnotationSettings::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_colorShadingLegend )
+    {
+        RimTools::colorLegendOptionItems( &options );
+    }
+
+    return options;
 }

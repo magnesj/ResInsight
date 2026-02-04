@@ -62,6 +62,8 @@ class RimColorLegend;
 class RimEnsembleWellLogCurveSet;
 class RimWellLogPropertyAxisSettings;
 class RimWellLogFormationSettings;
+class RimWellLogRegionAnnotationSettings;
+class RimWellLogWellPathAttributeSettings;
 class RiuPlotAnnotationTool;
 
 struct CurveSamplingPointData
@@ -314,6 +316,12 @@ private:
     // Formation settings
     caf::PdmChildField<RimWellLogFormationSettings*> m_formationSettings;
 
+    // Region annotation settings
+    caf::PdmChildField<RimWellLogRegionAnnotationSettings*> m_regionAnnotationSettings;
+
+    // Well path attribute settings
+    caf::PdmChildField<RimWellLogWellPathAttributeSettings*> m_wellPathAttributeSettings;
+
     // OBSOLETE: Property value axis fields (migrated to RimWellLogPropertyAxisSettings)
     caf::PdmField<bool>                         m_isPropertyAxisEnabled_OBSOLETE;
     caf::PdmField<double>                       m_visiblePropertyValueRangeMin_OBSOLETE;
@@ -333,12 +341,13 @@ private:
 
     RimFontSizeField m_axisFontSize;
 
-    caf::PdmField<RegionAnnotationTypeEnum>                            m_regionAnnotationType;
-    caf::PdmField<RegionAnnotationDisplayEnum>                         m_regionAnnotationDisplay;
-    caf::PdmPtrField<RimColorLegend*>                                  m_colorShadingLegend;
-    caf::PdmField<int>                                                 m_colorShadingTransparency;
-    caf::PdmField<bool>                                                m_showRegionLabels;
-    RimFontSizeField                                                   m_regionLabelFontSize;
+    // OBSOLETE: Region annotation fields (migrated to RimWellLogRegionAnnotationSettings)
+    caf::PdmField<RegionAnnotationTypeEnum>    m_regionAnnotationType_OBSOLETE;
+    caf::PdmField<RegionAnnotationDisplayEnum> m_regionAnnotationDisplay_OBSOLETE;
+    caf::PdmPtrField<RimColorLegend*>          m_colorShadingLegend_OBSOLETE;
+    caf::PdmField<int>                         m_colorShadingTransparency_OBSOLETE;
+    caf::PdmField<bool>                        m_showRegionLabels_OBSOLETE;
+    RimFontSizeField                           m_regionLabelFontSize_OBSOLETE;
 
     // OBSOLETE: Formation fields (migrated to RimWellLogFormationSettings)
     caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource_OBSOLETE;
@@ -351,17 +360,20 @@ private:
     caf::PdmField<caf::AppEnum<RigWellPathFormations::FormationLevel>> m_formationLevel_OBSOLETE;
     caf::PdmField<bool>                                                m_showformationFluids_OBSOLETE;
     caf::PdmField<bool>                                                m_formationBranchDetection_OBSOLETE;
-    caf::PdmField<bool>                                                m_showWellPathAttributes;
-    caf::PdmField<bool>                                                m_showWellPathCompletions;
-    caf::PdmField<bool>                                                m_showWellPathComponentsBothSides;
-    caf::PdmField<bool>                                                m_showWellPathComponentLabels;
-    caf::PdmField<bool>                                                m_wellPathAttributesInLegend;
-    caf::PdmField<bool>                                                m_wellPathCompletionsInLegend;
-    caf::PdmPtrField<RimWellPath*>                                     m_wellPathComponentSource;
-    caf::PdmPtrField<RimWellPathAttributeCollection*>                  m_wellPathAttributeCollection;
+
+    // OBSOLETE: Well path attribute fields (migrated to RimWellLogWellPathAttributeSettings)
+    caf::PdmField<bool>                                  m_showWellPathAttributes_OBSOLETE;
+    caf::PdmField<bool>                                  m_showWellPathCompletions_OBSOLETE;
+    caf::PdmField<bool>                                  m_showWellPathComponentsBothSides_OBSOLETE;
+    caf::PdmField<bool>                                  m_showWellPathComponentLabels_OBSOLETE;
+    caf::PdmField<bool>                                  m_wellPathAttributesInLegend_OBSOLETE;
+    caf::PdmField<bool>                                  m_wellPathCompletionsInLegend_OBSOLETE;
+    caf::PdmPtrField<RimWellPath*>                       m_wellPathComponentSource_OBSOLETE;
+    caf::PdmPtrField<RimWellPathAttributeCollection*>    m_wellPathAttributeCollection_OBSOLETE;
+    caf::PdmField<double>                                m_overburdenHeight_OBSOLETE;
+    caf::PdmField<double>                                m_underburdenHeight_OBSOLETE;
+
     caf::PdmChildField<RimEclipseResultDefinition*>                    m_resultDefinition;
-    caf::PdmField<double>                                              m_overburdenHeight;
-    caf::PdmField<double>                                              m_underburdenHeight;
     caf::PdmChildField<RimEnsembleWellLogCurveSet*>                    m_ensembleWellLogCurveSet;
 
     caf::PdmField<bool> m_autoCheckStateBasedOnCurveData;

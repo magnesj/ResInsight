@@ -68,9 +68,10 @@
 #include "RimWellLogCurve.h"
 #include "RimWellLogCurveCommonDataSource.h"
 #include "RimWellLogExtractionCurve.h"
+#include "RimWellLogFormationSettings.h"
 #include "RimWellLogPlotCollection.h"
 #include "RimWellLogPropertyAxisSettings.h"
-#include "RimWellLogFormationSettings.h"
+#include "RimWellLogRegionAnnotationSettings.h"
 #include "RimWellPath.h"
 #include "RimWellPathAttribute.h"
 #include "RimWellPathAttributeCollection.h"
@@ -219,19 +220,30 @@ RimWellLogTrack::RimWellLogTrack()
 
     CAF_PDM_InitFieldNoDefault( &m_axisFontSize, "AxisFontSize", "Axis Font Size" );
 
-    CAF_PDM_InitFieldNoDefault( &m_regionAnnotationType, "AnnotationType", "Region Annotations" );
-    CAF_PDM_InitFieldNoDefault( &m_regionAnnotationDisplay, "RegionDisplay", "Region Display" );
+    // Region annotation settings
+    CAF_PDM_InitFieldNoDefault( &m_regionAnnotationSettings, "RegionAnnotationSettings", "" );
+    m_regionAnnotationSettings = new RimWellLogRegionAnnotationSettings();
+    m_regionAnnotationSettings.uiCapability()->setUiTreeChildrenHidden( true );
 
-    CAF_PDM_InitFieldNoDefault( &m_colorShadingLegend, "ColorShadingLegend", "Colors" );
-    m_colorShadingLegend = RimRegularLegendConfig::mapToColorLegend( RimRegularLegendConfig::ColorRangesType::NORMAL );
+    // OBSOLETE region annotation fields
+    CAF_PDM_InitFieldNoDefault( &m_regionAnnotationType_OBSOLETE, "AnnotationType", "Region Annotations" );
+    m_regionAnnotationType_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitField( &m_colorShadingTransparency, "ColorShadingTransparency", 50, "Color Transparency" );
-    m_colorShadingTransparency.uiCapability()->setUiEditorTypeName( caf::PdmUiSliderEditor::uiEditorTypeName() );
+    CAF_PDM_InitFieldNoDefault( &m_regionAnnotationDisplay_OBSOLETE, "RegionDisplay", "Region Display" );
+    m_regionAnnotationDisplay_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitField( &m_showRegionLabels, "ShowFormationLabels", true, "Show Labels" );
+    CAF_PDM_InitFieldNoDefault( &m_colorShadingLegend_OBSOLETE, "ColorShadingLegend", "Colors" );
+    m_colorShadingLegend_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_colorShadingTransparency_OBSOLETE, "ColorShadingTransparency", 50, "Color Transparency" );
+    m_colorShadingTransparency_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_showRegionLabels_OBSOLETE, "ShowFormationLabels", true, "Show Labels" );
+    m_showRegionLabels_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     caf::FontTools::RelativeSizeEnum regionLabelFontSizeDefault = caf::FontTools::RelativeSize::Small;
-    CAF_PDM_InitField( &m_regionLabelFontSize, "RegionLabelFontSize", regionLabelFontSizeDefault, "Font Size" );
+    CAF_PDM_InitField( &m_regionLabelFontSize_OBSOLETE, "RegionLabelFontSize", regionLabelFontSizeDefault, "Font Size" );
+    m_regionLabelFontSize_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     // Formation settings
     CAF_PDM_InitFieldNoDefault( &m_formationSettings, "FormationSettings", "" );
@@ -253,10 +265,10 @@ RimWellLogTrack::RimWellLogTrack()
 
     CAF_PDM_InitField( &m_formationSimWellName_OBSOLETE, "FormationSimulationWellName", QString( "None" ), "Simulation Well" );
     m_formationSimWellName_OBSOLETE.xmlCapability()->setIOWritable( false );
-    
+
     CAF_PDM_InitField( &m_formationBranchIndex_OBSOLETE, "FormationBranchIndex", 0, " " );
     m_formationBranchIndex_OBSOLETE.xmlCapability()->setIOWritable( false );
-    
+
     CAF_PDM_InitField( &m_formationBranchDetection_OBSOLETE, "FormationBranchDetection", true, "Branch Detection" );
     m_formationBranchDetection_OBSOLETE.xmlCapability()->setIOWritable( false );
 
@@ -269,21 +281,43 @@ RimWellLogTrack::RimWellLogTrack()
     CAF_PDM_InitField( &m_showformationFluids_OBSOLETE, "ShowFormationFluids", false, "Show Fluids" );
     m_showformationFluids_OBSOLETE.xmlCapability()->setIOWritable( false );
 
-    CAF_PDM_InitField( &m_showWellPathAttributes, "ShowWellPathAttributes", false, "Show Well Attributes" );
-    CAF_PDM_InitField( &m_wellPathAttributesInLegend, "WellPathAttributesInLegend", true, "Attributes in Legend" );
-    CAF_PDM_InitField( &m_showWellPathCompletions, "ShowWellPathCompletions", true, "Show Well Completions" );
-    CAF_PDM_InitField( &m_wellPathCompletionsInLegend, "WellPathCompletionsInLegend", true, "Completions in Legend" );
-    CAF_PDM_InitField( &m_showWellPathComponentsBothSides, "ShowWellPathAttrBothSides", true, "Show Both Sides" );
-    CAF_PDM_InitField( &m_showWellPathComponentLabels, "ShowWellPathAttrLabels", false, "Show Labels" );
-    CAF_PDM_InitFieldNoDefault( &m_wellPathComponentSource, "AttributesWellPathSource", "Well Path" );
-    CAF_PDM_InitFieldNoDefault( &m_wellPathAttributeCollection, "AttributesCollection", "Well Attributes" );
+    // Well path attribute settings
+    CAF_PDM_InitFieldNoDefault( &m_wellPathAttributeSettings, "WellPathAttributeSettings", "" );
+    m_wellPathAttributeSettings = new RimWellLogWellPathAttributeSettings();
+    m_wellPathAttributeSettings.uiCapability()->setUiTreeChildrenHidden( true );
+
+    // OBSOLETE well path attribute fields
+    CAF_PDM_InitField( &m_showWellPathAttributes_OBSOLETE, "ShowWellPathAttributes", false, "Show Well Attributes" );
+    m_showWellPathAttributes_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_wellPathAttributesInLegend_OBSOLETE, "WellPathAttributesInLegend", true, "Attributes in Legend" );
+    m_wellPathAttributesInLegend_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_showWellPathCompletions_OBSOLETE, "ShowWellPathCompletions", true, "Show Well Completions" );
+    m_showWellPathCompletions_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_wellPathCompletionsInLegend_OBSOLETE, "WellPathCompletionsInLegend", true, "Completions in Legend" );
+    m_wellPathCompletionsInLegend_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_showWellPathComponentsBothSides_OBSOLETE, "ShowWellPathAttrBothSides", true, "Show Both Sides" );
+    m_showWellPathComponentsBothSides_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_showWellPathComponentLabels_OBSOLETE, "ShowWellPathAttrLabels", false, "Show Labels" );
+    m_showWellPathComponentLabels_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitFieldNoDefault( &m_wellPathComponentSource_OBSOLETE, "AttributesWellPathSource", "Well Path" );
+    m_wellPathComponentSource_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitFieldNoDefault( &m_wellPathAttributeCollection_OBSOLETE, "AttributesCollection", "Well Attributes" );
+    m_wellPathAttributeCollection_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_overburdenHeight_OBSOLETE, "OverburdenHeight", 0.0, "Overburden Height" );
+    m_overburdenHeight_OBSOLETE.xmlCapability()->setIOWritable( false );
+
+    CAF_PDM_InitField( &m_underburdenHeight_OBSOLETE, "UnderburdenHeight", 0.0, "Underburden Height" );
+    m_underburdenHeight_OBSOLETE.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitField( &m_autoCheckStateBasedOnCurveData, "AutoCheckStateBasedOnCurveData", false, "Hide Track if No Curve Data" );
-
-    CAF_PDM_InitField( &m_overburdenHeight, "OverburdenHeight", 0.0, "Overburden Height" );
-    m_overburdenHeight.uiCapability()->setUiHidden( true );
-    CAF_PDM_InitField( &m_underburdenHeight, "UnderburdenHeight", 0.0, "Underburden Height" );
-    m_underburdenHeight.uiCapability()->setUiHidden( true );
 
     CAF_PDM_InitFieldNoDefault( &m_resultDefinition, "ResultDefinition", "Result Definition" );
     m_resultDefinition.uiCapability()->setUiTreeChildrenHidden( true );
@@ -465,7 +499,7 @@ void RimWellLogTrack::calculateDepthZoomRange()
         }
     }
 
-    if ( m_showWellPathAttributes || m_showWellPathCompletions )
+    if ( m_wellPathAttributeSettings->showWellPathAttributes() || m_wellPathAttributeSettings->showWellPathCompletions() )
     {
         for ( const std::unique_ptr<RiuWellPathComponentPlotItem>& plotObject : m_wellPathAttributePlotObjects )
         {
@@ -524,12 +558,12 @@ void RimWellLogTrack::updatePropertyValueZoom()
     // Set an extended range here to allow for some label space.
     double componentRangeMax = 2.0 / ( static_cast<double>( colSpan() ) );
     double componentRangeMin = -0.25;
-    if ( m_showWellPathComponentsBothSides )
+    if ( m_wellPathAttributeSettings->showBothSides() )
     {
         componentRangeMin = -1.5;
         componentRangeMax *= 2.0;
     }
-    if ( m_showWellPathComponentLabels )
+    if ( m_wellPathAttributeSettings->showComponentLabels() )
     {
         componentRangeMax *= 1.5;
     }
@@ -598,33 +632,9 @@ void RimWellLogTrack::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
     {
         updateParentLayout();
     }
-    else if ( changedField == &m_regionAnnotationType || changedField == &m_regionAnnotationDisplay ||
-              changedField == &m_colorShadingTransparency || changedField == &m_colorShadingLegend )
-    {
-        loadDataAndUpdate();
-        updateParentLayout();
-        updateConnectedEditors();
-        RiuPlotMainWindowTools::refreshToolbars();
-    }
-    else if ( changedField == &m_showRegionLabels || changedField == &m_regionLabelFontSize )
-    {
-        loadDataAndUpdate();
-    }
-    else if ( changedField == &m_showWellPathAttributes || changedField == &m_showWellPathCompletions ||
-              changedField == &m_showWellPathComponentsBothSides || changedField == &m_showWellPathComponentLabels ||
-              changedField == &m_wellPathAttributesInLegend || changedField == &m_wellPathCompletionsInLegend )
-    {
-        updateWellPathAttributesOnPlot();
-        updateParentLayout();
-        RiuPlotMainWindowTools::refreshToolbars();
-    }
-    else if ( changedField == &m_wellPathComponentSource )
-    {
-        updateWellPathAttributesCollection();
-        updateWellPathAttributesOnPlot();
-        updateParentLayout();
-        RiuPlotMainWindowTools::refreshToolbars();
-    }
+    // Region annotation field changes are now handled by RimWellLogRegionAnnotationSettings
+    // Well path attribute field changes are now handled by RimWellLogWellPathAttributeSettings
+
     else if ( changedField == &m_autoCheckStateBasedOnCurveData )
     {
         updateCheckStateBasedOnCurveData();
@@ -980,17 +990,10 @@ QList<caf::PdmOptionItemInfo> RimWellLogTrack::calculateValueOptions( const caf:
     QList<caf::PdmOptionItemInfo> options;
 
     // Formation field options are now handled by RimWellLogFormationSettings
+    // Region annotation field options are now handled by RimWellLogRegionAnnotationSettings
+    // Well path attribute field options are now handled by RimWellLogWellPathAttributeSettings
 
-    if ( fieldNeedingOptions == &m_wellPathComponentSource )
-    {
-        RimTools::wellPathOptionItems( &options );
-        options.push_front( caf::PdmOptionItemInfo( "None", nullptr ) );
-    }
-    else if ( fieldNeedingOptions == &m_colorShadingLegend )
-    {
-        RimTools::colorLegendOptionItems( &options );
-    }
-    else if ( fieldNeedingOptions == &m_ensembleWellLogCurveSet )
+    if ( fieldNeedingOptions == &m_ensembleWellLogCurveSet )
     {
     }
 
@@ -1236,8 +1239,8 @@ void RimWellLogTrack::onLoadDataAndUpdate()
         m_curves[cIdx]->loadDataAndUpdate( false );
     }
 
-    if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS ||
-         m_regionAnnotationType == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS ||
+         m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
     {
         m_resultDefinition->loadDataAndUpdate();
         setFormationFieldsUiReadOnly( false );
@@ -1246,9 +1249,7 @@ void RimWellLogTrack::onLoadDataAndUpdate()
     {
         setFormationFieldsUiReadOnly( true );
     }
-    bool noAnnotations = m_regionAnnotationType() == RiaDefines::RegionAnnotationType::NO_ANNOTATIONS;
-    m_regionAnnotationDisplay.uiCapability()->setUiReadOnly( noAnnotations );
-    m_showRegionLabels.uiCapability()->setUiReadOnly( noAnnotations );
+    // UI read-only state for region annotation fields is managed by RimWellLogRegionAnnotationSettings
 
     if ( m_plotWidget )
     {
@@ -1280,7 +1281,7 @@ void RimWellLogTrack::setAndUpdateWellPathFormationNamesData( RimCase* rimCase, 
 
     updateConnectedEditors();
 
-    if ( m_regionAnnotationType != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
     {
         updateRegionAnnotationsOnPlot();
     }
@@ -1312,7 +1313,7 @@ void RimWellLogTrack::setAndUpdateSimWellFormationNamesData( RimCase* rimCase, c
 
     updateConnectedEditors();
 
-    if ( m_regionAnnotationType != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
     {
         updateRegionAnnotationsOnPlot();
     }
@@ -1641,7 +1642,7 @@ void RimWellLogTrack::setPropertyValueAxisGridVisibility( RimWellLogPlot::AxisGr
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setColorShadingLegend( RimColorLegend* colorLegend )
 {
-    m_colorShadingLegend = colorLegend;
+    m_regionAnnotationSettings->setColorShadingLegend( colorLegend );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1649,7 +1650,7 @@ void RimWellLogTrack::setColorShadingLegend( RimColorLegend* colorLegend )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAnnotationType( RiaDefines::RegionAnnotationType annotationType )
 {
-    m_regionAnnotationType = annotationType;
+    m_regionAnnotationSettings->setAnnotationType( annotationType );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1657,7 +1658,7 @@ void RimWellLogTrack::setAnnotationType( RiaDefines::RegionAnnotationType annota
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAnnotationDisplay( RiaDefines::RegionDisplay annotationDisplay )
 {
-    m_regionAnnotationDisplay = annotationDisplay;
+    m_regionAnnotationSettings->setAnnotationDisplay( annotationDisplay );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1665,7 +1666,7 @@ void RimWellLogTrack::setAnnotationDisplay( RiaDefines::RegionDisplay annotation
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAnnotationTransparency( int percent )
 {
-    m_colorShadingTransparency = percent;
+    m_regionAnnotationSettings->setColorShadingTransparency( percent );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1673,7 +1674,7 @@ void RimWellLogTrack::setAnnotationTransparency( int percent )
 //--------------------------------------------------------------------------------------------------
 RiaDefines::RegionAnnotationType RimWellLogTrack::annotationType() const
 {
-    return m_regionAnnotationType();
+    return m_regionAnnotationSettings->annotationType();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1681,7 +1682,7 @@ RiaDefines::RegionAnnotationType RimWellLogTrack::annotationType() const
 //--------------------------------------------------------------------------------------------------
 RiaDefines::RegionDisplay RimWellLogTrack::annotationDisplay() const
 {
-    return m_regionAnnotationDisplay();
+    return m_regionAnnotationSettings->annotationDisplay();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1689,7 +1690,7 @@ RiaDefines::RegionDisplay RimWellLogTrack::annotationDisplay() const
 //--------------------------------------------------------------------------------------------------
 bool RimWellLogTrack::showFormations() const
 {
-    return m_regionAnnotationType() == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS;
+    return m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1697,7 +1698,7 @@ bool RimWellLogTrack::showFormations() const
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setShowRegionLabels( bool on )
 {
-    m_showRegionLabels = on;
+    m_regionAnnotationSettings->setShowRegionLabels( on );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1705,7 +1706,7 @@ void RimWellLogTrack::setShowRegionLabels( bool on )
 //--------------------------------------------------------------------------------------------------
 bool RimWellLogTrack::showWellPathAttributes() const
 {
-    return m_showWellPathAttributes;
+    return m_wellPathAttributeSettings->showWellPathAttributes();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1713,7 +1714,7 @@ bool RimWellLogTrack::showWellPathAttributes() const
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setShowWellPathAttributes( bool on )
 {
-    m_showWellPathAttributes = on;
+    m_wellPathAttributeSettings->setShowWellPathAttributes( on );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1721,7 +1722,7 @@ void RimWellLogTrack::setShowWellPathAttributes( bool on )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setShowWellPathAttributesInLegend( bool on )
 {
-    m_wellPathAttributesInLegend = on;
+    m_wellPathAttributeSettings->setShowAttributesInLegend( on );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1729,7 +1730,7 @@ void RimWellLogTrack::setShowWellPathAttributesInLegend( bool on )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setShowWellPathCompletionsInLegend( bool on )
 {
-    m_wellPathCompletionsInLegend = on;
+    m_wellPathAttributeSettings->setShowCompletionsInLegend( on );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1737,7 +1738,7 @@ void RimWellLogTrack::setShowWellPathCompletionsInLegend( bool on )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setShowBothSidesOfWell( bool on )
 {
-    m_showWellPathComponentsBothSides = on;
+    m_wellPathAttributeSettings->setShowBothSides( on );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1745,7 +1746,7 @@ void RimWellLogTrack::setShowBothSidesOfWell( bool on )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setWellPathAttributesSource( RimWellPath* wellPath )
 {
-    m_wellPathComponentSource = wellPath;
+    m_wellPathAttributeSettings->setWellPathComponentSource( wellPath );
     updateWellPathAttributesCollection();
 }
 
@@ -1754,7 +1755,7 @@ void RimWellLogTrack::setWellPathAttributesSource( RimWellPath* wellPath )
 //--------------------------------------------------------------------------------------------------
 RimWellPath* RimWellLogTrack::wellPathAttributeSource() const
 {
-    return m_wellPathComponentSource;
+    return m_wellPathAttributeSettings->wellPathComponentSource();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1828,38 +1829,25 @@ void RimWellLogTrack::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     caf::PdmUiGroup* annotationGroup = uiOrdering.addNewGroup( "Regions/Annotations" );
     annotationGroup->setCollapsedByDefault();
 
-    annotationGroup->add( &m_regionAnnotationType );
-    annotationGroup->add( &m_regionAnnotationDisplay );
-    annotationGroup->add( &m_showRegionLabels );
-    if ( m_regionAnnotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
-        annotationGroup->add( &m_regionLabelFontSize );
-
-    if ( m_regionAnnotationDisplay() & RiaDefines::COLOR_SHADING || m_regionAnnotationDisplay() & RiaDefines::COLORED_LINES )
-    {
-        annotationGroup->add( &m_colorShadingLegend );
-        if ( m_regionAnnotationDisplay() & RiaDefines::COLOR_SHADING )
-        {
-            annotationGroup->add( &m_colorShadingTransparency );
-        }
-    }
+    // Region annotation settings UI ordering
+    m_regionAnnotationSettings->uiOrdering( uiConfigName, *annotationGroup );
 
     // Formation settings UI ordering
     m_formationSettings->uiOrdering( uiConfigName, *annotationGroup, m_formationsForCaseWithSimWellOnly );
 
-    if ( m_regionAnnotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
     {
         m_resultDefinition->uiOrdering( uiConfigName, *annotationGroup );
     }
 
     caf::PdmUiGroup* componentGroup = uiOrdering.addNewGroup( "Well Path Components" );
-    componentGroup->add( &m_showWellPathAttributes );
-    componentGroup->add( &m_showWellPathCompletions );
-    componentGroup->add( &m_wellPathAttributesInLegend );
-    componentGroup->add( &m_wellPathCompletionsInLegend );
-    componentGroup->add( &m_showWellPathComponentsBothSides );
-    componentGroup->add( &m_showWellPathComponentLabels );
-
-    componentGroup->add( &m_wellPathComponentSource );
+    componentGroup->add( m_wellPathAttributeSettings()->showWellPathAttributesField() );
+    componentGroup->add( m_wellPathAttributeSettings()->showWellPathCompletionsField() );
+    componentGroup->add( m_wellPathAttributeSettings()->showAttributesInLegendField() );
+    componentGroup->add( m_wellPathAttributeSettings()->showCompletionsInLegendField() );
+    componentGroup->add( m_wellPathAttributeSettings()->showBothSidesField() );
+    componentGroup->add( m_wellPathAttributeSettings()->showComponentLabelsField() );
+    componentGroup->add( m_wellPathAttributeSettings()->wellPathComponentSourceField() );
 
     uiOrdering.add( &m_ensembleWellLogCurveSet );
 
@@ -1873,7 +1861,7 @@ void RimWellLogTrack::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::initAfterRead()
 {
-    if ( m_regionAnnotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
     {
         RimEclipseCase* eclipseCase = dynamic_cast<RimEclipseCase*>( m_formationSettings->formationCase() );
         m_resultDefinition->setEclipseCase( dynamic_cast<RimEclipseCase*>( eclipseCase ) );
@@ -1913,6 +1901,26 @@ void RimWellLogTrack::initAfterRead()
         m_formationSettings->setBranchDetection( m_formationBranchDetection_OBSOLETE() );
         m_formationSettings->setFormationLevel( m_formationLevel_OBSOLETE() );
         m_formationSettings->setShowFormationFluids( m_showformationFluids_OBSOLETE() );
+
+        // Migrate region annotation settings from obsolete fields
+        m_regionAnnotationSettings->setAnnotationType( m_regionAnnotationType_OBSOLETE() );
+        m_regionAnnotationSettings->setAnnotationDisplay( m_regionAnnotationDisplay_OBSOLETE() );
+        m_regionAnnotationSettings->setColorShadingLegend( m_colorShadingLegend_OBSOLETE() );
+        m_regionAnnotationSettings->setColorShadingTransparency( m_colorShadingTransparency_OBSOLETE() );
+        m_regionAnnotationSettings->setShowRegionLabels( m_showRegionLabels_OBSOLETE() );
+        m_regionAnnotationSettings->setRegionLabelFontSize( m_regionLabelFontSize_OBSOLETE() );
+
+        // Migrate well path attribute settings from obsolete fields
+        m_wellPathAttributeSettings->setShowWellPathAttributes( m_showWellPathAttributes_OBSOLETE() );
+        m_wellPathAttributeSettings->setShowWellPathCompletions( m_showWellPathCompletions_OBSOLETE() );
+        m_wellPathAttributeSettings->setShowBothSides( m_showWellPathComponentsBothSides_OBSOLETE() );
+        m_wellPathAttributeSettings->setShowComponentLabels( m_showWellPathComponentLabels_OBSOLETE() );
+        m_wellPathAttributeSettings->setShowAttributesInLegend( m_wellPathAttributesInLegend_OBSOLETE() );
+        m_wellPathAttributeSettings->setShowCompletionsInLegend( m_wellPathCompletionsInLegend_OBSOLETE() );
+        m_wellPathAttributeSettings->setWellPathComponentSource( m_wellPathComponentSource_OBSOLETE() );
+        m_wellPathAttributeSettings->setWellPathAttributeCollection( m_wellPathAttributeCollection_OBSOLETE() );
+        m_wellPathAttributeSettings->setOverburdenHeight( m_overburdenHeight_OBSOLETE() );
+        m_wellPathAttributeSettings->setUnderburdenHeight( m_underburdenHeight_OBSOLETE() );
     }
 
     for ( auto curve : m_curves )
@@ -1926,15 +1934,7 @@ void RimWellLogTrack::initAfterRead()
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_colorShadingTransparency )
-    {
-        auto sliderAttrib = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute );
-        if ( sliderAttrib )
-        {
-            sliderAttrib->m_minimum = 0;
-            sliderAttrib->m_maximum = 100;
-        }
-    }
+    // Editor attributes are now handled by the individual settings objects
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2064,14 +2064,14 @@ std::pair<double, double> RimWellLogTrack::extendMinMaxRange( double minValue, d
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::updateWellPathAttributesCollection()
 {
-    m_wellPathAttributeCollection = nullptr;
-    if ( m_wellPathComponentSource )
+    m_wellPathAttributeSettings->setWellPathAttributeCollection( nullptr );
+    if ( m_wellPathAttributeSettings->wellPathComponentSource() )
     {
         std::vector<RimWellPathAttributeCollection*> attributeCollection =
-            m_wellPathComponentSource->descendantsIncludingThisOfType<RimWellPathAttributeCollection>();
+            m_wellPathAttributeSettings->wellPathComponentSource()->descendantsIncludingThisOfType<RimWellPathAttributeCollection>();
         if ( !attributeCollection.empty() )
         {
-            m_wellPathAttributeCollection = attributeCollection.front();
+            m_wellPathAttributeSettings->setWellPathAttributeCollection( attributeCollection.front() );
         }
     }
 }
@@ -2277,9 +2277,10 @@ void RimWellLogTrack::uiOrderingForRftPltFormations( caf::PdmUiOrdering& uiOrder
 {
     caf::PdmUiGroup* formationGroup = uiOrdering.addNewGroup( "Zonation/Formation Names" );
     formationGroup->setCollapsedByDefault();
-    formationGroup->add( &m_regionAnnotationType );
-    formationGroup->add( &m_regionAnnotationDisplay );
-    
+
+    // Region annotation settings UI ordering
+    m_regionAnnotationSettings->uiOrdering( "", *formationGroup );
+
     // Delegate to formation settings for formation-related fields
     m_formationSettings->uiOrdering( "", *formationGroup, m_formationsForCaseWithSimWellOnly );
 }
@@ -2592,9 +2593,8 @@ void RimWellLogTrack::updateStackedCurveData()
 void RimWellLogTrack::setFormationFieldsUiReadOnly( bool readOnly /*= true*/ )
 {
     // Formation fields are now managed by RimWellLogFormationSettings
-    // The settings object handles its own UI read-only state
-    m_colorShadingTransparency.uiCapability()->setUiReadOnly( readOnly );
-    m_colorShadingLegend.uiCapability()->setUiReadOnly( readOnly );
+    // Region annotation fields are managed by RimWellLogRegionAnnotationSettings
+    // The settings objects handle their own UI read-only state
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -2604,18 +2604,18 @@ void RimWellLogTrack::updateRegionAnnotationsOnPlot()
 {
     removeRegionAnnotations();
 
-    if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::NO_ANNOTATIONS ) return;
+    if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::NO_ANNOTATIONS ) return;
 
     if ( m_annotationTool == nullptr )
     {
         m_annotationTool = std::make_unique<RiuPlotAnnotationTool>();
     }
 
-    if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS )
+    if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS )
     {
         updateFormationNamesOnPlot();
     }
-    else if ( m_regionAnnotationType == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
+    else if ( m_regionAnnotationSettings->annotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
     {
         updateResultPropertyNamesOnPlot();
     }
@@ -2693,8 +2693,9 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
         }
         else
         {
-            eclWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor(
-                m_formationSettings->wellPathForSourceCase(), dynamic_cast<RimEclipseCase*>( m_formationSettings->formationCase() ) );
+            eclWellLogExtractor =
+                RiaExtractionTools::findOrCreateWellLogExtractor( m_formationSettings->wellPathForSourceCase(),
+                                                                  dynamic_cast<RimEclipseCase*>( m_formationSettings->formationCase() ) );
         }
 
         if ( eclWellLogExtractor )
@@ -2715,8 +2716,9 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
         }
         else
         {
-            geoMechWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor(
-                m_formationSettings->wellPathForSourceCase(), dynamic_cast<RimGeoMechCase*>( m_formationSettings->formationCase() ) );
+            geoMechWellLogExtractor =
+                RiaExtractionTools::findOrCreateWellLogExtractor( m_formationSettings->wellPathForSourceCase(),
+                                                                  dynamic_cast<RimGeoMechCase*>( m_formationSettings->formationCase() ) );
             if ( !geoMechWellLogExtractor ) return;
 
             std::string activeFormationNamesResultName = RiaResultNames::activeFormationNamesResultName().toStdString();
@@ -2740,10 +2742,10 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
                                                   { "Sea Level", "" },
                                                   orientation,
                                                   convertedYValues,
-                                                  m_regionAnnotationDisplay(),
+                                                  m_regionAnnotationSettings->annotationDisplay(),
                                                   waterAndRockColors,
-                                                  ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                                  m_showRegionLabels(),
+                                                  ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100,
+                                                  m_regionAnnotationSettings->showRegionLabels(),
                                                   RiaDefines::TrackSpan::LEFT_COLUMN,
                                                   { Qt::SolidPattern, Qt::Dense6Pattern } );
         }
@@ -2756,14 +2758,14 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
 
             std::vector<QString> formationNamesVector = RimWellLogTrack::formationNamesVector( m_formationSettings->formationCase() );
 
-            if ( m_overburdenHeight > 0.0 )
+            if ( m_wellPathAttributeSettings->overburdenHeight() > 0.0 )
             {
-                addOverburden( formationNamesVector, curveData, m_overburdenHeight );
+                addOverburden( formationNamesVector, curveData, m_wellPathAttributeSettings->overburdenHeight() );
             }
 
-            if ( m_underburdenHeight > 0.0 )
+            if ( m_wellPathAttributeSettings->underburdenHeight() > 0.0 )
             {
-                addUnderburden( formationNamesVector, curveData, m_underburdenHeight );
+                addUnderburden( formationNamesVector, curveData, m_wellPathAttributeSettings->underburdenHeight() );
             }
 
             std::vector<std::pair<double, double>> yValues;
@@ -2774,15 +2776,15 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
             std::vector<std::pair<double, double>> convertedYValues =
                 RiaWellLogUnitTools<double>::convertDepths( yValues, fromDepthUnit, toDepthUnit );
 
-            caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
+            caf::ColorTable colorTable( m_regionAnnotationSettings->colorShadingLegend()->colorArray() );
             m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
                                                   formationNamesToPlot,
                                                   orientation,
                                                   convertedYValues,
-                                                  m_regionAnnotationDisplay(),
+                                                  m_regionAnnotationSettings->annotationDisplay(),
                                                   colorTable,
-                                                  ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                                  m_showRegionLabels() );
+                                                  ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100,
+                                                  m_regionAnnotationSettings->showRegionLabels() );
         }
     }
 }
@@ -2799,8 +2801,9 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
 
     auto orientation = plot->depthOrientation();
 
-    RigEclipseWellLogExtractor* eclWellLogExtractor = RiaExtractionTools::findOrCreateWellLogExtractor(
-        m_formationSettings->wellPathForSourceCase(), dynamic_cast<RimEclipseCase*>( m_formationSettings->formationCase() ) );
+    RigEclipseWellLogExtractor* eclWellLogExtractor =
+        RiaExtractionTools::findOrCreateWellLogExtractor( m_formationSettings->wellPathForSourceCase(),
+                                                          dynamic_cast<RimEclipseCase*>( m_formationSettings->formationCase() ) );
 
     if ( !eclWellLogExtractor )
     {
@@ -2840,26 +2843,26 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
 
         // Find the largest category number.
         int maxCategoryValue = std::numeric_limits<int>::min();
-        for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
+        for ( RimColorLegendItem* legendItem : m_regionAnnotationSettings->colorShadingLegend()->colorLegendItems() )
         {
             maxCategoryValue = std::max( maxCategoryValue, legendItem->categoryValue() );
         }
 
         // Insert each name at index matching the category number.
         std::vector<QString> namesVector( maxCategoryValue + 1 );
-        for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
+        for ( RimColorLegendItem* legendItem : m_regionAnnotationSettings->colorShadingLegend()->colorLegendItems() )
         {
             namesVector[legendItem->categoryValue()] = legendItem->categoryName();
         }
 
-        if ( m_overburdenHeight > 0.0 )
+        if ( m_wellPathAttributeSettings->overburdenHeight() > 0.0 )
         {
-            addOverburden( namesVector, curveData, m_overburdenHeight );
+            addOverburden( namesVector, curveData, m_wellPathAttributeSettings->overburdenHeight() );
         }
 
-        if ( m_underburdenHeight > 0.0 )
+        if ( m_wellPathAttributeSettings->underburdenHeight() > 0.0 )
         {
-            addUnderburden( namesVector, curveData, m_underburdenHeight );
+            addUnderburden( namesVector, curveData, m_wellPathAttributeSettings->underburdenHeight() );
         }
 
         std::vector<QString>                   namesToPlot;
@@ -2875,7 +2878,7 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
         for ( QString nameToPlot : namesToPlot )
         {
             bool isFound = false;
-            for ( RimColorLegendItem* legendItem : m_colorShadingLegend()->colorLegendItems() )
+            for ( RimColorLegendItem* legendItem : m_regionAnnotationSettings->colorShadingLegend()->colorLegendItems() )
             {
                 if ( legendItem->categoryName() == nameToPlot )
                 {
@@ -2898,16 +2901,17 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
 
         caf::ColorTable colorTable( colors );
 
-        int fontSize = caf::FontTools::absolutePointSize( RiaPreferences::current()->defaultPlotFontSize(), m_regionLabelFontSize() );
+        int fontSize = caf::FontTools::absolutePointSize( RiaPreferences::current()->defaultPlotFontSize(),
+                                                          m_regionAnnotationSettings->regionLabelFontSize() );
 
         m_annotationTool->attachNamedRegions( m_plotWidget->qwtPlot(),
                                               namesToPlot,
                                               orientation,
                                               convertedYValues,
-                                              m_regionAnnotationDisplay(),
+                                              m_regionAnnotationSettings->annotationDisplay(),
                                               colorTable,
-                                              ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100,
-                                              m_showRegionLabels(),
+                                              ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100,
+                                              m_regionAnnotationSettings->showRegionLabels(),
                                               RiaDefines::TrackSpan::FULL_WIDTH,
                                               {},
                                               fontSize );
@@ -2956,7 +2960,7 @@ void RimWellLogTrack::updateCurveDataRegionsOnPlot()
             std::vector<double> ucsSourceRegions     = geoMechWellLogExtractor->ucsSourceRegions( stepIdx, frameIdx );
 
             {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
+                caf::ColorTable colorTable( m_regionAnnotationSettings->colorShadingLegend()->colorArray() );
 
                 std::vector<QString> sourceNames =
                     RigWbsParameter::PP_Reservoir().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::PP_NonReservoir() ) );
@@ -2974,14 +2978,14 @@ void RimWellLogTrack::updateCurveDataRegionsOnPlot()
                                                       sourceNamesToPlot,
                                                       orientation,
                                                       convertedYValues,
-                                                      m_regionAnnotationDisplay(),
+                                                      m_regionAnnotationSettings->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
+                                                      ( ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
+                                                      m_regionAnnotationSettings->showRegionLabels(),
                                                       RiaDefines::TrackSpan::LEFT_COLUMN );
             }
             {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
+                caf::ColorTable colorTable( m_regionAnnotationSettings->colorShadingLegend()->colorArray() );
 
                 std::vector<QString> sourceNames =
                     RigWbsParameter::poissonRatio().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::poissonRatio() ) );
@@ -2999,14 +3003,14 @@ void RimWellLogTrack::updateCurveDataRegionsOnPlot()
                                                       sourceNamesToPlot,
                                                       orientation,
                                                       convertedYValues,
-                                                      m_regionAnnotationDisplay(),
+                                                      m_regionAnnotationSettings->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
+                                                      ( ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
+                                                      m_regionAnnotationSettings->showRegionLabels(),
                                                       RiaDefines::TrackSpan::CENTRE_COLUMN );
             }
             {
-                caf::ColorTable colorTable( m_colorShadingLegend->colorArray() );
+                caf::ColorTable colorTable( m_regionAnnotationSettings->colorShadingLegend()->colorArray() );
 
                 std::vector<QString> sourceNames =
                     RigWbsParameter::UCS().allSourceUiLabels( "\n", wbsPlot->userDefinedValue( RigWbsParameter::UCS() ) );
@@ -3025,10 +3029,10 @@ void RimWellLogTrack::updateCurveDataRegionsOnPlot()
                                                       sourceNamesToPlot,
                                                       orientation,
                                                       convertedYValues,
-                                                      m_regionAnnotationDisplay(),
+                                                      m_regionAnnotationSettings->annotationDisplay(),
                                                       colorTable,
-                                                      ( ( ( 100 - m_colorShadingTransparency ) * 255 ) / 100 ) / 3,
-                                                      m_showRegionLabels(),
+                                                      ( ( ( 100 - m_regionAnnotationSettings->colorShadingTransparency() ) * 255 ) / 100 ) / 3,
+                                                      m_regionAnnotationSettings->showRegionLabels(),
                                                       RiaDefines::TrackSpan::RIGHT_COLUMN );
             }
         }
@@ -3046,16 +3050,17 @@ void RimWellLogTrack::updateWellPathAttributesOnPlot()
     {
         std::vector<const RimWellPathComponentInterface*> allWellPathComponents;
 
-        if ( wellPathAttributeSource()->wellPathGeometry() && ( m_showWellPathAttributes || m_showWellPathCompletions ) )
+        if ( wellPathAttributeSource()->wellPathGeometry() &&
+             ( m_wellPathAttributeSettings->showWellPathAttributes() || m_wellPathAttributeSettings->showWellPathCompletions() ) )
         {
             m_wellPathAttributePlotObjects.push_back( std::make_unique<RiuWellPathComponentPlotItem>( wellPathAttributeSource() ) );
         }
 
-        if ( m_showWellPathAttributes )
+        if ( m_wellPathAttributeSettings->showWellPathAttributes() )
         {
-            if ( m_wellPathAttributeCollection )
+            if ( m_wellPathAttributeSettings->wellPathAttributeCollection() )
             {
-                std::vector<RimWellPathAttribute*> attributes = m_wellPathAttributeCollection->attributes();
+                std::vector<RimWellPathAttribute*> attributes = m_wellPathAttributeSettings->wellPathAttributeCollection()->attributes();
                 for ( const RimWellPathAttribute* attribute : attributes )
                 {
                     if ( attribute->isEnabled() )
@@ -3065,7 +3070,7 @@ void RimWellLogTrack::updateWellPathAttributesOnPlot()
                 }
             }
         }
-        if ( m_showWellPathCompletions )
+        if ( m_wellPathAttributeSettings->showWellPathCompletions() )
         {
             const RimWellPathCompletions*                     completionsCollection = wellPathAttributeSource()->completions();
             std::vector<const RimWellPathComponentInterface*> allCompletions        = completionsCollection->allCompletions();
@@ -3108,7 +3113,8 @@ void RimWellLogTrack::updateWellPathAttributesOnPlot()
 
             std::unique_ptr<RiuWellPathComponentPlotItem> plotItem( new RiuWellPathComponentPlotItem( wellPathAttributeSource(), component ) );
             QString legendTitle        = plotItem->legendTitle();
-            bool    contributeToLegend = m_wellPathCompletionsInLegend() && !completionsAssignedToLegend.count( legendTitle );
+            bool    contributeToLegend = m_wellPathAttributeSettings->showCompletionsInLegend() &&
+                                      !completionsAssignedToLegend.count( legendTitle );
             plotItem->setContributeToLegend( contributeToLegend );
             m_wellPathAttributePlotObjects.push_back( std::move( plotItem ) );
             completionsAssignedToLegend.insert( legendTitle );
@@ -3122,7 +3128,7 @@ void RimWellLogTrack::updateWellPathAttributesOnPlot()
         {
             attributePlotObject->setDepthType( depthType );
             attributePlotObject->setDepthOrientation( depthOrientation );
-            attributePlotObject->setShowLabel( m_showWellPathComponentLabels() );
+            attributePlotObject->setShowLabel( m_wellPathAttributeSettings->showComponentLabels() );
             attributePlotObject->loadDataAndUpdate( false );
             attributePlotObject->setParentPlotNoReplot( m_plotWidget->qwtPlot() );
         }
@@ -3166,7 +3172,7 @@ void RimWellLogTrack::onChildDeleted( caf::PdmChildArrayFieldHandle* childArray,
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setOverburdenHeight( double overburdenHeight )
 {
-    m_overburdenHeight = overburdenHeight;
+    m_wellPathAttributeSettings->setOverburdenHeight( overburdenHeight );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -3174,7 +3180,7 @@ void RimWellLogTrack::setOverburdenHeight( double overburdenHeight )
 //--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setUnderburdenHeight( double underburdenHeight )
 {
-    m_underburdenHeight = underburdenHeight;
+    m_wellPathAttributeSettings->setUnderburdenHeight( underburdenHeight );
 }
 
 //--------------------------------------------------------------------------------------------------
