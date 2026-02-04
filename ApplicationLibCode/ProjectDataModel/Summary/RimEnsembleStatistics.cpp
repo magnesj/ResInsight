@@ -24,6 +24,9 @@
 #include "RimEnsembleCurveSetInterface.h"
 #include "RimProject.h"
 
+#include <QRegularExpression>
+#include <algorithm>
+
 CAF_PDM_SOURCE_INIT( RimEnsembleStatistics, "RimEnsembleStatistics" );
 
 //--------------------------------------------------------------------------------------------------
@@ -46,10 +49,24 @@ RimEnsembleStatistics::RimEnsembleStatistics( RimEnsembleCurveSetInterface* pare
     m_showEnsembleCurves.registerSetMethod( this, &RimEnsembleStatistics::onSetShowEnsembleCurves );
 
     CAF_PDM_InitField( &m_basedOnFilteredCases, "BasedOnFilteredCases", true, "Based on Filtered Cases" );
+
+    // Deprecated fields - kept for backward compatibility
     CAF_PDM_InitField( &m_showP10Curve, "ShowP10Curve", true, "P10" );
     CAF_PDM_InitField( &m_showP50Curve, "ShowP50Curve", false, "P50" );
     CAF_PDM_InitField( &m_showP90Curve, "ShowP90Curve", true, "P90" );
     CAF_PDM_InitField( &m_showMeanCurve, "ShowMeanCurve", true, "Mean" );
+    // Hide deprecated fields - will be converted in initAfterRead()
+    m_showP10Curve.uiCapability()->setUiHidden( true );
+    m_showP50Curve.uiCapability()->setUiHidden( true );
+    m_showP90Curve.uiCapability()->setUiHidden( true );
+
+    // New percentile fields
+    CAF_PDM_InitFieldNoDefault( &m_selectedPercentiles, "SelectedPercentiles", "Percentiles" );
+    m_selectedPercentiles.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
+
+    CAF_PDM_InitField( &m_percentileTextString, "PercentileTextString", QString( "" ), "Custom Percentiles" );
+    m_percentileTextString.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+
     CAF_PDM_InitField( &m_showCurveLabels, "ShowCurveLabels", true, "Show Curve Labels" );
     CAF_PDM_InitField( &m_includeIncompleteCurves, "IncludeIncompleteCurves", false, "Include Incomplete Curves" );
 
@@ -122,7 +139,8 @@ bool RimEnsembleStatistics::basedOnFilteredCases() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatistics::showP10Curve() const
 {
-    return m_showP10Curve;
+    auto percentiles = selectedPercentiles();
+    return std::find( percentiles.begin(), percentiles.end(), 10 ) != percentiles.end();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -130,7 +148,8 @@ bool RimEnsembleStatistics::showP10Curve() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatistics::showP50Curve() const
 {
-    return m_showP50Curve;
+    auto percentiles = selectedPercentiles();
+    return std::find( percentiles.begin(), percentiles.end(), 50 ) != percentiles.end();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -138,7 +157,8 @@ bool RimEnsembleStatistics::showP50Curve() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatistics::showP90Curve() const
 {
-    return m_showP90Curve;
+    auto percentiles = selectedPercentiles();
+    return std::find( percentiles.begin(), percentiles.end(), 90 ) != percentiles.end();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -270,22 +290,17 @@ void RimEnsembleStatistics::defaultUiOrdering( bool showCrossPlotGroup, caf::Pdm
     uiOrdering.add( &m_customColor );
     if ( m_customColor() ) uiOrdering.add( &m_color );
 
-    auto group = uiOrdering.addNewGroup( "Curves" );
+    auto group = uiOrdering.addNewGroup( "Percentiles" );
     if ( !curveSet->hasMeanData() ) group->add( &m_warningLabel );
-    group->add( &m_showP90Curve );
-    group->add( &m_showP50Curve );
+    group->add( &m_selectedPercentiles );
+    group->add( &m_percentileTextString );
     group->add( &m_showMeanCurve );
-    group->add( &m_showP10Curve );
 
-    disableP10Curve( !m_active || !curveSet->hasP10Data() );
-    disableP50Curve( !m_active || !curveSet->hasP50Data() );
-    disableP90Curve( !m_active || !curveSet->hasP90Data() );
-    disableMeanCurve( !m_active || !curveSet->hasMeanData() );
+    m_selectedPercentiles.uiCapability()->setUiReadOnly( !m_active );
+    m_percentileTextString.uiCapability()->setUiReadOnly( !m_active );
+    m_showMeanCurve.uiCapability()->setUiReadOnly( !m_active || !curveSet->hasMeanData() );
     m_showCurveLabels.uiCapability()->setUiReadOnly( !m_active );
     m_color.uiCapability()->setUiReadOnly( !m_active );
-
-    m_showP10Curve.uiCapability()->setUiName( curveSet->hasP10Data() ? "P10" : "P10 (Needs > 8 curves)" );
-    m_showP90Curve.uiCapability()->setUiName( curveSet->hasP90Data() ? "P90" : "P90 (Needs > 8 curves)" );
 
     uiOrdering.skipRemainingFields( true );
 }
@@ -303,6 +318,16 @@ void RimEnsembleStatistics::fieldChangedByUi( const caf::PdmFieldHandle* changed
         curveSet->updateAllCurves();
 
         return;
+    }
+
+    if ( changedField == &m_percentileTextString )
+    {
+        parsePercentileString();
+    }
+
+    if ( changedField == &m_selectedPercentiles )
+    {
+        updatePercentileTextFromSelection();
     }
 
     auto curveSet = m_parentCurveSet;
@@ -337,4 +362,114 @@ bool RimEnsembleStatistics::onShowEnsembleCurves() const
 void RimEnsembleStatistics::onSetShowEnsembleCurves( const bool& enable )
 {
     m_hideEnsembleCurves = !enable;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RimEnsembleStatistics::selectedPercentiles() const
+{
+    return m_selectedPercentiles();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleStatistics::setSelectedPercentiles( const std::vector<int>& percentiles )
+{
+    m_selectedPercentiles = percentiles;
+    updatePercentileTextFromSelection();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleStatistics::parsePercentileString()
+{
+    QString text = m_percentileTextString().trimmed();
+    if ( text.isEmpty() )
+    {
+        return;
+    }
+
+    std::vector<int> percentiles;
+    QStringList      tokens = text.split( QRegularExpression( "[,;\\s]+" ), Qt::SkipEmptyParts );
+
+    for ( const QString& token : tokens )
+    {
+        bool ok    = false;
+        int  value = token.toInt( &ok );
+        if ( ok && value >= 0 && value <= 100 )
+        {
+            percentiles.push_back( value );
+        }
+    }
+
+    if ( !percentiles.empty() )
+    {
+        // Sort and remove duplicates
+        std::sort( percentiles.begin(), percentiles.end() );
+        percentiles.erase( std::unique( percentiles.begin(), percentiles.end() ), percentiles.end() );
+
+        m_selectedPercentiles = percentiles;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleStatistics::updatePercentileTextFromSelection()
+{
+    auto        percentiles = m_selectedPercentiles();
+    QStringList strings;
+    for ( int p : percentiles )
+    {
+        strings.append( QString::number( p ) );
+    }
+    m_percentileTextString = strings.join( ", " );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleStatistics::initAfterRead()
+{
+    // Convert old boolean flags to percentile list on first load
+    if ( m_selectedPercentiles().empty() )
+    {
+        std::vector<int> percentiles;
+
+        if ( m_showP10Curve() ) percentiles.push_back( 10 );
+        if ( m_showP50Curve() ) percentiles.push_back( 50 );
+        if ( m_showP90Curve() ) percentiles.push_back( 90 );
+
+        // If no percentiles were set from old flags, use default P10, P90
+        if ( percentiles.empty() )
+        {
+            percentiles = { 10, 90 };
+        }
+
+        m_selectedPercentiles = percentiles;
+        updatePercentileTextFromSelection();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimEnsembleStatistics::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_selectedPercentiles )
+    {
+        // Provide common percentile options
+        options.push_back( caf::PdmOptionItemInfo( "P10", 10 ) );
+        options.push_back( caf::PdmOptionItemInfo( "P25", 25 ) );
+        options.push_back( caf::PdmOptionItemInfo( "P50", 50 ) );
+        options.push_back( caf::PdmOptionItemInfo( "P75", 75 ) );
+        options.push_back( caf::PdmOptionItemInfo( "P90", 90 ) );
+    }
+
+    return options;
 }

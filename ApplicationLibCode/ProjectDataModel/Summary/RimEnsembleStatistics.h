@@ -45,6 +45,9 @@ public:
     bool showP90Curve() const;
     bool showMeanCurve() const;
 
+    std::vector<int> selectedPercentiles() const;
+    void             setSelectedPercentiles( const std::vector<int>& percentiles );
+
     bool showCurveLabels() const;
     void enableCurveLabels( bool enable );
 
@@ -69,8 +72,13 @@ public:
 private:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void initAfterRead() override;
     bool onShowEnsembleCurves() const;
     void onSetShowEnsembleCurves( const bool& enable );
+
+    void   parsePercentileString();
+    void   updatePercentileTextFromSelection();
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
     RimEnsembleCurveSetInterface* m_parentCurveSet;
@@ -80,13 +88,20 @@ private:
     caf::PdmField<bool>           m_hideEnsembleCurves;
     caf::PdmProxyValueField<bool> m_showEnsembleCurves;
     caf::PdmField<bool>           m_basedOnFilteredCases;
-    caf::PdmField<bool>           m_showP10Curve;
-    caf::PdmField<bool>           m_showP50Curve;
-    caf::PdmField<bool>           m_showP90Curve;
-    caf::PdmField<bool>           m_showMeanCurve;
-    caf::PdmField<bool>           m_showCurveLabels;
-    caf::PdmField<bool>           m_includeIncompleteCurves;
-    caf::PdmField<bool>           m_customColor;
+
+    // Deprecated fields - kept for backward compatibility
+    caf::PdmField<bool> m_showP10Curve;
+    caf::PdmField<bool> m_showP50Curve;
+    caf::PdmField<bool> m_showP90Curve;
+    caf::PdmField<bool> m_showMeanCurve;
+
+    // New percentile fields
+    caf::PdmField<std::vector<int>> m_selectedPercentiles;
+    caf::PdmField<QString>          m_percentileTextString;
+
+    caf::PdmField<bool> m_showCurveLabels;
+    caf::PdmField<bool> m_includeIncompleteCurves;
+    caf::PdmField<bool> m_customColor;
 
     // Ensemble cross plot settings
     caf::PdmField<int> m_crossPlotCurvesBinCount;

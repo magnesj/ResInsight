@@ -71,6 +71,15 @@ bool RimEnsembleStatisticsCase::hasMeanData() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimEnsembleStatisticsCase::hasPercentileData( int percentile ) const
+{
+    auto it = m_percentileData.find( percentile );
+    return it != m_percentileData.end() && !it->second.empty();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
     if ( resultAddress.isErrorResult() ) return { true, {} };
