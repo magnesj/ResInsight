@@ -22,7 +22,6 @@
 #include "cvfObject.h"
 
 #include "RimWellLogPlot.h"
-#include "RimWellLogTrackEnums.h"
 
 #include <map>
 #include <utility>

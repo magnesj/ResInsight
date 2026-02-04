@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RimWellLogTrackEnums.h"
+#include "RiaWellLogTrackDefines.h"
 
 #include "Well/RigWellPathFormations.h"
 

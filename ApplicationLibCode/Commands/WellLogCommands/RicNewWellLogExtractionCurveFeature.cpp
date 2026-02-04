@@ -35,7 +35,6 @@
 #include "RimWellLogExtractionCurve.h"
 #include "RimWellLogPlot.h"
 #include "RimWellLogTrack.h"
-#include "RimWellLogTrackEnums.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
