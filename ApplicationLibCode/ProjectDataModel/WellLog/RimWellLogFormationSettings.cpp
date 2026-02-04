@@ -20,11 +20,11 @@
 
 #include "RiaSimWellBranchTools.h"
 
+#include "RiaWellLogTrackDefines.h"
 #include "RimCase.h"
 #include "RimEclipseCase.h"
 #include "RimTools.h"
 #include "RimWellLogTrack.h"
-#include "RiaWellLogTrackDefines.h"
 #include "RimWellPath.h"
 
 #include "RigEclipseCaseData.h"
@@ -317,13 +317,14 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
     if ( fieldNeedingOptions == &m_formationSource )
     {
         options.push_back( caf::PdmOptionItemInfo( "Case", static_cast<int>( RiaDefines::WellLogTrackFormationSource::CASE ) ) );
-        options.push_back(
-            caf::PdmOptionItemInfo( "Well Picks for Well Path", static_cast<int>( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "Well Picks for Well Path",
+                                                   static_cast<int>( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationTrajectoryType )
     {
         options.push_back( caf::PdmOptionItemInfo( "Well Path", static_cast<int>( RiaDefines::WellLogTrackTrajectoryType::WELL_PATH ) ) );
-        options.push_back( caf::PdmOptionItemInfo( "Simulation Well", static_cast<int>( RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL ) ) );
+        options.push_back(
+            caf::PdmOptionItemInfo( "Simulation Well", static_cast<int>( RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationWellPathForSourceCase )
     {

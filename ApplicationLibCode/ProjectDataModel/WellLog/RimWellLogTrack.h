@@ -19,8 +19,8 @@
 
 #pragma once
 
-#include "RimWellLogPlot.h"
 #include "RiaWellLogTrackDefines.h"
+#include "RimWellLogPlot.h"
 
 #include "RiaPlotDefines.h"
 
@@ -123,7 +123,7 @@ public:
     RimCase*                               formationNamesCase() const;
     void                                   setFormationTrajectoryType( RiaDefines::WellLogTrackTrajectoryType trajectoryType );
     RiaDefines::WellLogTrackTrajectoryType formationTrajectoryType() const;
-    void                          setRegionPropertyResultType( RiaDefines::ResultCatType resultCatType, const QString& resultVariable );
+    void setRegionPropertyResultType( RiaDefines::ResultCatType resultCatType, const QString& resultVariable );
 
     void detachAllCurves() override;
     void reattachAllCurves() override;
@@ -358,8 +358,8 @@ private:
     caf::PdmField<QString>                                               m_formationSimWellName_OBSOLETE;
     caf::PdmField<int>                                                   m_formationBranchIndex_OBSOLETE;
     caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>>  m_formationLevel_OBSOLETE;
-    caf::PdmField<bool>                                         m_showformationFluids_OBSOLETE;
-    caf::PdmField<bool>                                         m_formationBranchDetection_OBSOLETE;
+    caf::PdmField<bool>                                                  m_showformationFluids_OBSOLETE;
+    caf::PdmField<bool>                                                  m_formationBranchDetection_OBSOLETE;
 
     // OBSOLETE: Well path attribute fields (migrated to RimWellLogWellPathAttributeSettings)
     caf::PdmField<bool>                               m_showWellPathAttributes_OBSOLETE;
