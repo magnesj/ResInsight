@@ -2242,7 +2242,7 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
         }
         else
         {
-            m_ensembleStatCaseY->calculate( statCases, summaryAddressY(), m_statistics->includeIncompleteCurves() );
+            m_ensembleStatCaseY->calculate( statCases, summaryAddressY(), m_statistics->includeIncompleteCurves(), m_statistics->selectedPercentiles() );
         }
     }
 
@@ -2280,21 +2280,36 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
             RifEclipseSummaryAddress dataAddressY = m_yValuesSummaryAddress->address();
 
             auto getStatisticsAddress = []( RifEclipseSummaryAddressDefines::StatisticsType statisticsType,
-                                            const RifEclipseSummaryAddress&                 addrY ) -> RiaSummaryCurveAddress
+                                            const RifEclipseSummaryAddress&                 addrY,
+                                            int                                             percentile = -1 ) -> RiaSummaryCurveAddress
             {
                 auto xStatAddress = RifEclipseSummaryAddress::timeAddress();
                 auto yStatAddress = addrY;
                 yStatAddress.setStatisticsType( statisticsType );
+                if ( percentile >= 0 ) yStatAddress.setId( percentile );
 
                 return RiaSummaryCurveAddress( xStatAddress, yStatAddress );
             };
 
-            if ( m_statistics->showP10Curve() && m_ensembleStatCaseY->hasP10Data() )
-                addresses.push_back( getStatisticsAddress( RifEclipseSummaryAddressDefines::StatisticsType::P10, dataAddressY ) );
-            if ( m_statistics->showP50Curve() && m_ensembleStatCaseY->hasP50Data() )
-                addresses.push_back( getStatisticsAddress( RifEclipseSummaryAddressDefines::StatisticsType::P50, dataAddressY ) );
-            if ( m_statistics->showP90Curve() && m_ensembleStatCaseY->hasP90Data() )
-                addresses.push_back( getStatisticsAddress( RifEclipseSummaryAddressDefines::StatisticsType::P90, dataAddressY ) );
+            // Add percentile curves
+            for ( int p : m_statistics->selectedPercentiles() )
+            {
+                if ( m_ensembleStatCaseY->hasPercentileData( p ) )
+                {
+                    // Map common percentiles to their enum values, use NONE for custom percentiles
+                    RifEclipseSummaryAddressDefines::StatisticsType statType = RifEclipseSummaryAddressDefines::StatisticsType::NONE;
+                    if ( p == 10 )
+                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P10;
+                    else if ( p == 50 )
+                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P50;
+                    else if ( p == 90 )
+                        statType = RifEclipseSummaryAddressDefines::StatisticsType::P90;
+
+                    addresses.push_back( getStatisticsAddress( statType, dataAddressY, p ) );
+                }
+            }
+
+            // Add mean curve if requested
             if ( m_statistics->showMeanCurve() && m_ensembleStatCaseY->hasMeanData() )
                 addresses.push_back( getStatisticsAddress( RifEclipseSummaryAddressDefines::StatisticsType::MEAN, dataAddressY ) );
         }

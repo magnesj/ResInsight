@@ -95,7 +95,19 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
         case RifEclipseSummaryAddressDefines::StatisticsType::MEAN:
             return { true, m_meanData };
         default:
+        {
+            // Try to find custom percentile using id field
+            int id = resultAddress.id();
+            if ( id >= 0 && id <= 100 )
+            {
+                auto it = m_percentileData.find( id );
+                if ( it != m_percentileData.end() )
+                {
+                    return { true, it->second };
+                }
+            }
             return { true, {} };
+        }
     }
 }
 
@@ -139,11 +151,12 @@ RifSummaryReaderInterface* RimEnsembleStatisticsCase::summaryReader()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& summaryCases,
-                                           const RifEclipseSummaryAddress&     inputAddress,
-                                           bool                                includeIncompleteCurves )
+void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>&  summaryCases,
+                                           const RifEclipseSummaryAddress&      inputAddress,
+                                           bool                                 includeIncompleteCurves,
+                                           const std::vector<int>&              percentiles )
 {
-    auto hash = RiaHashTools::hash( summaryCases, inputAddress.toEclipseTextAddress(), includeIncompleteCurves );
+    auto hash = RiaHashTools::hash( summaryCases, inputAddress.toEclipseTextAddress(), includeIncompleteCurves, percentiles );
     if ( hash == m_hash ) return;
 
     auto startTime = RiaLogging::currentTime();
@@ -151,6 +164,8 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     m_hash = hash;
 
     clearData();
+
+    m_requestedPercentiles = percentiles;
 
     if ( !inputAddress.isValid() ) return;
     if ( summaryCases.empty() ) return;
@@ -209,10 +224,17 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
 
     m_timeSteps = curveMerger.allXValues();
 
+    // Calculate standard percentiles for backward compatibility
     m_p10Data.reserve( m_timeSteps.size() );
     m_p50Data.reserve( m_timeSteps.size() );
     m_p90Data.reserve( m_timeSteps.size() );
     m_meanData.reserve( m_timeSteps.size() );
+
+    // Initialize custom percentile storage
+    for ( int p : percentiles )
+    {
+        m_percentileData[p].reserve( m_timeSteps.size() );
+    }
 
     for ( size_t timeStepIndex = 0; timeStepIndex < m_timeSteps.size(); timeStepIndex++ )
     {
@@ -224,12 +246,29 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
             valuesAtTimeStep.push_back( curveValues[curveIdx][timeStepIndex] );
         }
 
+        // Calculate standard percentiles for backward compatibility
         double p10, p50, p90, mean;
         RigStatisticsMath::calculateStatisticsCurves( valuesAtTimeStep, &p10, &p50, &p90, &mean, RigStatisticsMath::PercentileStyle::SWITCHED );
         m_p10Data.push_back( p10 );
         m_p50Data.push_back( p50 );
         m_p90Data.push_back( p90 );
         m_meanData.push_back( mean );
+
+        // Calculate custom percentiles using interpolated method
+        std::vector<double> percentilePositions;
+        for ( int p : percentiles )
+        {
+            percentilePositions.push_back( static_cast<double>( p ) );
+        }
+
+        std::vector<double> percentileValues = RigStatisticsMath::calculateInterpolatedPercentiles( valuesAtTimeStep,
+                                                                                                      percentilePositions,
+                                                                                                      RigStatisticsMath::PercentileStyle::SWITCHED );
+
+        for ( size_t i = 0; i < percentiles.size(); i++ )
+        {
+            m_percentileData[percentiles[i]].push_back( percentileValues[i] );
+        }
     }
 
     bool showDebugTiming = false;
@@ -263,6 +302,8 @@ void RimEnsembleStatisticsCase::clearData()
     m_p50Data.clear();
     m_p90Data.clear();
     m_meanData.clear();
+    m_percentileData.clear();
+    m_requestedPercentiles.clear();
     m_firstSummaryCase = nullptr;
 }
 
