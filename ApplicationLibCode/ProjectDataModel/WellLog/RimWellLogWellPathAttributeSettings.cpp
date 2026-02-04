@@ -217,6 +217,62 @@ void RimWellLogWellPathAttributeSettings::setUnderburdenHeight( double height )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showWellPathAttributesField()
+{
+    return &m_showWellPathAttributes;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showWellPathCompletionsField()
+{
+    return &m_showWellPathCompletions;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showBothSidesField()
+{
+    return &m_showWellPathComponentsBothSides;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showComponentLabelsField()
+{
+    return &m_showWellPathComponentLabels;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showAttributesInLegendField()
+{
+    return &m_wellPathAttributesInLegend;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showCompletionsInLegendField()
+{
+    return &m_wellPathCompletionsInLegend;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::wellPathComponentSourceField()
+{
+    return &m_wellPathComponentSource;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimWellLogWellPathAttributeSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
                                                             const QVariant&            oldValue,
                                                             const QVariant&            newValue )
