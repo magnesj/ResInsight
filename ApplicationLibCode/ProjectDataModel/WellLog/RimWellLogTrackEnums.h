@@ -50,16 +50,3 @@ enum class RimWellLogTrackFormationLevel
     UNKNOWN,
     NONE
 };
-
-namespace caf
-{
-template <>
-void AppEnum<RimWellLogTrackTrajectoryType>::setUp();
-
-template <>
-void AppEnum<RimWellLogTrackFormationSource>::setUp();
-
-template <>
-void AppEnum<RimWellLogTrackFormationLevel>::setUp();
-
-} // namespace caf
