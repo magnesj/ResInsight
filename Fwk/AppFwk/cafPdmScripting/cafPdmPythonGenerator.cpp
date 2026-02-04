@@ -53,7 +53,6 @@
 #endif
 
 #include <QRegularExpression>
-#include <QTextDocument>
 #include <QTextStream>
 
 #include <list>
@@ -67,14 +66,18 @@ CAF_PDM_CODE_GENERATOR_SOURCE_INIT( PdmPythonGenerator, "py" );
 namespace internal
 {
 //--------------------------------------------------------------------------------------------------
-/// Decodes HTML entities in a QString (e.g., "&lt;" to "<", "&gt;" to ">", "&amp;" to "&", etc.)
+/// Decodes common HTML entities in a QString (e.g., "&lt;" to "<", "&gt;" to ">", etc.)
 /// This is necessary because XML serialization may encode special characters in type names.
 //--------------------------------------------------------------------------------------------------
 QString decodeHtmlEntities( const QString& encodedString )
 {
-    QTextDocument doc;
-    doc.setHtml( encodedString );
-    return doc.toPlainText();
+    QString decoded = encodedString;
+    decoded.replace( "&lt;", "<" );
+    decoded.replace( "&gt;", ">" );
+    decoded.replace( "&amp;", "&" );
+    decoded.replace( "&quot;", "\"" );
+    decoded.replace( "&apos;", "'" );
+    return decoded;
 }
 
 void appendCodeForMethod( std::map<QString, std::map<QString, QString>>& classMethods,
@@ -626,9 +629,7 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
     if ( scriptability && !scriptability->enumScriptTexts().empty() ) return "str";
 
     // Decode HTML entities from dataTypeName (e.g., "&lt;" to "<", "&gt;" to ">")
-    // This is necessary because XML serialization may encode angle brackets in template type names.
-    // We use QTextDocument for comprehensive HTML entity decoding, which is appropriate for this
-    // infrequent code generation operation.
+    // This is necessary because XML serialization may encode angle brackets in template type names
     QString rawDataTypeName = internal::decodeHtmlEntities( xmlObj->dataTypeName() );
     QString dataType        = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( rawDataTypeName );
 
