@@ -38,6 +38,7 @@
 #include "RimWellLogLasFileCurve.h"
 #include "RimWellLogRftCurve.h"
 #include "RimWellLogTrack.h"
+#include "RimWellLogTrackEnums.h"
 #include "RimWellLogWbsCurve.h"
 #include "RimWellMeasurementCurve.h"
 #include "RimWellPath.h"
@@ -386,7 +387,7 @@ RimWellLogRftCurve* RicWellLogTools::addRftCurve( RimWellLogTrack* plotTrack, co
     curve->setColor( curveColor );
 
     plotTrack->addCurve( curve );
-    plotTrack->setFormationTrajectoryType( RimWellLogTrack::SIMULATION_WELL );
+    plotTrack->setFormationTrajectoryType( RimWellLogTrackTrajectoryType::SIMULATION_WELL );
     plotTrack->updateConnectedEditors();
 
     RiaGuiApplication::instance()->getOrCreateMainPlotWindow();

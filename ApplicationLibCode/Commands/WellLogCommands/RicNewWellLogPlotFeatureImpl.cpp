@@ -32,6 +32,7 @@
 #include "RimWellLogPlotCollection.h"
 #include "RimWellLogPlotNameConfig.h"
 #include "RimWellLogTrack.h"
+#include "RimWellLogTrackEnums.h"
 #include "RimWellPath.h"
 
 #include "RiaGuiApplication.h"
@@ -232,11 +233,11 @@ RimWellLogTrack*
 
     if ( wellPathToApply )
     {
-        plotTrack->setFormationTrajectoryType( RimWellLogTrack::WELL_PATH );
+        plotTrack->setFormationTrajectoryType( RimWellLogTrackTrajectoryType::WELL_PATH );
     }
     else if ( !simWellToApply.isEmpty() )
     {
-        plotTrack->setFormationTrajectoryType( RimWellLogTrack::SIMULATION_WELL );
+        plotTrack->setFormationTrajectoryType( RimWellLogTrackTrajectoryType::SIMULATION_WELL );
     }
 
     if ( !branchDetectionToApply.isPartiallyTrue() )

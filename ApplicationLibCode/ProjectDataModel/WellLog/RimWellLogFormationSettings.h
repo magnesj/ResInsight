@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "RimWellLogTrackEnums.h"
+
 #include "Well/RigWellPathFormations.h"
 
 #include "cafAppEnum.h"
@@ -32,7 +34,6 @@ class RimWellLogTrack;
 //==================================================================================================
 ///
 /// Settings class for formation/trajectory configuration in well log tracks
-/// Note: Uses TrajectoryType and FormationSource enums defined in RimWellLogTrack for backward compatibility
 ///
 //==================================================================================================
 class RimWellLogFormationSettings : public caf::PdmObject
@@ -43,17 +44,17 @@ public:
     RimWellLogFormationSettings();
     ~RimWellLogFormationSettings() override;
 
-    // Formation source (uses int internally, converted to/from RimWellLogTrack::FormationSource)
-    int  formationSource() const;
-    void setFormationSource( int source );
+    // Formation source
+    RimWellLogTrackFormationSource formationSource() const;
+    void                           setFormationSource( RimWellLogTrackFormationSource source );
 
     // Formation case
     RimCase* formationCase() const;
     void     setFormationCase( RimCase* rimCase );
 
-    // Trajectory type (uses int internally, converted to/from RimWellLogTrack::TrajectoryType)
-    int  trajectoryType() const;
-    void setTrajectoryType( int trajectoryType );
+    // Trajectory type
+    RimWellLogTrackTrajectoryType trajectoryType() const;
+    void                          setTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType );
 
     // Well paths
     RimWellPath* wellPathForSourceCase() const;
@@ -88,9 +89,9 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
-    caf::PdmField<int>                                                 m_formationSource;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource;
     caf::PdmPtrField<RimCase*>                                         m_formationCase;
-    caf::PdmField<int>                                                 m_formationTrajectoryType;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>         m_formationTrajectoryType;
     caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase;
     caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceWellPath;
     caf::PdmField<QString>                                             m_formationSimWellName;

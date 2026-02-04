@@ -42,6 +42,7 @@
 #include "RimWellLogPlotCollection.h"
 #include "RimWellLogRftCurve.h"
 #include "RimWellLogTrack.h"
+#include "RimWellLogTrackEnums.h"
 #include "RimWellLogWbsCurve.h"
 #include "RimWellMeasurementCurve.h"
 #include "RimWellPath.h"
@@ -409,12 +410,12 @@ void RimWellLogCurveCommonDataSource::analyseCurvesAndTracks( const std::vector<
         }
         if ( track->showFormations() )
         {
-            m_uniqueTrajectoryTypes.insert( track->formationTrajectoryType() );
-            if ( track->formationTrajectoryType() == RimWellLogTrack::WELL_PATH )
+            m_uniqueTrajectoryTypes.insert( static_cast<int>( track->formationTrajectoryType() ) );
+            if ( track->formationTrajectoryType() == RimWellLogTrackTrajectoryType::WELL_PATH )
             {
                 m_uniqueWellPaths.insert( track->formationWellPath() );
             }
-            else if ( track->formationTrajectoryType() == RimWellLogTrack::SIMULATION_WELL )
+            else if ( track->formationTrajectoryType() == RimWellLogTrackTrajectoryType::SIMULATION_WELL )
             {
                 m_uniqueWellNames.insert( track->formationSimWellName() );
             }

@@ -35,6 +35,7 @@
 #include "RimWellLogExtractionCurve.h"
 #include "RimWellLogPlot.h"
 #include "RimWellLogTrack.h"
+#include "RimWellLogTrackEnums.h"
 #include "RimWellPath.h"
 #include "RimWellPathCollection.h"
 
@@ -96,12 +97,12 @@ void RicNewWellLogExtractionCurveFeature::onActionTriggered( bool isChecked )
             if ( wellPath )
             {
                 newWellLogPlotTrack->setFormationWellPath( wellPath );
-                newWellLogPlotTrack->setFormationTrajectoryType( RimWellLogTrack::WELL_PATH );
+                newWellLogPlotTrack->setFormationTrajectoryType( RimWellLogTrackTrajectoryType::WELL_PATH );
             }
             else
             {
                 newWellLogPlotTrack->setFormationSimWellName( simWell->name() );
-                newWellLogPlotTrack->setFormationTrajectoryType( RimWellLogTrack::SIMULATION_WELL );
+                newWellLogPlotTrack->setFormationTrajectoryType( RimWellLogTrackTrajectoryType::SIMULATION_WELL );
                 newWellLogPlotTrack->setFormationBranchIndex( branchIndex );
                 newWellLogPlotTrack->setFormationBranchDetection( useBranchDetection );
             }
