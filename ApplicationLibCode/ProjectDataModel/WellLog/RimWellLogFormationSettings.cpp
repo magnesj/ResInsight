@@ -367,11 +367,11 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
             {
                 using FormationLevelEnum = caf::AppEnum<RimWellLogTrackFormationLevel>;
 
-                options.push_back(
-                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::NONE ), RimWellLogTrackFormationLevel::NONE ) );
+                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::NONE ),
+                                                           RimWellLogTrackFormationLevel::NONE ) );
 
-                options.push_back(
-                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::ALL ), RimWellLogTrackFormationLevel::ALL ) );
+                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::ALL ),
+                                                           RimWellLogTrackFormationLevel::ALL ) );
 
                 for ( const auto& level : formations->formationsLevelsPresent() )
                 {

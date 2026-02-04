@@ -168,7 +168,7 @@ void RimWellLogRegionAnnotationSettings::uiOrdering( const QString& uiConfigName
     uiOrdering.add( &m_regionAnnotationType );
     uiOrdering.add( &m_regionAnnotationDisplay );
     uiOrdering.add( &m_showRegionLabels );
-    
+
     if ( m_regionAnnotationType() == RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS )
     {
         uiOrdering.add( &m_regionLabelFontSize );
