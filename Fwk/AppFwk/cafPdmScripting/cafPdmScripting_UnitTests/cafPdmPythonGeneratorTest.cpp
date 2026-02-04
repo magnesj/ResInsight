@@ -175,6 +175,15 @@ TEST( PdmPythonGenerator, DataTypeString_PairBoolDouble )
 }
 
 //--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_PairBoolFloat )
+{
+    InheritedDemoObj obj;
+    EXPECT_STREQ( "Tuple[bool, float]",
+                  caf::PdmPythonGenerator::dataTypeString( &obj.m_pairFloatField, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
 // Child-field dataTypeName() returns the class keyword of the referenced type.  That keyword is
 // not in the builtins table, so useStrForUnknownDataTypes controls whether it is kept or replaced
 // with "str".

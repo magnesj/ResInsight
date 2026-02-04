@@ -123,6 +123,7 @@ public:
     caf::PdmField<std::vector<double>>   m_numbers;
     caf::PdmField<std::optional<double>>      m_optionalNumber;
     caf::PdmField<std::pair<bool, double>>    m_pairField;
+    caf::PdmField<std::pair<bool, float>>     m_pairFloatField;
 
     caf::PdmField<caf::AppEnum<TestEnumType>> m_testEnumField;
     caf::PdmChildArrayField<SimpleObj*>       m_simpleObjectsField;
