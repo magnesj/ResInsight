@@ -32,7 +32,6 @@
 #include "RimWellLogPlotCollection.h"
 #include "RimWellLogPlotNameConfig.h"
 #include "RimWellLogTrack.h"
-#include "RimWellLogTrackEnums.h"
 #include "RimWellPath.h"
 
 #include "RiaGuiApplication.h"

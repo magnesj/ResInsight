@@ -24,7 +24,7 @@
 #include "RimEclipseCase.h"
 #include "RimTools.h"
 #include "RimWellLogTrack.h"
-#include "RimWellLogTrackEnums.h"
+#include "RiaWellLogTrackDefines.h"
 #include "RimWellPath.h"
 
 #include "RigEclipseCaseData.h"

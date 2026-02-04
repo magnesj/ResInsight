@@ -20,7 +20,7 @@
 #pragma once
 
 #include "RimWellLogPlot.h"
-#include "RimWellLogTrackEnums.h"
+#include "RiaWellLogTrackDefines.h"
 
 #include "RiaPlotDefines.h"
 
