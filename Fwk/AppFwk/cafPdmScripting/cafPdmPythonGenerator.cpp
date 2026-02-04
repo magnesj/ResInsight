@@ -53,6 +53,7 @@
 #endif
 
 #include <QRegularExpression>
+#include <QTextDocument>
 #include <QTextStream>
 
 #include <list>
@@ -65,6 +66,16 @@ CAF_PDM_CODE_GENERATOR_SOURCE_INIT( PdmPythonGenerator, "py" );
 
 namespace internal
 {
+//--------------------------------------------------------------------------------------------------
+/// Decodes HTML entities in a QString (e.g., converts "&lt;" to "<", "&gt;" to ">")
+//--------------------------------------------------------------------------------------------------
+QString decodeHtmlEntities( const QString& encodedString )
+{
+    QTextDocument doc;
+    doc.setHtml( encodedString );
+    return doc.toPlainText();
+}
+
 void appendCodeForMethod( std::map<QString, std::map<QString, QString>>& classMethods,
                           const std::list<QString>&                      classInheritanceStack,
                           const QString&                                 classKeyword,
@@ -613,7 +624,10 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
     auto scriptability = field->capability<PdmAbstractFieldScriptingCapability>();
     if ( scriptability && !scriptability->enumScriptTexts().empty() ) return "str";
 
-    QString dataType = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( xmlObj->dataTypeName() );
+    // Decode HTML entities from dataTypeName (e.g., "&lt;" to "<", "&gt;" to ">")
+    // This is necessary because XML serialization may encode angle brackets in template type names
+    QString rawDataTypeName = internal::decodeHtmlEntities( xmlObj->dataTypeName() );
+    QString dataType        = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( rawDataTypeName );
 
     std::map<QString, QString> builtins = {
         { QString::fromStdString( typeid( double ).name() ), "float" },
