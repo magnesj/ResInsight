@@ -68,6 +68,8 @@ namespace internal
 //--------------------------------------------------------------------------------------------------
 /// Decodes common HTML entities in a QString (e.g., "&lt;" to "<", "&gt;" to ">", etc.)
 /// This is necessary because XML serialization may encode special characters in type names.
+/// While type names primarily contain angle brackets, we decode all common HTML entities
+/// for robustness and to handle any edge cases in XML serialization.
 /// Note: &amp; is replaced last to avoid incorrect double-decoding of entities like &amp;lt;
 //--------------------------------------------------------------------------------------------------
 QString decodeHtmlEntities( const QString& encodedString )
