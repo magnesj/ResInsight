@@ -36,6 +36,7 @@
 
 #include "gtest/gtest.h"
 
+#include "cafMockObjects.h"
 #include "cafPdmPythonGenerator.h"
 
 //--------------------------------------------------------------------------------------------------
@@ -106,4 +107,74 @@ TEST( PdmPythonGenerator, PythonifyDataValue_MixedBooleans )
 {
     EXPECT_STREQ( "True and False",
                   caf::PdmPythonGenerator::pythonifyDataValue( "true and false" ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+// dataTypeString maps PdmFieldHandle types to Python type strings via the builtins table.
+// The builtins keys are typeid().name() strings, which is exactly what PdmXmlFieldHandle::dataTypeName()
+// returns for value fields.  Child fields return their class keyword instead.
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_Double )
+{
+    DemoPdmObject obj;
+    EXPECT_STREQ( "float", caf::PdmPythonGenerator::dataTypeString( &obj.m_doubleField, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_Int )
+{
+    DemoPdmObject obj;
+    EXPECT_STREQ( "int", caf::PdmPythonGenerator::dataTypeString( &obj.m_intField, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_QString )
+{
+    DemoPdmObject obj;
+    EXPECT_STREQ( "str", caf::PdmPythonGenerator::dataTypeString( &obj.m_textField, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_OptionalDouble )
+{
+    InheritedDemoObj obj;
+    EXPECT_STREQ( "Optional[float]",
+                  caf::PdmPythonGenerator::dataTypeString( &obj.m_optionalNumber, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------
+// Vector fields: dataTypeName() returns the element type; the List[] wrapper is added by the
+// caller (generate()) after checking isVectorField().
+TEST( PdmPythonGenerator, DataTypeString_VectorDouble )
+{
+    InheritedDemoObj obj;
+    EXPECT_STREQ( "float", caf::PdmPythonGenerator::dataTypeString( &obj.m_numbers, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+// A scriptable AppEnum field triggers the early-return path: enumScriptTexts() is non-empty, so
+// the function returns "str" without consulting the builtins table.
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_ScriptableEnum )
+{
+    InheritedDemoObj obj;
+    EXPECT_STREQ( "str", caf::PdmPythonGenerator::dataTypeString( &obj.m_myAppEnum, false ).toStdString().c_str() );
+}
+
+//--------------------------------------------------------------------------------------------------
+// Child-field dataTypeName() returns the class keyword of the referenced type.  That keyword is
+// not in the builtins table, so useStrForUnknownDataTypes controls whether it is kept or replaced
+// with "str".
+//--------------------------------------------------------------------------------------------------
+TEST( PdmPythonGenerator, DataTypeString_ChildField )
+{
+    DemoPdmObject obj;
+    EXPECT_STREQ( "SimpleObj",
+                  caf::PdmPythonGenerator::dataTypeString( &obj.m_simpleObjPtrField, false ).toStdString().c_str() );
+    EXPECT_STREQ( "str",
+                  caf::PdmPythonGenerator::dataTypeString( &obj.m_simpleObjPtrField, true ).toStdString().c_str() );
 }
