@@ -105,8 +105,7 @@ TEST( PdmPythonGenerator, PythonifyDataValue_NoChange )
 //--------------------------------------------------------------------------------------------------
 TEST( PdmPythonGenerator, PythonifyDataValue_MixedBooleans )
 {
-    EXPECT_STREQ( "True and False",
-                  caf::PdmPythonGenerator::pythonifyDataValue( "true and false" ).toStdString().c_str() );
+    EXPECT_STREQ( "True and False", caf::PdmPythonGenerator::pythonifyDataValue( "true and false" ).toStdString().c_str() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -193,6 +192,5 @@ TEST( PdmPythonGenerator, DataTypeString_ChildField )
     DemoPdmObject obj;
     EXPECT_STREQ( "SimpleObj",
                   caf::PdmPythonGenerator::dataTypeString( &obj.m_simpleObjPtrField, false ).toStdString().c_str() );
-    EXPECT_STREQ( "str",
-                  caf::PdmPythonGenerator::dataTypeString( &obj.m_simpleObjPtrField, true ).toStdString().c_str() );
+    EXPECT_STREQ( "str", caf::PdmPythonGenerator::dataTypeString( &obj.m_simpleObjPtrField, true ).toStdString().c_str() );
 }

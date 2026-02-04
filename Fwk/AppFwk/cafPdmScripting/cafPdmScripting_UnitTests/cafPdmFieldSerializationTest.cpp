@@ -194,7 +194,7 @@ TEST( PdmFieldSerialization, PairBoolDouble )
     EXPECT_STREQ( expected.toStdString().c_str(), text.toStdString().c_str() );
 
     // text → C++ (round-trip)
-    std::pair<bool, double> result;
+    std::pair<bool, double>  result;
     caf::PdmScriptIOMessages messages;
     caf::PdmFieldScriptingCapabilityIOHandler<std::pair<bool, double>>::writeToField( result, stream, &messages );
 
@@ -207,10 +207,10 @@ TEST( PdmFieldSerialization, PairBoolDouble )
 //--------------------------------------------------------------------------------------------------
 TEST( PdmFieldSerialization, PairBoolDouble_ParseWithSpaces )
 {
-    QString source = "( false , 2.5 )";
+    QString     source = "( false , 2.5 )";
     QTextStream stream( &source );
 
-    std::pair<bool, double> result;
+    std::pair<bool, double>  result;
     caf::PdmScriptIOMessages messages;
     caf::PdmFieldScriptingCapabilityIOHandler<std::pair<bool, double>>::writeToField( result, stream, &messages );
 
