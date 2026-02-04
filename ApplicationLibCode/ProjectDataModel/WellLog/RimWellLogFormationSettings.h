@@ -89,14 +89,14 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
-caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationSource>> m_formationSource;
-caf::PdmPtrField<RimCase*>                                           m_formationCase;
-caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackTrajectoryType>>  m_formationTrajectoryType;
-caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceCase;
-caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceWellPath;
-caf::PdmField<QString>                                               m_formationSimWellName;
-caf::PdmField<int>                                                   m_formationBranchIndex;
-caf::PdmField<bool>                                                  m_formationBranchDetection;
-caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>>  m_formationLevel;
-    caf::PdmField<bool>                                         m_showFormationFluids;
+    caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationSource>> m_formationSource;
+    caf::PdmPtrField<RimCase*>                                           m_formationCase;
+    caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackTrajectoryType>>  m_formationTrajectoryType;
+    caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceCase;
+    caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceWellPath;
+    caf::PdmField<QString>                                               m_formationSimWellName;
+    caf::PdmField<int>                                                   m_formationBranchIndex;
+    caf::PdmField<bool>                                                  m_formationBranchDetection;
+    caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>>  m_formationLevel;
+    caf::PdmField<bool>                                                  m_showFormationFluids;
 };
