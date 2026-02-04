@@ -116,50 +116,6 @@
 
 CAF_PDM_SOURCE_INIT( RimWellLogTrack, "WellLogPlotTrack" );
 
-namespace caf
-{
-template <>
-void AppEnum<RigWellPathFormations::FormationLevel>::setUp()
-{
-    addItem( RigWellPathFormations::NONE, "NONE", "None" );
-    addItem( RigWellPathFormations::ALL, "ALL", "All" );
-    addItem( RigWellPathFormations::GROUP, "GROUP", "Formation Group" );
-    addItem( RigWellPathFormations::LEVEL0, "LEVEL0", "Formation" );
-    addItem( RigWellPathFormations::LEVEL1, "LEVEL1", "Formation 1" );
-    addItem( RigWellPathFormations::LEVEL2, "LEVEL2", "Formation 2" );
-    addItem( RigWellPathFormations::LEVEL3, "LEVEL3", "Formation 3" );
-    addItem( RigWellPathFormations::LEVEL4, "LEVEL4", "Formation 4" );
-    addItem( RigWellPathFormations::LEVEL5, "LEVEL5", "Formation 5" );
-    addItem( RigWellPathFormations::LEVEL6, "LEVEL6", "Formation 6" );
-    addItem( RigWellPathFormations::LEVEL7, "LEVEL7", "Formation 7" );
-    addItem( RigWellPathFormations::LEVEL8, "LEVEL8", "Formation 8" );
-    addItem( RigWellPathFormations::LEVEL9, "LEVEL9", "Formation 9" );
-    addItem( RigWellPathFormations::LEVEL10, "LEVEL10", "Formation 10" );
-    setDefault( RigWellPathFormations::ALL );
-}
-
-template <>
-void AppEnum<RiaDefines::RegionAnnotationType>::setUp()
-{
-    addItem( RiaDefines::RegionAnnotationType::NO_ANNOTATIONS, "NO_ANNOTATIONS", "No Annotations" );
-    addItem( RiaDefines::RegionAnnotationType::FORMATION_ANNOTATIONS, "FORMATIONS", "Formations" );
-    addItem( RiaDefines::RegionAnnotationType::RESULT_PROPERTY_ANNOTATIONS, "RESULT_PROPERTY", "Result Property" );
-    setDefault( RiaDefines::RegionAnnotationType::NO_ANNOTATIONS );
-}
-
-template <>
-void AppEnum<RiaDefines::RegionDisplay>::setUp()
-{
-    addItem( RiaDefines::DARK_LINES, "DARK_LINES", "Dark Lines" );
-    addItem( RiaDefines::LIGHT_LINES, "LIGHT_LINES", "Light Lines" );
-    addItem( RiaDefines::COLORED_LINES, "COLORED_LINES", "Colored Lines" );
-    addItem( RiaDefines::COLOR_SHADING, "COLOR_SHADING", "Color Shading" );
-    addItem( RiaDefines::COLOR_SHADING_AND_LINES, "SHADING_AND_LINES", "Color Shading and Lines" );
-    setDefault( RiaDefines::COLOR_SHADING_AND_LINES );
-}
-
-} // namespace caf
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -2649,7 +2605,8 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
         if ( !formations ) return;
 
         std::vector<QString> formationNamesToPlot;
-        formations->depthAndFormationNamesUpToLevel( m_formationSettings->formationLevel(),
+        auto                 formationLevel = static_cast<RigWellPathFormations::FormationLevel>( m_formationSettings->formationLevel() );
+        formations->depthAndFormationNamesUpToLevel( formationLevel,
                                                      &formationNamesToPlot,
                                                      &yValues,
                                                      m_formationSettings->showFormationFluids(),

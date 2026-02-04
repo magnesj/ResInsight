@@ -289,11 +289,11 @@ void RigWellPathFormations::depthAndFormationNamesUpToLevel( FormationLevel     
         evaluateFluids( m_fluids, names, depths, depthType );
     }
 
-    if ( level == RigWellPathFormations::NONE )
+    if ( level == FormationLevel::NONE )
     {
         return;
     }
-    else if ( level == RigWellPathFormations::ALL )
+    else if ( level == FormationLevel::ALL )
     {
         depthAndFormationNamesWithoutDuplicatesOnDepth( names, depths, depthType );
     }
@@ -369,7 +369,7 @@ RigWellPathFormations::FormationLevel RigWellPathFormations::detectLevel( QStrin
     }
     if ( isGroupName )
     {
-        return RigWellPathFormations::GROUP;
+        return FormationLevel::GROUP;
     }
 
     QStringList formationNameSplitted = formationName.split( " " );
@@ -389,7 +389,7 @@ RigWellPathFormations::FormationLevel RigWellPathFormations::detectLevel( QStrin
     }
     if ( levelDesctiptorCandidates.empty() )
     {
-        return RigWellPathFormations::LEVEL0;
+        return FormationLevel::LEVEL0;
     }
 
     if ( levelDesctiptorCandidates.size() > 1 )
@@ -405,7 +405,7 @@ RigWellPathFormations::FormationLevel RigWellPathFormations::detectLevel( QStrin
             }
         }
     }
-    if ( levelDesctiptorCandidates.size() != 1 ) return RigWellPathFormations::UNKNOWN;
+    if ( levelDesctiptorCandidates.size() != 1 ) return FormationLevel::UNKNOWN;
 
     QString levelDescriptor = levelDesctiptorCandidates[0];
 
@@ -420,27 +420,27 @@ RigWellPathFormations::FormationLevel RigWellPathFormations::detectLevel( QStrin
     switch ( dotCount )
     {
         case 0:
-            return RigWellPathFormations::LEVEL1;
+            return FormationLevel::LEVEL1;
         case 1:
-            return RigWellPathFormations::LEVEL2;
+            return FormationLevel::LEVEL2;
         case 2:
-            return RigWellPathFormations::LEVEL3;
+            return FormationLevel::LEVEL3;
         case 3:
-            return RigWellPathFormations::LEVEL4;
+            return FormationLevel::LEVEL4;
         case 4:
-            return RigWellPathFormations::LEVEL5;
+            return FormationLevel::LEVEL5;
         case 5:
-            return RigWellPathFormations::LEVEL6;
+            return FormationLevel::LEVEL6;
         case 6:
-            return RigWellPathFormations::LEVEL7;
+            return FormationLevel::LEVEL7;
         case 7:
-            return RigWellPathFormations::LEVEL8;
+            return FormationLevel::LEVEL8;
         case 8:
-            return RigWellPathFormations::LEVEL9;
+            return FormationLevel::LEVEL9;
         case 9:
-            return RigWellPathFormations::LEVEL10;
+            return FormationLevel::LEVEL10;
         default:
             break;
     }
-    return RigWellPathFormations::UNKNOWN;
+    return FormationLevel::UNKNOWN;
 }

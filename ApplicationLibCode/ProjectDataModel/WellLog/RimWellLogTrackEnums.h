@@ -32,6 +32,25 @@ enum class RimWellLogTrackFormationSource
     WELL_PICK_FILTER
 };
 
+enum class RimWellLogTrackFormationLevel
+{
+    GROUP,
+    LEVEL0,
+    LEVEL1,
+    LEVEL2,
+    LEVEL3,
+    LEVEL4,
+    LEVEL5,
+    LEVEL6,
+    LEVEL7,
+    LEVEL8,
+    LEVEL9,
+    LEVEL10,
+    ALL,
+    UNKNOWN,
+    NONE
+};
+
 namespace caf
 {
 template <>
@@ -39,5 +58,8 @@ void AppEnum<RimWellLogTrackTrajectoryType>::setUp();
 
 template <>
 void AppEnum<RimWellLogTrackFormationSource>::setUp();
+
+template <>
+void AppEnum<RimWellLogTrackFormationLevel>::setUp();
 
 } // namespace caf

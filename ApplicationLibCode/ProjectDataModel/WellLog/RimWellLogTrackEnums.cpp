@@ -36,4 +36,24 @@ void AppEnum<RimWellLogTrackFormationSource>::setUp()
     setDefault( RimWellLogTrackFormationSource::CASE );
 }
 
+template <>
+void AppEnum<RimWellLogTrackFormationLevel>::setUp()
+{
+    addItem( RimWellLogTrackFormationLevel::NONE, "NONE", "None" );
+    addItem( RimWellLogTrackFormationLevel::ALL, "ALL", "All" );
+    addItem( RimWellLogTrackFormationLevel::GROUP, "GROUP", "Formation Group" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL0, "LEVEL0", "Formation" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL1, "LEVEL1", "Formation 1" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL2, "LEVEL2", "Formation 2" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL3, "LEVEL3", "Formation 3" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL4, "LEVEL4", "Formation 4" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL5, "LEVEL5", "Formation 5" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL6, "LEVEL6", "Formation 6" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL7, "LEVEL7", "Formation 7" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL8, "LEVEL8", "Formation 8" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL9, "LEVEL9", "Formation 9" );
+    addItem( RimWellLogTrackFormationLevel::LEVEL10, "LEVEL10", "Formation 10" );
+    setDefault( RimWellLogTrackFormationLevel::ALL );
+}
+
 } // namespace caf

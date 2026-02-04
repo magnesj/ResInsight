@@ -206,7 +206,7 @@ void RimWellLogFormationSettings::setBranchDetection( bool branchDetection )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigWellPathFormations::FormationLevel RimWellLogFormationSettings::formationLevel() const
+RimWellLogTrackFormationLevel RimWellLogFormationSettings::formationLevel() const
 {
     return m_formationLevel();
 }
@@ -214,7 +214,7 @@ RigWellPathFormations::FormationLevel RimWellLogFormationSettings::formationLeve
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setFormationLevel( RigWellPathFormations::FormationLevel level )
+void RimWellLogFormationSettings::setFormationLevel( RimWellLogTrackFormationLevel level )
 {
     m_formationLevel = level;
 }
@@ -365,21 +365,18 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
             const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
             if ( formations )
             {
-                using FormationLevelEnum = caf::AppEnum<RigWellPathFormations::FormationLevel>;
+                using FormationLevelEnum = caf::AppEnum<RimWellLogTrackFormationLevel>;
 
                 options.push_back(
-                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RigWellPathFormations::NONE ), RigWellPathFormations::NONE ) );
+                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::NONE ), RimWellLogTrackFormationLevel::NONE ) );
 
                 options.push_back(
-                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RigWellPathFormations::ALL ), RigWellPathFormations::ALL ) );
+                    caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::ALL ), RimWellLogTrackFormationLevel::ALL ) );
 
-                for ( const RigWellPathFormations::FormationLevel& level : formations->formationsLevelsPresent() )
+                for ( const auto& level : formations->formationsLevelsPresent() )
                 {
-                    size_t index = FormationLevelEnum::index( level );
-                    if ( index >= FormationLevelEnum::size() ) continue;
-
-                    options.push_back(
-                        caf::PdmOptionItemInfo( FormationLevelEnum::uiTextFromIndex( index ), FormationLevelEnum::fromIndex( index ) ) );
+                    RimWellLogTrackFormationLevel enumLevel = static_cast<RimWellLogTrackFormationLevel>( level );
+                    options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( enumLevel ), enumLevel ) );
                 }
             }
         }
