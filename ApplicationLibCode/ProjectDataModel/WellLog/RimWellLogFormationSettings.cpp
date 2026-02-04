@@ -78,7 +78,7 @@ RimWellLogFormationSettings::~RimWellLogFormationSettings()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimWellLogTrackFormationSource RimWellLogFormationSettings::formationSource() const
+RiaDefines::WellLogTrackFormationSource RimWellLogFormationSettings::formationSource() const
 {
     return m_formationSource();
 }
@@ -86,7 +86,7 @@ RimWellLogTrackFormationSource RimWellLogFormationSettings::formationSource() co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setFormationSource( RimWellLogTrackFormationSource source )
+void RimWellLogFormationSettings::setFormationSource( RiaDefines::WellLogTrackFormationSource source )
 {
     m_formationSource = source;
 }
@@ -110,7 +110,7 @@ void RimWellLogFormationSettings::setFormationCase( RimCase* rimCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimWellLogTrackTrajectoryType RimWellLogFormationSettings::trajectoryType() const
+RiaDefines::WellLogTrackTrajectoryType RimWellLogFormationSettings::trajectoryType() const
 {
     return m_formationTrajectoryType();
 }
@@ -118,7 +118,7 @@ RimWellLogTrackTrajectoryType RimWellLogFormationSettings::trajectoryType() cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType )
+void RimWellLogFormationSettings::setTrajectoryType( RiaDefines::WellLogTrackTrajectoryType trajectoryType )
 {
     m_formationTrajectoryType = trajectoryType;
 }
@@ -206,7 +206,7 @@ void RimWellLogFormationSettings::setBranchDetection( bool branchDetection )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimWellLogTrackFormationLevel RimWellLogFormationSettings::formationLevel() const
+RiaDefines::WellLogTrackFormationLevel RimWellLogFormationSettings::formationLevel() const
 {
     return m_formationLevel();
 }
@@ -214,7 +214,7 @@ RimWellLogTrackFormationLevel RimWellLogFormationSettings::formationLevel() cons
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setFormationLevel( RimWellLogTrackFormationLevel level )
+void RimWellLogFormationSettings::setFormationLevel( RiaDefines::WellLogTrackFormationLevel level )
 {
     m_formationLevel = level;
 }
@@ -245,7 +245,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
         uiOrdering.add( &m_formationSource );
     }
 
-    if ( m_formationSource() == RimWellLogTrackFormationSource::CASE )
+    if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::CASE )
     {
         uiOrdering.add( &m_formationCase );
 
@@ -253,13 +253,13 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
         {
             uiOrdering.add( &m_formationTrajectoryType );
 
-            if ( m_formationTrajectoryType() == RimWellLogTrackTrajectoryType::WELL_PATH )
+            if ( m_formationTrajectoryType() == RiaDefines::WellLogTrackTrajectoryType::WELL_PATH )
             {
                 uiOrdering.add( &m_formationWellPathForSourceCase );
             }
         }
 
-        if ( formationsForCaseWithSimWellOnly || m_formationTrajectoryType() == RimWellLogTrackTrajectoryType::SIMULATION_WELL )
+        if ( formationsForCaseWithSimWellOnly || m_formationTrajectoryType() == RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL )
         {
             uiOrdering.add( &m_formationSimWellName );
 
@@ -269,7 +269,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
                                                                                        m_formationBranchIndex );
         }
     }
-    else if ( m_formationSource() == RimWellLogTrackFormationSource::WELL_PICK_FILTER )
+    else if ( m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         uiOrdering.add( &m_formationWellPathForSourceWellPath );
         if ( m_formationWellPathForSourceWellPath() )
@@ -285,7 +285,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
 //--------------------------------------------------------------------------------------------------
 void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_formationSource && m_formationSource() == RimWellLogTrackFormationSource::WELL_PICK_FILTER )
+    if ( changedField == &m_formationSource && m_formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         std::vector<RimWellPath*> wellPaths;
         RimTools::wellPathWithFormations( &wellPaths );
@@ -316,14 +316,14 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
 
     if ( fieldNeedingOptions == &m_formationSource )
     {
-        options.push_back( caf::PdmOptionItemInfo( "Case", static_cast<int>( RimWellLogTrackFormationSource::CASE ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "Case", static_cast<int>( RiaDefines::WellLogTrackFormationSource::CASE ) ) );
         options.push_back(
-            caf::PdmOptionItemInfo( "Well Picks for Well Path", static_cast<int>( RimWellLogTrackFormationSource::WELL_PICK_FILTER ) ) );
+            caf::PdmOptionItemInfo( "Well Picks for Well Path", static_cast<int>( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationTrajectoryType )
     {
-        options.push_back( caf::PdmOptionItemInfo( "Well Path", static_cast<int>( RimWellLogTrackTrajectoryType::WELL_PATH ) ) );
-        options.push_back( caf::PdmOptionItemInfo( "Simulation Well", static_cast<int>( RimWellLogTrackTrajectoryType::SIMULATION_WELL ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "Well Path", static_cast<int>( RiaDefines::WellLogTrackTrajectoryType::WELL_PATH ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "Simulation Well", static_cast<int>( RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationWellPathForSourceCase )
     {
@@ -365,17 +365,17 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
             const RigWellPathFormations* formations = m_formationWellPathForSourceWellPath->formationsGeometry();
             if ( formations )
             {
-                using FormationLevelEnum = caf::AppEnum<RimWellLogTrackFormationLevel>;
+                using FormationLevelEnum = caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>;
 
-                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::NONE ),
-                                                           RimWellLogTrackFormationLevel::NONE ) );
+                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::NONE ),
+                                                           RiaDefines::WellLogTrackFormationLevel::NONE ) );
 
-                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RimWellLogTrackFormationLevel::ALL ),
-                                                           RimWellLogTrackFormationLevel::ALL ) );
+                options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( RiaDefines::WellLogTrackFormationLevel::ALL ),
+                                                           RiaDefines::WellLogTrackFormationLevel::ALL ) );
 
                 for ( const auto& level : formations->formationsLevelsPresent() )
                 {
-                    RimWellLogTrackFormationLevel enumLevel = static_cast<RimWellLogTrackFormationLevel>( level );
+                    RiaDefines::WellLogTrackFormationLevel enumLevel = static_cast<RiaDefines::WellLogTrackFormationLevel>( level );
                     options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( enumLevel ), enumLevel ) );
                 }
             }
