@@ -631,6 +631,7 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
         { QString::fromStdString( typeid( std::optional<bool> ).name() ), "Optional[bool]" },
         { QString::fromStdString( typeid( std::optional<QString> ).name() ), "Optional[str]" },
         { QString::fromStdString( typeid( std::pair<bool, double> ).name() ), "Tuple[bool, float]" },
+        { QString::fromStdString( typeid( std::pair<bool, float> ).name() ), "Tuple[bool, float]" },
     };
 
 #ifndef CAF_EXCLUDE_CVF
