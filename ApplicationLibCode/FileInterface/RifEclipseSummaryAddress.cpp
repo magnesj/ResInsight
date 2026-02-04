@@ -659,8 +659,17 @@ std::string RifEclipseSummaryAddress::uiText() const
 
     if ( isStatistics() )
     {
-        auto prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
-        text        = prefix + ":" + text;
+        std::string prefix;
+        // Check for custom percentile (type NONE with id encoding percentile value)
+        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::NONE && m_id >= 0 && m_id <= 100 )
+        {
+            prefix = "P" + std::to_string( m_id );
+        }
+        else
+        {
+            prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
+        }
+        text = prefix + ":" + text;
     }
 
     return text;
