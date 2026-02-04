@@ -23,6 +23,8 @@
 #include "RimWellPath.h"
 #include "RimWellPathAttributeCollection.h"
 
+#include "cafPdmUiOrdering.h"
+
 CAF_PDM_SOURCE_INIT( RimWellLogWellPathAttributeSettings, "RimWellLogWellPathAttributeSettings" );
 
 //--------------------------------------------------------------------------------------------------
@@ -217,57 +219,15 @@ void RimWellLogWellPathAttributeSettings::setUnderburdenHeight( double height )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showWellPathAttributesField()
+void RimWellLogWellPathAttributeSettings::uiOrdering( const QString& uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    return &m_showWellPathAttributes;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showWellPathCompletionsField()
-{
-    return &m_showWellPathCompletions;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showBothSidesField()
-{
-    return &m_showWellPathComponentsBothSides;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showComponentLabelsField()
-{
-    return &m_showWellPathComponentLabels;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showAttributesInLegendField()
-{
-    return &m_wellPathAttributesInLegend;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::showCompletionsInLegendField()
-{
-    return &m_wellPathCompletionsInLegend;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-caf::PdmFieldHandle* RimWellLogWellPathAttributeSettings::wellPathComponentSourceField()
-{
-    return &m_wellPathComponentSource;
+    uiOrdering.add( &m_showWellPathAttributes );
+    uiOrdering.add( &m_showWellPathCompletions );
+    uiOrdering.add( &m_wellPathAttributesInLegend );
+    uiOrdering.add( &m_wellPathCompletionsInLegend );
+    uiOrdering.add( &m_showWellPathComponentsBothSides );
+    uiOrdering.add( &m_showWellPathComponentLabels );
+    uiOrdering.add( &m_wellPathComponentSource );
 }
 
 //--------------------------------------------------------------------------------------------------

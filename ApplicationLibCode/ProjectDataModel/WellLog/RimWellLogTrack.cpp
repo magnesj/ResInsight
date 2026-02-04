@@ -1841,13 +1841,8 @@ void RimWellLogTrack::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering
     }
 
     caf::PdmUiGroup* componentGroup = uiOrdering.addNewGroup( "Well Path Components" );
-    componentGroup->add( m_wellPathAttributeSettings()->showWellPathAttributesField() );
-    componentGroup->add( m_wellPathAttributeSettings()->showWellPathCompletionsField() );
-    componentGroup->add( m_wellPathAttributeSettings()->showAttributesInLegendField() );
-    componentGroup->add( m_wellPathAttributeSettings()->showCompletionsInLegendField() );
-    componentGroup->add( m_wellPathAttributeSettings()->showBothSidesField() );
-    componentGroup->add( m_wellPathAttributeSettings()->showComponentLabelsField() );
-    componentGroup->add( m_wellPathAttributeSettings()->wellPathComponentSourceField() );
+    componentGroup->setCollapsedByDefault();
+    m_wellPathAttributeSettings->uiOrdering( uiConfigName, *componentGroup );
 
     uiOrdering.add( &m_ensembleWellLogCurveSet );
 
