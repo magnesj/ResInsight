@@ -108,19 +108,19 @@ public:
     void    setPropertyValueAxisTitle( const QString& text );
     QString depthAxisTitle() const;
 
-    void           setFormationWellPath( RimWellPath* wellPath );
-    RimWellPath*   formationWellPath() const;
-    void           setFormationSimWellName( const QString& simWellName );
-    QString        formationSimWellName() const;
-    void           setFormationBranchDetection( bool branchDetection );
-    bool           formationBranchDetection() const;
-    void           setFormationBranchIndex( int branchIndex );
-    int            formationBranchIndex() const;
+    void                          setFormationWellPath( RimWellPath* wellPath );
+    RimWellPath*                  formationWellPath() const;
+    void                          setFormationSimWellName( const QString& simWellName );
+    QString                       formationSimWellName() const;
+    void                          setFormationBranchDetection( bool branchDetection );
+    bool                          formationBranchDetection() const;
+    void                          setFormationBranchIndex( int branchIndex );
+    int                           formationBranchIndex() const;
     void                          setFormationCase( RimCase* rimCase );
     RimCase*                      formationNamesCase() const;
     void                          setFormationTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType );
     RimWellLogTrackTrajectoryType formationTrajectoryType() const;
-    void           setRegionPropertyResultType( RiaDefines::ResultCatType resultCatType, const QString& resultVariable );
+    void                          setRegionPropertyResultType( RiaDefines::ResultCatType resultCatType, const QString& resultVariable );
 
     void detachAllCurves() override;
     void reattachAllCurves() override;
@@ -335,7 +335,7 @@ private:
     caf::PdmField<int>                                                 m_colorShadingTransparency;
     caf::PdmField<bool>                                                m_showRegionLabels;
     RimFontSizeField                                                   m_regionLabelFontSize;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>         m_formationSource;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource;
     caf::PdmPtrField<RimCase*>                                         m_formationCase;
     caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>         m_formationTrajectoryType;
     caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase;
