@@ -22,6 +22,7 @@
 #include "cvfObject.h"
 
 #include "RimWellLogPlot.h"
+#include "RimWellLogTrackEnums.h"
 
 #include <map>
 #include <utility>
@@ -95,14 +96,14 @@ private:
     struct LevelAndName
     {
         LevelAndName() = default;
-        LevelAndName( RigWellPathFormations::FormationLevel level, QString name )
+        LevelAndName( FormationLevel level, QString name )
             : level( level )
             , name( name )
         {
         }
 
-        RigWellPathFormations::FormationLevel level;
-        QString                               name;
+        FormationLevel level;
+        QString        name;
     };
 
     enum PickPosition

@@ -350,16 +350,16 @@ private:
     RimFontSizeField                           m_regionLabelFontSize_OBSOLETE;
 
     // OBSOLETE: Formation fields (migrated to RimWellLogFormationSettings)
-    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource_OBSOLETE;
-    caf::PdmPtrField<RimCase*>                                         m_formationCase_OBSOLETE;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>         m_formationTrajectoryType_OBSOLETE;
-    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase_OBSOLETE;
-    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceWellPath_OBSOLETE;
-    caf::PdmField<QString>                                             m_formationSimWellName_OBSOLETE;
-    caf::PdmField<int>                                                 m_formationBranchIndex_OBSOLETE;
-    caf::PdmField<caf::AppEnum<RigWellPathFormations::FormationLevel>> m_formationLevel_OBSOLETE;
-    caf::PdmField<bool>                                                m_showformationFluids_OBSOLETE;
-    caf::PdmField<bool>                                                m_formationBranchDetection_OBSOLETE;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>   m_formationSource_OBSOLETE;
+    caf::PdmPtrField<RimCase*>                                    m_formationCase_OBSOLETE;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>    m_formationTrajectoryType_OBSOLETE;
+    caf::PdmPtrField<RimWellPath*>                                m_formationWellPathForSourceCase_OBSOLETE;
+    caf::PdmPtrField<RimWellPath*>                                m_formationWellPathForSourceWellPath_OBSOLETE;
+    caf::PdmField<QString>                                        m_formationSimWellName_OBSOLETE;
+    caf::PdmField<int>                                            m_formationBranchIndex_OBSOLETE;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationLevel>>    m_formationLevel_OBSOLETE;
+    caf::PdmField<bool>                                           m_showformationFluids_OBSOLETE;
+    caf::PdmField<bool>                                           m_formationBranchDetection_OBSOLETE;
 
     // OBSOLETE: Well path attribute fields (migrated to RimWellLogWellPathAttributeSettings)
     caf::PdmField<bool>                                  m_showWellPathAttributes_OBSOLETE;
