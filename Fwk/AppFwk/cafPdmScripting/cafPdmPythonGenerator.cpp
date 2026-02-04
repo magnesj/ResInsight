@@ -631,8 +631,8 @@ QString PdmPythonGenerator::dataTypeString( const PdmFieldHandle* field, bool us
 
     // Decode HTML entities from dataTypeName (e.g., "&lt;" to "<", "&gt;" to ">")
     // This is necessary because XML serialization may encode angle brackets in template type names
-    QString rawDataTypeName = internal::decodeHtmlEntities( xmlObj->dataTypeName() );
-    QString dataType        = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( rawDataTypeName );
+    QString decodedDataTypeName = internal::decodeHtmlEntities( xmlObj->dataTypeName() );
+    QString dataType            = PdmObjectScriptingCapabilityRegister::scriptClassNameFromClassKeyword( decodedDataTypeName );
 
     std::map<QString, QString> builtins = {
         { QString::fromStdString( typeid( double ).name() ), "float" },
