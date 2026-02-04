@@ -24,6 +24,7 @@
 #include "RimEclipseCase.h"
 #include "RimTools.h"
 #include "RimWellLogTrack.h"
+#include "RimWellLogTrackEnums.h"
 #include "RimWellPath.h"
 
 #include "RigEclipseCaseData.h"
@@ -39,9 +40,9 @@ RimWellLogFormationSettings::RimWellLogFormationSettings()
 {
     CAF_PDM_InitObject( "Formation Settings" );
 
-    CAF_PDM_InitField( &m_formationSource, "FormationSource", static_cast<int>( RimWellLogTrack::CASE ), "Source" );
+    CAF_PDM_InitFieldNoDefault( &m_formationSource, "FormationSource", "Source" );
 
-    CAF_PDM_InitField( &m_formationTrajectoryType, "FormationTrajectoryType", static_cast<int>( RimWellLogTrack::WELL_PATH ), "Trajectory" );
+    CAF_PDM_InitFieldNoDefault( &m_formationTrajectoryType, "FormationTrajectoryType", "Trajectory" );
 
     CAF_PDM_InitFieldNoDefault( &m_formationWellPathForSourceCase, "FormationWellPath", "Well Path" );
     m_formationWellPathForSourceCase.uiCapability()->setUiTreeChildrenHidden( true );
@@ -77,7 +78,7 @@ RimWellLogFormationSettings::~RimWellLogFormationSettings()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RimWellLogFormationSettings::formationSource() const
+RimWellLogTrackFormationSource RimWellLogFormationSettings::formationSource() const
 {
     return m_formationSource();
 }
@@ -85,7 +86,7 @@ int RimWellLogFormationSettings::formationSource() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setFormationSource( int source )
+void RimWellLogFormationSettings::setFormationSource( RimWellLogTrackFormationSource source )
 {
     m_formationSource = source;
 }
@@ -109,7 +110,7 @@ void RimWellLogFormationSettings::setFormationCase( RimCase* rimCase )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RimWellLogFormationSettings::trajectoryType() const
+RimWellLogTrackTrajectoryType RimWellLogFormationSettings::trajectoryType() const
 {
     return m_formationTrajectoryType();
 }
@@ -117,7 +118,7 @@ int RimWellLogFormationSettings::trajectoryType() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogFormationSettings::setTrajectoryType( int trajectoryType )
+void RimWellLogFormationSettings::setTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType )
 {
     m_formationTrajectoryType = trajectoryType;
 }
@@ -244,7 +245,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
         uiOrdering.add( &m_formationSource );
     }
 
-    if ( m_formationSource() == static_cast<int>( RimWellLogTrack::CASE ) )
+    if ( m_formationSource() == RimWellLogTrackFormationSource::CASE )
     {
         uiOrdering.add( &m_formationCase );
 
@@ -252,13 +253,13 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
         {
             uiOrdering.add( &m_formationTrajectoryType );
 
-            if ( m_formationTrajectoryType() == static_cast<int>( RimWellLogTrack::WELL_PATH ) )
+            if ( m_formationTrajectoryType() == RimWellLogTrackTrajectoryType::WELL_PATH )
             {
                 uiOrdering.add( &m_formationWellPathForSourceCase );
             }
         }
 
-        if ( formationsForCaseWithSimWellOnly || m_formationTrajectoryType() == static_cast<int>( RimWellLogTrack::SIMULATION_WELL ) )
+        if ( formationsForCaseWithSimWellOnly || m_formationTrajectoryType() == RimWellLogTrackTrajectoryType::SIMULATION_WELL )
         {
             uiOrdering.add( &m_formationSimWellName );
 
@@ -268,7 +269,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
                                                                                        m_formationBranchIndex );
         }
     }
-    else if ( m_formationSource() == static_cast<int>( RimWellLogTrack::WELL_PICK_FILTER ) )
+    else if ( m_formationSource() == RimWellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         uiOrdering.add( &m_formationWellPathForSourceWellPath );
         if ( m_formationWellPathForSourceWellPath() )
@@ -284,7 +285,7 @@ void RimWellLogFormationSettings::uiOrdering( const QString& uiConfigName, caf::
 //--------------------------------------------------------------------------------------------------
 void RimWellLogFormationSettings::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
-    if ( changedField == &m_formationSource && m_formationSource() == static_cast<int>( RimWellLogTrack::WELL_PICK_FILTER ) )
+    if ( changedField == &m_formationSource && m_formationSource() == RimWellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         std::vector<RimWellPath*> wellPaths;
         RimTools::wellPathWithFormations( &wellPaths );
@@ -315,13 +316,14 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
 
     if ( fieldNeedingOptions == &m_formationSource )
     {
-        options.push_back( caf::PdmOptionItemInfo( "Case", RimWellLogTrack::CASE ) );
-        options.push_back( caf::PdmOptionItemInfo( "Well Picks for Well Path", RimWellLogTrack::WELL_PICK_FILTER ) );
+        options.push_back( caf::PdmOptionItemInfo( "Case", static_cast<int>( RimWellLogTrackFormationSource::CASE ) ) );
+        options.push_back(
+            caf::PdmOptionItemInfo( "Well Picks for Well Path", static_cast<int>( RimWellLogTrackFormationSource::WELL_PICK_FILTER ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationTrajectoryType )
     {
-        options.push_back( caf::PdmOptionItemInfo( "Well Path", RimWellLogTrack::WELL_PATH ) );
-        options.push_back( caf::PdmOptionItemInfo( "Simulation Well", RimWellLogTrack::SIMULATION_WELL ) );
+        options.push_back( caf::PdmOptionItemInfo( "Well Path", static_cast<int>( RimWellLogTrackTrajectoryType::WELL_PATH ) ) );
+        options.push_back( caf::PdmOptionItemInfo( "Simulation Well", static_cast<int>( RimWellLogTrackTrajectoryType::SIMULATION_WELL ) ) );
     }
     else if ( fieldNeedingOptions == &m_formationWellPathForSourceCase )
     {
