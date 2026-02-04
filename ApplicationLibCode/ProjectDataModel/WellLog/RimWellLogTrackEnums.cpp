@@ -21,39 +21,39 @@
 namespace caf
 {
 template <>
-void AppEnum<RimWellLogTrackTrajectoryType>::setUp()
+void AppEnum<RiaDefines::WellLogTrackTrajectoryType>::setUp()
 {
-    addItem( RimWellLogTrackTrajectoryType::WELL_PATH, "WELL_PATH", "Well Path" );
-    addItem( RimWellLogTrackTrajectoryType::SIMULATION_WELL, "SIMULATION_WELL", "Simulation Well" );
-    setDefault( RimWellLogTrackTrajectoryType::WELL_PATH );
+    addItem( RiaDefines::WellLogTrackTrajectoryType::WELL_PATH, "WELL_PATH", "Well Path" );
+    addItem( RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL, "SIMULATION_WELL", "Simulation Well" );
+    setDefault( RiaDefines::WellLogTrackTrajectoryType::WELL_PATH );
 }
 
 template <>
-void AppEnum<RimWellLogTrackFormationSource>::setUp()
+void AppEnum<RiaDefines::WellLogTrackFormationSource>::setUp()
 {
-    addItem( RimWellLogTrackFormationSource::CASE, "CASE", "Case" );
-    addItem( RimWellLogTrackFormationSource::WELL_PICK_FILTER, "WELL_PICK_FILTER", "Well Picks for Well Path" );
-    setDefault( RimWellLogTrackFormationSource::CASE );
+    addItem( RiaDefines::WellLogTrackFormationSource::CASE, "CASE", "Case" );
+    addItem( RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER, "WELL_PICK_FILTER", "Well Picks for Well Path" );
+    setDefault( RiaDefines::WellLogTrackFormationSource::CASE );
 }
 
 template <>
-void AppEnum<RimWellLogTrackFormationLevel>::setUp()
+void AppEnum<RiaDefines::WellLogTrackFormationLevel>::setUp()
 {
-    addItem( RimWellLogTrackFormationLevel::NONE, "NONE", "None" );
-    addItem( RimWellLogTrackFormationLevel::ALL, "ALL", "All" );
-    addItem( RimWellLogTrackFormationLevel::GROUP, "GROUP", "Formation Group" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL0, "LEVEL0", "Formation" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL1, "LEVEL1", "Formation 1" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL2, "LEVEL2", "Formation 2" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL3, "LEVEL3", "Formation 3" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL4, "LEVEL4", "Formation 4" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL5, "LEVEL5", "Formation 5" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL6, "LEVEL6", "Formation 6" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL7, "LEVEL7", "Formation 7" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL8, "LEVEL8", "Formation 8" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL9, "LEVEL9", "Formation 9" );
-    addItem( RimWellLogTrackFormationLevel::LEVEL10, "LEVEL10", "Formation 10" );
-    setDefault( RimWellLogTrackFormationLevel::ALL );
+    addItem( RiaDefines::WellLogTrackFormationLevel::NONE, "NONE", "None" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::ALL, "ALL", "All" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::GROUP, "GROUP", "Formation Group" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL0, "LEVEL0", "Formation" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL1, "LEVEL1", "Formation 1" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL2, "LEVEL2", "Formation 2" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL3, "LEVEL3", "Formation 3" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL4, "LEVEL4", "Formation 4" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL5, "LEVEL5", "Formation 5" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL6, "LEVEL6", "Formation 6" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL7, "LEVEL7", "Formation 7" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL8, "LEVEL8", "Formation 8" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL9, "LEVEL9", "Formation 9" );
+    addItem( RiaDefines::WellLogTrackFormationLevel::LEVEL10, "LEVEL10", "Formation 10" );
+    setDefault( RiaDefines::WellLogTrackFormationLevel::ALL );
 }
 
 } // namespace caf

@@ -411,11 +411,11 @@ void RimWellLogCurveCommonDataSource::analyseCurvesAndTracks( const std::vector<
         if ( track->showFormations() )
         {
             m_uniqueTrajectoryTypes.insert( static_cast<int>( track->formationTrajectoryType() ) );
-            if ( track->formationTrajectoryType() == RimWellLogTrackTrajectoryType::WELL_PATH )
+            if ( track->formationTrajectoryType() == RiaDefines::WellLogTrackTrajectoryType::WELL_PATH )
             {
                 m_uniqueWellPaths.insert( track->formationWellPath() );
             }
-            else if ( track->formationTrajectoryType() == RimWellLogTrackTrajectoryType::SIMULATION_WELL )
+            else if ( track->formationTrajectoryType() == RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL )
             {
                 m_uniqueWellNames.insert( track->formationSimWellName() );
             }

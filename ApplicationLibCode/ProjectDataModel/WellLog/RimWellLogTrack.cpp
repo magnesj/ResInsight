@@ -1230,7 +1230,7 @@ void RimWellLogTrack::onLoadDataAndUpdate()
 void RimWellLogTrack::setAndUpdateWellPathFormationNamesData( RimCase* rimCase, RimWellPath* wellPath )
 {
     m_formationSettings->setFormationCase( rimCase );
-    m_formationSettings->setTrajectoryType( RimWellLogTrackTrajectoryType::WELL_PATH );
+    m_formationSettings->setTrajectoryType( RiaDefines::WellLogTrackTrajectoryType::WELL_PATH );
     m_formationSettings->setWellPathForSourceCase( wellPath );
     m_formationSettings->setSimWellName( "" );
     m_formationSettings->setBranchIndex( -1 );
@@ -1263,7 +1263,7 @@ void RimWellLogTrack::setAndUpdateSimWellFormationNamesAndBranchData( RimCase*  
 void RimWellLogTrack::setAndUpdateSimWellFormationNamesData( RimCase* rimCase, const QString& simWellName )
 {
     m_formationSettings->setFormationCase( rimCase );
-    m_formationSettings->setTrajectoryType( RimWellLogTrackTrajectoryType::SIMULATION_WELL );
+    m_formationSettings->setTrajectoryType( RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL );
     m_formationSettings->setWellPathForSourceCase( nullptr );
     m_formationSettings->setSimWellName( simWellName );
 
@@ -1453,7 +1453,7 @@ RimCase* RimWellLogTrack::formationNamesCase() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::setFormationTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType )
+void RimWellLogTrack::setFormationTrajectoryType( RiaDefines::WellLogTrackTrajectoryType trajectoryType )
 {
     m_formationSettings->setTrajectoryType( trajectoryType );
 }
@@ -1461,7 +1461,7 @@ void RimWellLogTrack::setFormationTrajectoryType( RimWellLogTrackTrajectoryType 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimWellLogTrackTrajectoryType RimWellLogTrack::formationTrajectoryType() const
+RiaDefines::WellLogTrackTrajectoryType RimWellLogTrack::formationTrajectoryType() const
 {
     return m_formationSettings->trajectoryType();
 }
@@ -2588,7 +2588,7 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
 
     auto orientation = plot->depthOrientation();
 
-    if ( m_formationSettings->formationSource() == RimWellLogTrackFormationSource::WELL_PICK_FILTER )
+    if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::WELL_PICK_FILTER )
     {
         if ( m_formationSettings->wellPathForSourceWellPath() == nullptr ) return;
 
@@ -2635,7 +2635,7 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
         RigEclipseWellLogExtractor* eclWellLogExtractor     = nullptr;
         RigGeoMechWellLogExtractor* geoMechWellLogExtractor = nullptr;
 
-        if ( m_formationSettings->trajectoryType() == RimWellLogTrackTrajectoryType::SIMULATION_WELL )
+        if ( m_formationSettings->trajectoryType() == RiaDefines::WellLogTrackTrajectoryType::SIMULATION_WELL )
         {
             eclWellLogExtractor = RimWellLogTrack::createSimWellExtractor( wellLogCollection,
                                                                            m_formationSettings->formationCase(),
@@ -2702,7 +2702,7 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
                                                   { Qt::SolidPattern, Qt::Dense6Pattern } );
         }
 
-        if ( m_formationSettings->formationSource() == RimWellLogTrackFormationSource::CASE && m_plotWidget )
+        if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::CASE && m_plotWidget )
         {
             if ( ( m_formationSettings->simWellName() == QString( "None" ) && m_formationSettings->wellPathForSourceCase() == nullptr ) ||
                  m_formationSettings->formationCase() == nullptr )
@@ -2785,7 +2785,7 @@ void RimWellLogTrack::updateResultPropertyNamesOnPlot()
 
     // Attach water and rock base formations
 
-    if ( m_formationSettings->formationSource() == RimWellLogTrackFormationSource::CASE )
+    if ( m_formationSettings->formationSource() == RiaDefines::WellLogTrackFormationSource::CASE )
     {
         if ( ( m_formationSettings->simWellName() == QString( "None" ) && m_formationSettings->wellPathForSourceCase() == nullptr ) ||
              m_formationSettings->formationCase() == nullptr )

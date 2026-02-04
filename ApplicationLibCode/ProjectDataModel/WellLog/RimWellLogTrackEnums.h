@@ -20,19 +20,22 @@
 
 #include "cafAppEnum.h"
 
-enum class RimWellLogTrackTrajectoryType
+namespace RiaDefines
+{
+
+enum class WellLogTrackTrajectoryType
 {
     WELL_PATH,
     SIMULATION_WELL
 };
 
-enum class RimWellLogTrackFormationSource
+enum class WellLogTrackFormationSource
 {
     CASE,
     WELL_PICK_FILTER
 };
 
-enum class RimWellLogTrackFormationLevel
+enum class WellLogTrackFormationLevel
 {
     GROUP,
     LEVEL0,
@@ -50,3 +53,5 @@ enum class RimWellLogTrackFormationLevel
     UNKNOWN,
     NONE
 };
+
+} // namespace RiaDefines

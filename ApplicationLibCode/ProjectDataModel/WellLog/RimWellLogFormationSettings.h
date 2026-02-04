@@ -45,16 +45,16 @@ public:
     ~RimWellLogFormationSettings() override;
 
     // Formation source
-    RimWellLogTrackFormationSource formationSource() const;
-    void                           setFormationSource( RimWellLogTrackFormationSource source );
+    RiaDefines::WellLogTrackFormationSource formationSource() const;
+    void                                    setFormationSource( RiaDefines::WellLogTrackFormationSource source );
 
     // Formation case
     RimCase* formationCase() const;
     void     setFormationCase( RimCase* rimCase );
 
     // Trajectory type
-    RimWellLogTrackTrajectoryType trajectoryType() const;
-    void                          setTrajectoryType( RimWellLogTrackTrajectoryType trajectoryType );
+    RiaDefines::WellLogTrackTrajectoryType trajectoryType() const;
+    void                                   setTrajectoryType( RiaDefines::WellLogTrackTrajectoryType trajectoryType );
 
     // Well paths
     RimWellPath* wellPathForSourceCase() const;
@@ -74,8 +74,8 @@ public:
     void setBranchDetection( bool branchDetection );
 
     // Formation level
-    RimWellLogTrackFormationLevel formationLevel() const;
-    void                          setFormationLevel( RimWellLogTrackFormationLevel level );
+    RiaDefines::WellLogTrackFormationLevel formationLevel() const;
+    void                                   setFormationLevel( RiaDefines::WellLogTrackFormationLevel level );
 
     // Show fluids
     bool showFormationFluids() const;
@@ -89,14 +89,14 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
 private:
-    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>> m_formationSource;
-    caf::PdmPtrField<RimCase*>                                  m_formationCase;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>  m_formationTrajectoryType;
-    caf::PdmPtrField<RimWellPath*>                              m_formationWellPathForSourceCase;
-    caf::PdmPtrField<RimWellPath*>                              m_formationWellPathForSourceWellPath;
-    caf::PdmField<QString>                                      m_formationSimWellName;
-    caf::PdmField<int>                                          m_formationBranchIndex;
-    caf::PdmField<bool>                                         m_formationBranchDetection;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationLevel>>  m_formationLevel;
+caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationSource>> m_formationSource;
+caf::PdmPtrField<RimCase*>                                           m_formationCase;
+caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackTrajectoryType>>  m_formationTrajectoryType;
+caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceCase;
+caf::PdmPtrField<RimWellPath*>                                       m_formationWellPathForSourceWellPath;
+caf::PdmField<QString>                                               m_formationSimWellName;
+caf::PdmField<int>                                                   m_formationBranchIndex;
+caf::PdmField<bool>                                                  m_formationBranchDetection;
+caf::PdmField<caf::AppEnum<RiaDefines::WellLogTrackFormationLevel>>  m_formationLevel;
     caf::PdmField<bool>                                         m_showFormationFluids;
 };
