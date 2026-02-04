@@ -73,14 +73,8 @@ public:
     double underburdenHeight() const;
     void   setUnderburdenHeight( double height );
 
-    // Field accessors for UI ordering
-    caf::PdmFieldHandle* showWellPathAttributesField();
-    caf::PdmFieldHandle* showWellPathCompletionsField();
-    caf::PdmFieldHandle* showBothSidesField();
-    caf::PdmFieldHandle* showComponentLabelsField();
-    caf::PdmFieldHandle* showAttributesInLegendField();
-    caf::PdmFieldHandle* showCompletionsInLegendField();
-    caf::PdmFieldHandle* wellPathComponentSourceField();
+    // UI ordering
+    void uiOrdering( const QString& uiConfigName, caf::PdmUiOrdering& uiOrdering );
 
 protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
