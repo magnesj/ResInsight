@@ -61,6 +61,7 @@ class RimEclipseResultDefinition;
 class RimColorLegend;
 class RimEnsembleWellLogCurveSet;
 class RimWellLogPropertyAxisSettings;
+class RimWellLogFormationSettings;
 class RiuPlotAnnotationTool;
 
 struct CurveSamplingPointData
@@ -310,6 +311,9 @@ private:
     // Property value axis settings
     caf::PdmChildField<RimWellLogPropertyAxisSettings*> m_propertyAxisSettings;
 
+    // Formation settings
+    caf::PdmChildField<RimWellLogFormationSettings*> m_formationSettings;
+
     // OBSOLETE: Property value axis fields (migrated to RimWellLogPropertyAxisSettings)
     caf::PdmField<bool>                         m_isPropertyAxisEnabled_OBSOLETE;
     caf::PdmField<double>                       m_visiblePropertyValueRangeMin_OBSOLETE;
@@ -335,16 +339,18 @@ private:
     caf::PdmField<int>                                                 m_colorShadingTransparency;
     caf::PdmField<bool>                                                m_showRegionLabels;
     RimFontSizeField                                                   m_regionLabelFontSize;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource;
-    caf::PdmPtrField<RimCase*>                                         m_formationCase;
-    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>         m_formationTrajectoryType;
-    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase;
-    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceWellPath;
-    caf::PdmField<QString>                                             m_formationSimWellName;
-    caf::PdmField<int>                                                 m_formationBranchIndex;
-    caf::PdmField<caf::AppEnum<RigWellPathFormations::FormationLevel>> m_formationLevel;
-    caf::PdmField<bool>                                                m_showformationFluids;
-    caf::PdmField<bool>                                                m_formationBranchDetection;
+
+    // OBSOLETE: Formation fields (migrated to RimWellLogFormationSettings)
+    caf::PdmField<caf::AppEnum<RimWellLogTrackFormationSource>>        m_formationSource_OBSOLETE;
+    caf::PdmPtrField<RimCase*>                                         m_formationCase_OBSOLETE;
+    caf::PdmField<caf::AppEnum<RimWellLogTrackTrajectoryType>>         m_formationTrajectoryType_OBSOLETE;
+    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceCase_OBSOLETE;
+    caf::PdmPtrField<RimWellPath*>                                     m_formationWellPathForSourceWellPath_OBSOLETE;
+    caf::PdmField<QString>                                             m_formationSimWellName_OBSOLETE;
+    caf::PdmField<int>                                                 m_formationBranchIndex_OBSOLETE;
+    caf::PdmField<caf::AppEnum<RigWellPathFormations::FormationLevel>> m_formationLevel_OBSOLETE;
+    caf::PdmField<bool>                                                m_showformationFluids_OBSOLETE;
+    caf::PdmField<bool>                                                m_formationBranchDetection_OBSOLETE;
     caf::PdmField<bool>                                                m_showWellPathAttributes;
     caf::PdmField<bool>                                                m_showWellPathCompletions;
     caf::PdmField<bool>                                                m_showWellPathComponentsBothSides;
