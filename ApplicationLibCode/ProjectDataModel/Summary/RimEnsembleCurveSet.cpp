@@ -2313,8 +2313,7 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
             // Add custom percentiles (excluding standard P10/P50/P90 if their checkbox is checked)
             for ( int p : m_statistics->allPercentiles() )
             {
-                bool isHandledByCheckbox = ( p == 10 && m_statistics->showP10Curve() ) ||
-                                           ( p == 50 && m_statistics->showP50Curve() ) ||
+                bool isHandledByCheckbox = ( p == 10 && m_statistics->showP10Curve() ) || ( p == 50 && m_statistics->showP50Curve() ) ||
                                            ( p == 90 && m_statistics->showP90Curve() );
 
                 if ( !isHandledByCheckbox && m_ensembleStatCaseY->hasPercentileData( p ) )
