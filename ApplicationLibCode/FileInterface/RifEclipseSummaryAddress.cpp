@@ -40,6 +40,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
+    , m_percentile( -1 )
 {
     std::pair<int, int> reg2regPair;
     switch ( category )
@@ -127,6 +128,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
     , m_number2( -1 )
     , m_isErrorResult( isErrorResult )
     , m_id( id )
+    , m_percentile( -1 )
 {
     switch ( category )
     {
@@ -188,6 +190,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress()
     , m_number2( -1 )
     , m_isErrorResult( false )
     , m_id( -1 )
+    , m_percentile( -1 )
 {
 }
 
@@ -659,8 +662,18 @@ std::string RifEclipseSummaryAddress::uiText() const
 
     if ( isStatistics() )
     {
-        auto prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
-        text        = prefix + ":" + text;
+        std::string prefix;
+        // Check for custom percentile (type NONE with percentile field set)
+        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::NONE && m_percentile >= MIN_PERCENTILE &&
+             m_percentile <= MAX_PERCENTILE )
+        {
+            prefix = "P" + std::to_string( m_percentile );
+        }
+        else
+        {
+            prefix = RifEclipseSummaryAddressDefines::statisticsTypeToString( statisticsType() );
+        }
+        text = prefix + ":" + text;
     }
 
     return text;
@@ -1015,6 +1028,31 @@ bool RifEclipseSummaryAddress::isErrorResult() const
 void RifEclipseSummaryAddress::setId( int id )
 {
     m_id = id;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+int RifEclipseSummaryAddress::percentile() const
+{
+    return m_percentile;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RifEclipseSummaryAddress::setPercentile( int percentile )
+{
+    // Validate percentile value: must be in valid range [0, 100] or -1 (unset)
+    if ( ( percentile >= MIN_PERCENTILE && percentile <= MAX_PERCENTILE ) || percentile == -1 )
+    {
+        m_percentile = percentile;
+    }
+    else
+    {
+        // Invalid percentile value, set to -1 (unset)
+        m_percentile = -1;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
