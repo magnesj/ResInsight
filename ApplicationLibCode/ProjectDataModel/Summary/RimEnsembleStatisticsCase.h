@@ -65,11 +65,8 @@ private:
 
 private:
     std::vector<time_t>                m_timeSteps;
-    std::vector<double>                m_p10Data;
-    std::vector<double>                m_p50Data;
-    std::vector<double>                m_p90Data;
     std::vector<double>                m_meanData;
-    std::map<int, std::vector<double>> m_percentileData; // Custom percentiles
+    std::map<int, std::vector<double>> m_percentileData;
     std::vector<int>                   m_requestedPercentiles;
 
     caf::PdmPointer<RimSummaryCase> m_firstSummaryCase;

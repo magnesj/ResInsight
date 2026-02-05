@@ -42,7 +42,7 @@ std::vector<time_t> RimEnsembleStatisticsCase::timeSteps( const RifEclipseSummar
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatisticsCase::hasP10Data() const
 {
-    return !m_p10Data.empty();
+    return hasPercentileData( 10 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ bool RimEnsembleStatisticsCase::hasP10Data() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatisticsCase::hasP50Data() const
 {
-    return !m_p50Data.empty();
+    return hasPercentileData( 50 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -58,7 +58,7 @@ bool RimEnsembleStatisticsCase::hasP50Data() const
 //--------------------------------------------------------------------------------------------------
 bool RimEnsembleStatisticsCase::hasP90Data() const
 {
-    return !m_p90Data.empty();
+    return hasPercentileData( 90 );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -90,11 +90,23 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
     switch ( resultAddress.statisticsType() )
     {
         case RifEclipseSummaryAddressDefines::StatisticsType::P10:
-            return { true, m_p10Data };
+        {
+            auto it = m_percentileData.find( 10 );
+            if ( it != m_percentileData.end() ) return { true, it->second };
+            return { true, {} };
+        }
         case RifEclipseSummaryAddressDefines::StatisticsType::P50:
-            return { true, m_p50Data };
+        {
+            auto it = m_percentileData.find( 50 );
+            if ( it != m_percentileData.end() ) return { true, it->second };
+            return { true, {} };
+        }
         case RifEclipseSummaryAddressDefines::StatisticsType::P90:
-            return { true, m_p90Data };
+        {
+            auto it = m_percentileData.find( 90 );
+            if ( it != m_percentileData.end() ) return { true, it->second };
+            return { true, {} };
+        }
         case RifEclipseSummaryAddressDefines::StatisticsType::MEAN:
             return { true, m_meanData };
         case RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM:
@@ -228,13 +240,9 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
 
     m_timeSteps = curveMerger.allXValues();
 
-    // Calculate standard percentiles for backward compatibility
-    m_p10Data.reserve( m_timeSteps.size() );
-    m_p50Data.reserve( m_timeSteps.size() );
-    m_p90Data.reserve( m_timeSteps.size() );
     m_meanData.reserve( m_timeSteps.size() );
 
-    // Initialize custom percentile storage
+    // Initialize percentile storage
     for ( int p : percentiles )
     {
         m_percentileData[p].reserve( m_timeSteps.size() );
@@ -250,15 +258,10 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
             valuesAtTimeStep.push_back( curveValues[curveIdx][timeStepIndex] );
         }
 
-        // Calculate standard percentiles for backward compatibility
-        double p10, p50, p90, mean;
-        RigStatisticsMath::calculateStatisticsCurves( valuesAtTimeStep, &p10, &p50, &p90, &mean, RigStatisticsMath::PercentileStyle::SWITCHED );
-        m_p10Data.push_back( p10 );
-        m_p50Data.push_back( p50 );
-        m_p90Data.push_back( p90 );
+        double mean = RigStatisticsMath::calculateMean( valuesAtTimeStep );
         m_meanData.push_back( mean );
 
-        // Calculate custom percentiles using interpolated method
+        // Calculate percentiles
         std::vector<double> percentilePositions;
         for ( int p : percentiles )
         {
@@ -301,9 +304,6 @@ RiaDefines::EclipseUnitSystem RimEnsembleStatisticsCase::unitSystem() const
 void RimEnsembleStatisticsCase::clearData()
 {
     m_timeSteps.clear();
-    m_p10Data.clear();
-    m_p50Data.clear();
-    m_p90Data.clear();
     m_meanData.clear();
     m_percentileData.clear();
     m_requestedPercentiles.clear();
