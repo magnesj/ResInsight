@@ -663,8 +663,7 @@ std::string RifEclipseSummaryAddress::uiText() const
     if ( isStatistics() )
     {
         std::string prefix;
-        // Check for custom percentile (type NONE with percentile field set)
-        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::NONE && m_percentile >= MIN_PERCENTILE &&
+        if ( statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM && m_percentile >= MIN_PERCENTILE &&
              m_percentile <= MAX_PERCENTILE )
         {
             prefix = "P" + std::to_string( m_percentile );

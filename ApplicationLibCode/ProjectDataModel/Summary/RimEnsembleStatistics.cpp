@@ -19,10 +19,15 @@
 #include "RimEnsembleStatistics.h"
 
 #include "RiaColorTools.h"
+#include "RiaStdStringTools.h"
 
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetInterface.h"
 #include "RimProject.h"
+
+#include "cafPdmUiLineEditor.h"
+
+#include <algorithm>
 
 CAF_PDM_SOURCE_INIT( RimEnsembleStatistics, "RimEnsembleStatistics" );
 
@@ -50,6 +55,8 @@ RimEnsembleStatistics::RimEnsembleStatistics( RimEnsembleCurveSetInterface* pare
     CAF_PDM_InitField( &m_showP50Curve, "ShowP50Curve", false, "P50" );
     CAF_PDM_InitField( &m_showP90Curve, "ShowP90Curve", true, "P90" );
     CAF_PDM_InitField( &m_showMeanCurve, "ShowMeanCurve", true, "Mean" );
+    CAF_PDM_InitField( &m_customPercentiles, "CustomPercentiles", QString(), "Custom Percentiles" );
+    m_customPercentiles.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
     CAF_PDM_InitField( &m_showCurveLabels, "ShowCurveLabels", true, "Show Curve Labels" );
     CAF_PDM_InitField( &m_includeIncompleteCurves, "IncludeIncompleteCurves", false, "Include Incomplete Curves" );
 
@@ -147,6 +154,50 @@ bool RimEnsembleStatistics::showP90Curve() const
 bool RimEnsembleStatistics::showMeanCurve() const
 {
     return m_showMeanCurve;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString RimEnsembleStatistics::customPercentiles() const
+{
+    return m_customPercentiles;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RimEnsembleStatistics::allPercentiles() const
+{
+    std::vector<int> percentiles;
+
+    // Add standard percentiles from checkboxes
+    if ( m_showP10Curve ) percentiles.push_back( 10 );
+    if ( m_showP50Curve ) percentiles.push_back( 50 );
+    if ( m_showP90Curve ) percentiles.push_back( 90 );
+
+    // Parse custom percentiles string
+    if ( !m_customPercentiles().isEmpty() )
+    {
+        std::set<int> customValues = RiaStdStringTools::valuesFromRangeSelection( m_customPercentiles().toStdString() );
+        for ( int p : customValues )
+        {
+            // Only include valid percentiles in range [0, 100]
+            if ( p >= 0 && p <= 100 )
+            {
+                // Avoid duplicates with standard percentiles
+                if ( std::find( percentiles.begin(), percentiles.end(), p ) == percentiles.end() )
+                {
+                    percentiles.push_back( p );
+                }
+            }
+        }
+    }
+
+    // Sort for consistent ordering
+    std::sort( percentiles.begin(), percentiles.end() );
+
+    return percentiles;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -276,6 +327,7 @@ void RimEnsembleStatistics::defaultUiOrdering( bool showCrossPlotGroup, caf::Pdm
     group->add( &m_showP50Curve );
     group->add( &m_showMeanCurve );
     group->add( &m_showP10Curve );
+    group->add( &m_customPercentiles );
 
     disableP10Curve( !m_active || !curveSet->hasP10Data() );
     disableP50Curve( !m_active || !curveSet->hasP50Data() );
@@ -283,6 +335,7 @@ void RimEnsembleStatistics::defaultUiOrdering( bool showCrossPlotGroup, caf::Pdm
     disableMeanCurve( !m_active || !curveSet->hasMeanData() );
     m_showCurveLabels.uiCapability()->setUiReadOnly( !m_active );
     m_color.uiCapability()->setUiReadOnly( !m_active );
+    m_customPercentiles.uiCapability()->setUiReadOnly( !m_active );
 
     m_showP10Curve.uiCapability()->setUiName( curveSet->hasP10Data() ? "P10" : "P10 (Needs > 8 curves)" );
     m_showP90Curve.uiCapability()->setUiName( curveSet->hasP90Data() ? "P90" : "P90 (Needs > 8 curves)" );
@@ -321,6 +374,20 @@ void RimEnsembleStatistics::defineUiOrdering( QString uiConfigName, caf::PdmUiOr
 {
     bool showCrossPlot = true;
     defaultUiOrdering( showCrossPlot, uiOrdering );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleStatistics::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
+{
+    if ( field == &m_customPercentiles )
+    {
+        if ( auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
+        {
+            lineEdAttr->placeholderText = "E.g. 5, 25, 75, 95";
+        }
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -97,9 +97,8 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
             return { true, m_p90Data };
         case RifEclipseSummaryAddressDefines::StatisticsType::MEAN:
             return { true, m_meanData };
-        default:
+        case RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM:
         {
-            // Try to find custom percentile using percentile field
             int percentile = resultAddress.percentile();
             if ( percentile >= RifEclipseSummaryAddress::MIN_PERCENTILE && percentile <= RifEclipseSummaryAddress::MAX_PERCENTILE )
             {
@@ -111,6 +110,8 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
             }
             return { true, {} };
         }
+        default:
+            return { true, {} };
     }
 }
 
@@ -154,10 +155,10 @@ RifSummaryReaderInterface* RimEnsembleStatisticsCase::summaryReader()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>&  summaryCases,
-                                           const RifEclipseSummaryAddress&      inputAddress,
-                                           bool                                 includeIncompleteCurves,
-                                           const std::vector<int>&              percentiles )
+void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& summaryCases,
+                                           const RifEclipseSummaryAddress&     inputAddress,
+                                           bool                                includeIncompleteCurves,
+                                           const std::vector<int>&             percentiles )
 {
     auto hash = RiaHashTools::hash( summaryCases, inputAddress.toEclipseTextAddress(), includeIncompleteCurves, percentiles );
     if ( hash == m_hash ) return;
@@ -264,9 +265,10 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>&  
             percentilePositions.push_back( static_cast<double>( p ) );
         }
 
-        std::vector<double> percentileValues = RigStatisticsMath::calculateInterpolatedPercentiles( valuesAtTimeStep,
-                                                                                                      percentilePositions,
-                                                                                                      RigStatisticsMath::PercentileStyle::SWITCHED );
+        std::vector<double> percentileValues =
+            RigStatisticsMath::calculateInterpolatedPercentiles( valuesAtTimeStep,
+                                                                 percentilePositions,
+                                                                 RigStatisticsMath::PercentileStyle::SWITCHED );
 
         for ( size_t i = 0; i < percentiles.size(); i++ )
         {
