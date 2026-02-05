@@ -82,3 +82,5 @@ nul
 
 #Python
 *.pyc
+memory_demo
+memory_demo.cpp
