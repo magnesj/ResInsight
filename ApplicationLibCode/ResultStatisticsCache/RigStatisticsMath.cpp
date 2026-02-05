@@ -140,22 +140,33 @@ void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& va
         *p90 = HUGE_VAL;
     }
 
-    // Calculate mean separately
-    std::vector<double> sortedValues = values;
-    sortedValues.erase( std::remove_if( sortedValues.begin(),
-                                        sortedValues.end(),
-                                        []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
-                        sortedValues.end() );
+    // Calculate mean separately, skipping invalid values
+    *mean = calculateMean( values );
+}
 
-    if ( !sortedValues.empty() )
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double RigStatisticsMath::calculateMean( const std::vector<double>& values )
+{
+    double sum   = 0.0;
+    size_t count = 0;
+
+    for ( double val : values )
     {
-        double valueSum = std::accumulate( sortedValues.begin(), sortedValues.end(), 0.0 );
-        *mean           = valueSum / sortedValues.size();
+        if ( RiaStatisticsTools::isValidNumber( val ) )
+        {
+            sum += val;
+            count++;
+        }
     }
-    else
+
+    if ( count > 0 )
     {
-        *mean = HUGE_VAL;
+        return sum / count;
     }
+
+    return HUGE_VAL;
 }
 
 //--------------------------------------------------------------------------------------------------
