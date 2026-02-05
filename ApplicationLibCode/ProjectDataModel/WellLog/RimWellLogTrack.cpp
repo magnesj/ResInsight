@@ -72,6 +72,7 @@
 #include "RimWellLogPlotCollection.h"
 #include "RimWellLogPropertyAxisSettings.h"
 #include "RimWellLogRegionAnnotationSettings.h"
+#include "RimWellLogWellPathAttributeSettings.h"
 #include "RimWellPath.h"
 #include "RimWellPathAttribute.h"
 #include "RimWellPathAttributeCollection.h"
