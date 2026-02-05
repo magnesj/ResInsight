@@ -16,23 +16,24 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RifStringPool.h"
+#include "RiaStringPool.h"
 
+#include <mutex>
 #include <stdexcept>
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifStringPool& RifStringPool::instance()
+RiaStringPool& RiaStringPool::instance()
 {
-    static RifStringPool pool;
+    static RiaStringPool pool;
     return pool;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifStringPool::RifStringPool()
+RiaStringPool::RiaStringPool()
 {
     // Pre-allocate empty string at index 0
     m_strings.push_back( "" );
@@ -43,7 +44,7 @@ RifStringPool::RifStringPool()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RifStringPool::IndexType RifStringPool::getIndex( const std::string& str )
+RiaStringPool::IndexType RiaStringPool::getIndex( const std::string& str )
 {
     // First try with shared lock for reading
     {
@@ -74,7 +75,7 @@ RifStringPool::IndexType RifStringPool::getIndex( const std::string& str )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::string& RifStringPool::getString( IndexType index ) const
+const std::string& RiaStringPool::getString( IndexType index ) const
 {
     std::shared_lock<std::shared_mutex> lock( m_mutex );
 

@@ -27,13 +27,13 @@
 /// String pool for memory-efficient storage of shared strings
 /// Stores strings once and returns indices for lookups
 //==================================================================================================
-class RifStringPool
+class RiaStringPool
 {
 public:
     using IndexType = uint32_t;
     static constexpr IndexType INVALID_INDEX = static_cast<IndexType>( -1 );
 
-    static RifStringPool& instance();
+    static RiaStringPool& instance();
 
     // Get or create an index for a string
     IndexType getIndex( const std::string& str );
@@ -45,9 +45,9 @@ public:
     IndexType getEmptyIndex() const { return m_emptyIndex; }
 
 private:
-    RifStringPool();
-    RifStringPool( const RifStringPool& )            = delete;
-    RifStringPool& operator=( const RifStringPool& ) = delete;
+    RiaStringPool();
+    RiaStringPool( const RiaStringPool& )            = delete;
+    RiaStringPool& operator=( const RiaStringPool& ) = delete;
 
     mutable std::shared_mutex                     m_mutex;
     std::vector<std::string>                      m_strings;

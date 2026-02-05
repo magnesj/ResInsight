@@ -22,7 +22,7 @@
 #include "RiaTextStringTools.h"
 
 #include "RifEclEclipseSummary.h"
-#include "RifStringPool.h"
+#include "RiaStringPool.h"
 #include "RiuSummaryQuantityNameInfoProvider.h"
 
 #include <QStringList>
@@ -36,9 +36,9 @@
 RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, std::map<SummaryIdentifierType, std::string>& identifiers )
     : m_category( category )
     , m_statisticsType( StatisticsType::NONE )
-    , m_vectorNameIdx( RifStringPool::instance().getEmptyIndex() )
-    , m_nameIdx( RifStringPool::instance().getEmptyIndex() )
-    , m_lgrNameIdx( RifStringPool::instance().getEmptyIndex() )
+    , m_vectorNameIdx( RiaStringPool::instance().getEmptyIndex() )
+    , m_nameIdx( RiaStringPool::instance().getEmptyIndex() )
+    , m_lgrNameIdx( RiaStringPool::instance().getEmptyIndex() )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
@@ -57,40 +57,40 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
             m_number1   = reg2regPair.second;
             break;
         case SummaryCategory::SUMMARY_GROUP:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_GROUP_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_GROUP_NAME] );
             break;
         case SummaryCategory::SUMMARY_NETWORK:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_NETWORK_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_NETWORK_NAME] );
             break;
         case SummaryCategory::SUMMARY_WELL:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             break;
         case SummaryCategory::SUMMARY_WELL_COMPLETION:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             m_number0 = RiaStdStringTools::toInt( identifiers[SummaryIdentifierType::INPUT_WELL_COMPLETION_NUMBER] );
             break;
         case SummaryCategory::SUMMARY_WELL_CONNECTION:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             setCellIjk( ijkTupleFromUiText( identifiers[SummaryIdentifierType::INPUT_CELL_IJK] ) );
             break;
         case SummaryCategory::SUMMARY_WELL_LGR:
-            m_lgrNameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
-            m_nameIdx    = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_lgrNameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
+            m_nameIdx    = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             break;
         case SummaryCategory::SUMMARY_WELL_CONNECTION_LGR:
-            m_lgrNameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
-            m_nameIdx    = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_lgrNameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
+            m_nameIdx    = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             setCellIjk( ijkTupleFromUiText( identifiers[SummaryIdentifierType::INPUT_CELL_IJK] ) );
             break;
         case SummaryCategory::SUMMARY_WELL_SEGMENT:
-            m_nameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
+            m_nameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_WELL_NAME] );
             m_number0 = RiaStdStringTools::toInt( identifiers[SummaryIdentifierType::INPUT_SEGMENT_NUMBER] );
             break;
         case SummaryCategory::SUMMARY_BLOCK:
             setCellIjk( ijkTupleFromUiText( identifiers[SummaryIdentifierType::INPUT_CELL_IJK] ) );
             break;
         case SummaryCategory::SUMMARY_BLOCK_LGR:
-            m_lgrNameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
+            m_lgrNameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_LGR_NAME] );
             setCellIjk( ijkTupleFromUiText( identifiers[SummaryIdentifierType::INPUT_CELL_IJK] ) );
             break;
         case SummaryCategory::SUMMARY_AQUIFER:
@@ -98,7 +98,7 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory category, st
             break;
     }
 
-    m_vectorNameIdx = RifStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_VECTOR_NAME] );
+    m_vectorNameIdx = RiaStringPool::instance().getIndex( identifiers[SummaryIdentifierType::INPUT_VECTOR_NAME] );
     m_id            = RiaStdStringTools::toInt( identifiers[SummaryIdentifierType::INPUT_ID] );
 }
 
@@ -124,9 +124,9 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
                                                     int                id )
     : m_category( category )
     , m_statisticsType( statisticsType )
-    , m_vectorNameIdx( RifStringPool::instance().getIndex( vectorName ) )
-    , m_nameIdx( RifStringPool::instance().getEmptyIndex() )
-    , m_lgrNameIdx( RifStringPool::instance().getIndex( lgrName ) )
+    , m_vectorNameIdx( RiaStringPool::instance().getIndex( vectorName ) )
+    , m_nameIdx( RiaStringPool::instance().getEmptyIndex() )
+    , m_lgrNameIdx( RiaStringPool::instance().getIndex( lgrName ) )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
@@ -143,31 +143,31 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
             m_number1 = regionNumber2;
             break;
         case SummaryCategory::SUMMARY_GROUP:
-            m_nameIdx = RifStringPool::instance().getIndex( groupName );
+            m_nameIdx = RiaStringPool::instance().getIndex( groupName );
             break;
         case SummaryCategory::SUMMARY_NETWORK:
-            m_nameIdx = RifStringPool::instance().getIndex( networkName );
+            m_nameIdx = RiaStringPool::instance().getIndex( networkName );
             break;
         case SummaryCategory::SUMMARY_WELL:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             break;
         case SummaryCategory::SUMMARY_WELL_COMPLETION:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             m_number0 = completionNumber;
             break;
         case SummaryCategory::SUMMARY_WELL_CONNECTION:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             setCellIjk( cellI, cellJ, cellK );
             break;
         case SummaryCategory::SUMMARY_WELL_LGR:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             break;
         case SummaryCategory::SUMMARY_WELL_CONNECTION_LGR:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             setCellIjk( cellI, cellJ, cellK );
             break;
         case SummaryCategory::SUMMARY_WELL_SEGMENT:
-            m_nameIdx = RifStringPool::instance().getIndex( wellName );
+            m_nameIdx = RiaStringPool::instance().getIndex( wellName );
             m_number0 = wellSegmentNumber;
             break;
         case SummaryCategory::SUMMARY_BLOCK:
@@ -188,9 +188,9 @@ RifEclipseSummaryAddress::RifEclipseSummaryAddress( SummaryCategory    category,
 RifEclipseSummaryAddress::RifEclipseSummaryAddress()
     : m_category( SummaryCategory::SUMMARY_INVALID )
     , m_statisticsType( StatisticsType::NONE )
-    , m_vectorNameIdx( RifStringPool::instance().getEmptyIndex() )
-    , m_nameIdx( RifStringPool::instance().getEmptyIndex() )
-    , m_lgrNameIdx( RifStringPool::instance().getEmptyIndex() )
+    , m_vectorNameIdx( RiaStringPool::instance().getEmptyIndex() )
+    , m_nameIdx( RiaStringPool::instance().getEmptyIndex() )
+    , m_lgrNameIdx( RiaStringPool::instance().getEmptyIndex() )
     , m_number0( -1 )
     , m_number1( -1 )
     , m_number2( -1 )
@@ -249,7 +249,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::fieldAddress( const std::stri
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_FIELD;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -261,7 +261,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::aquiferAddress( const std::st
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_AQUIFER;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_number0       = aquiferNumber;
     addr.m_id            = calculationId;
     return addr;
@@ -275,8 +275,8 @@ RifEclipseSummaryAddress
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_NETWORK;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( networkName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( networkName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -288,7 +288,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::miscAddress( const std::strin
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_MISC;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -300,7 +300,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::regionAddress( const std::str
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_REGION;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_number0       = regionNumber;
     addr.m_id            = calculationId;
     return addr;
@@ -314,7 +314,7 @@ RifEclipseSummaryAddress
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_REGION_2_REGION;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_number0       = regionNumber;
     addr.m_number1       = region2Number;
     addr.m_id            = calculationId;
@@ -328,8 +328,8 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::groupAddress( const std::stri
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_GROUP;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( groupName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( groupName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -341,8 +341,8 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::wellAddress( const std::strin
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -357,8 +357,8 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::wellCompletionAddress( const 
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL_COMPLETION;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.m_number0       = completionNumber;
     addr.m_id            = calculationId;
     return addr;
@@ -372,8 +372,8 @@ RifEclipseSummaryAddress
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL_CONNECTION;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.setCellIjk( i, j, k );
     addr.m_id = calculationId;
     return addr;
@@ -389,9 +389,9 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::wellLgrAddress( const std::st
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL_LGR;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_lgrNameIdx    = RifStringPool::instance().getIndex( lgrName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_lgrNameIdx    = RiaStringPool::instance().getIndex( lgrName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -409,9 +409,9 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::wellCompletionLgrAddress( con
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL_CONNECTION_LGR;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_lgrNameIdx    = RifStringPool::instance().getIndex( lgrName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_lgrNameIdx    = RiaStringPool::instance().getIndex( lgrName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.setCellIjk( i, j, k );
     addr.m_id = calculationId;
     return addr;
@@ -425,8 +425,8 @@ RifEclipseSummaryAddress
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_WELL_SEGMENT;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_nameIdx       = RifStringPool::instance().getIndex( wellName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_nameIdx       = RiaStringPool::instance().getIndex( wellName );
     addr.m_number0       = segmentNumber;
     addr.m_id            = calculationId;
     return addr;
@@ -439,7 +439,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::blockAddress( const std::stri
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_BLOCK;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.setCellIjk( i, j, k );
     addr.m_id = calculationId;
     return addr;
@@ -453,8 +453,8 @@ RifEclipseSummaryAddress
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_BLOCK_LGR;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
-    addr.m_lgrNameIdx    = RifStringPool::instance().getIndex( lgrName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
+    addr.m_lgrNameIdx    = RiaStringPool::instance().getIndex( lgrName );
     addr.setCellIjk( i, j, k );
     addr.m_id = calculationId;
     return addr;
@@ -467,7 +467,7 @@ RifEclipseSummaryAddress RifEclipseSummaryAddress::importedAddress( const std::s
 {
     RifEclipseSummaryAddress addr;
     addr.m_category      = SummaryCategory::SUMMARY_IMPORTED;
-    addr.m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    addr.m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
     addr.m_id            = calculationId;
     return addr;
 }
@@ -528,7 +528,7 @@ SummaryCategory RifEclipseSummaryAddress::category() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::vectorName() const
 {
-    return RifStringPool::instance().getString( m_vectorNameIdx );
+    return RiaStringPool::instance().getString( m_vectorNameIdx );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -539,7 +539,7 @@ bool RifEclipseSummaryAddress::isHistoryVector() const
     const std::string historyIdentifier = "H";
 
     // Optimize by using direct pool access and const reference
-    const auto& vecName = RifStringPool::instance().getString( m_vectorNameIdx );
+    const auto& vecName = RiaStringPool::instance().getString( m_vectorNameIdx );
     return RiaStdStringTools::endsWith( vecName, historyIdentifier );
 }
 
@@ -564,7 +564,7 @@ int RifEclipseSummaryAddress::regionNumber2() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::groupName() const
 {
-    return ( m_category == SummaryCategory::SUMMARY_GROUP ) ? RifStringPool::instance().getString( m_nameIdx ) : std::string();
+    return ( m_category == SummaryCategory::SUMMARY_GROUP ) ? RiaStringPool::instance().getString( m_nameIdx ) : std::string();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -572,7 +572,7 @@ std::string RifEclipseSummaryAddress::groupName() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::networkName() const
 {
-    return ( m_category == SummaryCategory::SUMMARY_NETWORK ) ? RifStringPool::instance().getString( m_nameIdx ) : std::string();
+    return ( m_category == SummaryCategory::SUMMARY_NETWORK ) ? RiaStringPool::instance().getString( m_nameIdx ) : std::string();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -580,7 +580,7 @@ std::string RifEclipseSummaryAddress::networkName() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::wellName() const
 {
-    return isDependentOnWellName( m_category ) ? RifStringPool::instance().getString( m_nameIdx ) : std::string();
+    return isDependentOnWellName( m_category ) ? RiaStringPool::instance().getString( m_nameIdx ) : std::string();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -604,7 +604,7 @@ int RifEclipseSummaryAddress::wellSegmentNumber() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::lgrName() const
 {
-    return RifStringPool::instance().getString( m_lgrNameIdx );
+    return RiaStringPool::instance().getString( m_lgrNameIdx );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -792,15 +792,15 @@ std::string RifEclipseSummaryAddress::addressComponentUiText( SummaryIdentifierT
         case SummaryIdentifierType::INPUT_REGION_2_REGION:
             return formatUiTextRegionToRegion();
         case SummaryIdentifierType::INPUT_WELL_NAME:
-            return RifStringPool::instance().getString( m_nameIdx );
+            return RiaStringPool::instance().getString( m_nameIdx );
         case SummaryIdentifierType::INPUT_GROUP_NAME:
-            return RifStringPool::instance().getString( m_nameIdx );
+            return RiaStringPool::instance().getString( m_nameIdx );
         case SummaryIdentifierType::INPUT_NETWORK_NAME:
-            return RifStringPool::instance().getString( m_nameIdx );
+            return RiaStringPool::instance().getString( m_nameIdx );
         case SummaryIdentifierType::INPUT_CELL_IJK:
             return blockAsString();
         case SummaryIdentifierType::INPUT_LGR_NAME:
-            return RifStringPool::instance().getString( m_lgrNameIdx );
+            return RiaStringPool::instance().getString( m_lgrNameIdx );
         case SummaryIdentifierType::INPUT_SEGMENT_NUMBER:
             return std::to_string( wellSegmentNumber() );
         case SummaryIdentifierType::INPUT_WELL_COMPLETION_NUMBER:
@@ -808,7 +808,7 @@ std::string RifEclipseSummaryAddress::addressComponentUiText( SummaryIdentifierT
         case SummaryIdentifierType::INPUT_AQUIFER_NUMBER:
             return std::to_string( aquiferNumber() );
         case SummaryIdentifierType::INPUT_VECTOR_NAME:
-            return RifStringPool::instance().getString( m_vectorNameIdx );
+            return RiaStringPool::instance().getString( m_vectorNameIdx );
         case SummaryIdentifierType::INPUT_ID:
             return std::to_string( id() );
     }
@@ -835,7 +835,7 @@ bool RifEclipseSummaryAddress::isUiTextMatchingFilterText( const QString& filter
 //--------------------------------------------------------------------------------------------------
 bool RifEclipseSummaryAddress::isValid() const
 {
-    if ( RifStringPool::instance().getString( m_vectorNameIdx ).empty() ) return false;
+    if ( RiaStringPool::instance().getString( m_vectorNameIdx ).empty() ) return false;
 
     switch ( category() )
     {
@@ -850,36 +850,36 @@ bool RifEclipseSummaryAddress::isValid() const
             return m_number1 != -1;
 
         case SummaryCategory::SUMMARY_GROUP:
-            return !RifStringPool::instance().getString( m_nameIdx ).empty();
+            return !RiaStringPool::instance().getString( m_nameIdx ).empty();
 
         case SummaryCategory::SUMMARY_WELL:
-            return !RifStringPool::instance().getString( m_nameIdx ).empty();
+            return !RiaStringPool::instance().getString( m_nameIdx ).empty();
 
         case SummaryCategory::SUMMARY_WELL_COMPLETION:
-            if ( RifStringPool::instance().getString( m_nameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_nameIdx ).empty() ) return false;
             return m_number0 != -1;
 
         case SummaryCategory::SUMMARY_WELL_CONNECTION:
-            if ( RifStringPool::instance().getString( m_nameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_nameIdx ).empty() ) return false;
             if ( m_number0 == -1 ) return false;
             if ( m_number1 == -1 ) return false;
             if ( m_number2 == -1 ) return false;
             return true;
 
         case SummaryCategory::SUMMARY_WELL_LGR:
-            if ( RifStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
-            return !RifStringPool::instance().getString( m_nameIdx ).empty();
+            if ( RiaStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
+            return !RiaStringPool::instance().getString( m_nameIdx ).empty();
 
         case SummaryCategory::SUMMARY_WELL_CONNECTION_LGR:
-            if ( RifStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
-            if ( RifStringPool::instance().getString( m_nameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_nameIdx ).empty() ) return false;
             if ( m_number0 == -1 ) return false;
             if ( m_number1 == -1 ) return false;
             if ( m_number2 == -1 ) return false;
             return true;
 
         case SummaryCategory::SUMMARY_WELL_SEGMENT:
-            if ( RifStringPool::instance().getString( m_nameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_nameIdx ).empty() ) return false;
             return m_number0 != -1;
 
         case SummaryCategory::SUMMARY_BLOCK:
@@ -889,7 +889,7 @@ bool RifEclipseSummaryAddress::isValid() const
             return true;
 
         case SummaryCategory::SUMMARY_BLOCK_LGR:
-            if ( RifStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
+            if ( RiaStringPool::instance().getString( m_lgrNameIdx ).empty() ) return false;
             if ( m_number0 == -1 ) return false;
             if ( m_number1 == -1 ) return false;
             if ( m_number2 == -1 ) return false;
@@ -907,7 +907,7 @@ bool RifEclipseSummaryAddress::isValid() const
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setVectorName( const std::string& vectorName )
 {
-    m_vectorNameIdx = RifStringPool::instance().getIndex( vectorName );
+    m_vectorNameIdx = RiaStringPool::instance().getIndex( vectorName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -915,7 +915,7 @@ void RifEclipseSummaryAddress::setVectorName( const std::string& vectorName )
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setWellName( const std::string& wellName )
 {
-    m_nameIdx = RifStringPool::instance().getIndex( wellName );
+    m_nameIdx = RiaStringPool::instance().getIndex( wellName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -923,7 +923,7 @@ void RifEclipseSummaryAddress::setWellName( const std::string& wellName )
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setGroupName( const std::string& groupName )
 {
-    m_nameIdx = RifStringPool::instance().getIndex( groupName );
+    m_nameIdx = RiaStringPool::instance().getIndex( groupName );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -931,7 +931,7 @@ void RifEclipseSummaryAddress::setGroupName( const std::string& groupName )
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setNetworkName( const std::string& networkName )
 {
-    m_nameIdx = RifStringPool::instance().getIndex( networkName );
+    m_nameIdx = RiaStringPool::instance().getIndex( networkName );
 }
 
 //--------------------------------------------------------------------------------------------------
