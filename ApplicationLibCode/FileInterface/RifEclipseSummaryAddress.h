@@ -109,6 +109,8 @@ public:
     bool           isStatistics() const;
     StatisticsType statisticsType() const;
     void           setStatisticsType( StatisticsType type );
+    int            percentile() const;
+    void           setPercentile( int percentile );
 
     int regionNumber() const;
     int regionNumber2() const;
@@ -187,6 +189,7 @@ private:
     int             m_number2;
     bool            m_isErrorResult;
     int             m_id;
+    int             m_percentile;
 };
 
 QTextStream& operator<<( QTextStream& str, const RifEclipseSummaryAddress& sobj );

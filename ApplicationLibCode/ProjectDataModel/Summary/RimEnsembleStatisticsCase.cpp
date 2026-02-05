@@ -104,11 +104,11 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
             constexpr int MIN_PERCENTILE = 0;
             constexpr int MAX_PERCENTILE = 100;
 
-            // Try to find custom percentile using id field
-            int id = resultAddress.id();
-            if ( id >= MIN_PERCENTILE && id <= MAX_PERCENTILE )
+            // Try to find custom percentile using percentile field
+            int percentile = resultAddress.percentile();
+            if ( percentile >= MIN_PERCENTILE && percentile <= MAX_PERCENTILE )
             {
-                auto it = m_percentileData.find( id );
+                auto it = m_percentileData.find( percentile );
                 if ( it != m_percentileData.end() )
                 {
                     return { true, it->second };

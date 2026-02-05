@@ -2298,7 +2298,7 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
                 auto xStatAddress = RifEclipseSummaryAddress::timeAddress();
                 auto yStatAddress = addrY;
                 yStatAddress.setStatisticsType( statisticsType );
-                if ( percentile >= 0 ) yStatAddress.setId( percentile );
+                if ( percentile >= 0 ) yStatAddress.setPercentile( percentile );
 
                 return RiaSummaryCurveAddress( xStatAddress, yStatAddress );
             };
