@@ -1043,18 +1043,14 @@ int RifEclipseSummaryAddress::percentile() const
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setPercentile( int percentile )
 {
-    // Validate percentile value: must be -1 (unset) or in valid range [0, 100]
-    if ( percentile >= MIN_PERCENTILE && percentile <= MAX_PERCENTILE )
+    // Validate percentile value: must be in valid range [0, 100] or -1 (unset)
+    if ( ( percentile >= MIN_PERCENTILE && percentile <= MAX_PERCENTILE ) || percentile == -1 )
     {
         m_percentile = percentile;
     }
-    else if ( percentile == -1 )
-    {
-        m_percentile = percentile; // Allow -1 for unset/invalid percentile
-    }
     else
     {
-        // Invalid percentile value, keep as -1 (unset)
+        // Invalid percentile value, set to -1 (unset)
         m_percentile = -1;
     }
 }
