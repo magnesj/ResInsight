@@ -648,9 +648,6 @@ int RifEclipseSummaryAddress::id() const
 //--------------------------------------------------------------------------------------------------
 std::string RifEclipseSummaryAddress::uiText() const
 {
-    constexpr int MIN_PERCENTILE = 0;
-    constexpr int MAX_PERCENTILE = 100;
-
     std::string text;
 
     if ( m_isErrorResult ) text += "ERR:";
@@ -1046,7 +1043,20 @@ int RifEclipseSummaryAddress::percentile() const
 //--------------------------------------------------------------------------------------------------
 void RifEclipseSummaryAddress::setPercentile( int percentile )
 {
-    m_percentile = percentile;
+    // Validate percentile value: must be -1 (unset) or in valid range [0, 100]
+    if ( percentile >= MIN_PERCENTILE && percentile <= MAX_PERCENTILE )
+    {
+        m_percentile = percentile;
+    }
+    else if ( percentile == -1 )
+    {
+        m_percentile = percentile; // Allow -1 for unset/invalid percentile
+    }
+    else
+    {
+        // Invalid percentile value, keep as -1 (unset)
+        m_percentile = -1;
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

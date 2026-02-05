@@ -167,6 +167,10 @@ public:
     std::string                formatUiTextRegionToRegion() const;
     static std::pair<int, int> regionToRegionPairFromUiText( const std::string& s );
 
+    // Percentile constants
+    static constexpr int MIN_PERCENTILE = 0;
+    static constexpr int MAX_PERCENTILE = 100;
+
 private:
     static RifEclipseSummaryAddress fromTokens( const std::vector<std::string>& tokens );
 
