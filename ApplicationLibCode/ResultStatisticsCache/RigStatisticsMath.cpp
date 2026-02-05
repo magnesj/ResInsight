@@ -27,6 +27,20 @@
 
 //--------------------------------------------------------------------------------------------------
 /// A function to do basic statistical calculations
+///
+/// Formulas:
+///   mean = sum(x) / n
+///
+///   Standard deviation (population):
+///   stdev = sqrt((n * sum(x^2) - (sum(x))^2)) / n
+///
+///   Which is equivalent to: sqrt(sum((x - mean)^2) / n)
+///
+///   range = max - min
+///
+/// References:
+///   Standard deviation: https://en.wikipedia.org/wiki/Standard_deviation
+///   Rapid calculation method: https://en.wikipedia.org/wiki/Standard_deviation#Rapid_calculation_methods
 //--------------------------------------------------------------------------------------------------
 
 void RigStatisticsMath::calculateBasicStatistics( const std::vector<double>& values,
@@ -84,6 +98,23 @@ void RigStatisticsMath::calculateBasicStatistics( const std::vector<double>& val
     if ( dev ) *dev = m_dev;
 }
 
+//--------------------------------------------------------------------------------------------------
+/// Calculate percentiles using linear interpolation method
+///
+/// Formula:
+///   rank = percentile * (n + 1) - 1
+///
+///   If rank is not an integer:
+///     value = sorted[floor(rank)] + frac(rank) * (sorted[floor(rank)+1] - sorted[floor(rank)])
+///
+///   Where frac(rank) is the fractional part of rank
+///
+///   Valid for percentiles in range [1/(n+1), n/(n+1)]
+///
+/// References:
+///   https://en.wikipedia.org/wiki/Percentile
+///   https://en.wikipedia.org/wiki/Percentile#Third_variant,_C_=_0
+//--------------------------------------------------------------------------------------------------
 std::vector<double> RigStatisticsMath::calculatePercentiles( const std::vector<double>& values,
                                                              const std::vector<double>& pValPositions,
                                                              PercentileStyle            percentileStyle )
@@ -141,8 +172,18 @@ std::vector<double> RigStatisticsMath::calculatePercentiles( const std::vector<d
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Algorithm:
-/// https://en.wikipedia.org/wiki/Percentile#Third_variant,_'%22%60UNIQ--postMath-00000052-QINU%60%22'
+/// Calculate statistical curves (P10, P50, P90, mean)
+///
+/// Percentiles (P10, P50, P90) are calculated using linear interpolation:
+///   rank = percentile * (n + 1) - 1
+///   value = sorted[floor(rank)] + frac(rank) * (sorted[floor(rank)+1] - sorted[floor(rank)])
+///
+/// Mean is calculated as:
+///   mean = sum(x) / n
+///
+/// References:
+///   Percentiles: https://en.wikipedia.org/wiki/Percentile#Third_variant,_C_=_0
+///   P10/P50/P90: https://en.wikipedia.org/wiki/Percentile#Definitions
 //--------------------------------------------------------------------------------------------------
 void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& values,
                                                    double*                    p10,
@@ -194,6 +235,16 @@ void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& va
 /// Calculate the percentiles of /a inputValues at the pValPosition percentages using the "Nearest Rank"
 /// method. This method treats HUGE_VAL as "undefined" values, and ignores these. Will return HUGE_VAL if
 /// the inputValues does not contain any valid values
+///
+/// Formula (Nearest Rank Method):
+///   index = floor(n * percentile)
+///   value = sorted[index]
+///
+///   Note: pValPositions are expected as percentages (0-100), converted to fraction (0-1) internally
+///
+/// References:
+///   https://en.wikipedia.org/wiki/Percentile#The_nearest-rank_method
+///   https://en.wikipedia.org/wiki/Percentile#First_variant,_C_=_1/2
 //--------------------------------------------------------------------------------------------------
 
 std::vector<double> RigStatisticsMath::calculateNearestRankPercentiles( const std::vector<double>&         inputValues,
@@ -239,6 +290,20 @@ std::vector<double> RigStatisticsMath::calculateNearestRankPercentiles( const st
 /// Calculate the percentiles of /a inputValues at the pValPosition percentages by interpolating input values.
 /// This method treats HUGE_VAL as "undefined" values, and ignores these. Will return HUGE_VAL if
 /// the inputValues does not contain any valid values
+///
+/// Formula (Linear Interpolation Method):
+///   doubleIndex = (n - 1) * percentile
+///   lowerIndex = floor(doubleIndex)
+///   upperIndex = lowerIndex + 1
+///   weight = doubleIndex - lowerIndex
+///
+///   value = (1 - weight) * sorted[lowerIndex] + weight * sorted[upperIndex]
+///
+///   Note: pValPositions are expected as percentages (0-100), convert to fraction (0-1) internally
+///
+/// References:
+///   https://en.wikipedia.org/wiki/Percentile#The_linear_interpolation_between_closest_ranks_method
+///   https://en.wikipedia.org/wiki/Percentile#Second_variant,_C_=_1
 //--------------------------------------------------------------------------------------------------
 std::vector<double> RigStatisticsMath::calculateInterpolatedPercentiles( const std::vector<double>&         inputValues,
                                                                          const std::vector<double>&         pValPositions,
@@ -359,7 +424,22 @@ void RigHistogramCalculator::addData( const std::vector<float>& data )
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Calculate percentile from histogram data
 ///
+/// Formula:
+///   1. Find cumulative count up to target: targetCount = percentile * totalObservations
+///   2. Find bin where cumulative count >= targetCount
+///   3. Interpolate within bin:
+///      unusedFraction = (cumulativeCount - targetCount) / binCount
+///      value = binEndValue - unusedFraction * binWidth
+///
+///   Where:
+///     binWidth = (max - min) / numberOfBins
+///     binEndValue = min + (binIndex + 1) * binWidth
+///
+/// References:
+///   https://en.wikipedia.org/wiki/Histogram
+///   https://en.wikipedia.org/wiki/Percentile#Estimating_percentiles_from_a_histogram
 //--------------------------------------------------------------------------------------------------
 double RigHistogramCalculator::calculatePercentil( double pVal, RigStatisticsMath::PercentileStyle percentileStyle )
 {
