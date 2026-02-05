@@ -2310,10 +2310,14 @@ void RimEnsembleCurveSet::updateStatisticsCurves( const std::vector<RimSummaryCa
             if ( m_statistics->showMeanCurve() && m_ensembleStatCaseY->hasMeanData() )
                 addresses.push_back( getStatisticsAddress( RifEclipseSummaryAddressDefines::StatisticsType::MEAN, dataAddressY ) );
 
-            // Add custom percentiles (excluding standard P10/P50/P90 which are handled above)
+            // Add custom percentiles (excluding standard P10/P50/P90 if their checkbox is checked)
             for ( int p : m_statistics->allPercentiles() )
             {
-                if ( p != 10 && p != 50 && p != 90 && m_ensembleStatCaseY->hasPercentileData( p ) )
+                bool isHandledByCheckbox = ( p == 10 && m_statistics->showP10Curve() ) ||
+                                           ( p == 50 && m_statistics->showP50Curve() ) ||
+                                           ( p == 90 && m_statistics->showP90Curve() );
+
+                if ( !isHandledByCheckbox && m_ensembleStatCaseY->hasPercentileData( p ) )
                 {
                     addresses.push_back( getPercentileAddress( p, dataAddressY ) );
                 }
