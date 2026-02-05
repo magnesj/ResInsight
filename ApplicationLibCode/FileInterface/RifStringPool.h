@@ -18,7 +18,7 @@
 #pragma once
 
 #include <cstdint>
-#include <mutex>
+#include <shared_mutex>
 #include <string>
 #include <unordered_map>
 #include <vector>
@@ -49,7 +49,7 @@ private:
     RifStringPool( const RifStringPool& )            = delete;
     RifStringPool& operator=( const RifStringPool& ) = delete;
 
-    mutable std::mutex                            m_mutex;
+    mutable std::shared_mutex                     m_mutex;
     std::vector<std::string>                      m_strings;
     std::unordered_map<std::string, IndexType>    m_stringToIndex;
     IndexType                                     m_emptyIndex;

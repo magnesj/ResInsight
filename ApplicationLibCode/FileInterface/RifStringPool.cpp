@@ -45,8 +45,20 @@ RifStringPool::RifStringPool()
 //--------------------------------------------------------------------------------------------------
 RifStringPool::IndexType RifStringPool::getIndex( const std::string& str )
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    // First try with shared lock for reading
+    {
+        std::shared_lock<std::shared_mutex> lock( m_mutex );
+        auto                                it = m_stringToIndex.find( str );
+        if ( it != m_stringToIndex.end() )
+        {
+            return it->second;
+        }
+    }
 
+    // Need to insert, acquire exclusive lock
+    std::unique_lock<std::shared_mutex> lock( m_mutex );
+
+    // Double-check after acquiring exclusive lock (another thread might have inserted it)
     auto it = m_stringToIndex.find( str );
     if ( it != m_stringToIndex.end() )
     {
@@ -55,7 +67,7 @@ RifStringPool::IndexType RifStringPool::getIndex( const std::string& str )
 
     IndexType newIndex = static_cast<IndexType>( m_strings.size() );
     m_strings.push_back( str );
-    m_stringToIndex[str] = newIndex;
+    m_stringToIndex[m_strings.back()] = newIndex;
     return newIndex;
 }
 
@@ -64,7 +76,7 @@ RifStringPool::IndexType RifStringPool::getIndex( const std::string& str )
 //--------------------------------------------------------------------------------------------------
 const std::string& RifStringPool::getString( IndexType index ) const
 {
-    std::lock_guard<std::mutex> lock( m_mutex );
+    std::shared_lock<std::shared_mutex> lock( m_mutex );
 
     if ( index >= m_strings.size() )
     {

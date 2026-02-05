@@ -538,7 +538,9 @@ bool RifEclipseSummaryAddress::isHistoryVector() const
 {
     const std::string historyIdentifier = "H";
 
-    return RiaStdStringTools::endsWith( vectorName(), historyIdentifier );
+    // Optimize by using direct pool access and const reference
+    const auto& vecName = RifStringPool::instance().getString( m_vectorNameIdx );
+    return RiaStdStringTools::endsWith( vecName, historyIdentifier );
 }
 
 //--------------------------------------------------------------------------------------------------
