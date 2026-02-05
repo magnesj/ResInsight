@@ -99,6 +99,66 @@ void RigStatisticsMath::calculateBasicStatistics( const std::vector<double>& val
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Calculate statistical curves (P10, P50, P90, mean)
+///
+/// Percentiles (P10, P50, P90) are calculated using linear interpolation:
+///   rank = percentile * (n + 1) - 1
+///   value = sorted[floor(rank)] + frac(rank) * (sorted[floor(rank)+1] - sorted[floor(rank)])
+///
+/// Mean is calculated as:
+///   mean = sum(x) / n
+///
+/// References:
+///   Percentiles: https://en.wikipedia.org/wiki/Percentile#Third_variant,_C_=_0
+///   P10/P50/P90: https://en.wikipedia.org/wiki/Percentile#Definitions
+//--------------------------------------------------------------------------------------------------
+void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& values,
+                                                   double*                    p10,
+                                                   double*                    p50,
+                                                   double*                    p90,
+                                                   double*                    mean,
+                                                   PercentileStyle            percentileStyle )
+{
+    CVF_ASSERT( p10 && p50 && p90 && mean );
+
+    if ( values.empty() ) return;
+
+    // Use the vector-based implementation
+    std::vector<double> percentilePositions = { 0.1, 0.5, 0.9 };
+    std::vector<double> results             = calculatePercentiles( values, percentilePositions, percentileStyle );
+
+    if ( results.size() == 3 )
+    {
+        *p10 = results[0];
+        *p50 = results[1];
+        *p90 = results[2];
+    }
+    else
+    {
+        *p10 = HUGE_VAL;
+        *p50 = HUGE_VAL;
+        *p90 = HUGE_VAL;
+    }
+
+    // Calculate mean separately
+    std::vector<double> sortedValues = values;
+    sortedValues.erase( std::remove_if( sortedValues.begin(),
+                                        sortedValues.end(),
+                                        []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
+                        sortedValues.end() );
+
+    if ( !sortedValues.empty() )
+    {
+        double valueSum = std::accumulate( sortedValues.begin(), sortedValues.end(), 0.0 );
+        *mean           = valueSum / sortedValues.size();
+    }
+    else
+    {
+        *mean = HUGE_VAL;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Calculate percentiles using linear interpolation method
 ///
 /// Formula:
@@ -169,66 +229,6 @@ std::vector<double> RigStatisticsMath::calculatePercentiles( const std::vector<d
     }
 
     return results;
-}
-
-//--------------------------------------------------------------------------------------------------
-/// Calculate statistical curves (P10, P50, P90, mean)
-///
-/// Percentiles (P10, P50, P90) are calculated using linear interpolation:
-///   rank = percentile * (n + 1) - 1
-///   value = sorted[floor(rank)] + frac(rank) * (sorted[floor(rank)+1] - sorted[floor(rank)])
-///
-/// Mean is calculated as:
-///   mean = sum(x) / n
-///
-/// References:
-///   Percentiles: https://en.wikipedia.org/wiki/Percentile#Third_variant,_C_=_0
-///   P10/P50/P90: https://en.wikipedia.org/wiki/Percentile#Definitions
-//--------------------------------------------------------------------------------------------------
-void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& values,
-                                                   double*                    p10,
-                                                   double*                    p50,
-                                                   double*                    p90,
-                                                   double*                    mean,
-                                                   PercentileStyle            percentileStyle )
-{
-    CVF_ASSERT( p10 && p50 && p90 && mean );
-
-    if ( values.empty() ) return;
-
-    // Use the vector-based implementation
-    std::vector<double> percentilePositions = { 0.1, 0.5, 0.9 };
-    std::vector<double> results             = calculatePercentiles( values, percentilePositions, percentileStyle );
-
-    if ( results.size() == 3 )
-    {
-        *p10 = results[0];
-        *p50 = results[1];
-        *p90 = results[2];
-    }
-    else
-    {
-        *p10 = HUGE_VAL;
-        *p50 = HUGE_VAL;
-        *p90 = HUGE_VAL;
-    }
-
-    // Calculate mean separately
-    std::vector<double> sortedValues = values;
-    sortedValues.erase( std::remove_if( sortedValues.begin(),
-                                        sortedValues.end(),
-                                        []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
-                        sortedValues.end() );
-
-    if ( !sortedValues.empty() )
-    {
-        double valueSum = std::accumulate( sortedValues.begin(), sortedValues.end(), 0.0 );
-        *mean           = valueSum / sortedValues.size();
-    }
-    else
-    {
-        *mean = HUGE_VAL;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
