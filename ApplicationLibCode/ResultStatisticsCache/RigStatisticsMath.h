@@ -42,6 +42,8 @@ public:
                                            double*                    p90,
                                            double*                    mean,
                                            PercentileStyle            percentileStyle );
+    static std::vector<double>
+        calculatePercentiles( const std::vector<double>& values, const std::vector<double>& pValPositions, PercentileStyle percentileStyle );
 
     static std::vector<double> calculateNearestRankPercentiles( const std::vector<double>& inputValues,
                                                                 const std::vector<double>& pValPositions,

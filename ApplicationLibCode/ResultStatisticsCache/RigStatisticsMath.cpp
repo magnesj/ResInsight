@@ -84,6 +84,62 @@ void RigStatisticsMath::calculateBasicStatistics( const std::vector<double>& val
     if ( dev ) *dev = m_dev;
 }
 
+std::vector<double> RigStatisticsMath::calculatePercentiles( const std::vector<double>& values,
+                                                             const std::vector<double>& pValPositions,
+                                                             PercentileStyle            percentileStyle )
+{
+    std::vector<double> results;
+    if ( values.empty() || pValPositions.empty() ) return results;
+
+    std::vector<double> sortedValues = values;
+
+    sortedValues.erase( std::remove_if( sortedValues.begin(),
+                                        sortedValues.end(),
+                                        []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
+                        sortedValues.end() );
+
+    if ( sortedValues.empty() ) return results;
+
+    std::sort( sortedValues.begin(), sortedValues.end() );
+
+    int valueCount = (int)sortedValues.size();
+    results.reserve( pValPositions.size() );
+
+    for ( size_t i = 0; i < pValPositions.size(); ++i )
+    {
+        double percentile = pValPositions[i];
+
+        if ( percentileStyle == PercentileStyle::SWITCHED )
+        {
+            percentile = 1.0 - percentile;
+        }
+
+        double pValue = HUGE_VAL;
+
+        // Check valid params
+        if ( percentile >= 1.0 / ( (double)valueCount + 1 ) && percentile <= (double)valueCount / ( (double)valueCount + 1 ) )
+        {
+            double rank = percentile * ( valueCount + 1 ) - 1;
+            double rankRem;
+            double rankFrac = std::modf( rank, &rankRem );
+            int    rankInt  = static_cast<int>( rankRem );
+
+            if ( rankInt < valueCount - 1 )
+            {
+                pValue = sortedValues[rankInt] + rankFrac * ( sortedValues[rankInt + 1] - sortedValues[rankInt] );
+            }
+            else
+            {
+                pValue = sortedValues.back();
+            }
+        }
+
+        results.push_back( pValue );
+    }
+
+    return results;
+}
+
 //--------------------------------------------------------------------------------------------------
 /// Algorithm:
 /// https://en.wikipedia.org/wiki/Percentile#Third_variant,_'%22%60UNIQ--postMath-00000052-QINU%60%22'
@@ -99,64 +155,39 @@ void RigStatisticsMath::calculateStatisticsCurves( const std::vector<double>& va
 
     if ( values.empty() ) return;
 
-    enum PValue
+    // Use the vector-based implementation
+    std::vector<double> percentilePositions = { 0.1, 0.5, 0.9 };
+    std::vector<double> results             = calculatePercentiles( values, percentilePositions, percentileStyle );
+
+    if ( results.size() == 3 )
     {
-        P10,
-        P50,
-        P90
-    };
+        *p10 = results[0];
+        *p50 = results[1];
+        *p90 = results[2];
+    }
+    else
+    {
+        *p10 = HUGE_VAL;
+        *p50 = HUGE_VAL;
+        *p90 = HUGE_VAL;
+    }
 
+    // Calculate mean separately
     std::vector<double> sortedValues = values;
-
     sortedValues.erase( std::remove_if( sortedValues.begin(),
                                         sortedValues.end(),
                                         []( double x ) { return !RiaStatisticsTools::isValidNumber( x ); } ),
                         sortedValues.end() );
 
-    std::sort( sortedValues.begin(), sortedValues.end() );
-
-    double valueSum = std::accumulate( sortedValues.begin(), sortedValues.end(), 0.0 );
-
-    int    valueCount    = (int)sortedValues.size();
-    double percentiles[] = { 0.1, 0.5, 0.9 };
-    double pValues[]     = { HUGE_VAL, HUGE_VAL, HUGE_VAL };
-
-    for ( int i = P10; i <= P90; i++ )
+    if ( !sortedValues.empty() )
     {
-        // Check valid params
-        if ( ( percentiles[i] < 1.0 / ( (double)valueCount + 1 ) ) || ( percentiles[i] > (double)valueCount / ( (double)valueCount + 1 ) ) )
-            continue;
-
-        double rank = percentiles[i] * ( valueCount + 1 ) - 1;
-        double rankRem;
-        double rankFrac = std::modf( rank, &rankRem );
-        int    rankInt  = static_cast<int>( rankRem );
-
-        if ( rankInt < valueCount - 1 )
-        {
-            pValues[i] = sortedValues[rankInt] + rankFrac * ( sortedValues[rankInt + 1] - sortedValues[rankInt] );
-        }
-        else
-        {
-            pValues[i] = sortedValues.back();
-        }
-    }
-
-    *p50 = pValues[P50];
-
-    if ( percentileStyle == PercentileStyle::REGULAR )
-    {
-        *p10 = pValues[P10];
-        *p90 = pValues[P90];
+        double valueSum = std::accumulate( sortedValues.begin(), sortedValues.end(), 0.0 );
+        *mean           = valueSum / sortedValues.size();
     }
     else
     {
-        CVF_ASSERT( percentileStyle == PercentileStyle::SWITCHED );
-        *p10 = pValues[P90];
-        *p90 = pValues[P10];
+        *mean = HUGE_VAL;
     }
-
-    *mean = valueSum / valueCount;
 }
 
 //--------------------------------------------------------------------------------------------------
