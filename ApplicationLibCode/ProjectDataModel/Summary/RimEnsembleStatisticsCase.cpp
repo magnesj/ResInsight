@@ -87,44 +87,40 @@ std::pair<bool, std::vector<double>> RimEnsembleStatisticsCase::values( const Ri
 {
     if ( resultAddress.isErrorResult() ) return { true, {} };
 
+    if ( resultAddress.statisticsType() == RifEclipseSummaryAddressDefines::StatisticsType::MEAN )
+    {
+        return { true, m_meanData };
+    }
+
+    int percentile = -1;
     switch ( resultAddress.statisticsType() )
     {
         case RifEclipseSummaryAddressDefines::StatisticsType::P10:
-        {
-            auto it = m_percentileData.find( 10 );
-            if ( it != m_percentileData.end() ) return { true, it->second };
-            return { true, {} };
-        }
+            percentile = 10;
+            break;
         case RifEclipseSummaryAddressDefines::StatisticsType::P50:
-        {
-            auto it = m_percentileData.find( 50 );
-            if ( it != m_percentileData.end() ) return { true, it->second };
-            return { true, {} };
-        }
+            percentile = 50;
+            break;
         case RifEclipseSummaryAddressDefines::StatisticsType::P90:
-        {
-            auto it = m_percentileData.find( 90 );
-            if ( it != m_percentileData.end() ) return { true, it->second };
-            return { true, {} };
-        }
-        case RifEclipseSummaryAddressDefines::StatisticsType::MEAN:
-            return { true, m_meanData };
+            percentile = 90;
+            break;
         case RifEclipseSummaryAddressDefines::StatisticsType::CUSTOM:
-        {
-            int percentile = resultAddress.percentile();
-            if ( percentile >= RifEclipseSummaryAddress::MIN_PERCENTILE && percentile <= RifEclipseSummaryAddress::MAX_PERCENTILE )
-            {
-                auto it = m_percentileData.find( percentile );
-                if ( it != m_percentileData.end() )
-                {
-                    return { true, it->second };
-                }
-            }
-            return { true, {} };
-        }
+            percentile = resultAddress.percentile();
+            break;
         default:
             return { true, {} };
     }
+
+    if ( percentile >= RifEclipseSummaryAddress::MIN_PERCENTILE && percentile <= RifEclipseSummaryAddress::MAX_PERCENTILE )
+    {
+        auto it = m_percentileData.find( percentile );
+        if ( it != m_percentileData.end() )
+        {
+            return { true, it->second };
+        }
+    }
+
+    return { true, {} };
 }
 
 //--------------------------------------------------------------------------------------------------
