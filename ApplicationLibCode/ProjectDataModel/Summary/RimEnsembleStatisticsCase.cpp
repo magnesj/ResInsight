@@ -262,13 +262,11 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
         std::vector<double> percentilePositions;
         for ( int p : percentiles )
         {
-            percentilePositions.push_back( static_cast<double>( p ) );
+            percentilePositions.push_back( static_cast<double>( p ) / 100.0 );
         }
 
         std::vector<double> percentileValues =
-            RigStatisticsMath::calculateInterpolatedPercentiles( valuesAtTimeStep,
-                                                                 percentilePositions,
-                                                                 RigStatisticsMath::PercentileStyle::SWITCHED );
+            RigStatisticsMath::calculatePercentiles( valuesAtTimeStep, percentilePositions, RigStatisticsMath::PercentileStyle::SWITCHED );
 
         for ( size_t i = 0; i < percentiles.size(); i++ )
         {
