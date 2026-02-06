@@ -21,7 +21,10 @@
 #include "RiaCurveMerger.h"
 #include "RiaLogging.h"
 #include "RiaQDateTimeTools.h"
+#include "RiaStdStringTools.h"
 #include "Summary/RiaSummaryTools.h"
+
+#include "RifEclipseSummaryAddressDefines.h"
 
 #include "RimDeltaSummaryEnsemble.h"
 #include "RimProject.h"
@@ -58,6 +61,26 @@ void caf::AppEnum<RimDeltaSummaryCase::FixedTimeStepMode>::setUp()
 CAF_PDM_SOURCE_INIT( RimDeltaSummaryCase, "RimDeltaSummaryCase", "RimDerivedEnsembleCase" );
 
 //--------------------------------------------------------------------------------------------------
+/// Helper function to get base address by stripping _DIFF suffix if present
+//--------------------------------------------------------------------------------------------------
+static RifEclipseSummaryAddress getBaseAddress( const RifEclipseSummaryAddress& address )
+{
+    auto vectorName     = address.vectorName();
+    auto stringToRemove = RifEclipseSummaryAddressDefines::differenceIdentifier();
+
+    if ( RiaStdStringTools::endsWith( vectorName, stringToRemove ) )
+    {
+        vectorName = vectorName.substr( 0, vectorName.size() - stringToRemove.size() );
+
+        auto baseAddress = address;
+        baseAddress.setVectorName( vectorName );
+        return baseAddress;
+    }
+
+    return address;
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::string RimDeltaSummaryCase::unitName( const RifEclipseSummaryAddress& resultAddress ) const
@@ -75,17 +98,20 @@ std::vector<time_t> RimDeltaSummaryCase::timeSteps( const RifEclipseSummaryAddre
         return {};
     }
 
-    if ( needsCalculation( resultAddress ) )
+    // Strip _DIFF suffix if present to get the base address for cache lookup
+    auto baseAddress = getBaseAddress( resultAddress );
+
+    if ( needsCalculation( baseAddress ) )
     {
-        calculate( resultAddress );
+        calculate( baseAddress );
     }
 
-    if ( m_dataCache.count( resultAddress ) == 0 )
+    if ( m_dataCache.count( baseAddress ) == 0 )
     {
         return {};
     }
 
-    return m_dataCache.at( resultAddress ).first;
+    return m_dataCache.at( baseAddress ).first;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -94,6 +120,9 @@ std::vector<time_t> RimDeltaSummaryCase::timeSteps( const RifEclipseSummaryAddre
 std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclipseSummaryAddress& resultAddress ) const
 {
     if ( !resultAddress.isValid() ) return { false, {} };
+
+    // Strip _DIFF suffix if present to get the base address for calculations
+    auto baseAddress = getBaseAddress( resultAddress );
 
     if ( auto deltaEnsemble = firstAncestorOfType<RimDeltaSummaryEnsemble>() )
     {
@@ -104,9 +133,9 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
 
             if ( !reader1 || !reader2 ) return { false, {} };
 
-            if ( !reader1->hasAddress( resultAddress ) || !reader2->hasAddress( resultAddress ) )
+            if ( !reader1->hasAddress( baseAddress ) || !reader2->hasAddress( baseAddress ) )
             {
-                QString txt = "Summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
+                QString txt = "Summary vector " + QString::fromStdString( baseAddress.toEclipseTextAddress() ) +
                               " is only present in one of the source ensembles, no values are calculated for this vector.";
 
                 RiaLogging::warning( txt );
@@ -116,12 +145,12 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
         }
     }
 
-    if ( needsCalculation( resultAddress ) )
+    if ( needsCalculation( baseAddress ) )
     {
-        calculate( resultAddress );
+        calculate( baseAddress );
     }
 
-    if ( m_dataCache.count( resultAddress ) == 0 )
+    if ( m_dataCache.count( baseAddress ) == 0 )
     {
         return { false, {} };
     }
@@ -132,7 +161,7 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
         {
             auto ensembleTimeSteps = deltaEnsemble->ensembleTimeSteps();
 
-            auto caseTimeSteps = m_dataCache.at( resultAddress ).first;
+            auto caseTimeSteps = m_dataCache.at( baseAddress ).first;
 
             if ( !ensembleTimeSteps.empty() && !caseTimeSteps.empty() )
             {
@@ -145,7 +174,7 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
 
                 if ( *caseTimeSteps.rbegin() < timeThreshold )
                 {
-                    QString txt = "Delta for summary vector " + QString::fromStdString( resultAddress.toEclipseTextAddress() ) +
+                    QString txt = "Delta for summary vector " + QString::fromStdString( baseAddress.toEclipseTextAddress() ) +
                                   ": One or both source realizations are incomplete, no values are calculated.";
 
                     RiaLogging::warning( txt );
@@ -156,7 +185,7 @@ std::pair<bool, std::vector<double>> RimDeltaSummaryCase::values( const RifEclip
         }
     }
 
-    return { true, m_dataCache.at( resultAddress ).second };
+    return { true, m_dataCache.at( baseAddress ).second };
 }
 
 //--------------------------------------------------------------------------------------------------
