@@ -22,6 +22,7 @@
 
 #include "SummaryPlotCommands/RicNewDerivedEnsembleFeature.h"
 
+#include "RifEclipseSummaryAddressDefines.h"
 #include "RifSummaryReaderInterface.h"
 
 #include "RimDeltaSummaryCase.h"
@@ -145,6 +146,17 @@ std::set<RifEclipseSummaryAddress> RimDeltaSummaryEnsemble::ensembleSummaryAddre
     addresses   = m_ensemble1->ensembleSummaryAddresses();
     auto addrs2 = m_ensemble2->ensembleSummaryAddresses();
     addresses.insert( addrs2.begin(), addrs2.end() );
+
+    // Add _DIFF versions of all common addresses
+    std::set<RifEclipseSummaryAddress> diffAddresses;
+    for ( const auto& addr : addresses )
+    {
+        auto diffAddr = addr;
+        diffAddr.setVectorName( addr.vectorName() + RifEclipseSummaryAddressDefines::differenceIdentifier() );
+        diffAddresses.insert( diffAddr );
+    }
+    addresses.insert( diffAddresses.begin(), diffAddresses.end() );
+
     return addresses;
 }
 
