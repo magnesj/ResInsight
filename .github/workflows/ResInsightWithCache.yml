@@ -190,9 +190,10 @@ jobs:
           setup-python: false
           modules: "qtnetworkauth"
 
-      - name: vcpkg bootstrap
-        run: |
-          ThirdParty/vcpkg/${{ matrix.config.vcpkg-bootstrap }}
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/ThirdParty/vcpkg'
 
       - name: Print CMake version
         shell: bash
@@ -203,26 +204,11 @@ jobs:
            EXEC_PATH=$(which cmake)
          fi
          echo "Executable path: $EXEC_PATH"
-         "$EXEC_PATH" --version    
-
-      - name: Check vcpkg secrets
-        shell: bash
-        run: |
-          if [ -z "${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}" ]; then
-            echo "Error: AZURE_VCPKG_STORAGE_ACCOUNT secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.AZURE_VCPKG_SAS_TOKEN }}" ]; then
-            echo "Error: AZURE_VCPKG_SAS_TOKEN secret is not set"
-            exit 1
-          fi
-          echo "All required vcpkg secrets are present"
+         "$EXEC_PATH" --version
 
       - name: Configure
         shell: bash
         env:
-          VCPKG_FEATURE_FLAGS: "binarycaching"
-          VCPKG_BINARY_SOURCES: "clear;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
         run: >

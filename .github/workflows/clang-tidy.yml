@@ -12,9 +12,6 @@ on:
     # Once every night
     - cron: "0 1 * * *"
 
-env:
-  VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
-
 jobs:
   ResInsight-clang-tidy:
     runs-on: ubuntu-24.04
@@ -38,13 +35,12 @@ jobs:
           cache: true
           modules: "qtnetworkauth"
 
-      - name: vcpkg bootstrap
-        run: ThirdParty/vcpkg/bootstrap-vcpkg.sh
+      - name: Setup vcpkg
+        uses: lukka/run-vcpkg@v11
+        with:
+          vcpkgDirectory: '${{ github.workspace }}/ThirdParty/vcpkg'
   
       - name: Create compile commands and run clang-tidy
-        env:
-          VCPKG_FEATURE_FLAGS: "binarycaching"
-          VCPKG_BINARY_SOURCES: "clear;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
         run: |
           mkdir build
           cd build
