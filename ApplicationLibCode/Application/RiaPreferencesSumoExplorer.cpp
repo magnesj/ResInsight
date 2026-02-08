@@ -18,9 +18,9 @@
 
 #include "RiaPreferencesSumoExplorer.h"
 
+#include "Cloud/RiaSumoExplorerDefines.h"
 #include "RiaApplication.h"
 #include "RiaPreferences.h"
-#include "Cloud/RiaSumoExplorerDefines.h"
 
 #include "cafPdmUiOrdering.h"
 

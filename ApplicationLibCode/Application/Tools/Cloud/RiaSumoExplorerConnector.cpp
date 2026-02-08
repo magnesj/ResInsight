@@ -143,7 +143,9 @@ bool RiaSumoExplorerConnector::startServer()
             }
         }
 
-        setError( QString( "Sumo Explorer server failed to become ready after 10 seconds. Check that uvicorn and required packages are installed (run: pip install -r %1/Python/sumo_explorer_server/requirements.txt)" ).arg( appPath ) );
+        setError( QString( "Sumo Explorer server failed to become ready after 10 seconds. Check that uvicorn and required packages are "
+                           "installed (run: pip install -r %1/Python/sumo_explorer_server/requirements.txt)" )
+                      .arg( appPath ) );
         stopServer();
         return false;
     }
