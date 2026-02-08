@@ -47,7 +47,9 @@ class SummaryDataResponse(BaseModel):
 
     case_id: str = Field(..., description="Case identifier")
     ensemble_name: str = Field(..., description="Ensemble name")
-    vector_name: Optional[str] = Field(None, description="Vector name (if single vector)")
+    vector_name: Optional[str] = Field(
+        None, description="Vector name (if single vector)"
+    )
     data_base64: str = Field(..., description="Base64-encoded parquet data")
     row_count: int = Field(..., description="Number of rows in the data")
 
@@ -72,5 +74,7 @@ class StatusResponse(BaseModel):
     """Sumo connection status response"""
 
     connected: bool = Field(..., description="Whether connected to Sumo")
-    environment: Optional[str] = Field(None, description="Sumo environment (e.g., 'prod')")
+    environment: Optional[str] = Field(
+        None, description="Sumo environment (e.g., 'prod')"
+    )
     error: Optional[str] = Field(None, description="Error message if not connected")
