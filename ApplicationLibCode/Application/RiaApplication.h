@@ -270,8 +270,8 @@ protected:
     std::optional<int> m_logLevelFromCommandLine;
 
 private:
-    static RiaApplication*              s_riaApplication;
-    QPointer<RiaOsduConnector>          m_osduConnector;
-    QPointer<RiaSumoConnector>          m_sumoConnector;
-    QPointer<RiaSumoExplorerConnector>  m_sumoExplorerConnector;
+    static RiaApplication*             s_riaApplication;
+    QPointer<RiaOsduConnector>         m_osduConnector;
+    QPointer<RiaSumoConnector>         m_sumoConnector;
+    QPointer<RiaSumoExplorerConnector> m_sumoExplorerConnector;
 };
