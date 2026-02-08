@@ -236,9 +236,7 @@ class SumoClientWrapper:
 
             # Get realizations
             realizations = iteration.realizations
-            return [
-                RealizationInfo(realization_id=real_id) for real_id in realizations
-            ]
+            return [RealizationInfo(realization_id=real_id) for real_id in realizations]
         except Exception as e:
             logger.error(
                 f"Failed to get realizations for case {case_id}, ensemble {ensemble_name}: {e}"
@@ -350,7 +348,5 @@ class SumoClientWrapper:
             df.to_parquet(buffer, index=False)
             return buffer.getvalue()
         except Exception as e:
-            logger.error(
-                f"Failed to get parameters for {case_id}/{ensemble_name}: {e}"
-            )
+            logger.error(f"Failed to get parameters for {case_id}/{ensemble_name}: {e}")
             return b""

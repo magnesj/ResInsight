@@ -197,7 +197,9 @@ async def get_summary_data(
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Failed to get summary data for {case_id}/{ensemble}/{vector}: {e}")
+        logger.error(
+            f"Failed to get summary data for {case_id}/{ensemble}/{vector}: {e}"
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -243,7 +245,10 @@ def main():
         "--port", type=int, default=54527, help="Port to listen on (default: 54527)"
     )
     parser.add_argument(
-        "--host", type=str, default="127.0.0.1", help="Host to bind to (default: 127.0.0.1)"
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="Host to bind to (default: 127.0.0.1)",
     )
     args = parser.parse_args()
 
