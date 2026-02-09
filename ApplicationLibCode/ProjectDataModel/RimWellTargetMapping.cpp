@@ -37,12 +37,12 @@
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseCaseEnsemble.h"
-#include "RimReservoirGridEnsemble.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipsePropertyFilterCollection.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimEclipseView.h"
 #include "RimRegularGridCase.h"
+#include "RimReservoirGridEnsemble.h"
 #include "RimTools.h"
 
 #include "cafPdmUiDoubleSliderEditor.h"
@@ -551,12 +551,10 @@ std::vector<double> RimWellTargetMapping::getVisibilityFilter() const
 RimEclipseCase* RimWellTargetMapping::firstCase() const
 {
     auto ensemble = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>();
-    if ( ensemble && !ensemble->cases().empty() )
-        return ensemble->cases()[0];
+    if ( ensemble && !ensemble->cases().empty() ) return ensemble->cases()[0];
 
     auto reservoirGridEnsemble = firstAncestorOrThisOfType<RimReservoirGridEnsemble>();
-    if ( reservoirGridEnsemble && !reservoirGridEnsemble->cases().empty() )
-        return reservoirGridEnsemble->cases()[0];
+    if ( reservoirGridEnsemble && !reservoirGridEnsemble->cases().empty() ) return reservoirGridEnsemble->cases()[0];
 
     return firstAncestorOrThisOfType<RimEclipseCase>();
 }

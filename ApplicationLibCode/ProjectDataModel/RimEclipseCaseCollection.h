@@ -48,10 +48,10 @@ public:
     RimEclipseCaseCollection();
     ~RimEclipseCaseCollection() override;
 
-    caf::PdmChildArrayField<RimEclipseCase*>              cases;
-    caf::PdmChildArrayField<RimIdenticalGridCaseGroup*>   caseGroups;
-    caf::PdmChildArrayField<RimEclipseCaseEnsemble*>      caseEnsembles;
-    caf::PdmChildArrayField<RimReservoirGridEnsemble*>    reservoirGridEnsembles;
+    caf::PdmChildArrayField<RimEclipseCase*>            cases;
+    caf::PdmChildArrayField<RimIdenticalGridCaseGroup*> caseGroups;
+    caf::PdmChildArrayField<RimEclipseCaseEnsemble*>    caseEnsembles;
+    caf::PdmChildArrayField<RimReservoirGridEnsemble*>  reservoirGridEnsembles;
 
     void close();
 
