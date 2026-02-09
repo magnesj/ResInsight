@@ -376,8 +376,7 @@ QList<caf::PdmOptionItemInfo> RimWellLogFormationSettings::calculateValueOptions
 
                 for ( const auto& level : formations->formationsLevelsPresent() )
                 {
-                    RiaDefines::WellLogTrackFormationLevel enumLevel = static_cast<RiaDefines::WellLogTrackFormationLevel>( level );
-                    options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( enumLevel ), enumLevel ) );
+                    options.push_back( caf::PdmOptionItemInfo( FormationLevelEnum::uiText( level ), level ) );
                 }
             }
         }

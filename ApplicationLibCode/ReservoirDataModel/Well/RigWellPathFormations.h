@@ -21,6 +21,7 @@
 #include "cvfMath.h"
 #include "cvfObject.h"
 
+#include "RiaWellLogTrackDefines.h"
 #include "RimWellLogPlot.h"
 
 #include <map>
@@ -44,24 +45,7 @@ struct RigWellPathFormation
 class RigWellPathFormations : public cvf::Object
 {
 public:
-    enum FormationLevel
-    {
-        GROUP,
-        LEVEL0,
-        LEVEL1,
-        LEVEL2,
-        LEVEL3,
-        LEVEL4,
-        LEVEL5,
-        LEVEL6,
-        LEVEL7,
-        LEVEL8,
-        LEVEL9,
-        LEVEL10,
-        ALL,
-        UNKNOWN,
-        NONE
-    };
+    using FormationLevel = RiaDefines::WellLogTrackFormationLevel;
 
 public:
     RigWellPathFormations( const std::vector<RigWellPathFormation>& formations, const QString& filePath, const QString& key );
