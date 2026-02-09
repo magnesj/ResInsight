@@ -1819,8 +1819,8 @@ void RimWellLogTrack::initAfterRead()
         m_resultDefinition->setEclipseCase( dynamic_cast<RimEclipseCase*>( eclipseCase ) );
     }
 
-    // Migrate property axis settings from obsolete fields (pre-2026.04)
-    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2026.04" ) )
+    // Migrate property axis settings from obsolete fields (pre-2025.12.0)
+    if ( RimProject::current()->isProjectFileVersionEqualOrOlderThan( "2025.12.0" ) )
     {
         m_propertyAxisSettings->setEnabled( m_isPropertyAxisEnabled_OBSOLETE() );
         m_propertyAxisSettings->setVisibleRange( m_visiblePropertyValueRangeMin_OBSOLETE(), m_visiblePropertyValueRangeMax_OBSOLETE() );
