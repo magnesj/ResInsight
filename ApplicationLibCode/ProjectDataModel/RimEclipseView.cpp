@@ -1626,8 +1626,7 @@ void RimEclipseView::updateLegendRangesTextAndVisibility( RimRegularLegendConfig
         nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( legendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
     }
 
-    RigCaseCellResultsData* cellResultsData = eclResultDef->currentGridCellResults();
-    if ( cellResultsData )
+    if ( RigCaseCellResultsData* cellResultsData = eclResultDef->currentGridCellResults() )
     {
         size_t maxTimeStepCount = cellResultsData->maxTimeStepCount();
         if ( eclResultDef->isTernarySaturationSelected() && maxTimeStepCount > 1 )
@@ -1635,7 +1634,8 @@ void RimEclipseView::updateLegendRangesTextAndVisibility( RimRegularLegendConfig
             if ( ternaryLegendConfig->showLegend() && ternaryLegendConfig->titledOverlayFrame() )
             {
                 ternaryLegendConfig->setTitle( legendHeading );
-                nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
+                nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(),
+                                                                            isUsingOverrideViewer() );
             }
         }
     }
