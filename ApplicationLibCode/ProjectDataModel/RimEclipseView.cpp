@@ -1658,6 +1658,14 @@ RimEclipseCase* RimEclipseView::eclipseCase() const
 }
 
 //--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseView::setEclipseCaseProvider( std::function<std::vector<RimEclipseCase*>()> provider )
+{
+    m_eclipseCaseProvider = provider;
+}
+
+//--------------------------------------------------------------------------------------------------
 //
 /*
     wells vs wellres
@@ -2088,7 +2096,18 @@ QList<caf::PdmOptionItemInfo> RimEclipseView::calculateValueOptions( const caf::
     {
         QList<caf::PdmOptionItemInfo> options;
 
-        for ( auto eclCase : RimEclipseCaseTools::allEclipseGridCases() )
+        // Use callback if provided, otherwise use global case list
+        std::vector<RimEclipseCase*> availableCases;
+        if ( m_eclipseCaseProvider )
+        {
+            availableCases = m_eclipseCaseProvider();
+        }
+        else
+        {
+            availableCases = RimEclipseCaseTools::allEclipseGridCases();
+        }
+
+        for ( auto eclCase : availableCases )
         {
             options.push_back( caf::PdmOptionItemInfo( eclCase->caseUserDescription(), eclCase, false, eclCase->uiIconProvider() ) );
         }
