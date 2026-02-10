@@ -18,15 +18,11 @@
 
 #include "RicCreateReservoirGridEnsembleFromFileSetFeature.h"
 
-#include "RiaImportEclipseCaseTools.h"
 #include "RiaLogging.h"
-
-#include "RifReaderOpmCommon.h"
 
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
 #include "RimEclipseCaseCollection.h"
 #include "RimEclipseView.h"
-#include "RimIdenticalGridCaseGroup.h"
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimReservoirGridEnsemble.h"
@@ -91,81 +87,31 @@ void RicCreateReservoirGridEnsembleFromFileSetFeature::onActionTriggered( bool i
             continue;
         }
 
-        // Read grid dimensions from all files to determine if they are identical
-        bool                                            allGridsIdentical = true;
-        RifReaderOpmCommon::GridDimensions              firstGridDimensions;
-        std::vector<RifReaderOpmCommon::GridDimensions> allGridDimensions;
+        // Always create RimReservoirGridEnsemble
+        RiaLogging::info(
+            QString( "Creating Reservoir Grid Ensemble for '%1' with %2 grid files." ).arg( fileSet->name() ).arg( gridFiles.size() ) );
 
+        RimReservoirGridEnsemble* gridEnsemble = new RimReservoirGridEnsemble();
+        gridEnsemble->setEnsembleFileSet( fileSet );
+        gridEnsemble->createGridCasesFromEnsembleFileSet();
+
+        project->assignIdToCaseGroup( gridEnsemble );
+        eclipseCaseColl->reservoirGridEnsembles.push_back( gridEnsemble );
+
+        gridEnsemble->loadDataAndUpdate();
+
+        // Create view for first case if available
+        auto allCases = gridEnsemble->cases();
+        if ( !allCases.empty() )
         {
-            caf::ProgressInfo progress( gridFiles.size(), QString( "Reading grid dimensions for %1 files" ).arg( gridFiles.size() ) );
-
-            for ( int i = 0; i < gridFiles.size(); i++ )
+            RimEclipseView* view = gridEnsemble->addViewForCase( allCases[0] );
+            if ( view )
             {
-                progress.setProgressDescription( QString( "Reading dimensions: %1" ).arg( gridFiles[i] ) );
-
-                auto gridDimensions = RifReaderOpmCommon::readGridDimensions( gridFiles[i] );
-
-                if ( i == 0 )
-                {
-                    firstGridDimensions = gridDimensions;
-                }
-                else
-                {
-                    if ( gridDimensions.i != firstGridDimensions.i || gridDimensions.j != firstGridDimensions.j ||
-                         gridDimensions.k != firstGridDimensions.k )
-                    {
-                        allGridsIdentical = false;
-                    }
-                }
-
-                allGridDimensions.push_back( gridDimensions );
-
-                progress.incrementProgress();
+                view->loadDataAndUpdate();
             }
         }
 
-        if ( allGridsIdentical )
-        {
-            // All grids have identical dimensions - use RimIdenticalGridCaseGroup
-            RiaLogging::info( QString( "All %1 grids in '%2' have identical dimensions. Creating Identical Grid Case Group." )
-                                  .arg( gridFiles.size() )
-                                  .arg( fileSet->name() ) );
-
-            RimIdenticalGridCaseGroup* gridCaseGroup = nullptr;
-            RiaImportEclipseCaseTools::addEclipseCases( gridFiles, &gridCaseGroup );
-
-            if ( gridCaseGroup )
-            {
-                gridCaseGroup->name = fileSet->name();
-                Riu3DMainWindowTools::selectAsCurrentItem( gridCaseGroup );
-            }
-        }
-        else
-        {
-            // Grids have different dimensions - use RimReservoirGridEnsemble
-            RiaLogging::info( QString( "Grids in '%1' have varying dimensions. Creating Reservoir Grid Ensemble." ).arg( fileSet->name() ) );
-
-            RimReservoirGridEnsemble* gridEnsemble = new RimReservoirGridEnsemble();
-            gridEnsemble->setEnsembleFileSet( fileSet );
-
-            project->assignIdToCaseGroup( gridEnsemble );
-            eclipseCaseColl->reservoirGridEnsembles.push_back( gridEnsemble );
-
-            gridEnsemble->loadDataAndUpdate();
-
-            // Create view for first case if available
-            auto allCases = gridEnsemble->cases();
-            if ( !allCases.empty() )
-            {
-                RimEclipseView* view = gridEnsemble->addViewForCase( allCases[0] );
-                if ( view )
-                {
-                    view->loadDataAndUpdate();
-                }
-            }
-
-            Riu3DMainWindowTools::selectAsCurrentItem( gridEnsemble );
-        }
+        Riu3DMainWindowTools::selectAsCurrentItem( gridEnsemble );
     }
 
     eclipseCaseColl->updateAllRequiredEditors();
