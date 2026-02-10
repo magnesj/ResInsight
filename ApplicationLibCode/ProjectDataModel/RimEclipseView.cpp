@@ -1635,7 +1635,8 @@ void RimEclipseView::updateLegendRangesTextAndVisibility( RimRegularLegendConfig
             if ( ternaryLegendConfig->showLegend() && ternaryLegendConfig->titledOverlayFrame() )
             {
                 ternaryLegendConfig->setTitle( legendHeading );
-                nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
+                nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(),
+                                                                            isUsingOverrideViewer() );
             }
         }
     }
