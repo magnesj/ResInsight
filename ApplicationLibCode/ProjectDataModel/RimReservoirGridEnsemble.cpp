@@ -21,6 +21,7 @@
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 
+#include "RifReaderOpmCommon.h"
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
@@ -49,6 +50,18 @@
 
 CAF_PDM_SOURCE_INIT( RimReservoirGridEnsemble, "RimReservoirGridEnsemble" );
 
+namespace caf
+{
+template <>
+void caf::AppEnum<RimReservoirGridEnsemble::GridModeType>::setUp()
+{
+    addItem( RimReservoirGridEnsemble::GridModeType::AUTO_DETECT, "AutoDetect", "Auto Detect" );
+    addItem( RimReservoirGridEnsemble::GridModeType::SHARED_GRID, "SharedGrid", "Shared Grid" );
+    addItem( RimReservoirGridEnsemble::GridModeType::INDIVIDUAL_GRIDS, "IndividualGrids", "Individual Grids" );
+    setDefault( RimReservoirGridEnsemble::GridModeType::AUTO_DETECT );
+}
+} // namespace caf
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -69,13 +82,13 @@ RimReservoirGridEnsemble::RimReservoirGridEnsemble()
     CAF_PDM_InitFieldNoDefault( &m_ensembleFileSet, "EnsembleFileSet", "Ensemble File Set" );
     m_ensembleFileSet.uiCapability()->setUiReadOnly( true );
 
-    CAF_PDM_InitField( &m_hasIdenticalGrids, "HasIdenticalGrids", false, "Identical Grids" );
-    m_hasIdenticalGrids.uiCapability()->setUiReadOnly( true );
+    CAF_PDM_InitField( &m_gridMode, "GridMode", GridModeType::AUTO_DETECT, "Grid Mode" );
 
     CAF_PDM_InitFieldNoDefault( &m_caseCollection, "CaseCollection", "Source Cases" );
     m_caseCollection = new RimCaseCollection;
     m_caseCollection->uiCapability()->setUiName( "Realizations" );
     m_caseCollection->uiCapability()->setUiIconFromResourceString( ":/Cases16x16.png" );
+    m_caseCollection.xmlCapability()->disableIO();
 
     CAF_PDM_InitFieldNoDefault( &m_statisticsCaseCollection, "StatisticsCaseCollection", "Statistics Cases" );
     m_statisticsCaseCollection = new RimCaseCollection;
@@ -84,6 +97,7 @@ RimReservoirGridEnsemble::RimReservoirGridEnsemble()
 
     CAF_PDM_InitFieldNoDefault( &m_viewCollection, "ViewCollection", "Views" );
     m_viewCollection = new RimEclipseViewCollection;
+    m_viewCollection->setEclipseCaseProvider( [this]() { return this->cases(); } );
 
     CAF_PDM_InitFieldNoDefault( &m_wellTargetMappings, "WellTargetMappings", "Well Target Mappings" );
     CAF_PDM_InitFieldNoDefault( &m_statisticsContourMaps, "StatisticsContourMaps", "Statistics Contour Maps" );
@@ -171,7 +185,7 @@ void RimReservoirGridEnsemble::addCase( RimEclipseCase* reservoir )
     {
         m_mainGrid = reservoir->eclipseCaseData()->mainGrid();
     }
-    else if ( m_hasIdenticalGrids && reservoir->eclipseCaseData() )
+    else if ( hasSharedGrid() && reservoir->eclipseCaseData() )
     {
         // Share the main grid for identical grids
         reservoir->eclipseCaseData()->setMainGrid( m_mainGrid );
@@ -266,9 +280,33 @@ RimEclipseCase* RimReservoirGridEnsemble::findByFileName( const QString& gridFil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RimReservoirGridEnsemble::hasIdenticalGrids() const
+bool RimReservoirGridEnsemble::hasSharedGrid() const
 {
-    return m_hasIdenticalGrids;
+    return m_gridMode.v() == GridModeType::SHARED_GRID;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimReservoirGridEnsemble::isGridDataLoaded() const
+{
+    return m_mainGrid != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimReservoirGridEnsemble::GridModeType RimReservoirGridEnsemble::effectiveGridMode() const
+{
+    return m_gridMode.v();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::setGridMode( GridModeType mode )
+{
+    m_gridMode = mode;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -276,50 +314,13 @@ bool RimReservoirGridEnsemble::hasIdenticalGrids() const
 //--------------------------------------------------------------------------------------------------
 RigMainGrid* RimReservoirGridEnsemble::mainGrid()
 {
+    // Trigger deferred loading if needed
+    if ( !m_mainGrid && !cases().empty() )
+    {
+        const_cast<RimReservoirGridEnsemble*>( this )->loadGridDataFromFiles();
+    }
+
     return m_mainGrid;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimReservoirGridEnsemble::detectGridEquality()
-{
-    auto allCases = cases();
-    if ( allCases.size() < 2 )
-    {
-        m_hasIdenticalGrids = true;
-        return;
-    }
-
-    RimEclipseCase* firstCase = allCases[0];
-    if ( !firstCase || !firstCase->eclipseCaseData() || !firstCase->eclipseCaseData()->mainGrid() )
-    {
-        m_hasIdenticalGrids = false;
-        return;
-    }
-
-    RigMainGrid* referenceGrid = firstCase->eclipseCaseData()->mainGrid();
-
-    for ( size_t i = 1; i < allCases.size(); i++ )
-    {
-        RimEclipseCase* caseToCompare = allCases[i];
-        if ( !caseToCompare || !caseToCompare->eclipseCaseData() || !caseToCompare->eclipseCaseData()->mainGrid() )
-        {
-            m_hasIdenticalGrids = false;
-            return;
-        }
-
-        if ( !RigGridManager::isEqual( referenceGrid, caseToCompare->eclipseCaseData()->mainGrid() ) )
-        {
-            m_hasIdenticalGrids = false;
-            RiaLogging::info( QString( "Grid ensemble '%1': Grids are not identical. Shared grid operations disabled." ).arg( name() ) );
-            return;
-        }
-    }
-
-    m_hasIdenticalGrids = true;
-    RiaLogging::info(
-        QString( "Grid ensemble '%1': All %2 grids are identical. Shared grid operations enabled." ).arg( name() ).arg( allCases.size() ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -327,7 +328,7 @@ void RimReservoirGridEnsemble::detectGridEquality()
 //--------------------------------------------------------------------------------------------------
 void RimReservoirGridEnsemble::setupSharedGrid()
 {
-    if ( !m_hasIdenticalGrids ) return;
+    if ( !hasSharedGrid() ) return;
 
     auto allCases = cases();
     if ( allCases.empty() ) return;
@@ -368,7 +369,7 @@ RigActiveCellInfo* RimReservoirGridEnsemble::unionOfActiveCells( RiaDefines::Por
 //--------------------------------------------------------------------------------------------------
 void RimReservoirGridEnsemble::computeUnionOfActiveCells()
 {
-    if ( !m_hasIdenticalGrids ) return;
+    if ( !hasSharedGrid() ) return;
 
     if ( m_unionOfMatrixActiveCells->reservoirActiveCellCount() > 0 )
     {
@@ -459,7 +460,7 @@ void RimReservoirGridEnsemble::computeUnionOfActiveCells()
 //--------------------------------------------------------------------------------------------------
 RimEclipseStatisticsCase* RimReservoirGridEnsemble::createAndAppendStatisticsCase()
 {
-    if ( !m_hasIdenticalGrids )
+    if ( !hasSharedGrid() )
     {
         RiaLogging::warning( QString( "Cannot create statistics case for ensemble '%1': grids are not identical." ).arg( name() ) );
         return nullptr;
@@ -584,7 +585,10 @@ void RimReservoirGridEnsemble::addStatisticsContourMap( RimStatisticsContourMap*
 //--------------------------------------------------------------------------------------------------
 void RimReservoirGridEnsemble::loadDataAndUpdate()
 {
-    createGridCasesFromEnsembleFileSet();
+    if ( !isGridDataLoaded() )
+    {
+        loadGridDataFromFiles();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -600,53 +604,8 @@ void RimReservoirGridEnsemble::createGridCasesFromEnsembleFileSet()
     clearActiveCellUnions();
     clearStatisticsResults();
 
-    // Get grid file paths from the file set
-    QStringList gridFiles = m_ensembleFileSet->createPaths( ".EGRID" );
-    if ( gridFiles.empty() )
-    {
-        // Try .GRID extension
-        gridFiles = m_ensembleFileSet->createPaths( ".GRID" );
-    }
-
-    if ( gridFiles.empty() )
-    {
-        RiaLogging::warning( QString( "No grid files found for ensemble '%1'" ).arg( name() ) );
-        return;
-    }
-
-    caf::ProgressInfo progress( gridFiles.size(), QString( "Loading %1 grid cases" ).arg( gridFiles.size() ) );
-
-    for ( const QString& gridFile : gridFiles )
-    {
-        progress.setProgressDescription( QString( "Loading %1" ).arg( gridFile ) );
-
-        RimEclipseResultCase* resultCase = new RimEclipseResultCase();
-        resultCase->setGridFileName( gridFile );
-
-        if ( resultCase->openEclipseGridFile() )
-        {
-            RimProject::current()->assignCaseIdToCase( resultCase );
-            addCase( resultCase );
-        }
-        else
-        {
-            RiaLogging::warning( QString( "Failed to load grid file: %1" ).arg( gridFile ) );
-            delete resultCase;
-        }
-
-        progress.incrementProgress();
-    }
-
-    // Detect if all grids are identical
-    detectGridEquality();
-
-    if ( m_hasIdenticalGrids )
-    {
-        setupSharedGrid();
-        computeUnionOfActiveCells();
-    }
-
-    updateConnectedEditors();
+    // Create case objects without loading grids
+    createCaseObjectsFromEnsembleFileSet();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -657,7 +616,7 @@ void RimReservoirGridEnsemble::appendMenuItems( caf::CmdFeatureMenuBuilder& menu
     menuBuilder << "RicNewViewForGridEnsembleFeature";
     menuBuilder << "RicNewStatisticsContourMapFeature";
 
-    if ( m_hasIdenticalGrids )
+    if ( hasSharedGrid() )
     {
         menuBuilder << "RicNewStatisticsCaseFeature";
     }
@@ -671,7 +630,7 @@ void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_groupId );
     uiOrdering.add( &m_ensembleFileSet );
-    uiOrdering.add( &m_hasIdenticalGrids );
+    uiOrdering.add( &m_gridMode );
 
     uiOrdering.skipRemainingFields();
 }
@@ -689,6 +648,12 @@ void RimReservoirGridEnsemble::initAfterRead()
                                                 {
                                                     if ( m_ensembleFileSet ) setName( m_ensembleFileSet->name() );
                                                 } );
+
+        // Create case objects WITHOUT loading grid data (deferred loading)
+        if ( m_caseCollection && m_caseCollection->reservoirs().empty() )
+        {
+            createCaseObjectsFromEnsembleFileSet();
+        }
     }
 }
 
@@ -756,5 +721,151 @@ void RimReservoirGridEnsemble::updateMainGridAndActiveCellsForStatisticsCases()
                 rimStaticsCase->computeActiveCellsBoundingBox();
             }
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::createCaseObjectsFromEnsembleFileSet()
+{
+    if ( !m_ensembleFileSet ) return;
+
+    // Get grid file paths from the file set
+    QStringList gridFiles = m_ensembleFileSet->createPaths( ".EGRID" );
+    if ( gridFiles.empty() )
+    {
+        // Try .GRID extension
+        gridFiles = m_ensembleFileSet->createPaths( ".GRID" );
+    }
+
+    if ( gridFiles.empty() )
+    {
+        RiaLogging::warning( QString( "No grid files found for ensemble '%1'" ).arg( name() ) );
+        return;
+    }
+
+    // Create case objects without loading grids
+    for ( const QString& gridFile : gridFiles )
+    {
+        RimEclipseResultCase* resultCase = new RimEclipseResultCase();
+        resultCase->setGridFileName( gridFile );
+        // DO NOT call openEclipseGridFile() here - deferred loading
+
+        RimProject::current()->assignCaseIdToCase( resultCase );
+        m_caseCollection->reservoirs().push_back( resultCase );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::loadGridDataFromFiles()
+{
+    // Guard: Only load once
+    if ( m_mainGrid != nullptr ) return;
+
+    auto allCases = cases();
+    if ( allCases.empty() ) return;
+
+    // Determine effective grid mode
+    GridModeType effectiveMode = m_gridMode.v();
+
+    if ( effectiveMode == GridModeType::AUTO_DETECT )
+    {
+        // Run dimension detection
+        bool identical = detectGridDimensionEquality();
+        effectiveMode  = identical ? GridModeType::SHARED_GRID : GridModeType::INDIVIDUAL_GRIDS;
+        m_gridMode     = effectiveMode; // Update to detected mode
+    }
+
+    // Load grids based on effective mode
+    if ( effectiveMode == GridModeType::SHARED_GRID )
+    {
+        loadGridsInSharedMode();
+    }
+    else
+    {
+        loadGridsInIndividualMode();
+    }
+
+    updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RimReservoirGridEnsemble::detectGridDimensionEquality()
+{
+    auto allCases = cases();
+    if ( allCases.size() < 2 ) return true;
+
+    RifReaderOpmCommon::GridDimensions firstDim;
+
+    for ( int i = 0; i < static_cast<int>( allCases.size() ); i++ )
+    {
+        auto dim = RifReaderOpmCommon::readGridDimensions( allCases[i]->gridFileName() );
+
+        if ( i == 0 )
+        {
+            firstDim = dim;
+        }
+        else if ( dim.i != firstDim.i || dim.j != firstDim.j || dim.k != firstDim.k )
+        {
+            return false; // Different dimensions
+        }
+    }
+
+    return true; // All dimensions identical
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::loadGridsInSharedMode()
+{
+    auto allCases = cases();
+
+    RiaLogging::info( QString( "Grid ensemble '%1': Loading grid in shared mode for %2 cases." ).arg( name() ).arg( allCases.size() ) );
+
+    // Load first case fully
+    RimEclipseCase* firstCase = allCases[0];
+    if ( firstCase->openEclipseGridFile() )
+    {
+        m_mainGrid = firstCase->eclipseCaseData()->mainGrid();
+
+        // Load remaining cases and share grid
+        for ( size_t i = 1; i < allCases.size(); i++ )
+        {
+            RimEclipseCase* eclipseCase = allCases[i];
+            if ( auto resultCase = dynamic_cast<RimEclipseResultCase*>( eclipseCase ) )
+            {
+                resultCase->openAndReadActiveCellData( firstCase->eclipseCaseData() );
+            }
+            eclipseCase->eclipseCaseData()->setMainGrid( m_mainGrid );
+        }
+
+        computeUnionOfActiveCells();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::loadGridsInIndividualMode()
+{
+    auto allCases = cases();
+
+    RiaLogging::info( QString( "Grid ensemble '%1': Loading grids in individual mode for %2 cases." ).arg( name() ).arg( allCases.size() ) );
+
+    for ( auto eclipseCase : allCases )
+    {
+        eclipseCase->openEclipseGridFile();
+    }
+
+    // Store first grid as reference
+    if ( !allCases.empty() && allCases[0]->eclipseCaseData() )
+    {
+        m_mainGrid = allCases[0]->eclipseCaseData()->mainGrid();
     }
 }

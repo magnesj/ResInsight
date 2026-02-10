@@ -21,6 +21,7 @@
 #include "RiaPorosityModel.h"
 #include "RimNamedObject.h"
 
+#include "cafAppEnum.h"
 #include "cafPdmChildArrayField.h"
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
@@ -55,6 +56,13 @@ class RimReservoirGridEnsemble : public RimNamedObject
     CAF_PDM_HEADER_INIT;
 
 public:
+    enum class GridModeType
+    {
+        AUTO_DETECT,
+        SHARED_GRID,
+        INDIVIDUAL_GRIDS
+    };
+
     RimReservoirGridEnsemble();
     ~RimReservoirGridEnsemble() override;
 
@@ -76,10 +84,17 @@ public:
     RimEclipseCase*              findByFileName( const QString& gridFileName ) const;
 
     // Grid detection and shared grid
-    bool         hasIdenticalGrids() const;
     RigMainGrid* mainGrid();
-    void         detectGridEquality();
     void         setupSharedGrid();
+
+    // Deferred loading control
+    void loadGridDataFromFiles();
+    bool isGridDataLoaded() const;
+    void setGridMode( GridModeType mode );
+
+    // Helper methods
+    bool         hasSharedGrid() const;
+    GridModeType effectiveGridMode() const;
 
     // Active cells
     RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType );
@@ -117,6 +132,11 @@ private:
     void clearStatisticsResults();
     void updateMainGridAndActiveCellsForStatisticsCases();
 
+    void createCaseObjectsFromEnsembleFileSet();
+    bool detectGridDimensionEquality();
+    void loadGridsInSharedMode();
+    void loadGridsInIndividualMode();
+
 private:
     // File set reference
     caf::PdmPtrField<RimEnsembleFileSet*> m_ensembleFileSet;
@@ -129,7 +149,7 @@ private:
     caf::PdmChildField<RimCaseCollection*> m_statisticsCaseCollection;
 
     // Grid mode
-    caf::PdmField<bool> m_hasIdenticalGrids;
+    caf::PdmField<caf::AppEnum<GridModeType>> m_gridMode;
 
     // Views and mappings
     caf::PdmChildField<RimEclipseViewCollection*>     m_viewCollection;
