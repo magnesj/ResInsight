@@ -1626,13 +1626,17 @@ void RimEclipseView::updateLegendRangesTextAndVisibility( RimRegularLegendConfig
         nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( legendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
     }
 
-    size_t maxTimeStepCount = eclResultDef->currentGridCellResults()->maxTimeStepCount();
-    if ( eclResultDef->isTernarySaturationSelected() && maxTimeStepCount > 1 )
+    RigCaseCellResultsData* cellResultsData = eclResultDef->currentGridCellResults();
+    if ( cellResultsData )
     {
-        if ( ternaryLegendConfig->showLegend() && ternaryLegendConfig->titledOverlayFrame() )
+        size_t maxTimeStepCount = cellResultsData->maxTimeStepCount();
+        if ( eclResultDef->isTernarySaturationSelected() && maxTimeStepCount > 1 )
         {
-            ternaryLegendConfig->setTitle( legendHeading );
-            nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
+            if ( ternaryLegendConfig->showLegend() && ternaryLegendConfig->titledOverlayFrame() )
+            {
+                ternaryLegendConfig->setTitle( legendHeading );
+                nativeOrOverrideViewer()->addColorLegendToBottomLeftCorner( ternaryLegendConfig->titledOverlayFrame(), isUsingOverrideViewer() );
+            }
         }
     }
 }
