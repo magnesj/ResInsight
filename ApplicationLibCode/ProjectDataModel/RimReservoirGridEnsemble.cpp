@@ -655,6 +655,12 @@ void RimReservoirGridEnsemble::initAfterRead()
             createCaseObjectsFromEnsembleFileSet();
         }
     }
+
+    // Set the case provider for views in the view collection
+    if ( m_viewCollection )
+    {
+        m_viewCollection->setEclipseCaseProvider( [this]() { return this->cases(); } );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
