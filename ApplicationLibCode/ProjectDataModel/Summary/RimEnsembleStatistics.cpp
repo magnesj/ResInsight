@@ -19,7 +19,7 @@
 #include "RimEnsembleStatistics.h"
 
 #include "RiaColorTools.h"
-#include "RiaStdStringTools.h"
+#include "RiaTextStringTools.h"
 
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetInterface.h"
@@ -180,13 +180,14 @@ std::vector<int> RimEnsembleStatistics::allPercentiles() const
     // Parse custom percentiles string
     if ( !m_customPercentiles().isEmpty() )
     {
-        std::set<int> customValues = RiaStdStringTools::valuesFromRangeSelection( m_customPercentiles().toStdString() );
-        for ( int p : customValues )
+        QStringList parts = RiaTextStringTools::splitSkipEmptyParts( m_customPercentiles() );
+        for ( const auto& part : parts )
         {
-            // Only include valid percentiles in range [0, 100]
-            if ( p >= 0 && p <= 100 )
+            bool ok    = false;
+            int  value = part.trimmed().toInt( &ok );
+            if ( ok && value >= 0 && value <= 100 )
             {
-                uniquePercentiles.insert( p );
+                uniquePercentiles.insert( value );
             }
         }
     }
@@ -379,7 +380,7 @@ void RimEnsembleStatistics::defineEditorAttribute( const caf::PdmFieldHandle* fi
     {
         if ( auto lineEdAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute ) )
         {
-            lineEdAttr->placeholderText = "E.g. 5, 25, 75, 95";
+            lineEdAttr->placeholderText = "E.g. 5 25 75 95";
         }
     }
 }
@@ -407,12 +408,18 @@ QString RimEnsembleStatistics::validateCustomPercentiles() const
 {
     if ( m_customPercentiles().isEmpty() ) return {};
 
-    std::set<int> values = RiaStdStringTools::valuesFromRangeSelection( m_customPercentiles().toStdString() );
-    for ( int v : values )
+    QStringList parts = RiaTextStringTools::splitSkipEmptyParts( m_customPercentiles() );
+    for ( const auto& part : parts )
     {
-        if ( v < 0 || v > 100 )
+        bool ok    = false;
+        int  value = part.trimmed().toInt( &ok );
+        if ( !ok )
         {
-            return "Percentile values must be in the range 0 to 100";
+            return QString( "Invalid percentile value: '%1'" ).arg( part.trimmed() );
+        }
+        if ( value < 0 || value > 100 )
+        {
+            return QString( "Percentile value %1 must be in the range 0 to 100" ).arg( value );
         }
     }
     return {};
