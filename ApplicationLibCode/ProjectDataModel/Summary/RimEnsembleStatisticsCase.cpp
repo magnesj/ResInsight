@@ -28,6 +28,7 @@
 
 #include "RigStatisticsMath.h"
 
+#include <algorithm>
 #include <limits>
 
 //--------------------------------------------------------------------------------------------------
@@ -180,6 +181,16 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
 
     m_requestedPercentiles = percentiles;
 
+    // Always include P10, P50, and P90
+    for ( int p : { 10, 50, 90 } )
+    {
+        if ( std::find( m_requestedPercentiles.begin(), m_requestedPercentiles.end(), p ) == m_requestedPercentiles.end() )
+        {
+            m_requestedPercentiles.push_back( p );
+        }
+    }
+    std::sort( m_requestedPercentiles.begin(), m_requestedPercentiles.end() );
+
     if ( !inputAddress.isValid() ) return;
     if ( summaryCases.empty() ) return;
 
@@ -240,7 +251,7 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
     m_meanData.reserve( m_timeSteps.size() );
 
     // Initialize percentile storage
-    for ( int p : percentiles )
+    for ( int p : m_requestedPercentiles )
     {
         m_percentileData[p].reserve( m_timeSteps.size() );
     }
@@ -260,7 +271,7 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
 
         // Calculate percentiles
         std::vector<double> percentilePositions;
-        for ( int p : percentiles )
+        for ( int p : m_requestedPercentiles )
         {
             percentilePositions.push_back( static_cast<double>( p ) / 100.0 );
         }
@@ -271,9 +282,9 @@ void RimEnsembleStatisticsCase::calculate( const std::vector<RimSummaryCase*>& s
         if ( percentileValuesResult.has_value() )
         {
             const auto& percentileValues = *percentileValuesResult;
-            for ( size_t i = 0; i < percentiles.size(); i++ )
+            for ( size_t i = 0; i < m_requestedPercentiles.size(); i++ )
             {
-                m_percentileData[percentiles[i]].push_back( percentileValues[i] );
+                m_percentileData[m_requestedPercentiles[i]].push_back( percentileValues[i] );
             }
         }
     }
