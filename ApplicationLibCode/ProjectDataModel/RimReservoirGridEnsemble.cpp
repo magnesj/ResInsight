@@ -598,14 +598,16 @@ void RimReservoirGridEnsemble::createGridCasesFromEnsembleFileSet()
 {
     if ( !m_ensembleFileSet ) return;
 
-    // Clear existing cases
+    // Clear existing cases and statistics
     m_caseCollection->reservoirs.deleteChildren();
+    m_statisticsCaseCollection->reservoirs.deleteChildren();
     m_mainGrid = nullptr;
     clearActiveCellUnions();
-    clearStatisticsResults();
 
     // Create case objects without loading grids
     createCaseObjectsFromEnsembleFileSet();
+
+    updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -24,6 +24,7 @@
 #include "RimEclipseStatisticsCaseCollection.h"
 #include "RimIdenticalGridCaseGroup.h"
 #include "RimProject.h"
+#include "RimReservoirGridEnsemble.h"
 
 #include "Riu3DMainWindowTools.h"
 
@@ -115,8 +116,25 @@ RimEclipseStatisticsCase* RicNewStatisticsCaseFeature::addStatisticalCalculation
         caseGroup->updateConnectedEditors();
         return createdObject;
     }
-    else
+
+    // Try RimReservoirGridEnsemble as parent
+    RimReservoirGridEnsemble* ensemble = nullptr;
+    if ( auto* statCase = dynamic_cast<RimEclipseStatisticsCase*>( uiItem ) )
     {
-        return nullptr;
+        ensemble = statCase->parentStatisticsCaseCollection()->parentGridEnsemble();
     }
+    else if ( auto* statColl = dynamic_cast<RimCaseCollection*>( uiItem ) )
+    {
+        ensemble = statColl->parentGridEnsemble();
+    }
+
+    if ( ensemble )
+    {
+        auto* createdObject = ensemble->createAndAppendStatisticsCase();
+        RimProject::current()->assignCaseIdToCase( createdObject );
+        ensemble->updateConnectedEditors();
+        return createdObject;
+    }
+
+    return nullptr;
 }

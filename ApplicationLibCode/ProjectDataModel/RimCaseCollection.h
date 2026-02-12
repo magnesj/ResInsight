@@ -24,6 +24,7 @@
 
 class RimEclipseCase;
 class RimIdenticalGridCaseGroup;
+class RimReservoirGridEnsemble;
 class RimCase;
 
 //==================================================================================================
@@ -43,5 +44,6 @@ public:
     caf::PdmChildArrayField<RimEclipseCase*> reservoirs;
 
     RimIdenticalGridCaseGroup* parentCaseGroup();
+    RimReservoirGridEnsemble*  parentGridEnsemble();
     RimEclipseCase*            findByDescription( const QString& caseDescription ) const;
 };

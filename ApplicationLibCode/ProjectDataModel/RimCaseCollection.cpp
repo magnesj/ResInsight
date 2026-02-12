@@ -22,6 +22,7 @@
 
 #include "RimEclipseCase.h"
 #include "RimIdenticalGridCaseGroup.h"
+#include "RimReservoirGridEnsemble.h"
 
 CAF_PDM_SOURCE_INIT( RimCaseCollection, "RimCaseCollection" );
 
@@ -56,6 +57,14 @@ std::vector<RimCase*> RimCaseCollection::cases() const
 RimIdenticalGridCaseGroup* RimCaseCollection::parentCaseGroup()
 {
     return dynamic_cast<RimIdenticalGridCaseGroup*>( parentField()->ownerObject() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimReservoirGridEnsemble* RimCaseCollection::parentGridEnsemble()
+{
+    return dynamic_cast<RimReservoirGridEnsemble*>( parentField()->ownerObject() );
 }
 
 //--------------------------------------------------------------------------------------------------

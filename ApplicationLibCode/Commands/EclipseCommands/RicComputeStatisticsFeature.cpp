@@ -24,6 +24,7 @@
 #include "RimEclipseStatisticsCase.h"
 #include "RimEclipseStatisticsCaseCollection.h"
 #include "RimIdenticalGridCaseGroup.h"
+#include "RimReservoirGridEnsemble.h"
 
 #include "cafCmdFeatureManager.h"
 #include "cafSelectionManager.h"
@@ -45,8 +46,19 @@ bool RicComputeStatisticsFeature::isCommandEnabled() const
         {
             RimIdenticalGridCaseGroup* gridCaseGroup = statisticsCase->firstAncestorOrThisOfType<RimIdenticalGridCaseGroup>();
 
-            RimCaseCollection* caseCollection = gridCaseGroup ? gridCaseGroup->caseCollection() : nullptr;
-            return caseCollection ? !caseCollection->reservoirs.empty() : false;
+            if ( gridCaseGroup )
+            {
+                RimCaseCollection* caseCollection = gridCaseGroup->caseCollection();
+                return caseCollection ? !caseCollection->reservoirs.empty() : false;
+            }
+
+            auto* ensemble = statisticsCase->firstAncestorOrThisOfType<RimReservoirGridEnsemble>();
+            if ( ensemble )
+            {
+                return !ensemble->cases().empty();
+            }
+
+            return false;
         }
     }
 

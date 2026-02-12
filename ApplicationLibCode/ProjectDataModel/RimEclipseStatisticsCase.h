@@ -28,11 +28,13 @@
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
+class RigActiveCellInfo;
 class RigMainGrid;
 class RigSimWellData;
 class RimEclipseResultDefinition;
 class RimEclipseStatisticsCaseCollection;
 class RimIdenticalGridCaseGroup;
+class RimReservoirGridEnsemble;
 class RimGridCalculation;
 
 //==================================================================================================
@@ -86,6 +88,14 @@ private:
     void scheduleACTIVEGeometryRegenOnReservoirViews();
 
     RimIdenticalGridCaseGroup*   caseGroup() const;
+    RimReservoirGridEnsemble*    gridEnsemble() const;
+    RigMainGrid*                 parentMainGrid() const;
+    RimEclipseCase*              parentMainCase() const;
+    std::vector<RimEclipseCase*> parentSourceCases() const;
+    RigActiveCellInfo*           parentUnionOfActiveCells( RiaDefines::PorosityModelType porosityType ) const;
+    void                         parentComputeUnionOfActiveCells();
+    RimEclipseCase*              parentFindByDescription( const QString& caseDescription ) const;
+
     std::vector<RimEclipseCase*> getSourceCases() const;
 
     void populateResultSelection();
