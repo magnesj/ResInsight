@@ -178,7 +178,7 @@ void RimEclipseCaseCollection::recomputeStatisticsForAllCaseGroups()
     for ( size_t caseGrpIdx = 0; caseGrpIdx < numCaseGroups; ++caseGrpIdx )
     {
         RimIdenticalGridCaseGroup* caseGroup                = caseGroups[caseGrpIdx];
-        RimCaseCollection*         statisticsCaseCollection = caseGroup->statisticsCaseCollection;
+        RimCaseCollection*         statisticsCaseCollection = caseGroup->statisticsCaseCollection();
         const size_t               numStatisticsCases       = statisticsCaseCollection->reservoirs.size();
         for ( size_t caseIdx = 0; caseIdx < numStatisticsCases; caseIdx++ )
         {

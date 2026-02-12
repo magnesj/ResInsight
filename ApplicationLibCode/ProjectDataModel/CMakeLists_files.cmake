@@ -130,6 +130,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimGeometrySelectionItem.h
     ${CMAKE_CURRENT_LIST_DIR}/RimCornerPointCase.h
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsemble.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimStatisticsCaseOwner.h
 )
 
 set(SOURCE_GROUP_SOURCE_FILES
@@ -258,6 +259,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimGeometrySelectionItem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimCornerPointCase.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimReservoirGridEnsemble.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimStatisticsCaseOwner.cpp
 )
 
 list(APPEND CODE_HEADER_FILES ${SOURCE_GROUP_HEADER_FILES})

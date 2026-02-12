@@ -24,7 +24,9 @@
 
 class RigActiveCellInfo;
 class RigMainGrid;
+class RimCaseCollection;
 class RimEclipseCase;
+class RimEclipseStatisticsCase;
 
 class QString;
 
@@ -39,4 +41,7 @@ public:
     virtual RigActiveCellInfo*           unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) = 0;
     virtual void                         computeUnionOfActiveCells()                                      = 0;
     virtual RimEclipseCase*              findByDescription( const QString& caseDescription ) const        = 0;
+    virtual RimCaseCollection*           statisticsCaseCollection() const                                  = 0;
+
+    virtual RimEclipseStatisticsCase* createAndAppendStatisticsCase();
 };

@@ -24,7 +24,7 @@
 #include "RimEclipseStatisticsCaseCollection.h"
 #include "RimIdenticalGridCaseGroup.h"
 #include "RimProject.h"
-#include "RimReservoirGridEnsemble.h"
+#include "RimStatisticsCaseOwner.h"
 
 #include "Riu3DMainWindowTools.h"
 
@@ -94,47 +94,26 @@ caf::PdmUiItem* RicNewStatisticsCaseFeature::selectedValidUIItem()
 //--------------------------------------------------------------------------------------------------
 RimEclipseStatisticsCase* RicNewStatisticsCaseFeature::addStatisticalCalculation( caf::PdmUiItem* uiItem )
 {
-    RimIdenticalGridCaseGroup* caseGroup = nullptr;
+    RimCaseCollection* caseCollection = nullptr;
 
-    if ( dynamic_cast<RimEclipseStatisticsCase*>( uiItem ) )
-    {
-        RimEclipseStatisticsCase* currentObject = dynamic_cast<RimEclipseStatisticsCase*>( uiItem );
-        caseGroup                               = currentObject->parentStatisticsCaseCollection()->parentCaseGroup();
-    }
-    else if ( dynamic_cast<RimCaseCollection*>( uiItem ) )
-    {
-        RimCaseCollection* statColl = dynamic_cast<RimCaseCollection*>( uiItem );
-        caseGroup                   = statColl->parentCaseGroup();
-    }
-
-    if ( caseGroup )
-    {
-        RimProject*               proj          = RimProject::current();
-        RimEclipseStatisticsCase* createdObject = caseGroup->createAndAppendStatisticsCase();
-        proj->assignCaseIdToCase( createdObject );
-
-        caseGroup->updateConnectedEditors();
-        return createdObject;
-    }
-
-    // Try RimReservoirGridEnsemble as parent
-    RimReservoirGridEnsemble* ensemble = nullptr;
     if ( auto* statCase = dynamic_cast<RimEclipseStatisticsCase*>( uiItem ) )
     {
-        ensemble = statCase->parentStatisticsCaseCollection()->parentGridEnsemble();
+        caseCollection = statCase->parentStatisticsCaseCollection();
     }
-    else if ( auto* statColl = dynamic_cast<RimCaseCollection*>( uiItem ) )
+    else if ( auto* caseColl = dynamic_cast<RimCaseCollection*>( uiItem ) )
     {
-        ensemble = statColl->parentGridEnsemble();
+        caseCollection = caseColl;
     }
 
-    if ( ensemble )
-    {
-        auto* createdObject = ensemble->createAndAppendStatisticsCase();
-        RimProject::current()->assignCaseIdToCase( createdObject );
-        ensemble->updateConnectedEditors();
-        return createdObject;
-    }
+    if ( !caseCollection ) return nullptr;
 
-    return nullptr;
+    auto* statisticsOwner = caseCollection->parentStatisticsCaseOwner();
+    if ( !statisticsOwner ) return nullptr;
+
+    auto* createdObject = statisticsOwner->createAndAppendStatisticsCase();
+    RimProject::current()->assignCaseIdToCase( createdObject );
+
+    caseCollection->parentField()->ownerObject()->uiCapability()->updateConnectedEditors();
+
+    return createdObject;
 }

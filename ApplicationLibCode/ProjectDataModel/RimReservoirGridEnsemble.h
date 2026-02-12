@@ -102,8 +102,9 @@ public:
     RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) override;
     void               computeUnionOfActiveCells() override;
 
-    // Statistics cases (for identical grids)
-    RimEclipseStatisticsCase* createAndAppendStatisticsCase();
+    // Statistics
+    RimCaseCollection*        statisticsCaseCollection() const override;
+    RimEclipseStatisticsCase* createAndAppendStatisticsCase() override;
 
     // Views
     void                         addView( RimEclipseView* view );

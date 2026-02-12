@@ -466,6 +466,14 @@ void RimReservoirGridEnsemble::computeUnionOfActiveCells()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimCaseCollection* RimReservoirGridEnsemble::statisticsCaseCollection() const
+{
+    return m_statisticsCaseCollection;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimEclipseStatisticsCase* RimReservoirGridEnsemble::createAndAppendStatisticsCase()
 {
     if ( !hasSharedGrid() )
@@ -474,26 +482,7 @@ RimEclipseStatisticsCase* RimReservoirGridEnsemble::createAndAppendStatisticsCas
         return nullptr;
     }
 
-    RimEclipseStatisticsCase* newStatisticsCase = new RimEclipseStatisticsCase;
-
-    newStatisticsCase->setCaseUserDescription( QString( "Statistics " ) +
-                                               QString::number( m_statisticsCaseCollection()->reservoirs.size() + 1 ) );
-    m_statisticsCaseCollection()->reservoirs.push_back( newStatisticsCase );
-
-    newStatisticsCase->populateResultSelectionAfterLoadingGrid();
-
-    auto reservoirs = m_caseCollection->reservoirs().childrenByType();
-    if ( !reservoirs.empty() )
-    {
-        auto caseDescription = reservoirs.front()->caseUserDescription();
-        newStatisticsCase->setWellDataSourceCase( caseDescription );
-    }
-
-    newStatisticsCase->openEclipseGridFile();
-    newStatisticsCase->computeActiveCellsBoundingBox();
-    newStatisticsCase->selectAllTimeSteps();
-
-    return newStatisticsCase;
+    return RimStatisticsCaseOwner::createAndAppendStatisticsCase();
 }
 
 //--------------------------------------------------------------------------------------------------
