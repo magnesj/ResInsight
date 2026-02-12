@@ -357,7 +357,7 @@ RimEclipseStatisticsCase* RimIdenticalGridCaseGroup::createAndAppendEmptyStatist
     auto cases = sourceCases();
     if ( !cases.empty() )
     {
-        newStatisticsCase->setWellDataSourceCase( cases.front()->caseUserDescription() );
+        newStatisticsCase->setWellDataSourceCase( cases.front() );
     }
 
     newStatisticsCase->openEclipseGridFile();
@@ -509,10 +509,3 @@ std::vector<RimEclipseCase*> RimIdenticalGridCaseGroup::sourceCases() const
     return caseCollection->reservoirs.childrenByType();
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseCase* RimIdenticalGridCaseGroup::findByDescription( const QString& caseDescription ) const
-{
-    return caseCollection->findByDescription( caseDescription );
-}

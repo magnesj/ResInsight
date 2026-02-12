@@ -47,5 +47,4 @@ public:
     RimIdenticalGridCaseGroup* parentCaseGroup();
     RimReservoirGridEnsemble*  parentGridEnsemble();
     RimStatisticsCaseOwner*    parentStatisticsCaseOwner();
-    RimEclipseCase*            findByDescription( const QString& caseDescription ) const;
 };

@@ -81,18 +81,3 @@ RimStatisticsCaseOwner* RimCaseCollection::parentStatisticsCaseOwner()
     return dynamic_cast<RimReservoirGridEnsemble*>( owner );
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseCase* RimCaseCollection::findByDescription( const QString& caseDescription ) const
-{
-    for ( size_t i = 0; i < reservoirs.size(); i++ )
-    {
-        if ( caseDescription == reservoirs[i]->caseUserDescription() )
-        {
-            return reservoirs[i];
-        }
-    }
-
-    return nullptr;
-}

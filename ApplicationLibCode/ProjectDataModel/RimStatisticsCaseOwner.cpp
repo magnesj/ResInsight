@@ -39,8 +39,7 @@ RimEclipseStatisticsCase* RimStatisticsCaseOwner::createAndAppendStatisticsCase(
     auto cases = sourceCases();
     if ( !cases.empty() )
     {
-        auto caseDescription = cases.front()->caseUserDescription();
-        newStatisticsCase->setWellDataSourceCase( caseDescription );
+        newStatisticsCase->setWellDataSourceCase( cases.front() );
     }
 
     newStatisticsCase->openEclipseGridFile();

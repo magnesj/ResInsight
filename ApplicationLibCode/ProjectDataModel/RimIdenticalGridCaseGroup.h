@@ -67,7 +67,6 @@ public:
     RigMainGrid* mainGrid() override;
 
     std::vector<RimEclipseCase*> sourceCases() const override;
-    RimEclipseCase*              findByDescription( const QString& caseDescription ) const override;
 
     RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) override;
     void               computeUnionOfActiveCells() override;

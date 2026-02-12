@@ -126,7 +126,10 @@ RimEclipseStatisticsCase::RimEclipseStatisticsCase()
     CAF_PDM_InitScriptableField( &m_midPercentile, "MidPercentile", 50.0, "Mid" );
     CAF_PDM_InitScriptableField( &m_highPercentile, "HighPercentile", 90.0, "High" );
 
-    CAF_PDM_InitScriptableField( &m_wellDataSourceCase, "WellDataSourceCase", RiaResultNames::undefinedResultName(), "Well Data Source Case" );
+    CAF_PDM_InitScriptableFieldNoDefault( &m_wellDataSourceCase, "WellDataSourceCasePtr", "Well Data Source Case" );
+
+    CAF_PDM_InitFieldNoDefault( &obsoleteField_wellDataSourceCase, "WellDataSourceCase", "Well Data Source Case" );
+    obsoleteField_wellDataSourceCase.xmlCapability()->setIOWritable( false );
 
     CAF_PDM_InitScriptableField( &m_useZeroAsInactiveCellValue, "UseZeroAsInactiveCellValue", false, "Use Zero as Inactive Cell Value" );
 
@@ -145,6 +148,31 @@ RimEclipseStatisticsCase::RimEclipseStatisticsCase()
 //--------------------------------------------------------------------------------------------------
 RimEclipseStatisticsCase::~RimEclipseStatisticsCase()
 {
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEclipseStatisticsCase::initAfterRead()
+{
+    RimEclipseCase::initAfterRead();
+
+    if ( !obsoleteField_wellDataSourceCase().isEmpty() && obsoleteField_wellDataSourceCase() != RiaResultNames::undefinedResultName() )
+    {
+        auto* owner = statisticsCaseOwner();
+        if ( owner )
+        {
+            for ( auto* sourceCase : owner->sourceCases() )
+            {
+                if ( sourceCase->caseUserDescription() == obsoleteField_wellDataSourceCase() )
+                {
+                    m_wellDataSourceCase = sourceCase;
+                    break;
+                }
+            }
+        }
+        obsoleteField_wellDataSourceCase = "";
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -180,6 +208,8 @@ bool RimEclipseStatisticsCase::openEclipseGridFile()
                                     statisticsOwner->unionOfActiveCells( RiaDefines::PorosityModelType::FRACTURE_MODEL ) );
 
     setReservoirData( eclipseCase.p() );
+
+    computeCachedData();
 
     loadSimulationWellDataFromSourceCase();
 
@@ -274,9 +304,9 @@ void RimEclipseStatisticsCase::selectAllTimeSteps()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEclipseStatisticsCase::setWellDataSourceCase( const QString& reservoirDescription )
+void RimEclipseStatisticsCase::setWellDataSourceCase( RimEclipseCase* sourceCase )
 {
-    m_wellDataSourceCase = reservoirDescription;
+    m_wellDataSourceCase = sourceCase;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -695,15 +725,15 @@ QList<caf::PdmOptionItemInfo> RimEclipseStatisticsCase::calculateValueOptions( c
 
     else if ( &m_wellDataSourceCase == fieldNeedingOptions )
     {
-        QStringList sourceCaseNames;
-        sourceCaseNames += RiaResultNames::undefinedResultName();
+        QList<caf::PdmOptionItemInfo> options;
+        options.push_back( caf::PdmOptionItemInfo( RiaResultNames::undefinedResultName(), nullptr ) );
 
         for ( auto* sourceCase : statisticsOwner->sourceCases() )
         {
-            sourceCaseNames += sourceCase->caseUserDescription();
+            options.push_back( caf::PdmOptionItemInfo( sourceCase->caseUserDescription(), sourceCase ) );
         }
 
-        return toOptionList( sourceCaseNames );
+        return options;
     }
 
     return RimEclipseCase::calculateValueOptions( fieldNeedingOptions );
@@ -754,11 +784,7 @@ void RimEclipseStatisticsCase::fieldChangedByUi( const caf::PdmFieldHandle* chan
 //--------------------------------------------------------------------------------------------------
 void RimEclipseStatisticsCase::loadSimulationWellDataFromSourceCase()
 {
-    // Find or load well data for given case
-    auto* statisticsOwner = statisticsCaseOwner();
-    if ( !statisticsOwner ) return;
-
-    RimEclipseCase* sourceResultCase = statisticsOwner->findByDescription( m_wellDataSourceCase );
+    RimEclipseCase* sourceResultCase = m_wellDataSourceCase();
     if ( sourceResultCase )
     {
         sourceResultCase->openEclipseGridFile();

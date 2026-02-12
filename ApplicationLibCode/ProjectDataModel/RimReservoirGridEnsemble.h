@@ -82,7 +82,6 @@ public:
     std::vector<RimEclipseCase*> cases() const;
     RimEclipseCase*              mainCase() override;
     std::vector<RimEclipseCase*> sourceCases() const override;
-    RimEclipseCase*              findByDescription( const QString& caseDescription ) const override;
     RimEclipseCase*              findByFileName( const QString& gridFileName ) const;
 
     // Grid detection and shared grid

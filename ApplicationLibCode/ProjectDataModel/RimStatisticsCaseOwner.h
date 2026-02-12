@@ -28,8 +28,6 @@ class RimCaseCollection;
 class RimEclipseCase;
 class RimEclipseStatisticsCase;
 
-class QString;
-
 class RimStatisticsCaseOwner
 {
 public:
@@ -40,7 +38,6 @@ public:
     virtual std::vector<RimEclipseCase*> sourceCases() const                                              = 0;
     virtual RigActiveCellInfo*           unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) = 0;
     virtual void                         computeUnionOfActiveCells()                                      = 0;
-    virtual RimEclipseCase*              findByDescription( const QString& caseDescription ) const        = 0;
     virtual RimCaseCollection*           statisticsCaseCollection() const                                 = 0;
 
     virtual RimEclipseStatisticsCase* createAndAppendStatisticsCase();

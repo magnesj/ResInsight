@@ -265,16 +265,6 @@ std::vector<RimEclipseCase*> RimReservoirGridEnsemble::sourceCases() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimEclipseCase* RimReservoirGridEnsemble::findByDescription( const QString& caseDescription ) const
-{
-    if ( !m_caseCollection ) return nullptr;
-
-    return m_caseCollection->findByDescription( caseDescription );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 RimEclipseCase* RimReservoirGridEnsemble::findByFileName( const QString& gridFileName ) const
 {
     for ( RimEclipseCase* rimReservoir : cases() )
