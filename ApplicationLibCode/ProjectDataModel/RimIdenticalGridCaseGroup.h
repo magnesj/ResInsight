@@ -21,6 +21,7 @@
 #pragma once
 
 #include "RiaPorosityModel.h"
+#include "RimStatisticsCaseOwner.h"
 
 #include "cafPdmChildField.h"
 #include "cafPdmField.h"
@@ -40,7 +41,7 @@ class RimEclipseStatisticsCase;
 //
 //
 //==================================================================================================
-class RimIdenticalGridCaseGroup : public caf::PdmObject
+class RimIdenticalGridCaseGroup : public caf::PdmObject, public RimStatisticsCaseOwner
 {
     CAF_PDM_HEADER_INIT;
 
@@ -61,13 +62,16 @@ public:
     RimEclipseStatisticsCase* createAndAppendStatisticsCase();
     RimEclipseStatisticsCase* createAndAppendEmptyStatisticsCase();
 
-    RimEclipseCase* mainCase();
+    RimEclipseCase* mainCase() override;
     void            loadMainCaseAndActiveCellInfo();
 
-    RigMainGrid* mainGrid();
+    RigMainGrid* mainGrid() override;
 
-    RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType );
-    void               computeUnionOfActiveCells();
+    std::vector<RimEclipseCase*> sourceCases() const override;
+    RimEclipseCase*              findByDescription( const QString& caseDescription ) const override;
+
+    RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) override;
+    void               computeUnionOfActiveCells() override;
 
     static bool isStatisticsCaseCollection( RimCaseCollection* rimCaseCollection );
 

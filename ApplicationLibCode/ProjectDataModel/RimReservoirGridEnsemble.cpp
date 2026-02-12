@@ -257,6 +257,14 @@ RimEclipseCase* RimReservoirGridEnsemble::mainCase()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+std::vector<RimEclipseCase*> RimReservoirGridEnsemble::sourceCases() const
+{
+    return cases();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimEclipseCase* RimReservoirGridEnsemble::findByDescription( const QString& caseDescription ) const
 {
     if ( !m_caseCollection ) return nullptr;

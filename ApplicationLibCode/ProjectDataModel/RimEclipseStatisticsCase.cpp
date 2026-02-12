@@ -36,12 +36,11 @@
 #include "RimEclipseStatisticsCaseEvaluator.h"
 #include "RimEclipseView.h"
 #include "RimGridCalculationCollection.h"
-#include "RimIdenticalGridCaseGroup.h"
 #include "RimIntersectionCollection.h"
 #include "RimProject.h"
 #include "RimReservoirCellResultsStorage.h"
-#include "RimReservoirGridEnsemble.h"
 #include "RimSimWellInViewCollection.h"
+#include "RimStatisticsCaseOwner.h"
 
 #include "RiuMainWindow.h"
 
@@ -166,17 +165,19 @@ bool RimEclipseStatisticsCase::openEclipseGridFile()
 {
     if ( eclipseCaseData() ) return true;
 
-    cvf::ref<RigEclipseCaseData> eclipseCase = new RigEclipseCaseData( this );
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return false;
 
-    RigMainGrid* mainGrid = parentMainGrid();
+    RigMainGrid* mainGrid = statisticsOwner->mainGrid();
     if ( !mainGrid ) return false;
 
+    cvf::ref<RigEclipseCaseData> eclipseCase = new RigEclipseCaseData( this );
     eclipseCase->setMainGrid( mainGrid );
 
     eclipseCase->setActiveCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL,
-                                    parentUnionOfActiveCells( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
+                                    statisticsOwner->unionOfActiveCells( RiaDefines::PorosityModelType::MATRIX_MODEL ) );
     eclipseCase->setActiveCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL,
-                                    parentUnionOfActiveCells( RiaDefines::PorosityModelType::FRACTURE_MODEL ) );
+                                    statisticsOwner->unionOfActiveCells( RiaDefines::PorosityModelType::FRACTURE_MODEL ) );
 
     setReservoirData( eclipseCase.p() );
 
@@ -253,8 +254,10 @@ void RimEclipseStatisticsCase::setSourceProperties( RiaDefines::ResultCatType pr
 //--------------------------------------------------------------------------------------------------
 void RimEclipseStatisticsCase::selectAllTimeSteps()
 {
-    RimEclipseCase* mainCase = parentMainCase();
-    if ( mainCase )
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return;
+
+    if ( RimEclipseCase* mainCase = statisticsOwner->mainCase() )
     {
         int timeStepCount = mainCase->timeStepStrings().size();
 
@@ -286,7 +289,10 @@ void RimEclipseStatisticsCase::computeStatistics()
         openEclipseGridFile();
     }
 
-    parentComputeUnionOfActiveCells();
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return;
+
+    statisticsOwner->computeUnionOfActiveCells();
 
     std::vector<RimEclipseCase*> sourceCases = getSourceCases();
 
@@ -415,8 +421,8 @@ void RimEclipseStatisticsCase::computeStatistics()
                                             timeStepIndices,
                                             statisticsConfig,
                                             resultCase,
-                                            parentUnionOfActiveCells( RiaDefines::PorosityModelType::MATRIX_MODEL ),
-                                            parentUnionOfActiveCells( RiaDefines::PorosityModelType::FRACTURE_MODEL ),
+                                            statisticsOwner->unionOfActiveCells( RiaDefines::PorosityModelType::MATRIX_MODEL ),
+                                            statisticsOwner->unionOfActiveCells( RiaDefines::PorosityModelType::FRACTURE_MODEL ),
                                             clearGridCalculationMemory );
 
     if ( m_useZeroAsInactiveCellValue )
@@ -442,129 +448,20 @@ void RimEclipseStatisticsCase::scheduleACTIVEGeometryRegenOnReservoirViews()
 //--------------------------------------------------------------------------------------------------
 std::vector<RimEclipseCase*> RimEclipseStatisticsCase::getSourceCases() const
 {
-    return parentSourceCases();
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return {};
+
+    return statisticsOwner->sourceCases();
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimIdenticalGridCaseGroup* RimEclipseStatisticsCase::caseGroup() const
+RimStatisticsCaseOwner* RimEclipseStatisticsCase::statisticsCaseOwner() const
 {
-    RimCaseCollection* parentCollection = parentStatisticsCaseCollection();
-    if ( parentCollection )
+    if ( RimCaseCollection* parentCollection = parentStatisticsCaseCollection() )
     {
-        return parentCollection->parentCaseGroup();
-    }
-
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimReservoirGridEnsemble* RimEclipseStatisticsCase::gridEnsemble() const
-{
-    RimCaseCollection* parentCollection = parentStatisticsCaseCollection();
-    if ( parentCollection )
-    {
-        return parentCollection->parentGridEnsemble();
-    }
-
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigMainGrid* RimEclipseStatisticsCase::parentMainGrid() const
-{
-    if ( auto* group = caseGroup() )
-    {
-        return group->mainGrid();
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        return ensemble->mainGrid();
-    }
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseCase* RimEclipseStatisticsCase::parentMainCase() const
-{
-    if ( auto* group = caseGroup() )
-    {
-        return group->mainCase();
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        return ensemble->mainCase();
-    }
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<RimEclipseCase*> RimEclipseStatisticsCase::parentSourceCases() const
-{
-    if ( auto* group = caseGroup() )
-    {
-        return group->caseCollection()->reservoirs.childrenByType();
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        return ensemble->cases();
-    }
-    return {};
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RigActiveCellInfo* RimEclipseStatisticsCase::parentUnionOfActiveCells( RiaDefines::PorosityModelType porosityType ) const
-{
-    if ( auto* group = caseGroup() )
-    {
-        return group->unionOfActiveCells( porosityType );
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        return ensemble->unionOfActiveCells( porosityType );
-    }
-    return nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEclipseStatisticsCase::parentComputeUnionOfActiveCells()
-{
-    if ( auto* group = caseGroup() )
-    {
-        group->computeUnionOfActiveCells();
-        return;
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        ensemble->computeUnionOfActiveCells();
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseCase* RimEclipseStatisticsCase::parentFindByDescription( const QString& caseDescription ) const
-{
-    if ( auto* group = caseGroup() )
-    {
-        return group->caseCollection()->findByDescription( caseDescription );
-    }
-    if ( auto* ensemble = gridEnsemble() )
-    {
-        return ensemble->findByDescription( caseDescription );
+        return parentCollection->parentStatisticsCaseOwner();
     }
     return nullptr;
 }
@@ -673,7 +570,10 @@ QList<caf::PdmOptionItemInfo> RimEclipseStatisticsCase::toOptionList( const QStr
 //--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> RimEclipseStatisticsCase::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
-    RimEclipseCase* mainCase = parentMainCase();
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return {};
+
+    RimEclipseCase* mainCase = statisticsOwner->mainCase();
     if ( !( mainCase && mainCase->eclipseCaseData() ) )
     {
         return {};
@@ -798,7 +698,7 @@ QList<caf::PdmOptionItemInfo> RimEclipseStatisticsCase::calculateValueOptions( c
         QStringList sourceCaseNames;
         sourceCaseNames += RiaResultNames::undefinedResultName();
 
-        for ( auto* sourceCase : parentSourceCases() )
+        for ( auto* sourceCase : statisticsOwner->sourceCases() )
         {
             sourceCaseNames += sourceCase->caseUserDescription();
         }
@@ -855,7 +755,10 @@ void RimEclipseStatisticsCase::fieldChangedByUi( const caf::PdmFieldHandle* chan
 void RimEclipseStatisticsCase::loadSimulationWellDataFromSourceCase()
 {
     // Find or load well data for given case
-    RimEclipseCase* sourceResultCase = parentFindByDescription( m_wellDataSourceCase );
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return;
+
+    RimEclipseCase* sourceResultCase = statisticsOwner->findByDescription( m_wellDataSourceCase );
     if ( sourceResultCase )
     {
         sourceResultCase->openEclipseGridFile();
@@ -1101,7 +1004,10 @@ void RimEclipseStatisticsCase::computeStatisticsAndUpdateViews()
 //--------------------------------------------------------------------------------------------------
 void RimEclipseStatisticsCase::populateResultSelection()
 {
-    RimEclipseCase* mainCase = parentMainCase();
+    auto* statisticsOwner = statisticsCaseOwner();
+    if ( !statisticsOwner ) return;
+
+    RimEclipseCase* mainCase = statisticsOwner->mainCase();
     if ( !( mainCase && mainCase->eclipseCaseData() ) )
     {
         return;

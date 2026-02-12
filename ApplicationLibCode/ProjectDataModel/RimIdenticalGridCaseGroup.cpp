@@ -510,3 +510,19 @@ RimEclipseCase* RimIdenticalGridCaseGroup::mainCase()
         return nullptr;
     }
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimEclipseCase*> RimIdenticalGridCaseGroup::sourceCases() const
+{
+    return caseCollection->reservoirs.childrenByType();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimEclipseCase* RimIdenticalGridCaseGroup::findByDescription( const QString& caseDescription ) const
+{
+    return caseCollection->findByDescription( caseDescription );
+}

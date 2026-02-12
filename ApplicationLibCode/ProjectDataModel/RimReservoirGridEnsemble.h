@@ -19,6 +19,7 @@
 #pragma once
 
 #include "RiaPorosityModel.h"
+#include "RimStatisticsCaseOwner.h"
 #include "RimNamedObject.h"
 
 #include "cafAppEnum.h"
@@ -51,7 +52,7 @@ class RimWellTargetMapping;
 /// shared main grid) when they do.
 ///
 //==================================================================================================
-class RimReservoirGridEnsemble : public RimNamedObject
+class RimReservoirGridEnsemble : public RimNamedObject, public RimStatisticsCaseOwner
 {
     CAF_PDM_HEADER_INIT;
 
@@ -79,12 +80,13 @@ public:
     void                         removeCase( RimEclipseCase* reservoir );
     bool                         contains( RimEclipseCase* reservoir ) const;
     std::vector<RimEclipseCase*> cases() const;
-    RimEclipseCase*              mainCase();
-    RimEclipseCase*              findByDescription( const QString& caseDescription ) const;
+    RimEclipseCase*              mainCase() override;
+    std::vector<RimEclipseCase*> sourceCases() const override;
+    RimEclipseCase*              findByDescription( const QString& caseDescription ) const override;
     RimEclipseCase*              findByFileName( const QString& gridFileName ) const;
 
     // Grid detection and shared grid
-    RigMainGrid* mainGrid();
+    RigMainGrid* mainGrid() override;
     void         setupSharedGrid();
 
     // Deferred loading control
@@ -97,8 +99,8 @@ public:
     GridModeType effectiveGridMode() const;
 
     // Active cells
-    RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType );
-    void               computeUnionOfActiveCells();
+    RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) override;
+    void               computeUnionOfActiveCells() override;
 
     // Statistics cases (for identical grids)
     RimEclipseStatisticsCase* createAndAppendStatisticsCase();

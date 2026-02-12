@@ -23,6 +23,7 @@
 #include "cafPdmObject.h"
 
 class RimEclipseCase;
+class RimStatisticsCaseOwner;
 class RimIdenticalGridCaseGroup;
 class RimReservoirGridEnsemble;
 class RimCase;
@@ -45,5 +46,6 @@ public:
 
     RimIdenticalGridCaseGroup* parentCaseGroup();
     RimReservoirGridEnsemble*  parentGridEnsemble();
+    RimStatisticsCaseOwner*    parentStatisticsCaseOwner();
     RimEclipseCase*            findByDescription( const QString& caseDescription ) const;
 };

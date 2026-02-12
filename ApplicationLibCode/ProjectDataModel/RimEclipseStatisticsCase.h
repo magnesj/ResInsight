@@ -33,8 +33,8 @@ class RigMainGrid;
 class RigSimWellData;
 class RimEclipseResultDefinition;
 class RimEclipseStatisticsCaseCollection;
+class RimStatisticsCaseOwner;
 class RimIdenticalGridCaseGroup;
-class RimReservoirGridEnsemble;
 class RimGridCalculation;
 
 //==================================================================================================
@@ -84,17 +84,10 @@ public:
 
     void setWellDataSourceCase( const QString& reservoirDescription );
 
+    RimStatisticsCaseOwner* statisticsCaseOwner() const;
+
 private:
     void scheduleACTIVEGeometryRegenOnReservoirViews();
-
-    RimIdenticalGridCaseGroup*   caseGroup() const;
-    RimReservoirGridEnsemble*    gridEnsemble() const;
-    RigMainGrid*                 parentMainGrid() const;
-    RimEclipseCase*              parentMainCase() const;
-    std::vector<RimEclipseCase*> parentSourceCases() const;
-    RigActiveCellInfo*           parentUnionOfActiveCells( RiaDefines::PorosityModelType porosityType ) const;
-    void                         parentComputeUnionOfActiveCells();
-    RimEclipseCase*              parentFindByDescription( const QString& caseDescription ) const;
 
     std::vector<RimEclipseCase*> getSourceCases() const;
 

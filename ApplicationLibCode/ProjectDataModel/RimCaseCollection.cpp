@@ -70,6 +70,20 @@ RimReservoirGridEnsemble* RimCaseCollection::parentGridEnsemble()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimStatisticsCaseOwner* RimCaseCollection::parentStatisticsCaseOwner()
+{
+    auto* owner = parentField()->ownerObject();
+
+    if ( auto* caseGroup = dynamic_cast<RimIdenticalGridCaseGroup*>( owner ) )
+    {
+        return caseGroup;
+    }
+    return dynamic_cast<RimReservoirGridEnsemble*>( owner );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimEclipseCase* RimCaseCollection::findByDescription( const QString& caseDescription ) const
 {
     for ( size_t i = 0; i < reservoirs.size(); i++ )
