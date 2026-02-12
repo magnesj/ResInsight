@@ -784,6 +784,22 @@ void RimReservoirGridEnsemble::loadGridDataFromFiles()
         loadGridsInIndividualMode();
     }
 
+    // NB! This code must be run AFTER loading grids.
+    for ( auto view : m_viewCollection->views() )
+    {
+        if ( view )
+        {
+            // Resolve the grid case reference for the view after grids are loaded
+            view->resolveReferencesRecursively();
+
+            // Propagate the eclipse case to child objects to ensure all references are updated. setEclipseCase() calls
+            // propagateEclipseCaseToChildObjects() internally, but we need to call it here to ensure propagation after loading and
+            // reference resolution.
+            auto eclipseCase = view->eclipseCase();
+            view->setEclipseCase( eclipseCase );
+        }
+    }
+
     updateConnectedEditors();
 }
 
