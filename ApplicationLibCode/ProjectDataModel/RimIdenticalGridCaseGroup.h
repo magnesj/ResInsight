@@ -62,7 +62,7 @@ public:
 
     RimEclipseCase*    mainCase() override;
     RimCaseCollection* statisticsCaseCollection() const override;
-    void            loadMainCaseAndActiveCellInfo();
+    void               loadMainCaseAndActiveCellInfo();
 
     RigMainGrid* mainGrid() override;
 

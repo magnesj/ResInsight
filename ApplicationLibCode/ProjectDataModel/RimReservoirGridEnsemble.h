@@ -19,8 +19,8 @@
 #pragma once
 
 #include "RiaPorosityModel.h"
-#include "RimStatisticsCaseOwner.h"
 #include "RimNamedObject.h"
+#include "RimStatisticsCaseOwner.h"
 
 #include "cafAppEnum.h"
 #include "cafPdmChildArrayField.h"
