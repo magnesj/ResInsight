@@ -508,4 +508,3 @@ std::vector<RimEclipseCase*> RimIdenticalGridCaseGroup::sourceCases() const
 {
     return caseCollection->reservoirs.childrenByType();
 }
-

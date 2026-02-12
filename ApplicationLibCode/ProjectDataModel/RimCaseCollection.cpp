@@ -80,4 +80,3 @@ RimStatisticsCaseOwner* RimCaseCollection::parentStatisticsCaseOwner()
     }
     return dynamic_cast<RimReservoirGridEnsemble*>( owner );
 }
-
