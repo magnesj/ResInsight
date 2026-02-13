@@ -111,23 +111,6 @@ RimReservoirGridEnsemble::RimReservoirGridEnsemble()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimReservoirGridEnsemble::~RimReservoirGridEnsemble()
-{
-    m_mainGrid = nullptr;
-
-    delete m_caseCollection;
-    m_caseCollection = nullptr;
-
-    delete m_statisticsCaseCollection;
-    m_statisticsCaseCollection = nullptr;
-
-    delete m_viewCollection;
-    m_viewCollection = nullptr;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 int RimReservoirGridEnsemble::groupId() const
 {
     return m_groupId;
@@ -496,31 +479,30 @@ RimEclipseView* RimReservoirGridEnsemble::addViewForCase( RimEclipseCase* eclips
 //--------------------------------------------------------------------------------------------------
 std::vector<RimEclipseView*> RimReservoirGridEnsemble::allViews() const
 {
-    std::vector<RimEclipseView*> retList;
-    if ( !viewCollection() ) return retList;
+    std::vector<RimEclipseView*> views;
 
-    for ( auto view : viewCollection()->views() )
+    for ( auto view : m_viewCollection->views() )
     {
-        retList.push_back( view );
+        views.push_back( view );
     }
 
-    for ( auto cmap : m_statisticsContourMaps.childrenByType() )
+    for ( auto statCase : m_statisticsCaseCollection->reservoirs() )
     {
-        for ( auto view : cmap->views() )
+        for ( auto view : statCase->reservoirViews() )
         {
-            retList.push_back( view );
+            views.push_back( view );
         }
     }
 
-    return retList;
-}
+    for ( auto cmap : m_statisticsContourMaps )
+    {
+        for ( auto view : cmap->views() )
+        {
+            views.push_back( view );
+        }
+    }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-RimEclipseViewCollection* RimReservoirGridEnsemble::viewCollection() const
-{
-    return m_viewCollection;
+    return views;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -781,7 +763,8 @@ void RimReservoirGridEnsemble::loadGridDataFromFiles()
     }
     else
     {
-        loadGridsInIndividualMode();
+        // TODO: Probably not needed load grids here, they are loaded on demand in individual mode
+        // loadGridsInIndividualMode();
     }
 
     // NB! This code must be run AFTER loading grids.

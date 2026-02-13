@@ -65,7 +65,6 @@ public:
     };
 
     RimReservoirGridEnsemble();
-    ~RimReservoirGridEnsemble() override;
 
     // Ensemble file set connection
     void                setEnsembleFileSet( RimEnsembleFileSet* ensembleFileSet );
@@ -109,7 +108,6 @@ public:
     void                         addView( RimEclipseView* view );
     RimEclipseView*              addViewForCase( RimEclipseCase* eclipseCase );
     std::vector<RimEclipseView*> allViews() const;
-    RimEclipseViewCollection*    viewCollection() const;
     std::set<RimEclipseCase*>    casesInViews() const;
 
     // Well target mapping
