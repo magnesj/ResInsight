@@ -137,25 +137,19 @@ jobs:
           cd ThirdParty/vcpkg
           ./bootstrap-vcpkg.sh
 
-      - name: Check vcpkg secrets
-        shell: bash
-        run: |
-          if [ -z "${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}" ]; then
-            echo "Error: AZURE_VCPKG_STORAGE_ACCOUNT secret is not set"
-            exit 1
-          fi
-          if [ -z "${{ secrets.AZURE_VCPKG_SAS_TOKEN }}" ]; then
-            echo "Error: AZURE_VCPKG_SAS_TOKEN secret is not set"
-            exit 1
-          fi
-          echo "All required vcpkg secrets are present"
+      - name: Restore vcpkg cache
+        id: vcpkg-cache
+        uses: TAServers/vcpkg-cache@f645f5b5c4a8a6546911a64b3b02ac86b76f584c
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          prefix: vcpkg-g++/
 
       - name: Configure CMake
         env:
           CC: /opt/rh/gcc-toolset-14/root/usr/bin/gcc
           CXX: /opt/rh/gcc-toolset-14/root/usr/bin/g++
           VCPKG_FEATURE_FLAGS: "binarycaching"
-          VCPKG_BINARY_SOURCES: "clear;x-azblob,https://${{ secrets.AZURE_VCPKG_STORAGE_ACCOUNT }}.blob.core.windows.net/vcpkg-binaries,${{ secrets.AZURE_VCPKG_SAS_TOKEN }},readwrite"
+          VCPKG_BINARY_SOURCES: "clear;files,${{ steps.vcpkg-cache.outputs.path }},readwrite"
         run: |
           source /opt/rh/gcc-toolset-14/enable
           cmake -S . -B cmakebuild -G Ninja \
