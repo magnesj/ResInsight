@@ -172,6 +172,7 @@ RiaPreferences::RiaPreferences()
                        "" );
 
     CAF_PDM_InitField( &m_defaultScaleFactorZ, "defaultScaleFactorZ", 5.0, "Default Z Scale Factor" );
+    m_defaultScaleFactorZ.setRange( 0.000001, 100000.0 );
 
     CAF_PDM_InitFieldNoDefault( &defaultSceneFontSize, "defaultSceneFontSizePt", "Viewer Font Size" );
     CAF_PDM_InitFieldNoDefault( &defaultAnnotationFontSize, "defaultAnnotationFontSizePt", "Annotation Font Size" );
@@ -348,14 +349,6 @@ void RiaPreferences::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
         if ( myAttr )
         {
             myAttr->validator = new RiaValidRegExpValidator( RiaPreferences::defaultMultiLateralWellNamePattern() );
-        }
-    }
-    else if ( field == &m_defaultScaleFactorZ )
-    {
-        auto myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( myAttr )
-        {
-            myAttr->validator = new QDoubleValidator( 0.000001, 100000.0, 6 );
         }
     }
     else if ( ( field == &m_deleteOsduToken ) || ( field == &m_deleteSumoToken ) )

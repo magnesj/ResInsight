@@ -53,6 +53,7 @@ RimCustomObjectiveFunctionWeight::RimCustomObjectiveFunctionWeight()
 
     CAF_PDM_InitField( &m_weightValue, "WeightValue", 1.0, "Weight" );
     m_weightValue.uiCapability()->setUiEditorTypeName( caf::PdmUiLineEditor::uiEditorTypeName() );
+    m_weightValue.setRange( 0.0, 9999.0 );
 
     CAF_PDM_InitFieldNoDefault( &m_objectiveFunction, "ObjectiveFunction", "Objective Function" );
     m_objectiveFunction.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -168,16 +169,6 @@ void RimCustomObjectiveFunctionWeight::defineEditorAttribute( const caf::PdmFiel
                                                               QString                    uiConfigName,
                                                               caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_weightValue )
-    {
-        caf::PdmUiLineEditorAttribute* myAttr = dynamic_cast<caf::PdmUiLineEditorAttribute*>( attribute );
-        if ( !myAttr )
-        {
-            return;
-        }
-
-        myAttr->validator = new QDoubleValidator( 0.0, 9999.0, 2 );
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

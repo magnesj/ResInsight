@@ -112,6 +112,7 @@ RimMudWeightWindowParameters::RimMudWeightWindowParameters()
     CAF_PDM_InitField( &m_wellDeviationType, "WellDeviationSourceType", defaultSourceType, "Well Deviation" );
     CAF_PDM_InitField( &m_wellDeviationFixed, "WellDeviationFixed", 0.0, "Fixed Well Deviation" );
     m_wellDeviationFixed.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_wellDeviationFixed.setRange( 0.0, 360.0 );
 
     CAF_PDM_InitField( &m_wellDeviationAddress, "WellDeviationAddress", QString( "" ), "Value" );
     m_wellDeviationAddress.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -119,6 +120,7 @@ RimMudWeightWindowParameters::RimMudWeightWindowParameters()
     CAF_PDM_InitField( &m_wellAzimuthType, "WellAzimuthSourceType", defaultSourceType, "Well Azimuth" );
     CAF_PDM_InitField( &m_wellAzimuthFixed, "WellAzimuthFixed", 0.0, "Fixed Well Azimuth" );
     m_wellAzimuthFixed.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_wellAzimuthFixed.setRange( 0.0, 360.0 );
 
     CAF_PDM_InitField( &m_wellAzimuthAddress, "WellAzimuthAddress", QString( "" ), "Value" );
     m_wellAzimuthAddress.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -521,14 +523,6 @@ void RimMudWeightWindowParameters::defineEditorAttribute( const caf::PdmFieldHan
                                                           QString                    uiConfigName,
                                                           caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_wellDeviationFixed || field == &m_wellAzimuthFixed )
-    {
-        auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.0, 360.0, 3 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
