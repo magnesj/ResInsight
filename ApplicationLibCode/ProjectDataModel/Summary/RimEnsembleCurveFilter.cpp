@@ -526,7 +526,7 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     else if ( m_filterMode() == FilterMode::OBJECTIVE_FUNCTION )
     {
         uiOrdering.add( &m_objectiveValuesSummaryAddressesUiField );
-        uiOrdering.add( &m_objectiveValuesSelectSummaryAddressPushButton, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+        uiOrdering.addNewButton( &m_objectiveValuesSelectSummaryAddressPushButton, "...", { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
         {
             auto equationGroup = uiOrdering.addNewGroup( "Equation" );
             m_objectiveFunction->uiOrdering( "", *equationGroup );
@@ -573,14 +573,7 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveFilter::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_objectiveValuesSelectSummaryAddressPushButton )
-    {
-        if ( auto attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-        {
-            attr->m_buttonText = "...";
-        }
-    }
-    else if ( field == &m_valueRange )
+    if ( field == &m_valueRange )
     {
         if ( auto attr = dynamic_cast<caf::PdmUiDoubleSliderEditorAttribute*>( attribute ) )
         {
