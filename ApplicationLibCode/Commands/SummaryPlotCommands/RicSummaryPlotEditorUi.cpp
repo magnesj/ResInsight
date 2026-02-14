@@ -260,9 +260,9 @@ QList<caf::PdmOptionItemInfo> RicSummaryPlotEditorUi::calculateValueOptions( con
 void RicSummaryPlotEditorUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_targetPlot );
-    uiOrdering.add( &m_okButtonField );
-    uiOrdering.add( &m_applyButtonField );
-    uiOrdering.add( &m_closeButtonField );
+    uiOrdering.addNewButton( &m_okButtonField, "OK" );
+    uiOrdering.addNewButton( &m_applyButtonField, "Apply" );
+    uiOrdering.addNewButton( &m_closeButtonField, "Cancel" );
 
     uiOrdering.skipRemainingFields( true );
 
@@ -499,31 +499,7 @@ void RicSummaryPlotEditorUi::updatePreviewCurvesFromCurveDefinitions( const std:
 //--------------------------------------------------------------------------------------------------
 void RicSummaryPlotEditorUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( &m_applyButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Apply";
-        }
-    }
-    else if ( &m_closeButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Cancel";
-        }
-    }
-    else if ( &m_okButtonField == field )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "OK";
-        }
-    }
-    else if ( &m_targetPlot == field )
+    if ( &m_targetPlot == field )
     {
         caf::PdmUiComboBoxEditorAttribute* attrib = dynamic_cast<caf::PdmUiComboBoxEditorAttribute*>( attribute );
         if ( attrib )
