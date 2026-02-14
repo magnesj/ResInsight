@@ -51,8 +51,6 @@
 #include "cafPdmUiDoubleValueEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
-#include <QDoubleValidator>
-
 namespace caf
 {
 template <>
