@@ -1226,7 +1226,7 @@ void RimEnsembleCurveSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         caf::PdmUiGroup* curveDataGroup = uiOrdering.addNewGroup( "Summary Vector" );
         curveDataGroup->add( &m_yValuesSummaryEnsemble );
         curveDataGroup->add( &m_yValuesSummaryAddressUiField );
-        curveDataGroup->add( &m_yPushButtonSelectSummaryAddress, { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+        curveDataGroup->addNewButton( &m_yPushButtonSelectSummaryAddress, "...", { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
         if ( !isXAxisSummaryVector() )
         {
@@ -1432,8 +1432,9 @@ void RimEnsembleCurveSet::appendColorGroup( caf::PdmUiOrdering& uiOrdering )
         if ( m_colorMode == ColorMode::BY_OBJECTIVE_FUNCTION )
         {
             colorsGroup->add( &m_objectiveValuesSummaryAddressesUiField );
-            colorsGroup->add( &m_objectiveValuesSelectSummaryAddressPushButton,
-                              { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+            colorsGroup->addNewButton( &m_objectiveValuesSelectSummaryAddressPushButton,
+                                       "...",
+                                       { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
             {
                 auto equationGroup = colorsGroup->addNewGroup( "Equation" );
@@ -1521,11 +1522,6 @@ caf::PdmFieldHandle* RimEnsembleCurveSet::objectToggleField()
 //--------------------------------------------------------------------------------------------------
 void RimEnsembleCurveSet::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( auto* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute ) )
-    {
-        attrib->m_buttonText = "...";
-    }
-
     if ( field == &m_minTimeSliderPosition || field == &m_maxTimeSliderPosition )
     {
         if ( auto* myAttr = dynamic_cast<caf::PdmUiSliderEditorAttribute*>( attribute ) )
