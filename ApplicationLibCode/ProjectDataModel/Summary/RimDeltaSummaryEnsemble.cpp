@@ -350,7 +350,7 @@ void RimDeltaSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUi
     caseGroup->add( &m_ensemble1 );
     caseGroup->add( &m_operator );
     caseGroup->add( &m_ensemble2 );
-    caseGroup->add( &m_swapEnsemblesButton );
+    caseGroup->addNewButton( &m_swapEnsemblesButton, "Swap Ensembles" );
 
     caseGroup->add( &m_useFixedTimeStep );
     if ( m_useFixedTimeStep() != RimDeltaSummaryEnsemble::FixedTimeStepMode::FIXED_TIME_STEP_NONE )
@@ -430,14 +430,6 @@ void RimDeltaSummaryEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chang
 //--------------------------------------------------------------------------------------------------
 void RimDeltaSummaryEnsemble::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
-    if ( field == &m_swapEnsemblesButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attrib = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( attrib )
-        {
-            attrib->m_buttonText = "Swap Ensembles";
-        }
-    }
     if ( &m_fixedTimeStepIndex == field )
     {
         auto a = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
