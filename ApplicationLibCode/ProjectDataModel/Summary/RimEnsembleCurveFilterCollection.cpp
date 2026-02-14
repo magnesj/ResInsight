@@ -128,7 +128,7 @@ void RimEnsembleCurveFilterCollection::defineUiOrdering( QString uiConfigName, c
 {
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Filters" );
 
-    group->add( &m_newFilterButton );
+    group->addNewButton( &m_newFilterButton, "Add Ensemble Curve Filter" );
 
     for ( auto& filter : m_filters )
     {
@@ -193,22 +193,6 @@ void RimEnsembleCurveFilterCollection::defineUiTreeOrdering( caf::PdmUiTreeOrder
         uiTreeOrdering.add( filter );
     }
     uiTreeOrdering.skipRemainingChildren( true );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RimEnsembleCurveFilterCollection::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                              QString                    uiConfigName,
-                                                              caf::PdmUiEditorAttribute* attribute )
-{
-    if ( field == &m_newFilterButton )
-    {
-        caf::PdmUiPushButtonEditorAttribute* attr = dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute );
-        if ( !attr ) return;
-
-        attr->m_buttonText = "Add Ensemble Curve Filter";
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
