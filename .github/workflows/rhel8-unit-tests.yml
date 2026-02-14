@@ -69,7 +69,7 @@ jobs:
           # Get major.minor version for download (e.g., 14.2.0 - releases use .0 patch)
           GCC_MAJOR_MINOR=$(echo $GCC_FULL_VERSION | cut -d. -f1,2)
           GCC_VERSION="${GCC_MAJOR_MINOR}.0"
-          GCC_VERSION: "14.1.0"
+          GCC_VERSION="14.1.0"
           echo "GCC full version: $GCC_FULL_VERSION"
           echo "GCC download version: $GCC_VERSION"
 
