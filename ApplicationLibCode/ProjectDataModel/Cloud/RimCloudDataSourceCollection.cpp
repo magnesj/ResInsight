@@ -192,13 +192,11 @@ void RimCloudDataSourceCollection::defineUiOrdering( QString uiConfigName, caf::
         uiOrdering.add( &m_sumoCaseId, layout );
         uiOrdering.add( &m_sumoEnsembleNames, layout );
 
-        uiOrdering.addNewButton( "Add Data Sources(s)", [this]() { addDataSources(); }, layout );
+        uiOrdering.addNewButton( "Add Data Source(s)", [this]() { addDataSources(); }, layout );
         uiOrdering.addNewButton( "Add Ensemble(s)", [this]() { addEnsembles(); }, layout );
     }
     uiOrdering.skipRemainingFields();
 }
-
-
 
 //--------------------------------------------------------------------------------------------------
 ///

@@ -338,8 +338,6 @@ void RiaMemoryCleanup::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderin
     uiOrdering.addNewButton( "Show Memory Report", [this]() { showMemoryReport(); } );
 }
 
-
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
