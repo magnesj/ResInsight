@@ -88,10 +88,14 @@ jobs:
             --disable-libstdcxx-pch \
             --with-gxx-include-dir=/opt/rh/gcc-toolset-14/root/usr/include/c++/${GCC_VERSION}
 
-          # Build dependencies and experimental library
-          make -j$(nproc)
+          # Build the experimental library (use -k to continue past unrelated failures like tzdb.cc)
+          make -k -j$(nproc) || true
 
-          # Install the library
+          # Verify and install the library
+          if [ ! -f src/experimental/.libs/libstdc++exp.a ]; then
+            echo "ERROR: libstdc++exp.a was not built"
+            exit 1
+          fi
           mkdir -p /opt/libstdcxx-exp/lib
           cp src/experimental/.libs/libstdc++exp.a /opt/libstdcxx-exp/lib/
 
