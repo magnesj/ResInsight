@@ -51,19 +51,15 @@ private:
 
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
     void                          defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     std::vector<RimSummarySumoDataSource*> addDataSources();
     void                                   addEnsembles();
 
 private:
-    caf::PdmField<bool>                 m_authenticate;
     caf::PdmField<QString>              m_sumoFieldName;
     caf::PdmField<QString>              m_sumoCaseId;
     caf::PdmField<std::vector<QString>> m_sumoEnsembleNames;
 
-    caf::PdmField<bool>                                m_addDataSources;
-    caf::PdmField<bool>                                m_addEnsembles;
     caf::PdmChildArrayField<RimSummarySumoDataSource*> m_sumoDataSources;
 
     QPointer<RiaSumoConnector> m_sumoConnector;
