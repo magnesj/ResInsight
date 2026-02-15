@@ -45,7 +45,6 @@
 #include "cafPdmUiDefaultObjectEditor.h"
 #include "cafPdmUiFieldEditorHandle.h"
 
-#include <QDoubleValidator>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -64,13 +63,6 @@ PdmUiDoubleValueEditor::PdmUiDoubleValueEditor()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-PdmUiDoubleValueEditor::~PdmUiDoubleValueEditor()
-{
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
 {
     CAF_ASSERT( !m_lineEdit.isNull() );
@@ -79,27 +71,19 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     m_lineEdit->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
 
-    caf::PdmUiObjectHandle* uiObject = uiObj( uiField()->fieldHandle()->ownerObject() );
-    if ( uiObject )
-    {
-        uiObject->editorAttribute( uiField()->fieldHandle(), uiConfigName, &m_attributes );
-        if ( m_attributes.m_validator )
-        {
-            m_lineEdit->setValidator( m_attributes.m_validator );
-        }
-    }
+    NumberFormatType numberFormat = NumberFormatType::AUTO;
+    int              precision    = 6;
 
-    // Override with map-based attributes if present (new system takes precedence)
     if ( auto uiItem = uiField() )
     {
         if ( auto val = uiItem->attribute<int>( Keys::DECIMALS, uiConfigName ) )
         {
-            m_attributes.m_decimals = val.value();
+            precision = val.value();
         }
 
         if ( auto val = uiItem->attribute<int>( Keys::NUMBER_FORMAT, uiConfigName ) )
         {
-            m_attributes.m_numberFormat = static_cast<NumberFormatType>( val.value() );
+            numberFormat = static_cast<NumberFormatType>( val.value() );
         }
 
         // Validate: warn about unsupported attributes
@@ -111,7 +95,7 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
     QString textValue;
     if ( valueOk )
     {
-        textValue = PdmUiNumberFormat::valueToText( value, m_attributes.m_numberFormat, m_attributes.m_decimals );
+        textValue = PdmUiNumberFormat::valueToText( value, numberFormat, precision );
     }
     else
     {
