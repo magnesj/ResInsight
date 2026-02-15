@@ -72,7 +72,7 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_airGap.setRange( 0.0, std::numeric_limits<double>::max() );
+    m_airGap.setMinValue( 0.0 );
     m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
     m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT, static_cast<int>( caf::NumberFormatType::FIXED ) );
 

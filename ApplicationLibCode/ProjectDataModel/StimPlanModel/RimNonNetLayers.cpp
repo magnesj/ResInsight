@@ -47,6 +47,7 @@ RimNonNetLayers::RimNonNetLayers()
     CAF_PDM_InitScriptableField( &m_cutOff, "Cutoff", 0.0, "Cutoff" );
     m_cutOff.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_cutOff.setRange( 0.0, 1.0 );
+    m_cutOff.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
 
     CAF_PDM_InitScriptableFieldNoDefault( &m_facies, "Facies", "Facies" );
 

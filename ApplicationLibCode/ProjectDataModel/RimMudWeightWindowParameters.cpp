@@ -113,6 +113,7 @@ RimMudWeightWindowParameters::RimMudWeightWindowParameters()
     CAF_PDM_InitField( &m_wellDeviationFixed, "WellDeviationFixed", 0.0, "Fixed Well Deviation" );
     m_wellDeviationFixed.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_wellDeviationFixed.setRange( 0.0, 360.0 );
+    m_wellDeviationFixed.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
 
     CAF_PDM_InitField( &m_wellDeviationAddress, "WellDeviationAddress", QString( "" ), "Value" );
     m_wellDeviationAddress.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
@@ -121,6 +122,7 @@ RimMudWeightWindowParameters::RimMudWeightWindowParameters()
     CAF_PDM_InitField( &m_wellAzimuthFixed, "WellAzimuthFixed", 0.0, "Fixed Well Azimuth" );
     m_wellAzimuthFixed.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_wellAzimuthFixed.setRange( 0.0, 360.0 );
+    m_wellAzimuthFixed.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
 
     CAF_PDM_InitField( &m_wellAzimuthAddress, "WellAzimuthAddress", QString( "" ), "Value" );
     m_wellAzimuthAddress.uiCapability()->setUiEditorTypeName( caf::PdmUiTreeSelectionEditor::uiEditorTypeName() );
