@@ -72,6 +72,10 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
 
     CAF_PDM_InitScriptableField( &m_airGap, "AirGap", 0.0, "Air Gap" );
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_airGap.setRange( 0.0, std::numeric_limits<double>::max() );
+    m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
+    m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT,
+                                           static_cast<int>( caf::NumberFormatType::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_mdAtFirstTarget, "MdAtFirstTarget", 0.0, "MD at First Target" );
     m_mdAtFirstTarget.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
@@ -776,15 +780,6 @@ void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* f
         }
     }
 
-    if ( field == &m_airGap )
-    {
-        auto uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_decimals  = 2;
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.0, std::numeric_limits<double>::max(), 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------

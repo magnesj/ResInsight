@@ -82,6 +82,10 @@ RimWellMeasurementInView::RimWellMeasurementInView()
 
     CAF_PDM_InitField( &m_radiusScaleFactor, "RadiusScaleFactor", 2.5, "Radius Scale" );
     m_radiusScaleFactor.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
+    m_radiusScaleFactor.setRange( 0.001, 100.0 );
+    m_radiusScaleFactor.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
+    m_radiusScaleFactor.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT,
+                                                      static_cast<int>( caf::NumberFormatType::FIXED ) );
 
     setName( "Well Measurement" );
 
@@ -147,15 +151,6 @@ void RimWellMeasurementInView::defineEditorAttribute( const caf::PdmFieldHandle*
         }
     }
 
-    if ( field == &m_radiusScaleFactor )
-    {
-        caf::PdmUiDoubleValueEditorAttribute* uiDoubleValueEditorAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attribute );
-        if ( uiDoubleValueEditorAttr )
-        {
-            uiDoubleValueEditorAttr->m_decimals  = 2;
-            uiDoubleValueEditorAttr->m_validator = new QDoubleValidator( 0.001, 100.0, 2 );
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
