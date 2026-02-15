@@ -106,7 +106,7 @@ RimGeoMechResultDefinition::RimGeoMechResultDefinition()
     CAF_PDM_InitField( &m_normalizeByHydrostaticPressure, "NormalizeByHSP", false, "Normalize by Hydrostatic Pressure" );
     CAF_PDM_InitField( &m_normalizationAirGap, "NormalizationAirGap", 0.0, "Air Gap" );
     m_normalizationAirGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
-    m_normalizationAirGap.setRange( 0.0, std::numeric_limits<double>::max() );
+    m_normalizationAirGap.setMinValue( 0.0 );
     m_normalizationAirGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
     m_normalizationAirGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT,
                                                         static_cast<int>( caf::NumberFormatType::FIXED ) );
