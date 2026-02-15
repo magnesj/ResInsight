@@ -193,7 +193,6 @@ protected:
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
     void initAfterRead() override;
-    void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
     void onLoadDataAndUpdate() override;
     void updatePlots();
     caf::PdmFieldHandle* userDescriptionField() override;
