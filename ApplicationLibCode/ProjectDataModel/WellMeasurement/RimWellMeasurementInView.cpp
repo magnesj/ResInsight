@@ -150,7 +150,6 @@ void RimWellMeasurementInView::defineEditorAttribute( const caf::PdmFieldHandle*
             myAttr->m_maximum = m_maximumResultValue;
         }
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------
