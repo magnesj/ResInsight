@@ -25,7 +25,6 @@
 #include "RiaNumericalTools.h"
 #include "RiaPreferences.h"
 #include "RiaResultNames.h"
-#include "cafPdmUiNumberFormat.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimColorLegend.h"

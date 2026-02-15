@@ -24,7 +24,6 @@
 #include "RiaPreferences.h"
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedHarmonicMeanCalculator.h"
-#include "cafPdmUiNumberFormat.h"
 
 #include "RigEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"
@@ -45,6 +44,7 @@
 #include "FractureCommands/RicNewStimPlanFractureTemplateFeature.h"
 
 #include "cafAppEnum.h"
+#include "cafPdmUiNumberFormat.h"
 #include "cafPdmUiTextEditor.h"
 #include "cafPdmUiToolButtonEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"

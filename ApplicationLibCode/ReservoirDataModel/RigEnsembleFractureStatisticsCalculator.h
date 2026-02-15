@@ -21,6 +21,7 @@
 #include "RiaDefines.h"
 
 #include "RigHistogramData.h"
+
 #include "cafPdmUiNumberFormat.h"
 
 #include "cvfObject.h"

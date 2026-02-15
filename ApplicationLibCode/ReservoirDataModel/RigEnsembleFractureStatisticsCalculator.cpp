@@ -21,7 +21,6 @@
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaWeightedMeanCalculator.h"
-#include "cafPdmUiNumberFormat.h"
 
 #include "RigFractureCell.h"
 #include "RigFractureGrid.h"

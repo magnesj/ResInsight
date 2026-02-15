@@ -20,11 +20,10 @@
 
 #include "ContourMap/RigContourPolygonsTools.h"
 
-#include "cafPdmUiNumberFormat.h"
-
 #include "cafDisplayCoordTransform.h"
 #include "cafPdmObject.h"
 #include "cafPdmPointer.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "cvfDrawableGeo.h"
 #include "cvfDrawableText.h"

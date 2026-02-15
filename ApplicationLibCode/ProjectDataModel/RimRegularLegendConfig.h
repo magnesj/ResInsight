@@ -20,8 +20,6 @@
 
 #pragma once
 
-#include "cafPdmUiNumberFormat.h"
-
 #include "RimLegendConfig.h"
 #include "RimLegendConfigChangeType.h"
 
@@ -29,6 +27,7 @@
 #include "cvfObject.h"
 
 #include "cafPdmPtrField.h"
+#include "cafPdmUiNumberFormat.h"
 #include "cafSignal.h"
 
 #include <tuple>

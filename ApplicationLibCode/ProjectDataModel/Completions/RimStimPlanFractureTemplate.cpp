@@ -25,7 +25,6 @@
 #include "RiaLogging.h"
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedMeanCalculator.h"
-#include "cafPdmUiNumberFormat.h"
 
 #include "RifStimPlanXmlReader.h"
 
@@ -52,6 +51,7 @@
 #include "cafPdmObjectScriptingCapability.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiFilePathEditor.h"
+#include "cafPdmUiNumberFormat.h"
 #include "cafPdmUiTextEditor.h"
 
 #include "cvfMath.h"

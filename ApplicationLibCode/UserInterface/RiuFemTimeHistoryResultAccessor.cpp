@@ -19,8 +19,6 @@
 
 #include "RiuFemTimeHistoryResultAccessor.h"
 
-#include "cafPdmUiNumberFormat.h"
-
 #include "RigFemClosestResultIndexCalculator.h"
 #include "RigFemPart.h"
 #include "RigFemPartCollection.h"
@@ -30,6 +28,8 @@
 #include "RigGeoMechCaseData.h"
 
 #include "RiuGeoMechXfTensorResultAccessor.h"
+
+#include "cafPdmUiNumberFormat.h"
 
 #include <cmath> // Needed for HUGE_VAL on Linux
 

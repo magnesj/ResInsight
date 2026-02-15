@@ -17,9 +17,9 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "cafPdmUiNumberFormat.h"
-
 #include "RiuAbstractLegendFrame.h"
+
+#include "cafPdmUiNumberFormat.h"
 
 #include "cvfObject.h"
 #include "cvfRect.h"
