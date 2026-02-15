@@ -39,7 +39,6 @@
 #include "cafPdmUiFieldLabelEditorHandle.h"
 #include "cafPdmUiNumberFormat.h"
 
-#include <QDoubleValidator>
 #include <QGroupBox>
 #include <QLabel>
 #include <QLineEdit>
@@ -49,23 +48,6 @@
 
 namespace caf
 {
-//==================================================================================================
-///
-//==================================================================================================
-class PdmUiDoubleValueEditorAttribute : public PdmUiEditorAttribute
-{
-public:
-    PdmUiDoubleValueEditorAttribute()
-    {
-        m_decimals     = 6;
-        m_numberFormat = NumberFormatType::AUTO;
-    }
-
-public:
-    int                        m_decimals;
-    NumberFormatType           m_numberFormat;
-    QPointer<QDoubleValidator> m_validator;
-};
 
 //==================================================================================================
 ///
@@ -77,7 +59,6 @@ class PdmUiDoubleValueEditor : public PdmUiFieldLabelEditorHandle
 
 public:
     PdmUiDoubleValueEditor();
-    ~PdmUiDoubleValueEditor() override;
 
     // Attribute key constants for compile-time safety and discoverability
     struct Keys
@@ -101,8 +82,6 @@ private:
 
 private:
     QPointer<QLineEdit> m_lineEdit;
-
-    PdmUiDoubleValueEditorAttribute m_attributes;
 };
 
 } // end namespace caf
