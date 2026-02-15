@@ -61,6 +61,11 @@ ValidationTestObject::ValidationTestObject()
     CAF_PDM_InitField( &m_rangeField, "rangeField", 0.0, "Range Field", "", "", "" );
     m_rangeField.uiCapability()->setUiToolTip( "Valid range: -100.0 to 100.0" );
     m_rangeField.setRange( -100.0, 100.0 );
+
+    // Toggle+double field with range validation: 0.001 to 1000.0
+    CAF_PDM_InitField( &m_toggleDoubleField, "toggleDoubleField", std::make_pair( false, 1.0 ), "Toggle Double", "", "", "" );
+    m_toggleDoubleField.uiCapability()->setUiToolTip( "Valid range: 0.001 to 1000.0" );
+    m_toggleDoubleField.setRange( 0.001, 1000.0 );
 }
 
 //--------------------------------------------------------------------------------------------------
