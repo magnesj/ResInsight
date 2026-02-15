@@ -20,8 +20,8 @@
 
 #include "RiaDefines.h"
 
-#include "cafPdmUiNumberFormat.h"
 #include "RigHistogramData.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "cvfObject.h"
 

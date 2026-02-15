@@ -64,7 +64,7 @@ void PdmUiCheckBoxAndTextEditor::configureAndUpdateUi( const QString& uiConfigNa
     m_lineEdit->setToolTip( uiField()->uiToolTip( uiConfigName ) );
 
     // Read display format from map-based attributes
-    int decimals    = -1;
+    int decimals     = -1;
     int numberFormat = -1;
     if ( auto uiItem = uiField() )
     {
@@ -97,7 +97,7 @@ void PdmUiCheckBoxAndTextEditor::configureAndUpdateUi( const QString& uiConfigNa
             double value   = lst[1].toDouble( &valueOk );
             if ( valueOk && decimals >= 0 )
             {
-                auto fmt = static_cast<PdmUiNumberFormat::NumberFormatType>( numberFormat );
+                auto fmt   = static_cast<PdmUiNumberFormat::NumberFormatType>( numberFormat );
                 textString = PdmUiNumberFormat::valueToText( value, fmt, decimals );
             }
             else

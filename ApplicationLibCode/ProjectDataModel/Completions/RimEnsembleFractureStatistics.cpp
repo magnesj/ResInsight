@@ -21,10 +21,10 @@
 #include "RiaApplication.h"
 #include "RiaDefines.h"
 #include "RiaLogging.h"
-#include "cafPdmUiNumberFormat.h"
 #include "RiaPreferences.h"
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedHarmonicMeanCalculator.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RigEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"

@@ -22,10 +22,10 @@
 
 #include "RiaApplication.h"
 #include "RiaColorTables.h"
-#include "cafPdmUiNumberFormat.h"
 #include "RiaNumericalTools.h"
 #include "RiaPreferences.h"
 #include "RiaResultNames.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimColorLegend.h"
@@ -1162,9 +1162,9 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
 {
     bool useLog = RiaResultNames::isLogarithmicResult( resultName );
 
-    RimRegularLegendConfig::MappingType mappingType  = MappingType::LINEAR_CONTINUOUS;
-    RimLegendConfig::RangeModeType      rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
-    caf::PdmUiNumberFormat::NumberFormatType   numberFormat = caf::PdmUiNumberFormat::NumberFormatType::FIXED;
+    RimRegularLegendConfig::MappingType      mappingType  = MappingType::LINEAR_CONTINUOUS;
+    RimLegendConfig::RangeModeType           rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
+    caf::PdmUiNumberFormat::NumberFormatType numberFormat = caf::PdmUiNumberFormat::NumberFormatType::FIXED;
 
     if ( useLog )
     {
