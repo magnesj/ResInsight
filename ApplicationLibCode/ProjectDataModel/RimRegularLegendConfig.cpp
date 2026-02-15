@@ -22,10 +22,10 @@
 
 #include "RiaApplication.h"
 #include "RiaColorTables.h"
-#include "cafPdmUiNumberFormat.h"
 #include "RiaNumericalTools.h"
 #include "RiaPreferences.h"
 #include "RiaResultNames.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RimCellEdgeColors.h"
 #include "RimColorLegend.h"
@@ -1164,7 +1164,7 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
 
     RimRegularLegendConfig::MappingType mappingType  = MappingType::LINEAR_CONTINUOUS;
     RimLegendConfig::RangeModeType      rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
-    caf::NumberFormatType   numberFormat = caf::NumberFormatType::FIXED;
+    caf::NumberFormatType               numberFormat = caf::NumberFormatType::FIXED;
 
     if ( useLog )
     {

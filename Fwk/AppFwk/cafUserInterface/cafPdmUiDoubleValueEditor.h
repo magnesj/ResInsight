@@ -78,7 +78,7 @@ public:
 
 public:
     int                        m_decimals;
-    NumberFormatType            m_numberFormat;
+    NumberFormatType           m_numberFormat;
     QPointer<QDoubleValidator> m_validator;
 };
 

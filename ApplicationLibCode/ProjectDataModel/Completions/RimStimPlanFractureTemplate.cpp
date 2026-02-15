@@ -23,9 +23,9 @@
 #include "RiaEclipseUnitTools.h"
 #include "RiaFractureDefines.h"
 #include "RiaLogging.h"
-#include "cafPdmUiNumberFormat.h"
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedMeanCalculator.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RifStimPlanXmlReader.h"
 

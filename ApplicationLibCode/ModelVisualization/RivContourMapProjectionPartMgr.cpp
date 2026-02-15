@@ -134,12 +134,12 @@ void RivContourMapProjectionPartMgr::appendContourLinesToModel( const cvf::Camer
                                                                 cvf::ModelBasicList*              model,
                                                                 const caf::DisplayCoordTransform* displayCoordTransform,
                                                                 const std::vector<RigContourPolygonsTools::ContourPolygons>& contourLinePolygons,
-                                                                const RigContourMapGrid&          contourMapGrid,
-                                                                cvf::ScalarMapper*                mapper,
-                                                                bool                              showContourLines,
-                                                                bool                              showContourLabels,
-                                                                caf::NumberFormatType numberFormat,
-                                                                int                               precision )
+                                                                const RigContourMapGrid& contourMapGrid,
+                                                                cvf::ScalarMapper*       mapper,
+                                                                bool                     showContourLines,
+                                                                bool                     showContourLabels,
+                                                                caf::NumberFormatType    numberFormat,
+                                                                int                      precision )
 {
     if ( showContourLines )
     {
@@ -409,7 +409,7 @@ std::vector<cvf::ref<cvf::Drawable>>
                                                          const std::vector<RigContourPolygonsTools::ContourPolygons>& contourLinePolygons,
                                                          const RigContourMapGrid&                                     contourMapGrid,
                                                          const cvf::ScalarMapper*                                     scalarMapper,
-                                                         caf::NumberFormatType                            numberFormat,
+                                                         caf::NumberFormatType                                        numberFormat,
                                                          int                                                          precision ) const
 {
     CVF_ASSERT( camera && displayCoordTransform && labelBBoxes );
