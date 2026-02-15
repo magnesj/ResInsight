@@ -1134,7 +1134,6 @@ void RimGeoMechCase::defineEditorAttribute( const caf::PdmFieldHandle* field, QS
     {
         dynamic_cast<caf::PdmUiPushButtonEditorAttribute*>( attribute )->m_buttonText = "Close Selected Properties";
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------
