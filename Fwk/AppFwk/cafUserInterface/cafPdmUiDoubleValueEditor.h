@@ -61,21 +61,6 @@ public:
         m_numberFormat = NumberFormatType::AUTO;
     }
 
-    void setFixedWithTwoDecimals()
-    {
-        m_decimals     = 2;
-        m_numberFormat = NumberFormatType::FIXED;
-    }
-
-    // Convenience function to set the number format to fixed with two decimals
-    static void testAndSetFixedWithTwoDecimals( caf::PdmUiEditorAttribute* attr )
-    {
-        if ( auto doubleAttr = dynamic_cast<caf::PdmUiDoubleValueEditorAttribute*>( attr ) )
-        {
-            doubleAttr->setFixedWithTwoDecimals();
-        }
-    }
-
 public:
     int                        m_decimals;
     NumberFormatType           m_numberFormat;
