@@ -18,22 +18,9 @@ namespace caf
 //--------------------------------------------------------------------------------------------------
 QString PdmUiNumberFormat::valueToText( double value, NumberFormatType numberFormat, int precision )
 {
-    QString valueString;
-
-    switch ( numberFormat )
-    {
-        case NumberFormatType::FIXED:
-            valueString = QString::number( value, 'f', precision );
-            break;
-        case NumberFormatType::SCIENTIFIC:
-            valueString = QString::number( value, 'e', precision );
-            break;
-        default:
-            valueString = QString::number( value );
-            break;
-    }
-
-    return valueString;
+    if ( numberFormat == NumberFormatType::FIXED ) return QString::number( value, 'f', precision );
+    if ( numberFormat == NumberFormatType::SCIENTIFIC ) return QString::number( value, 'e', precision );
+    return QString::number( value );
 }
 
 //--------------------------------------------------------------------------------------------------
