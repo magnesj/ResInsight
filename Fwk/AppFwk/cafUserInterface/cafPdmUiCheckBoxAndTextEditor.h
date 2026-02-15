@@ -37,7 +37,6 @@
 #pragma once
 
 #include "cafPdmUiFieldLabelEditorHandle.h"
-#include "cafPdmUiNumberFormat.h"
 
 #include <QCheckBox>
 #include <QLabel>
