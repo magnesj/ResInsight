@@ -1276,7 +1276,7 @@ QString RimEnsembleFractureStatistics::generateStatisticsTable(
     text += "</thead>";
     text += "<tbody>";
 
-    auto emptyTextOnInf = []( double value, caf::PdmUiNumberFormat::NumberFormatType numberFormat, int precision )
+    auto emptyTextOnInf = []( double value, caf::NumberFormatType numberFormat, int precision )
     {
         if ( std::isinf( value ) )
             return QString( "" );

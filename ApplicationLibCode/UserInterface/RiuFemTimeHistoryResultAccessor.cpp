@@ -101,9 +101,9 @@ QString RiuFemTimeHistoryResultAccessor::geometrySelectionText() const
             cvf::Vec3d domainCoord = m_intersectionPointInDomain;
             text += QString( ", ijk[%1, %2, %3] " ).arg( i ).arg( j ).arg( k );
 
-            auto xTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.x(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
-            auto yTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.y(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
-            auto zTxt = caf::PdmUiNumberFormat::valueToText( -domainCoord.z(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
+            auto xTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.x(), caf::NumberFormatType::FIXED, 2 );
+            auto yTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.y(), caf::NumberFormatType::FIXED, 2 );
+            auto zTxt = caf::PdmUiNumberFormat::valueToText( -domainCoord.z(), caf::NumberFormatType::FIXED, 2 );
 
             QString formattedText = QString( "Intersection point : [E: %1, N: %2, Depth: %3]" ).arg( xTxt ).arg( yTxt ).arg( zTxt );
 

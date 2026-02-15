@@ -1881,7 +1881,7 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
                 anno->setValue( yValue );
 
                 auto scaledValue = yValue / annotationAxis->scaleFactor();
-                auto valueText   = caf::PdmUiNumberFormat::valueToText( scaledValue, caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
+                auto valueText   = caf::PdmUiNumberFormat::valueToText( scaledValue, caf::NumberFormatType::FIXED, 2 );
 
                 anno->setName( valueText );
 

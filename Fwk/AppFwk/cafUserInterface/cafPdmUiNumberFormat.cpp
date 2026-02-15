@@ -3,12 +3,12 @@
 #include "cafAppEnum.h"
 
 template <>
-void caf::AppEnum<caf::PdmUiNumberFormat::NumberFormatType>::setUp()
+void caf::AppEnum<caf::NumberFormatType>::setUp()
 {
-    addItem( caf::PdmUiNumberFormat::NumberFormatType::AUTO, "AUTO", "Automatic" );
-    addItem( caf::PdmUiNumberFormat::NumberFormatType::FIXED, "FIXED", "Fixed, decimal" );
-    addItem( caf::PdmUiNumberFormat::NumberFormatType::SCIENTIFIC, "SCIENTIFIC", "Scientific notation" );
-    setDefault( caf::PdmUiNumberFormat::NumberFormatType::FIXED );
+    addItem( caf::NumberFormatType::AUTO, "AUTO", "Automatic" );
+    addItem( caf::NumberFormatType::FIXED, "FIXED", "Fixed, decimal" );
+    addItem( caf::NumberFormatType::SCIENTIFIC, "SCIENTIFIC", "Scientific notation" );
+    setDefault( caf::NumberFormatType::FIXED );
 };
 
 namespace caf
@@ -16,16 +16,16 @@ namespace caf
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString PdmUiNumberFormat::valueToText( double value, PdmUiNumberFormat::NumberFormatType numberFormat, int precision )
+QString PdmUiNumberFormat::valueToText( double value, NumberFormatType numberFormat, int precision )
 {
     QString valueString;
 
     switch ( numberFormat )
     {
-        case PdmUiNumberFormat::NumberFormatType::FIXED:
+        case NumberFormatType::FIXED:
             valueString = QString::number( value, 'f', precision );
             break;
-        case PdmUiNumberFormat::NumberFormatType::SCIENTIFIC:
+        case NumberFormatType::SCIENTIFIC:
             valueString = QString::number( value, 'e', precision );
             break;
         default:
@@ -39,13 +39,13 @@ QString PdmUiNumberFormat::valueToText( double value, PdmUiNumberFormat::NumberF
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString PdmUiNumberFormat::sprintfFormat( PdmUiNumberFormat::NumberFormatType numberFormat, int precision )
+QString PdmUiNumberFormat::sprintfFormat( NumberFormatType numberFormat, int precision )
 {
     switch ( numberFormat )
     {
-        case PdmUiNumberFormat::NumberFormatType::FIXED:
+        case NumberFormatType::FIXED:
             return QString( "%.%1f" ).arg( precision );
-        case PdmUiNumberFormat::NumberFormatType::SCIENTIFIC:
+        case NumberFormatType::SCIENTIFIC:
             return QString( "%.%1e" ).arg( precision );
         default:
             return QString( "%.%1g" ).arg( precision );

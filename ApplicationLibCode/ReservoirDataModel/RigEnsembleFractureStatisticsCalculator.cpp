@@ -434,10 +434,10 @@ std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> RigEnsembleFr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<caf::PdmUiNumberFormat::NumberFormatType, int> RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
+std::pair<caf::NumberFormatType, int> RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
 {
     if ( propertyType == PropertyType::WIDTH )
-        return std::make_pair( caf::PdmUiNumberFormat::NumberFormatType::FIXED, 4 );
+        return std::make_pair( caf::NumberFormatType::FIXED, 4 );
     else
-        return std::make_pair( caf::PdmUiNumberFormat::NumberFormatType::FIXED, 1 );
+        return std::make_pair( caf::NumberFormatType::FIXED, 1 );
 }

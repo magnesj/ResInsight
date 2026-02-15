@@ -97,7 +97,7 @@ void PdmUiCheckBoxAndTextEditor::configureAndUpdateUi( const QString& uiConfigNa
             double value   = lst[1].toDouble( &valueOk );
             if ( valueOk && decimals >= 0 )
             {
-                auto fmt = static_cast<PdmUiNumberFormat::NumberFormatType>( numberFormat );
+                auto fmt = static_cast<NumberFormatType>( numberFormat );
                 textString = PdmUiNumberFormat::valueToText( value, fmt, decimals );
             }
             else

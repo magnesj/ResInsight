@@ -64,7 +64,7 @@ public:
 
     static std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes();
 
-    static std::pair<caf::PdmUiNumberFormat::NumberFormatType, int> numberFormatForProperty( PropertyType propertyType );
+    static std::pair<caf::NumberFormatType, int> numberFormatForProperty( PropertyType propertyType );
 
 private:
     static std::vector<double> calculateGridStatistics( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,

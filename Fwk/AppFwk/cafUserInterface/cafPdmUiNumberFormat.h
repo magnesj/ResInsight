@@ -4,17 +4,17 @@
 
 namespace caf
 {
+enum class NumberFormatType
+{
+    AUTO,
+    SCIENTIFIC,
+    FIXED
+};
+
 class PdmUiNumberFormat
 {
 public:
-    enum class NumberFormatType
-    {
-        AUTO,
-        SCIENTIFIC,
-        FIXED
-    };
-
-    static QString valueToText( double value, PdmUiNumberFormat::NumberFormatType numberFormat, int precision );
-    static QString sprintfFormat( PdmUiNumberFormat::NumberFormatType numberFormat, int precision );
+    static QString valueToText( double value, NumberFormatType numberFormat, int precision );
+    static QString sprintfFormat( NumberFormatType numberFormat, int precision );
 };
 } // namespace caf

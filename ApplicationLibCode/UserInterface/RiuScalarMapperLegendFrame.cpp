@@ -37,7 +37,7 @@ RiuScalarMapperLegendFrame::RiuScalarMapperLegendFrame( QWidget* parent, const Q
     : RiuAbstractLegendFrame( parent, title )
     , m_scalarMapper( scalarMapper )
     , m_tickNumberPrecision( 4 )
-    , m_numberFormat( caf::PdmUiNumberFormat::NumberFormatType::AUTO )
+    , m_numberFormat( caf::NumberFormatType::AUTO )
 {
     updateTickValues();
 }
@@ -60,7 +60,7 @@ void RiuScalarMapperLegendFrame::setTickPrecision( int precision )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiuScalarMapperLegendFrame::setTickFormat( NumberFormat format )
+void RiuScalarMapperLegendFrame::setTickFormat( caf::NumberFormatType format )
 {
     m_numberFormat = format;
 }

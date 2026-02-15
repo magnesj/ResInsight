@@ -63,7 +63,7 @@ public:
                                     cvf::ScalarMapper*                                           mapper,
                                     bool                                                         showContourLines,
                                     bool                                                         showContourLabels,
-                                    caf::PdmUiNumberFormat::NumberFormatType                            numberFormat,
+                                    caf::NumberFormatType                            numberFormat,
                                     int                                                          precision );
 
     void appendPickPointVisToModel( cvf::ModelBasicList*              model,
@@ -94,7 +94,7 @@ private:
                                                               const std::vector<RigContourPolygonsTools::ContourPolygons>& contourLinePolygons,
                                                               const RigContourMapGrid&          contourMapGrid,
                                                               const cvf::ScalarMapper*          scalarMapper,
-                                                              caf::PdmUiNumberFormat::NumberFormatType numberFormat,
+                                                              caf::NumberFormatType numberFormat,
                                                               int                               precision ) const;
 
     cvf::ref<cvf::DrawableGeo> createPickPointVisDrawable( const caf::DisplayCoordTransform* displayCoordTransform,

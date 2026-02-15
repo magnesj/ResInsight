@@ -99,7 +99,7 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
 
         if ( auto val = uiItem->attribute<int>( Keys::NUMBER_FORMAT, uiConfigName ) )
         {
-            m_attributes.m_numberFormat = static_cast<PdmUiDoubleValueEditorAttribute::NumberFormat>( val.value() );
+            m_attributes.m_numberFormat = static_cast<NumberFormatType>( val.value() );
         }
 
         // Validate: warn about unsupported attributes

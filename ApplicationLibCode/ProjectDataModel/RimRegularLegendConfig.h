@@ -128,9 +128,9 @@ public:
     void            setMappingMode( MappingType mappingType );
     MappingType     mappingMode() { return m_mappingMode(); }
 
-    void setTickNumberFormat( caf::PdmUiNumberFormat::NumberFormatType numberFormat );
+    void setTickNumberFormat( caf::NumberFormatType numberFormat );
 
-    caf::PdmUiNumberFormat::NumberFormatType tickNumberFormat() const;
+    caf::NumberFormatType tickNumberFormat() const;
 
     int significantDigitsInData() const;
 
@@ -232,7 +232,7 @@ private:
     caf::PdmField<bool>                                            m_showLegend;
     caf::PdmField<int>                                             m_numLevels;
     caf::PdmField<int>                                             m_precision;
-    caf::PdmField<caf::AppEnum<caf::PdmUiNumberFormat::NumberFormatType>> m_tickNumberFormat;
+    caf::PdmField<caf::AppEnum<caf::NumberFormatType>> m_tickNumberFormat;
     caf::PdmField<RangeModeEnum>                                   m_rangeMode;
     caf::PdmField<double>                                          m_userDefinedMaxValue;
     caf::PdmField<double>                                          m_userDefinedMinValue;
