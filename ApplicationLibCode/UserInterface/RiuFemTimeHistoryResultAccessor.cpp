@@ -19,7 +19,7 @@
 
 #include "RiuFemTimeHistoryResultAccessor.h"
 
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RigFemClosestResultIndexCalculator.h"
 #include "RigFemPart.h"
@@ -101,9 +101,9 @@ QString RiuFemTimeHistoryResultAccessor::geometrySelectionText() const
             cvf::Vec3d domainCoord = m_intersectionPointInDomain;
             text += QString( ", ijk[%1, %2, %3] " ).arg( i ).arg( j ).arg( k );
 
-            auto xTxt = RiaNumberFormat::valueToText( domainCoord.x(), RiaNumberFormat::NumberFormatType::FIXED, 2 );
-            auto yTxt = RiaNumberFormat::valueToText( domainCoord.y(), RiaNumberFormat::NumberFormatType::FIXED, 2 );
-            auto zTxt = RiaNumberFormat::valueToText( -domainCoord.z(), RiaNumberFormat::NumberFormatType::FIXED, 2 );
+            auto xTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.x(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
+            auto yTxt = caf::PdmUiNumberFormat::valueToText( domainCoord.y(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
+            auto zTxt = caf::PdmUiNumberFormat::valueToText( -domainCoord.z(), caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
 
             QString formattedText = QString( "Intersection point : [E: %1, N: %2, Depth: %3]" ).arg( xTxt ).arg( yTxt ).arg( zTxt );
 

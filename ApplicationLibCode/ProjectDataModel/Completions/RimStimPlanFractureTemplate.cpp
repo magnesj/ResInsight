@@ -23,7 +23,7 @@
 #include "RiaEclipseUnitTools.h"
 #include "RiaFractureDefines.h"
 #include "RiaLogging.h"
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedMeanCalculator.h"
 
@@ -818,7 +818,7 @@ void RimStimPlanFractureTemplate::appendTextIfValidValue( QString&              
     {
         QString name                   = caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>::uiText( propertyType );
         auto [numberFormat, precision] = RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( propertyType );
-        body += QString( "%1: %2<br>" ).arg( name ).arg( RiaNumberFormat::valueToText( value, numberFormat, precision ) );
+        body += QString( "%1: %2<br>" ).arg( name ).arg( caf::PdmUiNumberFormat::valueToText( value, numberFormat, precision ) );
     }
 }
 

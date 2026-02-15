@@ -138,7 +138,7 @@ void RivContourMapProjectionPartMgr::appendContourLinesToModel( const cvf::Camer
                                                                 cvf::ScalarMapper*                mapper,
                                                                 bool                              showContourLines,
                                                                 bool                              showContourLabels,
-                                                                RiaNumberFormat::NumberFormatType numberFormat,
+                                                                caf::PdmUiNumberFormat::NumberFormatType numberFormat,
                                                                 int                               precision )
 {
     if ( showContourLines )
@@ -409,7 +409,7 @@ std::vector<cvf::ref<cvf::Drawable>>
                                                          const std::vector<RigContourPolygonsTools::ContourPolygons>& contourLinePolygons,
                                                          const RigContourMapGrid&                                     contourMapGrid,
                                                          const cvf::ScalarMapper*                                     scalarMapper,
-                                                         RiaNumberFormat::NumberFormatType                            numberFormat,
+                                                         caf::PdmUiNumberFormat::NumberFormatType                            numberFormat,
                                                          int                                                          precision ) const
 {
     CVF_ASSERT( camera && displayCoordTransform && labelBBoxes );
@@ -438,7 +438,7 @@ std::vector<cvf::ref<cvf::Drawable>>
         {
             if ( contourLinePolygons[i][j].vertices.empty() ) continue;
 
-            QString     qLabelText = RiaNumberFormat::valueToText( contourLinePolygons[i][j].value, numberFormat, precision );
+            QString     qLabelText = caf::PdmUiNumberFormat::valueToText( contourLinePolygons[i][j].value, numberFormat, precision );
             cvf::String labelText  = cvfqt::Utils::toString( qLabelText );
 
             size_t nVertices              = contourLinePolygons[i][j].vertices.size();

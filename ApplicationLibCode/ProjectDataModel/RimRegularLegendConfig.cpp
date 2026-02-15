@@ -22,7 +22,7 @@
 
 #include "RiaApplication.h"
 #include "RiaColorTables.h"
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 #include "RiaNumericalTools.h"
 #include "RiaPreferences.h"
 #include "RiaResultNames.h"
@@ -153,7 +153,7 @@ RimRegularLegendConfig::RimRegularLegendConfig()
     m_significantDigitsInData = m_precision;
     CAF_PDM_InitField( &m_tickNumberFormat,
                        "TickNumberFormat",
-                       caf::AppEnum<RiaNumberFormat::NumberFormatType>( RiaNumberFormat::NumberFormatType::FIXED ),
+                       caf::AppEnum<caf::PdmUiNumberFormat::NumberFormatType>( caf::PdmUiNumberFormat::NumberFormatType::FIXED ),
                        "Number format" );
 
     CAF_PDM_InitField( &m_colorRangeMode_OBSOLETE, "ColorRangeMode", ColorRangeEnum( ColorRangesType::UNDEFINED ), "Colors" );
@@ -533,12 +533,12 @@ void RimRegularLegendConfig::updateLegend()
     decadesInRange = cvf::Math::ceil( decadesInRange );
 
     // Using Fixed format
-    RiaNumberFormat::NumberFormatType nft = m_tickNumberFormat();
+    caf::PdmUiNumberFormat::NumberFormatType nft = m_tickNumberFormat();
     m_scalarMapperLegend->setTickFormat( (caf::OverlayScalarMapperLegend::NumberFormat)nft );
 
     // Set the fixed number of digits after the decimal point to the number needed to show all the significant digits.
     int numDecimalDigits = m_precision();
-    if ( nft != RiaNumberFormat::NumberFormatType::SCIENTIFIC )
+    if ( nft != caf::PdmUiNumberFormat::NumberFormatType::SCIENTIFIC )
     {
         numDecimalDigits -= static_cast<int>( decadesInRange );
     }
@@ -572,7 +572,7 @@ void RimRegularLegendConfig::updateLegend()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimRegularLegendConfig::setTickNumberFormat( RiaNumberFormat::NumberFormatType numberFormat )
+void RimRegularLegendConfig::setTickNumberFormat( caf::PdmUiNumberFormat::NumberFormatType numberFormat )
 {
     m_tickNumberFormat = numberFormat;
 }
@@ -1136,13 +1136,13 @@ void RimRegularLegendConfig::updateFonts()
 //--------------------------------------------------------------------------------------------------
 QString RimRegularLegendConfig::valueToText( double value ) const
 {
-    return RiaNumberFormat::valueToText( value, m_tickNumberFormat(), m_significantDigitsInData );
+    return caf::PdmUiNumberFormat::valueToText( value, m_tickNumberFormat(), m_significantDigitsInData );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RiaNumberFormat::NumberFormatType RimRegularLegendConfig::tickNumberFormat() const
+caf::PdmUiNumberFormat::NumberFormatType RimRegularLegendConfig::tickNumberFormat() const
 {
     return m_tickNumberFormat();
 }
@@ -1164,7 +1164,7 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
 
     RimRegularLegendConfig::MappingType mappingType  = MappingType::LINEAR_CONTINUOUS;
     RimLegendConfig::RangeModeType      rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
-    RiaNumberFormat::NumberFormatType   numberFormat = RiaNumberFormat::NumberFormatType::FIXED;
+    caf::PdmUiNumberFormat::NumberFormatType   numberFormat = caf::PdmUiNumberFormat::NumberFormatType::FIXED;
 
     if ( useLog )
     {
@@ -1173,7 +1173,7 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
         else
             mappingType = RimRegularLegendConfig::MappingType::LOG10_CONTINUOUS;
 
-        numberFormat = RiaNumberFormat::NumberFormatType::AUTO;
+        numberFormat = caf::PdmUiNumberFormat::NumberFormatType::AUTO;
         rangeType    = RimLegendConfig::RangeModeType::USER_DEFINED;
     }
 
@@ -1203,7 +1203,7 @@ void RimRegularLegendConfig::setDefaultConfigForResultName( int caseId, const QS
     {
         mappingType  = MappingType::LINEAR_DISCRETE;
         rangeType    = RimLegendConfig::RangeModeType::AUTOMATIC_ALLTIMESTEPS;
-        numberFormat = RiaNumberFormat::NumberFormatType::FIXED;
+        numberFormat = caf::PdmUiNumberFormat::NumberFormatType::FIXED;
     }
 
     resetUserDefinedValues();

@@ -20,7 +20,7 @@
 
 #include "ContourMap/RigContourPolygonsTools.h"
 
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "cafDisplayCoordTransform.h"
 #include "cafPdmObject.h"
@@ -63,7 +63,7 @@ public:
                                     cvf::ScalarMapper*                                           mapper,
                                     bool                                                         showContourLines,
                                     bool                                                         showContourLabels,
-                                    RiaNumberFormat::NumberFormatType                            numberFormat,
+                                    caf::PdmUiNumberFormat::NumberFormatType                            numberFormat,
                                     int                                                          precision );
 
     void appendPickPointVisToModel( cvf::ModelBasicList*              model,
@@ -94,7 +94,7 @@ private:
                                                               const std::vector<RigContourPolygonsTools::ContourPolygons>& contourLinePolygons,
                                                               const RigContourMapGrid&          contourMapGrid,
                                                               const cvf::ScalarMapper*          scalarMapper,
-                                                              RiaNumberFormat::NumberFormatType numberFormat,
+                                                              caf::PdmUiNumberFormat::NumberFormatType numberFormat,
                                                               int                               precision ) const;
 
     cvf::ref<cvf::DrawableGeo> createPickPointVisDrawable( const caf::DisplayCoordTransform* displayCoordTransform,

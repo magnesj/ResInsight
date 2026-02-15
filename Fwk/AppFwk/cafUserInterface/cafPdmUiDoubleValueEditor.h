@@ -37,6 +37,7 @@
 #pragma once
 
 #include "cafPdmUiFieldLabelEditorHandle.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include <QDoubleValidator>
 #include <QGroupBox>
@@ -54,22 +55,18 @@ namespace caf
 class PdmUiDoubleValueEditorAttribute : public PdmUiEditorAttribute
 {
 public:
-    enum class NumberFormat
-    {
-        FIXED,
-        SCIENTIFIC,
-        AUTOMATIC
-    };
+    using NumberFormat = PdmUiNumberFormat::NumberFormatType;
+
     PdmUiDoubleValueEditorAttribute()
     {
         m_decimals     = 6;
-        m_numberFormat = NumberFormat::AUTOMATIC;
+        m_numberFormat = NumberFormat::AUTO;
     }
 
     void setFixedWithTwoDecimals()
     {
         m_decimals     = 2;
-        m_numberFormat = NumberFormat::FIXED;
+        m_numberFormat = PdmUiNumberFormat::NumberFormatType::FIXED;
     }
 
     // Convenience function to set the number format to fixed with two decimals

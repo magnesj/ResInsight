@@ -56,6 +56,8 @@
 #include "RimSummaryPlotSourceStepping.h"
 #include "RimSummaryTimeAxisProperties.h"
 
+#include "cafPdmUiNumberFormat.h"
+
 #include "RiuPlotMainWindowTools.h"
 #include "RiuQwtPlotWidget.h"
 #include "RiuSummaryMultiPlotBook.h"
@@ -1879,7 +1881,7 @@ void RimSummaryMultiPlot::updateReadOutLines( double qwtTimeValue, double yValue
                 anno->setValue( yValue );
 
                 auto scaledValue = yValue / annotationAxis->scaleFactor();
-                auto valueText   = RiaNumberFormat::valueToText( scaledValue, RiaNumberFormat::NumberFormatType::FIXED, 2 );
+                auto valueText   = caf::PdmUiNumberFormat::valueToText( scaledValue, caf::PdmUiNumberFormat::NumberFormatType::FIXED, 2 );
 
                 anno->setName( valueText );
 

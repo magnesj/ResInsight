@@ -20,7 +20,7 @@
 
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 #include "RiaWeightedMeanCalculator.h"
 
 #include "RigFractureCell.h"
@@ -434,10 +434,10 @@ std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> RigEnsembleFr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<RiaNumberFormat::NumberFormatType, int> RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
+std::pair<caf::PdmUiNumberFormat::NumberFormatType, int> RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
 {
     if ( propertyType == PropertyType::WIDTH )
-        return std::make_pair( RiaNumberFormat::NumberFormatType::FIXED, 4 );
+        return std::make_pair( caf::PdmUiNumberFormat::NumberFormatType::FIXED, 4 );
     else
-        return std::make_pair( RiaNumberFormat::NumberFormatType::FIXED, 1 );
+        return std::make_pair( caf::PdmUiNumberFormat::NumberFormatType::FIXED, 1 );
 }

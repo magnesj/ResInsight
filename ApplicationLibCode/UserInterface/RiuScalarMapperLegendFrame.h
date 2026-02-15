@@ -17,7 +17,7 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RiaNumberFormat.h"
+#include "cafPdmUiNumberFormat.h"
 
 #include "RiuAbstractLegendFrame.h"
 
@@ -38,7 +38,7 @@ class RiuScalarMapperLegendFrame : public RiuAbstractLegendFrame
     Q_OBJECT
 
 public:
-    using NumberFormat = RiaNumberFormat::NumberFormatType;
+    using NumberFormat = caf::PdmUiNumberFormat::NumberFormatType;
 
 public:
     RiuScalarMapperLegendFrame( QWidget* parent, const QString& title, cvf::ScalarMapper* scalarMapper );
