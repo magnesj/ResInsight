@@ -74,8 +74,7 @@ RimWellPathGeometryDef::RimWellPathGeometryDef()
     m_airGap.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
     m_airGap.setRange( 0.0, std::numeric_limits<double>::max() );
     m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
-    m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT,
-                                           static_cast<int>( caf::NumberFormatType::FIXED ) );
+    m_airGap.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::NUMBER_FORMAT, static_cast<int>( caf::NumberFormatType::FIXED ) );
 
     CAF_PDM_InitScriptableField( &m_mdAtFirstTarget, "MdAtFirstTarget", 0.0, "MD at First Target" );
     m_mdAtFirstTarget.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
@@ -779,7 +778,6 @@ void RimWellPathGeometryDef::defineEditorAttribute( const caf::PdmFieldHandle* f
                                                    QString::number( m_referencePointUtmXyd()[2], 'f', 2 );
         }
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------
