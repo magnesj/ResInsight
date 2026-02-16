@@ -114,6 +114,7 @@ void PdmUiDoubleValueEditor::writeValueToField()
 
     this->setValueToField( v );
 
+    // This is required if the user entered an invalid value, we want to reset the text to the current value in the field
     m_lineEdit->setText( formattedValue() );
 }
 

@@ -25,9 +25,9 @@ ValidationTestObject::ValidationTestObject()
 
     // Percentage field: 0 to 100
     CAF_PDM_InitField( &m_percentage, "percentage", 50.0, "Percentage (%)", "", "", "" );
-    m_percentage.uiCapability()->setUiToolTip( "Valid range: 0 to 100%, 2 decimal places" );
+    m_percentage.uiCapability()->setUiToolTip( "Valid range: 0 to 100%, 4 significant digits" );
     m_percentage.setRange( 0.0, 100.0 );
-    m_percentage.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 2 );
+    m_percentage.uiCapability()->setAttribute( caf::PdmUiDoubleValueEditor::Keys::DECIMALS, 4 );
     m_percentage.uiCapability()->setUiEditorTypeName( caf::PdmUiDoubleValueEditor::uiEditorTypeName() );
 
     // Count field: minimum value only (>= 0) and must be even (custom callback)
