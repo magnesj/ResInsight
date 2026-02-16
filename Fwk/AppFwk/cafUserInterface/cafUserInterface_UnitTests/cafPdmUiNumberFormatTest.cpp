@@ -44,6 +44,7 @@ TEST( PdmUiNumberFormatTest, ValueToText )
     {
         QString result = PdmUiNumberFormat::valueToText( tc.value, tc.format, tc.precision );
         EXPECT_EQ( result.toStdString(), tc.expected )
-            << "Failed for value=" << tc.value << " format=" << static_cast<int>( tc.format ) << " precision=" << tc.precision;
+            << "Failed for value=" << tc.value << " format=" << static_cast<int>( tc.format )
+            << " precision=" << tc.precision;
     }
 }
