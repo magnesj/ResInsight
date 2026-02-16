@@ -2285,17 +2285,8 @@ RimSummaryPlot::CurveInfo RimSummaryPlot::handleAddressCollectionDrop( RimSummar
                                                                                 addressCollection->contentType(),
                                                                                 RiaPreferencesSummary::current()->appendHistoryVectors() );
 
-    std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>> existingSummaryCurves;
-    for ( auto& curve : summaryCurves() )
-    {
-        existingSummaryCurves[curve->summaryAddressY()].insert( curve->summaryCaseY() );
-    }
-
-    std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>> existingEnsembleCurves;
-    for ( auto& curveSet : curveSets() )
-    {
-        existingEnsembleCurves[curveSet->summaryAddressY()].insert( curveSet->summaryEnsemble() );
-    }
+    auto existingSummaryCurves  = RiaSummaryAddressCollectionTools::buildAddressCaseMapFromCurves( summaryCurves() );
+    auto existingEnsembleCurves = RiaSummaryAddressCollectionTools::buildAddressEnsembleMapFromCurveSets( curveSets() );
 
     auto newCurveDefs =
         RiaSummaryAddressCollectionTools::removeExistingCurveDefs( candidateCurveDefs, existingSummaryCurves, existingEnsembleCurves );
@@ -2354,13 +2345,7 @@ RimSummaryPlot::CurveInfo RimSummaryPlot::handleSummaryAddressDrop( RimSummaryAd
 
     if ( summaryAddr->isEnsemble() )
     {
-        std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>> dataVectorMap;
-
-        for ( auto& curve : curveSets() )
-        {
-            const auto addr = curve->summaryAddressY();
-            dataVectorMap[addr].insert( curve->summaryEnsemble() );
-        }
+        auto dataVectorMap = RiaSummaryAddressCollectionTools::buildAddressEnsembleMapFromCurveSets( curveSets() );
 
         auto ensemble = RiaSummaryTools::ensembleById( summaryAddr->ensembleId() );
         if ( ensemble )
@@ -2391,13 +2376,7 @@ RimSummaryPlot::CurveInfo RimSummaryPlot::handleSummaryAddressDrop( RimSummaryAd
     }
     else
     {
-        std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>> dataVectorMap;
-
-        for ( auto& curve : summaryCurves() )
-        {
-            const auto addr = curve->summaryAddressY();
-            dataVectorMap[addr].insert( curve->summaryCaseY() );
-        }
+        auto dataVectorMap = RiaSummaryAddressCollectionTools::buildAddressCaseMapFromCurves( summaryCurves() );
 
         auto summaryCase = RiaSummaryTools::summaryCaseById( summaryAddr->caseId() );
         if ( summaryCase )

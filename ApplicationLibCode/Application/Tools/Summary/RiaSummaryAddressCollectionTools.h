@@ -28,7 +28,9 @@
 #include <vector>
 
 class RifEclipseSummaryAddress;
+class RimEnsembleCurveSet;
 class RimSummaryCase;
+class RimSummaryCurve;
 class RimSummaryEnsemble;
 
 //==================================================================================================
@@ -49,5 +51,10 @@ std::vector<RiaSummaryCurveDefinition>
     removeExistingCurveDefs( const std::vector<RiaSummaryCurveDefinition>&                            candidateCurveDefs,
                              const std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>>&     existingSummaryCurves,
                              const std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>>& existingEnsembleCurves );
+
+std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>> buildAddressCaseMapFromCurves( const std::vector<RimSummaryCurve*>& curves );
+
+std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>>
+    buildAddressEnsembleMapFromCurveSets( const std::vector<RimEnsembleCurveSet*>& curveSets );
 
 }; // namespace RiaSummaryAddressCollectionTools

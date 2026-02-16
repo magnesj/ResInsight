@@ -21,6 +21,9 @@
 #include "RifEclipseSummaryAddress.h"
 #include "RifEclipseSummaryAddressDefines.h"
 
+#include "RimEnsembleCurveSet.h"
+#include "RimSummaryCurve.h"
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -94,7 +97,9 @@ std::vector<RiaSummaryCurveDefinition>
 }
 
 //--------------------------------------------------------------------------------------------------
-///
+/// Filter out candidate curve definitions that already have a matching curve on the plot.
+/// A candidate is considered a duplicate only when both the summary address and the data source (case or ensemble)
+/// match an existing curve. This allows the same vector from a different case to pass through.
 //--------------------------------------------------------------------------------------------------
 std::vector<RiaSummaryCurveDefinition> RiaSummaryAddressCollectionTools::removeExistingCurveDefs(
     const std::vector<RiaSummaryCurveDefinition>&                            candidateCurveDefs,
@@ -109,11 +114,13 @@ std::vector<RiaSummaryCurveDefinition> RiaSummaryAddressCollectionTools::removeE
 
         if ( curveDef.ensemble() )
         {
+            // Skip if the plot already has an ensemble curve set with this address for the same ensemble
             auto it = existingEnsembleCurves.find( addr );
             if ( it != existingEnsembleCurves.end() && it->second.count( curveDef.ensemble() ) > 0 ) continue;
         }
         else if ( curveDef.summaryCaseY() )
         {
+            // Skip if the plot already has a summary curve with this address for the same case
             auto it = existingSummaryCurves.find( addr );
             if ( it != existingSummaryCurves.end() && it->second.count( curveDef.summaryCaseY() ) > 0 ) continue;
         }
@@ -122,4 +129,32 @@ std::vector<RiaSummaryCurveDefinition> RiaSummaryAddressCollectionTools::removeE
     }
 
     return filtered;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>>
+    RiaSummaryAddressCollectionTools::buildAddressCaseMapFromCurves( const std::vector<RimSummaryCurve*>& curves )
+{
+    std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>> result;
+    for ( auto* curve : curves )
+    {
+        result[curve->summaryAddressY()].insert( curve->summaryCaseY() );
+    }
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>>
+    RiaSummaryAddressCollectionTools::buildAddressEnsembleMapFromCurveSets( const std::vector<RimEnsembleCurveSet*>& curveSets )
+{
+    std::map<RifEclipseSummaryAddress, std::set<RimSummaryEnsemble*>> result;
+    for ( auto* curveSet : curveSets )
+    {
+        result[curveSet->summaryAddressY()].insert( curveSet->summaryEnsemble() );
+    }
+    return result;
 }
