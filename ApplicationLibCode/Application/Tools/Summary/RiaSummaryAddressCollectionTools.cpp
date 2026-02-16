@@ -140,8 +140,7 @@ std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>>
     std::map<RifEclipseSummaryAddress, std::set<RimSummaryCase*>> result;
     for ( auto* curve : curves )
     {
-        if ( !curve || !curve->summaryCaseY() )
-            continue;
+        if ( !curve || !curve->summaryCaseY() ) continue;
         result[curve->summaryAddressY()].insert( curve->summaryCaseY() );
     }
     return result;
