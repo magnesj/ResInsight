@@ -71,38 +71,10 @@ void PdmUiDoubleValueEditor::configureAndUpdateUi( const QString& uiConfigName )
 
     m_lineEdit->setEnabled( !uiField()->isUiReadOnly( uiConfigName ) );
 
-    NumberFormatType numberFormat = NumberFormatType::AUTO;
-    int              precision    = 6;
+    // Validate: warn about unsupported attributes
+    uiField()->validateAttributes( "PdmUiDoubleValueEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
 
-    if ( auto uiItem = uiField() )
-    {
-        if ( auto val = uiItem->attribute<int>( Keys::DECIMALS, uiConfigName ) )
-        {
-            precision = val.value();
-        }
-
-        if ( auto val = uiItem->attribute<int>( Keys::NUMBER_FORMAT, uiConfigName ) )
-        {
-            numberFormat = static_cast<NumberFormatType>( val.value() );
-        }
-
-        // Validate: warn about unsupported attributes
-        uiItem->validateAttributes( "PdmUiDoubleValueEditor", SUPPORTED_ATTRIBUTES, uiConfigName );
-    }
-
-    bool    valueOk = false;
-    double  value   = uiField()->uiValue().toDouble( &valueOk );
-    QString textValue;
-    if ( valueOk )
-    {
-        textValue = PdmUiNumberFormat::valueToText( value, numberFormat, precision );
-    }
-    else
-    {
-        textValue = uiField()->uiValue().toString();
-    }
-
-    m_lineEdit->setText( textValue );
+    m_lineEdit->setText( formattedValue() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -138,9 +110,45 @@ void PdmUiDoubleValueEditor::slotEditingFinished()
 void PdmUiDoubleValueEditor::writeValueToField()
 {
     QString  textValue = m_lineEdit->text();
-    QVariant v;
-    v = textValue;
+    QVariant v         = textValue;
+
     this->setValueToField( v );
+
+    m_lineEdit->setText( formattedValue() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QString PdmUiDoubleValueEditor::formattedValue()
+{
+    if ( !uiField() )
+    {
+        return {};
+    }
+    auto uiFieldHandle = uiField();
+
+    NumberFormatType numberFormat = NumberFormatType::AUTO;
+    int              precision    = 6;
+
+    if ( auto val = uiFieldHandle->attribute<int>( Keys::DECIMALS ) )
+    {
+        precision = val.value();
+    }
+
+    if ( auto val = uiFieldHandle->attribute<int>( Keys::NUMBER_FORMAT ) )
+    {
+        numberFormat = static_cast<NumberFormatType>( val.value() );
+    }
+
+    bool   valueOk = false;
+    double value   = uiFieldHandle->uiValue().toDouble( &valueOk );
+    if ( valueOk )
+    {
+        return PdmUiNumberFormat::valueToText( value, numberFormat, precision );
+    }
+
+    return uiFieldHandle->uiValue().toString();
 }
 
 } // end namespace caf

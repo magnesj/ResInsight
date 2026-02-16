@@ -345,6 +345,7 @@ void PdmUiFieldEditorHandle::applyValidationStyling( QWidget* widget, const QStr
                 parentWidget->removeAction( m_validationErrorAction );
             }
             delete m_validationErrorAction;
+            m_validationErrorAction = nullptr;
             QToolTip::hideText();
         }
     }
