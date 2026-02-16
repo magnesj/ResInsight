@@ -78,7 +78,8 @@ protected slots:
     void slotEditingFinished();
 
 private:
-    void writeValueToField();
+    void    writeValueToField();
+    QString formattedValue();
 
 private:
     QPointer<QLineEdit> m_lineEdit;
