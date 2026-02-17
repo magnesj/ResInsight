@@ -18,8 +18,8 @@
 
 #include "RigContourMapProjection.h"
 
-#include "RigStatisticsTools.h"
 #include "RiaWeightedMeanCalculator.h"
+#include "RigStatisticsTools.h"
 
 #include "RigContourMapCalculator.h"
 #include "RigContourMapGrid.h"

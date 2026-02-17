@@ -27,8 +27,8 @@
 #include "RiaResultNames.h"
 #include "RiaRftDefines.h"
 #include "RiaSimWellBranchTools.h"
-#include "RigStatisticsTools.h"
 #include "RiaTextStringTools.h"
+#include "RigStatisticsTools.h"
 #include "Summary/RiaSummaryTools.h"
 
 #include "RifEclipseRftAddress.h"

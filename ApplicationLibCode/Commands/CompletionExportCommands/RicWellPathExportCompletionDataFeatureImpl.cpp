@@ -23,8 +23,8 @@
 #include "RiaFractureDefines.h"
 #include "RiaLogging.h"
 #include "RiaPreferencesSystem.h"
-#include "RigStatisticsTools.h"
 #include "RiaWeightedMeanCalculator.h"
+#include "RigStatisticsTools.h"
 
 #include "ExportCommands/RicExportLgrFeature.h"
 #include "RicExportCompletionDataSettingsUi.h"

@@ -21,8 +21,8 @@
 #include "RiaLogging.h"
 #include "RiaQDateTimeTools.h"
 #include "RiaRegressionTextTools.h"
-#include "RigStatisticsTools.h"
 #include "RiaTimeTTools.h"
+#include "RigStatisticsTools.h"
 
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetCollection.h"
