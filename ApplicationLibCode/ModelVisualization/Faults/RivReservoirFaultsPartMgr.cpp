@@ -245,8 +245,7 @@ void RivReservoirFaultsPartMgr::updateColors( size_t timeStepIndex, RimEclipseCe
 {
     if ( !m_reservoirView ) return;
 
-    RimFaultInViewCollection* faultCollection = m_reservoirView->faultCollection();
-    CVF_ASSERT( faultCollection );
+    CVF_ASSERT( m_reservoirView->faultCollection() );
 
     for ( auto& faultPart : m_faultParts )
     {
