@@ -26,6 +26,7 @@
 
 #include "Well/RigWellPath.h"
 
+#include "RimCustomSegmentIntervalCollection.h"
 #include "RimMswCompletionParameters.h"
 #include "RimPerforationInterval.h"
 #include "RimWellPath.h"
@@ -197,8 +198,11 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
     double startMD = segment->startMD();
     double endMD   = segment->endMD();
 
+    auto lateral   = branch->wellPath();
+    auto intervals = lateral->completionSettings()->mswCompletionParameters()->getSegmentIntervals();
+
     std::vector<std::pair<double, double>> segments =
-        RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
+        RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, intervals );
 
     CVF_ASSERT( branch->wellPath() );
 
