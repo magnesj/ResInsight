@@ -144,33 +144,73 @@ QString ExpressionParserImpl::parserErrorText(parser_t& parser)
 //        c[i] : = if ((a[i] > 13), a[i], b[i]);
 //    }
 //
+// When aggregating functions (min, max, sum, avg) are applied to a single vector variable,
+// they compute a scalar result over the whole vector. These must be pre-computed before the
+// element-wise for loop, otherwise the variable gets replaced with its indexed version (e.g.
+// min(b) -> min(b[i])) which changes the semantics: min(b[i]) returns b[i], not min of all b.
+//
+// Example with pre-computation:
+//   c := if(a > min(b), a, b)
+//
+// Expanded to:
+//   var ri_agg_0 := min(b);
+//   for (var i := 0; i < min(c[], a[], b[]); i += 1)
+//   {
+//       c[i] := if(a[i] > ri_agg_0, a[i], b[i]);
+//   }
+//
 //--------------------------------------------------------------------------------------------------
 QString ExpressionParserImpl::expandIfStatements(const QString& expressionText)
 {
-    QString expandedText;
+    auto allVectorVariables = detectReferencedVariables(expressionText);
+
+    QString textWithVectorBrackets = expressionText;
+    QString precomputedStatements;
+
+    // Pre-compute aggregating function calls with a single vector variable argument.
+    // For example, min(b) should be computed as a scalar before the element-wise loop.
+    // Without pre-computation, min(b) would expand to min(b[i]) which just returns b[i].
+    static const QStringList aggregatingFunctions = { "min", "max", "sum", "avg" };
+
+    int precomputedIndex = 0;
+    for ( const QString& func : aggregatingFunctions )
     {
-        QString textWithVectorBrackets = expressionText;
-
-        QString listOfVars;
-        auto allVectorVariables = detectReferencedVariables(expressionText);
-        for (const QString& var : allVectorVariables)
+        for ( const QString& var : allVectorVariables )
         {
-            listOfVars += QString("%1[],").arg(var);
-            
-            QString regexpText = QString("\\b%1\\b").arg(var);
-            QRegularExpression regexp(regexpText);
+            // Match func(var) where var is the sole argument (bounded by word boundaries)
+            QString patternStr = QString( "\\b%1\\(\\s*\\b%2\\b\\s*\\)" ).arg( func, var );
+            QRegularExpression pattern( patternStr, QRegularExpression::CaseInsensitiveOption );
 
-            QString varWithBrackets = var + "[i]";
-            textWithVectorBrackets = textWithVectorBrackets.replace(regexp, varWithBrackets);
+            if ( pattern.match( textWithVectorBrackets ).hasMatch() )
+            {
+                // Create a unique scalar variable name for the pre-computed value.
+                // Must start with a letter (exprtk requirement). Use ri_agg_N prefix.
+                QString preVarName = QString( "ri_agg_%1" ).arg( precomputedIndex++ );
+                precomputedStatements += QString( "var %1 := %2(%3);\n" ).arg( preVarName, func, var );
+                textWithVectorBrackets.replace( pattern, preVarName );
+            }
         }
-
-        listOfVars = listOfVars.left(listOfVars.size() - 1);
-
-        expandedText = QString("for (var i := 0; i < min(%1); i += 1)\n").arg(listOfVars);
-        expandedText += "{\n";
-        expandedText += QString("    %1;\n").arg(textWithVectorBrackets);
-        expandedText += "}\n";
     }
+
+    QString listOfVars;
+    for ( const QString& var : allVectorVariables )
+    {
+        listOfVars += QString( "%1[]," ).arg( var );
+
+        QString            regexpText = QString( "\\b%1\\b" ).arg( var );
+        QRegularExpression regexp( regexpText );
+
+        QString varWithBrackets = var + "[i]";
+        textWithVectorBrackets  = textWithVectorBrackets.replace( regexp, varWithBrackets );
+    }
+
+    listOfVars = listOfVars.left( listOfVars.size() - 1 );
+
+    QString expandedText = precomputedStatements;
+    expandedText += QString( "for (var i := 0; i < min(%1); i += 1)\n" ).arg( listOfVars );
+    expandedText += "{\n";
+    expandedText += QString( "    %1;\n" ).arg( textWithVectorBrackets );
+    expandedText += "}\n";
 
     return expandedText;
 }
