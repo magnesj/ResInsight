@@ -209,14 +209,12 @@ Opm::DeckKeyword complumpKeyword( const std::vector<RigCompletionData>& compdata
         {
             continue;
         }
-        std::vector<Opm::DeckItem> items;
-        items.push_back( RifOpmDeckTools::item( C::WELL::itemName, wellName ) );
-        items.push_back( RifOpmDeckTools::item( C::I::itemName, cd.completionDataGridCell().localCellIndexI() + 1 ) );
-        items.push_back( RifOpmDeckTools::item( C::J::itemName, cd.completionDataGridCell().localCellIndexJ() + 1 ) );
-        items.push_back( RifOpmDeckTools::item( C::K1::itemName, cd.completionDataGridCell().localCellIndexK() + 1 ) );
-        items.push_back( RifOpmDeckTools::item( C::K2::itemName, cd.completionDataGridCell().localCellIndexK() + 1 ) );
-        items.push_back( RifOpmDeckTools::item( C::N::itemName, cd.completionNumber().value() ) );
-        kw.addRecord( Opm::DeckRecord{ std::move( items ) } );
+        kw.addRecord( RifOpmDeckTools::createRecord( { { C::WELL::itemName, wellName },
+                                                       { C::I::itemName, cd.completionDataGridCell().localCellIndexI() + 1 },
+                                                       { C::J::itemName, cd.completionDataGridCell().localCellIndexJ() + 1 },
+                                                       { C::K1::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
+                                                       { C::K2::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
+                                                       { C::N::itemName, cd.completionNumber().value() } } ) );
     }
     return kw;
 }

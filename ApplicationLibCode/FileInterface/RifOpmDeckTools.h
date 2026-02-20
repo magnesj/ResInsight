@@ -18,12 +18,15 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <optional>
 #include <string>
+#include <variant>
 
 namespace Opm
 {
 class DeckItem;
+class DeckRecord;
 } // namespace Opm
 
 namespace RifOpmDeckTools
@@ -38,5 +41,45 @@ Opm::DeckItem item( std::string name, double value );
 Opm::DeckItem optionalItem( std::string name, std::optional<float> value );
 Opm::DeckItem optionalItem( std::string name, std::optional<double> value );
 Opm::DeckItem defaultItem( std::string name );
+
+struct NamedValue
+{
+    // Test
+    std::string                            name;
+    std::variant<std::string, int, double> value;
+
+    NamedValue( std::string n, std::string v )
+        : name( std::move( n ) )
+        , value( std::move( v ) )
+    {
+    }
+    NamedValue( std::string n, const char* v )
+        : name( std::move( n ) )
+        , value( std::string( v ) )
+    {
+    }
+    NamedValue( std::string n, int v )
+        : name( std::move( n ) )
+        , value( v )
+    {
+    }
+    NamedValue( std::string n, size_t v )
+        : name( std::move( n ) )
+        , value( (int)v )
+    {
+    }
+    NamedValue( std::string n, double v )
+        : name( std::move( n ) )
+        , value( v )
+    {
+    }
+    NamedValue( std::string n, float v )
+        : name( std::move( n ) )
+        , value( (double)v )
+    {
+    }
+};
+
+Opm::DeckRecord createRecord( std::initializer_list<NamedValue> items );
 
 } // namespace RifOpmDeckTools

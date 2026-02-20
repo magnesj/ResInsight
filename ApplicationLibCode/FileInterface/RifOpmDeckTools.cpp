@@ -19,6 +19,7 @@
 #include "RifOpmDeckTools.h"
 
 #include "opm/input/eclipse/Deck/DeckItem.hpp"
+#include "opm/input/eclipse/Deck/DeckRecord.hpp"
 #include "opm/input/eclipse/Units/Dimension.hpp"
 
 namespace RifOpmDeckTools
@@ -133,6 +134,20 @@ Opm::DeckItem optionalItem( std::string name, std::optional<float> value )
         return item( name, (double)value.value() );
     }
     return defaultItem( name );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+Opm::DeckRecord createRecord( std::initializer_list<NamedValue> namedValues )
+{
+    std::vector<Opm::DeckItem> items;
+    items.reserve( namedValues.size() );
+    for ( const auto& nv : namedValues )
+    {
+        items.push_back( std::visit( [&nv]( const auto& val ) { return RifOpmDeckTools::item( nv.name, val ); }, nv.value ) );
+    }
+    return Opm::DeckRecord{ std::move( items ) };
 }
 
 } // namespace RifOpmDeckTools
