@@ -209,13 +209,12 @@ Opm::DeckKeyword complumpKeyword( const std::vector<RigCompletionData>& compdata
         {
             continue;
         }
-        kw.addRecord( RifOpmDeckTools::createRecord( {
-            { C::WELL::itemName, wellName },
-            { C::I::itemName, cd.completionDataGridCell().localCellIndexI() + 1 },
-            { C::J::itemName, cd.completionDataGridCell().localCellIndexJ() + 1 },
-            { C::K1::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
-            { C::K2::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
-            { C::N::itemName, cd.completionNumber().value() } } ) );
+        kw.addRecord( RifOpmDeckTools::createRecord( { { C::WELL::itemName, wellName },
+                                                       { C::I::itemName, cd.completionDataGridCell().localCellIndexI() + 1 },
+                                                       { C::J::itemName, cd.completionDataGridCell().localCellIndexJ() + 1 },
+                                                       { C::K1::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
+                                                       { C::K2::itemName, cd.completionDataGridCell().localCellIndexK() + 1 },
+                                                       { C::N::itemName, cd.completionNumber().value() } } ) );
     }
     return kw;
 }

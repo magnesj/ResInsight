@@ -47,12 +47,36 @@ struct NamedValue
     std::string                            name;
     std::variant<std::string, int, double> value;
 
-    NamedValue( std::string n, std::string v ) : name( std::move( n ) ), value( std::move( v ) ) {}
-    NamedValue( std::string n, const char* v ) : name( std::move( n ) ), value( std::string( v ) ) {}
-    NamedValue( std::string n, int v ) : name( std::move( n ) ), value( v ) {}
-    NamedValue( std::string n, size_t v ) : name( std::move( n ) ), value( (int)v ) {}
-    NamedValue( std::string n, double v ) : name( std::move( n ) ), value( v ) {}
-    NamedValue( std::string n, float v ) : name( std::move( n ) ), value( (double)v ) {}
+    NamedValue( std::string n, std::string v )
+        : name( std::move( n ) )
+        , value( std::move( v ) )
+    {
+    }
+    NamedValue( std::string n, const char* v )
+        : name( std::move( n ) )
+        , value( std::string( v ) )
+    {
+    }
+    NamedValue( std::string n, int v )
+        : name( std::move( n ) )
+        , value( v )
+    {
+    }
+    NamedValue( std::string n, size_t v )
+        : name( std::move( n ) )
+        , value( (int)v )
+    {
+    }
+    NamedValue( std::string n, double v )
+        : name( std::move( n ) )
+        , value( v )
+    {
+    }
+    NamedValue( std::string n, float v )
+        : name( std::move( n ) )
+        , value( (double)v )
+    {
+    }
 };
 
 Opm::DeckRecord createRecord( std::initializer_list<NamedValue> items );
