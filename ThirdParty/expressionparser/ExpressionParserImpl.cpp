@@ -127,9 +127,9 @@ QString ExpressionParserImpl::parserErrorText(parser_t& parser)
 }
 
 //--------------------------------------------------------------------------------------------------
-// 
+//
 // The parser do not support single-line if statements on a vector.
-// Expand a single line if-statement to a for loop over all items in the referenced 
+// Expand a single line if-statement to a for loop over all items in the referenced
 // vectors. The script will add '[i]' as postfix to all variables, assuming all variables
 // to be vectors. This statement will be put in a for loop over all elements counting
 // up to size of the vector with minimum items.
@@ -159,9 +159,116 @@ QString ExpressionParserImpl::parserErrorText(parser_t& parser)
 //       c[i] := if(a[i] > ri_agg_0, a[i], b[i]);
 //   }
 //
+// When an aggregating function wraps an entire if expression, the result is a scalar assigned
+// to all elements of the LHS vector. This requires a two-pass expansion:
+//
+//   c := min(if(a > 13, a, b))
+//
+// Expanded to:
+//   var ri_agg_0 := 1.7976931348623158e+308;
+//   for (var i := 0; i < min(a[], b[]); i += 1)
+//   {
+//       var ri_elem := if(a[i] > 13, a[i], b[i]);
+//       ri_agg_0 := min(ri_agg_0, ri_elem);
+//   }
+//   for (var i := 0; i < min(c[]); i += 1)
+//   {
+//       c[i] := ri_agg_0;
+//   }
+//
 //--------------------------------------------------------------------------------------------------
 QString ExpressionParserImpl::expandIfStatements(const QString& expressionText)
 {
+    // Check for pattern: c := agg_func(if(condition, true_expr, false_expr))
+    // Computes a scalar aggregate of the element-wise if-result and assigns it as a constant
+    // to all elements of c. The two closing parens )) close the if() and agg_func() respectively.
+    QRegularExpression outerAggIfPattern( R"(\b(\w+)\s*:=\s*(min|max|sum|avg)\(if\((.+)\)\)\s*$)",
+                                          QRegularExpression::CaseInsensitiveOption |
+                                              QRegularExpression::DotMatchesEverythingOption );
+
+    auto outerMatch = outerAggIfPattern.match( expressionText.trimmed() );
+    if ( outerMatch.hasMatch() )
+    {
+        QString lhsVar  = outerMatch.captured( 1 );
+        QString aggFunc = outerMatch.captured( 2 ).toLower();
+        QString ifArgs  = outerMatch.captured( 3 );
+
+        // Detect referenced variables, excluding the outer aggregating function name itself.
+        // exprtk::collect_variables may treat the function name (e.g. "avg") as a variable
+        // when it appears in an expression context it doesn't fully recognise (avg(if(...))).
+        static const QStringList knownFunctions = { "min", "max", "sum", "avg" };
+        auto                     allVars        = detectReferencedVariables( expressionText );
+        allVars.erase( std::remove_if( allVars.begin(),
+                                       allVars.end(),
+                                       [&]( const QString& v )
+                                       { return knownFunctions.contains( v, Qt::CaseInsensitive ); } ),
+                       allVars.end() );
+
+        QString listOfNonLhsVars;
+        for ( const QString& var : allVars )
+        {
+            if ( var != lhsVar )
+                listOfNonLhsVars += QString( "%1[]," ).arg( var );
+        }
+        listOfNonLhsVars = listOfNonLhsVars.left( listOfNonLhsVars.size() - 1 );
+
+        // Build element-wise version of the if expression
+        QString indexedIfExpr = QString( "if(%1)" ).arg( ifArgs );
+        for ( const QString& var : allVars )
+        {
+            if ( var == lhsVar ) continue;
+            QString            regexpText = QString( "\\b%1\\b" ).arg( var );
+            QRegularExpression regexp( regexpText );
+            indexedIfExpr = indexedIfExpr.replace( regexp, var + "[i]" );
+        }
+
+        QString preVarName = "ri_agg_0";
+        QString initVal;
+        QString extraVarDecl;
+        QString updateExpr;
+
+        if ( aggFunc == "min" )
+        {
+            initVal    = "1.7976931348623158e+308";
+            updateExpr = QString( "%1 := min(%1, ri_elem);" ).arg( preVarName );
+        }
+        else if ( aggFunc == "max" )
+        {
+            initVal    = "-1.7976931348623158e+308";
+            updateExpr = QString( "%1 := max(%1, ri_elem);" ).arg( preVarName );
+        }
+        else if ( aggFunc == "sum" )
+        {
+            initVal    = "0";
+            updateExpr = QString( "%1 := %1 + ri_elem;" ).arg( preVarName );
+        }
+        else // avg: Welford online algorithm to avoid a post-loop assignment
+        {
+            // ri_agg_0 accumulates the running mean; ri_k tracks the count.
+            // After the loop ri_agg_0 holds the average with no statement needed outside the loop.
+            initVal      = "0";
+            extraVarDecl = "var ri_k := 0;\n";
+            updateExpr   = "ri_k := ri_k + 1;\n"
+                           "    ri_agg_0 := ri_agg_0 + (ri_elem - ri_agg_0) / ri_k;";
+        }
+
+        QString expandedText;
+        expandedText += QString( "var %1 := %2;\n" ).arg( preVarName, initVal );
+        expandedText += extraVarDecl;
+        expandedText += QString( "for (var i := 0; i < min(%1); i += 1)\n" ).arg( listOfNonLhsVars );
+        expandedText += "{\n";
+        expandedText += QString( "    var ri_elem := %1;\n" ).arg( indexedIfExpr );
+        expandedText += QString( "    %1\n" ).arg( updateExpr );
+        expandedText += "}\n";
+
+        expandedText += QString( "for (var i := 0; i < min(%1[]); i += 1)\n" ).arg( lhsVar );
+        expandedText += "{\n";
+        expandedText += QString( "    %1[i] := %2;\n" ).arg( lhsVar, preVarName );
+        expandedText += "}\n";
+
+        return expandedText;
+    }
+
     auto allVectorVariables = detectReferencedVariables(expressionText);
 
     QString textWithVectorBrackets = expressionText;
