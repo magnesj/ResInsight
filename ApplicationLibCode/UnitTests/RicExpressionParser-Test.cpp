@@ -194,3 +194,43 @@ TEST( RicExpressionParserTest, ExpandIfWithMinAggregation )
     EXPECT_DOUBLE_EQ( c[1], 6.0 );  // Would be 7.0 with the bug (comparing a[1]=6 with b[1]=7)
     EXPECT_DOUBLE_EQ( c[2], 25.0 );
 }
+
+//--------------------------------------------------------------------------------------------------
+///
+// The expression "c:= min(if(a > 13), a, b)" is intended to compute if(a > 13, a, b) element-wise
+// and then assign the minimum of that result as a constant to c.
+//
+// With a = [10..19] and b = [100..109]:
+//   if(a > 13, a, b) => [100, 101, 102, 103, 14, 15, 16, 17, 18, 19]
+//   min(...)         => 14
+//
+// The expression is malformed: if() only receives the condition as its argument, and min() receives
+// three separate arguments (the condition result, a, b) instead of a single vector result.
+// This means c will NOT be constant 14 for all elements.
+//--------------------------------------------------------------------------------------------------
+TEST( RicExpressionParserTest, MinWithIfStatementDoesNotProduceConstant )
+{
+    std::vector<double> a( 10 );
+    std::iota( a.begin(), a.end(), 10 );
+
+    std::vector<double> b( 10 );
+    std::iota( b.begin(), b.end(), 100 );
+
+    std::vector<double> c( 10 );
+
+    ExpressionParser parser;
+    parser.assignVector( "a", a );
+    parser.assignVector( "b", b );
+    parser.assignVector( "c", c );
+
+    QString expr = "c:= min(if(a > 13), a, b)";
+
+    EXPECT_TRUE( parser.expandIfStatementsAndEvaluate( expr ) );
+
+    // Expected: all elements of c should be the constant value 14
+    // Actual: the expression does not work as intended and c is not constant
+    for ( size_t i = 0; i < c.size(); i++ )
+    {
+        EXPECT_DOUBLE_EQ( c[i], 14.0 );
+    }
+}
