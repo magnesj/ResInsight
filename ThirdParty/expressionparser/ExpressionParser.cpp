@@ -56,11 +56,7 @@ void ExpressionParser::assignVector( const QString& variableName, std::vector<do
 //--------------------------------------------------------------------------------------------------
 std::expected<void, QString> ExpressionParser::evaluate( const QString& expressionText )
 {
-    QString errorText;
-    if ( !m_expressionParserImpl->evaluate( expressionText, &errorText ) )
-        return std::unexpected( errorText );
-
-    return {};
+    return m_expressionParserImpl->evaluate( expressionText );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -68,20 +64,11 @@ std::expected<void, QString> ExpressionParser::evaluate( const QString& expressi
 //--------------------------------------------------------------------------------------------------
 std::expected<void, QString> ExpressionParser::expandIfStatementsAndEvaluate( const QString& expressionText )
 {
-    QString errorText;
-    bool    ok = false;
-
     if ( expressionText.contains( "if", Qt::CaseInsensitive ) )
     {
         QString expanded = ExpressionParserImpl::expandIfStatements( expressionText );
-        ok               = m_expressionParserImpl->evaluate( expanded, &errorText );
-    }
-    else
-    {
-        ok = m_expressionParserImpl->evaluate( expressionText, &errorText );
+        return m_expressionParserImpl->evaluate( expanded );
     }
 
-    if ( !ok ) return std::unexpected( errorText );
-
-    return {};
+    return m_expressionParserImpl->evaluate( expressionText );
 }
