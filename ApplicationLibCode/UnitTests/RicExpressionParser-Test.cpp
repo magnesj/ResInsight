@@ -191,7 +191,7 @@ TEST( RicExpressionParserTest, ExpandIfWithMinAggregation )
     EXPECT_TRUE( parser.expandIfStatementsAndEvaluate( expr ) );
 
     EXPECT_DOUBLE_EQ( c[0], 5.0 );
-    EXPECT_DOUBLE_EQ( c[1], 6.0 );  // Would be 7.0 with the bug (comparing a[1]=6 with b[1]=7)
+    EXPECT_DOUBLE_EQ( c[1], 6.0 ); // Would be 7.0 with the bug (comparing a[1]=6 with b[1]=7)
     EXPECT_DOUBLE_EQ( c[2], 25.0 );
 }
 
@@ -482,4 +482,3 @@ TEST( RicExpressionParserTest, SimpleVectorAvg )
         EXPECT_DOUBLE_EQ( c[i], 14.5 );
     }
 }
-
