@@ -46,6 +46,7 @@
 #include "Well/RigWellPath.h"
 #include "Well/RigWellPathFormations.h"
 
+#include "Formations/RimFormationNames.h"
 #include "RimCase.h"
 #include "RimColorLegend.h"
 #include "RimColorLegendCollection.h"
@@ -59,7 +60,6 @@
 #include "RimMainPlotCollection.h"
 #include "RimPerforationCollection.h"
 #include "RimPerforationInterval.h"
-#include "Formations/RimFormationNames.h"
 #include "RimProject.h"
 #include "RimRftTopologyCurve.h"
 #include "RimTools.h"
@@ -2726,8 +2726,7 @@ void RimWellLogTrack::updateFormationNamesOnPlot()
             // formations not found in the legend (e.g., when using a generic color palette).
             // Related to https://github.com/OPM/ResInsight/issues/12974
             RimColorLegend* legend = m_regionAnnotationSettings->colorShadingLegend();
-            if ( !legend )
-                legend = RimRegularLegendConfig::mapToColorLegend( RimRegularLegendConfig::ColorRangesType::NORMAL );
+            if ( !legend ) legend = RimRegularLegendConfig::mapToColorLegend( RimRegularLegendConfig::ColorRangesType::NORMAL );
 
             if ( legend && !formationNamesToPlot.empty() )
             {
