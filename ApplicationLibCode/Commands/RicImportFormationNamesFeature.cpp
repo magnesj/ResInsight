@@ -170,32 +170,8 @@ void RicImportFormationNamesFeature::setupActionLook( QAction* actionToSetup )
 //--------------------------------------------------------------------------------------------------
 void RicImportFormationNamesFeature::addCustomColorLegend( QString& name, RimFormationNames* rimFormationNames )
 {
-    RigFormationNames* rigFormationNames = rimFormationNames->formationNamesData();
-    if ( !rigFormationNames ) return;
-
-    const std::vector<QString>&      formationNames  = rigFormationNames->formationNames();
-    const std::vector<cvf::Color3f>& formationColors = rigFormationNames->formationColors();
-
-    // return if no formation names or colors (latter e.g. in case of FMU input or LYR without colors)
-    if ( formationNames.empty() || formationColors.empty() ) return;
-
-    auto* colorLegend = new RimColorLegend;
-    colorLegend->setColorLegendName( name );
-
-    for ( size_t i = 0; i < formationColors.size(); i++ )
-    {
-        auto* colorLegendItem = new RimColorLegendItem;
-
-        colorLegendItem->setValues( formationNames[i], (int)i, formationColors[i] );
-
-        colorLegend->appendColorLegendItem( colorLegendItem );
-    }
-
-    RimProject* proj = RimProject::current();
-
-    RimColorLegendCollection* colorLegendCollection = proj->colorLegendCollection;
-
-    colorLegendCollection->appendCustomColorLegend( colorLegend );
+    RimColorLegendCollection* colorLegendCollection = RimProject::current()->colorLegendCollection;
+    colorLegendCollection->createColorLegendFromFormationNames( rimFormationNames );
     colorLegendCollection->updateConnectedEditors();
 }
 
