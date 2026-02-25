@@ -70,26 +70,12 @@ RimFormationNames* RicImportFormationNamesFeature::importFormationFiles( const Q
     std::vector<RimFormationNames*> formationNames = fomNameColl->importFiles( fileNames );
     fomNameColl->updateConnectedEditors();
 
-    for ( int i = 0; i < fileNames.size(); i++ )
+    RimColorLegendCollection* colorLegendCollection = proj->colorLegendCollection;
+    for ( auto* fmNames : formationNames )
     {
-        auto colors = formationNames[i]->formationNamesData()->formationColors();
-
-        bool anyValidColor = false;
-        for ( const auto& color : colors )
-        {
-            if ( color.isValid() )
-            {
-                anyValidColor = true;
-                break;
-            }
-        }
-
-        if ( anyValidColor )
-        {
-            QString baseName = QFileInfo( fileNames[i] ).baseName();
-            RicImportFormationNamesFeature::addCustomColorLegend( baseName, formationNames[i] );
-        }
+        colorLegendCollection->createColorLegendFromFormationNames( fmNames );
     }
+    colorLegendCollection->updateConnectedEditors();
 
     if ( !formationNames.empty() ) return formationNames.back();
 
@@ -163,16 +149,6 @@ void RicImportFormationNamesFeature::setupActionLook( QAction* actionToSetup )
 {
     actionToSetup->setIcon( QIcon( ":/FormationCollection16x16.png" ) );
     actionToSetup->setText( "Import Formations" );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicImportFormationNamesFeature::addCustomColorLegend( QString& name, RimFormationNames* rimFormationNames )
-{
-    RimColorLegendCollection* colorLegendCollection = RimProject::current()->colorLegendCollection;
-    colorLegendCollection->createColorLegendFromFormationNames( rimFormationNames );
-    colorLegendCollection->updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
