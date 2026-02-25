@@ -21,15 +21,14 @@
 #include "RiaColorTables.h"
 #include "RiaFractureDefines.h"
 
+#include "RigFormationNames.h"
+
 #include "Formations/RimFormationNames.h"
 #include "RimColorLegend.h"
 #include "RimColorLegendItem.h"
 #include "RimProject.h"
 #include "RimRegularLegendConfig.h"
 
-#include "RigFormationNames.h"
-
-#include <QFileInfo>
 #include <QString>
 
 CAF_PDM_SOURCE_INIT( RimColorLegendCollection, "ColorLegendCollection" );
