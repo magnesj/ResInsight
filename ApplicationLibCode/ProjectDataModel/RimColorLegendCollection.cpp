@@ -223,6 +223,7 @@ void RimColorLegendCollection::createColorLegendFromFormationNames( RimFormation
     const std::vector<cvf::Color3f>& formationColors = rigFormationNames->formationColors();
 
     if ( formationNames.empty() || formationColors.empty() ) return;
+    if ( formationNames.size() != formationColors.size() ) return;
 
     bool anyValidColor = false;
     for ( const auto& color : formationColors )
