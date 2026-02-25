@@ -119,6 +119,21 @@
 
 CAF_PDM_SOURCE_INIT( RimWellLogTrack, "WellLogPlotTrack" );
 
+namespace internal
+{
+void setColorShadingLegendFromFormationCase( RimWellLogRegionAnnotationSettings* settings, RimCase* rimCase )
+{
+    if ( !rimCase ) return;
+
+    auto* formationNames = rimCase->activeFormationNames();
+    if ( !formationNames ) return;
+
+    QString legendName = formationNames->shortName();
+    auto*   legend     = RimProject::current()->colorLegendCollection->findByName( legendName );
+    if ( legend ) settings->setColorShadingLegend( legend );
+}
+} // namespace Internal
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -1221,21 +1236,6 @@ void RimWellLogTrack::onLoadDataAndUpdate()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimWellLogTrack::setColorShadingLegendFromFormationCase( RimCase* rimCase )
-{
-    if ( !rimCase ) return;
-
-    auto* formationNames = rimCase->activeFormationNames();
-    if ( !formationNames ) return;
-
-    QString legendName = formationNames->shortName();
-    auto*   legend     = RimProject::current()->colorLegendCollection->findByName( legendName );
-    if ( legend ) m_regionAnnotationSettings->setColorShadingLegend( legend );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RimWellLogTrack::setAndUpdateWellPathFormationNamesData( RimCase* rimCase, RimWellPath* wellPath )
 {
     m_formationSettings->setFormationCase( rimCase );
@@ -1244,7 +1244,7 @@ void RimWellLogTrack::setAndUpdateWellPathFormationNamesData( RimCase* rimCase, 
     m_formationSettings->setSimWellName( "" );
     m_formationSettings->setBranchIndex( -1 );
 
-    setColorShadingLegendFromFormationCase( rimCase );
+    internal::setColorShadingLegendFromFormationCase( m_regionAnnotationSettings, rimCase );
     updateConnectedEditors();
 
     if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )
@@ -1277,7 +1277,7 @@ void RimWellLogTrack::setAndUpdateSimWellFormationNamesData( RimCase* rimCase, c
     m_formationSettings->setWellPathForSourceCase( nullptr );
     m_formationSettings->setSimWellName( simWellName );
 
-    setColorShadingLegendFromFormationCase( rimCase );
+    internal::setColorShadingLegendFromFormationCase( m_regionAnnotationSettings, rimCase );
     updateConnectedEditors();
 
     if ( m_regionAnnotationSettings->annotationType() != RiaDefines::RegionAnnotationType::NO_ANNOTATIONS )

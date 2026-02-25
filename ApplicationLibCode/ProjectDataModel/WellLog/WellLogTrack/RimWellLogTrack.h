@@ -242,8 +242,6 @@ protected:
 private:
     RiuPlotWidget* doCreatePlotViewWidget( QWidget* mainWindowParent = nullptr ) override;
 
-    void setColorShadingLegendFromFormationCase( RimCase* rimCase );
-
     void cleanupBeforeClose();
     void detachAllPlotItems();
     void calculatePropertyValueZoomRange();
