@@ -236,7 +236,7 @@ void RimColorLegendCollection::createColorLegendFromFormationNames( RimFormation
     }
     if ( !anyValidColor ) return;
 
-    QString legendName = QFileInfo( rimFormationNames->fileName() ).baseName();
+    QString legendName = rimFormationNames->shortName();
 
     // Do not create duplicate legends
     if ( findByName( legendName ) != nullptr ) return;
