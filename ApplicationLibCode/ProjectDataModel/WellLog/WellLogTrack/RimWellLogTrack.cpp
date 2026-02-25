@@ -123,7 +123,7 @@ namespace internal
 {
 void setColorShadingLegendFromFormationCase( RimWellLogRegionAnnotationSettings* settings, RimCase* rimCase )
 {
-    if ( !rimCase ) return;
+    if ( !settings || !rimCase ) return;
 
     auto* formationNames = rimCase->activeFormationNames();
     if ( !formationNames ) return;
@@ -132,7 +132,7 @@ void setColorShadingLegendFromFormationCase( RimWellLogRegionAnnotationSettings*
     auto*   legend     = RimProject::current()->colorLegendCollection->findByName( legendName );
     if ( legend ) settings->setColorShadingLegend( legend );
 }
-} // namespace Internal
+} // namespace internal
 
 //--------------------------------------------------------------------------------------------------
 ///
