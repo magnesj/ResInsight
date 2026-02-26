@@ -123,6 +123,7 @@ public:
 protected:
     void appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const override;
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
+    void fieldChangedByUi( const caf::FieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void initAfterRead() override;
 
 private:
@@ -130,6 +131,7 @@ private:
     void clearActiveCellUnions();
     void clearStatisticsResults();
     void updateMainGridAndActiveCellsForStatisticsCases();
+    void updateStatisticsVisibility();
 
     void createCaseObjectsFromEnsembleFileSet();
     bool detectGridDimensionEquality();
