@@ -621,6 +621,18 @@ void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::fieldChangedByUi( const caf::FieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+{
+    if ( changedField == &m_autoDetectGridType || changedField == &m_gridMode )
+    {
+        updateStatisticsVisibility();
+        updateConnectedEditors();
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimReservoirGridEnsemble::initAfterRead()
 {
     if ( m_ensembleFileSet )
@@ -660,6 +672,8 @@ void RimReservoirGridEnsemble::initAfterRead()
     {
         m_viewCollection->setEclipseCaseProvider( [this]() { return this->cases(); } );
     }
+
+    updateStatisticsVisibility();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -706,6 +720,15 @@ void RimReservoirGridEnsemble::clearStatisticsResults()
             rimReservoirView->loadDataAndUpdate();
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimReservoirGridEnsemble::updateStatisticsVisibility()
+{
+    bool hidden = !hasSharedGrid();
+    m_statisticsCaseCollection->uiCapability()->setUiTreeHidden( hidden );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -793,6 +816,7 @@ void RimReservoirGridEnsemble::loadGridDataFromFiles()
         // loadGridsInIndividualMode();
     }
 
+    updateStatisticsVisibility();
     updateConnectedEditors();
 }
 
