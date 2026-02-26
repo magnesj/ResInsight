@@ -42,6 +42,7 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseEnsemble.h"
+#include "RimReservoirGridEnsemble.h"
 #include "RimEclipseContourMapProjection.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimSimWellInViewCollection.h"
@@ -150,9 +151,9 @@ RimStatisticsContourMap::RimStatisticsContourMap()
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
-    if ( ( eclipseCase() == nullptr ) && ( !ensemble()->cases().empty() ) )
+    if ( ( eclipseCase() == nullptr ) && ( !ensembleCases().empty() ) )
     {
-        auto selCase = ensemble()->cases().front();
+        auto selCase = ensembleCases().front();
         setEclipseCase( selCase );
     }
 
@@ -268,6 +269,36 @@ RimEclipseCaseEnsemble* RimStatisticsContourMap::ensemble() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+QString RimStatisticsContourMap::ensembleName() const
+{
+    if ( auto* ens = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() ) return ens->name();
+    if ( auto* ens = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() ) return ens->name();
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RimEclipseCase*> RimStatisticsContourMap::ensembleCases() const
+{
+    if ( auto* ens = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() ) return ens->cases();
+    if ( auto* ens = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() ) return ens->cases();
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::set<RimEclipseCase*> RimStatisticsContourMap::ensembleCasesInViews() const
+{
+    if ( auto* ens = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() ) return ens->casesInViews();
+    if ( auto* ens = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() ) return ens->casesInViews();
+    return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( &m_computeStatisticsButton == changedField )
@@ -321,7 +352,7 @@ void RimStatisticsContourMap::switchToSelectedSourceCase()
     {
         newCase->ensureReservoirCaseIsOpen();
 
-        if ( m_openEclipseCase && !ensemble()->casesInViews().contains( m_openEclipseCase ) )
+        if ( m_openEclipseCase && !ensembleCasesInViews().contains( m_openEclipseCase ) )
         {
             m_openEclipseCase->closeReservoirCase();
         }
@@ -353,7 +384,7 @@ QList<caf::PdmOptionItemInfo> RimStatisticsContourMap::calculateValueOptions( co
     }
     else if ( &m_primaryCase == fieldNeedingOptions )
     {
-        for ( auto eCase : ensemble()->cases() )
+        for ( auto eCase : ensembleCases() )
         {
             options.push_back( caf::PdmOptionItemInfo( eCase->caseUserDescription(), eCase, false, eCase->uiIconProvider() ) );
         }
@@ -418,8 +449,7 @@ void RimStatisticsContourMap::defineEditorAttribute( const caf::PdmFieldHandle* 
 //--------------------------------------------------------------------------------------------------
 void RimStatisticsContourMap::initAfterRead()
 {
-    auto ensemble = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>();
-    if ( !ensemble ) return;
+    if ( ensembleCases().empty() ) return;
 
     switchToSelectedSourceCase();
 
@@ -498,10 +528,8 @@ void RimStatisticsContourMap::computeStatistics()
     if ( m_computeStatisticsButton.isReadOnly() ) return;
 
     RiaLogging::info( "Computing statistics" );
-    auto ensemble = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>();
-    if ( !ensemble ) return;
-
-    if ( ensemble->cases().empty() ) return;
+    auto cases = ensembleCases();
+    if ( cases.empty() ) return;
     if ( eclipseCase() == nullptr ) return;
 
     RigFloodingSettings floodSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
@@ -518,7 +546,7 @@ void RimStatisticsContourMap::computeStatistics()
 
     auto contourMapGrid = std::make_unique<RigContourMapGrid>( gridBoundingBox, sampleSpacing );
 
-    const size_t nCases = ensemble->cases().size();
+    const size_t nCases = cases.size();
 
     std::map<size_t, std::vector<std::vector<double>>> timestep_results;
 
@@ -526,12 +554,12 @@ void RimStatisticsContourMap::computeStatistics()
 
     auto readerSettings                = RiaPreferencesGrid::gridOnlyReaderSettings();
     readerSettings.onlyLoadActiveCells = true;
-    auto casesInViews                  = ensemble->casesInViews();
+    auto casesInViews                  = ensembleCasesInViews();
     auto oldReaderType                 = RiaPreferencesGrid::current()->gridModelReaderOverride();
     RiaPreferencesGrid::current()->setGridModelReaderOverride( RiaDefines::GridModelReader::OPM_COMMON );
 
     int i = 1;
-    for ( RimEclipseCase* eCase : ensemble->cases() )
+    for ( RimEclipseCase* eCase : cases )
     {
         auto task = progInfo.task( QString( "Processing Case %1 of %2" ).arg( i++ ).arg( nCases ) );
 
