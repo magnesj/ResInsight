@@ -55,10 +55,9 @@ namespace caf
 template <>
 void caf::AppEnum<RimReservoirGridEnsemble::GridModeType>::setUp()
 {
-    addItem( RimReservoirGridEnsemble::GridModeType::AUTO_DETECT, "AutoDetect", "Auto Detect" );
     addItem( RimReservoirGridEnsemble::GridModeType::SHARED_GRID, "SharedGrid", "Shared Grid" );
     addItem( RimReservoirGridEnsemble::GridModeType::INDIVIDUAL_GRIDS, "IndividualGrids", "Individual Grids" );
-    setDefault( RimReservoirGridEnsemble::GridModeType::AUTO_DETECT );
+    setDefault( RimReservoirGridEnsemble::GridModeType::SHARED_GRID );
 }
 } // namespace caf
 
@@ -82,7 +81,10 @@ RimReservoirGridEnsemble::RimReservoirGridEnsemble()
     CAF_PDM_InitFieldNoDefault( &m_ensembleFileSet, "EnsembleFileSet", "Ensemble File Set" );
     m_ensembleFileSet.uiCapability()->setUiReadOnly( true );
 
-    CAF_PDM_InitField( &m_gridMode, "GridMode", GridModeType::AUTO_DETECT, "Grid Mode" );
+    CAF_PDM_InitField( &m_autoDetectGridType, "AutoDetectGridType", true, "Auto Detect Grid Type" );
+    CAF_PDM_InitField( &m_gridMode, "GridMode", GridModeType::SHARED_GRID, "Grid Mode" );
+    CAF_PDM_InitField( &m_detectedGridMode, "DetectedGridMode", GridModeType::SHARED_GRID, "Detected Grid Mode" );
+    m_detectedGridMode.uiCapability()->setUiReadOnly( true );
 
     CAF_PDM_InitFieldNoDefault( &m_caseCollection, "CaseCollection", "Source Cases" );
     m_caseCollection = new RimCaseCollection;
@@ -263,7 +265,7 @@ RimEclipseCase* RimReservoirGridEnsemble::findByFileName( const QString& gridFil
 //--------------------------------------------------------------------------------------------------
 bool RimReservoirGridEnsemble::hasSharedGrid() const
 {
-    return m_gridMode.v() == GridModeType::SHARED_GRID;
+    return effectiveGridMode() == GridModeType::SHARED_GRID;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -279,6 +281,7 @@ bool RimReservoirGridEnsemble::isGridDataLoaded() const
 //--------------------------------------------------------------------------------------------------
 RimReservoirGridEnsemble::GridModeType RimReservoirGridEnsemble::effectiveGridMode() const
 {
+    if ( m_autoDetectGridType ) return m_detectedGridMode.v();
     return m_gridMode.v();
 }
 
@@ -601,7 +604,16 @@ void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmU
     uiOrdering.add( nameField() );
     uiOrdering.add( &m_groupId );
     uiOrdering.add( &m_ensembleFileSet );
-    uiOrdering.add( &m_gridMode );
+    uiOrdering.add( &m_autoDetectGridType );
+
+    if ( m_autoDetectGridType )
+    {
+        uiOrdering.add( &m_detectedGridMode );
+    }
+    else
+    {
+        uiOrdering.add( &m_gridMode );
+    }
 
     uiOrdering.skipRemainingFields();
 }
@@ -762,15 +774,13 @@ void RimReservoirGridEnsemble::loadGridDataFromFiles()
     if ( allCases.empty() ) return;
 
     // Determine effective grid mode
-    GridModeType effectiveMode = m_gridMode.v();
-
-    if ( effectiveMode == GridModeType::AUTO_DETECT )
+    if ( m_autoDetectGridType )
     {
-        // Run dimension detection
-        bool identical = detectGridDimensionEquality();
-        effectiveMode  = identical ? GridModeType::SHARED_GRID : GridModeType::INDIVIDUAL_GRIDS;
-        m_gridMode     = effectiveMode; // Update to detected mode
+        bool identical    = detectGridDimensionEquality();
+        m_detectedGridMode = identical ? GridModeType::SHARED_GRID : GridModeType::INDIVIDUAL_GRIDS;
     }
+
+    GridModeType effectiveMode = effectiveGridMode();
 
     // Load grids based on effective mode
     if ( effectiveMode == GridModeType::SHARED_GRID )

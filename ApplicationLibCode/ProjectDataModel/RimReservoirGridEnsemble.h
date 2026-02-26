@@ -59,7 +59,6 @@ class RimReservoirGridEnsemble : public RimNamedObject, public RimReservoirGridE
 public:
     enum class GridModeType
     {
-        AUTO_DETECT,
         SHARED_GRID,
         INDIVIDUAL_GRIDS
     };
@@ -149,7 +148,9 @@ private:
     caf::PdmChildField<RimCaseCollection*> m_statisticsCaseCollection;
 
     // Grid mode
+    caf::PdmField<bool>                       m_autoDetectGridType;
     caf::PdmField<caf::AppEnum<GridModeType>> m_gridMode;
+    caf::PdmField<caf::AppEnum<GridModeType>> m_detectedGridMode;
 
     // Views and mappings
     caf::PdmChildField<RimEclipseViewCollection*>     m_viewCollection;
