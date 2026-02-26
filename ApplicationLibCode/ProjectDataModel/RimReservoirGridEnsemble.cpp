@@ -621,7 +621,7 @@ void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimReservoirGridEnsemble::fieldChangedByUi( const caf::FieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+void RimReservoirGridEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
     if ( changedField == &m_autoDetectGridType || changedField == &m_gridMode )
     {
