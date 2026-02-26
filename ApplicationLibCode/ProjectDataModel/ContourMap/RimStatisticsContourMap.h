@@ -37,6 +37,7 @@
 class RimEclipseCase;
 class RimEclipseResultDefinition;
 class RimEclipseCaseEnsemble;
+class RimReservoirGridEnsemble;
 class RimEclipseContourMapView;
 class RimStatisticsContourMapView;
 class RimPolygon;
@@ -66,6 +67,7 @@ public:
     RimEclipseCase* eclipseCase() const;
 
     RimEclipseCaseEnsemble* ensemble() const;
+    QString                 ensembleName() const;
 
     RigContourMapGrid*  contourMapGrid() const;
     std::vector<double> result( size_t timeStep, StatisticsType statisticsType ) const;
@@ -100,6 +102,9 @@ protected:
 private:
     void computeStatistics();
     void doStatisticsCalculation( std::map<size_t, std::vector<std::vector<double>>>& timestep_results );
+
+    std::vector<RimEclipseCase*> ensembleCases() const;
+    std::set<RimEclipseCase*>    ensembleCasesInViews() const;
 
     std::vector<std::pair<int, int>> mapLocalToGlobalTimeSteps( std::vector<QDateTime> localDates ) const;
 
