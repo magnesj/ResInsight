@@ -371,13 +371,13 @@ void RigWellTargetMapping::growCluster( RimEclipseCase*            eclipseCase,
     // Initially only the start cell is found
     size_t              reservoirCellIdx = eclipseCase->mainGrid()->cellIndexFromIJK( startCell.i(), startCell.j(), startCell.k() );
     std::vector<size_t> foundCells       = { reservoirCellIdx };
-    assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
+    RigWellTargetMappingTools::assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
 
     for ( int i = 0; i < maxIterations; i++ )
     {
         foundCells = findCandidates( eclipseCase, foundCells, volumeType, limits, data, filterVector, clusters );
         if ( foundCells.empty() ) break;
-        assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
+        RigWellTargetMappingTools::assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
     }
 }
 
@@ -450,7 +450,7 @@ std::vector<size_t> RigWellTargetMapping::findCandidates( RimEclipseCase*       
 
         if ( data.transmissibilityNNC != nullptr )
         {
-            auto nncCells = nncConnectionCellAndResult( cellIdx, mainGrid );
+            auto nncCells = RigWellTargetMappingTools::nncConnectionCellAndResult( cellIdx, mainGrid );
             for ( auto& [cellInfo, nncResultIdx] : nncCells )
             {
                 auto& [otherCellIdx, face] = cellInfo;
@@ -475,21 +475,6 @@ std::vector<size_t> RigWellTargetMapping::findCandidates( RimEclipseCase*       
     }
 
     return candidates;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RigWellTargetMapping::assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
-                                                   const std::vector<size_t>& cells,
-                                                   std::vector<int>&          clusters,
-                                                   int                        clusterId )
-{
-    for ( size_t reservoirCellIdx : cells )
-    {
-        size_t resultIndex = activeCellInfo.cellResultIndex( reservoirCellIdx );
-        if ( resultIndex != cvf::UNDEFINED_SIZE_T ) clusters[resultIndex] = clusterId;
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1128,28 +1113,6 @@ cvf::BoundingBox RigWellTargetMapping::computeBoundingBoxForResult( RimEclipseCa
     }
 
     return boundingBox;
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::list<std::pair<std::pair<size_t, RigWellTargetMapping::CellFaceType>, size_t>>
-    RigWellTargetMapping::nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid )
-{
-    std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> foundCells;
-
-    if ( mainGrid->nncData() == nullptr ) return foundCells;
-
-    auto& connections = mainGrid->nncData()->allConnections();
-    for ( size_t i = 0; i < connections.size(); i++ )
-    {
-        if ( connections[i].c1GlobIdx() == cellIdx )
-        {
-            foundCells.push_back( std::make_pair( std::make_pair( connections[i].c2GlobIdx(), connections[i].face() ), i ) );
-        }
-    }
-
-    return foundCells;
 }
 
 //--------------------------------------------------------------------------------------------------

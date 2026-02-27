@@ -20,6 +20,11 @@
 
 #include "Well/RigWellTargetMappingTools.h"
 
+#include "RigActiveCellInfo.h"
+#include "RigMainGrid.h"
+#include "RigNNCData.h"
+#include "RigNncConnection.h"
+
 #include "cvfStructGrid.h"
 
 #include <limits>
@@ -345,4 +350,134 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasType_OilAbove_Ret
     limits.saturationGas = 0.3;
 
     EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, 0 ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+// assignClusterIdToCells tests
+//--------------------------------------------------------------------------------------------------
+
+TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_SetsCorrectIds )
+{
+    RigActiveCellInfo activeCellInfo;
+    activeCellInfo.setReservoirCellCount( 5 );
+    activeCellInfo.setCellResultIndex( 0, 0 );
+    activeCellInfo.setCellResultIndex( 1, 1 );
+    activeCellInfo.setCellResultIndex( 2, 2 );
+
+    std::vector<int>    clusters( 3, 0 );
+    std::vector<size_t> cells = { 0, 1, 2 };
+
+    RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 5 );
+
+    EXPECT_EQ( 5, clusters[0] );
+    EXPECT_EQ( 5, clusters[1] );
+    EXPECT_EQ( 5, clusters[2] );
+}
+
+TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_SkipsUndefinedResultIndex )
+{
+    RigActiveCellInfo activeCellInfo;
+    activeCellInfo.setReservoirCellCount( 3 );
+    activeCellInfo.setCellResultIndex( 0, 0 );
+    // reservoir cells 1 and 2 have no result index (UNDEFINED_SIZE_T)
+
+    std::vector<int>    clusters( 1, 0 );
+    std::vector<size_t> cells = { 0, 1, 2 };
+
+    RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 7 );
+
+    EXPECT_EQ( 7, clusters[0] );
+}
+
+TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_EmptyCells_NoChange )
+{
+    RigActiveCellInfo activeCellInfo;
+    activeCellInfo.setReservoirCellCount( 3 );
+    activeCellInfo.setCellResultIndex( 0, 0 );
+    activeCellInfo.setCellResultIndex( 1, 1 );
+
+    std::vector<int>    clusters( 2, 99 );
+    std::vector<size_t> cells;
+
+    RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 1 );
+
+    EXPECT_EQ( 99, clusters[0] );
+    EXPECT_EQ( 99, clusters[1] );
+}
+
+TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_OverwritesExistingId )
+{
+    RigActiveCellInfo activeCellInfo;
+    activeCellInfo.setReservoirCellCount( 2 );
+    activeCellInfo.setCellResultIndex( 0, 0 );
+    activeCellInfo.setCellResultIndex( 1, 1 );
+
+    std::vector<int>    clusters = { 3, 3 };
+    std::vector<size_t> cells    = { 0, 1 };
+
+    RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 9 );
+
+    EXPECT_EQ( 9, clusters[0] );
+    EXPECT_EQ( 9, clusters[1] );
+}
+
+//--------------------------------------------------------------------------------------------------
+// nncConnectionCellAndResult tests
+//--------------------------------------------------------------------------------------------------
+
+TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NoConnections_ReturnsEmpty )
+{
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 0, mainGrid.p() );
+
+    EXPECT_TRUE( result.empty() );
+}
+
+TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MatchingCell_ReturnsConnection )
+{
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+    mainGrid->nncData()->allConnections().push_back(
+        RigConnection( (size_t)3, (size_t)7, cvf::StructGridInterface::FaceType::POS_I ) );
+
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 3, mainGrid.p() );
+
+    ASSERT_EQ( 1u, result.size() );
+    auto& [cellInfo, nncIdx] = result.front();
+    EXPECT_EQ( 7u, cellInfo.first );
+    EXPECT_EQ( cvf::StructGridInterface::FaceType::POS_I, cellInfo.second );
+    EXPECT_EQ( 0u, nncIdx );
+}
+
+TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NonMatchingCell_ReturnsEmpty )
+{
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+    mainGrid->nncData()->allConnections().push_back(
+        RigConnection( (size_t)5, (size_t)8, cvf::StructGridInterface::FaceType::NEG_J ) );
+
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 0, mainGrid.p() );
+
+    EXPECT_TRUE( result.empty() );
+}
+
+TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MultipleConnections_ReturnsOnlyMatching )
+{
+    cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
+    mainGrid->nncData()->allConnections().push_back(
+        RigConnection( (size_t)2, (size_t)10, cvf::StructGridInterface::FaceType::POS_I ) );
+    mainGrid->nncData()->allConnections().push_back(
+        RigConnection( (size_t)4, (size_t)11, cvf::StructGridInterface::FaceType::POS_J ) );
+    mainGrid->nncData()->allConnections().push_back(
+        RigConnection( (size_t)2, (size_t)12, cvf::StructGridInterface::FaceType::NEG_K ) );
+
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 2, mainGrid.p() );
+
+    ASSERT_EQ( 2u, result.size() );
+
+    auto it = result.begin();
+    EXPECT_EQ( 10u, it->first.first );
+    EXPECT_EQ( 0u, it->second );
+    ++it;
+    EXPECT_EQ( 12u, it->first.first );
+    EXPECT_EQ( 2u, it->second );
 }

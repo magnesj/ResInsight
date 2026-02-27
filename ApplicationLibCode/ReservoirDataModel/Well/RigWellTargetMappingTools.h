@@ -18,9 +18,14 @@
 
 #pragma once
 
+#include "RigActiveCellInfo.h"
 #include "RigWellTargetMapping.h"
 
+#include <list>
+#include <utility>
 #include <vector>
+
+class RigMainGrid;
 
 //==================================================================================================
 ///
@@ -49,8 +54,16 @@ public:
     static QString getOilVectorName( VolumesType volumesType );
     static QString getGasVectorName( VolumesType volumesType );
 
-    static bool isSaturationSufficient( VolumeType                              volumeType,
-                                        const RigWellTargetMapping::DataContainer& data,
+    static bool isSaturationSufficient( VolumeType                                   volumeType,
+                                        const RigWellTargetMapping::DataContainer&   data,
                                         const RigWellTargetMapping::ClusteringLimits& limits,
-                                        size_t                                  idx );
+                                        size_t                                       idx );
+
+    static void assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
+                                        const std::vector<size_t>& cells,
+                                        std::vector<int>&          clusters,
+                                        int                        clusterId );
+
+    static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>>
+        nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
 };

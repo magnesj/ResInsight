@@ -187,11 +187,6 @@ private:
                                                const std::vector<double>& filterVector,
                                                std::vector<int>&          clusters );
 
-    static void assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
-                                        const std::vector<size_t>& cells,
-                                        std::vector<int>&          clusters,
-                                        int                        clusterId );
-
     static std::optional<size_t> getActiveCellCount( RimEclipseCase* eclipseCase );
 
     static void createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address );
@@ -228,8 +223,6 @@ private:
                                                 size_t                                               timeStepIdx );
 
     static cvf::BoundingBox computeBoundingBoxForResult( RimEclipseCase& eclipseCase, const QString& resultName, size_t timeStepIndex );
-
-    static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
 
     static std::vector<double> loadVectorByName( RigCaseCellResultsData& resultsData, const QString& resultName, size_t timeStepIdx );
 
