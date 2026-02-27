@@ -18,9 +18,9 @@
 
 #pragma once
 
-#include "cvfStructGrid.h"
-
 #include "RigEclipseResultAddress.h"
+
+#include "cvfVector3.h"
 
 #include <vector>
 
@@ -37,8 +37,6 @@ class RigFloodingSettings;
 class RigWellTargetMapping
 {
 public:
-    using CellFaceType = cvf::StructGridInterface::FaceType;
-
     enum class VolumeType
     {
         OIL,
@@ -73,20 +71,6 @@ public:
         std::vector<double>     filter;
     };
 
-    struct DataContainer
-    {
-        std::vector<double>        volume;
-        std::vector<double>        saturationOil;
-        std::vector<double>        saturationGas;
-        std::vector<double>        pressure;
-        std::vector<double>        permeabilityX;
-        std::vector<double>        permeabilityNNC;
-        std::vector<double>        transmissibilityX;
-        std::vector<double>        transmissibilityY;
-        std::vector<double>        transmissibilityZ;
-        const std::vector<double>* transmissibilityNNC;
-    };
-
     static void generateCandidates( RimEclipseCase*            eclipseCase,
                                     size_t                     timeStepIdx,
                                     VolumeType                 volumeType,
@@ -115,40 +99,4 @@ public:
                                                            const ClusteringLimits&    limits );
 
     static QString wellTargetResultName();
-
-    class ClusterStatistics
-    {
-    public:
-        ClusterStatistics()
-            : id( -1 )
-            , numCells( 0 )
-            , totalPorvSoil( 0.0 )
-            , totalPorvSgas( 0.0 )
-            , totalPorvSoilAndSgas( 0.0 )
-            , totalFipOil( 0.0 )
-            , totalFipGas( 0.0 )
-            , totalRfipOil( 0.0 )
-            , totalRfipGas( 0.0 )
-            , totalSfipOil( 0.0 )
-            , totalSfipGas( 0.0 )
-            , permeability( 0.0 )
-            , pressure( 0.0 )
-        {
-        }
-
-        int    id;
-        size_t numCells;
-        double totalPorvSoil;
-        double totalPorvSgas;
-        double totalPorvSoilAndSgas;
-        double totalFipOil;
-        double totalFipGas;
-        double totalRfipOil;
-        double totalRfipGas;
-        double totalSfipOil;
-        double totalSfipGas;
-        double permeability;
-        double pressure;
-    };
-
 };

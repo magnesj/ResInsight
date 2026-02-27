@@ -128,10 +128,10 @@ QString RigWellTargetMappingTools::getGasVectorName( VolumesType volumesType )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType                                volumeType,
-                                                        const RigWellTargetMapping::DataContainer& data,
-                                                        const RigWellTargetMapping::ClusteringLimits& limits,
-                                                        size_t                                    idx )
+bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType              volumeType,
+                                                        const DataContainer&    data,
+                                                        const ClusteringLimits& limits,
+                                                        size_t                  idx )
 {
     bool needsValidOil = volumeType == VolumeType::OIL || volumeType == VolumeType::HYDROCARBON;
     bool needsValidGas = volumeType == VolumeType::GAS || volumeType == VolumeType::HYDROCARBON;

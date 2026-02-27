@@ -25,6 +25,7 @@
 
 #include "cafVecIjk.h"
 #include "cvfBoundingBox.h"
+#include "cvfStructGrid.h"
 
 #include <list>
 #include <map>
@@ -44,13 +45,60 @@ class RimEclipseCase;
 class RigWellTargetMappingTools
 {
 public:
-    using CellFaceType      = RigWellTargetMapping::CellFaceType;
-    using VolumeType        = RigWellTargetMapping::VolumeType;
-    using VolumesType       = RigWellTargetMapping::VolumesType;
-    using VolumeResultType  = RigWellTargetMapping::VolumeResultType;
-    using ClusteringLimits  = RigWellTargetMapping::ClusteringLimits;
-    using DataContainer     = RigWellTargetMapping::DataContainer;
-    using ClusterStatistics = RigWellTargetMapping::ClusterStatistics;
+    using CellFaceType     = cvf::StructGridInterface::FaceType;
+    using VolumeType       = RigWellTargetMapping::VolumeType;
+    using VolumesType      = RigWellTargetMapping::VolumesType;
+    using VolumeResultType = RigWellTargetMapping::VolumeResultType;
+    using ClusteringLimits = RigWellTargetMapping::ClusteringLimits;
+
+    struct DataContainer
+    {
+        std::vector<double>        volume;
+        std::vector<double>        saturationOil;
+        std::vector<double>        saturationGas;
+        std::vector<double>        pressure;
+        std::vector<double>        permeabilityX;
+        std::vector<double>        permeabilityNNC;
+        std::vector<double>        transmissibilityX;
+        std::vector<double>        transmissibilityY;
+        std::vector<double>        transmissibilityZ;
+        const std::vector<double>* transmissibilityNNC;
+    };
+
+    class ClusterStatistics
+    {
+    public:
+        ClusterStatistics()
+            : id( -1 )
+            , numCells( 0 )
+            , totalPorvSoil( 0.0 )
+            , totalPorvSgas( 0.0 )
+            , totalPorvSoilAndSgas( 0.0 )
+            , totalFipOil( 0.0 )
+            , totalFipGas( 0.0 )
+            , totalRfipOil( 0.0 )
+            , totalRfipGas( 0.0 )
+            , totalSfipOil( 0.0 )
+            , totalSfipGas( 0.0 )
+            , permeability( 0.0 )
+            , pressure( 0.0 )
+        {
+        }
+
+        int    id;
+        size_t numCells;
+        double totalPorvSoil;
+        double totalPorvSgas;
+        double totalPorvSoilAndSgas;
+        double totalFipOil;
+        double totalFipGas;
+        double totalRfipOil;
+        double totalRfipGas;
+        double totalSfipOil;
+        double totalSfipGas;
+        double permeability;
+        double pressure;
+    };
 
     static double getValueForFace( const std::vector<double>& x,
                                    const std::vector<double>& y,
@@ -68,10 +116,10 @@ public:
     static QString getOilVectorName( VolumesType volumesType );
     static QString getGasVectorName( VolumesType volumesType );
 
-    static bool isSaturationSufficient( VolumeType                                   volumeType,
-                                        const RigWellTargetMapping::DataContainer&   data,
-                                        const RigWellTargetMapping::ClusteringLimits& limits,
-                                        size_t                                       idx );
+    static bool isSaturationSufficient( VolumeType             volumeType,
+                                        const DataContainer&   data,
+                                        const ClusteringLimits& limits,
+                                        size_t                  idx );
 
     static void assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
                                         const std::vector<size_t>& cells,
