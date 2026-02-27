@@ -27,6 +27,7 @@ class RigMainGrid;
 class RimCaseCollection;
 class RimEclipseCase;
 class RimEclipseStatisticsCase;
+class RimFormationNames;
 
 class RimReservoirGridEnsembleBase
 {
@@ -41,4 +42,6 @@ public:
     virtual RimCaseCollection*           statisticsCaseCollection() const                                 = 0;
 
     virtual RimEclipseStatisticsCase* createAndAppendStatisticsCase();
+
+    virtual RimFormationNames* activeFormationNames() const { return nullptr; }
 };

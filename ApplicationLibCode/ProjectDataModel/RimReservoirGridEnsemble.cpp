@@ -31,8 +31,11 @@
 #include "ContourMap/RimStatisticsContourMap.h"
 #include "ContourMap/RimStatisticsContourMapView.h"
 #include "EnsembleFileSet/RimEnsembleFileSet.h"
+#include "Formations/RimFormationNames.h"
+#include "Formations/RimFormationNamesCollection.h"
 #include "RimCaseCollection.h"
 #include "RimEclipseCase.h"
+#include "RimOilField.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseStatisticsCase.h"
@@ -85,6 +88,8 @@ RimReservoirGridEnsemble::RimReservoirGridEnsemble()
     CAF_PDM_InitField( &m_gridMode, "GridMode", GridModeType::SHARED_GRID, "Grid Mode" );
     CAF_PDM_InitField( &m_detectedGridMode, "DetectedGridMode", GridModeType::SHARED_GRID, "Detected Grid Mode" );
     m_detectedGridMode.uiCapability()->setUiReadOnly( true );
+
+    CAF_PDM_InitFieldNoDefault( &m_activeFormationNames, "DefaultFormationNames", "Formation Names" );
 
     CAF_PDM_InitFieldNoDefault( &m_caseCollection, "CaseCollection", "Source Cases" );
     m_caseCollection = new RimCaseCollection;
@@ -599,6 +604,39 @@ void RimReservoirGridEnsemble::appendMenuItems( caf::CmdFeatureMenuBuilder& menu
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RimFormationNames* RimReservoirGridEnsemble::activeFormationNames() const
+{
+    if ( !hasSharedGrid() ) return nullptr;
+    return m_activeFormationNames();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+QList<caf::PdmOptionItemInfo> RimReservoirGridEnsemble::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
+{
+    QList<caf::PdmOptionItemInfo> options;
+
+    if ( fieldNeedingOptions == &m_activeFormationNames )
+    {
+        RimProject* proj = RimProject::current();
+        if ( proj && proj->activeOilField() && proj->activeOilField()->formationNamesCollection() )
+        {
+            for ( RimFormationNames* fnames : proj->activeOilField()->formationNamesCollection()->formationNamesList() )
+            {
+                options.push_back( caf::PdmOptionItemInfo( fnames->shortName(), fnames, false, fnames->uiCapability()->uiIconProvider() ) );
+            }
+        }
+
+        options.push_front( caf::PdmOptionItemInfo( "None", nullptr ) );
+    }
+
+    return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( nameField() );
@@ -615,6 +653,11 @@ void RimReservoirGridEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmU
         uiOrdering.add( &m_gridMode );
     }
 
+    if ( hasSharedGrid() )
+    {
+        uiOrdering.add( &m_activeFormationNames );
+    }
+
     uiOrdering.skipRemainingFields();
 }
 
@@ -627,6 +670,13 @@ void RimReservoirGridEnsemble::fieldChangedByUi( const caf::PdmFieldHandle* chan
     {
         updateStatisticsVisibility();
         updateConnectedEditors();
+    }
+    else if ( changedField == &m_activeFormationNames )
+    {
+        for ( auto rimCase : cases() )
+        {
+            rimCase->updateFormationNamesData();
+        }
     }
 }
 
