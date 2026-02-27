@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RifColorLegendData.h"
+#include "RifFormationNamesReader.h"
 
 #include "RiaTextStringTools.h"
 #include "RigFormationNames.h"
@@ -34,24 +34,24 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RigFormationNames> RifColorLegendData::readFormationNamesFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifFormationNamesReader::readFormationNamesFile( const QString& fileName, QString* errorMessage )
 {
     QFileInfo fileInfo( fileName );
 
     if ( fileInfo.fileName() == "layer_zone_table.txt" )
     {
-        return RifColorLegendData::readFmuFormationNameFile( fileName, errorMessage );
+        return RifFormationNamesReader::readFmuFormationNameFile( fileName, errorMessage );
     }
     else
     {
-        return RifColorLegendData::readLyrFormationNameFile( fileName, errorMessage );
+        return RifFormationNamesReader::readLyrFormationNameFile( fileName, errorMessage );
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RigFormationNames> RifColorLegendData::readLyrFormationNameFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifFormationNamesReader::readLyrFormationNameFile( const QString& fileName, QString* errorMessage )
 {
     auto formationNames = std::make_unique<RigFormationNames>();
 
@@ -162,7 +162,7 @@ std::unique_ptr<RigFormationNames> RifColorLegendData::readLyrFormationNameFile(
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::unique_ptr<RigFormationNames> RifColorLegendData::readFmuFormationNameFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifFormationNamesReader::readFmuFormationNameFile( const QString& fileName, QString* errorMessage )
 {
     auto formationNames = std::make_unique<RigFormationNames>();
 
@@ -244,7 +244,7 @@ std::unique_ptr<RigFormationNames> RifColorLegendData::readFmuFormationNameFile(
 /// SVG color keyword names, c.f. https://www.w3.org/TR/SVG11/types.html#ColorKeywords,
 /// or #RRGGBB used on a LYR formation data file.
 //--------------------------------------------------------------------------------------------------
-bool RifColorLegendData::convertStringToColor( const QString& word, cvf::Color3f* color )
+bool RifFormationNamesReader::convertStringToColor( const QString& word, cvf::Color3f* color )
 {
     if ( word.isEmpty() ) return false;
 

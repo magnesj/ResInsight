@@ -33,7 +33,7 @@ class Color3f;
 //==================================================================================================
 ///
 //==================================================================================================
-class RifColorLegendData
+class RifFormationNamesReader
 {
 public:
     static std::unique_ptr<RigFormationNames> readFormationNamesFile( const QString& fileName, QString* errorMessage );
