@@ -18,6 +18,8 @@
 
 #include "RigWellTargetMapping.h"
 
+#include "RigWellTargetMappingTools.h"
+
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
 #include "RiaLogging.h"
@@ -330,7 +332,7 @@ std::optional<caf::VecIjk0> RigWellTargetMapping::findStartCell( RimEclipseCase*
             const double cellVolume   = data.volume[resultIndex];
             const double cellPressure = data.pressure[resultIndex];
 
-            const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, resultIndex );
+            const bool isSaturationValid = RigWellTargetMappingTools::isSaturationSufficient( volumeType, data, limits, resultIndex );
 
             const double cellPermeabiltyX  = data.permeabilityX[resultIndex];
             const bool   permeabilityValid = ( cellPermeabiltyX >= limits.permeability );
@@ -426,15 +428,15 @@ std::vector<size_t> RigWellTargetMapping::findCandidates( RimEclipseCase*       
                 if ( neighborResultIndex != cvf::UNDEFINED_SIZE_T && clusters[neighborResultIndex] == 0 )
                 {
                     double permeability     = data.permeabilityX[neighborResultIndex];
-                    double transmissibility = getTransmissibilityValueForFace( data.transmissibilityX,
-                                                                               data.transmissibilityY,
-                                                                               data.transmissibilityZ,
-                                                                               face,
-                                                                               resultIndex,
-                                                                               neighborResultIndex );
+                    double transmissibility = RigWellTargetMappingTools::getTransmissibilityValueForFace( data.transmissibilityX,
+                                                                                                        data.transmissibilityY,
+                                                                                                        data.transmissibilityZ,
+                                                                                                        face,
+                                                                                                        resultIndex,
+                                                                                                        neighborResultIndex );
                     bool   filterValue      = !std::isinf( filterVector[neighborResultIndex] ) && filterVector[neighborResultIndex] > 0.0;
 
-                    const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, neighborResultIndex );
+                    const bool isSaturationValid = RigWellTargetMappingTools::isSaturationSufficient( volumeType, data, limits, neighborResultIndex );
 
                     if ( data.pressure[neighborResultIndex] > limits.pressure && permeability > limits.permeability &&
                          transmissibility > limits.transmissibility && filterValue && isSaturationValid )
@@ -460,7 +462,7 @@ std::vector<size_t> RigWellTargetMapping::findCandidates( RimEclipseCase*       
 
                 bool filterValue = !std::isinf( filterVector[otherResultIndex] ) && filterVector[otherResultIndex] > 0.0;
 
-                const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, otherResultIndex );
+                const bool isSaturationValid = RigWellTargetMappingTools::isSaturationSufficient( volumeType, data, limits, otherResultIndex );
 
                 if ( data.pressure[otherResultIndex] > limits.pressure && permeability > limits.permeability &&
                      transmissibility > limits.transmissibility && filterValue && isSaturationValid )
@@ -640,89 +642,11 @@ std::optional<size_t> RigWellTargetMapping::getActiveCellCount( RimEclipseCase* 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigWellTargetMapping::getValueForFace( const std::vector<double>& x,
-                                              const std::vector<double>& y,
-                                              const std::vector<double>& z,
-                                              CellFaceType               face,
-                                              size_t                     resultIndex )
-{
-    if ( face == cvf::StructGridInterface::FaceType::POS_I || face == cvf::StructGridInterface::FaceType::NEG_I ) return x[resultIndex];
-    if ( face == cvf::StructGridInterface::FaceType::POS_J || face == cvf::StructGridInterface::FaceType::NEG_J ) return y[resultIndex];
-    if ( face == cvf::StructGridInterface::FaceType::POS_K || face == cvf::StructGridInterface::FaceType::NEG_K ) return z[resultIndex];
-    return std::numeric_limits<double>::infinity();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-double RigWellTargetMapping::getTransmissibilityValueForFace( const std::vector<double>& x,
-                                                              const std::vector<double>& y,
-                                                              const std::vector<double>& z,
-                                                              CellFaceType               face,
-                                                              size_t                     resultIndex,
-                                                              size_t                     neighborResultIndex )
-{
-    // For negative directions (NEG_I, NEG_J, NEG_K) use the value from the neighbor cell
-    bool isPos = face == cvf::StructGridInterface::FaceType::POS_I || face == cvf::StructGridInterface::FaceType::POS_J ||
-                 face == cvf::StructGridInterface::FaceType::POS_K;
-    size_t index = isPos ? resultIndex : neighborResultIndex;
-    return getValueForFace( x, y, z, face, index );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 std::vector<double> RigWellTargetMapping::loadVectorByName( RigCaseCellResultsData& resultsData, const QString& resultName, size_t timeStepIdx )
 {
     RigEclipseResultAddress address( RiaDefines::ResultCatType::DYNAMIC_NATIVE, resultName );
     if ( !resultsData.ensureKnownResultLoaded( address ) ) return {};
     return resultsData.cellScalarResults( address, timeStepIdx );
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RigWellTargetMapping::getOilVectorName( VolumesType volumesType )
-{
-    switch ( volumesType )
-    {
-        case VolumesType::RESERVOIR_VOLUMES_COMPUTED:
-            return RiaResultNames::riPorvSoil();
-        case VolumesType::RESERVOIR_VOLUMES:
-            return "RFIPOIL";
-        case VolumesType::SURFACE_VOLUMES_SFIP:
-            return "SFIPOIL";
-        case VolumesType::SURFACE_VOLUMES_FIP:
-            return "FIPOIL";
-        default:
-        {
-            CAF_ASSERT( false );
-            return "";
-        }
-    }
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-QString RigWellTargetMapping::getGasVectorName( VolumesType volumesType )
-{
-    switch ( volumesType )
-    {
-        case VolumesType::RESERVOIR_VOLUMES_COMPUTED:
-            return RiaResultNames::riPorvSgas();
-        case VolumesType::RESERVOIR_VOLUMES:
-            return "RFIPGAS";
-        case VolumesType::SURFACE_VOLUMES_SFIP:
-            return "SFIPGAS";
-        case VolumesType::SURFACE_VOLUMES_FIP:
-            return "FIPGAS";
-        default:
-        {
-            CAF_ASSERT( false );
-            return "";
-        }
-    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -734,7 +658,7 @@ std::vector<double> RigWellTargetMapping::loadOilVectorByName( RigCaseCellResult
                                                                size_t                     timeStepIdx,
                                                                const RigFloodingSettings& floodingSettings )
 {
-    std::vector<double> volume = loadVectorByName( resultsData, getOilVectorName( volumesType ), timeStepIdx );
+    std::vector<double> volume = loadVectorByName( resultsData, RigWellTargetMappingTools::getOilVectorName( volumesType ), timeStepIdx );
     if ( volumeResultType == RigWellTargetMapping::VolumeResultType::MOBILE )
     {
         std::vector<double> residualOil = RigHydrocarbonFlowTools::residualOilData( resultsData,
@@ -784,7 +708,7 @@ std::vector<double> RigWellTargetMapping::loadGasVectorByName( RigCaseCellResult
                                                                size_t                        timeStepIdx,
                                                                const RigFloodingSettings&    floodingSettings )
 {
-    std::vector<double> volume = loadVectorByName( resultsData, getGasVectorName( volumesType ), timeStepIdx );
+    std::vector<double> volume = loadVectorByName( resultsData, RigWellTargetMappingTools::getGasVectorName( volumesType ), timeStepIdx );
 
     if ( volumeResultType == RigWellTargetMapping::VolumeResultType::MOBILE )
     {
@@ -1236,15 +1160,3 @@ QString RigWellTargetMapping::wellTargetResultName()
     return "WELL_TARGET_NUM";
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-bool RigWellTargetMapping::isSaturationSufficient( const VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx )
-{
-    bool needsValidOil = volumeType == VolumeType::OIL || volumeType == VolumeType::HYDROCARBON;
-    bool needsValidGas = volumeType == VolumeType::GAS || volumeType == VolumeType::HYDROCARBON;
-    // For hydrocarbon it is enough that one of the saturations is above the limit.
-    if ( needsValidOil && data.saturationOil[idx] >= limits.saturationOil ) return true;
-    if ( needsValidGas && data.saturationGas[idx] >= limits.saturationGas ) return true;
-    return false;
-}
