@@ -67,7 +67,7 @@ void RicImportColorCategoriesFeature::onActionTriggered( bool isChecked )
     app->setLastUsedDialogDirectory( "BINARY_GRID", QFileInfo( fileName ).absolutePath() );
 
     QString errormessage;
-    auto formations = RifColorLegendData::readFormationNamesFile( fileName, &errormessage );
+    auto    formations = RifColorLegendData::readFormationNamesFile( fileName, &errormessage );
     if ( !formations || !errormessage.isEmpty() )
     {
         QMessageBox::warning( Riu3DMainWindowTools::mainWindowWidget(),
