@@ -210,19 +210,6 @@ private:
                                              const std::vector<double>& values,
                                              int                        timeStepIdx = -1 );
 
-    static double getValueForFace( const std::vector<double>& x,
-                                   const std::vector<double>& y,
-                                   const std::vector<double>& z,
-                                   CellFaceType               face,
-                                   size_t                     resultIndex );
-
-    static double getTransmissibilityValueForFace( const std::vector<double>& x,
-                                                   const std::vector<double>& y,
-                                                   const std::vector<double>& z,
-                                                   CellFaceType               face,
-                                                   size_t                     resultIndex,
-                                                   size_t                     neighborResultIndex );
-
     static std::vector<RigWellTargetMapping::ClusterStatistics> generateStatistics( RimEclipseCase*            eclipseCase,
                                                                                     const std::vector<double>& pressure,
                                                                                     const std::vector<double>& permeabilityX,
@@ -259,8 +246,4 @@ private:
                                                     size_t                        timeStepIdx,
                                                     const RigFloodingSettings&    floodingSettings );
 
-    static QString getOilVectorName( VolumesType volumesType );
-    static QString getGasVectorName( VolumesType volumesType );
-
-    static bool isSaturationSufficient( const VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx );
 };
