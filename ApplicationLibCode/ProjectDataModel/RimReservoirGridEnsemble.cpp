@@ -594,6 +594,7 @@ void RimReservoirGridEnsemble::appendMenuItems( caf::CmdFeatureMenuBuilder& menu
 {
     menuBuilder << "RicNewViewForGridEnsembleFeature";
     menuBuilder << "RicNewStatisticsContourMapFeature";
+    menuBuilder << "RicNewWellTargetMappingFeature";
 
     if ( hasSharedGrid() )
     {
