@@ -86,7 +86,7 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
 
     RiaDefines::EclipseUnitSystem unitsType = caseData->unitsType();
 
-    DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.volume = getVolumeVector( *resultsData, unitsType, volumeType, volumesType, volumeResultType, timeStepIdx, floodingSettings );
     if ( data.volume.empty() )
     {
@@ -202,7 +202,7 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     QString resultName = RigWellTargetMapping::wellTargetResultName();
     RigWellTargetMappingTools::createResultVector( *eclipseCase, resultName, clusters, timeStepIdx );
 
-    std::vector<ClusterStatistics> statistics =
+    std::vector<RigWellTargetMappingTools::ClusterStatistics> statistics =
         RigWellTargetMappingTools::generateStatistics( eclipseCase, data.pressure, data.permeabilityX, numClustersFound, timeStepIdx, resultName );
     std::vector<double> totalPorvSoil( clusters.size(), std::numeric_limits<double>::infinity() );
     std::vector<double> totalPorvSgas( clusters.size(), std::numeric_limits<double>::infinity() );

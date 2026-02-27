@@ -222,7 +222,7 @@ TEST( RigWellTargetMappingToolsTest, GetGasVectorName_ReservoirVolumesComputed )
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAboveThreshold_ReturnsTrue )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.3, 0.1 };
     data.saturationGas = { 0.0, 0.0 };
 
@@ -235,7 +235,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAboveThreshold_Re
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilBelowThreshold_ReturnsFalse )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.3, 0.1 };
     data.saturationGas = { 0.0, 0.0 };
 
@@ -248,7 +248,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilBelowThreshold_Re
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAtThreshold_ReturnsTrue )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.2 };
     data.saturationGas = { 0.0 };
 
@@ -261,7 +261,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAtThreshold_Retur
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasAboveThreshold_ReturnsTrue )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.0 };
     data.saturationGas = { 0.5 };
 
@@ -274,7 +274,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasAboveThreshold_Re
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasBelowThreshold_ReturnsFalse )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.0 };
     data.saturationGas = { 0.1 };
 
@@ -287,7 +287,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasBelowThreshold_Re
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_OilSufficient_ReturnsTrue )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.4 };
     data.saturationGas = { 0.05 };
 
@@ -300,7 +300,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_OilSuffi
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_GasSufficient_ReturnsTrue )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.05 };
     data.saturationGas = { 0.5 };
 
@@ -313,7 +313,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_GasSuffi
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_NeitherSufficient_ReturnsFalse )
 {
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.05 };
     data.saturationGas = { 0.05 };
 
@@ -327,7 +327,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_NeitherS
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilType_GasAbove_ReturnsFalse )
 {
     // VolumeType::OIL only checks oil saturation, not gas
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.05 };
     data.saturationGas = { 0.9 };
 
@@ -341,7 +341,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilType_GasAbove_Ret
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasType_OilAbove_ReturnsFalse )
 {
     // VolumeType::GAS only checks gas saturation, not oil
-    RigWellTargetMapping::DataContainer data;
+    RigWellTargetMappingTools::DataContainer data;
     data.saturationOil = { 0.9 };
     data.saturationGas = { 0.05 };
 
