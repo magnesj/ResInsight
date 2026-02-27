@@ -30,8 +30,10 @@ RigFormationNames::RigFormationNames()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFormationNames::~RigFormationNames()
+int RigFormationNames::formationIndexFromKLayerIdx( size_t Kidx ) const
 {
+    if ( Kidx >= m_nameIndexPrKLayer.size() ) return -1;
+    return m_nameIndexPrKLayer[Kidx];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -62,6 +64,22 @@ bool RigFormationNames::formationColorFromKLayerIdx( size_t Kidx, cvf::Color3f* 
 
     *formationColor = m_formationColors[idx];
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<QString> RigFormationNames::formationNames() const
+{
+    return m_formationNames;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<cvf::Color3f> RigFormationNames::formationColors() const
+{
+    return m_formationColors;
 }
 
 //--------------------------------------------------------------------------------------------------

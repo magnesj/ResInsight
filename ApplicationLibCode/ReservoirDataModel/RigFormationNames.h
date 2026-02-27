@@ -29,20 +29,13 @@ class RigFormationNames
 {
 public:
     RigFormationNames();
-    ~RigFormationNames();
 
-    int formationIndexFromKLayerIdx( size_t Kidx ) const
-    {
-        if ( Kidx >= m_nameIndexPrKLayer.size() ) return -1;
-        return m_nameIndexPrKLayer[Kidx];
-    }
-
+    int     formationIndexFromKLayerIdx( size_t Kidx ) const;
     QString formationNameFromKLayerIdx( size_t Kidx ) const;
+    bool    formationColorFromKLayerIdx( size_t Kidx, cvf::Color3f* formationColor ) const;
 
-    bool formationColorFromKLayerIdx( size_t Kidx, cvf::Color3f* formationColor ) const;
-
-    const std::vector<QString>&      formationNames() const { return m_formationNames; }
-    const std::vector<cvf::Color3f>& formationColors() const { return m_formationColors; }
+    std::vector<QString>      formationNames() const;
+    std::vector<cvf::Color3f> formationColors() const;
 
     void appendFormationRange( const QString& name, int kStartIdx, int kEndIdx );
     void appendFormationRangeHeight( const QString& name, int kLayerCount );
