@@ -18,17 +18,23 @@
 
 #include "RigWellTargetMappingTools.h"
 
+#include "RiaDefines.h"
 #include "RiaResultNames.h"
 
+#include "RigCaseCellResultsData.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
 #include "RigNncConnection.h"
+
+#include "RimEclipseCase.h"
 
 #include "cafAssert.h"
 #include "cvfMath.h"
 #include "cvfStructGrid.h"
 
+#include <algorithm>
 #include <limits>
+#include <set>
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -159,4 +165,140 @@ std::list<std::pair<std::pair<size_t, RigWellTargetMappingTools::CellFaceType>, 
     }
 
     return foundCells;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address )
+{
+    if ( !resultsData->hasResultEntry( address ) )
+    {
+        resultsData->createResultEntry( address, false );
+
+        RigEclipseResultAddress addrToMaxTimeStepCountResult;
+        resultsData->maxTimeStepCount( &addrToMaxTimeStepCountResult );
+        const std::vector<RigEclipseTimeStepInfo> timeStepInfos = resultsData->timeStepInfos( addrToMaxTimeStepCountResult );
+        resultsData->setTimeStepInfos( address, timeStepInfos );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createResultVector( RimEclipseCase&         eclipseCase,
+                                                    const QString&          resultName,
+                                                    const std::vector<int>& clusterIds,
+                                                    size_t                  timeStepIdx )
+{
+    RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, RiaDefines::ResultDataType::INTEGER, resultName );
+
+    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+    createDynamicResultEntry( resultsData, resultAddress );
+
+    std::vector<double>* resultVector = resultsData->modifiableCellScalarResult( resultAddress, timeStepIdx );
+    resultVector->resize( clusterIds.size(), std::numeric_limits<double>::infinity() );
+
+    std::fill( resultVector->begin(), resultVector->end(), std::numeric_limits<double>::infinity() );
+
+    for ( size_t idx = 0; idx < clusterIds.size(); idx++ )
+    {
+        if ( clusterIds[idx] > 0 )
+        {
+            resultVector->at( idx ) = 1.0 * clusterIds[idx];
+        }
+    }
+
+    std::set<int> uniqueClusterIds( clusterIds.begin(), clusterIds.end() );
+    uniqueClusterIds.erase( 0 ); // Remove unassigned cluster id
+    resultsData->recalculateStatistics( resultAddress, uniqueClusterIds );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createResultVector( RimEclipseCase&            eclipseCase,
+                                                    const QString&             resultName,
+                                                    const std::vector<double>& values,
+                                                    size_t                     timeStepIdx )
+{
+    RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
+
+    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+    createDynamicResultEntry( resultsData, resultAddress );
+
+    auto resultVector = resultsData->modifiableCellScalarResult( resultAddress, timeStepIdx );
+    resultVector->resize( values.size(), std::numeric_limits<double>::infinity() );
+    std::copy( values.begin(), values.end(), resultVector->begin() );
+
+    resultsData->recalculateStatistics( resultAddress );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& intValues )
+{
+    RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
+
+    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+    resultsData->addStaticScalarResult( RiaDefines::ResultCatType::GENERATED, resultName, false, intValues.size() );
+
+    std::vector<double>* resultVector = resultsData->modifiableCellScalarResult( resultAddress, 0 );
+    resultVector->resize( intValues.size(), std::numeric_limits<double>::infinity() );
+
+    std::fill( resultVector->begin(), resultVector->end(), std::numeric_limits<double>::infinity() );
+
+    for ( size_t idx = 0; idx < intValues.size(); idx++ )
+    {
+        if ( intValues[idx] > 0 )
+        {
+            resultVector->at( idx ) = intValues[idx];
+        }
+    }
+
+    resultsData->recalculateStatistics( resultAddress );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values )
+{
+    RigEclipseResultAddress resultAddress( RiaDefines::ResultCatType::GENERATED, resultName );
+
+    auto resultsData = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
+    resultsData->addStaticScalarResult( RiaDefines::ResultCatType::GENERATED, resultName, false, values.size() );
+
+    std::vector<double>* resultVector = resultsData->modifiableCellScalarResult( resultAddress, 0 );
+    resultVector->resize( values.size(), std::numeric_limits<double>::infinity() );
+
+    std::copy( values.begin(), values.end(), resultVector->begin() );
+
+    resultsData->recalculateStatistics( resultAddress );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::createResultVectorIfDefined( RimEclipseCase&            eclipseCase,
+                                                             const QString&             resultName,
+                                                             const std::vector<double>& values,
+                                                             int                        timeStepIdx )
+{
+    // Avoid creating the result vector if all values are inf/nan
+    if ( std::all_of( values.begin(), values.end(), []( auto v ) { return std::isinf( v ) || std::isnan( v ); } ) ) return;
+
+    if ( timeStepIdx < 0 )
+    {
+        createStaticResultVector( eclipseCase, resultName, values );
+    }
+    else
+    {
+        createResultVector( eclipseCase, resultName, values, timeStepIdx );
+    }
 }

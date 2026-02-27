@@ -189,22 +189,6 @@ private:
 
     static std::optional<size_t> getActiveCellCount( RimEclipseCase* eclipseCase );
 
-    static void createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address );
-
-    static void
-        createResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& clusterIds, size_t timeStepIdx );
-
-    static void
-        createResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values, size_t timeStepIdx );
-
-    static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& intValues );
-    static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values );
-
-    static void createResultVectorIfDefined( RimEclipseCase&            eclipseCase,
-                                             const QString&             resultName,
-                                             const std::vector<double>& values,
-                                             int                        timeStepIdx = -1 );
-
     static std::vector<RigWellTargetMapping::ClusterStatistics> generateStatistics( RimEclipseCase*            eclipseCase,
                                                                                     const std::vector<double>& pressure,
                                                                                     const std::vector<double>& permeabilityX,
