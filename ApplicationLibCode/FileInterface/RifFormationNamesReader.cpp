@@ -53,16 +53,15 @@ std::unique_ptr<RigFormationNames> RifFormationNamesReader::readFormationNamesFi
 //--------------------------------------------------------------------------------------------------
 std::unique_ptr<RigFormationNames> RifFormationNamesReader::readLyrFormationNameFile( const QString& fileName, QString* errorMessage )
 {
-    auto formationNames = std::make_unique<RigFormationNames>();
-
     QFile dataFile( fileName );
 
     if ( !dataFile.open( QFile::ReadOnly ) )
     {
         if ( errorMessage ) ( *errorMessage ) += "Could not open file: " + fileName + "\n";
-        return formationNames;
+        return nullptr;
     }
 
+    auto        formationNames = std::make_unique<RigFormationNames>();
     QTextStream stream( &dataFile );
 
     int lineNumber = 1;
@@ -164,16 +163,15 @@ std::unique_ptr<RigFormationNames> RifFormationNamesReader::readLyrFormationName
 //--------------------------------------------------------------------------------------------------
 std::unique_ptr<RigFormationNames> RifFormationNamesReader::readFmuFormationNameFile( const QString& fileName, QString* errorMessage )
 {
-    auto formationNames = std::make_unique<RigFormationNames>();
-
     QFile dataFile( fileName );
 
     if ( !dataFile.open( QFile::ReadOnly ) )
     {
         if ( errorMessage ) ( *errorMessage ) += "Could not open file: " + fileName + "\n";
-        return formationNames;
+        return nullptr;
     }
 
+    auto        formationNames = std::make_unique<RigFormationNames>();
     QTextStream stream( &dataFile );
 
     int lineNumber = 1;

@@ -19,6 +19,7 @@
 #include "RicImportColorCategoriesFeature.h"
 
 #include "RiaApplication.h"
+#include "RiaLogging.h"
 
 #include "RigFormationNames.h"
 #include "RimColorLegend.h"

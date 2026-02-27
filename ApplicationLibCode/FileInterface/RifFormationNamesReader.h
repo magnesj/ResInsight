@@ -36,7 +36,7 @@ class Color3f;
 class RifFormationNamesReader
 {
 public:
-    static std::unique_ptr<RigFormationNames> readFormationNamesFile( const QString& fileName, QString* errorMessage );
+    [[nodiscard]] static std::unique_ptr<RigFormationNames> readFormationNamesFile( const QString& fileName, QString* errorMessage );
 
 private:
     static std::unique_ptr<RigFormationNames> readLyrFormationNameFile( const QString& fileName, QString* errorMessage );
