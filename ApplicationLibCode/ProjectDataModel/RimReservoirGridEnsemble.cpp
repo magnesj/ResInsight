@@ -35,12 +35,12 @@
 #include "Formations/RimFormationNamesCollection.h"
 #include "RimCaseCollection.h"
 #include "RimEclipseCase.h"
-#include "RimOilField.h"
 #include "RimEclipseCellColors.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseStatisticsCase.h"
 #include "RimEclipseView.h"
 #include "RimEclipseViewCollection.h"
+#include "RimOilField.h"
 #include "RimProject.h"
 #include "RimWellTargetMapping.h"
 
@@ -849,7 +849,7 @@ void RimReservoirGridEnsemble::loadGridDataFromFiles()
     // Determine effective grid mode
     if ( m_autoDetectGridType )
     {
-        bool identical    = detectGridDimensionEquality();
+        bool identical     = detectGridDimensionEquality();
         m_detectedGridMode = identical ? GridModeType::SHARED_GRID : GridModeType::INDIVIDUAL_GRIDS;
     }
 
