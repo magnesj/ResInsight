@@ -238,7 +238,7 @@ std::vector<QString> RigFemPartResultsCollection::formationNames() const
 //--------------------------------------------------------------------------------------------------
 const RigFormationNames* RigFemPartResultsCollection::activeFormationNames() const
 {
-    return m_activeFormationNamesData.p();
+    return m_activeFormationNamesData;
 }
 
 //--------------------------------------------------------------------------------------------------

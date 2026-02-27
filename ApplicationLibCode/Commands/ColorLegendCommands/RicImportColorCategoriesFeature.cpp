@@ -65,8 +65,8 @@ void RicImportColorCategoriesFeature::onActionTriggered( bool isChecked )
     // Remember the path to next time
     app->setLastUsedDialogDirectory( "BINARY_GRID", QFileInfo( fileName ).absolutePath() );
 
-    QString                     errormessage;
-    cvf::ref<RigFormationNames> formations = RifColorLegendData::readFormationNamesFile( fileName, &errormessage );
+    QString errormessage;
+    auto    formations = RifColorLegendData::readFormationNamesFile( fileName, &errormessage );
 
     const std::vector<QString>&      formationNames  = formations->formationNames();
     const std::vector<cvf::Color3f>& formationColors = formations->formationColors();

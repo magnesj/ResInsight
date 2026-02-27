@@ -19,7 +19,8 @@
 
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-#include "cvfObject.h"
+
+#include <memory>
 
 class RigFormationNames;
 class QString;
@@ -35,11 +36,11 @@ class Color3f;
 class RifColorLegendData
 {
 public:
-    static cvf::ref<RigFormationNames> readFormationNamesFile( const QString& fileName, QString* errorMessage );
+    static std::unique_ptr<RigFormationNames> readFormationNamesFile( const QString& fileName, QString* errorMessage );
 
 private:
-    static cvf::ref<RigFormationNames> readLyrFormationNameFile( const QString& fileName, QString* errorMessage );
-    static cvf::ref<RigFormationNames> readFmuFormationNameFile( const QString& fileName, QString* errorMessage );
+    static std::unique_ptr<RigFormationNames> readLyrFormationNameFile( const QString& fileName, QString* errorMessage );
+    static std::unique_ptr<RigFormationNames> readFmuFormationNameFile( const QString& fileName, QString* errorMessage );
 
     static bool convertStringToColor( const QString& word, cvf::Color3f* color );
 };

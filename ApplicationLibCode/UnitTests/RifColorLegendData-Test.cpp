@@ -20,7 +20,7 @@ TEST( RifColorLegendData, ReadLYRFileWithoutColor )
 
     QString errormessage;
 
-    cvf::ref<RigFormationNames> fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
+    auto fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
     EXPECT_TRUE( errormessage.isEmpty() );
 
     QString formationName_K1 = fm->formationNameFromKLayerIdx( 0 );
@@ -40,7 +40,7 @@ TEST( RifColorLegendData, ReadLYRFileWithColorName )
 
     QString errormessage;
 
-    cvf::ref<RigFormationNames> fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
+    auto fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
     EXPECT_TRUE( errormessage.isEmpty() );
 
     QString formationName_K1 = fm->formationNameFromKLayerIdx( 1 );
@@ -67,7 +67,7 @@ TEST( RifColorLegendData, ReadLYRFileWithColorHTML )
 
     QString errormessage;
 
-    cvf::ref<RigFormationNames> fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
+    auto fm = RifColorLegendData::readFormationNamesFile( filePath, &errormessage );
     EXPECT_TRUE( errormessage.isEmpty() );
 
     QString formationName_K1 = fm->formationNameFromKLayerIdx( 1 );

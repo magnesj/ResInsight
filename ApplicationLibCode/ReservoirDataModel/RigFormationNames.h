@@ -18,7 +18,6 @@
 
 #pragma once
 
-#include "cvfObject.h"
 #include <QString>
 
 #include <set>
@@ -26,11 +25,11 @@
 
 #include "cvfColor3.h"
 
-class RigFormationNames : public cvf::Object
+class RigFormationNames
 {
 public:
     RigFormationNames();
-    ~RigFormationNames() override;
+    ~RigFormationNames();
 
     int formationIndexFromKLayerIdx( size_t Kidx ) const
     {

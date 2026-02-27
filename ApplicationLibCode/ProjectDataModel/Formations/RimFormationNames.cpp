@@ -114,6 +114,14 @@ QString RimFormationNames::shortName()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+RigFormationNames* RimFormationNames::formationNamesData()
+{
+    return m_formationNamesData.get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimFormationNames::updateConnectedViews()
 {
     std::vector<RimCase*> objects = objectsWithReferringPtrFieldsOfType<RimCase>();

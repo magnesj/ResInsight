@@ -19,7 +19,8 @@
 
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-#include "cvfObject.h"
+
+#include <memory>
 
 class RigFormationNames;
 
@@ -40,7 +41,8 @@ public:
     QString fileName();
     QString shortName();
 
-    RigFormationNames* formationNamesData() { return m_formationNamesData.p(); }
+    RigFormationNames* formationNamesData();
+
     void               updateConnectedViews();
 
     void readFormationNamesFile( QString* errorMessage );
@@ -58,5 +60,5 @@ private:
 private:
     caf::PdmField<caf::FilePath> m_formationNamesFileName;
 
-    cvf::ref<RigFormationNames> m_formationNamesData;
+    std::unique_ptr<RigFormationNames> m_formationNamesData;
 };

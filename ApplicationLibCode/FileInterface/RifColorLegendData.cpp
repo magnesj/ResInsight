@@ -21,6 +21,8 @@
 #include "RiaTextStringTools.h"
 #include "RigFormationNames.h"
 
+#include <memory>
+
 #include "cafAssert.h"
 #include "cafPdmUiFilePathEditor.h"
 
@@ -32,7 +34,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::ref<RigFormationNames> RifColorLegendData::readFormationNamesFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifColorLegendData::readFormationNamesFile( const QString& fileName, QString* errorMessage )
 {
     QFileInfo fileInfo( fileName );
 
@@ -49,9 +51,9 @@ cvf::ref<RigFormationNames> RifColorLegendData::readFormationNamesFile( const QS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::ref<RigFormationNames> RifColorLegendData::readLyrFormationNameFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifColorLegendData::readLyrFormationNameFile( const QString& fileName, QString* errorMessage )
 {
-    cvf::ref<RigFormationNames> formationNames = new RigFormationNames;
+    auto formationNames = std::make_unique<RigFormationNames>();
 
     QFile dataFile( fileName );
 
@@ -160,9 +162,9 @@ cvf::ref<RigFormationNames> RifColorLegendData::readLyrFormationNameFile( const 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::ref<RigFormationNames> RifColorLegendData::readFmuFormationNameFile( const QString& fileName, QString* errorMessage )
+std::unique_ptr<RigFormationNames> RifColorLegendData::readFmuFormationNameFile( const QString& fileName, QString* errorMessage )
 {
-    cvf::ref<RigFormationNames> formationNames = new RigFormationNames;
+    auto formationNames = std::make_unique<RigFormationNames>();
 
     QFile dataFile( fileName );
 

@@ -2899,7 +2899,7 @@ void RigCaseCellResultsData::setActiveFormationNames( RigFormationNames* activeF
                                                                                        RiaResultNames::activeFormationNamesResultName() ),
                                                               0 );
 
-    if ( m_activeFormationNamesData.isNull() )
+    if ( !m_activeFormationNamesData )
     {
         for ( size_t cIdx = 0; cIdx < totalGlobCellCount; ++cIdx )
         {
@@ -2957,7 +2957,7 @@ void RigCaseCellResultsData::setActiveFormationNames( RigFormationNames* activeF
 //--------------------------------------------------------------------------------------------------
 const RigFormationNames* RigCaseCellResultsData::activeFormationNames() const
 {
-    return m_activeFormationNamesData.p();
+    return m_activeFormationNamesData;
 }
 
 //--------------------------------------------------------------------------------------------------
