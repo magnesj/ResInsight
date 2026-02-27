@@ -60,7 +60,7 @@ public:
                                  const RigFemPartCollection* femPartCollection );
     ~RigFemPartResultsCollection() override;
 
-    void                 setActiveFormationNames( RigFormationNames* activeFormationNames );
+    void                 setActiveFormationNames( const RigFormationNames* activeFormationNames );
     std::vector<QString> formationNames() const;
 
     void                             addElementPropertyFiles( const std::vector<QString>& filenames );

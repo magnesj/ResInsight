@@ -37,7 +37,7 @@ RigFormationNames::~RigFormationNames()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RigFormationNames::formationNameFromKLayerIdx( size_t Kidx )
+QString RigFormationNames::formationNameFromKLayerIdx( size_t Kidx ) const
 {
     int idx = formationIndexFromKLayerIdx( Kidx );
     if ( idx >= static_cast<int>( m_formationNames.size() ) ) return "";
@@ -49,7 +49,7 @@ QString RigFormationNames::formationNameFromKLayerIdx( size_t Kidx )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigFormationNames::formationColorFromKLayerIdx( size_t Kidx, cvf::Color3f* formationColor )
+bool RigFormationNames::formationColorFromKLayerIdx( size_t Kidx, cvf::Color3f* formationColor ) const
 {
     int idx = formationIndexFromKLayerIdx( Kidx );
 
@@ -143,7 +143,7 @@ void RigFormationNames::appendFormationRangeWithColor( const QString& name, cvf:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::set<int> RigFormationNames::findKLayers( std::vector<QString> formationNames )
+std::set<int> RigFormationNames::findKLayers( std::vector<QString> formationNames ) const
 {
     std::set<int> foundK;
 

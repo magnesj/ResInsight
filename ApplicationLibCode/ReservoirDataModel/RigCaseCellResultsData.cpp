@@ -2881,7 +2881,7 @@ void RigCaseCellResultsData::setHdf5Filename( const QString& hdf5SourSimFilename
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCaseCellResultsData::setActiveFormationNames( RigFormationNames* activeFormationNames )
+void RigCaseCellResultsData::setActiveFormationNames( const RigFormationNames* activeFormationNames )
 {
     m_activeFormationNamesData = activeFormationNames;
 

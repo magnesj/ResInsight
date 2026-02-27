@@ -57,7 +57,7 @@ public:
     void                      setReaderInterface( RifReaderInterface* readerInterface );
     const RifReaderInterface* readerInterface() const;
     void                      setHdf5Filename( const QString& hdf5SourSimFilename );
-    void                      setActiveFormationNames( RigFormationNames* activeFormationNames );
+    void                      setActiveFormationNames( const RigFormationNames* activeFormationNames );
     const RigFormationNames*  activeFormationNames() const;
     RigAllanDiagramData*      allanDiagramData();
 

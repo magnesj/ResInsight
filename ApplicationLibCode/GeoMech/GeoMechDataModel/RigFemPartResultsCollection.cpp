@@ -213,7 +213,7 @@ RigFemPartResultsCollection::~RigFemPartResultsCollection()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFemPartResultsCollection::setActiveFormationNames( RigFormationNames* activeFormationNames )
+void RigFemPartResultsCollection::setActiveFormationNames( const RigFormationNames* activeFormationNames )
 {
     m_activeFormationNamesData = activeFormationNames;
 

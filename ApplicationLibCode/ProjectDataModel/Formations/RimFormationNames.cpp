@@ -114,7 +114,7 @@ QString RimFormationNames::shortName()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFormationNames* RimFormationNames::formationNamesData()
+const RigFormationNames* RimFormationNames::formationNamesData() const
 {
     return m_formationNamesData.get();
 }
