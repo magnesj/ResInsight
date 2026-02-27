@@ -26,7 +26,7 @@
 #include "RimColorLegendItem.h"
 #include "RimProject.h"
 
-#include "RifColorLegendData.h"
+#include "RifFormationNamesReader.h"
 
 #include "Riu3DMainWindowTools.h"
 #include "RiuFileDialogTools.h"
@@ -66,7 +66,7 @@ void RicImportColorCategoriesFeature::onActionTriggered( bool isChecked )
     app->setLastUsedDialogDirectory( "BINARY_GRID", QFileInfo( fileName ).absolutePath() );
 
     QString errormessage;
-    auto    formations = RifColorLegendData::readFormationNamesFile( fileName, &errormessage );
+    auto    formations = RifFormationNamesReader::readFormationNamesFile( fileName, &errormessage );
 
     const std::vector<QString>&      formationNames  = formations->formationNames();
     const std::vector<cvf::Color3f>& formationColors = formations->formationColors();

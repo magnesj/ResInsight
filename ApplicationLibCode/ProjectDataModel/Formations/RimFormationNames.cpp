@@ -19,7 +19,7 @@
 #include "RimFormationNames.h"
 
 #include "RiaLogging.h"
-#include "RifColorLegendData.h"
+#include "RifFormationNamesReader.h"
 #include "RigFormationNames.h"
 
 #include "Rim3dView.h"
@@ -151,7 +151,7 @@ void RimFormationNames::updateConnectedViews()
 //--------------------------------------------------------------------------------------------------
 void RimFormationNames::readFormationNamesFile( QString* errorMessage )
 {
-    m_formationNamesData = RifColorLegendData::readFormationNamesFile( m_formationNamesFileName().path(), errorMessage );
+    m_formationNamesData = RifFormationNamesReader::readFormationNamesFile( m_formationNamesFileName().path(), errorMessage );
 }
 
 //--------------------------------------------------------------------------------------------------
