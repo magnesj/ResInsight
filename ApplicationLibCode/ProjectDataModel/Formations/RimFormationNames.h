@@ -43,7 +43,7 @@ public:
 
     RigFormationNames* formationNamesData();
 
-    void               updateConnectedViews();
+    void updateConnectedViews();
 
     void readFormationNamesFile( QString* errorMessage );
 
