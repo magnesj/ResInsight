@@ -42,9 +42,9 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseEnsemble.h"
-#include "RimReservoirGridEnsemble.h"
 #include "RimEclipseContourMapProjection.h"
 #include "RimEclipseResultDefinition.h"
+#include "RimReservoirGridEnsemble.h"
 #include "RimSimWellInViewCollection.h"
 #include "RimStatisticsContourMapProjection.h"
 #include "RimStatisticsContourMapView.h"
@@ -77,6 +77,7 @@ void caf::AppEnum<RimStatisticsContourMap::StatisticsType>::setUp()
     setDefault( RimStatisticsContourMap::StatisticsType::MEAN );
 }
 }; // namespace caf
+
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -204,7 +205,7 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     tsGroup->setCollapsedByDefault();
     tsGroup->add( &m_selectedTimeSteps );
 
-    if ( eclipseCase() && eclipseCase()->activeFormationNames() )
+    if ( activeFormationNames() )
     {
         auto formationGrp = uiOrdering.addNewGroup( "Formation Selection" );
         if ( !m_enableFormationFilter ) formationGrp->setCollapsedByDefault();
@@ -274,6 +275,22 @@ QString RimStatisticsContourMap::ensembleName() const
     if ( auto* ens = firstAncestorOrThisOfType<RimEclipseCaseEnsemble>() ) return ens->name();
     if ( auto* ens = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() ) return ens->name();
     return {};
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimFormationNames* RimStatisticsContourMap::activeFormationNames() const
+{
+    if ( auto* gridCase = eclipseCase() )
+    {
+        if ( auto* formationNames = gridCase->activeFormationNames() ) return formationNames;
+    }
+    if ( auto* ensemble = firstAncestorOrThisOfType<RimReservoirGridEnsemble>() )
+    {
+        return ensemble->activeFormationNames();
+    }
+    return nullptr;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -392,16 +409,13 @@ QList<caf::PdmOptionItemInfo> RimStatisticsContourMap::calculateValueOptions( co
     }
     else if ( &m_selectedFormations == fieldNeedingOptions )
     {
-        if ( auto eCase = eclipseCase() )
+        if ( auto formations = activeFormationNames() )
         {
-            if ( auto formations = eCase->activeFormationNames() )
+            if ( formations->formationNamesData() )
             {
-                if ( formations->formationNamesData() )
+                for ( auto& f : formations->formationNamesData()->formationNames() )
                 {
-                    for ( auto& f : formations->formationNamesData()->formationNames() )
-                    {
-                        options.push_back( caf::PdmOptionItemInfo( f, f, false ) );
-                    }
+                    options.push_back( caf::PdmOptionItemInfo( f, f, false ) );
                 }
             }
         }
@@ -569,12 +583,11 @@ void RimStatisticsContourMap::computeStatistics()
             auto          formationNames = selectedFormations();
             if ( !formationNames.empty() )
             {
-                if ( auto names = eclipseCase()->activeFormationNames() )
-                    if ( auto fData = names->formationNamesData() )
-                        sharedKLayers = fData->findKLayers( formationNames );
+                if ( auto names = activeFormationNames() )
+                    if ( auto fData = names->formationNamesData() ) sharedKLayers = fData->findKLayers( formationNames );
             }
 
-            auto* primaryCaseData = eclipseCase()->eclipseCaseData();
+            auto* primaryCaseData   = eclipseCase()->eclipseCaseData();
             auto* primaryResultData = primaryCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
             sharedProjection = std::make_unique<RigEclipseContourMapProjection>( *contourMapGrid, *primaryCaseData, *primaryResultData );
             sharedProjection->generateGridMapping( resultAggregation, {}, sharedKLayers, selectedPolygons() );
@@ -639,7 +652,11 @@ void RimStatisticsContourMap::computeStatistics()
                 bool formationNamesOk = true;
                 if ( !formationNames.empty() )
                 {
-                    if ( auto names = eCase->activeFormationNames() )
+                    // Use per-case formation names if set, otherwise fall back to ensemble-level formation names
+                    auto names = eCase->activeFormationNames();
+                    if ( !names ) names = activeFormationNames();
+
+                    if ( names )
                     {
                         if ( auto fData = names->formationNamesData() )
                         {

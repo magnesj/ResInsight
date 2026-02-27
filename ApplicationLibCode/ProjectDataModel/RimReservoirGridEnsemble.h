@@ -40,6 +40,7 @@ class RimEclipseStatisticsCase;
 class RimEclipseView;
 class RimEclipseViewCollection;
 class RimEnsembleFileSet;
+class RimFormationNames;
 class RimStatisticsContourMap;
 class RimWellTargetMapping;
 
@@ -99,6 +100,9 @@ public:
     RigActiveCellInfo* unionOfActiveCells( RiaDefines::PorosityModelType porosityType ) override;
     void               computeUnionOfActiveCells() override;
 
+    // Formation names
+    RimFormationNames* activeFormationNames() const override;
+
     // Statistics
     RimCaseCollection*        statisticsCaseCollection() const override;
     RimEclipseStatisticsCase* createAndAppendStatisticsCase() override;
@@ -126,6 +130,8 @@ protected:
     void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
     void initAfterRead() override;
 
+    QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+
 private:
     void onFileSetChanged( const caf::SignalEmitter* emitter );
     void clearActiveCellUnions();
@@ -141,6 +147,9 @@ private:
 private:
     // File set reference
     caf::PdmPtrField<RimEnsembleFileSet*> m_ensembleFileSet;
+
+    // Formation names (shared across all realizations, only valid in shared grid mode)
+    caf::PdmPtrField<RimFormationNames*> m_activeFormationNames;
 
     // Ensemble id
     caf::PdmField<int> m_groupId;
