@@ -19,13 +19,16 @@
 #pragma once
 
 #include "RigActiveCellInfo.h"
+#include "RigEclipseResultAddress.h"
 #include "RigWellTargetMapping.h"
 
 #include <list>
 #include <utility>
 #include <vector>
 
+class RigCaseCellResultsData;
 class RigMainGrid;
+class RimEclipseCase;
 
 //==================================================================================================
 ///
@@ -66,4 +69,24 @@ public:
 
     static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>>
         nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
+
+    static void createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address );
+
+    static void createResultVector( RimEclipseCase&         eclipseCase,
+                                    const QString&          resultName,
+                                    const std::vector<int>& clusterIds,
+                                    size_t                  timeStepIdx );
+
+    static void createResultVector( RimEclipseCase&            eclipseCase,
+                                    const QString&             resultName,
+                                    const std::vector<double>& values,
+                                    size_t                     timeStepIdx );
+
+    static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& intValues );
+    static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values );
+
+    static void createResultVectorIfDefined( RimEclipseCase&            eclipseCase,
+                                             const QString&             resultName,
+                                             const std::vector<double>& values,
+                                             int                        timeStepIdx = -1 );
 };
