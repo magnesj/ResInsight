@@ -18,15 +18,22 @@
 
 #pragma once
 
+#include "RiaDefines.h"
 #include "RigActiveCellInfo.h"
 #include "RigEclipseResultAddress.h"
 #include "RigWellTargetMapping.h"
 
+#include "cafVecIjk.h"
+#include "cvfBoundingBox.h"
+
 #include <list>
+#include <map>
+#include <optional>
 #include <utility>
 #include <vector>
 
 class RigCaseCellResultsData;
+class RigFloodingSettings;
 class RigMainGrid;
 class RimEclipseCase;
 
@@ -37,9 +44,13 @@ class RimEclipseCase;
 class RigWellTargetMappingTools
 {
 public:
-    using CellFaceType = RigWellTargetMapping::CellFaceType;
-    using VolumeType   = RigWellTargetMapping::VolumeType;
-    using VolumesType  = RigWellTargetMapping::VolumesType;
+    using CellFaceType      = RigWellTargetMapping::CellFaceType;
+    using VolumeType        = RigWellTargetMapping::VolumeType;
+    using VolumesType       = RigWellTargetMapping::VolumesType;
+    using VolumeResultType  = RigWellTargetMapping::VolumeResultType;
+    using ClusteringLimits  = RigWellTargetMapping::ClusteringLimits;
+    using DataContainer     = RigWellTargetMapping::DataContainer;
+    using ClusterStatistics = RigWellTargetMapping::ClusterStatistics;
 
     static double getValueForFace( const std::vector<double>& x,
                                    const std::vector<double>& y,
@@ -89,4 +100,67 @@ public:
                                              const QString&             resultName,
                                              const std::vector<double>& values,
                                              int                        timeStepIdx = -1 );
+
+    static std::optional<caf::VecIjk0> findStartCell( RimEclipseCase*            eclipseCase,
+                                                       size_t                     timeStepIdx,
+                                                       VolumeType                 volumeType,
+                                                       const ClusteringLimits&    limits,
+                                                       const DataContainer&       data,
+                                                       const std::vector<double>& filterVector,
+                                                       const std::vector<int>&    clusters );
+
+    static void growCluster( RimEclipseCase*            eclipseCase,
+                             const caf::VecIjk0&        startCell,
+                             VolumeType                 volumeType,
+                             const ClusteringLimits&    limits,
+                             const DataContainer&       data,
+                             const std::vector<double>& filterVector,
+                             std::vector<int>&          clusters,
+                             int                        clusterId,
+                             size_t                     timeStepIdx,
+                             int                        maxIterations );
+
+    static std::vector<size_t> findCandidates( RimEclipseCase*            eclipseCase,
+                                               const std::vector<size_t>& previousCells,
+                                               VolumeType                 volumeType,
+                                               const ClusteringLimits&    limits,
+                                               const DataContainer&       data,
+                                               const std::vector<double>& filterVector,
+                                               std::vector<int>&          clusters );
+
+    static std::optional<size_t> getActiveCellCount( RimEclipseCase* eclipseCase );
+
+    static std::vector<ClusterStatistics> generateStatistics( RimEclipseCase*            eclipseCase,
+                                                              const std::vector<double>& pressure,
+                                                              const std::vector<double>& permeabilityX,
+                                                              int                        numClustersFound,
+                                                              size_t                     timeStepIdx,
+                                                              const QString&             clusterResultName );
+
+    static void computeStatisticsAndCreateVectors( RimEclipseCase&                         targetCase,
+                                                   const QString&                          resultName,
+                                                   const std::vector<std::vector<double>>& vec );
+
+    static void accumulateResultsForSingleCase( RimEclipseCase&                                      eclipseCase,
+                                                RimEclipseCase&                                      targetCase,
+                                                std::map<QString, std::vector<std::vector<double>>>& resultNamesAndSamples,
+                                                std::vector<int>&                                    occupancy,
+                                                size_t                                               timeStepIdx );
+
+    static cvf::BoundingBox computeBoundingBoxForResult( RimEclipseCase& eclipseCase, const QString& resultName, size_t timeStepIndex );
+
+    static std::vector<double> loadVectorByName( RigCaseCellResultsData& resultsData, const QString& resultName, size_t timeStepIdx );
+
+    static std::vector<double> loadOilVectorByName( RigCaseCellResultsData&    resultsData,
+                                                    VolumesType                volumesType,
+                                                    VolumeResultType           volumeResultType,
+                                                    size_t                     timeStepIdx,
+                                                    const RigFloodingSettings& floodingSettings );
+
+    static std::vector<double> loadGasVectorByName( RigCaseCellResultsData&       resultsData,
+                                                    RiaDefines::EclipseUnitSystem unitsType,
+                                                    VolumesType                   volumesType,
+                                                    VolumeResultType              volumeResultType,
+                                                    size_t                        timeStepIdx,
+                                                    const RigFloodingSettings&    floodingSettings );
 };
