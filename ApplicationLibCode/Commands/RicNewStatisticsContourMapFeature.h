@@ -39,6 +39,6 @@ protected:
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
 
-    static RimEclipseCaseEnsemble*    selectedEclipseCaseEnsemble();
+    static RimEclipseCaseEnsemble*   selectedEclipseCaseEnsemble();
     static RimReservoirGridEnsemble* selectedGridEnsemble();
 };
