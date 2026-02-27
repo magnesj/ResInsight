@@ -20,7 +20,12 @@
 
 #include "RiaResultNames.h"
 
+#include "RigMainGrid.h"
+#include "RigNNCData.h"
+#include "RigNncConnection.h"
+
 #include "cafAssert.h"
+#include "cvfMath.h"
 #include "cvfStructGrid.h"
 
 #include <limits>
@@ -117,4 +122,41 @@ bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType              
     if ( needsValidOil && data.saturationOil[idx] >= limits.saturationOil ) return true;
     if ( needsValidGas && data.saturationGas[idx] >= limits.saturationGas ) return true;
     return false;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigWellTargetMappingTools::assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
+                                                        const std::vector<size_t>& cells,
+                                                        std::vector<int>&          clusters,
+                                                        int                        clusterId )
+{
+    for ( size_t reservoirCellIdx : cells )
+    {
+        size_t resultIndex = activeCellInfo.cellResultIndex( reservoirCellIdx );
+        if ( resultIndex != cvf::UNDEFINED_SIZE_T ) clusters[resultIndex] = clusterId;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::list<std::pair<std::pair<size_t, RigWellTargetMappingTools::CellFaceType>, size_t>>
+    RigWellTargetMappingTools::nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid )
+{
+    std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> foundCells;
+
+    if ( mainGrid->nncData() == nullptr ) return foundCells;
+
+    auto& connections = mainGrid->nncData()->allConnections();
+    for ( size_t i = 0; i < connections.size(); i++ )
+    {
+        if ( connections[i].c1GlobIdx() == cellIdx )
+        {
+            foundCells.push_back( std::make_pair( std::make_pair( connections[i].c2GlobIdx(), connections[i].face() ), i ) );
+        }
+    }
+
+    return foundCells;
 }
