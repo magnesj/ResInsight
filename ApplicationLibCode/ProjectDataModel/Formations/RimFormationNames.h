@@ -41,7 +41,7 @@ public:
     QString fileName();
     QString shortName();
 
-    RigFormationNames* formationNamesData();
+    const RigFormationNames* formationNamesData() const;
 
     void updateConnectedViews();
 
