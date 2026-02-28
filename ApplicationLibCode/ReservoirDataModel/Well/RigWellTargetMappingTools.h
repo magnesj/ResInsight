@@ -116,30 +116,22 @@ public:
     static QString getOilVectorName( VolumesType volumesType );
     static QString getGasVectorName( VolumesType volumesType );
 
-    static bool isSaturationSufficient( VolumeType             volumeType,
-                                        const DataContainer&   data,
-                                        const ClusteringLimits& limits,
-                                        size_t                  idx );
+    static bool isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx );
 
     static void assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
                                         const std::vector<size_t>& cells,
                                         std::vector<int>&          clusters,
                                         int                        clusterId );
 
-    static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>>
-        nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
+    static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
 
     static void createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address );
 
-    static void createResultVector( RimEclipseCase&         eclipseCase,
-                                    const QString&          resultName,
-                                    const std::vector<int>& clusterIds,
-                                    size_t                  timeStepIdx );
+    static void
+        createResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& clusterIds, size_t timeStepIdx );
 
-    static void createResultVector( RimEclipseCase&            eclipseCase,
-                                    const QString&             resultName,
-                                    const std::vector<double>& values,
-                                    size_t                     timeStepIdx );
+    static void
+        createResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values, size_t timeStepIdx );
 
     static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<int>& intValues );
     static void createStaticResultVector( RimEclipseCase& eclipseCase, const QString& resultName, const std::vector<double>& values );
@@ -150,12 +142,12 @@ public:
                                              int                        timeStepIdx = -1 );
 
     static std::optional<caf::VecIjk0> findStartCell( RimEclipseCase*            eclipseCase,
-                                                       size_t                     timeStepIdx,
-                                                       VolumeType                 volumeType,
-                                                       const ClusteringLimits&    limits,
-                                                       const DataContainer&       data,
-                                                       const std::vector<double>& filterVector,
-                                                       const std::vector<int>&    clusters );
+                                                      size_t                     timeStepIdx,
+                                                      VolumeType                 volumeType,
+                                                      const ClusteringLimits&    limits,
+                                                      const DataContainer&       data,
+                                                      const std::vector<double>& filterVector,
+                                                      const std::vector<int>&    clusters );
 
     static void growCluster( RimEclipseCase*            eclipseCase,
                              const caf::VecIjk0&        startCell,

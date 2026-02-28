@@ -437,8 +437,7 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NoConnections_Re
 TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MatchingCell_ReturnsConnection )
 {
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
-    mainGrid->nncData()->allConnections().push_back(
-        RigConnection( (size_t)3, (size_t)7, cvf::StructGridInterface::FaceType::POS_I ) );
+    mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)3, (size_t)7, cvf::StructGridInterface::FaceType::POS_I ) );
 
     auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 3, mainGrid.p() );
 
@@ -452,8 +451,7 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MatchingCell_Ret
 TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NonMatchingCell_ReturnsEmpty )
 {
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
-    mainGrid->nncData()->allConnections().push_back(
-        RigConnection( (size_t)5, (size_t)8, cvf::StructGridInterface::FaceType::NEG_J ) );
+    mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)5, (size_t)8, cvf::StructGridInterface::FaceType::NEG_J ) );
 
     auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 0, mainGrid.p() );
 
@@ -463,12 +461,9 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NonMatchingCell_
 TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MultipleConnections_ReturnsOnlyMatching )
 {
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
-    mainGrid->nncData()->allConnections().push_back(
-        RigConnection( (size_t)2, (size_t)10, cvf::StructGridInterface::FaceType::POS_I ) );
-    mainGrid->nncData()->allConnections().push_back(
-        RigConnection( (size_t)4, (size_t)11, cvf::StructGridInterface::FaceType::POS_J ) );
-    mainGrid->nncData()->allConnections().push_back(
-        RigConnection( (size_t)2, (size_t)12, cvf::StructGridInterface::FaceType::NEG_K ) );
+    mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)2, (size_t)10, cvf::StructGridInterface::FaceType::POS_I ) );
+    mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)4, (size_t)11, cvf::StructGridInterface::FaceType::POS_J ) );
+    mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)2, (size_t)12, cvf::StructGridInterface::FaceType::NEG_K ) );
 
     auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 2, mainGrid.p() );
 

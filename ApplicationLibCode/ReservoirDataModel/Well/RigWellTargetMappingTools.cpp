@@ -24,8 +24,8 @@
 #include "RiaResultNames.h"
 #include "RiaWeightedMeanCalculator.h"
 
-#include "RigCell.h"
 #include "RigCaseCellResultsData.h"
+#include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigFloodingSettings.h"
 #include "RigGridBase.h"
@@ -128,10 +128,7 @@ QString RigWellTargetMappingTools::getGasVectorName( VolumesType volumesType )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType              volumeType,
-                                                        const DataContainer&    data,
-                                                        const ClusteringLimits& limits,
-                                                        size_t                  idx )
+bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx )
 {
     bool needsValidOil = volumeType == VolumeType::OIL || volumeType == VolumeType::HYDROCARBON;
     bool needsValidGas = volumeType == VolumeType::GAS || volumeType == VolumeType::HYDROCARBON;
@@ -318,12 +315,12 @@ void RigWellTargetMappingTools::createResultVectorIfDefined( RimEclipseCase&    
 ///
 //--------------------------------------------------------------------------------------------------
 std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RimEclipseCase*            eclipseCase,
-                                                                       size_t                     timeStepIdx,
-                                                                       VolumeType                 volumeType,
-                                                                       const ClusteringLimits&    limits,
-                                                                       const DataContainer&       data,
-                                                                       const std::vector<double>& filterVector,
-                                                                       const std::vector<int>&    clusters )
+                                                                      size_t                     timeStepIdx,
+                                                                      VolumeType                 volumeType,
+                                                                      const ClusteringLimits&    limits,
+                                                                      const DataContainer&       data,
+                                                                      const std::vector<double>& filterVector,
+                                                                      const std::vector<int>&    clusters )
 {
     auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !resultsData )
@@ -502,9 +499,8 @@ std::optional<size_t> RigWellTargetMappingTools::getActiveCellCount( RimEclipseC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RigWellTargetMappingTools::loadVectorByName( RigCaseCellResultsData& resultsData,
-                                                                  const QString&          resultName,
-                                                                  size_t                  timeStepIdx )
+std::vector<double>
+    RigWellTargetMappingTools::loadVectorByName( RigCaseCellResultsData& resultsData, const QString& resultName, size_t timeStepIdx )
 {
     RigEclipseResultAddress address( RiaDefines::ResultCatType::DYNAMIC_NATIVE, resultName );
     if ( !resultsData.ensureKnownResultLoaded( address ) ) return {};
@@ -515,10 +511,10 @@ std::vector<double> RigWellTargetMappingTools::loadVectorByName( RigCaseCellResu
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<double> RigWellTargetMappingTools::loadOilVectorByName( RigCaseCellResultsData&    resultsData,
-                                                                     VolumesType                volumesType,
-                                                                     VolumeResultType           volumeResultType,
-                                                                     size_t                     timeStepIdx,
-                                                                     const RigFloodingSettings& floodingSettings )
+                                                                    VolumesType                volumesType,
+                                                                    VolumeResultType           volumeResultType,
+                                                                    size_t                     timeStepIdx,
+                                                                    const RigFloodingSettings& floodingSettings )
 {
     std::vector<double> volume = loadVectorByName( resultsData, getOilVectorName( volumesType ), timeStepIdx );
     if ( volumeResultType == VolumeResultType::MOBILE )
@@ -564,11 +560,11 @@ std::vector<double> RigWellTargetMappingTools::loadOilVectorByName( RigCaseCellR
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<double> RigWellTargetMappingTools::loadGasVectorByName( RigCaseCellResultsData&       resultsData,
-                                                                     RiaDefines::EclipseUnitSystem unitsType,
-                                                                     VolumesType                   volumesType,
-                                                                     VolumeResultType              volumeResultType,
-                                                                     size_t                        timeStepIdx,
-                                                                     const RigFloodingSettings&    floodingSettings )
+                                                                    RiaDefines::EclipseUnitSystem unitsType,
+                                                                    VolumesType                   volumesType,
+                                                                    VolumeResultType              volumeResultType,
+                                                                    size_t                        timeStepIdx,
+                                                                    const RigFloodingSettings&    floodingSettings )
 {
     std::vector<double> volume = loadVectorByName( resultsData, getGasVectorName( volumesType ), timeStepIdx );
 
@@ -620,13 +616,12 @@ std::vector<double> RigWellTargetMappingTools::loadGasVectorByName( RigCaseCellR
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigWellTargetMappingTools::ClusterStatistics>
-    RigWellTargetMappingTools::generateStatistics( RimEclipseCase*            eclipseCase,
-                                                   const std::vector<double>& pressure,
-                                                   const std::vector<double>& permeabilityX,
-                                                   int                        numClustersFound,
-                                                   size_t                     timeStepIdx,
-                                                   const QString&             clusterResultName )
+std::vector<RigWellTargetMappingTools::ClusterStatistics> RigWellTargetMappingTools::generateStatistics( RimEclipseCase* eclipseCase,
+                                                                                                         const std::vector<double>& pressure,
+                                                                                                         const std::vector<double>& permeabilityX,
+                                                                                                         int            numClustersFound,
+                                                                                                         size_t         timeStepIdx,
+                                                                                                         const QString& clusterResultName )
 {
     std::vector<ClusterStatistics> statistics( numClustersFound );
 
@@ -719,8 +714,8 @@ std::vector<RigWellTargetMappingTools::ClusterStatistics>
 ///
 //--------------------------------------------------------------------------------------------------
 void RigWellTargetMappingTools::computeStatisticsAndCreateVectors( RimEclipseCase&                         targetCase,
-                                                                    const QString&                          resultName,
-                                                                    const std::vector<std::vector<double>>& vec )
+                                                                   const QString&                          resultName,
+                                                                   const std::vector<std::vector<double>>& vec )
 {
     const RigCaseCellResultsData* targetResultsData = targetCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     if ( !targetResultsData ) return;
@@ -845,9 +840,8 @@ void RigWellTargetMappingTools::accumulateResultsForSingleCase( RimEclipseCase& 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-cvf::BoundingBox RigWellTargetMappingTools::computeBoundingBoxForResult( RimEclipseCase& eclipseCase,
-                                                                          const QString&  resultName,
-                                                                          size_t          timeStepIndex )
+cvf::BoundingBox
+    RigWellTargetMappingTools::computeBoundingBoxForResult( RimEclipseCase& eclipseCase, const QString& resultName, size_t timeStepIndex )
 {
     RigCaseCellResultsData*  resultsData       = eclipseCase.results( RiaDefines::PorosityModelType::MATRIX_MODEL );
     const RigMainGrid*       mainGrid          = eclipseCase.mainGrid();
