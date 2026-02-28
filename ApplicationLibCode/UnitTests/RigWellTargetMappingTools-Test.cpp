@@ -44,7 +44,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_PosI_ReturnsXValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 2.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_I, 1 ) );
+    EXPECT_DOUBLE_EQ( 2.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 1 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegI_ReturnsXValue )
@@ -53,7 +53,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegI_ReturnsXValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 1.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_I, 0 ) );
+    EXPECT_DOUBLE_EQ( 1.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_PosJ_ReturnsYValue )
@@ -62,7 +62,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_PosJ_ReturnsYValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 30.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_J, 2 ) );
+    EXPECT_DOUBLE_EQ( 30.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_J, ReservoirResultIndex( 2 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegJ_ReturnsYValue )
@@ -71,7 +71,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegJ_ReturnsYValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 20.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_J, 1 ) );
+    EXPECT_DOUBLE_EQ( 20.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_J, ReservoirResultIndex( 1 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_PosK_ReturnsZValue )
@@ -80,7 +80,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_PosK_ReturnsZValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 100.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_K, 0 ) );
+    EXPECT_DOUBLE_EQ( 100.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::POS_K, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegK_ReturnsZValue )
@@ -89,7 +89,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_NegK_ReturnsZValue )
     std::vector<double> y = { 10.0, 20.0, 30.0 };
     std::vector<double> z = { 100.0, 200.0, 300.0 };
 
-    EXPECT_DOUBLE_EQ( 300.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_K, 2 ) );
+    EXPECT_DOUBLE_EQ( 300.0, RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NEG_K, ReservoirResultIndex( 2 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, GetValueForFace_NoFace_ReturnsInfinity )
@@ -98,7 +98,7 @@ TEST( RigWellTargetMappingToolsTest, GetValueForFace_NoFace_ReturnsInfinity )
     std::vector<double> y = { 10.0 };
     std::vector<double> z = { 100.0 };
 
-    double result = RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NO_FACE, 0 );
+    double result = RigWellTargetMappingTools::getValueForFace( x, y, z, FaceType::NO_FACE, ReservoirResultIndex( 0 ) );
     EXPECT_TRUE( std::isinf( result ) );
 }
 
@@ -113,7 +113,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosI_UsesRe
     std::vector<double> z = { 7.0, 17.0, 27.0 };
 
     // For positive face, should use resultIndex (0) not neighborResultIndex (2)
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, 0, 2 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
     EXPECT_DOUBLE_EQ( 5.0, result );
 }
 
@@ -124,7 +124,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegI_UsesNe
     std::vector<double> z = { 7.0, 17.0, 27.0 };
 
     // For negative face, should use neighborResultIndex (2) not resultIndex (0)
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, 0, 2 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
     EXPECT_DOUBLE_EQ( 25.0, result );
 }
 
@@ -134,7 +134,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosJ_UsesRe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_J, 0, 1 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 6.0, result );
 }
 
@@ -144,7 +144,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegJ_UsesNe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_J, 0, 1 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 16.0, result );
 }
 
@@ -154,7 +154,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosK_UsesRe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_K, 0, 1 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 7.0, result );
 }
 
@@ -164,7 +164,7 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegK_UsesNe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_K, 0, 1 );
+    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 17.0, result );
 }
 
@@ -230,7 +230,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAboveThreshold_Re
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.1;
 
-    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, 0 ) );
+    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilBelowThreshold_ReturnsFalse )
@@ -243,7 +243,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilBelowThreshold_Re
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.1;
 
-    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, 1 ) );
+    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, ReservoirResultIndex( 1 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAtThreshold_ReturnsTrue )
@@ -256,7 +256,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilAtThreshold_Retur
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.1;
 
-    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, 0 ) );
+    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasAboveThreshold_ReturnsTrue )
@@ -269,7 +269,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasAboveThreshold_Re
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, 0 ) );
+    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasBelowThreshold_ReturnsFalse )
@@ -282,7 +282,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasBelowThreshold_Re
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, 0 ) );
+    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_OilSufficient_ReturnsTrue )
@@ -295,7 +295,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_OilSuffi
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, 0 ) );
+    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_GasSufficient_ReturnsTrue )
@@ -308,7 +308,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_GasSuffi
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, 0 ) );
+    EXPECT_TRUE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_NeitherSufficient_ReturnsFalse )
@@ -321,7 +321,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_Hydrocarbon_NeitherS
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, 0 ) );
+    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::HYDROCARBON, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilType_GasAbove_ReturnsFalse )
@@ -335,7 +335,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_OilType_GasAbove_Ret
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, 0 ) );
+    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::OIL, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasType_OilAbove_ReturnsFalse )
@@ -349,7 +349,7 @@ TEST( RigWellTargetMappingToolsTest, IsSaturationSufficient_GasType_OilAbove_Ret
     limits.saturationOil = 0.2;
     limits.saturationGas = 0.3;
 
-    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, 0 ) );
+    EXPECT_FALSE( RigWellTargetMappingTools::isSaturationSufficient( VolumeType::GAS, data, limits, ReservoirResultIndex( 0 ) ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -364,8 +364,8 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_SetsCorrectIds )
     activeCellInfo.setCellResultIndex( 1, 1 );
     activeCellInfo.setCellResultIndex( 2, 2 );
 
-    std::vector<int>    clusters( 3, 0 );
-    std::vector<size_t> cells = { 0, 1, 2 };
+    std::vector<int>              clusters( 3, 0 );
+    std::vector<ReservoirCellIndex> cells = { ReservoirCellIndex( 0 ), ReservoirCellIndex( 1 ), ReservoirCellIndex( 2 ) };
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 5 );
 
@@ -381,8 +381,8 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_SkipsUndefinedResult
     activeCellInfo.setCellResultIndex( 0, 0 );
     // reservoir cells 1 and 2 have no result index (UNDEFINED_SIZE_T)
 
-    std::vector<int>    clusters( 1, 0 );
-    std::vector<size_t> cells = { 0, 1, 2 };
+    std::vector<int>                clusters( 1, 0 );
+    std::vector<ReservoirCellIndex> cells = { ReservoirCellIndex( 0 ), ReservoirCellIndex( 1 ), ReservoirCellIndex( 2 ) };
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 7 );
 
@@ -396,8 +396,8 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_EmptyCells_NoChange 
     activeCellInfo.setCellResultIndex( 0, 0 );
     activeCellInfo.setCellResultIndex( 1, 1 );
 
-    std::vector<int>    clusters( 2, 99 );
-    std::vector<size_t> cells;
+    std::vector<int>                clusters( 2, 99 );
+    std::vector<ReservoirCellIndex> cells;
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 1 );
 
@@ -412,8 +412,8 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_OverwritesExistingId
     activeCellInfo.setCellResultIndex( 0, 0 );
     activeCellInfo.setCellResultIndex( 1, 1 );
 
-    std::vector<int>    clusters = { 3, 3 };
-    std::vector<size_t> cells    = { 0, 1 };
+    std::vector<int>                clusters = { 3, 3 };
+    std::vector<ReservoirCellIndex> cells    = { ReservoirCellIndex( 0 ), ReservoirCellIndex( 1 ) };
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 9 );
 
@@ -429,7 +429,7 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NoConnections_Re
 {
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
 
-    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 0, mainGrid.p() );
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( ReservoirCellIndex( 0 ), mainGrid.p() );
 
     EXPECT_TRUE( result.empty() );
 }
@@ -439,11 +439,11 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MatchingCell_Ret
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
     mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)3, (size_t)7, cvf::StructGridInterface::FaceType::POS_I ) );
 
-    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 3, mainGrid.p() );
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( ReservoirCellIndex( 3 ), mainGrid.p() );
 
     ASSERT_EQ( 1u, result.size() );
     auto& [cellInfo, nncIdx] = result.front();
-    EXPECT_EQ( 7u, cellInfo.first );
+    EXPECT_EQ( 7u, cellInfo.first.value() );
     EXPECT_EQ( cvf::StructGridInterface::FaceType::POS_I, cellInfo.second );
     EXPECT_EQ( 0u, nncIdx );
 }
@@ -453,7 +453,7 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_NonMatchingCell_
     cvf::ref<RigMainGrid> mainGrid = new RigMainGrid;
     mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)5, (size_t)8, cvf::StructGridInterface::FaceType::NEG_J ) );
 
-    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 0, mainGrid.p() );
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( ReservoirCellIndex( 0 ), mainGrid.p() );
 
     EXPECT_TRUE( result.empty() );
 }
@@ -465,14 +465,14 @@ TEST( RigWellTargetMappingToolsTest, NncConnectionCellAndResult_MultipleConnecti
     mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)4, (size_t)11, cvf::StructGridInterface::FaceType::POS_J ) );
     mainGrid->nncData()->allConnections().push_back( RigConnection( (size_t)2, (size_t)12, cvf::StructGridInterface::FaceType::NEG_K ) );
 
-    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( 2, mainGrid.p() );
+    auto result = RigWellTargetMappingTools::nncConnectionCellAndResult( ReservoirCellIndex( 2 ), mainGrid.p() );
 
     ASSERT_EQ( 2u, result.size() );
 
     auto it = result.begin();
-    EXPECT_EQ( 10u, it->first.first );
+    EXPECT_EQ( 10u, it->first.first.value() );
     EXPECT_EQ( 0u, it->second );
     ++it;
-    EXPECT_EQ( 12u, it->first.first );
+    EXPECT_EQ( 12u, it->first.first.value() );
     EXPECT_EQ( 2u, it->second );
 }
