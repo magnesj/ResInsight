@@ -39,7 +39,6 @@
 #include "RigStatisticsMath.h"
 
 #include "RimEclipseCase.h"
-#include "RimEclipseCaseEnsemble.h"
 #include "RimEclipseView.h"
 #include "RimProject.h"
 #include "RimPropertyFilterCollection.h"
@@ -171,7 +170,8 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     int              numClustersFound = 0;
     for ( int clusterId = 1; clusterId <= numClusters; clusterId++ )
     {
-        std::optional<caf::VecIjk0> startCell = RigWellTargetMappingTools::findStartCell( eclipseCase, timeStepIdx, volumeType, limits, data, filterVector, clusters );
+        std::optional<caf::VecIjk0> startCell =
+            RigWellTargetMappingTools::findStartCell( eclipseCase, timeStepIdx, volumeType, limits, data, filterVector, clusters );
 
         if ( startCell.has_value() )
         {
@@ -182,7 +182,16 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
                                   .arg( startCell->k() + 1 ),
                               logKeyword );
 
-            RigWellTargetMappingTools::growCluster( eclipseCase, startCell.value(), volumeType, limits, data, filterVector, clusters, clusterId, timeStepIdx, maxIterations );
+            RigWellTargetMappingTools::growCluster( eclipseCase,
+                                                    startCell.value(),
+                                                    volumeType,
+                                                    limits,
+                                                    data,
+                                                    filterVector,
+                                                    clusters,
+                                                    clusterId,
+                                                    timeStepIdx,
+                                                    maxIterations );
             numClustersFound++;
         }
         else
@@ -303,7 +312,6 @@ void RigWellTargetMapping::generateCandidates( RimEclipseCase*            eclips
     }
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -344,24 +352,23 @@ std::vector<double> RigWellTargetMapping::getVolumeVector( RigCaseCellResultsDat
     return {};
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( RimEclipseCaseEnsemble&    ensemble,
-                                                                      size_t                     timeStepIdx,
-                                                                      const cvf::Vec3st&         resultGridCellCount,
-                                                                      VolumeType                 volumeType,
-                                                                      VolumesType                volumesType,
-                                                                      VolumeResultType           volumeResultType,
-                                                                      const RigFloodingSettings& floodingSettings,
-                                                                      const ClusteringLimits&    limits )
+RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( const std::vector<RimEclipseCase*>& cases,
+                                                                      size_t                              timeStepIdx,
+                                                                      const cvf::Vec3st&                  resultGridCellCount,
+                                                                      VolumeType                          volumeType,
+                                                                      VolumesType                         volumesType,
+                                                                      VolumeResultType                    volumeResultType,
+                                                                      const RigFloodingSettings&          floodingSettings,
+                                                                      const ClusteringLimits&             limits )
 {
     RiaLogging::debug( "Generating ensemble statistics" );
 
-    caf::ProgressInfo progInfo( ensemble.cases().size() * 2, "Generating ensemble statistics" );
+    caf::ProgressInfo progInfo( cases.size() * 2, "Generating ensemble statistics" );
 
-    for ( auto eclipseCase : ensemble.cases() )
+    for ( auto eclipseCase : cases )
     {
         auto task = progInfo.task( "Generating realization statistics.", 1 );
 
@@ -369,9 +376,10 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( RimEclipse
     }
 
     cvf::BoundingBox boundingBox;
-    for ( auto eclipseCase : ensemble.cases() )
+    for ( auto eclipseCase : cases )
     {
-        cvf::BoundingBox bb = RigWellTargetMappingTools::computeBoundingBoxForResult( *eclipseCase, RigWellTargetMapping::wellTargetResultName(), timeStepIdx );
+        cvf::BoundingBox bb =
+            RigWellTargetMappingTools::computeBoundingBoxForResult( *eclipseCase, RigWellTargetMapping::wellTargetResultName(), timeStepIdx );
         boundingBox.add( bb );
     }
 
@@ -398,7 +406,7 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( RimEclipse
     resultNamesAndSamples["TOTAL_SFIPOIL"]        = {};
     resultNamesAndSamples["TOTAL_SFIPGAS"]        = {};
 
-    for ( auto eclipseCase : ensemble.cases() )
+    for ( auto eclipseCase : cases )
     {
         auto task = progInfo.task( "Accumulating results.", 1 );
 
@@ -417,7 +425,7 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( RimEclipse
     };
 
     RigWellTargetMappingTools::createStaticResultVector( *targetCase, "OCCURRENCE", occurrence );
-    std::vector<double> probability = createFractionVector( occurrence, static_cast<int>( ensemble.cases().size() ) );
+    std::vector<double> probability = createFractionVector( occurrence, static_cast<int>( cases.size() ) );
     RigWellTargetMappingTools::createStaticResultVector( *targetCase, "PROBABILITY", probability );
 
     for ( auto [resultName, vec] : resultNamesAndSamples )
@@ -428,7 +436,6 @@ RimRegularGridCase* RigWellTargetMapping::generateEnsembleCandidates( RimEclipse
     return targetCase;
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
@@ -436,4 +443,3 @@ QString RigWellTargetMapping::wellTargetResultName()
 {
     return "WELL_TARGET_NUM";
 }
-

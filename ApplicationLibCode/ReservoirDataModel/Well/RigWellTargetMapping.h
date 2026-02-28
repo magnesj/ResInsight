@@ -26,7 +26,6 @@
 
 class RigCaseCellResultsData;
 class RimEclipseCase;
-class RimEclipseCaseEnsemble;
 class RimRegularGridCase;
 class RigFloodingSettings;
 
@@ -89,14 +88,14 @@ public:
                                                 size_t                        timeStepIdx,
                                                 const RigFloodingSettings&    floodingSettings );
 
-    static RimRegularGridCase* generateEnsembleCandidates( RimEclipseCaseEnsemble&    ensemble,
-                                                           size_t                     timeStepIdx,
-                                                           const cvf::Vec3st&         resultGridCellCount,
-                                                           VolumeType                 volumeType,
-                                                           VolumesType                volumesType,
-                                                           VolumeResultType           volumeResultType,
-                                                           const RigFloodingSettings& floodingSettings,
-                                                           const ClusteringLimits&    limits );
+    static RimRegularGridCase* generateEnsembleCandidates( const std::vector<RimEclipseCase*>& cases,
+                                                           size_t                              timeStepIdx,
+                                                           const cvf::Vec3st&                  resultGridCellCount,
+                                                           VolumeType                          volumeType,
+                                                           VolumesType                         volumesType,
+                                                           VolumeResultType                    volumeResultType,
+                                                           const RigFloodingSettings&          floodingSettings,
+                                                           const ClusteringLimits&             limits );
 
     static QString wellTargetResultName();
 };
