@@ -58,13 +58,6 @@ private:
     size_t m_value;
 };
 
-// Define specific types using tag structs
-struct ReservoirCellIndexTag
-{
-};
-
-using ReservoirCellIndex = TypeSafeIndex<ReservoirCellIndexTag>;
-
 // Hash support for using in std::unordered_map, etc.
 namespace std
 {
@@ -73,4 +66,16 @@ struct hash<TypeSafeIndex<Tag>>
 {
     size_t operator()( const TypeSafeIndex<Tag>& idx ) const noexcept { return hash<size_t>{}( idx.value() ); }
 };
+
 } // namespace std
+
+// Define specific types using tag structs
+struct ReservoirCellIndexTag
+{
+};
+using ReservoirCellIndex = TypeSafeIndex<ReservoirCellIndexTag>;
+
+struct ReservoirResultIndexTag
+{
+};
+using ReservoirResultIndex = TypeSafeIndex<ReservoirResultIndexTag>;
