@@ -113,7 +113,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosI_UsesRe
     std::vector<double> z = { 7.0, 17.0, 27.0 };
 
     // For positive face, should use resultIndex (0) not neighborResultIndex (2)
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
     EXPECT_DOUBLE_EQ( 5.0, result );
 }
 
@@ -124,7 +125,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegI_UsesNe
     std::vector<double> z = { 7.0, 17.0, 27.0 };
 
     // For negative face, should use neighborResultIndex (2) not resultIndex (0)
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 2 ) );
     EXPECT_DOUBLE_EQ( 25.0, result );
 }
 
@@ -134,7 +136,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosJ_UsesRe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 6.0, result );
 }
 
@@ -144,7 +147,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegJ_UsesNe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_J, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 16.0, result );
 }
 
@@ -154,7 +158,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_PosK_UsesRe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 7.0, result );
 }
 
@@ -164,7 +169,8 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_NegK_UsesNe
     std::vector<double> y = { 6.0, 16.0 };
     std::vector<double> z = { 7.0, 17.0 };
 
-    double result = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
+    double result =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_K, ReservoirResultIndex( 0 ), ReservoirResultIndex( 1 ) );
     EXPECT_DOUBLE_EQ( 17.0, result );
 }
 
@@ -364,7 +370,7 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_SetsCorrectIds )
     activeCellInfo.setCellResultIndex( 1, 1 );
     activeCellInfo.setCellResultIndex( 2, 2 );
 
-    std::vector<int>              clusters( 3, 0 );
+    std::vector<int>                clusters( 3, 0 );
     std::vector<ReservoirCellIndex> cells = { ReservoirCellIndex( 0 ), ReservoirCellIndex( 1 ), ReservoirCellIndex( 2 ) };
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 5 );
