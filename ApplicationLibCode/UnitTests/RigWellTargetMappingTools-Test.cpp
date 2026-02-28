@@ -20,11 +20,11 @@
 
 #include "Well/RigWellTargetMappingTools.h"
 
+#include "RiaResultNames.h"
 #include "RigActiveCellInfo.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
 #include "RigNncConnection.h"
-#include "RiaResultNames.h"
 
 #include "cvfStructGrid.h"
 
@@ -200,8 +200,10 @@ TEST( RigWellTargetMappingToolsTest, GetTransmissibilityValueForFace_SameIndex_S
     std::vector<double> y = { 19.0 };
     std::vector<double> z = { 29.0 };
 
-    double posI = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 0 ) );
-    double negI = RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 0 ) );
+    double posI =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::POS_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 0 ) );
+    double negI =
+        RigWellTargetMappingTools::getTransmissibilityValueForFace( x, y, z, FaceType::NEG_I, ReservoirResultIndex( 0 ), ReservoirResultIndex( 0 ) );
 
     EXPECT_DOUBLE_EQ( posI, negI );
 }
@@ -511,11 +513,8 @@ TEST( RigWellTargetMappingToolsTest, AssignClusterIdToCells_MixedActiveInactive_
     activeCellInfo.setCellResultIndex( ReservoirCellIndex( 2 ), ReservoirResultIndex( 1 ) );
     // cell 3 inactive
 
-    std::vector<int>                clusters( 2, 0 );
-    std::vector<ReservoirCellIndex> cells = { ReservoirCellIndex( 0 ),
-                                              ReservoirCellIndex( 1 ),
-                                              ReservoirCellIndex( 2 ),
-                                              ReservoirCellIndex( 3 ) };
+    std::vector<int> clusters( 2, 0 );
+    std::vector<ReservoirCellIndex> cells = { ReservoirCellIndex( 0 ), ReservoirCellIndex( 1 ), ReservoirCellIndex( 2 ), ReservoirCellIndex( 3 ) };
 
     RigWellTargetMappingTools::assignClusterIdToCells( activeCellInfo, cells, clusters, 4 );
 
