@@ -54,11 +54,14 @@ double RigWellTargetMappingTools::getValueForFace( const std::vector<double>& x,
                                                    const std::vector<double>& y,
                                                    const std::vector<double>& z,
                                                    CellFaceType               face,
-                                                   size_t                     resultIndex )
+                                                   ReservoirResultIndex       resultIndex )
 {
-    if ( face == cvf::StructGridInterface::FaceType::POS_I || face == cvf::StructGridInterface::FaceType::NEG_I ) return x[resultIndex];
-    if ( face == cvf::StructGridInterface::FaceType::POS_J || face == cvf::StructGridInterface::FaceType::NEG_J ) return y[resultIndex];
-    if ( face == cvf::StructGridInterface::FaceType::POS_K || face == cvf::StructGridInterface::FaceType::NEG_K ) return z[resultIndex];
+    if ( face == cvf::StructGridInterface::FaceType::POS_I || face == cvf::StructGridInterface::FaceType::NEG_I )
+        return x[resultIndex.value()];
+    if ( face == cvf::StructGridInterface::FaceType::POS_J || face == cvf::StructGridInterface::FaceType::NEG_J )
+        return y[resultIndex.value()];
+    if ( face == cvf::StructGridInterface::FaceType::POS_K || face == cvf::StructGridInterface::FaceType::NEG_K )
+        return z[resultIndex.value()];
     return std::numeric_limits<double>::infinity();
 }
 
@@ -69,13 +72,13 @@ double RigWellTargetMappingTools::getTransmissibilityValueForFace( const std::ve
                                                                    const std::vector<double>& y,
                                                                    const std::vector<double>& z,
                                                                    CellFaceType               face,
-                                                                   size_t                     resultIndex,
-                                                                   size_t                     neighborResultIndex )
+                                                                   ReservoirResultIndex       resultIndex,
+                                                                   ReservoirResultIndex       neighborResultIndex )
 {
     // For negative directions (NEG_I, NEG_J, NEG_K) use the value from the neighbor cell
     bool isPos = face == cvf::StructGridInterface::FaceType::POS_I || face == cvf::StructGridInterface::FaceType::POS_J ||
                  face == cvf::StructGridInterface::FaceType::POS_K;
-    size_t index = isPos ? resultIndex : neighborResultIndex;
+    ReservoirResultIndex index = isPos ? resultIndex : neighborResultIndex;
     return getValueForFace( x, y, z, face, index );
 }
 
@@ -128,47 +131,51 @@ QString RigWellTargetMappingTools::getGasVectorName( VolumesType volumesType )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx )
+bool RigWellTargetMappingTools::isSaturationSufficient( VolumeType              volumeType,
+                                                        const DataContainer&    data,
+                                                        const ClusteringLimits& limits,
+                                                        ReservoirResultIndex    idx )
 {
     bool needsValidOil = volumeType == VolumeType::OIL || volumeType == VolumeType::HYDROCARBON;
     bool needsValidGas = volumeType == VolumeType::GAS || volumeType == VolumeType::HYDROCARBON;
     // For hydrocarbon it is enough that one of the saturations is above the limit.
-    if ( needsValidOil && data.saturationOil[idx] >= limits.saturationOil ) return true;
-    if ( needsValidGas && data.saturationGas[idx] >= limits.saturationGas ) return true;
+    if ( needsValidOil && data.saturationOil[idx.value()] >= limits.saturationOil ) return true;
+    if ( needsValidGas && data.saturationGas[idx.value()] >= limits.saturationGas ) return true;
     return false;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigWellTargetMappingTools::assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
-                                                        const std::vector<size_t>& cells,
-                                                        std::vector<int>&          clusters,
-                                                        int                        clusterId )
+void RigWellTargetMappingTools::assignClusterIdToCells( const RigActiveCellInfo&               activeCellInfo,
+                                                        const std::vector<ReservoirCellIndex>& cells,
+                                                        std::vector<int>&                      clusters,
+                                                        int                                    clusterId )
 {
-    for ( size_t reservoirCellIdx : cells )
+    for ( ReservoirCellIndex reservoirCellIdx : cells )
     {
-        size_t resultIndex = activeCellInfo.cellResultIndex( reservoirCellIdx );
-        if ( resultIndex != cvf::UNDEFINED_SIZE_T ) clusters[resultIndex] = clusterId;
+        ReservoirResultIndex resultIndex = activeCellInfo.cellResultIndex( reservoirCellIdx );
+        if ( resultIndex.value() != cvf::UNDEFINED_SIZE_T ) clusters[resultIndex.value()] = clusterId;
     }
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::list<std::pair<std::pair<size_t, RigWellTargetMappingTools::CellFaceType>, size_t>>
-    RigWellTargetMappingTools::nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid )
+std::list<std::pair<std::pair<ReservoirCellIndex, RigWellTargetMappingTools::CellFaceType>, size_t>>
+    RigWellTargetMappingTools::nncConnectionCellAndResult( ReservoirCellIndex cellIdx, RigMainGrid* mainGrid )
 {
-    std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> foundCells;
+    std::list<std::pair<std::pair<ReservoirCellIndex, CellFaceType>, size_t>> foundCells;
 
     if ( mainGrid->nncData() == nullptr ) return foundCells;
 
     auto& connections = mainGrid->nncData()->allConnections();
     for ( size_t i = 0; i < connections.size(); i++ )
     {
-        if ( connections[i].c1GlobIdx() == cellIdx )
+        if ( connections[i].c1GlobIdx() == cellIdx.value() )
         {
-            foundCells.push_back( std::make_pair( std::make_pair( connections[i].c2GlobIdx(), connections[i].face() ), i ) );
+            foundCells.push_back(
+                std::make_pair( std::make_pair( ReservoirCellIndex( connections[i].c2GlobIdx() ), connections[i].face() ), i ) );
         }
     }
 
@@ -329,35 +336,35 @@ std::optional<caf::VecIjk0> RigWellTargetMappingTools::findStartCell( RimEclipse
         return {};
     }
 
-    size_t       startCell         = std::numeric_limits<size_t>::max();
-    double       maxVolume         = -std::numeric_limits<double>::max();
-    const size_t numReservoirCells = resultsData->activeCellInfo()->reservoirCellCount();
-    for ( size_t reservoirCellIdx = 0; reservoirCellIdx < numReservoirCells; reservoirCellIdx++ )
+    std::optional<ReservoirCellIndex> startCell;
+    double                            maxVolume         = -std::numeric_limits<double>::max();
+    const size_t                      numReservoirCells = resultsData->activeCellInfo()->reservoirCellCount();
+    for ( ReservoirCellIndex reservoirCellIdx( 0 ); reservoirCellIdx.value() < numReservoirCells; ++reservoirCellIdx )
     {
-        size_t resultIndex = resultsData->activeCellInfo()->cellResultIndex( reservoirCellIdx );
-        if ( resultIndex != cvf::UNDEFINED_SIZE_T && clusters[resultIndex] == 0 )
+        ReservoirResultIndex resultIndex = resultsData->activeCellInfo()->cellResultIndex( reservoirCellIdx );
+        if ( resultIndex.value() != cvf::UNDEFINED_SIZE_T && clusters[resultIndex.value()] == 0 )
         {
-            const double cellVolume   = data.volume[resultIndex];
-            const double cellPressure = data.pressure[resultIndex];
+            const double cellVolume   = data.volume[resultIndex.value()];
+            const double cellPressure = data.pressure[resultIndex.value()];
 
             const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, resultIndex );
 
-            const double cellPermeabiltyX  = data.permeabilityX[resultIndex];
+            const double cellPermeabiltyX  = data.permeabilityX[resultIndex.value()];
             const bool   permeabilityValid = ( cellPermeabiltyX >= limits.permeability );
 
-            const bool filterValue = !std::isinf( filterVector[resultIndex] ) && filterVector[resultIndex] > 0.0;
+            const bool filterValue = !std::isinf( filterVector[resultIndex.value()] ) && filterVector[resultIndex.value()] > 0.0;
 
             if ( cellVolume > maxVolume && cellPressure >= limits.pressure && permeabilityValid && filterValue && isSaturationValid )
             {
                 maxVolume = cellVolume;
-                startCell = reservoirCellIdx;
+                startCell = ReservoirCellIndex( reservoirCellIdx );
             }
         }
     }
 
-    if ( startCell == std::numeric_limits<size_t>::max() ) return {};
+    if ( !startCell ) return {};
 
-    return eclipseCase->mainGrid()->ijkFromCellIndex( startCell );
+    return eclipseCase->mainGrid()->ijkFromCellIndex( startCell->value() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -377,8 +384,8 @@ void RigWellTargetMappingTools::growCluster( RimEclipseCase*            eclipseC
     auto resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     // Initially only the start cell is found
-    size_t              reservoirCellIdx = eclipseCase->mainGrid()->cellIndexFromIJK( startCell.i(), startCell.j(), startCell.k() );
-    std::vector<size_t> foundCells       = { reservoirCellIdx };
+    ReservoirCellIndex reservoirCellIdx( eclipseCase->mainGrid()->cellIndexFromIJK( startCell.i(), startCell.j(), startCell.k() ) );
+    std::vector<ReservoirCellIndex> foundCells = { reservoirCellIdx };
     assignClusterIdToCells( *resultsData->activeCellInfo(), foundCells, clusters, clusterId );
 
     for ( int i = 0; i < maxIterations; i++ )
@@ -392,17 +399,17 @@ void RigWellTargetMappingTools::growCluster( RimEclipseCase*            eclipseC
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<size_t> RigWellTargetMappingTools::findCandidates( RimEclipseCase*            eclipseCase,
-                                                               const std::vector<size_t>& previousCells,
-                                                               VolumeType                 volumeType,
-                                                               const ClusteringLimits&    limits,
-                                                               const DataContainer&       data,
-                                                               const std::vector<double>& filterVector,
-                                                               std::vector<int>&          clusters )
+std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RimEclipseCase*                        eclipseCase,
+                                                                           const std::vector<ReservoirCellIndex>& previousCells,
+                                                                           VolumeType                             volumeType,
+                                                                           const ClusteringLimits&                limits,
+                                                                           const DataContainer&                   data,
+                                                                           const std::vector<double>&             filterVector,
+                                                                           std::vector<int>&                      clusters )
 {
-    std::vector<size_t> candidates;
-    auto                resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
-    auto                mainGrid    = eclipseCase->eclipseCaseData()->mainGrid();
+    std::vector<ReservoirCellIndex> candidates;
+    auto                            resultsData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    auto                            mainGrid    = eclipseCase->eclipseCaseData()->mainGrid();
 
     const std::vector<CellFaceType> faces = {
         cvf::StructGridInterface::FaceType::POS_I,
@@ -413,14 +420,14 @@ std::vector<size_t> RigWellTargetMappingTools::findCandidates( RimEclipseCase*  
         cvf::StructGridInterface::FaceType::NEG_K,
     };
 
-    for ( size_t cellIdx : previousCells )
+    for ( ReservoirCellIndex cellIdx : previousCells )
     {
-        const RigCell& cell = mainGrid->cell( cellIdx );
+        const RigCell& cell = mainGrid->cell( cellIdx.value() );
         if ( cell.isInvalid() ) continue;
 
-        RigGridBase* grid               = cell.hostGrid();
-        size_t       gridLocalCellIndex = cell.gridLocalCellIndex();
-        size_t       resultIndex        = resultsData->activeCellInfo()->cellResultIndex( cellIdx );
+        RigGridBase*         grid               = cell.hostGrid();
+        size_t               gridLocalCellIndex = cell.gridLocalCellIndex();
+        ReservoirResultIndex resultIndex        = resultsData->activeCellInfo()->cellResultIndex( cellIdx );
 
         size_t i, j, k;
 
@@ -431,26 +438,27 @@ std::vector<size_t> RigWellTargetMappingTools::findCandidates( RimEclipseCase*  
             size_t gridLocalNeighborCellIdx;
             if ( grid->cellIJKNeighbor( i, j, k, face, &gridLocalNeighborCellIdx ) )
             {
-                size_t neighborResvCellIdx = grid->reservoirCellIndex( gridLocalNeighborCellIdx );
-                size_t neighborResultIndex = resultsData->activeCellInfo()->cellResultIndex( neighborResvCellIdx );
-                if ( neighborResultIndex != cvf::UNDEFINED_SIZE_T && clusters[neighborResultIndex] == 0 )
+                ReservoirCellIndex   neighborResvCellIdx( grid->reservoirCellIndex( gridLocalNeighborCellIdx ) );
+                ReservoirResultIndex neighborResultIndex = resultsData->activeCellInfo()->cellResultIndex( neighborResvCellIdx );
+                if ( neighborResultIndex.value() != cvf::UNDEFINED_SIZE_T && clusters[neighborResultIndex.value()] == 0 )
                 {
-                    double permeability     = data.permeabilityX[neighborResultIndex];
+                    double permeability     = data.permeabilityX[neighborResultIndex.value()];
                     double transmissibility = getTransmissibilityValueForFace( data.transmissibilityX,
                                                                                data.transmissibilityY,
                                                                                data.transmissibilityZ,
                                                                                face,
                                                                                resultIndex,
                                                                                neighborResultIndex );
-                    bool   filterValue      = !std::isinf( filterVector[neighborResultIndex] ) && filterVector[neighborResultIndex] > 0.0;
+                    bool   filterValue      = !std::isinf( filterVector[neighborResultIndex.value()] ) &&
+                                       filterVector[neighborResultIndex.value()] > 0.0;
 
                     const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, neighborResultIndex );
 
-                    if ( data.pressure[neighborResultIndex] > limits.pressure && permeability > limits.permeability &&
+                    if ( data.pressure[neighborResultIndex.value()] > limits.pressure && permeability > limits.permeability &&
                          transmissibility > limits.transmissibility && filterValue && isSaturationValid )
                     {
                         candidates.push_back( neighborResvCellIdx );
-                        clusters[neighborResultIndex] = -1;
+                        clusters[neighborResultIndex.value()] = -1;
                     }
                 }
             }
@@ -464,19 +472,19 @@ std::vector<size_t> RigWellTargetMappingTools::findCandidates( RimEclipseCase*  
                 auto& [otherCellIdx, face] = cellInfo;
                 double transmissibility    = data.transmissibilityNNC->at( nncResultIdx );
 
-                size_t otherResultIndex = resultsData->activeCellInfo()->cellResultIndex( otherCellIdx );
+                ReservoirResultIndex otherResultIndex = resultsData->activeCellInfo()->cellResultIndex( otherCellIdx );
 
-                double permeability = data.permeabilityX[otherResultIndex];
+                double permeability = data.permeabilityX[otherResultIndex.value()];
 
-                bool filterValue = !std::isinf( filterVector[otherResultIndex] ) && filterVector[otherResultIndex] > 0.0;
+                bool filterValue = !std::isinf( filterVector[otherResultIndex.value()] ) && filterVector[otherResultIndex.value()] > 0.0;
 
                 const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, otherResultIndex );
 
-                if ( data.pressure[otherResultIndex] > limits.pressure && permeability > limits.permeability &&
+                if ( data.pressure[otherResultIndex.value()] > limits.pressure && permeability > limits.permeability &&
                      transmissibility > limits.transmissibility && filterValue && isSaturationValid )
                 {
                     candidates.push_back( otherCellIdx );
-                    clusters[otherResultIndex] = -1;
+                    clusters[otherResultIndex.value()] = -1;
                 }
             }
         }
@@ -809,23 +817,24 @@ void RigWellTargetMappingTools::accumulateResultsForSingleCase( RimEclipseCase& 
         namedOutputVector[resultName] = std::vector( targetNumActiveCells, std::numeric_limits<double>::infinity() );
     }
 
-    for ( size_t targetCellIdx = 0; targetCellIdx < targetNumReservoirCells; targetCellIdx++ )
+    for ( ReservoirCellIndex targetCellIdx( 0 ); targetCellIdx.value() < targetNumReservoirCells; ++targetCellIdx )
     {
-        const RigCell& nativeCell = targetCase.mainGrid()->cell( targetCellIdx );
+        const RigCell& nativeCell = targetCase.mainGrid()->cell( targetCellIdx.value() );
         cvf::Vec3d     cellCenter = nativeCell.center();
 
-        size_t targetResultIndex = targetActiveCellInfo->cellResultIndex( targetCellIdx );
+        ReservoirResultIndex targetResultIndex = targetActiveCellInfo->cellResultIndex( targetCellIdx );
 
-        size_t cellIdx = mainGrid->findReservoirCellIndexFromPoint( cellCenter );
-        if ( cellIdx != cvf::UNDEFINED_SIZE_T && activeCellInfo->isActive( cellIdx ) && targetResultIndex != cvf::UNDEFINED_SIZE_T )
+        ReservoirCellIndex cellIdx( mainGrid->findReservoirCellIndexFromPoint( cellCenter ) );
+        if ( cellIdx.value() != cvf::UNDEFINED_SIZE_T && activeCellInfo->isActive( cellIdx ) &&
+             targetResultIndex.value() != cvf::UNDEFINED_SIZE_T )
         {
-            size_t resultIndex = resultsData->activeCellInfo()->cellResultIndex( cellIdx );
-            if ( !std::isinf( clusterNum[resultIndex] ) && clusterNum[resultIndex] > 0 )
+            ReservoirResultIndex resultIndex = resultsData->activeCellInfo()->cellResultIndex( cellIdx );
+            if ( !std::isinf( clusterNum[resultIndex.value()] ) && clusterNum[resultIndex.value()] > 0 )
             {
-                occupancy[targetResultIndex]++;
+                occupancy[targetResultIndex.value()]++;
                 for ( const auto& [resultName, vec] : resultNamesAndSamples )
                 {
-                    namedOutputVector[resultName][targetResultIndex] = namedInputVector[resultName]->at( resultIndex );
+                    namedOutputVector[resultName][targetResultIndex.value()] = namedInputVector[resultName]->at( resultIndex.value() );
                 }
             }
         }
@@ -853,13 +862,13 @@ cvf::BoundingBox
     const std::vector<double>& clusterNum = resultsData->cellScalarResults( clustersNumAddress, timeStepIndex );
 
     cvf::BoundingBox boundingBox;
-    for ( size_t reservoirCellIndex = 0; reservoirCellIndex < numReservoirCells; reservoirCellIndex++ )
+    for ( ReservoirCellIndex reservoirCellIdx( 0 ); reservoirCellIdx.value() < numReservoirCells; ++reservoirCellIdx )
     {
-        size_t targetResultIndex = activeCellInfo->cellResultIndex( reservoirCellIndex );
-        if ( reservoirCellIndex != cvf::UNDEFINED_SIZE_T && activeCellInfo->isActive( reservoirCellIndex ) &&
-             targetResultIndex != cvf::UNDEFINED_SIZE_T && !std::isinf( clusterNum[targetResultIndex] ) && clusterNum[targetResultIndex] > 0 )
+        ReservoirResultIndex targetResultIndex = activeCellInfo->cellResultIndex( reservoirCellIdx );
+        if ( activeCellInfo->isActive( reservoirCellIdx ) && targetResultIndex.value() != cvf::UNDEFINED_SIZE_T &&
+             !std::isinf( clusterNum[targetResultIndex.value()] ) && clusterNum[targetResultIndex.value()] > 0 )
         {
-            const RigCell& nativeCell = mainGrid->cell( reservoirCellIndex );
+            const RigCell& nativeCell = mainGrid->cell( reservoirCellIdx.value() );
             boundingBox.add( nativeCell.boundingBox() );
         }
     }

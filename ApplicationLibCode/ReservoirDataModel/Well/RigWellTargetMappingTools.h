@@ -104,26 +104,28 @@ public:
                                    const std::vector<double>& y,
                                    const std::vector<double>& z,
                                    CellFaceType               face,
-                                   size_t                     resultIndex );
+                                   ReservoirResultIndex       resultIndex );
 
     static double getTransmissibilityValueForFace( const std::vector<double>& x,
                                                    const std::vector<double>& y,
                                                    const std::vector<double>& z,
                                                    CellFaceType               face,
-                                                   size_t                     resultIndex,
-                                                   size_t                     neighborResultIndex );
+                                                   ReservoirResultIndex       resultIndex,
+                                                   ReservoirResultIndex       neighborResultIndex );
 
     static QString getOilVectorName( VolumesType volumesType );
     static QString getGasVectorName( VolumesType volumesType );
 
-    static bool isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, size_t idx );
+    static bool
+        isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, ReservoirResultIndex idx );
 
-    static void assignClusterIdToCells( const RigActiveCellInfo&   activeCellInfo,
-                                        const std::vector<size_t>& cells,
-                                        std::vector<int>&          clusters,
-                                        int                        clusterId );
+    static void assignClusterIdToCells( const RigActiveCellInfo&               activeCellInfo,
+                                        const std::vector<ReservoirCellIndex>& cells,
+                                        std::vector<int>&                      clusters,
+                                        int                                    clusterId );
 
-    static std::list<std::pair<std::pair<size_t, CellFaceType>, size_t>> nncConnectionCellAndResult( size_t cellIdx, RigMainGrid* mainGrid );
+    static std::list<std::pair<std::pair<ReservoirCellIndex, CellFaceType>, size_t>> nncConnectionCellAndResult( ReservoirCellIndex cellIdx,
+                                                                                                                 RigMainGrid* mainGrid );
 
     static void createDynamicResultEntry( RigCaseCellResultsData* resultsData, const RigEclipseResultAddress& address );
 
@@ -160,13 +162,13 @@ public:
                              size_t                     timeStepIdx,
                              int                        maxIterations );
 
-    static std::vector<size_t> findCandidates( RimEclipseCase*            eclipseCase,
-                                               const std::vector<size_t>& previousCells,
-                                               VolumeType                 volumeType,
-                                               const ClusteringLimits&    limits,
-                                               const DataContainer&       data,
-                                               const std::vector<double>& filterVector,
-                                               std::vector<int>&          clusters );
+    static std::vector<ReservoirCellIndex> findCandidates( RimEclipseCase*                        eclipseCase,
+                                                           const std::vector<ReservoirCellIndex>& previousCells,
+                                                           VolumeType                             volumeType,
+                                                           const ClusteringLimits&                limits,
+                                                           const DataContainer&                   data,
+                                                           const std::vector<double>&             filterVector,
+                                                           std::vector<int>&                      clusters );
 
     static std::optional<size_t> getActiveCellCount( RimEclipseCase* eclipseCase );
 
