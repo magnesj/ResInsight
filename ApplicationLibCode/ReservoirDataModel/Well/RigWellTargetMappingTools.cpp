@@ -449,7 +449,8 @@ std::vector<ReservoirCellIndex> RigWellTargetMappingTools::findCandidates( RimEc
                                                                                face,
                                                                                resultIndex,
                                                                                neighborResultIndex );
-                    bool   filterValue      = !std::isinf( filterVector[neighborResultIndex.value()] ) &&
+
+                    bool filterValue = !std::isinf( filterVector[neighborResultIndex.value()] ) &&
                                        filterVector[neighborResultIndex.value()] > 0.0;
 
                     const bool isSaturationValid = isSaturationSufficient( volumeType, data, limits, neighborResultIndex );
