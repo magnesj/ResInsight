@@ -52,6 +52,7 @@
 #include "Riu3DMainWindowTools.h"
 
 #include "cafCmdFeatureMenuBuilder.h"
+#include "cafPdmUiButton.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafProgressInfo.h"
@@ -156,13 +157,10 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
 
     uiOrdering.add( nameField() );
 
-    if ( computeOK )
     {
-        uiOrdering.addNewButton( "Compute", [this]() { onComputeStatisticsClicked(); }, "Start statistics computations." );
-    }
-    else
-    {
-        uiOrdering.addNewButton( "Compute", [this]() { onComputeStatisticsClicked(); }, "Please check your time step and/or formation filter selections." );
+        auto* btn = uiOrdering.addNewButton( "Compute", [this]() { onComputeStatisticsClicked(); } );
+        btn->setUiToolTip( computeOK ? "Start statistics computations."
+                                     : "Please check your time step and/or formation filter selections." );
     }
 
     auto genGrp = uiOrdering.addNewGroup( "General" );
