@@ -1226,7 +1226,9 @@ void RimEnsembleCurveSet::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
         caf::PdmUiGroup* curveDataGroup = uiOrdering.addNewGroup( "Summary Vector" );
         curveDataGroup->add( &m_yValuesSummaryEnsemble );
         curveDataGroup->add( &m_yValuesSummaryAddressUiField );
-        curveDataGroup->addNewButton( &m_yPushButtonSelectSummaryAddress, "...", { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
+        curveDataGroup->addNewButton( &m_yPushButtonSelectSummaryAddress,
+                                      "...",
+                                      { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
         if ( !isXAxisSummaryVector() )
         {
