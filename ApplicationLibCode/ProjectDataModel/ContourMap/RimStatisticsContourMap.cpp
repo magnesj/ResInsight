@@ -159,8 +159,7 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
 
     {
         auto* btn = uiOrdering.addNewButton( "Compute", [this]() { onComputeStatisticsClicked(); } );
-        btn->setUiToolTip( computeOK ? "Start statistics computations."
-                                     : "Please check your time step and/or formation filter selections." );
+        btn->setUiToolTip( computeOK ? "Start statistics computations." : "Please check your time step and/or formation filter selections." );
     }
 
     auto genGrp = uiOrdering.addNewGroup( "General" );

@@ -267,7 +267,7 @@ void RimWellPathFracture::defineUiOrdering( QString uiConfigName, caf::PdmUiOrde
     {
         uiOrdering.add( nameField() );
         {
-                uiOrdering.add( &m_fractureTemplate );
+            uiOrdering.add( &m_fractureTemplate );
         }
     }
 
