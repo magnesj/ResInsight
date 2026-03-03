@@ -30,6 +30,7 @@
 #ifdef RESINSIGHT_HAVE_RESQML
 // fesapi includes for reading RESQML EPC files
 // These become available when RESINSIGHT_ENABLE_RESQML=ON and fesapi is found
+#include "common/DataObjectRepository.h"
 #include "common/EpcDocument.h"
 #include "resqml2/AbstractIjkGridRepresentation.h"
 #include "resqml2/AbstractValuesProperty.h"
@@ -47,8 +48,9 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
 #ifdef RESINSIGHT_HAVE_RESQML
     try
     {
-        COMMON_NS::EpcDocument epcDoc( fileName.toStdString() );
-        const std::string      deserializationMessages = epcDoc.deserializeInto( *epcDoc.createHdf5File() );
+        COMMON_NS::DataObjectRepository repo;
+        COMMON_NS::EpcDocument          epcDoc( fileName.toStdString() );
+        const std::string               deserializationMessages = epcDoc.deserializeInto( repo );
         if ( !deserializationMessages.empty() )
         {
             RiaLogging::warning(
@@ -56,8 +58,7 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
         }
 
         // Find the first IJK grid representation in the package
-        auto* dataObjectRepo = epcDoc.getDataObjectRepository();
-        auto  ijkGrids       = dataObjectRepo->getIjkGridRepresentationSet();
+        auto ijkGrids = repo.getIjkGridRepresentationSet();
 
         if ( ijkGrids.empty() )
         {
@@ -86,37 +87,49 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
         activeCellInfo->setReservoirCellCount( cellCount );
         fractureActiveCellInfo->setReservoirCellCount( cellCount );
 
-        // Reserve room for cells and nodes (8 corner nodes per cell in corner-point layout)
-        mainGrid->reservoirCells().reserve( cellCount );
-        mainGrid->nodes().reserve( 8 * cellCount );
+        // Load block geometry for the entire grid
+        ijkGrid->loadBlockInformation( 0, static_cast<unsigned int>( ni ), 0, static_cast<unsigned int>( nj ), 0, static_cast<unsigned int>( nk ) );
+        const uint64_t      xyzPointCount = ijkGrid->getXyzPointCountOfBlock();
+        std::vector<double> xyzPoints( 3 * xyzPointCount );
+        ijkGrid->getXyzPointsOfBlock( xyzPoints.data() );
 
+        // Copy nodes into ResInsight, negating Z for right-handed coordinates
+        mainGrid->nodes().resize( xyzPointCount, cvf::Vec3d( 0, 0, 0 ) );
+        for ( uint64_t i = 0; i < xyzPointCount; ++i )
+        {
+            mainGrid->nodes()[i] = cvf::Vec3d( xyzPoints[i * 3], xyzPoints[i * 3 + 1], -xyzPoints[i * 3 + 2] );
+        }
+
+        // Allocate cells
         RigCell defaultCell;
         defaultCell.setHostGrid( mainGrid );
         mainGrid->reservoirCells().resize( cellCount, defaultCell );
-        mainGrid->nodes().resize( 8 * cellCount, cvf::Vec3d( 0, 0, 0 ) );
 
-        // Read corner-point geometry: 8 corners per cell, XYZ per corner
-        // RESQML getXyzPointsOfAllBlocksOfPatch returns: 8 * cellCount * 3 doubles
-        std::vector<double> xyzPoints( cellCount * 8 * 3 );
-        ijkGrid->getXyzPointsOfAllBlocksOfPatch( 0, xyzPoints.data() );
-
-        // Map RESQML corner-point nodes into ResInsight cells
-        // RESQML uses depth-positive-down; negate Z for ResInsight right-handed coordinates
-        for ( uint64_t cellIdx = 0; cellIdx < cellCount; ++cellIdx )
+        // Map cell corners to node indices
+        for ( uint64_t kIdx = 0; kIdx < nk; ++kIdx )
         {
-            RigCell& cell = mainGrid->cell( cellIdx );
-            cell.setGridLocalCellIndex( cellIdx );
-            cell.setParentCellIndex( cvf::UNDEFINED_SIZE_T );
-
-            for ( int corner = 0; corner < 8; ++corner )
+            for ( uint64_t jIdx = 0; jIdx < nj; ++jIdx )
             {
-                const uint64_t base                     = ( cellIdx * 8 + corner ) * 3;
-                mainGrid->nodes()[cellIdx * 8 + corner] = cvf::Vec3d( xyzPoints[base + 0], xyzPoints[base + 1], -xyzPoints[base + 2] );
-                cell.cornerIndices()[corner]            = cellIdx * 8 + corner;
-            }
+                for ( uint64_t iIdx = 0; iIdx < ni; ++iIdx )
+                {
+                    const uint64_t cellIdx = iIdx + jIdx * ni + kIdx * ni * nj;
+                    RigCell&       cell    = mainGrid->cell( cellIdx );
+                    cell.setGridLocalCellIndex( cellIdx );
+                    cell.setParentCellIndex( cvf::UNDEFINED_SIZE_T );
 
-            // Default: all cells active
-            activeCellInfo->setCellResultIndex( cellIdx, cellIdx );
+                    for ( int corner = 0; corner < 8; ++corner )
+                    {
+                        cell.cornerIndices()[corner] =
+                            ijkGrid->getXyzPointIndexFromCellCorner( static_cast<unsigned int>( iIdx ),
+                                                                     static_cast<unsigned int>( jIdx ),
+                                                                     static_cast<unsigned int>( kIdx ),
+                                                                     static_cast<unsigned int>( corner ) );
+                    }
+
+                    // Default: all cells active
+                    activeCellInfo->setCellResultIndex( cellIdx, cellIdx );
+                }
+            }
         }
 
         activeCellInfo->computeDerivedData();
@@ -148,18 +161,18 @@ std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputPrope
 #ifdef RESINSIGHT_HAVE_RESQML
     try
     {
-        COMMON_NS::EpcDocument epcDoc( fileName.toStdString() );
-        epcDoc.deserializeInto( *epcDoc.createHdf5File() );
+        COMMON_NS::DataObjectRepository repo;
+        COMMON_NS::EpcDocument          epcDoc( fileName.toStdString() );
+        epcDoc.deserializeInto( repo );
 
-        auto* dataObjectRepo = epcDoc.getDataObjectRepository();
-        auto  ijkGrids       = dataObjectRepo->getIjkGridRepresentationSet();
+        auto ijkGrids = repo.getIjkGridRepresentationSet();
         if ( ijkGrids.empty() ) return { false, keywordMapping };
 
         auto*          ijkGrid   = ijkGrids[0];
         const uint64_t cellCount = ijkGrid->getICellCount() * ijkGrid->getJCellCount() * ijkGrid->getKCellCount();
 
         // Read all continuous (floating-point) properties
-        for ( auto* prop : dataObjectRepo->getDataObjects<RESQML2_NS::ContinuousProperty>() )
+        for ( auto* prop : repo.getDataObjects<RESQML2_NS::ContinuousProperty>() )
         {
             const QString propName = QString::fromStdString( prop->getTitle() );
 
@@ -177,12 +190,12 @@ std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputPrope
         }
 
         // Read all discrete (integer) properties
-        for ( auto* prop : dataObjectRepo->getDataObjects<RESQML2_NS::DiscreteProperty>() )
+        for ( auto* prop : repo.getDataObjects<RESQML2_NS::DiscreteProperty>() )
         {
             const QString propName = QString::fromStdString( prop->getTitle() );
 
-            std::vector<int> intValues( cellCount );
-            prop->getIntValuesOfPatch( 0, intValues.data() );
+            std::vector<int32_t> intValues( cellCount );
+            prop->getInt32ValuesOfPatch( 0, intValues.data() );
 
             std::vector<double> values( intValues.begin(), intValues.end() );
 
@@ -216,10 +229,10 @@ bool RifResqmlFileTools::hasGridData( const QString& fileName )
 #ifdef RESINSIGHT_HAVE_RESQML
     try
     {
-        COMMON_NS::EpcDocument epcDoc( fileName.toStdString() );
-        epcDoc.deserializeInto( *epcDoc.createHdf5File() );
-        auto* dataObjectRepo = epcDoc.getDataObjectRepository();
-        return !dataObjectRepo->getIjkGridRepresentationSet().empty();
+        COMMON_NS::DataObjectRepository repo;
+        COMMON_NS::EpcDocument          epcDoc( fileName.toStdString() );
+        epcDoc.deserializeInto( repo );
+        return !repo.getIjkGridRepresentationSet().empty();
     }
     catch ( ... )
     {

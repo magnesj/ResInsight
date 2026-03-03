@@ -550,7 +550,7 @@ if(RESINSIGHT_ENABLE_RESQML)
   )
 
   add_subdirectory(ThirdParty/fesapi)
-  list(APPEND THIRD_PARTY_LIBRARIES fesapi)
+  list(APPEND THIRD_PARTY_LIBRARIES FesapiCpp)
   set(RESINSIGHT_FOUND_RESQML 1)
   message(STATUS "Using fesapi from ThirdParty/fesapi for RESQML support")
 endif()
