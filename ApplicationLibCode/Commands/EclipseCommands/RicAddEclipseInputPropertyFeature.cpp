@@ -29,8 +29,8 @@
 #include "RimEclipseInputPropertyCollection.h"
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
-#include "RimRoffCase.h"
 #include "RimResqmlCase.h"
+#include "RimRoffCase.h"
 
 #include "Riu3DMainWindowTools.h"
 #include "RiuFileDialogTools.h"
