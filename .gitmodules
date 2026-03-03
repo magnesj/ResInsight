@@ -28,3 +28,6 @@
 [submodule "ThirdParty/custom-opm-flowdiag-app/opm-flowdiagnostics-applications"]
 	path = ThirdParty/custom-opm-flowdiag-app/opm-flowdiagnostics-applications
 	url = https://github.com/CeetronSolutions/opm-flowdiagnostics-applications
+[submodule "ThirdParty/fesapi"]
+	path = ThirdParty/fesapi
+	url = https://github.com/F2I-CONSULTING/fesapi.git

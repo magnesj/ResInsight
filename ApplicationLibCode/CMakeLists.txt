@@ -221,7 +221,6 @@ endif()
 #
 if(RESINSIGHT_FOUND_RESQML)
   add_definitions(-DRESINSIGHT_HAVE_RESQML)
-  list(APPEND RI_PRIVATE_INCLUDES ${fesapi_INCLUDE_DIRS})
 endif()
 
 #
