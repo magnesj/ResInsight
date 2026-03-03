@@ -25,9 +25,9 @@
 #include "RiaWeightedMeanCalculator.h"
 
 #include "RigCaseCellResultsData.h"
-#include "RigEclipseResultInfo.h"
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
+#include "RigEclipseResultInfo.h"
 #include "RigFloodingSettings.h"
 #include "RigGridBase.h"
 #include "RigHydrocarbonFlowTools.h"
