@@ -526,7 +526,9 @@ endif() # MSVC
 # RESQML (fesapi library)
 # ##############################################################################
 
-option(RESINSIGHT_ENABLE_RESQML "Enable RESQML file support via fesapi library" OFF)
+option(RESINSIGHT_ENABLE_RESQML "Enable RESQML file support via fesapi library"
+       OFF
+)
 
 if(RESINSIGHT_ENABLE_RESQML)
   find_package(fesapi QUIET)
