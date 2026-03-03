@@ -104,20 +104,19 @@ public:
                                    const std::vector<double>& y,
                                    const std::vector<double>& z,
                                    CellFaceType               face,
-                                   ReservoirResultIndex       resultIndex );
+                                   ActiveCellIndex            resultIndex );
 
     static double getTransmissibilityValueForFace( const std::vector<double>& x,
                                                    const std::vector<double>& y,
                                                    const std::vector<double>& z,
                                                    CellFaceType               face,
-                                                   ReservoirResultIndex       resultIndex,
-                                                   ReservoirResultIndex       neighborResultIndex );
+                                                   ActiveCellIndex            resultIndex,
+                                                   ActiveCellIndex            neighborResultIndex );
 
     static QString getOilVectorName( VolumesType volumesType );
     static QString getGasVectorName( VolumesType volumesType );
 
-    static bool
-        isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, ReservoirResultIndex idx );
+    static bool isSaturationSufficient( VolumeType volumeType, const DataContainer& data, const ClusteringLimits& limits, ActiveCellIndex idx );
 
     static void assignClusterIdToCells( const RigActiveCellInfo&               activeCellInfo,
                                         const std::vector<ReservoirCellIndex>& cells,

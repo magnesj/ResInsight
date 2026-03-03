@@ -33,7 +33,7 @@ RigActiveCellInfo::RigActiveCellInfo()
 //--------------------------------------------------------------------------------------------------
 void RigActiveCellInfo::setReservoirCellCount( size_t reservoirCellCount )
 {
-    m_cellIndexToResultIndex.resize( reservoirCellCount, ReservoirResultIndex( cvf::UNDEFINED_SIZE_T ) );
+    m_reservoirCellToActiveCell.resize( reservoirCellCount, ActiveCellIndex( cvf::UNDEFINED_SIZE_T ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -41,7 +41,7 @@ void RigActiveCellInfo::setReservoirCellCount( size_t reservoirCellCount )
 //--------------------------------------------------------------------------------------------------
 size_t RigActiveCellInfo::reservoirCellCount() const
 {
-    return m_cellIndexToResultIndex.size();
+    return m_reservoirCellToActiveCell.size();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -49,14 +49,14 @@ size_t RigActiveCellInfo::reservoirCellCount() const
 //--------------------------------------------------------------------------------------------------
 bool RigActiveCellInfo::isActive( ReservoirCellIndex reservoirCellIndex ) const
 {
-    if ( m_cellIndexToResultIndex.empty() )
+    if ( m_reservoirCellToActiveCell.empty() )
     {
         return true;
     }
 
-    CVF_TIGHT_ASSERT( reservoirCellIndex.value() < m_cellIndexToResultIndex.size() );
+    CVF_TIGHT_ASSERT( reservoirCellIndex.value() < m_reservoirCellToActiveCell.size() );
 
-    return m_cellIndexToResultIndex[reservoirCellIndex.value()].value() != cvf::UNDEFINED_SIZE_T;
+    return m_reservoirCellToActiveCell[reservoirCellIndex.value()].value() != cvf::UNDEFINED_SIZE_T;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -70,11 +70,11 @@ bool RigActiveCellInfo::isActive( size_t reservoirCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-ReservoirResultIndex RigActiveCellInfo::cellResultIndex( ReservoirCellIndex reservoirCellIndex ) const
+ActiveCellIndex RigActiveCellInfo::cellResultIndex( ReservoirCellIndex reservoirCellIndex ) const
 {
-    CVF_TIGHT_ASSERT( reservoirCellIndex.value() < m_cellIndexToResultIndex.size() );
+    CVF_TIGHT_ASSERT( reservoirCellIndex.value() < m_reservoirCellToActiveCell.size() );
 
-    return m_cellIndexToResultIndex[reservoirCellIndex.value()];
+    return m_reservoirCellToActiveCell[reservoirCellIndex.value()];
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -88,11 +88,11 @@ size_t RigActiveCellInfo::cellResultIndex( size_t reservoirCellIndex ) const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigActiveCellInfo::setCellResultIndex( ReservoirCellIndex reservoirCellIndex, ReservoirResultIndex reservoirCellResultIndex )
+void RigActiveCellInfo::setCellResultIndex( ReservoirCellIndex reservoirCellIndex, ActiveCellIndex reservoirCellResultIndex )
 {
-    CVF_TIGHT_ASSERT( reservoirCellResultIndex < m_cellIndexToResultIndex.size() );
+    CVF_TIGHT_ASSERT( reservoirCellResultIndex < m_reservoirCellToActiveCell.size() );
 
-    m_cellIndexToResultIndex[reservoirCellIndex.value()] = reservoirCellResultIndex;
+    m_reservoirCellToActiveCell[reservoirCellIndex.value()] = reservoirCellResultIndex;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -100,7 +100,7 @@ void RigActiveCellInfo::setCellResultIndex( ReservoirCellIndex reservoirCellInde
 //--------------------------------------------------------------------------------------------------
 void RigActiveCellInfo::setCellResultIndex( size_t reservoirCellIndex, size_t reservoirCellResultIndex )
 {
-    setCellResultIndex( ReservoirCellIndex( reservoirCellIndex ), ReservoirResultIndex( reservoirCellResultIndex ) );
+    setCellResultIndex( ReservoirCellIndex( reservoirCellIndex ), ActiveCellIndex( reservoirCellResultIndex ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -108,7 +108,7 @@ void RigActiveCellInfo::setCellResultIndex( size_t reservoirCellIndex, size_t re
 //--------------------------------------------------------------------------------------------------
 std::vector<ReservoirCellIndex> RigActiveCellInfo::activeReservoirCellIndices() const
 {
-    return m_activeCellIndices;
+    return m_activeReservoirCells;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -141,11 +141,11 @@ void RigActiveCellInfo::computeDerivedData()
         m_reservoirActiveCellCount += m_perGridActiveCellInfo[i].activeCellCount();
     }
 
-    for ( size_t i = 0; i < m_cellIndexToResultIndex.size(); i++ )
+    for ( size_t i = 0; i < m_reservoirCellToActiveCell.size(); i++ )
     {
-        if ( m_cellIndexToResultIndex[i].value() != cvf::UNDEFINED_SIZE_T )
+        if ( m_reservoirCellToActiveCell[i].value() != cvf::UNDEFINED_SIZE_T )
         {
-            m_activeCellIndices.push_back( ReservoirCellIndex( i ) );
+            m_activeReservoirCells.push_back( ReservoirCellIndex( i ) );
         }
     }
 }
@@ -206,7 +206,7 @@ void RigActiveCellInfo::setGeometryBoundingBox( cvf::BoundingBox bb )
 void RigActiveCellInfo::clear()
 {
     m_perGridActiveCellInfo.clear();
-    m_cellIndexToResultIndex.clear();
+    m_reservoirCellToActiveCell.clear();
     m_reservoirActiveCellCount = 0;
     m_ijkBoundingBox           = RigBoundingBoxIjk<caf::VecIjk0>();
     m_activeCellsBoundingBox.reset();
@@ -229,7 +229,7 @@ void RigActiveCellInfo::addLgr( size_t cellCount )
 
     for ( size_t i = 0; i < cellCount; i++ )
     {
-        setCellResultIndex( ReservoirCellIndex( currentReservoirCellCount + i ), ReservoirResultIndex( currentActiveCellCount + i ) );
+        setCellResultIndex( ReservoirCellIndex( currentReservoirCellCount + i ), ActiveCellIndex( currentActiveCellCount + i ) );
     }
 }
 

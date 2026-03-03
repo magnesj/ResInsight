@@ -70,12 +70,15 @@ struct hash<TypeSafeIndex<Tag>>
 } // namespace std
 
 // Define specific types using tag structs
+
 struct ReservoirCellIndexTag
 {
 };
+// Global cell index in the full IJK reservoir grid
 using ReservoirCellIndex = TypeSafeIndex<ReservoirCellIndexTag>;
 
-struct ReservoirResultIndexTag
+struct ActiveCellIndexTag
 {
 };
-using ReservoirResultIndex = TypeSafeIndex<ReservoirResultIndexTag>;
+// Index into the subset of active cells. This is usually the index used to access results data.
+using ActiveCellIndex = TypeSafeIndex<ActiveCellIndexTag>;
