@@ -72,6 +72,7 @@ RicImportGeneralDataFeature::OpenCaseResults RicImportGeneralDataFeature::openEc
     QStringList eclipseSummaryFiles;
     QStringList roffFiles;
     QStringList emFiles;
+    QStringList resqmlFiles;
 
     for ( const QString& fileName : fileNames )
     {
@@ -95,6 +96,10 @@ RicImportGeneralDataFeature::OpenCaseResults RicImportGeneralDataFeature::openEc
         else if ( fileType == ImportFileType::EM_H5GRID )
         {
             emFiles.push_back( fileName );
+        }
+        else if ( fileType == ImportFileType::RESQML_FILE )
+        {
+            resqmlFiles.push_back( fileName );
         }
     }
 
@@ -142,6 +147,16 @@ RicImportGeneralDataFeature::OpenCaseResults RicImportGeneralDataFeature::openEc
         {
             return OpenCaseResults();
         }
+    }
+
+    if ( !resqmlFiles.empty() )
+    {
+        if ( !openResqmlFilesFromFileNames( resqmlFiles, createDefaultView, results.createdCaseIds ) )
+        {
+            return OpenCaseResults();
+        }
+        results.resqmlFiles = resqmlFiles;
+        RiaApplication::instance()->setLastUsedDialogDirectory( defaultDirectoryLabel( ImportFileType::RESQML_FILE ), defaultDir );
     }
 
     return results;
@@ -275,6 +290,11 @@ QString RicImportGeneralDataFeature::getFilePattern( RiaDefines::ImportFileType 
         return QString( "Roff File (%1)" ).arg( roffFilePattern );
     }
 
+    if ( fileType == ImportFileType::RESQML_FILE )
+    {
+        return QString( "RESQML EPC File (*.epc)" );
+    }
+
     return "";
 }
 
@@ -311,6 +331,10 @@ QStringList RicImportGeneralDataFeature::getEclipseFileNamesWithDialog( RiaDefin
     if ( fileType == ImportFileType::ROFF_FILE )
     {
         filePatternTexts += getFilePattern( ImportFileType::ROFF_FILE );
+    }
+    if ( fileType == ImportFileType::RESQML_FILE )
+    {
+        filePatternTexts += getFilePattern( ImportFileType::RESQML_FILE );
     }
 
     QString fullPattern = filePatternTexts.join( ";;" );
@@ -567,4 +591,28 @@ bool RicImportGeneralDataFeature::openRoffCaseAndPropertiesFromFileNames( const 
     generatedRoffCase->importAsciiInputProperties( propertyFileNames );
 
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RicImportGeneralDataFeature::openResqmlFilesFromFileNames( const QStringList& fileNames,
+                                                                bool               createDefaultView,
+                                                                std::vector<int>&  createdCaseIds )
+{
+    if ( fileNames.empty() ) return false;
+
+    const size_t initialNumCases  = createdCaseIds.size();
+    auto         generatedCaseIds = RiaImportEclipseCaseTools::openResqmlCasesFromFileNames( fileNames, createDefaultView );
+
+    for ( int i = 0; i < fileNames.size(); ++i )
+    {
+        const auto caseId = generatedCaseIds[static_cast<size_t>( i )];
+        if ( caseId >= 0 )
+        {
+            RiaApplication::instance()->addToRecentFiles( fileNames[i] );
+            createdCaseIds.push_back( caseId );
+        }
+    }
+    return initialNumCases != createdCaseIds.size();
 }

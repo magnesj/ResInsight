@@ -523,6 +523,27 @@ else()
 endif() # MSVC
 
 # ##############################################################################
+# RESQML (fesapi library)
+# ##############################################################################
+
+option(RESINSIGHT_ENABLE_RESQML "Enable RESQML file support via fesapi library" OFF)
+
+if(RESINSIGHT_ENABLE_RESQML)
+  find_package(fesapi QUIET)
+  if(fesapi_FOUND)
+    list(APPEND EXTERNAL_LINK_LIBRARIES fesapi::fesapi)
+    set(RESINSIGHT_FOUND_RESQML 1)
+    message(STATUS "Using fesapi for RESQML support")
+  else()
+    message(
+      WARNING
+        "RESINSIGHT_ENABLE_RESQML is ON but fesapi was not found. "
+        "Install fesapi (https://github.com/F2I-CONSULTING/fesapi) and set fesapi_DIR."
+    )
+  endif()
+endif()
+
+# ##############################################################################
 # Opm
 # ##############################################################################
 

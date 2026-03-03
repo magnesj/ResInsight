@@ -115,6 +115,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultAddress.h
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultAddressCollection.h
     ${CMAKE_CURRENT_LIST_DIR}/RimRoffCase.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimResqmlCase.h
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseCaseTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RimMultipleEclipseResults.h
     ${CMAKE_CURRENT_LIST_DIR}/RimPressureDepthData.h
@@ -243,6 +244,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultAddress.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseResultAddressCollection.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimRoffCase.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimResqmlCase.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimEclipseCaseTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimMultipleEclipseResults.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimPressureDepthData.cpp

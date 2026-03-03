@@ -50,6 +50,7 @@
 #include "RimOilField.h"
 #include "RimProject.h"
 #include "RimRoffCase.h"
+#include "RimResqmlCase.h"
 #include "RimSummaryCase.h"
 #include "RimSummaryCaseMainCollection.h"
 #include "RimSummaryCurve.h"
@@ -661,4 +662,104 @@ bool RiaImportEclipseCaseTools::openEmFilesFromFileNames( const QStringList& fil
     }
 
     return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<int> RiaImportEclipseCaseTools::openResqmlCasesFromFileNames( const QStringList& fileNames, bool createDefaultView )
+{
+    CAF_ASSERT( !fileNames.empty() );
+
+    RimProject* project = RimProject::current();
+    if ( !project ) return {};
+
+    RimEclipseCaseCollection* analysisModels = project->activeOilField() ? project->activeOilField()->analysisModels() : nullptr;
+    if ( !analysisModels ) return {};
+
+    std::vector<int> resqmlCaseIds;
+    for ( const auto& fileName : fileNames )
+    {
+        auto* resqmlCase = new RimResqmlCase();
+        project->assignCaseIdToCase( resqmlCase );
+        resqmlCase->setGridFileName( fileName );
+
+        bool gridImportSuccess = resqmlCase->openEclipseGridFile();
+        if ( !gridImportSuccess )
+        {
+            const auto errMsg = "Failed to import grid from file: " + fileName.toStdString();
+            RiaLogging::error( errMsg.c_str() );
+            delete resqmlCase;
+            continue;
+        }
+
+        analysisModels->cases.push_back( resqmlCase );
+
+        RimEclipseView* eclipseView = nullptr;
+        if ( createDefaultView )
+        {
+            eclipseView = resqmlCase->createAndAddReservoirView();
+
+            eclipseView->cellResult()->setResultType( RiaDefines::ResultCatType::INPUT_PROPERTY );
+
+            if ( RiaGuiApplication::isRunning() )
+            {
+                if ( RiuMainWindow::instance() ) RiuMainWindow::instance()->selectAsCurrentItem( eclipseView->cellResult() );
+            }
+
+            eclipseView->loadDataAndUpdate();
+        }
+
+        analysisModels->updateConnectedEditors();
+        resqmlCaseIds.push_back( resqmlCase->caseId() );
+    }
+    return resqmlCaseIds;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimResqmlCase* RiaImportEclipseCaseTools::openResqmlCaseFromFileName( const QString& fileName, bool createDefaultView )
+{
+    RimProject* project = RimProject::current();
+    if ( !project ) return nullptr;
+
+    RimEclipseCaseCollection* analysisModels = project->activeOilField() ? project->activeOilField()->analysisModels() : nullptr;
+    if ( !analysisModels ) return nullptr;
+
+    auto* resqmlCase = new RimResqmlCase();
+    project->assignCaseIdToCase( resqmlCase );
+    resqmlCase->setGridFileName( fileName );
+
+    bool gridImportSuccess = resqmlCase->openEclipseGridFile();
+    if ( !gridImportSuccess )
+    {
+        const auto errMsg = "Failed to import grid from file: " + fileName.toStdString();
+        RiaLogging::error( errMsg.c_str() );
+        delete resqmlCase;
+        return nullptr;
+    }
+
+    analysisModels->cases.push_back( resqmlCase );
+    analysisModels->updateConnectedEditors();
+
+    RimEclipseView* eclipseView = nullptr;
+    if ( createDefaultView )
+    {
+        eclipseView = resqmlCase->createAndAddReservoirView();
+
+        eclipseView->cellResult()->setResultType( RiaDefines::ResultCatType::INPUT_PROPERTY );
+        eclipseView->loadDataAndUpdate();
+
+        resqmlCase->updateAllRequiredEditors();
+        if ( RiaGuiApplication::isRunning() )
+        {
+            if ( RiuMainWindow::instance() ) RiuMainWindow::instance()->selectAsCurrentItem( eclipseView->cellResult() );
+
+            // Make sure the call to setExpanded is done after the call to selectAsCurrentItem
+            Riu3DMainWindowTools::setExpanded( eclipseView );
+        }
+    }
+
+    return resqmlCase;
 }

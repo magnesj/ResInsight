@@ -123,6 +123,9 @@ void RiuMenuBarBuildTools::addImportMenuWithActions( QObject* parent, QMenu* men
     QMenu* importRoffMenu = importMenu->addMenu( QIcon( ":/Case48x48.png" ), "Roff Grid Models" );
     importRoffMenu->addAction( cmdFeatureMgr->action( "RicImportRoffCaseFeature" ) );
 
+    QMenu* importResqmlMenu = importMenu->addMenu( QIcon( ":/Case48x48.png" ), "RESQML Grid Models" );
+    importResqmlMenu->addAction( cmdFeatureMgr->action( "RicImportResqmlCaseFeature" ) );
+
     importMenu->addSeparator();
     QMenu* importSummaryMenu = importMenu->addMenu( QIcon( ":/SummaryCase.svg" ), "Summary Cases" );
     importSummaryMenu->addAction( cmdFeatureMgr->action( "RicImportSummaryCaseFeature" ) );

@@ -20,6 +20,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicEclipseShowOnlyFaultFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicRenameCaseFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicImportRoffCaseFeature.h
+    ${CMAKE_CURRENT_LIST_DIR}/RicImportResqmlCaseFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicAddGridCalculationFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicCreateGridCaseEnsemblesFromFilesFeature.h
     ${CMAKE_CURRENT_LIST_DIR}/RicAddLinkedEclipsePropertyFilterFeature.h
@@ -47,6 +48,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicEclipseShowOnlyFaultFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicRenameCaseFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicImportRoffCaseFeature.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicImportResqmlCaseFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicAddGridCalculationFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicCreateGridCaseEnsemblesFromFilesFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicAddLinkedEclipsePropertyFilterFeature.cpp
