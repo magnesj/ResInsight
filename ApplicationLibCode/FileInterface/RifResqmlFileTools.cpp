@@ -51,9 +51,8 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
         const std::string      deserializationMessages = epcDoc.deserializeInto( *epcDoc.createHdf5File() );
         if ( !deserializationMessages.empty() )
         {
-            RiaLogging::warning( QString( "RESQML deserialization warnings for %1: %2" )
-                                     .arg( fileName )
-                                     .arg( QString::fromStdString( deserializationMessages ) ) );
+            RiaLogging::warning(
+                QString( "RESQML deserialization warnings for %1: %2" ).arg( fileName ).arg( QString::fromStdString( deserializationMessages ) ) );
         }
 
         // Find the first IJK grid representation in the package
@@ -79,8 +78,8 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
 
         const uint64_t cellCount = ni * nj * nk;
 
-        RigActiveCellInfo* activeCellInfo          = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
-        RigActiveCellInfo* fractureActiveCellInfo  = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
+        RigActiveCellInfo* activeCellInfo         = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        RigActiveCellInfo* fractureActiveCellInfo = eclipseCase->activeCellInfo( RiaDefines::PorosityModelType::FRACTURE_MODEL );
 
         activeCellInfo->setGridCount( 1 );
         fractureActiveCellInfo->setGridCount( 1 );
@@ -111,9 +110,9 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
 
             for ( int corner = 0; corner < 8; ++corner )
             {
-                const uint64_t base                 = ( cellIdx * 8 + corner ) * 3;
+                const uint64_t base                     = ( cellIdx * 8 + corner ) * 3;
                 mainGrid->nodes()[cellIdx * 8 + corner] = cvf::Vec3d( xyzPoints[base + 0], xyzPoints[base + 1], -xyzPoints[base + 2] );
-                cell.cornerIndices()[corner]             = cellIdx * 8 + corner;
+                cell.cornerIndices()[corner]            = cellIdx * 8 + corner;
             }
 
             // Default: all cells active
@@ -142,8 +141,7 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputProperties( const QString& fileName,
-                                                                                        RigEclipseCaseData* eclipseCase )
+std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputProperties( const QString& fileName, RigEclipseCaseData* eclipseCase )
 {
     std::map<QString, QString> keywordMapping;
 
@@ -157,7 +155,7 @@ std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputPrope
         auto  ijkGrids       = dataObjectRepo->getIjkGridRepresentationSet();
         if ( ijkGrids.empty() ) return { false, keywordMapping };
 
-        auto*          ijkGrid  = ijkGrids[0];
+        auto*          ijkGrid   = ijkGrids[0];
         const uint64_t cellCount = ijkGrid->getICellCount() * ijkGrid->getJCellCount() * ijkGrid->getKCellCount();
 
         // Read all continuous (floating-point) properties
@@ -171,7 +169,8 @@ std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputPrope
             RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::INPUT_PROPERTY, RiaDefines::ResultDataType::FLOAT, propName );
             eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->createResultEntry( resAddr, false );
 
-            auto* newPropertyData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->modifiableCellScalarResultTimesteps( resAddr );
+            auto* newPropertyData =
+                eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->modifiableCellScalarResultTimesteps( resAddr );
             newPropertyData->push_back( std::move( values ) );
 
             keywordMapping[propName] = propName;
@@ -190,7 +189,8 @@ std::pair<bool, std::map<QString, QString>> RifResqmlFileTools::createInputPrope
             RigEclipseResultAddress resAddr( RiaDefines::ResultCatType::INPUT_PROPERTY, RiaDefines::ResultDataType::INTEGER, propName );
             eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->createResultEntry( resAddr, false );
 
-            auto* newPropertyData = eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->modifiableCellScalarResultTimesteps( resAddr );
+            auto* newPropertyData =
+                eclipseCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->modifiableCellScalarResultTimesteps( resAddr );
             newPropertyData->push_back( std::move( values ) );
 
             keywordMapping[propName] = propName;
