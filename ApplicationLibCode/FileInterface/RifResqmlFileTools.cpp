@@ -120,11 +120,10 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
 
                     for ( int corner = 0; corner < 8; ++corner )
                     {
-                        cell.cornerIndices()[corner] =
-                            ijkGrid->getXyzPointIndexFromCellCorner( static_cast<unsigned int>( iIdx ),
-                                                                     static_cast<unsigned int>( jIdx ),
-                                                                     static_cast<unsigned int>( kIdx ),
-                                                                     static_cast<unsigned int>( corner ) );
+                        cell.cornerIndices()[corner] = ijkGrid->getXyzPointIndexFromCellCorner( static_cast<unsigned int>( iIdx ),
+                                                                                                static_cast<unsigned int>( jIdx ),
+                                                                                                static_cast<unsigned int>( kIdx ),
+                                                                                                static_cast<unsigned int>( corner ) );
                     }
 
                     // Default: all cells active
