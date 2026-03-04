@@ -206,7 +206,6 @@ RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialo
 //--------------------------------------------------------------------------------------------------
 RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QWidget* parent )
     : QDialog( parent, RiuTools::defaultDialogFlags() )
-    , m_isCancelPressed( false )
     , m_blockItemUpdates( false )
 {
     // Create widgets
@@ -560,7 +559,6 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
         auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( representativeFiles, mode );
 
         auto rootItem = m_filePathModel.invisibleRootItem();
-        bool isFirst  = true;
         for ( const auto& [groupName, groupFiles] : grouping )
         {
             auto ensembleItem = new QStandardItem( QDir::toNativeSeparators( groupName ) );
@@ -578,13 +576,6 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
                 childItem->setCheckState( Qt::Checked );
                 childItem->setData( basePath, Qt::UserRole );
                 ensembleItem->appendRow( childItem );
-            }
-
-            if ( isFirst )
-            {
-                QModelIndex index = m_filePathModel.index( 0, 0 );
-                m_fileTreeView->expand( index );
-                isFirst = false;
             }
         }
     }
@@ -629,7 +620,7 @@ void RicImportGridAndSummaryEnsembleDialog::populateComboBoxFromRegistry( QCombo
     QStringList             items = serializer.textStrings();
 
     const int maxItemsInRegistry = 10;
-    int       numItems           = std::min( (int)items.size(), maxItemsInRegistry );
+    int       numItems           = std::min( static_cast<int>( items.size() ), maxItemsInRegistry );
     for ( int i = 0; i < numItems; i++ )
     {
         comboBox->addItem( items[i] );
@@ -659,13 +650,11 @@ void RicImportGridAndSummaryEnsembleDialog::slotFileFilterChanged( const QString
 void RicImportGridAndSummaryEnsembleDialog::slotBrowseClicked()
 {
     QString folder = RiuFileDialogTools::getExistingDirectory( this, "Select folder", rootDirWithSeparator() );
+    if ( folder.isEmpty() ) return;
     RiaFilePathTools::appendSeparatorIfNo( folder );
     folder += "*";
-    if ( !folder.isEmpty() )
-    {
-        m_pathFilterField->addItem( QDir::toNativeSeparators( folder ) );
-        m_pathFilterField->setCurrentText( QDir::toNativeSeparators( folder ) );
-    }
+    m_pathFilterField->addItem( QDir::toNativeSeparators( folder ) );
+    m_pathFilterField->setCurrentText( QDir::toNativeSeparators( folder ) );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -761,7 +750,6 @@ void RicImportGridAndSummaryEnsembleDialog::slotOkClicked()
 //--------------------------------------------------------------------------------------------------
 void RicImportGridAndSummaryEnsembleDialog::slotCancelClicked()
 {
-    m_isCancelPressed = true;
     reject();
 }
 
