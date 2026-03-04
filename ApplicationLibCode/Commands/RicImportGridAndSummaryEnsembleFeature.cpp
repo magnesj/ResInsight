@@ -21,6 +21,7 @@
 #include "RiaEnsembleNameTools.h"
 #include "RiaGuiApplication.h"
 #include "Summary/RiaSummaryDefines.h"
+#include "Summary/RiaSummaryTools.h"
 
 #include "EclipseCommands/RicCreateGridCaseEnsemblesFromFilesFeature.h"
 #include "RicImportEnsembleFeature.h"
@@ -71,6 +72,9 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
             }
         }
     }
+
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -78,6 +82,6 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
 //--------------------------------------------------------------------------------------------------
 void RicImportGridAndSummaryEnsembleFeature::setupActionLook( QAction* actionToSetup )
 {
-    actionToSetup->setText( "Import Grid and Summary Ensemble" );
     actionToSetup->setIcon( QIcon( ":/CreateGridCaseGroup16x16.png" ) );
+    actionToSetup->setText( "Import Grid and Summary Ensemble" );
 }
