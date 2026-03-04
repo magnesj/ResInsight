@@ -116,6 +116,5 @@ private:
 
     QMap<QString, RealizationFiles> m_foundRealizations;
 
-    bool m_isCancelPressed;
     bool m_blockItemUpdates;
 };
