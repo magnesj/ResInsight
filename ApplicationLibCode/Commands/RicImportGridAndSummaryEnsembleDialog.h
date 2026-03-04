@@ -63,7 +63,6 @@ private:
     QString cleanPathFilter() const;
     QString rootDirWithSeparator() const;
     QString pathFilterWithoutRoot() const;
-    QString fileNameFilter() const;
     void    updateEffectiveFilter();
     void    setOkButtonEnabled( bool enabled );
 
@@ -78,7 +77,6 @@ private:
 
 private slots:
     void slotPathFilterChanged( const QString& text );
-    void slotFileFilterChanged( const QString& text );
     void slotBrowseClicked();
     void slotUseRealizationStarClicked();
     void slotSearchClicked();
@@ -97,7 +95,6 @@ private:
     QComboBox*   m_pathFilterField;
     QPushButton* m_browseButton;
     QCheckBox*   m_useRealizationStarCheckBox;
-    QComboBox*   m_fileFilterField;
     QComboBox*   m_ensembleGroupingMode;
     QLabel*      m_effectiveFilterLabel;
     QPushButton* m_searchButton;
