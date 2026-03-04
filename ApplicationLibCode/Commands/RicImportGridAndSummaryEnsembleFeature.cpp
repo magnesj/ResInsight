@@ -25,6 +25,7 @@
 
 #include <QAction>
 #include <QIcon>
+#include <QSet>
 
 CAF_CMD_SOURCE_INIT( RicImportGridAndSummaryEnsembleFeature, "RicImportGridAndSummaryEnsembleFeature" );
 
@@ -38,9 +39,27 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     if ( !result.ok ) return;
     if ( !result.createGridEnsemble && !result.createSummaryEnsemble ) return;
 
-    // Use the union of grid and summary files so the path pattern covers all realizations
-    QStringList representativeFiles = result.gridFiles + result.summaryFiles;
-    if ( representativeFiles.isEmpty() ) return;
+    // Build the union of base paths (extension-stripped) from both lists so every realization
+    // appears exactly once. findPathPattern requires each realization number to be unique across
+    // the input; duplicating paths with different extensions breaks the pattern detection.
+    auto stripExtension = []( const QString& path ) -> QString
+    {
+        int dot = path.lastIndexOf( '.' );
+        return dot != -1 ? path.left( dot ) : path;
+    };
+
+    QSet<QString> basePaths;
+    for ( const auto& f : result.gridFiles )
+        basePaths.insert( stripExtension( f ) );
+    for ( const auto& f : result.summaryFiles )
+        basePaths.insert( stripExtension( f ) );
+
+    if ( basePaths.isEmpty() ) return;
+
+    // Reconstruct with a uniform extension — findAndSetPathPatternAndRangeString strips it anyway
+    QStringList representativeFiles;
+    for ( const auto& base : basePaths )
+        representativeFiles << base + ".EGRID";
 
     auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
     if ( fileSets.empty() ) return;
