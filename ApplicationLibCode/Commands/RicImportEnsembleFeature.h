@@ -41,6 +41,12 @@ public:
                                                   RiaDefines::EnsembleGroupingMode groupingMode,
                                                   bool                             isEnsemble = false );
 
+    static RimSummaryEnsemble* importSingleEnsembleFileSet( const QStringList&               fileNames,
+                                                            bool                             useEnsembleNameDialog,
+                                                            RiaDefines::EnsembleGroupingMode groupingMode,
+                                                            RiaDefines::FileType             fileType,
+                                                            const QString&                   defaultEnsembleName = QString() );
+
 private:
     void onActionTriggered( bool isChecked ) override;
     void setupActionLook( QAction* actionToSetup ) override;
@@ -51,10 +57,4 @@ private:
                                                      RiaDefines::EnsembleGroupingMode groupingMode,
                                                      RiaDefines::FileType             fileType,
                                                      const QString&                   defaultEnsembleName = QString() );
-
-    static RimSummaryEnsemble* importSingleEnsembleFileSet( const QStringList&               fileNames,
-                                                            bool                             useEnsembleNameDialog,
-                                                            RiaDefines::EnsembleGroupingMode groupingMode,
-                                                            RiaDefines::FileType             fileType,
-                                                            const QString&                   defaultEnsembleName = QString() );
 };
