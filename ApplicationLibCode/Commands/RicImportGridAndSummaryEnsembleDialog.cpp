@@ -201,11 +201,11 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     , m_blockItemUpdates( false )
 {
     // Create widgets
-    m_pathFilterField  = new QComboBox();
-    m_browseButton     = new QPushButton( "..." );
+    m_pathFilterField      = new QComboBox();
+    m_browseButton         = new QPushButton( "..." );
     m_effectiveFilterLabel = new QLabel();
     m_effectiveFilterLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
-    m_searchButton         = new QPushButton( "Search" );
+    m_searchButton = new QPushButton( "Search" );
     m_searchButton->setFixedWidth( 75 );
 
     m_useRealizationStarCheckBox = new QCheckBox( "Use 'realization-*' in filter" );
@@ -216,7 +216,7 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     m_createGridEnsembleCheckBox->setChecked( true );
     m_createSummaryEnsembleCheckBox->setChecked( true );
 
-    m_outputGroup       = new QGroupBox( "Files Found" );
+    m_outputGroup        = new QGroupBox( "Files Found" );
     m_treeFilterLineEdit = new QLineEdit();
     m_treeFilterLineEdit->setPlaceholderText( "Select Realizations: 1, 5-7, !4, 9-18:3" );
     m_treeFilterButton = new QPushButton( "Apply" );
@@ -239,14 +239,8 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     m_treeFilterButton->setVisible( false );
 
     // Connect signals
-    connect( m_pathFilterField,
-             SIGNAL( currentTextChanged( const QString& ) ),
-             this,
-             SLOT( slotPathFilterChanged( const QString& ) ) );
-    connect( m_pathFilterField,
-             SIGNAL( editTextChanged( const QString& ) ),
-             this,
-             SLOT( slotPathFilterChanged( const QString& ) ) );
+    connect( m_pathFilterField, SIGNAL( currentTextChanged( const QString& ) ), this, SLOT( slotPathFilterChanged( const QString& ) ) );
+    connect( m_pathFilterField, SIGNAL( editTextChanged( const QString& ) ), this, SLOT( slotPathFilterChanged( const QString& ) ) );
 
     connect( m_browseButton, SIGNAL( clicked() ), this, SLOT( slotBrowseClicked() ) );
     connect( m_useRealizationStarCheckBox, SIGNAL( clicked() ), this, SLOT( slotUseRealizationStarClicked() ) );
@@ -447,7 +441,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
     // Build m_foundRealizations map using relative base path (no extension) as key
     for ( const auto& filePath : gridFiles )
     {
-        QString rel      = filePath.mid( rootLen );
+        QString   rel = filePath.mid( rootLen );
         QFileInfo fi( rel );
         QString   basePath = QDir::cleanPath( fi.path() + "/" + fi.completeBaseName() );
         if ( !m_foundRealizations.contains( basePath ) )
@@ -462,7 +456,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
 
     for ( const auto& filePath : summaryFiles )
     {
-        QString rel      = filePath.mid( rootLen );
+        QString   rel = filePath.mid( rootLen );
         QFileInfo fi( rel );
         QString   basePath = QDir::cleanPath( fi.path() + "/" + fi.completeBaseName() );
         if ( !m_foundRealizations.contains( basePath ) )
@@ -501,7 +495,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
     else
     {
         // Build list of representative files for grouping (grid if available, else summary)
-        QStringList representativeFiles;
+        QStringList            representativeFiles;
         QMap<QString, QString> repFileToBasePath;
         for ( auto it = m_foundRealizations.begin(); it != m_foundRealizations.end(); ++it )
         {
@@ -648,8 +642,8 @@ void RicImportGridAndSummaryEnsembleDialog::slotSearchClicked()
         m_outputGroup->setTitle( "Files Found" );
 
         // Add "No files found" status item
-        auto rootItem     = m_filePathModel.invisibleRootItem();
-        auto statusItem   = new QStandardItem( "No files found" );
+        auto rootItem   = m_filePathModel.invisibleRootItem();
+        auto statusItem = new QStandardItem( "No files found" );
         rootItem->appendRow( statusItem );
     }
 }
