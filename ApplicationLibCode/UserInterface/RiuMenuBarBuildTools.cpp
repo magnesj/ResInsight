@@ -119,10 +119,12 @@ void RiuMenuBarBuildTools::addImportMenuWithActions( QObject* parent, QMenu* men
 
     QMenu* importEclipseMenu = importMenu->addMenu( QIcon( ":/Case48x48.png" ), "Eclipse Cases" );
     caf::CmdFeatureMenuBuilder::appendToMenu( importEclipseMenu, RimEclipseCaseCollection::importMenuFeatureNames() );
-    importEclipseMenu->addAction( cmdFeatureMgr->action( "RicImportGridAndSummaryEnsembleFeature" ) );
 
     QMenu* importRoffMenu = importMenu->addMenu( QIcon( ":/Case48x48.png" ), "Roff Grid Models" );
     importRoffMenu->addAction( cmdFeatureMgr->action( "RicImportRoffCaseFeature" ) );
+
+    importMenu->addSeparator();
+    importMenu->addAction( cmdFeatureMgr->action( "RicImportGridAndSummaryEnsembleFeature" ) );
 
     importMenu->addSeparator();
     QMenu* importSummaryMenu = importMenu->addMenu( QIcon( ":/SummaryCase.svg" ), "Summary Cases" );
