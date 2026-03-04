@@ -87,7 +87,8 @@ bool RifResqmlFileTools::openGridFile( const QString& fileName, RigEclipseCaseDa
         activeCellInfo->setReservoirCellCount( cellCount );
         fractureActiveCellInfo->setReservoirCellCount( cellCount );
 
-        // Load block geometry for the entire grid
+        // Load split and block geometry for the entire grid
+        ijkGrid->loadSplitInformation();
         ijkGrid->loadBlockInformation( 0, static_cast<unsigned int>( ni ), 0, static_cast<unsigned int>( nj ), 0, static_cast<unsigned int>( nk ) );
         const uint64_t      xyzPointCount = ijkGrid->getXyzPointCountOfBlock();
         std::vector<double> xyzPoints( 3 * xyzPointCount );
