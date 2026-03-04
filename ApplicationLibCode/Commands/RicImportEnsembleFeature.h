@@ -26,6 +26,7 @@
 #include <QString>
 
 class RimSummaryCase;
+class RimSummaryEnsemble;
 
 //==================================================================================================
 ///
