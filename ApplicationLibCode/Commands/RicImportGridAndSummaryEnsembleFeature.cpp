@@ -23,6 +23,8 @@
 #include "Summary/RiaSummaryDefines.h"
 #include "Summary/RiaSummaryTools.h"
 
+#include "RimSummaryCaseMainCollection.h"
+
 #include "EclipseCommands/RicCreateGridCaseEnsemblesFromFilesFeature.h"
 #include "RicImportEnsembleFeature.h"
 #include "RicImportGridAndSummaryEnsembleDialog.h"

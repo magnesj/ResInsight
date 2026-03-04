@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include "RiaDefines.h"
+#include "Summary/RiaSummaryDefines.h"
 
 #include <QDialog>
 #include <QMap>
