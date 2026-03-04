@@ -476,7 +476,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
     QStringList gridFiles    = findMatchingFiles( { "EGRID" } );
     QStringList summaryFiles = findMatchingFiles( { "SMSPEC", "ESMRY" } );
 
-    // Sort so SMSPEC comes before ESMRY
+    // Sort so ESMRY comes before SMSPEC (alphabetically E < S)
     std::sort( summaryFiles.begin(), summaryFiles.end() );
 
     QString rootDir = rootDirWithSeparator();
@@ -509,7 +509,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
         }
         else if ( m_foundRealizations[basePath].summaryFile.isEmpty() )
         {
-            // Only store first match per base (SMSPEC wins over ESMRY since list is sorted)
+            // Only store first match per base (ESMRY wins since it sorts before SMSPEC alphabetically)
             m_foundRealizations[basePath].summaryFile = filePath;
         }
     }
