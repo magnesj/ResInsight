@@ -38,8 +38,8 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     if ( !result.ok ) return;
     if ( !result.createGridEnsemble && !result.createSummaryEnsemble ) return;
 
-    // Use grid files to define the path pattern when available, otherwise fall back to summary files
-    QStringList representativeFiles = !result.gridFiles.isEmpty() ? result.gridFiles : result.summaryFiles;
+    // Use the union of grid and summary files so the path pattern covers all realizations
+    QStringList representativeFiles = result.gridFiles + result.summaryFiles;
     if ( representativeFiles.isEmpty() ) return;
 
     auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
