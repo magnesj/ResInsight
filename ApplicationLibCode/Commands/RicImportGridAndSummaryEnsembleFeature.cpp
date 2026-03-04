@@ -56,19 +56,18 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
 
     if ( basePaths.isEmpty() ) return;
 
-    // Reconstruct with a uniform extension — findAndSetPathPatternAndRangeString strips it anyway
+    // Convert to list for the file set creation. The dialog should ensure that the base paths are in a consistent order, so the grouping
+    // should work as intended.
     QStringList representativeFiles;
     for ( const auto& base : basePaths )
-        representativeFiles << base + ".EGRID";
+        representativeFiles << base;
 
     auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
     if ( fileSets.empty() ) return;
 
-    if ( result.createGridEnsemble )
-        RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
+    if ( result.createGridEnsemble ) RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
 
-    if ( result.createSummaryEnsemble )
-        RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
+    if ( result.createSummaryEnsemble ) RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
 }
 
 //--------------------------------------------------------------------------------------------------
