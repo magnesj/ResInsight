@@ -105,15 +105,13 @@ void findItemsMatching( QStandardItem* parentItem, const QString& substring, QLi
 //--------------------------------------------------------------------------------------------------
 RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialog::runDialog( QWidget* parent )
 {
-    const QString pathRegistryKey   = "RicImportGridAndSummaryEnsembleDialog_path";
-    const QString filterRegistryKey = "RicImportGridAndSummaryEnsembleDialog_filter";
+    const QString pathRegistryKey = "RicImportGridAndSummaryEnsembleDialog_path";
 
     auto* app = RiaApplication::instance();
 
     RicImportGridAndSummaryEnsembleDialog dialog( parent );
     {
         QSignalBlocker blocker1( dialog.m_pathFilterField );
-        QSignalBlocker blocker2( dialog.m_fileFilterField );
 
         dialog.setWindowTitle( "Import Grid and Summary Ensemble" );
 
@@ -124,10 +122,8 @@ RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialo
         dialog.m_pathFilterField->addItem( QDir::toNativeSeparators( defaultDir ) );
 
         populateComboBoxFromRegistry( dialog.m_pathFilterField, pathRegistryKey );
-        populateComboBoxFromRegistry( dialog.m_fileFilterField, filterRegistryKey );
 
         dialog.m_pathFilterField->setEditable( true );
-        dialog.m_fileFilterField->setEditable( true );
 
         for ( const auto& s : caf::AppEnum<RiaDefines::EnsembleGroupingMode>::uiTexts() )
         {
@@ -151,10 +147,6 @@ RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialo
     {
         RiaStringListSerializer s( pathRegistryKey );
         s.addString( dialog.m_pathFilterField->currentText(), maxItemsInRegistry );
-    }
-    {
-        RiaStringListSerializer s( filterRegistryKey );
-        s.addString( dialog.m_fileFilterField->currentText(), maxItemsInRegistry );
     }
 
     // Save last used directory
@@ -211,7 +203,6 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     // Create widgets
     m_pathFilterField  = new QComboBox();
     m_browseButton     = new QPushButton( "..." );
-    m_fileFilterField  = new QComboBox();
     m_effectiveFilterLabel = new QLabel();
     m_effectiveFilterLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
     m_searchButton         = new QPushButton( "Search" );
@@ -256,15 +247,6 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
              SIGNAL( editTextChanged( const QString& ) ),
              this,
              SLOT( slotPathFilterChanged( const QString& ) ) );
-
-    connect( m_fileFilterField,
-             SIGNAL( currentTextChanged( const QString& ) ),
-             this,
-             SLOT( slotFileFilterChanged( const QString& ) ) );
-    connect( m_fileFilterField,
-             SIGNAL( editTextChanged( const QString& ) ),
-             this,
-             SLOT( slotFileFilterChanged( const QString& ) ) );
 
     connect( m_browseButton, SIGNAL( clicked() ), this, SLOT( slotBrowseClicked() ) );
     connect( m_useRealizationStarCheckBox, SIGNAL( clicked() ), this, SLOT( slotUseRealizationStarClicked() ) );
@@ -313,10 +295,6 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     searchGridLayout->addWidget( new QLabel( "Path pattern" ), row, 0 );
     searchGridLayout->addWidget( m_pathFilterField, row, 1, 1, 2 );
     searchGridLayout->addWidget( m_browseButton, row, 3 );
-
-    row++;
-    searchGridLayout->addWidget( new QLabel( "File pattern" ), row, 0 );
-    searchGridLayout->addWidget( m_fileFilterField, row, 1, 1, 2 );
 
     row++;
     {
@@ -403,14 +381,6 @@ QString RicImportGridAndSummaryEnsembleDialog::pathFilterWithoutRoot() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RicImportGridAndSummaryEnsembleDialog::fileNameFilter() const
-{
-    return m_fileFilterField->currentText().trimmed();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
 void RicImportGridAndSummaryEnsembleDialog::updateEffectiveFilter()
 {
     QString pathFilter = pathFilterWithoutRoot();
@@ -420,12 +390,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateEffectiveFilter()
         pathFilter = pathFilter + "...";
     }
 
-    QString fileFilter = fileNameFilter();
-    if ( fileFilter.isEmpty() ) fileFilter = "*";
-
-    QString extensions = "EGRID|SMSPEC|ESMRY";
-
-    QString effFilter = QString( "%1%2/%3.%4" ).arg( rootDirWithSeparator() ).arg( pathFilter ).arg( fileFilter ).arg( extensions );
+    QString effFilter = QString( "%1%2/*.EGRID|SMSPEC|ESMRY" ).arg( rootDirWithSeparator() ).arg( pathFilter );
     effFilter         = RiaFilePathTools::removeDuplicatePathSeparators( effFilter );
 
     m_effectiveFilterLabel->setText( QDir::toNativeSeparators( effFilter ) );
@@ -453,13 +418,10 @@ QStringList RicImportGridAndSummaryEnsembleDialog::findMatchingFiles( const QStr
     QStringList matchingFolders;
     RiaFileSearchTools::findMatchingFoldersRecursively( rootDir, pathFilter, matchingFolders );
 
-    QString fileFilter = fileNameFilter();
-    if ( fileFilter.isEmpty() ) fileFilter = "*";
-
     QStringList nameFilters;
     for ( const auto& ext : extensions )
     {
-        nameFilters.append( fileFilter + "." + ext );
+        nameFilters.append( "*." + ext );
     }
 
     return RiaFileSearchTools::findFilesInFolders( matchingFolders, nameFilters );
@@ -632,15 +594,6 @@ void RicImportGridAndSummaryEnsembleDialog::populateComboBoxFromRegistry( QCombo
 //--------------------------------------------------------------------------------------------------
 void RicImportGridAndSummaryEnsembleDialog::slotPathFilterChanged( const QString& /*text*/ )
 {
-    updateEffectiveFilter();
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicImportGridAndSummaryEnsembleDialog::slotFileFilterChanged( const QString& /*text*/ )
-{
-    clearFileList();
     updateEffectiveFilter();
 }
 
