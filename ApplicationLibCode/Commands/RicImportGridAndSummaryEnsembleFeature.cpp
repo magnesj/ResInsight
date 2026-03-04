@@ -18,15 +18,9 @@
 
 #include "RicImportGridAndSummaryEnsembleFeature.h"
 
-#include "RiaEnsembleNameTools.h"
 #include "RiaGuiApplication.h"
-#include "Summary/RiaSummaryDefines.h"
-#include "Summary/RiaSummaryTools.h"
 
-#include "RimSummaryCaseMainCollection.h"
-
-#include "EclipseCommands/RicCreateGridCaseEnsemblesFromFilesFeature.h"
-#include "RicImportEnsembleFeature.h"
+#include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 #include "RicImportGridAndSummaryEnsembleDialog.h"
 
 #include <QAction>
@@ -42,41 +36,20 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     auto result = RicImportGridAndSummaryEnsembleDialog::runDialog( RiaGuiApplication::widgetToUseAsParent() );
 
     if ( !result.ok ) return;
+    if ( !result.createGridEnsemble && !result.createSummaryEnsemble ) return;
 
-    if ( result.createGridEnsemble && !result.gridFiles.isEmpty() )
-    {
-        if ( result.groupingMode == RiaDefines::EnsembleGroupingMode::NONE )
-        {
-            RicCreateGridCaseEnsemblesFromFilesFeature::importSingleGridCaseEnsemble( result.gridFiles );
-        }
-        else
-        {
-            auto groups = RiaEnsembleNameTools::groupFilesByEnsemble( result.gridFiles, result.groupingMode );
-            for ( const auto& group : groups )
-            {
-                RicCreateGridCaseEnsemblesFromFilesFeature::importSingleGridCaseEnsemble( group );
-            }
-        }
-    }
+    // Use grid files to define the path pattern when available, otherwise fall back to summary files
+    QStringList representativeFiles = !result.gridFiles.isEmpty() ? result.gridFiles : result.summaryFiles;
+    if ( representativeFiles.isEmpty() ) return;
 
-    if ( result.createSummaryEnsemble && !result.summaryFiles.isEmpty() )
-    {
-        if ( result.groupingMode == RiaDefines::EnsembleGroupingMode::NONE )
-        {
-            RicImportEnsembleFeature::importSingleEnsembleFileSet( result.summaryFiles, false, result.groupingMode, RiaDefines::FileType::SMSPEC );
-        }
-        else
-        {
-            auto groupedFiles = RiaEnsembleNameTools::groupFilesByEnsembleName( result.summaryFiles, result.groupingMode );
-            for ( const auto& [groupName, fileNames] : groupedFiles )
-            {
-                RicImportEnsembleFeature::importSingleEnsembleFileSet( fileNames, false, result.groupingMode, RiaDefines::FileType::SMSPEC, groupName );
-            }
-        }
-    }
+    auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
+    if ( fileSets.empty() ) return;
 
-    RiaSummaryTools::updateSummaryEnsembleNames();
-    RiaSummaryTools::summaryCaseMainCollection()->updateConnectedEditors();
+    if ( result.createGridEnsemble )
+        RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
+
+    if ( result.createSummaryEnsemble )
+        RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
 }
 
 //--------------------------------------------------------------------------------------------------
