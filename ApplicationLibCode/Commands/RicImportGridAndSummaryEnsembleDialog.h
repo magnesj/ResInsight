@@ -73,8 +73,6 @@ private:
 
     RiaDefines::EnsembleGroupingMode ensembleGroupingMode() const;
 
-    static void populateComboBoxFromRegistry( QComboBox* comboBox, const QString& key );
-
 private slots:
     void slotPathFilterChanged( const QString& text );
     void slotBrowseClicked();
