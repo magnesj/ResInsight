@@ -18,6 +18,8 @@
 
 #include "RicImportGridAndSummaryEnsembleDialog.h"
 
+#include "RicRecursiveFileSearchDialog.h"
+
 #include "RiaApplication.h"
 #include "RiaEnsembleNameTools.h"
 #include "RiaFilePathTools.h"
@@ -44,62 +46,10 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QRegularExpression>
-#include <QSettings>
 #include <QSignalBlocker>
 #include <QStandardItem>
 #include <QTreeView>
 #include <QVBoxLayout>
-
-namespace
-{
-
-// Get all first level items (usually ensemble items)
-QList<QStandardItem*> firstLevelItems( QStandardItem* rootItem )
-{
-    QList<QStandardItem*> items;
-    for ( int i = 0; i < rootItem->rowCount(); ++i )
-    {
-        QStandardItem* item = rootItem->child( i );
-        if ( item ) items.append( item );
-    }
-    return items;
-}
-
-void setCheckedStateChildItems( QStandardItem* parentItem, Qt::CheckState checkState )
-{
-    if ( !parentItem ) return;
-    for ( int i = 0; i < parentItem->rowCount(); ++i )
-    {
-        auto childItem = parentItem->child( i );
-        if ( childItem && childItem->isCheckable() )
-        {
-            childItem->setCheckState( checkState );
-        }
-        setCheckedStateChildItems( childItem, checkState );
-    }
-}
-
-void findItemsMatching( QStandardItem* parentItem, const QString& substring, QList<QStandardItem*>& matchingItems )
-{
-    if ( !parentItem ) return;
-    for ( int i = 0; i < parentItem->rowCount(); ++i )
-    {
-        auto searchString = substring + "/";
-        auto childItem    = parentItem->child( i );
-        if ( childItem )
-        {
-            auto textToMatch = childItem->text();
-            textToMatch.replace( '\\', '/' );
-            if ( textToMatch.contains( searchString, Qt::CaseInsensitive ) )
-            {
-                matchingItems.append( childItem );
-            }
-        }
-        findItemsMatching( childItem, substring, matchingItems );
-    }
-}
-
-} // namespace
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -123,7 +73,7 @@ RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialo
         dialog.m_pathFilterField->addItem( QDir::toNativeSeparators( defaultDir ) );
 
         // Registry history starts at index 1
-        populateComboBoxFromRegistry( dialog.m_pathFilterField, pathRegistryKey );
+        RicRecursiveFileSearchDialog::populateComboBoxHistoryFromRegistry( dialog.m_pathFilterField, pathRegistryKey );
 
         // Use most recently used path from registry (index 1) when preference is enabled
         if ( RiaPreferences::current()->useRecentlyUsedFolderAsDefault() && dialog.m_pathFilterField->count() > 1 )
@@ -271,7 +221,7 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
 
                           if ( item->isCheckable() )
                           {
-                              setCheckedStateChildItems( item, item->checkState() );
+                              RicRecursiveFileSearchDialog::setCheckedStateChildItems( item, item->checkState() );
                           }
 
                           if ( item->checkState() == Qt::Checked )
@@ -575,21 +525,6 @@ RiaDefines::EnsembleGroupingMode RicImportGridAndSummaryEnsembleDialog::ensemble
     return RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
 }
 
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-void RicImportGridAndSummaryEnsembleDialog::populateComboBoxFromRegistry( QComboBox* comboBox, const QString& key )
-{
-    RiaStringListSerializer serializer( key );
-    QStringList             items = serializer.textStrings();
-
-    const int maxItemsInRegistry = 10;
-    int       numItems           = std::min( static_cast<int>( items.size() ), maxItemsInRegistry );
-    for ( int i = 0; i < numItems; i++ )
-    {
-        comboBox->addItem( items[i] );
-    }
-}
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -664,25 +599,25 @@ void RicImportGridAndSummaryEnsembleDialog::slotFilterTreeViewClicked()
     QString filterText = m_treeFilterLineEdit->text();
     auto    values     = RiaStdStringTools::valuesFromRangeSelection( filterText.toStdString() );
 
-    auto items = firstLevelItems( m_filePathModel.invisibleRootItem() );
+    auto items = RicRecursiveFileSearchDialog::firstLevelItems( m_filePathModel.invisibleRootItem() );
     for ( auto item : items )
     {
         if ( item->checkState() == Qt::Unchecked ) continue;
 
         if ( filterText.isEmpty() )
         {
-            setCheckedStateChildItems( item, Qt::Checked );
+            RicRecursiveFileSearchDialog::setCheckedStateChildItems( item, Qt::Checked );
         }
         else
         {
-            setCheckedStateChildItems( item, Qt::Unchecked );
+            RicRecursiveFileSearchDialog::setCheckedStateChildItems( item, Qt::Unchecked );
 
             for ( auto val : values )
             {
                 QString searchString = "realization-" + QString::number( val );
 
                 QList<QStandardItem*> matchingItems;
-                findItemsMatching( item, searchString, matchingItems );
+                RicRecursiveFileSearchDialog::findItemsMatching( item, searchString, matchingItems );
                 for ( auto matchedItem : matchingItems )
                 {
                     matchedItem->setCheckState( Qt::Checked );
