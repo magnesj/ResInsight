@@ -19,13 +19,22 @@
 #include "RicImportGridAndSummaryEnsembleFeature.h"
 
 #include "RiaGuiApplication.h"
+#include "Summary/RiaSummaryPlotTools.h"
 
 #include "EnsembleFileSet/RimEnsembleFileSetTools.h"
 #include "RicImportGridAndSummaryEnsembleDialog.h"
+#include "RicNewViewFeature.h"
+#include "Rim3dView.h"
+#include "RimReservoirGridEnsemble.h"
+#include "RimSummaryEnsemble.h"
+#include "RimViewNameConfig.h"
+
+#include "RiuPlotMainWindowTools.h"
 
 #include <QAction>
 #include <QIcon>
 #include <QSet>
+#include <QTimer>
 
 CAF_CMD_SOURCE_INIT( RicImportGridAndSummaryEnsembleFeature, "RicImportGridAndSummaryEnsembleFeature" );
 
@@ -34,7 +43,9 @@ CAF_CMD_SOURCE_INIT( RicImportGridAndSummaryEnsembleFeature, "RicImportGridAndSu
 //--------------------------------------------------------------------------------------------------
 void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
 {
-    auto result = RicImportGridAndSummaryEnsembleDialog::runDialog( RiaGuiApplication::widgetToUseAsParent() );
+    QPointer<QWidget> activeWindowBeforeImport = RiaGuiApplication::widgetToUseAsParent();
+
+    auto result = RicImportGridAndSummaryEnsembleDialog::runDialog( activeWindowBeforeImport );
 
     if ( !result.ok ) return;
     if ( !result.createGridEnsemble && !result.createSummaryEnsemble ) return;
@@ -65,9 +76,41 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
     if ( fileSets.empty() ) return;
 
-    if ( result.createGridEnsemble ) RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
+    if ( result.createGridEnsemble )
+    {
+        auto gridEnsembles = RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
+        if ( !gridEnsembles.empty() )
+        {
+            auto firstEnsemble = gridEnsembles.front();
+            auto cases         = firstEnsemble->cases();
+            if ( !cases.empty() )
+            {
+                auto view = RicNewViewFeature::addReservoirView( cases.front(), nullptr, firstEnsemble->viewCollection() );
+                if ( view ) view->nameConfig()->setAddCaseName( true );
+            }
+        }
+    }
 
-    if ( result.createSummaryEnsemble ) RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
+    if ( result.createSummaryEnsemble )
+    {
+        auto summaryEnsembles = RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
+        for ( auto ensemble : summaryEnsembles )
+        {
+            RiaSummaryPlotTools::createAndAppendDefaultSummaryMultiPlot( {}, { ensemble } );
+        }
+        if ( !summaryEnsembles.empty() ) RiuPlotMainWindowTools::showPlotMainWindow();
+    }
+
+    if ( activeWindowBeforeImport )
+    {
+        QTimer::singleShot( 500,
+                            activeWindowBeforeImport,
+                            [activeWindowBeforeImport]()
+                            {
+                                activeWindowBeforeImport->raise();
+                                activeWindowBeforeImport->activateWindow();
+                            } );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
