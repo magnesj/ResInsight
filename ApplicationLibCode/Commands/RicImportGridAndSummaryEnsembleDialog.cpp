@@ -20,9 +20,9 @@
 
 #include "RiaApplication.h"
 #include "RiaEnsembleNameTools.h"
-#include "RiaPreferences.h"
 #include "RiaFilePathTools.h"
 #include "RiaFileSearchTools.h"
+#include "RiaPreferences.h"
 #include "RiaStdStringTools.h"
 #include "RiaStringListSerializer.h"
 
