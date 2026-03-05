@@ -20,6 +20,7 @@
 
 #include "RiaApplication.h"
 #include "RiaEnsembleNameTools.h"
+#include "RiaPreferences.h"
 #include "RiaFilePathTools.h"
 #include "RiaFileSearchTools.h"
 #include "RiaStdStringTools.h"
@@ -115,13 +116,20 @@ RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialo
 
         dialog.setWindowTitle( "Import Grid and Summary Ensemble" );
 
-        // Default path
+        // Default path (index 0 fallback)
         QString defaultDir = app->lastUsedDialogDirectory( "GRID_SUMMARY_ENSEMBLE" );
         RiaFilePathTools::appendSeparatorIfNo( defaultDir );
         defaultDir += "*";
         dialog.m_pathFilterField->addItem( QDir::toNativeSeparators( defaultDir ) );
 
+        // Registry history starts at index 1
         populateComboBoxFromRegistry( dialog.m_pathFilterField, pathRegistryKey );
+
+        // Use most recently used path from registry (index 1) when preference is enabled
+        if ( RiaPreferences::current()->useRecentlyUsedFolderAsDefault() && dialog.m_pathFilterField->count() > 1 )
+        {
+            dialog.m_pathFilterField->setCurrentIndex( 1 );
+        }
 
         dialog.m_pathFilterField->setEditable( true );
 
