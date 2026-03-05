@@ -76,13 +76,15 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
     auto fileSets = RimEnsembleFileSetTools::createEnsembleFileSets( representativeFiles, result.groupingMode );
     if ( fileSets.empty() ) return;
 
-    if ( result.createGridEnsemble )
+    bool gridEnsemblesCreated = false;
+    if ( result.createGridEnsemble && !result.gridFiles.isEmpty() )
     {
         auto gridEnsembles = RimEnsembleFileSetTools::createGridEnsemblesFromFileSets( fileSets );
         if ( !gridEnsembles.empty() )
         {
-            auto firstEnsemble = gridEnsembles.front();
-            auto cases         = firstEnsemble->cases();
+            gridEnsemblesCreated = true;
+            auto firstEnsemble   = gridEnsembles.front();
+            auto cases           = firstEnsemble->cases();
             if ( !cases.empty() )
             {
                 auto view = RicNewViewFeature::addReservoirView( cases.front(), nullptr, firstEnsemble->viewCollection() );
@@ -91,7 +93,7 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
         }
     }
 
-    if ( result.createSummaryEnsemble )
+    if ( result.createSummaryEnsemble && !result.summaryFiles.isEmpty() )
     {
         auto summaryEnsembles = RimEnsembleFileSetTools::createSummaryEnsemblesFromFileSets( fileSets );
         for ( auto ensemble : summaryEnsembles )
@@ -101,7 +103,7 @@ void RicImportGridAndSummaryEnsembleFeature::onActionTriggered( bool isChecked )
         if ( !summaryEnsembles.empty() ) RiuPlotMainWindowTools::showPlotMainWindow();
     }
 
-    if ( activeWindowBeforeImport )
+    if ( gridEnsemblesCreated && activeWindowBeforeImport )
     {
         QTimer::singleShot( 500,
                             activeWindowBeforeImport,
