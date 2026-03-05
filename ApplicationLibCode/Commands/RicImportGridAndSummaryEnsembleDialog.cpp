@@ -525,7 +525,6 @@ RiaDefines::EnsembleGroupingMode RicImportGridAndSummaryEnsembleDialog::ensemble
     return RiaDefines::EnsembleGroupingMode::FMU_FOLDER_STRUCTURE;
 }
 
-
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
