@@ -23,10 +23,10 @@
 #include "RifJsonEncodeDecode.h"
 
 #include <QCryptographicHash>
+#include <QEventLoop>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QEventLoop>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QNetworkRequest>
@@ -387,9 +387,9 @@ void RiaOpenTelemetryManager::reportCrash( int signalCode, const std::stacktrace
     // the reply never gets a chance to finish and the crash is silently dropped.
     if ( m_pendingReplies.load() > 0 )
     {
-        auto* prefs         = RiaPreferencesOpenTelemetry::current();
-        int   timeoutMs     = prefs ? prefs->connectionTimeoutMs() : 5000;
-        int   elapsedMs     = 0;
+        auto* prefs          = RiaPreferencesOpenTelemetry::current();
+        int   timeoutMs      = prefs ? prefs->connectionTimeoutMs() : 5000;
+        int   elapsedMs      = 0;
         int   pollIntervalMs = 50;
         while ( m_pendingReplies.load() > 0 && elapsedMs < timeoutMs )
         {
