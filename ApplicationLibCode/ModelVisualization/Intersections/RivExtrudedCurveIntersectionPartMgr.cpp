@@ -80,9 +80,9 @@
 #include "cvfRenderStateDepth.h"
 #include "cvfRenderStatePoint.h"
 #include "cvfRenderState_FF.h"
-#include "cvfUniform.h"
 #include "cvfStructGridGeometryGenerator.h"
 #include "cvfTransform.h"
+#include "cvfUniform.h"
 #include "cvfqtUtils.h"
 
 #include <functional>

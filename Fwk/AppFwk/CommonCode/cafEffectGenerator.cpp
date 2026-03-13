@@ -154,7 +154,6 @@ cvf::ref<cvf::RenderStatePolygonOffset>
     return rs;
 }
 
-
 //--------------------------------------------------------------------------------------------------
 /// Sets both the GL polygon offset render state and the equivalent shader uniforms.
 /// glPolygonOffset has no effect when gl_FragDepth is written explicitly (as in log-depth
@@ -169,11 +168,25 @@ void EffectGenerator::applyPolygonOffset( cvf::Effect* effect, PolygonOffset pol
     float factor = 0.0f, units = 0.0f;
     switch ( polygonOffset )
     {
-        case PO_1:         factor = 1.0f;  units = 1.0f;   break;
-        case PO_2:         factor = 2.0f;  units = 2.0f;   break;
-        case PO_POS_LARGE: factor = 3.0f;  units = 50.0f;  break;
-        case PO_NEG_LARGE: factor = -1.0f; units = -30.0f; break;
-        default:           CVF_FAIL_MSG( "Unhandled polygon offset enum" ); return;
+        case PO_1:
+            factor = 1.0f;
+            units  = 1.0f;
+            break;
+        case PO_2:
+            factor = 2.0f;
+            units  = 2.0f;
+            break;
+        case PO_POS_LARGE:
+            factor = 3.0f;
+            units  = 50.0f;
+            break;
+        case PO_NEG_LARGE:
+            factor = -1.0f;
+            units  = -30.0f;
+            break;
+        default:
+            CVF_FAIL_MSG( "Unhandled polygon offset enum" );
+            return;
     }
     effect->setUniform( new cvf::UniformFloat( "u_polygonOffsetFactor", factor ) );
     effect->setUniform( new cvf::UniformFloat( "u_polygonOffsetUnits", units ) );

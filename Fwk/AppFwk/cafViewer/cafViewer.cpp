@@ -100,10 +100,7 @@ public:
     }
 
     // FC = 2.0 / log2(farPlane + 1.0) — update each frame after clip plane calculation
-    void setLogDepthFarConstant( float fc )
-    {
-        m_logDepthFC->set( fc );
-    }
+    void setLogDepthFarConstant( float fc ) { m_logDepthFC->set( fc ); }
 
     cvf::UniformSet* uniformSet() override { return m_uniformSet.p(); }
     void             update( cvf::Rendering* rendering ) override {};
@@ -536,9 +533,9 @@ bool caf::Viewer::calculateNearFarPlanes( const cvf::Rendering* rendering,
     double maxDistEyeToCornerAlongViewDir = -HUGE_VAL;
     double minDistEyeToCornerAlongViewDir = HUGE_VAL;
 
-    cvf::Frustum    viewFrustum = rendering->camera()->frustum();
-    const cvf::Scene* scene = rendering->scene();
-    bool            anyModelContributed = false;
+    cvf::Frustum      viewFrustum         = rendering->camera()->frustum();
+    const cvf::Scene* scene               = rendering->scene();
+    bool              anyModelContributed = false;
 
     if ( scene )
     {
@@ -554,7 +551,7 @@ bool caf::Viewer::calculateNearFarPlanes( const cvf::Rendering* rendering,
             modelBB.cornerVertices( corners );
             for ( int cIdx = 0; cIdx < 8; ++cIdx )
             {
-                double dist               = ( corners[cIdx] - eye ) * viewdir;
+                double dist                    = ( corners[cIdx] - eye ) * viewdir;
                 maxDistEyeToCornerAlongViewDir = CVF_MAX( maxDistEyeToCornerAlongViewDir, dist );
                 minDistEyeToCornerAlongViewDir = CVF_MIN( minDistEyeToCornerAlongViewDir, dist );
             }

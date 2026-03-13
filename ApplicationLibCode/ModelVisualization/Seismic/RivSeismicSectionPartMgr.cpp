@@ -46,10 +46,10 @@
 #include "cvfLibCore.h"
 #include "cvfLibGeometry.h"
 #include "cvfLibRender.h"
-#include "cvfUniform.h"
 #include "cvfModelBasicList.h"
 #include "cvfPart.h"
 #include "cvfScalarMapper.h"
+#include "cvfUniform.h"
 
 #include <zgyaccess/seismicslice.h>
 
