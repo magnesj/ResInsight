@@ -114,11 +114,10 @@ jobs:
       - name: Setup buildcache
         uses: CeetronSolutions/setup-buildcache-action@v1.0
 
-      - name: Get current time
-        uses: josStorer/get-current-time@v2
+      - name: Get current date
         id: current-time
-        with:
-          format: YYYY-MM-DD
+        shell: bash
+        run: echo "formattedTime=$(date -u +%Y-%m-%d)" >> $GITHUB_OUTPUT
 
       - name: Print time stamp
         run: echo "timestamp ${{ steps.current-time.outputs.formattedTime }}"
@@ -197,7 +196,7 @@ jobs:
 
       - name: Restore vcpkg cache
         id: vcpkg-cache
-        uses: TAServers/vcpkg-cache@f645f5b5c4a8a6546911a64b3b02ac86b76f584c
+        uses: TAServers/vcpkg-cache@v3.4.1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           prefix: vcpkg-${{ matrix.config.cxx}}/
