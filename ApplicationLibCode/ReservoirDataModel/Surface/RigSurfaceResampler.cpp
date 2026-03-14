@@ -79,7 +79,7 @@ std::vector<float> RigSurfaceResampler::resampleToRegularGrid( RigSurface* surfa
             const cvf::Vec3d pointBelow( x, y, zLow );
 
             cvf::Vec3d intersectionPoint;
-            if ( findClosestPointOnSurface( surface, pointAbove, pointBelow, intersectionPoint ) )
+            if ( computeIntersectionWithLine( surface, pointAbove, pointBelow, intersectionPoint ) )
             {
                 depthValues[j * nx + i] = static_cast<float>( intersectionPoint.z() );
             }
