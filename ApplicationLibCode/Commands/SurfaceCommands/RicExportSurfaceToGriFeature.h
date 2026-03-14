@@ -25,6 +25,8 @@
 #include <optional>
 #include <vector>
 
+#include <QString>
+
 class RimSurface;
 
 //==================================================================================================
@@ -35,12 +37,11 @@ class RicExportSurfaceToGriFeature : public caf::CmdFeature
     CAF_CMD_HEADER_INIT;
 
 public:
-    // Determines the regular grid to use for all surfaces.
-    // For a single RimRegularSurface the stored params are returned directly (no dialog).
-    // For multiple surfaces or any unstructured surface, the union bounding box is computed
-    // and a dialog is shown once so the user can confirm/adjust the grid parameters.
-    // Returns nullopt if the user cancels.
-    static std::optional<RigRegularSurfaceData> resolveGridParams( const std::vector<RimSurface*>& surfaces );
+    // Shows the export dialog (pre-populated with grid params from the surface(s) and the given
+    // default folder) and returns the accepted parameters, or nullopt if the user cancels.
+    static std::optional<RigRegularSurfaceData> resolveGridParams( const std::vector<RimSurface*>& surfaces,
+                                                                   const QString&                  defaultFolder,
+                                                                   QString&                        exportFolder );
 
     // Resamples one surface onto the given regular grid and returns depth values
     // in row-major order (index = j * nx + i). Returns an empty vector on failure.

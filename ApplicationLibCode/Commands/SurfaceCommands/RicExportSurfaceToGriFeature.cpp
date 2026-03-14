@@ -29,8 +29,9 @@
 #include "RimRegularSurface.h"
 #include "RimSurface.h"
 
-#include "RicExportSurfaceToGriDialog.h"
-#include "RiuFileDialogTools.h"
+#include "RicExportSurfaceToGriUi.h"
+
+#include "cafPdmUiPropertyViewDialog.h"
 
 #include "cafSelectionManagerTools.h"
 #include "cafUtils.h"
@@ -43,70 +44,58 @@
 CAF_CMD_SOURCE_INIT( RicExportSurfaceToGriFeature, "RicExportSurfaceToGriFeature" );
 
 //--------------------------------------------------------------------------------------------------
-/// For a single RimRegularSurface, its stored grid params are returned without showing a dialog.
-/// For multiple surfaces or any unstructured surface, the union bounding box across all surfaces
-/// is computed and the dialog is shown once so the user can confirm/adjust the shared grid.
+/// Computes default grid parameters from the surfaces, shows a PdmUiPropertyViewDialog to let the
+/// user confirm/adjust them, and returns the grid params via return value and the chosen folder via
+/// exportFolder. Returns nullopt if the user cancels or no valid grid can be computed.
 //--------------------------------------------------------------------------------------------------
-std::optional<RigRegularSurfaceData> RicExportSurfaceToGriFeature::resolveGridParams( const std::vector<RimSurface*>& surfaces )
+std::optional<RigRegularSurfaceData> RicExportSurfaceToGriFeature::resolveGridParams( const std::vector<RimSurface*>& surfaces,
+                                                                                      const QString&                  defaultFolder,
+                                                                                      QString&                        exportFolder )
 {
     if ( surfaces.empty() ) return std::nullopt;
 
-    // Single RimRegularSurface: use its stored params directly, no dialog needed
+    RicExportSurfaceToGriUi ui;
+
+    // Single RimRegularSurface: pre-populate from its stored params
     if ( surfaces.size() == 1 )
     {
         if ( auto* reg = dynamic_cast<RimRegularSurface*>( surfaces[0] ) )
         {
-            RigRegularSurfaceData p;
-            p.nx         = reg->nx();
-            p.ny         = reg->ny();
-            p.originX    = reg->originX();
-            p.originY    = reg->originY();
-            p.incrementX = reg->incrementX();
-            p.incrementY = reg->incrementY();
-            p.rotation   = reg->rotation();
-            return p;
+            ui.setDefaults( defaultFolder, reg->nx(), reg->ny(), reg->originX(), reg->originY(), reg->incrementX(), reg->incrementY() );
         }
     }
-
-    // Multiple surfaces or unstructured: compute union bounding box and show dialog once
-    cvf::BoundingBox bb;
-    size_t           totalVertexCount = 0;
-    for ( RimSurface* surf : surfaces )
+    else
     {
-        RigSurface* rig = surf->surfaceData();
-        if ( !rig ) continue;
-        for ( const auto& v : rig->vertices() )
-            bb.add( v );
-        totalVertexCount += rig->vertices().size();
+        // Multiple surfaces or unstructured: compute union bounding box
+        cvf::BoundingBox bb;
+        size_t           totalVertexCount = 0;
+        for ( RimSurface* surf : surfaces )
+        {
+            RigSurface* rig = surf->surfaceData();
+            if ( !rig ) continue;
+            for ( const auto& v : rig->vertices() )
+                bb.add( v );
+            totalVertexCount += rig->vertices().size();
+        }
+
+        if ( !bb.isValid() || totalVertexCount == 0 ) return std::nullopt;
+
+        // Estimate grid spacing from total vertex density across all surfaces:
+        //   spacing ≈ sqrt( union_area / total_vertex_count )
+        const double areaApprox = bb.extent().x() * bb.extent().y();
+        const double spacing    = ( areaApprox > 0.0 ) ? std::sqrt( areaApprox / static_cast<double>( totalVertexCount ) ) : 1.0;
+
+        const int nx = std::max( 2, static_cast<int>( std::ceil( bb.extent().x() / spacing ) ) + 1 );
+        const int ny = std::max( 2, static_cast<int>( std::ceil( bb.extent().y() / spacing ) ) + 1 );
+        ui.setDefaults( defaultFolder, nx, ny, bb.min().x(), bb.min().y(), spacing, spacing );
     }
 
-    if ( !bb.isValid() || totalVertexCount == 0 ) return std::nullopt;
+    caf::PdmUiPropertyViewDialog dialog( nullptr, &ui, "Export Surface to Regular Grid", "" );
+    dialog.resize( QSize( 400, 300 ) );
+    if ( dialog.exec() != QDialog::Accepted ) return std::nullopt;
 
-    // Estimate grid spacing from total vertex density across all surfaces:
-    //   spacing ≈ sqrt( union_area / total_vertex_count )
-    const double areaApprox = bb.extent().x() * bb.extent().y();
-    const double spacing    = ( areaApprox > 0.0 ) ? std::sqrt( areaApprox / static_cast<double>( totalVertexCount ) ) : 1.0;
-
-    RicGriExportGridParams defaults;
-    defaults.originX    = bb.min().x();
-    defaults.originY    = bb.min().y();
-    defaults.incrementX = spacing;
-    defaults.incrementY = spacing;
-    defaults.nx         = std::max( 2, static_cast<int>( std::ceil( bb.extent().x() / spacing ) ) + 1 );
-    defaults.ny         = std::max( 2, static_cast<int>( std::ceil( bb.extent().y() / spacing ) ) + 1 );
-
-    auto params = RicExportSurfaceToGriDialog::openDialog( nullptr, defaults );
-    if ( !params.accepted ) return std::nullopt;
-
-    RigRegularSurfaceData p;
-    p.nx         = params.nx;
-    p.ny         = params.ny;
-    p.originX    = params.originX;
-    p.originY    = params.originY;
-    p.incrementX = params.incrementX;
-    p.incrementY = params.incrementY;
-    p.rotation   = 0.0;
-    return p;
+    exportFolder = ui.exportFolder();
+    return ui.gridParams();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -151,14 +140,12 @@ std::vector<float> RicExportSurfaceToGriFeature::resampleToGrid( RimSurface* sur
 //--------------------------------------------------------------------------------------------------
 void RicExportSurfaceToGriFeature::exportToFolder( const std::vector<RimSurface*>& surfaces, ExportFormat format )
 {
-    auto gridParams = resolveGridParams( surfaces );
-    if ( !gridParams ) return;
-
     RiaApplication* app        = RiaApplication::instance();
     QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
 
-    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, QObject::tr( "Select Export Folder" ), defaultDir );
-    if ( exportDir.isEmpty() ) return;
+    QString               exportDir;
+    auto                  gridParams = resolveGridParams( surfaces, defaultDir, exportDir );
+    if ( !gridParams || exportDir.isEmpty() ) return;
 
     app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
 
