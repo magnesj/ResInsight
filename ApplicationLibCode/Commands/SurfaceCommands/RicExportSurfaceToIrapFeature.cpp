@@ -18,17 +18,11 @@
 
 #include "RicExportSurfaceToIrapFeature.h"
 
-#include "RiaApplication.h"
-
-#include "RifSurfio.h"
-
 #include "RimSurface.h"
 
 #include "RicExportSurfaceToGriFeature.h"
-#include "RiuFileDialogTools.h"
 
 #include "cafSelectionManagerTools.h"
-#include "cafUtils.h"
 
 #include <QAction>
 
@@ -39,8 +33,7 @@ CAF_CMD_SOURCE_INIT( RicExportSurfaceToIrapFeature, "RicExportSurfaceToIrapFeatu
 //--------------------------------------------------------------------------------------------------
 bool RicExportSurfaceToIrapFeature::isCommandEnabled() const
 {
-    std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
-    return !surfaces.empty();
+    return !caf::selectedObjectsByTypeStrict<RimSurface*>().empty();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -48,30 +41,10 @@ bool RicExportSurfaceToIrapFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicExportSurfaceToIrapFeature::onActionTriggered( bool isChecked )
 {
-    std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
+    auto surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
     if ( surfaces.empty() ) return;
 
-    // Resolve the shared grid once for all selected surfaces
-    auto gridParams = RicExportSurfaceToGriFeature::resolveGridParams( surfaces );
-    if ( !gridParams ) return;
-
-    RiaApplication* app        = RiaApplication::instance();
-    QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-
-    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, tr( "Select Export Folder" ), defaultDir );
-    if ( exportDir.isEmpty() ) return;
-
-    app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
-
-    for ( RimSurface* surf : surfaces )
-    {
-        const QString fileName = caf::Utils::constructFullFileName( exportDir, surf->userDescription(), ".irap" );
-
-        const auto depthValues = RicExportSurfaceToGriFeature::resampleToGrid( surf, *gridParams );
-        if ( depthValues.empty() ) continue;
-
-        RifSurfio::exportToIrap( fileName.toStdString(), *gridParams, depthValues );
-    }
+    RicExportSurfaceToGriFeature::exportToFolder( surfaces, RicExportSurfaceToGriFeature::ExportFormat::IRAP );
 }
 
 //--------------------------------------------------------------------------------------------------

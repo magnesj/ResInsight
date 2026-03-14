@@ -46,6 +46,15 @@ public:
     // in row-major order (index = j * nx + i). Returns an empty vector on failure.
     static std::vector<float> resampleToGrid( RimSurface* surf, const RigRegularSurfaceData& gridParams );
 
+    enum class ExportFormat
+    {
+        GRI,
+        IRAP
+    };
+
+    // Shared export pipeline: resolve grid, ask for folder, resample and write each surface.
+    static void exportToFolder( const std::vector<RimSurface*>& surfaces, ExportFormat format );
+
 protected:
     bool isCommandEnabled() const override;
     void onActionTriggered( bool isChecked ) override;

@@ -148,6 +148,39 @@ std::vector<float> RicExportSurfaceToGriFeature::resampleToGrid( RimSurface* sur
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicExportSurfaceToGriFeature::exportToFolder( const std::vector<RimSurface*>& surfaces, ExportFormat format )
+{
+    auto gridParams = resolveGridParams( surfaces );
+    if ( !gridParams ) return;
+
+    RiaApplication* app        = RiaApplication::instance();
+    QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
+
+    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, QObject::tr( "Select Export Folder" ), defaultDir );
+    if ( exportDir.isEmpty() ) return;
+
+    app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
+
+    const QString extension = ( format == ExportFormat::GRI ) ? ".gri" : ".irap";
+
+    for ( RimSurface* surf : surfaces )
+    {
+        const QString fileName =
+            caf::Utils::constructFullFileName( exportDir, caf::Utils::makeValidFileBasename( surf->fullName() ), extension );
+
+        const auto depthValues = resampleToGrid( surf, *gridParams );
+        if ( depthValues.empty() ) continue;
+
+        if ( format == ExportFormat::GRI )
+            RifSurfio::exportToGri( fileName.toStdString(), *gridParams, depthValues );
+        else
+            RifSurfio::exportToIrap( fileName.toStdString(), *gridParams, depthValues );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 bool RicExportSurfaceToGriFeature::isCommandEnabled() const
 {
     return !caf::selectedObjectsByTypeStrict<RimSurface*>().empty();
@@ -158,30 +191,10 @@ bool RicExportSurfaceToGriFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicExportSurfaceToGriFeature::onActionTriggered( bool isChecked )
 {
-    std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
+    auto surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
     if ( surfaces.empty() ) return;
 
-    // Resolve the shared grid once for all selected surfaces
-    auto gridParams = resolveGridParams( surfaces );
-    if ( !gridParams ) return;
-
-    RiaApplication* app        = RiaApplication::instance();
-    QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-
-    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, tr( "Select Export Folder" ), defaultDir );
-    if ( exportDir.isEmpty() ) return;
-
-    app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
-
-    for ( RimSurface* surf : surfaces )
-    {
-        const QString fileName = caf::Utils::constructFullFileName( exportDir, surf->userDescription(), ".gri" );
-
-        const auto depthValues = resampleToGrid( surf, *gridParams );
-        if ( depthValues.empty() ) continue;
-
-        RifSurfio::exportToGri( fileName.toStdString(), *gridParams, depthValues );
-    }
+    exportToFolder( surfaces, ExportFormat::GRI );
 }
 
 //--------------------------------------------------------------------------------------------------
