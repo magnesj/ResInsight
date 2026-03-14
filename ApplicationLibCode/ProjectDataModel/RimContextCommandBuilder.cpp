@@ -84,7 +84,6 @@
 #include "RimGeoMechPropertyFilter.h"
 #include "RimGeoMechPropertyFilterCollection.h"
 #include "RimGeoMechView.h"
-#include "RimGridCaseSurface.h"
 #include "RimGridCollection.h"
 #include "RimGridCrossPlot.h"
 #include "RimGridCrossPlotCollection.h"
@@ -135,7 +134,6 @@
 #include "RimSummaryTable.h"
 #include "RimSummaryTableCollection.h"
 #include "RimSummaryTimeAxisProperties.h"
-#include "RimSurface.h"
 #include "RimValveCollection.h"
 #include "RimValveTemplate.h"
 #include "RimValveTemplateCollection.h"
@@ -930,20 +928,6 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         {
             menuBuilder << "RicNewElasticPropertyScalingFeature";
         }
-        else if ( dynamic_cast<RimSurface*>( firstUiItem ) )
-        {
-            if ( dynamic_cast<RimGridCaseSurface*>( firstUiItem ) )
-            {
-                menuBuilder << "RicExportKLayerToPtlFeature";
-            }
-
-            menuBuilder << "RicExportSurfaceToGriFeature";
-            menuBuilder << "RicExportSurfaceToIrapFeature";
-            menuBuilder << "RicExportSurfaceToTsurfFeature";
-            menuBuilder << "Separator";
-            menuBuilder << "RicCopySurfaceFeature";
-            menuBuilder << "RicReloadSurfaceFeature";
-        }
         else if ( dynamic_cast<RimSeismicSectionCollection*>( firstUiItem ) )
         {
             menuBuilder << "RicNewInlineSeismicSectionFeature";
@@ -1085,6 +1069,9 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         // can be executed, communicated by isCommandEnabled(). When a command feature
         // is aware of multiple selected items, move the command to this list
         // without using dyncamic_cast.
+
+        menuBuilder << "RicExportSurfaceToGriFeature";
+        menuBuilder << "RicExportSurfaceToIrapFeature";
 
         menuBuilder << "RicPasteTimeHistoryCurveFeature";
         menuBuilder << "RicPasteAsciiDataCurveFeature";
