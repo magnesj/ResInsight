@@ -49,27 +49,32 @@ bool RicExportSurfaceToIrapFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicExportSurfaceToIrapFeature::onActionTriggered( bool isChecked )
 {
-    RiaApplication* app = RiaApplication::instance();
-
-    QString defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-
-    QString fileExtensionFilter = QString( "IRAP Classic Surface (*.irap)" );
-    QString defaultAbsFileName  = caf::Utils::constructFullFileName( defaultDir, "surface", ".irap" );
-
     std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
+    if ( surfaces.empty() ) return;
+
+    // Resolve the shared grid once for all selected surfaces
+    auto gridParams = RicExportSurfaceToGriFeature::resolveGridParams( surfaces );
+    if ( !gridParams ) return;
+
+    RiaApplication* app       = RiaApplication::instance();
+    QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
+    const QString   filterStr  = "IRAP Classic Surface (*.irap)";
+
     for ( RimSurface* surf : surfaces )
     {
+        const QString defaultName = caf::Utils::constructFullFileName( defaultDir, surf->userDescription(), ".irap" );
+
         QString selectedExtension;
         QString fileName =
-            RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultAbsFileName, fileExtensionFilter, &selectedExtension );
+            RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultName, filterStr, &selectedExtension );
         if ( fileName.isEmpty() ) return;
 
         app->setLastUsedDialogDirectory( "EXPORT_SURFACE", QFileInfo( fileName ).absolutePath() );
 
-        auto exportData = RicExportSurfaceToGriFeature::prepareExportData( surf );
-        if ( !exportData ) return;
+        const auto depthValues = RicExportSurfaceToGriFeature::resampleToGrid( surf, *gridParams );
+        if ( depthValues.empty() ) continue;
 
-        RifSurfio::exportToIrap( fileName.toStdString(), exportData->first, exportData->second );
+        RifSurfio::exportToIrap( fileName.toStdString(), *gridParams, depthValues );
     }
 }
 

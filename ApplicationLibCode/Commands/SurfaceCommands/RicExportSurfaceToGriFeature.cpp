@@ -43,40 +43,49 @@
 CAF_CMD_SOURCE_INIT( RicExportSurfaceToGriFeature, "RicExportSurfaceToGriFeature" );
 
 //--------------------------------------------------------------------------------------------------
-///
+/// For a single RimRegularSurface, its stored grid params are returned without showing a dialog.
+/// For multiple surfaces or any unstructured surface, the union bounding box across all surfaces
+/// is computed and the dialog is shown once so the user can confirm/adjust the shared grid.
 //--------------------------------------------------------------------------------------------------
-std::optional<std::pair<RigRegularSurfaceData, std::vector<float>>> RicExportSurfaceToGriFeature::prepareExportData( RimSurface* surf )
+std::optional<RigRegularSurfaceData> RicExportSurfaceToGriFeature::resolveGridParams( const std::vector<RimSurface*>& surfaces )
 {
-    if ( auto* regularSurface = dynamic_cast<RimRegularSurface*>( surf ) )
+    if ( surfaces.empty() ) return std::nullopt;
+
+    // Single RimRegularSurface: use its stored params directly, no dialog needed
+    if ( surfaces.size() == 1 )
     {
-        // RimRegularSurface and RimRegularFileSurface: use stored grid parameters directly
-        RigRegularSurfaceData gridParams;
-        gridParams.nx         = regularSurface->nx();
-        gridParams.ny         = regularSurface->ny();
-        gridParams.originX    = regularSurface->originX();
-        gridParams.originY    = regularSurface->originY();
-        gridParams.incrementX = regularSurface->incrementX();
-        gridParams.incrementY = regularSurface->incrementY();
-        gridParams.rotation   = regularSurface->rotation();
-        return std::make_pair( gridParams, regularSurface->depthValues() );
+        if ( auto* reg = dynamic_cast<RimRegularSurface*>( surfaces[0] ) )
+        {
+            RigRegularSurfaceData p;
+            p.nx         = reg->nx();
+            p.ny         = reg->ny();
+            p.originX    = reg->originX();
+            p.originY    = reg->originY();
+            p.incrementX = reg->incrementX();
+            p.incrementY = reg->incrementY();
+            p.rotation   = reg->rotation();
+            return p;
+        }
     }
 
-    // Unstructured surface: determine grid parameters from bounding box and resample
-    RigSurface* rigSurface = surf->surfaceData();
-    if ( !rigSurface || rigSurface->vertices().empty() ) return std::nullopt;
-
+    // Multiple surfaces or unstructured: compute union bounding box and show dialog once
     cvf::BoundingBox bb;
-    for ( const auto& v : rigSurface->vertices() )
-        bb.add( v );
+    size_t           totalVertexCount = 0;
+    for ( RimSurface* surf : surfaces )
+    {
+        RigSurface* rig = surf->surfaceData();
+        if ( !rig ) continue;
+        for ( const auto& v : rig->vertices() )
+            bb.add( v );
+        totalVertexCount += rig->vertices().size();
+    }
 
-    // Estimate a representative grid spacing from vertex density:
-    //   spacing ≈ sqrt( bounding_box_area / vertex_count )
-    // This targets a grid with roughly the same resolution as the source mesh,
-    // and is more robust than maxExtentTriangleInXDirection() which can be dominated
-    // by a single large boundary triangle.
-    const size_t vertexCount = rigSurface->vertices().size();
-    const double areaApprox  = bb.extent().x() * bb.extent().y();
-    const double spacing     = ( vertexCount > 0 && areaApprox > 0.0 ) ? std::sqrt( areaApprox / static_cast<double>( vertexCount ) ) : 1.0;
+    if ( !bb.isValid() || totalVertexCount == 0 ) return std::nullopt;
+
+    // Estimate grid spacing from total vertex density across all surfaces:
+    //   spacing ≈ sqrt( union_area / total_vertex_count )
+    const double areaApprox = bb.extent().x() * bb.extent().y();
+    const double spacing    = ( areaApprox > 0.0 ) ? std::sqrt( areaApprox / static_cast<double>( totalVertexCount ) ) : 1.0;
 
     RicGriExportGridParams defaults;
     defaults.originX    = bb.min().x();
@@ -89,31 +98,52 @@ std::optional<std::pair<RigRegularSurfaceData, std::vector<float>>> RicExportSur
     auto params = RicExportSurfaceToGriDialog::openDialog( nullptr, defaults );
     if ( !params.accepted ) return std::nullopt;
 
-    RigRegularSurfaceData gridParams;
-    gridParams.nx         = params.nx;
-    gridParams.ny         = params.ny;
-    gridParams.originX    = params.originX;
-    gridParams.originY    = params.originY;
-    gridParams.incrementX = params.incrementX;
-    gridParams.incrementY = params.incrementY;
-    gridParams.rotation   = 0.0;
+    RigRegularSurfaceData p;
+    p.nx         = params.nx;
+    p.ny         = params.ny;
+    p.originX    = params.originX;
+    p.originY    = params.originY;
+    p.incrementX = params.incrementX;
+    p.incrementY = params.incrementY;
+    p.rotation   = 0.0;
+    return p;
+}
 
-    auto depthValues = RigSurfaceResampler::resampleToRegularGrid( rigSurface,
-                                                                   params.nx,
-                                                                   params.ny,
-                                                                   params.originX,
-                                                                   params.originY,
-                                                                   params.incrementX,
-                                                                   params.incrementY,
-                                                                   0.0 );
+//--------------------------------------------------------------------------------------------------
+/// For a RimRegularSurface whose stored grid matches gridParams exactly, depth values are returned
+/// directly. Otherwise the surface is resampled onto the grid via RigSurfaceResampler.
+//--------------------------------------------------------------------------------------------------
+std::vector<float> RicExportSurfaceToGriFeature::resampleToGrid( RimSurface* surf, const RigRegularSurfaceData& gridParams )
+{
+    // Regular surface with matching grid: use stored depth values directly (lossless)
+    if ( auto* reg = dynamic_cast<RimRegularSurface*>( surf ) )
+    {
+        if ( reg->nx() == gridParams.nx && reg->ny() == gridParams.ny && reg->originX() == gridParams.originX &&
+             reg->originY() == gridParams.originY && reg->incrementX() == gridParams.incrementX &&
+             reg->incrementY() == gridParams.incrementY && reg->rotation() == gridParams.rotation )
+        {
+            return reg->depthValues();
+        }
+    }
+
+    // Resample the surface onto the requested grid
+    RigSurface* rig = surf->surfaceData();
+    if ( !rig || rig->vertices().empty() ) return {};
+
+    auto depthValues = RigSurfaceResampler::resampleToRegularGrid( rig,
+                                                                   gridParams.nx,
+                                                                   gridParams.ny,
+                                                                   gridParams.originX,
+                                                                   gridParams.originY,
+                                                                   gridParams.incrementX,
+                                                                   gridParams.incrementY,
+                                                                   gridParams.rotation );
 
     // RigSurface stores Z as negative depth; IRAP format uses positive depth values
     for ( auto& v : depthValues )
-    {
         if ( !std::isnan( v ) ) v = -v;
-    }
 
-    return std::make_pair( gridParams, depthValues );
+    return depthValues;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -121,8 +151,7 @@ std::optional<std::pair<RigRegularSurfaceData, std::vector<float>>> RicExportSur
 //--------------------------------------------------------------------------------------------------
 bool RicExportSurfaceToGriFeature::isCommandEnabled() const
 {
-    std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
-    return !surfaces.empty();
+    return !caf::selectedObjectsByTypeStrict<RimSurface*>().empty();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -130,27 +159,31 @@ bool RicExportSurfaceToGriFeature::isCommandEnabled() const
 //--------------------------------------------------------------------------------------------------
 void RicExportSurfaceToGriFeature::onActionTriggered( bool isChecked )
 {
-    RiaApplication* app = RiaApplication::instance();
-
-    QString defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-
-    QString fileExtensionFilter = QString( "IRAP Binary Surface (*.gri)" );
-    QString defaultAbsFileName  = caf::Utils::constructFullFileName( defaultDir, "surface", ".gri" );
-
     std::vector<RimSurface*> surfaces = caf::selectedObjectsByTypeStrict<RimSurface*>();
+    if ( surfaces.empty() ) return;
+
+    // Resolve the shared grid once for all selected surfaces
+    auto gridParams = resolveGridParams( surfaces );
+    if ( !gridParams ) return;
+
+    RiaApplication* app           = RiaApplication::instance();
+    QString         defaultDir    = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
+    const QString   filterStr     = "IRAP Binary Surface (*.gri)";
+
     for ( RimSurface* surf : surfaces )
     {
+        const QString defaultName = caf::Utils::constructFullFileName( defaultDir, surf->userDescription(), ".gri" );
+
         QString selectedExtension;
-        QString fileName =
-            RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultAbsFileName, fileExtensionFilter, &selectedExtension );
+        QString fileName = RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultName, filterStr, &selectedExtension );
         if ( fileName.isEmpty() ) return;
 
         app->setLastUsedDialogDirectory( "EXPORT_SURFACE", QFileInfo( fileName ).absolutePath() );
 
-        auto exportData = prepareExportData( surf );
-        if ( !exportData ) return;
+        const auto depthValues = resampleToGrid( surf, *gridParams );
+        if ( depthValues.empty() ) continue;
 
-        RifSurfio::exportToGri( fileName.toStdString(), exportData->first, exportData->second );
+        RifSurfio::exportToGri( fileName.toStdString(), *gridParams, depthValues );
     }
 }
 

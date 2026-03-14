@@ -35,9 +35,16 @@ class RicExportSurfaceToGriFeature : public caf::CmdFeature
     CAF_CMD_HEADER_INIT;
 
 public:
-    // Shared helper: resolves grid parameters and depth values for any RimSurface type.
-    // Shows a dialog for unstructured surfaces. Returns nullopt if the user cancels.
-    static std::optional<std::pair<RigRegularSurfaceData, std::vector<float>>> prepareExportData( RimSurface* surf );
+    // Determines the regular grid to use for all surfaces.
+    // For a single RimRegularSurface the stored params are returned directly (no dialog).
+    // For multiple surfaces or any unstructured surface, the union bounding box is computed
+    // and a dialog is shown once so the user can confirm/adjust the grid parameters.
+    // Returns nullopt if the user cancels.
+    static std::optional<RigRegularSurfaceData> resolveGridParams( const std::vector<RimSurface*>& surfaces );
+
+    // Resamples one surface onto the given regular grid and returns depth values
+    // in row-major order (index = j * nx + i). Returns an empty vector on failure.
+    static std::vector<float> resampleToGrid( RimSurface* surf, const RigRegularSurfaceData& gridParams );
 
 protected:
     bool isCommandEnabled() const override;
