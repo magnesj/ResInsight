@@ -39,9 +39,8 @@ class RicExportSurfaceToGriFeature : public caf::CmdFeature
 public:
     // Shows the export dialog (pre-populated with grid params from the surface(s) and the given
     // default folder) and returns the accepted parameters, or nullopt if the user cancels.
-    static std::optional<RigRegularSurfaceData> resolveGridParams( const std::vector<RimSurface*>& surfaces,
-                                                                   const QString&                  defaultFolder,
-                                                                   QString&                        exportFolder );
+    static std::optional<RigRegularSurfaceData>
+        resolveGridParams( const std::vector<RimSurface*>& surfaces, const QString& defaultFolder, QString& exportFolder );
 
     // Resamples one surface onto the given regular grid and returns depth values
     // in row-major order (index = j * nx + i). Returns an empty vector on failure.

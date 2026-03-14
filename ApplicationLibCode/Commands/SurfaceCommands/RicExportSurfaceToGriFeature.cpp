@@ -143,8 +143,8 @@ void RicExportSurfaceToGriFeature::exportToFolder( const std::vector<RimSurface*
     RiaApplication* app        = RiaApplication::instance();
     QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
 
-    QString               exportDir;
-    auto                  gridParams = resolveGridParams( surfaces, defaultDir, exportDir );
+    QString exportDir;
+    auto    gridParams = resolveGridParams( surfaces, defaultDir, exportDir );
     if ( !gridParams || exportDir.isEmpty() ) return;
 
     app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
