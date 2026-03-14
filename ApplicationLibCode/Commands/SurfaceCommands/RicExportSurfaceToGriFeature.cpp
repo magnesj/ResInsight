@@ -37,7 +37,6 @@
 #include "cvfBoundingBox.h"
 
 #include <QAction>
-#include <QFileInfo>
 #include <cmath>
 
 CAF_CMD_SOURCE_INIT( RicExportSurfaceToGriFeature, "RicExportSurfaceToGriFeature" );
@@ -166,19 +165,17 @@ void RicExportSurfaceToGriFeature::onActionTriggered( bool isChecked )
     auto gridParams = resolveGridParams( surfaces );
     if ( !gridParams ) return;
 
-    RiaApplication* app           = RiaApplication::instance();
-    QString         defaultDir    = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-    const QString   filterStr     = "IRAP Binary Surface (*.gri)";
+    RiaApplication* app        = RiaApplication::instance();
+    QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
+
+    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, tr( "Select Export Folder" ), defaultDir );
+    if ( exportDir.isEmpty() ) return;
+
+    app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
 
     for ( RimSurface* surf : surfaces )
     {
-        const QString defaultName = caf::Utils::constructFullFileName( defaultDir, surf->userDescription(), ".gri" );
-
-        QString selectedExtension;
-        QString fileName = RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultName, filterStr, &selectedExtension );
-        if ( fileName.isEmpty() ) return;
-
-        app->setLastUsedDialogDirectory( "EXPORT_SURFACE", QFileInfo( fileName ).absolutePath() );
+        const QString fileName = caf::Utils::constructFullFileName( exportDir, surf->userDescription(), ".gri" );
 
         const auto depthValues = resampleToGrid( surf, *gridParams );
         if ( depthValues.empty() ) continue;

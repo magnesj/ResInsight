@@ -31,7 +31,6 @@
 #include "cafUtils.h"
 
 #include <QAction>
-#include <QFileInfo>
 
 CAF_CMD_SOURCE_INIT( RicExportSurfaceToIrapFeature, "RicExportSurfaceToIrapFeature" );
 
@@ -56,20 +55,17 @@ void RicExportSurfaceToIrapFeature::onActionTriggered( bool isChecked )
     auto gridParams = RicExportSurfaceToGriFeature::resolveGridParams( surfaces );
     if ( !gridParams ) return;
 
-    RiaApplication* app       = RiaApplication::instance();
+    RiaApplication* app        = RiaApplication::instance();
     QString         defaultDir = app->lastUsedDialogDirectoryWithFallbackToProjectFolder( "EXPORT_SURFACE" );
-    const QString   filterStr  = "IRAP Classic Surface (*.irap)";
+
+    QString exportDir = RiuFileDialogTools::getExistingDirectory( nullptr, tr( "Select Export Folder" ), defaultDir );
+    if ( exportDir.isEmpty() ) return;
+
+    app->setLastUsedDialogDirectory( "EXPORT_SURFACE", exportDir );
 
     for ( RimSurface* surf : surfaces )
     {
-        const QString defaultName = caf::Utils::constructFullFileName( defaultDir, surf->userDescription(), ".irap" );
-
-        QString selectedExtension;
-        QString fileName =
-            RiuFileDialogTools::getSaveFileName( nullptr, tr( "Export to File" ), defaultName, filterStr, &selectedExtension );
-        if ( fileName.isEmpty() ) return;
-
-        app->setLastUsedDialogDirectory( "EXPORT_SURFACE", QFileInfo( fileName ).absolutePath() );
+        const QString fileName = caf::Utils::constructFullFileName( exportDir, surf->userDescription(), ".irap" );
 
         const auto depthValues = RicExportSurfaceToGriFeature::resampleToGrid( surf, *gridParams );
         if ( depthValues.empty() ) continue;
