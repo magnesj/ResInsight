@@ -19,6 +19,7 @@
 #include "RicExportSurfaceToGriFeature.h"
 
 #include "RiaApplication.h"
+#include "RiaLogging.h"
 
 #include "RifSurfio.h"
 
@@ -171,10 +172,13 @@ void RicExportSurfaceToGriFeature::exportToFolder( const std::vector<RimSurface*
         const auto depthValues = resampleToGrid( surf, *gridParams );
         if ( depthValues.empty() ) continue;
 
-        if ( format == ExportFormat::GRI )
-            RifSurfio::exportToGri( fileName.toStdString(), *gridParams, depthValues );
+        bool ok = ( format == ExportFormat::GRI ) ? RifSurfio::exportToGri( fileName.toStdString(), *gridParams, depthValues )
+                                                  : RifSurfio::exportToIrap( fileName.toStdString(), *gridParams, depthValues );
+
+        if ( ok )
+            RiaLogging::info( QString( "Exported surface to: %1" ).arg( fileName ) );
         else
-            RifSurfio::exportToIrap( fileName.toStdString(), *gridParams, depthValues );
+            RiaLogging::error( QString( "Failed to export surface to: %1" ).arg( fileName ) );
     }
 }
 
