@@ -20,6 +20,8 @@
 
 #include "cafPdmUiFilePathEditor.h"
 
+#include <cmath>
+
 namespace caf
 {
 template <>
@@ -61,10 +63,10 @@ void RicExportSurfaceToGriUi::setDefaults( const QString& exportFolder, int nx, 
     m_exportFolder = exportFolder;
     m_nx           = nx;
     m_ny           = ny;
-    m_originX      = originX;
-    m_originY      = originY;
-    m_incrementX   = incrementX;
-    m_incrementY   = incrementY;
+    m_originX      = std::round( originX );
+    m_originY      = std::round( originY );
+    m_incrementX   = std::round( incrementX );
+    m_incrementY   = std::round( incrementY );
 }
 
 //--------------------------------------------------------------------------------------------------
