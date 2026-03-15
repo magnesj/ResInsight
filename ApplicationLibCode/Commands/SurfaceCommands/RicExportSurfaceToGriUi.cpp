@@ -56,13 +56,7 @@ RicExportSurfaceToGriUi::RicExportSurfaceToGriUi()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicExportSurfaceToGriUi::setDefaults( const QString& exportFolder,
-                                           int            nx,
-                                           int            ny,
-                                           double         originX,
-                                           double         originY,
-                                           double         incrementX,
-                                           double         incrementY )
+void RicExportSurfaceToGriUi::setDefaults( const QString& exportFolder, int nx, int ny, double originX, double originY, double incrementX, double incrementY )
 {
     m_exportFolder = exportFolder;
     m_nx           = nx;
@@ -108,9 +102,7 @@ RicExportSurfaceToGriUi::ExportFormat RicExportSurfaceToGriUi::exportFormat() co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicExportSurfaceToGriUi::defineEditorAttribute( const caf::PdmFieldHandle* field,
-                                                     QString                    uiConfigName,
-                                                     caf::PdmUiEditorAttribute* attribute )
+void RicExportSurfaceToGriUi::defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute )
 {
     if ( field == &m_exportFolder )
     {
