@@ -20,6 +20,7 @@
 
 #include "RifSurfio.h"
 
+#include "cafAppEnum.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
@@ -31,22 +32,30 @@ class RicExportSurfaceToGriUi : public caf::PdmObject
     CAF_PDM_HEADER_INIT;
 
 public:
+    enum class ExportFormat
+    {
+        GRI,
+        IRAP
+    };
+
     RicExportSurfaceToGriUi();
 
     void setDefaults( const QString& exportFolder, int nx, int ny, double originX, double originY, double incrementX, double incrementY );
 
     RigRegularSurfaceData gridParams() const;
     QString               exportFolder() const;
+    ExportFormat          exportFormat() const;
 
 protected:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
 private:
-    caf::PdmField<QString> m_exportFolder;
-    caf::PdmField<int>     m_nx;
-    caf::PdmField<int>     m_ny;
-    caf::PdmField<double>  m_originX;
-    caf::PdmField<double>  m_originY;
-    caf::PdmField<double>  m_incrementX;
-    caf::PdmField<double>  m_incrementY;
+    caf::PdmField<caf::AppEnum<ExportFormat>> m_exportFormat;
+    caf::PdmField<QString>                    m_exportFolder;
+    caf::PdmField<int>                        m_nx;
+    caf::PdmField<int>                        m_ny;
+    caf::PdmField<double>                     m_originX;
+    caf::PdmField<double>                     m_originY;
+    caf::PdmField<double>                     m_incrementX;
+    caf::PdmField<double>                     m_incrementY;
 };

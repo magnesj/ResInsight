@@ -388,7 +388,6 @@ cvf::BoundingBox RimSurface::boundingBoxInDomainCoords() const
 void RimSurface::appendMenuItems( caf::CmdFeatureMenuBuilder& menuBuilder ) const
 {
     menuBuilder << "RicExportSurfaceToGriFeature";
-    menuBuilder << "RicExportSurfaceToIrapFeature";
     menuBuilder << "RicExportSurfaceToTsurfFeature";
     menuBuilder << "Separator";
     menuBuilder << "RicCopySurfaceFeature";

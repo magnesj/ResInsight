@@ -37,23 +37,12 @@ class RicExportSurfaceToGriFeature : public caf::CmdFeature
     CAF_CMD_HEADER_INIT;
 
 public:
-    // Shows the export dialog (pre-populated with grid params from the surface(s) and the given
-    // default folder) and returns the accepted parameters, or nullopt if the user cancels.
-    static std::optional<RigRegularSurfaceData>
-        resolveGridParams( const std::vector<RimSurface*>& surfaces, const QString& defaultFolder, QString& exportFolder );
-
     // Resamples one surface onto the given regular grid and returns depth values
     // in row-major order (index = j * nx + i). Returns an empty vector on failure.
     static std::vector<float> resampleToGrid( RimSurface* surf, const RigRegularSurfaceData& gridParams );
 
-    enum class ExportFormat
-    {
-        GRI,
-        IRAP
-    };
-
-    // Shared export pipeline: resolve grid, ask for folder, resample and write each surface.
-    static void exportToFolder( const std::vector<RimSurface*>& surfaces, ExportFormat format );
+    // Shows the export dialog, resamples and writes each surface. Format is chosen in the dialog.
+    static void exportSurfaces( const std::vector<RimSurface*>& surfaces );
 
 protected:
     bool isCommandEnabled() const override;
