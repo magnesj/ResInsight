@@ -1070,9 +1070,6 @@ caf::CmdFeatureMenuBuilder RimContextCommandBuilder::commandsFromSelection()
         // is aware of multiple selected items, move the command to this list
         // without using dyncamic_cast.
 
-        menuBuilder << "RicExportSurfaceToGriFeature";
-        menuBuilder << "RicExportSurfaceToIrapFeature";
-
         menuBuilder << "RicPasteTimeHistoryCurveFeature";
         menuBuilder << "RicPasteAsciiDataCurveFeature";
         menuBuilder << "RicPasteSummaryCaseFeature";
