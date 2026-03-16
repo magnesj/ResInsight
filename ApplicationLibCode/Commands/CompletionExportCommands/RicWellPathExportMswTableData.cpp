@@ -122,6 +122,13 @@ std::expected<RigMswTableData, std::string>
     // Extract custom segment intervals from MSW parameters
     std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
 
+    // Preprocessing: split main bore segments according to maxSegmentLength and custom intervals.
+    // This must be done before collectWelsegsData so the export pass is purely read-only.
+    preprocessMainBoreSegments( exportInfo.mainBoreBranch(),
+                                 wellPath,
+                                 mswParameters->maxSegmentLength(),
+                                 customSegmentIntervals );
+
     // Use the new collection functions to populate the table data
     RicMswTableDataTools::collectWelsegsData( tableData,
                                               exportInfo,
@@ -872,6 +879,54 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
             QString text = QString( "Skipping segment , threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( segmentLength );
             RiaLogging::info( text );
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Preprocessing step: split main bore segments by maxSegmentLength and customSegmentIntervals.
+/// New sub-segments are inserted before the original segment (which retains its completions).
+/// Recurses into child branches.
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<RicMswBranch*>                  branch,
+                                                                 const RimWellPath*                            wellPath,
+                                                                 double                                        maxSegmentLength,
+                                                                 const std::vector<std::pair<double, double>>& customSegmentIntervals )
+{
+    // Snapshot of current segments (raw pointers), so insertions during iteration are safe
+    auto segments = branch->segments();
+
+    for ( auto* segment : segments )
+    {
+        auto subPairs = RicMswTableDataTools::createSubSegmentMDPairs( segment->startMD(),
+                                                                       segment->endMD(),
+                                                                       maxSegmentLength,
+                                                                       customSegmentIntervals );
+
+        if ( subPairs.size() <= 1 ) continue;
+
+        // Insert N-1 sub-segments before the original segment.
+        // insertAfterSegment(X, Y) inserts Y before X, so repeated calls accumulate in order.
+        for ( size_t i = 0; i + 1 < subPairs.size(); ++i )
+        {
+            auto [subStart, subEnd] = subPairs[i];
+            double subStartTVD     = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subStart );
+            double subEndTVD       = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subEnd );
+
+            auto newSeg = std::make_unique<RicMswSegment>( segment->label(), subStart, subEnd, subStartTVD, subEndTVD );
+            branch->insertAfterSegment( segment, std::move( newSeg ) );
+        }
+
+        // Update the original segment to cover only the last sub-pair
+        auto [lastStart, lastEnd]   = subPairs.back();
+        double lastStartTVD         = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, lastStart );
+        segment->setStartMD( lastStart );
+        segment->setStartTVD( lastStartTVD );
+        // segment->endMD() and outputMD are unchanged (still the original cell midpoint)
+    }
+
+    for ( auto* childBranch : branch->branches() )
+    {
+        preprocessMainBoreSegments( childBranch, childBranch->wellPath(), maxSegmentLength, customSegmentIntervals );
     }
 }
 
