@@ -152,16 +152,13 @@ void collectWsegSicdData( RigMswTableData& tableData, RicMswExportInfo& exportIn
 
 // Helper functions for data collection
 
-void collectWelsegsSegment( RigMswTableData&                              tableData,
-                            RicMswSegment*                                segment,
-                            const RicMswSegment*                          previousSegment,
-                            RicMswExportInfo&                             exportInfo,
-                            double                                        maxSegmentLength,
-                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                            gsl::not_null<RicMswBranch*>                  branch,
-                            int*                                          segmentNumber,
-                            QString                                       branchDescription,
-                            const std::optional<QDateTime>&               exportDate = std::nullopt );
+void collectWelsegsSegment( RigMswTableData&                tableData,
+                            const RicMswSegment*            segment,
+                            const RicMswSegment*            previousSegment,
+                            RicMswExportInfo&               exportInfo,
+                            gsl::not_null<RicMswBranch*>    branch,
+                            QString                         branchDescription,
+                            const std::optional<QDateTime>& exportDate = std::nullopt );
 
 void collectValveWelsegsSegment( RigMswTableData&                              tableData,
                                  const RicMswSegment*                          outletSegment,

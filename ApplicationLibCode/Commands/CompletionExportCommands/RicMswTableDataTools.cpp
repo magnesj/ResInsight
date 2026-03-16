@@ -117,16 +117,8 @@ void RicMswTableDataTools::collectWelsegsDataRecursively( RigMswTableData&      
             branchDescription = QString( "Segments on branch %1" ).arg( branch->label() );
         }
 
-        collectWelsegsSegment( tableData,
-                               segment,
-                               outletSegment,
-                               exportInfo,
-                               maxSegmentLength,
-                               customSegmentIntervals,
-                               branch,
-                               segmentNumber,
-                               branchDescription,
-                               exportDate );
+        collectWelsegsSegment( tableData, segment, outletSegment, exportInfo, branch, branchDescription, exportDate );
+        ( *segmentNumber )++;
         outletSegment = segment;
 
         if ( !exportCompletionSegmentsAfterMainBore )
@@ -180,28 +172,22 @@ void RicMswTableDataTools::collectWelsegsDataRecursively( RigMswTableData&      
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Helper function to collect WELSEGS data for a single segment with sub-segmentation
+/// Collect WELSEGS data for a single preprocessed segment (read-only, no sub-segmentation).
+/// Segment subdivision must have been performed by preprocessMainBoreSegments before this call.
 //--------------------------------------------------------------------------------------------------
-void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&                              tableData,
-                                                  RicMswSegment*                                segment,
-                                                  const RicMswSegment*                          previousSegment,
-                                                  RicMswExportInfo&                             exportInfo,
-                                                  double                                        maxSegmentLength,
-                                                  const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                                  gsl::not_null<RicMswBranch*>                  branch,
-                                                  int*                                          segmentNumber,
-                                                  QString                                       branchDescription,
-                                                  const std::optional<QDateTime>&               exportDate )
+void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&                tableData,
+                                                  const RicMswSegment*            segment,
+                                                  const RicMswSegment*            previousSegment,
+                                                  RicMswExportInfo&               exportInfo,
+                                                  gsl::not_null<RicMswBranch*>    branch,
+                                                  QString                         branchDescription,
+                                                  const std::optional<QDateTime>& exportDate )
 {
-    CVF_ASSERT( segment && segmentNumber );
-
-    double startMD = segment->startMD();
-    double endMD   = segment->endMD();
-
-    std::vector<std::pair<double, double>> segments =
-        RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
-
+    CVF_ASSERT( segment );
     CVF_ASSERT( branch->wellPath() );
+
+    double reportMD  = segment->outputMD();
+    double reportTVD = segment->outputTVD();
 
     double prevOutMD  = branch->startMD();
     double prevOutTVD = branch->startTVD();
@@ -211,90 +197,56 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
         prevOutTVD = previousSegment->outputTVD();
     }
 
-    bool setDescription = true;
-
-    auto outletSegment         = previousSegment;
-    int  previousSegmentNumber = outletSegment ? outletSegment->segmentNumber() : 1;
-    for ( const auto& [subStartMD, subEndMD] : segments )
+    if ( reportMD < prevOutMD )
     {
-        double depth  = 0;
-        double length = 0;
-
-        double midPointMD  = 0.5 * ( subStartMD + subEndMD );
-        double midPointTVD = RicMswTableDataTools::tvdFromMeasuredDepth( branch->wellPath(), midPointMD );
-
-        if ( midPointMD < prevOutMD )
-        {
-            // The first segment of parent branch may sometimes have a MD that is larger than the first segment on the
-            // lateral. If this is the case, use the startMD of the branch instead
-            prevOutMD  = branch->startMD();
-            prevOutTVD = branch->startTVD();
-        }
-
-        if ( exportInfo.lengthAndDepthText() == "INC" )
-        {
-            depth  = midPointTVD - prevOutTVD;
-            length = midPointMD - prevOutMD;
-        }
-        else
-        {
-            depth  = midPointTVD;
-            length = midPointMD;
-        }
-
-        double linerDiameter   = 0.0;
-        double roughnessFactor = 0.0;
-        if ( exportDate.has_value() )
-        {
-            linerDiameter = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
-            roughnessFactor =
-                branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
-        }
-        else
-        {
-            linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem() );
-            roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem() );
-        }
-
-        WelsegsRow row;
-        row.sourceWellName = branch->wellPath()->name().toStdString();
-        row.segment1       = segment->segmentNumber();
-        row.segment2       = segment->segmentNumber();
-        row.joinSegment    = previousSegmentNumber;
-        row.branch         = branch->branchNumber();
-        row.length         = length;
-        row.depth          = depth;
-        row.diameter       = linerDiameter;
-        row.roughness      = roughnessFactor;
-        if ( setDescription )
-        {
-            row.description = branchDescription.toStdString();
-            setDescription  = false;
-        }
-
-        tableData.addWelsegsRow( row );
-
-        previousSegmentNumber++;
-
-        if ( segments.size() > 1 )
-        {
-            ( *segmentNumber )++;
-            segment->setSegmentNumber( *segmentNumber );
-        }
-
-        segment->setOutputMD( midPointMD );
-        segment->setOutputTVD( midPointTVD );
-        segment->setSegmentNumber( *segmentNumber );
-
-        outletSegment = segment;
-        prevOutMD     = midPointMD;
-        prevOutTVD    = midPointTVD;
+        // The first segment of parent branch may sometimes have a MD that is larger than the first segment on the
+        // lateral. If this is the case, use the startMD of the branch instead
+        prevOutMD  = branch->startMD();
+        prevOutTVD = branch->startTVD();
     }
 
-    if ( segments.size() <= 1 )
+    double depth  = 0;
+    double length = 0;
+    if ( exportInfo.lengthAndDepthText() == "INC" )
     {
-        ( *segmentNumber )++;
+        depth  = reportTVD - prevOutTVD;
+        length = reportMD - prevOutMD;
     }
+    else
+    {
+        depth  = reportTVD;
+        length = reportMD;
+    }
+
+    double linerDiameter   = 0.0;
+    double roughnessFactor = 0.0;
+    if ( exportDate.has_value() )
+    {
+        linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( reportMD, exportInfo.unitSystem(), *exportDate );
+        roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( reportMD, exportInfo.unitSystem(), *exportDate );
+    }
+    else
+    {
+        linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( reportMD, exportInfo.unitSystem() );
+        roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( reportMD, exportInfo.unitSystem() );
+    }
+
+    int joinSegment = previousSegment ? previousSegment->segmentNumber() : 1;
+
+    WelsegsRow row;
+    row.sourceWellName = branch->wellPath()->name().toStdString();
+    row.segment1       = segment->segmentNumber();
+    row.segment2       = segment->segmentNumber();
+    row.joinSegment    = joinSegment;
+    row.branch         = branch->branchNumber();
+    row.length         = length;
+    row.depth          = depth;
+    row.diameter       = linerDiameter;
+    row.roughness      = roughnessFactor;
+    row.description    = branchDescription.toStdString();
+
+    tableData.addWelsegsRow( row );
+    // No mutations to segment data.
 }
 
 //--------------------------------------------------------------------------------------------------
