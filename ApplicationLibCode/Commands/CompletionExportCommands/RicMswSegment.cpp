@@ -95,6 +95,24 @@ void RicMswSegment::setStartTVD( double startTVD )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicMswSegment::setEndMD( double endMD )
+{
+    m_endMD    = endMD;
+    m_outputMD = endMD; // outputMD is always kept in sync with endMD
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswSegment::setEndTVD( double endTVD )
+{
+    m_endTVD    = endTVD;
+    m_outputTVD = endTVD; // outputTVD is always kept in sync with endTVD
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicMswSegment::setOutputMD( double outputMD )
 {
     m_outputMD = outputMD;
