@@ -171,7 +171,7 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
     double endMD   = segment->endMD();
 
     // Custom interval segments are honoured as a single output row — do not subdivide by maxSegmentLength.
-    const double effectiveMaxLength = segment->isCustomInterval() ? 0.0 : maxSegmentLength;
+    const double                           effectiveMaxLength = segment->isCustomInterval() ? 0.0 : maxSegmentLength;
     std::vector<std::pair<double, double>> segments = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, effectiveMaxLength );
 
     CVF_ASSERT( branch->wellPath() );
@@ -222,7 +222,7 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
         double roughnessFactor = 0.0;
         if ( exportDate.has_value() )
         {
-            linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( refMD, exportInfo.unitSystem(), *exportDate );
+            linerDiameter = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( refMD, exportInfo.unitSystem(), *exportDate );
             roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( refMD, exportInfo.unitSystem(), *exportDate );
         }
         else
@@ -1013,8 +1013,7 @@ void RicMswTableDataTools::generateWsegSicdTableRecursively( RicMswExportInfo&  
 /// splitIntersectionsAtCustomBoundaries) so each segment already aligns with interval
 /// boundaries by the time this function is called.
 //--------------------------------------------------------------------------------------------------
-std::vector<std::pair<double, double>>
-    RicMswTableDataTools::createSubSegmentMDPairs( double startMD, double endMD, double maxSegmentLength )
+std::vector<std::pair<double, double>> RicMswTableDataTools::createSubSegmentMDPairs( double startMD, double endMD, double maxSegmentLength )
 {
     std::vector<std::pair<double, double>> subSegmentMDPairs;
 

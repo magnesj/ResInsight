@@ -602,13 +602,21 @@ bool RicWellPathExportMswTableData::generateWellSegmentsForMswExportInfo( const 
     // Split intersections at custom interval boundaries so that no single WellPathCellIntersectionInfo
     // straddles a custom interval boundary. Consecutive split intersections that fall within the same
     // custom interval are then merged into one RicMswSegment by createWellPathSegments.
-    auto processedIntersections = customIntervals.empty()
-                                      ? filteredIntersections
-                                      : splitIntersectionsAtCustomBoundaries( filteredIntersections, customIntervals, wellPath->wellPathGeometry(), eclipseCase );
+    auto processedIntersections =
+        customIntervals.empty()
+            ? filteredIntersections
+            : splitIntersectionsAtCustomBoundaries( filteredIntersections, customIntervals, wellPath->wellPathGeometry(), eclipseCase );
 
     bool foundSubGridIntersections = false;
 
-    createWellPathSegments( branch, processedIntersections, customIntervals, perforationIntervals, wellPath, exportDate, eclipseCase, &foundSubGridIntersections );
+    createWellPathSegments( branch,
+                            processedIntersections,
+                            customIntervals,
+                            perforationIntervals,
+                            wellPath,
+                            exportDate,
+                            eclipseCase,
+                            &foundSubGridIntersections );
 
     createValveCompletions( branch, perforationIntervals, wellPath, exportInfo->unitSystem() );
 
@@ -821,9 +829,9 @@ std::vector<WellPathCellIntersectionInfo>
 //--------------------------------------------------------------------------------------------------
 std::vector<WellPathCellIntersectionInfo>
     RicWellPathExportMswTableData::splitIntersectionsAtCustomBoundaries( const std::vector<WellPathCellIntersectionInfo>& intersections,
-                                                                         const std::vector<std::pair<double, double>>&    customSegmentIntervals,
-                                                                         gsl::not_null<const RigWellPath*>                wellPathGeometry,
-                                                                         gsl::not_null<const RimEclipseCase*>             eclipseCase )
+                                                                         const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                                                         gsl::not_null<const RigWellPath*>    wellPathGeometry,
+                                                                         gsl::not_null<const RimEclipseCase*> eclipseCase )
 {
     if ( customSegmentIntervals.empty() ) return intersections;
 
@@ -835,8 +843,8 @@ std::vector<WellPathCellIntersectionInfo>
         boundaryMDs.insert( endMD );
     }
 
-    const double            splitTolerance = 1.0e-3;
-    const RigMainGrid*      grid           = eclipseCase->mainGrid();
+    const double                              splitTolerance = 1.0e-3;
+    const RigMainGrid*                        grid           = eclipseCase->mainGrid();
     std::vector<WellPathCellIntersectionInfo> result;
     result.reserve( intersections.size() );
 
@@ -846,8 +854,7 @@ std::vector<WellPathCellIntersectionInfo>
         std::vector<double> splitMDs;
         for ( double md : boundaryMDs )
         {
-            if ( md > intersection.startMD + splitTolerance && md < intersection.endMD - splitTolerance )
-                splitMDs.push_back( md );
+            if ( md > intersection.startMD + splitTolerance && md < intersection.endMD - splitTolerance ) splitMDs.push_back( md );
         }
 
         if ( splitMDs.empty() )
@@ -968,10 +975,10 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
         else
         {
             SegmentGroup g;
-            g.startMD         = cellIntInfo.startMD;
-            g.endMD           = cellIntInfo.endMD;
-            g.startTVD        = cellIntInfo.startTVD();
-            g.endTVD          = cellIntInfo.endTVD();
+            g.startMD          = cellIntInfo.startMD;
+            g.endMD            = cellIntInfo.endMD;
+            g.startTVD         = cellIntInfo.startTVD();
+            g.endTVD           = cellIntInfo.endTVD();
             g.isCustomInterval = ( intervalIdx >= 0 );
             g.cells            = { cellIntInfo };
             groups.push_back( std::move( g ) );
@@ -986,8 +993,7 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
         const double segmentLength = std::fabs( group.endMD - group.startMD );
         if ( segmentLength <= segmentLengthThreshold )
         {
-            RiaLogging::info(
-                QString( "Skipping segment , threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( segmentLength ) );
+            RiaLogging::info( QString( "Skipping segment , threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( segmentLength ) );
             continue;
         }
 
