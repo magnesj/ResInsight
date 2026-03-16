@@ -32,8 +32,8 @@ RicMswSegment::RicMswSegment( const QString& label, double startMD, double endMD
     , m_endMD( endMD )
     , m_startTVD( startTVD )
     , m_endTVD( endTVD )
-    , m_outputMD( 0.0 )
-    , m_outputTVD( 0.0 )
+    , m_outputMD( endMD )
+    , m_outputTVD( endTVD )
     , m_equivalentDiameter( 0.15 )
     , m_holeDiameter( RicMswExportInfo::defaultDoubleValue() )
     , m_openHoleRoughnessFactor( 5.0e-5 )
@@ -74,6 +74,22 @@ double RicMswSegment::startTVD() const
 double RicMswSegment::endTVD() const
 {
     return m_endTVD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswSegment::setStartMD( double startMD )
+{
+    m_startMD = startMD;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswSegment::setStartTVD( double startTVD )
+{
+    m_startTVD = startTVD;
 }
 
 //--------------------------------------------------------------------------------------------------
