@@ -820,17 +820,25 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
     // is a pretty large threshold based on the indicated threshold of 0.001m for MSW segments
     const double segmentLengthThreshold = 1.0e-3;
 
+    // Each segment spans [prevEndMD, cellMidMD] so that the reported MD is the cell midpoint.
+    // This ensures that WELSEGS lengths are computed relative to the midpoint of each grid cell.
+    double prevEndMD  = branch->startMD();
+    double prevEndTVD = branch->startTVD();
+
     for ( const auto& cellIntInfo : cellSegmentIntersections )
     {
         const double segmentLength = std::fabs( cellIntInfo.endMD - cellIntInfo.startMD );
 
         if ( segmentLength > segmentLengthThreshold )
         {
+            double midMD  = 0.5 * ( cellIntInfo.startMD + cellIntInfo.endMD );
+            double midTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, midMD );
+
             auto segment = std::make_unique<RicMswSegment>( QString( "%1 segment" ).arg( branch->label() ),
-                                                            cellIntInfo.startMD,
-                                                            cellIntInfo.endMD,
-                                                            cellIntInfo.startTVD(),
-                                                            cellIntInfo.endTVD() );
+                                                            prevEndMD,
+                                                            midMD,
+                                                            prevEndTVD,
+                                                            midTVD );
 
             for ( const RimPerforationInterval* interval : perforationIntervals )
             {
@@ -853,6 +861,10 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
                     segment->addCompletion( std::move( intervalCompletion ) );
                 }
             }
+
+            prevEndMD  = midMD;
+            prevEndTVD = midTVD;
+
             branch->addSegment( std::move( segment ) );
         }
         else
