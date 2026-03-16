@@ -883,8 +883,66 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Preprocessing step: split main bore segments by maxSegmentLength and customSegmentIntervals.
-/// New sub-segments are inserted before the original segment (which retains its completions).
+/// Merge consecutive segments whose endMDs both fall within the same custom interval [a, b].
+/// The first segment is extended to cover the last; its completions and intersections are
+/// accumulated. Subsequent segments in the group are removed from the branch.
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswTableData::mergeSegmentsForCustomIntervals( gsl::not_null<RicMswBranch*>                  branch,
+                                                                      const std::vector<std::pair<double, double>>& customSegmentIntervals )
+{
+    for ( const auto& [intervalStart, intervalEnd] : customSegmentIntervals )
+    {
+        bool mergedAny = true;
+        while ( mergedAny )
+        {
+            mergedAny    = false;
+            auto segments = branch->segments(); // fresh snapshot each pass
+
+            for ( size_t i = 0; i + 1 < segments.size(); ++i )
+            {
+                auto* seg  = segments[i];
+                auto* next = segments[i + 1];
+
+                // A segment is "within" the interval if its representative MD (endMD = cell midpoint)
+                // is within [intervalStart, intervalEnd].
+                bool segWithin  = ( seg->endMD() >= intervalStart && seg->endMD() <= intervalEnd );
+                bool nextWithin = ( next->endMD() >= intervalStart && next->endMD() <= intervalEnd );
+
+                if ( segWithin && nextWithin )
+                {
+                    // Extend seg to cover next
+                    seg->setEndMD( next->endMD() );
+                    seg->setEndTVD( next->endTVD() );
+
+                    // Transfer completions from next into seg
+                    auto comps = next->completions();
+                    for ( auto* comp : comps )
+                    {
+                        seg->addCompletion( next->removeCompletion( comp ) );
+                    }
+
+                    // Transfer cell intersections
+                    for ( auto& intersection : next->intersections() )
+                    {
+                        seg->addIntersection( intersection );
+                    }
+                    auto mergedCells = seg->globalCellsIntersected();
+                    auto nextCells   = next->globalCellsIntersected();
+                    mergedCells.insert( nextCells.begin(), nextCells.end() );
+                    seg->setIntersectedGlobalCells( mergedCells );
+
+                    branch->removeSegment( next );
+                    mergedAny = true;
+                    break; // restart scan with fresh snapshot
+                }
+            }
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Preprocessing step: first merge grid cells covered by the same custom interval into a single
+/// segment, then split any remaining segments that exceed maxSegmentLength.
 /// Recurses into child branches.
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<RicMswBranch*>                  branch,
@@ -892,15 +950,18 @@ void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<Ri
                                                                  double                                        maxSegmentLength,
                                                                  const std::vector<std::pair<double, double>>& customSegmentIntervals )
 {
-    // Snapshot of current segments (raw pointers), so insertions during iteration are safe
-    auto segments = branch->segments();
+    // Step 1: merge grid-cell segments that are covered by the same custom interval
+    mergeSegmentsForCustomIntervals( branch, customSegmentIntervals );
 
+    // Step 2: split segments that exceed maxSegmentLength.
+    // Custom interval boundaries are already handled by the merge, so pass empty intervals here.
+    auto segments = branch->segments(); // snapshot; insertions during iteration are safe
     for ( auto* segment : segments )
     {
         auto subPairs = RicMswTableDataTools::createSubSegmentMDPairs( segment->startMD(),
                                                                        segment->endMD(),
                                                                        maxSegmentLength,
-                                                                       customSegmentIntervals );
+                                                                       {} );
 
         if ( subPairs.size() <= 1 ) continue;
 
@@ -917,11 +978,10 @@ void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<Ri
         }
 
         // Update the original segment to cover only the last sub-pair
-        auto [lastStart, lastEnd]   = subPairs.back();
-        double lastStartTVD         = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, lastStart );
+        auto [lastStart, lastEnd] = subPairs.back();
+        double lastStartTVD       = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, lastStart );
         segment->setStartMD( lastStart );
         segment->setStartTVD( lastStartTVD );
-        // segment->endMD() and outputMD are unchanged (still the original cell midpoint)
     }
 
     for ( auto* childBranch : branch->branches() )

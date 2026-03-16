@@ -190,6 +190,9 @@ private:
                                              double                                        maxSegmentLength,
                                              const std::vector<std::pair<double, double>>& customSegmentIntervals );
 
+    static void mergeSegmentsForCustomIntervals( gsl::not_null<RicMswBranch*>                  branch,
+                                                 const std::vector<std::pair<double, double>>& customSegmentIntervals );
+
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
 };
 
