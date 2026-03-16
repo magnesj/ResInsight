@@ -108,22 +108,20 @@ public:
 };
 
 // New data collection functions (replace formatter versions)
-void collectWelsegsData( RigMswTableData&                              tableData,
-                         RicMswExportInfo&                             exportInfo,
-                         double                                        maxSegmentLength,
-                         const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                         bool                                          exportCompletionSegmentsAfterMainBore,
-                         const std::optional<QDateTime>&               exportDate = std::nullopt );
+void collectWelsegsData( RigMswTableData&                tableData,
+                         RicMswExportInfo&               exportInfo,
+                         double                          maxSegmentLength,
+                         bool                            exportCompletionSegmentsAfterMainBore,
+                         const std::optional<QDateTime>& exportDate = std::nullopt );
 
-void collectWelsegsDataRecursively( RigMswTableData&                              tableData,
-                                    RicMswExportInfo&                             exportInfo,
-                                    gsl::not_null<RicMswBranch*>                  branch,
-                                    gsl::not_null<int*>                           segmentNumber,
-                                    double                                        maxSegmentLength,
-                                    const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                    bool                                          exportCompletionSegmentsAfterMainBore,
-                                    RicMswSegment*                                connectedToSegment,
-                                    const std::optional<QDateTime>&               exportDate = std::nullopt );
+void collectWelsegsDataRecursively( RigMswTableData&                tableData,
+                                    RicMswExportInfo&               exportInfo,
+                                    gsl::not_null<RicMswBranch*>    branch,
+                                    gsl::not_null<int*>             segmentNumber,
+                                    double                          maxSegmentLength,
+                                    bool                            exportCompletionSegmentsAfterMainBore,
+                                    RicMswSegment*                  connectedToSegment,
+                                    const std::optional<QDateTime>& exportDate = std::nullopt );
 
 void collectCompsegData( RigMswTableData&                tableData,
                          RicMswExportInfo&               exportInfo,
@@ -152,41 +150,37 @@ void collectWsegSicdData( RigMswTableData& tableData, RicMswExportInfo& exportIn
 
 // Helper functions for data collection
 
-void collectWelsegsSegment( RigMswTableData&                              tableData,
-                            RicMswSegment*                                segment,
-                            const RicMswSegment*                          previousSegment,
-                            RicMswExportInfo&                             exportInfo,
-                            double                                        maxSegmentLength,
-                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                            gsl::not_null<RicMswBranch*>                  branch,
-                            int*                                          segmentNumber,
-                            QString                                       branchDescription,
-                            const std::optional<QDateTime>&               exportDate = std::nullopt );
+void collectWelsegsSegment( RigMswTableData&                tableData,
+                            RicMswSegment*                  segment,
+                            const RicMswSegment*            previousSegment,
+                            RicMswExportInfo&               exportInfo,
+                            double                          maxSegmentLength,
+                            gsl::not_null<RicMswBranch*>    branch,
+                            int*                            segmentNumber,
+                            QString                         branchDescription,
+                            const std::optional<QDateTime>& exportDate = std::nullopt );
 
-void collectValveWelsegsSegment( RigMswTableData&                              tableData,
-                                 const RicMswSegment*                          outletSegment,
-                                 RicMswValve*                                  valve,
-                                 RicMswExportInfo&                             exportInfo,
-                                 double                                        maxSegmentLength,
-                                 const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                 int*                                          segmentNumber );
+void collectValveWelsegsSegment( RigMswTableData&     tableData,
+                                 const RicMswSegment* outletSegment,
+                                 RicMswValve*         valve,
+                                 RicMswExportInfo&    exportInfo,
+                                 double               maxSegmentLength,
+                                 int*                 segmentNumber );
 
-void collectCompletionsForSegment( RigMswTableData&                              tableData,
-                                   gsl::not_null<const RicMswSegment*>           outletSegment,
-                                   gsl::not_null<RicMswSegment*>                 segment,
-                                   RicMswValve**                                 outletValve,
-                                   RicMswExportInfo&                             exportInfo,
-                                   double                                        maxSegmentLength,
-                                   const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                   int*                                          segmentNumber );
+void collectCompletionsForSegment( RigMswTableData&                    tableData,
+                                   gsl::not_null<const RicMswSegment*> outletSegment,
+                                   gsl::not_null<RicMswSegment*>       segment,
+                                   RicMswValve**                       outletValve,
+                                   RicMswExportInfo&                   exportInfo,
+                                   double                              maxSegmentLength,
+                                   int*                                segmentNumber );
 
-void collectCompletionWelsegsSegments( RigMswTableData&                              tableData,
-                                       gsl::not_null<const RicMswSegment*>           outletSegment,
-                                       gsl::not_null<RicMswCompletion*>              completion,
-                                       RicMswExportInfo&                             exportInfo,
-                                       double                                        maxSegmentLength,
-                                       const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                       int*                                          segmentNumber );
+void collectCompletionWelsegsSegments( RigMswTableData&                    tableData,
+                                       gsl::not_null<const RicMswSegment*> outletSegment,
+                                       gsl::not_null<RicMswCompletion*>    completion,
+                                       RicMswExportInfo&                   exportInfo,
+                                       double                              maxSegmentLength,
+                                       int*                                segmentNumber );
 
 void generateWsegAicdTableRecursively( RicMswExportInfo&                                 exportInfo,
                                        gsl::not_null<const RicMswBranch*>                branch,
@@ -198,10 +192,7 @@ void generateWsegSicdTableRecursively( RicMswExportInfo&                        
                                        std::map<size_t, std::vector<SicdWsegvalveData>>& sicdValveData,
                                        const std::optional<QDateTime>&                   exportDate = std::nullopt );
 
-std::vector<std::pair<double, double>> createSubSegmentMDPairs( double                                        startMD,
-                                                                double                                        endMD,
-                                                                double                                        maxSegmentLength,
-                                                                const std::vector<std::pair<double, double>>& customSegmentIntervals = {} );
+std::vector<std::pair<double, double>> createSubSegmentMDPairs( double startMD, double endMD, double maxSegmentLength );
 
 double tvdFromMeasuredDepth( gsl::not_null<const RimWellPath*> wellPath, double measuredDepth );
 
