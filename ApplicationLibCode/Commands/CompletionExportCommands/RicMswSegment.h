@@ -86,6 +86,9 @@ public:
     std::set<size_t> globalCellsIntersected() const;
     void             setIntersectedGlobalCells( const std::set<size_t>& intersectedCells );
 
+    void setIsCustomInterval( bool isCustomInterval );
+    bool isCustomInterval() const;
+
     void                  setSourcePdmObject( const caf::PdmObject* object );
     const caf::PdmObject* sourcePdmObject() const;
 
@@ -114,6 +117,8 @@ private:
 
     // All global cells intersected by this segment
     std::set<std::size_t> m_intersectedGlobalCells;
+
+    bool m_isCustomInterval = false;
 
     caf::PdmPointer<caf::PdmObject> m_sourcePdmObject;
 };

@@ -323,6 +323,22 @@ void RicMswSegment::setIntersectedGlobalCells( const std::set<size_t>& intersect
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicMswSegment::setIsCustomInterval( bool isCustomInterval )
+{
+    m_isCustomInterval = isCustomInterval;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+bool RicMswSegment::isCustomInterval() const
+{
+    return m_isCustomInterval;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicMswSegment::setSourcePdmObject( const caf::PdmObject* object )
 {
     m_sourcePdmObject = const_cast<caf::PdmObject*>( object );

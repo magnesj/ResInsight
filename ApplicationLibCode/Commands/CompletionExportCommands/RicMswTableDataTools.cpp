@@ -170,7 +170,9 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
     double startMD = segment->startMD();
     double endMD   = segment->endMD();
 
-    std::vector<std::pair<double, double>> segments = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength );
+    // Custom interval segments are honoured as a single output row — do not subdivide by maxSegmentLength.
+    const double effectiveMaxLength = segment->isCustomInterval() ? 0.0 : maxSegmentLength;
+    std::vector<std::pair<double, double>> segments = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, effectiveMaxLength );
 
     CVF_ASSERT( branch->wellPath() );
 
@@ -191,10 +193,13 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
         double depth  = 0;
         double length = 0;
 
-        double midPointMD  = 0.5 * ( subStartMD + subEndMD );
-        double midPointTVD = RicMswTableDataTools::tvdFromMeasuredDepth( branch->wellPath(), midPointMD );
+        // For custom interval segments the reference point is the end MD so that the segment
+        // spans exactly from its defined start to end. For cell-based segments the conventional
+        // midpoint is used.
+        const double refMD  = segment->isCustomInterval() ? subEndMD : 0.5 * ( subStartMD + subEndMD );
+        const double refTVD = RicMswTableDataTools::tvdFromMeasuredDepth( branch->wellPath(), refMD );
 
-        if ( midPointMD < prevOutMD )
+        if ( refMD < prevOutMD )
         {
             // The first segment of parent branch may sometimes have a MD that is larger than the first segment on the
             // lateral. If this is the case, use the startMD of the branch instead
@@ -204,27 +209,26 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
 
         if ( exportInfo.lengthAndDepthText() == "INC" )
         {
-            depth  = midPointTVD - prevOutTVD;
-            length = midPointMD - prevOutMD;
+            depth  = refTVD - prevOutTVD;
+            length = refMD - prevOutMD;
         }
         else
         {
-            depth  = midPointTVD;
-            length = midPointMD;
+            depth  = refTVD;
+            length = refMD;
         }
 
         double linerDiameter   = 0.0;
         double roughnessFactor = 0.0;
         if ( exportDate.has_value() )
         {
-            linerDiameter = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
-            roughnessFactor =
-                branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
+            linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( refMD, exportInfo.unitSystem(), *exportDate );
+            roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( refMD, exportInfo.unitSystem(), *exportDate );
         }
         else
         {
-            linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem() );
-            roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem() );
+            linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( refMD, exportInfo.unitSystem() );
+            roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( refMD, exportInfo.unitSystem() );
         }
 
         WelsegsRow row;
@@ -253,13 +257,13 @@ void RicMswTableDataTools::collectWelsegsSegment( RigMswTableData&              
             segment->setSegmentNumber( *segmentNumber );
         }
 
-        segment->setOutputMD( midPointMD );
-        segment->setOutputTVD( midPointTVD );
+        segment->setOutputMD( refMD );
+        segment->setOutputTVD( refTVD );
         segment->setSegmentNumber( *segmentNumber );
 
         outletSegment = segment;
-        prevOutMD     = midPointMD;
-        prevOutTVD    = midPointTVD;
+        prevOutMD     = refMD;
+        prevOutTVD    = refTVD;
     }
 
     if ( segments.size() <= 1 )

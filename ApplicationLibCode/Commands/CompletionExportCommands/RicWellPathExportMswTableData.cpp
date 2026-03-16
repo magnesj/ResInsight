@@ -945,6 +945,7 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
     struct SegmentGroup
     {
         double                                    startMD, endMD, startTVD, endTVD;
+        bool                                      isCustomInterval = false;
         std::vector<WellPathCellIntersectionInfo> cells;
     };
 
@@ -953,7 +954,7 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
 
     for ( const auto& cellIntInfo : cellSegmentIntersections )
     {
-        double midMD      = 0.5 * ( cellIntInfo.startMD + cellIntInfo.endMD );
+        double midMD       = 0.5 * ( cellIntInfo.startMD + cellIntInfo.endMD );
         int    intervalIdx = findCustomIntervalIndex( midMD );
 
         // Merge into the current group only if both this cell and the previous cell are in
@@ -967,11 +968,12 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
         else
         {
             SegmentGroup g;
-            g.startMD  = cellIntInfo.startMD;
-            g.endMD    = cellIntInfo.endMD;
-            g.startTVD = cellIntInfo.startTVD();
-            g.endTVD   = cellIntInfo.endTVD();
-            g.cells    = { cellIntInfo };
+            g.startMD         = cellIntInfo.startMD;
+            g.endMD           = cellIntInfo.endMD;
+            g.startTVD        = cellIntInfo.startTVD();
+            g.endTVD          = cellIntInfo.endTVD();
+            g.isCustomInterval = ( intervalIdx >= 0 );
+            g.cells            = { cellIntInfo };
             groups.push_back( std::move( g ) );
             currentIntervalIdx = intervalIdx;
         }
@@ -994,6 +996,7 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
                                                         group.endMD,
                                                         group.startTVD,
                                                         group.endTVD );
+        segment->setIsCustomInterval( group.isCustomInterval );
 
         for ( const auto& cellIntInfo : group.cells )
         {
