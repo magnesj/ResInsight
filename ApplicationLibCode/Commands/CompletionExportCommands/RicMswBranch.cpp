@@ -58,6 +58,18 @@ void RicMswBranch::insertAfterSegment( const RicMswSegment* insertAfter, std::un
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RicMswBranch::removeSegment( const RicMswSegment* segment )
+{
+    auto it = std::find_if( m_segments.begin(), m_segments.end(), [segment]( const auto& item ) { return item.get() == segment; } );
+    if ( it != m_segments.end() )
+    {
+        m_segments.erase( it );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RicMswBranch::sortSegments()
 {
     std::stable_sort( m_segments.begin(),

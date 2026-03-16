@@ -38,6 +38,7 @@ public:
 
     void               addSegment( std::unique_ptr<RicMswSegment> segment );
     void               insertAfterSegment( const RicMswSegment* insertAfter, std::unique_ptr<RicMswSegment> segment );
+    void               removeSegment( const RicMswSegment* segment );
     void               sortSegments();
     const RimWellPath* wellPath() const;
 
