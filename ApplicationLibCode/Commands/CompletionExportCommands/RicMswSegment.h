@@ -48,10 +48,10 @@ public:
     double startTVD() const override;
     double endTVD() const override;
 
-    void   setStartMD( double startMD );
-    void   setStartTVD( double startTVD );
-    void   setEndMD( double endMD );
-    void   setEndTVD( double endTVD );
+    void setStartMD( double startMD );
+    void setStartTVD( double startTVD );
+    void setEndMD( double endMD );
+    void setEndTVD( double endTVD );
 
     void   setOutputMD( double outputMD );
     double outputMD() const;

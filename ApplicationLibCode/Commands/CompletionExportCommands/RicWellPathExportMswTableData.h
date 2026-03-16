@@ -186,9 +186,9 @@ private:
     static std::unique_ptr<RicMswBranch> createChildMswBranch( const RimWellPath* childWellPath );
 
     static void preprocessMainBoreSegments( gsl::not_null<RicMswBranch*>                  branch,
-                                             const RimWellPath*                            wellPath,
-                                             double                                        maxSegmentLength,
-                                             const std::vector<std::pair<double, double>>& customSegmentIntervals );
+                                            const RimWellPath*                            wellPath,
+                                            double                                        maxSegmentLength,
+                                            const std::vector<std::pair<double, double>>& customSegmentIntervals );
 
     static void mergeSegmentsForCustomIntervals( gsl::not_null<RicMswBranch*>                  branch,
                                                  const std::vector<std::pair<double, double>>& customSegmentIntervals );

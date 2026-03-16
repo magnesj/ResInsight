@@ -124,10 +124,7 @@ std::expected<RigMswTableData, std::string>
 
     // Preprocessing: split main bore segments according to maxSegmentLength and custom intervals.
     // This must be done before collectWelsegsData so the export pass is purely read-only.
-    preprocessMainBoreSegments( exportInfo.mainBoreBranch(),
-                                 wellPath,
-                                 mswParameters->maxSegmentLength(),
-                                 customSegmentIntervals );
+    preprocessMainBoreSegments( exportInfo.mainBoreBranch(), wellPath, mswParameters->maxSegmentLength(), customSegmentIntervals );
 
     // Use the new collection functions to populate the table data
     RicMswTableDataTools::collectWelsegsData( tableData,
@@ -841,11 +838,8 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
             double midMD  = 0.5 * ( cellIntInfo.startMD + cellIntInfo.endMD );
             double midTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, midMD );
 
-            auto segment = std::make_unique<RicMswSegment>( QString( "%1 segment" ).arg( branch->label() ),
-                                                            prevEndMD,
-                                                            midMD,
-                                                            prevEndTVD,
-                                                            midTVD );
+            auto segment =
+                std::make_unique<RicMswSegment>( QString( "%1 segment" ).arg( branch->label() ), prevEndMD, midMD, prevEndTVD, midTVD );
 
             for ( const RimPerforationInterval* interval : perforationIntervals )
             {
@@ -888,14 +882,14 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
 /// accumulated. Subsequent segments in the group are removed from the branch.
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::mergeSegmentsForCustomIntervals( gsl::not_null<RicMswBranch*>                  branch,
-                                                                      const std::vector<std::pair<double, double>>& customSegmentIntervals )
+                                                                     const std::vector<std::pair<double, double>>& customSegmentIntervals )
 {
     for ( const auto& [intervalStart, intervalEnd] : customSegmentIntervals )
     {
         bool mergedAny = true;
         while ( mergedAny )
         {
-            mergedAny    = false;
+            mergedAny     = false;
             auto segments = branch->segments(); // fresh snapshot each pass
 
             for ( size_t i = 0; i + 1 < segments.size(); ++i )
@@ -947,9 +941,9 @@ void RicWellPathExportMswTableData::mergeSegmentsForCustomIntervals( gsl::not_nu
 /// Recurses into child branches.
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<RicMswBranch*>                  branch,
-                                                                 const RimWellPath*                            wellPath,
-                                                                 double                                        maxSegmentLength,
-                                                                 const std::vector<std::pair<double, double>>& customSegmentIntervals )
+                                                                const RimWellPath*                            wellPath,
+                                                                double                                        maxSegmentLength,
+                                                                const std::vector<std::pair<double, double>>& customSegmentIntervals )
 {
     // Step 1: merge grid-cell segments that are covered by the same custom interval
     mergeSegmentsForCustomIntervals( branch, customSegmentIntervals );
@@ -964,16 +958,10 @@ void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<Ri
         bool inCustomInterval = std::any_of( customSegmentIntervals.begin(),
                                              customSegmentIntervals.end(),
                                              [segment]( const auto& interval )
-                                             {
-                                                 return segment->endMD() >= interval.first &&
-                                                        segment->endMD() <= interval.second;
-                                             } );
+                                             { return segment->endMD() >= interval.first && segment->endMD() <= interval.second; } );
         if ( inCustomInterval ) continue;
 
-        auto subPairs = RicMswTableDataTools::createSubSegmentMDPairs( segment->startMD(),
-                                                                       segment->endMD(),
-                                                                       maxSegmentLength,
-                                                                       {} );
+        auto subPairs = RicMswTableDataTools::createSubSegmentMDPairs( segment->startMD(), segment->endMD(), maxSegmentLength, {} );
 
         if ( subPairs.size() <= 1 ) continue;
 
@@ -982,8 +970,8 @@ void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<Ri
         for ( size_t i = 0; i + 1 < subPairs.size(); ++i )
         {
             auto [subStart, subEnd] = subPairs[i];
-            double subStartTVD     = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subStart );
-            double subEndTVD       = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subEnd );
+            double subStartTVD      = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subStart );
+            double subEndTVD        = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subEnd );
 
             auto newSeg = std::make_unique<RicMswSegment>( segment->label(), subStart, subEnd, subStartTVD, subEndTVD );
             branch->insertAfterSegment( segment, std::move( newSeg ) );
