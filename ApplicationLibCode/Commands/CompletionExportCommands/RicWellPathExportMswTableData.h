@@ -128,6 +128,7 @@ private:
 
     static void createWellPathSegments( gsl::not_null<RicMswBranch*>                      branch,
                                         const std::vector<WellPathCellIntersectionInfo>&  cellSegmentIntersections,
+                                        const std::vector<std::pair<double, double>>&     customSegmentIntervals,
                                         const std::vector<const RimPerforationInterval*>& perforationIntervals,
                                         const RimWellPath*                                wellPath,
                                         const std::optional<QDateTime>&                   exportDate,

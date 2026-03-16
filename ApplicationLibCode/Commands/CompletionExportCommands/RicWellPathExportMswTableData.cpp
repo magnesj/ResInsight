@@ -595,22 +595,26 @@ bool RicWellPathExportMswTableData::generateWellSegmentsForMswExportInfo( const 
         filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
 
     auto mswParameters = wellPath->mswCompletionParameters();
-    if ( mswParameters )
-    {
-        auto customIntervals = mswParameters->getSegmentIntervals();
-        filteredIntersections =
-            splitIntersectionsAtCustomBoundaries( filteredIntersections, customIntervals, wellPath->wellPathGeometry(), eclipseCase );
-    }
+
+    std::vector<std::pair<double, double>> customIntervals;
+    if ( mswParameters ) customIntervals = mswParameters->getSegmentIntervals();
+
+    // Split intersections at custom interval boundaries so that no single WellPathCellIntersectionInfo
+    // straddles a custom interval boundary. Consecutive split intersections that fall within the same
+    // custom interval are then merged into one RicMswSegment by createWellPathSegments.
+    auto processedIntersections = customIntervals.empty()
+                                      ? filteredIntersections
+                                      : splitIntersectionsAtCustomBoundaries( filteredIntersections, customIntervals, wellPath->wellPathGeometry(), eclipseCase );
 
     bool foundSubGridIntersections = false;
 
-    createWellPathSegments( branch, filteredIntersections, perforationIntervals, wellPath, exportDate, eclipseCase, &foundSubGridIntersections );
+    createWellPathSegments( branch, processedIntersections, customIntervals, perforationIntervals, wellPath, exportDate, eclipseCase, &foundSubGridIntersections );
 
     createValveCompletions( branch, perforationIntervals, wellPath, exportInfo->unitSystem() );
 
     const RigActiveCellInfo* activeCellInfo = eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
-    assignValveContributionsToSuperXICDs( branch, perforationIntervals, filteredIntersections, activeCellInfo, exportInfo->unitSystem() );
+    assignValveContributionsToSuperXICDs( branch, perforationIntervals, processedIntersections, activeCellInfo, exportInfo->unitSystem() );
     moveIntersectionsToICVs( branch, perforationIntervals, exportInfo->unitSystem() );
     moveIntersectionsToSuperXICDs( branch );
 
@@ -911,6 +915,7 @@ std::vector<WellPathCellIntersectionInfo>
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMswBranch*>                      branch,
                                                             const std::vector<WellPathCellIntersectionInfo>&  cellSegmentIntersections,
+                                                            const std::vector<std::pair<double, double>>&     customSegmentIntervals,
                                                             const std::vector<const RimPerforationInterval*>& perforationIntervals,
                                                             const RimWellPath*                                wellPath,
                                                             const std::optional<QDateTime>&                   exportDate,
@@ -922,22 +927,80 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
     // is a pretty large threshold based on the indicated threshold of 0.001m for MSW segments
     const double segmentLengthThreshold = 1.0e-3;
 
+    // Returns the index of the custom interval that contains midMD, or -1 if none.
+    auto findCustomIntervalIndex = [&]( double midMD ) -> int
+    {
+        for ( int i = 0; i < static_cast<int>( customSegmentIntervals.size() ); ++i )
+        {
+            const auto& [start, end] = customSegmentIntervals[i];
+            if ( midMD >= start && midMD <= end ) return i;
+        }
+        return -1;
+    };
+
+    // Group consecutive cell intersections that belong to the same custom interval into a single
+    // segment. Intersections outside all custom intervals remain as individual segments.
+    // The input intersections have already been split at custom interval boundaries, so no
+    // intersection straddles a boundary.
+    struct SegmentGroup
+    {
+        double                                    startMD, endMD, startTVD, endTVD;
+        std::vector<WellPathCellIntersectionInfo> cells;
+    };
+
+    std::vector<SegmentGroup> groups;
+    int                       currentIntervalIdx = -2; // -2 = uninitialized
+
     for ( const auto& cellIntInfo : cellSegmentIntersections )
     {
-        const double segmentLength = std::fabs( cellIntInfo.endMD - cellIntInfo.startMD );
+        double midMD      = 0.5 * ( cellIntInfo.startMD + cellIntInfo.endMD );
+        int    intervalIdx = findCustomIntervalIndex( midMD );
 
-        if ( segmentLength > segmentLengthThreshold )
+        // Merge into the current group only if both this cell and the previous cell are in
+        // the same valid (non-negative) custom interval.
+        if ( intervalIdx >= 0 && currentIntervalIdx >= 0 && intervalIdx == currentIntervalIdx )
         {
-            auto segment = std::make_unique<RicMswSegment>( QString( "%1 segment" ).arg( branch->label() ),
-                                                            cellIntInfo.startMD,
-                                                            cellIntInfo.endMD,
-                                                            cellIntInfo.startTVD(),
-                                                            cellIntInfo.endTVD() );
+            groups.back().endMD  = cellIntInfo.endMD;
+            groups.back().endTVD = cellIntInfo.endTVD();
+            groups.back().cells.push_back( cellIntInfo );
+        }
+        else
+        {
+            SegmentGroup g;
+            g.startMD  = cellIntInfo.startMD;
+            g.endMD    = cellIntInfo.endMD;
+            g.startTVD = cellIntInfo.startTVD();
+            g.endTVD   = cellIntInfo.endTVD();
+            g.cells    = { cellIntInfo };
+            groups.push_back( std::move( g ) );
+            currentIntervalIdx = intervalIdx;
+        }
+    }
 
+    // Create one RicMswSegment per group. For custom-interval groups this spans the entire
+    // interval (possibly multiple cells); for non-custom groups it spans one cell.
+    for ( const auto& group : groups )
+    {
+        const double segmentLength = std::fabs( group.endMD - group.startMD );
+        if ( segmentLength <= segmentLengthThreshold )
+        {
+            RiaLogging::info(
+                QString( "Skipping segment , threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( segmentLength ) );
+            continue;
+        }
+
+        auto segment = std::make_unique<RicMswSegment>( QString( "%1 segment" ).arg( branch->label() ),
+                                                        group.startMD,
+                                                        group.endMD,
+                                                        group.startTVD,
+                                                        group.endTVD );
+
+        for ( const auto& cellIntInfo : group.cells )
+        {
             for ( const RimPerforationInterval* interval : perforationIntervals )
             {
-                double overlapStart = std::max( interval->startMD(), segment->startMD() );
-                double overlapEnd   = std::min( interval->endMD(), segment->endMD() );
+                double overlapStart = std::max( interval->startMD(), cellIntInfo.startMD );
+                double overlapEnd   = std::min( interval->endMD(), cellIntInfo.endMD );
                 double overlap      = std::max( 0.0, overlapEnd - overlapStart );
                 if ( overlap > 0.0 )
                 {
@@ -955,13 +1018,9 @@ void RicWellPathExportMswTableData::createWellPathSegments( gsl::not_null<RicMsw
                     segment->addCompletion( std::move( intervalCompletion ) );
                 }
             }
-            branch->addSegment( std::move( segment ) );
         }
-        else
-        {
-            QString text = QString( "Skipping segment , threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( segmentLength );
-            RiaLogging::info( text );
-        }
+
+        branch->addSegment( std::move( segment ) );
     }
 }
 
