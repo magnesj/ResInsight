@@ -115,6 +115,12 @@ private:
                                                                           gsl::not_null<const RigWellPath*>                wellPathGeometry,
                                                                           gsl::not_null<const RimEclipseCase*>             eclipseCase );
 
+    static std::vector<WellPathCellIntersectionInfo>
+        splitIntersectionsAtCustomBoundaries( const std::vector<WellPathCellIntersectionInfo>& intersections,
+                                              const std::vector<std::pair<double, double>>&    customSegmentIntervals,
+                                              gsl::not_null<const RigWellPath*>                wellPathGeometry,
+                                              gsl::not_null<const RimEclipseCase*>             eclipseCase );
+
     static std::pair<double, double> calculateOverlapWithActiveCells( double startMD,
                                                                       double endMD,
                                                                       const std::vector<WellPathCellIntersectionInfo>& wellPathIntersections,

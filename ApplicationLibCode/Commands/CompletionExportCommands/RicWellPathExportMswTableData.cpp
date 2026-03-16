@@ -598,6 +598,14 @@ bool RicWellPathExportMswTableData::generateWellSegmentsForMswExportInfo( const 
     std::vector<WellPathCellIntersectionInfo> filteredIntersections =
         filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
 
+    auto mswParameters = wellPath->mswCompletionParameters();
+    if ( mswParameters )
+    {
+        auto customIntervals = mswParameters->getSegmentIntervals();
+        filteredIntersections =
+            splitIntersectionsAtCustomBoundaries( filteredIntersections, customIntervals, wellPath->wellPathGeometry(), eclipseCase );
+    }
+
     bool foundSubGridIntersections = false;
 
     createWellPathSegments( branch, filteredIntersections, perforationIntervals, wellPath, exportDate, eclipseCase, &foundSubGridIntersections );
@@ -802,6 +810,104 @@ std::vector<WellPathCellIntersectionInfo>
     }
 
     return filteredIntersections;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Split each WellPathCellIntersectionInfo at the boundary MDs of the custom segment intervals.
+/// This ensures that every RicMswSegment created afterwards spans at most one custom interval,
+/// so completions and intersection lengths are assigned to the correct sub-segments.
+/// The pattern mirrors filterIntersections(): interpolate the split point from the well path
+/// geometry and recompute intersectionLengthsInCellCS for each piece.
+//--------------------------------------------------------------------------------------------------
+std::vector<WellPathCellIntersectionInfo>
+    RicWellPathExportMswTableData::splitIntersectionsAtCustomBoundaries( const std::vector<WellPathCellIntersectionInfo>& intersections,
+                                                                         const std::vector<std::pair<double, double>>&    customSegmentIntervals,
+                                                                         gsl::not_null<const RigWellPath*>                wellPathGeometry,
+                                                                         gsl::not_null<const RimEclipseCase*>             eclipseCase )
+{
+    if ( customSegmentIntervals.empty() ) return intersections;
+
+    // Collect all unique boundary MDs from custom intervals
+    std::set<double> boundaryMDs;
+    for ( const auto& [startMD, endMD] : customSegmentIntervals )
+    {
+        boundaryMDs.insert( startMD );
+        boundaryMDs.insert( endMD );
+    }
+
+    const double            splitTolerance = 1.0e-3;
+    const RigMainGrid*      grid           = eclipseCase->mainGrid();
+    std::vector<WellPathCellIntersectionInfo> result;
+    result.reserve( intersections.size() );
+
+    for ( const auto& intersection : intersections )
+    {
+        // Collect boundary MDs that fall strictly inside this intersection
+        std::vector<double> splitMDs;
+        for ( double md : boundaryMDs )
+        {
+            if ( md > intersection.startMD + splitTolerance && md < intersection.endMD - splitTolerance )
+                splitMDs.push_back( md );
+        }
+
+        if ( splitMDs.empty() )
+        {
+            result.push_back( intersection );
+            continue;
+        }
+
+        std::sort( splitMDs.begin(), splitMDs.end() );
+
+        double     currentStartMD    = intersection.startMD;
+        cvf::Vec3d currentStartPoint = intersection.startPoint;
+        bool       isFirst           = true;
+
+        for ( double splitMD : splitMDs )
+        {
+            cvf::Vec3d splitPoint = wellPathGeometry->interpolatedPointAlongWellPath( splitMD );
+
+            WellPathCellIntersectionInfo sub;
+            sub.globCellIndex          = intersection.globCellIndex;
+            sub.startPoint             = currentStartPoint;
+            sub.endPoint               = splitPoint;
+            sub.startMD                = currentStartMD;
+            sub.endMD                  = splitMD;
+            sub.intersectedCellFaceIn  = isFirst ? intersection.intersectedCellFaceIn : cvf::StructGridInterface::NO_FACE;
+            sub.intersectedCellFaceOut = cvf::StructGridInterface::NO_FACE;
+
+            if ( intersection.globCellIndex < grid->cellCount() )
+                sub.intersectionLengthsInCellCS =
+                    RigWellPathIntersectionTools::calculateLengthInCell( grid, intersection.globCellIndex, currentStartPoint, splitPoint );
+            else
+                sub.intersectionLengthsInCellCS = cvf::Vec3d::ZERO;
+
+            result.push_back( sub );
+
+            currentStartMD    = splitMD;
+            currentStartPoint = splitPoint;
+            isFirst           = false;
+        }
+
+        // Final piece after last split point
+        WellPathCellIntersectionInfo sub;
+        sub.globCellIndex          = intersection.globCellIndex;
+        sub.startPoint             = currentStartPoint;
+        sub.endPoint               = intersection.endPoint;
+        sub.startMD                = currentStartMD;
+        sub.endMD                  = intersection.endMD;
+        sub.intersectedCellFaceIn  = isFirst ? intersection.intersectedCellFaceIn : cvf::StructGridInterface::NO_FACE;
+        sub.intersectedCellFaceOut = intersection.intersectedCellFaceOut;
+
+        if ( intersection.globCellIndex < grid->cellCount() )
+            sub.intersectionLengthsInCellCS =
+                RigWellPathIntersectionTools::calculateLengthInCell( grid, intersection.globCellIndex, currentStartPoint, intersection.endPoint );
+        else
+            sub.intersectionLengthsInCellCS = cvf::Vec3d::ZERO;
+
+        result.push_back( sub );
+    }
+
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------
