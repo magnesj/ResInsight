@@ -943,6 +943,7 @@ void RicWellPathExportMswTableData::mergeSegmentsForCustomIntervals( gsl::not_nu
 //--------------------------------------------------------------------------------------------------
 /// Preprocessing step: first merge grid cells covered by the same custom interval into a single
 /// segment, then split any remaining segments that exceed maxSegmentLength.
+/// Segments defined by a custom interval are never split by maxSegmentLength.
 /// Recurses into child branches.
 //--------------------------------------------------------------------------------------------------
 void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<RicMswBranch*>                  branch,
@@ -954,10 +955,21 @@ void RicWellPathExportMswTableData::preprocessMainBoreSegments( gsl::not_null<Ri
     mergeSegmentsForCustomIntervals( branch, customSegmentIntervals );
 
     // Step 2: split segments that exceed maxSegmentLength.
-    // Custom interval boundaries are already handled by the merge, so pass empty intervals here.
+    // Segments that belong to a custom interval are never split — the interval defines exactly
+    // one segment regardless of maxSegmentLength.
     auto segments = branch->segments(); // snapshot; insertions during iteration are safe
     for ( auto* segment : segments )
     {
+        // Skip segments owned by a custom interval
+        bool inCustomInterval = std::any_of( customSegmentIntervals.begin(),
+                                             customSegmentIntervals.end(),
+                                             [segment]( const auto& interval )
+                                             {
+                                                 return segment->endMD() >= interval.first &&
+                                                        segment->endMD() <= interval.second;
+                                             } );
+        if ( inCustomInterval ) continue;
+
         auto subPairs = RicMswTableDataTools::createSubSegmentMDPairs( segment->startMD(),
                                                                        segment->endMD(),
                                                                        maxSegmentLength,
