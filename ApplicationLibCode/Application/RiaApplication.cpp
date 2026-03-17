@@ -202,7 +202,6 @@ RiaApplication::~RiaApplication()
     caf::SelectionManager::instance()->setPdmRootObject( nullptr );
 
     m_project.reset();
-
 }
 
 //--------------------------------------------------------------------------------------------------
