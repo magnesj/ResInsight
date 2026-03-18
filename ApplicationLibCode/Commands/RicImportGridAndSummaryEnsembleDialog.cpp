@@ -522,8 +522,8 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
         }
     }
 
-    // Expand first item
-    if ( m_filePathModel.rowCount() > 0 )
+    // Expand first item only when a single ensemble is detected
+    if ( m_filePathModel.rowCount() == 1 )
     {
         QModelIndex index = m_filePathModel.index( 0, 0 );
         m_fileTreeView->expand( index );
