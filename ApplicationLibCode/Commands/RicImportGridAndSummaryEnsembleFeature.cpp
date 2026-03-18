@@ -184,7 +184,7 @@ bool RicImportGridAndSummaryEnsembleFeature::importFromDirectory( const QString&
     QStringList matchingFolders;
     RiaFileSearchTools::findMatchingFoldersRecursively( rootDir, pathFilter, matchingFolders );
 
-    QStringList gridFiles    = RiaFileSearchTools::findFilesInFolders( matchingFolders, { filePattern + ".EGRID" } );
+    QStringList gridFiles = RiaFileSearchTools::findFilesInFolders( matchingFolders, { filePattern + ".EGRID" } );
     QStringList summaryFiles = RiaFileSearchTools::findFilesInFolders( matchingFolders, { filePattern + ".SMSPEC", filePattern + ".ESMRY" } );
     std::sort( summaryFiles.begin(), summaryFiles.end() );
 
