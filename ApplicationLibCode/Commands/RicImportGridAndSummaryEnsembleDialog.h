@@ -42,6 +42,7 @@ struct RicImportGridAndSummaryEnsembleDialogResult
     QStringList                      summaryFiles;
     QString                          rootDir;
     QString                          pathFilter;
+    QString                          filePattern;
     RiaDefines::EnsembleGroupingMode groupingMode;
     bool                             createGridEnsemble;
     bool                             createSummaryEnsemble;
@@ -64,6 +65,7 @@ private:
     QString cleanPathFilter() const;
     QString rootDirWithSeparator() const;
     QString pathFilterWithoutRoot() const;
+    QString filePattern() const;
     void    updateEffectiveFilter();
     void    setOkButtonEnabled( bool enabled );
 
@@ -94,6 +96,7 @@ private:
 
     QComboBox*   m_pathFilterField;
     QPushButton* m_browseButton;
+    QLineEdit*   m_filePatternField;
     QCheckBox*   m_useRealizationStarCheckBox;
     QComboBox*   m_ensembleGroupingMode;
     QLabel*      m_effectiveFilterLabel;

@@ -58,7 +58,7 @@ void storeEnsembleImportParams( const RicImportGridAndSummaryEnsembleDialogResul
 
     QString record = rootDir + k_sep + result.pathFilter + k_sep + QString::number( static_cast<int>( result.groupingMode ) ) + k_sep +
                      ( result.createGridEnsemble ? QChar( '1' ) : QChar( '0' ) ) + k_sep +
-                     ( result.createSummaryEnsemble ? QChar( '1' ) : QChar( '0' ) );
+                     ( result.createSummaryEnsemble ? QChar( '1' ) : QChar( '0' ) ) + k_sep + result.filePattern;
 
     QSettings   settings;
     QStringList stored = settings.value( k_settingsKey ).toStringList();
@@ -74,7 +74,8 @@ bool loadEnsembleImportParams( const QString&                    rootDir,
                                QString&                          pathFilter,
                                RiaDefines::EnsembleGroupingMode& groupingMode,
                                bool&                             createGrid,
-                               bool&                             createSummary )
+                               bool&                             createSummary,
+                               QString&                          filePattern )
 {
     QSettings   settings;
     QStringList stored = settings.value( k_settingsKey ).toStringList();
@@ -86,6 +87,8 @@ bool loadEnsembleImportParams( const QString&                    rootDir,
             groupingMode  = static_cast<RiaDefines::EnsembleGroupingMode>( r.section( k_sep, 2, 2 ).toInt() );
             createGrid    = r.section( k_sep, 3, 3 ) == "1";
             createSummary = r.section( k_sep, 4, 4 ) == "1";
+            filePattern   = r.section( k_sep, 5, 5 );
+            if ( filePattern.isEmpty() ) filePattern = "*";
             return true;
         }
     }
@@ -171,8 +174,9 @@ bool RicImportGridAndSummaryEnsembleFeature::importFromDirectory( const QString&
     RiaDefines::EnsembleGroupingMode groupingMode;
     bool                             createGrid;
     bool                             createSummary;
+    QString                          filePattern;
 
-    if ( !loadEnsembleImportParams( dirPath, pathFilter, groupingMode, createGrid, createSummary ) ) return false;
+    if ( !loadEnsembleImportParams( dirPath, pathFilter, groupingMode, createGrid, createSummary, filePattern ) ) return false;
 
     QString rootDir = dirPath;
     if ( rootDir.size() > 1 && ( rootDir.endsWith( '/' ) || rootDir.endsWith( '\\' ) ) ) rootDir.chop( 1 );
@@ -180,8 +184,8 @@ bool RicImportGridAndSummaryEnsembleFeature::importFromDirectory( const QString&
     QStringList matchingFolders;
     RiaFileSearchTools::findMatchingFoldersRecursively( rootDir, pathFilter, matchingFolders );
 
-    QStringList gridFiles    = RiaFileSearchTools::findFilesInFolders( matchingFolders, { "*.EGRID" } );
-    QStringList summaryFiles = RiaFileSearchTools::findFilesInFolders( matchingFolders, { "*.SMSPEC", "*.ESMRY" } );
+    QStringList gridFiles    = RiaFileSearchTools::findFilesInFolders( matchingFolders, { filePattern + ".EGRID" } );
+    QStringList summaryFiles = RiaFileSearchTools::findFilesInFolders( matchingFolders, { filePattern + ".SMSPEC", filePattern + ".ESMRY" } );
     std::sort( summaryFiles.begin(), summaryFiles.end() );
 
     if ( gridFiles.isEmpty() && summaryFiles.isEmpty() ) return false;
@@ -190,6 +194,7 @@ bool RicImportGridAndSummaryEnsembleFeature::importFromDirectory( const QString&
     result.ok                    = true;
     result.rootDir               = rootDir + RiaFilePathTools::separator();
     result.pathFilter            = pathFilter;
+    result.filePattern           = filePattern;
     result.groupingMode          = groupingMode;
     result.createGridEnsemble    = createGrid;
     result.createSummaryEnsemble = createSummary;
