@@ -42,6 +42,7 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseEnsemble.h"
+#include "RimEclipseResultCase.h"
 #include "RimEclipseContourMapProjection.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimReservoirGridEnsemble.h"
@@ -65,6 +66,14 @@ CAF_PDM_SOURCE_INIT( RimStatisticsContourMap, "RimStatisticalContourMap" );
 
 namespace caf
 {
+template <>
+void caf::AppEnum<RimStatisticsContourMap::GridImportMode>::setUp()
+{
+    addItem( RimStatisticsContourMap::GridImportMode::SHARED_GRID, "SHARED_GRID", "Reuse Grid from First Realization" );
+    addItem( RimStatisticsContourMap::GridImportMode::INDIVIDUAL_GRIDS, "INDIVIDUAL_GRIDS", "Import All Grids" );
+    setDefault( RimStatisticsContourMap::GridImportMode::SHARED_GRID );
+}
+
 template <>
 void caf::AppEnum<RimStatisticsContourMap::StatisticsType>::setUp()
 {
@@ -95,6 +104,8 @@ RimStatisticsContourMap::RimStatisticsContourMap()
                        "ensemble." );
 
     CAF_PDM_InitFieldNoDefault( &m_resolution, "Resolution", "Sampling Resolution" );
+
+    CAF_PDM_InitFieldNoDefault( &m_gridImportMode, "GridImportMode", "Grid Import Mode" );
 
     CAF_PDM_InitFieldNoDefault( &m_resultAggregation, "ResultAggregation", "Result Aggregation" );
 
@@ -189,6 +200,13 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
     }
 
     genGrp->add( &m_resolution );
+
+    if ( auto* gridEnsemble = firstAncestorOrThisOfType<RimReservoirGridEnsembleBase>() )
+    {
+        if ( gridEnsemble->gridMode() == RimReservoirGridEnsembleBase::GridModeType::SHARED_GRID )
+            genGrp->add( &m_gridImportMode );
+    }
+
     genGrp->add( &m_primaryCase );
     genGrp->add( &m_boundingBoxExpPercent );
 
@@ -248,6 +266,14 @@ void RimStatisticsContourMap::setEclipseCase( RimEclipseCase* eCase )
         view->setEclipseCase( eCase );
     }
     m_resultDefinition->updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimStatisticsContourMap::setGridImportMode( GridImportMode mode )
+{
+    m_gridImportMode = mode;
 }
 
 //--------------------------------------------------------------------------------------------------
