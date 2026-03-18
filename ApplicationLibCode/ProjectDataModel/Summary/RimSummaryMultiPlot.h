@@ -149,7 +149,7 @@ private:
     void appendSubPlotByStepping( int direction );
     void appendCurveByStepping( int direction );
 
-    bool isStepDimensionSharedAmongSubPlots();
+    bool            isStepDimensionSharedAmongSubPlots();
     caf::PdmObject* steppingSourceObject();
 
     void onSubPlotChanged( const caf::SignalEmitter* emitter );
