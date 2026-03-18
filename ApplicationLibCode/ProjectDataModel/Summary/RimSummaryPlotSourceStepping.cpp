@@ -533,12 +533,18 @@ void RimSummaryPlotSourceStepping::fieldChangedByUi( const caf::PdmFieldHandle* 
                 summaryMultiPlot->zoomAllYAxes();
             }
         }
-        else if ( auto summaryPlot = firstAncestorOrThisOfType<RimSummaryPlot>() )
+        else
         {
-            summaryPlot->updatePlotTitle();
-            summaryPlot->loadDataAndUpdate();
-            summaryPlot->updateConnectedEditors();
-            summaryPlot->curvesChanged.send();
+            RimSummaryPlot* summaryPlot = dynamic_cast<RimSummaryPlot*>( m_objectForSourceStepping.p() );
+            if ( !summaryPlot ) summaryPlot = firstAncestorOrThisOfType<RimSummaryPlot>();
+
+            if ( summaryPlot )
+            {
+                summaryPlot->updatePlotTitle();
+                summaryPlot->loadDataAndUpdate();
+                summaryPlot->updateConnectedEditors();
+                summaryPlot->curvesChanged.send();
+            }
         }
 
         updateAllRequiredEditors();
