@@ -1660,6 +1660,8 @@ void RimSummaryMultiPlot::appendSubPlotByStepping( int direction )
         }
     };
 
+    if ( m_sourceStepping()->isAtEnd( direction ) ) return;
+
     if ( caf::SelectionManager::instance()->selectedItemOfType<RimSummaryMultiPlot>() != nullptr )
     {
         if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )

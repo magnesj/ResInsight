@@ -1355,6 +1355,40 @@ void RimSummaryPlotSourceStepping::setStepDimension( RimSummaryDataSourceSteppin
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimSummaryPlotSourceStepping::isAtEnd( int direction )
+{
+    caf::PdmValueField* valueField = fieldToModify();
+    if ( !valueField ) return true;
+
+    QList<caf::PdmOptionItemInfo> options = calculateValueOptions( valueField );
+    if ( options.isEmpty() ) return true;
+
+    QVariant                              currentValue  = valueField->toQVariant();
+    caf::PdmPointer<caf::PdmObjectHandle> currentHandle = currentValue.value<caf::PdmPointer<caf::PdmObjectHandle>>();
+    int                                   currentIndex  = -1;
+    for ( int i = 0; i < options.size(); i++ )
+    {
+        QVariant                              optionValue  = options[i].value();
+        caf::PdmPointer<caf::PdmObjectHandle> optionHandle = optionValue.value<caf::PdmPointer<caf::PdmObjectHandle>>();
+        if ( optionHandle )
+        {
+            if ( currentHandle == optionHandle ) currentIndex = i;
+        }
+        else if ( currentValue == optionValue )
+        {
+            currentIndex = i;
+        }
+    }
+
+    if ( currentIndex == -1 ) return false;
+
+    int nextIndex = currentIndex + direction;
+    return ( nextIndex < 0 || nextIndex >= options.size() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 RimSummaryCase* RimSummaryPlotSourceStepping::stepCase( int direction )
 {
     std::vector<RimSummaryCase*> cases;
