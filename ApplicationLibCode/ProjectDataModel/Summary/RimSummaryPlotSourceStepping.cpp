@@ -521,8 +521,6 @@ void RimSummaryPlotSourceStepping::fieldChangedByUi( const caf::PdmFieldHandle* 
 
     if ( triggerLoadDataAndUpdate )
     {
-        auto summaryPlot = firstAncestorOrThisOfType<RimSummaryPlot>();
-
         RimSummaryMultiPlot* summaryMultiPlot = dynamic_cast<RimSummaryMultiPlot*>( m_objectForSourceStepping.p() );
         if ( summaryMultiPlot )
         {
@@ -535,7 +533,7 @@ void RimSummaryPlotSourceStepping::fieldChangedByUi( const caf::PdmFieldHandle* 
                 summaryMultiPlot->zoomAllYAxes();
             }
         }
-        else
+        else if ( auto summaryPlot = firstAncestorOrThisOfType<RimSummaryPlot>() )
         {
             summaryPlot->updatePlotTitle();
             summaryPlot->loadDataAndUpdate();
