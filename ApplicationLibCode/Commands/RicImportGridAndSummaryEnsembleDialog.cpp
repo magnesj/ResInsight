@@ -541,13 +541,15 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
 
         auto grouping = RiaEnsembleNameTools::groupFilesByEnsembleName( representativeFiles, mode );
 
-        auto rootItem = m_filePathModel.invisibleRootItem();
+        auto rootItem     = m_filePathModel.invisibleRootItem();
+        bool isFirstGroup = true;
         for ( const auto& [groupName, groupFiles] : grouping )
         {
             auto ensembleItem = new QStandardItem();
             ensembleItem->setCheckable( true );
-            ensembleItem->setCheckState( Qt::Checked );
+            ensembleItem->setCheckState( isFirstGroup ? Qt::Checked : Qt::Unchecked );
             rootItem->appendRow( ensembleItem );
+            isFirstGroup = false;
 
             int gridCount = 0, summaryCount = 0;
             for ( const auto& repFile : groupFiles )
@@ -564,7 +566,7 @@ void RicImportGridAndSummaryEnsembleDialog::updateFileListWidget()
 
                 auto childItem = new QStandardItem( QDir::toNativeSeparators( basePath ) );
                 childItem->setCheckable( true );
-                childItem->setCheckState( Qt::Checked );
+                childItem->setCheckState( ensembleItem->checkState() );
                 childItem->setData( basePath, Qt::UserRole );
                 ensembleItem->appendRow( childItem );
             }
