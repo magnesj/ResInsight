@@ -224,9 +224,9 @@ void RimSummaryMultiPlotCollection::summaryPlotItemInfos( QList<caf::PdmOptionIt
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimSummaryMultiPlotCollection::duplicatePlot( RimSummaryMultiPlot* plotToDuplicate )
+RimSummaryMultiPlot* RimSummaryMultiPlotCollection::duplicatePlot( RimSummaryMultiPlot* plotToDuplicate )
 {
-    if ( !plotToDuplicate ) return;
+    if ( !plotToDuplicate ) return nullptr;
 
     auto plotCopy = plotToDuplicate->copyObject<RimSummaryMultiPlot>();
     addSummaryMultiPlot( plotCopy );
@@ -239,6 +239,8 @@ void RimSummaryMultiPlotCollection::duplicatePlot( RimSummaryMultiPlot* plotToDu
     updateConnectedEditors();
 
     RiuPlotMainWindowTools::selectAsCurrentItem( plotCopy );
+
+    return plotCopy;
 }
 
 //--------------------------------------------------------------------------------------------------

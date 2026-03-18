@@ -44,10 +44,10 @@ public:
 
     std::vector<RimSummaryMultiPlot*> multiPlots() const;
 
-    void addSummaryMultiPlot( RimSummaryMultiPlot* plot );
-    void summaryPlotItemInfos( QList<caf::PdmOptionItemInfo>* optionInfos ) const;
-    void duplicatePlot( RimSummaryMultiPlot* plotToDuplicate );
-    void removePlotNoUpdate( RimSummaryMultiPlot* plotToRemove );
+    void                 addSummaryMultiPlot( RimSummaryMultiPlot* plot );
+    void                 summaryPlotItemInfos( QList<caf::PdmOptionItemInfo>* optionInfos ) const;
+    RimSummaryMultiPlot* duplicatePlot( RimSummaryMultiPlot* plotToDuplicate );
+    void                 removePlotNoUpdate( RimSummaryMultiPlot* plotToRemove );
 
     void updateSummaryNameHasChanged();
 
