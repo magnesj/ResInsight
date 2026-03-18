@@ -1616,86 +1616,93 @@ void RimSummaryMultiPlot::onPlotAdditionOrRemoval()
 //--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlot::appendSubPlotByStepping( int direction )
 {
-    std::vector<RimSummaryPlot*> plotsForStepping;
-
-    bool isMultiPlotSelected = ( caf::SelectionManager::instance()->selectedItemOfType<RimSummaryMultiPlot>() != nullptr );
-    if ( isMultiPlotSelected )
+    auto applySteppingToPlots = []( const std::vector<RimSummaryPlot*>& summaryPlots, RimSummaryPlotSourceStepping* sourceStepper, int direction )
     {
-        duplicate();
+        if ( !sourceStepper ) return;
 
-        // The duplicate operation selects duplicated plot by default. Select this as current item to continue stepping on this plot
-        RiuPlotMainWindowTools::selectAsCurrentItem( this );
+        for ( auto newPlot : summaryPlots )
+        {
+            if ( sourceStepper->stepDimension() == RimSummaryDataSourceStepping::SourceSteppingDimension::SUMMARY_CASE )
+            {
+                RimSummaryCase* newCase = sourceStepper->stepCase( direction );
+                for ( auto curve : newPlot->allCurves() )
+                {
+                    curve->setSummaryCaseY( newCase );
 
-        plotsForStepping = summaryPlots();
+                    // NOTE: If summary cross plots should be handled here, we also need to call
+                    // curve->setSummaryCaseX( newCase );
+                    // Setting summaryCaseX with a default uninitialized summary address causes issues for the summary
+                    // name analyzer
+                }
+            }
+            else if ( sourceStepper->stepDimension() == RimSummaryDataSourceStepping::SourceSteppingDimension::ENSEMBLE )
+            {
+                RimSummaryEnsemble* newEnsemble = sourceStepper->stepEnsemble( direction );
+                for ( auto curveSet : newPlot->curveSets() )
+                {
+                    curveSet->setSummaryEnsemble( newEnsemble );
+                }
+            }
+            else
+            {
+                std::vector<RiaSummaryCurveAddress> newCurveAdrs;
+
+                auto curveAddressProviders = RiaSummaryAddressModifier::createAddressProviders( newPlot );
+                for ( const auto& adr : RiaSummaryAddressModifier::curveAddresses( curveAddressProviders ) )
+                {
+                    const auto adrX = sourceStepper->stepAddress( adr.summaryAddressX(), direction );
+                    const auto adrY = sourceStepper->stepAddress( adr.summaryAddressY(), direction );
+                    newCurveAdrs.push_back( RiaSummaryCurveAddress( adrX, adrY ) );
+                }
+
+                RiaSummaryAddressModifier::applyAddressesToCurveAddressProviders( curveAddressProviders, newCurveAdrs );
+            }
+        }
+    };
+
+    if ( caf::SelectionManager::instance()->selectedItemOfType<RimSummaryMultiPlot>() != nullptr )
+    {
+        if ( auto plotCollection = RimMainPlotCollection::current()->summaryMultiPlotCollection() )
+        {
+            auto copy = plotCollection->duplicatePlot( this );
+
+            applySteppingToPlots( copy->summaryPlots(), m_sourceStepping(), direction );
+
+            copy->loadDataAndUpdate();
+            copy->updateConnectedEditors();
+            copy->updateSourceStepper();
+        }
     }
     else
     {
         std::vector<RimPlot*> plots = m_sourceStepping->plotsMatchingStepSettings( summaryPlots() );
         if ( !plots.empty() )
         {
-            auto newPlots = RiaSummaryPlotTools::duplicatePlots( plots );
+            std::vector<RimSummaryPlot*> summaryPlots;
+            auto                         newPlots = RiaSummaryPlotTools::duplicatePlots( plots );
             for ( auto plot : newPlots )
             {
                 if ( RimSummaryPlot* newPlot = dynamic_cast<RimSummaryPlot*>( plot ) )
                 {
                     addPlot( newPlot );
                     newPlot->resolveReferencesRecursively();
-
-                    plotsForStepping.push_back( newPlot );
+                    summaryPlots.push_back( newPlot );
                 }
             }
+            applySteppingToPlots( summaryPlots, m_sourceStepping(), direction );
         }
+
+        loadDataAndUpdate();
+        updateConnectedEditors();
+
+        if ( summaryPlots().empty() )
+        {
+            // Select the last plot in the list as the current item to be able to append plots for the next object type (well, region, etc.)
+            RiuPlotMainWindowTools::selectAsCurrentItem( summaryPlots().back() );
+        }
+        updateSourceStepper();
     }
 
-    for ( auto newPlot : plotsForStepping )
-    {
-        if ( m_sourceStepping()->stepDimension() == RimSummaryDataSourceStepping::SourceSteppingDimension::SUMMARY_CASE )
-        {
-            RimSummaryCase* newCase = m_sourceStepping()->stepCase( direction );
-            for ( auto curve : newPlot->allCurves() )
-            {
-                curve->setSummaryCaseY( newCase );
-
-                // NOTE: If summary cross plots should be handled here, we also need to call
-                // curve->setSummaryCaseX( newCase );
-                // Setting summaryCaseX with a default uninitialized summary address causes issues for the summary
-                // name analyzer
-            }
-        }
-        else if ( m_sourceStepping()->stepDimension() == RimSummaryDataSourceStepping::SourceSteppingDimension::ENSEMBLE )
-        {
-            RimSummaryEnsemble* newEnsemble = m_sourceStepping()->stepEnsemble( direction );
-            for ( auto curveSet : newPlot->curveSets() )
-            {
-                curveSet->setSummaryEnsemble( newEnsemble );
-            }
-        }
-        else
-        {
-            std::vector<RiaSummaryCurveAddress> newCurveAdrs;
-
-            auto curveAddressProviders = RiaSummaryAddressModifier::createAddressProviders( newPlot );
-            for ( const auto& adr : RiaSummaryAddressModifier::curveAddresses( curveAddressProviders ) )
-            {
-                const auto adrX = m_sourceStepping()->stepAddress( adr.summaryAddressX(), direction );
-                const auto adrY = m_sourceStepping()->stepAddress( adr.summaryAddressY(), direction );
-                newCurveAdrs.push_back( RiaSummaryCurveAddress( adrX, adrY ) );
-            }
-
-            RiaSummaryAddressModifier::applyAddressesToCurveAddressProviders( curveAddressProviders, newCurveAdrs );
-        }
-    }
-
-    loadDataAndUpdate();
-    updateConnectedEditors();
-
-    if ( !isMultiPlotSelected && !summaryPlots().empty() )
-    {
-        // Select the last plot in the list as the current item to be able to append plots for the next object type (well, region, etc.)
-        RiuPlotMainWindowTools::selectAsCurrentItem( summaryPlots().back() );
-    }
-
-    updateSourceStepper();
     RiuPlotMainWindowTools::refreshToolbars();
 }
 
