@@ -689,6 +689,8 @@ std::vector<caf::PdmFieldHandle*> RimSummaryMultiPlot::fieldsToShowInToolbar()
     auto& sourceObject = m_sourceStepping();
     if ( sourceObject )
     {
+        sourceObject->setSourceSteppingObject( steppingSourceObject() );
+
         auto fields = sourceObject->fieldsToShowInToolbar();
         toolBarFields.insert( std::end( toolBarFields ), std::begin( fields ), std::end( fields ) );
     }
@@ -1614,8 +1616,62 @@ void RimSummaryMultiPlot::onPlotAdditionOrRemoval()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+bool RimSummaryMultiPlot::isStepDimensionSharedAmongSubPlots()
+{
+    using Dim = RimSummaryDataSourceStepping::SourceSteppingDimension;
+
+    populateNameHelper( m_nameHelper.get() );
+
+    switch ( m_sourceStepping->stepDimension() )
+    {
+        case Dim::SUMMARY_CASE:
+        case Dim::ENSEMBLE:
+            return m_nameHelper->isCaseInTitle();
+        case Dim::WELL:
+            return m_nameHelper->isWellNameInTitle();
+        case Dim::GROUP:
+            return m_nameHelper->isGroupNameInTitle();
+        case Dim::NETWORK:
+            return m_nameHelper->isNetworkInTitle();
+        case Dim::REGION:
+            return m_nameHelper->isRegionInTitle();
+        case Dim::VECTOR:
+            return !m_nameHelper->titleVectorName().empty();
+        case Dim::BLOCK:
+            return m_nameHelper->isBlockInTitle();
+        case Dim::WELL_SEGMENT:
+            return m_nameHelper->isSegmentInTitle();
+        case Dim::WELL_CONNECTION:
+            return m_nameHelper->isConnectionInTitle();
+        case Dim::WELL_COMPLETION_NUMBER:
+            return m_nameHelper->isWellCompletionInTitle();
+        default:
+            break;
+    }
+
+    return true;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmObject* RimSummaryMultiPlot::steppingSourceObject()
+{
+    if ( !isStepDimensionSharedAmongSubPlots() )
+    {
+        auto* selectedPlot = caf::SelectionManager::instance()->selectedItemOfType<RimSummaryPlot>();
+        if ( selectedPlot && selectedPlot->firstAncestorOrThisOfType<RimSummaryMultiPlot>() == this ) return selectedPlot;
+    }
+    return this;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RimSummaryMultiPlot::appendSubPlotByStepping( int direction )
 {
+    m_sourceStepping->setSourceSteppingObject( steppingSourceObject() );
+
     auto applySteppingToPlots = []( const std::vector<RimSummaryPlot*>& summaryPlots, RimSummaryPlotSourceStepping* sourceStepper, int direction )
     {
         if ( !sourceStepper ) return;
@@ -1697,11 +1753,8 @@ void RimSummaryMultiPlot::appendSubPlotByStepping( int direction )
         loadDataAndUpdate();
         updateConnectedEditors();
 
-        if ( summaryPlots().empty() )
-        {
-            // Select the last plot in the list as the current item to be able to append plots for the next object type (well, region, etc.)
-            RiuPlotMainWindowTools::selectAsCurrentItem( summaryPlots().back() );
-        }
+        RiuPlotMainWindowTools::selectAsCurrentItem( summaryPlots().back() );
+
         updateSourceStepper();
     }
 
