@@ -55,8 +55,10 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RicImportGridAndSummaryEnsembleDialogResult
-    RicImportGridAndSummaryEnsembleDialog::runDialog( QWidget* parent, bool defaultGridChecked, bool defaultSummaryChecked )
+RicImportGridAndSummaryEnsembleDialogResult RicImportGridAndSummaryEnsembleDialog::runDialog( QWidget* parent,
+                                                                                                bool    defaultGridChecked,
+                                                                                                bool    defaultSummaryChecked,
+                                                                                                const QString& initialDir )
 {
     const QString pathRegistryKey = "RicImportGridAndSummaryEnsembleDialog_path";
 
@@ -77,9 +79,17 @@ RicImportGridAndSummaryEnsembleDialogResult
         // Registry history starts at index 1
         RicRecursiveFileSearchDialog::populateComboBoxHistoryFromRegistry( dialog.m_pathFilterField, pathRegistryKey );
 
-        // Use most recently used path from registry (index 1) when preference is enabled
-        if ( RiaPreferences::current()->useRecentlyUsedFolderAsDefault() && dialog.m_pathFilterField->count() > 1 )
+        if ( !initialDir.isEmpty() )
         {
+            // Pre-fill with the provided directory
+            QString prefilledDir = initialDir;
+            RiaFilePathTools::appendSeparatorIfNo( prefilledDir );
+            prefilledDir += "*";
+            dialog.m_pathFilterField->setCurrentText( QDir::toNativeSeparators( prefilledDir ) );
+        }
+        else if ( RiaPreferences::current()->useRecentlyUsedFolderAsDefault() && dialog.m_pathFilterField->count() > 1 )
+        {
+            // Use most recently used path from registry (index 1) when preference is enabled
             dialog.m_pathFilterField->setCurrentIndex( 1 );
         }
 
