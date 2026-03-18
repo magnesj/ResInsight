@@ -239,6 +239,14 @@ RicImportGridAndSummaryEnsembleDialog::RicImportGridAndSummaryEnsembleDialog( QW
     connect( m_browseButton, SIGNAL( clicked() ), this, SLOT( slotBrowseClicked() ) );
     connect( m_useRealizationStarCheckBox, SIGNAL( clicked() ), this, SLOT( slotUseRealizationStarClicked() ) );
     connect( m_searchButton, SIGNAL( clicked() ), this, SLOT( slotSearchClicked() ) );
+
+    auto updateOkFromCheckboxes = [this]()
+    {
+        bool anyChecked = m_createGridEnsembleCheckBox->isChecked() || m_createSummaryEnsembleCheckBox->isChecked();
+        setOkButtonEnabled( anyChecked && !m_foundRealizations.isEmpty() );
+    };
+    connect( m_createGridEnsembleCheckBox, &QCheckBox::toggled, this, updateOkFromCheckboxes );
+    connect( m_createSummaryEnsembleCheckBox, &QCheckBox::toggled, this, updateOkFromCheckboxes );
     connect( m_treeFilterButton, SIGNAL( clicked() ), this, SLOT( slotFilterTreeViewClicked() ) );
     connect( m_treeFilterLineEdit, &QLineEdit::returnPressed, m_treeFilterButton, &QPushButton::click );
     connect( m_treeFilterLineEdit, &QLineEdit::textEdited, m_treeFilterButton, &QPushButton::click );
@@ -592,6 +600,8 @@ void RicImportGridAndSummaryEnsembleDialog::clearFileList()
     m_filePathModel.clear();
     m_outputGroup->setTitle( "Files Found" );
     setOkButtonEnabled( false );
+    m_createGridEnsembleCheckBox->setEnabled( true );
+    m_createSummaryEnsembleCheckBox->setEnabled( true );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -740,12 +750,28 @@ void RicImportGridAndSummaryEnsembleDialog::slotSearchClicked()
 
     updateFileListWidget();
 
+    int gridCount    = 0;
+    int summaryCount = 0;
+    for ( const auto& r : m_foundRealizations )
+    {
+        if ( !r.gridFile.isEmpty() ) gridCount++;
+        if ( !r.summaryFile.isEmpty() ) summaryCount++;
+    }
+
+    const bool hasGrid    = gridCount > 0;
+    const bool hasSummary = summaryCount > 0;
+    m_createGridEnsembleCheckBox->setEnabled( hasGrid );
+    m_createSummaryEnsembleCheckBox->setEnabled( hasSummary );
+    if ( !hasGrid ) m_createGridEnsembleCheckBox->setChecked( false );
+    if ( !hasSummary ) m_createSummaryEnsembleCheckBox->setChecked( false );
+
     int realizationCount = m_foundRealizations.size();
     if ( realizationCount > 0 )
     {
         m_outputGroup->setTitle( QString( "Files Found (%1)" ).arg( realizationCount ) );
-        setOkButtonEnabled( true );
-        m_buttons->button( QDialogButtonBox::Ok )->setFocus();
+        bool anyChecked = m_createGridEnsembleCheckBox->isChecked() || m_createSummaryEnsembleCheckBox->isChecked();
+        setOkButtonEnabled( anyChecked );
+        if ( anyChecked ) m_buttons->button( QDialogButtonBox::Ok )->setFocus();
     }
     else
     {
