@@ -127,7 +127,7 @@ private:
     caf::PdmPtrField<RimEclipseCase*>                         m_primaryCase;
     caf::PdmPtrArrayField<RimPolygon*>                        m_selectedPolygons;
 
-    caf::PdmField<caf::AppEnum<GridImportMode>>                                    m_gridImportMode;
+    caf::PdmField<caf::AppEnum<GridImportMode>>                                   m_gridImportMode;
     caf::PdmField<caf::AppEnum<RimContourMapResolutionTools::SamplingResolution>> m_resolution;
 
     caf::PdmField<caf::AppEnum<RigFloodingSettings::FloodingType>> m_oilFloodingType;

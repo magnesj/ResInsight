@@ -42,8 +42,8 @@
 #include "Polygons/RimPolygonCollection.h"
 #include "RimEclipseCase.h"
 #include "RimEclipseCaseEnsemble.h"
-#include "RimEclipseResultCase.h"
 #include "RimEclipseContourMapProjection.h"
+#include "RimEclipseResultCase.h"
 #include "RimEclipseResultDefinition.h"
 #include "RimReservoirGridEnsemble.h"
 #include "RimSimWellInViewCollection.h"
@@ -203,8 +203,7 @@ void RimStatisticsContourMap::defineUiOrdering( QString uiConfigName, caf::PdmUi
 
     if ( auto* gridEnsemble = firstAncestorOrThisOfType<RimReservoirGridEnsembleBase>() )
     {
-        if ( gridEnsemble->gridMode() == RimReservoirGridEnsembleBase::GridModeType::SHARED_GRID )
-            genGrp->add( &m_gridImportMode );
+        if ( gridEnsemble->gridMode() == RimReservoirGridEnsembleBase::GridModeType::SHARED_GRID ) genGrp->add( &m_gridImportMode );
     }
 
     genGrp->add( &m_primaryCase );
