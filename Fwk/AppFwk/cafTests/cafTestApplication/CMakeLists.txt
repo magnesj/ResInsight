@@ -36,8 +36,22 @@ set(PROJECT_FILES
     CustomObjectEditor.h
     MenuItemProducer.cpp
     MenuItemProducer.h
+    PdmObjects/ColorTriplet.h
+    PdmObjects/ColorTriplet.cpp
+    PdmObjects/DemoPdmObject.h
+    PdmObjects/DemoPdmObject.cpp
+    PdmObjects/DemoPdmObjectGroup.h
+    PdmObjects/DemoPdmObjectGroup.cpp
     PdmObjects/ManyGroups.cpp
     PdmObjects/ManyGroups.h
+    PdmObjects/SingleEditorPdmObject.h
+    PdmObjects/SingleEditorPdmObject.cpp
+    PdmObjects/SmallDemoPdmObject.h
+    PdmObjects/SmallDemoPdmObject.cpp
+    PdmObjects/SmallDemoPdmObjectA.h
+    PdmObjects/SmallDemoPdmObjectA.cpp
+    PdmObjects/SmallGridDemoPdmObject.h
+    PdmObjects/SmallGridDemoPdmObject.cpp
     PdmObjects/TamComboBox.h
     PdmObjects/TamComboBox.cpp
     PdmObjects/LineEditAndPushButtons.h
