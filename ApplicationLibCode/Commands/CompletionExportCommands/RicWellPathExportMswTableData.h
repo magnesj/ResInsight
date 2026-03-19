@@ -196,6 +196,7 @@ private:
 
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
 
+    [[deprecated( "Use buildFlatMswSegments() instead" )]]
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
 
     static RigMswFlatExportData buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
