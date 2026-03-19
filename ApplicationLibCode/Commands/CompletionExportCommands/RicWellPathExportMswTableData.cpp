@@ -49,6 +49,7 @@
 #include "RimWellPathCompletions.h"
 #include "RimWellPathFracture.h"
 #include "RimWellPathFractureCollection.h"
+#include "RimValveCollection.h"
 #include "RimWellPathTieIn.h"
 #include "RimWellPathValve.h"
 
@@ -529,6 +530,96 @@ static void buildFlatSegmentsRecursive( std::vector<RigMswSegment>&             
                                     exportCompletionsAfterMainBore,
                                     exportDate );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Collect standalone WSEGVALV rows (from the well's valve collection, not from completions)
+/// into a map keyed by segment number.
+//--------------------------------------------------------------------------------------------------
+static void collectStandaloneWsegvalvBySegmentRecursive( std::map<int, WsegvalvRow>&  result,
+                                                          gsl::not_null<RicMswBranch*> branch,
+                                                          const std::string&           wellName )
+{
+    auto* valveColl = branch->wellPath()->valveCollection();
+    for ( auto* valve : valveColl->activeValves() )
+    {
+        auto* seg    = branch->findClosestSegmentWithLowerMD( valve->startMD() );
+        int   segNum = seg ? seg->segmentNumber() : 1;
+        if ( segNum > 1 && seg && valve->startMD() < seg->startMD() ) segNum--;
+
+        WsegvalvRow row;
+        row.well          = wellName;
+        row.segmentNumber = segNum;
+        row.cv            = valve->flowCoefficient();
+        row.area          = valve->area( branch->wellPath()->unitSystem() );
+        row.status        = "OPEN";
+        row.description   = valve->name().toStdString();
+        result[row.segmentNumber] = row;
+    }
+
+    for ( auto* subBranch : branch->branches() )
+        collectStandaloneWsegvalvBySegmentRecursive( result, subBranch, wellName );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Collect WSEGVALV rows from completion-based valves (ICD/ICV) into a map keyed by segment number.
+//--------------------------------------------------------------------------------------------------
+static void collectWsegvalvBySegmentRecursive( std::map<int, WsegvalvRow>&     result,
+                                               gsl::not_null<RicMswBranch*>    branch,
+                                               const std::string&              wellName,
+                                               const std::optional<QDateTime>& exportDate )
+{
+    // Tie-in ICV at branch level
+    if ( auto* tieInValve = dynamic_cast<RicMswTieInICV*>( branch.get() ) )
+    {
+        bool isActiveOnDate = !exportDate.has_value() ||
+                              ( tieInValve->wellPathValve() && tieInValve->wellPathValve()->isActiveOnDate( *exportDate ) );
+        if ( isActiveOnDate && !tieInValve->segments().empty() )
+        {
+            auto* firstSeg = tieInValve->segments().front();
+            WsegvalvRow row;
+            row.well          = wellName;
+            row.segmentNumber = firstSeg->segmentNumber();
+            row.cv            = tieInValve->flowCoefficient();
+            row.area          = tieInValve->area();
+            row.status        = tieInValve->isOpen() ? "OPEN" : "SHUT";
+            row.description   = tieInValve->label().toStdString();
+            result[row.segmentNumber] = row;
+        }
+    }
+
+    // Completion-based WSEGVALV entries (ICD / ICV completions on branch segments)
+    for ( auto* segment : branch->segments() )
+    {
+        for ( auto* comp : segment->completions() )
+        {
+            if ( !RigCompletionData::isWsegValveTypes( comp->completionType() ) ) continue;
+
+            auto* wsegValve = static_cast<RicMswWsegValve*>( comp );
+            if ( exportDate.has_value() && wsegValve->wellPathValve() &&
+                 !wsegValve->wellPathValve()->isActiveOnDate( *exportDate ) )
+                continue;
+
+            int segNum = -1;
+            for ( auto* valveSeg : wsegValve->segments() )
+            {
+                if ( valveSeg->segmentNumber() > -1 ) segNum = valveSeg->segmentNumber();
+                if ( valveSeg->intersections().empty() ) continue;
+
+                WsegvalvRow row;
+                row.well          = wellName;
+                row.segmentNumber = segNum;
+                row.cv            = wsegValve->flowCoefficient();
+                row.area          = wsegValve->area();
+                row.status        = wsegValve->isOpen() ? "OPEN" : "SHUT";
+                row.description   = wsegValve->label().toStdString();
+                result[row.segmentNumber] = row;
+            }
+        }
+    }
+
+    for ( auto* childBranch : branch->branches() )
+        collectWsegvalvBySegmentRecursive( result, childBranch, wellName, exportDate );
 }
 
 }; // namespace internal (additional helpers)
@@ -2376,6 +2467,20 @@ RigMswFlatExportData
             auto it = sicdBySegment.find( seg.segmentNumber );
             if ( it != sicdBySegment.end() )
                 seg.wsegsicdData = it->second;
+        }
+    }
+
+    // Join WSEGVALV data (ICD / ICV valves) into flat segment list by segment number
+    {
+        std::map<int, WsegvalvRow> wsegvalvBySegment;
+        internal::collectStandaloneWsegvalvBySegmentRecursive( wsegvalvBySegment, exportInfo.mainBoreBranch(), header.well );
+        internal::collectWsegvalvBySegmentRecursive( wsegvalvBySegment, exportInfo.mainBoreBranch(), header.well, exportDate );
+
+        for ( auto& seg : segments )
+        {
+            auto it = wsegvalvBySegment.find( seg.segmentNumber );
+            if ( it != wsegvalvBySegment.end() )
+                seg.wsegvalvData = it->second;
         }
     }
 
