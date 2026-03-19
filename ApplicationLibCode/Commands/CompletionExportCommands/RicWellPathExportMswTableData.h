@@ -197,6 +197,12 @@ private:
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
 
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
+
+    static RigMswFlatExportData buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
+                                                          double                                        maxSegmentLength,
+                                                          const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                                          bool                                          exportCompletionsAfterMainBore,
+                                                          const std::optional<QDateTime>&               exportDate );
 };
 
 ENABLE_BITMASK_OPERATORS( RicWellPathExportMswTableData::CompletionType )
