@@ -6,6 +6,11 @@
 #include "cafPdmUiOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include <QMenu>
+#include <QVariant>
+
+#include <iostream>
+
 CAF_PDM_SOURCE_INIT( SmallDemoPdmObject, "SmallDemoPdmObject" );
 
 SmallDemoPdmObject::SmallDemoPdmObject()
@@ -144,6 +149,56 @@ QList<caf::PdmOptionItemInfo> SmallDemoPdmObject::calculateValueOptions( const c
     }
 
     return options;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* SmallDemoPdmObject::objectToggleField()
+{
+    return &m_toggleField;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObject::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
+                                           const QVariant&            oldValue,
+                                           const QVariant&            newValue )
+{
+    if ( changedField == &m_toggleField )
+    {
+        std::cout << "Toggle Field changed" << std::endl;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObject::setDoubleMember( const double& d )
+{
+    m_doubleMember = d;
+    std::cout << "setDoubleMember" << std::endl;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+double SmallDemoPdmObject::doubleMember() const
+{
+    std::cout << "doubleMember" << std::endl;
+    return m_doubleMember;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObject::defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu,
+                                                  QMenu*                     menu,
+                                                  QWidget*                   fieldEditorWidget )
+{
+    menu->addAction( "test" );
+    menu->addAction( "other test <<>>" );
 }
 
 //--------------------------------------------------------------------------------------------------
