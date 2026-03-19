@@ -200,25 +200,7 @@ void MainWindow::buildTestModel()
     auto tamComboBox = new TamComboBox;
     m_testRoot->objects.push_back( tamComboBox );
 
-    DemoPdmObject* demoObj2 = new DemoPdmObject;
-
-    demoObject->m_textField = "Mitt Demo Obj";
-    demoObject->m_objectList.push_back( demoObj2 );
-    demoObject->m_objectList.push_back( new SmallDemoPdmObjectA() );
-    SmallDemoPdmObject* smallObj3 = new SmallDemoPdmObject();
-    demoObject->m_objectList.push_back( smallObj3 );
-    demoObject->m_objectList.push_back( new SmallDemoPdmObject() );
-
-    demoObject->m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
-    demoObject->m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
-    demoObject->m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
-    demoObject->m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
-
-    demoObj2->m_objectList.push_back( new SmallDemoPdmObjectA() );
-    demoObj2->m_objectList.push_back( new SmallDemoPdmObjectA() );
-    demoObj2->m_objectList.push_back( new SmallDemoPdmObject() );
-
-    delete smallObj3;
+    demoObject->buildTestData();
 
     m_testRoot->objects.push_back( new ApplicationEnum );
 

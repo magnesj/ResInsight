@@ -18,22 +18,20 @@ class DemoPdmObject : public caf::PdmObject
 public:
     DemoPdmObject();
 
-    //--------------------------------------------------------------------------------------------------
-    ///
-    //--------------------------------------------------------------------------------------------------
+    caf::PdmFieldHandle* userDescriptionField() override;
+    caf::PdmFieldHandle* objectToggleField() override;
+
+    void buildTestData();
+
     void defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering ) override;
-
-    //--------------------------------------------------------------------------------------------------
-    ///
-    //--------------------------------------------------------------------------------------------------
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
+    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
+    void onEditorWidgetsCreated() override;
 
-    //--------------------------------------------------------------------------------------------------
-    ///
-    //--------------------------------------------------------------------------------------------------
-    caf::PdmFieldHandle* userDescriptionField() override { return &m_textField; }
+protected:
+    void defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu, QMenu* menu, QWidget* fieldEditorWidget ) override;
 
-    // Fields
+private:
     caf::PdmField<bool>    m_boolField;
     caf::PdmField<double>  m_doubleField;
     caf::PdmField<int>     m_intField;
@@ -55,19 +53,4 @@ public:
     caf::PdmField<bool> m_updateAutoValues;
 
     MenuItemProducer* m_menuItemProducer;
-
-    caf::PdmFieldHandle* objectToggleField() override { return &m_toggleField; }
-
-    void fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue ) override;
-
-    //--------------------------------------------------------------------------------------------------
-    ///
-    //--------------------------------------------------------------------------------------------------
-    void onEditorWidgetsCreated() override;
-
-protected:
-    //--------------------------------------------------------------------------------------------------
-    ///
-    //--------------------------------------------------------------------------------------------------
-    void defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu, QMenu* menu, QWidget* fieldEditorWidget ) override;
 };

@@ -2,6 +2,8 @@
 
 #include "../MenuItemProducer.h"
 
+#include "SmallDemoPdmObject.h"
+
 #include "cafPdmUiFilePathEditor.h"
 #include "cafPdmUiOrdering.h"
 #include "cafPdmUiPushButtonEditor.h"
@@ -76,6 +78,48 @@ DemoPdmObject::DemoPdmObject()
     m_longText.capability<caf::PdmUiFieldHandle>()->setUiLabelPosition( caf::PdmUiItemInfo::LabelPosition::HIDDEN );
 
     m_menuItemProducer = new MenuItemProducer;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void DemoPdmObject::buildTestData()
+{
+    m_textField = "Mitt Demo Obj";
+
+    DemoPdmObject* demoObj2 = new DemoPdmObject;
+    m_objectList.push_back( demoObj2 );
+    m_objectList.push_back( new SmallDemoPdmObjectA() );
+    SmallDemoPdmObject* smallObj3 = new SmallDemoPdmObject();
+    m_objectList.push_back( smallObj3 );
+    m_objectList.push_back( new SmallDemoPdmObject() );
+
+    m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
+    m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
+    m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
+    m_objectListOfSameType.push_back( new SmallDemoPdmObjectA() );
+
+    demoObj2->m_objectList.push_back( new SmallDemoPdmObjectA() );
+    demoObj2->m_objectList.push_back( new SmallDemoPdmObjectA() );
+    demoObj2->m_objectList.push_back( new SmallDemoPdmObject() );
+
+    delete smallObj3;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* DemoPdmObject::userDescriptionField()
+{
+    return &m_textField;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* DemoPdmObject::objectToggleField()
+{
+    return &m_toggleField;
 }
 
 //--------------------------------------------------------------------------------------------------
