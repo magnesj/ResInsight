@@ -22,10 +22,12 @@
 
 #include "RicMswBranch.h"
 #include "RicMswSegment.h"
+#include "CompletionsMsw/RigMswSegment.h"
 
 #include <QString>
 
 #include <memory>
+#include <vector>
 
 class RimWellPath;
 class RimFishbones;
@@ -54,6 +56,10 @@ public:
     const RicMswBranch* mainBoreBranch() const;
     RicMswBranch*       mainBoreBranch();
 
+    void                               addSegment( RigMswSegment segment );
+    const std::vector<RigMswSegment>&  segments() const;
+    std::vector<RigMswSegment>&        segments();
+
 private:
     RiaDefines::EclipseUnitSystem m_unitSystem;
     double                        m_topWellBoreVolume;
@@ -62,4 +68,5 @@ private:
     bool                          m_hasSubGridIntersections;
 
     std::unique_ptr<RicMswBranch> m_mainBoreBranch;
+    std::vector<RigMswSegment>    m_segments;
 };
