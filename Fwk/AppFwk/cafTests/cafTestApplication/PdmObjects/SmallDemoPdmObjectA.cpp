@@ -3,6 +3,10 @@
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 
+#include <QVariant>
+
+#include <iostream>
+
 CAF_PDM_SOURCE_INIT( SmallDemoPdmObjectA, "SmallDemoPdmObjectA" );
 
 namespace caf
@@ -70,6 +74,124 @@ SmallDemoPdmObjectA::SmallDemoPdmObjectA()
     m_highlightedEnum.uiCapability()->setUiHidden( true );
 }
 
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* SmallDemoPdmObjectA::objectToggleField()
+{
+    return &m_toggleField;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::PdmFieldHandle* SmallDemoPdmObjectA::userDescriptionField()
+{
+    return &m_textField;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::migrateFieldContent( QString& fieldContent, caf::PdmFieldHandle* fieldHandle )
+{
+    if ( fieldHandle == &m_textField )
+    {
+        fieldContent = "Migrated Text Field Content";
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
+                                             const QVariant&            oldValue,
+                                             const QVariant&            newValue )
+{
+    if ( changedField == &m_toggleField )
+    {
+        std::cout << "Toggle Field changed" << std::endl;
+    }
+    else if ( changedField == &m_highlightedEnum )
+    {
+        std::cout << "Highlight value " << m_highlightedEnum().uiText().toStdString() << std::endl;
+    }
+    else if ( changedField == &m_pushButtonField )
+    {
+        std::cout << "Push Button pressed " << std::endl;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::setEnumMember( const caf::AppEnum<TestEnumType>& val )
+{
+    m_proxyEnumMember = val;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+caf::AppEnum<SmallDemoPdmObjectA::TestEnumType> SmallDemoPdmObjectA::enumMember() const
+{
+    return m_proxyEnumMember;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::enableAutoValueForTestEnum( TestEnumType value )
+{
+    auto enumValue = static_cast<std::underlying_type_t<TestEnumType>>( value );
+    m_testEnumField.uiCapability()->enableAndSetAutoValue( enumValue );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::enableAutoValueForDouble( double value )
+{
+    m_doubleField.uiCapability()->enableAndSetAutoValue( value );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::enableAutoValueForInt( double value )
+{
+    m_intField.uiCapability()->enableAndSetAutoValue( value );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::setAutoValueForTestEnum( TestEnumType value )
+{
+    auto enumValue = static_cast<std::underlying_type_t<TestEnumType>>( value );
+    m_testEnumField.uiCapability()->setAutoValue( enumValue );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::setAutoValueForDouble( double value )
+{
+    m_doubleField.uiCapability()->setAutoValue( value );
+    m_doubleField.uiCapability()->updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void SmallDemoPdmObjectA::setAutoValueForInt( double value )
+{
+    m_intField.uiCapability()->setAutoValue( value );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 QList<caf::PdmOptionItemInfo> SmallDemoPdmObjectA::calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions )
 {
     QList<caf::PdmOptionItemInfo> options;
