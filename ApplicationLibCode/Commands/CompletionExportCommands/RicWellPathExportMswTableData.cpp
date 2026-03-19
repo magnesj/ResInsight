@@ -689,7 +689,7 @@ std::expected<RigMswFlatExportData, std::string>
 
     // Switch between legacy path (collectWelsegsData -> buildFlatMswSegmentList)
     // and new direct path (buildFlatSegmentsDirect).
-    constexpr bool useLegacyPath = true;
+    constexpr bool useLegacyPath = false;
 
     if ( !useLegacyPath )
     {
