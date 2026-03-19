@@ -65,9 +65,8 @@
 
 namespace
 {
-std::optional<std::set<int>> findKLayersForFormations( RimEclipseCase*             eCase,
-                                                       const std::vector<QString>& selectedFormations,
-                                                       RimFormationNames*          fallbackFormationNames )
+std::optional<std::set<int>>
+    findKLayersForFormations( RimEclipseCase* eCase, const std::vector<QString>& selectedFormations, RimFormationNames* fallbackFormationNames )
 {
     if ( selectedFormations.empty() ) return std::set<int>{};
 
@@ -81,20 +80,19 @@ std::optional<std::set<int>> findKLayersForFormations( RimEclipseCase*          
     return fData->findKLayers( selectedFormations );
 }
 
-void extractCaseResults( RigEclipseContourMapProjection&                projection,
-                         const RigEclipseResultAddress&                 resultAddress,
-                         bool                                           hasDynamicResult,
-                         RigContourMapCalculator::ResultAggregationType resultAggregation,
-                         RigFloodingSettings&                           floodSettings,
-                         const std::vector<std::pair<int, int>>&        localToGlobalTimeSteps,
+void extractCaseResults( RigEclipseContourMapProjection&                     projection,
+                         const RigEclipseResultAddress&                      resultAddress,
+                         bool                                                hasDynamicResult,
+                         RigContourMapCalculator::ResultAggregationType      resultAggregation,
+                         RigFloodingSettings&                                floodSettings,
+                         const std::vector<std::pair<int, int>>&             localToGlobalTimeSteps,
                          std::map<size_t, std::vector<std::vector<double>>>& timestepResults )
 {
     if ( hasDynamicResult )
     {
         for ( auto [localTs, globalTs] : localToGlobalTimeSteps )
         {
-            timestepResults[globalTs].push_back(
-                projection.generateResults( resultAddress, resultAggregation, localTs, floodSettings ) );
+            timestepResults[globalTs].push_back( projection.generateResults( resultAddress, resultAggregation, localTs, floodSettings ) );
         }
     }
     else
@@ -592,8 +590,7 @@ void RimStatisticsContourMap::computeStatistics()
     gridBoundingBox.expandPercent( m_boundingBoxExpPercent() );
 
     double sampleSpacing = 1.0;
-    if ( auto mainGrid = eclipseCase()->mainGrid() )
-        sampleSpacing = sampleSpacingFactor() * mainGrid->characteristicIJCellSize();
+    if ( auto mainGrid = eclipseCase()->mainGrid() ) sampleSpacing = sampleSpacingFactor() * mainGrid->characteristicIJCellSize();
 
     auto contourMapGrid = std::make_unique<RigContourMapGrid>( gridBoundingBox, sampleSpacing );
 
@@ -650,7 +647,7 @@ void RimStatisticsContourMap::computeStatisticsSharedGrid( RigContourMapGrid*  c
         return;
     }
 
-    RigFloodingSettings                            floodSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
+    RigFloodingSettings floodSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
     RigContourMapCalculator::ResultAggregationType resultAggregation = m_resultAggregation();
 
     sharedProjection.generateGridMapping( resultAggregation, {}, *kLayers, selectedPolygons() );
@@ -701,7 +698,7 @@ void RimStatisticsContourMap::computeStatisticsIndividualGrids( RigContourMapGri
     readerSettings.onlyLoadActiveCells = true;
     auto casesInViews                  = ensembleCasesInViews();
 
-    RigFloodingSettings                            floodSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
+    RigFloodingSettings floodSettings( m_oilFloodingType(), m_userDefinedFloodingOil(), m_gasFloodingType(), m_userDefinedFloodingGas() );
     RigContourMapCalculator::ResultAggregationType resultAggregation = m_resultAggregation();
 
     auto         cases  = ensembleCases();
