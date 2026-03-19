@@ -46,6 +46,7 @@ DemoPdmObject::DemoPdmObject()
                        "",
                        "Enter some small number here",
                        "This is a place you can enter a small integer value if you want" );
+    CAF_PDM_InitField( &m_sizeField, "SizeField", size_t( 0 ), "Size Field", "", "", "" );
     CAF_PDM_InitField( &m_boolField,
                        "BooleanValue",
                        false,
@@ -127,6 +128,8 @@ caf::PdmFieldHandle* DemoPdmObject::objectToggleField()
 //--------------------------------------------------------------------------------------------------
 void DemoPdmObject::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
+    uiOrdering.add( &m_sizeField );
+
     uiOrdering.add( &m_applyAutoOnChildObjectFields );
     uiOrdering.add( &m_updateAutoValues );
 

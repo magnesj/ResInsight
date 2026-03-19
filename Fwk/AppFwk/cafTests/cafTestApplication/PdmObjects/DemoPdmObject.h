@@ -35,6 +35,7 @@ private:
     caf::PdmField<bool>    m_boolField;
     caf::PdmField<double>  m_doubleField;
     caf::PdmField<int>     m_intField;
+    caf::PdmField<size_t>  m_sizeField;
     caf::PdmField<QString> m_textField;
 
     caf::PdmField<QString> m_filePath;
