@@ -105,8 +105,8 @@ void SmallDemoPdmObjectA::migrateFieldContent( QString& fieldContent, caf::PdmFi
 ///
 //--------------------------------------------------------------------------------------------------
 void SmallDemoPdmObjectA::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
-                                             const QVariant&            oldValue,
-                                             const QVariant&            newValue )
+                                            const QVariant&            oldValue,
+                                            const QVariant&            newValue )
 {
     if ( changedField == &m_toggleField )
     {

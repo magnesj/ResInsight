@@ -30,7 +30,7 @@ public:
 
     QList<caf::PdmOptionItemInfo> calculateValueOptions( const caf::PdmFieldHandle* fieldNeedingOptions ) override;
 
-    void setEnumMember( const caf::AppEnum<TestEnumType>& val );
+    void                       setEnumMember( const caf::AppEnum<TestEnumType>& val );
     caf::AppEnum<TestEnumType> enumMember() const;
 
     void enableAutoValueForTestEnum( TestEnumType value );
