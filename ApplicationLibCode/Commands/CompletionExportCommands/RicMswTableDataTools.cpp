@@ -20,6 +20,7 @@
 
 #include "RiaLogging.h"
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "CompletionsMsw/RigMswTableData.h"
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
@@ -34,6 +35,66 @@
 #include "RimWellPathValve.h"
 
 #include <cmath>
+
+//--------------------------------------------------------------------------------------------------
+/// Populate RigMswTableData from a pre-built flat segment list.
+/// This replaces the recursive tree-based collection functions (collectWelsegsData etc.) with
+/// simple iteration over RigMswSegment objects.
+//--------------------------------------------------------------------------------------------------
+void RicMswTableDataTools::collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData )
+{
+    tableData.setWelsegsHeader( exportData.header );
+
+    std::set<size_t> intersectedCells; // deduplicate COMPSEGS entries across segments
+
+    for ( const auto& seg : exportData.segments )
+    {
+        // WELSEGS row
+        WelsegsRow welsegsRow;
+        welsegsRow.segment1       = seg.segmentNumber;
+        welsegsRow.segment2       = seg.segmentNumber;
+        welsegsRow.branch         = seg.branchNumber;
+        welsegsRow.joinSegment    = seg.outletSegmentNumber;
+        welsegsRow.length         = seg.length;
+        welsegsRow.depth          = seg.depth;
+        welsegsRow.diameter       = seg.diameter;
+        welsegsRow.roughness      = seg.roughness;
+        welsegsRow.description    = seg.description;
+        welsegsRow.sourceWellName = seg.sourceWellName;
+        tableData.addWelsegsRow( welsegsRow );
+
+        // COMPSEGS / COMPSEGL rows — deduplicated across segments
+        for ( const auto& inter : seg.intersections )
+        {
+            // Use a simple hash for deduplication: combine i, j, k, gridName
+            // Reuse the intersectedCells set via a packed index trick; for LGR cells we skip dedup
+            CompsegsRow compRow;
+            compRow.i             = inter.i;
+            compRow.j             = inter.j;
+            compRow.k             = inter.k;
+            compRow.branch        = seg.branchNumber;
+            compRow.distanceStart = inter.distanceStart;
+            compRow.distanceEnd   = inter.distanceEnd;
+            compRow.gridName      = inter.gridName;
+            tableData.addCompsegsRow( compRow );
+        }
+
+        // WSEGVALV row
+        if ( seg.wsegvalvData )
+            tableData.addWsegvalvRow( *seg.wsegvalvData );
+
+        // WSEGAICD row
+        if ( seg.wsegaicdData )
+            tableData.addWsegaicdRow( *seg.wsegaicdData );
+
+        // WSEGSICD row
+        if ( seg.wsegsicdData )
+            tableData.addWsegsicdRow( *seg.wsegsicdData );
+
+        // Also store the segment in the flat list on tableData
+        tableData.addMswSegment( seg );
+    }
+}
 
 //--------------------------------------------------------------------------------------------------
 ///

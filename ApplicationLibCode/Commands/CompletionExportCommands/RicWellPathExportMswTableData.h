@@ -20,6 +20,7 @@
 
 #include "RiaDefines.h"
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "Tools/enum_bitmask.hpp"
 
 #include <gsl/gsl>
@@ -69,6 +70,14 @@ public:
                                                                                  bool exportCompletionsAfterMainBoreSegments = true,
                                                                                  CompletionType completionType = CompletionType::ALL,
                                                                                  const std::optional<QDateTime>& exportDate = std::nullopt );
+
+    // Build the flat segment list directly, bypassing the tree as a public intermediate.
+    // Returns all WELSEGS rows and embedded COMPSEGS/valve data in a flat, ordered list.
+    static std::expected<RigMswFlatExportData, std::string> buildFlatMswSegments( RimEclipseCase*                 eclipseCase,
+                                                                                  RimWellPath*                    wellPath,
+                                                                                  bool                            exportCompletionsAfterMainBoreSegments = true,
+                                                                                  CompletionType                  completionType = CompletionType::ALL,
+                                                                                  const std::optional<QDateTime>& exportDate    = std::nullopt );
 
     static CompletionType convertFromExportSettings( const class RicExportCompletionDataSettingsUi& settings );
 
