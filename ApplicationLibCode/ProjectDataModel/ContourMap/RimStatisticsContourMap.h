@@ -31,9 +31,16 @@
 #include "cvfVector3.h"
 
 #include <map>
+#include <optional>
 #include <utility>
 #include <vector>
 
+namespace caf
+{
+class ProgressInfo;
+}
+
+class RigContourMapGrid;
 class RimEclipseCase;
 class RimEclipseResultDefinition;
 class RimEclipseCaseEnsemble;
@@ -108,9 +115,13 @@ protected:
     void switchToSelectedSourceCase();
 
 private:
+    using TimestepResultsMap = std::map<size_t, std::vector<std::vector<double>>>;
+
     void computeStatistics();
+    void computeStatisticsSharedGrid( RigContourMapGrid* contourMapGrid, TimestepResultsMap& timestepResults, caf::ProgressInfo& progInfo );
+    void computeStatisticsIndividualGrids( RigContourMapGrid* contourMapGrid, TimestepResultsMap& timestepResults, caf::ProgressInfo& progInfo );
     void onComputeStatisticsClicked();
-    void doStatisticsCalculation( std::map<size_t, std::vector<std::vector<double>>>& timestep_results );
+    void doStatisticsCalculation( TimestepResultsMap& timestep_results );
 
     RimFormationNames*           activeFormationNames() const;
     std::vector<RimEclipseCase*> ensembleCases() const;
@@ -118,6 +129,7 @@ private:
 
     std::vector<std::pair<int, int>> mapLocalToGlobalTimeSteps( std::vector<QDateTime> localDates ) const;
 
+private:
     caf::PdmField<double>                                     m_boundingBoxExpPercent;
     caf::PdmField<RimContourMapProjection::ResultAggregation> m_resultAggregation;
     caf::PdmField<std::vector<int>>                           m_selectedTimeSteps;
