@@ -27,6 +27,7 @@
 #include "RicMswTableDataTools.h"
 #include "RicMswValveAccumulators.h"
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "CompletionsMsw/RigMswTableData.h"
 #include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
@@ -145,6 +146,8 @@ std::expected<RigMswTableData, std::string>
     RicMswTableDataTools::collectWsegvalvData( tableData, exportInfo, exportDate );
     RicMswTableDataTools::collectWsegAicdData( tableData, exportInfo, exportDate );
     RicMswTableDataTools::collectWsegSicdData( tableData, exportInfo, exportDate );
+
+    buildFlatMswSegmentList( exportInfo, tableData );
 
     return tableData;
 }
@@ -1661,4 +1664,83 @@ std::pair<double, double>
         }
     }
     return std::make_pair( 0.0, 0.0 );
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Build the flat RigMswSegment list from the already-collected table data and tree intersections.
+/// Each WelsegsRow becomes one RigMswSegment. Cell intersections are looked up from the tree
+/// (each RicMswSegment has its segment number assigned by collectWelsegsData). Valve data is
+/// joined from the separate WSEGVALV/WSEGAICD/WSEGSICD table rows.
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswTableData::buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData )
+{
+    // Build map: segmentNumber -> cell intersections, from all segments in the tree
+    std::map<int, std::vector<RigMswCellIntersection>> intersectionsBySegment;
+    {
+        auto allSegments = const_cast<RicMswBranch*>( exportInfo.mainBoreBranch() )->allSegmentsRecursively();
+        for ( const auto* seg : allSegments )
+        {
+            int segNum = seg->segmentNumber();
+            if ( segNum <= 0 ) continue;
+
+            for ( const auto& inter : seg->intersections() )
+            {
+                RigMswCellIntersection ci;
+                auto                  ijk = inter->gridLocalCellIJK().toOneBased();
+                ci.i                      = ijk.i();
+                ci.j                      = ijk.j();
+                ci.k                      = ijk.k();
+                ci.distanceStart          = seg->startMD();
+                ci.distanceEnd            = seg->endMD();
+                ci.gridName               = inter->gridName().toStdString();
+                intersectionsBySegment[segNum].push_back( ci );
+            }
+        }
+    }
+
+    // Build maps: segmentNumber -> valve row (at most one type per segment)
+    std::map<int, WsegvalvRow> valvBySegment;
+    for ( const auto& row : tableData.wsegvalvData() )
+        valvBySegment[row.segmentNumber] = row;
+
+    std::map<int, WsegaicdRow> aicdBySegment;
+    for ( const auto& row : tableData.wsegaicdData() )
+        aicdBySegment[row.segment1] = row;
+
+    std::map<int, WsegsicdRow> sicdBySegment;
+    for ( const auto& row : tableData.wsegsicdData() )
+        sicdBySegment[row.segment1] = row;
+
+    // Convert each WelsegsRow to a RigMswSegment
+    for ( const auto& row : tableData.welsegsData() )
+    {
+        RigMswSegment seg;
+        seg.segmentNumber       = row.segment1;
+        seg.branchNumber        = row.branch;
+        seg.outletSegmentNumber = row.joinSegment;
+        seg.length              = row.length;
+        seg.depth               = row.depth;
+        seg.diameter            = row.diameter;
+        seg.roughness           = row.roughness;
+        seg.description         = row.description;
+        seg.sourceWellName      = row.sourceWellName;
+
+        auto iIt = intersectionsBySegment.find( row.segment1 );
+        if ( iIt != intersectionsBySegment.end() )
+            seg.intersections = iIt->second;
+
+        auto vIt = valvBySegment.find( row.segment1 );
+        if ( vIt != valvBySegment.end() )
+            seg.wsegvalvData = vIt->second;
+
+        auto aIt = aicdBySegment.find( row.segment1 );
+        if ( aIt != aicdBySegment.end() )
+            seg.wsegaicdData = aIt->second;
+
+        auto sIt = sicdBySegment.find( row.segment1 );
+        if ( sIt != sicdBySegment.end() )
+            seg.wsegsicdData = sIt->second;
+
+        tableData.addMswSegment( std::move( seg ) );
+    }
 }

@@ -186,6 +186,8 @@ private:
     static std::unique_ptr<RicMswBranch> createChildMswBranch( const RimWellPath* childWellPath );
 
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
+
+    static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
 };
 
 ENABLE_BITMASK_OPERATORS( RicWellPathExportMswTableData::CompletionType )
