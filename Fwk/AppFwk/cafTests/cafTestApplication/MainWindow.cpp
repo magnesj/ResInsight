@@ -3,15 +3,15 @@
 
 #include "MainWindow.h"
 
-#include "ApplicationEnum.h"
+#include "PdmObjects/ApplicationEnum.h"
 #include "CustomObjectEditor.h"
-#include "LabelsAndHyperlinks.h"
-#include "LineEditAndPushButtons.h"
-#include "ManyGroups.h"
+#include "PdmObjects/LabelsAndHyperlinks.h"
+#include "PdmObjects/LineEditAndPushButtons.h"
+#include "PdmObjects/ManyGroups.h"
 #include "MenuItemProducer.h"
-#include "OptionalFields.h"
-#include "TamComboBox.h"
-#include "ValidationTest.h"
+#include "PdmObjects/OptionalFields.h"
+#include "PdmObjects/TamComboBox.h"
+#include "PdmObjects/ValidationTest.h"
 #include "WidgetLayoutTest.h"
 
 #include "cafAppEnum.h"
