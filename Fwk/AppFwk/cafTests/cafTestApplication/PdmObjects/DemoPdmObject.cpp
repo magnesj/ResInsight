@@ -28,8 +28,7 @@ DemoPdmObject::DemoPdmObject()
 
     CAF_PDM_InitField( &m_updateAutoValues, "UpdateAutoValue", false, "Update Auto Values" );
     m_updateAutoValues.uiCapability()->setUiEditorTypeName( caf::PdmUiPushButtonEditor::uiEditorTypeName() );
-    m_updateAutoValues.uiCapability()->setAttribute( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT,
-                                                     "Update Auto Values" );
+    m_updateAutoValues.uiCapability()->setAttribute( caf::PdmUiPushButtonEditor::Keys::BUTTON_TEXT, "Update Auto Values" );
 
     CAF_PDM_InitField( &m_doubleField,
                        "BigNumber",
@@ -133,7 +132,9 @@ QList<caf::PdmOptionItemInfo> DemoPdmObject::calculateValueOptions( const caf::P
     return options;
 }
 
-void DemoPdmObject::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
+void DemoPdmObject::fieldChangedByUi( const caf::PdmFieldHandle* changedField,
+                                      const QVariant&            oldValue,
+                                      const QVariant&            newValue )
 {
     if ( changedField == &m_toggleField )
     {
@@ -200,7 +201,9 @@ void DemoPdmObject::onEditorWidgetsCreated()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void DemoPdmObject::defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu, QMenu* menu, QWidget* fieldEditorWidget )
+void DemoPdmObject::defineCustomContextMenu( const caf::PdmFieldHandle* fieldNeedingMenu,
+                                             QMenu*                     menu,
+                                             QWidget*                   fieldEditorWidget )
 {
     if ( fieldNeedingMenu == &m_objectListOfSameType )
     {

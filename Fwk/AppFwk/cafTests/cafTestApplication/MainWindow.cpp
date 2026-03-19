@@ -3,15 +3,15 @@
 
 #include "MainWindow.h"
 
-#include "PdmObjects/ApplicationEnum.h"
 #include "CustomObjectEditor.h"
+#include "MenuItemProducer.h"
+#include "PdmObjects/ApplicationEnum.h"
 #include "PdmObjects/ColorTriplet.h"
 #include "PdmObjects/DemoPdmObject.h"
 #include "PdmObjects/DemoPdmObjectGroup.h"
 #include "PdmObjects/LabelsAndHyperlinks.h"
 #include "PdmObjects/LineEditAndPushButtons.h"
 #include "PdmObjects/ManyGroups.h"
-#include "MenuItemProducer.h"
 #include "PdmObjects/OptionalFields.h"
 #include "PdmObjects/SingleEditorPdmObject.h"
 #include "PdmObjects/SmallDemoPdmObject.h"

@@ -3,8 +3,8 @@
 #include "cafAppEnum.h"
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
-#include "cafPdmPtrField.h"
 #include "cafPdmProxyValueField.h"
+#include "cafPdmPtrField.h"
 
 #include <QString>
 

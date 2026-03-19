@@ -55,13 +55,7 @@ SmallDemoPdmObjectA::SmallDemoPdmObjectA()
                        "Enter some small number here",
                        "This is a place you can enter a small integer value if you want" );
     CAF_PDM_InitField( &m_textField, "TextField", QString( "Small Demo Object A" ), "Name Text Field", "", "", "" );
-    CAF_PDM_InitField( &m_testEnumField,
-                       "TestEnumValue",
-                       caf::AppEnum<TestEnumType>( TestEnumType::T1 ),
-                       "EnumField",
-                       "",
-                       "",
-                       "" );
+    CAF_PDM_InitField( &m_testEnumField, "TestEnumValue", caf::AppEnum<TestEnumType>( TestEnumType::T1 ), "EnumField", "", "", "" );
     CAF_PDM_InitFieldNoDefault( &m_ptrField, "m_ptrField", "PtrField", "", "", "" );
 
     CAF_PDM_InitFieldNoDefault( &m_proxyEnumField, "ProxyEnumValue", "ProxyEnum", "", "", "" );
@@ -101,9 +95,9 @@ QList<caf::PdmOptionItemInfo> SmallDemoPdmObjectA::calculateValueOptions( const 
                     }
                 }
 
-                options.push_back( caf::PdmOptionItemInfo( uiObject->uiName() + "(" + userDesc + ")",
-                                                           QVariant::fromValue( caf::PdmPointer<caf::PdmObjectHandle>(
-                                                               objects[i] ) ) ) );
+                options.push_back(
+                    caf::PdmOptionItemInfo( uiObject->uiName() + "(" + userDesc + ")",
+                                            QVariant::fromValue( caf::PdmPointer<caf::PdmObjectHandle>( objects[i] ) ) ) );
             }
         }
     }
@@ -128,8 +122,7 @@ void SmallDemoPdmObjectA::defineEditorAttribute( const caf::PdmFieldHandle* fiel
 {
     if ( field == &m_multipleAppEnum )
     {
-        caf::PdmUiTreeSelectionEditorAttribute* attr =
-            dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
+        caf::PdmUiTreeSelectionEditorAttribute* attr = dynamic_cast<caf::PdmUiTreeSelectionEditorAttribute*>( attribute );
         if ( attr )
         {
             attr->currentIndexFieldHandle = &m_highlightedEnum;
