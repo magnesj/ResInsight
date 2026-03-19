@@ -8,6 +8,7 @@
 #include "cafPdmObject.h"
 #include "cafPdmProxyValueField.h"
 
+#include <QMenu>
 #include <QString>
 
 class SmallDemoPdmObject : public caf::PdmObject

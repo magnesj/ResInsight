@@ -1,6 +1,5 @@
 #include "SmallDemoPdmObjectA.h"
 
-#include "cafPdmUiEditorAttribute.h"
 #include "cafPdmUiTableViewEditor.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 

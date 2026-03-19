@@ -36,6 +36,7 @@
 #include "cafPdmUiComboBoxEditor.h"
 #include "cafPdmUiItem.h"
 #include "cafPdmUiPropertyView.h"
+#include "cafPdmUiTableView.h"
 #include "cafPdmUiTreeView.h"
 #include "cafSelectionManager.h"
 
