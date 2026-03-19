@@ -20,6 +20,7 @@
 
 #include "RicMswBranch.h"
 #include "RicMswCompletions.h"
+#include "CompletionsMsw/RigMswSegment.h"
 
 #include "RimMswCompletionParameters.h"
 #include "RimWellPath.h"
@@ -119,4 +120,28 @@ const RicMswBranch* RicMswExportInfo::mainBoreBranch() const
 RicMswBranch* RicMswExportInfo::mainBoreBranch()
 {
     return m_mainBoreBranch.get();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicMswExportInfo::addSegment( RigMswSegment segment )
+{
+    m_segments.push_back( std::move( segment ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+const std::vector<RigMswSegment>& RicMswExportInfo::segments() const
+{
+    return m_segments;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+std::vector<RigMswSegment>& RicMswExportInfo::segments()
+{
+    return m_segments;
 }
