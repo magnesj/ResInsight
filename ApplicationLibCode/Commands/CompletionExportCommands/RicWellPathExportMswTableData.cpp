@@ -58,7 +58,480 @@ namespace internal
 {
 constexpr double VALVE_SEGMENT_LENGTH = 0.1;
 
-}; // namespace internal
+//--------------------------------------------------------------------------------------------------
+/// Convert a tree segment's cell intersections to flat RigMswCellIntersection objects.
+//--------------------------------------------------------------------------------------------------
+static std::vector<RigMswCellIntersection> collectCellIntersections( const RicMswSegment* seg )
+{
+    std::vector<RigMswCellIntersection> result;
+    for ( const auto& inter : seg->intersections() )
+    {
+        RigMswCellIntersection ci;
+        auto                  ijk = inter->gridLocalCellIJK().toOneBased();
+        ci.i                      = ijk.i();
+        ci.j                      = ijk.j();
+        ci.k                      = ijk.k();
+        ci.distanceStart          = seg->startMD();
+        ci.distanceEnd            = seg->endMD();
+        ci.gridName               = inter->gridName().toStdString();
+        result.push_back( ci );
+    }
+    return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add sub-segments for a completion (non-valve, e.g. fishbones lateral, fracture) to the flat list.
+//--------------------------------------------------------------------------------------------------
+static void addCompletionSubSegments( std::vector<RigMswSegment>&                   result,
+                                      int&                                          segmentNumber,
+                                      gsl::not_null<RicMswCompletion*>              completion,
+                                      int                                           outletNumber,
+                                      RicMswExportInfo&                             exportInfo,
+                                      double                                        maxSegmentLength,
+                                      const std::vector<std::pair<double, double>>& customSegmentIntervals )
+{
+    bool isDescriptionAdded = false;
+    int  localOutletNumber  = outletNumber;
+
+    for ( auto* treeSegment : completion->segments() )
+    {
+        treeSegment->setSegmentNumber( segmentNumber );
+
+        double startMD  = treeSegment->startMD();
+        double endMD    = treeSegment->endMD();
+        double startTVD = treeSegment->startTVD();
+        double endTVD   = treeSegment->endTVD();
+
+        auto splitSegments = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
+        for ( const auto& [subStartMD, subEndMD] : splitSegments )
+        {
+            int subSegNum = segmentNumber++;
+
+            double subStartTVD = RicMswTableDataTools::tvdFromMeasuredDepth( completion->wellPath(), subStartMD );
+            double subEndTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( completion->wellPath(), subEndMD );
+
+            if ( completion->completionType() == RigCompletionData::CompletionType::FISHBONES )
+            {
+                // Use linear interpolation based on start/end TVD for fishbones
+                auto normalizedStart = ( subStartMD - startMD ) / ( endMD - startMD );
+                subStartTVD          = startTVD * ( 1.0 - normalizedStart ) + endTVD * normalizedStart;
+                auto normalizedEnd   = ( subEndMD - startMD ) / ( endMD - startMD );
+                subEndTVD            = startTVD * ( 1.0 - normalizedEnd ) + endTVD * normalizedEnd;
+            }
+
+            double depth  = 0;
+            double length = 0;
+            if ( exportInfo.lengthAndDepthText() == "INC" )
+            {
+                depth  = subEndTVD - subStartTVD;
+                length = subEndMD - subStartMD;
+            }
+            else
+            {
+                depth  = subEndTVD;
+                length = subEndMD;
+            }
+
+            double diameter = treeSegment->equivalentDiameter();
+            if ( treeSegment->effectiveDiameter() > 0.0 ) diameter = treeSegment->effectiveDiameter();
+
+            RigMswSegment seg;
+            seg.segmentNumber       = subSegNum;
+            seg.branchNumber        = completion->branchNumber();
+            seg.outletSegmentNumber = localOutletNumber;
+            seg.length              = length;
+            seg.depth               = depth;
+            seg.diameter            = diameter;
+            seg.roughness           = treeSegment->openHoleRoughnessFactor();
+            seg.sourceWellName      = completion->wellPath()->name().toStdString();
+            if ( !isDescriptionAdded )
+            {
+                seg.description    = completion->label().toStdString();
+                isDescriptionAdded = true;
+            }
+            seg.intersections = collectCellIntersections( treeSegment );
+
+            result.push_back( std::move( seg ) );
+            localOutletNumber = subSegNum;
+        }
+
+        // Recurse into sub-completions
+        for ( auto* subComp : treeSegment->completions() )
+        {
+            auto* subCompletion = dynamic_cast<RicMswCompletion*>( subComp );
+            if ( subCompletion )
+                addCompletionSubSegments( result, segmentNumber, subCompletion, treeSegment->segmentNumber(), exportInfo, maxSegmentLength, customSegmentIntervals );
+        }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Add WELSEGS segments for a valve completion to the flat list.
+//--------------------------------------------------------------------------------------------------
+static void addValveSubSegments( std::vector<RigMswSegment>&                   result,
+                                 int&                                          segmentNumber,
+                                 RicMswValve*                                  valve,
+                                 int                                           outletNumber,
+                                 RicMswExportInfo&                             exportInfo,
+                                 double                                        maxSegmentLength,
+                                 const std::vector<std::pair<double, double>>& customSegmentIntervals )
+{
+    if ( !valve ) return;
+    if ( !valve->isValid() ) return;
+    if ( !valve->wellPath() ) return;
+
+    auto segments = valve->segments();
+
+    double startMD = 0.0;
+    double endMD   = 0.0;
+
+    if ( valve->completionType() == RigCompletionData::CompletionType::PERFORATION_ICD ||
+         valve->completionType() == RigCompletionData::CompletionType::PERFORATION_AICD ||
+         valve->completionType() == RigCompletionData::CompletionType::PERFORATION_SICD )
+    {
+        CVF_ASSERT( segments.size() > 1 );
+        auto subSegment = segments[0];
+        subSegment->setSegmentNumber( segmentNumber );
+        double midPointMD = subSegment->outputMD();
+        startMD           = midPointMD;
+        endMD             = startMD + 0.1;
+    }
+    else
+    {
+        auto subSegment = segments.front();
+        subSegment->setSegmentNumber( segmentNumber );
+        startMD = subSegment->startMD();
+        endMD   = subSegment->endMD();
+    }
+
+    auto splitSegments = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
+
+    int        localOutletNumber = outletNumber;
+    const auto linerDiameter     = valve->wellPath()->mswCompletionParameters()->linerDiameter( exportInfo.unitSystem() );
+    const auto roughnessFactor   = valve->wellPath()->mswCompletionParameters()->roughnessFactor( exportInfo.unitSystem() );
+
+    bool isDescriptionAdded = false;
+    for ( const auto& [subStartMD, subEndMD] : splitSegments )
+    {
+        const double subStartTVD = RicMswTableDataTools::tvdFromMeasuredDepth( valve->wellPath(), subStartMD );
+        const double subEndTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( valve->wellPath(), subEndMD );
+
+        double depth  = 0;
+        double length = 0;
+        if ( exportInfo.lengthAndDepthText() == QString( "INC" ) )
+        {
+            depth  = subEndTVD - subStartTVD;
+            length = subEndMD - subStartMD;
+        }
+        else
+        {
+            depth  = subEndTVD;
+            length = subEndMD;
+        }
+
+        RigMswSegment seg;
+        seg.segmentNumber       = segmentNumber;
+        seg.branchNumber        = valve->branchNumber();
+        seg.outletSegmentNumber = localOutletNumber;
+        seg.length              = length;
+        seg.depth               = depth;
+        seg.diameter            = linerDiameter;
+        seg.roughness           = roughnessFactor;
+        seg.sourceWellName      = valve->wellPath()->name().toStdString();
+        if ( !isDescriptionAdded )
+        {
+            seg.description    = valve->label().toStdString();
+            isDescriptionAdded = true;
+        }
+
+        result.push_back( std::move( seg ) );
+
+        localOutletNumber = segmentNumber;
+        segmentNumber++;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Recursively traverse the RicMswBranch tree and write RigMswSegment objects directly to result.
+/// Mirrors RicMswTableDataTools::collectWelsegsDataRecursively but writes flat segments instead of rows.
+//--------------------------------------------------------------------------------------------------
+static void buildFlatSegmentsRecursive( std::vector<RigMswSegment>&                   result,
+                                        RicMswExportInfo&                             exportInfo,
+                                        gsl::not_null<RicMswBranch*>                  branch,
+                                        gsl::not_null<int*>                           segmentNumber,
+                                        double                                        prevOutMD,
+                                        double                                        prevOutTVD,
+                                        int                                           outletSegmentNumber,
+                                        double                                        maxSegmentLength,
+                                        const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                        bool                                          exportCompletionsAfterMainBore,
+                                        const std::optional<QDateTime>&               exportDate );
+
+//--------------------------------------------------------------------------------------------------
+/// Process completions on a segment and add them to the flat list.
+//--------------------------------------------------------------------------------------------------
+static void processCompletionsForSegment( std::vector<RigMswSegment>&                   result,
+                                          RicMswExportInfo&                             exportInfo,
+                                          RicMswSegment*                                treeSegment,
+                                          RicMswValve**                                 outletValve,
+                                          int&                                          segmentNumber,
+                                          double                                        maxSegmentLength,
+                                          const std::vector<std::pair<double, double>>& customSegmentIntervals )
+{
+    for ( auto* comp : treeSegment->completions() )
+    {
+        // Skip RicMswPerforation — not exported as WELSEGS rows
+        if ( dynamic_cast<RicMswPerforation*>( comp ) ) continue;
+
+        auto* fishboneIcd  = dynamic_cast<RicMswFishbonesICD*>( comp );
+        auto* segmentValve = dynamic_cast<RicMswValve*>( comp );
+
+        if ( !fishboneIcd && segmentValve != nullptr )
+        {
+            // Valve that is not a fishbones ICD
+            addValveSubSegments( result, segmentNumber, segmentValve, treeSegment->segmentNumber(), exportInfo, maxSegmentLength, customSegmentIntervals );
+            *outletValve = segmentValve;
+        }
+        else if ( dynamic_cast<RicMswTieInICV*>( comp ) )
+        {
+            // Special handling for Tie-in ICVs
+            int outletForCompletion = ( *outletValve && ( *outletValve )->segmentCount() > 0 )
+                                          ? ( *outletValve )->segments().front()->segmentNumber()
+                                          : treeSegment->segmentNumber();
+            auto* completion        = dynamic_cast<RicMswCompletion*>( comp );
+            if ( completion )
+                addCompletionSubSegments( result, segmentNumber, completion, outletForCompletion, exportInfo, maxSegmentLength, customSegmentIntervals );
+        }
+        else
+        {
+            auto* completion = dynamic_cast<RicMswCompletion*>( comp );
+            if ( completion )
+                addCompletionSubSegments( result, segmentNumber, completion, treeSegment->segmentNumber(), exportInfo, maxSegmentLength, customSegmentIntervals );
+        }
+    }
+}
+
+static void buildFlatSegmentsRecursive( std::vector<RigMswSegment>&                   result,
+                                        RicMswExportInfo&                             exportInfo,
+                                        gsl::not_null<RicMswBranch*>                  branch,
+                                        gsl::not_null<int*>                           segmentNumber,
+                                        double                                        prevOutMD,
+                                        double                                        prevOutTVD,
+                                        int                                           outletSegmentNumber,
+                                        double                                        maxSegmentLength,
+                                        const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                        bool                                          exportCompletionsAfterMainBore,
+                                        const std::optional<QDateTime>&               exportDate )
+{
+    RicMswSegment* lastTreeSegment = nullptr;
+    RicMswValve*   outletValve     = nullptr;
+
+    auto branchSegments = branch->segments();
+    auto it             = branchSegments.begin();
+
+    // Handle tie-in ICV at branch start
+    if ( auto* tieInValve = dynamic_cast<RicMswTieInICV*>( branch.get() ); tieInValve != nullptr )
+    {
+        // Delegate to old helper via a temporary RigMswTableData to reuse the logic for assigning segment numbers
+        // Instead, replicate: assign segmentNumber, create valve WELSEGS segment
+        auto valveSegments = tieInValve->segments();
+        if ( !valveSegments.empty() )
+        {
+            auto* valveTreeSeg = valveSegments.front();
+            valveTreeSeg->setSegmentNumber( *segmentNumber );
+
+            double startMD   = valveTreeSeg->startMD();
+            double endMD     = valveTreeSeg->endMD();
+            auto   splitSegs = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
+
+            const auto linerDiameter   = tieInValve->wellPath()->mswCompletionParameters()->linerDiameter( exportInfo.unitSystem() );
+            const auto roughnessFactor = tieInValve->wellPath()->mswCompletionParameters()->roughnessFactor( exportInfo.unitSystem() );
+
+            int localOutletNumber   = outletSegmentNumber;
+            bool descriptionWritten = false;
+            for ( const auto& [subStartMD, subEndMD] : splitSegs )
+            {
+                const double subStartTVD = RicMswTableDataTools::tvdFromMeasuredDepth( tieInValve->wellPath(), subStartMD );
+                const double subEndTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( tieInValve->wellPath(), subEndMD );
+
+                double depth  = 0;
+                double length = 0;
+                if ( exportInfo.lengthAndDepthText() == "INC" )
+                {
+                    depth  = subEndTVD - subStartTVD;
+                    length = subEndMD - subStartMD;
+                }
+                else
+                {
+                    depth  = subEndTVD;
+                    length = subEndMD;
+                }
+
+                RigMswSegment seg;
+                seg.segmentNumber       = *segmentNumber;
+                seg.branchNumber        = tieInValve->branchNumber();
+                seg.outletSegmentNumber = localOutletNumber;
+                seg.length              = length;
+                seg.depth               = depth;
+                seg.diameter            = linerDiameter;
+                seg.roughness           = roughnessFactor;
+                seg.sourceWellName      = tieInValve->wellPath()->name().toStdString();
+                if ( !descriptionWritten )
+                {
+                    seg.description    = tieInValve->label().toStdString();
+                    descriptionWritten = true;
+                }
+                result.push_back( std::move( seg ) );
+
+                localOutletNumber = *segmentNumber;
+                ( *segmentNumber )++;
+            }
+
+            outletSegmentNumber = valveTreeSeg->segmentNumber();
+            ++it; // skip the segment below tie-in
+        }
+    }
+
+    auto branchStartIt = it;
+    for ( ; it != branchSegments.end(); ++it )
+    {
+        auto* treeSegment = *it;
+        treeSegment->setSegmentNumber( *segmentNumber );
+
+        bool   isFirstSegment = ( it == branchSegments.begin() );
+        double curPrevOutMD   = prevOutMD;
+        double curPrevOutTVD  = prevOutTVD;
+        if ( lastTreeSegment )
+        {
+            curPrevOutMD  = lastTreeSegment->outputMD();
+            curPrevOutTVD = lastTreeSegment->outputTVD();
+        }
+
+        double startMD = treeSegment->startMD();
+        double endMD   = treeSegment->endMD();
+
+        auto splitSegs = RicMswTableDataTools::createSubSegmentMDPairs( startMD, endMD, maxSegmentLength, customSegmentIntervals );
+
+        bool isDescriptionAdded    = false;
+        int  previousSegmentNumber = outletSegmentNumber;
+
+        for ( const auto& [subStartMD, subEndMD] : splitSegs )
+        {
+            double midPointMD  = 0.5 * ( subStartMD + subEndMD );
+            double midPointTVD = RicMswTableDataTools::tvdFromMeasuredDepth( branch->wellPath(), midPointMD );
+
+            if ( midPointMD < curPrevOutMD )
+            {
+                curPrevOutMD  = branch->startMD();
+                curPrevOutTVD = branch->startTVD();
+            }
+
+            double depth  = 0;
+            double length = 0;
+            if ( exportInfo.lengthAndDepthText() == "INC" )
+            {
+                depth  = midPointTVD - curPrevOutTVD;
+                length = midPointMD - curPrevOutMD;
+            }
+            else
+            {
+                depth  = midPointTVD;
+                length = midPointMD;
+            }
+
+            double linerDiameter   = 0.0;
+            double roughnessFactor = 0.0;
+            if ( exportDate.has_value() )
+            {
+                linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
+                roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem(), *exportDate );
+            }
+            else
+            {
+                linerDiameter   = branch->wellPath()->mswCompletionParameters()->getDiameterAtMD( midPointMD, exportInfo.unitSystem() );
+                roughnessFactor = branch->wellPath()->mswCompletionParameters()->getRoughnessAtMD( midPointMD, exportInfo.unitSystem() );
+            }
+
+            RigMswSegment seg;
+            seg.segmentNumber       = *segmentNumber;
+            seg.branchNumber        = branch->branchNumber();
+            seg.outletSegmentNumber = previousSegmentNumber;
+            seg.length              = length;
+            seg.depth               = depth;
+            seg.diameter            = linerDiameter;
+            seg.roughness           = roughnessFactor;
+            seg.sourceWellName      = branch->wellPath()->name().toStdString();
+
+            if ( !isDescriptionAdded && isFirstSegment )
+            {
+                seg.description    = QString( "Segments on branch %1" ).arg( branch->label() ).toStdString();
+                isDescriptionAdded = true;
+            }
+
+            seg.intersections = collectCellIntersections( treeSegment );
+            result.push_back( std::move( seg ) );
+
+            previousSegmentNumber = *segmentNumber;
+
+            if ( splitSegs.size() > 1 )
+            {
+                ( *segmentNumber )++;
+                treeSegment->setSegmentNumber( *segmentNumber );
+            }
+
+            treeSegment->setOutputMD( midPointMD );
+            treeSegment->setOutputTVD( midPointTVD );
+            treeSegment->setSegmentNumber( *segmentNumber );
+
+            curPrevOutMD  = midPointMD;
+            curPrevOutTVD = midPointTVD;
+        }
+
+        if ( splitSegs.size() <= 1 )
+            ( *segmentNumber )++;
+
+        lastTreeSegment = treeSegment;
+
+        if ( !exportCompletionsAfterMainBore )
+        {
+            processCompletionsForSegment( result, exportInfo, treeSegment, &outletValve, *segmentNumber, maxSegmentLength, customSegmentIntervals );
+        }
+    }
+
+    if ( exportCompletionsAfterMainBore )
+    {
+        for ( it = branchStartIt; it != branchSegments.end(); ++it )
+        {
+            processCompletionsForSegment( result, exportInfo, *it, &outletValve, *segmentNumber, maxSegmentLength, customSegmentIntervals );
+        }
+    }
+
+    for ( auto* childBranch : branch->branches() )
+    {
+        RicMswSegment* outletForChild = lastTreeSegment;
+
+        RicMswSegment* tieInSegment = branch->findClosestSegmentWithLowerMD( childBranch->startMD() );
+        if ( tieInSegment ) outletForChild = tieInSegment;
+
+        int  childOutletSegNum = outletForChild ? outletForChild->segmentNumber() : outletSegmentNumber;
+        double childPrevMD    = outletForChild ? outletForChild->outputMD() : prevOutMD;
+        double childPrevTVD   = outletForChild ? outletForChild->outputTVD() : prevOutTVD;
+
+        buildFlatSegmentsRecursive( result,
+                                    exportInfo,
+                                    childBranch,
+                                    segmentNumber,
+                                    childPrevMD,
+                                    childPrevTVD,
+                                    childOutletSegNum,
+                                    maxSegmentLength,
+                                    customSegmentIntervals,
+                                    exportCompletionsAfterMainBore,
+                                    exportDate );
+    }
+}
+
+}; // namespace internal (additional helpers)
 
 //--------------------------------------------------------------------------------------------------
 ///
@@ -121,9 +594,23 @@ std::expected<RigMswFlatExportData, std::string>
     int branchNumber = 1;
     assignBranchNumbersToBranch( eclipseCase, &exportInfo, exportInfo.mainBoreBranch(), &branchNumber );
 
+    const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
+
+    // Switch between legacy path (collectWelsegsData -> buildFlatMswSegmentList)
+    // and new direct path (buildFlatSegmentsDirect).
+    constexpr bool useLegacyPath = true;
+
+    if ( !useLegacyPath )
+    {
+        return buildFlatSegmentsDirect( exportInfo,
+                                        mswParameters->maxSegmentLength(),
+                                        customSegmentIntervals,
+                                        exportCompletionsAfterMainBoreSegments,
+                                        exportDate );
+    }
+
     // Run all collection functions into a temporary table to compute segment numbers, lengths, depths, etc.
     RigMswTableData tempTableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
-    const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
 
     RicMswTableDataTools::collectWelsegsData( tempTableData, exportInfo, mswParameters->maxSegmentLength(), customSegmentIntervals, exportCompletionsAfterMainBoreSegments, exportDate );
     RicMswTableDataTools::collectCompsegData( tempTableData, exportInfo, false, exportDate );
@@ -136,8 +623,8 @@ std::expected<RigMswFlatExportData, std::string>
 
     // Build result
     RigMswFlatExportData result;
-    result.header    = tempTableData.welsegsHeader();
-    result.segments  = tempTableData.mswSegments();
+    result.header   = tempTableData.welsegsHeader();
+    result.segments = tempTableData.mswSegments();
 
     return result;
 }
@@ -1733,4 +2220,167 @@ void RicWellPathExportMswTableData::buildFlatMswSegmentList( const RicMswExportI
 
         tableData.addMswSegment( std::move( seg ) );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Build the flat export data by traversing the tree directly, creating RigMswSegment objects
+/// inline — without calling the old collectWelsegsData / collectCompsegData functions.
+/// AICD/SICD data is joined from the existing per-cell accumulation helpers (segment numbers
+/// are already assigned during the recursive traversal above).
+//--------------------------------------------------------------------------------------------------
+RigMswFlatExportData
+    RicWellPathExportMswTableData::buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
+                                                            double                                        maxSegmentLength,
+                                                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                                            bool                                          exportCompletionsAfterMainBore,
+                                                            const std::optional<QDateTime>&               exportDate )
+{
+    // Build WELSEGS header (same logic as collectWelsegsData)
+    WelsegsHeader header;
+    header.well      = exportInfo.mainBoreBranch()->wellPath()->completionSettings()->wellNameForExport().toStdString();
+    header.topLength = exportInfo.mainBoreBranch()->startMD();
+    header.topDepth  = exportInfo.mainBoreBranch()->startTVD();
+    if ( exportInfo.topWellBoreVolume() != RicMswExportInfo::defaultDoubleValue() )
+        header.wellboreVolume = exportInfo.topWellBoreVolume();
+    header.infoType           = exportInfo.lengthAndDepthText().toStdString();
+    header.pressureComponents = exportInfo.pressureDropText().toStdString();
+
+    std::vector<RigMswSegment> segments;
+    int                        segmentNumber = 2; // Implicit segment 1 is the well heel.
+
+    internal::buildFlatSegmentsRecursive( segments,
+                                          exportInfo,
+                                          exportInfo.mainBoreBranch(),
+                                          &segmentNumber,
+                                          header.topLength,
+                                          header.topDepth,
+                                          1,
+                                          maxSegmentLength,
+                                          customSegmentIntervals,
+                                          exportCompletionsAfterMainBore,
+                                          exportDate );
+
+    // Join AICD data into flat segment list by segment number
+    {
+        std::map<size_t, std::vector<RicMswTableDataTools::AicdWsegvalveData>> aicdValveData;
+        RicMswTableDataTools::generateWsegAicdTableRecursively( exportInfo, exportInfo.mainBoreBranch(), aicdValveData, exportDate );
+
+        // Build segment-number -> WsegaicdRow using same accumulation logic as collectWsegAicdData
+        auto setOptional = []( double value ) -> std::optional<double>
+        {
+            if ( value == RicMswExportInfo::defaultDoubleValue() ) return std::nullopt;
+            return value;
+        };
+
+        std::map<int, WsegaicdRow> aicdBySegment;
+        for ( auto& [globalCellIndex, aicdDataForSameCell] : aicdValveData )
+        {
+            if ( aicdDataForSameCell.empty() ) continue;
+
+            double      accumulatedFlowScalingFactorDivisor = 0.0;
+            QStringList comments;
+            for ( const auto& aicdData : aicdDataForSameCell )
+            {
+                accumulatedFlowScalingFactorDivisor += 1.0 / aicdData.m_flowScalingFactor;
+                comments.push_back( aicdData.m_comment );
+            }
+
+            WsegaicdRow row;
+            row.description = comments.join( "; " ).toStdString();
+
+            auto& first  = aicdDataForSameCell.front();
+            row.well     = first.m_wellName.toStdString();
+            row.segment1 = first.m_segmentNumber;
+            row.segment2 = first.m_segmentNumber;
+
+            std::array<double, AICD_NUM_PARAMS> values = first.m_values;
+            row.strength                               = values[AICD_STRENGTH];
+            row.length                                 = 1.0 / accumulatedFlowScalingFactorDivisor;
+            row.densityCali                            = setOptional( values[AICD_DENSITY_CALIB_FLUID] );
+            row.viscosityCali                          = setOptional( values[AICD_VISCOSITY_CALIB_FLUID] );
+            row.criticalValue                          = setOptional( values[AICD_CRITICAL_WATER_IN_LIQUID_FRAC] );
+            row.widthTrans                             = setOptional( values[AICD_EMULSION_VISC_TRANS_REGION] );
+            row.maxViscRatio                           = setOptional( values[AICD_MAX_RATIO_EMULSION_VISC] );
+            row.methodScalingFactor                    = 1;
+            row.maxAbsRate                             = values[AICD_MAX_FLOW_RATE];
+            row.flowRateExponent                       = values[AICD_VOL_FLOW_EXP];
+            row.viscExponent                           = values[AICD_VISOSITY_FUNC_EXP];
+            row.status                                 = first.m_isOpen ? "OPEN" : "SHUT";
+            row.oilFlowFraction                        = setOptional( values[AICD_EXP_OIL_FRAC_DENSITY] );
+            row.waterFlowFraction                      = setOptional( values[AICD_EXP_WATER_FRAC_DENSITY] );
+            row.gasFlowFraction                        = setOptional( values[AICD_EXP_GAS_FRAC_DENSITY] );
+            row.oilViscFraction                        = setOptional( values[AICD_EXP_OIL_FRAC_VISCOSITY] );
+            row.waterViscFraction                      = setOptional( values[AICD_EXP_WATER_FRAC_VISCOSITY] );
+            row.gasViscFraction                        = setOptional( values[AICD_EXP_GAS_FRAC_VISCOSITY] );
+
+            aicdBySegment[row.segment1] = row;
+        }
+
+        for ( auto& seg : segments )
+        {
+            auto it = aicdBySegment.find( seg.segmentNumber );
+            if ( it != aicdBySegment.end() )
+                seg.wsegaicdData = it->second;
+        }
+    }
+
+    // Join SICD data into flat segment list by segment number
+    {
+        std::map<size_t, std::vector<RicMswTableDataTools::SicdWsegvalveData>> sicdValveData;
+        RicMswTableDataTools::generateWsegSicdTableRecursively( exportInfo, exportInfo.mainBoreBranch(), sicdValveData, exportDate );
+
+        auto setOptional = []( double value ) -> std::optional<double>
+        {
+            if ( value == RicMswExportInfo::defaultDoubleValue() ) return std::nullopt;
+            return value;
+        };
+
+        std::map<int, WsegsicdRow> sicdBySegment;
+        for ( auto& [globalCellIndex, sicdDataForSameCell] : sicdValveData )
+        {
+            if ( sicdDataForSameCell.empty() ) continue;
+
+            double      accumulatedFlowScalingFactorDivisor = 0.0;
+            QStringList comments;
+            for ( const auto& sicdData : sicdDataForSameCell )
+            {
+                accumulatedFlowScalingFactorDivisor += 1.0 / sicdData.m_flowScalingFactor;
+                comments.push_back( sicdData.m_comment );
+            }
+
+            WsegsicdRow row;
+            row.description = comments.join( "; " ).toStdString();
+
+            auto& first  = sicdDataForSameCell.front();
+            row.well     = first.m_wellName.toStdString();
+            row.segment1 = first.m_segmentNumber;
+            row.segment2 = first.m_segmentNumber;
+
+            std::array<double, SICD_NUM_PARAMS> values = first.m_values;
+            row.strength              = values[SICD_STRENGTH];
+            row.length                = 1.0 / accumulatedFlowScalingFactorDivisor;
+            row.densityCali           = setOptional( values[SICD_CALIBRATION_DENSITY] );
+            row.viscosityCali         = setOptional( values[SICD_CALIBRATION_VISCOSITY] );
+            row.criticalValue         = setOptional( values[SICD_EML_CRT] );
+            row.widthTrans            = setOptional( values[SICD_EML_TRANS] );
+            row.maxViscRatio          = setOptional( values[SICD_EML_MAX] );
+            row.methodScalingFactor   = 1;
+            row.maxAbsRate            = values[SICD_MAX_CALIB_RATE];
+            row.status                = first.m_isOpen ? "OPEN" : "SHUT";
+
+            sicdBySegment[row.segment1] = row;
+        }
+
+        for ( auto& seg : segments )
+        {
+            auto it = sicdBySegment.find( seg.segmentNumber );
+            if ( it != sicdBySegment.end() )
+                seg.wsegsicdData = it->second;
+        }
+    }
+
+    RigMswFlatExportData result;
+    result.header   = header;
+    result.segments = std::move( segments );
+    return result;
 }
