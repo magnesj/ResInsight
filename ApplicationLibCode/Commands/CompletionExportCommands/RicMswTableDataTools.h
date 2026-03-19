@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "RigCompletionData.h"
 
 #include "RimWellPathAicdParameters.h"
@@ -106,6 +107,10 @@ public:
     bool                                m_isOpen;
     std::array<double, SICD_NUM_PARAMS> m_values;
 };
+
+// Simple flat-list collection: iterate RigMswSegment list instead of traversing the tree.
+// These replace the recursive tree-based collection functions.
+void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData );
 
 // New data collection functions (replace formatter versions)
 void collectWelsegsData( RigMswTableData&                              tableData,

@@ -15,7 +15,6 @@
 //  for more details.
 //
 /////////////////////////////////////////////////////////////////////////////////
-
 #pragma once
 
 #include "RigMswTableRows.h"
@@ -25,6 +24,7 @@
 #include <vector>
 
 // clang-format off
+
 
 //==================================================================================================
 /// Grid-cell intersection for a single MSW segment.
@@ -65,6 +65,18 @@ struct RigMswSegment
     std::optional<WsegvalvRow> wsegvalvData;  // WSEGVALV: ICV / ICD valves
     std::optional<WsegaicdRow> wsegaicdData;  // WSEGAICD: Autonomous ICD valves
     std::optional<WsegsicdRow> wsegsicdData;  // WSEGSICD: Spiral ICD valves
+};
+
+
+//==================================================================================================
+/// Result of buildFlatMswSegments(): the complete, pre-computed MSW export data for one well.
+/// Contains all information needed to write WELSEGS, COMPSEGS, and valve tables without
+/// any further tree traversal.
+//==================================================================================================
+struct RigMswFlatExportData
+{
+    WelsegsHeader              header;    // WELSEGS well-level header
+    std::vector<RigMswSegment> segments;  // One entry per WELSEGS row
 };
 
 // clang-format on
