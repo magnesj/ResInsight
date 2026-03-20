@@ -20,9 +20,9 @@
 
 #include "RiaDefines.h"
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "RicMswBranch.h"
 #include "RicMswSegment.h"
-#include "CompletionsMsw/RigMswSegment.h"
 
 #include <QString>
 
@@ -56,9 +56,9 @@ public:
     const RicMswBranch* mainBoreBranch() const;
     RicMswBranch*       mainBoreBranch();
 
-    void                               addSegment( RigMswSegment segment );
-    const std::vector<RigMswSegment>&  segments() const;
-    std::vector<RigMswSegment>&        segments();
+    void                              addSegment( RigMswSegment segment );
+    const std::vector<RigMswSegment>& segments() const;
+    std::vector<RigMswSegment>&       segments();
 
 private:
     RiaDefines::EclipseUnitSystem m_unitSystem;
