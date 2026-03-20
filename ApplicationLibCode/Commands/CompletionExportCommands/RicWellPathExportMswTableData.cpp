@@ -935,6 +935,115 @@ static std::vector<RigMswSegment>
     return result;
 }
 
+//--------------------------------------------------------------------------------------------------
+/// Build WELSEGS + COMPSEGS segments for fracture completions directly from
+/// RimWellPath / RimWellPathFracture — no RicMswItem types used.
+/// Each fracture produces one WELSEGS segment branching off the nearest main-bore segment.
+/// COMPSEGS entries are attached from the fracture's generateCompdatValues() result.
+//--------------------------------------------------------------------------------------------------
+static std::vector<RigMswSegment>
+    buildFractureSegmentsFromGeometry( RimEclipseCase*                              eclipseCase,
+                                       const RimWellPath*                           wellPath,
+                                       const RigMainGrid*                           mainGrid,
+                                       const std::vector<CellSegmentEntry>&         cellSegMap,
+                                       const std::string&                           infoType,
+                                       int&                                         segmentNumber,
+                                       int&                                         branchNumber )
+{
+    std::vector<RigMswSegment> result;
+
+    const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter(
+        eclipseCase->eclipseCaseData()->unitsType() );
+    const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor(
+        eclipseCase->eclipseCaseData()->unitsType() );
+
+    const QString wellNameForExport = wellPath->completionSettings()->wellNameForExport();
+
+    for ( RimWellPathFracture* fracture : wellPath->fractureCollection()->activeFractures() )
+    {
+        fracture->ensureValidNonDarcyProperties();
+
+        double position = fracture->fractureMD();
+        double width    = fracture->fractureTemplate()->computeFractureWidth( fracture );
+
+        if ( fracture->fractureTemplate()->orientationType() == RimFractureTemplate::ALONG_WELL_PATH )
+        {
+            double perforationLength = fracture->fractureTemplate()->perforationLength();
+            position -= 0.5 * perforationLength;
+            width = perforationLength;
+        }
+
+        const double endMD     = position + width;
+        const double startTVD  = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, position );
+        const double endTVD    = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, endMD );
+
+        double length = 0.0;
+        double depth  = 0.0;
+        if ( infoType == "INC" )
+        {
+            length = width;
+            depth  = endTVD - startTVD;
+        }
+        else
+        {
+            length = endMD;
+            depth  = endTVD;
+        }
+
+        const int outletSeg     = findOutletSegmentForMD( cellSegMap, position );
+        const int fracBranch    = ++branchNumber;
+
+        // Get COMPSEGS cell intersections from fracture completion data
+        std::vector<RigCompletionData> completionData =
+            RicExportFractureCompletionsImpl::generateCompdatValues( eclipseCase,
+                                                                     wellNameForExport,
+                                                                     wellPath->wellPathGeometry(),
+                                                                     { fracture },
+                                                                     nullptr,
+                                                                     nullptr );
+
+        std::vector<RigMswCellIntersection> compsegs;
+        for ( const auto& compData : completionData )
+        {
+            const auto& cell = compData.completionDataGridCell();
+
+            // 0-based -> 1-based
+            size_t i = cell.localCellIndexI() + 1;
+            size_t j = cell.localCellIndexJ() + 1;
+            size_t k = cell.localCellIndexK() + 1;
+
+            // Shift K for dual porosity models
+            if ( mainGrid->isDualPorosity() )
+                k += mainGrid->cellCountK();
+
+            RigMswCellIntersection ci;
+            ci.i             = i;
+            ci.j             = j;
+            ci.k             = k;
+            ci.distanceStart = position;
+            ci.distanceEnd   = endMD;
+            ci.gridName      = cell.lgrName().toStdString();
+            compsegs.push_back( ci );
+        }
+
+        RigMswSegment seg;
+        seg.segmentNumber       = segmentNumber++;
+        seg.branchNumber        = fracBranch;
+        seg.outletSegmentNumber = outletSeg;
+        seg.length              = length;
+        seg.depth               = depth;
+        seg.diameter            = linerDiameter;
+        seg.roughness           = roughnessFactor;
+        seg.sourceWellName      = wellPath->name().toStdString();
+        seg.description         = fracture->name().toStdString();
+        seg.intersections       = std::move( compsegs );
+
+        result.push_back( std::move( seg ) );
+    }
+
+    return result;
+}
+
 }; // namespace internal (additional helpers)
 
 //--------------------------------------------------------------------------------------------------
@@ -2723,8 +2832,20 @@ RigMswFlatExportData
                                                                     exportDate,
                                                                     unitSystem );
 
+    const bool includeFractures = ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES;
+    std::vector<RigMswSegment> fractureSegments;
+    if ( includeFractures )
+    {
+        fractureSegments = internal::buildFractureSegmentsFromGeometry( eclipseCase,
+                                                                         wellPath,
+                                                                         mainGrid,
+                                                                         cellSegMap,
+                                                                         infoType,
+                                                                         segmentNumber,
+                                                                         branchNumber );
+    }
+
     // TODO: append fishbones lateral segments.
-    // TODO: append fracture completion segments.
     // TODO: handle tie-in child well paths.
 
     RigMswFlatExportData result;
@@ -2733,6 +2854,9 @@ RigMswFlatExportData
     result.segments.insert( result.segments.end(),
                              std::make_move_iterator( valveSegments.begin() ),
                              std::make_move_iterator( valveSegments.end() ) );
+    result.segments.insert( result.segments.end(),
+                             std::make_move_iterator( fractureSegments.begin() ),
+                             std::make_move_iterator( fractureSegments.end() ) );
     return result;
 }
 
