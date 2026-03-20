@@ -1656,8 +1656,7 @@ void RimWellRftPlot::detachAndDeleteLegendCurves()
 //--------------------------------------------------------------------------------------------------
 RimWellRftEnsembleCurveSet* RimWellRftPlot::selectedEnsembleCurveSet() const
 {
-    auto selected = caf::SelectionManager::instance()->selectedItemOfType<RimWellRftEnsembleCurveSet>();
-    if ( selected )
+    if ( auto selected = caf::SelectionManager::instance()->selectedItemOfType<RimWellRftEnsembleCurveSet>() )
     {
         for ( auto cs : m_ensembleCurveSets )
         {
