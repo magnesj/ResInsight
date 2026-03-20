@@ -86,6 +86,21 @@ public:
                                                        RicMswExportInfo*     exportInfo,
                                                        RicMswBranch*         branch );
 
+    // Shared geometry helpers used by both the tree path and the direct geometry path.
+    static std::vector<WellPathCellIntersectionInfo> generateCellSegments( const RimEclipseCase* eclipseCase, const RimWellPath* wellPath );
+
+    static double computeIntitialMeasuredDepth( const RimEclipseCase*                            eclipseCase,
+                                                const RimWellPath*                               wellPath,
+                                                const RimMswCompletionParameters*                mswParameters,
+                                                const std::vector<WellPathCellIntersectionInfo>& allIntersections );
+
+    static std::vector<WellPathCellIntersectionInfo> filterIntersections( const std::vector<WellPathCellIntersectionInfo>& intersections,
+                                                                          double                                           initialMD,
+                                                                          gsl::not_null<const RigWellPath*>                wellPathGeometry,
+                                                                          gsl::not_null<const RimEclipseCase*>             eclipseCase );
+
+    static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
+
 private:
     static void updateDataForMultipleItemsInSameGridCell( gsl::not_null<RicMswBranch*> branch );
 
@@ -111,18 +126,6 @@ private:
                                               const std::vector<WellPathCellIntersectionInfo>& cellIntersections,
                                               gsl::not_null<RicMswExportInfo*>                 exportInfo,
                                               gsl::not_null<RicMswBranch*>                     branch );
-
-    static std::vector<WellPathCellIntersectionInfo> generateCellSegments( const RimEclipseCase* eclipseCase, const RimWellPath* wellPath );
-
-    static double computeIntitialMeasuredDepth( const RimEclipseCase*                            eclipseCase,
-                                                const RimWellPath*                               wellPath,
-                                                const RimMswCompletionParameters*                mswParameters,
-                                                const std::vector<WellPathCellIntersectionInfo>& allIntersections );
-
-    static std::vector<WellPathCellIntersectionInfo> filterIntersections( const std::vector<WellPathCellIntersectionInfo>& intersections,
-                                                                          double                                           initialMD,
-                                                                          gsl::not_null<const RigWellPath*>                wellPathGeometry,
-                                                                          gsl::not_null<const RimEclipseCase*>             eclipseCase );
 
     static std::pair<double, double> calculateOverlapWithActiveCells( double startMD,
                                                                       double endMD,
@@ -194,33 +197,8 @@ private:
 
     static std::unique_ptr<RicMswBranch> createChildMswBranch( const RimWellPath* childWellPath );
 
-    static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
-
-    // Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
-    // and any of its own child laterals. outletSegNum is the parent segment at the tie-in MD.
-    static void buildLateralSegments( RimEclipseCase*                 eclipseCase,
-                                      const RimWellPath*              wellPath,
-                                      const RigMainGrid*              mainGrid,
-                                      int                             outletSegNum,
-                                      CompletionType                  completionType,
-                                      const std::optional<QDateTime>& exportDate,
-                                      int&                            segmentNumber,
-                                      int&                            branchNumber,
-                                      RiaDefines::EclipseUnitSystem   unitSystem,
-                                      std::vector<RigMswSegment>&     result );
-
     [[deprecated( "Use buildFlatMswSegments() instead" )]]
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
-
-    // Direct geometry path: builds the flat segment list from well-path geometry and Rim
-    // completions without creating any RicMswBranch / RicMswItem tree.
-    // Handles main-bore, valves (ICD/ICV/AICD/SICD), fractures, fishbones, and tie-in laterals.
-    static RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
-                                                      const RimWellPath*                            wellPath,
-                                                      double                                        maxSegmentLength,
-                                                      const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                                      CompletionType                                completionType,
-                                                      const std::optional<QDateTime>&               exportDate );
 
     static RigMswFlatExportData buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
                                                          double                                        maxSegmentLength,

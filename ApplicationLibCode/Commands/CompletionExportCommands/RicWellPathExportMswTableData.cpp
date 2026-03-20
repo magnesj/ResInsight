@@ -18,6 +18,8 @@
 
 #include "RicWellPathExportMswTableData.h"
 
+#include "RicWellPathExportMswGeometryPath.h"
+
 #include "RiaLogging.h"
 
 #include "RicExportCompletionDataSettingsUi.h"
@@ -713,7 +715,7 @@ std::expected<RigMswFlatExportData, std::string>
 
     if ( useGeometryPath )
     {
-        return buildMswFromGeometry( eclipseCase, wellPath, mswParameters->maxSegmentLength(), customSegmentIntervals, completionType, exportDate );
+        return RicWellPathExportMswGeometryPath::buildMswFromGeometry( eclipseCase, wellPath, mswParameters->maxSegmentLength(), customSegmentIntervals, completionType, exportDate );
     }
 
     if ( !useLegacyPath )
