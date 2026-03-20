@@ -743,8 +743,9 @@ void buildLateralSegments( RimEclipseCase*                 eclipseCase,
     }
 
     // Child main-bore segments
-    auto cellIntersections     = RicWellPathExportMswTableData::generateCellSegments( eclipseCase, wellPath );
-    auto filteredIntersections = RicWellPathExportMswTableData::filterIntersections( cellIntersections, tieInMD, wellPath->wellPathGeometry(), eclipseCase );
+    auto cellIntersections = RicWellPathExportMswTableData::generateCellSegments( eclipseCase, wellPath );
+    auto filteredIntersections =
+        RicWellPathExportMswTableData::filterIntersections( cellIntersections, tieInMD, wellPath->wellPathGeometry(), eclipseCase );
 
     const bool includePerforations = ( completionType & CompletionType::PERFORATIONS ) == CompletionType::PERFORATIONS;
     const std::vector<const RimPerforationInterval*> perforationIntervals =
@@ -864,11 +865,12 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
     const RigMainGrid*                  mainGrid   = eclipseCase->mainGrid();
     const std::string                   infoType   = mswParameters->lengthAndDepth().text().toStdString();
 
-    auto   cellIntersections = RicWellPathExportMswTableData::generateCellSegments( eclipseCase, wellPath );
-    double initialMD         = RicWellPathExportMswTableData::computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
-    double initialTVD        = -wellPath->wellPathGeometry()->interpolatedPointAlongWellPath( initialMD ).z();
+    auto cellIntersections = RicWellPathExportMswTableData::generateCellSegments( eclipseCase, wellPath );
+    double initialMD = RicWellPathExportMswTableData::computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+    double initialTVD = -wellPath->wellPathGeometry()->interpolatedPointAlongWellPath( initialMD ).z();
 
-    auto filteredIntersections = RicWellPathExportMswTableData::filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
+    auto filteredIntersections =
+        RicWellPathExportMswTableData::filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
 
     WelsegsHeader header;
     header.well               = wellPath->completionSettings()->wellNameForExport().toStdString();

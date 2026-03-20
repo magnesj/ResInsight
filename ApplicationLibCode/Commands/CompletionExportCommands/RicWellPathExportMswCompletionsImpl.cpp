@@ -142,10 +142,8 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
         auto completionType = RicWellPathExportMswTableData::convertFromExportSettings( exportSettings );
         auto exportDate =
             RicWellPathExportCompletionDataFeatureImpl::exportDateForTimeStep( exportSettings.caseToApply, exportSettings.timeStep );
-        auto wellDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply,
-                                                                                       wellPath,
-                                                                                       completionType,
-                                                                                       exportDate );
+        auto wellDataResult =
+            RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply, wellPath, completionType, exportDate );
 
         if ( !wellDataResult.has_value() )
         {
