@@ -18,9 +18,9 @@
 
 #include "RicMswExportInfo.h"
 
+#include "CompletionsMsw/RigMswSegment.h"
 #include "RicMswBranch.h"
 #include "RicMswCompletions.h"
-#include "CompletionsMsw/RigMswSegment.h"
 
 #include "RimMswCompletionParameters.h"
 #include "RimWellPath.h"
