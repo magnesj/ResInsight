@@ -299,12 +299,10 @@ void RicScheduleDataGenerator::generateMswForWell( const RimWellEventTimeline& t
 
     // Extract MSW data using the existing infrastructure
     // Pass the export date to filter valve/perforation output based on their creation dates
-    bool exportAfterMainBore = true;
-    auto mswDataResult       = RicWellPathExportMswTableData::extractSingleWellMswData( &eclipseCase,
-                                                                                  &wellPath,
-                                                                                  exportAfterMainBore,
-                                                                                  RicWellPathExportMswTableData::CompletionType::ALL,
-                                                                                  date );
+    auto mswDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( &eclipseCase,
+                                                                                 &wellPath,
+                                                                                 RicWellPathExportMswTableData::CompletionType::ALL,
+                                                                                 date );
 
     if ( !mswDataResult.has_value() ) return;
 
