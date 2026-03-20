@@ -151,7 +151,7 @@ void RimMswSegmentCollection::updateSegments( RimWellPath* topLevelWell, RimEcli
         }
     };
 
-    auto exportDate                             = RicWellPathExportCompletionDataFeatureImpl::exportDateForTimeStep( eclipseCase, 0 );
+    auto exportDate      = RicWellPathExportCompletionDataFeatureImpl::exportDateForTimeStep( eclipseCase, 0 );
     auto tableDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase,
                                                                                     topLevelWell,
                                                                                     RicWellPathExportMswTableData::CompletionType::ALL,

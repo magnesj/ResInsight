@@ -67,14 +67,14 @@ public:
     // The intention is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
     static std::expected<RigMswTableData, std::string> extractSingleWellMswData( RimEclipseCase* eclipseCase,
                                                                                  RimWellPath*    wellPath,
-                                                                                 CompletionType completionType = CompletionType::ALL,
+                                                                                 CompletionType  completionType = CompletionType::ALL,
                                                                                  const std::optional<QDateTime>& exportDate = std::nullopt );
 
     // Build the flat segment list directly, bypassing the tree as a public intermediate.
     // Returns all WELSEGS rows and embedded COMPSEGS/valve data in a flat, ordered list.
     static std::expected<RigMswFlatExportData, std::string> buildFlatMswSegments( RimEclipseCase* eclipseCase,
                                                                                   RimWellPath*    wellPath,
-                                                                                  CompletionType completionType = CompletionType::ALL,
+                                                                                  CompletionType  completionType = CompletionType::ALL,
                                                                                   const std::optional<QDateTime>& exportDate = std::nullopt );
 
     static CompletionType convertFromExportSettings( const class RicExportCompletionDataSettingsUi& settings );

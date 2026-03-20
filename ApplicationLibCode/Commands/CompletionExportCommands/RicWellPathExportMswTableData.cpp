@@ -263,11 +263,10 @@ static void addValveSubSegments( std::vector<RigMswSegment>&                   r
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::expected<RigMswTableData, std::string>
-    RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase*                 eclipseCase,
-                                                             RimWellPath*                    wellPath,
-                                                             CompletionType                  completionType,
-                                                             const std::optional<QDateTime>& exportDate )
+std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extractSingleWellMswData( RimEclipseCase* eclipseCase,
+                                                                                                     RimWellPath*    wellPath,
+                                                                                                     CompletionType  completionType,
+                                                                                                     const std::optional<QDateTime>& exportDate )
 {
     auto flatData = buildFlatMswSegments( eclipseCase, wellPath, completionType, exportDate );
     if ( !flatData ) return std::unexpected( flatData.error() );
@@ -282,11 +281,10 @@ std::expected<RigMswTableData, std::string>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::expected<RigMswFlatExportData, std::string>
-    RicWellPathExportMswTableData::buildFlatMswSegments( RimEclipseCase*                 eclipseCase,
-                                                         RimWellPath*                    wellPath,
-                                                         CompletionType                  completionType,
-                                                         const std::optional<QDateTime>& exportDate )
+std::expected<RigMswFlatExportData, std::string> RicWellPathExportMswTableData::buildFlatMswSegments( RimEclipseCase* eclipseCase,
+                                                                                                      RimWellPath*    wellPath,
+                                                                                                      CompletionType  completionType,
+                                                                                                      const std::optional<QDateTime>& exportDate )
 {
     if ( !eclipseCase || !wellPath || eclipseCase->eclipseCaseData() == nullptr )
         return std::unexpected( "Invalid eclipse case or well path provided" );
@@ -1891,4 +1889,3 @@ void RicWellPathExportMswTableData::buildFlatMswSegmentList( const RicMswExportI
         tableData.addMswSegment( std::move( seg ) );
     }
 }
-
