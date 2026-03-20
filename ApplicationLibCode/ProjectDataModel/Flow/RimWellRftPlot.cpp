@@ -62,8 +62,8 @@
 #include "RiuPlotItem.h"
 #include "RiuPlotMainWindowTools.h"
 #include "RiuQwtPlotCurve.h"
-#include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotCurveDefines.h"
+#include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotWidget.h"
 
 #include "cafPdmUiTreeOrdering.h"
@@ -736,10 +736,10 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
         // Connect legend item clicks to select the corresponding ensemble curve set in the project tree.
         // Disconnect previous connection first to avoid duplicates (non-QObject lambda connections).
         QObject::disconnect( m_legendClickedConnection );
-        m_legendClickedConnection =
-            QObject::connect( qwtWidget, &RiuQwtPlotWidget::plotItemSelected, [this]( std::shared_ptr<RiuPlotItem> item, bool toggle, int idx ) {
-                onLegendItemClicked( item, toggle, idx );
-            } );
+        m_legendClickedConnection = QObject::connect( qwtWidget,
+                                                      &RiuQwtPlotWidget::plotItemSelected,
+                                                      [this]( std::shared_ptr<RiuPlotItem> item, bool toggle, int idx )
+                                                      { onLegendItemClicked( item, toggle, idx ); } );
 
         // Create curves with no content to display in the curve legend section. Ensures a consistent legend for both ensemble and
         // statistics curves.
@@ -1692,8 +1692,7 @@ void RimWellRftPlot::onLegendItemClicked( std::shared_ptr<RiuPlotItem> plotItem,
     if ( !qwtCurve ) return;
 
     auto it = m_legendCurveToEnsembleCurveSet.find( qwtCurve );
-    if ( it != m_legendCurveToEnsembleCurveSet.end() )
-        RiuPlotMainWindowTools::selectOrToggleObject( it->second, toggle );
+    if ( it != m_legendCurveToEnsembleCurveSet.end() ) RiuPlotMainWindowTools::selectOrToggleObject( it->second, toggle );
 }
 
 //--------------------------------------------------------------------------------------------------
