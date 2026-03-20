@@ -158,7 +158,7 @@ std::map<size_t, std::vector<WellBorePartForTransCalc>>
     if ( !wellPath || !wellPath->wellPathGeometry() || wellPath->wellPathGeometry()->measuredDepths().size() < 2 )
         return wellBorePartsInCells;
 
-    const RigEclipseCaseData*     caseData  = eclipseCase->eclipseCaseData();
+    const RigEclipseCaseData*     caseData   = eclipseCase->eclipseCaseData();
     RiaDefines::EclipseUnitSystem unitSystem = caseData->unitsType();
 
     // Build lateral WellBoreParts directly from RimFishbones — no MSW tree needed.
@@ -180,16 +180,17 @@ std::map<size_t, std::vector<WellBorePartForTransCalc>>
                 mds.push_back( md );
             }
 
-            auto intersections =
-                RigWellPathIntersectionTools::findCellIntersectionInfosAlongPath( caseData, wellPath->name(), coords, mds );
+            auto intersections = RigWellPathIntersectionTools::findCellIntersectionInfosAlongPath( caseData, wellPath->name(), coords, mds );
 
             for ( const auto& cellIntInfo : intersections )
             {
-                QString completionMetaData =
-                    QString( "Sub segment: Sub: %1 Lateral: %2" ).arg( subIndex + 1 ).arg( lateralIndex + 1 );
+                QString completionMetaData = QString( "Sub segment: Sub: %1 Lateral: %2" ).arg( subIndex + 1 ).arg( lateralIndex + 1 );
 
-                WellBorePartForTransCalc wellBorePart(
-                    cellIntInfo.intersectionLengthsInCellCS, holeDiameter / 2.0, skinFactor, false, completionMetaData );
+                WellBorePartForTransCalc wellBorePart( cellIntInfo.intersectionLengthsInCellCS,
+                                                       holeDiameter / 2.0,
+                                                       skinFactor,
+                                                       false,
+                                                       completionMetaData );
 
                 wellBorePart.intersectionWithWellMeasuredDepth = cellIntInfo.endMD;
                 wellBorePart.lateralIndex                      = lateralIndex;

@@ -298,8 +298,7 @@ TEST( RicFishbonesTransmissibilityCalculation, MainBoreWithMockGrid_ReturnsInter
     wellPath->setUnitSystem( RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     // Vertical well at (25, 25) passing through z=0 (top of grid) at MD=10, then into the grid
-    cvf::ref<RigWellPath> geometry =
-        new RigWellPath( { cvf::Vec3d( 25, 25, 10 ), cvf::Vec3d( 25, 25, -110 ) }, { 0.0, 120.0 } );
+    cvf::ref<RigWellPath> geometry = new RigWellPath( { cvf::Vec3d( 25, 25, 10 ), cvf::Vec3d( 25, 25, -110 ) }, { 0.0, 120.0 } );
     wellPath->setWellPathGeometry( geometry.p() );
 
     project->oilFields[0]->wellPathCollection->addWellPath( wellPath );
@@ -367,8 +366,7 @@ TEST( RicFishbonesTransmissibilityCalculation, MainBoreWithMockGrid_ValidatesRes
     wellPath->setUnitSystem( RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     // Vertical well at (25,25): starts above grid at z=10 (MD=0), crosses z=0 at MD=10, ends at z=-110 (MD=120).
-    cvf::ref<RigWellPath> geometry =
-        new RigWellPath( { cvf::Vec3d( 25, 25, 10 ), cvf::Vec3d( 25, 25, -110 ) }, { 0.0, 120.0 } );
+    cvf::ref<RigWellPath> geometry = new RigWellPath( { cvf::Vec3d( 25, 25, 10 ), cvf::Vec3d( 25, 25, -110 ) }, { 0.0, 120.0 } );
     wellPath->setWellPathGeometry( geometry.p() );
 
     project->oilFields[0]->wellPathCollection->addWellPath( wellPath );
@@ -388,7 +386,7 @@ TEST( RicFishbonesTransmissibilityCalculation, MainBoreWithMockGrid_ValidatesRes
     const auto& parts = result.begin()->second;
 
     // Find the single main bore part (laterals also land in this cell but have isMainBore=false).
-    const WellBorePartForTransCalc* mainBorePart = nullptr;
+    const WellBorePartForTransCalc* mainBorePart  = nullptr;
     int                             mainBoreCount = 0;
     for ( const auto& part : parts )
     {
