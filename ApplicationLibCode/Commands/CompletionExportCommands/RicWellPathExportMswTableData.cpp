@@ -1310,9 +1310,24 @@ std::expected<RigMswFlatExportData, std::string>
 
     const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
 
-    // Switch between legacy path (collectWelsegsData -> buildFlatMswSegmentList)
-    // and new direct path (buildFlatSegmentsDirect).
-    constexpr bool useLegacyPath = false;
+    // Switch between three paths:
+    //   useLegacyPath=true  → old collectWelsegsData / buildFlatMswSegmentList (keep for reference)
+    //   useGeometryPath=true → buildMswFromGeometry: builds directly from well-path geometry and
+    //                          Rim completions, no RicMswBranch/RicMswItem tree created at all.
+    //   default             → buildFlatSegmentsDirect: traverses the RicMswBranch tree inline,
+    //                          writing RigMswSegment objects without the old collectWelsegsData path.
+    constexpr bool useLegacyPath   = false;
+    constexpr bool useGeometryPath = false;
+
+    if ( useGeometryPath )
+    {
+        return buildMswFromGeometry( eclipseCase,
+                                     wellPath,
+                                     mswParameters->maxSegmentLength(),
+                                     customSegmentIntervals,
+                                     completionType,
+                                     exportDate );
+    }
 
     if ( !useLegacyPath )
     {
