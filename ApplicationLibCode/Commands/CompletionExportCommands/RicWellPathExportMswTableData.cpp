@@ -1321,12 +1321,7 @@ std::expected<RigMswFlatExportData, std::string>
 
     if ( useGeometryPath )
     {
-        return buildMswFromGeometry( eclipseCase,
-                                     wellPath,
-                                     mswParameters->maxSegmentLength(),
-                                     customSegmentIntervals,
-                                     completionType,
-                                     exportDate );
+        return buildMswFromGeometry( eclipseCase, wellPath, mswParameters->maxSegmentLength(), customSegmentIntervals, completionType, exportDate );
     }
 
     if ( !useLegacyPath )
