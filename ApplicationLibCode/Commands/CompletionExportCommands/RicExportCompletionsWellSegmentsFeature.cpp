@@ -24,7 +24,6 @@
 #include "RifTextDataTableFormatter.h"
 
 #include "RicExportFeatureImpl.h"
-#include "RicMswExportInfo.h"
 #include "RicWellPathExportCompletionDataFeatureImpl.h"
 #include "RicWellPathExportCompletionsFileTools.h"
 #include "RicWellPathExportMswCompletionsImpl.h"
