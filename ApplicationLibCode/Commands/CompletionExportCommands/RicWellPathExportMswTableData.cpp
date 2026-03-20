@@ -1814,4 +1814,3 @@ std::pair<double, double>
     }
     return std::make_pair( 0.0, 0.0 );
 }
-

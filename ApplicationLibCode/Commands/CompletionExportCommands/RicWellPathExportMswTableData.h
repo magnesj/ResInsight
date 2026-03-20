@@ -194,8 +194,6 @@ private:
                                              gsl::not_null<int*>          branchNumber );
 
     static std::unique_ptr<RicMswBranch> createChildMswBranch( const RimWellPath* childWellPath );
-
-
 };
 
 ENABLE_BITMASK_OPERATORS( RicWellPathExportMswTableData::CompletionType )
