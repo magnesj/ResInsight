@@ -1044,6 +1044,211 @@ static std::vector<RigMswSegment>
     return result;
 }
 
+//--------------------------------------------------------------------------------------------------
+/// Build WELSEGS + COMPSEGS + WSEGVALV segments for fishbones completions directly from
+/// RimFishbones — no RicMswItem types used.
+/// For each sub location:
+///   - One ICD WELSEGS segment branching off the nearest main-bore segment.
+///     COMPSEGS = cells closest to the sub. WSEGVALV = ICD Cv/area.
+///   - For each lateral: one WELSEGS sub-segment per cell intersection along the lateral,
+///     all on a new branch, with COMPSEGS per cell.
+//--------------------------------------------------------------------------------------------------
+static std::vector<RigMswSegment>
+    buildFishbonesSegmentsFromGeometry( const RimEclipseCase*                        eclipseCase,
+                                        const RimWellPath*                           wellPath,
+                                        const RigMainGrid*                           mainGrid,
+                                        const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
+                                        const std::vector<CellSegmentEntry>&         cellSegMap,
+                                        const std::string&                           infoType,
+                                        const std::string&                           wellNameForExport,
+                                        int&                                         segmentNumber,
+                                        int&                                         branchNumber,
+                                        RiaDefines::EclipseUnitSystem                unitSystem )
+{
+    std::vector<RigMswSegment> result;
+
+    const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter( unitSystem );
+    const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor( unitSystem );
+
+    auto fishbonesSubs = wellPath->completions()->fishbonesCollection()->activeFishbonesSubs();
+    for ( const RimFishbones* subs : fishbonesSubs )
+    {
+        // Group laterals by sub index
+        std::map<size_t, std::vector<size_t>> subAndLateralIndices;
+        for ( const auto& [subIndex, lateralIndex] : subs->installedLateralIndices() )
+            subAndLateralIndices[subIndex].push_back( lateralIndex );
+
+        // Identify which filtered intersections are closest to each sub, and which
+        // intersection contains the sub's MD.  This mirrors appendFishbonesMswExportInfo.
+        const double fishboneSectionStart = subs->startMD();
+        const double fishboneSectionEnd   = subs->endMD();
+
+        std::map<size_t, std::vector<size_t>> closestSubForCellIntersections;
+        std::map<size_t, size_t>              cellIntersectionContainingSubIndex;
+
+        for ( size_t ii = 0; ii < filteredIntersections.size(); ++ii )
+        {
+            const auto& ci = filteredIntersections[ii];
+            if ( fishboneSectionEnd < ci.startMD || fishboneSectionStart > ci.endMD ) continue;
+
+            const double midpoint       = 0.5 * ( ci.startMD + ci.endMD );
+            size_t       closestSubIdx  = 0;
+            double       closestDist    = std::numeric_limits<double>::infinity();
+
+            for ( const auto& [subIdx, lats] : subAndLateralIndices )
+            {
+                const double subMD = subs->measuredDepth( subIdx );
+                if ( ci.startMD <= subMD && subMD <= ci.endMD )
+                    cellIntersectionContainingSubIndex[subIdx] = ii;
+
+                const double dist = std::abs( subMD - midpoint );
+                if ( dist < closestDist )
+                {
+                    closestDist   = dist;
+                    closestSubIdx = subIdx;
+                }
+            }
+            closestSubForCellIntersections[closestSubIdx].push_back( ii );
+        }
+
+        // ICD parameters
+        const double icdOrificeRadius = subs->icdOrificeDiameter( unitSystem ) / 2.0;
+        const double icdArea          = icdOrificeRadius * icdOrificeRadius * cvf::PI_D * static_cast<double>( subs->icdCount() );
+        const double icdCv            = subs->icdFlowCoefficient();
+
+        for ( const auto& [subIndex, lateralIndices] : subAndLateralIndices )
+        {
+            const double subEndMd      = subs->measuredDepth( subIndex );
+            const double startValveMd  = subEndMd - VALVE_SEGMENT_LENGTH;
+            const double startValveTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, startValveMd );
+            const double endValveTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, subEndMd );
+
+            const int outletSeg  = findOutletSegmentForMD( cellSegMap, subEndMd );
+            const int icdBranch  = ++branchNumber;
+            const int icdSegNum  = segmentNumber++;
+
+            // COMPSEGS for the ICD segment: cells closest to this sub
+            std::set<size_t> icdCellIndices;
+            if ( closestSubForCellIntersections.count( subIndex ) )
+            {
+                for ( auto idx : closestSubForCellIntersections[subIndex] )
+                    icdCellIndices.insert( idx );
+            }
+            if ( cellIntersectionContainingSubIndex.count( subIndex ) )
+                icdCellIndices.insert( cellIntersectionContainingSubIndex[subIndex] );
+
+            std::vector<RigMswCellIntersection> icdCompsegs;
+            for ( auto idx : icdCellIndices )
+            {
+                const auto& ci = filteredIntersections[idx];
+                if ( auto mci = toMswCellIntersection( ci, mainGrid, ci.startMD, ci.endMD ) )
+                    icdCompsegs.push_back( *mci );
+            }
+
+            double icdLength = 0.0;
+            double icdDepth  = 0.0;
+            if ( infoType == "INC" )
+            {
+                icdLength = subEndMd - startValveMd;
+                icdDepth  = endValveTVD - startValveTVD;
+            }
+            else
+            {
+                icdLength = subEndMd;
+                icdDepth  = endValveTVD;
+            }
+
+            RigMswSegment icdSeg;
+            icdSeg.segmentNumber       = icdSegNum;
+            icdSeg.branchNumber        = icdBranch;
+            icdSeg.outletSegmentNumber = outletSeg;
+            icdSeg.length              = icdLength;
+            icdSeg.depth               = icdDepth;
+            icdSeg.diameter            = linerDiameter;
+            icdSeg.roughness           = roughnessFactor;
+            icdSeg.sourceWellName      = wellPath->name().toStdString();
+            icdSeg.description         = QString( "ICD sub %1" ).arg( subIndex + 1 ).toStdString();
+            icdSeg.intersections       = std::move( icdCompsegs );
+
+            WsegvalvRow wv;
+            wv.well          = wellNameForExport;
+            wv.segmentNumber = icdSegNum;
+            wv.cv            = icdCv;
+            wv.area          = icdArea;
+            wv.status        = "OPEN";
+            wv.description   = QString( "ICD sub %1" ).arg( subIndex + 1 ).toStdString();
+            icdSeg.wsegvalvData = wv;
+
+            result.push_back( std::move( icdSeg ) );
+
+            // Lateral sub-segments
+            for ( size_t lateralIndex : lateralIndices )
+            {
+                auto lateralCoordMDPairs = subs->coordsAndMDForLateral( subIndex, lateralIndex );
+                if ( lateralCoordMDPairs.empty() ) continue;
+
+                std::vector<cvf::Vec3d> lateralCoords;
+                std::vector<double>     lateralMDs;
+                for ( auto& [coord, md] : lateralCoordMDPairs )
+                {
+                    lateralCoords.push_back( coord );
+                    lateralMDs.push_back( md );
+                }
+
+                auto lateralIntersections =
+                    RigWellPathIntersectionTools::findCellIntersectionInfosAlongPath( eclipseCase->eclipseCaseData(),
+                                                                                      wellPath->name(),
+                                                                                      lateralCoords,
+                                                                                      lateralMDs );
+
+                if ( lateralIntersections.empty() ) continue;
+
+                const int    latBranch       = ++branchNumber;
+                double       prevMD          = lateralMDs.front();
+                double       prevTVD         = -lateralCoords.front().z();
+                int          latOutletSeg    = icdSegNum;
+
+                for ( const auto& cellIntInfo : lateralIntersections )
+                {
+                    if ( auto mci = toMswCellIntersection( cellIntInfo, mainGrid, cellIntInfo.startMD, cellIntInfo.endMD ) )
+                    {
+                        double len = 0.0;
+                        double dep = 0.0;
+                        if ( infoType == "INC" )
+                        {
+                            len = cellIntInfo.endMD - prevMD;
+                            dep = cellIntInfo.endTVD() - prevTVD;
+                        }
+                        else
+                        {
+                            len = cellIntInfo.endMD;
+                            dep = cellIntInfo.endTVD();
+                        }
+
+                        RigMswSegment latSeg;
+                        latSeg.segmentNumber       = segmentNumber++;
+                        latSeg.branchNumber        = latBranch;
+                        latSeg.outletSegmentNumber = latOutletSeg;
+                        latSeg.length              = len;
+                        latSeg.depth               = dep;
+                        latSeg.diameter            = subs->equivalentDiameter( unitSystem );
+                        latSeg.roughness           = subs->openHoleRoughnessFactor( unitSystem );
+                        latSeg.sourceWellName      = wellPath->name().toStdString();
+                        latSeg.intersections       = { *mci };
+
+                        latOutletSeg = latSeg.segmentNumber;
+                        prevMD       = cellIntInfo.endMD;
+                        prevTVD      = cellIntInfo.endTVD();
+                        result.push_back( std::move( latSeg ) );
+                    }
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 }; // namespace internal (additional helpers)
 
 //--------------------------------------------------------------------------------------------------
@@ -2845,7 +3050,22 @@ RigMswFlatExportData
                                                                          branchNumber );
     }
 
-    // TODO: append fishbones lateral segments.
+    const bool includeFishbones = ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES;
+    std::vector<RigMswSegment> fishbonesSegments;
+    if ( includeFishbones )
+    {
+        fishbonesSegments = internal::buildFishbonesSegmentsFromGeometry( eclipseCase,
+                                                                           wellPath,
+                                                                           mainGrid,
+                                                                           filteredIntersections,
+                                                                           cellSegMap,
+                                                                           infoType,
+                                                                           wellNameForExport,
+                                                                           segmentNumber,
+                                                                           branchNumber,
+                                                                           unitSystem );
+    }
+
     // TODO: handle tie-in child well paths.
 
     RigMswFlatExportData result;
@@ -2857,6 +3077,9 @@ RigMswFlatExportData
     result.segments.insert( result.segments.end(),
                              std::make_move_iterator( fractureSegments.begin() ),
                              std::make_move_iterator( fractureSegments.end() ) );
+    result.segments.insert( result.segments.end(),
+                             std::make_move_iterator( fishbonesSegments.begin() ),
+                             std::make_move_iterator( fishbonesSegments.end() ) );
     return result;
 }
 
