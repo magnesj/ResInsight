@@ -47,6 +47,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathFractureReportItem.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicExportCompletionsForTemporaryLgrsFeature.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathExportMswTableData.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellPathExportMswGeometryPath.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicMswTableDataTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicScheduleDataGenerator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicTransmissibilityCalculator.cpp
