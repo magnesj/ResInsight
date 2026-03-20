@@ -40,9 +40,8 @@ public:
         generateFishboneCompdatValuesUsingAdjustedCellVolume( const RimWellPath* wellPath, const RicExportCompletionDataSettingsUi& settings );
 
 private:
-    static void findFishboneLateralsWellBoreParts( std::map<size_t, std::vector<WellBorePartForTransCalc>>& wellBorePartsInCells,
-                                                   const RimWellPath*                                       wellPath,
-                                                   const RimEclipseCase*                                    eclipseCase );
+    static std::map<size_t, std::vector<WellBorePartForTransCalc>> findFishboneLateralsWellBoreParts( const RimWellPath*    wellPath,
+                                                                                                       const RimEclipseCase* eclipseCase );
 
     static void appendMainWellBoreParts( std::map<size_t, std::vector<WellBorePartForTransCalc>>& wellBorePartsInCells,
                                          const RimWellPath*                                       wellPath,

@@ -87,9 +87,7 @@ std::vector<RigCompletionData> RicFishbonesTransmissibilityCalculationFeatureImp
         return completionData;
     }
 
-    std::map<size_t, std::vector<WellBorePartForTransCalc>> wellBorePartsInCells; // wellBore = main bore or fishbone
-                                                                                  // lateral
-    findFishboneLateralsWellBoreParts( wellBorePartsInCells, wellPath, settings.caseToApply() );
+    auto wellBorePartsInCells = findFishboneLateralsWellBoreParts( wellPath, settings.caseToApply() );
 
     const RigActiveCellInfo* activeCellInfo =
         settings.caseToApply->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
@@ -187,12 +185,13 @@ std::vector<RigCompletionData> RicFishbonesTransmissibilityCalculationFeatureImp
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWellBoreParts(
-    std::map<size_t, std::vector<WellBorePartForTransCalc>>& wellBorePartsInCells,
-    const RimWellPath*                                       wellPath,
-    const RimEclipseCase*                                    eclipseCase )
+std::map<size_t, std::vector<WellBorePartForTransCalc>>
+    RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWellBoreParts( const RimWellPath*    wellPath,
+                                                                                          const RimEclipseCase* eclipseCase )
 {
-    if ( !wellPath || !wellPath->wellPathGeometry() || wellPath->wellPathGeometry()->measuredDepths().size() < 2 ) return;
+    std::map<size_t, std::vector<WellBorePartForTransCalc>> wellBorePartsInCells;
+    if ( !wellPath || !wellPath->wellPathGeometry() || wellPath->wellPathGeometry()->measuredDepths().size() < 2 )
+        return wellBorePartsInCells;
 
     // Generate data
     const RigEclipseCaseData* caseData = eclipseCase->eclipseCaseData();
@@ -278,6 +277,8 @@ void RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWell
             }
         }
     }
+
+    return wellBorePartsInCells;
 }
 
 //--------------------------------------------------------------------------------------------------
