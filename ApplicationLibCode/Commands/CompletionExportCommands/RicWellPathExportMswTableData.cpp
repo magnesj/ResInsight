@@ -622,6 +622,167 @@ static void collectWsegvalvBySegmentRecursive( std::map<int, WsegvalvRow>&     r
         collectWsegvalvBySegmentRecursive( result, childBranch, wellName, exportDate );
 }
 
+//--------------------------------------------------------------------------------------------------
+/// Convert a WellPathCellIntersectionInfo global-cell index to a RigMswCellIntersection (1-based i,j,k).
+/// Returns std::nullopt for gap-segments (globCellIndex >= totalCellCount).
+//--------------------------------------------------------------------------------------------------
+static std::optional<RigMswCellIntersection> toMswCellIntersection( const WellPathCellIntersectionInfo& cellInfo,
+                                                                     const RigMainGrid*                  mainGrid,
+                                                                     double                              distanceStart,
+                                                                     double                              distanceEnd )
+{
+    if ( cellInfo.globCellIndex >= mainGrid->totalCellCount() )
+        return std::nullopt;
+
+    size_t             localIdx  = 0;
+    const RigGridBase* localGrid = mainGrid->gridAndGridLocalIdxFromGlobalCellIdx( cellInfo.globCellIndex, &localIdx );
+
+    size_t i, j, k;
+    localGrid->ijkFromCellIndex( localIdx, &i, &j, &k );
+    if ( mainGrid->isDualPorosity() )
+        k += mainGrid->cellCountK();
+
+    RigMswCellIntersection ci;
+    ci.i             = i + 1; // 1-based
+    ci.j             = j + 1;
+    ci.k             = k + 1;
+    ci.distanceStart = distanceStart;
+    ci.distanceEnd   = distanceEnd;
+    if ( localGrid != mainGrid )
+        ci.gridName = localGrid->gridName();
+    return ci;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Build main-bore WELSEGS segments directly from well-path geometry — no RicMswItem types used.
+/// For each grid-cell intersection that overlaps an active perforation interval, a COMPSEGS entry
+/// is embedded in the segment (distanceStart/End = overlap of cell with the perforation interval).
+/// Valve completions, fishbones, and fractures are not handled here; add them in subsequent steps.
+//--------------------------------------------------------------------------------------------------
+static std::vector<RigMswSegment>
+    buildMainBoreSegmentsFromGeometry( const RimWellPath*                               wellPath,
+                                       const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
+                                       const RigMainGrid*                               mainGrid,
+                                       const std::vector<const RimPerforationInterval*>& perforationIntervals,
+                                       const std::string&                               infoType,
+                                       double                                           heelMD,
+                                       double                                           heelTVD,
+                                       int                                              branchNumber,
+                                       int&                                             segmentNumber,
+                                       int                                              outletSegmentNumber,
+                                       double                                           maxSegmentLength,
+                                       const std::vector<std::pair<double, double>>&    customSegmentIntervals,
+                                       const std::optional<QDateTime>&                  exportDate,
+                                       RiaDefines::EclipseUnitSystem                    unitSystem )
+{
+    std::vector<RigMswSegment> result;
+
+    const double segmentLengthThreshold = 1.0e-3;
+
+    double prevOutMD  = heelMD;
+    double prevOutTVD = heelTVD;
+    int    prevSegNum = outletSegmentNumber;
+    bool   firstSeg   = true;
+
+    for ( const auto& cellInfo : filteredIntersections )
+    {
+        const double cellLength = std::fabs( cellInfo.endMD - cellInfo.startMD );
+        if ( cellLength <= segmentLengthThreshold )
+        {
+            RiaLogging::info(
+                QString( "Skipping segment, threshold = %1, length = %2" ).arg( segmentLengthThreshold ).arg( cellLength ) );
+            continue;
+        }
+
+        // Collect COMPSEGS intersections for this cell from overlapping active perforations.
+        // Perforations on the main bore inherit the main-bore branch number.
+        std::vector<RigMswCellIntersection> cellCompsegs;
+        for ( const auto* perf : perforationIntervals )
+        {
+            if ( exportDate.has_value() && !perf->isActiveOnDate( exportDate.value() ) ) continue;
+
+            const double overlapStart = std::max( perf->startMD(), cellInfo.startMD );
+            const double overlapEnd   = std::min( perf->endMD(), cellInfo.endMD );
+            if ( overlapEnd > overlapStart )
+            {
+                if ( auto ci = toMswCellIntersection( cellInfo, mainGrid, overlapStart, overlapEnd ) )
+                    cellCompsegs.push_back( *ci );
+            }
+        }
+        // If no perforations, COMPSEGS is not produced for this cell (same as tree-based path).
+
+        const auto subSegs =
+            RicMswTableDataTools::createSubSegmentMDPairs( cellInfo.startMD, cellInfo.endMD, maxSegmentLength, customSegmentIntervals );
+
+        bool firstSubSeg = true;
+        for ( const auto& [subStartMD, subEndMD] : subSegs )
+        {
+            const double midPointMD  = 0.5 * ( subStartMD + subEndMD );
+            const double midPointTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, midPointMD );
+
+            double curPrevOutMD  = prevOutMD;
+            double curPrevOutTVD = prevOutTVD;
+            if ( midPointMD < curPrevOutMD )
+            {
+                curPrevOutMD  = heelMD;
+                curPrevOutTVD = heelTVD;
+            }
+
+            double length = 0.0;
+            double depth  = 0.0;
+            if ( infoType == "INC" )
+            {
+                length = midPointMD - curPrevOutMD;
+                depth  = midPointTVD - curPrevOutTVD;
+            }
+            else
+            {
+                length = midPointMD;
+                depth  = midPointTVD;
+            }
+
+            double diameter  = 0.0;
+            double roughness = 0.0;
+            if ( exportDate.has_value() )
+            {
+                diameter  = wellPath->mswCompletionParameters()->getDiameterAtMD( midPointMD, unitSystem, *exportDate );
+                roughness = wellPath->mswCompletionParameters()->getRoughnessAtMD( midPointMD, unitSystem, *exportDate );
+            }
+            else
+            {
+                diameter  = wellPath->mswCompletionParameters()->getDiameterAtMD( midPointMD, unitSystem );
+                roughness = wellPath->mswCompletionParameters()->getRoughnessAtMD( midPointMD, unitSystem );
+            }
+
+            RigMswSegment seg;
+            seg.segmentNumber       = segmentNumber;
+            seg.branchNumber        = branchNumber;
+            seg.outletSegmentNumber = prevSegNum;
+            seg.length              = length;
+            seg.depth               = depth;
+            seg.diameter            = diameter;
+            seg.roughness           = roughness;
+            seg.sourceWellName      = wellPath->name().toStdString();
+            if ( firstSeg && firstSubSeg )
+            {
+                seg.description = "Segments on main bore";
+                firstSeg        = false;
+            }
+            // Attach COMPSEGS intersections to the first sub-segment of each cell.
+            if ( firstSubSeg )
+                seg.intersections = cellCompsegs;
+
+            prevSegNum  = segmentNumber++;
+            prevOutMD   = midPointMD;
+            prevOutTVD  = midPointTVD;
+            firstSubSeg = false;
+            result.push_back( std::move( seg ) );
+        }
+    }
+
+    return result;
+}
+
 }; // namespace internal (additional helpers)
 
 //--------------------------------------------------------------------------------------------------
@@ -2311,6 +2472,73 @@ void RicWellPathExportMswTableData::buildFlatMswSegmentList( const RicMswExportI
 
         tableData.addMswSegment( std::move( seg ) );
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Build the flat MSW export data directly from well-path geometry and Rim completion objects,
+/// without building the RicMswBranch / RicMswItem tree.
+///
+/// Currently implemented: main-bore WELSEGS segments + perforation COMPSEGS entries.
+/// TODO: valve completions (ICD/AICD/SICD/ICV), fishbones laterals, fractures, tie-in wells.
+//--------------------------------------------------------------------------------------------------
+RigMswFlatExportData
+    RicWellPathExportMswTableData::buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
+                                                          const RimWellPath*                            wellPath,
+                                                          double                                        maxSegmentLength,
+                                                          const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                                          CompletionType                                completionType,
+                                                          const std::optional<QDateTime>&               exportDate )
+{
+    auto mswParameters = wellPath->mswCompletionParameters();
+    CVF_ASSERT( mswParameters );
+
+    const RiaDefines::EclipseUnitSystem unitSystem  = eclipseCase->eclipseCaseData()->unitsType();
+    const RigMainGrid*                  mainGrid    = eclipseCase->mainGrid();
+    const std::string                   infoType    = mswParameters->lengthAndDepth().text().toStdString();
+
+    auto   cellIntersections = generateCellSegments( eclipseCase, wellPath );
+    double initialMD         = computeIntitialMeasuredDepth( eclipseCase, wellPath, mswParameters, cellIntersections );
+    double initialTVD        = -wellPath->wellPathGeometry()->interpolatedPointAlongWellPath( initialMD ).z();
+
+    auto filteredIntersections = filterIntersections( cellIntersections, initialMD, wellPath->wellPathGeometry(), eclipseCase );
+
+    WelsegsHeader header;
+    header.well               = wellPath->completionSettings()->wellNameForExport().toStdString();
+    header.topLength          = initialMD;
+    header.topDepth           = initialTVD;
+    header.infoType           = infoType;
+    header.pressureComponents = mswParameters->pressureDrop().text().toStdString();
+
+    const bool includePerforations = ( completionType & CompletionType::PERFORATIONS ) == CompletionType::PERFORATIONS;
+    const std::vector<const RimPerforationInterval*> perforationIntervals =
+        includePerforations ? wellPath->perforationIntervalCollection()->activePerforations()
+                            : std::vector<const RimPerforationInterval*>();
+
+    int segmentNumber = 2; // Segment 1 is the implicit well heel.
+    auto mainBoreSegments = internal::buildMainBoreSegmentsFromGeometry( wellPath,
+                                                                          filteredIntersections,
+                                                                          mainGrid,
+                                                                          perforationIntervals,
+                                                                          infoType,
+                                                                          initialMD,
+                                                                          initialTVD,
+                                                                          1, // main bore branch number
+                                                                          segmentNumber,
+                                                                          1, // outlet = heel (segment 1)
+                                                                          maxSegmentLength,
+                                                                          customSegmentIntervals,
+                                                                          exportDate,
+                                                                          unitSystem );
+
+    // TODO: append valve completion segments (ICD/AICD/SICD/ICV) for perforations.
+    // TODO: append fishbones lateral segments.
+    // TODO: append fracture completion segments.
+    // TODO: handle tie-in child well paths.
+
+    RigMswFlatExportData result;
+    result.header   = header;
+    result.segments = std::move( mainBoreSegments );
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------

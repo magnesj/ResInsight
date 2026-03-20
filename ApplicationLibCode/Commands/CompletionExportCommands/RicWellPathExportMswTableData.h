@@ -199,6 +199,17 @@ private:
     [[deprecated( "Use buildFlatMswSegments() instead" )]]
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
 
+    // Direct path: build the flat segment list from well-path geometry and Rim completions,
+    // without creating the RicMswBranch / RicMswItem tree.
+    // Currently handles main-bore segments + perforation COMPSEGS.
+    // TODO: add valve completions, fishbones, and fractures.
+    static RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                              eclipseCase,
+                                                       const RimWellPath*                           wellPath,
+                                                       double                                       maxSegmentLength,
+                                                       const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                                       CompletionType                               completionType,
+                                                       const std::optional<QDateTime>&              exportDate );
+
     static RigMswFlatExportData buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
                                                           double                                        maxSegmentLength,
                                                           const std::vector<std::pair<double, double>>& customSegmentIntervals,
