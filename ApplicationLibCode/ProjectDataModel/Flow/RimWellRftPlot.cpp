@@ -66,6 +66,7 @@
 #include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotWidget.h"
 
+#include "cafPdmPointer.h"
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
 #include "cafSelectionManager.h"
@@ -735,11 +736,15 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
     {
         // Connect legend item clicks to select the corresponding ensemble curve set in the project tree.
         // Disconnect previous connection first to avoid duplicates (non-QObject lambda connections).
+        // Use a guarded PdmPointer to avoid use-after-free if the signal fires after this object is destroyed.
         QObject::disconnect( m_legendClickedConnection );
+        caf::PdmPointer<RimWellRftPlot> self( this );
         m_legendClickedConnection = QObject::connect( qwtWidget,
                                                       &RiuQwtPlotWidget::plotItemSelected,
-                                                      [this]( std::shared_ptr<RiuPlotItem> item, bool toggle, int idx )
-                                                      { onLegendItemClicked( item, toggle, idx ); } );
+                                                      [self]( std::shared_ptr<RiuPlotItem> item, bool toggle, int idx )
+                                                      {
+                                                          if ( self ) self->onLegendItemClicked( item, toggle, idx );
+                                                      } );
 
         // Create curves with no content to display in the curve legend section. Ensures a consistent legend for both ensemble and
         // statistics curves.
@@ -1398,6 +1403,10 @@ void RimWellRftPlot::deleteViewWidget()
 {
     // Required to detach curves before view widget is deleted. The Qwt plot curves are implicitly deleted when the view widget is deleted.
     detachAndDeleteLegendCurves();
+
+    // Disconnect before the widget is deleted to prevent the lambda from firing after this object is destroyed.
+    QObject::disconnect( m_legendClickedConnection );
+    m_legendClickedConnection = {};
 
     RimDepthTrackPlot::deleteViewWidget();
 }
