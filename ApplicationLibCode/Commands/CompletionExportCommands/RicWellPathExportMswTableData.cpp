@@ -2838,6 +2838,187 @@ std::vector<RimWellPath*> RicWellPathExportMswTableData::wellPathsWithTieIn( con
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
+/// and any of its own child laterals.
+//--------------------------------------------------------------------------------------------------
+void RicWellPathExportMswTableData::buildLateralSegments( RimEclipseCase*                 eclipseCase,
+                                                           const RimWellPath*              wellPath,
+                                                           const RigMainGrid*              mainGrid,
+                                                           int                             outletSegNum,
+                                                           CompletionType                  completionType,
+                                                           const std::optional<QDateTime>& exportDate,
+                                                           int&                            segmentNumber,
+                                                           int&                            branchNumber,
+                                                           RiaDefines::EclipseUnitSystem   unitSystem,
+                                                           std::vector<RigMswSegment>&     result )
+{
+    auto mswParameters = wellPath->mswCompletionParameters();
+    if ( !mswParameters ) return;
+
+    const std::string infoType          = mswParameters->lengthAndDepth().text().toStdString();
+    const double      tieInMD           = wellPath->wellPathTieIn()->tieInMeasuredDepth();
+    const double      tieInTVD          = -wellPath->wellPathGeometry()->interpolatedPointAlongWellPath( tieInMD ).z();
+    const std::string wellNameForExport = wellPath->completionSettings()->wellNameForExport().toStdString();
+
+    int childOutletSeg = outletSegNum;
+
+    // Optional ICV valve at the tie-in point
+    const RimWellPathValve* outletValve = wellPath->wellPathTieIn()->outletValve();
+    if ( outletValve && outletValve->isChecked() )
+    {
+        const bool isActive = !exportDate.has_value() || outletValve->isActiveOnDate( *exportDate );
+        if ( isActive )
+        {
+            const double valveMD       = wellPath->wellPathTieIn()->branchValveMeasuredDepth();
+            const double offset        = ( valveMD == tieInMD ) ? internal::VALVE_SEGMENT_LENGTH : 0.0;
+            const double valveEndMD    = tieInMD + offset;
+            const double valveStartTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
+            const double valveEndTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
+
+            double length = 0.0;
+            double depth  = 0.0;
+            if ( infoType == "INC" )
+            {
+                length = valveEndMD - valveMD;
+                depth  = valveEndTVD - valveStartTVD;
+            }
+            else
+            {
+                length = valveEndMD;
+                depth  = valveEndTVD;
+            }
+
+            const int valveSegNum = segmentNumber++;
+            const int valveBranch = ++branchNumber;
+
+            RigMswSegment valveSeg;
+            valveSeg.segmentNumber       = valveSegNum;
+            valveSeg.branchNumber        = valveBranch;
+            valveSeg.outletSegmentNumber = outletSegNum;
+            valveSeg.length              = length;
+            valveSeg.depth               = depth;
+            valveSeg.diameter            = mswParameters->linerDiameter( unitSystem );
+            valveSeg.roughness           = mswParameters->roughnessFactor( unitSystem );
+            valveSeg.sourceWellName      = wellPath->name().toStdString();
+            valveSeg.description         = QString( "%1 valve for %2" )
+                                               .arg( outletValve->componentLabel() )
+                                               .arg( wellPath->name() )
+                                               .toStdString();
+
+            WsegvalvRow wv;
+            wv.well          = wellNameForExport;
+            wv.segmentNumber = valveSegNum;
+            wv.cv            = outletValve->flowCoefficient();
+            wv.area          = outletValve->area( unitSystem );
+            wv.status        = outletValve->isOpen() ? "OPEN" : "SHUT";
+            wv.description   = valveSeg.description;
+            valveSeg.wsegvalvData = wv;
+
+            result.push_back( std::move( valveSeg ) );
+            childOutletSeg = valveSegNum;
+        }
+    }
+
+    // Child main-bore segments
+    auto cellIntersections     = generateCellSegments( eclipseCase, wellPath );
+    auto filteredIntersections = filterIntersections( cellIntersections, tieInMD, wellPath->wellPathGeometry(), eclipseCase );
+
+    const bool includePerforations = ( completionType & CompletionType::PERFORATIONS ) == CompletionType::PERFORATIONS;
+    const std::vector<const RimPerforationInterval*> perforationIntervals =
+        includePerforations ? wellPath->perforationIntervalCollection()->activePerforations()
+                            : std::vector<const RimPerforationInterval*>();
+
+    std::set<const RimPerforationInterval*> valvedIntervals;
+    for ( const auto* perf : perforationIntervals )
+    {
+        if ( exportDate.has_value() && !perf->isActiveOnDate( exportDate.value() ) ) continue;
+        for ( const auto* valve : perf->descendantsIncludingThisOfType<RimWellPathValve>() )
+        {
+            if ( !valve->isChecked() ) continue;
+            if ( exportDate.has_value() && !valve->isActiveOnDate( exportDate.value() ) ) continue;
+            const auto t = valve->componentType();
+            if ( t == RiaDefines::WellPathComponentType::ICD || t == RiaDefines::WellPathComponentType::ICV ||
+                 t == RiaDefines::WellPathComponentType::AICD || t == RiaDefines::WellPathComponentType::SICD )
+            {
+                valvedIntervals.insert( perf );
+                break;
+            }
+        }
+    }
+
+    std::vector<internal::CellSegmentEntry> childCellSegMap;
+    const int                               childBoreNum = ++branchNumber;
+
+    auto mainBoreSegs = internal::buildMainBoreSegmentsFromGeometry( wellPath,
+                                                                      filteredIntersections,
+                                                                      mainGrid,
+                                                                      perforationIntervals,
+                                                                      valvedIntervals,
+                                                                      infoType,
+                                                                      tieInMD,
+                                                                      tieInTVD,
+                                                                      childBoreNum,
+                                                                      segmentNumber,
+                                                                      childOutletSeg,
+                                                                      mswParameters->maxSegmentLength(),
+                                                                      {},
+                                                                      exportDate,
+                                                                      unitSystem,
+                                                                      &childCellSegMap );
+    result.insert( result.end(), std::make_move_iterator( mainBoreSegs.begin() ), std::make_move_iterator( mainBoreSegs.end() ) );
+
+    auto valveSegs = internal::buildValveSegmentsFromGeometry( wellPath,
+                                                                filteredIntersections,
+                                                                mainGrid,
+                                                                perforationIntervals,
+                                                                childCellSegMap,
+                                                                infoType,
+                                                                wellNameForExport,
+                                                                segmentNumber,
+                                                                branchNumber,
+                                                                mswParameters->maxSegmentLength(),
+                                                                {},
+                                                                exportDate,
+                                                                unitSystem );
+    result.insert( result.end(), std::make_move_iterator( valveSegs.begin() ), std::make_move_iterator( valveSegs.end() ) );
+
+    if ( ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES )
+    {
+        auto fracSegs = internal::buildFractureSegmentsFromGeometry( eclipseCase,
+                                                                      wellPath,
+                                                                      mainGrid,
+                                                                      childCellSegMap,
+                                                                      infoType,
+                                                                      segmentNumber,
+                                                                      branchNumber );
+        result.insert( result.end(), std::make_move_iterator( fracSegs.begin() ), std::make_move_iterator( fracSegs.end() ) );
+    }
+
+    if ( ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES )
+    {
+        auto fishSegs = internal::buildFishbonesSegmentsFromGeometry( eclipseCase,
+                                                                       wellPath,
+                                                                       mainGrid,
+                                                                       filteredIntersections,
+                                                                       childCellSegMap,
+                                                                       infoType,
+                                                                       wellNameForExport,
+                                                                       segmentNumber,
+                                                                       branchNumber,
+                                                                       unitSystem );
+        result.insert( result.end(), std::make_move_iterator( fishSegs.begin() ), std::make_move_iterator( fishSegs.end() ) );
+    }
+
+    // Recurse into grandchildren
+    for ( auto* grandchild : wellPathsWithTieIn( wellPath ) )
+    {
+        const int grandchildOutlet =
+            internal::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->tieInMeasuredDepth() );
+        buildLateralSegments( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem, result );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
 std::pair<double, double>
@@ -3066,7 +3247,14 @@ RigMswFlatExportData
                                                                            unitSystem );
     }
 
-    // TODO: handle tie-in child well paths.
+    // Tie-in child laterals (recursive)
+    std::vector<RigMswSegment> lateralSegments;
+    for ( auto* childWellPath : wellPathsWithTieIn( wellPath ) )
+    {
+        const int childOutlet =
+            internal::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->tieInMeasuredDepth() );
+        buildLateralSegments( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem, lateralSegments );
+    }
 
     RigMswFlatExportData result;
     result.header   = header;
@@ -3080,6 +3268,9 @@ RigMswFlatExportData
     result.segments.insert( result.segments.end(),
                              std::make_move_iterator( fishbonesSegments.begin() ),
                              std::make_move_iterator( fishbonesSegments.end() ) );
+    result.segments.insert( result.segments.end(),
+                             std::make_move_iterator( lateralSegments.begin() ),
+                             std::make_move_iterator( lateralSegments.end() ) );
     return result;
 }
 

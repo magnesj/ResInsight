@@ -196,6 +196,19 @@ private:
 
     static std::vector<RimWellPath*> wellPathsWithTieIn( const RimWellPath* wellPath );
 
+    // Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
+    // and any of its own child laterals. outletSegNum is the parent segment at the tie-in MD.
+    static void buildLateralSegments( RimEclipseCase*                 eclipseCase,
+                                      const RimWellPath*              wellPath,
+                                      const RigMainGrid*              mainGrid,
+                                      int                             outletSegNum,
+                                      CompletionType                  completionType,
+                                      const std::optional<QDateTime>& exportDate,
+                                      int&                            segmentNumber,
+                                      int&                            branchNumber,
+                                      RiaDefines::EclipseUnitSystem   unitSystem,
+                                      std::vector<RigMswSegment>&     result );
+
     [[deprecated( "Use buildFlatMswSegments() instead" )]]
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
 
