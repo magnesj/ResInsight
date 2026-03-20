@@ -59,6 +59,10 @@
 #include "RiuAbstractLegendFrame.h"
 #include "RiuDraggableOverlayFrame.h"
 #include "RiuPlotCurve.h"
+#include "RiuPlotItem.h"
+#include "RiuPlotMainWindowTools.h"
+#include "RiuQwtPlotCurve.h"
+#include "RiuQwtPlotItem.h"
 #include "RiuQwtPlotCurveDefines.h"
 #include "RiuQwtPlotWidget.h"
 
@@ -727,16 +731,24 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
         }
     }
 
-    if ( auto widget = plotTrack->plotWidget() )
+    if ( auto qwtWidget = dynamic_cast<RiuQwtPlotWidget*>( plotTrack->plotWidget() ) )
     {
+        // Connect legend item clicks to select the corresponding ensemble curve set in the project tree.
+        // Disconnect previous connection first to avoid duplicates (non-QObject lambda connections).
+        QObject::disconnect( m_legendClickedConnection );
+        m_legendClickedConnection =
+            QObject::connect( qwtWidget, &RiuQwtPlotWidget::plotItemSelected, [this]( std::shared_ptr<RiuPlotItem> item, bool toggle, int idx ) {
+                onLegendItemClicked( item, toggle, idx );
+            } );
+
         // Create curves with no content to display in the curve legend section. Ensures a consistent legend for both ensemble and
         // statistics curves.
 
         auto formatString = RiaQDateTimeTools::createTimeFormatStringFromDates( m_selectedTimeSteps() );
         for ( const auto& [curveSet, dateTime] : curveSetsForLegend )
         {
-            auto riuCurve = widget->createPlotCurve( nullptr, "" );
-            riuCurve->attachToPlot( plotTrack->plotWidget() );
+            auto riuCurve = qwtWidget->createPlotCurve( nullptr, "" );
+            riuCurve->attachToPlot( qwtWidget );
             riuCurve->setVisibleInLegend( true );
 
             QStringList titleItems;
@@ -761,6 +773,7 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
             riuCurve->setSymbol( symbol );
 
             m_legendPlotCurves.push_back( riuCurve );
+            m_legendCurveToEnsembleCurveSet[riuCurve] = curveSet;
         }
     }
 
@@ -1635,6 +1648,7 @@ void RimWellRftPlot::detachAndDeleteLegendCurves()
     }
 
     m_legendPlotCurves.clear();
+    m_legendCurveToEnsembleCurveSet.clear();
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -1664,6 +1678,22 @@ void RimWellRftPlot::onSelectionManagerSelectionChanged( const std::set<int>& /*
         m_highlightedCurveSet = newSelection;
         loadDataAndUpdate();
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::onLegendItemClicked( std::shared_ptr<RiuPlotItem> plotItem, bool toggle, int /*sampleIndex*/ )
+{
+    auto wrapper = dynamic_cast<RiuQwtPlotItem*>( plotItem.get() );
+    if ( !wrapper ) return;
+
+    auto qwtCurve = dynamic_cast<RiuQwtPlotCurve*>( wrapper->qwtPlotItem() );
+    if ( !qwtCurve ) return;
+
+    auto it = m_legendCurveToEnsembleCurveSet.find( qwtCurve );
+    if ( it != m_legendCurveToEnsembleCurveSet.end() )
+        RiuPlotMainWindowTools::selectOrToggleObject( it->second, toggle );
 }
 
 //--------------------------------------------------------------------------------------------------
