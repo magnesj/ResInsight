@@ -522,7 +522,17 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
 
     defineCurveColorsAndSymbols( allCurveDefs );
 
-    std::set<std::pair<RimWellRftEnsembleCurveSet*, QDateTime>> curveSetsForLegend;
+    // Sort legend items by project tree order (index in m_ensembleCurveSets), then by date/time
+    auto curveSetsForLegendCmp = [this]( const std::pair<RimWellRftEnsembleCurveSet*, QDateTime>& a,
+                                        const std::pair<RimWellRftEnsembleCurveSet*, QDateTime>& b ) -> bool
+    {
+        auto ia = m_ensembleCurveSets.indexOf( a.first );
+        auto ib = m_ensembleCurveSets.indexOf( b.first );
+        if ( ia != ib ) return ia < ib;
+        return a.second < b.second;
+    };
+    std::set<std::pair<RimWellRftEnsembleCurveSet*, QDateTime>, decltype( curveSetsForLegendCmp )> curveSetsForLegend(
+        curveSetsForLegendCmp );
 
     // Add new curves
     for ( const RiaRftPltCurveDefinition& curveDefToAdd : allCurveDefs )
