@@ -42,36 +42,6 @@
 #include "RimWellPathCompletions.h"
 
 #include <cafPdmObject.h>
-#include <cafPdmPointer.h>
-
-//==================================================================================================
-///
-//==================================================================================================
-struct WellBorePartForTransCalc
-{
-    WellBorePartForTransCalc( cvf::Vec3d lengthsInCell, double wellRadius, double skinFactor, bool isMainBore, const QString& metaData )
-        : lengthsInCell( lengthsInCell )
-        , wellRadius( wellRadius )
-        , skinFactor( skinFactor )
-        , isMainBore( isMainBore )
-        , metaData( metaData )
-        , intersectionWithWellMeasuredDepth( HUGE_VAL )
-        , lateralIndex( cvf::UNDEFINED_SIZE_T )
-    {
-    }
-
-    cvf::Vec3d lengthsInCell;
-    double     wellRadius;
-    double     skinFactor;
-    QString    metaData;
-    bool       isMainBore;
-
-    double intersectionWithWellMeasuredDepth;
-    size_t lateralIndex;
-
-    void setSourcePdmObject( const caf::PdmObject* sourcePdmObj ) { sourcePdmObject = const_cast<caf::PdmObject*>( sourcePdmObj ); }
-    caf::PdmPointer<caf::PdmObject> sourcePdmObject;
-};
 
 //--------------------------------------------------------------------------------------------------
 ///

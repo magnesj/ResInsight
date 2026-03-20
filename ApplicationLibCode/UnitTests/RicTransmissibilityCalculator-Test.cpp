@@ -18,6 +18,7 @@
 
 #include "gtest/gtest.h"
 
+#include "CompletionExportCommands/RicFishbonesTransmissibilityCalculationFeatureImp.h"
 #include "CompletionExportCommands/RicTransmissibilityCalculator.h"
 
 #include "RifReaderMockModel.h"
@@ -28,6 +29,8 @@
 #include "RigEclipseResultAddress.h"
 #include "RigEclipseResultInfo.h"
 #include "RigMainGrid.h"
+
+#include "Well/RigWellPath.h"
 
 #include "RimEclipseCase.h"
 #include "RimEclipseResultCase.h"
@@ -218,4 +221,38 @@ TEST( RicTransmissibilityCalculator, CalculateCellMainDirection_DualPorosity_Use
     EXPECT_EQ( RigCompletionData::CellDirection::DIR_J, direction );
 
     delete eclipseCase;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RicFishbonesTransmissibilityCalculation, NullWellPath_ReturnsEmptyMap )
+{
+    auto result = RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWellBoreParts( nullptr, nullptr );
+    EXPECT_TRUE( result.empty() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RicFishbonesTransmissibilityCalculation, WellPathWithNoGeometry_ReturnsEmptyMap )
+{
+    RimWellPath wellPath;
+
+    auto result = RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWellBoreParts( &wellPath, nullptr );
+    EXPECT_TRUE( result.empty() );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+TEST( RicFishbonesTransmissibilityCalculation, WellPathWithSingleMeasuredDepth_ReturnsEmptyMap )
+{
+    RimWellPath wellPath;
+
+    cvf::ref<RigWellPath> geometry = new RigWellPath( { cvf::Vec3d( 0, 0, -1000 ) }, { 1000.0 } );
+    wellPath.setWellPathGeometry( geometry.p() );
+
+    auto result = RicFishbonesTransmissibilityCalculationFeatureImp::findFishboneLateralsWellBoreParts( &wellPath, nullptr );
+    EXPECT_TRUE( result.empty() );
 }
