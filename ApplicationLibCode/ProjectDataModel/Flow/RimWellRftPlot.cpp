@@ -64,6 +64,7 @@
 
 #include "cafPdmUiTreeOrdering.h"
 #include "cafPdmUiTreeSelectionEditor.h"
+#include "cafSelectionManager.h"
 
 #include <algorithm>
 #include <iterator>
@@ -172,6 +173,14 @@ void RimWellRftPlot::applyCurveAppearance( RimWellLogCurve* curve )
 
     curve->setSymbol( currentSymbol );
     curve->setLineStyle( lineStyle );
+
+    // Dim ensemble member curves that do not belong to the highlighted curve set.
+    // Statistics curves (ENSEMBLE_RFT) are intentionally excluded.
+    if ( m_highlightedCurveSet && curveDef.address().sourceType() != RifDataSourceForRftPlt::SourceType::ENSEMBLE_RFT )
+    {
+        auto curveSet = findEnsembleCurveSet( curveDef.address().ensemble() );
+        if ( curveSet && curveSet != m_highlightedCurveSet ) curve->setCurveColorOpacity( 0.1f );
+    }
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -524,15 +533,14 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
 
     // Sort legend items by project tree order (index in m_ensembleCurveSets), then by date/time
     auto curveSetsForLegendCmp = [this]( const std::pair<RimWellRftEnsembleCurveSet*, QDateTime>& a,
-                                        const std::pair<RimWellRftEnsembleCurveSet*, QDateTime>& b ) -> bool
+                                         const std::pair<RimWellRftEnsembleCurveSet*, QDateTime>& b ) -> bool
     {
         auto ia = m_ensembleCurveSets.indexOf( a.first );
         auto ib = m_ensembleCurveSets.indexOf( b.first );
         if ( ia != ib ) return ia < ib;
         return a.second < b.second;
     };
-    std::set<std::pair<RimWellRftEnsembleCurveSet*, QDateTime>, decltype( curveSetsForLegendCmp )> curveSetsForLegend(
-        curveSetsForLegendCmp );
+    std::set<std::pair<RimWellRftEnsembleCurveSet*, QDateTime>, decltype( curveSetsForLegendCmp )> curveSetsForLegend( curveSetsForLegendCmp );
 
     // Add new curves
     for ( const RiaRftPltCurveDefinition& curveDefToAdd : allCurveDefs )
@@ -579,6 +587,19 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
         else if ( ( !curveDefToAdd.address().ensemble() || m_showEnsembleCurves ) &&
                   curveDefToAdd.address().sourceType() == RifDataSourceForRftPlt::SourceType::SUMMARY_RFT )
         {
+            // A summary case address can optionally contain an Eclipse case used to compute the TVD/MD for a well path
+            // https://github.com/OPM/ResInsight/issues/10501
+            auto eclipeCase = curveDefToAdd.address().eclCase();
+            if ( curveDefToAdd.address().ensemble() )
+            {
+                auto curveSet = findEnsembleCurveSet( curveDefToAdd.address().ensemble() );
+                if ( curveSet )
+                {
+                    eclipeCase = curveSet->eclipseCase();
+                    curveSetsForLegend.insert( { curveSet, curveDefToAdd.timeStep() } );
+                }
+            }
+
             auto curve = new RimWellLogRftCurve();
             plotTrack->addCurve( curve );
             auto summaryCase = curveDefToAdd.address().summaryCase();
@@ -589,20 +610,6 @@ void RimWellRftPlot::updateCurvesInPlot( const std::set<RiaRftPltCurveDefinition
                                                                                 curveDefToAdd.timeStep(),
                                                                                 RifEclipseRftAddress::RftWellLogChannelType::PRESSURE );
             curve->setRftAddress( address );
-
-            // A summary case address can optionally contain an Eclipse case used to compute the TVD/MD for a well path
-            // https://github.com/OPM/ResInsight/issues/10501
-            auto eclipeCase = curveDefToAdd.address().eclCase();
-            if ( curveDefToAdd.address().ensemble() )
-            {
-                auto curveSet = findEnsembleCurveSet( curveDefToAdd.address().ensemble() );
-                if ( curveSet )
-                {
-                    eclipeCase = curveSet->eclipseCase();
-
-                    curveSetsForLegend.insert( { curveSet, curveDefToAdd.timeStep() } );
-                }
-            }
             curve->setEclipseCase( eclipeCase );
 
             double zValue = 1.0;
@@ -1628,6 +1635,35 @@ void RimWellRftPlot::detachAndDeleteLegendCurves()
     }
 
     m_legendPlotCurves.clear();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+RimWellRftEnsembleCurveSet* RimWellRftPlot::selectedEnsembleCurveSet() const
+{
+    auto selected = caf::SelectionManager::instance()->selectedItemOfType<RimWellRftEnsembleCurveSet>();
+    if ( selected )
+    {
+        for ( auto cs : m_ensembleCurveSets )
+        {
+            if ( cs == selected ) return selected;
+        }
+    }
+    return nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimWellRftPlot::onSelectionManagerSelectionChanged( const std::set<int>& /*changedSelectionLevels*/ )
+{
+    auto newSelection = selectedEnsembleCurveSet();
+    if ( newSelection != m_highlightedCurveSet )
+    {
+        m_highlightedCurveSet = newSelection;
+        loadDataAndUpdate();
+    }
 }
 
 //--------------------------------------------------------------------------------------------------

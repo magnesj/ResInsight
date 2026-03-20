@@ -22,6 +22,8 @@
 
 #include "RifDataSourceForRftPltQMetaType.h"
 
+#include "cafSelectionChangedReceiver.h"
+
 #include "RiuPlotCurveSymbol.h"
 
 #include "cafPdmField.h"
@@ -66,7 +68,7 @@ class PdmOptionItemInfo;
 ///
 ///
 //==================================================================================================
-class RimWellRftPlot : public RimWellLogPlot
+class RimWellRftPlot : public RimWellLogPlot, public caf::SelectionChangedReceiver
 {
     CAF_PDM_HEADER_INIT;
 
@@ -136,6 +138,9 @@ private:
     void applyCurveAppearance( RimWellLogCurve* curve );
     void applyCurveColor( RimWellLogCurve* curve );
 
+    void                        onSelectionManagerSelectionChanged( const std::set<int>& changedSelectionLevels ) override;
+    RimWellRftEnsembleCurveSet* selectedEnsembleCurveSet() const;
+
     void    updateFormationsOnPlot() const;
     QString associatedSimWellName() const;
 
@@ -173,7 +178,8 @@ private:
     std::map<QDateTime, RiuPlotCurveSymbol::PointSymbolEnum> m_timeStepSymbols;
     bool                                                     m_isOnLoad;
 
-    std::vector<RiuPlotCurve*> m_legendPlotCurves;
+    std::vector<RiuPlotCurve*>  m_legendPlotCurves;
+    RimWellRftEnsembleCurveSet* m_highlightedCurveSet = nullptr;
 
     caf::PdmChildField<RimWellLogPlot*> m_wellLogPlot_OBSOLETE;
     bool                                m_isInitialized = false;
