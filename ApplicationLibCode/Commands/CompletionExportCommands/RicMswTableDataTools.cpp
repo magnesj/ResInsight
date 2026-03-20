@@ -80,16 +80,13 @@ void RicMswTableDataTools::collectDataFromFlatList( RigMswTableData& tableData, 
         }
 
         // WSEGVALV row
-        if ( seg.wsegvalvData )
-            tableData.addWsegvalvRow( *seg.wsegvalvData );
+        if ( seg.wsegvalvData ) tableData.addWsegvalvRow( *seg.wsegvalvData );
 
         // WSEGAICD row
-        if ( seg.wsegaicdData )
-            tableData.addWsegaicdRow( *seg.wsegaicdData );
+        if ( seg.wsegaicdData ) tableData.addWsegaicdRow( *seg.wsegaicdData );
 
         // WSEGSICD row
-        if ( seg.wsegsicdData )
-            tableData.addWsegsicdRow( *seg.wsegsicdData );
+        if ( seg.wsegsicdData ) tableData.addWsegsicdRow( *seg.wsegsicdData );
 
         // Also store the segment in the flat list on tableData
         tableData.addMswSegment( seg );
