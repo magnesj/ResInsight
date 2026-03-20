@@ -67,7 +67,6 @@ public:
     // The intention is to extract MSW data from a single well. Any handling of multiple wells is supposed to be managed in a different class
     static std::expected<RigMswTableData, std::string> extractSingleWellMswData( RimEclipseCase* eclipseCase,
                                                                                  RimWellPath*    wellPath,
-                                                                                 bool exportCompletionsAfterMainBoreSegments = true,
                                                                                  CompletionType completionType = CompletionType::ALL,
                                                                                  const std::optional<QDateTime>& exportDate = std::nullopt );
 
@@ -75,7 +74,6 @@ public:
     // Returns all WELSEGS rows and embedded COMPSEGS/valve data in a flat, ordered list.
     static std::expected<RigMswFlatExportData, std::string> buildFlatMswSegments( RimEclipseCase* eclipseCase,
                                                                                   RimWellPath*    wellPath,
-                                                                                  bool exportCompletionsAfterMainBoreSegments = true,
                                                                                   CompletionType completionType = CompletionType::ALL,
                                                                                   const std::optional<QDateTime>& exportDate = std::nullopt );
 
@@ -199,12 +197,6 @@ private:
 
     [[deprecated( "Use buildFlatMswSegments() instead" )]]
     static void buildFlatMswSegmentList( const RicMswExportInfo& exportInfo, RigMswTableData& tableData );
-
-    static RigMswFlatExportData buildFlatSegmentsDirect( RicMswExportInfo&                             exportInfo,
-                                                         double                                        maxSegmentLength,
-                                                         const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                                         bool                                          exportCompletionsAfterMainBore,
-                                                         const std::optional<QDateTime>&               exportDate );
 };
 
 ENABLE_BITMASK_OPERATORS( RicWellPathExportMswTableData::CompletionType )

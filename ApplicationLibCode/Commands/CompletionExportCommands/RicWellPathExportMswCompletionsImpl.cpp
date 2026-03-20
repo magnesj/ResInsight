@@ -52,9 +52,7 @@ RigMswUnifiedData
 
     for ( RimWellPath* wellPath : wellPaths )
     {
-        bool exportAfterMainbore = true;
-        auto wellData =
-            RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, exportAfterMainbore, completionType, exportDate );
+        auto wellData = RicWellPathExportMswTableData::extractSingleWellMswData( eclipseCase, wellPath, completionType, exportDate );
         if ( wellData.has_value() )
         {
             unifiedData.addWellData( std::move( wellData.value() ) );
@@ -146,7 +144,6 @@ void exportSplitMswData( const RicExportCompletionDataSettingsUi& exportSettings
             RicWellPathExportCompletionDataFeatureImpl::exportDateForTimeStep( exportSettings.caseToApply, exportSettings.timeStep );
         auto wellDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( exportSettings.caseToApply,
                                                                                        wellPath,
-                                                                                       exportSettings.exportCompletionWelspecAfterMainBore(),
                                                                                        completionType,
                                                                                        exportDate );
 

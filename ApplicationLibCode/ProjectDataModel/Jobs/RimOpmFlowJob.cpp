@@ -1102,7 +1102,6 @@ int RimOpmFlowJob::mergeMswData( int mergePosition )
     auto exportDate    = RicWellPathExportCompletionDataFeatureImpl::exportDateForTimeStep( m_eclipseCase(), 0 );
     auto mswDataResult = RicWellPathExportMswTableData::extractSingleWellMswData( m_eclipseCase(),
                                                                                   m_wellPath(),
-                                                                                  true,
                                                                                   RicWellPathExportMswTableData::CompletionType::ALL,
                                                                                   exportDate );
     if ( !mswDataResult.has_value() )
