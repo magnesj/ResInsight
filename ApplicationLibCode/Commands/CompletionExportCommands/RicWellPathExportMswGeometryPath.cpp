@@ -667,19 +667,19 @@ using CompletionType = RicWellPathExportMswTableData::CompletionType;
 /// Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
 /// and any of its own child laterals.
 //--------------------------------------------------------------------------------------------------
-void buildLateralSegments( RimEclipseCase*                 eclipseCase,
-                           const RimWellPath*              wellPath,
-                           const RigMainGrid*              mainGrid,
-                           int                             outletSegNum,
-                           CompletionType                  completionType,
-                           const std::optional<QDateTime>& exportDate,
-                           int&                            segmentNumber,
-                           int&                            branchNumber,
-                           RiaDefines::EclipseUnitSystem   unitSystem,
-                           std::vector<RigMswSegment>&     result )
+std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                 eclipseCase,
+                                                 const RimWellPath*              wellPath,
+                                                 const RigMainGrid*              mainGrid,
+                                                 int                             outletSegNum,
+                                                 CompletionType                  completionType,
+                                                 const std::optional<QDateTime>& exportDate,
+                                                 int&                            segmentNumber,
+                                                 int&                            branchNumber,
+                                                 RiaDefines::EclipseUnitSystem   unitSystem )
 {
+    std::vector<RigMswSegment> result;
     auto mswParameters = wellPath->mswCompletionParameters();
-    if ( !mswParameters ) return;
+    if ( !mswParameters ) return result;
 
     const std::string infoType          = mswParameters->lengthAndDepth().text().toStdString();
     const double      tieInMD           = wellPath->wellPathTieIn()->tieInMeasuredDepth();
@@ -831,17 +831,19 @@ void buildLateralSegments( RimEclipseCase*                 eclipseCase,
     for ( auto* grandchild : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int grandchildOutlet = internal::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->tieInMeasuredDepth() );
-        buildLateralSegments( eclipseCase,
-                              grandchild,
-                              mainGrid,
-                              grandchildOutlet,
-                              completionType,
-                              exportDate,
-                              segmentNumber,
-                              branchNumber,
-                              unitSystem,
-                              result );
+        auto grandchildSegs        = buildLateralSegments( eclipseCase,
+                                                    grandchild,
+                                                    mainGrid,
+                                                    grandchildOutlet,
+                                                    completionType,
+                                                    exportDate,
+                                                    segmentNumber,
+                                                    branchNumber,
+                                                    unitSystem );
+        result.insert( result.end(), std::make_move_iterator( grandchildSegs.begin() ), std::make_move_iterator( grandchildSegs.end() ) );
     }
+
+    return result;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -969,16 +971,16 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
     for ( auto* childWellPath : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int childOutlet = internal::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->tieInMeasuredDepth() );
-        buildLateralSegments( eclipseCase,
-                              childWellPath,
-                              mainGrid,
-                              childOutlet,
-                              completionType,
-                              exportDate,
-                              segmentNumber,
-                              branchNumber,
-                              unitSystem,
-                              lateralSegments );
+        auto childSegs        = buildLateralSegments( eclipseCase,
+                                               childWellPath,
+                                               mainGrid,
+                                               childOutlet,
+                                               completionType,
+                                               exportDate,
+                                               segmentNumber,
+                                               branchNumber,
+                                               unitSystem );
+        lateralSegments.insert( lateralSegments.end(), std::make_move_iterator( childSegs.begin() ), std::make_move_iterator( childSegs.end() ) );
     }
 
     RigMswFlatExportData result;
