@@ -994,8 +994,9 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
 /// This replaces the recursive tree-based collection functions (collectWelsegsData etc.) with
 /// simple iteration over RigMswSegment objects.
 //--------------------------------------------------------------------------------------------------
-void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData )
+RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem )
 {
+    RigMswTableData tableData( exportData.header.well, unitSystem );
     tableData.setWelsegsHeader( exportData.header );
 
     for ( const auto& seg : exportData.segments )
@@ -1040,6 +1041,7 @@ void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExport
         // Also store the segment in the flat list on tableData
         tableData.addMswSegment( seg );
     }
+    return tableData;
 }
 
 } // namespace RicWellPathExportMswGeometryPath

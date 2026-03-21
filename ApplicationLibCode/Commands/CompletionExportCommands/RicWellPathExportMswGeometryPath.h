@@ -21,6 +21,7 @@
 #include "RicWellPathExportMswTableData.h"
 
 #include "CompletionsMsw/RigMswSegment.h"
+#include "CompletionsMsw/RigMswTableData.h"
 
 #include <optional>
 #include <vector>
@@ -30,7 +31,6 @@
 class RimEclipseCase;
 class RimWellPath;
 class RigMainGrid;
-class RigMswTableData;
 
 //--------------------------------------------------------------------------------------------------
 /// Free functions that implement the direct geometry path for MSW export.
@@ -57,6 +57,6 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                            RicWellPathExportMswTableData::CompletionType completionType,
                                            const std::optional<QDateTime>&               exportDate );
 
-void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData );
+RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
 
 } // namespace RicWellPathExportMswGeometryPath

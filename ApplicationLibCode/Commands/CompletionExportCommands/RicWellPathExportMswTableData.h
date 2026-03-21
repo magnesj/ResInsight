@@ -70,6 +70,19 @@ public:
                                                                                  CompletionType completionType = CompletionType::ALL,
                                                                                  const std::optional<QDateTime>& exportDate = std::nullopt );
 
+    static std::expected<RigMswTableData, std::string> extractSingleWellMswDataTree( RimEclipseCase* eclipseCase,
+                                                                                     RimWellPath*    wellPath,
+                                                                                     bool exportCompletionsAfterMainBoreSegments = true,
+                                                                                     CompletionType completionType = CompletionType::ALL,
+                                                                                     const std::optional<QDateTime>& exportDate = std::nullopt );
+
+    static std::expected<RigMswTableData, std::string>
+        extractSingleWellMswDataFlatList( RimEclipseCase*                 eclipseCase,
+                                          RimWellPath*                    wellPath,
+                                          bool                            exportCompletionsAfterMainBoreSegments = true,
+                                          CompletionType                  completionType                         = CompletionType::ALL,
+                                          const std::optional<QDateTime>& exportDate                             = std::nullopt );
+
     static CompletionType convertFromExportSettings( const class RicExportCompletionDataSettingsUi& settings );
 
     static void generateFishbonesMswExportInfoForWell( const RimEclipseCase* eclipseCase,
