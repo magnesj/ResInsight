@@ -20,6 +20,8 @@
 
 #include "RicWellPathExportMswTableData.h"
 
+#include "CompletionsMsw/RigMswTableData.h"
+
 #include "RiaLogging.h"
 
 #include "RicExportFractureCompletionsImpl.h"
@@ -999,6 +1001,59 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                             std::make_move_iterator( lateralSegments.begin() ),
                             std::make_move_iterator( lateralSegments.end() ) );
     return result;
+}
+
+//--------------------------------------------------------------------------------------------------
+/// Populate RigMswTableData from a pre-built flat segment list.
+/// This replaces the recursive tree-based collection functions (collectWelsegsData etc.) with
+/// simple iteration over RigMswSegment objects.
+//--------------------------------------------------------------------------------------------------
+void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData )
+{
+    tableData.setWelsegsHeader( exportData.header );
+
+    for ( const auto& seg : exportData.segments )
+    {
+        // WELSEGS row
+        WelsegsRow welsegsRow;
+        welsegsRow.segment1       = seg.segmentNumber;
+        welsegsRow.segment2       = seg.segmentNumber;
+        welsegsRow.branch         = seg.branchNumber;
+        welsegsRow.joinSegment    = seg.outletSegmentNumber;
+        welsegsRow.length         = seg.length;
+        welsegsRow.depth          = seg.depth;
+        welsegsRow.diameter       = seg.diameter;
+        welsegsRow.roughness      = seg.roughness;
+        welsegsRow.description    = seg.description;
+        welsegsRow.sourceWellName = seg.sourceWellName;
+        tableData.addWelsegsRow( welsegsRow );
+
+        // COMPSEGS rows
+        for ( const auto& inter : seg.intersections )
+        {
+            CompsegsRow compRow;
+            compRow.i             = inter.i;
+            compRow.j             = inter.j;
+            compRow.k             = inter.k;
+            compRow.branch        = seg.branchNumber;
+            compRow.distanceStart = inter.distanceStart;
+            compRow.distanceEnd   = inter.distanceEnd;
+            compRow.gridName      = inter.gridName;
+            tableData.addCompsegsRow( compRow );
+        }
+
+        // WSEGVALV row
+        if ( seg.wsegvalvData ) tableData.addWsegvalvRow( *seg.wsegvalvData );
+
+        // WSEGAICD row
+        if ( seg.wsegaicdData ) tableData.addWsegaicdRow( *seg.wsegaicdData );
+
+        // WSEGSICD row
+        if ( seg.wsegsicdData ) tableData.addWsegsicdRow( *seg.wsegsicdData );
+
+        // Also store the segment in the flat list on tableData
+        tableData.addMswSegment( seg );
+    }
 }
 
 } // namespace RicWellPathExportMswGeometryPath
