@@ -273,7 +273,7 @@ std::expected<RigMswTableData, std::string> RicWellPathExportMswTableData::extra
 
     auto            unitSystem = eclipseCase->eclipseCaseData()->unitsType();
     RigMswTableData tableData( wellPath->completionSettings()->wellNameForExport().toStdString(), unitSystem );
-    RicMswTableDataTools::collectDataFromFlatList( tableData, *flatData );
+    RicWellPathExportMswGeometryPath::collectDataFromFlatList( tableData, *flatData );
 
     return tableData;
 }

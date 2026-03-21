@@ -108,11 +108,7 @@ public:
     std::array<double, SICD_NUM_PARAMS> m_values;
 };
 
-// Simple flat-list collection: iterate RigMswSegment list instead of traversing the tree.
-// These replace the recursive tree-based collection functions.
-void collectDataFromFlatList( RigMswTableData& tableData, const RigMswFlatExportData& exportData );
-
-// Deprecated: tree-based collection functions — use buildFlatMswSegments() + collectDataFromFlatList() instead.
+// Deprecated: tree-based collection functions — use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead.
 [[deprecated( "Use RicWellPathExportMswTableData::buildFlatMswSegments() instead" )]]
 void collectWelsegsData( RigMswTableData&                              tableData,
                          RicMswExportInfo&                             exportInfo,
@@ -132,13 +128,13 @@ void collectWelsegsDataRecursively( RigMswTableData&                            
                                     RicMswSegment*                                connectedToSegment,
                                     const std::optional<QDateTime>&               exportDate = std::nullopt );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectCompsegData( RigMswTableData&                tableData,
                          RicMswExportInfo&               exportInfo,
                          bool                            exportSubGridIntersections,
                          const std::optional<QDateTime>& exportDate = std::nullopt );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectCompsegDataByType( RigMswTableData&                                   tableData,
                                RicMswExportInfo&                                  exportInfo,
                                gsl::not_null<const RicMswBranch*>                 branch,
@@ -147,21 +143,21 @@ void collectCompsegDataByType( RigMswTableData&                                 
                                gsl::not_null<std::set<size_t>*>                   intersectedCells,
                                const std::optional<QDateTime>&                    exportDate = std::nullopt );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectWsegvalvData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, const std::optional<QDateTime>& exportDate = std::nullopt );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectStandaloneWsegvalvDataRecursively( RigMswTableData& tableData, RicMswBranch* branch, std::string wellName );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectWsegvalvDataRecursively( RigMswTableData&                tableData,
                                      gsl::not_null<RicMswBranch*>    branch,
                                      const std::string&              wellNameForExport,
                                      const std::optional<QDateTime>& exportDate = std::nullopt );
 
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectWsegAicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, const std::optional<QDateTime>& exportDate = std::nullopt );
-[[deprecated( "Use collectDataFromFlatList() instead" )]]
+[[deprecated( "Use RicWellPathExportMswGeometryPath::collectDataFromFlatList() instead" )]]
 void collectWsegSicdData( RigMswTableData& tableData, RicMswExportInfo& exportInfo, const std::optional<QDateTime>& exportDate = std::nullopt );
 
 // Helper functions for data collection
