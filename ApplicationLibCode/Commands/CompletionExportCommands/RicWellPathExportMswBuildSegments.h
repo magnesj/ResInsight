@@ -59,10 +59,8 @@ struct CellSegmentEntry
 /// Convert a WellPathCellIntersectionInfo global-cell index to a RigMswCellIntersection (1-based i,j,k).
 /// Returns std::nullopt for gap-segments (globCellIndex >= totalCellCount).
 //--------------------------------------------------------------------------------------------------
-std::optional<RigMswCellIntersection> toMswCellIntersection( const WellPathCellIntersectionInfo& cellInfo,
-                                                              const RigMainGrid*                  mainGrid,
-                                                              double                              distanceStart,
-                                                              double                              distanceEnd );
+std::optional<RigMswCellIntersection>
+    toMswCellIntersection( const WellPathCellIntersectionInfo& cellInfo, const RigMainGrid* mainGrid, double distanceStart, double distanceEnd );
 
 //--------------------------------------------------------------------------------------------------
 /// Find the main-bore outlet segment number for a given measured depth.
@@ -76,9 +74,9 @@ int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, dou
 /// For each grid-cell intersection overlapping a bare perforation (no active valve) a COMPSEGS
 /// entry is embedded.  Optionally fills cellSegMap for later valve outlet-segment lookups.
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswSegment> buildMainBoreSegmentsFromGeometry( const RimWellPath*                               wellPath,
-                                                              const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
-                                                              const RigMainGrid*                               mainGrid,
+std::vector<RigMswSegment> buildMainBoreSegmentsFromGeometry( const RimWellPath*                                wellPath,
+                                                              const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
+                                                              const RigMainGrid*                                mainGrid,
                                                               const std::vector<const RimPerforationInterval*>& perforationIntervals,
                                                               const std::set<const RimPerforationInterval*>&    valvedIntervals,
                                                               const std::string&                                infoType,

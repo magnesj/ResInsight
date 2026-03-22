@@ -301,8 +301,7 @@ TEST( RicWellPathExportMswGeometryPath, MultipleSegments )
     exportData.header = makeHeader();
 
     RigMswSegment seg1 = makeSegment( 2, 1, 1 );
-    seg1.intersections = { RigMswCellIntersection{ 1, 1, 1, 0.0, 10.0, "" },
-                           RigMswCellIntersection{ 1, 1, 2, 10.0, 20.0, "" } };
+    seg1.intersections = { RigMswCellIntersection{ 1, 1, 1, 0.0, 10.0, "" }, RigMswCellIntersection{ 1, 1, 2, 10.0, 20.0, "" } };
 
     RigMswSegment seg2 = makeSegment( 3, 1, 2 );
     seg2.intersections = { RigMswCellIntersection{ 2, 1, 2, 20.0, 30.0, "" } };
@@ -373,9 +372,8 @@ TEST( RicWellPathExportMswGeometryPath, CompsegsInheritsBranchFromSegment )
     RigMswFlatExportData exportData;
     exportData.header = makeHeader();
 
-    RigMswSegment seg  = makeSegment( 3, 7, 2 ); // branch = 7
-    seg.intersections  = { RigMswCellIntersection{ 1, 2, 3, 10.0, 20.0, "" },
-                           RigMswCellIntersection{ 1, 2, 4, 20.0, 30.0, "" } };
+    RigMswSegment seg   = makeSegment( 3, 7, 2 ); // branch = 7
+    seg.intersections   = { RigMswCellIntersection{ 1, 2, 3, 10.0, 20.0, "" }, RigMswCellIntersection{ 1, 2, 4, 20.0, 30.0, "" } };
     exportData.segments = { seg };
 
     auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );

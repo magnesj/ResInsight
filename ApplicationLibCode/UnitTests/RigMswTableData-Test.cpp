@@ -213,8 +213,7 @@ TEST( RigMswTableData, ValidationErrors_EmptyWellName )
 
     auto errors = td.validationErrors();
     EXPECT_FALSE( errors.empty() );
-    bool foundWellNameError =
-        std::any_of( errors.begin(), errors.end(), []( const QString& e ) { return e.contains( "Well name" ); } );
+    bool foundWellNameError = std::any_of( errors.begin(), errors.end(), []( const QString& e ) { return e.contains( "Well name" ); } );
     EXPECT_TRUE( foundWellNameError );
     EXPECT_FALSE( td.isValid() );
 }
@@ -225,8 +224,7 @@ TEST( RigMswTableData, ValidationErrors_NoWelsegsRows )
 
     auto errors = td.validationErrors();
     EXPECT_FALSE( errors.empty() );
-    bool foundWelsegsError =
-        std::any_of( errors.begin(), errors.end(), []( const QString& e ) { return e.contains( "WELSEGS" ); } );
+    bool foundWelsegsError = std::any_of( errors.begin(), errors.end(), []( const QString& e ) { return e.contains( "WELSEGS" ); } );
     EXPECT_TRUE( foundWelsegsError );
     EXPECT_FALSE( td.isValid() );
 }

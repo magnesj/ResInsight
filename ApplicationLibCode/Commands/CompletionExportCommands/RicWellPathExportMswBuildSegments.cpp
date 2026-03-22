@@ -49,10 +49,8 @@ namespace RicWellPathExportMswBuildSegments
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::optional<RigMswCellIntersection> toMswCellIntersection( const WellPathCellIntersectionInfo& cellInfo,
-                                                              const RigMainGrid*                  mainGrid,
-                                                              double                              distanceStart,
-                                                              double                              distanceEnd )
+std::optional<RigMswCellIntersection>
+    toMswCellIntersection( const WellPathCellIntersectionInfo& cellInfo, const RigMainGrid* mainGrid, double distanceStart, double distanceEnd )
 {
     if ( cellInfo.globCellIndex >= mainGrid->totalCellCount() ) return std::nullopt;
 
@@ -88,9 +86,9 @@ int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, dou
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswSegment> buildMainBoreSegmentsFromGeometry( const RimWellPath*                               wellPath,
-                                                              const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
-                                                              const RigMainGrid*                               mainGrid,
+std::vector<RigMswSegment> buildMainBoreSegmentsFromGeometry( const RimWellPath*                                wellPath,
+                                                              const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
+                                                              const RigMainGrid*                                mainGrid,
                                                               const std::vector<const RimPerforationInterval*>& perforationIntervals,
                                                               const std::set<const RimPerforationInterval*>&    valvedIntervals,
                                                               const std::string&                                infoType,
