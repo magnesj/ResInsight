@@ -119,10 +119,10 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
             continue;
         }
 
-        ASSERT_TRUE( treeResult.has_value() )
-            << "Tree mode failed for well '" << wellPath->name().toStdString() << "': " << treeResult.error();
-        ASSERT_TRUE( flatResult.has_value() )
-            << "FlatList mode failed for well '" << wellPath->name().toStdString() << "': " << flatResult.error();
+        ASSERT_TRUE( treeResult.has_value() ) << "Tree mode failed for well '" << wellPath->name().toStdString()
+                                              << "': " << treeResult.error();
+        ASSERT_TRUE( flatResult.has_value() ) << "FlatList mode failed for well '" << wellPath->name().toStdString()
+                                              << "': " << flatResult.error();
 
         const std::string wellName = treeResult->wellName();
 
@@ -152,13 +152,13 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
 }
 
 INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
-                           MswTreeVsFlatListTest,
-                           testing::Values( "base.rsp",
-                                            "fishbones.rsp",
-                                            "fracture.rsp",
-                                            "perf_aicd.rsp",
-                                            "perf_valve.rsp",
-                                            "perf_lateral.rsp",
-                                            "perf-lgr.rsp",
-                                            "perf-lgr-two-wells.rsp",
-                                            "two_wells.rsp" ) );
+                          MswTreeVsFlatListTest,
+                          testing::Values( "base.rsp",
+                                           "fishbones.rsp",
+                                           "fracture.rsp",
+                                           "perf_aicd.rsp",
+                                           "perf_valve.rsp",
+                                           "perf_lateral.rsp",
+                                           "perf-lgr.rsp",
+                                           "perf-lgr-two-wells.rsp",
+                                           "two_wells.rsp" ) );
