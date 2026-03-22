@@ -134,6 +134,7 @@ set(SOURCE_UNITTEST_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaConnectorTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWellTargetMappingTools-Test.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RicWellPathExportMswGeometryPath-Test.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RicWellPathExportMswBuildSegments-Test.cpp
 )
 
 if(RESINSIGHT_ENABLE_GRPC)
