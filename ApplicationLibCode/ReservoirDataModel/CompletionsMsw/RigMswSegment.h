@@ -42,12 +42,12 @@ struct RigMswCellIntersection
 /// Primary building block for the MSW export.
 /// Each RigMswSegment corresponds to exactly one row in the WELSEGS table.
 /// Cell intersections (COMPSEGS/COMPSEGL) and optional valve data are embedded.
+/// The branch number lives on the containing RigMswBranchExportData, not here.
 //==================================================================================================
 struct RigMswSegment
 {
     // WELSEGS fields
     int    segmentNumber;        // ISEG1 / ISEG2
-    int    branchNumber;         // IBRANCH
     int    outletSegmentNumber;  // ISEG3 (parent/outlet segment)
 
     double                length;    // LENGTH (incremental or absolute MD)
@@ -69,14 +69,27 @@ struct RigMswSegment
 
 
 //==================================================================================================
-/// Result of buildFlatMswSegments(): the complete, pre-computed MSW export data for one well.
+/// One branch in the MSW export.
+/// All segments share the same IBRANCH number, which is stored here rather than per-segment.
+/// An optional tie-in valve segment (ICV) may appear at the start of lateral branches.
+//==================================================================================================
+struct RigMswBranchExportData
+{
+    int                          branchNumber;  // IBRANCH for all segments in this branch
+    std::optional<RigMswSegment> tieInValve;    // Optional ICV at the tie-in point (laterals only)
+    std::vector<RigMswSegment>   segments;      // Segments of this branch
+};
+
+
+//==================================================================================================
+/// Result of buildMswFromGeometry(): the complete, pre-computed MSW export data for one well.
 /// Contains all information needed to write WELSEGS, COMPSEGS, and valve tables without
 /// any further tree traversal.
 //==================================================================================================
 struct RigMswFlatExportData
 {
-    WelsegsHeader              header;    // WELSEGS well-level header
-    std::vector<RigMswSegment> segments;  // One entry per WELSEGS row
+    WelsegsHeader                       header;    // WELSEGS well-level header
+    std::vector<RigMswBranchExportData> branches;  // One entry per branch
 };
 
 // clang-format on

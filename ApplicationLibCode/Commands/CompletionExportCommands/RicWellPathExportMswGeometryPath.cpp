@@ -42,18 +42,18 @@ using CompletionType = RicWellPathExportMswTableData::CompletionType;
 /// Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
 /// and any of its own child laterals.
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                 eclipseCase,
-                                                 const RimWellPath*              wellPath,
-                                                 const RigMainGrid*              mainGrid,
-                                                 int                             outletSegNum,
-                                                 CompletionType                  completionType,
-                                                 const std::optional<QDateTime>& exportDate,
-                                                 int&                            segmentNumber,
-                                                 int&                            branchNumber,
-                                                 RiaDefines::EclipseUnitSystem   unitSystem )
+std::vector<RigMswBranchExportData> buildLateralSegments( RimEclipseCase*                 eclipseCase,
+                                                          const RimWellPath*              wellPath,
+                                                          const RigMainGrid*              mainGrid,
+                                                          int                             outletSegNum,
+                                                          CompletionType                  completionType,
+                                                          const std::optional<QDateTime>& exportDate,
+                                                          int&                            segmentNumber,
+                                                          int&                            branchNumber,
+                                                          RiaDefines::EclipseUnitSystem   unitSystem )
 {
-    std::vector<RigMswSegment> result;
-    auto                       mswParameters = wellPath->mswCompletionParameters();
+    std::vector<RigMswBranchExportData> result;
+    auto                                mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters ) return result;
 
     const std::string infoType          = mswParameters->lengthAndDepth().text().toStdString();
@@ -61,10 +61,12 @@ std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                
     const double      tieInTVD          = -wellPath->wellPathGeometry()->interpolatedPointAlongWellPath( tieInMD ).z();
     const std::string wellNameForExport = wellPath->completionSettings()->wellNameForExport().toStdString();
 
-    int childOutletSeg = outletSegNum;
+    const int lateralBranchNum = ++branchNumber;
+    int       childOutletSeg   = outletSegNum;
 
-    // Optional ICV valve at the tie-in point
-    const RimWellPathValve* outletValve = wellPath->wellPathTieIn()->outletValve();
+    // Optional ICV valve at the tie-in point — stored on the branch, not as a separate branch
+    std::optional<RigMswSegment> tieInValve;
+    const RimWellPathValve*      outletValve = wellPath->wellPathTieIn()->outletValve();
     if ( outletValve && outletValve->isChecked() )
     {
         const bool isActive = !exportDate.has_value() || outletValve->isActiveOnDate( *exportDate );
@@ -90,11 +92,9 @@ std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                
             }
 
             const int valveSegNum = segmentNumber++;
-            const int valveBranch = ++branchNumber;
 
             RigMswSegment valveSeg;
             valveSeg.segmentNumber       = valveSegNum;
-            valveSeg.branchNumber        = valveBranch;
             valveSeg.outletSegmentNumber = outletSegNum;
             valveSeg.length              = length;
             valveSeg.depth               = depth;
@@ -112,7 +112,7 @@ std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                
             wv.description        = valveSeg.description;
             valveSeg.wsegvalvData = wv;
 
-            result.push_back( std::move( valveSeg ) );
+            tieInValve     = std::move( valveSeg );
             childOutletSeg = valveSegNum;
         }
     }
@@ -145,66 +145,66 @@ std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                
     }
 
     std::vector<RicWellPathExportMswBuildSegments::CellSegmentEntry> childCellSegMap;
-    const int                                                        childBoreNum = ++branchNumber;
 
-    auto mainBoreSegs = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
-                                                                                              filteredIntersections,
-                                                                                              mainGrid,
-                                                                                              perforationIntervals,
-                                                                                              valvedIntervals,
-                                                                                              infoType,
-                                                                                              tieInMD,
-                                                                                              tieInTVD,
-                                                                                              childBoreNum,
-                                                                                              segmentNumber,
-                                                                                              childOutletSeg,
-                                                                                              mswParameters->maxSegmentLength(),
-                                                                                              {},
-                                                                                              exportDate,
-                                                                                              unitSystem,
-                                                                                              &childCellSegMap );
-    result.insert( result.end(), std::make_move_iterator( mainBoreSegs.begin() ), std::make_move_iterator( mainBoreSegs.end() ) );
+    auto lateralBranch       = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
+                                                                                               filteredIntersections,
+                                                                                               mainGrid,
+                                                                                               perforationIntervals,
+                                                                                               valvedIntervals,
+                                                                                               infoType,
+                                                                                               tieInMD,
+                                                                                               tieInTVD,
+                                                                                               lateralBranchNum,
+                                                                                               segmentNumber,
+                                                                                               childOutletSeg,
+                                                                                               mswParameters->maxSegmentLength(),
+                                                                                                     {},
+                                                                                               exportDate,
+                                                                                               unitSystem,
+                                                                                               &childCellSegMap );
+    lateralBranch.tieInValve = std::move( tieInValve );
+    result.push_back( std::move( lateralBranch ) );
 
-    auto valveSegs = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
-                                                                                        filteredIntersections,
-                                                                                        mainGrid,
-                                                                                        perforationIntervals,
-                                                                                        childCellSegMap,
-                                                                                        infoType,
-                                                                                        wellNameForExport,
-                                                                                        segmentNumber,
-                                                                                        branchNumber,
-                                                                                        mswParameters->maxSegmentLength(),
-                                                                                        {},
-                                                                                        exportDate,
-                                                                                        unitSystem );
-    result.insert( result.end(), std::make_move_iterator( valveSegs.begin() ), std::make_move_iterator( valveSegs.end() ) );
+    auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
+                                                                                            filteredIntersections,
+                                                                                            mainGrid,
+                                                                                            perforationIntervals,
+                                                                                            childCellSegMap,
+                                                                                            infoType,
+                                                                                            wellNameForExport,
+                                                                                            segmentNumber,
+                                                                                            branchNumber,
+                                                                                            mswParameters->maxSegmentLength(),
+                                                                                            {},
+                                                                                            exportDate,
+                                                                                            unitSystem );
+    result.insert( result.end(), std::make_move_iterator( valveBranches.begin() ), std::make_move_iterator( valveBranches.end() ) );
 
     if ( ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES )
     {
-        auto fracSegs = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
-                                                                                              wellPath,
-                                                                                              mainGrid,
-                                                                                              childCellSegMap,
-                                                                                              infoType,
-                                                                                              segmentNumber,
-                                                                                              branchNumber );
-        result.insert( result.end(), std::make_move_iterator( fracSegs.begin() ), std::make_move_iterator( fracSegs.end() ) );
+        auto fracBranches = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
+                                                                                                  wellPath,
+                                                                                                  mainGrid,
+                                                                                                  childCellSegMap,
+                                                                                                  infoType,
+                                                                                                  segmentNumber,
+                                                                                                  branchNumber );
+        result.insert( result.end(), std::make_move_iterator( fracBranches.begin() ), std::make_move_iterator( fracBranches.end() ) );
     }
 
     if ( ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES )
     {
-        auto fishSegs = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
-                                                                                               wellPath,
-                                                                                               mainGrid,
-                                                                                               filteredIntersections,
-                                                                                               childCellSegMap,
-                                                                                               infoType,
-                                                                                               wellNameForExport,
-                                                                                               segmentNumber,
-                                                                                               branchNumber,
-                                                                                               unitSystem );
-        result.insert( result.end(), std::make_move_iterator( fishSegs.begin() ), std::make_move_iterator( fishSegs.end() ) );
+        auto fishBranches = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
+                                                                                                   wellPath,
+                                                                                                   mainGrid,
+                                                                                                   filteredIntersections,
+                                                                                                   childCellSegMap,
+                                                                                                   infoType,
+                                                                                                   wellNameForExport,
+                                                                                                   segmentNumber,
+                                                                                                   branchNumber,
+                                                                                                   unitSystem );
+        result.insert( result.end(), std::make_move_iterator( fishBranches.begin() ), std::make_move_iterator( fishBranches.end() ) );
     }
 
     // Recurse into grandchildren
@@ -212,9 +212,9 @@ std::vector<RigMswSegment> buildLateralSegments( RimEclipseCase*                
     {
         const int grandchildOutlet =
             RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->tieInMeasuredDepth() );
-        auto grandchildSegs =
+        auto grandchildBranches =
             buildLateralSegments( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
-        result.insert( result.end(), std::make_move_iterator( grandchildSegs.begin() ), std::make_move_iterator( grandchildSegs.end() ) );
+        result.insert( result.end(), std::make_move_iterator( grandchildBranches.begin() ), std::make_move_iterator( grandchildBranches.end() ) );
     }
 
     return result;
@@ -280,29 +280,29 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
     }
 
     int                                                              segmentNumber = 2; // Segment 1 is the implicit well heel.
-    int                                                              branchNumber  = 1; // Incremented for each valve branch.
+    int                                                              branchNumber  = 1; // Incremented for each new branch.
     std::vector<RicWellPathExportMswBuildSegments::CellSegmentEntry> cellSegMap;
 
-    auto mainBoreSegments = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
-                                                                                                  filteredIntersections,
-                                                                                                  mainGrid,
-                                                                                                  perforationIntervals,
-                                                                                                  valvedIntervals,
-                                                                                                  infoType,
-                                                                                                  initialMD,
-                                                                                                  initialTVD,
-                                                                                                  branchNumber,
-                                                                                                  segmentNumber,
-                                                                                                  1, // outlet = heel (segment 1)
-                                                                                                  maxSegmentLength,
-                                                                                                  customSegmentIntervals,
-                                                                                                  exportDate,
-                                                                                                  unitSystem,
-                                                                                                  &cellSegMap );
+    auto mainBoreBranch = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
+                                                                                                filteredIntersections,
+                                                                                                mainGrid,
+                                                                                                perforationIntervals,
+                                                                                                valvedIntervals,
+                                                                                                infoType,
+                                                                                                initialMD,
+                                                                                                initialTVD,
+                                                                                                branchNumber,
+                                                                                                segmentNumber,
+                                                                                                1, // outlet = heel (segment 1)
+                                                                                                maxSegmentLength,
+                                                                                                customSegmentIntervals,
+                                                                                                exportDate,
+                                                                                                unitSystem,
+                                                                                                &cellSegMap );
 
     const std::string wellNameForExport = wellPath->completionSettings()->wellNameForExport().toStdString();
 
-    auto valveSegments = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
+    auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
                                                                                             filteredIntersections,
                                                                                             mainGrid,
                                                                                             perforationIntervals,
@@ -316,11 +316,11 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                                                                             exportDate,
                                                                                             unitSystem );
 
-    const bool                 includeFractures = ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES;
-    std::vector<RigMswSegment> fractureSegments;
+    const bool                          includeFractures = ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES;
+    std::vector<RigMswBranchExportData> fractureBranches;
     if ( includeFractures )
     {
-        fractureSegments = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
+        fractureBranches = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
                                                                                                  wellPath,
                                                                                                  mainGrid,
                                                                                                  cellSegMap,
@@ -329,11 +329,11 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                                                                                  branchNumber );
     }
 
-    const bool                 includeFishbones = ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES;
-    std::vector<RigMswSegment> fishbonesSegments;
+    const bool                          includeFishbones = ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES;
+    std::vector<RigMswBranchExportData> fishbonesBranches;
     if ( includeFishbones )
     {
-        fishbonesSegments = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
+        fishbonesBranches = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
                                                                                                    wellPath,
                                                                                                    mainGrid,
                                                                                                    filteredIntersections,
@@ -346,31 +346,33 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
     }
 
     // Tie-in child laterals (recursive)
-    std::vector<RigMswSegment> lateralSegments;
+    std::vector<RigMswBranchExportData> lateralBranches;
     for ( auto* childWellPath : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int childOutlet =
             RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->tieInMeasuredDepth() );
-        auto childSegs =
+        auto childBranches =
             buildLateralSegments( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
-        lateralSegments.insert( lateralSegments.end(), std::make_move_iterator( childSegs.begin() ), std::make_move_iterator( childSegs.end() ) );
+        lateralBranches.insert( lateralBranches.end(),
+                                std::make_move_iterator( childBranches.begin() ),
+                                std::make_move_iterator( childBranches.end() ) );
     }
 
     RigMswFlatExportData result;
-    result.header   = header;
-    result.segments = std::move( mainBoreSegments );
-    result.segments.insert( result.segments.end(),
-                            std::make_move_iterator( valveSegments.begin() ),
-                            std::make_move_iterator( valveSegments.end() ) );
-    result.segments.insert( result.segments.end(),
-                            std::make_move_iterator( fractureSegments.begin() ),
-                            std::make_move_iterator( fractureSegments.end() ) );
-    result.segments.insert( result.segments.end(),
-                            std::make_move_iterator( fishbonesSegments.begin() ),
-                            std::make_move_iterator( fishbonesSegments.end() ) );
-    result.segments.insert( result.segments.end(),
-                            std::make_move_iterator( lateralSegments.begin() ),
-                            std::make_move_iterator( lateralSegments.end() ) );
+    result.header = header;
+    result.branches.push_back( std::move( mainBoreBranch ) );
+    result.branches.insert( result.branches.end(),
+                            std::make_move_iterator( valveBranches.begin() ),
+                            std::make_move_iterator( valveBranches.end() ) );
+    result.branches.insert( result.branches.end(),
+                            std::make_move_iterator( fractureBranches.begin() ),
+                            std::make_move_iterator( fractureBranches.end() ) );
+    result.branches.insert( result.branches.end(),
+                            std::make_move_iterator( fishbonesBranches.begin() ),
+                            std::make_move_iterator( fishbonesBranches.end() ) );
+    result.branches.insert( result.branches.end(),
+                            std::make_move_iterator( lateralBranches.begin() ),
+                            std::make_move_iterator( lateralBranches.end() ) );
     return result;
 }
 
@@ -384,13 +386,13 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
     RigMswTableData tableData( exportData.header.well, unitSystem );
     tableData.setWelsegsHeader( exportData.header );
 
-    for ( const auto& seg : exportData.segments )
+    auto emitSegment = [&]( const RigMswBranchExportData& branch, const RigMswSegment& seg )
     {
         // WELSEGS row
         WelsegsRow welsegsRow;
         welsegsRow.segment1       = seg.segmentNumber;
         welsegsRow.segment2       = seg.segmentNumber;
-        welsegsRow.branch         = seg.branchNumber;
+        welsegsRow.branch         = branch.branchNumber;
         welsegsRow.joinSegment    = seg.outletSegmentNumber;
         welsegsRow.length         = seg.length;
         welsegsRow.depth          = seg.depth;
@@ -407,7 +409,7 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
             compRow.i             = inter.i;
             compRow.j             = inter.j;
             compRow.k             = inter.k;
-            compRow.branch        = seg.branchNumber;
+            compRow.branch        = branch.branchNumber;
             compRow.distanceStart = inter.distanceStart;
             compRow.distanceEnd   = inter.distanceEnd;
             compRow.gridName      = inter.gridName;
@@ -425,6 +427,13 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
 
         // Also store the segment in the flat list on tableData
         tableData.addMswSegment( seg );
+    };
+
+    for ( const auto& branch : exportData.branches )
+    {
+        if ( branch.tieInValve ) emitSegment( branch, *branch.tieInValve );
+        for ( const auto& seg : branch.segments )
+            emitSegment( branch, seg );
     }
     return tableData;
 }
