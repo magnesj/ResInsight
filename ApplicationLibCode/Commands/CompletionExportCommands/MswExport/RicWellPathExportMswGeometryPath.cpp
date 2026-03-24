@@ -19,7 +19,7 @@
 #include "RicWellPathExportMswGeometryPath.h"
 
 #include "RicMswTableDataTools.h"
-#include "RicWellPathExportMswBuildSegments.h"
+#include "RicMswBranchBuilder.h"
 #include "RicWellPathExportMswTableData.h"
 
 #include "CompletionsMsw/RigMswTableData.h"
@@ -150,9 +150,9 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
         }
     }
 
-    std::vector<RicWellPathExportMswBuildSegments::CellSegmentEntry> childCellSegMap;
+    std::vector<RicMswBranchBuilder::CellSegmentEntry> childCellSegMap;
 
-    auto lateralBranch       = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
+    auto lateralBranch       = RicMswBranchBuilder::buildMainBoreSegmentsFromGeometry( wellPath,
                                                                                                filteredIntersections,
                                                                                                mainGrid,
                                                                                                perforationIntervals,
@@ -177,7 +177,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
     {
         if ( exportDate.has_value() && !valve->isActiveOnDate( *exportDate ) ) continue;
 
-        const int segNum = RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, valve->startMD() );
+        const int segNum = RicMswBranchBuilder::findOutletSegmentForMD( childCellSegMap, valve->startMD() );
         for ( auto& seg : lateralBranch.segments )
         {
             if ( seg.segmentNumber == segNum )
@@ -197,7 +197,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     result.push_back( std::move( lateralBranch ) );
 
-    auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
+    auto valveBranches = RicMswBranchBuilder::buildValveSegmentsFromGeometry( wellPath,
                                                                                             filteredIntersections,
                                                                                             mainGrid,
                                                                                             perforationIntervals,
@@ -214,7 +214,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     if ( ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES )
     {
-        auto fracBranches = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
+        auto fracBranches = RicMswBranchBuilder::buildFractureSegmentsFromGeometry( eclipseCase,
                                                                                                   wellPath,
                                                                                                   mainGrid,
                                                                                                   childCellSegMap,
@@ -226,7 +226,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     if ( ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES )
     {
-        auto fishBranches = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
+        auto fishBranches = RicMswBranchBuilder::buildFishbonesSegmentsFromGeometry( eclipseCase,
                                                                                                    wellPath,
                                                                                                    mainGrid,
                                                                                                    filteredIntersections,
@@ -243,7 +243,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
     for ( auto* grandchild : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int grandchildOutlet =
-            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->branchValveMeasuredDepth() );
+            RicMswBranchBuilder::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->branchValveMeasuredDepth() );
         auto grandchildBranches =
             buildLateralBranches( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         result.insert( result.end(), std::make_move_iterator( grandchildBranches.begin() ), std::make_move_iterator( grandchildBranches.end() ) );
@@ -313,9 +313,9 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
 
     int                                                              segmentNumber = 2; // Segment 1 is the implicit well heel.
     int                                                              branchNumber  = 1; // Incremented for each new branch.
-    std::vector<RicWellPathExportMswBuildSegments::CellSegmentEntry> cellSegMap;
+    std::vector<RicMswBranchBuilder::CellSegmentEntry> cellSegMap;
 
-    auto mainBoreBranch = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
+    auto mainBoreBranch = RicMswBranchBuilder::buildMainBoreSegmentsFromGeometry( wellPath,
                                                                                                 filteredIntersections,
                                                                                                 mainGrid,
                                                                                                 perforationIntervals,
@@ -339,7 +339,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     {
         if ( exportDate.has_value() && !valve->isActiveOnDate( *exportDate ) ) continue;
 
-        const int segNum = RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, valve->startMD() );
+        const int segNum = RicMswBranchBuilder::findOutletSegmentForMD( cellSegMap, valve->startMD() );
         for ( auto& seg : mainBoreBranch.segments )
         {
             if ( seg.segmentNumber == segNum )
@@ -357,7 +357,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
         }
     }
 
-    auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
+    auto valveBranches = RicMswBranchBuilder::buildValveSegmentsFromGeometry( wellPath,
                                                                                             filteredIntersections,
                                                                                             mainGrid,
                                                                                             perforationIntervals,
@@ -375,7 +375,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     std::vector<RigMswBranch> fractureBranches;
     if ( includeFractures )
     {
-        fractureBranches = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
+        fractureBranches = RicMswBranchBuilder::buildFractureSegmentsFromGeometry( eclipseCase,
                                                                                                  wellPath,
                                                                                                  mainGrid,
                                                                                                  cellSegMap,
@@ -388,7 +388,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     std::vector<RigMswBranch> fishbonesBranches;
     if ( includeFishbones )
     {
-        fishbonesBranches = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
+        fishbonesBranches = RicMswBranchBuilder::buildFishbonesSegmentsFromGeometry( eclipseCase,
                                                                                                    wellPath,
                                                                                                    mainGrid,
                                                                                                    filteredIntersections,
@@ -405,7 +405,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     for ( auto* childWellPath : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int childOutlet =
-            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->branchValveMeasuredDepth() );
+            RicMswBranchBuilder::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->branchValveMeasuredDepth() );
         auto childBranches =
             buildLateralBranches( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         lateralBranches.insert( lateralBranches.end(),

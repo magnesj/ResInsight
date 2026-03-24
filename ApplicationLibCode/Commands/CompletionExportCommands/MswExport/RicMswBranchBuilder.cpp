@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RicWellPathExportMswBuildSegments.h"
+#include "RicMswBranchBuilder.h"
 
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswTableDataTools.h"
@@ -44,7 +44,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace RicWellPathExportMswBuildSegments
+namespace RicMswBranchBuilder
 {
 
 //--------------------------------------------------------------------------------------------------
@@ -845,4 +845,4 @@ std::vector<RigMswBranch> buildFishbonesSegmentsFromGeometry( const RimEclipseCa
     return result;
 }
 
-} // namespace RicWellPathExportMswBuildSegments
+} // namespace RicMswBranchBuilder

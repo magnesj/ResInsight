@@ -41,7 +41,7 @@ class RimPerforationInterval;
 /// Extracted from the former `internal` anonymous namespace in RicWellPathExportMswGeometryPath.cpp
 /// so that they can be called from other translation units and unit-tested in isolation.
 //--------------------------------------------------------------------------------------------------
-namespace RicWellPathExportMswBuildSegments
+namespace RicMswBranchBuilder
 {
 
 //--------------------------------------------------------------------------------------------------
@@ -134,4 +134,4 @@ std::vector<RigMswBranch> buildFishbonesSegmentsFromGeometry( const RimEclipseCa
                                                               int&                                             branchNumber,
                                                               RiaDefines::EclipseUnitSystem                    unitSystem );
 
-} // namespace RicWellPathExportMswBuildSegments
+} // namespace RicMswBranchBuilder

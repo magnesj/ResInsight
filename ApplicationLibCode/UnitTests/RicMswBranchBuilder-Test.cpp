@@ -18,13 +18,13 @@
 
 #include "gtest/gtest.h"
 
-#include "CompletionExportCommands/MswExport/RicWellPathExportMswBuildSegments.h"
+#include "CompletionExportCommands/MswExport/RicMswBranchBuilder.h"
 
 #include "RifReaderMockModel.h"
 #include "RigEclipseCaseData.h"
 #include "RigMainGrid.h"
 
-using namespace RicWellPathExportMswBuildSegments;
+using namespace RicMswBranchBuilder;
 
 //==================================================================================================
 // findOutletSegmentForMD tests
@@ -33,7 +33,7 @@ using namespace RicWellPathExportMswBuildSegments;
 //--------------------------------------------------------------------------------------------------
 /// Empty map returns 1 (heel segment).
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_EmptyMap )
+TEST( RicMswBranchBuilder, FindOutlet_EmptyMap )
 {
     std::vector<CellSegmentEntry> map;
     EXPECT_EQ( 1, findOutletSegmentForMD( map, 500.0 ) );
@@ -42,7 +42,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_EmptyMap )
 //--------------------------------------------------------------------------------------------------
 /// MD falls within the first cell's range.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInFirstCell )
+TEST( RicMswBranchBuilder, FindOutlet_MDInFirstCell )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 }, { 300.0, 400.0, 7 } };
     EXPECT_EQ( 5, findOutletSegmentForMD( map, 150.0 ) );
@@ -51,7 +51,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInFirstCell )
 //--------------------------------------------------------------------------------------------------
 /// MD falls within the middle cell's range.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInMiddleCell )
+TEST( RicMswBranchBuilder, FindOutlet_MDInMiddleCell )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 }, { 300.0, 400.0, 7 } };
     EXPECT_EQ( 6, findOutletSegmentForMD( map, 250.0 ) );
@@ -60,7 +60,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInMiddleCell )
 //--------------------------------------------------------------------------------------------------
 /// MD falls within the last cell's range.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInLastCell )
+TEST( RicMswBranchBuilder, FindOutlet_MDInLastCell )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 }, { 300.0, 400.0, 7 } };
     EXPECT_EQ( 7, findOutletSegmentForMD( map, 350.0 ) );
@@ -72,7 +72,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInLastCell )
 /// MD exactly at the shared boundary (200) — midpoint of first cell (150) is below 200,
 /// midpoint of second cell (250) is above 200; closest-below midpoint is 150 → seg 5.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellStart )
+TEST( RicMswBranchBuilder, FindOutlet_MDAtCellStart )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
     EXPECT_EQ( 5, findOutletSegmentForMD( map, 100.0 ) ); // shallower than midpoint 150 → first seg
@@ -83,7 +83,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellStart )
 /// MD=200 sits between midpoint 150 (seg 5) and midpoint 250 (seg 6).
 /// Closest midpoint at-or-below is 150 → seg 5.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellEnd_ExclusiveBoundary )
+TEST( RicMswBranchBuilder, FindOutlet_MDAtCellEnd_ExclusiveBoundary )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
     EXPECT_EQ( 5, findOutletSegmentForMD( map, 200.0 ) );
@@ -93,7 +93,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellEnd_ExclusiveBoundar
 /// MD before all segment midpoints — no midpoint is at or below md;
 /// fallback = first (shallowest) segment.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDBelowAllCells )
+TEST( RicMswBranchBuilder, FindOutlet_MDBelowAllCells )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
     EXPECT_EQ( 5, findOutletSegmentForMD( map, 50.0 ) ); // shallower than all midpoints → first seg
@@ -102,7 +102,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDBelowAllCells )
 //--------------------------------------------------------------------------------------------------
 /// MD beyond the last cell returns the last cell's segment number (fallback).
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDBeyondAllCells )
+TEST( RicMswBranchBuilder, FindOutlet_MDBeyondAllCells )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 }, { 300.0, 400.0, 7 } };
     EXPECT_EQ( 7, findOutletSegmentForMD( map, 999.0 ) );
@@ -111,7 +111,7 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDBeyondAllCells )
 //--------------------------------------------------------------------------------------------------
 /// Single-cell map.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, FindOutlet_SingleCell )
+TEST( RicMswBranchBuilder, FindOutlet_SingleCell )
 {
     std::vector<CellSegmentEntry> map = { { 0.0, 100.0, 3 } };
     EXPECT_EQ( 3, findOutletSegmentForMD( map, 50.0 ) );
@@ -154,7 +154,7 @@ WellPathCellIntersectionInfo makeCellInfo( size_t globCellIndex )
 //--------------------------------------------------------------------------------------------------
 /// A gap segment (globCellIndex >= totalCellCount) returns nullopt.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_GapSegmentReturnsNullopt )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_GapSegmentReturnsNullopt )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
@@ -170,7 +170,7 @@ TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_GapSegmentReturns
 //--------------------------------------------------------------------------------------------------
 /// Cell index 0 is (I=0,J=0,K=0) in 0-based → (1,1,1) in 1-based.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_CellZero_OneBasedIJK )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_CellZero_OneBasedIJK )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
@@ -185,7 +185,7 @@ TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_CellZero_OneBased
 //--------------------------------------------------------------------------------------------------
 /// Distance parameters are passed through unchanged.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_DistancesPassedThrough )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_DistancesPassedThrough )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
@@ -199,7 +199,7 @@ TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_DistancesPassedTh
 //--------------------------------------------------------------------------------------------------
 /// A main-grid cell has an empty gridName.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_MainGridHasEmptyGridName )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_MainGridHasEmptyGridName )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
@@ -215,7 +215,7 @@ TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_MainGridHasEmptyG
 /// Cell at (0,1,0) has globalIdx = 2 → (1,2,1) in 1-based.
 /// Cell at (0,0,2) has globalIdx = 8 → (1,1,3) in 1-based.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_IJKMapping )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_IJKMapping )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
@@ -245,7 +245,7 @@ TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_IJKMapping )
 //--------------------------------------------------------------------------------------------------
 /// Dual-porosity: K index is shifted up by cellCountK.
 //--------------------------------------------------------------------------------------------------
-TEST( RicWellPathExportMswBuildSegments, ToMswCellIntersection_DualPorosity_KShifted )
+TEST( RicMswBranchBuilder, ToMswCellIntersection_DualPorosity_KShifted )
 {
     auto         caseData = makeMockGrid();
     RigMainGrid* grid     = caseData->mainGrid();
