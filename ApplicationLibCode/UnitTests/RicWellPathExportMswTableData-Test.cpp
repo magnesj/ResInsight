@@ -218,4 +218,5 @@ INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                                            "perf_aicd.rsp",
                                            "fishbones.rsp",
                                            "multiple_laterals.rsp",
-                                           "tie-in-custom-valve-location.rsp" ) );
+                                           "tie-in-custom-valve-location.rsp",
+                                           "standalone-valve.rsp" ) );

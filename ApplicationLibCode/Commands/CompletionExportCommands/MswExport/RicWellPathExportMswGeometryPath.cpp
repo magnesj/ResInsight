@@ -32,6 +32,7 @@
 #include "RimPerforationCollection.h"
 #include "RimPerforationInterval.h"
 #include "RimWellPath.h"
+#include "RimValveCollection.h"
 #include "RimWellPathCompletionSettings.h"
 #include "RimWellPathTieIn.h"
 #include "RimWellPathValve.h"
@@ -170,6 +171,30 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
     if ( tieInValve && !lateralBranch.segments.empty() )
         lateralBranch.segments.front().description.clear();
     lateralBranch.tieInValve = std::move( tieInValve );
+
+    // Standalone valves (from valveCollection, not inside perforation intervals)
+    for ( const auto* valve : wellPath->valveCollection()->activeValves() )
+    {
+        if ( exportDate.has_value() && !valve->isActiveOnDate( *exportDate ) ) continue;
+
+        const int segNum = RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, valve->startMD() );
+        for ( auto& seg : lateralBranch.segments )
+        {
+            if ( seg.segmentNumber == segNum )
+            {
+                WsegvalvRow wv;
+                wv.well          = wellNameForExport;
+                wv.segmentNumber = segNum;
+                wv.cv            = valve->flowCoefficient();
+                wv.area          = valve->area( unitSystem );
+                wv.status        = valve->isOpen() ? "OPEN" : "SHUT";
+                wv.description   = valve->name().toStdString();
+                seg.wsegvalvData = wv;
+                break;
+            }
+        }
+    }
+
     result.push_back( std::move( lateralBranch ) );
 
     auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
@@ -308,6 +333,29 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
                                                                                                 &cellSegMap );
 
     const std::string wellNameForExport = wellPath->completionSettings()->wellNameForExport().toStdString();
+
+    // Standalone valves (from valveCollection, not inside perforation intervals)
+    for ( const auto* valve : wellPath->valveCollection()->activeValves() )
+    {
+        if ( exportDate.has_value() && !valve->isActiveOnDate( *exportDate ) ) continue;
+
+        const int segNum = RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, valve->startMD() );
+        for ( auto& seg : mainBoreBranch.segments )
+        {
+            if ( seg.segmentNumber == segNum )
+            {
+                WsegvalvRow wv;
+                wv.well          = wellNameForExport;
+                wv.segmentNumber = segNum;
+                wv.cv            = valve->flowCoefficient();
+                wv.area          = valve->area( unitSystem );
+                wv.status        = valve->isOpen() ? "OPEN" : "SHUT";
+                wv.description   = valve->name().toStdString();
+                seg.wsegvalvData = wv;
+                break;
+            }
+        }
+    }
 
     auto valveBranches = RicWellPathExportMswBuildSegments::buildValveSegmentsFromGeometry( wellPath,
                                                                                             filteredIntersections,
