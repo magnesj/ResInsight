@@ -215,7 +215,8 @@ target_include_directories(
   ResInsight-tests
   PUBLIC ${CMAKE_BINARY_DIR}/Generated
          "$<TARGET_PROPERTY:ApplicationLibCode,PUBLIC_INCLUDE_DIRECTORIES>"
-         ${RI_PRIVATE_INCLUDES} ${PROJECT_SOURCE_DIR}/Commands
+         ${RI_PRIVATE_INCLUDES}
+         ${PROJECT_SOURCE_DIR}/Commands
          ${PROJECT_SOURCE_DIR}/Commands/CompletionExportCommands
 )
 
