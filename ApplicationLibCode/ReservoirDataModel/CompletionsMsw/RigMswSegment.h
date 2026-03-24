@@ -32,17 +32,17 @@
 //==================================================================================================
 struct RigMswCellIntersection
 {
-    size_t      i, j, k;         // Grid cell IJK indices (1-based)
-    double      distanceStart;    // Distance from well heel to start of intersection [m or ft]
-    double      distanceEnd;      // Distance from well heel to end of intersection [m or ft]
-    std::string gridName;         // Empty for main grid; LGR name for sub-grids (COMPSEGL)
+    size_t      i, j, k;        // Grid cell IJK indices (1-based)
+    double      distanceStart;  // Distance from well heel to start of intersection [m or ft]
+    double      distanceEnd;    // Distance from well heel to end of intersection [m or ft]
+    std::string gridName;       // Empty for main grid; LGR name for sub-grids (COMPSEGL)
 };
 
 //==================================================================================================
 /// Primary building block for the MSW export.
 /// Each RigMswSegment corresponds to exactly one row in the WELSEGS table.
 /// Cell intersections (COMPSEGS/COMPSEGL) and optional valve data are embedded.
-/// The branch number lives on the containing RigMswBranchExportData, not here.
+/// The branch number lives on the containing RigMswBranch, not here.
 //==================================================================================================
 struct RigMswSegment
 {
@@ -73,7 +73,7 @@ struct RigMswSegment
 /// All segments share the same IBRANCH number, which is stored here rather than per-segment.
 /// An optional tie-in valve segment (ICV) may appear at the start of lateral branches.
 //==================================================================================================
-struct RigMswBranchExportData
+struct RigMswBranch
 {
     int                          branchNumber;  // IBRANCH for all segments in this branch
     std::optional<RigMswSegment> tieInValve;    // Optional ICV at the tie-in point (laterals only)
@@ -82,14 +82,14 @@ struct RigMswBranchExportData
 
 
 //==================================================================================================
-/// Result of buildMswFromGeometry(): the complete, pre-computed MSW export data for one well.
+/// Complete pre-computed MSW export data for one well.
 /// Contains all information needed to write WELSEGS, COMPSEGS, and valve tables without
 /// any further tree traversal.
 //==================================================================================================
-struct RigMswFlatExportData
+struct RigMswWellExportData
 {
-    WelsegsHeader                       header;    // WELSEGS well-level header
-    std::vector<RigMswBranchExportData> branches;  // One entry per branch
+    WelsegsHeader               header;    // WELSEGS well-level header
+    std::vector<RigMswBranch>   branches;  // One entry per branch
 };
 
 // clang-format on

@@ -79,8 +79,7 @@ double segmentMidpointMD( const std::vector<CellSegmentEntry>& cellSegMap, int s
 {
     for ( const auto& entry : cellSegMap )
     {
-        if ( entry.lastSubSegmentNumber == segmentNumber )
-            return 0.5 * ( entry.cellStartMD + entry.cellEndMD );
+        if ( entry.lastSubSegmentNumber == segmentNumber ) return 0.5 * ( entry.cellStartMD + entry.cellEndMD );
     }
     return 0.0;
 }
@@ -94,8 +93,7 @@ int findContainingSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap,
 
     for ( const auto& entry : cellSegMap )
     {
-        if ( md >= entry.cellStartMD && md < entry.cellEndMD )
-            return entry.lastSubSegmentNumber;
+        if ( md >= entry.cellStartMD && md < entry.cellEndMD ) return entry.lastSubSegmentNumber;
     }
 
     // Fallback: md is beyond all segments — return the last segment.
@@ -131,22 +129,22 @@ int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, dou
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigMswBranchExportData buildMainBoreSegmentsFromGeometry( const RimWellPath*                                wellPath,
-                                                          const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
-                                                          const RigMainGrid*                                mainGrid,
-                                                          const std::vector<const RimPerforationInterval*>& perforationIntervals,
-                                                          const std::set<const RimPerforationInterval*>&    valvedIntervals,
-                                                          const std::string&                                infoType,
-                                                          double                                            heelMD,
-                                                          double                                            heelTVD,
-                                                          int                                               branchNumber,
-                                                          int&                                              segmentNumber,
-                                                          int                                               outletSegmentNumber,
-                                                          double                                            maxSegmentLength,
-                                                          const std::vector<std::pair<double, double>>&     customSegmentIntervals,
-                                                          const std::optional<QDateTime>&                   exportDate,
-                                                          RiaDefines::EclipseUnitSystem                     unitSystem,
-                                                          std::vector<CellSegmentEntry>*                    cellSegMap )
+RigMswBranch buildMainBoreSegmentsFromGeometry( const RimWellPath*                                wellPath,
+                                                const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
+                                                const RigMainGrid*                                mainGrid,
+                                                const std::vector<const RimPerforationInterval*>& perforationIntervals,
+                                                const std::set<const RimPerforationInterval*>&    valvedIntervals,
+                                                const std::string&                                infoType,
+                                                double                                            heelMD,
+                                                double                                            heelTVD,
+                                                int                                               branchNumber,
+                                                int&                                              segmentNumber,
+                                                int                                               outletSegmentNumber,
+                                                double                                            maxSegmentLength,
+                                                const std::vector<std::pair<double, double>>&     customSegmentIntervals,
+                                                const std::optional<QDateTime>&                   exportDate,
+                                                RiaDefines::EclipseUnitSystem                     unitSystem,
+                                                std::vector<CellSegmentEntry>*                    cellSegMap )
 {
     std::vector<RigMswSegment> result;
 
@@ -251,27 +249,27 @@ RigMswBranchExportData buildMainBoreSegmentsFromGeometry( const RimWellPath*    
         }
     }
 
-    return RigMswBranchExportData{ branchNumber, std::nullopt, std::move( result ) };
+    return RigMswBranch{ branchNumber, std::nullopt, std::move( result ) };
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWellPath*                                wellPath,
-                                                                    const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
-                                                                    const RigMainGrid*                                mainGrid,
-                                                                    const std::vector<const RimPerforationInterval*>& perforationIntervals,
-                                                                    const std::vector<CellSegmentEntry>&              cellSegMap,
-                                                                    const std::string&                                infoType,
-                                                                    const std::string&                                wellNameForExport,
-                                                                    int&                                              segmentNumber,
-                                                                    int&                                              branchNumber,
-                                                                    double                                            maxSegmentLength,
-                                                                    const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                                                    const std::optional<QDateTime>&               exportDate,
-                                                                    RiaDefines::EclipseUnitSystem                 unitSystem )
+std::vector<RigMswBranch> buildValveSegmentsFromGeometry( const RimWellPath*                                wellPath,
+                                                          const std::vector<WellPathCellIntersectionInfo>&  filteredIntersections,
+                                                          const RigMainGrid*                                mainGrid,
+                                                          const std::vector<const RimPerforationInterval*>& perforationIntervals,
+                                                          const std::vector<CellSegmentEntry>&              cellSegMap,
+                                                          const std::string&                                infoType,
+                                                          const std::string&                                wellNameForExport,
+                                                          int&                                              segmentNumber,
+                                                          int&                                              branchNumber,
+                                                          double                                            maxSegmentLength,
+                                                          const std::vector<std::pair<double, double>>&     customSegmentIntervals,
+                                                          const std::optional<QDateTime>&                   exportDate,
+                                                          RiaDefines::EclipseUnitSystem                     unitSystem )
 {
-    std::vector<RigMswBranchExportData> result;
+    std::vector<RigMswBranch> result;
 
     const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter( unitSystem );
     const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor( unitSystem );
@@ -328,12 +326,12 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                     // One branch+segment per cell with area proportional to overlap length
                     for ( auto& entry : cells )
                     {
-                        const int    cellBranch  = ++branchNumber;
-                        const int    outletSeg   = findContainingSegmentForMD( cellSegMap, entry.ci.distanceStart );
-                        const double valveMD     = segmentMidpointMD( cellSegMap, outletSeg );
-                        const double valveEndMD  = valveMD + RicMswTableDataTools::valveSegmentLength;
-                        const double startTVD    = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
-                        const double endTVD      = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
+                        const int    cellBranch = ++branchNumber;
+                        const int    outletSeg  = findContainingSegmentForMD( cellSegMap, entry.ci.distanceStart );
+                        const double valveMD    = segmentMidpointMD( cellSegMap, outletSeg );
+                        const double valveEndMD = valveMD + RicMswTableDataTools::valveSegmentLength;
+                        const double startTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
+                        const double endTVD     = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
 
                         double length = 0.0, depth = 0.0;
                         if ( infoType == "INC" )
@@ -368,7 +366,7 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                         seg.wsegvalvData = wv;
 
                         segmentNumber++;
-                        result.push_back( RigMswBranchExportData{ cellBranch, std::nullopt, { std::move( seg ) } } );
+                        result.push_back( RigMswBranch{ cellBranch, std::nullopt, { std::move( seg ) } } );
                     }
                 }
                 continue;
@@ -383,9 +381,7 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                     const auto aicdValues = aicdParams->doubleValues();
 
                     auto setOptional = []( double value ) -> std::optional<double>
-                    {
-                        return std::isinf( value ) ? std::nullopt : std::optional<double>{ value };
-                    };
+                    { return std::isinf( value ) ? std::nullopt : std::optional<double>{ value }; };
 
                     for ( size_t vi = 0; vi < valveLocations.size(); ++vi )
                     {
@@ -440,9 +436,8 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                             seg.diameter            = linerDiameter;
                             seg.roughness           = roughnessFactor;
                             seg.sourceWellName      = wellPath->name().toStdString();
-                            seg.description =
-                                QString( "%1 #%2" ).arg( valve->name() ).arg( vi + 1 ).toStdString();
-                            seg.intersections = { entry.ci };
+                            seg.description         = QString( "%1 #%2" ).arg( valve->name() ).arg( vi + 1 ).toStdString();
+                            seg.intersections       = { entry.ci };
 
                             WsegaicdRow wa;
                             wa.well                = wellNameForExport;
@@ -464,7 +459,7 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                             seg.wsegaicdData       = wa;
 
                             segmentNumber++;
-                            result.push_back( RigMswBranchExportData{ cellBranch, std::nullopt, { std::move( seg ) } } );
+                            result.push_back( RigMswBranch{ cellBranch, std::nullopt, { std::move( seg ) } } );
                         }
                     }
                 }
@@ -535,7 +530,7 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                 segmentNumber++;
                 branchSegs.push_back( std::move( valveSeg ) );
             }
-            result.push_back( RigMswBranchExportData{ valveBranch, std::nullopt, std::move( branchSegs ) } );
+            result.push_back( RigMswBranch{ valveBranch, std::nullopt, std::move( branchSegs ) } );
         }
     }
 
@@ -545,15 +540,15 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswBranchExportData> buildFractureSegmentsFromGeometry( RimEclipseCase*                      eclipseCase,
-                                                                       const RimWellPath*                   wellPath,
-                                                                       const RigMainGrid*                   mainGrid,
-                                                                       const std::vector<CellSegmentEntry>& cellSegMap,
-                                                                       const std::string&                   infoType,
-                                                                       int&                                 segmentNumber,
-                                                                       int&                                 branchNumber )
+std::vector<RigMswBranch> buildFractureSegmentsFromGeometry( RimEclipseCase*                      eclipseCase,
+                                                             const RimWellPath*                   wellPath,
+                                                             const RigMainGrid*                   mainGrid,
+                                                             const std::vector<CellSegmentEntry>& cellSegMap,
+                                                             const std::string&                   infoType,
+                                                             int&                                 segmentNumber,
+                                                             int&                                 branchNumber )
 {
-    std::vector<RigMswBranchExportData> result;
+    std::vector<RigMswBranch> result;
 
     const QString wellNameForExport = wellPath->completionSettings()->wellNameForExport();
 
@@ -627,13 +622,13 @@ std::vector<RigMswBranchExportData> buildFractureSegmentsFromGeometry( RimEclips
         seg.outletSegmentNumber = outletSeg;
         seg.length              = length;
         seg.depth               = depth;
-        seg.diameter            = 0.15;    // RicMswSegment default (tree approach uses same value)
-        seg.roughness           = 5.0e-5;  // RicMswSegment default (tree approach uses same value)
+        seg.diameter            = 0.15; // RicMswSegment default (tree approach uses same value)
+        seg.roughness           = 5.0e-5; // RicMswSegment default (tree approach uses same value)
         seg.sourceWellName      = wellPath->name().toStdString();
         seg.description         = fracture->name().toStdString();
         seg.intersections       = std::move( compsegs );
 
-        result.push_back( RigMswBranchExportData{ fracBranch, std::nullopt, { std::move( seg ) } } );
+        result.push_back( RigMswBranch{ fracBranch, std::nullopt, { std::move( seg ) } } );
     }
 
     return result;
@@ -642,18 +637,18 @@ std::vector<RigMswBranchExportData> buildFractureSegmentsFromGeometry( RimEclips
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const RimEclipseCase* eclipseCase,
-                                                                        const RimWellPath*    wellPath,
-                                                                        const RigMainGrid*    mainGrid,
-                                                                        const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
-                                                                        const std::vector<CellSegmentEntry>& cellSegMap,
-                                                                        const std::string&                   infoType,
-                                                                        const std::string&                   wellNameForExport,
-                                                                        int&                                 segmentNumber,
-                                                                        int&                                 branchNumber,
-                                                                        RiaDefines::EclipseUnitSystem        unitSystem )
+std::vector<RigMswBranch> buildFishbonesSegmentsFromGeometry( const RimEclipseCase*                            eclipseCase,
+                                                              const RimWellPath*                               wellPath,
+                                                              const RigMainGrid*                               mainGrid,
+                                                              const std::vector<WellPathCellIntersectionInfo>& filteredIntersections,
+                                                              const std::vector<CellSegmentEntry>&             cellSegMap,
+                                                              const std::string&                               infoType,
+                                                              const std::string&                               wellNameForExport,
+                                                              int&                                             segmentNumber,
+                                                              int&                                             branchNumber,
+                                                              RiaDefines::EclipseUnitSystem                    unitSystem )
 {
-    std::vector<RigMswBranchExportData> result;
+    std::vector<RigMswBranch> result;
 
     const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter( unitSystem );
     const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor( unitSystem );
@@ -773,7 +768,7 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
             wv.description      = QString( "ICD sub %1" ).arg( subIndex + 1 ).toStdString();
             icdSeg.wsegvalvData = wv;
 
-            result.push_back( RigMswBranchExportData{ icdBranch, std::nullopt, { std::move( icdSeg ) } } );
+            result.push_back( RigMswBranch{ icdBranch, std::nullopt, { std::move( icdSeg ) } } );
 
             // Lateral sub-segments
             for ( size_t lateralIndex : lateralIndices )
@@ -833,8 +828,7 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
                         latSeg.roughness           = subs->openHoleRoughnessFactor( unitSystem );
                         latSeg.sourceWellName      = wellPath->name().toStdString();
                         if ( firstLatSeg ) latSeg.description = lateralLabel;
-                        latSeg.intersections = isNewCell ? std::vector<RigMswCellIntersection>{ *mci }
-                                                         : std::vector<RigMswCellIntersection>{};
+                        latSeg.intersections = isNewCell ? std::vector<RigMswCellIntersection>{ *mci } : std::vector<RigMswCellIntersection>{};
 
                         latOutletSeg = latSeg.segmentNumber;
                         prevMD       = cellIntInfo.endMD;
@@ -843,7 +837,7 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
                         latSegs.push_back( std::move( latSeg ) );
                     }
                 }
-                result.push_back( RigMswBranchExportData{ latBranch, std::nullopt, std::move( latSegs ) } );
+                result.push_back( RigMswBranch{ latBranch, std::nullopt, std::move( latSegs ) } );
             }
         }
     }

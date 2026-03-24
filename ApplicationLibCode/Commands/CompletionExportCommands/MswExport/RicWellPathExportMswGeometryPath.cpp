@@ -47,18 +47,18 @@ using CompletionType = RicWellPathExportMswTableData::CompletionType;
 /// Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
 /// and any of its own child laterals.
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswBranchExportData> buildLateralSegments( RimEclipseCase*                 eclipseCase,
-                                                          const RimWellPath*              wellPath,
-                                                          const RigMainGrid*              mainGrid,
-                                                          int                             outletSegNum,
-                                                          CompletionType                  completionType,
-                                                          const std::optional<QDateTime>& exportDate,
-                                                          int&                            segmentNumber,
-                                                          int&                            branchNumber,
-                                                          RiaDefines::EclipseUnitSystem   unitSystem )
+std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 eclipseCase,
+                                                const RimWellPath*              wellPath,
+                                                const RigMainGrid*              mainGrid,
+                                                int                             outletSegNum,
+                                                CompletionType                  completionType,
+                                                const std::optional<QDateTime>& exportDate,
+                                                int&                            segmentNumber,
+                                                int&                            branchNumber,
+                                                RiaDefines::EclipseUnitSystem   unitSystem )
 {
-    std::vector<RigMswBranchExportData> result;
-    auto                                mswParameters = wellPath->mswCompletionParameters();
+    std::vector<RigMswBranch> result;
+    auto                      mswParameters = wellPath->mswCompletionParameters();
     if ( !mswParameters ) return result;
 
     const std::string infoType          = mswParameters->lengthAndDepth().text().toStdString();
@@ -232,7 +232,7 @@ std::vector<RigMswBranchExportData> buildLateralSegments( RimEclipseCase*       
 /// Currently implemented: main-bore WELSEGS segments + perforation COMPSEGS entries.
 /// TODO: valve completions (ICD/AICD/SICD/ICV), fishbones laterals, fractures, tie-in wells.
 //--------------------------------------------------------------------------------------------------
-RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
+RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
                                            const RimWellPath*                            wellPath,
                                            double                                        maxSegmentLength,
                                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
@@ -321,8 +321,8 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                                                                             exportDate,
                                                                                             unitSystem );
 
-    const bool                          includeFractures = ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES;
-    std::vector<RigMswBranchExportData> fractureBranches;
+    const bool                includeFractures = ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES;
+    std::vector<RigMswBranch> fractureBranches;
     if ( includeFractures )
     {
         fractureBranches = RicWellPathExportMswBuildSegments::buildFractureSegmentsFromGeometry( eclipseCase,
@@ -334,8 +334,8 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                                                                                  branchNumber );
     }
 
-    const bool                          includeFishbones = ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES;
-    std::vector<RigMswBranchExportData> fishbonesBranches;
+    const bool                includeFishbones = ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES;
+    std::vector<RigMswBranch> fishbonesBranches;
     if ( includeFishbones )
     {
         fishbonesBranches = RicWellPathExportMswBuildSegments::buildFishbonesSegmentsFromGeometry( eclipseCase,
@@ -351,7 +351,7 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
     }
 
     // Tie-in child laterals (recursive)
-    std::vector<RigMswBranchExportData> lateralBranches;
+    std::vector<RigMswBranch> lateralBranches;
     for ( auto* childWellPath : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int childOutlet =
@@ -363,7 +363,7 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
                                 std::make_move_iterator( childBranches.end() ) );
     }
 
-    RigMswFlatExportData result;
+    RigMswWellExportData result;
     result.header = header;
     result.branches.push_back( std::move( mainBoreBranch ) );
     result.branches.insert( result.branches.end(),
@@ -386,12 +386,12 @@ RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                      
 /// This replaces the recursive tree-based collection functions (collectWelsegsData etc.) with
 /// simple iteration over RigMswSegment objects.
 //--------------------------------------------------------------------------------------------------
-RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem )
+RigMswTableData collectDataFromFlatList( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem )
 {
     RigMswTableData tableData( exportData.header.well, unitSystem );
     tableData.setWelsegsHeader( exportData.header );
 
-    auto emitSegment = [&]( const RigMswBranchExportData& branch, const RigMswSegment& seg )
+    auto emitSegment = [&]( const RigMswBranch& branch, const RigMswSegment& seg )
     {
         // WELSEGS row
         WelsegsRow welsegsRow;
@@ -429,7 +429,6 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
 
         // WSEGSICD row
         if ( seg.wsegsicdData ) tableData.addWsegsicdRow( *seg.wsegsicdData );
-
     };
 
     for ( const auto& branch : exportData.branches )

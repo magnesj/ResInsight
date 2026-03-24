@@ -49,8 +49,8 @@ public:
     void addWsegsicdRow( const WsegsicdRow& row );
 
     // Branch list — the primary building block for the new MSW export approach
-    void                                    addMswBranch( RigMswBranchExportData branch );
-    const std::vector<RigMswBranchExportData>& mswBranches() const;
+    void                             addMswBranch( RigMswBranch branch );
+    const std::vector<RigMswBranch>& mswBranches() const;
 
     // Metadata
     std::string                   wellName() const { return m_wellName; }
@@ -84,5 +84,5 @@ private:
     std::vector<WsegaicdRow> m_wsegaicdData;
     std::vector<WsegsicdRow> m_wsegsicdData;
 
-    std::vector<RigMswBranchExportData> m_mswBranches;
+    std::vector<RigMswBranch> m_mswBranches;
 };

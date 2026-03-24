@@ -47,11 +47,11 @@ RigMswSegment makeSegment( int segNum, int outletSegNum, double length = 10.0, d
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Build a minimal RigMswBranchExportData with the given branch number and segments.
+/// Build a minimal RigMswBranch with the given branch number and segments.
 //--------------------------------------------------------------------------------------------------
-RigMswBranchExportData makeBranch( int branchNum, std::vector<RigMswSegment> segs )
+RigMswBranch makeBranch( int branchNum, std::vector<RigMswSegment> segs )
 {
-    return RigMswBranchExportData{ branchNum, std::nullopt, std::move( segs ) };
+    return RigMswBranch{ branchNum, std::nullopt, std::move( segs ) };
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -74,7 +74,7 @@ WelsegsHeader makeHeader( const std::string& wellName = "TestWell" )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, EmptySegmentList )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader( "Well_A" );
 
     auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
@@ -95,7 +95,7 @@ TEST( RicWellPathExportMswGeometryPath, EmptySegmentList )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, SingleSegmentNoIntersections )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg   = makeSegment( 2, 1, 25.0, 12.5 );
@@ -129,7 +129,7 @@ TEST( RicWellPathExportMswGeometryPath, SingleSegmentNoIntersections )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, SegmentWithMultipleIntersections )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg = makeSegment( 2, 1 );
@@ -166,7 +166,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithMultipleIntersections )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, MainGridAndLgrIntersections )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg = makeSegment( 2, 1 );
@@ -198,7 +198,7 @@ TEST( RicWellPathExportMswGeometryPath, MainGridAndLgrIntersections )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegvalvData )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg = makeSegment( 3, 2 );
@@ -235,7 +235,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegvalvData )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegaicdData )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg = makeSegment( 4, 2 );
@@ -270,7 +270,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegaicdData )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegsicdData )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg = makeSegment( 5, 3 );
@@ -304,7 +304,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegsicdData )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, MultipleSegments )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     RigMswSegment seg1 = makeSegment( 2, 1 );
@@ -331,7 +331,7 @@ TEST( RicWellPathExportMswGeometryPath, MultipleSegments )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, OutletSegmentNumberMapping )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     // Simulate a chain: 2->1 (heel), 3->2, 4->3
@@ -359,7 +359,7 @@ TEST( RicWellPathExportMswGeometryPath, OutletSegmentNumberMapping )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, Segment1EqualsSegment2 )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
     exportData.branches = { makeBranch( 1, { makeSegment( 2, 1 ) } ),
@@ -379,10 +379,10 @@ TEST( RicWellPathExportMswGeometryPath, Segment1EqualsSegment2 )
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswGeometryPath, CompsegsInheritsBranchFromSegment )
 {
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = makeHeader();
 
-    RigMswSegment seg   = makeSegment( 3, 2 ); // branch comes from the enclosing RigMswBranchExportData (branchNumber=7)
+    RigMswSegment seg   = makeSegment( 3, 2 ); // branch comes from the enclosing RigMswBranch (branchNumber=7)
     seg.intersections   = { RigMswCellIntersection{ 1, 2, 3, 10.0, 20.0, "" }, RigMswCellIntersection{ 1, 2, 4, 20.0, 30.0, "" } };
     exportData.branches = { makeBranch( 7, { seg } ) };
 
@@ -406,7 +406,7 @@ TEST( RicWellPathExportMswGeometryPath, HeaderFieldsPropagated )
     hdr.topLength = 2345.6;
     hdr.infoType  = "ABS";
 
-    RigMswFlatExportData exportData;
+    RigMswWellExportData exportData;
     exportData.header = hdr;
 
     auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_FIELD );

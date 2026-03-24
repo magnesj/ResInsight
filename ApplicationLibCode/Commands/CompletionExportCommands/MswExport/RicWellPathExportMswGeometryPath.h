@@ -40,23 +40,23 @@ class RigMainGrid;
 namespace RicWellPathExportMswGeometryPath
 {
 
-std::vector<RigMswBranchExportData> buildLateralSegments( RimEclipseCase*                               eclipseCase,
-                                                          const RimWellPath*                            wellPath,
-                                                          const RigMainGrid*                            mainGrid,
-                                                          int                                           outletSegNum,
-                                                          RicWellPathExportMswTableData::CompletionType completionType,
-                                                          const std::optional<QDateTime>&               exportDate,
-                                                          int&                                          segmentNumber,
-                                                          int&                                          branchNumber,
-                                                          RiaDefines::EclipseUnitSystem                 unitSystem );
+std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                               eclipseCase,
+                                                const RimWellPath*                            wellPath,
+                                                const RigMainGrid*                            mainGrid,
+                                                int                                           outletSegNum,
+                                                RicWellPathExportMswTableData::CompletionType completionType,
+                                                const std::optional<QDateTime>&               exportDate,
+                                                int&                                          segmentNumber,
+                                                int&                                          branchNumber,
+                                                RiaDefines::EclipseUnitSystem                 unitSystem );
 
-RigMswFlatExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
+RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
                                            const RimWellPath*                            wellPath,
                                            double                                        maxSegmentLength,
                                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
                                            RicWellPathExportMswTableData::CompletionType completionType,
                                            const std::optional<QDateTime>&               exportDate );
 
-RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
+RigMswTableData collectDataFromFlatList( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
 
 } // namespace RicWellPathExportMswGeometryPath
