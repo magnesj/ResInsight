@@ -208,10 +208,15 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
 
 // Project files with known failures (FlatList mode not yet producing equivalent output):
 //   "fishbones.rsp"        — duplicate COMPSEGS cells in FlatList mode
-//   "perf_aicd.rsp"        — WSEGAICD rows missing in FlatList mode
-//   "perf-lgr-two-wells.rsp" — extra COMPSEGS cell in FlatList mode
-//   "two_wells.rsp"        — WSEGVALV row count differs in FlatList mode
 
 INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                           MswTreeVsFlatListTest,
-                          testing::Values( "base.rsp", "fracture.rsp", "perf_lateral.rsp", "perf-lgr.rsp", "perf_valve.rsp" ) );
+                          testing::Values( "base.rsp",
+                                           "fracture.rsp",
+                                           "perf_lateral.rsp",
+                                           "perf-lgr.rsp",
+                                           "perf_valve.rsp",
+                                           "two_wells.rsp",
+                                           "perf-lgr-two-wells.rsp",
+                                           "perf_aicd.rsp",
+                                           "fishbones.rsp" ) );
