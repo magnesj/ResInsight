@@ -153,8 +153,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     std::vector<RicMswBranchBuilder::CellSegmentEntry> childCellSegMap;
 
-    const RigActiveCellInfo* activeCellInfo =
-        eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    const RigActiveCellInfo* activeCellInfo = eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
 
     auto lateralBranch = RicMswBranchBuilder::buildMainBoreBranchFromGeometry( wellPath,
                                                                                filteredIntersections,
