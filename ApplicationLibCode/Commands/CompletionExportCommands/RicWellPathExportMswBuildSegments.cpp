@@ -796,10 +796,12 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
 
                 if ( lateralIntersections.empty() ) continue;
 
-                const int latBranch    = ++branchNumber;
-                double    prevMD       = lateralMDs.front();
-                double    prevTVD      = -lateralCoords.front().z();
-                int       latOutletSeg = icdSegNum;
+                const int  latBranch    = ++branchNumber;
+                double     prevMD       = lateralMDs.front();
+                double     prevTVD      = -lateralCoords.front().z();
+                int        latOutletSeg = icdSegNum;
+                bool       firstLatSeg  = true;
+                const auto lateralLabel = QString( "Lateral %1" ).arg( lateralIndex + 1 ).toStdString();
 
                 std::vector<RigMswSegment> latSegs;
                 for ( const auto& cellIntInfo : lateralIntersections )
@@ -830,12 +832,14 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
                         latSeg.diameter            = subs->equivalentDiameter( unitSystem );
                         latSeg.roughness           = subs->openHoleRoughnessFactor( unitSystem );
                         latSeg.sourceWellName      = wellPath->name().toStdString();
-                        latSeg.intersections       = isNewCell ? std::vector<RigMswCellIntersection>{ *mci }
-                                                               : std::vector<RigMswCellIntersection>{};
+                        if ( firstLatSeg ) latSeg.description = lateralLabel;
+                        latSeg.intersections = isNewCell ? std::vector<RigMswCellIntersection>{ *mci }
+                                                         : std::vector<RigMswCellIntersection>{};
 
                         latOutletSeg = latSeg.segmentNumber;
                         prevMD       = cellIntInfo.endMD;
                         prevTVD      = cellIntInfo.endTVD();
+                        firstLatSeg  = false;
                         latSegs.push_back( std::move( latSeg ) );
                     }
                 }
