@@ -23,14 +23,19 @@
 
 #include "CompletionExportCommands/RicWellPathExportMswTableData.h"
 
+#include "CompletionsMsw/RigMswDataFormatter.h"
 #include "CompletionsMsw/RigMswTableData.h"
 #include "CompletionsMsw/RigMswTableRows.h"
+
+#include "RifTextDataTableFormatter.h"
 
 #include "RimEclipseCase.h"
 #include "RimProject.h"
 #include "RimWellPath.h"
 
+#include <QDir>
 #include <QFile>
+#include <QTextStream>
 
 #include <algorithm>
 #include <string>
@@ -39,6 +44,22 @@
 
 namespace
 {
+
+//--------------------------------------------------------------------------------------------------
+/// Write MSW table data for one well to a file, creating parent directories as needed.
+//--------------------------------------------------------------------------------------------------
+void writeMswTableDataToFile( const RigMswTableData& tableData, const QString& filePath )
+{
+    QFileInfo fileInfo( filePath );
+    QDir().mkpath( fileInfo.absolutePath() );
+
+    QFile file( filePath );
+    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text ) ) return;
+
+    QTextStream               stream( &file );
+    RifTextDataTableFormatter formatter( stream );
+    RigMswDataFormatter::formatMswTables( formatter, tableData );
+}
 
 //--------------------------------------------------------------------------------------------------
 /// Extract {i, j, k, gridName} tuples from COMPSEGS data, sorted for stable comparison.
@@ -78,6 +99,10 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
     const std::string& projectFileName = GetParam();
     QString            projectFilePath =
         QString( "%1/msw-export/project-files/%2" ).arg( TEST_MODEL_DIR ).arg( QString::fromStdString( projectFileName ) );
+
+    // Strip extension for use as folder name, e.g. "base.rsp" -> "base"
+    const QString projectStem    = QFileInfo( QString::fromStdString( projectFileName ) ).completeBaseName();
+    const QString compareOutBase = QString( "%1/msw-export/compare-output/%2" ).arg( TEST_MODEL_DIR ).arg( projectStem );
 
     if ( !QFile::exists( projectFilePath ) )
     {
@@ -124,7 +149,12 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
         ASSERT_TRUE( flatResult.has_value() ) << "FlatList mode failed for well '" << wellPath->name().toStdString()
                                               << "': " << flatResult.error();
 
-        const std::string wellName = treeResult->wellName();
+        const std::string wellName    = treeResult->wellName();
+        const QString     wellFileName = QString::fromStdString( wellName ) + ".txt";
+
+        // Export both modes to files for side-by-side comparison
+        writeMswTableDataToFile( *treeResult, compareOutBase + "/tree/" + wellFileName );
+        writeMswTableDataToFile( *flatResult, compareOutBase + "/flat-list/" + wellFileName );
 
         // Both modes must produce data for the same well.
         EXPECT_EQ( wellName, flatResult->wellName() ) << "Well name mismatch for: " << wellPath->name().toStdString();

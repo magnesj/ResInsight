@@ -430,8 +430,6 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
         // WSEGSICD row
         if ( seg.wsegsicdData ) tableData.addWsegsicdRow( *seg.wsegsicdData );
 
-        // Also store the segment in the flat list on tableData
-        tableData.addMswSegment( seg );
     };
 
     for ( const auto& branch : exportData.branches )
@@ -439,6 +437,7 @@ RigMswTableData collectDataFromFlatList( const RigMswFlatExportData& exportData,
         if ( branch.tieInValve ) emitSegment( branch, *branch.tieInValve );
         for ( const auto& seg : branch.segments )
             emitSegment( branch, seg );
+        tableData.addMswBranch( branch );
     }
     return tableData;
 }

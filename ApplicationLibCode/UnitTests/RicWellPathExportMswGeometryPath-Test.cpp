@@ -86,7 +86,7 @@ TEST( RicWellPathExportMswGeometryPath, EmptySegmentList )
     EXPECT_TRUE( result.wsegvalvData().empty() );
     EXPECT_TRUE( result.wsegaicdData().empty() );
     EXPECT_TRUE( result.wsegsicdData().empty() );
-    EXPECT_TRUE( result.mswSegments().empty() );
+    EXPECT_TRUE( result.mswBranches().empty() );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -322,7 +322,8 @@ TEST( RicWellPathExportMswGeometryPath, MultipleSegments )
 
     EXPECT_EQ( 3u, result.welsegsData().size() );
     EXPECT_EQ( 3u, result.compsegsData().size() ); // 2 + 1 + 0
-    EXPECT_EQ( 3u, result.mswSegments().size() );
+    ASSERT_EQ( 1u, result.mswBranches().size() );
+    EXPECT_EQ( 3u, result.mswBranches()[0].segments.size() );
 }
 
 //--------------------------------------------------------------------------------------------------

@@ -80,17 +80,17 @@ void RigMswTableData::addWsegsicdRow( const WsegsicdRow& row )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigMswTableData::addMswSegment( RigMswSegment segment )
+void RigMswTableData::addMswBranch( RigMswBranchExportData branch )
 {
-    m_mswSegments.push_back( std::move( segment ) );
+    m_mswBranches.push_back( std::move( branch ) );
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<RigMswSegment>& RigMswTableData::mswSegments() const
+const std::vector<RigMswBranchExportData>& RigMswTableData::mswBranches() const
 {
-    return m_mswSegments;
+    return m_mswBranches;
 }
 
 //--------------------------------------------------------------------------------------------------
