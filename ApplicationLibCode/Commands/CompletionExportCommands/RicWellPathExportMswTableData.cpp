@@ -101,11 +101,11 @@ std::expected<RigMswTableData, std::string>
 
     const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
     auto                                         wellExportData = RicWellPathExportMswGeometryPath::buildMswWellExportData( eclipseCase,
-                                                                                  wellPath,
-                                                                                  mswParameters->maxSegmentLength(),
-                                                                                  customSegmentIntervals,
-                                                                                  completionType,
-                                                                                  exportDate );
+                                                                                    wellPath,
+                                                                                    mswParameters->maxSegmentLength(),
+                                                                                    customSegmentIntervals,
+                                                                                    completionType,
+                                                                                    exportDate );
 
     auto unitSystem = eclipseCase->eclipseCaseData()->unitsType();
     return RicWellPathExportMswGeometryPath::collectTableData( wellExportData, unitSystem );
