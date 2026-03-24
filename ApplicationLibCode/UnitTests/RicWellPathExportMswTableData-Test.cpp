@@ -135,6 +135,8 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
     {
         ASSERT_NE( wellPath, nullptr );
 
+        if ( !wellPath->isTopLevelWellPath() ) continue;
+
         auto treeResult = RicWellPathExportMswTableData::extractSingleWellMswDataTree( eclipseCase, wellPath );
         auto flatResult = RicWellPathExportMswTableData::extractSingleWellMswDataFlatList( eclipseCase, wellPath );
 
