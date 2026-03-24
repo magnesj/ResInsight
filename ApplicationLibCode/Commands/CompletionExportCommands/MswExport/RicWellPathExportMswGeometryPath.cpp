@@ -24,6 +24,7 @@
 
 #include "CompletionsMsw/RigMswTableData.h"
 
+#include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
 #include "Well/RigWellPath.h"
 
@@ -152,6 +153,9 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     std::vector<RicMswBranchBuilder::CellSegmentEntry> childCellSegMap;
 
+    const RigActiveCellInfo* activeCellInfo =
+        eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
     auto lateralBranch = RicMswBranchBuilder::buildMainBoreBranchFromGeometry( wellPath,
                                                                                filteredIntersections,
                                                                                mainGrid,
@@ -167,7 +171,8 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
                                                                                {},
                                                                                exportDate,
                                                                                unitSystem,
-                                                                               &childCellSegMap );
+                                                                               &childCellSegMap,
+                                                                               activeCellInfo );
     if ( tieInValve && !lateralBranch.segments.empty() ) lateralBranch.segments.front().description.clear();
     lateralBranch.tieInValve = std::move( tieInValve );
 
@@ -314,6 +319,8 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     int                                                branchNumber  = 1; // Incremented for each new branch.
     std::vector<RicMswBranchBuilder::CellSegmentEntry> cellSegMap;
 
+    const RigActiveCellInfo* activeCellInfo = eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+
     auto mainBoreBranch = RicMswBranchBuilder::buildMainBoreBranchFromGeometry( wellPath,
                                                                                 filteredIntersections,
                                                                                 mainGrid,
@@ -329,7 +336,8 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
                                                                                 customSegmentIntervals,
                                                                                 exportDate,
                                                                                 unitSystem,
-                                                                                &cellSegMap );
+                                                                                &cellSegMap,
+                                                                                activeCellInfo );
 
     const std::string wellNameForExport = wellPath->completionSettings()->wellNameForExport().toStdString();
 

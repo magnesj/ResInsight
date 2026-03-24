@@ -21,6 +21,7 @@
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswTableDataTools.h"
 
+#include "RigActiveCellInfo.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 #include "RigMainGrid.h"
@@ -144,7 +145,8 @@ RigMswBranch buildMainBoreBranchFromGeometry( const RimWellPath*                
                                               const std::vector<std::pair<double, double>>&     customSegmentIntervals,
                                               const std::optional<QDateTime>&                   exportDate,
                                               RiaDefines::EclipseUnitSystem                     unitSystem,
-                                              std::vector<CellSegmentEntry>*                    cellSegMap )
+                                              std::vector<CellSegmentEntry>*                    cellSegMap,
+                                              const RigActiveCellInfo*                          activeCellInfo )
 {
     std::vector<RigMswSegment> result;
 
@@ -176,6 +178,9 @@ RigMswBranch buildMainBoreBranchFromGeometry( const RimWellPath*                
             const double overlapEnd   = std::min( perf->endMD(), cellInfo.endMD );
             if ( overlapEnd > overlapStart )
             {
+                if ( activeCellInfo && cellInfo.globCellIndex < mainGrid->totalCellCount() &&
+                     !activeCellInfo->isActive( cellInfo.globCellIndex ) )
+                    continue;
                 if ( auto ci = toMswCellIntersection( cellInfo, mainGrid, overlapStart, overlapEnd ) ) cellCompsegs.push_back( *ci );
             }
         }

@@ -20,6 +20,7 @@
 
 #include "CompletionsMsw/RigMswSegment.h"
 #include "RiaDefines.h"
+#include "RigActiveCellInfo.h"
 #include "Well/RigWellLogExtractor.h"
 
 #include <optional>
@@ -90,7 +91,8 @@ RigMswBranch buildMainBoreBranchFromGeometry( const RimWellPath*                
                                               const std::vector<std::pair<double, double>>&     customSegmentIntervals,
                                               const std::optional<QDateTime>&                   exportDate,
                                               RiaDefines::EclipseUnitSystem                     unitSystem,
-                                              std::vector<CellSegmentEntry>*                    cellSegMap );
+                                              std::vector<CellSegmentEntry>*                    cellSegMap,
+                                              const RigActiveCellInfo*                          activeCellInfo = nullptr );
 
 //--------------------------------------------------------------------------------------------------
 /// Build WELSEGS + COMPSEGS segments for ICD/ICV/AICD/SICD valve completions.
