@@ -35,7 +35,6 @@ class RigMainGrid;
 //--------------------------------------------------------------------------------------------------
 /// Free functions that implement the direct geometry path for MSW export.
 /// These build WELSEGS/COMPSEGS/valve segment data directly from well-path geometry
-/// without creating the intermediate RicMswBranch / RicMswItem tree.
 //--------------------------------------------------------------------------------------------------
 namespace RicWellPathExportMswGeometryPath
 {
@@ -51,11 +50,11 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
                                                 RiaDefines::EclipseUnitSystem                 unitSystem );
 
 RigMswWellExportData buildMswWellExportData( RimEclipseCase*                               eclipseCase,
-                                           const RimWellPath*                            wellPath,
-                                           double                                        maxSegmentLength,
-                                           const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                           RicWellPathExportMswTableData::CompletionType completionType,
-                                           const std::optional<QDateTime>&               exportDate );
+                                             const RimWellPath*                            wellPath,
+                                             double                                        maxSegmentLength,
+                                             const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                             RicWellPathExportMswTableData::CompletionType completionType,
+                                             const std::optional<QDateTime>&               exportDate );
 
 RigMswTableData collectTableData( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
 

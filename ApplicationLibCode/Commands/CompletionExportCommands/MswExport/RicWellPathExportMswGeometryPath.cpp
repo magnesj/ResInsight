@@ -152,7 +152,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     std::vector<RicMswBranchBuilder::CellSegmentEntry> childCellSegMap;
 
-    auto lateralBranch       = RicMswBranchBuilder::buildMainBoreSegmentsFromGeometry( wellPath,
+    auto lateralBranch       = RicMswBranchBuilder::buildMainBoreBranchFromGeometry( wellPath,
                                                                                                filteredIntersections,
                                                                                                mainGrid,
                                                                                                perforationIntervals,
@@ -197,7 +197,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     result.push_back( std::move( lateralBranch ) );
 
-    auto valveBranches = RicMswBranchBuilder::buildValveSegmentsFromGeometry( wellPath,
+    auto valveBranches = RicMswBranchBuilder::buildValveBranchesFromGeometry( wellPath,
                                                                                             filteredIntersections,
                                                                                             mainGrid,
                                                                                             perforationIntervals,
@@ -214,7 +214,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     if ( ( completionType & CompletionType::FRACTURES ) == CompletionType::FRACTURES )
     {
-        auto fracBranches = RicMswBranchBuilder::buildFractureSegmentsFromGeometry( eclipseCase,
+        auto fracBranches = RicMswBranchBuilder::buildFractureBranchesFromGeometry( eclipseCase,
                                                                                                   wellPath,
                                                                                                   mainGrid,
                                                                                                   childCellSegMap,
@@ -226,7 +226,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     if ( ( completionType & CompletionType::FISHBONES ) == CompletionType::FISHBONES )
     {
-        auto fishBranches = RicMswBranchBuilder::buildFishbonesSegmentsFromGeometry( eclipseCase,
+        auto fishBranches = RicMswBranchBuilder::buildFishbonesBranchesFromGeometry( eclipseCase,
                                                                                                    wellPath,
                                                                                                    mainGrid,
                                                                                                    filteredIntersections,
@@ -315,7 +315,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     int                                                              branchNumber  = 1; // Incremented for each new branch.
     std::vector<RicMswBranchBuilder::CellSegmentEntry> cellSegMap;
 
-    auto mainBoreBranch = RicMswBranchBuilder::buildMainBoreSegmentsFromGeometry( wellPath,
+    auto mainBoreBranch = RicMswBranchBuilder::buildMainBoreBranchFromGeometry( wellPath,
                                                                                                 filteredIntersections,
                                                                                                 mainGrid,
                                                                                                 perforationIntervals,
@@ -357,7 +357,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
         }
     }
 
-    auto valveBranches = RicMswBranchBuilder::buildValveSegmentsFromGeometry( wellPath,
+    auto valveBranches = RicMswBranchBuilder::buildValveBranchesFromGeometry( wellPath,
                                                                                             filteredIntersections,
                                                                                             mainGrid,
                                                                                             perforationIntervals,
@@ -375,7 +375,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     std::vector<RigMswBranch> fractureBranches;
     if ( includeFractures )
     {
-        fractureBranches = RicMswBranchBuilder::buildFractureSegmentsFromGeometry( eclipseCase,
+        fractureBranches = RicMswBranchBuilder::buildFractureBranchesFromGeometry( eclipseCase,
                                                                                                  wellPath,
                                                                                                  mainGrid,
                                                                                                  cellSegMap,
@@ -388,7 +388,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     std::vector<RigMswBranch> fishbonesBranches;
     if ( includeFishbones )
     {
-        fishbonesBranches = RicMswBranchBuilder::buildFishbonesSegmentsFromGeometry( eclipseCase,
+        fishbonesBranches = RicMswBranchBuilder::buildFishbonesBranchesFromGeometry( eclipseCase,
                                                                                                    wellPath,
                                                                                                    mainGrid,
                                                                                                    filteredIntersections,
