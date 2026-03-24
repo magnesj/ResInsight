@@ -703,6 +703,9 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
         const double icdArea          = icdOrificeRadius * icdOrificeRadius * cvf::PI_D * static_cast<double>( subs->icdCount() );
         const double icdCv            = subs->icdFlowCoefficient();
 
+        // Track used global cell indices to deduplicate COMPSEGS, matching the tree's intersectedCells logic.
+        std::set<size_t> usedGlobalCellIndices;
+
         for ( const auto& [subIndex, lateralIndices] : subAndLateralIndices )
         {
             const double subEndMd      = subs->measuredDepth( subIndex );
@@ -714,7 +717,7 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
             const int icdBranch = ++branchNumber;
             const int icdSegNum = segmentNumber++;
 
-            // COMPSEGS for the ICD segment: cells closest to this sub
+            // COMPSEGS for the ICD segment: cells closest to this sub, clipped to [startValveMd, subEndMd]
             std::set<size_t> icdCellIndices;
             if ( closestSubForCellIntersections.count( subIndex ) )
             {
@@ -727,8 +730,15 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
             std::vector<RigMswCellIntersection> icdCompsegs;
             for ( auto idx : icdCellIndices )
             {
-                const auto& ci = filteredIntersections[idx];
-                if ( auto mci = toMswCellIntersection( ci, mainGrid, ci.startMD, ci.endMD ) ) icdCompsegs.push_back( *mci );
+                const auto&  ci           = filteredIntersections[idx];
+                const double overlapStart = std::max( startValveMd, ci.startMD );
+                const double overlapEnd   = std::min( subEndMd, ci.endMD );
+                if ( overlapEnd <= overlapStart ) continue;
+                if ( auto mci = toMswCellIntersection( ci, mainGrid, overlapStart, overlapEnd ) )
+                {
+                    icdCompsegs.push_back( *mci );
+                    usedGlobalCellIndices.insert( ci.globCellIndex );
+                }
             }
 
             double icdLength = 0.0;
@@ -749,11 +759,10 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
             icdSeg.outletSegmentNumber = outletSeg;
             icdSeg.length              = icdLength;
             icdSeg.depth               = icdDepth;
-            icdSeg.diameter            = linerDiameter;
-            icdSeg.roughness           = roughnessFactor;
-            icdSeg.sourceWellName      = wellPath->name().toStdString();
-            icdSeg.description         = QString( "ICD sub %1" ).arg( subIndex + 1 ).toStdString();
-            icdSeg.intersections       = std::move( icdCompsegs );
+            // Use RigMswSegment defaults for diameter/roughness (matching tree approach for fishbones ICD)
+            icdSeg.sourceWellName = wellPath->name().toStdString();
+            icdSeg.description    = QString( "ICD sub %1" ).arg( subIndex + 1 ).toStdString();
+            icdSeg.intersections  = std::move( icdCompsegs );
 
             WsegvalvRow wv;
             wv.well             = wellNameForExport;
@@ -810,6 +819,9 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
                             dep = cellIntInfo.endTVD();
                         }
 
+                        // Deduplicate COMPSEGS: skip cells already connected (matching tree intersectedCells logic)
+                        const bool isNewCell = usedGlobalCellIndices.insert( cellIntInfo.globCellIndex ).second;
+
                         RigMswSegment latSeg;
                         latSeg.segmentNumber       = segmentNumber++;
                         latSeg.outletSegmentNumber = latOutletSeg;
@@ -818,7 +830,8 @@ std::vector<RigMswBranchExportData> buildFishbonesSegmentsFromGeometry( const Ri
                         latSeg.diameter            = subs->equivalentDiameter( unitSystem );
                         latSeg.roughness           = subs->openHoleRoughnessFactor( unitSystem );
                         latSeg.sourceWellName      = wellPath->name().toStdString();
-                        latSeg.intersections       = { *mci };
+                        latSeg.intersections       = isNewCell ? std::vector<RigMswCellIntersection>{ *mci }
+                                                               : std::vector<RigMswCellIntersection>{};
 
                         latOutletSeg = latSeg.segmentNumber;
                         prevMD       = cellIntInfo.endMD;

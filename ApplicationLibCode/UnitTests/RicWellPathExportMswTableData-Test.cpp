@@ -206,9 +206,6 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
     EXPECT_GT( wellsWithData, 0 ) << "No well paths produced MSW data — check project file and well path MSW parameters";
 }
 
-// Project files with known failures (FlatList mode not yet producing equivalent output):
-//   "fishbones.rsp"        — duplicate COMPSEGS cells in FlatList mode
-
 INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                           MswTreeVsFlatListTest,
                           testing::Values( "base.rsp",
