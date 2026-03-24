@@ -357,9 +357,6 @@ std::vector<RigMswBranchExportData> buildFractureSegmentsFromGeometry( RimEclips
 {
     std::vector<RigMswBranchExportData> result;
 
-    const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter( eclipseCase->eclipseCaseData()->unitsType() );
-    const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor( eclipseCase->eclipseCaseData()->unitsType() );
-
     const QString wellNameForExport = wellPath->completionSettings()->wellNameForExport();
 
     for ( RimWellPathFracture* fracture : wellPath->fractureCollection()->activeFractures() )
@@ -432,8 +429,8 @@ std::vector<RigMswBranchExportData> buildFractureSegmentsFromGeometry( RimEclips
         seg.outletSegmentNumber = outletSeg;
         seg.length              = length;
         seg.depth               = depth;
-        seg.diameter            = linerDiameter;
-        seg.roughness           = roughnessFactor;
+        seg.diameter            = 0.15;    // RicMswSegment default (tree approach uses same value)
+        seg.roughness           = 5.0e-5;  // RicMswSegment default (tree approach uses same value)
         seg.sourceWellName      = wellPath->name().toStdString();
         seg.description         = fracture->name().toStdString();
         seg.intersections       = std::move( compsegs );
