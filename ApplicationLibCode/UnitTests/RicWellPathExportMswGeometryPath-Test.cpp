@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "CompletionExportCommands/RicWellPathExportMswGeometryPath.h"
+#include "CompletionExportCommands/MswExport/RicWellPathExportMswGeometryPath.h"
 
 #include "CompletionsMsw/RigMswSegment.h"
 #include "CompletionsMsw/RigMswTableData.h"

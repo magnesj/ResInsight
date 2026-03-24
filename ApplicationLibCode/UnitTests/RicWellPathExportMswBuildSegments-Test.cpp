@@ -18,7 +18,7 @@
 
 #include "gtest/gtest.h"
 
-#include "CompletionExportCommands/RicWellPathExportMswBuildSegments.h"
+#include "CompletionExportCommands/MswExport/RicWellPathExportMswBuildSegments.h"
 
 #include "RifReaderMockModel.h"
 #include "RigEclipseCaseData.h"

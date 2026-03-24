@@ -26,7 +26,7 @@
 #include "RicMswExportInfo.h"
 #include "RicMswTableDataTools.h"
 #include "RicMswValveAccumulators.h"
-#include "RicWellPathExportMswGeometryPath.h"
+#include "MswExport/RicWellPathExportMswGeometryPath.h"
 
 #include "CompletionsMsw/RigMswTableData.h"
 #include "RigActiveCellInfo.h"
