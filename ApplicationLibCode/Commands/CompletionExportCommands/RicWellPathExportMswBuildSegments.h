@@ -45,8 +45,9 @@ namespace RicWellPathExportMswBuildSegments
 {
 
 //--------------------------------------------------------------------------------------------------
-/// Mapping from a cell's MD range to the last main-bore sub-segment number within that cell.
-/// Used by valve and lateral builders to locate the outlet segment for a given measured depth.
+/// Mapping from a sub-segment's MD range to its main-bore segment number.
+/// One entry is emitted per sub-segment (a cell split into N sub-segments produces N entries).
+/// Used by valve, fracture, and lateral builders to locate the outlet segment for a given MD.
 //--------------------------------------------------------------------------------------------------
 struct CellSegmentEntry
 {

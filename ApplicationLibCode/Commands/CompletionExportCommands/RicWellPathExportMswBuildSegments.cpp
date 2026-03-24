@@ -42,6 +42,7 @@
 #include "RiaLogging.h"
 
 #include <algorithm>
+#include <limits>
 
 namespace RicWellPathExportMswBuildSegments
 {
@@ -76,11 +77,28 @@ std::optional<RigMswCellIntersection>
 //--------------------------------------------------------------------------------------------------
 int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, double md )
 {
+    if ( cellSegMap.empty() ) return 1;
+
+    // Match the tree-based logic (findClosestSegmentWithLowerMD): find the sub-segment whose
+    // midpoint is closest to, but not greater than, the given MD.  Range-based lookup is
+    // incorrect when a cell's midpoint lies above the completion MD (e.g. a fracture near the
+    // heel of a long cell), which would assign the wrong outlet segment.
+    const CellSegmentEntry* best     = nullptr;
+    double                  bestDist = std::numeric_limits<double>::infinity();
+
     for ( const auto& entry : cellSegMap )
     {
-        if ( md >= entry.cellStartMD && md < entry.cellEndMD ) return entry.lastSubSegmentNumber;
+        const double midpoint = 0.5 * ( entry.cellStartMD + entry.cellEndMD );
+        const double dist     = md - midpoint;
+        if ( dist >= 0.0 && dist < bestDist )
+        {
+            best     = &entry;
+            bestDist = dist;
+        }
     }
-    return cellSegMap.empty() ? 1 : cellSegMap.back().lastSubSegmentNumber;
+
+    // Fallback: md is shallower than all segment midpoints — connect to the first (shallowest) segment.
+    return best ? best->lastSubSegmentNumber : cellSegMap.front().lastSubSegmentNumber;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -201,10 +219,9 @@ RigMswBranchExportData buildMainBoreSegmentsFromGeometry( const RimWellPath*    
             prevOutMD     = midPointMD;
             prevOutTVD    = midPointTVD;
             firstSubSeg   = false;
+            if ( cellSegMap ) cellSegMap->push_back( { subStartMD, subEndMD, lastSubSegNum } );
             result.push_back( std::move( seg ) );
         }
-
-        if ( cellSegMap ) cellSegMap->push_back( { cellInfo.startMD, cellInfo.endMD, lastSubSegNum } );
     }
 
     return RigMswBranchExportData{ branchNumber, std::nullopt, std::move( result ) };

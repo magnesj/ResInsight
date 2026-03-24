@@ -67,35 +67,36 @@ TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDInLastCell )
 }
 
 //--------------------------------------------------------------------------------------------------
-/// MD exactly at the start of a cell (inclusive lower bound).
+/// MD exactly at the start of the first cell — shallower than the first midpoint (100),
+/// so no midpoint is at or below md; fallback = first (shallowest) segment.
+/// MD exactly at the shared boundary (200) — midpoint of first cell (150) is below 200,
+/// midpoint of second cell (250) is above 200; closest-below midpoint is 150 → seg 5.
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellStart )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
-    EXPECT_EQ( 5, findOutletSegmentForMD( map, 100.0 ) );
-    EXPECT_EQ( 6, findOutletSegmentForMD( map, 200.0 ) ); // exactly at boundary → next cell
+    EXPECT_EQ( 5, findOutletSegmentForMD( map, 100.0 ) ); // shallower than midpoint 150 → first seg
+    EXPECT_EQ( 5, findOutletSegmentForMD( map, 200.0 ) ); // midpoint 150 ≤ 200 < midpoint 250 → seg 5
 }
 
 //--------------------------------------------------------------------------------------------------
-/// MD exactly at cellEndMD is NOT matched (exclusive upper bound), falls to next cell.
+/// MD=200 sits between midpoint 150 (seg 5) and midpoint 250 (seg 6).
+/// Closest midpoint at-or-below is 150 → seg 5.
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDAtCellEnd_ExclusiveBoundary )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
-    // 200.0 is NOT in cell [100,200) — it belongs to [200,300)
-    EXPECT_EQ( 6, findOutletSegmentForMD( map, 200.0 ) );
+    EXPECT_EQ( 5, findOutletSegmentForMD( map, 200.0 ) );
 }
 
 //--------------------------------------------------------------------------------------------------
-/// MD before first cell returns 1 (no match, empty fallback should not apply —
-/// but in this implementation the fallback returns the last entry's segment, so we verify
-/// that for MD below the first cell the loop finds no match and falls back to last entry).
+/// MD before all segment midpoints — no midpoint is at or below md;
+/// fallback = first (shallowest) segment.
 //--------------------------------------------------------------------------------------------------
 TEST( RicWellPathExportMswBuildSegments, FindOutlet_MDBelowAllCells )
 {
     std::vector<CellSegmentEntry> map = { { 100.0, 200.0, 5 }, { 200.0, 300.0, 6 } };
-    // MD=50 is below all cells, no match → fallback = last entry's segment
-    EXPECT_EQ( 6, findOutletSegmentForMD( map, 50.0 ) );
+    EXPECT_EQ( 5, findOutletSegmentForMD( map, 50.0 ) ); // shallower than all midpoints → first seg
 }
 
 //--------------------------------------------------------------------------------------------------
