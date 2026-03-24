@@ -77,7 +77,7 @@ TEST( RicWellPathExportMswGeometryPath, EmptySegmentList )
     RigMswWellExportData exportData;
     exportData.header = makeHeader( "Well_A" );
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     EXPECT_EQ( "Well_A", result.wellName() );
     EXPECT_EQ( "Well_A", result.welsegsHeader().well );
@@ -103,7 +103,7 @@ TEST( RicWellPathExportMswGeometryPath, SingleSegmentNoIntersections )
     seg.sourceWellName  = "WP_1";
     exportData.branches = { makeBranch( 1, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 1u, result.welsegsData().size() );
     EXPECT_TRUE( result.compsegsData().empty() );
@@ -141,7 +141,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithMultipleIntersections )
 
     exportData.branches = { makeBranch( 1, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 1u, result.welsegsData().size() );
     ASSERT_EQ( 3u, result.compsegsData().size() );
@@ -177,7 +177,7 @@ TEST( RicWellPathExportMswGeometryPath, MainGridAndLgrIntersections )
 
     exportData.branches = { makeBranch( 1, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 2u, result.compsegsData().size() );
 
@@ -214,7 +214,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegvalvData )
 
     exportData.branches = { makeBranch( 2, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 1u, result.welsegsData().size() );
     ASSERT_EQ( 1u, result.wsegvalvData().size() );
@@ -252,7 +252,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegaicdData )
 
     exportData.branches = { makeBranch( 2, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 1u, result.welsegsData().size() );
     EXPECT_TRUE( result.wsegvalvData().empty() );
@@ -285,7 +285,7 @@ TEST( RicWellPathExportMswGeometryPath, SegmentWithWsegsicdData )
 
     exportData.branches = { makeBranch( 3, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 1u, result.welsegsData().size() );
     EXPECT_TRUE( result.wsegvalvData().empty() );
@@ -318,7 +318,7 @@ TEST( RicWellPathExportMswGeometryPath, MultipleSegments )
 
     exportData.branches = { makeBranch( 1, { seg1, seg2, seg3 } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     EXPECT_EQ( 3u, result.welsegsData().size() );
     EXPECT_EQ( 3u, result.compsegsData().size() ); // 2 + 1 + 0
@@ -341,7 +341,7 @@ TEST( RicWellPathExportMswGeometryPath, OutletSegmentNumberMapping )
 
     exportData.branches = { makeBranch( 1, { seg2, seg3, seg4 } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 3u, result.welsegsData().size() );
     EXPECT_EQ( 2, result.welsegsData()[0].segment1 );
@@ -366,7 +366,7 @@ TEST( RicWellPathExportMswGeometryPath, Segment1EqualsSegment2 )
                             makeBranch( 2, { makeSegment( 5, 2 ) } ),
                             makeBranch( 3, { makeSegment( 9, 5 ) } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     for ( const auto& row : result.welsegsData() )
     {
@@ -386,7 +386,7 @@ TEST( RicWellPathExportMswGeometryPath, CompsegsInheritsBranchFromSegment )
     seg.intersections   = { RigMswCellIntersection{ 1, 2, 3, 10.0, 20.0, "" }, RigMswCellIntersection{ 1, 2, 4, 20.0, 30.0, "" } };
     exportData.branches = { makeBranch( 7, { seg } ) };
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_METRIC );
 
     ASSERT_EQ( 2u, result.compsegsData().size() );
     for ( const auto& row : result.compsegsData() )
@@ -409,7 +409,7 @@ TEST( RicWellPathExportMswGeometryPath, HeaderFieldsPropagated )
     RigMswWellExportData exportData;
     exportData.header = hdr;
 
-    auto result = RicWellPathExportMswGeometryPath::collectDataFromFlatList( exportData, RiaDefines::EclipseUnitSystem::UNITS_FIELD );
+    auto result = RicWellPathExportMswGeometryPath::collectTableData( exportData, RiaDefines::EclipseUnitSystem::UNITS_FIELD );
 
     EXPECT_EQ( "DeepWell", result.welsegsHeader().well );
     EXPECT_DOUBLE_EQ( 1234.5, result.welsegsHeader().topDepth );

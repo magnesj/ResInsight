@@ -226,7 +226,7 @@ std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Build the flat MSW export data directly from well-path geometry and Rim completion objects,
+/// Build MSW export data directly from well-path geometry and Rim completion objects,
 /// without building the RicMswBranch / RicMswItem tree.
 ///
 /// Currently implemented: main-bore WELSEGS segments + perforation COMPSEGS entries.
@@ -382,11 +382,11 @@ RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                      
 }
 
 //--------------------------------------------------------------------------------------------------
-/// Populate RigMswTableData from a pre-built flat segment list.
+/// Populate RigMswTableData from a pre-built RigMswWellExportData.
 /// This replaces the recursive tree-based collection functions (collectWelsegsData etc.) with
 /// simple iteration over RigMswSegment objects.
 //--------------------------------------------------------------------------------------------------
-RigMswTableData collectDataFromFlatList( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem )
+RigMswTableData collectTableData( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem )
 {
     RigMswTableData tableData( exportData.header.well, unitSystem );
     tableData.setWelsegsHeader( exportData.header );

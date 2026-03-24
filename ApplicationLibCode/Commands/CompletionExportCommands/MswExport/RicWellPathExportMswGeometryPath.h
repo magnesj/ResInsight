@@ -57,6 +57,6 @@ RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                      
                                            RicWellPathExportMswTableData::CompletionType completionType,
                                            const std::optional<QDateTime>&               exportDate );
 
-RigMswTableData collectDataFromFlatList( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
+RigMswTableData collectTableData( const RigMswWellExportData& exportData, RiaDefines::EclipseUnitSystem unitSystem );
 
 } // namespace RicWellPathExportMswGeometryPath

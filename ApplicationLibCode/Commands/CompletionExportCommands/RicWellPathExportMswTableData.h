@@ -77,7 +77,7 @@ public:
                                                                                      const std::optional<QDateTime>& exportDate = std::nullopt );
 
     static std::expected<RigMswTableData, std::string>
-        extractSingleWellMswDataFlatList( RimEclipseCase*                 eclipseCase,
+        extractSingleWellMswDataGeometry( RimEclipseCase*                 eclipseCase,
                                           RimWellPath*                    wellPath,
                                           bool                            exportCompletionsAfterMainBoreSegments = true,
                                           CompletionType                  completionType                         = CompletionType::ALL,

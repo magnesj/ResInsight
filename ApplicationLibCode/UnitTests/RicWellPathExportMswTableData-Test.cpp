@@ -97,10 +97,10 @@ std::vector<std::tuple<size_t, size_t, size_t, std::string>> extractSortedCells(
 
 //==================================================================================================
 //
-// Parameterized integration tests: Tree mode vs FlatList mode for all MSW project files.
+// Parameterized integration tests: Tree mode vs Geometry mode for all MSW project files.
 //
 // The test loads a ResInsight project file, extracts well MSW data using both the tree-based
-// (extractSingleWellMswDataTree) and flat-list-based (extractSingleWellMswDataFlatList)
+// (extractSingleWellMswDataTree) and geometry-based (extractSingleWellMswDataGeometry)
 // algorithms, and verifies that both produce equivalent results for every well path:
 //
 //   - The same set of reservoir cells in COMPSEGS (sorted {i,j,k,gridName} tuples)
@@ -108,11 +108,11 @@ std::vector<std::tuple<size_t, size_t, size_t, std::string>> extractSortedCells(
 //
 //==================================================================================================
 
-class MswTreeVsFlatListTest : public testing::TestWithParam<std::string>
+class MswTreeVsGeometryTest : public testing::TestWithParam<std::string>
 {
 };
 
-TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
+TEST_P( MswTreeVsGeometryTest, CompareTreeAndGeometryModes )
 {
     const std::string& projectFileName = GetParam();
     QString            projectFilePath =
@@ -155,49 +155,49 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
 
         if ( !wellPath->isTopLevelWellPath() ) continue;
 
-        auto treeResult = RicWellPathExportMswTableData::extractSingleWellMswDataTree( eclipseCase, wellPath );
-        auto flatResult = RicWellPathExportMswTableData::extractSingleWellMswDataFlatList( eclipseCase, wellPath );
+        auto treeResult     = RicWellPathExportMswTableData::extractSingleWellMswDataTree( eclipseCase, wellPath );
+        auto geometryResult = RicWellPathExportMswTableData::extractSingleWellMswDataGeometry( eclipseCase, wellPath );
 
         // If one mode fails, the other should fail too (no MSW data for this well path).
-        if ( !treeResult.has_value() && !flatResult.has_value() )
+        if ( !treeResult.has_value() && !geometryResult.has_value() )
         {
             continue;
         }
 
         ASSERT_TRUE( treeResult.has_value() ) << "Tree mode failed for well '" << wellPath->name().toStdString()
                                               << "': " << treeResult.error();
-        ASSERT_TRUE( flatResult.has_value() ) << "FlatList mode failed for well '" << wellPath->name().toStdString()
-                                              << "': " << flatResult.error();
+        ASSERT_TRUE( geometryResult.has_value() )
+            << "Geometry mode failed for well '" << wellPath->name().toStdString() << "': " << geometryResult.error();
 
-        const std::string wellName    = treeResult->wellName();
+        const std::string wellName     = treeResult->wellName();
         const QString     wellFileName = QString::fromStdString( wellName ) + ".txt";
 
         // Export both modes to files for side-by-side comparison
         writeMswTableDataToFile( *treeResult, compareOutBase + "/tree/" + wellFileName );
-        writeMswTableDataToFile( *flatResult, compareOutBase + "/flat-list/" + wellFileName );
+        writeMswTableDataToFile( *geometryResult, compareOutBase + "/geometry/" + wellFileName );
 
         // Export LGR (COMPSEGL) data to separate files if present
         const QString lgrFileName = QString::fromStdString( wellName ) + "_LGR.txt";
         writeMswLgrTableDataToFile( *treeResult, compareOutBase + "/tree/" + lgrFileName );
-        writeMswLgrTableDataToFile( *flatResult, compareOutBase + "/flat-list/" + lgrFileName );
+        writeMswLgrTableDataToFile( *geometryResult, compareOutBase + "/geometry/" + lgrFileName );
 
         // Both modes must produce data for the same well.
-        EXPECT_EQ( wellName, flatResult->wellName() ) << "Well name mismatch for: " << wellPath->name().toStdString();
+        EXPECT_EQ( wellName, geometryResult->wellName() ) << "Well name mismatch for: " << wellPath->name().toStdString();
 
         // Both modes must connect to the same set of reservoir cells.
-        auto treeCells = extractSortedCells( *treeResult );
-        auto flatCells = extractSortedCells( *flatResult );
+        auto treeCells     = extractSortedCells( *treeResult );
+        auto geometryCells = extractSortedCells( *geometryResult );
 
-        EXPECT_EQ( treeCells, flatCells ) << "COMPSEGS cells differ between Tree and FlatList modes for well '" << wellName << "'";
+        EXPECT_EQ( treeCells, geometryCells ) << "COMPSEGS cells differ between Tree and Geometry modes for well '" << wellName << "'";
 
         // Both modes must produce the same number of valve rows for each valve type.
-        EXPECT_EQ( treeResult->wsegvalvData().size(), flatResult->wsegvalvData().size() )
+        EXPECT_EQ( treeResult->wsegvalvData().size(), geometryResult->wsegvalvData().size() )
             << "WSEGVALV row count differs for well '" << wellName << "'";
 
-        EXPECT_EQ( treeResult->wsegaicdData().size(), flatResult->wsegaicdData().size() )
+        EXPECT_EQ( treeResult->wsegaicdData().size(), geometryResult->wsegaicdData().size() )
             << "WSEGAICD row count differs for well '" << wellName << "'";
 
-        EXPECT_EQ( treeResult->wsegsicdData().size(), flatResult->wsegsicdData().size() )
+        EXPECT_EQ( treeResult->wsegsicdData().size(), geometryResult->wsegsicdData().size() )
             << "WSEGSICD row count differs for well '" << wellName << "'";
 
         ++wellsWithData;
@@ -207,7 +207,7 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
 }
 
 INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
-                          MswTreeVsFlatListTest,
+                          MswTreeVsGeometryTest,
                           testing::Values( "base.rsp",
                                            "fracture.rsp",
                                            "perf_lateral.rsp",

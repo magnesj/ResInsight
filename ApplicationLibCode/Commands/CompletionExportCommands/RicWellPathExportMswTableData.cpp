@@ -20,13 +20,13 @@
 
 #include "RiaLogging.h"
 
+#include "MswExport/RicWellPathExportMswGeometryPath.h"
 #include "RicExportCompletionDataSettingsUi.h"
 #include "RicExportFractureCompletionsImpl.h"
 #include "RicMswCompletions.h"
 #include "RicMswExportInfo.h"
 #include "RicMswTableDataTools.h"
 #include "RicMswValveAccumulators.h"
-#include "MswExport/RicWellPathExportMswGeometryPath.h"
 
 #include "CompletionsMsw/RigMswTableData.h"
 #include "RigActiveCellInfo.h"
@@ -79,7 +79,7 @@ std::expected<RigMswTableData, std::string>
     }
     else
     {
-        return extractSingleWellMswDataFlatList( eclipseCase, wellPath, exportCompletionsAfterMainBoreSegments, completionType, exportDate );
+        return extractSingleWellMswDataGeometry( eclipseCase, wellPath, exportCompletionsAfterMainBoreSegments, completionType, exportDate );
     }
 }
 
@@ -87,7 +87,7 @@ std::expected<RigMswTableData, std::string>
 ///
 //--------------------------------------------------------------------------------------------------
 std::expected<RigMswTableData, std::string>
-    RicWellPathExportMswTableData::extractSingleWellMswDataFlatList( RimEclipseCase*                 eclipseCase,
+    RicWellPathExportMswTableData::extractSingleWellMswDataGeometry( RimEclipseCase*                 eclipseCase,
                                                                      RimWellPath*                    wellPath,
                                                                      bool                            exportCompletionsAfterMainBoreSegments,
                                                                      CompletionType                  completionType,
@@ -100,15 +100,15 @@ std::expected<RigMswTableData, std::string>
     if ( !mswParameters ) return std::unexpected( "Missing MSW completion parameters" );
 
     const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
-    auto                                         flatData = RicWellPathExportMswGeometryPath::buildMswFromGeometry( eclipseCase,
-                                                                            wellPath,
-                                                                            mswParameters->maxSegmentLength(),
-                                                                            customSegmentIntervals,
-                                                                            completionType,
-                                                                            exportDate );
+    auto                                         wellExportData = RicWellPathExportMswGeometryPath::buildMswFromGeometry( eclipseCase,
+                                                                                  wellPath,
+                                                                                  mswParameters->maxSegmentLength(),
+                                                                                  customSegmentIntervals,
+                                                                                  completionType,
+                                                                                  exportDate );
 
     auto unitSystem = eclipseCase->eclipseCaseData()->unitsType();
-    return RicWellPathExportMswGeometryPath::collectDataFromFlatList( flatData, unitSystem );
+    return RicWellPathExportMswGeometryPath::collectTableData( wellExportData, unitSystem );
 }
 
 //--------------------------------------------------------------------------------------------------
