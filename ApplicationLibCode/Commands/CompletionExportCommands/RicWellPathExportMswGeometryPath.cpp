@@ -18,12 +18,17 @@
 
 #include "RicWellPathExportMswGeometryPath.h"
 
+#include "RicMswTableDataTools.h"
 #include "RicWellPathExportMswBuildSegments.h"
 #include "RicWellPathExportMswTableData.h"
 
 #include "CompletionsMsw/RigMswTableData.h"
 
+#include "RigEclipseCaseData.h"
+#include "Well/RigWellPath.h"
+
 #include "RimEclipseCase.h"
+#include "RimWellPathCompletionSettings.h"
 #include "RimMswCompletionParameters.h"
 #include "RimPerforationCollection.h"
 #include "RimPerforationInterval.h"
