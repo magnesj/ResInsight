@@ -28,11 +28,11 @@
 #include "Well/RigWellPath.h"
 
 #include "RimEclipseCase.h"
-#include "RimWellPathCompletionSettings.h"
 #include "RimMswCompletionParameters.h"
 #include "RimPerforationCollection.h"
 #include "RimPerforationInterval.h"
 #include "RimWellPath.h"
+#include "RimWellPathCompletionSettings.h"
 #include "RimWellPathTieIn.h"
 #include "RimWellPathValve.h"
 
