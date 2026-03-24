@@ -100,7 +100,7 @@ std::expected<RigMswTableData, std::string>
     if ( !mswParameters ) return std::unexpected( "Missing MSW completion parameters" );
 
     const std::vector<std::pair<double, double>> customSegmentIntervals = mswParameters->getSegmentIntervals();
-    auto                                         wellExportData = RicWellPathExportMswGeometryPath::buildMswFromGeometry( eclipseCase,
+    auto                                         wellExportData = RicWellPathExportMswGeometryPath::buildMswWellExportData( eclipseCase,
                                                                                   wellPath,
                                                                                   mswParameters->maxSegmentLength(),
                                                                                   customSegmentIntervals,

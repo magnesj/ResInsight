@@ -47,7 +47,7 @@ using CompletionType = RicWellPathExportMswTableData::CompletionType;
 /// Recursively build all WELSEGS/COMPSEGS/valve segments for one lateral (child well path)
 /// and any of its own child laterals.
 //--------------------------------------------------------------------------------------------------
-std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 eclipseCase,
+std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 eclipseCase,
                                                 const RimWellPath*              wellPath,
                                                 const RigMainGrid*              mainGrid,
                                                 int                             outletSegNum,
@@ -218,7 +218,7 @@ std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 
         const int grandchildOutlet =
             RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->tieInMeasuredDepth() );
         auto grandchildBranches =
-            buildLateralSegments( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
+            buildLateralBranches( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         result.insert( result.end(), std::make_move_iterator( grandchildBranches.begin() ), std::make_move_iterator( grandchildBranches.end() ) );
     }
 
@@ -232,7 +232,7 @@ std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 
 /// Currently implemented: main-bore WELSEGS segments + perforation COMPSEGS entries.
 /// TODO: valve completions (ICD/AICD/SICD/ICV), fishbones laterals, fractures, tie-in wells.
 //--------------------------------------------------------------------------------------------------
-RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
+RigMswWellExportData buildMswWellExportData( RimEclipseCase*                               eclipseCase,
                                            const RimWellPath*                            wellPath,
                                            double                                        maxSegmentLength,
                                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
@@ -357,7 +357,7 @@ RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                      
         const int childOutlet =
             RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->tieInMeasuredDepth() );
         auto childBranches =
-            buildLateralSegments( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
+            buildLateralBranches( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         lateralBranches.insert( lateralBranches.end(),
                                 std::make_move_iterator( childBranches.begin() ),
                                 std::make_move_iterator( childBranches.end() ) );

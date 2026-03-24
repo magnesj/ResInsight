@@ -40,7 +40,7 @@ class RigMainGrid;
 namespace RicWellPathExportMswGeometryPath
 {
 
-std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                               eclipseCase,
+std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                               eclipseCase,
                                                 const RimWellPath*                            wellPath,
                                                 const RigMainGrid*                            mainGrid,
                                                 int                                           outletSegNum,
@@ -50,7 +50,7 @@ std::vector<RigMswBranch> buildLateralSegments( RimEclipseCase*                 
                                                 int&                                          branchNumber,
                                                 RiaDefines::EclipseUnitSystem                 unitSystem );
 
-RigMswWellExportData buildMswFromGeometry( RimEclipseCase*                               eclipseCase,
+RigMswWellExportData buildMswWellExportData( RimEclipseCase*                               eclipseCase,
                                            const RimWellPath*                            wellPath,
                                            double                                        maxSegmentLength,
                                            const std::vector<std::pair<double, double>>& customSegmentIntervals,
