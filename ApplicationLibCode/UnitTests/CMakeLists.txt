@@ -216,6 +216,7 @@ target_include_directories(
   PUBLIC ${CMAKE_BINARY_DIR}/Generated
          "$<TARGET_PROPERTY:ApplicationLibCode,PUBLIC_INCLUDE_DIRECTORIES>"
          ${RI_PRIVATE_INCLUDES} ${PROJECT_SOURCE_DIR}/Commands
+         ${PROJECT_SOURCE_DIR}/Commands/CompletionExportCommands
 )
 
 target_compile_features(ResInsight-tests PRIVATE cxx_std_20)
