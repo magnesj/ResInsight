@@ -216,4 +216,5 @@ INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                                            "two_wells.rsp",
                                            "perf-lgr-two-wells.rsp",
                                            "perf_aicd.rsp",
-                                           "fishbones.rsp" ) );
+                                           "fishbones.rsp",
+                                           "multiple_laterals.rsp" ) );
