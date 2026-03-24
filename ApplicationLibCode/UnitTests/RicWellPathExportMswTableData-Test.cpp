@@ -62,6 +62,24 @@ void writeMswTableDataToFile( const RigMswTableData& tableData, const QString& f
 }
 
 //--------------------------------------------------------------------------------------------------
+/// Write COMPSEGL (LGR) table data to a separate file.
+//--------------------------------------------------------------------------------------------------
+void writeMswLgrTableDataToFile( const RigMswTableData& tableData, const QString& filePath )
+{
+    if ( !tableData.hasLgrData() ) return;
+
+    QFileInfo fileInfo( filePath );
+    QDir().mkpath( fileInfo.absolutePath() );
+
+    QFile file( filePath );
+    if ( !file.open( QIODevice::WriteOnly | QIODevice::Text ) ) return;
+
+    QTextStream               stream( &file );
+    RifTextDataTableFormatter formatter( stream );
+    RigMswDataFormatter::formatCompsegsTable( formatter, tableData, true );
+}
+
+//--------------------------------------------------------------------------------------------------
 /// Extract {i, j, k, gridName} tuples from COMPSEGS data, sorted for stable comparison.
 //--------------------------------------------------------------------------------------------------
 std::vector<std::tuple<size_t, size_t, size_t, std::string>> extractSortedCells( const RigMswTableData& data )
@@ -157,6 +175,11 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
         // Export both modes to files for side-by-side comparison
         writeMswTableDataToFile( *treeResult, compareOutBase + "/tree/" + wellFileName );
         writeMswTableDataToFile( *flatResult, compareOutBase + "/flat-list/" + wellFileName );
+
+        // Export LGR (COMPSEGL) data to separate files if present
+        const QString lgrFileName = QString::fromStdString( wellName ) + "_LGR.txt";
+        writeMswLgrTableDataToFile( *treeResult, compareOutBase + "/tree/" + lgrFileName );
+        writeMswLgrTableDataToFile( *flatResult, compareOutBase + "/flat-list/" + lgrFileName );
 
         // Both modes must produce data for the same well.
         EXPECT_EQ( wellName, flatResult->wellName() ) << "Well name mismatch for: " << wellPath->name().toStdString();
