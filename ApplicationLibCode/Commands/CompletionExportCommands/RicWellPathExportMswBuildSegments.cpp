@@ -266,10 +266,89 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                 ( valveType == RiaDefines::WellPathComponentType::AICD || valveType == RiaDefines::WellPathComponentType::SICD );
             if ( !isIcdOrIcv && !isAicdOrSicd ) continue;
 
-            const int valveBranch = ++branchNumber;
-
             const auto& valveLocations = valve->valveLocations();
             const auto& valveSegs      = valve->valveSegments(); // one (startMD, endMD) per location
+
+            // ICD: one branch per overlapping cell with proportional area, matching tree approach
+            if ( valveType == RiaDefines::WellPathComponentType::ICD )
+            {
+                for ( size_t vi = 0; vi < valveLocations.size(); ++vi )
+                {
+                    const double valveSegStart = valveSegs[vi].first;
+                    const double valveSegEnd   = valveSegs[vi].second;
+
+                    // Collect cells overlapping this ICD's coverage range and total overlap length
+                    struct CellEntry
+                    {
+                        RigMswCellIntersection ci;
+                        double                 overlapMD;
+                    };
+                    std::vector<CellEntry> cells;
+                    double                 totalOverlapMD = 0.0;
+                    for ( const auto& cellInfo : filteredIntersections )
+                    {
+                        const double overlapStart = std::max( valveSegStart, cellInfo.startMD );
+                        const double overlapEnd   = std::min( valveSegEnd, cellInfo.endMD );
+                        if ( overlapEnd <= overlapStart ) continue;
+                        if ( auto ci = toMswCellIntersection( cellInfo, mainGrid, overlapStart, overlapEnd ) )
+                        {
+                            double overlapMD = overlapEnd - overlapStart;
+                            cells.push_back( { *ci, overlapMD } );
+                            totalOverlapMD += overlapMD;
+                        }
+                    }
+
+                    // One branch+segment per cell with area proportional to overlap length
+                    for ( auto& entry : cells )
+                    {
+                        const int    cellBranch  = ++branchNumber;
+                        const double valveMD     = entry.ci.distanceStart;
+                        const double valveEndMD  = valveMD + RicMswTableDataTools::valveSegmentLength;
+                        const int    outletSeg   = findOutletSegmentForMD( cellSegMap, valveMD );
+                        const double startTVD    = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
+                        const double endTVD      = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
+
+                        double length = 0.0, depth = 0.0;
+                        if ( infoType == "INC" )
+                        {
+                            length = valveEndMD - valveMD;
+                            depth  = endTVD - startTVD;
+                        }
+                        else
+                        {
+                            length = valveEndMD;
+                            depth  = endTVD;
+                        }
+
+                        RigMswSegment seg;
+                        seg.segmentNumber       = segmentNumber;
+                        seg.outletSegmentNumber = outletSeg;
+                        seg.length              = length;
+                        seg.depth               = depth;
+                        seg.diameter            = linerDiameter;
+                        seg.roughness           = roughnessFactor;
+                        seg.sourceWellName      = wellPath->name().toStdString();
+                        seg.description         = QString( "%1 #%2" ).arg( valve->name() ).arg( vi + 1 ).toStdString();
+                        seg.intersections       = { entry.ci };
+
+                        WsegvalvRow wv;
+                        wv.well          = wellNameForExport;
+                        wv.segmentNumber = segmentNumber;
+                        wv.cv            = valve->flowCoefficient();
+                        wv.area          = totalOverlapMD > 0.0 ? valve->area( unitSystem ) * entry.overlapMD / totalOverlapMD : 0.0;
+                        wv.status        = valve->isOpen() ? "OPEN" : "SHUT";
+                        wv.description   = valve->name().toStdString();
+                        seg.wsegvalvData = wv;
+
+                        segmentNumber++;
+                        result.push_back( RigMswBranchExportData{ cellBranch, std::nullopt, { std::move( seg ) } } );
+                    }
+                }
+                continue;
+            }
+
+            // ICV / AICD / SICD: one branch, one segment per valve location
+            const int valveBranch = ++branchNumber;
 
             std::vector<RigMswSegment> branchSegs;
             for ( size_t vi = 0; vi < valveLocations.size(); ++vi )
@@ -319,8 +398,8 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                     }
                 }
 
-                // WSEGVALV for ICD/ICV
-                if ( isIcdOrIcv )
+                // WSEGVALV for ICV
+                if ( valveType == RiaDefines::WellPathComponentType::ICV )
                 {
                     WsegvalvRow wv;
                     wv.well               = wellNameForExport;
