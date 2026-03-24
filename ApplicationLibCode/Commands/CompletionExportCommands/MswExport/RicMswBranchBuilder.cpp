@@ -650,9 +650,6 @@ std::vector<RigMswBranch> buildFishbonesBranchesFromGeometry( const RimEclipseCa
 {
     std::vector<RigMswBranch> result;
 
-    const auto linerDiameter   = wellPath->mswCompletionParameters()->linerDiameter( unitSystem );
-    const auto roughnessFactor = wellPath->mswCompletionParameters()->roughnessFactor( unitSystem );
-
     auto fishbonesSubs = wellPath->completions()->fishbonesCollection()->activeFishbonesSubs();
     for ( const RimFishbones* subs : fishbonesSubs )
     {
