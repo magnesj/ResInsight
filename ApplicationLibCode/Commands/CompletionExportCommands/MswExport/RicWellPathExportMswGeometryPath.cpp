@@ -31,8 +31,8 @@
 #include "RimMswCompletionParameters.h"
 #include "RimPerforationCollection.h"
 #include "RimPerforationInterval.h"
-#include "RimWellPath.h"
 #include "RimValveCollection.h"
+#include "RimWellPath.h"
 #include "RimWellPathCompletionSettings.h"
 #include "RimWellPathTieIn.h"
 #include "RimWellPathValve.h"
@@ -152,7 +152,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 
     std::vector<RicWellPathExportMswBuildSegments::CellSegmentEntry> childCellSegMap;
 
-    auto lateralBranch       = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
+    auto lateralBranch = RicWellPathExportMswBuildSegments::buildMainBoreSegmentsFromGeometry( wellPath,
                                                                                                filteredIntersections,
                                                                                                mainGrid,
                                                                                                perforationIntervals,
@@ -164,12 +164,11 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
                                                                                                segmentNumber,
                                                                                                childOutletSeg,
                                                                                                mswParameters->maxSegmentLength(),
-                                                                                                     {},
+                                                                                               {},
                                                                                                exportDate,
                                                                                                unitSystem,
                                                                                                &childCellSegMap );
-    if ( tieInValve && !lateralBranch.segments.empty() )
-        lateralBranch.segments.front().description.clear();
+    if ( tieInValve && !lateralBranch.segments.empty() ) lateralBranch.segments.front().description.clear();
     lateralBranch.tieInValve = std::move( tieInValve );
 
     // Standalone valves (from valveCollection, not inside perforation intervals)
@@ -243,7 +242,8 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
     for ( auto* grandchild : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int grandchildOutlet =
-            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->branchValveMeasuredDepth() );
+            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap,
+                                                                       grandchild->wellPathTieIn()->branchValveMeasuredDepth() );
         auto grandchildBranches =
             buildLateralBranches( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         result.insert( result.end(), std::make_move_iterator( grandchildBranches.begin() ), std::make_move_iterator( grandchildBranches.end() ) );
@@ -260,11 +260,11 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
 /// TODO: valve completions (ICD/AICD/SICD/ICV), fishbones laterals, fractures, tie-in wells.
 //--------------------------------------------------------------------------------------------------
 RigMswWellExportData buildMswWellExportData( RimEclipseCase*                               eclipseCase,
-                                           const RimWellPath*                            wellPath,
-                                           double                                        maxSegmentLength,
-                                           const std::vector<std::pair<double, double>>& customSegmentIntervals,
-                                           CompletionType                                completionType,
-                                           const std::optional<QDateTime>&               exportDate )
+                                             const RimWellPath*                            wellPath,
+                                             double                                        maxSegmentLength,
+                                             const std::vector<std::pair<double, double>>& customSegmentIntervals,
+                                             CompletionType                                completionType,
+                                             const std::optional<QDateTime>&               exportDate )
 {
     auto mswParameters = wellPath->mswCompletionParameters();
     CVF_ASSERT( mswParameters );
