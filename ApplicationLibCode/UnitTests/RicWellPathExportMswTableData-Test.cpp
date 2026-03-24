@@ -160,7 +160,4 @@ TEST_P( MswTreeVsFlatListTest, CompareTreeAndFlatListModes )
 
 INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                           MswTreeVsFlatListTest,
-                          testing::Values( "base.rsp",
-                                           "fracture.rsp",
-                                           "perf_lateral.rsp",
-                                           "perf-lgr.rsp" ) );
+                          testing::Values( "base.rsp", "fracture.rsp", "perf_lateral.rsp", "perf-lgr.rsp" ) );
