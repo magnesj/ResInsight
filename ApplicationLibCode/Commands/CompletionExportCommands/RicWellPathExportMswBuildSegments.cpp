@@ -75,6 +75,16 @@ std::optional<RigMswCellIntersection>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+double segmentMidpointMD( const std::vector<CellSegmentEntry>& cellSegMap, int segmentNumber )
+{
+    for ( const auto& entry : cellSegMap )
+    {
+        if ( entry.lastSubSegmentNumber == segmentNumber )
+            return 0.5 * ( entry.cellStartMD + entry.cellEndMD );
+    }
+    return 0.0;
+}
+
 int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, double md )
 {
     if ( cellSegMap.empty() ) return 1;
@@ -302,9 +312,9 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                     for ( auto& entry : cells )
                     {
                         const int    cellBranch  = ++branchNumber;
-                        const double valveMD     = entry.ci.distanceStart;
+                        const int    outletSeg   = findOutletSegmentForMD( cellSegMap, entry.ci.distanceStart );
+                        const double valveMD     = segmentMidpointMD( cellSegMap, outletSeg );
                         const double valveEndMD  = valveMD + RicMswTableDataTools::valveSegmentLength;
-                        const int    outletSeg   = findOutletSegmentForMD( cellSegMap, valveMD );
                         const double startTVD    = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
                         const double endTVD      = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
 
