@@ -85,6 +85,23 @@ double segmentMidpointMD( const std::vector<CellSegmentEntry>& cellSegMap, int s
     return 0.0;
 }
 
+// Range-based lookup: find the segment whose [cellStartMD, cellEndMD] range contains md.
+// Used for ICD valves where the valve overlap start always falls within the host main-bore cell.
+// Fractures use findOutletSegmentForMD (midpoint-based) to match the tree approach.
+int findContainingSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, double md )
+{
+    if ( cellSegMap.empty() ) return 1;
+
+    for ( const auto& entry : cellSegMap )
+    {
+        if ( md >= entry.cellStartMD && md < entry.cellEndMD )
+            return entry.lastSubSegmentNumber;
+    }
+
+    // Fallback: md is beyond all segments — return the last segment.
+    return cellSegMap.back().lastSubSegmentNumber;
+}
+
 int findOutletSegmentForMD( const std::vector<CellSegmentEntry>& cellSegMap, double md )
 {
     if ( cellSegMap.empty() ) return 1;
@@ -312,7 +329,7 @@ std::vector<RigMswBranchExportData> buildValveSegmentsFromGeometry( const RimWel
                     for ( auto& entry : cells )
                     {
                         const int    cellBranch  = ++branchNumber;
-                        const int    outletSeg   = findOutletSegmentForMD( cellSegMap, entry.ci.distanceStart );
+                        const int    outletSeg   = findContainingSegmentForMD( cellSegMap, entry.ci.distanceStart );
                         const double valveMD     = segmentMidpointMD( cellSegMap, outletSeg );
                         const double valveEndMD  = valveMD + RicMswTableDataTools::valveSegmentLength;
                         const double startTVD    = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
