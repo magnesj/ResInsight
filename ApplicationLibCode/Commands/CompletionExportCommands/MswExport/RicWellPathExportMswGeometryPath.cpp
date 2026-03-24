@@ -79,7 +79,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
         {
             const double valveMD       = wellPath->wellPathTieIn()->branchValveMeasuredDepth();
             const double offset        = ( valveMD == tieInMD ) ? RicMswTableDataTools::valveSegmentLength : 0.0;
-            const double valveEndMD    = tieInMD + offset;
+            const double valveEndMD    = valveMD + offset;
             const double valveStartTVD = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveMD );
             const double valveEndTVD   = RicMswTableDataTools::tvdFromMeasuredDepth( wellPath, valveEndMD );
 
@@ -167,6 +167,8 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
                                                                                                exportDate,
                                                                                                unitSystem,
                                                                                                &childCellSegMap );
+    if ( tieInValve && !lateralBranch.segments.empty() )
+        lateralBranch.segments.front().description.clear();
     lateralBranch.tieInValve = std::move( tieInValve );
     result.push_back( std::move( lateralBranch ) );
 
@@ -216,7 +218,7 @@ std::vector<RigMswBranch> buildLateralBranches( RimEclipseCase*                 
     for ( auto* grandchild : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int grandchildOutlet =
-            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->tieInMeasuredDepth() );
+            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( childCellSegMap, grandchild->wellPathTieIn()->branchValveMeasuredDepth() );
         auto grandchildBranches =
             buildLateralBranches( eclipseCase, grandchild, mainGrid, grandchildOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         result.insert( result.end(), std::make_move_iterator( grandchildBranches.begin() ), std::make_move_iterator( grandchildBranches.end() ) );
@@ -355,7 +357,7 @@ RigMswWellExportData buildMswWellExportData( RimEclipseCase*                    
     for ( auto* childWellPath : RicWellPathExportMswTableData::wellPathsWithTieIn( wellPath ) )
     {
         const int childOutlet =
-            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->tieInMeasuredDepth() );
+            RicWellPathExportMswBuildSegments::findOutletSegmentForMD( cellSegMap, childWellPath->wellPathTieIn()->branchValveMeasuredDepth() );
         auto childBranches =
             buildLateralBranches( eclipseCase, childWellPath, mainGrid, childOutlet, completionType, exportDate, segmentNumber, branchNumber, unitSystem );
         lateralBranches.insert( lateralBranches.end(),

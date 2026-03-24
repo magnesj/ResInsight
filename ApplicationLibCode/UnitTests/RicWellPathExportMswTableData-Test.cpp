@@ -217,4 +217,5 @@ INSTANTIATE_TEST_SUITE_P( MswExportProjectFiles,
                                            "perf-lgr-two-wells.rsp",
                                            "perf_aicd.rsp",
                                            "fishbones.rsp",
-                                           "multiple_laterals.rsp" ) );
+                                           "multiple_laterals.rsp",
+                                           "tie-in-custom-valve-location.rsp" ) );
