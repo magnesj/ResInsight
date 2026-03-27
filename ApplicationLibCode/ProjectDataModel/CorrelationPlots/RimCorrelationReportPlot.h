@@ -26,7 +26,6 @@
 
 #include <QDateTime>
 #include <QObject>
-#include <QPointer>
 
 class RimAnalysisPlotDataEntry;
 class RimCorrelationMatrixPlot;
@@ -37,7 +36,11 @@ class RiaSummaryCurveDefinition;
 class RimSummaryPlot;
 class RimSummaryAddressSelector;
 
-class RiuMultiPlotPage;
+namespace ads
+{
+class CDockManager;
+class CDockWidget;
+} // namespace ads
 
 class RimCorrelationReportPlot : public QObject, public RimPlotWindow
 {
@@ -58,7 +61,6 @@ public:
     RimCorrelationPlot*          correlationPlot() const;
     RimParameterResultCrossPlot* crossPlot() const;
 
-    int columnCount() const override;
     int subTitleFontSize() const;
     int axisTitleFontSize() const;
     int axisValueFontSize() const;
@@ -97,5 +99,11 @@ private:
     caf::PdmChildField<RimSummaryPlot*>            m_summaryPlot;
     caf::PdmChildField<RimSummaryAddressSelector*> m_summaryAddressSelector;
 
-    QPointer<RiuMultiPlotPage> m_viewer;
+    caf::PdmField<QString> m_dockState;
+
+    ads::CDockManager* m_dockManager         = nullptr;
+    ads::CDockWidget*  m_matrixDockWidget     = nullptr;
+    ads::CDockWidget*  m_correlationDockWidget = nullptr;
+    ads::CDockWidget*  m_crossPlotDockWidget  = nullptr;
+    ads::CDockWidget*  m_summaryDockWidget    = nullptr;
 };
