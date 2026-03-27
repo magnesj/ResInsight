@@ -25,9 +25,15 @@
 #include "RimCorrelationMatrixPlot.h"
 #include "RimCorrelationPlot.h"
 #include "RimCorrelationPlotCollection.h"
+#include "RimEnsembleCurveSet.h"
+#include "RimEnsembleCurveSetCollection.h"
 #include "RimParameterResultCrossPlot.h"
 #include "RimRegularLegendConfig.h"
+#include "RimSummaryAddressSelector.h"
 #include "RimSummaryEnsemble.h"
+#include "RimSummaryPlot.h"
+
+#include "RiaTimeTTools.h"
 
 #include "RiuMultiPlotPage.h"
 #include "RiuPlotWidget.h"
@@ -69,6 +75,10 @@ RimCorrelationReportPlot::RimCorrelationReportPlot()
     CAF_PDM_InitFieldNoDefault( &m_axisTitleFontSize, "AxisTitleFontSize", "Axis Title Font Size" );
     CAF_PDM_InitFieldNoDefault( &m_axisValueFontSize, "AxisValueFontSize", "Axis Value Font Size" );
 
+    CAF_PDM_InitField( &m_showSummaryPlot, "ShowSummaryPlot", false, "Show Summary Plot" );
+    CAF_PDM_InitFieldNoDefault( &m_summaryPlot, "SummaryPlot", "Summary Plot" );
+    CAF_PDM_InitFieldNoDefault( &m_summaryAddressSelector, "SummaryAddressSelector", "Summary Vector" );
+
     setAsPlotMdiWindow();
 
     m_showWindow      = true;
@@ -90,6 +100,16 @@ RimCorrelationReportPlot::RimCorrelationReportPlot()
 
     m_parameterResultCrossPlot = new RimParameterResultCrossPlot;
     m_parameterResultCrossPlot->setLegendsVisible( true );
+
+    m_summaryPlot = new RimSummaryPlot();
+    m_summaryPlot->setLegendsVisible( false );
+    m_summaryPlot->setRowSpan( RimPlot::TWO );
+    m_summaryPlot->ensembleCurveSetCollection()->addCurveSet( new RimEnsembleCurveSet() );
+
+    m_summaryAddressSelector = new RimSummaryAddressSelector();
+    m_summaryAddressSelector->setShowResampling( false );
+    m_summaryAddressSelector->setShowAxis( false );
+    m_summaryAddressSelector->addressChanged.connect( this, &RimCorrelationReportPlot::onAddressSelectorChanged );
 
     uiCapability()->setUiTreeChildrenHidden( true );
 
@@ -183,7 +203,7 @@ RimParameterResultCrossPlot* RimCorrelationReportPlot::crossPlot() const
 //--------------------------------------------------------------------------------------------------
 int RimCorrelationReportPlot::columnCount() const
 {
-    return 3;
+    return m_showSummaryPlot() ? 4 : 3;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -249,8 +269,26 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
     m_parameterResultCrossPlot->createPlotWidget();
 
     m_viewer->addPlot( m_correlationMatrixPlot->viewer() );
-    m_viewer->addPlot( m_correlationPlot->viewer() );
-    m_viewer->addPlot( m_parameterResultCrossPlot->viewer() );
+
+    if ( m_showSummaryPlot() )
+    {
+        m_summaryPlot->createPlotWidget( m_viewer );
+
+        m_viewer->addPlot( m_correlationPlot->viewer() );
+        m_viewer->addPlot( m_summaryPlot->plotWidget() );
+        m_viewer->addPlot( m_parameterResultCrossPlot->viewer() );
+
+        auto* summaryWidget = dynamic_cast<RiuQwtPlotWidget*>( m_summaryPlot->plotWidget() );
+        if ( summaryWidget )
+        {
+            connect( summaryWidget, &RiuQwtPlotWidget::plotMousePressedAt, this, &RimCorrelationReportPlot::onSummaryPlotMousePressed );
+        }
+    }
+    else
+    {
+        m_viewer->addPlot( m_correlationPlot->viewer() );
+        m_viewer->addPlot( m_parameterResultCrossPlot->viewer() );
+    }
 
     m_viewer->scheduleUpdate();
 }
@@ -263,6 +301,7 @@ void RimCorrelationReportPlot::cleanupBeforeClose()
     m_correlationMatrixPlot->detachAllCurves();
     m_correlationPlot->detachAllCurves();
     m_parameterResultCrossPlot->detachAllCurves();
+    if ( m_showSummaryPlot() ) m_summaryPlot->detachAllCurves();
 
     if ( m_viewer )
     {
@@ -351,6 +390,24 @@ void RimCorrelationReportPlot::onLoadDataAndUpdate()
         m_correlationPlot->loadDataAndUpdate();
         m_parameterResultCrossPlot->loadDataAndUpdate();
 
+        if ( m_showSummaryPlot() )
+        {
+            if ( !m_summaryAddressSelector->ensemble() )
+            {
+                auto ensembles = m_correlationMatrixPlot->ensembles();
+                if ( !ensembles.empty() ) m_summaryAddressSelector->setEnsemble( *ensembles.begin() );
+            }
+
+            auto curveSets = m_summaryPlot->ensembleCurveSetCollection()->curveSets();
+            if ( !curveSets.empty() )
+            {
+                curveSets[0]->setSummaryEnsemble( m_summaryAddressSelector->ensemble() );
+                curveSets[0]->setSummaryAddressY( m_summaryAddressSelector->summaryAddress() );
+            }
+
+            m_summaryPlot->loadDataAndUpdate();
+        }
+
         m_viewer->setPlotTitle( createDescription() );
     }
 
@@ -366,6 +423,13 @@ void RimCorrelationReportPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
 
     auto filterGroup = uiOrdering.addNewGroup( "Filter" );
     m_parameterResultCrossPlot->appendFilterFields( *filterGroup );
+
+    auto summaryGroup = uiOrdering.addNewGroup( "Summary Plot" );
+    summaryGroup->add( &m_showSummaryPlot );
+    if ( m_showSummaryPlot() )
+    {
+        m_summaryAddressSelector->uiOrdering( "", *summaryGroup );
+    }
 
     auto plotGroup = uiOrdering.addNewGroup( "Plot Settings" );
     plotGroup->setCollapsedByDefault();
@@ -385,6 +449,11 @@ void RimCorrelationReportPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
 //--------------------------------------------------------------------------------------------------
 void RimCorrelationReportPlot::fieldChangedByUi( const caf::PdmFieldHandle* changedField, const QVariant& oldValue, const QVariant& newValue )
 {
+    if ( changedField == &m_showSummaryPlot && m_viewer )
+    {
+        m_viewer->removeAllPlots();
+        recreatePlotWidgets();
+    }
     loadDataAndUpdate();
 }
 
@@ -430,4 +499,29 @@ void RimCorrelationReportPlot::onDataSelection( const caf::SignalEmitter*       
     }
 
     updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationReportPlot::onSummaryPlotMousePressed( double xPlotCoordinate )
+{
+    auto clickedTime    = RiaTimeTTools::fromDouble( xPlotCoordinate );
+    auto availableSteps = m_correlationMatrixPlot->allAvailableTimeSteps();
+    if ( availableSteps.empty() ) return;
+
+    auto it = std::min_element( availableSteps.begin(),
+                                availableSteps.end(),
+                                [clickedTime]( time_t a, time_t b ) { return std::abs( a - clickedTime ) < std::abs( b - clickedTime ); } );
+
+    m_correlationMatrixPlot->setTimeStep( *it );
+    loadDataAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationReportPlot::onAddressSelectorChanged( const caf::SignalEmitter* )
+{
+    loadDataAndUpdate();
 }

@@ -20,6 +20,7 @@
 #include "RimPlotWindow.h"
 
 #include "cafPdmChildField.h"
+#include "cafPdmField.h"
 #include "cafPdmProxyValueField.h"
 #include "cafPdmPtrField.h"
 
@@ -33,6 +34,8 @@ class RimParameterResultCrossPlot;
 class RimSummaryEnsemble;
 class RimCorrelationPlot;
 class RiaSummaryCurveDefinition;
+class RimSummaryPlot;
+class RimSummaryAddressSelector;
 
 class RiuMultiPlotPage;
 
@@ -76,6 +79,8 @@ private:
     void     doUpdateLayout() override;
 
     void onDataSelection( const caf::SignalEmitter* emitter, std::pair<QString, RiaSummaryCurveDefinition> parameterAndCurveDef );
+    void onSummaryPlotMousePressed( double xPlotCoordinate );
+    void onAddressSelectorChanged( const caf::SignalEmitter* emitter );
 
 private:
     caf::PdmProxyValueField<QString> m_name;
@@ -87,6 +92,10 @@ private:
     RimFontSizeField                                 m_labelFontSize;
     RimFontSizeField                                 m_axisTitleFontSize;
     RimFontSizeField                                 m_axisValueFontSize;
+
+    caf::PdmField<bool>                            m_showSummaryPlot;
+    caf::PdmChildField<RimSummaryPlot*>            m_summaryPlot;
+    caf::PdmChildField<RimSummaryAddressSelector*> m_summaryAddressSelector;
 
     QPointer<RiuMultiPlotPage> m_viewer;
 };
