@@ -304,6 +304,7 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
 
         m_summaryDockWidget->toggleView( m_showSummaryPlot() );
     }
+
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -326,6 +327,17 @@ void RimCorrelationReportPlot::cleanupBeforeClose()
     {
         delete m_dockManager;
         m_dockManager = nullptr;
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationReportPlot::setupBeforeSave()
+{
+    if ( m_dockManager )
+    {
+        m_dockState = QString::fromLatin1( m_dockManager->saveState( 1 ).toBase64() );
     }
 }
 
@@ -357,11 +369,6 @@ QWidget* RimCorrelationReportPlot::createViewWidget( QWidget* mainWindowParent /
 //--------------------------------------------------------------------------------------------------
 void RimCorrelationReportPlot::deleteViewWidget()
 {
-    // Persist dock layout before destroying the manager
-    if ( m_dockManager )
-    {
-        m_dockState = QString::fromLatin1( m_dockManager->saveState( 1 ).toBase64() );
-    }
     cleanupBeforeClose();
 }
 

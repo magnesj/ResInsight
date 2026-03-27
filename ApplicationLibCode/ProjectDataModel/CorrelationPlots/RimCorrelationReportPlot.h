@@ -71,6 +71,7 @@ private:
     void    recreatePlotWidgets();
     void    cleanupBeforeClose();
 
+    void     setupBeforeSave() override;
     void     doRenderWindowContent( QPaintDevice* paintDevice ) override;
     QWidget* createViewWidget( QWidget* mainWindowParent = nullptr ) override;
     void     deleteViewWidget() override;
