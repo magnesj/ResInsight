@@ -102,9 +102,9 @@ private:
 
     caf::PdmField<QString> m_dockState;
 
-    ads::CDockManager* m_dockManager         = nullptr;
-    ads::CDockWidget*  m_matrixDockWidget     = nullptr;
+    ads::CDockManager* m_dockManager           = nullptr;
+    ads::CDockWidget*  m_matrixDockWidget      = nullptr;
     ads::CDockWidget*  m_correlationDockWidget = nullptr;
-    ads::CDockWidget*  m_crossPlotDockWidget  = nullptr;
-    ads::CDockWidget*  m_summaryDockWidget    = nullptr;
+    ads::CDockWidget*  m_crossPlotDockWidget   = nullptr;
+    ads::CDockWidget*  m_summaryDockWidget     = nullptr;
 };

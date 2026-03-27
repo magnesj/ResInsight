@@ -148,8 +148,7 @@ QString RimCorrelationReportPlot::description() const
 //--------------------------------------------------------------------------------------------------
 QImage RimCorrelationReportPlot::snapshotWindowContent()
 {
-    if ( m_dockManager )
-        return m_dockManager->grab().toImage();
+    if ( m_dockManager ) return m_dockManager->grab().toImage();
     return {};
 }
 
@@ -304,7 +303,6 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
 
         m_summaryDockWidget->toggleView( m_showSummaryPlot() );
     }
-
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -319,7 +317,7 @@ void RimCorrelationReportPlot::cleanupBeforeClose()
 
     // Dock widget pointers are owned by the dock manager; nullify them before deletion
     m_matrixDockWidget      = nullptr;
-    m_correlationDockWidget  = nullptr;
+    m_correlationDockWidget = nullptr;
     m_crossPlotDockWidget   = nullptr;
     m_summaryDockWidget     = nullptr;
 
@@ -416,16 +414,13 @@ void RimCorrelationReportPlot::onLoadDataAndUpdate()
         m_parameterResultCrossPlot->setAxisValueFontSize( m_axisValueFontSize() );
 
         m_correlationMatrixPlot->loadDataAndUpdate();
-        if ( m_correlationMatrixPlot->viewer() )
-            m_correlationMatrixPlot->viewer()->setPlotTitleEnabled( true );
+        if ( m_correlationMatrixPlot->viewer() ) m_correlationMatrixPlot->viewer()->setPlotTitleEnabled( true );
 
         m_correlationPlot->loadDataAndUpdate();
-        if ( m_correlationPlot->viewer() )
-            m_correlationPlot->viewer()->setPlotTitleEnabled( true );
+        if ( m_correlationPlot->viewer() ) m_correlationPlot->viewer()->setPlotTitleEnabled( true );
 
         m_parameterResultCrossPlot->loadDataAndUpdate();
-        if ( m_parameterResultCrossPlot->viewer() )
-            m_parameterResultCrossPlot->viewer()->setPlotTitleEnabled( true );
+        if ( m_parameterResultCrossPlot->viewer() ) m_parameterResultCrossPlot->viewer()->setPlotTitleEnabled( true );
 
         if ( m_showSummaryPlot() )
         {
@@ -443,8 +438,7 @@ void RimCorrelationReportPlot::onLoadDataAndUpdate()
             }
 
             m_summaryPlot->loadDataAndUpdate();
-            if ( m_summaryPlot->plotWidget() )
-                m_summaryPlot->plotWidget()->setPlotTitleEnabled( true );
+            if ( m_summaryPlot->plotWidget() ) m_summaryPlot->plotWidget()->setPlotTitleEnabled( true );
         }
     }
 
