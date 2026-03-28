@@ -46,12 +46,14 @@
 #include "cafAssert.h"
 #include "cafPdmPointer.h"
 #include "cafPdmUiTreeOrdering.h"
+#include "cafSelectionManager.h"
 
 #include "qwt_picker_machine.h"
 #include "qwt_plot.h"
 #include "qwt_plot_picker.h"
 #include "qwt_text.h"
 
+#include <QContextMenuEvent>
 #include <QImage>
 #include <QStringList>
 #include <QVBoxLayout>
@@ -101,6 +103,32 @@ private:
     caf::PdmPointer<RimSummaryPlot>        m_summaryPlot;
     mutable caf::PdmPointer<RimTimeAxisAnnotation> m_trackingAnnotation;
 };
+
+namespace
+{
+// Ensures the correlation report plot is selected in CAF whenever a context menu event is dispatched
+// anywhere within the dock manager — so feature availability checks in RiuContextMenuLauncher
+// see the correct item (mirrors what RiuMultiPlotPage::contextMenuEvent did explicitly).
+class ReportPlotContextMenuFilter : public QObject
+{
+public:
+    ReportPlotContextMenuFilter( RimCorrelationReportPlot* plot, QObject* parent )
+        : QObject( parent )
+        , m_plot( plot )
+    {
+    }
+
+    bool eventFilter( QObject*, QEvent* event ) override
+    {
+        if ( event->type() == QEvent::ContextMenu )
+            caf::SelectionManager::instance()->setSelectedItem( m_plot );
+        return false; // never consume the event
+    }
+
+private:
+    RimCorrelationReportPlot* m_plot;
+};
+} // namespace
 
 //==================================================================================================
 //
@@ -313,6 +341,14 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
     m_correlationPlot->createPlotWidget( m_dockManager );
     m_parameterResultCrossPlot->createPlotWidget( m_dockManager );
     m_summaryPlot->createPlotWidget( m_dockManager );
+
+    // Install selection fixer on each plot widget (runs first due to LIFO filter order), so that
+    // RiuContextMenuLauncher sees the correct CAF selection when building the context menu.
+    auto* filter = new ReportPlotContextMenuFilter( this, m_dockManager );
+    if ( m_correlationMatrixPlot->viewer() ) m_correlationMatrixPlot->viewer()->installEventFilter( filter );
+    if ( m_correlationPlot->viewer() ) m_correlationPlot->viewer()->installEventFilter( filter );
+    if ( m_parameterResultCrossPlot->viewer() ) m_parameterResultCrossPlot->viewer()->installEventFilter( filter );
+    if ( m_summaryPlot->plotWidget() ) m_summaryPlot->plotWidget()->installEventFilter( filter );
 
     // Wrap each plot in a dock widget
     m_matrixDockWidget = new ads::CDockWidget( "Matrix Plot", m_dockManager );
