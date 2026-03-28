@@ -28,6 +28,8 @@
 #include "RimCorrelationPlotCollection.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetCollection.h"
+#include "RimSummaryTimeAxisProperties.h"
+#include "RimTimeAxisAnnotation.h"
 #include "RimParameterResultCrossPlot.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSummaryAddressSelector.h"
@@ -42,11 +44,63 @@
 #include "DockWidget.h"
 
 #include "cafAssert.h"
+#include "cafPdmPointer.h"
 #include "cafPdmUiTreeOrdering.h"
+
+#include "qwt_picker_machine.h"
+#include "qwt_plot.h"
+#include "qwt_plot_picker.h"
+#include "qwt_text.h"
 
 #include <QImage>
 #include <QStringList>
 #include <QVBoxLayout>
+
+//--------------------------------------------------------------------------------------------------
+/// Local picker for time tracking readout — draws a dashed vertical line following the mouse cursor.
+/// Manages only its own annotation so the static selected-time annotation is preserved.
+//--------------------------------------------------------------------------------------------------
+class TimeReadoutPicker : public QwtPlotPicker
+{
+public:
+    TimeReadoutPicker( RimSummaryPlot* summaryPlot, QwtPlot* plot )
+        : QwtPlotPicker( plot->canvas() )
+        , m_summaryPlot( summaryPlot )
+    {
+        setTrackerMode( QwtPlotPicker::AlwaysOn );
+        plot->canvas()->setMouseTracking( true );
+        setStateMachine( new QwtPickerTrackerMachine );
+    }
+
+    QwtText trackerText( const QPoint& screenPixelCoordinates ) const override
+    {
+        if ( !plot() || !m_summaryPlot ) return {};
+
+        const auto timeTValue    = RiaTimeTTools::fromDouble( invTransform( screenPixelCoordinates ).x() );
+        auto*      timeAxisProps = m_summaryPlot->timeAxisProperties();
+        if ( timeAxisProps )
+        {
+            if ( m_trackingAnnotation )
+            {
+                timeAxisProps->removeAnnotation( m_trackingAnnotation );
+                m_trackingAnnotation = nullptr;
+            }
+            auto* anno = RimTimeAxisAnnotation::createTimeAnnotation( timeTValue, cvf::Color3f( 0.6f, 0.4f, 0.08f ) );
+            anno->setPenStyle( Qt::DashLine );
+            timeAxisProps->appendAnnotation( anno );
+            m_trackingAnnotation = anno;
+        }
+
+        m_summaryPlot->updateAnnotationsInPlotWidget();
+        m_summaryPlot->updatePlotWidgetFromAxisRanges();
+
+        return {};
+    }
+
+private:
+    caf::PdmPointer<RimSummaryPlot>        m_summaryPlot;
+    mutable caf::PdmPointer<RimTimeAxisAnnotation> m_trackingAnnotation;
+};
 
 //==================================================================================================
 //
@@ -105,7 +159,11 @@ RimCorrelationReportPlot::RimCorrelationReportPlot()
 
     m_summaryPlot = new RimSummaryPlot();
     m_summaryPlot->setLegendsVisible( false );
-    m_summaryPlot->ensembleCurveSetCollection()->addCurveSet( new RimEnsembleCurveSet() );
+
+    auto* curveSet = new RimEnsembleCurveSet();
+    curveSet->setColorMode( RimEnsembleCurveSet::ColorMode::SINGLE_COLOR );
+    curveSet->setColor( cvf::Color3f( 0.6f, 0.4f, 0.08f ) );
+    m_summaryPlot->ensembleCurveSetCollection()->addCurveSet( curveSet );
 
     m_summaryAddressSelector = new RimSummaryAddressSelector();
     m_summaryAddressSelector->setShowResampling( false );
@@ -273,11 +331,12 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
     m_summaryDockWidget->setWidget( m_summaryPlot->plotWidget(), ads::CDockWidget::ForceNoScrollArea );
     m_summaryDockWidget->setFeature( ads::CDockWidget::DockWidgetClosable, false );
 
-    // Connect summary plot click → time step update
+    // Connect summary plot click → time step update; add time tracking readout
     auto* summaryWidget = dynamic_cast<RiuQwtPlotWidget*>( m_summaryPlot->plotWidget() );
     if ( summaryWidget )
     {
         connect( summaryWidget, &RiuQwtPlotWidget::plotMousePressedAt, this, &RimCorrelationReportPlot::onSummaryPlotMousePressed );
+        new TimeReadoutPicker( m_summaryPlot(), summaryWidget->qwtPlot() );
     }
 
     // Restore saved dock state if available; otherwise set up default layout
@@ -426,8 +485,12 @@ void RimCorrelationReportPlot::onLoadDataAndUpdate()
         {
             if ( !m_summaryAddressSelector->ensemble() )
             {
-                auto ensembles = m_correlationMatrixPlot->ensembles();
-                if ( !ensembles.empty() ) m_summaryAddressSelector->setEnsemble( *ensembles.begin() );
+                auto curveDefs = m_correlationMatrixPlot->curveDefinitions();
+                if ( !curveDefs.empty() )
+                {
+                    m_summaryAddressSelector->setEnsemble( curveDefs.front().ensemble() );
+                    m_summaryAddressSelector->setAddress( curveDefs.front().summaryAddressY() );
+                }
             }
 
             auto curveSets = m_summaryPlot->ensembleCurveSetCollection()->curveSets();
@@ -439,6 +502,15 @@ void RimCorrelationReportPlot::onLoadDataAndUpdate()
 
             m_summaryPlot->loadDataAndUpdate();
             if ( m_summaryPlot->plotWidget() ) m_summaryPlot->plotWidget()->setPlotTitleEnabled( true );
+
+            // Add static line for the currently selected time step.
+            // Must be done after loadDataAndUpdate() since that clears all annotations internally.
+            auto* timeAxisProps = m_summaryPlot->timeAxisProperties();
+            if ( timeAxisProps )
+            {
+                timeAxisProps->appendAnnotation( RimTimeAxisAnnotation::createTimeAnnotation( timeStep, cvf::Color3f( 0.6f, 0.4f, 0.08f ) ) );
+                m_summaryPlot->updateAnnotationsInPlotWidget();
+            }
         }
     }
 
