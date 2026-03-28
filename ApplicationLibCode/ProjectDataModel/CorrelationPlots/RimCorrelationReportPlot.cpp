@@ -385,8 +385,8 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
         stateToRestore = QByteArray::fromBase64( m_dockState().toLatin1() );
     else
     {
-        QSettings  settings;
-        QVariant   v = settings.value( DOCK_LAYOUT_REGISTRY_KEY );
+        QSettings settings;
+        QVariant  v = settings.value( DOCK_LAYOUT_REGISTRY_KEY );
         if ( v.isValid() ) stateToRestore = v.toByteArray();
     }
 
@@ -693,6 +693,5 @@ void RimCorrelationReportPlot::onRestoreDefaultDockLayout()
 
     QSettings settings;
     QVariant  v = settings.value( DOCK_LAYOUT_REGISTRY_KEY );
-    if ( v.isValid() )
-        m_dockManager->restoreState( v.toByteArray(), 1 );
+    if ( v.isValid() ) m_dockManager->restoreState( v.toByteArray(), 1 );
 }
