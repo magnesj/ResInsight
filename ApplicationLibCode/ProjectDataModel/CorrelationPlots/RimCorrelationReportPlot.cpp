@@ -28,6 +28,7 @@
 #include "RimCorrelationPlotCollection.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetCollection.h"
+#include "RimEnsembleStatistics.h"
 #include "RimParameterResultCrossPlot.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSummaryAddressSelector.h"
@@ -55,8 +56,11 @@
 
 #include <QContextMenuEvent>
 #include <QImage>
+#include <QSettings>
 #include <QStringList>
 #include <QVBoxLayout>
+
+static const char* DOCK_LAYOUT_REGISTRY_KEY = "CorrelationReportPlot/defaultDockLayout";
 
 //--------------------------------------------------------------------------------------------------
 /// Local picker for time tracking readout — draws a dashed vertical line following the mouse cursor.
@@ -157,7 +161,7 @@ RimCorrelationReportPlot::RimCorrelationReportPlot()
     CAF_PDM_InitFieldNoDefault( &m_axisTitleFontSize, "AxisTitleFontSize", "Axis Title Font Size" );
     CAF_PDM_InitFieldNoDefault( &m_axisValueFontSize, "AxisValueFontSize", "Axis Value Font Size" );
 
-    CAF_PDM_InitField( &m_showSummaryPlot, "ShowSummaryPlot", false, "Show Summary Plot" );
+    CAF_PDM_InitField( &m_showSummaryPlot, "ShowSummaryPlot", true, "Show Summary Plot" );
     CAF_PDM_InitFieldNoDefault( &m_summaryPlot, "SummaryPlot", "Summary Plot" );
     CAF_PDM_InitFieldNoDefault( &m_summaryAddressSelector, "SummaryAddressSelector", "Summary Vector" );
 
@@ -190,6 +194,7 @@ RimCorrelationReportPlot::RimCorrelationReportPlot()
     auto* curveSet = new RimEnsembleCurveSet();
     curveSet->setColorMode( RimEnsembleCurveSet::ColorMode::SINGLE_COLOR );
     curveSet->setColor( cvf::Color3f( 0.6f, 0.4f, 0.08f ) );
+    const_cast<RimEnsembleStatistics*>( curveSet->statisticsOptions() )->enableCurveLabels( false );
     m_summaryPlot->ensembleCurveSetCollection()->addCurveSet( curveSet );
 
     m_summaryAddressSelector = new RimSummaryAddressSelector();
@@ -374,19 +379,29 @@ void RimCorrelationReportPlot::recreatePlotWidgets()
         new TimeReadoutPicker( m_summaryPlot(), summaryWidget->qwtPlot() );
     }
 
-    // Restore saved dock state if available; otherwise set up default layout
+    // Restore saved dock state: project state takes priority, then registry default, then hard-coded layout
+    QByteArray stateToRestore;
     if ( !m_dockState().isEmpty() )
+        stateToRestore = QByteArray::fromBase64( m_dockState().toLatin1() );
+    else
+    {
+        QSettings  settings;
+        QVariant   v = settings.value( DOCK_LAYOUT_REGISTRY_KEY );
+        if ( v.isValid() ) stateToRestore = v.toByteArray();
+    }
+
+    if ( !stateToRestore.isEmpty() )
     {
         // Add all widgets to the manager first (required before restoreState)
         m_dockManager->addDockWidget( ads::LeftDockWidgetArea, m_matrixDockWidget );
         m_dockManager->addDockWidget( ads::RightDockWidgetArea, m_correlationDockWidget );
         m_dockManager->addDockWidget( ads::RightDockWidgetArea, m_crossPlotDockWidget );
         m_dockManager->addDockWidget( ads::RightDockWidgetArea, m_summaryDockWidget );
-        m_dockManager->restoreState( QByteArray::fromBase64( m_dockState().toLatin1() ), 1 );
+        m_dockManager->restoreState( stateToRestore, 1 );
     }
     else
     {
-        // Default layout: matrix on left, corr top-right, cross bottom-right, summary far right
+        // Hard-coded default: matrix on left, corr top-right, cross bottom-right, summary far right
         auto* matrixArea = m_dockManager->addDockWidget( ads::LeftDockWidgetArea, m_matrixDockWidget );
         auto* corrArea   = m_dockManager->addDockWidget( ads::RightDockWidgetArea, m_correlationDockWidget );
         auto* crossArea  = m_dockManager->addDockWidget( ads::BottomDockWidgetArea, m_crossPlotDockWidget, corrArea );
@@ -579,6 +594,11 @@ void RimCorrelationReportPlot::defineUiOrdering( QString uiConfigName, caf::PdmU
     plotGroup->add( &m_axisValueFontSize );
     m_correlationMatrixPlot->legendConfig()->uiOrdering( "ColorsOnly", *plotGroup );
 
+    auto layoutGroup = uiOrdering.addNewGroup( "Dock Layout" );
+    layoutGroup->setCollapsedByDefault();
+    layoutGroup->addNewButton( "Save as Default Layout", [this]() { onSaveDefaultDockLayout(); } );
+    layoutGroup->addNewButton( "Restore Default Layout", [this]() { onRestoreDefaultDockLayout(); } );
+
     uiOrdering.skipRemainingFields( true );
 }
 
@@ -650,4 +670,29 @@ void RimCorrelationReportPlot::onSummaryPlotMousePressed( double xPlotCoordinate
 void RimCorrelationReportPlot::onAddressSelectorChanged( const caf::SignalEmitter* )
 {
     loadDataAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationReportPlot::onSaveDefaultDockLayout()
+{
+    if ( m_dockManager )
+    {
+        QSettings settings;
+        settings.setValue( DOCK_LAYOUT_REGISTRY_KEY, m_dockManager->saveState( 1 ) );
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimCorrelationReportPlot::onRestoreDefaultDockLayout()
+{
+    if ( !m_dockManager ) return;
+
+    QSettings settings;
+    QVariant  v = settings.value( DOCK_LAYOUT_REGISTRY_KEY );
+    if ( v.isValid() )
+        m_dockManager->restoreState( v.toByteArray(), 1 );
 }
