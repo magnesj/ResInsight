@@ -28,13 +28,13 @@
 #include "RimCorrelationPlotCollection.h"
 #include "RimEnsembleCurveSet.h"
 #include "RimEnsembleCurveSetCollection.h"
-#include "RimSummaryTimeAxisProperties.h"
-#include "RimTimeAxisAnnotation.h"
 #include "RimParameterResultCrossPlot.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSummaryAddressSelector.h"
 #include "RimSummaryEnsemble.h"
 #include "RimSummaryPlot.h"
+#include "RimSummaryTimeAxisProperties.h"
+#include "RimTimeAxisAnnotation.h"
 
 #include "RiuPlotWidget.h"
 #include "RiuQwtPlotWidget.h"
@@ -100,7 +100,7 @@ public:
     }
 
 private:
-    caf::PdmPointer<RimSummaryPlot>        m_summaryPlot;
+    caf::PdmPointer<RimSummaryPlot>                m_summaryPlot;
     mutable caf::PdmPointer<RimTimeAxisAnnotation> m_trackingAnnotation;
 };
 
@@ -120,8 +120,7 @@ public:
 
     bool eventFilter( QObject*, QEvent* event ) override
     {
-        if ( event->type() == QEvent::ContextMenu )
-            caf::SelectionManager::instance()->setSelectedItem( m_plot );
+        if ( event->type() == QEvent::ContextMenu ) caf::SelectionManager::instance()->setSelectedItem( m_plot );
         return false; // never consume the event
     }
 
