@@ -1,0 +1,37 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "wsl-base",
+            "hidden": true,
+            "displayName": "WSL Base",
+            "inherits": "ninja",
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "cacheVariables": {
+                "RESINSIGHT_ENABLE_UNITY_BUILD": true,
+                "RESINSIGHT_ENABLE_GRPC": false,
+                "CMAKE_PREFIX_PATH": "/home/builder/qt/6.6.3/gcc_64/lib/cmake",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/ThirdParty/vcpkg-custom-triplets",
+                "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic",
+                "VCPKG_INSTALLED_DIR": "$env{HOME}/.vcpkg/resinsight/installed"
+            }
+        },
+        {
+            "name": "wsl-x64-release",
+            "displayName": "WSL x64 Release",
+            "description": "WSL Release (uses Linux-native paths and dynamic linking for faster configuration)",
+            "inherits": "wsl-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Release" }
+        },
+        {
+            "name": "wsl-x64-debug",
+            "displayName": "WSL x64 Debug",
+            "description": "WSL Debug (uses Linux-native paths and dynamic linking for faster configuration)",
+            "inherits": "wsl-base",
+            "cacheVariables": { "CMAKE_BUILD_TYPE": "Debug" }
+        }
+    ]
+}

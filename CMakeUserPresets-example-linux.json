@@ -13,7 +13,9 @@
             "cacheVariables": {
                 "RESINSIGHT_ENABLE_UNITY_BUILD": true,
                 "RESINSIGHT_ENABLE_GRPC": false,
-                "CMAKE_PREFIX_PATH": "/home/builder/qt/6.6.3/gcc_64/lib/cmake"
+                "CMAKE_PREFIX_PATH": "/home/builder/qt/6.6.3/gcc_64/lib/cmake",
+                "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/ThirdParty/vcpkg-custom-triplets",
+                "VCPKG_TARGET_TRIPLET": "x64-linux-dynamic"
             }
         },
         {
