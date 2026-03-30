@@ -407,30 +407,27 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 
   if(RESINSIGHT_UPDATE_SUBMODULES)
     set(SUBDIR "${PROJECT_SOURCE_DIR}/ThirdParty")
-    message(STATUS "Initializing GIT submodules")
-    execute_process(
-      COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${SUBDIR}
-      WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-      RESULT_VARIABLE GIT_SUBMOD_RESULT
-    )
-    if(NOT GIT_SUBMOD_RESULT EQUAL "0")
-      message(
-        FATAL_ERROR
-          "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules"
+    set(_SUBMOD_STAMP "${CMAKE_BINARY_DIR}/submodules_initialized.stamp")
+    set(_GITMODULES "${PROJECT_SOURCE_DIR}/.gitmodules")
+    if(NOT EXISTS "${_SUBMOD_STAMP}" OR "${_GITMODULES}" IS_NEWER_THAN "${_SUBMOD_STAMP}")
+      message(STATUS "Initializing GIT submodules")
+      execute_process(
+        COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${SUBDIR}
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        RESULT_VARIABLE GIT_SUBMOD_RESULT
       )
+      if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+        message(
+          FATAL_ERROR
+            "git submodule update --init failed with ${GIT_SUBMOD_RESULT}, please checkout submodules"
+        )
+      endif()
+      file(TOUCH "${_SUBMOD_STAMP}")
     endif()
   endif()
 endif()
 
-if(UNIX)
-  execute_process(
-    COMMAND date "+%Y-%m-%d %H:%M:%S"
-    OUTPUT_VARIABLE RESINSIGHT_BUILD_DATE
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-  )
-else()
-  string(TIMESTAMP RESINSIGHT_BUILD_DATE "%Y-%m-%d %H:%M:%S")
-endif()
+string(TIMESTAMP RESINSIGHT_BUILD_DATE "%Y-%m-%d %H:%M:%S")
 
 # ##############################################################################
 # OpenVDS seismic file access
