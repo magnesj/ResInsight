@@ -409,10 +409,13 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
     set(SUBDIR "${PROJECT_SOURCE_DIR}/ThirdParty")
     set(_SUBMOD_STAMP "${CMAKE_BINARY_DIR}/submodules_initialized.stamp")
     set(_GITMODULES "${PROJECT_SOURCE_DIR}/.gitmodules")
-    if(NOT EXISTS "${_SUBMOD_STAMP}" OR "${_GITMODULES}" IS_NEWER_THAN "${_SUBMOD_STAMP}")
+    if(NOT EXISTS "${_SUBMOD_STAMP}" OR "${_GITMODULES}" IS_NEWER_THAN
+                                        "${_SUBMOD_STAMP}"
+    )
       message(STATUS "Initializing GIT submodules")
       execute_process(
-        COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive -- ${SUBDIR}
+        COMMAND ${GIT_EXECUTABLE} submodule update --init --recursive --
+                ${SUBDIR}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
         RESULT_VARIABLE GIT_SUBMOD_RESULT
       )
