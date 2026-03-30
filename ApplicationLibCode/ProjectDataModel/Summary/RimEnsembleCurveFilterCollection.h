@@ -61,5 +61,4 @@ private:
 private:
     caf::PdmField<bool>                              m_active;
     caf::PdmChildArrayField<RimEnsembleCurveFilter*> m_filters;
-    caf::PdmField<bool>                              m_newFilterButton;
 };

@@ -76,7 +76,6 @@ private:
     caf::PdmPtrField<RimSummaryEnsemble*>             m_summaryCaseCollection;
     caf::PdmChildField<RimSummaryAddress*>            m_summaryAddress;
     caf::PdmProxyValueField<RifEclipseSummaryAddress> m_summaryAddressUiField;
-    caf::PdmField<bool>                               m_pushButtonSelectSummaryAddress;
     caf::PdmPtrField<RimPlotAxisPropertiesInterface*> m_plotAxisProperties;
     caf::PdmField<RiaDefines::DateTimePeriodEnum>     m_resamplingPeriod;
 

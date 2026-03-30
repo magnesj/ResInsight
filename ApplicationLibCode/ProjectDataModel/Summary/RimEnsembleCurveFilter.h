@@ -104,7 +104,6 @@ private:
 
     caf::PdmChildArrayField<RimSummaryAddress*>   m_objectiveValuesSummaryAddresses;
     caf::PdmField<QString>                        m_objectiveValuesSummaryAddressesUiField;
-    caf::PdmField<bool>                           m_objectiveValuesSelectSummaryAddressPushButton;
     caf::PdmChildField<RimObjectiveFunction*>     m_objectiveFunction;
     caf::PdmPtrField<RimCustomObjectiveFunction*> m_customObjectiveFunction;
 

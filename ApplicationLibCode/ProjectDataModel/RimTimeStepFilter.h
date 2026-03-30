@@ -97,7 +97,6 @@ private:
     caf::PdmField<int>                  m_firstTimeStep;
     caf::PdmField<int>                  m_lastTimeStep;
     caf::PdmField<int>                  m_interval;
-    caf::PdmField<bool>                 m_applyReloadOfCase;
     caf::PdmField<QString>              m_dateFormat;
     caf::PdmField<std::vector<QString>> m_timeStepNamesFromFile;
     caf::PdmField<bool>                 m_readOnlyLastFrame;
