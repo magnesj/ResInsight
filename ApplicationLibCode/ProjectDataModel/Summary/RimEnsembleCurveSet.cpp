@@ -135,6 +135,8 @@ RimEnsembleCurveSet::RimEnsembleCurveSet()
     m_yValuesSummaryAddress.uiCapability()->setUiTreeChildrenHidden( true );
     m_yValuesSummaryAddress = new RimSummaryAddress;
 
+    CAF_PDM_InitFieldNoDefault( &m_resampling, "Resampling", "Resampling" );
+
     // X Axis
     CAF_PDM_InitField( &m_xAxisType,
                        "HorizontalAxisType",
