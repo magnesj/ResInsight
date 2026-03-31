@@ -431,23 +431,7 @@ void RimTimeStepFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiOrderi
 
     if ( caseLoaded )
     {
-        uiOrdering.addNewButton( "Reload Case",
-                                 [this]()
-                                 {
-                                     updateFilteredTimeStepsFromUi();
-
-                                     auto rimEclipseResultCase = parentEclipseResultCase();
-                                     auto rimGeoMechCase       = parentGeoMechCase();
-
-                                     if ( rimEclipseResultCase )
-                                     {
-                                         RimReloadCaseTools::reloadEclipseGrid( rimEclipseResultCase );
-                                     }
-                                     else if ( rimGeoMechCase )
-                                     {
-                                         rimGeoMechCase->reloadDataAndUpdate();
-                                     }
-                                 } );
+        uiOrdering.addNewButton( "Reload Case", [this]() { onReloadCaseButtonClicked(); } );
     }
 
     updateFieldVisibility();
@@ -527,5 +511,25 @@ void RimTimeStepFilter::timeStepOptions( QList<caf::PdmOptionItemInfo>&         
             options.push_back(
                 caf::PdmOptionItemInfo( RiaQDateTimeTools::toStringUsingApplicationLocale( dateTime, dateFormatString ), dateTime ) );
         }
+    }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimTimeStepFilter::onReloadCaseButtonClicked()
+{
+    updateFilteredTimeStepsFromUi();
+
+    auto rimEclipseResultCase = parentEclipseResultCase();
+    auto rimGeoMechCase       = parentGeoMechCase();
+
+    if ( rimEclipseResultCase )
+    {
+        RimReloadCaseTools::reloadEclipseGrid( rimEclipseResultCase );
+    }
+    else if ( rimGeoMechCase )
+    {
+        rimGeoMechCase->reloadDataAndUpdate();
     }
 }

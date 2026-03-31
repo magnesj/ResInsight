@@ -130,6 +130,7 @@ private:
     void connectAllCaseSignals();
     void connectCurveFilterSignals();
     void onFilterSourceChanged( const caf::SignalEmitter* emitter );
+    void onSelectVariablesButtonClicked();
 
     RiaSummaryCurveDefinitionAnalyser* getOrCreateSelectedCurveDefAnalyser() const;
 

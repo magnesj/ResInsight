@@ -237,6 +237,9 @@ private:
     void onObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
     void onCustomObjectiveFunctionChanged( const caf::SignalEmitter* emitter );
 
+    void onYValuesSummaryAddressButtonClicked();
+    void onObjectiveValuesSummaryAddressesButtonClicked();
+
     void computeRealizationColor();
     void onColorTagClicked( const SignalEmitter* emitter, size_t index );
 

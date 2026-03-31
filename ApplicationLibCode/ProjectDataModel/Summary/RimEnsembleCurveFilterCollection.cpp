@@ -116,16 +116,7 @@ void RimEnsembleCurveFilterCollection::defineUiOrdering( QString uiConfigName, c
 {
     caf::PdmUiGroup* group = uiOrdering.addNewGroup( "Filters" );
 
-    group->addNewButton( "Add Ensemble Curve Filter",
-                         [this]()
-                         {
-                             addFilter();
-                             updateConnectedEditors();
-                             if ( auto curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>() )
-                             {
-                                 curveSet->updateAllCurves();
-                             }
-                         } );
+    group->addNewButton( "Add Ensemble Curve Filter", [this]() { onAddFilterButtonClicked(); } );
 
     for ( auto& filter : m_filters )
     {
@@ -262,4 +253,17 @@ void RimEnsembleCurveFilterCollection::onChildDeleted( caf::PdmChildArrayFieldHa
 
     RimEnsembleCurveSet* curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>();
     if ( curveSet ) curveSet->updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveFilterCollection::onAddFilterButtonClicked()
+{
+    addFilter();
+    updateConnectedEditors();
+    if ( auto curveSet = firstAncestorOrThisOfType<RimEnsembleCurveSet>() )
+    {
+        curveSet->updateAllCurves();
+    }
 }

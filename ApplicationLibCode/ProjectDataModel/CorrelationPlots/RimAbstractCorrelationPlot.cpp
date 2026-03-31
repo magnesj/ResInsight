@@ -710,37 +710,7 @@ void RimAbstractCorrelationPlot::appendDataSourceFields( QString uiConfigName, c
 
     curveDataGroup->add( &m_selectedVarsUiField );
     curveDataGroup->addNewButton( "...",
-                                  [this]()
-                                  {
-                                      RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
-
-                                      if ( m_selectMultipleVectors )
-                                      {
-                                          dlg.enableMultiSelect( true );
-                                      }
-
-                                      dlg.hideSummaryCases();
-                                      dlg.setCurveSelection( curveDefinitions() );
-
-                                      if ( dlg.exec() == QDialog::Accepted )
-                                      {
-                                          auto curveSelection = dlg.curveSelection();
-                                          if ( !curveSelection.empty() )
-                                          {
-                                              std::vector<RiaSummaryCurveDefinition> summaryVectorDefinitions = dlg.curveSelection();
-                                              m_dataSources.deleteChildren();
-                                              for ( const RiaSummaryCurveDefinition& vectorDef : summaryVectorDefinitions )
-                                              {
-                                                  auto plotEntry = new RimAnalysisPlotDataEntry();
-                                                  plotEntry->setFromCurveDefinition( vectorDef );
-                                                  m_dataSources.push_back( plotEntry );
-                                              }
-                                              connectAllCaseSignals();
-                                              loadDataAndUpdate();
-                                              updateConnectedEditors();
-                                          }
-                                      }
-                                  },
+                                  [this]() { onSelectVariablesButtonClicked(); },
                                   { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
     curveDataGroup->add( &m_timeStepFilter );
     curveDataGroup->add( &m_timeStep );
@@ -791,4 +761,39 @@ void RimAbstractCorrelationPlot::connectCurveFilterSignals()
 void RimAbstractCorrelationPlot::onFilterSourceChanged( const caf::SignalEmitter* emitter )
 {
     if ( m_useCaseFilter() ) loadDataAndUpdate();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimAbstractCorrelationPlot::onSelectVariablesButtonClicked()
+{
+    RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
+
+    if ( m_selectMultipleVectors )
+    {
+        dlg.enableMultiSelect( true );
+    }
+
+    dlg.hideSummaryCases();
+    dlg.setCurveSelection( curveDefinitions() );
+
+    if ( dlg.exec() == QDialog::Accepted )
+    {
+        auto curveSelection = dlg.curveSelection();
+        if ( !curveSelection.empty() )
+        {
+            std::vector<RiaSummaryCurveDefinition> summaryVectorDefinitions = dlg.curveSelection();
+            m_dataSources.deleteChildren();
+            for ( const RiaSummaryCurveDefinition& vectorDef : summaryVectorDefinitions )
+            {
+                auto plotEntry = new RimAnalysisPlotDataEntry();
+                plotEntry->setFromCurveDefinition( vectorDef );
+                m_dataSources.push_back( plotEntry );
+            }
+            connectAllCaseSignals();
+            loadDataAndUpdate();
+            updateConnectedEditors();
+        }
+    }
 }

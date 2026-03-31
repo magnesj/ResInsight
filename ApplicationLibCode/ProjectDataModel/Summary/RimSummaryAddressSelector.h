@@ -70,6 +70,7 @@ private:
     void defineEditorAttribute( const caf::PdmFieldHandle* field, QString uiConfigName, caf::PdmUiEditorAttribute* attribute ) override;
 
     bool isEnsemble() const;
+    void onSummaryAddressButtonClicked();
 
 private:
     caf::PdmPtrField<RimSummaryCase*>                 m_summaryCase;

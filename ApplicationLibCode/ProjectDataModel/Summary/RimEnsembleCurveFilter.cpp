@@ -490,36 +490,7 @@ void RimEnsembleCurveFilter::defineUiOrdering( QString uiConfigName, caf::PdmUiO
     {
         uiOrdering.add( &m_objectiveValuesSummaryAddressesUiField );
         uiOrdering.addNewButton( "...",
-                                 [this]()
-                                 {
-                                     RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
-                                     RimObjectiveFunctionTools::configureDialogForObjectiveFunctions( &dlg );
-                                     RimSummaryEnsemble* candidateEnsemble = parentCurveSet()->summaryEnsemble();
-
-                                     std::vector<RifEclipseSummaryAddress> candidateAddresses;
-                                     for ( auto address : m_objectiveValuesSummaryAddresses().childrenByType() )
-                                     {
-                                         candidateAddresses.push_back( address->address() );
-                                     }
-
-                                     dlg.setEnsembleAndAddresses( candidateEnsemble, candidateAddresses );
-
-                                     if ( dlg.exec() == QDialog::Accepted )
-                                     {
-                                         auto curveSelection = dlg.curveSelection();
-                                         if ( !curveSelection.empty() )
-                                         {
-                                             m_objectiveValuesSummaryAddresses.deleteChildren();
-                                             for ( auto address : curveSelection )
-                                             {
-                                                 RimSummaryAddress* summaryAddress = new RimSummaryAddress();
-                                                 summaryAddress->setAddress( address.summaryAddressY() );
-                                                 m_objectiveValuesSummaryAddresses.push_back( summaryAddress );
-                                             }
-                                             loadDataAndUpdate();
-                                         }
-                                     }
-                                 },
+                                 [this]() { onObjectiveFunctionSelectionButtonClicked(); },
                                  { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
         {
             auto equationGroup = uiOrdering.addNewGroup( "Equation" );
@@ -866,4 +837,38 @@ RigEnsembleParameter RimEnsembleCurveFilter::selectedEnsembleParameter() const
     auto curveSet = parentCurveSet();
     auto ensemble = curveSet ? curveSet->summaryEnsemble() : nullptr;
     return ensemble ? ensemble->ensembleParameter( m_ensembleParameterName ) : RigEnsembleParameter();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimEnsembleCurveFilter::onObjectiveFunctionSelectionButtonClicked()
+{
+    RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
+    RimObjectiveFunctionTools::configureDialogForObjectiveFunctions( &dlg );
+    RimSummaryEnsemble* candidateEnsemble = parentCurveSet()->summaryEnsemble();
+
+    std::vector<RifEclipseSummaryAddress> candidateAddresses;
+    for ( auto address : m_objectiveValuesSummaryAddresses().childrenByType() )
+    {
+        candidateAddresses.push_back( address->address() );
+    }
+
+    dlg.setEnsembleAndAddresses( candidateEnsemble, candidateAddresses );
+
+    if ( dlg.exec() == QDialog::Accepted )
+    {
+        auto curveSelection = dlg.curveSelection();
+        if ( !curveSelection.empty() )
+        {
+            m_objectiveValuesSummaryAddresses.deleteChildren();
+            for ( auto address : curveSelection )
+            {
+                RimSummaryAddress* summaryAddress = new RimSummaryAddress();
+                summaryAddress->setAddress( address.summaryAddressY() );
+                m_objectiveValuesSummaryAddresses.push_back( summaryAddress );
+            }
+            loadDataAndUpdate();
+        }
+    }
 }

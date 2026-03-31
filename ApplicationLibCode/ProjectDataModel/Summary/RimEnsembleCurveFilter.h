@@ -88,6 +88,7 @@ private:
     void                 initAfterRead() override;
 
     void onObjectionFunctionChanged( const caf::SignalEmitter* emitter );
+    void onObjectiveFunctionSelectionButtonClicked();
 
     RimEnsembleCurveFilterCollection* parentCurveFilterCollection() const;
     void                              updateMaxMinAndDefaultValues( bool forceDefault );

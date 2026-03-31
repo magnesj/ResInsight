@@ -218,41 +218,8 @@ QList<caf::PdmOptionItemInfo> RicSummaryPlotEditorUi::calculateValueOptions( con
 void RicSummaryPlotEditorUi::defineUiOrdering( QString uiConfigName, caf::PdmUiOrdering& uiOrdering )
 {
     uiOrdering.add( &m_targetPlot );
-    uiOrdering.addNewButton( "OK",
-                             [this]()
-                             {
-                                 if ( m_targetPlot == nullptr ) createNewPlot();
-                                 updateTargetPlot();
-
-                                 m_closeButtonPressed = true;
-
-                                 RiuPlotMainWindowTools::showPlotMainWindow();
-                                 RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
-                                 RiuPlotMainWindowTools::setExpanded( m_targetPlot );
-
-                                 caf::PdmField<bool>* field =
-                                     dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
-                                 if ( field ) field->setValueWithFieldChanged( true );
-
-                                 RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
-                                 mainPlotWindow->updateMultiPlotToolBar();
-
-                                 uiCapability()->updateConnectedEditors();
-                             } );
-    uiOrdering.addNewButton( "Apply",
-                             [this]()
-                             {
-                                 if ( m_targetPlot == nullptr ) createNewPlot();
-                                 updateTargetPlot();
-
-                                 caf::PdmField<bool>* field =
-                                     dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
-                                 if ( field ) field->setValueWithFieldChanged( true );
-
-                                 RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
-                                 mainPlotWindow->updateMultiPlotToolBar();
-                             },
-                             { .newRow = false } );
+    uiOrdering.addNewButton( "OK", [this]() { onOkButtonClicked(); } );
+    uiOrdering.addNewButton( "Apply", [this]() { onApplyButtonClicked(); }, { .newRow = false } );
     uiOrdering.addNewButton( "Cancel",
                              [this]()
                              {
@@ -762,6 +729,46 @@ void RicSummaryPlotEditorUi::setInitialCurveVisibility( const RimSummaryPlot* ta
             curveSet->showCurves( false );
         }
     }
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicSummaryPlotEditorUi::onOkButtonClicked()
+{
+    if ( m_targetPlot == nullptr ) createNewPlot();
+    updateTargetPlot();
+
+    m_closeButtonPressed = true;
+
+    RiuPlotMainWindowTools::showPlotMainWindow();
+    RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
+    RiuPlotMainWindowTools::setExpanded( m_targetPlot );
+
+    caf::PdmField<bool>* field =
+        dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+    if ( field ) field->setValueWithFieldChanged( true );
+
+    RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+    mainPlotWindow->updateMultiPlotToolBar();
+
+    uiCapability()->updateConnectedEditors();
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RicSummaryPlotEditorUi::onApplyButtonClicked()
+{
+    if ( m_targetPlot == nullptr ) createNewPlot();
+    updateTargetPlot();
+
+    caf::PdmField<bool>* field =
+        dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+    if ( field ) field->setValueWithFieldChanged( true );
+
+    RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
+    mainPlotWindow->updateMultiPlotToolBar();
 }
 
 //--------------------------------------------------------------------------------------------------

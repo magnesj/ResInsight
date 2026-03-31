@@ -328,36 +328,7 @@ void RimSummaryAddressSelector::defineUiOrdering( QString uiConfigName, caf::Pdm
 
     uiOrdering.add( &m_summaryAddressUiField, { .newRow = true, .totalColumnSpan = 2, .leftLabelColumnSpan = 1 } );
     uiOrdering.addNewButton( "...",
-                             [this]()
-                             {
-                                 RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
-
-                                 if ( isEnsemble() )
-                                 {
-                                     dlg.hideSummaryCases();
-                                     dlg.setEnsembleAndAddress( m_summaryCaseCollection(), m_summaryAddress->address() );
-                                 }
-                                 else
-                                 {
-                                     dlg.hideEnsembles();
-                                     dlg.setCaseAndAddress( m_summaryCase(), m_summaryAddress->address() );
-                                 }
-
-                                 if ( dlg.exec() == QDialog::Accepted )
-                                 {
-                                     auto curveSelection = dlg.curveSelection();
-                                     if ( !curveSelection.empty() )
-                                     {
-                                         m_summaryCase           = curveSelection[0].summaryCaseY();
-                                         m_summaryCaseCollection = curveSelection[0].ensemble();
-                                         auto addr               = curveSelection[0].summaryAddressY();
-                                         m_summaryAddress->setAddress( addr );
-                                         m_summaryAddressUiField = addr;
-                                     }
-                                 }
-
-                                 addressChanged.send();
-                             },
+                             [this]() { onSummaryAddressButtonClicked(); },
                              { .newRow = false, .totalColumnSpan = 1, .leftLabelColumnSpan = 0 } );
 
     if ( m_showResampling )
@@ -386,4 +357,38 @@ void RimSummaryAddressSelector::defineEditorAttribute( const caf::PdmFieldHandle
 bool RimSummaryAddressSelector::isEnsemble() const
 {
     return m_summaryCaseCollection() != nullptr;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimSummaryAddressSelector::onSummaryAddressButtonClicked()
+{
+    RiuSummaryVectorSelectionDialog dlg( RiaGuiApplication::widgetToUseAsParent() );
+
+    if ( isEnsemble() )
+    {
+        dlg.hideSummaryCases();
+        dlg.setEnsembleAndAddress( m_summaryCaseCollection(), m_summaryAddress->address() );
+    }
+    else
+    {
+        dlg.hideEnsembles();
+        dlg.setCaseAndAddress( m_summaryCase(), m_summaryAddress->address() );
+    }
+
+    if ( dlg.exec() == QDialog::Accepted )
+    {
+        auto curveSelection = dlg.curveSelection();
+        if ( !curveSelection.empty() )
+        {
+            m_summaryCase           = curveSelection[0].summaryCaseY();
+            m_summaryCaseCollection = curveSelection[0].ensemble();
+            auto addr               = curveSelection[0].summaryAddressY();
+            m_summaryAddress->setAddress( addr );
+            m_summaryAddressUiField = addr;
+        }
+    }
+
+    addressChanged.send();
 }

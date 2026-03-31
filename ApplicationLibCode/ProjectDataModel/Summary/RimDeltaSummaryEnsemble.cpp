@@ -347,23 +347,7 @@ void RimDeltaSummaryEnsemble::defineUiOrdering( QString uiConfigName, caf::PdmUi
     caseGroup->add( &m_ensemble1 );
     caseGroup->add( &m_operator );
     caseGroup->add( &m_ensemble2 );
-    caseGroup->addNewButton( "Swap Ensembles",
-                             [this]()
-                             {
-                                 auto temp  = m_ensemble1();
-                                 m_ensemble1 = m_ensemble2();
-                                 m_ensemble2 = temp;
-
-                                 RiaSummaryTools::updateSummaryEnsembleNames();
-                                 createDerivedEnsembleCases();
-                                 updateConnectedEditors();
-                                 updateReferringCurveSetsZoomAll();
-
-                                 for ( auto referring : findReferringEnsembles() )
-                                 {
-                                     referring->updateReferringCurveSetsZoomAll();
-                                 }
-                             } );
+    caseGroup->addNewButton( "Swap Ensembles", [this]() { onSwapEnsemblesButtonClicked(); } );
 
     caseGroup->add( &m_useFixedTimeStep );
     if ( m_useFixedTimeStep() != RimDeltaSummaryEnsemble::FixedTimeStepMode::FIXED_TIME_STEP_NONE )
@@ -614,4 +598,24 @@ std::vector<RimSummaryEnsemble*> RimDeltaSummaryEnsemble::allEnsembles() const
         ensembles.push_back( ensemble );
     }
     return ensembles;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RimDeltaSummaryEnsemble::onSwapEnsemblesButtonClicked()
+{
+    auto temp   = m_ensemble1();
+    m_ensemble1 = m_ensemble2();
+    m_ensemble2 = temp;
+
+    RiaSummaryTools::updateSummaryEnsembleNames();
+    createDerivedEnsembleCases();
+    updateConnectedEditors();
+    updateReferringCurveSetsZoomAll();
+
+    for ( auto referring : findReferringEnsembles() )
+    {
+        referring->updateReferringCurveSetsZoomAll();
+    }
 }

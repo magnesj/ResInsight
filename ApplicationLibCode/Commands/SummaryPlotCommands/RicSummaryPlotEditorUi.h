@@ -98,6 +98,9 @@ private:
     void selectionEditorFieldChanged();
     void setInitialCurveVisibility( const RimSummaryPlot* targetPlot );
 
+    void onOkButtonClicked();
+    void onApplyButtonClicked();
+
 private:
     caf::PdmPtrField<RimSummaryPlot*> m_targetPlot;
 

@@ -483,12 +483,8 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
         caf::PdmUiGroup& excludeTimeStepGroup = *flowDiagConfigGroup.addNewGroup( "Exclude Time Steps" );
         excludeTimeStepGroup.add( &m_excludeTimeSteps );
         excludeTimeStepGroup.setCollapsedByDefault();
-        flowDiagConfigGroup.addNewButton( "Apply",
-                                          [this]()
-                                          {
-                                              // For time step range - depends on apply button to prevent unwanted loading of large amount of data
-                                              onLoadDataAndUpdate();
-                                          } );
+        // For time step range - depends on apply button to prevent unwanted loading of large amount of data
+        flowDiagConfigGroup.addNewButton( "Apply", [this]() { onLoadDataAndUpdate(); } );
     }
 
     caf::PdmUiGroup* selectionGroup = uiOrdering.addNewGroup( "Tracer Selection" );
@@ -499,12 +495,8 @@ void RimWellConnectivityTable::defineUiOrdering( QString uiConfigName, caf::PdmU
     injectorGroup->add( &m_selectedInjectorTracersUiField );
     injectorGroup->add( &m_syncSelectedProducersFromInjectorSelection );
 
-    selectionGroup->addNewButton( "Apply",
-                                  [this]()
-                                  {
-                                      // For time step range - depends on apply button to prevent unwanted loading of large amount of data
-                                      onLoadDataAndUpdate();
-                                  } );
+    // For tracer selection - depends on apply button to prevent unwanted loading of large amount of data
+    selectionGroup->addNewButton( "Apply", [this]() { onLoadDataAndUpdate(); } );
 
     caf::PdmUiGroup* tableSettingsGroup = uiOrdering.addNewGroup( "Table Settings" );
     tableSettingsGroup->add( &m_showValueLabels );
