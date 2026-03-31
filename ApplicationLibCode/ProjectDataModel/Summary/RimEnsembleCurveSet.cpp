@@ -68,8 +68,8 @@
 
 #include "cafCmdFeatureMenuBuilder.h"
 #include "cafPdmObject.h"
-#include "cafPdmUiColorEditor.h"
 #include "cafPdmUiButton.h"
+#include "cafPdmUiColorEditor.h"
 #include "cafPdmUiDateEditor.h"
 #include "cafPdmUiDoubleSliderEditor.h"
 #include "cafPdmUiItem.h"

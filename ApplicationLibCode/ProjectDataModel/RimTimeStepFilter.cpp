@@ -87,7 +87,6 @@ RimTimeStepFilter::RimTimeStepFilter()
 
     CAF_PDM_InitField( &m_readOnlyLastFrame, "OnlyLastFrame", false, "Load Only Last Frame Of Each Time Step" );
     caf::PdmUiNativeCheckBoxEditor::configureFieldForEditor( &m_readOnlyLastFrame );
-
 }
 
 //--------------------------------------------------------------------------------------------------

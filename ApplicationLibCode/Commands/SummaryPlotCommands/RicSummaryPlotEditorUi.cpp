@@ -745,8 +745,7 @@ void RicSummaryPlotEditorUi::onOkButtonClicked()
     RiuPlotMainWindowTools::selectAsCurrentItem( m_targetPlot );
     RiuPlotMainWindowTools::setExpanded( m_targetPlot );
 
-    caf::PdmField<bool>* field =
-        dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+    caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
     if ( field ) field->setValueWithFieldChanged( true );
 
     RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
@@ -763,8 +762,7 @@ void RicSummaryPlotEditorUi::onApplyButtonClicked()
     if ( m_targetPlot == nullptr ) createNewPlot();
     updateTargetPlot();
 
-    caf::PdmField<bool>* field =
-        dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
+    caf::PdmField<bool>* field = dynamic_cast<caf::PdmField<bool>*>( m_targetPlot->uiCapability()->objectToggleField() );
     if ( field ) field->setValueWithFieldChanged( true );
 
     RiuPlotMainWindow* mainPlotWindow = RiaGuiApplication::instance()->mainPlotWindow();
