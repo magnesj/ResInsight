@@ -32,10 +32,10 @@ class RigMainGrid;
 class RigCaseCellResultCalculator
 {
 public:
-    static bool computeDifference( RigEclipseCaseData*                        destination,
-                                   RiaDefines::PorosityModelType              porosityModel,
-                                   const RigEclipseResultAddress&             address,
-                                   std::function<RigEclipseCaseData*( int )>  caseDataLookup );
+    static bool computeDifference( RigEclipseCaseData*                       destination,
+                                   RiaDefines::PorosityModelType             porosityModel,
+                                   const RigEclipseResultAddress&            address,
+                                   std::function<RigEclipseCaseData*( int )> caseDataLookup );
 
     static bool computeDivideByCellFaceArea( RigMainGrid*                   mainGrid,
                                              RigEclipseCaseData*            destination,
