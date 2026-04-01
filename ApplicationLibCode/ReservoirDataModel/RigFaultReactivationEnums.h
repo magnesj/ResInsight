@@ -1,6 +1,6 @@
 /////////////////////////////////////////////////////////////////////////////////
 //
-//  Copyright (C) 2023     Equinor ASA
+//  Copyright (C) 2023 Equinor ASA
 //
 //  ResInsight is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -18,36 +18,38 @@
 
 #pragma once
 
-#include "RigFaultReactivationEnums.h"
-
-namespace RimFaultReactivation
+namespace RigFaultReactivation
 {
 
-using GridPart      = RigFaultReactivation::GridPart;
-using BorderSurface = RigFaultReactivation::BorderSurface;
-using Boundary      = RigFaultReactivation::Boundary;
-using ElementSets   = RigFaultReactivation::ElementSets;
-
-enum class StressSource
+enum class GridPart
 {
-    StressFromEclipse,
-    StressFromGeoMech
+    FW, // footwall
+    HW // hanging wall
 };
 
-enum class Property
+enum class BorderSurface
 {
-    PorePressure,
-    VoidRatio,
-    Temperature,
-    Density,
-    YoungsModulus,
-    PoissonsRatio,
-    StressTop,
-    StressBottom,
-    DepthTop,
-    DepthBottom,
-    LateralStressComponentX,
-    LateralStressComponentY
+    UpperSurface,
+    FaultSurface,
+    LowerSurface,
+    Seabed
 };
 
-} // namespace RimFaultReactivation
+enum class Boundary
+{
+    FarSide,
+    Bottom,
+    Fault,
+    Reservoir
+};
+
+enum class ElementSets
+{
+    OverBurden,
+    UnderBurden,
+    Reservoir,
+    IntraReservoir,
+    FaultZone
+};
+
+} // namespace RigFaultReactivation

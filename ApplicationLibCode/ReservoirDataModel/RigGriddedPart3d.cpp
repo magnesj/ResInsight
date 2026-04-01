@@ -362,10 +362,10 @@ void RigGriddedPart3d::generateGeometry( const std::array<cvf::Vec3d, 12>&    in
 
     m_elementIndices.resize( (size_t)( ( nVertCells - 1 ) * nHorzCells * nThicknessCells ) );
 
-    m_borderSurfaceElements[RimFaultReactivation::BorderSurface::Seabed]       = {};
-    m_borderSurfaceElements[RimFaultReactivation::BorderSurface::UpperSurface] = {};
-    m_borderSurfaceElements[RimFaultReactivation::BorderSurface::FaultSurface] = {};
-    m_borderSurfaceElements[RimFaultReactivation::BorderSurface::LowerSurface] = {};
+    m_borderSurfaceElements[RigFaultReactivation::BorderSurface::Seabed]       = {};
+    m_borderSurfaceElements[RigFaultReactivation::BorderSurface::UpperSurface] = {};
+    m_borderSurfaceElements[RigFaultReactivation::BorderSurface::FaultSurface] = {};
+    m_borderSurfaceElements[RigFaultReactivation::BorderSurface::LowerSurface] = {};
 
     m_elementSets[ElementSets::OverBurden]     = {};
     m_elementSets[ElementSets::Reservoir]      = {};
@@ -385,7 +385,7 @@ void RigGriddedPart3d::generateGeometry( const std::array<cvf::Vec3d, 12>&    in
     const int nVertCellsFault = (int)( layersPerRegion[Regions::UpperUnderburden].size() + layersPerRegion[Regions::Reservoir].size() +
                                        layersPerRegion[Regions::LowerOverburden].size() );
 
-    RimFaultReactivation::BorderSurface currentSurfaceRegion = RimFaultReactivation::BorderSurface::LowerSurface;
+    RigFaultReactivation::BorderSurface currentSurfaceRegion = RigFaultReactivation::BorderSurface::LowerSurface;
 
     const int nextLayerIdxOff = ( (int)nHorzCells + 1 ) * ( nThicknessCells + 1 );
     const int nThicknessOff   = nThicknessCells + 1;
@@ -395,8 +395,8 @@ void RigGriddedPart3d::generateGeometry( const std::array<cvf::Vec3d, 12>&    in
 
     for ( int v = 0; v < (int)nVertCells - 1; v++ )
     {
-        if ( v >= nVertCellsLower ) currentSurfaceRegion = RimFaultReactivation::BorderSurface::FaultSurface;
-        if ( v >= nVertCellsLower + nVertCellsFault ) currentSurfaceRegion = RimFaultReactivation::BorderSurface::UpperSurface;
+        if ( v >= nVertCellsLower ) currentSurfaceRegion = RigFaultReactivation::BorderSurface::FaultSurface;
+        if ( v >= nVertCellsLower + nVertCellsFault ) currentSurfaceRegion = RigFaultReactivation::BorderSurface::UpperSurface;
 
         int i = layerIndexOffset;
 
@@ -420,16 +420,16 @@ void RigGriddedPart3d::generateGeometry( const std::array<cvf::Vec3d, 12>&    in
                 }
                 else if ( v == seaBedLayer )
                 {
-                    m_borderSurfaceElements[RimFaultReactivation::BorderSurface::Seabed].push_back( elementIdx );
+                    m_borderSurfaceElements[RigFaultReactivation::BorderSurface::Seabed].push_back( elementIdx );
                 }
                 if ( h == 0 )
                 {
                     m_boundaryElements[Boundary::FarSide].push_back( elementIdx );
                 }
 
-                bool inFaultZone = ( currentSurfaceRegion == RimFaultReactivation::BorderSurface::FaultSurface ) && ( h > nFaultZoneStart );
+                bool inFaultZone = ( currentSurfaceRegion == RigFaultReactivation::BorderSurface::FaultSurface ) && ( h > nFaultZoneStart );
 
-                if ( inFaultZone ) m_elementSets[RimFaultReactivation::ElementSets::FaultZone].push_back( elementIdx );
+                if ( inFaultZone ) m_elementSets[RigFaultReactivation::ElementSets::FaultZone].push_back( elementIdx );
             }
             i += nThicknessOff;
         }
@@ -608,7 +608,7 @@ std::vector<cvf::Vec3d> RigGriddedPart3d::extractCornersForElement( const std::v
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::map<RimFaultReactivation::BorderSurface, std::vector<unsigned int>>& RigGriddedPart3d::borderSurfaceElements() const
+const std::map<RigFaultReactivation::BorderSurface, std::vector<unsigned int>>& RigGriddedPart3d::borderSurfaceElements() const
 {
     return m_borderSurfaceElements;
 }
@@ -624,7 +624,7 @@ const std::vector<std::vector<cvf::Vec3d>>& RigGriddedPart3d::meshLines() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::map<RimFaultReactivation::Boundary, std::vector<unsigned int>>& RigGriddedPart3d::boundaryElements() const
+const std::map<RigFaultReactivation::Boundary, std::vector<unsigned int>>& RigGriddedPart3d::boundaryElements() const
 {
     return m_boundaryElements;
 }
@@ -632,7 +632,7 @@ const std::map<RimFaultReactivation::Boundary, std::vector<unsigned int>>& RigGr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::map<RimFaultReactivation::Boundary, std::vector<unsigned int>>& RigGriddedPart3d::boundaryNodes() const
+const std::map<RigFaultReactivation::Boundary, std::vector<unsigned int>>& RigGriddedPart3d::boundaryNodes() const
 {
     return m_boundaryNodes;
 }
@@ -640,7 +640,7 @@ const std::map<RimFaultReactivation::Boundary, std::vector<unsigned int>>& RigGr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::map<RimFaultReactivation::ElementSets, std::vector<unsigned int>>& RigGriddedPart3d::elementSets() const
+const std::map<RigFaultReactivation::ElementSets, std::vector<unsigned int>>& RigGriddedPart3d::elementSets() const
 {
     return m_elementSets;
 }
