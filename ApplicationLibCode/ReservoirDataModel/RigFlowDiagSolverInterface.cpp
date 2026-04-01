@@ -31,10 +31,6 @@
 #include "RigEclipseResultAddress.h"
 #include "RigFlowDiagInterfaceTools.h"
 
-#include "RimEclipseCase.h"
-#include "RimEclipseResultCase.h"
-#include "RimFlowDiagSolution.h"
-
 #include "opm/flowdiagnostics/DerivedQuantities.hpp"
 
 #include "opm/utility/ECLPropertyUnitConversion.hpp"
@@ -116,8 +112,9 @@ public:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagSolverInterface::RigFlowDiagSolverInterface( RimEclipseResultCase* eclipseCase )
-    : m_eclipseCase( eclipseCase )
+RigFlowDiagSolverInterface::RigFlowDiagSolverInterface( RigEclipseCaseData* eclipseCaseData, const QString& gridFileName )
+    : m_eclipseCaseData( eclipseCaseData )
+    , m_gridFileName( gridFileName )
     , m_pvtCurveErrorCount( 0 )
     , m_relpermCurveErrorCount( 0 )
 {
@@ -128,28 +125,35 @@ RigFlowDiagSolverInterface::RigFlowDiagSolverInterface( RimEclipseResultCase* ec
 //--------------------------------------------------------------------------------------------------
 RigFlowDiagSolverInterface::~RigFlowDiagSolverInterface() = default;
 
+static const std::string CROSS_FLOW_ENDING = "-XF";
+
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::string removeCrossFlowEnding( std::string tracerName )
+std::string removeCrossFlowEnding( const std::string& tracerName )
 {
-    return RimFlowDiagSolution::removeCrossFlowEnding( QString::fromStdString( tracerName ) ).toStdString();
+    if ( tracerName.size() >= CROSS_FLOW_ENDING.size() && tracerName.substr( tracerName.size() - CROSS_FLOW_ENDING.size() ) == CROSS_FLOW_ENDING )
+    {
+        return tracerName.substr( 0, tracerName.size() - CROSS_FLOW_ENDING.size() );
+    }
+    return tracerName;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-bool hasCrossFlowEnding( std::string tracerName )
+bool hasCrossFlowEnding( const std::string& tracerName )
 {
-    return RimFlowDiagSolution::hasCrossFlowEnding( QString::fromStdString( tracerName ) );
+    return tracerName.size() >= CROSS_FLOW_ENDING.size() &&
+           tracerName.substr( tracerName.size() - CROSS_FLOW_ENDING.size() ) == CROSS_FLOW_ENDING;
 }
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::string addCrossFlowEnding( std::string tracerName )
+std::string addCrossFlowEnding( const std::string& tracerName )
 {
-    return RimFlowDiagSolution::addCrossFlowEnding( QString::fromStdString( tracerName ) ).toStdString();
+    return tracerName + CROSS_FLOW_ENDING;
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -163,7 +167,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
     using namespace Opm::FlowDiagnostics;
 
     RigFlowDiagTimeStepResult result(
-        m_eclipseCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->reservoirActiveCellCount() );
+        m_eclipseCaseData->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL )->reservoirActiveCellCount() );
 
     caf::ProgressInfo progressInfo( 8, "Calculating Flow Diagnostics" );
 
@@ -194,8 +198,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
         // Look for unified restart file
         QStringList m_filesWithSameBaseName;
 
-        QString gridFileName = m_eclipseCase->gridFileName();
-        if ( !RifEclipseOutputFileTools::findSiblingFilesWithSameBaseName( gridFileName, &m_filesWithSameBaseName ) ) return result;
+        if ( !RifEclipseOutputFileTools::findSiblingFilesWithSameBaseName( m_gridFileName, &m_filesWithSameBaseName ) ) return result;
 
         QString firstRestartFileName = RifEclipseOutputFileTools::firstFileNameOfType( m_filesWithSameBaseName, ECL_UNIFIED_RESTART_FILE );
         if ( !firstRestartFileName.isEmpty() )
@@ -209,8 +212,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
             QStringList restartFileNames = RifEclipseOutputFileTools::filterFileNamesOfType( m_filesWithSameBaseName, ECL_RESTART_FILE );
 
             size_t restartFileCount = static_cast<size_t>( restartFileNames.size() );
-            size_t maxTimeStepCount =
-                m_eclipseCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount();
+            size_t maxTimeStepCount = m_eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount();
 
             if ( restartFileCount <= timeStepIndex && restartFileCount != maxTimeStepCount )
             {
@@ -257,11 +259,10 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
     CVF_ASSERT( currentRestartData );
 
     RigEclipseResultAddress addrToMaxTimeStepCountResult;
-    m_eclipseCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount( &addrToMaxTimeStepCountResult );
+    m_eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->maxTimeStepCount( &addrToMaxTimeStepCountResult );
 
-    int reportStepNumber = m_eclipseCase->eclipseCaseData()
-                               ->results( RiaDefines::PorosityModelType::MATRIX_MODEL )
-                               ->reportStepNumber( addrToMaxTimeStepCountResult, timeStepIndex );
+    int reportStepNumber =
+        m_eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->reportStepNumber( addrToMaxTimeStepCountResult, timeStepIndex );
 
     if ( !currentRestartData->selectReportStep( reportStepNumber ) )
     {
@@ -278,7 +279,7 @@ RigFlowDiagTimeStepResult RigFlowDiagSolverInterface::calculate( size_t         
 
     try
     {
-        if ( m_eclipseCase->eclipseCaseData()->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasFlowDiagUsableFluxes() )
+        if ( m_eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->hasFlowDiagUsableFluxes() )
         {
             Opm::FlowDiagnostics::ConnectionValues connectionsVals =
                 RigFlowDiagInterfaceTools::extractFluxFieldFromRestartFile( *( m_opmFlowDiagStaticData->m_eclGraph ),
@@ -442,7 +443,7 @@ bool RigFlowDiagSolverInterface::ensureStaticDataObjectInstanceCreated()
         std::wstring initFileName = getInitFileName();
         if ( initFileName.empty() ) return false;
 
-        const RigEclipseCaseData* eclipseCaseData = m_eclipseCase->eclipseCaseData();
+        const RigEclipseCaseData* eclipseCaseData = m_eclipseCaseData;
         if ( eclipseCaseData )
         {
             auto           fileReader = eclipseCaseData->results( RiaDefines::PorosityModelType::MATRIX_MODEL )->readerInterface();
@@ -475,7 +476,7 @@ bool RigFlowDiagSolverInterface::ensureStaticDataObjectInstanceCreated()
 //--------------------------------------------------------------------------------------------------
 void RigFlowDiagSolverInterface::assignPhaseCorrecedPORV( RigFlowDiagResultAddress::PhaseSelection phaseSelection, size_t timeStepIdx )
 {
-    RigEclipseCaseData* eclipseCaseData = m_eclipseCase->eclipseCaseData();
+    RigEclipseCaseData* eclipseCaseData = m_eclipseCaseData;
 
     const std::vector<double>* phaseSaturation = nullptr;
 
@@ -978,13 +979,11 @@ bool RigFlowDiagSolverInterface::calculatePvtDynamicPropertiesViscosity( int pvt
 //--------------------------------------------------------------------------------------------------
 std::wstring RigFlowDiagSolverInterface::getInitFileName() const
 {
-    QString gridFileName = m_eclipseCase->gridFileName();
+    QStringList filesWithSameBaseName;
 
-    QStringList m_filesWithSameBaseName;
+    if ( !RifEclipseOutputFileTools::findSiblingFilesWithSameBaseName( m_gridFileName, &filesWithSameBaseName ) ) return std::wstring();
 
-    if ( !RifEclipseOutputFileTools::findSiblingFilesWithSameBaseName( gridFileName, &m_filesWithSameBaseName ) ) return std::wstring();
-
-    QString initFileName = RifEclipseOutputFileTools::firstFileNameOfType( m_filesWithSameBaseName, ECL_INIT_FILE );
+    QString initFileName = RifEclipseOutputFileTools::firstFileNameOfType( filesWithSameBaseName, ECL_INIT_FILE );
 
     return initFileName.toStdWString();
 }

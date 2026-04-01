@@ -287,7 +287,7 @@ bool RimEclipseResultCase::importGridAndResultMetaData( bool showTimeStepFilter 
         caf::ProgressInfo progInfo( 50, "Reading Eclipse Grid File", false /*do not delay*/ );
         progInfo.setNextProgressIncrement( 49 );
 
-        m_flowDagSolverInterface = std::make_unique<RigFlowDiagSolverInterface>( this );
+        m_flowDagSolverInterface = std::make_unique<RigFlowDiagSolverInterface>( eclipseCaseData(), gridFileName() );
 
         CVF_ASSERT( eclipseCaseData() );
         CVF_ASSERT( readerInterface.notNull() );

@@ -20,6 +20,7 @@
 
 #include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
+#include "RimFlowDiagSolution.h"
 #include "RimSimWellInView.h"
 #include "RimSimWellInViewCollection.h"
 

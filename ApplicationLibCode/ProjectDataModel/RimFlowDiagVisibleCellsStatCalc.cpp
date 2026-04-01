@@ -28,6 +28,7 @@
 #include "RigWeightedMeanCalc.h"
 
 #include "RimEclipseResultCase.h"
+#include "RimFlowDiagSolution.h"
 
 #include <cmath>
 
