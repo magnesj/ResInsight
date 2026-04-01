@@ -28,6 +28,7 @@
 #include <QDateTime>
 
 #include <cmath>
+#include <functional>
 #include <map>
 #include <optional>
 #include <vector>
@@ -41,8 +42,6 @@ class RigEclipseCaseData;
 class RigFormationNames;
 class RigAllanDiagramData;
 class RigEclipseResultAddress;
-
-class RimEclipseCase;
 
 //==================================================================================================
 /// Class containing the results for the complete number of active cells. Both main grid and LGR's
@@ -145,9 +144,11 @@ public:
     void computeCellVolumes();
     bool hasFlowDiagUsableFluxes() const;
 
-    static void copyResultsMetaDataFromMainCase( RigEclipseCaseData*           mainCaseResultsData,
-                                                 RiaDefines::PorosityModelType poroModel,
-                                                 std::vector<RimEclipseCase*>  destinationCases );
+    static void copyResultsMetaDataFromMainCase( RigEclipseCaseData*                  mainCaseResultsData,
+                                                 RiaDefines::PorosityModelType        poroModel,
+                                                 std::vector<RigCaseCellResultsData*> destinationResults );
+
+    void setCompletionTypeCallback( std::function<void( std::vector<double>&, size_t )> callback );
 
     void setStatisticsDataCacheNumBins( const RigEclipseResultAddress& resultAddress, size_t numBins );
 
@@ -236,4 +237,6 @@ private:
     RigActiveCellInfo*            m_activeCellInfo;
     RiaDefines::PorosityModelType m_porosityModel;
     const RigFormationNames*      m_activeFormationNamesData = nullptr;
+
+    std::function<void( std::vector<double>&, size_t )> m_computeCompletionTypeCallback;
 };

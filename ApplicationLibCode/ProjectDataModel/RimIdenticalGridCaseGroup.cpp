@@ -234,7 +234,15 @@ void RimIdenticalGridCaseGroup::loadMainCaseAndActiveCellInfo()
         computeUnionOfActiveCells();
     }
 
-    RigCaseCellResultsData::copyResultsMetaDataFromMainCase( rigCaseData, poroModel, caseCollection->reservoirs.childrenByType() );
+    std::vector<RigCaseCellResultsData*> destinationResults;
+    for ( auto* rimCase : caseCollection->reservoirs.childrenByType() )
+    {
+        if ( auto* resultCase = dynamic_cast<RimEclipseResultCase*>( rimCase ) )
+        {
+            destinationResults.push_back( resultCase->results( poroModel ) );
+        }
+    }
+    RigCaseCellResultsData::copyResultsMetaDataFromMainCase( rigCaseData, poroModel, destinationResults );
 
     // "Load" the statistical cases
 
