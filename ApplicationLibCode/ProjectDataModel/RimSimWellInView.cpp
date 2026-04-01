@@ -203,7 +203,16 @@ std::vector<SimulationWellCellBranch> RimSimWellInView::wellBranchesForVisualiza
         return {};
     }
 
-    return RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( this );
+    auto eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+    if ( eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+    {
+        return RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( eclipseView->eclipseCase()->eclipseCaseData(),
+                                                                                         simWellData,
+                                                                                         eclipseView->wellCollection()->isAutoDetectingBranches(),
+                                                                                         isUsingCellCenterForPipe() );
+    }
+
+    return {};
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -796,8 +805,18 @@ void RimSimWellInView::scaleDisk( double minValue, double maxValue )
 //--------------------------------------------------------------------------------------------------
 cvf::BoundingBox RimSimWellInView::boundingBoxInDomainCoords() const
 {
-    auto noConst         = const_cast<RimSimWellInView*>( this );
-    auto simWellBranches = RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( noConst );
+    const RigSimWellData* simWellData = this->simWellData();
+    auto                  eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+
+    std::vector<SimulationWellCellBranch> simWellBranches;
+    if ( simWellData && eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+    {
+        simWellBranches =
+            RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( eclipseView->eclipseCase()->eclipseCaseData(),
+                                                                                      simWellData,
+                                                                                      eclipseView->wellCollection()->isAutoDetectingBranches(),
+                                                                                      isUsingCellCenterForPipe() );
+    }
 
     cvf::BoundingBox bb;
     for ( const auto& [coords, wellCells] : simWellBranches )
