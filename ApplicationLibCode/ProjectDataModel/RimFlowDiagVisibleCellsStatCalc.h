@@ -32,10 +32,10 @@
 class RigFlowDiagResults;
 class RigActiveCellInfo;
 
-class RigFlowDiagVisibleCellsStatCalc : public RigStatisticsCalculator
+class RimFlowDiagVisibleCellsStatCalc : public RigStatisticsCalculator
 {
 public:
-    RigFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
+    RimFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
                                      const RigFlowDiagResultAddress& resVarAddr,
                                      const cvf::UByteArray*          cellVisibilities );
 

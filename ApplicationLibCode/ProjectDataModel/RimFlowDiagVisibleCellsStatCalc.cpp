@@ -17,7 +17,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigFlowDiagVisibleCellsStatCalc.h"
+#include "RimFlowDiagVisibleCellsStatCalc.h"
 
 #include "RiaResultNames.h"
 
@@ -34,7 +34,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigFlowDiagVisibleCellsStatCalc::RigFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
+RimFlowDiagVisibleCellsStatCalc::RimFlowDiagVisibleCellsStatCalc( RigFlowDiagResults*             resultsData,
                                                                   const RigFlowDiagResultAddress& resVarAddr,
                                                                   const cvf::UByteArray*          cellVisibilities )
     : m_resultsData( resultsData )
@@ -46,7 +46,7 @@ RigFlowDiagVisibleCellsStatCalc::RigFlowDiagVisibleCellsStatCalc( RigFlowDiagRes
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::minMaxCellScalarValues( size_t timeStepIndex, double& min, double& max )
+void RimFlowDiagVisibleCellsStatCalc::minMaxCellScalarValues( size_t timeStepIndex, double& min, double& max )
 {
     MinMaxAccumulator acc( min, max );
     traverseElementNodes( acc, timeStepIndex );
@@ -57,7 +57,7 @@ void RigFlowDiagVisibleCellsStatCalc::minMaxCellScalarValues( size_t timeStepInd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::posNegClosestToZero( size_t timeStepIndex, double& pos, double& neg )
+void RimFlowDiagVisibleCellsStatCalc::posNegClosestToZero( size_t timeStepIndex, double& pos, double& neg )
 {
     PosNegAccumulator acc( pos, neg );
     traverseElementNodes( acc, timeStepIndex );
@@ -68,7 +68,7 @@ void RigFlowDiagVisibleCellsStatCalc::posNegClosestToZero( size_t timeStepIndex,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::valueSumAndSampleCount( size_t timeStepIndex, double& valueSum, size_t& sampleCount )
+void RimFlowDiagVisibleCellsStatCalc::valueSumAndSampleCount( size_t timeStepIndex, double& valueSum, size_t& sampleCount )
 {
     SumCountAccumulator acc( valueSum, sampleCount );
     traverseElementNodes( acc, timeStepIndex );
@@ -79,7 +79,7 @@ void RigFlowDiagVisibleCellsStatCalc::valueSumAndSampleCount( size_t timeStepInd
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::addDataToHistogramCalculator( size_t timeStepIndex, RigHistogramCalculator& histogramCalculator )
+void RimFlowDiagVisibleCellsStatCalc::addDataToHistogramCalculator( size_t timeStepIndex, RigHistogramCalculator& histogramCalculator )
 {
     traverseElementNodes( histogramCalculator, timeStepIndex );
 }
@@ -87,7 +87,7 @@ void RigFlowDiagVisibleCellsStatCalc::addDataToHistogramCalculator( size_t timeS
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::uniqueValues( size_t timeStepIndex, std::set<int>& values )
+void RimFlowDiagVisibleCellsStatCalc::uniqueValues( size_t timeStepIndex, std::set<int>& values )
 {
     UniqueValueAccumulator acc;
     traverseElementNodes( acc, timeStepIndex );
@@ -97,7 +97,7 @@ void RigFlowDiagVisibleCellsStatCalc::uniqueValues( size_t timeStepIndex, std::s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RigFlowDiagVisibleCellsStatCalc::timeStepCount()
+size_t RimFlowDiagVisibleCellsStatCalc::timeStepCount()
 {
     return m_resultsData->timeStepCount();
 }
@@ -105,7 +105,7 @@ size_t RigFlowDiagVisibleCellsStatCalc::timeStepCount()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFlowDiagVisibleCellsStatCalc::mobileVolumeWeightedMean( size_t timeStepIndex, double& result )
+void RimFlowDiagVisibleCellsStatCalc::mobileVolumeWeightedMean( size_t timeStepIndex, double& result )
 {
     auto eclCase = m_resultsData->flowDiagSolution()->firstAncestorOrThisOfType<RimEclipseResultCase>();
     if ( !eclCase ) return;

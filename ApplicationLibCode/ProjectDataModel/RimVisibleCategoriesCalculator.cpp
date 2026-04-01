@@ -24,7 +24,7 @@
 #include "RigEclipseNativeVisibleCellsStatCalc.h"
 #include "RigFault.h"
 #include "RigFlowDiagResults.h"
-#include "RigFlowDiagVisibleCellsStatCalc.h"
+#include "RimFlowDiagVisibleCellsStatCalc.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
 #include "RigResultAccessorFactory.h"
@@ -59,8 +59,8 @@ std::set<int> RimVisibleCategoriesCalculator::visibleFlowDiagCategories( RimEcli
 {
     cvf::ref<cvf::UByteArray> cellVisibilities = eclView.currentTotalCellVisibility();
 
-    cvf::ref<RigFlowDiagVisibleCellsStatCalc> calculator =
-        cvf::make_ref<RigFlowDiagVisibleCellsStatCalc>( &flowDiagResults, resVarAddr, cellVisibilities.p() );
+    cvf::ref<RimFlowDiagVisibleCellsStatCalc> calculator =
+        cvf::make_ref<RimFlowDiagVisibleCellsStatCalc>( &flowDiagResults, resVarAddr, cellVisibilities.p() );
 
     std::set<int> visibleTracers;
     calculator->uniqueValues( timeStepIndex, visibleTracers );

@@ -27,7 +27,7 @@
 #include "RigFemPartResultsCollection.h"
 #include "RigFemResultAddress.h"
 #include "RigFlowDiagResults.h"
-#include "RigFlowDiagVisibleCellsStatCalc.h"
+#include "RimFlowDiagVisibleCellsStatCalc.h"
 #include "RigGeoMechCaseData.h"
 
 #include "ContourMap/RimEclipseContourMapProjection.h"
@@ -414,7 +414,7 @@ void RimHistogramCalculator::updateVisCellStatsIfNeeded( RimEclipseView* eclipse
     {
         RigFlowDiagResultAddress resAddr    = eclResultDefinition->flowDiagResAddress();
         RigFlowDiagResults*      fldResults = eclResultDefinition->flowDiagSolution()->flowDiagResults();
-        calc = new RigFlowDiagVisibleCellsStatCalc( fldResults, resAddr, eclipseView->currentTotalCellVisibility().p() );
+        calc = new RimFlowDiagVisibleCellsStatCalc( fldResults, resAddr, eclipseView->currentTotalCellVisibility().p() );
     }
     else
     {
