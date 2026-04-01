@@ -26,9 +26,9 @@
 #include "cvfObject.h"
 #include "cvfVector3.h"
 
-#include "RimEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureCell.h"
 #include "RigFractureGrid.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 #include <vector>
 

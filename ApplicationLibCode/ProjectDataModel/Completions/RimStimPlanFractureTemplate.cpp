@@ -28,11 +28,11 @@
 
 #include "RifStimPlanXmlReader.h"
 
-#include "RimEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"
 #include "RigStimPlanFractureDefinition.h"
 #include "RigTransmissibilityEquations.h"
 #include "RigWellPathStimplanIntersector.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 #include "RigFractureCell.h"
 #include "RimEclipseView.h"
