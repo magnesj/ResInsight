@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RiaInterpolationTools.h"
+#include "RigInterpolationTools.h"
 
 #include "cafAssert.h"
 
@@ -42,7 +42,7 @@ bool almostEqual( double a, double b, double maxRelDiff = std::numeric_limits<do
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RiaInterpolationTools::linear( const std::vector<double>& x, const std::vector<double>& y, double value, ExtrapolationMode extrapolationMode )
+double RigInterpolationTools::linear( const std::vector<double>& x, const std::vector<double>& y, double value, ExtrapolationMode extrapolationMode )
 {
     CAF_ASSERT( x.size() == y.size() );
 
@@ -101,7 +101,7 @@ double RiaInterpolationTools::linear( const std::vector<double>& x, const std::v
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RiaInterpolationTools::extrapolate( const std::vector<double>& x, const std::vector<double>& y, double value )
+double RigInterpolationTools::extrapolate( const std::vector<double>& x, const std::vector<double>& y, double value )
 {
     CAF_ASSERT( x.size() == y.size() );
     CAF_ASSERT( x.size() >= 2 && "Need at least two points for extrapolation" );
@@ -119,7 +119,7 @@ double RiaInterpolationTools::extrapolate( const std::vector<double>& x, const s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RiaInterpolationTools::extrapolate( double x0, double y0, double x1, double y1, double value )
+double RigInterpolationTools::extrapolate( double x0, double y0, double x1, double y1, double value )
 {
     return y0 + ( value - x0 ) / ( x1 - x0 ) * ( y1 - y0 );
 }
@@ -127,7 +127,7 @@ double RiaInterpolationTools::extrapolate( double x0, double y0, double x1, doub
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RiaInterpolationTools::extrapolateClosestValue( const std::vector<double>& x, const std::vector<double>& y, double value )
+double RigInterpolationTools::extrapolateClosestValue( const std::vector<double>& x, const std::vector<double>& y, double value )
 {
     if ( value <= x[0] )
         return y[0];
@@ -138,7 +138,7 @@ double RiaInterpolationTools::extrapolateClosestValue( const std::vector<double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiaInterpolationTools::findNextDataPoint( const std::vector<double>& values, int index )
+int RigInterpolationTools::findNextDataPoint( const std::vector<double>& values, int index )
 {
     for ( size_t i = index; i < values.size(); i++ )
     {
@@ -151,7 +151,7 @@ int RiaInterpolationTools::findNextDataPoint( const std::vector<double>& values,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiaInterpolationTools::findPreviousDataPoint( const std::vector<double>& values, int index )
+int RigInterpolationTools::findPreviousDataPoint( const std::vector<double>& values, int index )
 {
     CAF_ASSERT( index >= 0 );
 
@@ -166,7 +166,7 @@ int RiaInterpolationTools::findPreviousDataPoint( const std::vector<double>& val
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiaInterpolationTools::extrapolateRange( int start, int end, int firstPoint, int lastPoint, const std::vector<double>& x, std::vector<double>& y )
+int RigInterpolationTools::extrapolateRange( int start, int end, int firstPoint, int lastPoint, const std::vector<double>& x, std::vector<double>& y )
 {
     std::vector<double> xs = { x[firstPoint], x[lastPoint] };
     std::vector<double> ys = { y[firstPoint], y[lastPoint] };
@@ -185,7 +185,7 @@ int RiaInterpolationTools::extrapolateRange( int start, int end, int firstPoint,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-int RiaInterpolationTools::interpolateRange( int start, int end, int firstPoint, int lastPoint, const std::vector<double>& x, std::vector<double>& y )
+int RigInterpolationTools::interpolateRange( int start, int end, int firstPoint, int lastPoint, const std::vector<double>& x, std::vector<double>& y )
 {
     CAF_ASSERT( start <= end );
 
@@ -193,7 +193,7 @@ int RiaInterpolationTools::interpolateRange( int start, int end, int firstPoint,
     std::vector<double> ys = { y[firstPoint], y[lastPoint] };
     for ( int index = start; index < end; index++ )
     {
-        y[index] = RiaInterpolationTools::linear( xs, ys, x[index] );
+        y[index] = RigInterpolationTools::linear( xs, ys, x[index] );
     }
 
     return end;
@@ -202,7 +202,7 @@ int RiaInterpolationTools::interpolateRange( int start, int end, int firstPoint,
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RiaInterpolationTools::interpolateMissingValues( const std::vector<double>& x, std::vector<double>& y )
+void RigInterpolationTools::interpolateMissingValues( const std::vector<double>& x, std::vector<double>& y )
 {
     CAF_ASSERT( x.size() == y.size() );
 

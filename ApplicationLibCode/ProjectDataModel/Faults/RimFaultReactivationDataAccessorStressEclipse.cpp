@@ -19,9 +19,9 @@
 #include "RimFaultReactivationDataAccessorStressEclipse.h"
 
 #include "RiaEclipseUnitTools.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaWellLogUnitTools.h"
+#include "RigInterpolationTools.h"
 
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseResultAddress.h"
@@ -157,7 +157,7 @@ double RimFaultReactivationDataAccessorStressEclipse::extractStressValue( Stress
             // Interpolate value from the two closest points.
             std::vector<double> xs = { intersections[bottomIdx].z(), intersections[topIdx].z() };
             std::vector<double> ys = { stressValues[bottomIdx], stressValues[topIdx] };
-            return RiaEclipseUnitTools::pascalToBar( RiaInterpolationTools::linear( xs, ys, position.z() ) );
+            return RiaEclipseUnitTools::pascalToBar( RigInterpolationTools::linear( xs, ys, position.z() ) );
         }
     }
     else if ( position.z() <= intersections.back().z() )

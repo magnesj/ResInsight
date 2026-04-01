@@ -18,10 +18,10 @@
 #include "RimStimPlanModelElasticPropertyCalculator.h"
 
 #include "RiaDefines.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
