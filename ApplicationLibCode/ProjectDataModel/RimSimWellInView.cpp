@@ -35,6 +35,7 @@
 #include "Rim2dIntersectionView.h"
 #include "RimCellFilterCollection.h"
 #include "RimEclipseCase.h"
+#include "RimEclipseResultCase.h"
 #include "RimEclipseView.h"
 #include "RimExtrudedCurveIntersection.h"
 #include "RimIntersectionCollection.h"
@@ -184,7 +185,22 @@ std::vector<SimulationWellCellBranch> RimSimWellInView::wellBranchesForVisualiza
 
     if ( simWellData && simWellData->isMultiSegmentWell() )
     {
-        return RigMswCenterLineCalculator::calculateMswWellPipeGeometry( this );
+        auto eclipseView = firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
+        if ( eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
+        {
+            auto eclipseCaseData = eclipseView->eclipseCase()->eclipseCaseData();
+            int  timeStepIndex   = eclipseView->currentTimeStep();
+
+            int shortBranchMergeThreshold = 4;
+            if ( auto eclipseResultCase = dynamic_cast<RimEclipseResultCase*>( eclipseView->eclipseCase() ) )
+            {
+                shortBranchMergeThreshold = eclipseResultCase->mswMergeThreshold();
+            }
+
+            return RigMswCenterLineCalculator::calculateMswWellPipeGeometry( eclipseCaseData, simWellData, timeStepIndex, shortBranchMergeThreshold );
+        }
+
+        return {};
     }
 
     return RigSimulationWellCenterLineCalculator::calculateWellPipeStaticCenterline( this );

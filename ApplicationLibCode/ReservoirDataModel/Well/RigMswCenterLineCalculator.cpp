@@ -27,50 +27,15 @@
 #include "RigSimWellData.h"
 #include "RigWellResultFrame.h"
 
-#include "RimEclipseCase.h"
-#include "RimEclipseResultCase.h"
-#include "RimEclipseView.h"
-#include "RimSimWellInView.h"
-#include "RimSimWellInViewCollection.h"
-
 #include "cvfRay.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<SimulationWellCellBranch> RigMswCenterLineCalculator::calculateMswWellPipeGeometry( const RimSimWellInView* rimWell )
-{
-    CVF_ASSERT( rimWell );
-
-    const RigSimWellData* simWellData = rimWell->simWellData();
-    if ( !simWellData ) return {};
-
-    auto eclipseView = rimWell->firstAncestorOrThisOfTypeAsserted<RimEclipseView>();
-    if ( eclipseView->eclipseCase() && eclipseView->eclipseCase()->eclipseCaseData() )
-    {
-        auto eclipseCaseData = eclipseView->eclipseCase()->eclipseCaseData();
-        int  timeStepIndex   = eclipseView->currentTimeStep();
-
-        int shortBranchMergeThreshold = 4;
-        if ( auto eclipseResultCase = dynamic_cast<RimEclipseResultCase*>( eclipseView->eclipseCase() ) )
-        {
-            shortBranchMergeThreshold = eclipseResultCase->mswMergeThreshold();
-        }
-
-        return calculateMswWellPipeGeometryForTimeStep( eclipseCaseData, simWellData, timeStepIndex, shortBranchMergeThreshold );
-    }
-
-    return {};
-}
-
-//--------------------------------------------------------------------------------------------------
-///
-//--------------------------------------------------------------------------------------------------
-std::vector<SimulationWellCellBranch>
-    RigMswCenterLineCalculator::calculateMswWellPipeGeometryForTimeStep( const RigEclipseCaseData* eclipseCaseData,
-                                                                         const RigSimWellData*     wellResults,
-                                                                         int                       timeStepIndex,
-                                                                         int                       shortBranchMergeThreshold )
+std::vector<SimulationWellCellBranch> RigMswCenterLineCalculator::calculateMswWellPipeGeometry( const RigEclipseCaseData* eclipseCaseData,
+                                                                                                const RigSimWellData*     wellResults,
+                                                                                                int                       timeStepIndex,
+                                                                                                int shortBranchMergeThreshold )
 {
     const RigWellResultFrame* wellFramePtr = nullptr;
 

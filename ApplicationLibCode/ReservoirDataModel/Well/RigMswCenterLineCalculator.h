@@ -26,7 +26,6 @@
 #include <vector>
 
 class RigEclipseCaseData;
-class RimSimWellInView;
 class RigSimWellData;
 
 //--------------------------------------------------------------------------------------------------
@@ -35,7 +34,10 @@ class RigSimWellData;
 class RigMswCenterLineCalculator
 {
 public:
-    static std::vector<SimulationWellCellBranch> calculateMswWellPipeGeometry( const RimSimWellInView* rimWell );
+    static std::vector<SimulationWellCellBranch> calculateMswWellPipeGeometry( const RigEclipseCaseData* eclipseCaseData,
+                                                                               const RigSimWellData*     simWellData,
+                                                                               int                       timeStepIndex,
+                                                                               int                       shortBranchMergeThreshold );
 
 private:
     struct OutputSegment
@@ -67,11 +69,6 @@ private:
     };
 
 private:
-    static std::vector<SimulationWellCellBranch> calculateMswWellPipeGeometryForTimeStep( const RigEclipseCaseData* eclipseCaseData,
-                                                                                          const RigSimWellData*     simWellData,
-                                                                                          int                       timeStepIndex,
-                                                                                          int shortBranchMergeThreshold );
-
     static SimulationWellCellBranch addCoordsAtCellFaceIntersectionsAndCreateBranch( const std::vector<cvf::Vec3d>          branchCoords,
                                                                                      const std::vector<RigWellResultPoint>& resultPoints,
                                                                                      const RigEclipseCaseData* eclipseCaseData );
