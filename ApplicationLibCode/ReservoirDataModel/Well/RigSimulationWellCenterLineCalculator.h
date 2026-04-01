@@ -27,7 +27,6 @@
 #include <vector>
 
 class RigEclipseCaseData;
-class RimSimWellInView;
 class RigSimWellData;
 class RigWellResultFrame;
 
@@ -37,7 +36,10 @@ class RigWellResultFrame;
 class RigSimulationWellCenterLineCalculator
 {
 public:
-    static std::vector<SimulationWellCellBranch> calculateWellPipeStaticCenterline( const RimSimWellInView* rimWell );
+    static std::vector<SimulationWellCellBranch> calculateWellPipeStaticCenterline( const RigEclipseCaseData* eclipseCaseData,
+                                                                                    const RigSimWellData*     simWellData,
+                                                                                    bool                      isAutoDetectBranches,
+                                                                                    bool                      useAllCellCenters );
 
     static std::vector<SimulationWellCellBranch> calculateWellPipeCenterlineForTimeStep( const RigEclipseCaseData* eclipseCaseData,
                                                                                          const RigSimWellData*     simWellData,
@@ -49,10 +51,6 @@ public:
         extractBranchData( const std::vector<SimulationWellCellBranch>& simulationBranch );
 
 private:
-    static void calculateWellPipeStaticCenterline( const RimSimWellInView*                       rimWell,
-                                                   std::vector<std::vector<cvf::Vec3d>>&         pipeBranchesCLCoords,
-                                                   std::vector<std::vector<RigWellResultPoint>>& pipeBranchesCellIds );
-
     static void calculateWellPipeCenterlineForTimeStep( const RigEclipseCaseData*                     eclipseCaseData,
                                                         const RigSimWellData*                         simWellData,
                                                         int                                           timeStepIndex,
