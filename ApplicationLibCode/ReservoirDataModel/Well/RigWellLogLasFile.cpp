@@ -23,8 +23,6 @@
 
 #include "RiaStringEncodingTools.h"
 
-#include "RimWellLogCurve.h"
-
 #include "laswell.hpp"
 #include "well.hpp"
 
