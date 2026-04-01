@@ -85,8 +85,6 @@ protected:
 
     std::vector<size_t> buildCellColumn( size_t startCell, FaceType startFace, std::map<double, cvf::Vec3d>& layers );
 
-    void updateFilters( std::vector<size_t> frontCells, std::vector<size_t> backCells );
-
     size_t oppositeStartCellIndex( const std::vector<size_t> cellIndexColumn, FaceType face );
 
     void generatePointsFrontBack();
