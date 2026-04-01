@@ -1332,7 +1332,7 @@ size_t RigCaseCellResultsData::findOrLoadKnownScalarResult( const RigEclipseResu
 
     if ( resVarAddr.isDeltaCaseActive() || resVarAddr.isDeltaTimeStepActive() )
     {
-        if ( !RigCaseCellResultCalculator::computeDifference( m_ownerCaseData, m_porosityModel, resVarAddr ) )
+        if ( !RigCaseCellResultCalculator::computeDifference( m_ownerCaseData, m_porosityModel, resVarAddr, m_caseDataLookup ) )
         {
             return cvf::UNDEFINED_SIZE_T;
         }
@@ -2826,6 +2826,14 @@ void RigCaseCellResultsData::computeMobilePV()
 void RigCaseCellResultsData::setCompletionTypeCallback( std::function<void( std::vector<double>&, size_t )> callback )
 {
     m_computeCompletionTypeCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+void RigCaseCellResultsData::setCaseDataLookup( std::function<RigEclipseCaseData*( int caseId )> lookup )
+{
+    m_caseDataLookup = std::move( lookup );
 }
 
 //--------------------------------------------------------------------------------------------------

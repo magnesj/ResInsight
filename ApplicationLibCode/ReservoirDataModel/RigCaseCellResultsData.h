@@ -149,6 +149,7 @@ public:
                                                  std::vector<RigCaseCellResultsData*> destinationResults );
 
     void setCompletionTypeCallback( std::function<void( std::vector<double>&, size_t )> callback );
+    void setCaseDataLookup( std::function<RigEclipseCaseData*( int caseId )> lookup );
 
     void setStatisticsDataCacheNumBins( const RigEclipseResultAddress& resultAddress, size_t numBins );
 
@@ -239,4 +240,5 @@ private:
     const RigFormationNames*      m_activeFormationNamesData = nullptr;
 
     std::function<void( std::vector<double>&, size_t )> m_computeCompletionTypeCallback;
+    std::function<RigEclipseCaseData*( int caseId )>    m_caseDataLookup;
 };

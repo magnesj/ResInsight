@@ -931,11 +931,24 @@ void RimEclipseCase::setReservoirData( RigEclipseCaseData* eclipseCase )
             RimCompletionCellIntersectionCalc::calculateCompletionTypeResult( this, completionTypeResult, timeStep );
         };
 
+        auto caseDataLookup = []( int caseId ) -> RigEclipseCaseData*
+        {
+            for ( RimEclipseCase* c : RimProject::current()->eclipseCases() )
+            {
+                if ( c && c->caseId() == caseId && c->eclipseCaseData() )
+                {
+                    return c->eclipseCaseData();
+                }
+            }
+            return nullptr;
+        };
+
         for ( auto poroModel : { RiaDefines::PorosityModelType::MATRIX_MODEL, RiaDefines::PorosityModelType::FRACTURE_MODEL } )
         {
             if ( auto* results = eclipseCaseData()->results( poroModel ) )
             {
                 results->setCompletionTypeCallback( completionTypeCallback );
+                results->setCaseDataLookup( caseDataLookup );
             }
         }
     }
