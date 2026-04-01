@@ -37,7 +37,7 @@ class RigStimPlanFractureDefinition;
 ///
 ///
 //==================================================================================================
-class RigEnsembleFractureStatisticsCalculator
+class RimEnsembleFractureStatisticsCalculator
 {
 public:
     enum class PropertyType
@@ -63,7 +63,7 @@ public:
     static std::vector<double> calculateProperty( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
                                                   PropertyType                                                propertyType );
 
-    static std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes();
+    static std::vector<RimEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes();
 
     static std::pair<caf::NumberFormatType, int> numberFormatForProperty( PropertyType propertyType );
 

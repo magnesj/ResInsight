@@ -119,7 +119,7 @@ RimHistogramDataSource::HistogramResult RimEnsembleFractureHistogramDataSource::
     if ( !m_ensembleFractureStatistics() ) return result;
 
     RigHistogramData histogramData =
-        RigEnsembleFractureStatisticsCalculator::createStatisticsData( m_ensembleFractureStatistics(), m_property(), m_numBins() );
+        RimEnsembleFractureStatisticsCalculator::createStatisticsData( m_ensembleFractureStatistics(), m_property(), m_numBins() );
 
     if ( !histogramData.isHistogramVectorValid() ) return result;
 
@@ -148,7 +148,7 @@ std::string RimEnsembleFractureHistogramDataSource::name() const
 
     QStringList nameTags;
     nameTags += m_ensembleFractureStatistics()->name();
-    nameTags += caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>::uiText( m_property() );
+    nameTags += caf::AppEnum<RimEnsembleFractureStatisticsCalculator::PropertyType>::uiText( m_property() );
 
     return nameTags.join( ", " ).toStdString();
 }
@@ -164,7 +164,7 @@ void RimEnsembleFractureHistogramDataSource::setEnsembleFractureStatistics( RimE
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimEnsembleFractureHistogramDataSource::setProperty( RigEnsembleFractureStatisticsCalculator::PropertyType property )
+void RimEnsembleFractureHistogramDataSource::setProperty( RimEnsembleFractureStatisticsCalculator::PropertyType property )
 {
     m_property = property;
 }

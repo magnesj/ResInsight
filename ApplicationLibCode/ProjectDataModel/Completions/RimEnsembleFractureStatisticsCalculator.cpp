@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEnsembleFractureStatisticsCalculator.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
@@ -41,23 +41,23 @@
 namespace caf
 {
 template <>
-void caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>::setUp()
+void caf::AppEnum<RimEnsembleFractureStatisticsCalculator::PropertyType>::setUp()
 {
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT, "HEIGHT", "Height" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::AREA, "AREA", "Area" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::WIDTH, "WIDTH", "Width" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::XF, "XF", "Halflength (Xf)" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::KFWF, "KFWF", "Conductivity (KfWf)" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::PERMEABILITY, "PERMEABILITY", "Permeability" );
-    addItem( RigEnsembleFractureStatisticsCalculator::PropertyType::FORMATION_DIP, "FORMATION_DIP", "Formation Dip" );
-    setDefault( RigEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT, "HEIGHT", "Height" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::AREA, "AREA", "Area" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::WIDTH, "WIDTH", "Width" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::XF, "XF", "Halflength (Xf)" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::KFWF, "KFWF", "Conductivity (KfWf)" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::PERMEABILITY, "PERMEABILITY", "Permeability" );
+    addItem( RimEnsembleFractureStatisticsCalculator::PropertyType::FORMATION_DIP, "FORMATION_DIP", "Formation Dip" );
+    setDefault( RimEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT );
 }
 }; // namespace caf
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigHistogramData RigEnsembleFractureStatisticsCalculator::createStatisticsData( const RimEnsembleFractureStatistics* esf,
+RigHistogramData RimEnsembleFractureStatisticsCalculator::createStatisticsData( const RimEnsembleFractureStatistics* esf,
                                                                                 PropertyType                         propertyType,
                                                                                 int                                  numBins )
 {
@@ -65,7 +65,7 @@ RigHistogramData RigEnsembleFractureStatisticsCalculator::createStatisticsData( 
 
     if ( esf->excludeZeroWidthFractures() )
     {
-        fractureDefinitions = RigEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( fractureDefinitions );
+        fractureDefinitions = RimEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions( fractureDefinitions );
     }
 
     return createStatisticsData( fractureDefinitions, propertyType, numBins );
@@ -75,7 +75,7 @@ RigHistogramData RigEnsembleFractureStatisticsCalculator::createStatisticsData( 
 ///
 //--------------------------------------------------------------------------------------------------
 RigHistogramData
-    RigEnsembleFractureStatisticsCalculator::createStatisticsData( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
+    RimEnsembleFractureStatisticsCalculator::createStatisticsData( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
                                                                    PropertyType propertyType,
                                                                    int          numBins )
 {
@@ -111,34 +111,34 @@ RigHistogramData
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<double>
-    RigEnsembleFractureStatisticsCalculator::calculateProperty( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
+    RimEnsembleFractureStatisticsCalculator::calculateProperty( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
                                                                 PropertyType propertyType )
 {
     std::vector<double> samples;
     if ( propertyType == PropertyType::HEIGHT )
     {
-        samples = calculateGridStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateHeight );
+        samples = calculateGridStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateHeight );
     }
     else if ( propertyType == PropertyType::AREA )
     {
-        samples = calculateGridStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateArea );
+        samples = calculateGridStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateArea );
     }
     else if ( propertyType == PropertyType::WIDTH )
     {
-        samples = calculateAreaWeightedStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth );
+        samples = calculateAreaWeightedStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth );
     }
     else if ( propertyType == PropertyType::PERMEABILITY )
     {
         samples = calculateAreaWeightedStatistics( fractureDefinitions,
-                                                   &RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedPermeability );
+                                                   &RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedPermeability );
     }
     else if ( propertyType == PropertyType::XF )
     {
-        samples = calculateGridStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateXf );
+        samples = calculateGridStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateXf );
     }
     else if ( propertyType == PropertyType::KFWF )
     {
-        samples = calculateGridStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateKfWf );
+        samples = calculateGridStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateKfWf );
     }
     else if ( propertyType == PropertyType::FORMATION_DIP )
     {
@@ -151,7 +151,7 @@ std::vector<double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RigEnsembleFractureStatisticsCalculator::calculateGridStatistics(
+std::vector<double> RimEnsembleFractureStatisticsCalculator::calculateGridStatistics(
     const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
     double( func )( cvf::cref<RigFractureGrid> ) )
 {
@@ -179,7 +179,7 @@ std::vector<double> RigEnsembleFractureStatisticsCalculator::calculateGridStatis
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateHeight( cvf::cref<RigFractureGrid> fractureGrid )
+double RimEnsembleFractureStatisticsCalculator::calculateHeight( cvf::cref<RigFractureGrid> fractureGrid )
 {
     double longestRange = 0.0;
 
@@ -212,7 +212,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateHeight( cvf::cref<RigFr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateArea( cvf::cref<RigFractureGrid> fractureGrid )
+double RimEnsembleFractureStatisticsCalculator::calculateArea( cvf::cref<RigFractureGrid> fractureGrid )
 {
     double sum = 0.0;
     for ( auto fractureCell : fractureGrid->fractureCells() )
@@ -230,7 +230,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateArea( cvf::cref<RigFrac
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateKfWf( cvf::cref<RigFractureGrid> fractureGrid )
+double RimEnsembleFractureStatisticsCalculator::calculateKfWf( cvf::cref<RigFractureGrid> fractureGrid )
 {
     RiaWeightedMeanCalculator<double> calc;
     for ( auto fractureCell : fractureGrid->fractureCells() )
@@ -249,7 +249,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateKfWf( cvf::cref<RigFrac
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedStatistics(
+std::vector<double> RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedStatistics(
     const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions,
     double( func )( cvf::cref<RigFractureGrid>, cvf::cref<RigFractureGrid>, RiaDefines::EclipseUnitSystem, const QString& ) )
 {
@@ -286,7 +286,7 @@ std::vector<double> RigEnsembleFractureStatisticsCalculator::calculateAreaWeight
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth( cvf::cref<RigFractureGrid>    conductivityGrid,
+double RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth( cvf::cref<RigFractureGrid>    conductivityGrid,
                                                                             cvf::cref<RigFractureGrid>    widthGrid,
                                                                             RiaDefines::EclipseUnitSystem widthUnitSystem,
                                                                             const QString&                widthUnit )
@@ -314,7 +314,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth( cvf:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedPermeability( cvf::cref<RigFractureGrid>    conductivityGrid,
+double RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedPermeability( cvf::cref<RigFractureGrid>    conductivityGrid,
                                                                                    cvf::cref<RigFractureGrid>    widthGrid,
                                                                                    RiaDefines::EclipseUnitSystem widthUnitSystem,
                                                                                    const QString&                widthUnit )
@@ -343,7 +343,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedPermeabilit
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::calculateXf( cvf::cref<RigFractureGrid> fractureGrid )
+double RimEnsembleFractureStatisticsCalculator::calculateXf( cvf::cref<RigFractureGrid> fractureGrid )
 {
     double height = calculateHeight( fractureGrid );
     double area   = calculateArea( fractureGrid );
@@ -362,7 +362,7 @@ double RigEnsembleFractureStatisticsCalculator::calculateXf( cvf::cref<RigFractu
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<double>
-    RigEnsembleFractureStatisticsCalculator::calculateFormationDip( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions )
+    RimEnsembleFractureStatisticsCalculator::calculateFormationDip( const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions )
 {
     std::vector<double> formationDips;
     for ( auto fractureDefinition : fractureDefinitions )
@@ -376,7 +376,7 @@ std::vector<double>
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigEnsembleFractureStatisticsCalculator::convertUnit( double value, RiaDefines::EclipseUnitSystem unitSystem, const QString& unitName )
+double RimEnsembleFractureStatisticsCalculator::convertUnit( double value, RiaDefines::EclipseUnitSystem unitSystem, const QString& unitName )
 {
     if ( unitSystem == RiaDefines::EclipseUnitSystem::UNITS_METRIC )
     {
@@ -392,11 +392,11 @@ double RigEnsembleFractureStatisticsCalculator::convertUnit( double value, RiaDe
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<cvf::ref<RigStimPlanFractureDefinition>> RigEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions(
+std::vector<cvf::ref<RigStimPlanFractureDefinition>> RimEnsembleFractureStatisticsCalculator::removeZeroWidthDefinitions(
     const std::vector<cvf::ref<RigStimPlanFractureDefinition>>& fractureDefinitions )
 {
     std::vector<double> samples =
-        calculateAreaWeightedStatistics( fractureDefinitions, &RigEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth );
+        calculateAreaWeightedStatistics( fractureDefinitions, &RimEnsembleFractureStatisticsCalculator::calculateAreaWeightedWidth );
 
     std::vector<cvf::ref<RigStimPlanFractureDefinition>> filteredFractureDefinitions;
 
@@ -416,16 +416,16 @@ std::vector<cvf::ref<RigStimPlanFractureDefinition>> RigEnsembleFractureStatisti
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> RigEnsembleFractureStatisticsCalculator::propertyTypes()
+std::vector<RimEnsembleFractureStatisticsCalculator::PropertyType> RimEnsembleFractureStatisticsCalculator::propertyTypes()
 {
-    std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> types = {
-        RigEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::XF,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::AREA,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::PERMEABILITY,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::WIDTH,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::KFWF,
-        RigEnsembleFractureStatisticsCalculator::PropertyType::FORMATION_DIP,
+    std::vector<RimEnsembleFractureStatisticsCalculator::PropertyType> types = {
+        RimEnsembleFractureStatisticsCalculator::PropertyType::HEIGHT,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::XF,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::AREA,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::PERMEABILITY,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::WIDTH,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::KFWF,
+        RimEnsembleFractureStatisticsCalculator::PropertyType::FORMATION_DIP,
     };
     return types;
 }
@@ -433,7 +433,7 @@ std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> RigEnsembleFr
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::pair<caf::NumberFormatType, int> RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
+std::pair<caf::NumberFormatType, int> RimEnsembleFractureStatisticsCalculator::numberFormatForProperty( PropertyType propertyType )
 {
     if ( propertyType == PropertyType::WIDTH )
         return std::make_pair( caf::NumberFormatType::FIXED, 4 );

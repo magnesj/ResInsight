@@ -28,7 +28,7 @@
 
 #include "RifStimPlanXmlReader.h"
 
-#include "RigEnsembleFractureStatisticsCalculator.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"
 #include "RigStimPlanFractureDefinition.h"
 #include "RigTransmissibilityEquations.h"
@@ -781,11 +781,11 @@ QString RimStimPlanFractureTemplate::generatePropertiesTable() const
 
         std::vector<cvf::ref<RigStimPlanFractureDefinition>> fractureDefinitions = { m_stimPlanFractureDefinitionData };
 
-        std::vector<RigEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes =
-            RigEnsembleFractureStatisticsCalculator::propertyTypes();
+        std::vector<RimEnsembleFractureStatisticsCalculator::PropertyType> propertyTypes =
+            RimEnsembleFractureStatisticsCalculator::propertyTypes();
         for ( auto propertyType : propertyTypes )
         {
-            std::vector<double> values = RigEnsembleFractureStatisticsCalculator::calculateProperty( fractureDefinitions, propertyType );
+            std::vector<double> values = RimEnsembleFractureStatisticsCalculator::calculateProperty( fractureDefinitions, propertyType );
             if ( !values.empty() )
             {
                 appendTextIfValidValue( body, values[0], propertyType );
@@ -812,12 +812,12 @@ void RimStimPlanFractureTemplate::appendTextIfValidValue( QString& body, const Q
 //--------------------------------------------------------------------------------------------------
 void RimStimPlanFractureTemplate::appendTextIfValidValue( QString&                                              body,
                                                           double                                                value,
-                                                          RigEnsembleFractureStatisticsCalculator::PropertyType propertyType )
+                                                          RimEnsembleFractureStatisticsCalculator::PropertyType propertyType )
 {
     if ( value != HUGE_VAL )
     {
-        QString name                   = caf::AppEnum<RigEnsembleFractureStatisticsCalculator::PropertyType>::uiText( propertyType );
-        auto [numberFormat, precision] = RigEnsembleFractureStatisticsCalculator::numberFormatForProperty( propertyType );
+        QString name                   = caf::AppEnum<RimEnsembleFractureStatisticsCalculator::PropertyType>::uiText( propertyType );
+        auto [numberFormat, precision] = RimEnsembleFractureStatisticsCalculator::numberFormatForProperty( propertyType );
         body += QString( "%1: %2<br>" ).arg( name ).arg( caf::PdmUiNumberFormat::valueToText( value, numberFormat, precision ) );
     }
 }

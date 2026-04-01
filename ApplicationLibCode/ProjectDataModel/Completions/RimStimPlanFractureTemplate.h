@@ -26,7 +26,7 @@
 #include "cvfObject.h"
 #include "cvfVector3.h"
 
-#include "RigEnsembleFractureStatisticsCalculator.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureCell.h"
 #include "RigFractureGrid.h"
 
@@ -101,7 +101,7 @@ public:
 
     QString     generatePropertiesTable() const;
     static void appendTextIfValidValue( QString& body, const QString& title, double value );
-    static void appendTextIfValidValue( QString& body, double value, RigEnsembleFractureStatisticsCalculator::PropertyType propertyType );
+    static void appendTextIfValidValue( QString& body, double value, RimEnsembleFractureStatisticsCalculator::PropertyType propertyType );
 
     QString mapUiResultNameToFileResultName( const QString& uiResultName ) const;
     void    convertToUnitSystem( RiaDefines::EclipseUnitSystem neededUnit ) override;
