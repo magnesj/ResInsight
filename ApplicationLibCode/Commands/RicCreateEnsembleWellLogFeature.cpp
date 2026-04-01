@@ -33,7 +33,7 @@
 #include "RifReaderSettings.h"
 #include "WellPathCommands/RicImportWellPaths.h"
 
-#include "RimLasFileExporter.h"
+#include "ExportCommands/RimLasFileExporter.h"
 
 #include "RimDialogData.h"
 #include "RimEclipseCase.h"
