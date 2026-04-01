@@ -18,11 +18,11 @@
 
 #include "RimCellFilter.h"
 
-#include "RimReservoirGridTools.h"
 #include "Rim3dView.h"
 #include "RimCase.h"
 #include "RimEclipseCase.h"
 #include "RimGeoMechCase.h"
+#include "RimReservoirGridTools.h"
 #include "RimTools.h"
 #include "RimViewController.h"
 
