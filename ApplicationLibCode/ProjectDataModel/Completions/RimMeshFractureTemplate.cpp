@@ -259,7 +259,11 @@ WellFractureIntersectionData RimMeshFractureTemplate::wellFractureIntersectionDa
 
                 std::vector<cvf::Vec3d> wellPathPoints =
                     rimWellPath->wellPathGeometry()->wellPathPointsIncludingInterpolatedIntersectionPoint( fractureInstance->fractureMD() );
-                RigWellPathStimplanIntersector intersector( wellPathPoints, fractureInstance );
+                RigWellPathStimplanIntersector intersector( wellPathPoints,
+                                                            fractureInstance->transformMatrix(),
+                                                            fractureInstance->wellRadius(),
+                                                            fractureInstance->perforationLength(),
+                                                            fractureInstance->fractureGrid() );
                 for ( const auto& v : intersector.intersections() )
                 {
                     size_t fractureGlobalCellIndex = v.first;
