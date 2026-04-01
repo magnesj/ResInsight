@@ -29,10 +29,10 @@
 #include "RigCaseCellResultCalculator.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
-#include "RimEclipseCrossPlotDataExtractor.h"
 #include "RigEclipseResultAddress.h"
 #include "RigFormationNames.h"
 #include "RigMainGrid.h"
+#include "RimEclipseCrossPlotDataExtractor.h"
 
 #include "RiuDraggableOverlayFrame.h"
 #include "RiuGuiTheme.h"

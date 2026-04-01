@@ -52,7 +52,6 @@
 #include "RigSwatResultCalculator.h"
 #include "RigTypeSafeIndex.h"
 
-
 #include "cafAssert.h"
 #include "cafProgressInfo.h"
 #include "cvfGeometryTools.h"

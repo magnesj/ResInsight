@@ -23,10 +23,10 @@
 #include "RiaOptionItemFactory.h"
 
 #include "RigCaseToCaseCellMapper.h"
-#include "RimCaseToCaseRangeFilterMapper.h"
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
 #include "RigMainGrid.h"
+#include "RimCaseToCaseRangeFilterMapper.h"
 
 #include "ContourMap/RimEclipseContourMapView.h"
 #include "Rim3dView.h"

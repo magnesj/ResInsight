@@ -25,12 +25,12 @@
 #include "RiaWeightedGeometricMeanCalculator.h"
 #include "RiaWeightedHarmonicMeanCalculator.h"
 
-#include "RimEnsembleFractureStatisticsCalculator.h"
 #include "RigFractureGrid.h"
 #include "RigHistogramData.h"
 #include "RigSlice2D.h"
 #include "RigStatisticsMath.h"
 #include "RigStimPlanFractureDefinition.h"
+#include "RimEnsembleFractureStatisticsCalculator.h"
 
 #include "Histogram/RimEnsembleFractureHistogramDataSource.h"
 #include "RimFractureTemplateCollection.h"

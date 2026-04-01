@@ -17,8 +17,8 @@
 /////////////////////////////////////////////////////////////////////////////////
 #pragma once
 
-#include "RimEclipseCrossPlotDataExtractor.h"
 #include "RigGridCrossPlotCurveGrouping.h"
+#include "RimEclipseCrossPlotDataExtractor.h"
 
 #include "RimCheckableNamedObject.h"
 #include "RimNameConfig.h"
