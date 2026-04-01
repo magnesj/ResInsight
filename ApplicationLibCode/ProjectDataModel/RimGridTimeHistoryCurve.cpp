@@ -25,6 +25,7 @@
 #include "RigFemResultAddress.h"
 #include "RigMainGrid.h"
 #include "RigTimeHistoryResultAccessor.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "WellLogCommands/RicWellLogPlotCurveFeatureImpl.h"
 
@@ -179,11 +180,10 @@ std::vector<double> RimGridTimeHistoryCurve::yValues() const
         {
             std::vector<QDateTime> timeStepDates = cellResultsData->timeStepDates();
 
-            values = RigTimeHistoryResultAccessor::timeHistoryValues( eclTopItem->eclipseCase()->eclipseCaseData(),
-                                                                      m_eclipseResultDefinition(),
-                                                                      gridIndex,
-                                                                      cellIndex,
-                                                                      timeStepDates.size() );
+            auto timeHistAccessorFactory =
+                [caseData_ = eclTopItem->eclipseCase()->eclipseCaseData(), gridIndex, resDef_ = m_eclipseResultDefinition()]( size_t timeStep )
+            { return RimEclipseResultDefinitionTools::createResultAccessor( caseData_, gridIndex, timeStep, resDef_ ); };
+            values = RigTimeHistoryResultAccessor::timeHistoryValues( timeHistAccessorFactory, cellIndex, timeStepDates.size() );
         }
     }
 

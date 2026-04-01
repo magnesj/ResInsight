@@ -22,18 +22,15 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 #include "RigResultAccessor.h"
-#include "RigResultAccessorFactory.h"
 
 // #include <cmath> // Needed for HUGE_VAL on Linux
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<double> RigTimeHistoryResultAccessor::timeHistoryValues( RigEclipseCaseData*         eclipseCaseData,
-                                                                     RimEclipseResultDefinition* resultDefinition,
-                                                                     size_t                      gridIndex,
-                                                                     size_t                      cellIndex,
-                                                                     size_t                      timeStepCount )
+std::vector<double> RigTimeHistoryResultAccessor::timeHistoryValues( std::function<cvf::ref<RigResultAccessor>( size_t )> accessorFactory,
+                                                                     size_t                                               cellIndex,
+                                                                     size_t                                               timeStepCount )
 {
     std::vector<double> values;
 
@@ -41,11 +38,7 @@ std::vector<double> RigTimeHistoryResultAccessor::timeHistoryValues( RigEclipseC
 
     for ( size_t i = 0; i < timeStepCount; i++ )
     {
-        // TODO: Consider rewrite RigResultAccessorFactory::createFromResultDefinition so the function always returns a
-        // valid result accessor. Use hugeVal result accessor if no valid result is found
-
-        cvf::ref<RigResultAccessor> resultAccessor =
-            RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, gridIndex, i, resultDefinition );
+        cvf::ref<RigResultAccessor> resultAccessor = accessorFactory( i );
         if ( resultAccessor.notNull() )
         {
             values.push_back( resultAccessor->cellScalar( cellIndex ) );

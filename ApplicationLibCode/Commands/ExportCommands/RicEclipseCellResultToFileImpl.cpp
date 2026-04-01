@@ -26,6 +26,7 @@
 #include "RigMainGrid.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "RimEclipseResultDefinition.h"
 
@@ -84,7 +85,7 @@ bool RicEclipseCellResultToFileImpl::writeBinaryResultToTextFile( const QString&
     CVF_TIGHT_ASSERT( eclipseCase );
 
     cvf::ref<RigResultAccessor> resultAccessor =
-        RigResultAccessorFactory::createFromResultDefinition( eclipseCase, 0, timeStep, resultDefinition );
+        RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase, 0, timeStep, resultDefinition );
     if ( resultAccessor.isNull() )
     {
         return false;

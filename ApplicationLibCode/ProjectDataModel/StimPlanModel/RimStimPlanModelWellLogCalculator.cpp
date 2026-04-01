@@ -29,6 +29,7 @@
 #include "RigMainGrid.h"
 #include "RigResultAccessor.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigWellLogCurveData.h"
 #include "Well/RigWellPath.h"
@@ -550,7 +551,7 @@ bool RimStimPlanModelWellLogCalculator::extractValuesForProperty( RiaDefines::Cu
     }
 
     cvf::ref<RigResultAccessor> resAcc =
-        RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, 0, timeStep, &eclipseResultDefinition );
+        RimEclipseResultDefinitionTools::createResultAccessor( eclipseCaseData, 0, timeStep, &eclipseResultDefinition );
 
     if ( resAcc.notNull() )
     {

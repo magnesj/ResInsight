@@ -23,7 +23,6 @@
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
 #include "RigResultAccessor.h"
-#include "RigResultAccessorFactory.h"
 
 #include <cmath>
 
@@ -31,10 +30,9 @@
 ///
 //--------------------------------------------------------------------------------------------------
 std::vector<double> RigDepthResultAccessor::resultValues( RigEclipseCaseData*         eclipseCaseData,
-                                                          RimEclipseResultDefinition* resultDefinition,
+                                                          cvf::ref<RigResultAccessor> resultAccessor,
                                                           int                         gridIndex,
-                                                          size_t                      cellIndex,
-                                                          int                         currentTimeStep )
+                                                          size_t                      cellIndex )
 {
     std::vector<double> values;
 
@@ -54,9 +52,6 @@ std::vector<double> RigDepthResultAccessor::resultValues( RigEclipseCaseData*   
 
         if ( grid->ijkFromCellIndex( cellIndex, &i, &j, &dummy ) )
         {
-            cvf::ref<RigResultAccessor> resultAccessor =
-                RigResultAccessorFactory::createFromResultDefinition( eclipseCaseData, gridIndex, currentTimeStep, resultDefinition );
-
             for ( auto k : kvals )
             {
                 size_t tmpCellIdx = grid->cellIndexFromIJK( i, j, k );

@@ -27,7 +27,7 @@
 #include "RigCell.h"
 #include "RigEclipseCaseData.h"
 #include "RigGridBase.h"
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "Rim3dOverlayInfoConfig.h"
 #include "RimCellEdgeColors.h"
@@ -868,10 +868,10 @@ void RivReservoirViewPartMgr::computePropertyVisibility( cvf::UByteArray*       
                 RigEclipseCaseData* eclipseCase = propFilterColl->reservoirView()->eclipseCase()->eclipseCaseData();
 
                 cvf::ref<RigResultAccessor> resultAccessor =
-                    RigResultAccessorFactory::createFromResultDefinition( eclipseCase,
-                                                                          grid->gridIndex(),
-                                                                          timeStepIndex,
-                                                                          propertyFilter->resultDefinition() );
+                    RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase,
+                                                                           grid->gridIndex(),
+                                                                           timeStepIndex,
+                                                                           propertyFilter->resultDefinition() );
 
                 CVF_ASSERT( resultAccessor.notNull() );
 

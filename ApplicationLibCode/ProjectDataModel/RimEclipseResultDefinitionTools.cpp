@@ -23,11 +23,15 @@
 #include "RiaLogging.h"
 #include "RiaResultNames.h"
 
+#include "RigActiveCellsResultAccessor.h"
 #include "RigAllanDiagramData.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
 #include "RigFlowDiagResults.h"
+#include "RigGridBase.h"
+#include "RigResultAccessor.h"
+#include "RigResultAccessorFactory.h"
 #include "RimVisibleCategoriesCalculator.h"
 
 #include "RimColorLegend.h"
@@ -37,6 +41,7 @@
 #include "RimEclipseInputProperty.h"
 #include "RimEclipseInputPropertyCollection.h"
 #include "RimEclipseView.h"
+#include "RimFlowDiagSolution.h"
 #include "RimFlowDiagnosticsTools.h"
 #include "RimRegularLegendConfig.h"
 #include "RimSimWellInView.h"
@@ -812,4 +817,39 @@ QList<caf::PdmOptionItemInfo> RimEclipseResultDefinitionTools::calcOptionsForVar
     optionList.push_front( caf::PdmOptionItemInfo( RiaResultNames::undefinedResultName(), RiaResultNames::undefinedResultName() ) );
 
     return optionList;
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
+cvf::ref<RigResultAccessor> RimEclipseResultDefinitionTools::createResultAccessor( const RigEclipseCaseData*         eclipseCase,
+                                                                                   size_t                            gridIndex,
+                                                                                   size_t                            timeStepIndex,
+                                                                                   const RimEclipseResultDefinition* resultDefinition )
+{
+    if ( resultDefinition->isFlowDiagOrInjectionFlooding() )
+    {
+        RimFlowDiagSolution* flowSol = resultDefinition->flowDiagSolution();
+        if ( !flowSol ) return new RigHugeValResultAccessor;
+
+        const std::vector<double>* resultValues =
+            flowSol->flowDiagResults()->resultValues( resultDefinition->flowDiagResAddress(), timeStepIndex );
+        if ( !resultValues ) return new RigHugeValResultAccessor;
+
+        const RigGridBase* grid = eclipseCase->grid( gridIndex );
+        if ( !grid ) return new RigHugeValResultAccessor;
+
+        cvf::ref<RigResultAccessor> object =
+            new RigActiveCellsResultAccessor( grid, resultValues, eclipseCase->activeCellInfo( resultDefinition->porosityModel() ) );
+
+        return object;
+    }
+    else
+    {
+        return RigResultAccessorFactory::createFromResultAddress( eclipseCase,
+                                                                  gridIndex,
+                                                                  resultDefinition->porosityModel(),
+                                                                  timeStepIndex,
+                                                                  resultDefinition->eclipseResultAddress() );
+    }
 }

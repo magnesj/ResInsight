@@ -21,7 +21,7 @@
 #include "RiaLogging.h"
 
 #include "RigResultAccessor.h"
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 
 #include "Rim2dIntersectionView.h"
 #include "RimEclipseCase.h"
@@ -315,7 +315,7 @@ std::expected<caf::PdmObjectHandle*, QString> RimcExtrudedCurveIntersection_geom
 
         size_t                      gridIndex = 0;
         cvf::ref<RigResultAccessor> resultAccessor =
-            RigResultAccessorFactory::createFromResultDefinition( eclipseCase, gridIndex, eclView->currentTimeStep(), eclResultDef );
+            RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase, gridIndex, eclView->currentTimeStep(), eclResultDef );
 
         auto                triToCellIndex = geoGenerator->triangleToCellIndex();
         std::vector<double> values;

@@ -26,7 +26,7 @@
 #include "RigFlowDiagResults.h"
 #include "RigMainGrid.h"
 #include "RigNNCData.h"
-#include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "RimFlowDiagVisibleCellsStatCalc.h"
 
 #include "RimBoxIntersection.h"
@@ -122,10 +122,10 @@ std::set<int> RimVisibleCategoriesCalculator::visibleCategories( RimEclipseView*
         RimVisibleCategoriesCalculator::appendVisibleIntersectionCells( cellVisibilityView, visibleReservoirCells );
 
         cvf::ref<RigResultAccessor> resultAccessor =
-            RigResultAccessorFactory::createFromResultDefinition( cellVisibilityView->eclipseCase()->eclipseCaseData(),
-                                                                  0,
-                                                                  cellVisibilityView->currentTimeStep(),
-                                                                  categoryResult );
+            RimEclipseResultDefinitionTools::createResultAccessor( cellVisibilityView->eclipseCase()->eclipseCaseData(),
+                                                                   0,
+                                                                   cellVisibilityView->currentTimeStep(),
+                                                                   categoryResult );
 
         if ( resultAccessor.notNull() )
         {

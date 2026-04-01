@@ -32,6 +32,7 @@
 #include "RigFemPartResultsCollection.h"
 #include "RigGeoMechCaseData.h"
 #include "RigResultAccessorFactory.h"
+#include "RimEclipseResultDefinitionTools.h"
 #include "Well/RigEclipseWellLogExtractor.h"
 #include "Well/RigGeoMechWellLogExtractor.h"
 #include "Well/RigSimWellData.h"
@@ -546,7 +547,7 @@ RimWellLogExtractionCurve::WellLogExtractionCurveData RimWellLogExtractionCurve:
         m_eclipseResultDefinition->loadResult();
 
         resAcc =
-            RigResultAccessorFactory::createFromResultDefinition( eclipseCase->eclipseCaseData(), 0, m_timeStep, m_eclipseResultDefinition );
+            RimEclipseResultDefinitionTools::createResultAccessor( eclipseCase->eclipseCaseData(), 0, m_timeStep, m_eclipseResultDefinition );
         if ( resAcc.notNull() )
         {
             wellExtractor->curveData( resAcc.p(), &curveData.values );
