@@ -19,8 +19,8 @@
 #include "RimFaultReactivationDataAccessorWellLogExtraction.h"
 
 #include "RiaEclipseUnitTools.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
+#include "RigInterpolationTools.h"
 
 #include "RigFaultReactivationModel.h"
 #include "RigFemAddressDefines.h"
@@ -124,10 +124,10 @@ std::pair<double, cvf::Vec3d>
             // Interpolate value from the two closest points.
             std::vector<double> xs     = { intersections[bottomIdx].z(), intersections[topIdx].z() };
             std::vector<double> ys     = { values[bottomIdx], values[topIdx] };
-            double              porBar = RiaInterpolationTools::linear( xs, ys, position.z() );
+            double              porBar = RigInterpolationTools::linear( xs, ys, position.z() );
 
             // Interpolate position from depth
-            double     fraction           = RiaInterpolationTools::linear( xs, { 0.0, 1.0 }, position.z() );
+            double     fraction           = RigInterpolationTools::linear( xs, { 0.0, 1.0 }, position.z() );
             cvf::Vec3d extractionPosition = lerp( intersections[bottomIdx], intersections[topIdx], fraction );
             return { porBar, extractionPosition };
         }
@@ -233,7 +233,7 @@ void RimFaultReactivationDataAccessorWellLogExtraction::fillInMissingValuesWithG
 
     // Interpolate the missing values (should only be intra-reservoir by now)
     std::vector<double> intersectionsZ = extractDepthValues( intersections );
-    RiaInterpolationTools::interpolateMissingValues( intersectionsZ, values );
+    RigInterpolationTools::interpolateMissingValues( intersectionsZ, values );
 }
 
 //--------------------------------------------------------------------------------------------------
@@ -256,7 +256,7 @@ void RimFaultReactivationDataAccessorWellLogExtraction::fillInMissingValuesWithT
 
     // Interpolate the missing values (should only be intra-reservoir by now)
     std::vector<double> intersectionsZ = extractDepthValues( intersections );
-    RiaInterpolationTools::interpolateMissingValues( intersectionsZ, values );
+    RigInterpolationTools::interpolateMissingValues( intersectionsZ, values );
 }
 
 //--------------------------------------------------------------------------------------------------

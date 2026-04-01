@@ -14,7 +14,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaQDateTimeTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellNameComparer.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaStdStringTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RiaInterpolationTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaSimWellBranchTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectFileTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RiaStringEncodingTools.h
@@ -77,7 +76,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RiaQDateTimeTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaWellNameComparer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaStdStringTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RiaInterpolationTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaSimWellBranchTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaProjectFileTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RiaStringEncodingTools.cpp

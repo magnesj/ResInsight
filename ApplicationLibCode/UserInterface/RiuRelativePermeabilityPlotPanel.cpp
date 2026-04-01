@@ -21,10 +21,10 @@
 #include "RiaCurveDataTools.h"
 #include "RiaDefines.h"
 #include "RiaEclipseUnitTools.h"
-#include "RiaInterpolationTools.h"
 #include "RiaPhaseTools.h"
 #include "RiaPlotDefines.h"
 #include "RiaResultNames.h"
+#include "RigInterpolationTools.h"
 
 #include "RigFlowDiagSolverInterface.h"
 
@@ -726,7 +726,7 @@ void RiuRelativePermeabilityPlotPanel::addCurveConstSaturationIntersectionMarker
                                                                                   std::vector<QPointF>*                   points,
                                                                                   std::vector<WhichYAxis>*                axes )
 {
-    const double yVal = RiaInterpolationTools::linear( curve.saturationVals, curve.yVals, saturationValue );
+    const double yVal = RigInterpolationTools::linear( curve.saturationVals, curve.yVals, saturationValue );
     if ( yVal != HUGE_VAL )
     {
         QwtPlotMarker* pointMarker = new QwtPlotMarker;

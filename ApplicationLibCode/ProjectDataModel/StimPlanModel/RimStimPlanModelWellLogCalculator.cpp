@@ -18,9 +18,9 @@
 #include "RimStimPlanModelWellLogCalculator.h"
 
 #include "RiaDefines.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigActiveCellInfo.h"
 #include "RigCaseCellResultsData.h"
@@ -142,7 +142,7 @@ bool RimStimPlanModelWellLogCalculator::calculate( RiaDefines::CurveProperty cur
         }
         else if ( strategy == RimStimPlanModel::MissingValueStrategy::LINEAR_INTERPOLATION )
         {
-            RiaInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
+            RigInterpolationTools::interpolateMissingValues( measuredDepthValues, values );
         }
         else if ( strategy == RimStimPlanModel::MissingValueStrategy::OTHER_CURVE_PROPERTY )
         {

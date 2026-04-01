@@ -19,10 +19,10 @@
 #include "RimStimPlanModelCurve.h"
 
 #include "RiaApplication.h"
-#include "RiaInterpolationTools.h"
 #include "RiaLogging.h"
 #include "RiaPreferences.h"
 #include "RiaStimPlanModelDefines.h"
+#include "RigInterpolationTools.h"
 
 #include "RigEclipseCaseData.h"
 

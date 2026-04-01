@@ -28,6 +28,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.h
+    ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEquil.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.h
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.h
@@ -114,6 +115,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseResultTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigElasticProperties.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEnsembleParameter.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RigInterpolationTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEquil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFault.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigFaultReactivationModel.cpp
