@@ -29,7 +29,7 @@ class RimEclipseResultDefinition;
 //==================================================================================================
 ///
 //==================================================================================================
-class RigVisibleCategoriesCalculator
+class RimVisibleCategoriesCalculator
 {
 public:
     static std::set<int> visibleFlowDiagCategories( RimEclipseView&                 eclView,

@@ -79,7 +79,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.h
     ${CMAKE_CURRENT_LIST_DIR}/RigVfpTables.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigVisibleCategoriesCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWbsParameter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigWeightedMeanCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigPolygonTools.h
@@ -170,7 +169,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigVfpTables.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigVisibleCategoriesCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWbsParameter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigWeightedMeanCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigPolygonTools.cpp

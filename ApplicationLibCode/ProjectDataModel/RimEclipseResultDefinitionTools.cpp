@@ -28,7 +28,7 @@
 #include "RigEclipseCaseData.h"
 #include "RigEclipseResultAddress.h"
 #include "RigFlowDiagResults.h"
-#include "RigVisibleCategoriesCalculator.h"
+#include "RimVisibleCategoriesCalculator.h"
 
 #include "RimColorLegend.h"
 #include "RimColorLegendItem.h"
@@ -471,7 +471,7 @@ void RimEclipseResultDefinitionTools::updateLegendForFlowDiagnostics( const RimE
             if ( resultDefinition->showOnlyVisibleCategoriesInLegend() )
             {
                 std::set<int> visibleTracers =
-                    RigVisibleCategoriesCalculator::visibleFlowDiagCategories( *eclView, *flowResultsData, resAddr, timeStep );
+                    RimVisibleCategoriesCalculator::visibleFlowDiagCategories( *eclView, *flowResultsData, resAddr, timeStep );
                 for ( auto tupIt : categories )
                 {
                     int tracerIndex = std::get<1>( tupIt );
@@ -570,7 +570,7 @@ void RimEclipseResultDefinitionTools::updateCellResultLegend( const RimEclipseRe
                 {
                     auto eclView = resultDefinition->firstAncestorOrThisOfType<RimEclipseView>();
 
-                    visibleAllanCategories = RigVisibleCategoriesCalculator::visibleAllanCategories( eclView );
+                    visibleAllanCategories = RimVisibleCategoriesCalculator::visibleAllanCategories( eclView );
                 }
 
                 for ( auto [formationPair, categoryIndex] : formationCombToCategory )
@@ -650,7 +650,7 @@ void RimEclipseResultDefinitionTools::updateCellResultLegend( const RimEclipseRe
                 if ( cellVisibilityView && cellVisibilityView->showWindow() )
                 {
                     std::set<int> visibleCategorySet =
-                        RigVisibleCategoriesCalculator::visibleCategories( cellVisibilityView, resultDefinition );
+                        RimVisibleCategoriesCalculator::visibleCategories( cellVisibilityView, resultDefinition );
 
                     // If we have a view, use the unique values defined by visible cells in this view
                     visibleCategoryValues.clear();
