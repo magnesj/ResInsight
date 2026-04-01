@@ -20,7 +20,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseAllanFaultsStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseData.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseDataTools.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCrossPlotDataExtractor.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseMultiPropertyStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeStatCalc.h
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.h
@@ -108,7 +107,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseAllanFaultsStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseData.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCaseDataTools.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigEclipseCrossPlotDataExtractor.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseMultiPropertyStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeStatCalc.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigEclipseNativeVisibleCellsStatCalc.cpp

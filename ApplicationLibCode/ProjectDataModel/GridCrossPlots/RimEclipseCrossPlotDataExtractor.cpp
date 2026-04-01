@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigEclipseCrossPlotDataExtractor.h"
+#include "RimEclipseCrossPlotDataExtractor.h"
 
 #include "RiaQDateTimeTools.h"
 
@@ -36,7 +36,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigEclipseCrossPlotResult RigEclipseCrossPlotDataExtractor::extract( RigEclipseCaseData*               caseData,
+RimEclipseCrossPlotResult RimEclipseCrossPlotDataExtractor::extract( RigEclipseCaseData*               caseData,
                                                                      int                               resultTimeStep,
                                                                      const RimEclipseResultDefinition& xAddress,
                                                                      const RimEclipseResultDefinition& yAddress,
@@ -44,7 +44,7 @@ RigEclipseCrossPlotResult RigEclipseCrossPlotDataExtractor::extract( RigEclipseC
                                                                      const RimEclipseResultDefinition& groupAddress,
                                                                      std::map<int, cvf::UByteArray>    timeStepCellVisibilityMap )
 {
-    RigEclipseCrossPlotResult result;
+    RimEclipseCrossPlotResult result;
 
     if ( xAddress.eclipseResultAddress().isValid() && yAddress.eclipseResultAddress().isValid() )
     {

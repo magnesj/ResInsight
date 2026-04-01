@@ -30,7 +30,7 @@ class RimEclipseResultDefinition;
 
 class QString;
 
-struct RigEclipseCrossPlotResult
+struct RimEclipseCrossPlotResult
 {
     std::vector<double> xValues;
     std::vector<double> yValues;
@@ -38,10 +38,10 @@ struct RigEclipseCrossPlotResult
     std::vector<int>    groupValuesDiscrete;
 };
 
-class RigEclipseCrossPlotDataExtractor
+class RimEclipseCrossPlotDataExtractor
 {
 public:
-    static RigEclipseCrossPlotResult extract( RigEclipseCaseData*               eclipseCase,
+    static RimEclipseCrossPlotResult extract( RigEclipseCaseData*               eclipseCase,
                                               int                               resultTimeStep,
                                               const RimEclipseResultDefinition& xAddress,
                                               const RimEclipseResultDefinition& yAddress,

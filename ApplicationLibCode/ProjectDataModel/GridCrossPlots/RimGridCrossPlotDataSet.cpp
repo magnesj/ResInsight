@@ -29,7 +29,7 @@
 #include "RigCaseCellResultCalculator.h"
 #include "RigCaseCellResultsData.h"
 #include "RigEclipseCaseData.h"
-#include "RigEclipseCrossPlotDataExtractor.h"
+#include "RimEclipseCrossPlotDataExtractor.h"
 #include "RigEclipseResultAddress.h"
 #include "RigFormationNames.h"
 #include "RigMainGrid.h"
@@ -369,7 +369,7 @@ void RimGridCrossPlotDataSet::updateRegressionCurves()
     if ( !eclipseCase ) return;
 
     std::map<int, cvf::UByteArray> timeStepCellVisibilityMap = calculateCellVisibility( eclipseCase );
-    RigEclipseCrossPlotResult      result                    = RigEclipseCrossPlotDataExtractor::extract( eclipseCase->eclipseCaseData(),
+    RimEclipseCrossPlotResult      result                    = RimEclipseCrossPlotDataExtractor::extract( eclipseCase->eclipseCaseData(),
                                                                                   m_timeStep(),
                                                                                   *m_xAxisProperty,
                                                                                   *m_yAxisProperty,
@@ -546,7 +546,7 @@ void RimGridCrossPlotDataSet::onLoadDataAndUpdate( bool updateParentPlot )
 
     updateLegendRange();
 
-    RigEclipseCrossPlotResult result = RigEclipseCrossPlotDataExtractor::extract( eclipseCase->eclipseCaseData(),
+    RimEclipseCrossPlotResult result = RimEclipseCrossPlotDataExtractor::extract( eclipseCase->eclipseCaseData(),
                                                                                   m_timeStep(),
                                                                                   *m_xAxisProperty,
                                                                                   *m_yAxisProperty,
@@ -600,7 +600,7 @@ void RimGridCrossPlotDataSet::onLoadDataAndUpdate( bool updateParentPlot )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::assignCurveDataGroups( const RigEclipseCrossPlotResult& result )
+void RimGridCrossPlotDataSet::assignCurveDataGroups( const RimEclipseCrossPlotResult& result )
 {
     m_groupedResults.clear();
 
@@ -690,7 +690,7 @@ cvf::Color3f RimGridCrossPlotDataSet::createCurveColor( const std::vector<double
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::createCurves( const RigEclipseCrossPlotResult& result )
+void RimGridCrossPlotDataSet::createCurves( const RimEclipseCrossPlotResult& result )
 {
     if ( !groupingEnabled() )
     {
@@ -735,7 +735,7 @@ void RimGridCrossPlotDataSet::createCurves( const RigEclipseCrossPlotResult& res
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::fillCurveDataInExistingCurves( const RigEclipseCrossPlotResult& result )
+void RimGridCrossPlotDataSet::fillCurveDataInExistingCurves( const RimEclipseCrossPlotResult& result )
 {
     if ( !groupingEnabled() )
     {
@@ -767,7 +767,7 @@ void RimGridCrossPlotDataSet::fillCurveDataInExistingCurves( const RigEclipseCro
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::createRegressionCurves( const RigEclipseCrossPlotResult& result )
+void RimGridCrossPlotDataSet::createRegressionCurves( const RimEclipseCrossPlotResult& result )
 {
     auto symbolEdgeColor = RiaColorTools::fromQColorTo3f( RiuGuiTheme::getColorByVariableName( "auxilliaryCurveColor" ) );
 
@@ -819,7 +819,7 @@ void RimGridCrossPlotDataSet::createRegressionCurves( const RigEclipseCrossPlotR
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::fillCurveDataInExistingRegressionCurves( const RigEclipseCrossPlotResult& result )
+void RimGridCrossPlotDataSet::fillCurveDataInExistingRegressionCurves( const RimEclipseCrossPlotResult& result )
 {
     if ( !groupingEnabled() )
     {
@@ -1353,7 +1353,7 @@ void RimGridCrossPlotDataSet::exportFormattedData( RifTextDataTableFormatter& fo
     {
         auto task = progress.task( QString( "Exporting Group %1" ).arg( it->first ) );
 
-        RigEclipseCrossPlotResult res = it->second;
+        RimEclipseCrossPlotResult res = it->second;
 
         for ( size_t i = 0; i < it->second.xValues.size(); ++i )
         {
@@ -1603,14 +1603,14 @@ bool RimGridCrossPlotDataSet::hasMultipleTimeSteps() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RimGridCrossPlotDataSet::filterInvalidCurveValues( RigEclipseCrossPlotResult* result )
+void RimGridCrossPlotDataSet::filterInvalidCurveValues( RimEclipseCrossPlotResult* result )
 {
     bool xLog = isXAxisLogarithmic();
     bool yLog = isYAxisLogarithmic();
 
     if ( xLog || yLog )
     {
-        RigEclipseCrossPlotResult validResult;
+        RimEclipseCrossPlotResult validResult;
         for ( size_t i = 0; i < result->xValues.size(); ++i )
         {
             double xValue  = result->xValues[i];
