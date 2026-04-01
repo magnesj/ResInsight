@@ -19,11 +19,9 @@
 #include "RigFaultReactivationModel.h"
 
 #include "RigActiveCellInfo.h"
-#include "RigEclipseCaseData.h"
 #include "RigFaultReactivationModelGenerator.h"
 #include "RigGriddedPart3d.h"
-
-#include "RimEclipseCase.h"
+#include "RigMainGrid.h"
 
 #include <limits>
 
@@ -262,15 +260,13 @@ RigFaultReactivation::GridPart RigFaultReactivationModel::normalPointsAt() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigFaultReactivationModel::postProcessElementSets( const RimEclipseCase* eCase )
+void RigFaultReactivationModel::postProcessElementSets( const RigMainGrid* mainGrid, const RigActiveCellInfo* cellInfo )
 {
-    if ( eCase->eclipseCaseData() == nullptr ) return;
-
-    auto cellInfo = eCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    if ( mainGrid == nullptr || cellInfo == nullptr ) return;
 
     for ( auto part : allGridParts() )
     {
         auto gridPart = m_3dparts[part];
-        gridPart->postProcessElementSets( eCase->mainGrid(), cellInfo );
+        gridPart->postProcessElementSets( mainGrid, cellInfo );
     }
 }

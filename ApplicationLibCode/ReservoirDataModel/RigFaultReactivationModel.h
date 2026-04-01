@@ -34,9 +34,10 @@
 #include <utility>
 #include <vector>
 
+class RigActiveCellInfo;
 class RigGriddedPart3d;
 class RigFaultReactivationModelGenerator;
-class RimEclipseCase;
+class RigMainGrid;
 
 class RigFRModelPart
 {
@@ -87,7 +88,7 @@ public:
 
     RigFaultReactivation::GridPart normalPointsAt() const;
 
-    void postProcessElementSets( const RimEclipseCase* eCase );
+    void postProcessElementSets( const RigMainGrid* mainGrid, const RigActiveCellInfo* cellInfo );
 
 private:
     std::shared_ptr<RigFaultReactivationModelGenerator> m_generator;

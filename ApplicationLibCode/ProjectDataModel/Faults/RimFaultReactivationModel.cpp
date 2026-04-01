@@ -342,7 +342,12 @@ void RimFaultReactivationModel::updateVisualization()
     m_2Dmodel->setPartColors( m_modelPart1Color, m_modelPart2Color );
     m_2Dmodel->setGenerator( generator );
     m_2Dmodel->updateGeometry( m_startCellIndex, (cvf::StructGridInterface::FaceType)m_startCellFace() );
-    m_2Dmodel->postProcessElementSets( eclipseCase() );
+    auto eCase = eclipseCase();
+    if ( eCase && eCase->eclipseCaseData() )
+    {
+        auto cellInfo = eCase->eclipseCaseData()->activeCellInfo( RiaDefines::PorosityModelType::MATRIX_MODEL );
+        m_2Dmodel->postProcessElementSets( eCase->mainGrid(), cellInfo );
+    }
 
     view->scheduleCreateDisplayModelAndRedraw();
 }
