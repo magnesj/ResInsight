@@ -35,10 +35,10 @@ class QString;
 //
 //
 //==================================================================================================
-class RigTofWellDistributionCalculator
+class RimTofWellDistributionCalculator
 {
 public:
-    RigTofWellDistributionCalculator( RimEclipseResultCase* caseToApply, QString targetWellname, size_t timeStepIndex, RiaDefines::PhaseType phase );
+    RimTofWellDistributionCalculator( RimEclipseResultCase* caseToApply, QString targetWellname, size_t timeStepIndex, RiaDefines::PhaseType phase );
 
     void groupSmallContributions( double smallContribThreshold );
 

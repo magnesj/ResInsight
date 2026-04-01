@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigTofWellDistributionCalculator.h"
+#include "RimTofWellDistributionCalculator.h"
 
 #include "RiaDefines.h"
 #include "RiaLogging.h"
@@ -45,7 +45,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigTofWellDistributionCalculator::RigTofWellDistributionCalculator( RimEclipseResultCase* caseToApply,
+RimTofWellDistributionCalculator::RimTofWellDistributionCalculator( RimEclipseResultCase* caseToApply,
                                                                     QString               targetWellname,
                                                                     size_t                timeStepIndex,
                                                                     RiaDefines::PhaseType phase )
@@ -159,7 +159,7 @@ RigTofWellDistributionCalculator::RigTofWellDistributionCalculator( RimEclipseRe
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigTofWellDistributionCalculator::groupSmallContributions( double smallContribThreshold )
+void RimTofWellDistributionCalculator::groupSmallContributions( double smallContribThreshold )
 {
     if ( m_tofInIncreasingOrder.empty() )
     {
@@ -205,7 +205,7 @@ void RigTofWellDistributionCalculator::groupSmallContributions( double smallCont
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::map<double, std::vector<size_t>> RigTofWellDistributionCalculator::buildSortedTofToCellIndicesMap( const std::vector<double>& tofData )
+std::map<double, std::vector<size_t>> RimTofWellDistributionCalculator::buildSortedTofToCellIndicesMap( const std::vector<double>& tofData )
 {
     std::map<double, std::vector<size_t>> tofToCellIndicesMap;
 
@@ -238,7 +238,7 @@ std::map<double, std::vector<size_t>> RigTofWellDistributionCalculator::buildSor
 //--------------------------------------------------------------------------------------------------
 /// Determine name of the the wells that are candidates for contributing in our calculation
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RigTofWellDistributionCalculator::findCandidateContributingWellNames( const RimFlowDiagSolution& flowDiagSolution,
+std::vector<QString> RimTofWellDistributionCalculator::findCandidateContributingWellNames( const RimFlowDiagSolution& flowDiagSolution,
                                                                                            QString                    targetWellname,
                                                                                            size_t                     timeStepIndex )
 {
@@ -279,7 +279,7 @@ std::vector<QString> RigTofWellDistributionCalculator::findCandidateContributing
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigTofWellDistributionCalculator::sortedUniqueTofValues() const
+const std::vector<double>& RimTofWellDistributionCalculator::sortedUniqueTofValues() const
 {
     return m_tofInIncreasingOrder;
 }
@@ -287,7 +287,7 @@ const std::vector<double>& RigTofWellDistributionCalculator::sortedUniqueTofValu
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-size_t RigTofWellDistributionCalculator::contributingWellCount() const
+size_t RimTofWellDistributionCalculator::contributingWellCount() const
 {
     return m_contributingWells.size();
 }
@@ -295,7 +295,7 @@ size_t RigTofWellDistributionCalculator::contributingWellCount() const
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const QString& RigTofWellDistributionCalculator::contributingWellName( size_t contribWellIndex ) const
+const QString& RimTofWellDistributionCalculator::contributingWellName( size_t contribWellIndex ) const
 {
     return m_contributingWells[contribWellIndex].name;
 }
@@ -303,7 +303,7 @@ const QString& RigTofWellDistributionCalculator::contributingWellName( size_t co
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-const std::vector<double>& RigTofWellDistributionCalculator::accumulatedVolumeForContributingWell( size_t contributingWellIndex ) const
+const std::vector<double>& RimTofWellDistributionCalculator::accumulatedVolumeForContributingWell( size_t contributingWellIndex ) const
 {
     CVF_ASSERT( contributingWellIndex < m_contributingWells.size() );
     const ContribWellEntry& entry = m_contributingWells[contributingWellIndex];

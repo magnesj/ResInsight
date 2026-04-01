@@ -74,7 +74,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResult.h
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResultUtil.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTofAccumulatedPhaseFractionsCalculator.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofWellDistributionCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTracer.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.h
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.h
@@ -164,7 +163,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResult.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigThermalFractureResultUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTofAccumulatedPhaseFractionsCalculator.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigTofWellDistributionCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTracer.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTracerPoint.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigTransmissibilityEquations.cpp
