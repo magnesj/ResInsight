@@ -17,7 +17,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigCaseToCaseRangeFilterMapper.h"
+#include "RimCaseToCaseRangeFilterMapper.h"
 #include "RigCaseToCaseCellMapper.h"
 #include "RigCaseToCaseCellMapperTools.h"
 
@@ -32,7 +32,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCaseToCaseRangeFilterMapper::convertRangeFilterEclToFem( RimCellRangeFilter* srcFilter,
+void RimCaseToCaseRangeFilterMapper::convertRangeFilterEclToFem( RimCellRangeFilter* srcFilter,
                                                                  const RigMainGrid*  srcEclGrid,
                                                                  RimCellRangeFilter* dstFilter,
                                                                  const RigFemPart*   dstFemPart )
@@ -43,7 +43,7 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEclToFem( RimCellRangeFil
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCaseToCaseRangeFilterMapper::convertRangeFilterFemToEcl( RimCellRangeFilter* srcFilter,
+void RimCaseToCaseRangeFilterMapper::convertRangeFilterFemToEcl( RimCellRangeFilter* srcFilter,
                                                                  const RigFemPart*   srcFemPart,
                                                                  RimCellRangeFilter* dstFilter,
                                                                  const RigMainGrid*  dstEclGrid )
@@ -75,7 +75,7 @@ struct RigRangeEndPoints
 ///
 //--------------------------------------------------------------------------------------------------
 
-void RigCaseToCaseRangeFilterMapper::convertRangeFilter( const RimCellRangeFilter* srcFilter,
+void RimCaseToCaseRangeFilterMapper::convertRangeFilter( const RimCellRangeFilter* srcFilter,
                                                          RimCellRangeFilter*       dstFilter,
                                                          const RigMainGrid*        eclGrid,
                                                          const RigFemPart*         femPart,
@@ -179,7 +179,7 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilter( const RimCellRangeFilte
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRangeEndPoints& src,
+void RimCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRangeEndPoints& src,
                                                                   RigRangeEndPoints&       dst,
                                                                   const RigMainGrid*       eclGrid,
                                                                   const RigFemPart*        femPart,
@@ -352,7 +352,7 @@ void RigCaseToCaseRangeFilterMapper::convertRangeFilterEndPoints( const RigRange
 //--------------------------------------------------------------------------------------------------
 /// Return 0 for collapsed cell 1 for
 //--------------------------------------------------------------------------------------------------
-RigCaseToCaseRangeFilterMapper::CellMatchType RigCaseToCaseRangeFilterMapper::findBestFemCellFromEclCell( const RigMainGrid* masterEclGrid,
+RimCaseToCaseRangeFilterMapper::CellMatchType RimCaseToCaseRangeFilterMapper::findBestFemCellFromEclCell( const RigMainGrid* masterEclGrid,
                                                                                                           size_t             ei,
                                                                                                           size_t             ej,
                                                                                                           size_t             ek,
@@ -435,7 +435,7 @@ RigCaseToCaseRangeFilterMapper::CellMatchType RigCaseToCaseRangeFilterMapper::fi
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigCaseToCaseRangeFilterMapper::CellMatchType RigCaseToCaseRangeFilterMapper::findBestEclCellFromFemCell( const RigFemPart* dependentFemPart,
+RimCaseToCaseRangeFilterMapper::CellMatchType RimCaseToCaseRangeFilterMapper::findBestEclCellFromFemCell( const RigFemPart* dependentFemPart,
                                                                                                           size_t             fi,
                                                                                                           size_t             fj,
                                                                                                           size_t             fk,

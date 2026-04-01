@@ -23,7 +23,7 @@
 #include "RiaOptionItemFactory.h"
 
 #include "RigCaseToCaseCellMapper.h"
-#include "RigCaseToCaseRangeFilterMapper.h"
+#include "RimCaseToCaseRangeFilterMapper.h"
 #include "RigFemPartCollection.h"
 #include "RigGeoMechCaseData.h"
 #include "RigMainGrid.h"
@@ -1005,7 +1005,7 @@ void RimViewController::updateCellFilterOverrides( const RimCellFilter* changedF
 
                     if ( ( srcRFilter != nullptr ) && ( dstRFilter != nullptr ) )
                     {
-                        RigCaseToCaseRangeFilterMapper::convertRangeFilterEclToFem( srcRFilter, srcEclGrid, dstRFilter, dstFemPart );
+                        RimCaseToCaseRangeFilterMapper::convertRangeFilterEclToFem( srcRFilter, srcEclGrid, dstRFilter, dstFemPart );
                         continue;
                     }
 
@@ -1034,7 +1034,7 @@ void RimViewController::updateCellFilterOverrides( const RimCellFilter* changedF
 
                     if ( ( srcRFilter != nullptr ) && ( dstRFilter != nullptr ) )
                     {
-                        RigCaseToCaseRangeFilterMapper::convertRangeFilterFemToEcl( srcRFilter, srcFemPart, dstRFilter, dstEclGrid );
+                        RimCaseToCaseRangeFilterMapper::convertRangeFilterFemToEcl( srcRFilter, srcFemPart, dstRFilter, dstEclGrid );
                         continue;
                     }
 

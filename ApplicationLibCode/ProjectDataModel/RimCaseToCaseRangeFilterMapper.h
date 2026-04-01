@@ -25,7 +25,7 @@ class RigMainGrid;
 class RigFemPart;
 struct RigRangeEndPoints;
 
-class RigCaseToCaseRangeFilterMapper
+class RimCaseToCaseRangeFilterMapper
 {
 public:
     static void convertRangeFilterEclToFem( RimCellRangeFilter* srcFilter,
