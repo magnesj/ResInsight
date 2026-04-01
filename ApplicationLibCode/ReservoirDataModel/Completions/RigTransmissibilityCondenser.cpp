@@ -400,8 +400,8 @@ void RigTransmissibilityCondenser::calculateCondensedTransmissibilities()
 }
 
 #include "RigFractureCell.h"
+#include "RigFractureGrid.h"
 #include "RigMainGrid.h"
-#include "RimStimPlanFractureTemplate.h"
 
 void printCellAddress( std::stringstream&                        str,
                        const RigMainGrid*                        mainGrid,
