@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigTofAccumulatedPhaseFractionsCalculator.h"
+#include "RimTofAccumulatedPhaseFractionsCalculator.h"
 
 #include "RiaDefines.h"
 #include "RiaPorosityModel.h"
@@ -38,7 +38,7 @@
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigTofAccumulatedPhaseFractionsCalculator::RigTofAccumulatedPhaseFractionsCalculator( RimEclipseResultCase* caseToApply,
+RimTofAccumulatedPhaseFractionsCalculator::RimTofAccumulatedPhaseFractionsCalculator( RimEclipseResultCase* caseToApply,
                                                                                       QString               wellname,
                                                                                       size_t                timestep )
 {
@@ -94,7 +94,7 @@ RigTofAccumulatedPhaseFractionsCalculator::RigTofAccumulatedPhaseFractionsCalcul
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigTofAccumulatedPhaseFractionsCalculator::sortTofAndCalculateAccPhaseFraction( const std::vector<double>* tofData,
+void RimTofAccumulatedPhaseFractionsCalculator::sortTofAndCalculateAccPhaseFraction( const std::vector<double>* tofData,
                                                                                      const std::vector<double>* fractionData,
                                                                                      const std::vector<double>* porvResults,
                                                                                      const std::vector<double>* swatResults,

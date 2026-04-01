@@ -28,10 +28,10 @@ class QString;
 ///
 //==================================================================================================
 
-class RigTofAccumulatedPhaseFractionsCalculator
+class RimTofAccumulatedPhaseFractionsCalculator
 {
 public:
-    explicit RigTofAccumulatedPhaseFractionsCalculator( RimEclipseResultCase* caseToApply, QString wellname, size_t timestep );
+    explicit RimTofAccumulatedPhaseFractionsCalculator( RimEclipseResultCase* caseToApply, QString wellname, size_t timestep );
 
     const std::vector<double>& sortedUniqueTOFValues() const { return m_tofInIncreasingOrder; }
     const std::vector<double>& accumulatedPhaseFractionsSwat() const { return m_accumulatedPhaseFractionSwat; }
@@ -39,7 +39,7 @@ public:
     const std::vector<double>& accumulatedPhaseFractionsSgas() const { return m_accumulatedPhaseFractionSgas; }
 
 private:
-    friend class RigTofAccumulatedPhaseFractionsCalculatorTester;
+    friend class RimTofAccumulatedPhaseFractionsCalculatorTester;
     static void sortTofAndCalculateAccPhaseFraction( const std::vector<double>* tofData,
                                                      const std::vector<double>* fractionData,
                                                      const std::vector<double>* porvResults,
@@ -58,7 +58,7 @@ private:
     std::vector<double> m_accumulatedPhaseFractionSoil;
 };
 
-class RigTofAccumulatedPhaseFractionsCalculatorTester
+class RimTofAccumulatedPhaseFractionsCalculatorTester
 {
 public:
     static void testSortTofAndCalculateAccPhaseFraction( const std::vector<double>* tofData,
@@ -72,7 +72,7 @@ public:
                                                          std::vector<double>&       accumulatedPhaseFractionSoil,
                                                          std::vector<double>&       accumulatedPhaseFractionSgas )
     {
-        RigTofAccumulatedPhaseFractionsCalculator::sortTofAndCalculateAccPhaseFraction( tofData,
+        RimTofAccumulatedPhaseFractionsCalculator::sortTofAndCalculateAccPhaseFraction( tofData,
                                                                                         fractionData,
                                                                                         porvResults,
                                                                                         swatResults,

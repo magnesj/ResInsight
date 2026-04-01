@@ -12,6 +12,7 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimDataSourceForRftPlt.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellPlotTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellRftEnsembleCurveSet.h
+    ${CMAKE_CURRENT_LIST_DIR}/RimTofAccumulatedPhaseFractionsCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RimTofWellDistributionCalculator.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellDistributionPlot.h
     ${CMAKE_CURRENT_LIST_DIR}/RimWellDistributionPlotCollection.h
@@ -35,6 +36,7 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RimDataSourceForRftPlt.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellPlotTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellRftEnsembleCurveSet.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/RimTofAccumulatedPhaseFractionsCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimTofWellDistributionCalculator.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellDistributionPlot.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RimWellDistributionPlotCollection.cpp

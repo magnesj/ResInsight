@@ -24,7 +24,7 @@
 #include "RimSimWellInViewCollection.h"
 #include "RimWellAllocationPlot.h"
 
-#include "RigTofAccumulatedPhaseFractionsCalculator.h"
+#include "RimTofAccumulatedPhaseFractionsCalculator.h"
 #include "Well/RigSimWellData.h"
 
 #include "RimProject.h"
@@ -226,7 +226,7 @@ void RimTofAccumulatedPhaseFractionsPlot::onLoadDataAndUpdate()
 
     if ( m_tofAccumulatedPhaseFractionsPlotWidget && m_showWindow() )
     {
-        RigTofAccumulatedPhaseFractionsCalculator calc( resultCase(), tracerName(), timeStep() );
+        RimTofAccumulatedPhaseFractionsCalculator calc( resultCase(), tracerName(), timeStep() );
 
         const std::vector<double>& xValues   = calc.sortedUniqueTOFValues();
         const std::vector<double>& watValues = calc.accumulatedPhaseFractionsSwat();

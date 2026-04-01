@@ -17,12 +17,12 @@
 /////////////////////////////////////////////////////////////////////////////////
 #include "gtest/gtest.h"
 
-#include "RigTofAccumulatedPhaseFractionsCalculator.h"
+#include "RimTofAccumulatedPhaseFractionsCalculator.h"
 
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFractionTest )
+TEST( RimTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFractionTest )
 {
     std::vector<double> tofDataVector;
     tofDataVector.push_back( 0.001 );
@@ -59,7 +59,7 @@ TEST( RigTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFrac
     std::vector<double> accumulatedPhaseFractionSgas;
     std::vector<double> tofInIncreasingOrder;
 
-    RigTofAccumulatedPhaseFractionsCalculatorTester::testSortTofAndCalculateAccPhaseFraction( &( tofDataVector ),
+    RimTofAccumulatedPhaseFractionsCalculatorTester::testSortTofAndCalculateAccPhaseFraction( &( tofDataVector ),
                                                                                               &( fractionDataVector ),
                                                                                               &( porvResultVector ),
                                                                                               &( swatResultVector ),
@@ -84,7 +84,7 @@ TEST( RigTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFrac
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-TEST( RigTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFractionTest2 )
+TEST( RimTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFractionTest2 )
 {
     std::vector<double> tofDataVector2;
     tofDataVector2.push_back( 0.001 );
@@ -127,7 +127,7 @@ TEST( RigTofAccumulatedPhaseFractionsCalculator, sortTofAndCalculateAccPhaseFrac
     std::vector<double> accumulatedPhaseFractionSgas2;
     std::vector<double> tofInIncreasingOrder2;
 
-    RigTofAccumulatedPhaseFractionsCalculatorTester::testSortTofAndCalculateAccPhaseFraction( &( tofDataVector2 ),
+    RimTofAccumulatedPhaseFractionsCalculatorTester::testSortTofAndCalculateAccPhaseFraction( &( tofDataVector2 ),
                                                                                               &( fractionDataVector2 ),
                                                                                               &( porvResultVector2 ),
                                                                                               &( swatResultVector2 ),
