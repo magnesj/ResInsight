@@ -27,8 +27,6 @@
 #include "RigStatisticsMath.h"
 #include "RigWeightedMeanCalc.h"
 
-#include "RimEclipseResultCase.h"
-
 #include <cmath>
 
 //--------------------------------------------------------------------------------------------------
@@ -115,12 +113,21 @@ size_t RigFlowDiagStatCalc::timeStepCount()
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
+void RigFlowDiagStatCalc::setCaseCellResultsDataCallback( std::function<RigCaseCellResultsData*()> callback )
+{
+    m_caseCellResultsDataCallback = std::move( callback );
+}
+
+//--------------------------------------------------------------------------------------------------
+///
+//--------------------------------------------------------------------------------------------------
 void RigFlowDiagStatCalc::mobileVolumeWeightedMean( size_t timeStepIndex, double& mean )
 {
-    auto eclCase = m_resultsData->flowDiagSolution()->firstAncestorOrThisOfType<RimEclipseResultCase>();
-    if ( !eclCase ) return;
+    if ( !m_caseCellResultsDataCallback ) return;
 
-    RigCaseCellResultsData* caseCellResultsData = eclCase->results( RiaDefines::PorosityModelType::MATRIX_MODEL );
+    RigCaseCellResultsData* caseCellResultsData = m_caseCellResultsDataCallback();
+    if ( !caseCellResultsData ) return;
+
     RigEclipseResultAddress mobPoreVolResAddr( RiaDefines::ResultCatType::STATIC_NATIVE, RiaResultNames::mobilePoreVolumeName() );
 
     caseCellResultsData->ensureKnownResultLoaded( mobPoreVolResAddr );

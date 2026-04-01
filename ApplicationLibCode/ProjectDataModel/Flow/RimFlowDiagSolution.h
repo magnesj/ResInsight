@@ -18,6 +18,8 @@
 
 #pragma once
 
+#include "RigFlowDiagDefines.h"
+
 #include "cafPdmField.h"
 #include "cafPdmObject.h"
 
@@ -46,14 +48,7 @@ public:
     std::map<std::string, std::vector<int>> allInjectorTracerActiveCellIndices( size_t timeStepIndex ) const;
     std::map<std::string, std::vector<int>> allProducerTracerActiveCellIndices( size_t timeStepIndex ) const;
 
-    enum class TracerStatusType
-    {
-        CLOSED, ///< Tracer has no active cells, and does not contribute
-        PRODUCER, ///< Tracer with producing cells
-        INJECTOR, ///< Tracer with injecting cells
-        VARYING, ///< Tracer is producing and injecting at different time steps. Only used as a timestep-overall type
-        UNDEFINED ///< Used as "Any" or "not set"
-    };
+    using TracerStatusType = RigFlowDiagDefines::TracerStatusType;
 
     TracerStatusType tracerStatusOverall( const QString& tracerName ) const;
     TracerStatusType tracerStatusInTimeStep( const QString& tracerName, size_t timeStepIndex ) const;

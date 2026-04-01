@@ -22,10 +22,7 @@
 #include "RigFlowDiagDefines.h"
 #include "RigFlowDiagResultFrames.h"
 
-#include "RimFlowDiagSolution.h"
-
 #include "cafAppEnum.h"
-#include "cafPdmPointer.h"
 
 #include <map>
 #include <string>
@@ -35,6 +32,7 @@ class RigFlowDiagResultFrames;
 class RigStatisticsDataCache;
 class RigActiveCellInfo;
 class RigFlowDiagSolverInterface;
+class RimFlowDiagSolution;
 
 class RigFlowDiagResults
 {
@@ -109,15 +107,15 @@ private:
     std::vector<double>* calculateCommunicationResult( const RigFlowDiagResultAddress& resVarAddr, size_t timeStepIndex );
     void                 calculateNumFloodedPV( const RigFlowDiagResultAddress& resVarAddr );
 
-    std::vector<const std::vector<double>*> findResultsForSelectedTracers( const RigFlowDiagResultAddress&       resVarAddr,
-                                                                           size_t                                timeStepIndex,
-                                                                           const std::string&                    nativeResultName,
-                                                                           RimFlowDiagSolution::TracerStatusType wantedTracerType );
+    std::vector<const std::vector<double>*> findResultsForSelectedTracers( const RigFlowDiagResultAddress&      resVarAddr,
+                                                                           size_t                               timeStepIndex,
+                                                                           const std::string&                   nativeResultName,
+                                                                           RigFlowDiagDefines::TracerStatusType wantedTracerType );
     std::vector<std::pair<std::string, const std::vector<double>*>>
-        findNamedResultsForSelectedTracers( const RigFlowDiagResultAddress&       resVarAddr,
-                                            size_t                                timeStepIndex,
-                                            const std::string&                    nativeResultName,
-                                            RimFlowDiagSolution::TracerStatusType wantedTracerType );
+        findNamedResultsForSelectedTracers( const RigFlowDiagResultAddress&      resVarAddr,
+                                            size_t                               timeStepIndex,
+                                            const std::string&                   nativeResultName,
+                                            RigFlowDiagDefines::TracerStatusType wantedTracerType );
 
     void calculateSumOfFractionAndFractionMultTOF( size_t                                         activeCellCount,
                                                    const std::vector<const std::vector<double>*>& injectorFractions,
@@ -139,8 +137,8 @@ private:
 
     RigFlowDiagSolverInterface* solverInterface();
 
-    size_t                               m_timeStepCount;
-    caf::PdmPointer<RimFlowDiagSolution> m_flowDiagSolution;
+    size_t               m_timeStepCount;
+    RimFlowDiagSolution* m_flowDiagSolution = nullptr;
 
     std::vector<std::map<RigFlowDiagResultAddress::PhaseSelection, bool>> m_hasAtemptedNativeResults;
 

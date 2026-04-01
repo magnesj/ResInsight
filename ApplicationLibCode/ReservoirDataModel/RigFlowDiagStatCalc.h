@@ -22,6 +22,9 @@
 #include "RigFlowDiagResultAddress.h"
 #include "RigStatisticsCalculator.h"
 
+#include <functional>
+
+class RigCaseCellResultsData;
 class RigHistogramCalculator;
 class RigFlowDiagResults;
 
@@ -42,7 +45,10 @@ public:
     size_t timeStepCount() override;
     void   mobileVolumeWeightedMean( size_t timeStepIndex, double& mean ) override;
 
+    void setCaseCellResultsDataCallback( std::function<RigCaseCellResultsData*()> callback );
+
 private:
-    RigFlowDiagResults*      m_resultsData;
-    RigFlowDiagResultAddress m_resVarAddr;
+    RigFlowDiagResults*                      m_resultsData;
+    RigFlowDiagResultAddress                 m_resVarAddr;
+    std::function<RigCaseCellResultsData*()> m_caseCellResultsDataCallback;
 };
