@@ -592,7 +592,11 @@ void RicExportFractureCompletionsImpl::calculateFractureToWellTransmissibilities
             wellPathPoints = computeWellPointsInFracturePlane( fracture, wellPathGeometry );
         }
 
-        RigWellPathStimplanIntersector                                                wellFractureIntersector( wellPathPoints, fracture );
+        RigWellPathStimplanIntersector                                                wellFractureIntersector( wellPathPoints,
+                                                                fracture->transformMatrix(),
+                                                                fracture->wellRadius(),
+                                                                fracture->perforationLength(),
+                                                                fracture->fractureGrid() );
         const std::map<size_t, RigWellPathStimplanIntersector::WellCellIntersection>& fractureWellCells =
             wellFractureIntersector.intersections();
 
