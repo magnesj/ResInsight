@@ -33,7 +33,7 @@
 #include "RifReaderSettings.h"
 #include "WellPathCommands/RicImportWellPaths.h"
 
-#include "RigLasFileExporter.h"
+#include "RimLasFileExporter.h"
 
 #include "RimDialogData.h"
 #include "RimEclipseCase.h"
@@ -207,7 +207,7 @@ void RicCreateEnsembleWellLogFeature::executeCommand( const RicCreateEnsembleWel
         const bool    alwaysOverwrite    = true;
         const bool    convertCurveUnits  = false;
 
-        RigLasFileExporter   lasExporter( wellLogCurves );
+        RimLasFileExporter   lasExporter( wellLogCurves );
         std::vector<QString> lasFiles =
             lasExporter.writeToFolder( exportFolder, filePrefix, capitalizeFileName, alwaysOverwrite, convertCurveUnits );
         for ( const auto& lasFile : lasFiles )

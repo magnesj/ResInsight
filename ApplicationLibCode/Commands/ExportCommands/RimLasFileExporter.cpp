@@ -16,7 +16,7 @@
 //
 /////////////////////////////////////////////////////////////////////////////////
 
-#include "RigLasFileExporter.h"
+#include "RimLasFileExporter.h"
 
 #include "RiaDefines.h"
 #include "RiaGuiApplication.h"
@@ -278,7 +278,7 @@ private:
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-RigLasFileExporter::RigLasFileExporter( const std::vector<RimWellLogCurve*>& curves )
+RimLasFileExporter::RimLasFileExporter( const std::vector<RimWellLogCurve*>& curves )
     : m_curves( curves )
     , m_isResampleActive( false )
     , m_resamplingInterval( 1.0 )
@@ -288,7 +288,7 @@ RigLasFileExporter::RigLasFileExporter( const std::vector<RimWellLogCurve*>& cur
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigLasFileExporter::setResamplingInterval( double interval )
+void RimLasFileExporter::setResamplingInterval( double interval )
 {
     m_isResampleActive   = true;
     m_resamplingInterval = interval;
@@ -298,7 +298,7 @@ void RigLasFileExporter::setResamplingInterval( double interval )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigLasFileExporter::wellPathsAndRkbDiff( std::vector<QString>* wellNames, std::vector<double>* rkbDiffs )
+void RimLasFileExporter::wellPathsAndRkbDiff( std::vector<QString>* wellNames, std::vector<double>* rkbDiffs )
 {
     std::vector<SingleLasFileMetaData> lasFileDescriptions = createLasFileDescriptions( m_curves, false );
 
@@ -323,7 +323,7 @@ void RigLasFileExporter::wellPathsAndRkbDiff( std::vector<QString>* wellNames, s
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigLasFileExporter::setRkbDiffs( const std::vector<QString>& wellNames, const std::vector<double>& rkbDiffs )
+void RimLasFileExporter::setRkbDiffs( const std::vector<QString>& wellNames, const std::vector<double>& rkbDiffs )
 {
     assert( wellNames.size() == rkbDiffs.size() );
 
@@ -344,7 +344,7 @@ void RigLasFileExporter::setRkbDiffs( const std::vector<QString>& wellNames, con
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<QString> RigLasFileExporter::writeToFolder( const QString& exportFolder,
+std::vector<QString> RimLasFileExporter::writeToFolder( const QString& exportFolder,
                                                         const QString& filePrefix /*= ""*/,
                                                         bool           capitalizeFileName /*= false*/,
                                                         bool           alwaysOverwrite /*= false*/,
@@ -400,7 +400,7 @@ std::vector<QString> RigLasFileExporter::writeToFolder( const QString& exportFol
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-std::vector<SingleLasFileMetaData> RigLasFileExporter::createLasFileDescriptions( const std::vector<RimWellLogCurve*>& curves,
+std::vector<SingleLasFileMetaData> RimLasFileExporter::createLasFileDescriptions( const std::vector<RimWellLogCurve*>& curves,
                                                                                   bool                                 convertCurveUnits )
 {
     std::vector<RimWellLogCurve*> eclipseCurves;
@@ -441,7 +441,7 @@ std::vector<SingleLasFileMetaData> RigLasFileExporter::createLasFileDescriptions
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigLasFileExporter::appendLasFileDescriptions( const std::vector<RimWellLogCurve*>& curves,
+void RimLasFileExporter::appendLasFileDescriptions( const std::vector<RimWellLogCurve*>& curves,
                                                     std::vector<SingleLasFileMetaData>*  lasFileDescriptions,
                                                     bool                                 convertCurveUnits )
 {
@@ -522,7 +522,7 @@ void RigLasFileExporter::appendLasFileDescriptions( const std::vector<RimWellLog
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-QString RigLasFileExporter::caseNameFromCurve( RimWellLogCurve* curve )
+QString RimLasFileExporter::caseNameFromCurve( RimWellLogCurve* curve )
 {
     QString caseName;
 
@@ -542,7 +542,7 @@ QString RigLasFileExporter::caseNameFromCurve( RimWellLogCurve* curve )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-double RigLasFileExporter::rkbDiff( RimWellLogCurve* curve )
+double RimLasFileExporter::rkbDiff( RimWellLogCurve* curve )
 {
     RimWellLogExtractionCurve* extractionCurve = dynamic_cast<RimWellLogExtractionCurve*>( curve );
     if ( extractionCurve && extractionCurve->wellPath() )
@@ -556,7 +556,7 @@ double RigLasFileExporter::rkbDiff( RimWellLogCurve* curve )
 //--------------------------------------------------------------------------------------------------
 ///
 //--------------------------------------------------------------------------------------------------
-void RigLasFileExporter::applyUserDefinedRkbOffsets( std::vector<SingleLasFileMetaData>* lasFileDescriptions )
+void RimLasFileExporter::applyUserDefinedRkbOffsets( std::vector<SingleLasFileMetaData>* lasFileDescriptions )
 {
     if ( m_userDefinedRkbOffsets.size() == lasFileDescriptions->size() )
     {

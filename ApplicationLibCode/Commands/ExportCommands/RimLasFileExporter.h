@@ -26,10 +26,10 @@ class RimWellLogCurve;
 class SingleLasFileMetaData;
 class RigWellLogCurveData;
 
-class RigLasFileExporter
+class RimLasFileExporter
 {
 public:
-    explicit RigLasFileExporter( const std::vector<RimWellLogCurve*>& curves );
+    explicit RimLasFileExporter( const std::vector<RimWellLogCurve*>& curves );
 
     void setResamplingInterval( double interval );
 

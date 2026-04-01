@@ -52,7 +52,6 @@ set(SOURCE_GROUP_HEADER_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigGridManager.h
     ${CMAKE_CURRENT_LIST_DIR}/RigHexIntersectionTools.h
     ${CMAKE_CURRENT_LIST_DIR}/RigHistogramData.h
-    ${CMAKE_CURRENT_LIST_DIR}/RigLasFileExporter.h
     ${CMAKE_CURRENT_LIST_DIR}/RigLocalGrid.h
     ${CMAKE_CURRENT_LIST_DIR}/RigMainGrid.h
     ${CMAKE_CURRENT_LIST_DIR}/RigNncConnection.h
@@ -140,7 +139,6 @@ set(SOURCE_GROUP_SOURCE_FILES
     ${CMAKE_CURRENT_LIST_DIR}/RigGridManager.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigHexIntersectionTools.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigHistogramData.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/RigLasFileExporter.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigLocalGrid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigMainGrid.cpp
     ${CMAKE_CURRENT_LIST_DIR}/RigNncConnection.cpp
